@@ -1,0 +1,19 @@
+overwrite: true
+schema: https://localhost:3000/graphql
+documents:
+  - src/**/*.ts?(x)
+generates:
+  ./src/gql/:
+    preset: client-preset
+    config:
+      useIndexSignature: true
+      maybeValue: T | null
+      inputMaybeValue: T | undefined
+      enumsAsConst: true
+      scalars:
+        Datetime: Date
+  ./graphql.schema.json:
+    plugins:
+      - introspection
+hooks:
+  afterAllFileWrite: prettier --write

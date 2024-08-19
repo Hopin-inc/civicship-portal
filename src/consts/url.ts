@@ -1,0 +1,1 @@
+export const LINE_LOGIN_URL = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_DOMAIN}/line_connect&state=hoge&bot_prompt=normal&scope=profile%20openid&nonce=foobar&prompt=consent`;
