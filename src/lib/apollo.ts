@@ -1,24 +1,37 @@
-import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client";
-// import { registerApolloClient } from "@apollo/experimental-nextjs-app-support";
+import {
+  ApolloClient,
+  ApolloClientOptions, ApolloLink,
+  createHttpLink,
+  InMemoryCache,
+  NormalizedCacheObject,
+} from "@apollo/client";
+import { cookies } from "next/headers";
 
-const link = createHttpLink({
+const httpLink = createHttpLink({
   uri: process.env.API_ENDPOINT,
-  // credentials: "same-origin",
+  credentials: "same-origin",
 });
+const requestLink = new ApolloLink((operation, forward) => {
+  const accessToken = cookies().get("access_token")?.value;
+  console.log("accessToken", accessToken);
+  operation.setContext(({ headers = {} }) => ({
+    headers: {
+      ...headers,
+      "Authorization": accessToken ? `Bearer ${accessToken}` : "",
+    },
+  }));
 
-// export const { getClient } = registerApolloClient(
-//   () =>
-//     new ApolloClient({
-//       link,
-//       ssrMode: true,
-//       cache: new InMemoryCache(),
-//     }),
-// );
+  return forward(operation);
+});
+const link = ApolloLink.from([requestLink, httpLink]);
 
-export const makeApolloClient = () => {
+export const makeApolloClient = (options?: Partial<ApolloClientOptions<NormalizedCacheObject>>) => {
   return new ApolloClient({
     link,
     ssrMode: true,
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      resultCaching: false,
+    }),
+    ...options ?? {},
   });
 }

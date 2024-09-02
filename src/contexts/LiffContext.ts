@@ -3,9 +3,9 @@
 import { Liff } from "@line/liff";
 import { createContext } from "react";
 
-type LiffContextType = {
+type LiffContextState = {
   liffState: Liff | null;
   liffError: string | null;
 };
 
-export const LiffContext = createContext<LiffContextType | undefined>(undefined);
+export const LiffContext = createContext<LiffContextState | undefined>(undefined);

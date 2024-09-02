@@ -1,5 +1,5 @@
 import { makeApolloClient } from "@/lib/apollo";
-import { GET_ALL_ORGANIZATIONS } from "@/api/queries/organizations";
+import { GET_ALL_ORGANIZATIONS } from "@/graphql/queries/organizations";
 
 const TestOrganizationList: React.FC = async () => {
   const { data, loading, error } = await makeApolloClient().query({

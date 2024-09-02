@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import LiffProvider from "@/app/components/providers/LiffProvider";
-import SessionProvider from "@/app/components/providers/SessionProvider";
+import { CookiesProvider } from "next-client-cookies/server";
+import FirebaseAuthProvider from "@/app/components/providers/FirebaseAuthProvider";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -17,14 +18,16 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <SessionProvider>
-      <LiffProvider>
-        <html lang="en">
-          <body className={font.className}>{children}</body>
-        </html>
-      </LiffProvider>
-    </SessionProvider>
+    <html lang="en">
+      <body className={font.className}>
+        <CookiesProvider>
+          <LiffProvider>
+            <FirebaseAuthProvider>{children}</FirebaseAuthProvider>
+          </LiffProvider>
+        </CookiesProvider>
+      </body>
+    </html>
   );
-}
+};
 
 export default RootLayout;

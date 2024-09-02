@@ -10,7 +10,7 @@
     "lint": "next lint --dir src",
     "lint:fix": "yarn lint --fix",
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json}'",
-    "gql:generate": "graphql-codegen --config codegen.yaml"
+    "gql:generate": "export NODE_TLS_REJECT_UNAUTHORIZED=0 && graphql-codegen --config codegen.yaml"
   },
   "dependencies": {
     "@apollo/client": "^3.11.4",
@@ -27,7 +27,7 @@
     "graphql-scalars": "^1.23.0",
     "lucide-react": "^0.427.0",
     "next": "14.2.5",
-    "next-auth": "^4.24.7",
+    "next-client-cookies": "^1.1.1",
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.5.2",
