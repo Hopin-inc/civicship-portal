@@ -1,8 +1,9 @@
 import { initializeApp } from "firebase/app";
 import {
+  FacebookAuthProvider,
   getAuth,
   OAuthProvider,
-  signInWithRedirect,
+  signInWithPopup,
 } from "@firebase/auth";
 
 export const app = initializeApp({
@@ -15,5 +16,10 @@ export const auth = getAuth(app);
 
 const lineProvider = new OAuthProvider("oidc.line");
 export const signInWithLine = async () => {
-  await signInWithRedirect(auth, lineProvider);
+  return signInWithPopup(auth, lineProvider);
+};
+
+const facebookProvider = new FacebookAuthProvider();
+export const signInWithFacebook = async () => {
+  return signInWithPopup(auth, facebookProvider);
 };

@@ -19,9 +19,10 @@ const FirebaseAuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       console.log("user", user);
       if (user) {
         const idToken = await user.getIdToken();
+        console.log("uid", user.uid);
         setCurrentUser({
           uid: user.uid,
-          providerId: user.providerId,
+          providerIds: user.providerData.map(e => e.providerId),
           displayName: user.displayName,
         });
         cookies.set("access_token", idToken);
@@ -29,19 +30,10 @@ const FirebaseAuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       } else {
         setCurrentUser(null);
       }
-      // const credential = await getRedirectResult(auth);
-      // console.log("credential", credential);
       setLoading(false);
-      // const credential = await getSignInResult();
-      // const idToken = await credential?.user.getIdToken();
-      // console.log("credential", credential);
-      // console.log("idToken", idToken);
-      // console.log("currentUser", currentUser);
     });
-    return () => {
-      unsubscribe();
-    };
-  }, [cookies, router]);
+    return () => unsubscribe();
+  }, []);
 
   return (
     <FirebaseAuthContext.Provider value={{ currentUser }}>

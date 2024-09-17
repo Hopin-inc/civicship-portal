@@ -1,5 +1,5 @@
 export type CurrentUser = {
   uid: string;
-  providerId: string;
+  providerIds: string[];
   displayName: string | null;
 };
