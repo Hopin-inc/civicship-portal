@@ -63,11 +63,30 @@
   * {
     @apply border-border;
   }
+  html {
+    @apply min-h-screen;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground min-h-screen;
   }
 }
 
-.hover-link {
-  @apply hover:opacity-60;
+section {
+  @apply mt-8
+}
+
+h1 {
+  @apply text-2xl font-bold;
+}
+
+h2 {
+  @apply text-xl font-bold;
+}
+
+a {
+  @apply font-medium text-blue-600 dark:text-blue-500 hover:underline hover:opacity-60;
+}
+
+li {
+  @apply list-disc ml-8;
 }

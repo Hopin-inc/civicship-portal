@@ -1,7 +1,7 @@
+import LineLoginButton from "@/app/sign-in/LineLoginButton";
+import FacebookLoginButton from "@/app/sign-in/FacebookLoginButton";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import SignUpWithFacebookButton from "@/app/sign-up/SignUpWithFacebookButton";
-import SignUpWithLineButton from "@/app/sign-up/SignUpWithLineButton";
 
 const SignIn: React.FC = async () => {
   return (
@@ -10,10 +10,10 @@ const SignIn: React.FC = async () => {
         <ChevronLeft />
         トップに戻る
       </Link>
-      <h1>新規登録</h1>
+      <h1>ログイン</h1>
       <div className="flex gap-2">
-        <SignUpWithLineButton />
-        <SignUpWithFacebookButton />
+        <LineLoginButton />
+        <FacebookLoginButton />
       </div>
     </main>
   );

@@ -14,12 +14,23 @@ export const app = initializeApp({
 
 export const auth = getAuth(app);
 
-const lineProvider = new OAuthProvider("oidc.line");
-export const signInWithLine = async () => {
-  return signInWithPopup(auth, lineProvider);
+const providers = {
+  line: new OAuthProvider("oidc.line"),
+  facebook: new FacebookAuthProvider(),
 };
 
-const facebookProvider = new FacebookAuthProvider();
+const signIn = async (provider: keyof typeof providers) => {
+  try {
+    return signInWithPopup(auth, providers[provider]);
+  } catch (error) {
+    console.error(JSON.stringify(error));
+  }
+};
+
+export const signInWithLine = async () => {
+  return signIn("line");
+};
+
 export const signInWithFacebook = async () => {
-  return signInWithPopup(auth, facebookProvider);
+  return signIn("facebook");
 };
