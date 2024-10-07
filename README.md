@@ -12,7 +12,7 @@ Before starting up the server, make sure you have a connection with the `civicsh
 
 ```shell
 # Start up server
-pnpm dev
+pnpm dev:https
 ```
 
 ## Apply GraphQL queries and mutations
