@@ -19,7 +19,7 @@ const CancelButton: React.FC = () => {
   };
 
   return (
-    <Link href="/" onClick={cancel} className="inline-flex">
+    <Link href="/public" onClick={cancel} className="inline-flex">
       <ChevronLeft />
       トップに戻る
     </Link>

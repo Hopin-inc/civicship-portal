@@ -1,7 +1,6 @@
 "use client";
 
 import { useContext } from "react";
-import assert from "assert";
 import { FirebaseAuthContext } from "@/contexts/FirebaseAuthContext";
 
 export const useFirebaseAuth = () => {
@@ -10,6 +9,5 @@ export const useFirebaseAuth = () => {
   }
   const { ready, currentUser } = useContext(FirebaseAuthContext);
   ready.use();
-  assert(currentUser !== undefined);
   return { currentUser };
 };
