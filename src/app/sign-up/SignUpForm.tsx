@@ -23,7 +23,7 @@ const FormSchema = z
   .object({
     lastName: z.string().min(1, "必ず入力してください。"),
     firstName: z.string().min(1, "必ず入力してください。"),
-    email: z.string().email("正しいメールアドレスを入力してください。"),
+    email: z.string().email("正しいメールアドレスを入力してください。").optional(),
   })
   .partial({
     email: true,
@@ -40,7 +40,6 @@ const SignUpForm: React.FC = () => {
     defaultValues: {
       lastName: "",
       firstName: "",
-      email: "",
     },
   });
 

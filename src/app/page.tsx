@@ -16,10 +16,7 @@ const Home: React.FC = async () => {
         <h2>認証 / Identity</h2>
         <ul>
           <li>
-            <Link href="sign-in">ログイン</Link>
-          </li>
-          <li>
-            <Link href="sign-up">新規登録</Link>
+            <Link href="sign-in">ログイン/新規登録</Link>
           </li>
         </ul>
       </section>
