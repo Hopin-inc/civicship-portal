@@ -21,8 +21,8 @@ import { useRouter } from "next/navigation";
 
 const FormSchema = z
   .object({
-    lastName: z.string().min(1, "必ず入力してください。"),
-    firstName: z.string().min(1, "必ず入力してください。"),
+    lastName: z.string({ required_error: "必ず選択してください。" }),
+    firstName: z.string({ required_error: "必ず選択してください。" }),
     email: z.string().email("正しいメールアドレスを入力してください。").optional(),
   })
   .partial({
