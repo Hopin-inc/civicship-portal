@@ -48,7 +48,7 @@ const RootLayout = ({
             <ApolloProvider>
               <FirebaseAuthProvider>
                 <LoadingProvider>
-                  <Suspense fallback={<Loading />}>{children}</Suspense>
+                  {children}
                   <Toaster richColors className="mx-8" />
                 </LoadingProvider>
               </FirebaseAuthProvider>

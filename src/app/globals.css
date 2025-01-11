@@ -83,8 +83,12 @@ h2 {
   @apply text-xl font-bold;
 }
 
-a {
+a:not(.card-link) {
   @apply font-medium text-blue-600 dark:text-blue-500 hover:underline hover:opacity-60;
+}
+
+a.card-link {
+  @apply shadow-md overflow-hidden transition-all ease-in-out duration-300 hover:shadow-xl;
 }
 
 li {

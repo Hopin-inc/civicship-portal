@@ -64,8 +64,9 @@ export type ActivityAddUserInput = {
 export type ActivityCreateInput = {
   description?: InputMaybe<Scalars["String"]["input"]>;
   endsAt: Scalars["Datetime"]["input"];
-  eventId: Scalars["String"]["input"];
+  eventId?: InputMaybe<Scalars["String"]["input"]>;
   images?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
   remark?: InputMaybe<Scalars["String"]["input"]>;
   startsAt: Scalars["Datetime"]["input"];
   userId: Scalars["String"]["input"];
@@ -138,6 +139,7 @@ export type ActivityUpdateContentInput = {
   description?: InputMaybe<Scalars["String"]["input"]>;
   endsAt: Scalars["Datetime"]["input"];
   images?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
   remark?: InputMaybe<Scalars["String"]["input"]>;
   startsAt: Scalars["Datetime"]["input"];
 };
@@ -2375,6 +2377,55 @@ export enum ValueType {
   Int = "INT",
 }
 
+export type ActivityCreateMutationVariables = Exact<{
+  input: ActivityCreateInput;
+}>;
+
+export type ActivityCreateMutation = {
+  __typename?: "Mutation";
+  activityCreate?:
+    | {
+        __typename?: "ActivityCreateSuccess";
+        activity?: { __typename?: "Activity"; id: string; description?: string | null } | null;
+      }
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | null;
+};
+
+export type ActivityUpdateContentMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: ActivityUpdateContentInput;
+}>;
+
+export type ActivityUpdateContentMutation = {
+  __typename?: "Mutation";
+  activityUpdateContent?:
+    | {
+        __typename?: "ActivityUpdateContentSuccess";
+        activity: { __typename?: "Activity"; id: string; description?: string | null };
+      }
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | null;
+};
+
+export type DeleteActivityMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type DeleteActivityMutation = {
+  __typename?: "Mutation";
+  activityDelete?:
+    | { __typename?: "ActivityDeleteSuccess"; activityId: string }
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | null;
+};
+
 export type CreateUserMutationVariables = Exact<{
   input: CreateUserInput;
 }>;
@@ -2394,6 +2445,68 @@ export type DeleteUserMutation = {
   deleteUser?: {
     __typename?: "CurrentUserPayload";
     user?: { __typename?: "User"; id: string } | null;
+  } | null;
+};
+
+export type ActivitiesQueryVariables = Exact<{
+  filter?: InputMaybe<ActivityFilterInput>;
+  sort?: InputMaybe<ActivitySortInput>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type ActivitiesQuery = {
+  __typename?: "Query";
+  activities: {
+    __typename?: "ActivitiesConnection";
+    edges?: Array<{
+      __typename?: "ActivityEdge";
+      node?: {
+        __typename?: "Activity";
+        id: string;
+        description?: string | null;
+        remark?: string | null;
+        startsAt: Date;
+        endsAt: Date;
+        isPublic: boolean;
+        event?: { __typename?: "Event"; id: string; description?: string | null } | null;
+        user?: {
+          __typename?: "User";
+          id: string;
+          firstName: string;
+          middleName?: string | null;
+          lastName: string;
+        } | null;
+        organization?: { __typename?: "Organization"; id: string; name: string } | null;
+      } | null;
+    } | null> | null;
+    pageInfo: { __typename?: "PageInfo"; endCursor?: string | null; hasNextPage: boolean };
+  };
+};
+
+export type ActivityQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ActivityQuery = {
+  __typename?: "Query";
+  activity?: {
+    __typename?: "Activity";
+    id: string;
+    description?: string | null;
+    remark?: string | null;
+    startsAt: Date;
+    endsAt: Date;
+    isPublic: boolean;
+    event?: { __typename?: "Event"; id: string; description?: string | null } | null;
+    user?: {
+      __typename?: "User";
+      id: string;
+      firstName: string;
+      middleName?: string | null;
+      lastName: string;
+    } | null;
+    organization?: { __typename?: "Organization"; id: string; name: string } | null;
   } | null;
 };
 
@@ -2444,6 +2557,202 @@ export type OrganizationsQuery = {
   };
 };
 
+export const ActivityCreateDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "activityCreate" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ActivityCreateInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "activityCreate" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ActivityCreateSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "activity" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "description" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ActivityCreateMutation, ActivityCreateMutationVariables>;
+export const ActivityUpdateContentDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "activityUpdateContent" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "ActivityUpdateContentInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "activityUpdateContent" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ActivityUpdateContentSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "activity" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "description" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ActivityUpdateContentMutation, ActivityUpdateContentMutationVariables>;
+export const DeleteActivityDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "deleteActivity" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "activityDelete" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ActivityDeleteSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "activityId" } }],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DeleteActivityMutation, DeleteActivityMutationVariables>;
 export const CreateUserDocument = {
   kind: "Document",
   definitions: [
@@ -2525,6 +2834,226 @@ export const DeleteUserDocument = {
     },
   ],
 } as unknown as DocumentNode<DeleteUserMutation, DeleteUserMutationVariables>;
+export const ActivitiesDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "activities" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "ActivityFilterInput" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "sort" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "ActivitySortInput" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "first" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "activities" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "filter" },
+                value: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "sort" },
+                value: { kind: "Variable", name: { kind: "Name", value: "sort" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "cursor" },
+                value: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "Variable", name: { kind: "Name", value: "first" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "edges" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "node" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "description" } },
+                            { kind: "Field", name: { kind: "Name", value: "remark" } },
+                            { kind: "Field", name: { kind: "Name", value: "startsAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "endsAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "isPublic" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "event" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "description" } },
+                                ],
+                              },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "user" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "firstName" } },
+                                  { kind: "Field", name: { kind: "Name", value: "middleName" } },
+                                  { kind: "Field", name: { kind: "Name", value: "lastName" } },
+                                ],
+                              },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "organization" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "endCursor" } },
+                      { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ActivitiesQuery, ActivitiesQueryVariables>;
+export const ActivityDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "activity" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "activity" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "description" } },
+                { kind: "Field", name: { kind: "Name", value: "remark" } },
+                { kind: "Field", name: { kind: "Name", value: "startsAt" } },
+                { kind: "Field", name: { kind: "Name", value: "endsAt" } },
+                { kind: "Field", name: { kind: "Name", value: "isPublic" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "event" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "description" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "firstName" } },
+                      { kind: "Field", name: { kind: "Name", value: "middleName" } },
+                      { kind: "Field", name: { kind: "Name", value: "lastName" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "organization" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ActivityQuery, ActivityQueryVariables>;
 export const CurrentUserDocument = {
   kind: "Document",
   definitions: [

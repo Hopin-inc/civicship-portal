@@ -1,25 +1,25 @@
+"use client";
+
+import ActivityList from "@/app/activities/ActivityList";
 import Link from "next/link";
-import LogoutButton from "@/app/components/elements/LogoutButton";
-import AccountDeleteButton from "@/app/components/elements/AccountDeleteButton";
-import CurrentUserInfo from "@/app/components/elements/CurrentUserInfo";
+import { ChevronLeft } from "lucide-react";
+import ActivityCreateModal from "@/app/activities/ActivityCreateModal";
+import { Suspense } from "react";
 
 const Activities: React.FC = async () => {
   return (
     <main className="min-h-screen p-24">
-      <h1>活動一覧</h1>
-      <CurrentUserInfo />
-      <div className="flex gap-2">
-        <LogoutButton />
-        <AccountDeleteButton />
+      <Link href="/" className="inline-flex">
+        <ChevronLeft />
+        トップに戻る
+      </Link>
+      <div className="w-full flex justify-between">
+        <h1>活動一覧</h1>
+        <Suspense>
+          <ActivityCreateModal />
+        </Suspense>
       </div>
-      <section>
-        <h2>認証 / Identity</h2>
-        <ul>
-          <li>
-            <Link href="sign-in">ログイン/新規登録</Link>
-          </li>
-        </ul>
-      </section>
+      <ActivityList />
     </main>
   );
 };

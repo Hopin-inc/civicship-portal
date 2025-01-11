@@ -11,7 +11,7 @@ const Header: React.FC = () => {
         <nav className="hidden md:visible md:flex gap-[24px] items-center flex-[0_0_auto]">
           <ul className="flex align-center gap-[8px] relative flex-[0_0_auto]">
             <li>
-              <Link href="/"></Link>
+              <Link href="/" className="ul-link"></Link>
             </li>
           </ul>
         </nav>
