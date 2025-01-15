@@ -1,37 +1,55 @@
 import {
   ApolloClient,
-  ApolloClientOptions, ApolloLink,
+  ApolloClientOptions,
+  ApolloLink,
   createHttpLink,
   InMemoryCache,
   NormalizedCacheObject,
 } from "@apollo/client";
-import { cookies } from "next/headers";
+import { onError } from "@apollo/client/link/error";
+import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
+import { __DEV__ } from "@apollo/client/utilities/globals";
+
+if (__DEV__) {
+  loadDevMessages();
+  loadErrorMessages();
+}
 
 const httpLink = createHttpLink({
-  uri: process.env.API_ENDPOINT,
+  uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
   credentials: "same-origin",
 });
+
 const requestLink = new ApolloLink((operation, forward) => {
-  const accessToken = cookies().get("access_token")?.value;
-  console.log("accessToken", accessToken);
+  const cookies = document.cookie.split("; ");
+  const accessToken = cookies.find((e) => e.startsWith("access_token"))?.split("=").pop();
   operation.setContext(({ headers = {} }) => ({
     headers: {
       ...headers,
-      "Authorization": accessToken ? `Bearer ${accessToken}` : "",
+      Authorization: accessToken ? `Bearer ${accessToken}` : "",
     },
   }));
-
   return forward(operation);
 });
-const link = ApolloLink.from([requestLink, httpLink]);
 
-export const makeApolloClient = (options?: Partial<ApolloClientOptions<NormalizedCacheObject>>) => {
-  return new ApolloClient({
-    link,
-    ssrMode: true,
-    cache: new InMemoryCache({
-      resultCaching: false,
-    }),
-    ...options ?? {},
-  });
-}
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors)
+    graphQLErrors.map(({ message, locations, path }) =>
+      console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`),
+    );
+  if (networkError) {
+    console.log(`[Network error]: ${networkError}`);
+  }
+});
+
+const link = ApolloLink.from([requestLink, errorLink, httpLink]);
+
+const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
+  link,
+  ssrMode: true,
+  cache: new InMemoryCache({
+    resultCaching: false,
+  }),
+};
+
+export const apolloClient = new ApolloClient(defaultOptions);

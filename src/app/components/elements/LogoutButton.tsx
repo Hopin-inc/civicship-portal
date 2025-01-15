@@ -1,20 +1,20 @@
 "use client";
 
-import { useLiff } from "@/hooks/useLiff";
 import { Button } from "@/app/components/ui/button";
 import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 import { auth } from "@/lib/firebase";
 import { useCookies } from "next-client-cookies";
+import { toast } from "sonner";
 
 const LogoutButton: React.FC = () => {
-  const cookies=  useCookies();
-  const { liffState } = useLiff();
+  const cookies = useCookies();
   const { currentUser } = useFirebaseAuth();
-  const isLoggedIn = liffState?.isLoggedIn() || !!currentUser;
+  const isLoggedIn = !!currentUser;
 
   const logout = async () => {
     await auth.signOut();
     cookies.remove("access_token");
+    toast.success("ログアウト!");
   };
 
   return (

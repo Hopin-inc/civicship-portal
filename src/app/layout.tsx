@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import LiffProvider from "@/app/components/providers/LiffProvider";
 import { CookiesProvider } from "next-client-cookies/server";
+import LiffProvider from "@/app/components/providers/LiffProvider";
+import ApolloProvider from "@/app/components/providers/ApolloProvider";
 import FirebaseAuthProvider from "@/app/components/providers/FirebaseAuthProvider";
+import { Toaster } from "@/app/components/ui/sonner";
+import { Suspense } from "react";
+import Loading from "@/app/components/layout/Loading";
+import LoadingProvider from "@/app/components/providers/LoadingProvider";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -17,12 +22,37 @@ const RootLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  // Avoid displaying intentionally thrown error.
+  if (typeof window === "undefined") {
+    const originalConsoleError = console.error;
+    if (!(console.error as any)["_patched"]) {
+      console.error = (...args) => {
+        if (
+          args?.some((e) => {
+            const message = e?.message ?? (e as string | undefined);
+            return message?.includes("POSTPONE:");
+          })
+        )
+          return;
+        originalConsoleError(...args);
+      };
+      (console.error as any)["_patched"] = true;
+    }
+  }
+
   return (
-    <html lang="en">
+    <html lang="ja">
       <body className={font.className}>
         <CookiesProvider>
           <LiffProvider>
-            <FirebaseAuthProvider>{children}</FirebaseAuthProvider>
+            <ApolloProvider>
+              <FirebaseAuthProvider>
+                <LoadingProvider>
+                  {children}
+                  <Toaster richColors className="mx-8" />
+                </LoadingProvider>
+              </FirebaseAuthProvider>
+            </ApolloProvider>
           </LiffProvider>
         </CookiesProvider>
       </body>
