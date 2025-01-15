@@ -4,7 +4,7 @@ import { ChevronLeft } from "lucide-react";
 const ActivityDetail: React.FC = async () => {
   return (
     <main className="min-h-screen p-24">
-      <Link href="/activities" className="inline-flex">
+      <Link href="/opportunities" className="inline-flex">
         <ChevronLeft />
         活動一覧に戻る
       </Link>
