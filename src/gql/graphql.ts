@@ -22,340 +22,6 @@ export type Scalars = {
   Datetime: { input: Date; output: Date };
 };
 
-export type Activities = {
-  __typename?: "Activities";
-  data: Array<Activity>;
-  total: Scalars["Int"]["output"];
-};
-
-export type ActivitiesConnection = {
-  __typename?: "ActivitiesConnection";
-  edges?: Maybe<Array<Maybe<ActivityEdge>>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars["Int"]["output"];
-};
-
-export type Activity = {
-  __typename?: "Activity";
-  application?: Maybe<Application>;
-  createdAt: Scalars["Datetime"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
-  endsAt: Scalars["Datetime"]["output"];
-  event?: Maybe<Event>;
-  id: Scalars["ID"]["output"];
-  images?: Maybe<Array<Scalars["String"]["output"]>>;
-  isPublic: Scalars["Boolean"]["output"];
-  issue?: Maybe<Issue>;
-  organization?: Maybe<Organization>;
-  remark?: Maybe<Scalars["String"]["output"]>;
-  startsAt: Scalars["Datetime"]["output"];
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  user?: Maybe<User>;
-};
-
-export type ActivityAddEventInput = {
-  eventId: Scalars["String"]["input"];
-};
-
-export type ActivityAddUserInput = {
-  userId: Scalars["String"]["input"];
-};
-
-export type ActivityCreateInput = {
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  endsAt: Scalars["Datetime"]["input"];
-  eventId?: InputMaybe<Scalars["String"]["input"]>;
-  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  remark?: InputMaybe<Scalars["String"]["input"]>;
-  startsAt: Scalars["Datetime"]["input"];
-  userId: Scalars["String"]["input"];
-};
-
-export type ActivityCreatePayload =
-  | ActivityCreateSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ActivityCreateSuccess = {
-  __typename?: "ActivityCreateSuccess";
-  activity?: Maybe<Activity>;
-};
-
-export type ActivityDeletePayload =
-  | ActivityDeleteSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ActivityDeleteSuccess = {
-  __typename?: "ActivityDeleteSuccess";
-  activityId: Scalars["ID"]["output"];
-};
-
-export type ActivityEdge = Edge & {
-  __typename?: "ActivityEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<Activity>;
-};
-
-export type ActivityFilterInput = {
-  eventId?: InputMaybe<Scalars["String"]["input"]>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
-  userId?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type ActivityRemoveEventInput = {
-  eventId: Scalars["String"]["input"];
-};
-
-export type ActivityRemoveUserInput = {
-  userId: Scalars["String"]["input"];
-};
-
-export type ActivitySortInput = {
-  createdAt?: InputMaybe<SortDirection>;
-  startsAt?: InputMaybe<SortDirection>;
-};
-
-export type ActivitySwitchPrivacyInput = {
-  isPublic: Scalars["Boolean"]["input"];
-};
-
-export type ActivitySwitchPrivacyPayload =
-  | ActivitySwitchPrivacySuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ActivitySwitchPrivacySuccess = {
-  __typename?: "ActivitySwitchPrivacySuccess";
-  activity: Activity;
-};
-
-export type ActivityUpdateContentInput = {
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  endsAt: Scalars["Datetime"]["input"];
-  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  remark?: InputMaybe<Scalars["String"]["input"]>;
-  startsAt: Scalars["Datetime"]["input"];
-};
-
-export type ActivityUpdateContentPayload =
-  | ActivityUpdateContentSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ActivityUpdateContentSuccess = {
-  __typename?: "ActivityUpdateContentSuccess";
-  activity: Activity;
-};
-
-export type ActivityUpdateEventPayload =
-  | ActivityUpdateEventSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ActivityUpdateEventSuccess = {
-  __typename?: "ActivityUpdateEventSuccess";
-  activity: Activity;
-  event: Event;
-};
-
-export type ActivityUpdateUserPayload =
-  | ActivityUpdateUserSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ActivityUpdateUserSuccess = {
-  __typename?: "ActivityUpdateUserSuccess";
-  activity: Activity;
-  user: User;
-};
-
-export type Agenda = {
-  __typename?: "Agenda";
-  code: Scalars["String"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
-  id: Scalars["Int"]["output"];
-  name: Scalars["String"]["output"];
-};
-
-export type Application = {
-  __typename?: "Application";
-  activity?: Maybe<Activity>;
-  approvals?: Maybe<Array<ApplicationConfirmation>>;
-  comment?: Maybe<Scalars["String"]["output"]>;
-  createdAt: Scalars["Datetime"]["output"];
-  event?: Maybe<Event>;
-  id: Scalars["ID"]["output"];
-  isPublic: Scalars["Boolean"]["output"];
-  submittedAt: Scalars["Datetime"]["output"];
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  user?: Maybe<User>;
-};
-
-export type ApplicationAddConfirmationInput = {
-  comment?: InputMaybe<Scalars["String"]["input"]>;
-  confirmerId: Scalars["String"]["input"];
-  isApproved: Scalars["Boolean"]["input"];
-};
-
-export type ApplicationAddConfirmationPayload =
-  | ApplicationAddConfirmationSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationAddConfirmationSuccess = {
-  __typename?: "ApplicationAddConfirmationSuccess";
-  application: Application;
-};
-
-export type ApplicationApprovalInput = {
-  applicationConfirmationId: Scalars["String"]["input"];
-};
-
-export type ApplicationConfirmation = {
-  __typename?: "ApplicationConfirmation";
-  application?: Maybe<Application>;
-  comment?: Maybe<Scalars["String"]["output"]>;
-  confirmedBy?: Maybe<User>;
-  createdAt: Scalars["Datetime"]["output"];
-  id: Scalars["ID"]["output"];
-  isApproved: Scalars["Boolean"]["output"];
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-};
-
-export type ApplicationCreateInput = {
-  comment?: InputMaybe<Scalars["String"]["input"]>;
-  eventId?: InputMaybe<Scalars["String"]["input"]>;
-  submittedAt: Scalars["Datetime"]["input"];
-  userId: Scalars["String"]["input"];
-};
-
-export type ApplicationCreatePayload =
-  | ApplicationCreateSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationCreateSuccess = {
-  __typename?: "ApplicationCreateSuccess";
-  application: Application;
-};
-
-export type ApplicationDeleteConfirmationInput = {
-  applicationConfirmationId: Scalars["String"]["input"];
-};
-
-export type ApplicationDeleteConfirmationPayload =
-  | ApplicationDeleteConfirmationSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationDeleteConfirmationSuccess = {
-  __typename?: "ApplicationDeleteConfirmationSuccess";
-  applicationConfirmationId: Scalars["String"]["output"];
-  applicationId: Scalars["ID"]["output"];
-};
-
-export type ApplicationDeletePayload =
-  | ApplicationDeleteSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationDeleteSuccess = {
-  __typename?: "ApplicationDeleteSuccess";
-  applicationId: Scalars["ID"]["output"];
-};
-
-export type ApplicationEdge = Edge & {
-  __typename?: "ApplicationEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<Application>;
-};
-
-export type ApplicationFilterInput = {
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type ApplicationRefusalInput = {
-  applicationConfirmationId: Scalars["String"]["input"];
-};
-
-export type ApplicationSortInput = {
-  createdAt?: InputMaybe<SortDirection>;
-};
-
-export type ApplicationSwitchIsApprovedPayload =
-  | ApplicationSwitchIsApprovedSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationSwitchIsApprovedSuccess = {
-  __typename?: "ApplicationSwitchIsApprovedSuccess";
-  application: Application;
-};
-
-export type ApplicationSwitchPrivacyPayload =
-  | ApplicationSwitchPrivacySuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationSwitchPrivacySuccess = {
-  __typename?: "ApplicationSwitchPrivacySuccess";
-  application: Application;
-};
-
-export type ApplicationUpdateCommentInput = {
-  comment?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type ApplicationUpdateCommentPayload =
-  | ApplicationUpdateCommentSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationUpdateCommentSuccess = {
-  __typename?: "ApplicationUpdateCommentSuccess";
-  application: Application;
-};
-
-export type ApplicationUpdateConfirmationCommentInput = {
-  applicationConfirmationId: Scalars["String"]["input"];
-  comment?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type ApplicationUpdateConfirmationCommentPayload =
-  | ApplicationUpdateConfirmationCommentSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationUpdateConfirmationCommentSuccess = {
-  __typename?: "ApplicationUpdateConfirmationCommentSuccess";
-  application: Application;
-};
-
-export type ApplicationsConnection = {
-  __typename?: "ApplicationsConnection";
-  edges?: Maybe<Array<Maybe<ApplicationEdge>>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars["Int"]["output"];
-};
-
 export type AuthError = Error & {
   __typename?: "AuthError";
   message: Scalars["String"]["output"];
@@ -369,68 +35,144 @@ export type City = {
   state: State;
 };
 
-export type Comment = {
-  __typename?: "Comment";
-  content: Scalars["String"]["output"];
-  createdAt: Scalars["Datetime"]["output"];
-  event?: Maybe<Event>;
-  id: Scalars["ID"]["output"];
-  postedAt: Scalars["Datetime"]["output"];
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  user?: Maybe<User>;
-};
+export type CommonError = AuthError | ComplexQueryError | InvalidInputValueError;
 
-export type CommentAddEventInput = {
-  content: Scalars["String"]["input"];
-  eventId: Scalars["String"]["input"];
-  postedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  userId: Scalars["String"]["input"];
-};
-
-export type CommentAddEventPayload =
-  | AuthError
-  | CommentAddEventSuccess
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type CommentAddEventSuccess = {
-  __typename?: "CommentAddEventSuccess";
-  comment: Comment;
-};
-
-export type CommentDeletePayload =
-  | AuthError
-  | CommentDeleteSuccess
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type CommentDeleteSuccess = {
-  __typename?: "CommentDeleteSuccess";
-  commentId: Scalars["String"]["output"];
-};
-
-export type CommentUpdateContentInput = {
-  content?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type CommentUpdateContentPayload =
-  | AuthError
-  | CommentUpdateContentSuccess
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type CommentUpdateContentSuccess = {
-  __typename?: "CommentUpdateContentSuccess";
-  comment: Comment;
-};
-
-export type Comments = {
-  __typename?: "Comments";
-  data: Array<Comment>;
+export type Communities = {
+  __typename?: "Communities";
+  data: Array<Community>;
   total: Scalars["Int"]["output"];
 };
 
-export type CommonError = AuthError | ComplexQueryError | InvalidInputValueError;
+export type CommunitiesConnection = {
+  __typename?: "CommunitiesConnection";
+  edges?: Maybe<Array<Maybe<CommunityEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type Community = {
+  __typename?: "Community";
+  bio?: Maybe<Scalars["String"]["output"]>;
+  city: City;
+  createdAt: Scalars["Datetime"]["output"];
+  establishedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  id: Scalars["ID"]["output"];
+  image?: Maybe<Scalars["String"]["output"]>;
+  memberships?: Maybe<Array<Membership>>;
+  name: Scalars["String"]["output"];
+  opportunities?: Maybe<Array<Opportunity>>;
+  participations?: Maybe<Array<Participation>>;
+  pointName: Scalars["String"]["output"];
+  state?: Maybe<State>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  utilities?: Maybe<Array<Utility>>;
+  wallets?: Maybe<Array<Wallet>>;
+  website?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type CommunityCreateInput = {
+  bio?: InputMaybe<Scalars["String"]["input"]>;
+  cityCode: Scalars["String"]["input"];
+  establishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  image?: InputMaybe<Scalars["String"]["input"]>;
+  name: Scalars["String"]["input"];
+  pointName: Scalars["String"]["input"];
+  stateCode: Scalars["String"]["input"];
+  website?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type CommunityCreatePayload =
+  | AuthError
+  | CommunityCreateSuccess
+  | ComplexQueryError
+  | InvalidInputValueError;
+
+export type CommunityCreateSuccess = {
+  __typename?: "CommunityCreateSuccess";
+  community: Community;
+};
+
+export type CommunityDeletePayload =
+  | AuthError
+  | CommunityDeleteSuccess
+  | ComplexQueryError
+  | InvalidInputValueError;
+
+export type CommunityDeleteSuccess = {
+  __typename?: "CommunityDeleteSuccess";
+  communityId: Scalars["String"]["output"];
+};
+
+export type CommunityEdge = Edge & {
+  __typename?: "CommunityEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Community>;
+};
+
+export type CommunityFilterInput = {
+  cityCode?: InputMaybe<Scalars["String"]["input"]>;
+  stateCode?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type CommunityGrantPointInput = {
+  amount: Scalars["Int"]["input"];
+  userId: Scalars["String"]["input"];
+};
+
+export type CommunityGrantPointPayload =
+  | AuthError
+  | CommunityGrantPointSuccess
+  | ComplexQueryError
+  | InvalidInputValueError;
+
+export type CommunityGrantPointSuccess = {
+  __typename?: "CommunityGrantPointSuccess";
+  amount: Scalars["Int"]["output"];
+  community: Community;
+  user: User;
+};
+
+export type CommunityIssuePointInput = {
+  amount: Scalars["Int"]["input"];
+};
+
+export type CommunityIssuePointPayload =
+  | AuthError
+  | CommunityIssuePointSuccess
+  | ComplexQueryError
+  | InvalidInputValueError;
+
+export type CommunityIssuePointSuccess = {
+  __typename?: "CommunityIssuePointSuccess";
+  amount: Scalars["Int"]["output"];
+  community: Community;
+};
+
+export type CommunitySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export type CommunityUpdateProfileInput = {
+  bio?: InputMaybe<Scalars["String"]["input"]>;
+  cityCode?: InputMaybe<Scalars["String"]["input"]>;
+  establishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  image?: InputMaybe<Scalars["String"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  pointName?: InputMaybe<Scalars["String"]["input"]>;
+  stateCode?: InputMaybe<Scalars["String"]["input"]>;
+  website?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type CommunityUpdateProfilePayload =
+  | AuthError
+  | CommunityUpdateProfileSuccess
+  | ComplexQueryError
+  | InvalidInputValueError;
+
+export type CommunityUpdateProfileSuccess = {
+  __typename?: "CommunityUpdateProfileSuccess";
+  community: Community;
+};
 
 export type ComplexQueryError = Error & {
   __typename?: "ComplexQueryError";
@@ -439,18 +181,15 @@ export type ComplexQueryError = Error & {
 };
 
 export type CreateUserInput = {
-  agendaIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  firstName: Scalars["String"]["input"];
-  groupIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
   image?: InputMaybe<ImageInput>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  lastName: Scalars["String"]["input"];
-  middleName?: InputMaybe<Scalars["String"]["input"]>;
-  organizationIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  skillsetIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  name: Scalars["String"]["input"];
+  slug?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type CurrentPointView = {
+  __typename?: "CurrentPointView";
+  currentPoint: Scalars["Int"]["output"];
+  walletId: Scalars["String"]["output"];
 };
 
 export type CurrentUserPayload = {
@@ -462,389 +201,15 @@ export type Edge = {
   cursor: Scalars["String"]["output"];
 };
 
-export enum EntityPosition {
-  Prefix = "PREFIX",
-  Suffix = "SUFFIX",
-}
-
 export type Error = {
   message: Scalars["String"]["output"];
   statusCode: Scalars["Int"]["output"];
-};
-
-export type Event = {
-  __typename?: "Event";
-  activities?: Maybe<Activities>;
-  agendas?: Maybe<Array<Agenda>>;
-  cities?: Maybe<Array<City>>;
-  comments?: Maybe<Comments>;
-  createdAt: Scalars["Datetime"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
-  endsAt: Scalars["Datetime"]["output"];
-  groups?: Maybe<Array<Group>>;
-  id: Scalars["ID"]["output"];
-  images?: Maybe<Array<Scalars["String"]["output"]>>;
-  isPublic: Scalars["Boolean"]["output"];
-  likes?: Maybe<Likes>;
-  organizations?: Maybe<Array<Organization>>;
-  plannedEndsAt?: Maybe<Scalars["Datetime"]["output"]>;
-  plannedStartsAt?: Maybe<Scalars["Datetime"]["output"]>;
-  skillsets?: Maybe<Array<Skillset>>;
-  startsAt: Scalars["Datetime"]["output"];
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-};
-
-export type EventAddGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type EventAddOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type EventDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | EventDeleteSuccess
-  | InvalidInputValueError;
-
-export type EventDeleteSuccess = {
-  __typename?: "EventDeleteSuccess";
-  eventId: Scalars["ID"]["output"];
-};
-
-export type EventEdge = Edge & {
-  __typename?: "EventEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<Event>;
-};
-
-export type EventFilterInput = {
-  agendaId?: InputMaybe<Scalars["Int"]["input"]>;
-  cityCode?: InputMaybe<Scalars["String"]["input"]>;
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type EventPlanInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  endsAt: Scalars["Datetime"]["input"];
-  groupIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  organizationIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  plannedEndsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  plannedStartsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  skillsets?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  startsAt: Scalars["Datetime"]["input"];
-};
-
-export type EventPlanPayload =
-  | AuthError
-  | ComplexQueryError
-  | EventPlanSuccess
-  | InvalidInputValueError;
-
-export type EventPlanSuccess = {
-  __typename?: "EventPlanSuccess";
-  event?: Maybe<Event>;
-};
-
-export type EventRemoveGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type EventRemoveOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type EventSortInput = {
-  startsAt?: InputMaybe<SortDirection>;
-};
-
-export type EventUpdateContentInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  endsAt: Scalars["Datetime"]["input"];
-  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  plannedEndsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  plannedStartsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  skillsets?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  startsAt: Scalars["Datetime"]["input"];
-};
-
-export type EventUpdateContentPayload =
-  | AuthError
-  | ComplexQueryError
-  | EventUpdateContentSuccess
-  | InvalidInputValueError;
-
-export type EventUpdateContentSuccess = {
-  __typename?: "EventUpdateContentSuccess";
-  event: Event;
-};
-
-export type EventUpdateGroupPayload =
-  | AuthError
-  | ComplexQueryError
-  | EventUpdateGroupSuccess
-  | InvalidInputValueError;
-
-export type EventUpdateGroupSuccess = {
-  __typename?: "EventUpdateGroupSuccess";
-  event: Event;
-  group: Group;
-};
-
-export type EventUpdateOrganizationPayload =
-  | AuthError
-  | ComplexQueryError
-  | EventUpdateOrganizationSuccess
-  | InvalidInputValueError;
-
-export type EventUpdateOrganizationSuccess = {
-  __typename?: "EventUpdateOrganizationSuccess";
-  event: Event;
-  organization: Organization;
-};
-
-export type EventUpdatePrivacyPayload =
-  | AuthError
-  | ComplexQueryError
-  | EventUpdatePrivacySuccess
-  | InvalidInputValueError;
-
-export type EventUpdatePrivacySuccess = {
-  __typename?: "EventUpdatePrivacySuccess";
-  event: Event;
-};
-
-export type EventsConnection = {
-  __typename?: "EventsConnection";
-  edges?: Maybe<Array<Maybe<EventEdge>>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars["Int"]["output"];
 };
 
 export type Field = {
   __typename?: "Field";
   message?: Maybe<Scalars["String"]["output"]>;
   name: Scalars["String"]["output"];
-};
-
-export type Group = {
-  __typename?: "Group";
-  agendas?: Maybe<Array<Agenda>>;
-  bio?: Maybe<Scalars["String"]["output"]>;
-  children?: Maybe<Array<Group>>;
-  cities?: Maybe<Array<City>>;
-  createdAt: Scalars["Datetime"]["output"];
-  events?: Maybe<Array<Event>>;
-  id: Scalars["ID"]["output"];
-  image?: Maybe<Scalars["String"]["output"]>;
-  name: Scalars["String"]["output"];
-  organization?: Maybe<Organization>;
-  parent?: Maybe<Group>;
-  targets?: Maybe<Array<Target>>;
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  users?: Maybe<Array<User>>;
-};
-
-export type GroupAddChildInput = {
-  childId: Scalars["String"]["input"];
-};
-
-export type GroupAddEventInput = {
-  eventId: Scalars["String"]["input"];
-};
-
-export type GroupAddParentInput = {
-  parentId: Scalars["String"]["input"];
-};
-
-export type GroupAddTargetInput = {
-  targetId: Scalars["String"]["input"];
-};
-
-export type GroupAddUserInput = {
-  userId: Scalars["String"]["input"];
-};
-
-export type GroupChangeOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type GroupChangeOrganizationPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupChangeOrganizationSuccess
-  | InvalidInputValueError;
-
-export type GroupChangeOrganizationSuccess = {
-  __typename?: "GroupChangeOrganizationSuccess";
-  group: Group;
-  organization: Organization;
-};
-
-export type GroupCreateInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  bio?: InputMaybe<Scalars["String"]["input"]>;
-  childrenIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
-  organizationId?: InputMaybe<Scalars["String"]["input"]>;
-  parentId?: InputMaybe<Scalars["String"]["input"]>;
-  userIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-};
-
-export type GroupCreatePayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupCreateSuccess
-  | InvalidInputValueError;
-
-export type GroupCreateSuccess = {
-  __typename?: "GroupCreateSuccess";
-  group?: Maybe<Group>;
-};
-
-export type GroupDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupDeleteSuccess
-  | InvalidInputValueError;
-
-export type GroupDeleteSuccess = {
-  __typename?: "GroupDeleteSuccess";
-  groupId: Scalars["ID"]["output"];
-};
-
-export type GroupEdge = Edge & {
-  __typename?: "GroupEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<Group>;
-};
-
-export type GroupFilterInput = {
-  agendaId?: InputMaybe<Scalars["Int"]["input"]>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
-  organizationId?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type GroupRemoveChildInput = {
-  childId: Scalars["String"]["input"];
-};
-
-export type GroupRemoveEventInput = {
-  eventId: Scalars["String"]["input"];
-};
-
-export type GroupRemoveParentInput = {
-  parentId: Scalars["String"]["input"];
-};
-
-export type GroupRemoveTargetInput = {
-  targetId: Scalars["String"]["input"];
-};
-
-export type GroupRemoveUserInput = {
-  userId: Scalars["String"]["input"];
-};
-
-export type GroupSortInput = {
-  createdAt?: InputMaybe<SortDirection>;
-  updatedAt?: InputMaybe<SortDirection>;
-};
-
-export type GroupUpdateChildPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupUpdateChildSuccess
-  | InvalidInputValueError;
-
-export type GroupUpdateChildSuccess = {
-  __typename?: "GroupUpdateChildSuccess";
-  child: Group;
-  group: Group;
-};
-
-export type GroupUpdateContentInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
-};
-
-export type GroupUpdateContentPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupUpdateContentSuccess
-  | InvalidInputValueError;
-
-export type GroupUpdateContentSuccess = {
-  __typename?: "GroupUpdateContentSuccess";
-  group: Group;
-};
-
-export type GroupUpdateEventPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupUpdateEventSuccess
-  | InvalidInputValueError;
-
-export type GroupUpdateEventSuccess = {
-  __typename?: "GroupUpdateEventSuccess";
-  event: Event;
-  group: Group;
-};
-
-export type GroupUpdateParentPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupUpdateParentSuccess
-  | InvalidInputValueError;
-
-export type GroupUpdateParentSuccess = {
-  __typename?: "GroupUpdateParentSuccess";
-  group: Group;
-  parent: Group;
-};
-
-export type GroupUpdateTargetPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupUpdateTargetSuccess
-  | InvalidInputValueError;
-
-export type GroupUpdateTargetSuccess = {
-  __typename?: "GroupUpdateTargetSuccess";
-  group: Group;
-  target: Target;
-};
-
-export type GroupUpdateUserPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupUpdateUserSuccess
-  | InvalidInputValueError;
-
-export type GroupUpdateUserSuccess = {
-  __typename?: "GroupUpdateUserSuccess";
-  group: Group;
-  user: User;
-};
-
-export type GroupsConnection = {
-  __typename?: "GroupsConnection";
-  edges?: Maybe<Array<Maybe<GroupEdge>>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars["Int"]["output"];
 };
 
 export enum IdentityPlatform {
@@ -856,14 +221,6 @@ export type ImageInput = {
   base64: Scalars["String"]["input"];
 };
 
-export type Index = {
-  __typename?: "Index";
-  description?: Maybe<Scalars["String"]["output"]>;
-  id: Scalars["Int"]["output"];
-  name: Scalars["String"]["output"];
-  valueType: ValueType;
-};
-
 export type InvalidInputValueError = Error & {
   __typename?: "InvalidInputValueError";
   fields?: Maybe<Array<Field>>;
@@ -871,1019 +228,355 @@ export type InvalidInputValueError = Error & {
   statusCode: Scalars["Int"]["output"];
 };
 
-export type Issue = {
-  __typename?: "Issue";
-  activities?: Maybe<Activities>;
-  cities?: Maybe<Array<City>>;
-  comments?: Maybe<Comments>;
+export type Membership = {
+  __typename?: "Membership";
+  community: Community;
   createdAt: Scalars["Datetime"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
-  groups?: Maybe<Array<Group>>;
-  id: Scalars["ID"]["output"];
-  images?: Maybe<Array<Scalars["String"]["output"]>>;
-  isPublic: Scalars["Boolean"]["output"];
-  issueCategories?: Maybe<Array<IssueCategory>>;
-  likes?: Maybe<Likes>;
-  organizations?: Maybe<Array<Organization>>;
-  skillsets?: Maybe<Array<Skillset>>;
+  role: Role;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  user: User;
 };
 
-export type IssueAddCategoryInput = {
-  categoryId: Scalars["Int"]["input"];
+export type MembershipCreateInput = {
+  communityId: Scalars["String"]["input"];
+  role?: InputMaybe<Role>;
+  userId: Scalars["String"]["input"];
 };
 
-export type IssueAddCityInput = {
-  cityId: Scalars["String"]["input"];
-};
-
-export type IssueAddGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type IssueAddOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type IssueAddSkillsetInput = {
-  skillsetId: Scalars["Int"]["input"];
-};
-
-export type IssueCategory = {
-  __typename?: "IssueCategory";
-  code: Scalars["String"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
-  id: Scalars["Int"]["output"];
-  name: Scalars["String"]["output"];
-};
-
-export type IssueCreateInput = {
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  groupIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  issueCategoryIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  organizationIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  skillsetIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-};
-
-export type IssueCreatePayload =
+export type MembershipCreatePayload =
   | AuthError
   | ComplexQueryError
   | InvalidInputValueError
-  | IssueCreateSuccess;
+  | MembershipCreateSuccess;
 
-export type IssueCreateSuccess = {
-  __typename?: "IssueCreateSuccess";
-  issue: Issue;
+export type MembershipCreateSuccess = {
+  __typename?: "MembershipCreateSuccess";
+  membership: Membership;
 };
 
-export type IssueDeletePayload =
+export type MembershipDeletePayload =
   | AuthError
   | ComplexQueryError
   | InvalidInputValueError
-  | IssueDeleteSuccess;
+  | MembershipDeleteSuccess;
 
-export type IssueDeleteSuccess = {
-  __typename?: "IssueDeleteSuccess";
-  issueId: Scalars["String"]["output"];
+export type MembershipDeleteSuccess = {
+  __typename?: "MembershipDeleteSuccess";
+  communityId: Scalars["String"]["output"];
+  userId: Scalars["String"]["output"];
 };
 
-export type IssueEdge = Edge & {
-  __typename?: "IssueEdge";
+export type MembershipEdge = Edge & {
+  __typename?: "MembershipEdge";
   cursor: Scalars["String"]["output"];
-  node?: Maybe<Issue>;
+  node?: Maybe<Membership>;
 };
 
-export type IssueFilterInput = {
-  cityCode?: InputMaybe<Scalars["String"]["input"]>;
+export type MembershipFilterInput = {
   keyword?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type IssuePrivacyInput = {
-  isPublic: Scalars["Boolean"]["input"];
-};
-
-export type IssueRemoveCategoryInput = {
-  categoryId: Scalars["Int"]["input"];
-};
-
-export type IssueRemoveCityInput = {
-  cityId: Scalars["String"]["input"];
-};
-
-export type IssueRemoveGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type IssueRemoveOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type IssueRemoveSkillsetInput = {
-  skillsetId: Scalars["Int"]["input"];
-};
-
-export type IssueSortInput = {
+export type MembershipSortInput = {
   createdAt?: InputMaybe<SortDirection>;
 };
 
-export type IssueUpdateCategoryPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdateCategorySuccess;
-
-export type IssueUpdateCategorySuccess = {
-  __typename?: "IssueUpdateCategorySuccess";
-  issue: Issue;
-  issueCategory: IssueCategory;
-};
-
-export type IssueUpdateCityPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdateCitySuccess;
-
-export type IssueUpdateCitySuccess = {
-  __typename?: "IssueUpdateCitySuccess";
-  city: City;
-  issue: Issue;
-};
-
-export type IssueUpdateContentInput = {
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  issueCategoryIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  skillsetIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-};
-
-export type IssueUpdateContentPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdateContentSuccess;
-
-export type IssueUpdateContentSuccess = {
-  __typename?: "IssueUpdateContentSuccess";
-  issue: Issue;
-};
-
-export type IssueUpdateGroupPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdateGroupSuccess;
-
-export type IssueUpdateGroupSuccess = {
-  __typename?: "IssueUpdateGroupSuccess";
-  group: Group;
-  issue: Issue;
-};
-
-export type IssueUpdateOrganizationPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdateOrganizationSuccess;
-
-export type IssueUpdateOrganizationSuccess = {
-  __typename?: "IssueUpdateOrganizationSuccess";
-  issue: Issue;
-  organization: Organization;
-};
-
-export type IssueUpdatePrivacyPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdatePrivacySuccess;
-
-export type IssueUpdatePrivacySuccess = {
-  __typename?: "IssueUpdatePrivacySuccess";
-  issue: Issue;
-};
-
-export type IssueUpdateSkillsetPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdateSkillsetSuccess;
-
-export type IssueUpdateSkillsetSuccess = {
-  __typename?: "IssueUpdateSkillsetSuccess";
-  issue: Issue;
-  skillset: Skillset;
-};
-
-export type IssuesConnection = {
-  __typename?: "IssuesConnection";
-  edges?: Maybe<Array<Maybe<IssueEdge>>>;
+export type MembershipsConnection = {
+  __typename?: "MembershipsConnection";
+  edges?: Maybe<Array<Maybe<MembershipEdge>>>;
   pageInfo: PageInfo;
   totalCount: Scalars["Int"]["output"];
 };
 
-export type Like = {
-  __typename?: "Like";
-  createdAt: Scalars["Datetime"]["output"];
-  event?: Maybe<Event>;
-  postedAt: Scalars["Datetime"]["output"];
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  user?: Maybe<User>;
-};
-
-export type LikeAddEventInput = {
-  eventId: Scalars["String"]["input"];
-  postedAt: Scalars["Datetime"]["input"];
-  userId: Scalars["String"]["input"];
-};
-
-export type LikeAddEventPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | LikeAddEventSuccess;
-
-export type LikeAddEventSuccess = {
-  __typename?: "LikeAddEventSuccess";
-  like: Like;
-};
-
-export type LikeDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | LikeDeleteSuccess;
-
-export type LikeDeleteSuccess = {
-  __typename?: "LikeDeleteSuccess";
-  likeId: Scalars["String"]["output"];
-};
-
-export type Likes = {
-  __typename?: "Likes";
-  data: Array<Like>;
-  total: Scalars["Int"]["output"];
-};
-
 export type Mutation = {
   __typename?: "Mutation";
-  activityAddEvent?: Maybe<ActivityUpdateEventPayload>;
-  activityAddUser?: Maybe<ActivityUpdateUserPayload>;
-  activityCreate?: Maybe<ActivityCreatePayload>;
-  activityDelete?: Maybe<ActivityDeletePayload>;
-  activityPublish?: Maybe<ActivitySwitchPrivacyPayload>;
-  activityRemoveEvent?: Maybe<ActivityUpdateEventPayload>;
-  activityRemoveUser?: Maybe<ActivityUpdateUserPayload>;
-  activityUnpublish?: Maybe<ActivitySwitchPrivacyPayload>;
-  activityUpdateContent?: Maybe<ActivityUpdateContentPayload>;
-  applicationAddConfirmation?: Maybe<ApplicationAddConfirmationPayload>;
-  applicationApprove?: Maybe<ApplicationSwitchIsApprovedPayload>;
-  applicationCreate?: Maybe<ApplicationCreatePayload>;
-  applicationDelete?: Maybe<ApplicationDeletePayload>;
-  applicationDeleteConfirmation?: Maybe<ApplicationDeleteConfirmationPayload>;
-  applicationPublish?: Maybe<ApplicationSwitchPrivacyPayload>;
-  applicationRefuse?: Maybe<ApplicationSwitchIsApprovedPayload>;
-  applicationUnpublish?: Maybe<ApplicationSwitchPrivacyPayload>;
-  applicationUpdateComment?: Maybe<ApplicationUpdateCommentPayload>;
-  applicationUpdateConfirmation?: Maybe<ApplicationAddConfirmationPayload>;
-  applicationUpdateConfirmationComment?: Maybe<ApplicationUpdateConfirmationCommentPayload>;
-  commentAddEvent?: Maybe<CommentAddEventPayload>;
-  commentDelete?: Maybe<CommentDeletePayload>;
-  commentUpdateContent?: Maybe<CommentUpdateContentPayload>;
+  communityCreate?: Maybe<CommunityCreatePayload>;
+  communityDelete?: Maybe<CommunityDeletePayload>;
+  communityGrantPoint?: Maybe<CommunityGrantPointPayload>;
+  communityIssuePoint?: Maybe<CommunityIssuePointPayload>;
+  communityUpdateProfile?: Maybe<CommunityUpdateProfilePayload>;
   createUser?: Maybe<CurrentUserPayload>;
   deleteUser?: Maybe<CurrentUserPayload>;
-  eventAddGroup?: Maybe<EventUpdateGroupPayload>;
-  eventAddOrganization?: Maybe<EventUpdateOrganizationPayload>;
-  eventDelete?: Maybe<EventDeletePayload>;
-  eventPlan?: Maybe<EventPlanPayload>;
-  eventPublish?: Maybe<EventUpdatePrivacyPayload>;
-  eventRemoveGroup?: Maybe<EventUpdateGroupPayload>;
-  eventRemoveOrganization?: Maybe<EventUpdateOrganizationPayload>;
-  eventUnpublish?: Maybe<EventUpdatePrivacyPayload>;
-  eventUpdateContent?: Maybe<EventUpdateContentPayload>;
-  groupAddChild?: Maybe<GroupUpdateChildPayload>;
-  groupAddEvent?: Maybe<GroupUpdateEventPayload>;
-  groupAddParent?: Maybe<GroupUpdateParentPayload>;
-  groupAddTarget?: Maybe<GroupUpdateTargetPayload>;
-  groupAddUser?: Maybe<GroupUpdateUserPayload>;
-  groupChangeOrganization?: Maybe<GroupChangeOrganizationPayload>;
-  groupCreate?: Maybe<GroupCreatePayload>;
-  groupDelete?: Maybe<GroupDeletePayload>;
-  groupRemoveChild?: Maybe<GroupUpdateChildPayload>;
-  groupRemoveEvent?: Maybe<GroupUpdateEventPayload>;
-  groupRemoveParent?: Maybe<GroupUpdateParentPayload>;
-  groupRemoveTarget?: Maybe<GroupUpdateTargetPayload>;
-  groupRemoveUser?: Maybe<GroupUpdateUserPayload>;
-  groupUpdateContent?: Maybe<GroupUpdateContentPayload>;
-  issueAddCategory?: Maybe<IssueUpdateCategoryPayload>;
-  issueAddCity?: Maybe<IssueUpdateCityPayload>;
-  issueAddGroup?: Maybe<IssueUpdateGroupPayload>;
-  issueAddOrganization?: Maybe<IssueUpdateOrganizationPayload>;
-  issueAddSkillset?: Maybe<IssueUpdateSkillsetPayload>;
-  issueCreate?: Maybe<IssueCreatePayload>;
-  issueDelete?: Maybe<IssueDeletePayload>;
-  issuePublish?: Maybe<IssueUpdatePrivacyPayload>;
-  issueRemoveCategory?: Maybe<IssueUpdateCategoryPayload>;
-  issueRemoveCity?: Maybe<IssueUpdateCityPayload>;
-  issueRemoveGroup?: Maybe<IssueUpdateGroupPayload>;
-  issueRemoveOrganization?: Maybe<IssueUpdateOrganizationPayload>;
-  issueRemoveSkillset?: Maybe<IssueUpdateSkillsetPayload>;
-  issueUnpublish?: Maybe<IssueUpdatePrivacyPayload>;
-  issueUpdateContent?: Maybe<IssueUpdateContentPayload>;
-  likeAddEvent?: Maybe<LikeAddEventPayload>;
-  likeDelete?: Maybe<LikeDeletePayload>;
+  membershipCreate?: Maybe<MembershipCreatePayload>;
+  membershipDelete?: Maybe<MembershipDeletePayload>;
   mutationEcho: Scalars["String"]["output"];
-  organizationAddGroup?: Maybe<OrganizationUpdateGroupPayload>;
-  organizationAddTarget?: Maybe<OrganizationUpdateTargetPayload>;
-  organizationAddUser?: Maybe<OrganizationUpdateUserPayload>;
-  organizationCreate?: Maybe<OrganizationCreatePayload>;
-  organizationDelete?: Maybe<OrganizationDeletePayload>;
-  organizationPublish?: Maybe<OrganizationSwitchPrivacyPayload>;
-  organizationRemoveGroup?: Maybe<OrganizationUpdateGroupPayload>;
-  organizationRemoveTarget?: Maybe<OrganizationUpdateTargetPayload>;
-  organizationRemoveUser?: Maybe<OrganizationUpdateUserPayload>;
-  organizationUnpublish?: Maybe<OrganizationSwitchPrivacyPayload>;
-  organizationUpdateContent?: Maybe<OrganizationUpdateContentPayload>;
-  organizationUpdateDefault?: Maybe<OrganizationUpdateDefaultPayload>;
-  targetAddGroup?: Maybe<TargetUpdateGroupPayload>;
-  targetAddOrganization?: Maybe<TargetUpdateOrganizationPayload>;
-  targetCreate?: Maybe<TargetCreatePayload>;
-  targetDelete?: Maybe<TargetDeletePayload>;
-  targetRemoveGroup?: Maybe<TargetUpdateGroupPayload>;
-  targetRemoveOrganization?: Maybe<TargetUpdateOrganizationPayload>;
-  targetUpdateContent?: Maybe<TargetUpdateContentPayload>;
-  targetUpdateIndex?: Maybe<TargetUpdateIndexPayload>;
-  userAddActivity?: Maybe<UserUpdateActivityPayload>;
-  userAddGroup?: Maybe<UserUpdateGroupPayload>;
-  userAddOrganization?: Maybe<UserUpdateOrganizationPayload>;
-  userCreate?: Maybe<UserCreatePayload>;
-  userDelete?: Maybe<UserDeletePayload>;
-  userPublish?: Maybe<UserSwitchPrivacyPayload>;
-  userRemoveActivity?: Maybe<UserUpdateActivityPayload>;
-  userRemoveGroup?: Maybe<UserUpdateGroupPayload>;
-  userRemoveOrganization?: Maybe<UserUpdateOrganizationPayload>;
-  userUnpublish?: Maybe<UserSwitchPrivacyPayload>;
-  userUpdateContent?: Maybe<UserUpdateContentPayload>;
+  opportunityCreate?: Maybe<OpportunityCreatePayload>;
+  opportunityDelete?: Maybe<OpportunityDeletePayload>;
+  opportunityEditContent?: Maybe<OpportunityEditContentPayload>;
+  opportunitySetCommunityInternal?: Maybe<OpportunitySetPublishStatusPayload>;
+  opportunitySetPrivate?: Maybe<OpportunitySetPublishStatusPayload>;
+  opportunitySetPublic?: Maybe<OpportunitySetPublishStatusPayload>;
+  participationApply?: Maybe<ParticipationApplyPayload>;
+  participationApproveApplication?: Maybe<ParticipationSetStatusPayload>;
+  participationApproveInvitation?: Maybe<ParticipationSetStatusPayload>;
+  participationApprovePerformance?: Maybe<ParticipationSetStatusPayload>;
+  participationCancelApplication?: Maybe<ParticipationSetStatusPayload>;
+  participationCancelInvitation?: Maybe<ParticipationSetStatusPayload>;
+  participationCancelSubmission?: Maybe<ParticipationSetStatusPayload>;
+  participationDenyApplication?: Maybe<ParticipationSetStatusPayload>;
+  participationDenyInvitation?: Maybe<ParticipationSetStatusPayload>;
+  participationDenyPerformance?: Maybe<ParticipationSetStatusPayload>;
+  participationInvite?: Maybe<ParticipationSetStatusPayload>;
+  participationSubmitOutput?: Maybe<ParticipationSetStatusPayload>;
+  transactionCreate?: Maybe<TransactionCreatePayload>;
+  userUpdateProfile?: Maybe<UserUpdateProfilePayload>;
+  utilityCreate?: Maybe<UtilityCreatePayload>;
+  utilityDelete?: Maybe<UtilityDeletePayload>;
 };
 
-export type MutationActivityAddEventArgs = {
-  id: Scalars["ID"]["input"];
-  input: ActivityAddEventInput;
+export type MutationCommunityCreateArgs = {
+  input: CommunityCreateInput;
 };
 
-export type MutationActivityAddUserArgs = {
-  id: Scalars["ID"]["input"];
-  input: ActivityAddUserInput;
-};
-
-export type MutationActivityCreateArgs = {
-  input: ActivityCreateInput;
-};
-
-export type MutationActivityDeleteArgs = {
+export type MutationCommunityDeleteArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type MutationActivityPublishArgs = {
+export type MutationCommunityGrantPointArgs = {
   id: Scalars["ID"]["input"];
-  input: ActivitySwitchPrivacyInput;
+  input: CommunityGrantPointInput;
 };
 
-export type MutationActivityRemoveEventArgs = {
+export type MutationCommunityIssuePointArgs = {
   id: Scalars["ID"]["input"];
-  input: ActivityRemoveEventInput;
+  input: CommunityIssuePointInput;
 };
 
-export type MutationActivityRemoveUserArgs = {
+export type MutationCommunityUpdateProfileArgs = {
   id: Scalars["ID"]["input"];
-  input: ActivityRemoveUserInput;
-};
-
-export type MutationActivityUnpublishArgs = {
-  id: Scalars["ID"]["input"];
-  input: ActivitySwitchPrivacyInput;
-};
-
-export type MutationActivityUpdateContentArgs = {
-  id: Scalars["ID"]["input"];
-  input: ActivityUpdateContentInput;
-};
-
-export type MutationApplicationAddConfirmationArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationAddConfirmationInput;
-};
-
-export type MutationApplicationApproveArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationApprovalInput;
-};
-
-export type MutationApplicationCreateArgs = {
-  input: ApplicationCreateInput;
-};
-
-export type MutationApplicationDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationApplicationDeleteConfirmationArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationDeleteConfirmationInput;
-};
-
-export type MutationApplicationPublishArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationApplicationRefuseArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationRefusalInput;
-};
-
-export type MutationApplicationUnpublishArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationApplicationUpdateCommentArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationUpdateCommentInput;
-};
-
-export type MutationApplicationUpdateConfirmationArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationAddConfirmationInput;
-};
-
-export type MutationApplicationUpdateConfirmationCommentArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationUpdateConfirmationCommentInput;
-};
-
-export type MutationCommentAddEventArgs = {
-  input: CommentAddEventInput;
-};
-
-export type MutationCommentDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationCommentUpdateContentArgs = {
-  id: Scalars["ID"]["input"];
-  input: CommentUpdateContentInput;
+  input: CommunityUpdateProfileInput;
 };
 
 export type MutationCreateUserArgs = {
   input: CreateUserInput;
 };
 
-export type MutationEventAddGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: EventAddGroupInput;
-};
-
-export type MutationEventAddOrganizationArgs = {
-  id: Scalars["ID"]["input"];
-  input: EventAddOrganizationInput;
-};
-
-export type MutationEventDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationEventPlanArgs = {
-  input: EventPlanInput;
-};
-
-export type MutationEventPublishArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationEventRemoveGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: EventRemoveGroupInput;
-};
-
-export type MutationEventRemoveOrganizationArgs = {
-  id: Scalars["ID"]["input"];
-  input: EventRemoveOrganizationInput;
-};
-
-export type MutationEventUnpublishArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationEventUpdateContentArgs = {
-  id: Scalars["ID"]["input"];
-  input: EventUpdateContentInput;
-};
-
-export type MutationGroupAddChildArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupAddChildInput;
-};
-
-export type MutationGroupAddEventArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupAddEventInput;
-};
-
-export type MutationGroupAddParentArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupAddParentInput;
-};
-
-export type MutationGroupAddTargetArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupAddTargetInput;
-};
-
-export type MutationGroupAddUserArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupAddUserInput;
-};
-
-export type MutationGroupChangeOrganizationArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupChangeOrganizationInput;
-};
-
-export type MutationGroupCreateArgs = {
-  input: GroupCreateInput;
-};
-
-export type MutationGroupDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationGroupRemoveChildArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupRemoveChildInput;
-};
-
-export type MutationGroupRemoveEventArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupRemoveEventInput;
-};
-
-export type MutationGroupRemoveParentArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupRemoveParentInput;
-};
-
-export type MutationGroupRemoveTargetArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupRemoveTargetInput;
-};
-
-export type MutationGroupRemoveUserArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupRemoveUserInput;
-};
-
-export type MutationGroupUpdateContentArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupUpdateContentInput;
-};
-
-export type MutationIssueAddCategoryArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueAddCategoryInput;
-};
-
-export type MutationIssueAddCityArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueAddCityInput;
-};
-
-export type MutationIssueAddGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueAddGroupInput;
-};
-
-export type MutationIssueAddOrganizationArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueAddOrganizationInput;
-};
-
-export type MutationIssueAddSkillsetArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueAddSkillsetInput;
-};
-
-export type MutationIssueCreateArgs = {
-  input: IssueCreateInput;
-};
-
-export type MutationIssueDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationIssuePublishArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssuePrivacyInput;
-};
-
-export type MutationIssueRemoveCategoryArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueRemoveCategoryInput;
-};
-
-export type MutationIssueRemoveCityArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueRemoveCityInput;
-};
-
-export type MutationIssueRemoveGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueRemoveGroupInput;
-};
-
-export type MutationIssueRemoveOrganizationArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueRemoveOrganizationInput;
-};
-
-export type MutationIssueRemoveSkillsetArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueRemoveSkillsetInput;
-};
-
-export type MutationIssueUnpublishArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssuePrivacyInput;
-};
-
-export type MutationIssueUpdateContentArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueUpdateContentInput;
-};
-
-export type MutationLikeAddEventArgs = {
-  input: LikeAddEventInput;
-};
-
-export type MutationLikeDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationOrganizationAddGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: OrganizationAddGroupInput;
-};
-
-export type MutationOrganizationAddTargetArgs = {
-  id: Scalars["ID"]["input"];
-  input: OrganizationAddTargetInput;
-};
-
-export type MutationOrganizationAddUserArgs = {
-  id: Scalars["ID"]["input"];
-  input: OrganizationAddUserInput;
-};
-
-export type MutationOrganizationCreateArgs = {
-  input: OrganizationCreateInput;
-};
-
-export type MutationOrganizationDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationOrganizationPublishArgs = {
-  id: Scalars["ID"]["input"];
+export type MutationMembershipCreateArgs = {
+  input: MembershipCreateInput;
 };
 
-export type MutationOrganizationRemoveGroupArgs = {
+export type MutationMembershipDeleteArgs = {
   id: Scalars["ID"]["input"];
-  input: OrganizationRemoveGroupInput;
 };
 
-export type MutationOrganizationRemoveTargetArgs = {
-  id: Scalars["ID"]["input"];
-  input: OrganizationRemoveTargetInput;
-};
-
-export type MutationOrganizationRemoveUserArgs = {
-  id: Scalars["ID"]["input"];
-  input: OrganizationRemoveUserInput;
+export type MutationOpportunityCreateArgs = {
+  input: OpportunityCreateInput;
 };
 
-export type MutationOrganizationUnpublishArgs = {
+export type MutationOpportunityDeleteArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type MutationOrganizationUpdateContentArgs = {
+export type MutationOpportunityEditContentArgs = {
   id: Scalars["ID"]["input"];
-  input: OrganizationUpdateContentInput;
+  input: OpportunityEditContentInput;
 };
 
-export type MutationOrganizationUpdateDefaultArgs = {
+export type MutationOpportunitySetCommunityInternalArgs = {
   id: Scalars["ID"]["input"];
-  input: OrganizationUpdateDefaultInput;
 };
 
-export type MutationTargetAddGroupArgs = {
+export type MutationOpportunitySetPrivateArgs = {
   id: Scalars["ID"]["input"];
-  input: TargetAddGroupInput;
 };
 
-export type MutationTargetAddOrganizationArgs = {
+export type MutationOpportunitySetPublicArgs = {
   id: Scalars["ID"]["input"];
-  input: TargetAddOrganizationInput;
 };
 
-export type MutationTargetCreateArgs = {
-  input: TargetCreateInput;
+export type MutationParticipationApplyArgs = {
+  input: ParticipationApplyInput;
 };
 
-export type MutationTargetDeleteArgs = {
+export type MutationParticipationApproveApplicationArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type MutationTargetRemoveGroupArgs = {
+export type MutationParticipationApproveInvitationArgs = {
   id: Scalars["ID"]["input"];
-  input: TargetRemoveGroupInput;
 };
 
-export type MutationTargetRemoveOrganizationArgs = {
+export type MutationParticipationApprovePerformanceArgs = {
   id: Scalars["ID"]["input"];
-  input: TargetRemoveOrganizationInput;
 };
 
-export type MutationTargetUpdateContentArgs = {
+export type MutationParticipationCancelApplicationArgs = {
   id: Scalars["ID"]["input"];
-  input: TargetUpdateContentInput;
 };
 
-export type MutationTargetUpdateIndexArgs = {
+export type MutationParticipationCancelInvitationArgs = {
   id: Scalars["ID"]["input"];
-  input: TargetUpdateIndexInput;
 };
 
-export type MutationUserAddActivityArgs = {
+export type MutationParticipationCancelSubmissionArgs = {
   id: Scalars["ID"]["input"];
-  input: UserAddActivityInput;
 };
 
-export type MutationUserAddGroupArgs = {
+export type MutationParticipationDenyApplicationArgs = {
   id: Scalars["ID"]["input"];
-  input: UserAddGroupInput;
 };
 
-export type MutationUserAddOrganizationArgs = {
+export type MutationParticipationDenyInvitationArgs = {
   id: Scalars["ID"]["input"];
-  input: UserAddOrganizationInput;
-};
-
-export type MutationUserCreateArgs = {
-  input: UserCreateInput;
 };
 
-export type MutationUserDeleteArgs = {
+export type MutationParticipationDenyPerformanceArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type MutationUserPublishArgs = {
+export type MutationParticipationInviteArgs = {
   id: Scalars["ID"]["input"];
-  input: UserSwitchPrivacyInput;
+  input: ParticipationInviteInput;
 };
 
-export type MutationUserRemoveActivityArgs = {
+export type MutationParticipationSubmitOutputArgs = {
   id: Scalars["ID"]["input"];
-  input: UserRemoveActivityInput;
 };
 
-export type MutationUserRemoveGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: UserRemoveGroupInput;
+export type MutationTransactionCreateArgs = {
+  input: TransactionCreateInput;
 };
 
-export type MutationUserRemoveOrganizationArgs = {
+export type MutationUserUpdateProfileArgs = {
   id: Scalars["ID"]["input"];
-  input: UserRemoveOrganizationInput;
+  input: UserUpdateProfileInput;
 };
 
-export type MutationUserUnpublishArgs = {
-  id: Scalars["ID"]["input"];
-  input: UserSwitchPrivacyInput;
+export type MutationUtilityCreateArgs = {
+  input: UtilityCreateInput;
 };
 
-export type MutationUserUpdateContentArgs = {
+export type MutationUtilityDeleteArgs = {
   id: Scalars["ID"]["input"];
-  input: UserUpdateContentInput;
-};
-
-export type Organization = {
-  __typename?: "Organization";
-  address1: Scalars["String"]["output"];
-  address2?: Maybe<Scalars["String"]["output"]>;
-  agendas?: Maybe<Array<Agenda>>;
-  bio?: Maybe<Scalars["String"]["output"]>;
-  cities?: Maybe<Array<City>>;
-  city: City;
-  createdAt: Scalars["Datetime"]["output"];
-  entity?: Maybe<Scalars["String"]["output"]>;
-  entityPosition?: Maybe<EntityPosition>;
-  establishedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  events?: Maybe<Array<Event>>;
-  groups?: Maybe<Array<Group>>;
-  id: Scalars["ID"]["output"];
-  image?: Maybe<Scalars["String"]["output"]>;
-  isPublic: Scalars["Boolean"]["output"];
-  name: Scalars["String"]["output"];
-  state: State;
-  targets?: Maybe<Array<Target>>;
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  users?: Maybe<Array<User>>;
-  website?: Maybe<Scalars["String"]["output"]>;
-  zipcode: Scalars["String"]["output"];
-};
-
-export type OrganizationAddGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type OrganizationAddTargetInput = {
-  targetId: Scalars["String"]["input"];
-};
-
-export type OrganizationAddUserInput = {
-  userId: Scalars["String"]["input"];
-};
-
-export type OrganizationCreateInput = {
-  address1: Scalars["String"]["input"];
-  address2?: InputMaybe<Scalars["String"]["input"]>;
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCode: Scalars["String"]["input"];
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  entity?: InputMaybe<Scalars["String"]["input"]>;
-  entityPosition?: InputMaybe<EntityPosition>;
-  establishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
-  stateCode: Scalars["String"]["input"];
-  stateCountryCode: Scalars["String"]["input"];
-  userIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  website?: InputMaybe<Scalars["String"]["input"]>;
-  zipcode: Scalars["String"]["input"];
-};
-
-export type OrganizationCreatePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationCreateSuccess;
-
-export type OrganizationCreateSuccess = {
-  __typename?: "OrganizationCreateSuccess";
-  organization?: Maybe<Organization>;
-};
-
-export type OrganizationDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationDeleteSuccess;
-
-export type OrganizationDeleteSuccess = {
-  __typename?: "OrganizationDeleteSuccess";
-  organizationId: Scalars["ID"]["output"];
-};
-
-export type OrganizationEdge = Edge & {
-  __typename?: "OrganizationEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<Organization>;
-};
-
-export type OrganizationFilterInput = {
-  agendaId?: InputMaybe<Scalars["Int"]["input"]>;
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type OrganizationRemoveGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type OrganizationRemoveTargetInput = {
-  targetId: Scalars["String"]["input"];
-};
-
-export type OrganizationRemoveUserInput = {
-  userId: Scalars["String"]["input"];
-};
-
-export type OrganizationSortInput = {
-  updatedAt?: InputMaybe<SortDirection>;
-};
-
-export type OrganizationSwitchPrivacyPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationSwitchPrivacySuccess;
-
-export type OrganizationSwitchPrivacySuccess = {
-  __typename?: "OrganizationSwitchPrivacySuccess";
-  organization: Organization;
-};
-
-export type OrganizationUpdateContentInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  website?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type OrganizationUpdateContentPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationUpdateContentSuccess;
-
-export type OrganizationUpdateContentSuccess = {
-  __typename?: "OrganizationUpdateContentSuccess";
-  organization: Organization;
-};
-
-export type OrganizationUpdateDefaultInput = {
-  address1: Scalars["String"]["input"];
-  address2?: InputMaybe<Scalars["String"]["input"]>;
-  cityCode: Scalars["String"]["input"];
-  entity?: InputMaybe<Scalars["String"]["input"]>;
-  entityPosition?: InputMaybe<EntityPosition>;
-  establishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  name: Scalars["String"]["input"];
-  stateCode: Scalars["String"]["input"];
-  stateCountryCode: Scalars["String"]["input"];
-  zipcode: Scalars["String"]["input"];
-};
-
-export type OrganizationUpdateDefaultPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationUpdateDefaultSuccess;
-
-export type OrganizationUpdateDefaultSuccess = {
-  __typename?: "OrganizationUpdateDefaultSuccess";
-  organization: Organization;
-};
-
-export type OrganizationUpdateGroupPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationUpdateGroupSuccess;
-
-export type OrganizationUpdateGroupSuccess = {
-  __typename?: "OrganizationUpdateGroupSuccess";
-  group: Group;
-  organization: Organization;
-};
-
-export type OrganizationUpdateTargetPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationUpdateTargetSuccess;
-
-export type OrganizationUpdateTargetSuccess = {
-  __typename?: "OrganizationUpdateTargetSuccess";
-  organization: Organization;
-  target: Target;
-};
-
-export type OrganizationUpdateUserPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationUpdateUserSuccess;
-
-export type OrganizationUpdateUserSuccess = {
-  __typename?: "OrganizationUpdateUserSuccess";
-  organization: Organization;
-  user: User;
-};
-
-export type Organizations = {
-  __typename?: "Organizations";
-  data: Array<Organization>;
-  total: Scalars["Int"]["output"];
 };
 
-export type OrganizationsConnection = {
-  __typename?: "OrganizationsConnection";
-  edges?: Maybe<Array<Maybe<OrganizationEdge>>>;
+export type OpportunitiesConnection = {
+  __typename?: "OpportunitiesConnection";
+  edges: Array<OpportunityEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars["Int"]["output"];
+};
+
+export type Opportunity = {
+  __typename?: "Opportunity";
+  capacity?: Maybe<Scalars["Int"]["output"]>;
+  category: OpportunityCategory;
+  city: City;
+  community: Community;
+  createdAt: Scalars["Datetime"]["output"];
+  createdBy: User;
+  description?: Maybe<Scalars["String"]["output"]>;
+  endsAt?: Maybe<Scalars["Datetime"]["output"]>;
+  files?: Maybe<Array<Scalars["String"]["output"]>>;
+  id: Scalars["ID"]["output"];
+  image?: Maybe<Scalars["String"]["output"]>;
+  participations?: Maybe<Array<Participation>>;
+  pointsPerParticipation: Scalars["Int"]["output"];
+  publishStatus: PublishStatus;
+  requireApproval: Scalars["Boolean"]["output"];
+  startsAt?: Maybe<Scalars["Datetime"]["output"]>;
+  state?: Maybe<State>;
+  title: Scalars["String"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export enum OpportunityCategory {
+  Conversation = "CONVERSATION",
+  Event = "EVENT",
+  Task = "TASK",
+}
+
+export type OpportunityCreateInput = {
+  capacity?: InputMaybe<Scalars["Int"]["input"]>;
+  category: OpportunityCategory;
+  cityCode: Scalars["String"]["input"];
+  communityId: Scalars["String"]["input"];
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  files?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  image?: InputMaybe<Scalars["String"]["input"]>;
+  pointsPerParticipation: Scalars["Int"]["input"];
+  requireApproval?: InputMaybe<Scalars["Boolean"]["input"]>;
+  startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  stateCode?: InputMaybe<Scalars["String"]["input"]>;
+  title: Scalars["String"]["input"];
+};
+
+export type OpportunityCreatePayload =
+  | AuthError
+  | ComplexQueryError
+  | InvalidInputValueError
+  | OpportunityCreateSuccess;
+
+export type OpportunityCreateSuccess = {
+  __typename?: "OpportunityCreateSuccess";
+  opportunity: Opportunity;
+};
+
+export type OpportunityDeletePayload =
+  | AuthError
+  | ComplexQueryError
+  | InvalidInputValueError
+  | OpportunityDeleteSuccess;
+
+export type OpportunityDeleteSuccess = {
+  __typename?: "OpportunityDeleteSuccess";
+  opportunityId: Scalars["String"]["output"];
+};
+
+export type OpportunityEdge = Edge & {
+  __typename?: "OpportunityEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Opportunity>;
+};
+
+export type OpportunityEditContentInput = {
+  capacity?: InputMaybe<Scalars["Int"]["input"]>;
+  category?: InputMaybe<OpportunityCategory>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  files?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  image?: InputMaybe<Scalars["String"]["input"]>;
+  pointsPerParticipation?: InputMaybe<Scalars["Int"]["input"]>;
+  requireApproval?: InputMaybe<Scalars["Boolean"]["input"]>;
+  startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type OpportunityEditContentPayload =
+  | AuthError
+  | ComplexQueryError
+  | InvalidInputValueError
+  | OpportunityEditContentSuccess;
+
+export type OpportunityEditContentSuccess = {
+  __typename?: "OpportunityEditContentSuccess";
+  opportunity: Opportunity;
+};
+
+export type OpportunityFilterInput = {
+  category?: InputMaybe<OpportunityCategory>;
+  cityCode?: InputMaybe<Scalars["String"]["input"]>;
+  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  createdBy?: InputMaybe<Scalars["String"]["input"]>;
+  publishStatus?: InputMaybe<PublishStatus>;
+  stateCode?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type OpportunitySetPublishStatusPayload =
+  | AuthError
+  | ComplexQueryError
+  | InvalidInputValueError
+  | OpportunitySetPublishStatusSuccess;
+
+export type OpportunitySetPublishStatusSuccess = {
+  __typename?: "OpportunitySetPublishStatusSuccess";
+  opportunity: Opportunity;
+};
+
+export type OpportunitySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+  pointsPerParticipation?: InputMaybe<SortDirection>;
+  startsAt?: InputMaybe<SortDirection>;
 };
 
 export type PageInfo = {
@@ -1900,114 +593,253 @@ export type Paging = {
   take: Scalars["Int"]["output"];
 };
 
+export type Participation = {
+  __typename?: "Participation";
+  community?: Maybe<Community>;
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  opportunity?: Maybe<Opportunity>;
+  status: ParticipationStatus;
+  statusHistories?: Maybe<Array<ParticipationStatusHistory>>;
+  transactions?: Maybe<Array<Transaction>>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  user?: Maybe<User>;
+};
+
+export type ParticipationApplyInput = {
+  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  opportunityId: Scalars["String"]["input"];
+};
+
+export type ParticipationApplyPayload =
+  | AuthError
+  | ComplexQueryError
+  | InvalidInputValueError
+  | ParticipationApplySuccess;
+
+export type ParticipationApplySuccess = {
+  __typename?: "ParticipationApplySuccess";
+  participation: Participation;
+};
+
+export type ParticipationEdge = Edge & {
+  __typename?: "ParticipationEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Participation>;
+};
+
+export type ParticipationFilterInput = {
+  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  opportunityId?: InputMaybe<Scalars["String"]["input"]>;
+  status?: InputMaybe<ParticipationStatus>;
+  userId?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type ParticipationInviteInput = {
+  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  invitedUserId: Scalars["String"]["input"];
+  opportunityId: Scalars["String"]["input"];
+};
+
+export type ParticipationInvitePayload =
+  | AuthError
+  | ComplexQueryError
+  | InvalidInputValueError
+  | ParticipationInviteSuccess;
+
+export type ParticipationInviteSuccess = {
+  __typename?: "ParticipationInviteSuccess";
+  participation: Participation;
+};
+
+export type ParticipationSetStatusPayload =
+  | AuthError
+  | ComplexQueryError
+  | InvalidInputValueError
+  | ParticipationSetStatusSuccess;
+
+export type ParticipationSetStatusSuccess = {
+  __typename?: "ParticipationSetStatusSuccess";
+  participation: Participation;
+};
+
+export type ParticipationSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+};
+
+export enum ParticipationStatus {
+  Applied = "APPLIED",
+  Approved = "APPROVED",
+  Canceled = "CANCELED",
+  Denied = "DENIED",
+  Invited = "INVITED",
+  NotParticipating = "NOT_PARTICIPATING",
+  Participating = "PARTICIPATING",
+}
+
+export type ParticipationStatusHistoriesConnection = {
+  __typename?: "ParticipationStatusHistoriesConnection";
+  edges: Array<ParticipationStatusHistoryEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type ParticipationStatusHistory = {
+  __typename?: "ParticipationStatusHistory";
+  createdAt: Scalars["Datetime"]["output"];
+  createdBy?: Maybe<User>;
+  id: Scalars["ID"]["output"];
+  participation: Participation;
+  status: ParticipationStatus;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type ParticipationStatusHistoryCreateInput = {
+  createdById: Scalars["String"]["input"];
+  participationId: Scalars["String"]["input"];
+  status: ParticipationStatus;
+};
+
+export type ParticipationStatusHistoryCreatePayload =
+  | AuthError
+  | ComplexQueryError
+  | InvalidInputValueError
+  | ParticipationStatusHistoryCreateSuccess;
+
+export type ParticipationStatusHistoryCreateSuccess = {
+  __typename?: "ParticipationStatusHistoryCreateSuccess";
+  participationStatusHistory: ParticipationStatusHistory;
+};
+
+export type ParticipationStatusHistoryEdge = Edge & {
+  __typename?: "ParticipationStatusHistoryEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<ParticipationStatusHistory>;
+};
+
+export type ParticipationStatusHistoryFilterInput = {
+  createdById?: InputMaybe<Scalars["String"]["input"]>;
+  participationId?: InputMaybe<Scalars["String"]["input"]>;
+  status?: InputMaybe<ParticipationStatus>;
+};
+
+export type ParticipationStatusHistorySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export type ParticipationsConnection = {
+  __typename?: "ParticipationsConnection";
+  edges: Array<ParticipationEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export enum PublishStatus {
+  CommunityInternal = "COMMUNITY_INTERNAL",
+  Private = "PRIVATE",
+  Public = "PUBLIC",
+}
+
 export type Query = {
   __typename?: "Query";
-  activities: ActivitiesConnection;
-  activity?: Maybe<Activity>;
-  agendas: Array<Agenda>;
-  application?: Maybe<Application>;
-  applications: ApplicationsConnection;
   cities: Array<City>;
+  communities: CommunitiesConnection;
+  community?: Maybe<Community>;
   currentUser?: Maybe<CurrentUserPayload>;
   echo: Scalars["String"]["output"];
-  event?: Maybe<Event>;
-  events: EventsConnection;
-  group?: Maybe<Group>;
-  groups: GroupsConnection;
-  issue?: Maybe<Issue>;
-  issues: IssuesConnection;
-  organization?: Maybe<Organization>;
-  organizations: OrganizationsConnection;
+  membership?: Maybe<Membership>;
+  memberships: MembershipsConnection;
+  opportunities: OpportunitiesConnection;
+  opportunity?: Maybe<Opportunity>;
+  participation?: Maybe<Participation>;
+  participationStatusHistories: ParticipationStatusHistoriesConnection;
+  participationStatusHistory?: Maybe<ParticipationStatusHistory>;
+  participations: ParticipationsConnection;
   states: Array<State>;
-  target?: Maybe<Target>;
-  targets: TargetsConnection;
+  transaction?: Maybe<Transaction>;
+  transactions: TransactionsConnection;
   user?: Maybe<User>;
   users: UsersConnection;
-};
-
-export type QueryActivitiesArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<ActivityFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<ActivitySortInput>;
-};
-
-export type QueryActivityArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type QueryApplicationArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type QueryApplicationsArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<ApplicationFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<ApplicationSortInput>;
+  utilities: UtilitiesConnection;
+  utility?: Maybe<Utility>;
+  wallet?: Maybe<Wallet>;
+  wallets: WalletsConnection;
 };
 
 export type QueryCitiesArgs = {
   name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type QueryEventArgs = {
+export type QueryCommunitiesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<CommunityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<CommunitySortInput>;
+};
+
+export type QueryCommunityArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type QueryEventsArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<EventFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<EventSortInput>;
+export type QueryMembershipArgs = {
+  communityId: Scalars["ID"]["input"];
+  userId: Scalars["ID"]["input"];
 };
 
-export type QueryGroupArgs = {
+export type QueryMembershipsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<MembershipFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<MembershipSortInput>;
+};
+
+export type QueryOpportunitiesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunitySortInput>;
+};
+
+export type QueryOpportunityArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type QueryGroupsArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<GroupFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<GroupSortInput>;
-};
-
-export type QueryIssueArgs = {
+export type QueryParticipationArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type QueryIssuesArgs = {
+export type QueryParticipationStatusHistoriesArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<IssueFilterInput>;
+  filter?: InputMaybe<ParticipationStatusHistoryFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<IssueSortInput>;
+  sort?: InputMaybe<ParticipationStatusHistorySortInput>;
 };
 
-export type QueryOrganizationArgs = {
+export type QueryParticipationStatusHistoryArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type QueryOrganizationsArgs = {
+export type QueryParticipationsArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<OrganizationFilterInput>;
+  filter?: InputMaybe<ParticipationFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<OrganizationSortInput>;
+  sort?: InputMaybe<ParticipationSortInput>;
 };
 
 export type QueryStatesArgs = {
   name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type QueryTargetArgs = {
+export type QueryTransactionArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type QueryTargetsArgs = {
+export type QueryTransactionsArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<TargetFilterInput>;
+  filter?: InputMaybe<TransactionFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<TargetSortInput>;
+  sort?: InputMaybe<TransactionSortInput>;
 };
 
 export type QueryUserArgs = {
@@ -2021,19 +853,33 @@ export type QueryUsersArgs = {
   sort?: InputMaybe<UserSortInput>;
 };
 
+export type QueryUtilitiesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<UtilityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<UtilitySortInput>;
+};
+
+export type QueryUtilityArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryWalletArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryWalletsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<WalletFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<WalletSortInput>;
+};
+
 export enum Role {
   Manager = "MANAGER",
   Member = "MEMBER",
   Owner = "OWNER",
 }
-
-export type Skillset = {
-  __typename?: "Skillset";
-  code: Scalars["String"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
-  id: Scalars["Int"]["output"];
-  name: Scalars["String"]["output"];
-};
 
 export enum SortDirection {
   Asc = "asc",
@@ -2052,215 +898,92 @@ export enum SysRole {
   User = "USER",
 }
 
-export type Target = {
-  __typename?: "Target";
+export type Transaction = {
+  __typename?: "Transaction";
   createdAt: Scalars["Datetime"]["output"];
-  group?: Maybe<Group>;
+  fromPointChange?: Maybe<Scalars["Int"]["output"]>;
+  fromWallet?: Maybe<Wallet>;
   id: Scalars["ID"]["output"];
-  index?: Maybe<Index>;
-  name: Scalars["String"]["output"];
-  organization?: Maybe<Organization>;
+  participation?: Maybe<Participation>;
+  reason?: Maybe<TransactionReason>;
+  toPointChange?: Maybe<Scalars["Int"]["output"]>;
+  toWallet?: Maybe<Wallet>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  validFrom: Scalars["Datetime"]["output"];
-  validTo: Scalars["Datetime"]["output"];
-  value: Scalars["Float"]["output"];
+  utility?: Maybe<Utility>;
 };
 
-export type TargetAddGroupInput = {
-  groupId: Scalars["String"]["input"];
+export type TransactionCreateInput = {
+  fromPointChange?: InputMaybe<Scalars["Int"]["input"]>;
+  fromWalletId?: InputMaybe<Scalars["String"]["input"]>;
+  participationId?: InputMaybe<Scalars["String"]["input"]>;
+  reason: TransactionReason;
+  toPointChange?: InputMaybe<Scalars["Int"]["input"]>;
+  toWalletId: Scalars["String"]["input"];
+  utilityId?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type TargetAddOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type TargetCreateInput = {
-  groupId: Scalars["String"]["input"];
-  indexId: Scalars["Int"]["input"];
-  name: Scalars["String"]["input"];
-  organizationId: Scalars["String"]["input"];
-  validFrom: Scalars["Datetime"]["input"];
-  validTo: Scalars["Datetime"]["input"];
-  value: Scalars["Float"]["input"];
-};
-
-export type TargetCreatePayload =
+export type TransactionCreatePayload =
   | AuthError
   | ComplexQueryError
   | InvalidInputValueError
-  | TargetCreateSuccess;
+  | TransactionCreateSuccess;
 
-export type TargetCreateSuccess = {
-  __typename?: "TargetCreateSuccess";
-  target?: Maybe<Target>;
+export type TransactionCreateSuccess = {
+  __typename?: "TransactionCreateSuccess";
+  transaction: Transaction;
 };
 
-export type TargetDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | TargetDeleteSuccess;
-
-export type TargetDeleteSuccess = {
-  __typename?: "TargetDeleteSuccess";
-  targetId: Scalars["ID"]["output"];
-};
-
-export type TargetEdge = Edge & {
-  __typename?: "TargetEdge";
+export type TransactionEdge = Edge & {
+  __typename?: "TransactionEdge";
   cursor: Scalars["String"]["output"];
-  node?: Maybe<Target>;
+  node?: Maybe<Transaction>;
 };
 
-export type TargetFilterInput = {
+export type TransactionFilterInput = {
   keyword?: InputMaybe<Scalars["String"]["input"]>;
-  organizationId?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type TargetRemoveGroupInput = {
-  groupId: Scalars["String"]["input"];
+export enum TransactionReason {
+  Gift = "GIFT",
+  MembershipDeleted = "MEMBERSHIP_DELETED",
+  Other = "OTHER",
+  ParticipationApproved = "PARTICIPATION_APPROVED",
+  PointIssued = "POINT_ISSUED",
+  UtilityUsage = "UTILITY_USAGE",
+}
+
+export type TransactionSortInput = {
+  startsAt?: InputMaybe<SortDirection>;
 };
 
-export type TargetRemoveOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type TargetSortInput = {
-  updatedAt?: InputMaybe<SortDirection>;
-};
-
-export type TargetUpdateContentInput = {
-  name: Scalars["String"]["input"];
-  validFrom: Scalars["Datetime"]["input"];
-  validTo: Scalars["Datetime"]["input"];
-  value: Scalars["Float"]["input"];
-};
-
-export type TargetUpdateContentPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | TargetUpdateContentSuccess;
-
-export type TargetUpdateContentSuccess = {
-  __typename?: "TargetUpdateContentSuccess";
-  target?: Maybe<Target>;
-};
-
-export type TargetUpdateGroupPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | TargetUpdateGroupSuccess;
-
-export type TargetUpdateGroupSuccess = {
-  __typename?: "TargetUpdateGroupSuccess";
-  group: Group;
-  target: Target;
-};
-
-export type TargetUpdateIndexInput = {
-  indexId: Scalars["Int"]["input"];
-};
-
-export type TargetUpdateIndexPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | TargetUpdateIndexSuccess;
-
-export type TargetUpdateIndexSuccess = {
-  __typename?: "TargetUpdateIndexSuccess";
-  index: Index;
-  target: Target;
-};
-
-export type TargetUpdateOrganizationPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | TargetUpdateOrganizationSuccess;
-
-export type TargetUpdateOrganizationSuccess = {
-  __typename?: "TargetUpdateOrganizationSuccess";
-  organization: Organization;
-  target: Target;
-};
-
-export type TargetsConnection = {
-  __typename?: "TargetsConnection";
-  edges?: Maybe<Array<Maybe<TargetEdge>>>;
+export type TransactionsConnection = {
+  __typename?: "TransactionsConnection";
+  edges?: Maybe<Array<Maybe<TransactionEdge>>>;
   pageInfo: PageInfo;
   totalCount: Scalars["Int"]["output"];
 };
 
 export type User = {
   __typename?: "User";
-  activities?: Maybe<Array<Activity>>;
-  agendas?: Maybe<Array<Agenda>>;
   bio?: Maybe<Scalars["String"]["output"]>;
-  cities?: Maybe<Array<City>>;
-  comments?: Maybe<Array<Comment>>;
   createdAt: Scalars["Datetime"]["output"];
-  email?: Maybe<Scalars["String"]["output"]>;
-  firstName: Scalars["String"]["output"];
-  groups?: Maybe<Array<Group>>;
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
-  isPublic: Scalars["Boolean"]["output"];
-  lastName: Scalars["String"]["output"];
-  likes?: Maybe<Array<Like>>;
-  middleName?: Maybe<Scalars["String"]["output"]>;
-  organizations?: Maybe<Array<Organization>>;
-  sysRole: SysRole;
+  memberships?: Maybe<Array<Membership>>;
+  name: Scalars["String"]["output"];
+  opportunitiesCreatedByMe?: Maybe<Array<Opportunity>>;
+  participationStatusChangedByMe?: Maybe<Array<ParticipationStatusHistory>>;
+  participations?: Maybe<Array<Participation>>;
+  slug: Scalars["String"]["output"];
+  sysRole?: Maybe<SysRole>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-};
-
-export type UserAddActivityInput = {
-  activityId: Scalars["String"]["input"];
-};
-
-export type UserAddGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type UserAddOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type UserCreateInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  firstName: Scalars["String"]["input"];
-  groupIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  lastName: Scalars["String"]["input"];
-  middleName?: InputMaybe<Scalars["String"]["input"]>;
-  organizationIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-};
-
-export type UserCreatePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserCreateSuccess;
-
-export type UserCreateSuccess = {
-  __typename?: "UserCreateSuccess";
-  user?: Maybe<User>;
-};
-
-export type UserDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserDeleteSuccess;
-
-export type UserDeleteSuccess = {
-  __typename?: "UserDeleteSuccess";
-  userId: Scalars["ID"]["output"];
+  urlFacebook?: Maybe<Scalars["String"]["output"]>;
+  urlInstagram?: Maybe<Scalars["String"]["output"]>;
+  urlTiktok?: Maybe<Scalars["String"]["output"]>;
+  urlWebsite?: Maybe<Scalars["String"]["output"]>;
+  urlX?: Maybe<Scalars["String"]["output"]>;
+  urlYoutube?: Maybe<Scalars["String"]["output"]>;
+  wallets?: Maybe<Array<Wallet>>;
 };
 
 export type UserEdge = Edge & {
@@ -2270,99 +993,30 @@ export type UserEdge = Edge & {
 };
 
 export type UserFilterInput = {
-  agendaId?: InputMaybe<Scalars["Int"]["input"]>;
-  cityCode?: InputMaybe<Scalars["String"]["input"]>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
   keyword?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type UserRemoveActivityInput = {
-  activityId: Scalars["String"]["input"];
-};
-
-export type UserRemoveGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type UserRemoveOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
+  sysRole?: InputMaybe<SysRole>;
 };
 
 export type UserSortInput = {
-  updatedAt?: InputMaybe<SortDirection>;
+  createdAt?: InputMaybe<SortDirection>;
 };
 
-export type UserSwitchPrivacyInput = {
-  isPublic: Scalars["Boolean"]["input"];
-};
-
-export type UserSwitchPrivacyPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserSwitchPrivacySuccess;
-
-export type UserSwitchPrivacySuccess = {
-  __typename?: "UserSwitchPrivacySuccess";
-  user: User;
-};
-
-export type UserUpdateActivityPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserUpdateActivitySuccess;
-
-export type UserUpdateActivitySuccess = {
-  __typename?: "UserUpdateActivitySuccess";
-  activity: Activity;
-  user?: Maybe<User>;
-};
-
-export type UserUpdateContentInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
+export type UserUpdateProfileInput = {
   bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  firstName: Scalars["String"]["input"];
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  lastName: Scalars["String"]["input"];
-  middleName?: InputMaybe<Scalars["String"]["input"]>;
+  image?: InputMaybe<ImageInput>;
+  name: Scalars["String"]["input"];
+  slug?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type UserUpdateContentPayload =
+export type UserUpdateProfilePayload =
   | AuthError
   | ComplexQueryError
   | InvalidInputValueError
-  | UserUpdateContentSuccess;
+  | UserUpdateProfileSuccess;
 
-export type UserUpdateContentSuccess = {
-  __typename?: "UserUpdateContentSuccess";
+export type UserUpdateProfileSuccess = {
+  __typename?: "UserUpdateProfileSuccess";
   user?: Maybe<User>;
-};
-
-export type UserUpdateGroupPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserUpdateGroupSuccess;
-
-export type UserUpdateGroupSuccess = {
-  __typename?: "UserUpdateGroupSuccess";
-  group: Group;
-  user: User;
-};
-
-export type UserUpdateOrganizationPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserUpdateOrganizationSuccess;
-
-export type UserUpdateOrganizationSuccess = {
-  __typename?: "UserUpdateOrganizationSuccess";
-  organization: Organization;
-  user: User;
 };
 
 export type UsersConnection = {
@@ -2372,58 +1026,139 @@ export type UsersConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type UtilitiesConnection = {
+  __typename?: "UtilitiesConnection";
+  edges?: Maybe<Array<Maybe<UtilityEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type Utility = {
+  __typename?: "Utility";
+  community: Community;
+  createdAt: Scalars["Datetime"]["output"];
+  description?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  image?: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
+  pointsRequired: Scalars["Int"]["output"];
+  transactions?: Maybe<Array<Transaction>>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type UtilityCreateInput = {
+  communityId: Scalars["ID"]["input"];
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  image?: InputMaybe<Scalars["String"]["input"]>;
+  name: Scalars["String"]["input"];
+  pointsRequired: Scalars["Int"]["input"];
+};
+
+export type UtilityCreatePayload =
+  | AuthError
+  | ComplexQueryError
+  | InvalidInputValueError
+  | UtilityCreateSuccess;
+
+export type UtilityCreateSuccess = {
+  __typename?: "UtilityCreateSuccess";
+  utility: Utility;
+};
+
+export type UtilityDeletePayload =
+  | AuthError
+  | ComplexQueryError
+  | InvalidInputValueError
+  | UtilityDeleteSuccess;
+
+export type UtilityDeleteSuccess = {
+  __typename?: "UtilityDeleteSuccess";
+  utilityId: Scalars["ID"]["output"];
+};
+
+export type UtilityEdge = Edge & {
+  __typename?: "UtilityEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Utility>;
+};
+
+export type UtilityFilterInput = {
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type UtilitySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
 export enum ValueType {
   Float = "FLOAT",
   Int = "INT",
 }
 
-export type ActivityCreateMutationVariables = Exact<{
-  input: ActivityCreateInput;
-}>;
-
-export type ActivityCreateMutation = {
-  __typename?: "Mutation";
-  activityCreate?:
-    | {
-        __typename?: "ActivityCreateSuccess";
-        activity?: { __typename?: "Activity"; id: string; description?: string | null } | null;
-      }
-    | { __typename?: "AuthError" }
-    | { __typename?: "ComplexQueryError" }
-    | { __typename?: "InvalidInputValueError" }
-    | null;
+export type Wallet = {
+  __typename?: "Wallet";
+  community: Community;
+  createdAt: Scalars["Datetime"]["output"];
+  currentPointView?: Maybe<CurrentPointView>;
+  fromTransactions?: Maybe<Array<Transaction>>;
+  id: Scalars["ID"]["output"];
+  toTransactions?: Maybe<Array<Transaction>>;
+  type: WalletType;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  user?: Maybe<User>;
 };
 
-export type ActivityUpdateContentMutationVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  input: ActivityUpdateContentInput;
-}>;
-
-export type ActivityUpdateContentMutation = {
-  __typename?: "Mutation";
-  activityUpdateContent?:
-    | {
-        __typename?: "ActivityUpdateContentSuccess";
-        activity: { __typename?: "Activity"; id: string; description?: string | null };
-      }
-    | { __typename?: "AuthError" }
-    | { __typename?: "ComplexQueryError" }
-    | { __typename?: "InvalidInputValueError" }
-    | null;
+export type WalletCreateInput = {
+  communityId: Scalars["String"]["input"];
+  userId?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type DeleteActivityMutationVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
+export type WalletCreatePayload =
+  | AuthError
+  | ComplexQueryError
+  | InvalidInputValueError
+  | WalletCreateSuccess;
 
-export type DeleteActivityMutation = {
-  __typename?: "Mutation";
-  activityDelete?:
-    | { __typename?: "ActivityDeleteSuccess"; activityId: string }
-    | { __typename?: "AuthError" }
-    | { __typename?: "ComplexQueryError" }
-    | { __typename?: "InvalidInputValueError" }
-    | null;
+export type WalletCreateSuccess = {
+  __typename?: "WalletCreateSuccess";
+  wallet: Wallet;
+};
+
+export type WalletDeletePayload =
+  | AuthError
+  | ComplexQueryError
+  | InvalidInputValueError
+  | WalletDeleteSuccess;
+
+export type WalletDeleteSuccess = {
+  __typename?: "WalletDeleteSuccess";
+  walletId: Scalars["String"]["output"];
+};
+
+export type WalletEdge = Edge & {
+  __typename?: "WalletEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Wallet>;
+};
+
+export type WalletFilterInput = {
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type WalletSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export enum WalletType {
+  Community = "COMMUNITY",
+  Member = "MEMBER",
+}
+
+export type WalletsConnection = {
+  __typename?: "WalletsConnection";
+  edges?: Maybe<Array<Maybe<WalletEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type CreateUserMutationVariables = Exact<{
@@ -2448,66 +1183,248 @@ export type DeleteUserMutation = {
   } | null;
 };
 
-export type ActivitiesQueryVariables = Exact<{
-  filter?: InputMaybe<ActivityFilterInput>;
-  sort?: InputMaybe<ActivitySortInput>;
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
+export type OpportunityCreateMutationVariables = Exact<{
+  input: OpportunityCreateInput;
 }>;
 
-export type ActivitiesQuery = {
-  __typename?: "Query";
-  activities: {
-    __typename?: "ActivitiesConnection";
-    edges?: Array<{
-      __typename?: "ActivityEdge";
-      node?: {
-        __typename?: "Activity";
-        id: string;
-        description?: string | null;
-        remark?: string | null;
-        startsAt: Date;
-        endsAt: Date;
-        isPublic: boolean;
-        event?: { __typename?: "Event"; id: string; description?: string | null } | null;
-        user?: {
-          __typename?: "User";
+export type OpportunityCreateMutation = {
+  __typename?: "Mutation";
+  opportunityCreate?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | {
+        __typename?: "OpportunityCreateSuccess";
+        opportunity: {
+          __typename?: "Opportunity";
           id: string;
-          firstName: string;
-          middleName?: string | null;
-          lastName: string;
-        } | null;
-        organization?: { __typename?: "Organization"; id: string; name: string } | null;
-      } | null;
-    } | null> | null;
-    pageInfo: { __typename?: "PageInfo"; endCursor?: string | null; hasNextPage: boolean };
-  };
+          title: string;
+          description?: string | null;
+          category: OpportunityCategory;
+          startsAt?: Date | null;
+          endsAt?: Date | null;
+          pointsPerParticipation: number;
+          publishStatus: PublishStatus;
+          community: { __typename?: "Community"; id: string; name: string };
+          city: { __typename?: "City"; code: string; name: string };
+        };
+      }
+    | null;
 };
 
-export type ActivityQueryVariables = Exact<{
+export type OpportunityEditContentMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: OpportunityEditContentInput;
+}>;
+
+export type OpportunityEditContentMutation = {
+  __typename?: "Mutation";
+  opportunityEditContent?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | {
+        __typename?: "OpportunityEditContentSuccess";
+        opportunity: {
+          __typename?: "Opportunity";
+          id: string;
+          title: string;
+          description?: string | null;
+          category: OpportunityCategory;
+          startsAt?: Date | null;
+          endsAt?: Date | null;
+          pointsPerParticipation: number;
+          publishStatus: PublishStatus;
+          community: { __typename?: "Community"; id: string; name: string };
+          city: { __typename?: "City"; code: string; name: string };
+        };
+      }
+    | null;
+};
+
+export type OpportunityDeleteMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
 
-export type ActivityQuery = {
-  __typename?: "Query";
-  activity?: {
-    __typename?: "Activity";
-    id: string;
-    description?: string | null;
-    remark?: string | null;
-    startsAt: Date;
-    endsAt: Date;
-    isPublic: boolean;
-    event?: { __typename?: "Event"; id: string; description?: string | null } | null;
-    user?: {
-      __typename?: "User";
-      id: string;
-      firstName: string;
-      middleName?: string | null;
-      lastName: string;
-    } | null;
-    organization?: { __typename?: "Organization"; id: string; name: string } | null;
-  } | null;
+export type OpportunityDeleteMutation = {
+  __typename?: "Mutation";
+  opportunityDelete?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | { __typename?: "OpportunityDeleteSuccess"; opportunityId: string }
+    | null;
+};
+
+export type ParticipationInviteMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: ParticipationInviteInput;
+}>;
+
+export type ParticipationInviteMutation = {
+  __typename?: "Mutation";
+  participationInvite?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | {
+        __typename?: "ParticipationSetStatusSuccess";
+        participation: { __typename?: "Participation"; id: string; status: ParticipationStatus };
+      }
+    | null;
+};
+
+export type ParticipationCancelInvitationMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ParticipationCancelInvitationMutation = {
+  __typename?: "Mutation";
+  participationCancelInvitation?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | {
+        __typename?: "ParticipationSetStatusSuccess";
+        participation: { __typename?: "Participation"; id: string; status: ParticipationStatus };
+      }
+    | null;
+};
+
+export type ParticipationApproveInvitationMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ParticipationApproveInvitationMutation = {
+  __typename?: "Mutation";
+  participationApproveInvitation?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | {
+        __typename?: "ParticipationSetStatusSuccess";
+        participation: { __typename?: "Participation"; id: string; status: ParticipationStatus };
+      }
+    | null;
+};
+
+export type ParticipationDenyInvitationMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ParticipationDenyInvitationMutation = {
+  __typename?: "Mutation";
+  participationDenyInvitation?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | {
+        __typename?: "ParticipationSetStatusSuccess";
+        participation: { __typename?: "Participation"; id: string; status: ParticipationStatus };
+      }
+    | null;
+};
+
+export type ParticipationApplyMutationVariables = Exact<{
+  input: ParticipationApplyInput;
+}>;
+
+export type ParticipationApplyMutation = {
+  __typename?: "Mutation";
+  participationApply?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | {
+        __typename?: "ParticipationApplySuccess";
+        participation: { __typename?: "Participation"; id: string; status: ParticipationStatus };
+      }
+    | null;
+};
+
+export type ParticipationCancelApplicationMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ParticipationCancelApplicationMutation = {
+  __typename?: "Mutation";
+  participationCancelApplication?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | {
+        __typename?: "ParticipationSetStatusSuccess";
+        participation: { __typename?: "Participation"; id: string; status: ParticipationStatus };
+      }
+    | null;
+};
+
+export type ParticipationApproveApplicationMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ParticipationApproveApplicationMutation = {
+  __typename?: "Mutation";
+  participationApproveApplication?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | {
+        __typename?: "ParticipationSetStatusSuccess";
+        participation: { __typename?: "Participation"; id: string; status: ParticipationStatus };
+      }
+    | null;
+};
+
+export type ParticipationDenyApplicationMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ParticipationDenyApplicationMutation = {
+  __typename?: "Mutation";
+  participationDenyApplication?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | {
+        __typename?: "ParticipationSetStatusSuccess";
+        participation: { __typename?: "Participation"; id: string; status: ParticipationStatus };
+      }
+    | null;
+};
+
+export type ParticipationApprovePerformanceMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ParticipationApprovePerformanceMutation = {
+  __typename?: "Mutation";
+  participationApprovePerformance?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | {
+        __typename?: "ParticipationSetStatusSuccess";
+        participation: { __typename?: "Participation"; id: string; status: ParticipationStatus };
+      }
+    | null;
+};
+
+export type ParticipationDenyPerformanceMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ParticipationDenyPerformanceMutation = {
+  __typename?: "Mutation";
+  participationDenyPerformance?:
+    | { __typename?: "AuthError" }
+    | { __typename?: "ComplexQueryError" }
+    | { __typename?: "InvalidInputValueError" }
+    | {
+        __typename?: "ParticipationSetStatusSuccess";
+        participation: { __typename?: "Participation"; id: string; status: ParticipationStatus };
+      }
+    | null;
 };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -2516,243 +1433,126 @@ export type CurrentUserQuery = {
   __typename?: "Query";
   currentUser?: {
     __typename?: "CurrentUserPayload";
-    user?: {
-      __typename?: "User";
-      id: string;
-      lastName: string;
-      middleName?: string | null;
-      firstName: string;
-    } | null;
+    user?: { __typename?: "User"; id: string; name: string } | null;
   } | null;
 };
 
-export type OrganizationsQueryVariables = Exact<{
-  filter?: InputMaybe<OrganizationFilterInput>;
-  sort?: InputMaybe<OrganizationSortInput>;
+export type OpportunitiesQueryVariables = Exact<{
+  filter?: InputMaybe<OpportunityFilterInput>;
+  sort?: InputMaybe<OpportunitySortInput>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
-export type OrganizationsQuery = {
+export type OpportunitiesQuery = {
   __typename?: "Query";
-  organizations: {
-    __typename?: "OrganizationsConnection";
-    edges?: Array<{
-      __typename?: "OrganizationEdge";
+  opportunities: {
+    __typename?: "OpportunitiesConnection";
+    edges: Array<{
+      __typename?: "OpportunityEdge";
       node?: {
-        __typename?: "Organization";
+        __typename?: "Opportunity";
         id: string;
-        name: string;
-        city: { __typename?: "City"; name: string; state: { __typename?: "State"; name: string } };
-        users?: Array<{
-          __typename?: "User";
+        title: string;
+        description?: string | null;
+        category: OpportunityCategory;
+        requireApproval: boolean;
+        pointsPerParticipation: number;
+        publishStatus: PublishStatus;
+        startsAt?: Date | null;
+        endsAt?: Date | null;
+        createdBy: { __typename?: "User"; id: string; name: string };
+        community: {
+          __typename?: "Community";
           id: string;
-          firstName: string;
-          middleName?: string | null;
-          lastName: string;
+          name: string;
+          city: {
+            __typename?: "City";
+            code: string;
+            name: string;
+            state: { __typename?: "State"; code: string; name: string };
+          };
+          wallets?: Array<{
+            __typename?: "Wallet";
+            id: string;
+            user?: { __typename?: "User"; id: string; name: string } | null;
+            currentPointView?: {
+              __typename?: "CurrentPointView";
+              walletId: string;
+              currentPoint: number;
+            } | null;
+          }> | null;
+        };
+        city: {
+          __typename?: "City";
+          code: string;
+          name: string;
+          state: { __typename?: "State"; code: string; name: string };
+        };
+        participations?: Array<{
+          __typename?: "Participation";
+          id: string;
+          user?: { __typename?: "User"; id: string; name: string } | null;
         }> | null;
       } | null;
-    } | null> | null;
+    }>;
     pageInfo: { __typename?: "PageInfo"; endCursor?: string | null; hasNextPage: boolean };
   };
 };
 
-export const ActivityCreateDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "activityCreate" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ActivityCreateInput" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "activityCreate" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "ActivityCreateSuccess" },
-                  },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "activity" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            { kind: "Field", name: { kind: "Name", value: "id" } },
-                            { kind: "Field", name: { kind: "Name", value: "description" } },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<ActivityCreateMutation, ActivityCreateMutationVariables>;
-export const ActivityUpdateContentDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "activityUpdateContent" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "ActivityUpdateContentInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "activityUpdateContent" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "ActivityUpdateContentSuccess" },
-                  },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "activity" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            { kind: "Field", name: { kind: "Name", value: "id" } },
-                            { kind: "Field", name: { kind: "Name", value: "description" } },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<ActivityUpdateContentMutation, ActivityUpdateContentMutationVariables>;
-export const DeleteActivityDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "deleteActivity" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "activityDelete" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "ActivityDeleteSuccess" },
-                  },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [{ kind: "Field", name: { kind: "Name", value: "activityId" } }],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<DeleteActivityMutation, DeleteActivityMutationVariables>;
+export type OpportunityQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type OpportunityQuery = {
+  __typename?: "Query";
+  opportunity?: {
+    __typename?: "Opportunity";
+    id: string;
+    title: string;
+    description?: string | null;
+    category: OpportunityCategory;
+    requireApproval: boolean;
+    pointsPerParticipation: number;
+    publishStatus: PublishStatus;
+    startsAt?: Date | null;
+    endsAt?: Date | null;
+    createdBy: { __typename?: "User"; id: string; name: string };
+    community: {
+      __typename?: "Community";
+      id: string;
+      name: string;
+      city: {
+        __typename?: "City";
+        code: string;
+        name: string;
+        state: { __typename?: "State"; code: string; name: string };
+      };
+      wallets?: Array<{
+        __typename?: "Wallet";
+        id: string;
+        user?: { __typename?: "User"; id: string; name: string } | null;
+        currentPointView?: {
+          __typename?: "CurrentPointView";
+          walletId: string;
+          currentPoint: number;
+        } | null;
+      }> | null;
+    };
+    city: {
+      __typename?: "City";
+      code: string;
+      name: string;
+      state: { __typename?: "State"; code: string; name: string };
+    };
+    participations?: Array<{
+      __typename?: "Participation";
+      id: string;
+      user?: { __typename?: "User"; id: string; name: string } | null;
+    }> | null;
+  } | null;
+};
+
 export const CreateUserDocument = {
   kind: "Document",
   definitions: [
@@ -2834,33 +1634,21 @@ export const DeleteUserDocument = {
     },
   ],
 } as unknown as DocumentNode<DeleteUserMutation, DeleteUserMutationVariables>;
-export const ActivitiesDocument = {
+export const OpportunityCreateDocument = {
   kind: "Document",
   definitions: [
     {
       kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "activities" },
+      operation: "mutation",
+      name: { kind: "Name", value: "opportunityCreate" },
       variableDefinitions: [
         {
           kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "filter" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "ActivityFilterInput" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "sort" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "ActivitySortInput" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "first" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "OpportunityCreateInput" } },
+          },
         },
       ],
       selectionSet: {
@@ -2868,81 +1656,61 @@ export const ActivitiesDocument = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "activities" },
+            name: { kind: "Name", value: "opportunityCreate" },
             arguments: [
               {
                 kind: "Argument",
-                name: { kind: "Name", value: "filter" },
-                value: { kind: "Variable", name: { kind: "Name", value: "filter" } },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "sort" },
-                value: { kind: "Variable", name: { kind: "Name", value: "sort" } },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "cursor" },
-                value: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "first" },
-                value: { kind: "Variable", name: { kind: "Name", value: "first" } },
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
               },
             ],
             selectionSet: {
               kind: "SelectionSet",
               selections: [
                 {
-                  kind: "Field",
-                  name: { kind: "Name", value: "edges" },
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "OpportunityCreateSuccess" },
+                  },
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [
                       {
                         kind: "Field",
-                        name: { kind: "Name", value: "node" },
+                        name: { kind: "Name", value: "opportunity" },
                         selectionSet: {
                           kind: "SelectionSet",
                           selections: [
                             { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "title" } },
                             { kind: "Field", name: { kind: "Name", value: "description" } },
-                            { kind: "Field", name: { kind: "Name", value: "remark" } },
+                            { kind: "Field", name: { kind: "Name", value: "category" } },
                             { kind: "Field", name: { kind: "Name", value: "startsAt" } },
                             { kind: "Field", name: { kind: "Name", value: "endsAt" } },
-                            { kind: "Field", name: { kind: "Name", value: "isPublic" } },
                             {
                               kind: "Field",
-                              name: { kind: "Name", value: "event" },
+                              name: { kind: "Name", value: "pointsPerParticipation" },
+                            },
+                            { kind: "Field", name: { kind: "Name", value: "publishStatus" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "community" },
                               selectionSet: {
                                 kind: "SelectionSet",
                                 selections: [
                                   { kind: "Field", name: { kind: "Name", value: "id" } },
-                                  { kind: "Field", name: { kind: "Name", value: "description" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
                                 ],
                               },
                             },
                             {
                               kind: "Field",
-                              name: { kind: "Name", value: "user" },
+                              name: { kind: "Name", value: "city" },
                               selectionSet: {
                                 kind: "SelectionSet",
                                 selections: [
-                                  { kind: "Field", name: { kind: "Name", value: "id" } },
-                                  { kind: "Field", name: { kind: "Name", value: "firstName" } },
-                                  { kind: "Field", name: { kind: "Name", value: "middleName" } },
-                                  { kind: "Field", name: { kind: "Name", value: "lastName" } },
-                                ],
-                              },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "organization" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "code" } },
                                   { kind: "Field", name: { kind: "Name", value: "name" } },
                                 ],
                               },
@@ -2953,14 +1721,114 @@ export const ActivitiesDocument = {
                     ],
                   },
                 },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<OpportunityCreateMutation, OpportunityCreateMutationVariables>;
+export const OpportunityEditContentDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "opportunityEditContent" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "OpportunityEditContentInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "opportunityEditContent" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
                 {
-                  kind: "Field",
-                  name: { kind: "Name", value: "pageInfo" },
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "OpportunityEditContentSuccess" },
+                  },
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [
-                      { kind: "Field", name: { kind: "Name", value: "endCursor" } },
-                      { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "opportunity" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "title" } },
+                            { kind: "Field", name: { kind: "Name", value: "description" } },
+                            { kind: "Field", name: { kind: "Name", value: "category" } },
+                            { kind: "Field", name: { kind: "Name", value: "startsAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "endsAt" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "pointsPerParticipation" },
+                            },
+                            { kind: "Field", name: { kind: "Name", value: "publishStatus" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "community" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                ],
+                              },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "city" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "code" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
@@ -2971,14 +1839,17 @@ export const ActivitiesDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<ActivitiesQuery, ActivitiesQueryVariables>;
-export const ActivityDocument = {
+} as unknown as DocumentNode<
+  OpportunityEditContentMutation,
+  OpportunityEditContentMutationVariables
+>;
+export const OpportunityDeleteDocument = {
   kind: "Document",
   definitions: [
     {
       kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "activity" },
+      operation: "mutation",
+      name: { kind: "Name", value: "opportunityDelete" },
       variableDefinitions: [
         {
           kind: "VariableDefinition",
@@ -2994,7 +1865,7 @@ export const ActivityDocument = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "activity" },
+            name: { kind: "Name", value: "opportunityDelete" },
             arguments: [
               {
                 kind: "Argument",
@@ -3005,44 +1876,91 @@ export const ActivityDocument = {
             selectionSet: {
               kind: "SelectionSet",
               selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "description" } },
-                { kind: "Field", name: { kind: "Name", value: "remark" } },
-                { kind: "Field", name: { kind: "Name", value: "startsAt" } },
-                { kind: "Field", name: { kind: "Name", value: "endsAt" } },
-                { kind: "Field", name: { kind: "Name", value: "isPublic" } },
                 {
-                  kind: "Field",
-                  name: { kind: "Name", value: "event" },
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "OpportunityDeleteSuccess" },
+                  },
                   selectionSet: {
                     kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "description" } },
-                    ],
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "opportunityId" } }],
                   },
                 },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<OpportunityDeleteMutation, OpportunityDeleteMutationVariables>;
+export const ParticipationInviteDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "participationInvite" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ParticipationInviteInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participationInvite" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
                 {
-                  kind: "Field",
-                  name: { kind: "Name", value: "user" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "firstName" } },
-                      { kind: "Field", name: { kind: "Name", value: "middleName" } },
-                      { kind: "Field", name: { kind: "Name", value: "lastName" } },
-                    ],
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ParticipationSetStatusSuccess" },
                   },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "organization" },
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "participation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "status" } },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
@@ -3053,7 +1971,607 @@ export const ActivityDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<ActivityQuery, ActivityQueryVariables>;
+} as unknown as DocumentNode<ParticipationInviteMutation, ParticipationInviteMutationVariables>;
+export const ParticipationCancelInvitationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "participationCancelInvitation" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participationCancelInvitation" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ParticipationSetStatusSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "participation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "status" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ParticipationCancelInvitationMutation,
+  ParticipationCancelInvitationMutationVariables
+>;
+export const ParticipationApproveInvitationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "participationApproveInvitation" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participationApproveInvitation" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ParticipationSetStatusSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "participation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "status" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ParticipationApproveInvitationMutation,
+  ParticipationApproveInvitationMutationVariables
+>;
+export const ParticipationDenyInvitationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "participationDenyInvitation" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participationDenyInvitation" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ParticipationSetStatusSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "participation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "status" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ParticipationDenyInvitationMutation,
+  ParticipationDenyInvitationMutationVariables
+>;
+export const ParticipationApplyDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "participationApply" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ParticipationApplyInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participationApply" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ParticipationApplySuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "participation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "status" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ParticipationApplyMutation, ParticipationApplyMutationVariables>;
+export const ParticipationCancelApplicationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "participationCancelApplication" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participationCancelApplication" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ParticipationSetStatusSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "participation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "status" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ParticipationCancelApplicationMutation,
+  ParticipationCancelApplicationMutationVariables
+>;
+export const ParticipationApproveApplicationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "participationApproveApplication" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participationApproveApplication" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ParticipationSetStatusSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "participation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "status" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ParticipationApproveApplicationMutation,
+  ParticipationApproveApplicationMutationVariables
+>;
+export const ParticipationDenyApplicationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "participationDenyApplication" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participationDenyApplication" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ParticipationSetStatusSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "participation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "status" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ParticipationDenyApplicationMutation,
+  ParticipationDenyApplicationMutationVariables
+>;
+export const ParticipationApprovePerformanceDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "participationApprovePerformance" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participationApprovePerformance" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ParticipationSetStatusSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "participation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "status" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ParticipationApprovePerformanceMutation,
+  ParticipationApprovePerformanceMutationVariables
+>;
+export const ParticipationDenyPerformanceDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "participationDenyPerformance" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participationDenyPerformance" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ParticipationSetStatusSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "participation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "status" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ParticipationDenyPerformanceMutation,
+  ParticipationDenyPerformanceMutationVariables
+>;
 export const CurrentUserDocument = {
   kind: "Document",
   definitions: [
@@ -3077,9 +2595,7 @@ export const CurrentUserDocument = {
                     kind: "SelectionSet",
                     selections: [
                       { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "lastName" } },
-                      { kind: "Field", name: { kind: "Name", value: "middleName" } },
-                      { kind: "Field", name: { kind: "Name", value: "firstName" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
                     ],
                   },
                 },
@@ -3091,23 +2607,23 @@ export const CurrentUserDocument = {
     },
   ],
 } as unknown as DocumentNode<CurrentUserQuery, CurrentUserQueryVariables>;
-export const OrganizationsDocument = {
+export const OpportunitiesDocument = {
   kind: "Document",
   definitions: [
     {
       kind: "OperationDefinition",
       operation: "query",
-      name: { kind: "Name", value: "organizations" },
+      name: { kind: "Name", value: "opportunities" },
       variableDefinitions: [
         {
           kind: "VariableDefinition",
           variable: { kind: "Variable", name: { kind: "Name", value: "filter" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "OrganizationFilterInput" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "OpportunityFilterInput" } },
         },
         {
           kind: "VariableDefinition",
           variable: { kind: "Variable", name: { kind: "Name", value: "sort" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "OrganizationSortInput" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "OpportunitySortInput" } },
         },
         {
           kind: "VariableDefinition",
@@ -3125,7 +2641,7 @@ export const OrganizationsDocument = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "organizations" },
+            name: { kind: "Name", value: "opportunities" },
             arguments: [
               {
                 kind: "Argument",
@@ -3164,13 +2680,118 @@ export const OrganizationsDocument = {
                           kind: "SelectionSet",
                           selections: [
                             { kind: "Field", name: { kind: "Name", value: "id" } },
-                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                            { kind: "Field", name: { kind: "Name", value: "title" } },
+                            { kind: "Field", name: { kind: "Name", value: "description" } },
+                            { kind: "Field", name: { kind: "Name", value: "category" } },
+                            { kind: "Field", name: { kind: "Name", value: "requireApproval" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "pointsPerParticipation" },
+                            },
+                            { kind: "Field", name: { kind: "Name", value: "publishStatus" } },
+                            { kind: "Field", name: { kind: "Name", value: "startsAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "endsAt" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "createdBy" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                ],
+                              },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "community" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "city" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "code" } },
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "state" },
+                                          selectionSet: {
+                                            kind: "SelectionSet",
+                                            selections: [
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "code" },
+                                              },
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "name" },
+                                              },
+                                            ],
+                                          },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "wallets" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "user" },
+                                          selectionSet: {
+                                            kind: "SelectionSet",
+                                            selections: [
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "id" },
+                                              },
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "name" },
+                                              },
+                                            ],
+                                          },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "currentPointView" },
+                                          selectionSet: {
+                                            kind: "SelectionSet",
+                                            selections: [
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "walletId" },
+                                              },
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "currentPoint" },
+                                              },
+                                            ],
+                                          },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
                             {
                               kind: "Field",
                               name: { kind: "Name", value: "city" },
                               selectionSet: {
                                 kind: "SelectionSet",
                                 selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "code" } },
                                   { kind: "Field", name: { kind: "Name", value: "name" } },
                                   {
                                     kind: "Field",
@@ -3178,6 +2799,7 @@ export const OrganizationsDocument = {
                                     selectionSet: {
                                       kind: "SelectionSet",
                                       selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "code" } },
                                         { kind: "Field", name: { kind: "Name", value: "name" } },
                                       ],
                                     },
@@ -3187,14 +2809,22 @@ export const OrganizationsDocument = {
                             },
                             {
                               kind: "Field",
-                              name: { kind: "Name", value: "users" },
+                              name: { kind: "Name", value: "participations" },
                               selectionSet: {
                                 kind: "SelectionSet",
                                 selections: [
                                   { kind: "Field", name: { kind: "Name", value: "id" } },
-                                  { kind: "Field", name: { kind: "Name", value: "firstName" } },
-                                  { kind: "Field", name: { kind: "Name", value: "middleName" } },
-                                  { kind: "Field", name: { kind: "Name", value: "lastName" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "user" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                      ],
+                                    },
+                                  },
                                 ],
                               },
                             },
@@ -3222,4 +2852,173 @@ export const OrganizationsDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<OrganizationsQuery, OrganizationsQueryVariables>;
+} as unknown as DocumentNode<OpportunitiesQuery, OpportunitiesQueryVariables>;
+export const OpportunityDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "opportunity" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "opportunity" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "description" } },
+                { kind: "Field", name: { kind: "Name", value: "category" } },
+                { kind: "Field", name: { kind: "Name", value: "requireApproval" } },
+                { kind: "Field", name: { kind: "Name", value: "pointsPerParticipation" } },
+                { kind: "Field", name: { kind: "Name", value: "publishStatus" } },
+                { kind: "Field", name: { kind: "Name", value: "startsAt" } },
+                { kind: "Field", name: { kind: "Name", value: "endsAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "createdBy" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "community" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "city" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "code" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "state" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "code" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "wallets" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "user" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                ],
+                              },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "currentPointView" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "walletId" } },
+                                  { kind: "Field", name: { kind: "Name", value: "currentPoint" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "city" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "code" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "state" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "code" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "participations" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "user" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<OpportunityQuery, OpportunityQueryVariables>;

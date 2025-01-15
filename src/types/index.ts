@@ -5,5 +5,5 @@ export type CurrentUser = {
   uid: string;
   providerIds: string[];
   displayName: string | null;
-  user: Required<Partial<User>, "id" | "lastName" | "firstName"> | null;
+  user: Required<Partial<User>, "id" | "name" > | null;
 };

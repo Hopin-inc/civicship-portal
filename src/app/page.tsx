@@ -2,7 +2,7 @@ import Link from "next/link";
 import LogoutButton from "@/app/components/elements/LogoutButton";
 import AccountDeleteButton from "@/app/components/elements/AccountDeleteButton";
 import CurrentUserInfo from "@/app/components/elements/CurrentUserInfo";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 
 const Home: React.FC = async () => {
   return (
@@ -28,10 +28,10 @@ const Home: React.FC = async () => {
         </ul>
       </section>
       <section>
-        <h2>活動 / Activity</h2>
+        <h2>募集 / Opportunity</h2>
         <ul>
           <li>
-            <Link href="/activities">
+            <Link href="/opportunities">
               一覧
             </Link>
           </li>
