@@ -1,7 +1,6 @@
 "use client";
 
 import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
-import { displayName } from "@/utils";
 
 const CurrentUserInfo: React.FC = () => {
   const { currentUser } = useFirebaseAuth();
@@ -10,7 +9,7 @@ const CurrentUserInfo: React.FC = () => {
   if (user) {
     return (
       <p>
-        ログイン中: {displayName(user)}
+        ログイン中: `{user.name}`
       </p>
     );
   }

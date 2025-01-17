@@ -21,13 +21,9 @@ import { useRouter } from "next/navigation";
 
 const FormSchema = z
   .object({
-    lastName: z.string({ required_error: "必ず選択してください。" }),
-    firstName: z.string({ required_error: "必ず選択してください。" }),
-    email: z.string().email("正しいメールアドレスを入力してください。").optional(),
+    name: z.string({ required_error: "必ず選択してください。" }),
+    slug: z.string({ required_error: "必ず選択してください。" }),
   })
-  .partial({
-    email: true,
-  });
 
 const SignUpForm: React.FC = () => {
   const router = useRouter();
@@ -38,8 +34,8 @@ const SignUpForm: React.FC = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      lastName: "",
-      firstName: "",
+      name: "",
+      slug: "",
     },
   });
 
@@ -67,23 +63,10 @@ const SignUpForm: React.FC = () => {
         <div className="grid grid-cols-12 gap-4">
           <FormField
             control={form.control}
-            name="lastName"
+            name="name"
             render={({ field }) => (
               <FormItem className="col-span-6">
-                <FormLabel required>姓</FormLabel>
-                <FormControl>
-                  <Input placeholder="例: 山田" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem className="col-span-6">
-                <FormLabel required>名</FormLabel>
+                <FormLabel required>名前</FormLabel>
                 <FormControl>
                   <Input placeholder="例: 太郎" {...field} />
                 </FormControl>
@@ -95,12 +78,12 @@ const SignUpForm: React.FC = () => {
         <div className="grid grid-cols-12 gap-4">
           <FormField
             control={form.control}
-            name="email"
+            name="slug"
             render={({ field }) => (
-              <FormItem className="col-span-9">
-                <FormLabel>メールアドレス</FormLabel>
+              <FormItem className="col-span-6">
+                <FormLabel required>ユーザーID</FormLabel>
                 <FormControl>
-                  <Input placeholder="例: taro.yamada@example.com" {...field} />
+                  <Input placeholder="taro" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

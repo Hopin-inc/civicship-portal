@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/app/components/ui/card";
-import { Building, Clock, User } from "lucide-react";
+import { Building, Clock, Locate, Tag, User, Wallet } from "lucide-react";
 import { displayDuration } from "@/utils";
 import OpportunityEditModal from "@/app/opportunities/OpportunityEditModal";
 import OpportunityDeleteModal from "@/app/opportunities/OpportunityDeleteModal";
@@ -35,36 +35,48 @@ const OpportunityList: React.FC = () => {
             <li key={opportunity.id} className="list-none ml-0">
               <Card>
                 {/*<Link href={`/activities/${opportunity.id}`} passHref className="card-link">*/}
-                  <CardHeader>
-                    <CardTitle>{opportunity.title}</CardTitle>
-                      <CardDescription>{opportunity.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex flex-col gap-1 text-muted-foreground">
-                    <p className="flex gap-1">
-                      <Clock />
-                      {opportunity.startsAt && opportunity.endsAt
-                        ? displayDuration(opportunity.startsAt, opportunity.endsAt)
-                        : "期間未設定"}
-                    </p>
-                    <p className="flex gap-1">
-                      <User />
-                      {opportunity.createdBy
-                        ? opportunity.createdBy.name
-                        : "作成者未設定"}
-                    </p>
-                    <p className="flex gap-1">
-                      <Building />
-                      {opportunity.community ? opportunity.community.name : "団体未設定"}
-                    </p>
-                  </CardContent>
-                  <CardFooter className="flex gap-2">
-                    <Suspense>
-                      <OpportunityEditModal id={opportunity.id} />
-                    </Suspense>
-                    <Suspense>
-                      <OpportunityDeleteModal id={opportunity.id} />
-                    </Suspense>
-                  </CardFooter>
+                <CardHeader>
+                  <CardTitle>{opportunity.title}</CardTitle>
+                  <CardDescription>{opportunity.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-1 text-muted-foreground">
+                  <p className="flex gap-1">
+                    <Tag />
+                    {opportunity.category ? opportunity.category : "カテゴリ未設定"}
+                  </p>
+                  <p className="flex gap-1">
+                    <Clock />
+                    {opportunity.startsAt && opportunity.endsAt
+                      ? displayDuration(opportunity.startsAt, opportunity.endsAt)
+                      : "期間未設定"}
+                  </p>
+                  <p className="flex gap-1">
+                    <User />
+                    {opportunity.createdBy ? opportunity.createdBy.name : "作成者未設定"}
+                  </p>
+                  <p className="flex gap-1">
+                    <Building />
+                    {opportunity.community ? opportunity.community.name : "団体未設定"}
+                  </p>
+                  <p className="flex gap-1">
+                    <Locate />
+                    {opportunity.city ? opportunity.city.name : "地域未設定"}
+                  </p>
+                  <p className="flex gap-1">
+                    <Wallet />
+                    {opportunity.pointsPerParticipation
+                      ? opportunity.pointsPerParticipation
+                      : "0ポイント"}
+                  </p>
+                </CardContent>
+                <CardFooter className="flex gap-2">
+                  <Suspense>
+                    <OpportunityEditModal id={opportunity.id} />
+                  </Suspense>
+                  <Suspense>
+                    <OpportunityDeleteModal id={opportunity.id} />
+                  </Suspense>
+                </CardFooter>
                 {/*</Link>*/}
               </Card>
             </li>

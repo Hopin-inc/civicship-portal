@@ -3,7 +3,6 @@
 import { Button } from "@/app/components/ui/button";
 import { signInWithFacebook } from "@/lib/firebase";
 import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
-import { displayName } from "@/utils";
 import { useLoading } from "@/hooks/useLoading";
 
 const FacebookLoginButton: React.FC = () => {
@@ -21,7 +20,7 @@ const FacebookLoginButton: React.FC = () => {
 
   return (
     <Button onClick={signIn} disabled={isLoggedIn} className="mt-2">
-      {isLoggedIn && isLoggedInWithFacebook ? `Facebookでログイン済み: ${ displayName(user) }` : isLoggedIn ? "他サービスでログイン済み" : "Facebookでログイン"}
+      {isLoggedIn && isLoggedInWithFacebook ? `Facebookでログイン済み: ${ user?.name }` : isLoggedIn ? "他サービスでログイン済み" : "Facebookでログイン"}
     </Button>
   );
 };

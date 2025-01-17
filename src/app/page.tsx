@@ -28,7 +28,17 @@ const Home: React.FC = async () => {
         </ul>
       </section>
       <section>
-        <h2>募集 / Opportunity</h2>
+        <h2>関わりしろ / Opportunity</h2>
+        <ul>
+          <li>
+            <Link href="/opportunities">
+              一覧
+            </Link>
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h2>プロフィール / Profile</h2>
         <ul>
           <li>
             <Link href="/opportunities">

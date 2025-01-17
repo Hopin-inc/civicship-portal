@@ -3,7 +3,6 @@
 import { Button } from "@/app/components/ui/button";
 import { signInWithLine } from "@/lib/firebase";
 import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
-import { displayName } from "@/utils";
 import { Suspense } from "react";
 import { useLoading } from "@/hooks/useLoading";
 
@@ -24,7 +23,7 @@ const LineLoginButton: React.FC = () => {
     <Suspense fallback={<p>loading</p>}>
       <Button onClick={signIn} disabled={isLoggedIn} className="mt-2">
         {isLoggedIn && isLoggedInWithLine
-          ? `LINEでログイン済み: ${displayName(user)}`
+          ? `LINEでログイン済み: ${user?.name}`
           : isLoggedIn
             ? "他サービスでログイン済み"
             : "LINEでログイン"}
