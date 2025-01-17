@@ -5,6 +5,8 @@ export const CREATE_USER = graphql(`
     createUser(input: $input) {
       user {
         id
+        name
+        slug
       }
     }
   }

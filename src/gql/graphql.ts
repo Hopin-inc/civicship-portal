@@ -913,12 +913,12 @@ export type Transaction = {
 };
 
 export type TransactionCreateInput = {
+  from?: InputMaybe<Scalars["String"]["input"]>;
   fromPointChange?: InputMaybe<Scalars["Int"]["input"]>;
-  fromWalletId?: InputMaybe<Scalars["String"]["input"]>;
   participationId?: InputMaybe<Scalars["String"]["input"]>;
   reason: TransactionReason;
+  to: Scalars["String"]["input"];
   toPointChange?: InputMaybe<Scalars["Int"]["input"]>;
-  toWalletId: Scalars["String"]["input"];
   utilityId?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -1169,7 +1169,7 @@ export type CreateUserMutation = {
   __typename?: "Mutation";
   createUser?: {
     __typename?: "CurrentUserPayload";
-    user?: { __typename?: "User"; id: string } | null;
+    user?: { __typename?: "User"; id: string; name: string; slug: string } | null;
   } | null;
 };
 
@@ -1433,7 +1433,7 @@ export type CurrentUserQuery = {
   __typename?: "Query";
   currentUser?: {
     __typename?: "CurrentUserPayload";
-    user?: { __typename?: "User"; id: string; name: string } | null;
+    user?: { __typename?: "User"; id: string; name: string; slug: string } | null;
   } | null;
 };
 
@@ -1591,7 +1591,11 @@ export const CreateUserDocument = {
                   name: { kind: "Name", value: "user" },
                   selectionSet: {
                     kind: "SelectionSet",
-                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "slug" } },
+                    ],
                   },
                 },
               ],
@@ -2596,6 +2600,7 @@ export const CurrentUserDocument = {
                     selections: [
                       { kind: "Field", name: { kind: "Name", value: "id" } },
                       { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "slug" } },
                     ],
                   },
                 },

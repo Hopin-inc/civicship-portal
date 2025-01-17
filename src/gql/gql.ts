@@ -13,7 +13,7 @@ import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-  "\n  mutation createUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      user {\n        id\n      }\n    }\n  }\n":
+  "\n  mutation createUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      user {\n        id\n        name\n        slug\n      }\n    }\n  }\n":
     types.CreateUserDocument,
   "\n  mutation deleteUser {\n    deleteUser {\n      user {\n        id\n      }\n    }\n  }\n":
     types.DeleteUserDocument,
@@ -43,7 +43,7 @@ const documents = {
     types.ParticipationApprovePerformanceDocument,
   "\n    mutation participationDenyPerformance($id: ID!) {\n        participationDenyPerformance(id: $id) {\n            ...on ParticipationSetStatusSuccess {\n                participation {\n                    id\n                    status\n                }\n            }\n        }\n    }\n":
     types.ParticipationDenyPerformanceDocument,
-  "\n  query currentUser {\n    currentUser {\n      user {\n        id\n        name\n      }\n    }\n  }\n":
+  "\n  query currentUser {\n    currentUser {\n      user {\n        id\n        name\n        slug\n      }\n    }\n  }\n":
     types.CurrentUserDocument,
   "\n  query opportunities($filter: OpportunityFilterInput, $sort: OpportunitySortInput, $cursor: String, $first: Int) {\n      opportunities(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {\n          edges {\n              node {\n                  id\n                  title\n                  description\n                  category\n                  requireApproval\n                  pointsPerParticipation\n                  publishStatus\n                  startsAt\n                  endsAt\n                  createdBy {\n                      id\n                      name\n                  }\n                  community {\n                      id\n                      name\n                      city {\n                          code\n                          name\n                          state {\n                              code\n                              name\n                          }\n                      }\n                      wallets {\n                          id\n                          user {\n                              id\n                              name\n                          }\n                          currentPointView {\n                              walletId\n                              currentPoint\n                          }\n                      }\n                  }\n                  city {\n                      code\n                      name\n                      state {\n                          code\n                          name\n                      }\n                  }\n                  participations {\n                      id\n                      user {\n                          id\n                          name\n                      }\n                  }\n              }\n          }\n          pageInfo {\n              endCursor\n              hasNextPage\n          }\n      }\n  }\n":
     types.OpportunitiesDocument,
@@ -69,8 +69,8 @@ export function graphql(source: string): unknown;
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "\n  mutation createUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      user {\n        id\n      }\n    }\n  }\n",
-): (typeof documents)["\n  mutation createUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      user {\n        id\n      }\n    }\n  }\n"];
+  source: "\n  mutation createUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      user {\n        id\n        name\n        slug\n      }\n    }\n  }\n",
+): (typeof documents)["\n  mutation createUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      user {\n        id\n        name\n        slug\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -159,8 +159,8 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "\n  query currentUser {\n    currentUser {\n      user {\n        id\n        name\n      }\n    }\n  }\n",
-): (typeof documents)["\n  query currentUser {\n    currentUser {\n      user {\n        id\n        name\n      }\n    }\n  }\n"];
+  source: "\n  query currentUser {\n    currentUser {\n      user {\n        id\n        name\n        slug\n      }\n    }\n  }\n",
+): (typeof documents)["\n  query currentUser {\n    currentUser {\n      user {\n        id\n        name\n        slug\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

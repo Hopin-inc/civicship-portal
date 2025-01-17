@@ -6899,11 +6899,11 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fromPointChange",
+            "name": "from",
             "description": null,
             "type": {
               "kind": "SCALAR",
-              "name": "Int",
+              "name": "String",
               "ofType": null
             },
             "defaultValue": null,
@@ -6911,11 +6911,11 @@
             "deprecationReason": null
           },
           {
-            "name": "fromWalletId",
+            "name": "fromPointChange",
             "description": null,
             "type": {
               "kind": "SCALAR",
-              "name": "String",
+              "name": "Int",
               "ofType": null
             },
             "defaultValue": null,
@@ -6951,19 +6951,7 @@
             "deprecationReason": null
           },
           {
-            "name": "toPointChange",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "toWalletId",
+            "name": "to",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -6973,6 +6961,18 @@
                 "name": "String",
                 "ofType": null
               }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "toPointChange",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,

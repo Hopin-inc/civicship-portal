@@ -6,6 +6,7 @@ export const GET_CURRENT_USER = graphql(`
       user {
         id
         name
+        slug
       }
     }
   }
