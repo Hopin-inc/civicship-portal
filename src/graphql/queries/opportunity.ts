@@ -14,40 +14,17 @@ export const GET_OPPORTUNITIES = graphql(`
                   publishStatus
                   startsAt
                   endsAt
-                  createdBy {
+                  createdByUser {
                       id
                       name
                   }
                   community {
                       id
                       name
-                      city {
-                          code
-                          name
-                          state {
-                              code
-                              name
-                          }
-                      }
-                      wallets {
-                          id
-                          user {
-                              id
-                              name
-                          }
-                          currentPointView {
-                              walletId
-                              currentPoint
-                          }
-                      }
                   }
                   city {
                       code
                       name
-                      state {
-                          code
-                          name
-                      }
                   }
                   participations {
                       id
@@ -78,7 +55,7 @@ export const GET_OPPORTUNITY = graphql(`
             publishStatus
             startsAt
             endsAt
-            createdBy {
+            createdByUser {
                 id
                 name
             }

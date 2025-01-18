@@ -52,7 +52,7 @@ const OpportunityList: React.FC = () => {
                   </p>
                   <p className="flex gap-1">
                     <User />
-                    {opportunity.createdBy ? opportunity.createdBy.name : "作成者未設定"}
+                    {opportunity.createdByUser ? opportunity.createdByUser.name : "作成者未設定"}
                   </p>
                   <p className="flex gap-1">
                     <Building />

@@ -41,7 +41,6 @@ const FormSchema = z.object({
     required_error: "カテゴリを選択してください。",
   }),
   cityCode: z.string({ required_error: "市コードを入力してください。" }),
-  communityId: z.string({ required_error: "コミュニティIDを入力してください。" }),
   pointsPerParticipation: z
     .number({ required_error: "ポイントを入力してください。" })
     .min(1, "ポイントは1以上でなければなりません。"),
@@ -65,7 +64,6 @@ const OpportunityEditModal: React.FC<Props> = ({ id }) => {
       title: "",
       category: undefined,
       cityCode: "",
-      communityId: "",
       pointsPerParticipation: undefined,
     },
   });
@@ -76,7 +74,6 @@ const OpportunityEditModal: React.FC<Props> = ({ id }) => {
         title: data.opportunity.title,
         category: data.opportunity.category,
         cityCode: data.opportunity.city?.code || "",
-        communityId: data.opportunity.community?.id || "",
         pointsPerParticipation: data.opportunity.pointsPerParticipation || undefined,
       });
     }
@@ -156,19 +153,6 @@ const OpportunityEditModal: React.FC<Props> = ({ id }) => {
                   <FormLabel required>市コード</FormLabel>
                   <FormControl>
                     <Input placeholder="市コードを入力してください" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="communityId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel required>コミュニティID</FormLabel>
-                  <FormControl>
-                    <Input placeholder="コミュニティIDを入力してください" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

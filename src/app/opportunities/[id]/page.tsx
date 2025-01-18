@@ -10,7 +10,6 @@ const ActivityDetail: React.FC = async () => {
       </Link>
       <div className="w-full flex justify-between">
         <h1>活動詳細</h1>
-
       </div>
     </main>
   );
