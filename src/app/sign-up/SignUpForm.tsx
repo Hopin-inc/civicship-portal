@@ -9,13 +9,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/app/components/ui/form";
+} from "@/app/_components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/app/components/ui/input";
-import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/_components/ui/input";
+import { Button } from "@/app/_components/ui/button";
 import { useMutation } from "@apollo/client";
 import { CREATE_USER } from "@/graphql/mutations/identity";
-import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -31,7 +30,6 @@ const FormSchema = z
 
 const SignUpForm: React.FC = () => {
   const router = useRouter();
-  const { currentUser } = useFirebaseAuth();
   const [createUser] = useMutation(CREATE_USER, {
     fetchPolicy: "no-cache",
   });
@@ -53,17 +51,9 @@ const SignUpForm: React.FC = () => {
     router.push("/");
   };
 
-  const currentUserInfoText = `${currentUser?.displayName} [${currentUser?.providerIds.join(", ")}]`;
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 max-w-[480px]">
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-9">
-            <FormLabel>ログインユーザー</FormLabel>
-            <Input type="text" disabled value={currentUserInfoText} className="mt-2" />
-          </div>
-        </div>
         <div className="grid grid-cols-12 gap-4">
           <FormField
             control={form.control}
