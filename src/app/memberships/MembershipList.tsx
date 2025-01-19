@@ -6,15 +6,14 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/app/components/ui/card";
 import { Building, User } from "lucide-react";
-// import MembershipEditModal from "@/app/memberships/MembershipEditModal";
-// import MembershipDeleteModal from "@/app/memberships/MembershipDeleteModal";
-import React, { Suspense } from "react";
+import React from "react";
 import { SortDirection } from "@/gql/graphql";
+import { MembershipRoleActions } from "@/app/memberships/button/MembershipRoleActions";
+import { MembershipStatusActions } from "@/app/memberships/button/MembershipStatusActions";
 
 const MembershipList: React.FC = () => {
   const { data } = useQuery(GET_MEMBERSHIPS, {
@@ -47,17 +46,32 @@ const MembershipList: React.FC = () => {
                   </p>
                   <p className="flex gap-1">
                     <User />
-                    {membership.role || "役割未設定"}
+                    <span>
+                      {membership.role || "役割未設定"}
+                    </span>
+                  </p>
+                  <p className="flex gap-1">
+                    <User />
+                    <span>
+                      {membership.status || "ステータス未設定"}
+                    </span>
                   </p>
                 </CardContent>
-                {/*<CardFooter className="flex gap-2">*/}
-                {/*  <Suspense>*/}
-                {/*    <MembershipEditModal userId={membership.user.id} communityId={membership.community.id} />*/}
-                {/*  </Suspense>*/}
-                {/*  <Suspense>*/}
-                {/*    <MembershipDeleteModal userId={membership.user.id} communityId={membership.community.id} />*/}
-                {/*  </Suspense>*/}
-                {/*</CardFooter>*/}
+                <div className="p-4 flex flex-col gap-2">
+                  {/* Role Actions */}
+                  <MembershipRoleActions
+                    membership={{ user: { id: membership.user.id } }}
+                    communityId={membership.community.id}
+                  />
+                  {/* Status Actions */}
+                  <MembershipStatusActions
+                    membership={{
+                      status: membership.status,
+                      user: { id: membership.user.id },
+                    }}
+                    communityId={membership.community.id}
+                  />
+                </div>
               </Card>
             </li>
           )

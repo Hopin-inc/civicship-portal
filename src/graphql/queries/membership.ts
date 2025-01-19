@@ -5,6 +5,8 @@ export const GET_MEMBERSHIPS = graphql(`
         memberships(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
             edges {
                 node {
+                    status
+                    role
                     user {
                         id
                         name
@@ -36,6 +38,8 @@ export const GET_MEMBERSHIPS = graphql(`
 export const GET_MEMBERSHIP = graphql(`
     query membership($userId: ID!, $communityId: ID!) {
         membership(userId: $userId, communityId: $communityId) {
+            status
+            role
             user {
                 id
                 name
@@ -52,7 +56,6 @@ export const GET_MEMBERSHIP = graphql(`
                     }
                 }
             }
-            role
         }
     }
 `);

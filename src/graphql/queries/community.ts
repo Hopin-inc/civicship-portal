@@ -86,6 +86,9 @@ export const GET_COMMUNITY = graphql(`
             }
             wallets {
                 id
+                user {
+                    id
+                }
                 currentPointView {
                     currentPoint
                 }
@@ -94,6 +97,7 @@ export const GET_COMMUNITY = graphql(`
                 id
                 name
                 description
+                pointsRequired
             }
         }
     }

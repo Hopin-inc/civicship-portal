@@ -7,12 +7,10 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/app/components/ui/card";
-import UserEditProfileModal from "@/app/users/UserEditProfileModal";
-import React, { Suspense } from "react";
+import React from "react";
 import { SortDirection } from "@/gql/graphql";
 
 const UserList: React.FC = () => {
@@ -34,20 +32,17 @@ const UserList: React.FC = () => {
           return (
             user && (
               <li key={user.id} className="list-none ml-0">
-                <Link href={`/users/${user.id}`} passHref>
+                <Link
+                  href={`/users/${user.id}`}
+                  passHref
+                  className="no-underline"
+                >
+                  {/* LinkをCard全体に適用 */}
                   <Card className="cursor-pointer hover:shadow-lg transition-shadow">
                     <CardHeader>
                       <CardTitle>{user.name || "名前未設定"}</CardTitle>
                       <CardDescription>{user.bio || "説明がありません"}</CardDescription>
                     </CardHeader>
-                    <CardContent className="text-sm text-muted-foreground">
-                      <p>クリックして詳細を表示</p>
-                    </CardContent>
-                    <CardFooter className="flex gap-2">
-                      <Suspense>
-                        <UserEditProfileModal id={user.id} />
-                      </Suspense>
-                    </CardFooter>
                   </Card>
                 </Link>
               </li>

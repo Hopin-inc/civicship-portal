@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import MembershipSelfJoinModal from "@/app/memberships/MembershipSelfJoinModal";
 import React, { Suspense } from "react";
+import MembershipInviteModal from "@/app/memberships/MembershipInviteModal";
 
 const Memberships: React.FC = async () => {
   return (
@@ -16,6 +17,9 @@ const Memberships: React.FC = async () => {
       <div className="w-full flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">メンバーシップ一覧</h1>
         <div className="flex gap-4 ml-auto">
+          <Suspense>
+            <MembershipInviteModal />
+          </Suspense>
           <Suspense>
             <MembershipSelfJoinModal />
           </Suspense>
