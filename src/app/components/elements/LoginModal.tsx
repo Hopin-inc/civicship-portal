@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/_components/ui/dialog";
-import { Button } from "@/app/_components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/components/ui/dialog";
+import { Button } from "@/app/components/ui/button";
 import { signInWithLine } from "@/lib/firebase";
 
 type LoginModalProps = {

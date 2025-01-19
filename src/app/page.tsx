@@ -1,5 +1,5 @@
 import Link from "next/link";
-import CommunityCard from "@/app/_components/elements/CommunityCard";
+import CommunityCard from "@/app/components/elements/CommunityCard";
 
 const Home: React.FC = async () => {
   // This is mock data. In a real application, you would fetch this from an API

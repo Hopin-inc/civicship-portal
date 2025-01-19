@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { CookiesProvider } from "next-client-cookies/server";
-import ApolloProvider from "@/app/_components/providers/ApolloProvider";
-import { Toaster } from "@/app/_components/ui/sonner";
-import LoadingProvider from "@/app/_components/providers/LoadingProvider";
-import Header from "@/app/_components/layout/Header";
+import ApolloProvider from "@/app/components/providers/ApolloProvider";
+import { Toaster } from "@/app/components/ui/sonner";
+import LoadingProvider from "@/app/components/providers/LoadingProvider";
+import Header from "@/app/components/layout/Header";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 const font = Inter({ subsets: ["latin"] });

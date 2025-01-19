@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/app/_components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import { useMutation } from "@apollo/client";
 import { toast } from "sonner";
 import { DELETE_ACTIVITY } from "@/graphql/mutations/activity";
@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/app/_components/ui/dialog";
+} from "@/app/components/ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { useState } from "react";
 

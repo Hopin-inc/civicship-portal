@@ -9,10 +9,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/app/_components/ui/form";
+} from "@/app/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/app/_components/ui/input";
-import { Button } from "@/app/_components/ui/button";
+import { Input } from "@/app/components/ui/input";
+import { Button } from "@/app/components/ui/button";
 import { useMutation } from "@apollo/client";
 import { CREATE_USER } from "@/graphql/mutations/identity";
 import { toast } from "sonner";

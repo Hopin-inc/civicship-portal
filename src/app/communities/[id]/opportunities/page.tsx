@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { Button } from "@/app/_components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,10 +11,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/app/_components/ui/dialog";
-import { Input } from "@/app/_components/ui/input";
-import { Label } from "@/app/_components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
+} from "@/app/components/ui/dialog";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 
 type Params = {
   id: string;

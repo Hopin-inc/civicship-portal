@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Card, CardContent, CardFooter } from "@/app/_components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar";
+import { Card, CardContent, CardFooter } from "@/app/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { MapPin, Users } from "lucide-react";
 
 interface CommunityCardProps {

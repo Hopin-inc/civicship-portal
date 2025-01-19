@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/app/_components/ui/card";
+import { Card, CardContent } from "@/app/components/ui/card";
 
 const MyPageOpportunities: React.FC = () => {
   // This is mock data. In a real application, you would fetch this from an API

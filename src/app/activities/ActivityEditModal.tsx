@@ -9,23 +9,23 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/app/_components/ui/form";
+} from "@/app/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/app/_components/ui/input";
-import { Button } from "@/app/_components/ui/button";
+import { Input } from "@/app/components/ui/input";
+import { Button } from "@/app/components/ui/button";
 import { useMutation, useQuery } from "@apollo/client";
 import { toast } from "sonner";
 import { GET_ACTIVITY } from "@/graphql/queries/activity";
 import { UPDATE_ACTIVITY } from "@/graphql/mutations/activity";
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/app/_components/ui/dialog";
-import DateTimePicker from "@/app/_components/elements/DateTimePicker";
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/app/components/ui/dialog";
+import DateTimePicker from "@/app/components/elements/DateTimePicker";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/app/_components/ui/select";
+} from "@/app/components/ui/select";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { useEffect, useState } from "react";
 

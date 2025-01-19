@@ -4,10 +4,10 @@ import * as React from "react";
 import dayjs from "dayjs";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/app/_components/ui/button";
-import { Calendar } from "@/app/_components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/app/_components/ui/popover";
-import { ScrollArea, ScrollBar } from "@/app/_components/ui/scroll-area";
+import { Button } from "@/app/components/ui/button";
+import { Calendar } from "@/app/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/app/components/ui/popover";
+import { ScrollArea, ScrollBar } from "@/app/components/ui/scroll-area";
 import { CalendarIcon } from "lucide-react";
 
 type Props = {

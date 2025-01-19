@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Card, CardContent } from "@/app/_components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar";
+import { Card, CardContent } from "@/app/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import React from "react";
 
 const MyPageCommunities: React.FC = () => {

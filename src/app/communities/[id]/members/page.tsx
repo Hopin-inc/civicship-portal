@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar";
-import { Card, CardContent } from "@/app/_components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
+import { Card, CardContent } from "@/app/components/ui/card";
 
 type Params = {
   id: string;

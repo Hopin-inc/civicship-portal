@@ -9,7 +9,7 @@ import {
   CardDescription, CardFooter,
   CardHeader,
   CardTitle,
-} from "@/app/_components/ui/card";
+} from "@/app/components/ui/card";
 import { Building, Clock, User } from "lucide-react";
 import { displayDuration, displayName } from "@/utils";
 import ActivityEditModal from "@/app/activities/ActivityEditModal";

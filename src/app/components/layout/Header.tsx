@@ -4,16 +4,16 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User } from "lucide-react";
-import { Button } from "@/app/_components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar";
+import { Button } from "@/app/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/app/_components/ui/dropdown-menu";
+} from "@/app/components/ui/dropdown-menu";
 import { auth } from "@/lib/firebase";
-import LoginModal from "@/app/_components/elements/LoginModal";
+import LoginModal from "@/app/components/elements/LoginModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { displayName } from "@/utils";
 

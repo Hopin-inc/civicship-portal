@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Tabs, TabsList, TabsTrigger } from "@/app/_components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar";
+import { Tabs, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { MapPin, Users, ArrowLeft } from "lucide-react";
-import { Button } from "@/app/_components/ui/button";
+import { Button } from "@/app/components/ui/button";
 
 type Params = {
   id: string;

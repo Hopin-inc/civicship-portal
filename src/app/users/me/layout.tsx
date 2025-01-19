@@ -1,10 +1,10 @@
 "use client";
 
-import { Tabs, TabsList, TabsTrigger } from "@/app/_components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { User, ChevronLeft } from "lucide-react";
-import { Button } from "@/app/_components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import { usePathname } from "next/navigation";
 
 const MyPageLayout = ({ children }: { children: React.ReactNode }) => {

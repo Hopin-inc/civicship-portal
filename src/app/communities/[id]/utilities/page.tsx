@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 
 type Params = {
   id: string;
