@@ -38,10 +38,30 @@ const Home: React.FC = async () => {
         </ul>
       </section>
       <section>
+        <h2>コミュニティ / Community</h2>
+        <ul>
+          <li>
+            <Link href="/communities">
+              一覧
+            </Link>
+          </li>
+        </ul>
+      </section>
+      <section>
+        <h2>メンバー / Membership</h2>
+        <ul>
+          <li>
+            <Link href="/memberships">
+              一覧
+            </Link>
+          </li>
+        </ul>
+      </section>
+      <section>
         <h2>プロフィール / Profile</h2>
         <ul>
           <li>
-            <Link href="/opportunities">
+            <Link href="/users">
               一覧
             </Link>
           </li>
