@@ -2,24 +2,21 @@
 
 import { useQuery } from "@apollo/client";
 import { GET_OPPORTUNITIES } from "@/graphql/queries/opportunity";
-import { PublishStatus, SortDirection } from "@/gql/graphql";
+import Link from "next/link";
 import {
   Card,
   CardContent,
-  CardDescription, CardFooter,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/app/components/ui/card";
-import { Building, Clock, Locate, Tag, User, Wallet } from "lucide-react";
-import { displayDuration } from "@/utils";
-import OpportunityEditModal from "@/app/opportunities/OpportunityEditModal";
-import OpportunityDeleteModal from "@/app/opportunities/OpportunityDeleteModal";
-import React, { Suspense } from "react";
+import React from "react";
+import { SortDirection } from "@/gql/graphql";
 
 const OpportunityList: React.FC = () => {
   const { data } = useQuery(GET_OPPORTUNITIES, {
     variables: {
-      filter: { publishStatus: PublishStatus.Public },
+      filter: {},
       sort: { createdAt: SortDirection.Desc },
       first: 10,
     },
@@ -27,63 +24,33 @@ const OpportunityList: React.FC = () => {
   });
 
   return (
-    <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-      {data?.opportunities.edges?.map((e) => {
-        const opportunity = e?.node;
-        return (
-          opportunity && (
-            <li key={opportunity.id} className="list-none ml-0">
-              <Card>
-                {/*<Link href={`/activities/${opportunity.id}`} passHref className="card-link">*/}
-                <CardHeader>
-                  <CardTitle>{opportunity.title}</CardTitle>
-                  <CardDescription>{opportunity.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-1 text-muted-foreground">
-                  <p className="flex gap-1">
-                    <Tag />
-                    {opportunity.category ? opportunity.category : "カテゴリ未設定"}
-                  </p>
-                  <p className="flex gap-1">
-                    <Clock />
-                    {opportunity.startsAt && opportunity.endsAt
-                      ? displayDuration(opportunity.startsAt, opportunity.endsAt)
-                      : "期間未設定"}
-                  </p>
-                  <p className="flex gap-1">
-                    <User />
-                    {opportunity.createdByUser ? opportunity.createdByUser.name : "作成者未設定"}
-                  </p>
-                  <p className="flex gap-1">
-                    <Building />
-                    {opportunity.community ? opportunity.community.name : "団体未設定"}
-                  </p>
-                  <p className="flex gap-1">
-                    <Locate />
-                    {opportunity.city ? opportunity.city.name : "地域未設定"}
-                  </p>
-                  <p className="flex gap-1">
-                    <Wallet />
-                    {opportunity.pointsPerParticipation
-                      ? opportunity.pointsPerParticipation
-                      : "0ポイント"}
-                  </p>
-                </CardContent>
-                <CardFooter className="flex gap-2">
-                  <Suspense>
-                    <OpportunityEditModal id={opportunity.id} />
-                  </Suspense>
-                  <Suspense>
-                    <OpportunityDeleteModal id={opportunity.id} />
-                  </Suspense>
-                </CardFooter>
-                {/*</Link>*/}
-              </Card>
-            </li>
-          )
-        );
-      })}
-    </ul>
+    <main className="min-h-screen p-24">
+      <h1 className="text-2xl font-bold mb-8">募集一覧</h1>
+      <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {data?.opportunities.edges?.map((e) => {
+          const opportunity = e?.node;
+          return (
+            opportunity && (
+              <li key={opportunity.id} className="list-none ml-0">
+                <Link href={`/opportunities/${opportunity.id}`} passHref>
+                  <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <CardTitle>{opportunity.title || "タイトル未設定"}</CardTitle>
+                      <CardDescription>
+                        {opportunity.description || "説明がありません"}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="text-sm text-muted-foreground">
+                      <p>クリックして詳細を表示</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </li>
+            )
+          );
+        })}
+      </ul>
+    </main>
   );
 };
 

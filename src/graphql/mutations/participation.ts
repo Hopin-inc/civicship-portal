@@ -1,8 +1,8 @@
 import { graphql } from "@/gql";
 
 export const PARTICIPATION_INVITE = graphql(`
-    mutation participationInvite($id: ID!, $input: ParticipationInviteInput!) {
-        participationInvite(id: $id, input: $input) {
+    mutation participationInvite($input: ParticipationInviteInput!) {
+        participationInvite(input: $input) {
             ...on ParticipationSetStatusSuccess {
                 participation {
                     id

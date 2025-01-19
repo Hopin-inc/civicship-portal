@@ -92,6 +92,7 @@ export const GET_OPPORTUNITY = graphql(`
             }
             participations {
                 id
+                status
                 user {
                     id
                     name
