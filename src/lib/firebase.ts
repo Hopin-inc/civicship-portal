@@ -38,7 +38,7 @@ export const signInWithFacebook = async () => {
 
 export const signInWithLiffToken = async (accessToken: string): Promise<boolean> => {
   try {
-    const response = await fetch("https://localhost:3000/line/liff-login", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ accessToken }),
