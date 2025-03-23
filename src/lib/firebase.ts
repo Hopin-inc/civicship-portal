@@ -4,6 +4,7 @@ import {
   getAuth,
   OAuthProvider,
   signInWithPopup,
+  signInWithCustomToken,
 } from "@firebase/auth";
 
 export const app = initializeApp({
@@ -33,4 +34,28 @@ export const signInWithLine = async () => {
 
 export const signInWithFacebook = async () => {
   return signIn("facebook");
+};
+
+export const signInWithLiffToken = async (accessToken: string): Promise<boolean> => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ accessToken }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`LIFF authentication failed: ${response.status}`);
+    }
+
+    const { customToken } = await response.json();
+    
+    console.log("👏 customToken", customToken);
+    
+    await signInWithCustomToken(auth, customToken);
+    return true;
+  } catch (error) {
+    console.error("Authentication with LIFF token failed:", error);
+    return false;
+  }
 };

@@ -6,6 +6,7 @@ import ApolloProvider from "@/app/components/providers/ApolloProvider";
 import { Toaster } from "@/app/components/ui/sonner";
 import LoadingProvider from "@/app/components/providers/LoadingProvider";
 import Header from "@/app/components/layout/Header";
+import { LiffProvider } from "@/contexts/LiffContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 const font = Inter({ subsets: ["latin"] });
@@ -25,13 +26,15 @@ const RootLayout = ({
       <body className={font.className}>
         <CookiesProvider>
           <ApolloProvider>
-            <AuthProvider>
-              <LoadingProvider>
-                <Header />
-                <main className="flex-grow pt-16">{children}</main>
-                <Toaster richColors className="mx-8" />
-              </LoadingProvider>
-            </AuthProvider>
+            <LiffProvider>
+              <AuthProvider>
+                <LoadingProvider>
+                  <Header />
+                  <main className="flex-grow pt-16">{children}</main>
+                  <Toaster richColors className="mx-8" />
+                </LoadingProvider>
+              </AuthProvider>
+            </LiffProvider>
           </ApolloProvider>
         </CookiesProvider>
       </body>
