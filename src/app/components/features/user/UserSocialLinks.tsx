@@ -2,20 +2,19 @@ import {
   Twitter,
   Instagram,
   Facebook,
+  Youtube,
   Globe,
-  MessageCircle,
-  Pencil,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { User } from "@/types";
-import { useState } from "react";
+import type { User, SocialLink, SocialLinkType } from "@/types";
+import { useState, useMemo } from "react";
 import { UserSocialLinksEditModal } from "./UserSocialLinksEditModal";
 
 type Props = {
   user: User;
   className?: string;
   isOwner?: boolean;
-  onUpdate?: (socialLinks: User["socialLinks"]) => void;
+  onUpdate?: (socialLinks: SocialLink[]) => void;
 };
 
 export const UserSocialLinks = ({
@@ -26,37 +25,55 @@ export const UserSocialLinks = ({
 }: Props) => {
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const getSocialIcon = (type: string) => {
+  const socialLinks = useMemo(() => {
+    const links: SocialLink[] = [];
+    
+    if (user.urlX) {
+      links.push({ type: 'x', url: user.urlX });
+    }
+    if (user.urlInstagram) {
+      links.push({ type: 'instagram', url: user.urlInstagram });
+    }
+    if (user.urlFacebook) {
+      links.push({ type: 'facebook', url: user.urlFacebook });
+    }
+    if (user.urlYoutube) {
+      links.push({ type: 'youtube', url: user.urlYoutube });
+    }
+    if (user.urlWebsite) {
+      links.push({ type: 'website', url: user.urlWebsite });
+    }
+    
+    return links;
+  }, [user]);
+
+  const getSocialIcon = (type: SocialLinkType) => {
     switch (type) {
-      case "twitter":
+      case "x":
         return <Twitter className="w-4 h-4" />;
       case "instagram":
         return <Instagram className="w-4 h-4" />;
       case "facebook":
         return <Facebook className="w-4 h-4" />;
-      case "line":
-        return <MessageCircle className="w-4 h-4" />;
+      case "youtube":
+        return <Youtube className="w-4 h-4" />;
       case "website":
         return <Globe className="w-4 h-4" />;
-      default:
-        return null;
     }
   };
 
-  const getSocialLabel = (type: string) => {
+  const getSocialLabel = (type: SocialLinkType) => {
     switch (type) {
-      case "twitter":
-        return "Twitter";
+      case "x":
+        return "X (Twitter)";
       case "instagram":
         return "Instagram";
       case "facebook":
         return "Facebook";
-      case "line":
-        return "LINE";
+      case "youtube":
+        return "YouTube";
       case "website":
         return "Website";
-      default:
-        return type;
     }
   };
 
@@ -64,7 +81,7 @@ export const UserSocialLinks = ({
     <>
       <div className={`flex items-center gap-2 ${className}`}>
         <div className="flex gap-2">
-          {user.socialLinks?.map((link) => (
+          {socialLinks.map((link) => (
             <Button
               key={link.type}
               variant="ghost"

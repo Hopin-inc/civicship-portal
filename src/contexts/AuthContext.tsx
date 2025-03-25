@@ -102,14 +102,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const fetchedUser = data.currentUser?.user ?? null;
         login({ uid: user.uid, user: fetchedUser });
 
-        if (fetchedUser) {
-          toast.success("ログインしました！");
-          if (next) {
-            router.push(next);
-          }
-        } else {
-          router.push("/sign-up");
-        }
+        // if (fetchedUser) {
+        //   toast.success("ログインしました！");
+        //   if (next) {
+        //     router.push(next);
+        //   }
+        // } else {
+        //   router.push("/sign-up");
+        // }
       } else {
         login(null);
         cookies.remove("access_token");

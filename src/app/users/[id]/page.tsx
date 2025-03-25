@@ -1,30 +1,15 @@
 "use client";
 
+import { useQuery } from "@apollo/client";
 import { useState } from "react";
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserSocialLinks } from "@/components/features/user/UserSocialLinks";
 import { UserActivityList } from "@/components/features/user/UserActivityList";
+import { GET_USER_WITH_DETAILS } from "@/graphql/queries/user";
 import MapPinIcon from "@/../public/icons/map-pin.svg";
 import TicketIcon from "@/../public/icons/ticket.svg";
 import StarIcon from "@/../public/icons/star.svg";
-
-// モックデータの型定義
-type UserProfile = {
-  id: string;
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  bio?: string;
-  image?: string;
-  location?: string;
-  socialLinks: {
-    type: string;
-    url: string;
-  }[];
-  tickets: number;
-  currentPoint: number;
-};
 
 // 活動データの型定義
 type Participation = {
@@ -52,13 +37,8 @@ type Article = {
 type ActivityItem = Participation | Article;
 
 // モックデータ
-const MOCK_USER_PROFILE: UserProfile = {
-  id: "1",
-  firstName: "太郎",
-  lastName: "山田",
+const MOCK_USER_DATA = {
   location: "香川",
-  bio: "神戸でIT会社に勤めつつ、週末は地元の人々と交流しながら、一緒に手を動かすことを楽しんでいます。神戸でIT会社に勤めつつ、週末は地元の人々と交流を深め... もっと見る神戸でIT会社に勤めつつ、週末は地元の人々と交流しながら、一緒に手を動かすことを楽しんでいます。神戸でIT会社に勤めつつ、週末は地元の人々と交流を深め... もっと見る神戸でIT会社に勤めつつ、週末は地元の人々と交流しながら、一緒に手を動かすことを楽しんでいます。神戸でIT会社に勤めつつ、週末は地元の人々と交流を深め... もっと見る神戸でIT会社に勤めつつ、週末は地元の人々と交流しながら、一緒に手を動かすことを楽しんでいます。神戸でIT会社に勤めつつ、週末は地元の人々と交流を深め... もっと見る神戸でIT会社に勤めつつ、週末は地元の人々と交流しながら、一緒に手を動かすことを楽しんでいます。神戸でIT会社に勤めつつ、週末は地元の人々と交流を深め... もっと見る",
-  image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Fotor%20AI%20Image%20Creator%20Nov%2030%20(3).jpg-v7ifi1e9jgGZ756DbfeIZ8sO5wzaqA.jpeg",
   socialLinks: [
     { type: "twitter", url: "https://twitter.com/yamada" },
     { type: "github", url: "https://github.com/yamada" }
@@ -129,35 +109,54 @@ export default function UserPage({ params }: { params: { id: string } }) {
   const { user: currentUser } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
   
-  // モックデータを使用
-  const userData = MOCK_USER_PROFILE;
-  const activities = MOCK_ACTIVITIES;
-  const isOwner = currentUser?.id === userData.id;
+  const { data, loading, error } = useQuery(GET_USER_WITH_DETAILS, {
+    variables: { id: params.id },
+  });
 
-  const handleUpdateSocialLinks = async (socialLinks: typeof userData.socialLinks) => {
+  console.log('UserData', data);
+
+  // ローディング中の表示
+  if (loading) {
+    return <div className="container mx-auto px-4 py-6">Loading...</div>;
+  }
+
+  // エラー時の表示
+  if (error) {
+    return <div className="container mx-auto px-4 py-6">Error: {error.message}</div>;
+  }
+
+  // データが取得できない場合
+  if (!data?.user) {
+    return <div className="container mx-auto px-4 py-6">User not found</div>;
+  }
+
+  const userData = data.user;
+  const activities = MOCK_ACTIVITIES;
+  const isOwner = true;
+
+  const handleUpdateSocialLinks = async (socialLinks: { type: string; url: string }[]) => {
     // TODO: Implement social links update mutation
     console.log("Update social links:", socialLinks);
   };
 
   // bioの表示制御
-  const truncateBio = (bio: string) => {
+  const truncateBio = (bio: string | null | undefined) => {
     if (!bio) return "";
     return isExpanded ? bio : bio.slice(0, 100);
   };
 
-  const shouldShowMore = (bio?: string) => {
+  const shouldShowMore = (bio: string | null | undefined) => {
     return bio ? bio.length > 100 : false;
   };
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-3xl">
       <div className="space-y-6">
-        {/* ヘッダー部分: 画像と編集ボタン */}
         <div className="flex justify-between items-start">
           <div className="w-20 h-20 relative">
             <Image
               src={userData.image || "/placeholder.svg"}
-              alt={`${userData.firstName} ${userData.lastName}`}
+              alt={userData.name}
               fill
               className="rounded-full object-cover"
             />
@@ -172,14 +171,8 @@ export default function UserPage({ params }: { params: { id: string } }) {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">
-              {`${userData.firstName} ${userData.lastName}`}
+              {userData.name}
             </h1>
-            {userData.location && (
-              <div className="flex items-center text-gray-500">
-                <MapPinIcon className="w-4 h-4" />
-                <span className="text-sm">{userData.location}</span>
-              </div>
-            )}
           </div>
           <UserSocialLinks
             user={userData}
@@ -192,7 +185,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
         {/* Bio */}
         <div className="text-gray-600 text-base leading-relaxed">
           <p className="whitespace-pre-wrap">
-            {truncateBio(userData.bio || "")}
+            {truncateBio(userData.bio)}
             {shouldShowMore(userData.bio) && (
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
@@ -208,7 +201,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
             <div className="bg-blue-50 p-4 rounded-lg flex items-center justify-between cursor-pointer">
               <div className="flex items-center gap-2">
                 <TicketIcon className="w-4 h-4 text-blue-600" />
-                <span className="text-blue-600">利用可能なチケットが<span className="font-bold">{userData.tickets}</span>枚あります。</span>
+                <span className="text-blue-600">利用可能なチケットが<span className="font-bold">0</span>枚あります。</span>
               </div>
               <span className="text-blue-600">›</span>
             </div>
@@ -216,14 +209,14 @@ export default function UserPage({ params }: { params: { id: string } }) {
               <div className="flex items-center gap-2">
                 <StarIcon className="w-4 h-4" />
                 <span>保有中のポイント</span>
-                <span className="font-bold">{userData.currentPoint}pt</span>
+                <span className="font-bold">0pt</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <UserActivityList activities={activities} isOwner={isOwner} />
+      <UserActivityList userId={params.id} isOwner={isOwner} />
     </div>
   );
 } 

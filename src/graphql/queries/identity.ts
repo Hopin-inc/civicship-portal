@@ -5,9 +5,7 @@ export const GET_CURRENT_USER = graphql(`
     currentUser {
       user {
         id
-        lastName
-        middleName
-        firstName
+        name
       }
     }
   }

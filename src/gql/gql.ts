@@ -13,24 +13,12 @@ import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-  "\n  mutation activityCreate($input: ActivityCreateInput!) {\n    activityCreate(input: $input) {\n      ...on ActivityCreateSuccess {\n        activity {\n          id\n          description\n        }\n      }\n    }\n  }\n":
-    types.ActivityCreateDocument,
-  "\n  mutation activityUpdateContent($id: ID!, $input: ActivityUpdateContentInput!) {\n    activityUpdateContent(id: $id, input: $input) {\n      ...on ActivityUpdateContentSuccess {\n        activity {\n          id\n          description\n        }\n      }\n    }\n  }\n":
-    types.ActivityUpdateContentDocument,
-  "\n  mutation deleteActivity($id: ID!) {\n    activityDelete(id: $id) {\n      ... on ActivityDeleteSuccess {\n        activityId\n      }\n    }\n  }\n":
-    types.DeleteActivityDocument,
-  "\n  mutation createUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      user {\n        id\n      }\n    }\n  }\n":
-    types.CreateUserDocument,
-  "\n  mutation deleteUser {\n    deleteUser {\n      user {\n        id\n      }\n    }\n  }\n":
-    types.DeleteUserDocument,
-  "\n  query activities($filter: ActivityFilterInput, $sort: ActivitySortInput, $cursor: String, $first: Int) {\n    activities(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {\n      edges {\n        node {\n          id\n          description\n          remark\n          startsAt\n          endsAt\n          isPublic\n          event {\n            id\n            description\n          }\n          user {\n            id\n            firstName\n            middleName\n            lastName\n          }\n          organization {\n            id\n            name\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n":
-    types.ActivitiesDocument,
-  "\n  query activity($id: ID!) {\n    activity(id: $id) {\n      id\n      description\n      remark\n      startsAt\n      endsAt\n      isPublic\n      event {\n        id\n        description\n      }\n      user {\n        id\n        firstName\n        middleName\n        lastName\n      }\n      organization {\n        id\n        name\n      }\n    }\n  }\n":
-    types.ActivityDocument,
-  "\n  query currentUser {\n    currentUser {\n      user {\n        id\n        lastName\n        middleName\n        firstName\n      }\n    }\n  }\n":
+  "\n  query currentUser {\n    currentUser {\n      user {\n        id\n        name\n      }\n    }\n  }\n":
     types.CurrentUserDocument,
-  "\n  query organizations($filter: OrganizationFilterInput, $sort: OrganizationSortInput, $cursor: String, $first: Int) {\n    organizations(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {\n      edges {\n        node {\n          id\n          name\n          city {\n            name\n            state {\n              name\n            }\n          }\n          users {\n            id\n            firstName\n            middleName\n            lastName\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n":
-    types.OrganizationsDocument,
+  "\n  query GetUserWithDetails($id: ID!) {\n    user(id: $id) {\n      id\n      name\n      image\n      bio\n      sysRole\n      urlFacebook\n      urlInstagram\n      urlWebsite\n      urlX\n      urlYoutube\n    }\n  }\n":
+    types.GetUserWithDetailsDocument,
+  "\n  query GetUserActivities($id: ID!, $articlesFirst: Int, $articlesCursor: String) {\n    user(id: $id) {\n      id\n      articlesAboutMe(first: $articlesFirst, cursor: $articlesCursor) {\n        edges {\n          node {\n            id\n          }\n          cursor\n        }\n      }\n      articlesWrittenByMe(first: $articlesFirst, cursor: $articlesCursor) {\n        edges {\n          node {\n            id\n          }\n          cursor\n        }\n      }\n    }\n  }\n":
+    types.GetUserActivitiesDocument,
 };
 
 /**
@@ -51,56 +39,20 @@ export function graphql(source: string): unknown;
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "\n  mutation activityCreate($input: ActivityCreateInput!) {\n    activityCreate(input: $input) {\n      ...on ActivityCreateSuccess {\n        activity {\n          id\n          description\n        }\n      }\n    }\n  }\n",
-): (typeof documents)["\n  mutation activityCreate($input: ActivityCreateInput!) {\n    activityCreate(input: $input) {\n      ...on ActivityCreateSuccess {\n        activity {\n          id\n          description\n        }\n      }\n    }\n  }\n"];
+  source: "\n  query currentUser {\n    currentUser {\n      user {\n        id\n        name\n      }\n    }\n  }\n",
+): (typeof documents)["\n  query currentUser {\n    currentUser {\n      user {\n        id\n        name\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "\n  mutation activityUpdateContent($id: ID!, $input: ActivityUpdateContentInput!) {\n    activityUpdateContent(id: $id, input: $input) {\n      ...on ActivityUpdateContentSuccess {\n        activity {\n          id\n          description\n        }\n      }\n    }\n  }\n",
-): (typeof documents)["\n  mutation activityUpdateContent($id: ID!, $input: ActivityUpdateContentInput!) {\n    activityUpdateContent(id: $id, input: $input) {\n      ...on ActivityUpdateContentSuccess {\n        activity {\n          id\n          description\n        }\n      }\n    }\n  }\n"];
+  source: "\n  query GetUserWithDetails($id: ID!) {\n    user(id: $id) {\n      id\n      name\n      image\n      bio\n      sysRole\n      urlFacebook\n      urlInstagram\n      urlWebsite\n      urlX\n      urlYoutube\n    }\n  }\n",
+): (typeof documents)["\n  query GetUserWithDetails($id: ID!) {\n    user(id: $id) {\n      id\n      name\n      image\n      bio\n      sysRole\n      urlFacebook\n      urlInstagram\n      urlWebsite\n      urlX\n      urlYoutube\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "\n  mutation deleteActivity($id: ID!) {\n    activityDelete(id: $id) {\n      ... on ActivityDeleteSuccess {\n        activityId\n      }\n    }\n  }\n",
-): (typeof documents)["\n  mutation deleteActivity($id: ID!) {\n    activityDelete(id: $id) {\n      ... on ActivityDeleteSuccess {\n        activityId\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(
-  source: "\n  mutation createUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      user {\n        id\n      }\n    }\n  }\n",
-): (typeof documents)["\n  mutation createUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      user {\n        id\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(
-  source: "\n  mutation deleteUser {\n    deleteUser {\n      user {\n        id\n      }\n    }\n  }\n",
-): (typeof documents)["\n  mutation deleteUser {\n    deleteUser {\n      user {\n        id\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(
-  source: "\n  query activities($filter: ActivityFilterInput, $sort: ActivitySortInput, $cursor: String, $first: Int) {\n    activities(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {\n      edges {\n        node {\n          id\n          description\n          remark\n          startsAt\n          endsAt\n          isPublic\n          event {\n            id\n            description\n          }\n          user {\n            id\n            firstName\n            middleName\n            lastName\n          }\n          organization {\n            id\n            name\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n",
-): (typeof documents)["\n  query activities($filter: ActivityFilterInput, $sort: ActivitySortInput, $cursor: String, $first: Int) {\n    activities(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {\n      edges {\n        node {\n          id\n          description\n          remark\n          startsAt\n          endsAt\n          isPublic\n          event {\n            id\n            description\n          }\n          user {\n            id\n            firstName\n            middleName\n            lastName\n          }\n          organization {\n            id\n            name\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(
-  source: "\n  query activity($id: ID!) {\n    activity(id: $id) {\n      id\n      description\n      remark\n      startsAt\n      endsAt\n      isPublic\n      event {\n        id\n        description\n      }\n      user {\n        id\n        firstName\n        middleName\n        lastName\n      }\n      organization {\n        id\n        name\n      }\n    }\n  }\n",
-): (typeof documents)["\n  query activity($id: ID!) {\n    activity(id: $id) {\n      id\n      description\n      remark\n      startsAt\n      endsAt\n      isPublic\n      event {\n        id\n        description\n      }\n      user {\n        id\n        firstName\n        middleName\n        lastName\n      }\n      organization {\n        id\n        name\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(
-  source: "\n  query currentUser {\n    currentUser {\n      user {\n        id\n        lastName\n        middleName\n        firstName\n      }\n    }\n  }\n",
-): (typeof documents)["\n  query currentUser {\n    currentUser {\n      user {\n        id\n        lastName\n        middleName\n        firstName\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(
-  source: "\n  query organizations($filter: OrganizationFilterInput, $sort: OrganizationSortInput, $cursor: String, $first: Int) {\n    organizations(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {\n      edges {\n        node {\n          id\n          name\n          city {\n            name\n            state {\n              name\n            }\n          }\n          users {\n            id\n            firstName\n            middleName\n            lastName\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n",
-): (typeof documents)["\n  query organizations($filter: OrganizationFilterInput, $sort: OrganizationSortInput, $cursor: String, $first: Int) {\n    organizations(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {\n      edges {\n        node {\n          id\n          name\n          city {\n            name\n            state {\n              name\n            }\n          }\n          users {\n            id\n            firstName\n            middleName\n            lastName\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n"];
+  source: "\n  query GetUserActivities($id: ID!, $articlesFirst: Int, $articlesCursor: String) {\n    user(id: $id) {\n      id\n      articlesAboutMe(first: $articlesFirst, cursor: $articlesCursor) {\n        edges {\n          node {\n            id\n          }\n          cursor\n        }\n      }\n      articlesWrittenByMe(first: $articlesFirst, cursor: $articlesCursor) {\n        edges {\n          node {\n            id\n          }\n          cursor\n        }\n      }\n    }\n  }\n",
+): (typeof documents)["\n  query GetUserActivities($id: ID!, $articlesFirst: Int, $articlesCursor: String) {\n    user(id: $id) {\n      id\n      articlesAboutMe(first: $articlesFirst, cursor: $articlesCursor) {\n        edges {\n          node {\n            id\n          }\n          cursor\n        }\n      }\n      articlesWrittenByMe(first: $articlesFirst, cursor: $articlesCursor) {\n        edges {\n          node {\n            id\n          }\n          cursor\n        }\n      }\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
