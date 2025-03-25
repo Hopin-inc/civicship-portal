@@ -20,346 +20,134 @@ export type Scalars = {
   Float: { input: number; output: number };
   DateTime: { input: any; output: any };
   Datetime: { input: Date; output: Date };
+  /** Custom scalar for high-precision decimal (serialized as string) */
+  Decimal: { input: any; output: any };
+  JSON: { input: any; output: any };
 };
 
-export type Activities = {
-  __typename?: "Activities";
-  data: Array<Activity>;
-  total: Scalars["Int"]["output"];
+export type AccumulatedPointView = {
+  __typename?: "AccumulatedPointView";
+  accumulatedPoint: Scalars["Int"]["output"];
+  walletId: Scalars["String"]["output"];
 };
 
-export type ActivitiesConnection = {
-  __typename?: "ActivitiesConnection";
-  edges?: Maybe<Array<Maybe<ActivityEdge>>>;
+export type Article = {
+  __typename?: "Article";
+  authors?: Maybe<UsersConnection>;
+  body: Scalars["String"]["output"];
+  category: ArticleCategory;
+  community?: Maybe<Community>;
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  introduction: Scalars["String"]["output"];
+  opportunities?: Maybe<OpportunitiesConnection>;
+  publishStatus: PublishStatus;
+  publishedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  relatedUsers?: Maybe<UsersConnection>;
+  thumbnail?: Maybe<Scalars["JSON"]["output"]>;
+  title: Scalars["String"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type ArticleAuthorsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<UserFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<UserSortInput>;
+};
+
+export type ArticleOpportunitiesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunitySortInput>;
+};
+
+export type ArticleRelatedUsersArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<UserFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<UserSortInput>;
+};
+
+export enum ArticleCategory {
+  ActivityReport = "ACTIVITY_REPORT",
+  Interview = "INTERVIEW",
+}
+
+export type ArticleCreateInput = {
+  authorIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  body: Scalars["String"]["input"];
+  category: ArticleCategory;
+  communityId: Scalars["ID"]["input"];
+  introduction: Scalars["String"]["input"];
+  opportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  publishStatus?: InputMaybe<PublishStatus>;
+  publishedAt?: InputMaybe<Scalars["String"]["input"]>;
+  relatedUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  thumbnail?: InputMaybe<Scalars["JSON"]["input"]>;
+  title: Scalars["String"]["input"];
+};
+
+export type ArticleCreatePayload = ArticleCreateSuccess;
+
+export type ArticleCreateSuccess = {
+  __typename?: "ArticleCreateSuccess";
+  article?: Maybe<Article>;
+};
+
+export type ArticleDeletePayload = ArticleDeleteSuccess;
+
+export type ArticleDeleteSuccess = {
+  __typename?: "ArticleDeleteSuccess";
+  id: Scalars["ID"]["output"];
+};
+
+export type ArticleEdge = Edge & {
+  __typename?: "ArticleEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Article>;
+};
+
+export type ArticleFilterInput = {
+  category?: InputMaybe<ArticleCategory>;
+  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
+  publishStatus?: InputMaybe<PublishStatus>;
+  writtenByUserId?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type ArticleSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+  publishedAt?: InputMaybe<SortDirection>;
+};
+
+export type ArticleUpdateInput = {
+  authorIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  body: Scalars["String"]["input"];
+  category: ArticleCategory;
+  communityId: Scalars["ID"]["input"];
+  introduction: Scalars["String"]["input"];
+  opportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  publishStatus?: InputMaybe<PublishStatus>;
+  publishedAt?: InputMaybe<Scalars["String"]["input"]>;
+  relatedUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  thumbnail?: InputMaybe<Scalars["JSON"]["input"]>;
+  title: Scalars["String"]["input"];
+};
+
+export type ArticleUpdatePayload = ArticleUpdateSuccess;
+
+export type ArticleUpdateSuccess = {
+  __typename?: "ArticleUpdateSuccess";
+  article?: Maybe<Article>;
+};
+
+export type ArticlesConnection = {
+  __typename?: "ArticlesConnection";
+  edges?: Maybe<Array<Maybe<ArticleEdge>>>;
   pageInfo: PageInfo;
   totalCount: Scalars["Int"]["output"];
-};
-
-export type Activity = {
-  __typename?: "Activity";
-  application?: Maybe<Application>;
-  createdAt: Scalars["Datetime"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
-  endsAt: Scalars["Datetime"]["output"];
-  event?: Maybe<Event>;
-  id: Scalars["ID"]["output"];
-  images?: Maybe<Array<Scalars["String"]["output"]>>;
-  isPublic: Scalars["Boolean"]["output"];
-  issue?: Maybe<Issue>;
-  organization?: Maybe<Organization>;
-  remark?: Maybe<Scalars["String"]["output"]>;
-  startsAt: Scalars["Datetime"]["output"];
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  user?: Maybe<User>;
-};
-
-export type ActivityAddEventInput = {
-  eventId: Scalars["String"]["input"];
-};
-
-export type ActivityAddUserInput = {
-  userId: Scalars["String"]["input"];
-};
-
-export type ActivityCreateInput = {
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  endsAt: Scalars["Datetime"]["input"];
-  eventId?: InputMaybe<Scalars["String"]["input"]>;
-  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  remark?: InputMaybe<Scalars["String"]["input"]>;
-  startsAt: Scalars["Datetime"]["input"];
-  userId: Scalars["String"]["input"];
-};
-
-export type ActivityCreatePayload =
-  | ActivityCreateSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ActivityCreateSuccess = {
-  __typename?: "ActivityCreateSuccess";
-  activity?: Maybe<Activity>;
-};
-
-export type ActivityDeletePayload =
-  | ActivityDeleteSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ActivityDeleteSuccess = {
-  __typename?: "ActivityDeleteSuccess";
-  activityId: Scalars["ID"]["output"];
-};
-
-export type ActivityEdge = Edge & {
-  __typename?: "ActivityEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<Activity>;
-};
-
-export type ActivityFilterInput = {
-  eventId?: InputMaybe<Scalars["String"]["input"]>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
-  userId?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type ActivityRemoveEventInput = {
-  eventId: Scalars["String"]["input"];
-};
-
-export type ActivityRemoveUserInput = {
-  userId: Scalars["String"]["input"];
-};
-
-export type ActivitySortInput = {
-  createdAt?: InputMaybe<SortDirection>;
-  startsAt?: InputMaybe<SortDirection>;
-};
-
-export type ActivitySwitchPrivacyInput = {
-  isPublic: Scalars["Boolean"]["input"];
-};
-
-export type ActivitySwitchPrivacyPayload =
-  | ActivitySwitchPrivacySuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ActivitySwitchPrivacySuccess = {
-  __typename?: "ActivitySwitchPrivacySuccess";
-  activity: Activity;
-};
-
-export type ActivityUpdateContentInput = {
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  endsAt: Scalars["Datetime"]["input"];
-  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  remark?: InputMaybe<Scalars["String"]["input"]>;
-  startsAt: Scalars["Datetime"]["input"];
-};
-
-export type ActivityUpdateContentPayload =
-  | ActivityUpdateContentSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ActivityUpdateContentSuccess = {
-  __typename?: "ActivityUpdateContentSuccess";
-  activity: Activity;
-};
-
-export type ActivityUpdateEventPayload =
-  | ActivityUpdateEventSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ActivityUpdateEventSuccess = {
-  __typename?: "ActivityUpdateEventSuccess";
-  activity: Activity;
-  event: Event;
-};
-
-export type ActivityUpdateUserPayload =
-  | ActivityUpdateUserSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ActivityUpdateUserSuccess = {
-  __typename?: "ActivityUpdateUserSuccess";
-  activity: Activity;
-  user: User;
-};
-
-export type Agenda = {
-  __typename?: "Agenda";
-  code: Scalars["String"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
-  id: Scalars["Int"]["output"];
-  name: Scalars["String"]["output"];
-};
-
-export type Application = {
-  __typename?: "Application";
-  activity?: Maybe<Activity>;
-  approvals?: Maybe<Array<ApplicationConfirmation>>;
-  comment?: Maybe<Scalars["String"]["output"]>;
-  createdAt: Scalars["Datetime"]["output"];
-  event?: Maybe<Event>;
-  id: Scalars["ID"]["output"];
-  isPublic: Scalars["Boolean"]["output"];
-  submittedAt: Scalars["Datetime"]["output"];
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  user?: Maybe<User>;
-};
-
-export type ApplicationAddConfirmationInput = {
-  comment?: InputMaybe<Scalars["String"]["input"]>;
-  confirmerId: Scalars["String"]["input"];
-  isApproved: Scalars["Boolean"]["input"];
-};
-
-export type ApplicationAddConfirmationPayload =
-  | ApplicationAddConfirmationSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationAddConfirmationSuccess = {
-  __typename?: "ApplicationAddConfirmationSuccess";
-  application: Application;
-};
-
-export type ApplicationApprovalInput = {
-  applicationConfirmationId: Scalars["String"]["input"];
-};
-
-export type ApplicationConfirmation = {
-  __typename?: "ApplicationConfirmation";
-  application?: Maybe<Application>;
-  comment?: Maybe<Scalars["String"]["output"]>;
-  confirmedBy?: Maybe<User>;
-  createdAt: Scalars["Datetime"]["output"];
-  id: Scalars["ID"]["output"];
-  isApproved: Scalars["Boolean"]["output"];
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-};
-
-export type ApplicationCreateInput = {
-  comment?: InputMaybe<Scalars["String"]["input"]>;
-  eventId?: InputMaybe<Scalars["String"]["input"]>;
-  submittedAt: Scalars["Datetime"]["input"];
-  userId: Scalars["String"]["input"];
-};
-
-export type ApplicationCreatePayload =
-  | ApplicationCreateSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationCreateSuccess = {
-  __typename?: "ApplicationCreateSuccess";
-  application: Application;
-};
-
-export type ApplicationDeleteConfirmationInput = {
-  applicationConfirmationId: Scalars["String"]["input"];
-};
-
-export type ApplicationDeleteConfirmationPayload =
-  | ApplicationDeleteConfirmationSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationDeleteConfirmationSuccess = {
-  __typename?: "ApplicationDeleteConfirmationSuccess";
-  applicationConfirmationId: Scalars["String"]["output"];
-  applicationId: Scalars["ID"]["output"];
-};
-
-export type ApplicationDeletePayload =
-  | ApplicationDeleteSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationDeleteSuccess = {
-  __typename?: "ApplicationDeleteSuccess";
-  applicationId: Scalars["ID"]["output"];
-};
-
-export type ApplicationEdge = Edge & {
-  __typename?: "ApplicationEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<Application>;
-};
-
-export type ApplicationFilterInput = {
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type ApplicationRefusalInput = {
-  applicationConfirmationId: Scalars["String"]["input"];
-};
-
-export type ApplicationSortInput = {
-  createdAt?: InputMaybe<SortDirection>;
-};
-
-export type ApplicationSwitchIsApprovedPayload =
-  | ApplicationSwitchIsApprovedSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationSwitchIsApprovedSuccess = {
-  __typename?: "ApplicationSwitchIsApprovedSuccess";
-  application: Application;
-};
-
-export type ApplicationSwitchPrivacyPayload =
-  | ApplicationSwitchPrivacySuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationSwitchPrivacySuccess = {
-  __typename?: "ApplicationSwitchPrivacySuccess";
-  application: Application;
-};
-
-export type ApplicationUpdateCommentInput = {
-  comment?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type ApplicationUpdateCommentPayload =
-  | ApplicationUpdateCommentSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationUpdateCommentSuccess = {
-  __typename?: "ApplicationUpdateCommentSuccess";
-  application: Application;
-};
-
-export type ApplicationUpdateConfirmationCommentInput = {
-  applicationConfirmationId: Scalars["String"]["input"];
-  comment?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type ApplicationUpdateConfirmationCommentPayload =
-  | ApplicationUpdateConfirmationCommentSuccess
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type ApplicationUpdateConfirmationCommentSuccess = {
-  __typename?: "ApplicationUpdateConfirmationCommentSuccess";
-  application: Application;
-};
-
-export type ApplicationsConnection = {
-  __typename?: "ApplicationsConnection";
-  edges?: Maybe<Array<Maybe<ApplicationEdge>>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars["Int"]["output"];
-};
-
-export type AuthError = Error & {
-  __typename?: "AuthError";
-  message: Scalars["String"]["output"];
-  statusCode: Scalars["Int"]["output"];
 };
 
 export type City = {
@@ -369,88 +157,145 @@ export type City = {
   state: State;
 };
 
-export type Comment = {
-  __typename?: "Comment";
-  content: Scalars["String"]["output"];
-  createdAt: Scalars["Datetime"]["output"];
-  event?: Maybe<Event>;
-  id: Scalars["ID"]["output"];
-  postedAt: Scalars["Datetime"]["output"];
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  user?: Maybe<User>;
-};
-
-export type CommentAddEventInput = {
-  content: Scalars["String"]["input"];
-  eventId: Scalars["String"]["input"];
-  postedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  userId: Scalars["String"]["input"];
-};
-
-export type CommentAddEventPayload =
-  | AuthError
-  | CommentAddEventSuccess
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type CommentAddEventSuccess = {
-  __typename?: "CommentAddEventSuccess";
-  comment: Comment;
-};
-
-export type CommentDeletePayload =
-  | AuthError
-  | CommentDeleteSuccess
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type CommentDeleteSuccess = {
-  __typename?: "CommentDeleteSuccess";
-  commentId: Scalars["String"]["output"];
-};
-
-export type CommentUpdateContentInput = {
-  content?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type CommentUpdateContentPayload =
-  | AuthError
-  | CommentUpdateContentSuccess
-  | ComplexQueryError
-  | InvalidInputValueError;
-
-export type CommentUpdateContentSuccess = {
-  __typename?: "CommentUpdateContentSuccess";
-  comment: Comment;
-};
-
-export type Comments = {
-  __typename?: "Comments";
-  data: Array<Comment>;
+export type Communities = {
+  __typename?: "Communities";
+  data: Array<Community>;
   total: Scalars["Int"]["output"];
 };
 
-export type CommonError = AuthError | ComplexQueryError | InvalidInputValueError;
-
-export type ComplexQueryError = Error & {
-  __typename?: "ComplexQueryError";
-  message: Scalars["String"]["output"];
-  statusCode: Scalars["Int"]["output"];
+export type CommunitiesConnection = {
+  __typename?: "CommunitiesConnection";
+  edges?: Maybe<Array<Maybe<CommunityEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
 };
 
-export type CreateUserInput = {
-  agendaIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
+export type Community = {
+  __typename?: "Community";
+  articles?: Maybe<ArticlesConnection>;
+  bio?: Maybe<Scalars["String"]["output"]>;
+  createdAt: Scalars["Datetime"]["output"];
+  establishedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  id: Scalars["ID"]["output"];
+  image?: Maybe<Scalars["String"]["output"]>;
+  memberships?: Maybe<MembershipsConnection>;
+  name: Scalars["String"]["output"];
+  opportunities?: Maybe<OpportunitiesConnection>;
+  participations?: Maybe<ParticipationsConnection>;
+  pointName: Scalars["String"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  utilities?: Maybe<UtilitiesConnection>;
+  wallets?: Maybe<WalletsConnection>;
+  website?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type CommunityArticlesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ArticleFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ArticleSortInput>;
+};
+
+export type CommunityMembershipsArgs = {
+  cursor?: InputMaybe<MembershipCursorInput>;
+  filter?: InputMaybe<MembershipFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<MembershipSortInput>;
+};
+
+export type CommunityOpportunitiesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunitySortInput>;
+};
+
+export type CommunityParticipationsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ParticipationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ParticipationSortInput>;
+};
+
+export type CommunityUtilitiesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<UtilityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<UtilitySortInput>;
+};
+
+export type CommunityWalletsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<WalletFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<WalletSortInput>;
+};
+
+export type CommunityCreateInput = {
   bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  firstName: Scalars["String"]["input"];
-  groupIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  image?: InputMaybe<ImageInput>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  lastName: Scalars["String"]["input"];
-  middleName?: InputMaybe<Scalars["String"]["input"]>;
-  organizationIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  skillsetIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  establishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  image?: InputMaybe<Scalars["String"]["input"]>;
+  name: Scalars["String"]["input"];
+  pointName: Scalars["String"]["input"];
+  website?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type CommunityCreatePayload = CommunityCreateSuccess;
+
+export type CommunityCreateSuccess = {
+  __typename?: "CommunityCreateSuccess";
+  community: Community;
+};
+
+export type CommunityDeleteInput = {
+  communityId: Scalars["ID"]["input"];
+};
+
+export type CommunityDeletePayload = CommunityDeleteSuccess;
+
+export type CommunityDeleteSuccess = {
+  __typename?: "CommunityDeleteSuccess";
+  communityId: Scalars["String"]["output"];
+};
+
+export type CommunityEdge = Edge & {
+  __typename?: "CommunityEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Community>;
+};
+
+export type CommunityFilterInput = {
+  cityCode?: InputMaybe<Scalars["String"]["input"]>;
+  stateCode?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type CommunitySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export type CommunityUpdateProfileInput = {
+  bio?: InputMaybe<Scalars["String"]["input"]>;
+  cityCode?: InputMaybe<Scalars["String"]["input"]>;
+  communityId: Scalars["ID"]["input"];
+  establishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  image?: InputMaybe<Scalars["String"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  pointName?: InputMaybe<Scalars["String"]["input"]>;
+  stateCode?: InputMaybe<Scalars["String"]["input"]>;
+  website?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type CommunityUpdateProfilePayload = CommunityUpdateProfileSuccess;
+
+export type CommunityUpdateProfileSuccess = {
+  __typename?: "CommunityUpdateProfileSuccess";
+  community: Community;
+};
+
+export type CurrentPointView = {
+  __typename?: "CurrentPointView";
+  currentPoint: Scalars["Int"]["output"];
+  walletId: Scalars["String"]["output"];
 };
 
 export type CurrentUserPayload = {
@@ -462,391 +307,6 @@ export type Edge = {
   cursor: Scalars["String"]["output"];
 };
 
-export enum EntityPosition {
-  Prefix = "PREFIX",
-  Suffix = "SUFFIX",
-}
-
-export type Error = {
-  message: Scalars["String"]["output"];
-  statusCode: Scalars["Int"]["output"];
-};
-
-export type Event = {
-  __typename?: "Event";
-  activities?: Maybe<Activities>;
-  agendas?: Maybe<Array<Agenda>>;
-  cities?: Maybe<Array<City>>;
-  comments?: Maybe<Comments>;
-  createdAt: Scalars["Datetime"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
-  endsAt: Scalars["Datetime"]["output"];
-  groups?: Maybe<Array<Group>>;
-  id: Scalars["ID"]["output"];
-  images?: Maybe<Array<Scalars["String"]["output"]>>;
-  isPublic: Scalars["Boolean"]["output"];
-  likes?: Maybe<Likes>;
-  organizations?: Maybe<Array<Organization>>;
-  plannedEndsAt?: Maybe<Scalars["Datetime"]["output"]>;
-  plannedStartsAt?: Maybe<Scalars["Datetime"]["output"]>;
-  skillsets?: Maybe<Array<Skillset>>;
-  startsAt: Scalars["Datetime"]["output"];
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-};
-
-export type EventAddGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type EventAddOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type EventDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | EventDeleteSuccess
-  | InvalidInputValueError;
-
-export type EventDeleteSuccess = {
-  __typename?: "EventDeleteSuccess";
-  eventId: Scalars["ID"]["output"];
-};
-
-export type EventEdge = Edge & {
-  __typename?: "EventEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<Event>;
-};
-
-export type EventFilterInput = {
-  agendaId?: InputMaybe<Scalars["Int"]["input"]>;
-  cityCode?: InputMaybe<Scalars["String"]["input"]>;
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type EventPlanInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  endsAt: Scalars["Datetime"]["input"];
-  groupIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  organizationIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  plannedEndsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  plannedStartsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  skillsets?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  startsAt: Scalars["Datetime"]["input"];
-};
-
-export type EventPlanPayload =
-  | AuthError
-  | ComplexQueryError
-  | EventPlanSuccess
-  | InvalidInputValueError;
-
-export type EventPlanSuccess = {
-  __typename?: "EventPlanSuccess";
-  event?: Maybe<Event>;
-};
-
-export type EventRemoveGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type EventRemoveOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type EventSortInput = {
-  startsAt?: InputMaybe<SortDirection>;
-};
-
-export type EventUpdateContentInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  endsAt: Scalars["Datetime"]["input"];
-  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  plannedEndsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  plannedStartsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  skillsets?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  startsAt: Scalars["Datetime"]["input"];
-};
-
-export type EventUpdateContentPayload =
-  | AuthError
-  | ComplexQueryError
-  | EventUpdateContentSuccess
-  | InvalidInputValueError;
-
-export type EventUpdateContentSuccess = {
-  __typename?: "EventUpdateContentSuccess";
-  event: Event;
-};
-
-export type EventUpdateGroupPayload =
-  | AuthError
-  | ComplexQueryError
-  | EventUpdateGroupSuccess
-  | InvalidInputValueError;
-
-export type EventUpdateGroupSuccess = {
-  __typename?: "EventUpdateGroupSuccess";
-  event: Event;
-  group: Group;
-};
-
-export type EventUpdateOrganizationPayload =
-  | AuthError
-  | ComplexQueryError
-  | EventUpdateOrganizationSuccess
-  | InvalidInputValueError;
-
-export type EventUpdateOrganizationSuccess = {
-  __typename?: "EventUpdateOrganizationSuccess";
-  event: Event;
-  organization: Organization;
-};
-
-export type EventUpdatePrivacyPayload =
-  | AuthError
-  | ComplexQueryError
-  | EventUpdatePrivacySuccess
-  | InvalidInputValueError;
-
-export type EventUpdatePrivacySuccess = {
-  __typename?: "EventUpdatePrivacySuccess";
-  event: Event;
-};
-
-export type EventsConnection = {
-  __typename?: "EventsConnection";
-  edges?: Maybe<Array<Maybe<EventEdge>>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars["Int"]["output"];
-};
-
-export type Field = {
-  __typename?: "Field";
-  message?: Maybe<Scalars["String"]["output"]>;
-  name: Scalars["String"]["output"];
-};
-
-export type Group = {
-  __typename?: "Group";
-  agendas?: Maybe<Array<Agenda>>;
-  bio?: Maybe<Scalars["String"]["output"]>;
-  children?: Maybe<Array<Group>>;
-  cities?: Maybe<Array<City>>;
-  createdAt: Scalars["Datetime"]["output"];
-  events?: Maybe<Array<Event>>;
-  id: Scalars["ID"]["output"];
-  image?: Maybe<Scalars["String"]["output"]>;
-  name: Scalars["String"]["output"];
-  organization?: Maybe<Organization>;
-  parent?: Maybe<Group>;
-  targets?: Maybe<Array<Target>>;
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  users?: Maybe<Array<User>>;
-};
-
-export type GroupAddChildInput = {
-  childId: Scalars["String"]["input"];
-};
-
-export type GroupAddEventInput = {
-  eventId: Scalars["String"]["input"];
-};
-
-export type GroupAddParentInput = {
-  parentId: Scalars["String"]["input"];
-};
-
-export type GroupAddTargetInput = {
-  targetId: Scalars["String"]["input"];
-};
-
-export type GroupAddUserInput = {
-  userId: Scalars["String"]["input"];
-};
-
-export type GroupChangeOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type GroupChangeOrganizationPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupChangeOrganizationSuccess
-  | InvalidInputValueError;
-
-export type GroupChangeOrganizationSuccess = {
-  __typename?: "GroupChangeOrganizationSuccess";
-  group: Group;
-  organization: Organization;
-};
-
-export type GroupCreateInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  bio?: InputMaybe<Scalars["String"]["input"]>;
-  childrenIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
-  organizationId?: InputMaybe<Scalars["String"]["input"]>;
-  parentId?: InputMaybe<Scalars["String"]["input"]>;
-  userIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-};
-
-export type GroupCreatePayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupCreateSuccess
-  | InvalidInputValueError;
-
-export type GroupCreateSuccess = {
-  __typename?: "GroupCreateSuccess";
-  group?: Maybe<Group>;
-};
-
-export type GroupDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupDeleteSuccess
-  | InvalidInputValueError;
-
-export type GroupDeleteSuccess = {
-  __typename?: "GroupDeleteSuccess";
-  groupId: Scalars["ID"]["output"];
-};
-
-export type GroupEdge = Edge & {
-  __typename?: "GroupEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<Group>;
-};
-
-export type GroupFilterInput = {
-  agendaId?: InputMaybe<Scalars["Int"]["input"]>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
-  organizationId?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type GroupRemoveChildInput = {
-  childId: Scalars["String"]["input"];
-};
-
-export type GroupRemoveEventInput = {
-  eventId: Scalars["String"]["input"];
-};
-
-export type GroupRemoveParentInput = {
-  parentId: Scalars["String"]["input"];
-};
-
-export type GroupRemoveTargetInput = {
-  targetId: Scalars["String"]["input"];
-};
-
-export type GroupRemoveUserInput = {
-  userId: Scalars["String"]["input"];
-};
-
-export type GroupSortInput = {
-  createdAt?: InputMaybe<SortDirection>;
-  updatedAt?: InputMaybe<SortDirection>;
-};
-
-export type GroupUpdateChildPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupUpdateChildSuccess
-  | InvalidInputValueError;
-
-export type GroupUpdateChildSuccess = {
-  __typename?: "GroupUpdateChildSuccess";
-  child: Group;
-  group: Group;
-};
-
-export type GroupUpdateContentInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
-};
-
-export type GroupUpdateContentPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupUpdateContentSuccess
-  | InvalidInputValueError;
-
-export type GroupUpdateContentSuccess = {
-  __typename?: "GroupUpdateContentSuccess";
-  group: Group;
-};
-
-export type GroupUpdateEventPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupUpdateEventSuccess
-  | InvalidInputValueError;
-
-export type GroupUpdateEventSuccess = {
-  __typename?: "GroupUpdateEventSuccess";
-  event: Event;
-  group: Group;
-};
-
-export type GroupUpdateParentPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupUpdateParentSuccess
-  | InvalidInputValueError;
-
-export type GroupUpdateParentSuccess = {
-  __typename?: "GroupUpdateParentSuccess";
-  group: Group;
-  parent: Group;
-};
-
-export type GroupUpdateTargetPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupUpdateTargetSuccess
-  | InvalidInputValueError;
-
-export type GroupUpdateTargetSuccess = {
-  __typename?: "GroupUpdateTargetSuccess";
-  group: Group;
-  target: Target;
-};
-
-export type GroupUpdateUserPayload =
-  | AuthError
-  | ComplexQueryError
-  | GroupUpdateUserSuccess
-  | InvalidInputValueError;
-
-export type GroupUpdateUserSuccess = {
-  __typename?: "GroupUpdateUserSuccess";
-  group: Group;
-  user: User;
-};
-
-export type GroupsConnection = {
-  __typename?: "GroupsConnection";
-  edges?: Maybe<Array<Maybe<GroupEdge>>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars["Int"]["output"];
-};
-
 export enum IdentityPlatform {
   Facebook = "FACEBOOK",
   Line = "LINE",
@@ -856,1034 +316,714 @@ export type ImageInput = {
   base64: Scalars["String"]["input"];
 };
 
-export type Index = {
-  __typename?: "Index";
-  description?: Maybe<Scalars["String"]["output"]>;
-  id: Scalars["Int"]["output"];
-  name: Scalars["String"]["output"];
-  valueType: ValueType;
-};
-
-export type InvalidInputValueError = Error & {
-  __typename?: "InvalidInputValueError";
-  fields?: Maybe<Array<Field>>;
-  message: Scalars["String"]["output"];
-  statusCode: Scalars["Int"]["output"];
-};
-
-export type Issue = {
-  __typename?: "Issue";
-  activities?: Maybe<Activities>;
-  cities?: Maybe<Array<City>>;
-  comments?: Maybe<Comments>;
+export type Membership = {
+  __typename?: "Membership";
+  community: Community;
   createdAt: Scalars["Datetime"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
-  groups?: Maybe<Array<Group>>;
-  id: Scalars["ID"]["output"];
-  images?: Maybe<Array<Scalars["String"]["output"]>>;
-  isPublic: Scalars["Boolean"]["output"];
-  issueCategories?: Maybe<Array<IssueCategory>>;
-  likes?: Maybe<Likes>;
-  organizations?: Maybe<Array<Organization>>;
-  skillsets?: Maybe<Array<Skillset>>;
+  role: Role;
+  status?: Maybe<MembershipStatus>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  user: User;
 };
 
-export type IssueAddCategoryInput = {
-  categoryId: Scalars["Int"]["input"];
-};
-
-export type IssueAddCityInput = {
-  cityId: Scalars["String"]["input"];
-};
-
-export type IssueAddGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type IssueAddOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type IssueAddSkillsetInput = {
-  skillsetId: Scalars["Int"]["input"];
-};
-
-export type IssueCategory = {
-  __typename?: "IssueCategory";
-  code: Scalars["String"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
-  id: Scalars["Int"]["output"];
-  name: Scalars["String"]["output"];
-};
-
-export type IssueCreateInput = {
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  groupIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  issueCategoryIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  organizationIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  skillsetIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-};
-
-export type IssueCreatePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueCreateSuccess;
-
-export type IssueCreateSuccess = {
-  __typename?: "IssueCreateSuccess";
-  issue: Issue;
-};
-
-export type IssueDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueDeleteSuccess;
-
-export type IssueDeleteSuccess = {
-  __typename?: "IssueDeleteSuccess";
-  issueId: Scalars["String"]["output"];
-};
-
-export type IssueEdge = Edge & {
-  __typename?: "IssueEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<Issue>;
-};
-
-export type IssueFilterInput = {
-  cityCode?: InputMaybe<Scalars["String"]["input"]>;
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type IssuePrivacyInput = {
-  isPublic: Scalars["Boolean"]["input"];
-};
-
-export type IssueRemoveCategoryInput = {
-  categoryId: Scalars["Int"]["input"];
-};
-
-export type IssueRemoveCityInput = {
-  cityId: Scalars["String"]["input"];
-};
-
-export type IssueRemoveGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type IssueRemoveOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
-};
-
-export type IssueRemoveSkillsetInput = {
-  skillsetId: Scalars["Int"]["input"];
-};
-
-export type IssueSortInput = {
-  createdAt?: InputMaybe<SortDirection>;
-};
-
-export type IssueUpdateCategoryPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdateCategorySuccess;
-
-export type IssueUpdateCategorySuccess = {
-  __typename?: "IssueUpdateCategorySuccess";
-  issue: Issue;
-  issueCategory: IssueCategory;
-};
-
-export type IssueUpdateCityPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdateCitySuccess;
-
-export type IssueUpdateCitySuccess = {
-  __typename?: "IssueUpdateCitySuccess";
-  city: City;
-  issue: Issue;
-};
-
-export type IssueUpdateContentInput = {
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  issueCategoryIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  skillsetIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-};
-
-export type IssueUpdateContentPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdateContentSuccess;
-
-export type IssueUpdateContentSuccess = {
-  __typename?: "IssueUpdateContentSuccess";
-  issue: Issue;
-};
-
-export type IssueUpdateGroupPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdateGroupSuccess;
-
-export type IssueUpdateGroupSuccess = {
-  __typename?: "IssueUpdateGroupSuccess";
-  group: Group;
-  issue: Issue;
-};
-
-export type IssueUpdateOrganizationPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdateOrganizationSuccess;
-
-export type IssueUpdateOrganizationSuccess = {
-  __typename?: "IssueUpdateOrganizationSuccess";
-  issue: Issue;
-  organization: Organization;
-};
-
-export type IssueUpdatePrivacyPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdatePrivacySuccess;
-
-export type IssueUpdatePrivacySuccess = {
-  __typename?: "IssueUpdatePrivacySuccess";
-  issue: Issue;
-};
-
-export type IssueUpdateSkillsetPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | IssueUpdateSkillsetSuccess;
-
-export type IssueUpdateSkillsetSuccess = {
-  __typename?: "IssueUpdateSkillsetSuccess";
-  issue: Issue;
-  skillset: Skillset;
-};
-
-export type IssuesConnection = {
-  __typename?: "IssuesConnection";
-  edges?: Maybe<Array<Maybe<IssueEdge>>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars["Int"]["output"];
-};
-
-export type Like = {
-  __typename?: "Like";
-  createdAt: Scalars["Datetime"]["output"];
-  event?: Maybe<Event>;
-  postedAt: Scalars["Datetime"]["output"];
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  user?: Maybe<User>;
-};
-
-export type LikeAddEventInput = {
-  eventId: Scalars["String"]["input"];
-  postedAt: Scalars["Datetime"]["input"];
+export type MembershipAcceptMyInvitationInput = {
+  communityId: Scalars["String"]["input"];
   userId: Scalars["String"]["input"];
 };
 
-export type LikeAddEventPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | LikeAddEventSuccess;
-
-export type LikeAddEventSuccess = {
-  __typename?: "LikeAddEventSuccess";
-  like: Like;
+export type MembershipAssignManagerInput = {
+  communityId: Scalars["String"]["input"];
+  userId: Scalars["String"]["input"];
 };
 
-export type LikeDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | LikeDeleteSuccess;
-
-export type LikeDeleteSuccess = {
-  __typename?: "LikeDeleteSuccess";
-  likeId: Scalars["String"]["output"];
+export type MembershipAssignMemberInput = {
+  communityId: Scalars["String"]["input"];
+  userId: Scalars["String"]["input"];
 };
 
-export type Likes = {
-  __typename?: "Likes";
-  data: Array<Like>;
-  total: Scalars["Int"]["output"];
+export type MembershipAssignOwnerInput = {
+  communityId: Scalars["String"]["input"];
+  userId: Scalars["String"]["input"];
+};
+
+export type MembershipCancelInvitationInput = {
+  communityId: Scalars["String"]["input"];
+  userId: Scalars["String"]["input"];
+};
+
+export type MembershipCursorInput = {
+  communityId: Scalars["ID"]["input"];
+  userId: Scalars["ID"]["input"];
+};
+
+export type MembershipDenyMyInvitationInput = {
+  communityId: Scalars["String"]["input"];
+  userId: Scalars["String"]["input"];
+};
+
+export type MembershipEdge = Edge & {
+  __typename?: "MembershipEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Membership>;
+};
+
+export type MembershipFilterInput = {
+  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  role?: InputMaybe<Role>;
+  status?: InputMaybe<MembershipStatus>;
+  userId?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type MembershipInviteInput = {
+  communityId: Scalars["String"]["input"];
+  role?: InputMaybe<Role>;
+  userId: Scalars["String"]["input"];
+};
+
+export type MembershipInvitePayload = MembershipInviteSuccess;
+
+export type MembershipInviteSuccess = {
+  __typename?: "MembershipInviteSuccess";
+  membership: Membership;
+};
+
+export type MembershipRemoveInput = {
+  communityId: Scalars["String"]["input"];
+  userId: Scalars["String"]["input"];
+};
+
+export type MembershipRemovePayload = MembershipRemoveSuccess;
+
+export type MembershipRemoveSuccess = {
+  __typename?: "MembershipRemoveSuccess";
+  communityId: Scalars["String"]["output"];
+  userId: Scalars["String"]["output"];
+};
+
+export type MembershipSetInvitationStatusPayload = MembershipSetInvitationStatusSuccess;
+
+export type MembershipSetInvitationStatusSuccess = {
+  __typename?: "MembershipSetInvitationStatusSuccess";
+  membership: Membership;
+};
+
+export type MembershipSetRolePayload = MembershipSetRoleSuccess;
+
+export type MembershipSetRoleSuccess = {
+  __typename?: "MembershipSetRoleSuccess";
+  membership: Membership;
+};
+
+export type MembershipSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export enum MembershipStatus {
+  Canceled = "CANCELED",
+  Invited = "INVITED",
+  Joined = "JOINED",
+  Withdrawed = "WITHDRAWED",
+}
+
+export type MembershipWithdrawInput = {
+  communityId: Scalars["String"]["input"];
+  userId: Scalars["String"]["input"];
+};
+
+export type MembershipWithdrawPayload = MembershipWithdrawSuccess;
+
+export type MembershipWithdrawSuccess = {
+  __typename?: "MembershipWithdrawSuccess";
+  communityId: Scalars["String"]["output"];
+  userId: Scalars["String"]["output"];
+};
+
+export type MembershipsConnection = {
+  __typename?: "MembershipsConnection";
+  edges?: Maybe<Array<Maybe<MembershipEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type Mutation = {
   __typename?: "Mutation";
-  activityAddEvent?: Maybe<ActivityUpdateEventPayload>;
-  activityAddUser?: Maybe<ActivityUpdateUserPayload>;
-  activityCreate?: Maybe<ActivityCreatePayload>;
-  activityDelete?: Maybe<ActivityDeletePayload>;
-  activityPublish?: Maybe<ActivitySwitchPrivacyPayload>;
-  activityRemoveEvent?: Maybe<ActivityUpdateEventPayload>;
-  activityRemoveUser?: Maybe<ActivityUpdateUserPayload>;
-  activityUnpublish?: Maybe<ActivitySwitchPrivacyPayload>;
-  activityUpdateContent?: Maybe<ActivityUpdateContentPayload>;
-  applicationAddConfirmation?: Maybe<ApplicationAddConfirmationPayload>;
-  applicationApprove?: Maybe<ApplicationSwitchIsApprovedPayload>;
-  applicationCreate?: Maybe<ApplicationCreatePayload>;
-  applicationDelete?: Maybe<ApplicationDeletePayload>;
-  applicationDeleteConfirmation?: Maybe<ApplicationDeleteConfirmationPayload>;
-  applicationPublish?: Maybe<ApplicationSwitchPrivacyPayload>;
-  applicationRefuse?: Maybe<ApplicationSwitchIsApprovedPayload>;
-  applicationUnpublish?: Maybe<ApplicationSwitchPrivacyPayload>;
-  applicationUpdateComment?: Maybe<ApplicationUpdateCommentPayload>;
-  applicationUpdateConfirmation?: Maybe<ApplicationAddConfirmationPayload>;
-  applicationUpdateConfirmationComment?: Maybe<ApplicationUpdateConfirmationCommentPayload>;
-  commentAddEvent?: Maybe<CommentAddEventPayload>;
-  commentDelete?: Maybe<CommentDeletePayload>;
-  commentUpdateContent?: Maybe<CommentUpdateContentPayload>;
-  createUser?: Maybe<CurrentUserPayload>;
-  deleteUser?: Maybe<CurrentUserPayload>;
-  eventAddGroup?: Maybe<EventUpdateGroupPayload>;
-  eventAddOrganization?: Maybe<EventUpdateOrganizationPayload>;
-  eventDelete?: Maybe<EventDeletePayload>;
-  eventPlan?: Maybe<EventPlanPayload>;
-  eventPublish?: Maybe<EventUpdatePrivacyPayload>;
-  eventRemoveGroup?: Maybe<EventUpdateGroupPayload>;
-  eventRemoveOrganization?: Maybe<EventUpdateOrganizationPayload>;
-  eventUnpublish?: Maybe<EventUpdatePrivacyPayload>;
-  eventUpdateContent?: Maybe<EventUpdateContentPayload>;
-  groupAddChild?: Maybe<GroupUpdateChildPayload>;
-  groupAddEvent?: Maybe<GroupUpdateEventPayload>;
-  groupAddParent?: Maybe<GroupUpdateParentPayload>;
-  groupAddTarget?: Maybe<GroupUpdateTargetPayload>;
-  groupAddUser?: Maybe<GroupUpdateUserPayload>;
-  groupChangeOrganization?: Maybe<GroupChangeOrganizationPayload>;
-  groupCreate?: Maybe<GroupCreatePayload>;
-  groupDelete?: Maybe<GroupDeletePayload>;
-  groupRemoveChild?: Maybe<GroupUpdateChildPayload>;
-  groupRemoveEvent?: Maybe<GroupUpdateEventPayload>;
-  groupRemoveParent?: Maybe<GroupUpdateParentPayload>;
-  groupRemoveTarget?: Maybe<GroupUpdateTargetPayload>;
-  groupRemoveUser?: Maybe<GroupUpdateUserPayload>;
-  groupUpdateContent?: Maybe<GroupUpdateContentPayload>;
-  issueAddCategory?: Maybe<IssueUpdateCategoryPayload>;
-  issueAddCity?: Maybe<IssueUpdateCityPayload>;
-  issueAddGroup?: Maybe<IssueUpdateGroupPayload>;
-  issueAddOrganization?: Maybe<IssueUpdateOrganizationPayload>;
-  issueAddSkillset?: Maybe<IssueUpdateSkillsetPayload>;
-  issueCreate?: Maybe<IssueCreatePayload>;
-  issueDelete?: Maybe<IssueDeletePayload>;
-  issuePublish?: Maybe<IssueUpdatePrivacyPayload>;
-  issueRemoveCategory?: Maybe<IssueUpdateCategoryPayload>;
-  issueRemoveCity?: Maybe<IssueUpdateCityPayload>;
-  issueRemoveGroup?: Maybe<IssueUpdateGroupPayload>;
-  issueRemoveOrganization?: Maybe<IssueUpdateOrganizationPayload>;
-  issueRemoveSkillset?: Maybe<IssueUpdateSkillsetPayload>;
-  issueUnpublish?: Maybe<IssueUpdatePrivacyPayload>;
-  issueUpdateContent?: Maybe<IssueUpdateContentPayload>;
-  likeAddEvent?: Maybe<LikeAddEventPayload>;
-  likeDelete?: Maybe<LikeDeletePayload>;
+  articleCreate?: Maybe<ArticleCreatePayload>;
+  articleDelete?: Maybe<ArticleDeletePayload>;
+  articleUpdate?: Maybe<ArticleUpdatePayload>;
+  communityCreate?: Maybe<CommunityCreatePayload>;
+  communityDelete?: Maybe<CommunityDeletePayload>;
+  communityUpdateProfile?: Maybe<CommunityUpdateProfilePayload>;
+  membershipAcceptMyInvitation?: Maybe<MembershipSetInvitationStatusPayload>;
+  membershipAssignManager?: Maybe<MembershipSetRolePayload>;
+  membershipAssignMember?: Maybe<MembershipSetRolePayload>;
+  membershipAssignOwner?: Maybe<MembershipSetRolePayload>;
+  membershipCancelInvitation?: Maybe<MembershipSetInvitationStatusPayload>;
+  membershipDenyMyInvitation?: Maybe<MembershipSetInvitationStatusPayload>;
+  membershipInvite?: Maybe<MembershipInvitePayload>;
+  membershipRemove?: Maybe<MembershipRemovePayload>;
+  membershipWithdraw?: Maybe<MembershipWithdrawPayload>;
   mutationEcho: Scalars["String"]["output"];
-  organizationAddGroup?: Maybe<OrganizationUpdateGroupPayload>;
-  organizationAddTarget?: Maybe<OrganizationUpdateTargetPayload>;
-  organizationAddUser?: Maybe<OrganizationUpdateUserPayload>;
-  organizationCreate?: Maybe<OrganizationCreatePayload>;
-  organizationDelete?: Maybe<OrganizationDeletePayload>;
-  organizationPublish?: Maybe<OrganizationSwitchPrivacyPayload>;
-  organizationRemoveGroup?: Maybe<OrganizationUpdateGroupPayload>;
-  organizationRemoveTarget?: Maybe<OrganizationUpdateTargetPayload>;
-  organizationRemoveUser?: Maybe<OrganizationUpdateUserPayload>;
-  organizationUnpublish?: Maybe<OrganizationSwitchPrivacyPayload>;
-  organizationUpdateContent?: Maybe<OrganizationUpdateContentPayload>;
-  organizationUpdateDefault?: Maybe<OrganizationUpdateDefaultPayload>;
-  targetAddGroup?: Maybe<TargetUpdateGroupPayload>;
-  targetAddOrganization?: Maybe<TargetUpdateOrganizationPayload>;
-  targetCreate?: Maybe<TargetCreatePayload>;
-  targetDelete?: Maybe<TargetDeletePayload>;
-  targetRemoveGroup?: Maybe<TargetUpdateGroupPayload>;
-  targetRemoveOrganization?: Maybe<TargetUpdateOrganizationPayload>;
-  targetUpdateContent?: Maybe<TargetUpdateContentPayload>;
-  targetUpdateIndex?: Maybe<TargetUpdateIndexPayload>;
-  userAddActivity?: Maybe<UserUpdateActivityPayload>;
-  userAddGroup?: Maybe<UserUpdateGroupPayload>;
-  userAddOrganization?: Maybe<UserUpdateOrganizationPayload>;
-  userCreate?: Maybe<UserCreatePayload>;
-  userDelete?: Maybe<UserDeletePayload>;
-  userPublish?: Maybe<UserSwitchPrivacyPayload>;
-  userRemoveActivity?: Maybe<UserUpdateActivityPayload>;
-  userRemoveGroup?: Maybe<UserUpdateGroupPayload>;
-  userRemoveOrganization?: Maybe<UserUpdateOrganizationPayload>;
-  userUnpublish?: Maybe<UserSwitchPrivacyPayload>;
-  userUpdateContent?: Maybe<UserUpdateContentPayload>;
-};
-
-export type MutationActivityAddEventArgs = {
-  id: Scalars["ID"]["input"];
-  input: ActivityAddEventInput;
-};
-
-export type MutationActivityAddUserArgs = {
-  id: Scalars["ID"]["input"];
-  input: ActivityAddUserInput;
-};
-
-export type MutationActivityCreateArgs = {
-  input: ActivityCreateInput;
-};
-
-export type MutationActivityDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationActivityPublishArgs = {
-  id: Scalars["ID"]["input"];
-  input: ActivitySwitchPrivacyInput;
-};
-
-export type MutationActivityRemoveEventArgs = {
-  id: Scalars["ID"]["input"];
-  input: ActivityRemoveEventInput;
-};
-
-export type MutationActivityRemoveUserArgs = {
-  id: Scalars["ID"]["input"];
-  input: ActivityRemoveUserInput;
-};
-
-export type MutationActivityUnpublishArgs = {
-  id: Scalars["ID"]["input"];
-  input: ActivitySwitchPrivacyInput;
-};
-
-export type MutationActivityUpdateContentArgs = {
-  id: Scalars["ID"]["input"];
-  input: ActivityUpdateContentInput;
-};
-
-export type MutationApplicationAddConfirmationArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationAddConfirmationInput;
-};
-
-export type MutationApplicationApproveArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationApprovalInput;
-};
-
-export type MutationApplicationCreateArgs = {
-  input: ApplicationCreateInput;
-};
-
-export type MutationApplicationDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationApplicationDeleteConfirmationArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationDeleteConfirmationInput;
-};
-
-export type MutationApplicationPublishArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationApplicationRefuseArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationRefusalInput;
-};
-
-export type MutationApplicationUnpublishArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationApplicationUpdateCommentArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationUpdateCommentInput;
-};
-
-export type MutationApplicationUpdateConfirmationArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationAddConfirmationInput;
-};
-
-export type MutationApplicationUpdateConfirmationCommentArgs = {
-  id: Scalars["ID"]["input"];
-  input: ApplicationUpdateConfirmationCommentInput;
-};
-
-export type MutationCommentAddEventArgs = {
-  input: CommentAddEventInput;
-};
-
-export type MutationCommentDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationCommentUpdateContentArgs = {
-  id: Scalars["ID"]["input"];
-  input: CommentUpdateContentInput;
-};
-
-export type MutationCreateUserArgs = {
-  input: CreateUserInput;
-};
-
-export type MutationEventAddGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: EventAddGroupInput;
-};
-
-export type MutationEventAddOrganizationArgs = {
-  id: Scalars["ID"]["input"];
-  input: EventAddOrganizationInput;
-};
-
-export type MutationEventDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationEventPlanArgs = {
-  input: EventPlanInput;
-};
-
-export type MutationEventPublishArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationEventRemoveGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: EventRemoveGroupInput;
-};
-
-export type MutationEventRemoveOrganizationArgs = {
-  id: Scalars["ID"]["input"];
-  input: EventRemoveOrganizationInput;
-};
-
-export type MutationEventUnpublishArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationEventUpdateContentArgs = {
-  id: Scalars["ID"]["input"];
-  input: EventUpdateContentInput;
-};
-
-export type MutationGroupAddChildArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupAddChildInput;
-};
-
-export type MutationGroupAddEventArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupAddEventInput;
-};
-
-export type MutationGroupAddParentArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupAddParentInput;
-};
-
-export type MutationGroupAddTargetArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupAddTargetInput;
-};
-
-export type MutationGroupAddUserArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupAddUserInput;
-};
-
-export type MutationGroupChangeOrganizationArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupChangeOrganizationInput;
-};
-
-export type MutationGroupCreateArgs = {
-  input: GroupCreateInput;
-};
-
-export type MutationGroupDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationGroupRemoveChildArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupRemoveChildInput;
-};
-
-export type MutationGroupRemoveEventArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupRemoveEventInput;
-};
-
-export type MutationGroupRemoveParentArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupRemoveParentInput;
-};
-
-export type MutationGroupRemoveTargetArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupRemoveTargetInput;
-};
-
-export type MutationGroupRemoveUserArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupRemoveUserInput;
-};
-
-export type MutationGroupUpdateContentArgs = {
-  id: Scalars["ID"]["input"];
-  input: GroupUpdateContentInput;
-};
-
-export type MutationIssueAddCategoryArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueAddCategoryInput;
-};
-
-export type MutationIssueAddCityArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueAddCityInput;
+  opportunityCreate?: Maybe<OpportunityCreatePayload>;
+  opportunityDelete?: Maybe<OpportunityDeletePayload>;
+  opportunityInvitationCreate?: Maybe<OpportunityInvitationCreatePayload>;
+  opportunityInvitationDelete?: Maybe<OpportunityInvitationDeletePayload>;
+  opportunityInvitationDisable?: Maybe<OpportunityInvitationDisablePayload>;
+  opportunitySetPublishStatus?: Maybe<OpportunitySetPublishStatusPayload>;
+  opportunitySlotsBulkUpdate?: Maybe<OpportunitySlotsBulkUpdatePayload>;
+  opportunityUpdateContent?: Maybe<OpportunityUpdateContentPayload>;
+  participationAcceptApplication?: Maybe<ParticipationSetStatusPayload>;
+  participationAcceptMyInvitation?: Maybe<ParticipationSetStatusPayload>;
+  participationApply?: Maybe<ParticipationApplyPayload>;
+  participationApprovePerformance?: Maybe<ParticipationSetStatusPayload>;
+  participationCancelInvitation?: Maybe<ParticipationSetStatusPayload>;
+  participationCancelMyApplication?: Maybe<ParticipationSetStatusPayload>;
+  participationDenyApplication?: Maybe<ParticipationSetStatusPayload>;
+  participationDenyMyInvitation?: Maybe<ParticipationSetStatusPayload>;
+  participationDenyPerformance?: Maybe<ParticipationSetStatusPayload>;
+  participationInvite?: Maybe<ParticipationInvitePayload>;
+  transactionDonateSelfPoint?: Maybe<TransactionDonateSelfPointPayload>;
+  transactionGrantCommunityPoint?: Maybe<TransactionGrantCommunityPointPayload>;
+  transactionIssueCommunityPoint?: Maybe<TransactionIssueCommunityPointPayload>;
+  userDeleteMe?: Maybe<UserDeletePayload>;
+  userSignUp?: Maybe<CurrentUserPayload>;
+  userUpdateMyProfile?: Maybe<UserUpdateProfilePayload>;
+  utilityCreate?: Maybe<UtilityCreatePayload>;
+  utilityDelete?: Maybe<UtilityDeletePayload>;
+  utilityRedeem?: Maybe<UtilityRedeemPayload>;
+  utilityUpdateInfo?: Maybe<UtilityUpdateInfoPayload>;
+  utilityUse?: Maybe<UtilityUsePayload>;
 };
 
-export type MutationIssueAddGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueAddGroupInput;
+export type MutationArticleCreateArgs = {
+  input: ArticleCreateInput;
 };
 
-export type MutationIssueAddOrganizationArgs = {
+export type MutationArticleDeleteArgs = {
   id: Scalars["ID"]["input"];
-  input: IssueAddOrganizationInput;
 };
 
-export type MutationIssueAddSkillsetArgs = {
+export type MutationArticleUpdateArgs = {
   id: Scalars["ID"]["input"];
-  input: IssueAddSkillsetInput;
-};
-
-export type MutationIssueCreateArgs = {
-  input: IssueCreateInput;
+  input: ArticleUpdateInput;
 };
 
-export type MutationIssueDeleteArgs = {
-  id: Scalars["ID"]["input"];
+export type MutationCommunityCreateArgs = {
+  input: CommunityCreateInput;
 };
 
-export type MutationIssuePublishArgs = {
+export type MutationCommunityDeleteArgs = {
   id: Scalars["ID"]["input"];
-  input: IssuePrivacyInput;
+  input: CommunityDeleteInput;
 };
 
-export type MutationIssueRemoveCategoryArgs = {
+export type MutationCommunityUpdateProfileArgs = {
   id: Scalars["ID"]["input"];
-  input: IssueRemoveCategoryInput;
+  input: CommunityUpdateProfileInput;
 };
 
-export type MutationIssueRemoveCityArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueRemoveCityInput;
+export type MutationMembershipAcceptMyInvitationArgs = {
+  input: MembershipAcceptMyInvitationInput;
 };
 
-export type MutationIssueRemoveGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueRemoveGroupInput;
+export type MutationMembershipAssignManagerArgs = {
+  input: MembershipAssignManagerInput;
 };
 
-export type MutationIssueRemoveOrganizationArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueRemoveOrganizationInput;
+export type MutationMembershipAssignMemberArgs = {
+  input: MembershipAssignMemberInput;
 };
 
-export type MutationIssueRemoveSkillsetArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueRemoveSkillsetInput;
+export type MutationMembershipAssignOwnerArgs = {
+  input: MembershipAssignOwnerInput;
 };
 
-export type MutationIssueUnpublishArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssuePrivacyInput;
+export type MutationMembershipCancelInvitationArgs = {
+  input: MembershipCancelInvitationInput;
 };
 
-export type MutationIssueUpdateContentArgs = {
-  id: Scalars["ID"]["input"];
-  input: IssueUpdateContentInput;
+export type MutationMembershipDenyMyInvitationArgs = {
+  input: MembershipDenyMyInvitationInput;
 };
 
-export type MutationLikeAddEventArgs = {
-  input: LikeAddEventInput;
+export type MutationMembershipInviteArgs = {
+  input: MembershipInviteInput;
 };
 
-export type MutationLikeDeleteArgs = {
-  id: Scalars["ID"]["input"];
+export type MutationMembershipRemoveArgs = {
+  input: MembershipRemoveInput;
 };
 
-export type MutationOrganizationAddGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: OrganizationAddGroupInput;
+export type MutationMembershipWithdrawArgs = {
+  input: MembershipWithdrawInput;
 };
 
-export type MutationOrganizationAddTargetArgs = {
-  id: Scalars["ID"]["input"];
-  input: OrganizationAddTargetInput;
+export type MutationOpportunityCreateArgs = {
+  input: OpportunityCreateInput;
 };
 
-export type MutationOrganizationAddUserArgs = {
+export type MutationOpportunityDeleteArgs = {
   id: Scalars["ID"]["input"];
-  input: OrganizationAddUserInput;
-};
-
-export type MutationOrganizationCreateArgs = {
-  input: OrganizationCreateInput;
 };
 
-export type MutationOrganizationDeleteArgs = {
-  id: Scalars["ID"]["input"];
+export type MutationOpportunityInvitationCreateArgs = {
+  input: OpportunityInvitationCreateInput;
 };
 
-export type MutationOrganizationPublishArgs = {
+export type MutationOpportunityInvitationDeleteArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type MutationOrganizationRemoveGroupArgs = {
+export type MutationOpportunityInvitationDisableArgs = {
   id: Scalars["ID"]["input"];
-  input: OrganizationRemoveGroupInput;
+  input: OpportunityInvitationDisableInput;
 };
 
-export type MutationOrganizationRemoveTargetArgs = {
+export type MutationOpportunitySetPublishStatusArgs = {
   id: Scalars["ID"]["input"];
-  input: OrganizationRemoveTargetInput;
+  input: OpportunitySetPublishStatusInput;
 };
 
-export type MutationOrganizationRemoveUserArgs = {
-  id: Scalars["ID"]["input"];
-  input: OrganizationRemoveUserInput;
+export type MutationOpportunitySlotsBulkUpdateArgs = {
+  input: OpportunitySlotsBulkUpdateInput;
 };
 
-export type MutationOrganizationUnpublishArgs = {
+export type MutationOpportunityUpdateContentArgs = {
   id: Scalars["ID"]["input"];
+  input: OpportunityUpdateContentInput;
 };
 
-export type MutationOrganizationUpdateContentArgs = {
+export type MutationParticipationAcceptApplicationArgs = {
   id: Scalars["ID"]["input"];
-  input: OrganizationUpdateContentInput;
+  input: ParticipationSetStatusInput;
 };
 
-export type MutationOrganizationUpdateDefaultArgs = {
+export type MutationParticipationAcceptMyInvitationArgs = {
   id: Scalars["ID"]["input"];
-  input: OrganizationUpdateDefaultInput;
 };
 
-export type MutationTargetAddGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: TargetAddGroupInput;
+export type MutationParticipationApplyArgs = {
+  input: ParticipationApplyInput;
 };
 
-export type MutationTargetAddOrganizationArgs = {
+export type MutationParticipationApprovePerformanceArgs = {
   id: Scalars["ID"]["input"];
-  input: TargetAddOrganizationInput;
-};
-
-export type MutationTargetCreateArgs = {
-  input: TargetCreateInput;
+  input: ParticipationSetStatusInput;
 };
 
-export type MutationTargetDeleteArgs = {
+export type MutationParticipationCancelInvitationArgs = {
   id: Scalars["ID"]["input"];
+  input: ParticipationSetStatusInput;
 };
 
-export type MutationTargetRemoveGroupArgs = {
+export type MutationParticipationCancelMyApplicationArgs = {
   id: Scalars["ID"]["input"];
-  input: TargetRemoveGroupInput;
 };
 
-export type MutationTargetRemoveOrganizationArgs = {
+export type MutationParticipationDenyApplicationArgs = {
   id: Scalars["ID"]["input"];
-  input: TargetRemoveOrganizationInput;
+  input: ParticipationSetStatusInput;
 };
 
-export type MutationTargetUpdateContentArgs = {
+export type MutationParticipationDenyMyInvitationArgs = {
   id: Scalars["ID"]["input"];
-  input: TargetUpdateContentInput;
 };
 
-export type MutationTargetUpdateIndexArgs = {
+export type MutationParticipationDenyPerformanceArgs = {
   id: Scalars["ID"]["input"];
-  input: TargetUpdateIndexInput;
+  input: ParticipationSetStatusInput;
 };
 
-export type MutationUserAddActivityArgs = {
-  id: Scalars["ID"]["input"];
-  input: UserAddActivityInput;
+export type MutationParticipationInviteArgs = {
+  input: ParticipationInviteInput;
 };
 
-export type MutationUserAddGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: UserAddGroupInput;
+export type MutationTransactionDonateSelfPointArgs = {
+  input: TransactionDonateSelfPointInput;
 };
 
-export type MutationUserAddOrganizationArgs = {
-  id: Scalars["ID"]["input"];
-  input: UserAddOrganizationInput;
+export type MutationTransactionGrantCommunityPointArgs = {
+  input: TransactionGrantCommunityPointInput;
 };
 
-export type MutationUserCreateArgs = {
-  input: UserCreateInput;
+export type MutationTransactionIssueCommunityPointArgs = {
+  input: TransactionIssueCommunityPointInput;
 };
 
-export type MutationUserDeleteArgs = {
-  id: Scalars["ID"]["input"];
+export type MutationUserDeleteMeArgs = {
+  input: UserDeleteInput;
 };
 
-export type MutationUserPublishArgs = {
-  id: Scalars["ID"]["input"];
-  input: UserSwitchPrivacyInput;
+export type MutationUserSignUpArgs = {
+  input: UserSignUpInput;
 };
 
-export type MutationUserRemoveActivityArgs = {
-  id: Scalars["ID"]["input"];
-  input: UserRemoveActivityInput;
+export type MutationUserUpdateMyProfileArgs = {
+  input: UserUpdateProfileInput;
 };
 
-export type MutationUserRemoveGroupArgs = {
-  id: Scalars["ID"]["input"];
-  input: UserRemoveGroupInput;
+export type MutationUtilityCreateArgs = {
+  input: UtilityCreateInput;
 };
 
-export type MutationUserRemoveOrganizationArgs = {
+export type MutationUtilityDeleteArgs = {
   id: Scalars["ID"]["input"];
-  input: UserRemoveOrganizationInput;
 };
 
-export type MutationUserUnpublishArgs = {
+export type MutationUtilityRedeemArgs = {
   id: Scalars["ID"]["input"];
-  input: UserSwitchPrivacyInput;
+  input: UtilityRedeemInput;
 };
 
-export type MutationUserUpdateContentArgs = {
+export type MutationUtilityUpdateInfoArgs = {
   id: Scalars["ID"]["input"];
-  input: UserUpdateContentInput;
-};
-
-export type Organization = {
-  __typename?: "Organization";
-  address1: Scalars["String"]["output"];
-  address2?: Maybe<Scalars["String"]["output"]>;
-  agendas?: Maybe<Array<Agenda>>;
-  bio?: Maybe<Scalars["String"]["output"]>;
-  cities?: Maybe<Array<City>>;
-  city: City;
-  createdAt: Scalars["Datetime"]["output"];
-  entity?: Maybe<Scalars["String"]["output"]>;
-  entityPosition?: Maybe<EntityPosition>;
-  establishedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  events?: Maybe<Array<Event>>;
-  groups?: Maybe<Array<Group>>;
-  id: Scalars["ID"]["output"];
-  image?: Maybe<Scalars["String"]["output"]>;
-  isPublic: Scalars["Boolean"]["output"];
-  name: Scalars["String"]["output"];
-  state: State;
-  targets?: Maybe<Array<Target>>;
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  users?: Maybe<Array<User>>;
-  website?: Maybe<Scalars["String"]["output"]>;
-  zipcode: Scalars["String"]["output"];
-};
-
-export type OrganizationAddGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type OrganizationAddTargetInput = {
-  targetId: Scalars["String"]["input"];
-};
-
-export type OrganizationAddUserInput = {
-  userId: Scalars["String"]["input"];
-};
-
-export type OrganizationCreateInput = {
-  address1: Scalars["String"]["input"];
-  address2?: InputMaybe<Scalars["String"]["input"]>;
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCode: Scalars["String"]["input"];
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  entity?: InputMaybe<Scalars["String"]["input"]>;
-  entityPosition?: InputMaybe<EntityPosition>;
-  establishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
-  stateCode: Scalars["String"]["input"];
-  stateCountryCode: Scalars["String"]["input"];
-  userIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  website?: InputMaybe<Scalars["String"]["input"]>;
-  zipcode: Scalars["String"]["input"];
-};
-
-export type OrganizationCreatePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationCreateSuccess;
-
-export type OrganizationCreateSuccess = {
-  __typename?: "OrganizationCreateSuccess";
-  organization?: Maybe<Organization>;
-};
-
-export type OrganizationDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationDeleteSuccess;
-
-export type OrganizationDeleteSuccess = {
-  __typename?: "OrganizationDeleteSuccess";
-  organizationId: Scalars["ID"]["output"];
-};
-
-export type OrganizationEdge = Edge & {
-  __typename?: "OrganizationEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<Organization>;
-};
-
-export type OrganizationFilterInput = {
-  agendaId?: InputMaybe<Scalars["Int"]["input"]>;
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type OrganizationRemoveGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type OrganizationRemoveTargetInput = {
-  targetId: Scalars["String"]["input"];
-};
-
-export type OrganizationRemoveUserInput = {
-  userId: Scalars["String"]["input"];
-};
-
-export type OrganizationSortInput = {
-  updatedAt?: InputMaybe<SortDirection>;
-};
-
-export type OrganizationSwitchPrivacyPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationSwitchPrivacySuccess;
-
-export type OrganizationSwitchPrivacySuccess = {
-  __typename?: "OrganizationSwitchPrivacySuccess";
-  organization: Organization;
-};
-
-export type OrganizationUpdateContentInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  website?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type OrganizationUpdateContentPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationUpdateContentSuccess;
-
-export type OrganizationUpdateContentSuccess = {
-  __typename?: "OrganizationUpdateContentSuccess";
-  organization: Organization;
-};
-
-export type OrganizationUpdateDefaultInput = {
-  address1: Scalars["String"]["input"];
-  address2?: InputMaybe<Scalars["String"]["input"]>;
-  cityCode: Scalars["String"]["input"];
-  entity?: InputMaybe<Scalars["String"]["input"]>;
-  entityPosition?: InputMaybe<EntityPosition>;
-  establishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  name: Scalars["String"]["input"];
-  stateCode: Scalars["String"]["input"];
-  stateCountryCode: Scalars["String"]["input"];
-  zipcode: Scalars["String"]["input"];
-};
-
-export type OrganizationUpdateDefaultPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationUpdateDefaultSuccess;
-
-export type OrganizationUpdateDefaultSuccess = {
-  __typename?: "OrganizationUpdateDefaultSuccess";
-  organization: Organization;
-};
-
-export type OrganizationUpdateGroupPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationUpdateGroupSuccess;
-
-export type OrganizationUpdateGroupSuccess = {
-  __typename?: "OrganizationUpdateGroupSuccess";
-  group: Group;
-  organization: Organization;
-};
-
-export type OrganizationUpdateTargetPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationUpdateTargetSuccess;
-
-export type OrganizationUpdateTargetSuccess = {
-  __typename?: "OrganizationUpdateTargetSuccess";
-  organization: Organization;
-  target: Target;
-};
-
-export type OrganizationUpdateUserPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | OrganizationUpdateUserSuccess;
-
-export type OrganizationUpdateUserSuccess = {
-  __typename?: "OrganizationUpdateUserSuccess";
-  organization: Organization;
-  user: User;
+  input: UtilityUpdateInfoInput;
 };
 
-export type Organizations = {
-  __typename?: "Organizations";
-  data: Array<Organization>;
-  total: Scalars["Int"]["output"];
+export type MutationUtilityUseArgs = {
+  input: UtilityUseInput;
 };
 
-export type OrganizationsConnection = {
-  __typename?: "OrganizationsConnection";
-  edges?: Maybe<Array<Maybe<OrganizationEdge>>>;
+export type OpportunitiesConnection = {
+  __typename?: "OpportunitiesConnection";
+  edges: Array<OpportunityEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars["Int"]["output"];
+};
+
+export type Opportunity = {
+  __typename?: "Opportunity";
+  articles?: Maybe<ArticlesConnection>;
+  body?: Maybe<Scalars["String"]["output"]>;
+  capacity?: Maybe<Scalars["Int"]["output"]>;
+  category: OpportunityCategory;
+  community?: Maybe<Community>;
+  createdAt: Scalars["Datetime"]["output"];
+  createdByUser?: Maybe<User>;
+  description: Scalars["String"]["output"];
+  endsAt?: Maybe<Scalars["Datetime"]["output"]>;
+  feeRequired?: Maybe<Scalars["Int"]["output"]>;
+  files?: Maybe<Scalars["JSON"]["output"]>;
+  id: Scalars["ID"]["output"];
+  image?: Maybe<Scalars["String"]["output"]>;
+  invitations?: Maybe<OpportunityInvitationsConnection>;
+  participations?: Maybe<ParticipationsConnection>;
+  place?: Maybe<Place>;
+  pointsRequired?: Maybe<Scalars["Int"]["output"]>;
+  pointsToEarn?: Maybe<Scalars["Int"]["output"]>;
+  publishStatus: PublishStatus;
+  requireApproval: Scalars["Boolean"]["output"];
+  slots?: Maybe<OpportunitySlotsConnection>;
+  startsAt?: Maybe<Scalars["Datetime"]["output"]>;
+  title: Scalars["String"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type OpportunityArticlesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ArticleFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ArticleSortInput>;
+};
+
+export type OpportunityInvitationsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunityInvitationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunityInvitationSortInput>;
+};
+
+export type OpportunityParticipationsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ParticipationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ParticipationSortInput>;
+};
+
+export type OpportunitySlotsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunitySlotFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunitySlotSortInput>;
+};
+
+export enum OpportunityCategory {
+  Activity = "ACTIVITY",
+  Event = "EVENT",
+  Quest = "QUEST",
+}
+
+export type OpportunityCreateInput = {
+  body?: InputMaybe<Scalars["String"]["input"]>;
+  capacity?: InputMaybe<Scalars["Int"]["input"]>;
+  category: OpportunityCategory;
+  communityId: Scalars["String"]["input"];
+  description: Scalars["String"]["input"];
+  endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
+  files?: InputMaybe<Scalars["JSON"]["input"]>;
+  image?: InputMaybe<Scalars["String"]["input"]>;
+  placeId?: InputMaybe<Scalars["String"]["input"]>;
+  pointsRequired?: InputMaybe<Scalars["Int"]["input"]>;
+  pointsToEarn?: InputMaybe<Scalars["Int"]["input"]>;
+  publishStatus: PublishStatus;
+  requireApproval: Scalars["Boolean"]["input"];
+  startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  title: Scalars["String"]["input"];
+};
+
+export type OpportunityCreatePayload = OpportunityCreateSuccess;
+
+export type OpportunityCreateSuccess = {
+  __typename?: "OpportunityCreateSuccess";
+  opportunity: Opportunity;
+};
+
+export type OpportunityDeletePayload = OpportunityDeleteSuccess;
+
+export type OpportunityDeleteSuccess = {
+  __typename?: "OpportunityDeleteSuccess";
+  opportunityId: Scalars["String"]["output"];
+};
+
+export type OpportunityEdge = Edge & {
+  __typename?: "OpportunityEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Opportunity>;
+};
+
+export type OpportunityFilterInput = {
+  articleId?: InputMaybe<Scalars["String"]["input"]>;
+  category?: InputMaybe<OpportunityCategory>;
+  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  createdByUserId?: InputMaybe<Scalars["String"]["input"]>;
+  placeId?: InputMaybe<Scalars["String"]["input"]>;
+  publishStatus?: InputMaybe<PublishStatus>;
+};
+
+export type OpportunityInvitation = {
+  __typename?: "OpportunityInvitation";
+  code: Scalars["String"]["output"];
+  createdAt: Scalars["Datetime"]["output"];
+  createdByUser?: Maybe<User>;
+  histories?: Maybe<OpportunityInvitationHistoriesConnection>;
+  id: Scalars["ID"]["output"];
+  isValid: Scalars["Boolean"]["output"];
+  opportunity?: Maybe<Opportunity>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type OpportunityInvitationHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunityInvitationHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunityInvitationHistorySortInput>;
+};
+
+export type OpportunityInvitationCreateInput = {
+  code: Scalars["String"]["input"];
+  communityId: Scalars["ID"]["input"];
+  opportunityId: Scalars["ID"]["input"];
+};
+
+export type OpportunityInvitationCreatePayload = OpportunityInvitationCreateSuccess;
+
+export type OpportunityInvitationCreateSuccess = {
+  __typename?: "OpportunityInvitationCreateSuccess";
+  opportunityInvitation?: Maybe<OpportunityInvitation>;
+};
+
+export type OpportunityInvitationDeletePayload = OpportunityInvitationDeleteSuccess;
+
+export type OpportunityInvitationDeleteSuccess = {
+  __typename?: "OpportunityInvitationDeleteSuccess";
+  id: Scalars["ID"]["output"];
+};
+
+export type OpportunityInvitationDisableInput = {
+  communityId: Scalars["ID"]["input"];
+};
+
+export type OpportunityInvitationDisablePayload = OpportunityInvitationDisableSuccess;
+
+export type OpportunityInvitationDisableSuccess = {
+  __typename?: "OpportunityInvitationDisableSuccess";
+  opportunityInvitation?: Maybe<OpportunityInvitation>;
+};
+
+export type OpportunityInvitationEdge = Edge & {
+  __typename?: "OpportunityInvitationEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<OpportunityInvitation>;
+};
+
+export type OpportunityInvitationFilterInput = {
+  createdByUserId?: InputMaybe<Scalars["ID"]["input"]>;
+  isValid?: InputMaybe<Scalars["Boolean"]["input"]>;
+  opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type OpportunityInvitationHistoriesConnection = {
+  __typename?: "OpportunityInvitationHistoriesConnection";
+  edges?: Maybe<Array<Maybe<OpportunityInvitationHistoryEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type OpportunityInvitationHistory = {
+  __typename?: "OpportunityInvitationHistory";
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  invitation?: Maybe<OpportunityInvitation>;
+  invitedUser?: Maybe<User>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type OpportunityInvitationHistoryCreateInput = {
+  invitationId: Scalars["ID"]["input"];
+  invitedUserId: Scalars["ID"]["input"];
+};
+
+export type OpportunityInvitationHistoryCreatePayload = OpportunityInvitationHistoryCreateSuccess;
+
+export type OpportunityInvitationHistoryCreateSuccess = {
+  __typename?: "OpportunityInvitationHistoryCreateSuccess";
+  opportunityInvitationHistory?: Maybe<OpportunityInvitationHistory>;
+};
+
+export type OpportunityInvitationHistoryEdge = Edge & {
+  __typename?: "OpportunityInvitationHistoryEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<OpportunityInvitationHistory>;
+};
+
+export type OpportunityInvitationHistoryFilterInput = {
+  invitationId?: InputMaybe<Scalars["ID"]["input"]>;
+  invitedUserId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type OpportunityInvitationHistorySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export type OpportunityInvitationSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export type OpportunityInvitationsConnection = {
+  __typename?: "OpportunityInvitationsConnection";
+  edges?: Maybe<Array<Maybe<OpportunityInvitationEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type OpportunitySetPublishStatusInput = {
+  communityId: Scalars["String"]["input"];
+  status: PublishStatus;
+};
+
+export type OpportunitySetPublishStatusPayload = OpportunitySetPublishStatusSuccess;
+
+export type OpportunitySetPublishStatusSuccess = {
+  __typename?: "OpportunitySetPublishStatusSuccess";
+  opportunity: Opportunity;
+};
+
+export type OpportunitySlot = {
+  __typename?: "OpportunitySlot";
+  createdAt: Scalars["Datetime"]["output"];
+  endsAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  opportunity?: Maybe<Opportunity>;
+  participations?: Maybe<ParticipationsConnection>;
+  startsAt: Scalars["Datetime"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type OpportunitySlotParticipationsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ParticipationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ParticipationSortInput>;
+};
+
+export type OpportunitySlotCreateInput = {
+  endsAt: Scalars["Datetime"]["input"];
+  startsAt: Scalars["Datetime"]["input"];
+};
+
+export type OpportunitySlotEdge = Edge & {
+  __typename?: "OpportunitySlotEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<OpportunitySlot>;
+};
+
+export type OpportunitySlotFilterInput = {
+  opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type OpportunitySlotSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+  endsAt?: InputMaybe<SortDirection>;
+  startsAt?: InputMaybe<SortDirection>;
+};
+
+export type OpportunitySlotUpdateInput = {
+  endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  id: Scalars["ID"]["input"];
+  startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+};
+
+export type OpportunitySlotsBulkUpdateInput = {
+  create?: InputMaybe<Array<OpportunitySlotCreateInput>>;
+  delete?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  opportunityId: Scalars["ID"]["input"];
+  update?: InputMaybe<Array<OpportunitySlotUpdateInput>>;
+};
+
+export type OpportunitySlotsBulkUpdatePayload = OpportunitySlotsBulkUpdateSuccess;
+
+export type OpportunitySlotsBulkUpdateSuccess = {
+  __typename?: "OpportunitySlotsBulkUpdateSuccess";
+  slots: Array<OpportunitySlot>;
+};
+
+export type OpportunitySlotsConnection = {
+  __typename?: "OpportunitySlotsConnection";
+  edges?: Maybe<Array<Maybe<OpportunitySlotEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type OpportunitySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+  pointsRequired?: InputMaybe<SortDirection>;
+  startsAt?: InputMaybe<SortDirection>;
+};
+
+export type OpportunityUpdateContentInput = {
+  body?: InputMaybe<Scalars["String"]["input"]>;
+  capacity?: InputMaybe<Scalars["Int"]["input"]>;
+  category: OpportunityCategory;
+  communityId: Scalars["String"]["input"];
+  description: Scalars["String"]["input"];
+  endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
+  files?: InputMaybe<Scalars["JSON"]["input"]>;
+  image?: InputMaybe<Scalars["String"]["input"]>;
+  placeId?: InputMaybe<Scalars["String"]["input"]>;
+  pointsRequired?: InputMaybe<Scalars["Int"]["input"]>;
+  pointsToEarn?: InputMaybe<Scalars["Int"]["input"]>;
+  publishStatus: PublishStatus;
+  requireApproval: Scalars["Boolean"]["input"];
+  startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  title: Scalars["String"]["input"];
+};
+
+export type OpportunityUpdateContentPayload = OpportunityUpdateContentSuccess;
+
+export type OpportunityUpdateContentSuccess = {
+  __typename?: "OpportunityUpdateContentSuccess";
+  opportunity: Opportunity;
 };
 
 export type PageInfo = {
@@ -1900,114 +1040,412 @@ export type Paging = {
   take: Scalars["Int"]["output"];
 };
 
+export type Participation = {
+  __typename?: "Participation";
+  community?: Maybe<Community>;
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  images?: Maybe<Scalars["JSON"]["output"]>;
+  opportunity?: Maybe<Opportunity>;
+  opportunitySlot?: Maybe<OpportunitySlot>;
+  status: ParticipationStatus;
+  statusHistories?: Maybe<ParticipationStatusHistoriesConnection>;
+  transactions?: Maybe<TransactionsConnection>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  user?: Maybe<User>;
+};
+
+export type ParticipationStatusHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ParticipationStatusHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ParticipationStatusHistorySortInput>;
+};
+
+export type ParticipationTransactionsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<TransactionFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<TransactionSortInput>;
+};
+
+export type ParticipationApplyInput = {
+  opportunityId: Scalars["String"]["input"];
+};
+
+export type ParticipationApplyPayload = ParticipationApplySuccess;
+
+export type ParticipationApplySuccess = {
+  __typename?: "ParticipationApplySuccess";
+  participation: Participation;
+};
+
+export type ParticipationEdge = Edge & {
+  __typename?: "ParticipationEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Participation>;
+};
+
+export type ParticipationFilterInput = {
+  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  opportunityId?: InputMaybe<Scalars["String"]["input"]>;
+  opportunitySlotId?: InputMaybe<Scalars["String"]["input"]>;
+  status?: InputMaybe<ParticipationStatus>;
+  userId?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type ParticipationInviteInput = {
+  communityId: Scalars["String"]["input"];
+  invitedUserId: Scalars["String"]["input"];
+  opportunityId: Scalars["String"]["input"];
+};
+
+export type ParticipationInvitePayload = ParticipationInviteSuccess;
+
+export type ParticipationInviteSuccess = {
+  __typename?: "ParticipationInviteSuccess";
+  participation: Participation;
+};
+
+export type ParticipationSetStatusInput = {
+  communityId: Scalars["String"]["input"];
+};
+
+export type ParticipationSetStatusPayload = ParticipationSetStatusSuccess;
+
+export type ParticipationSetStatusSuccess = {
+  __typename?: "ParticipationSetStatusSuccess";
+  participation: Participation;
+};
+
+export type ParticipationSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+};
+
+export enum ParticipationStatus {
+  Applied = "APPLIED",
+  Approved = "APPROVED",
+  Canceled = "CANCELED",
+  Denied = "DENIED",
+  Invited = "INVITED",
+  NotParticipating = "NOT_PARTICIPATING",
+  Participating = "PARTICIPATING",
+}
+
+export type ParticipationStatusHistoriesConnection = {
+  __typename?: "ParticipationStatusHistoriesConnection";
+  edges: Array<ParticipationStatusHistoryEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type ParticipationStatusHistory = {
+  __typename?: "ParticipationStatusHistory";
+  createdAt: Scalars["Datetime"]["output"];
+  createdByUser?: Maybe<User>;
+  id: Scalars["ID"]["output"];
+  participation: Participation;
+  status: ParticipationStatus;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type ParticipationStatusHistoryCreateInput = {
+  createdById: Scalars["String"]["input"];
+  participationId: Scalars["String"]["input"];
+  status: ParticipationStatus;
+};
+
+export type ParticipationStatusHistoryCreatePayload = ParticipationStatusHistoryCreateSuccess;
+
+export type ParticipationStatusHistoryCreateSuccess = {
+  __typename?: "ParticipationStatusHistoryCreateSuccess";
+  participationStatusHistory: ParticipationStatusHistory;
+};
+
+export type ParticipationStatusHistoryEdge = Edge & {
+  __typename?: "ParticipationStatusHistoryEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<ParticipationStatusHistory>;
+};
+
+export type ParticipationStatusHistoryFilterInput = {
+  createdById?: InputMaybe<Scalars["String"]["input"]>;
+  participationId?: InputMaybe<Scalars["String"]["input"]>;
+  status?: InputMaybe<ParticipationStatus>;
+};
+
+export type ParticipationStatusHistorySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export type ParticipationsConnection = {
+  __typename?: "ParticipationsConnection";
+  edges: Array<ParticipationEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type Place = {
+  __typename?: "Place";
+  address: Scalars["String"]["output"];
+  city?: Maybe<City>;
+  createdAt: Scalars["Datetime"]["output"];
+  googlePlaceId?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  isManual: Scalars["Boolean"]["output"];
+  latitude: Scalars["Decimal"]["output"];
+  longitude: Scalars["Decimal"]["output"];
+  mapLocation?: Maybe<Scalars["JSON"]["output"]>;
+  name: Scalars["String"]["output"];
+  opportunities?: Maybe<OpportunitiesConnection>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type PlaceOpportunitiesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunitySortInput>;
+};
+
+export type PlaceCreateInput = {
+  address: Scalars["String"]["input"];
+  cityCode: Scalars["String"]["input"];
+  googlePlaceId?: InputMaybe<Scalars["String"]["input"]>;
+  isManual: Scalars["Boolean"]["input"];
+  latitude: Scalars["Decimal"]["input"];
+  longitude: Scalars["Decimal"]["input"];
+  mapLocation?: InputMaybe<Scalars["JSON"]["input"]>;
+  name: Scalars["String"]["input"];
+};
+
+export type PlaceCreatePayload = PlaceCreateSuccess;
+
+export type PlaceCreateSuccess = {
+  __typename?: "PlaceCreateSuccess";
+  place?: Maybe<Place>;
+};
+
+export type PlaceDeletePayload = PlaceDeleteSuccess;
+
+export type PlaceDeleteSuccess = {
+  __typename?: "PlaceDeleteSuccess";
+  id: Scalars["ID"]["output"];
+};
+
+export type PlaceEdge = Edge & {
+  __typename?: "PlaceEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Place>;
+};
+
+export type PlaceFilterInput = {
+  cityCode?: InputMaybe<Scalars["String"]["input"]>;
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type PlaceSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export type PlaceUpdateInput = {
+  address?: InputMaybe<Scalars["String"]["input"]>;
+  cityCode?: InputMaybe<Scalars["String"]["input"]>;
+  googlePlaceId?: InputMaybe<Scalars["String"]["input"]>;
+  isManual?: InputMaybe<Scalars["Boolean"]["input"]>;
+  latitude?: InputMaybe<Scalars["Decimal"]["input"]>;
+  longitude?: InputMaybe<Scalars["Decimal"]["input"]>;
+  mapLocation?: InputMaybe<Scalars["JSON"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type PlaceUpdatePayload = PlaceUpdateSuccess;
+
+export type PlaceUpdateSuccess = {
+  __typename?: "PlaceUpdateSuccess";
+  place?: Maybe<Place>;
+};
+
+export type PlacesConnection = {
+  __typename?: "PlacesConnection";
+  edges?: Maybe<Array<Maybe<PlaceEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export enum PublishStatus {
+  CommunityInternal = "COMMUNITY_INTERNAL",
+  Private = "PRIVATE",
+  Public = "PUBLIC",
+}
+
 export type Query = {
   __typename?: "Query";
-  activities: ActivitiesConnection;
-  activity?: Maybe<Activity>;
-  agendas: Array<Agenda>;
-  application?: Maybe<Application>;
-  applications: ApplicationsConnection;
+  article?: Maybe<Article>;
+  articles: ArticlesConnection;
   cities: Array<City>;
+  communities: CommunitiesConnection;
+  community?: Maybe<Community>;
   currentUser?: Maybe<CurrentUserPayload>;
   echo: Scalars["String"]["output"];
-  event?: Maybe<Event>;
-  events: EventsConnection;
-  group?: Maybe<Group>;
-  groups: GroupsConnection;
-  issue?: Maybe<Issue>;
-  issues: IssuesConnection;
-  organization?: Maybe<Organization>;
-  organizations: OrganizationsConnection;
+  membership?: Maybe<Membership>;
+  memberships: MembershipsConnection;
+  opportunities: OpportunitiesConnection;
+  opportunity?: Maybe<Opportunity>;
+  opportunityInvitation?: Maybe<OpportunityInvitation>;
+  opportunityInvitationHistories: OpportunityInvitationHistoriesConnection;
+  opportunityInvitationHistory?: Maybe<OpportunityInvitationHistory>;
+  opportunityInvitations: OpportunityInvitationsConnection;
+  opportunitySlot?: Maybe<OpportunitySlot>;
+  opportunitySlots: OpportunitySlotsConnection;
+  participation?: Maybe<Participation>;
+  participationStatusHistories: ParticipationStatusHistoriesConnection;
+  participationStatusHistory?: Maybe<ParticipationStatusHistory>;
+  participations: ParticipationsConnection;
+  place?: Maybe<Place>;
+  places: PlacesConnection;
   states: Array<State>;
-  target?: Maybe<Target>;
-  targets: TargetsConnection;
+  transaction?: Maybe<Transaction>;
+  transactions: TransactionsConnection;
   user?: Maybe<User>;
   users: UsersConnection;
+  utilities: UtilitiesConnection;
+  utility?: Maybe<Utility>;
+  utilityHistories: UtilityHistoriesConnection;
+  utilityHistory?: Maybe<UtilityHistory>;
+  wallet?: Maybe<Wallet>;
+  wallets: WalletsConnection;
 };
 
-export type QueryActivitiesArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<ActivityFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<ActivitySortInput>;
-};
-
-export type QueryActivityArgs = {
+export type QueryArticleArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type QueryApplicationArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type QueryApplicationsArgs = {
+export type QueryArticlesArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<ApplicationFilterInput>;
+  filter?: InputMaybe<ArticleFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<ApplicationSortInput>;
+  sort?: InputMaybe<ArticleSortInput>;
 };
 
 export type QueryCitiesArgs = {
   name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type QueryEventArgs = {
+export type QueryCommunitiesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<CommunityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<CommunitySortInput>;
+};
+
+export type QueryCommunityArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type QueryEventsArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<EventFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<EventSortInput>;
+export type QueryMembershipArgs = {
+  communityId: Scalars["ID"]["input"];
+  userId: Scalars["ID"]["input"];
 };
 
-export type QueryGroupArgs = {
+export type QueryMembershipsArgs = {
+  cursor?: InputMaybe<MembershipCursorInput>;
+  filter?: InputMaybe<MembershipFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<MembershipSortInput>;
+};
+
+export type QueryOpportunitiesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunitySortInput>;
+};
+
+export type QueryOpportunityArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type QueryGroupsArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<GroupFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<GroupSortInput>;
-};
-
-export type QueryIssueArgs = {
+export type QueryOpportunityInvitationArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type QueryIssuesArgs = {
+export type QueryOpportunityInvitationHistoriesArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<IssueFilterInput>;
+  filter?: InputMaybe<OpportunityInvitationHistoryFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<IssueSortInput>;
+  sort?: InputMaybe<OpportunityInvitationHistorySortInput>;
 };
 
-export type QueryOrganizationArgs = {
+export type QueryOpportunityInvitationHistoryArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type QueryOrganizationsArgs = {
+export type QueryOpportunityInvitationsArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<OrganizationFilterInput>;
+  filter?: InputMaybe<OpportunityInvitationFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<OrganizationSortInput>;
+  sort?: InputMaybe<OpportunityInvitationSortInput>;
+};
+
+export type QueryOpportunitySlotArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryOpportunitySlotsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunitySlotFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunitySlotSortInput>;
+};
+
+export type QueryParticipationArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryParticipationStatusHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ParticipationStatusHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ParticipationStatusHistorySortInput>;
+};
+
+export type QueryParticipationStatusHistoryArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryParticipationsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ParticipationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ParticipationSortInput>;
+};
+
+export type QueryPlaceArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryPlacesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<PlaceFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<PlaceSortInput>;
 };
 
 export type QueryStatesArgs = {
   name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type QueryTargetArgs = {
+export type QueryTransactionArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type QueryTargetsArgs = {
+export type QueryTransactionsArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<TargetFilterInput>;
+  filter?: InputMaybe<TransactionFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<TargetSortInput>;
+  sort?: InputMaybe<TransactionSortInput>;
 };
 
 export type QueryUserArgs = {
@@ -2021,19 +1459,44 @@ export type QueryUsersArgs = {
   sort?: InputMaybe<UserSortInput>;
 };
 
+export type QueryUtilitiesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<UtilityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<UtilitySortInput>;
+};
+
+export type QueryUtilityArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryUtilityHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<UtilityHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<UtilityHistorySortInput>;
+};
+
+export type QueryUtilityHistoryArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryWalletArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryWalletsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<WalletFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<WalletSortInput>;
+};
+
 export enum Role {
   Manager = "MANAGER",
   Member = "MEMBER",
   Owner = "OWNER",
 }
-
-export type Skillset = {
-  __typename?: "Skillset";
-  code: Scalars["String"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
-  id: Scalars["Int"]["output"];
-  name: Scalars["String"]["output"];
-};
 
 export enum SortDirection {
   Asc = "asc",
@@ -2052,215 +1515,228 @@ export enum SysRole {
   User = "USER",
 }
 
-export type Target = {
-  __typename?: "Target";
+export type Transaction = {
+  __typename?: "Transaction";
   createdAt: Scalars["Datetime"]["output"];
-  group?: Maybe<Group>;
+  fromPointChange?: Maybe<Scalars["Int"]["output"]>;
+  fromWallet?: Maybe<Wallet>;
   id: Scalars["ID"]["output"];
-  index?: Maybe<Index>;
-  name: Scalars["String"]["output"];
-  organization?: Maybe<Organization>;
+  participation?: Maybe<Participation>;
+  reason: TransactionReason;
+  toPointChange?: Maybe<Scalars["Int"]["output"]>;
+  toWallet?: Maybe<Wallet>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  validFrom: Scalars["Datetime"]["output"];
-  validTo: Scalars["Datetime"]["output"];
-  value: Scalars["Float"]["output"];
+  utilityHistories?: Maybe<UtilityHistoriesConnection>;
 };
 
-export type TargetAddGroupInput = {
-  groupId: Scalars["String"]["input"];
+export type TransactionUtilityHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<UtilityHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<UtilityHistorySortInput>;
 };
 
-export type TargetAddOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
+export type TransactionDonateSelfPointInput = {
+  communityId: Scalars["String"]["input"];
+  fromPointChange: Scalars["Int"]["input"];
+  fromWalletId: Scalars["String"]["input"];
+  toPointChange: Scalars["Int"]["input"];
+  toUserId: Scalars["String"]["input"];
 };
 
-export type TargetCreateInput = {
-  groupId: Scalars["String"]["input"];
-  indexId: Scalars["Int"]["input"];
-  name: Scalars["String"]["input"];
-  organizationId: Scalars["String"]["input"];
-  validFrom: Scalars["Datetime"]["input"];
-  validTo: Scalars["Datetime"]["input"];
-  value: Scalars["Float"]["input"];
+export type TransactionDonateSelfPointPayload = TransactionDonateSelfPointSuccess;
+
+export type TransactionDonateSelfPointSuccess = {
+  __typename?: "TransactionDonateSelfPointSuccess";
+  transaction: Transaction;
 };
 
-export type TargetCreatePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | TargetCreateSuccess;
-
-export type TargetCreateSuccess = {
-  __typename?: "TargetCreateSuccess";
-  target?: Maybe<Target>;
-};
-
-export type TargetDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | TargetDeleteSuccess;
-
-export type TargetDeleteSuccess = {
-  __typename?: "TargetDeleteSuccess";
-  targetId: Scalars["ID"]["output"];
-};
-
-export type TargetEdge = Edge & {
-  __typename?: "TargetEdge";
+export type TransactionEdge = Edge & {
+  __typename?: "TransactionEdge";
   cursor: Scalars["String"]["output"];
-  node?: Maybe<Target>;
+  node?: Maybe<Transaction>;
 };
 
-export type TargetFilterInput = {
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
-  organizationId?: InputMaybe<Scalars["String"]["input"]>;
+export type TransactionFilterInput = {
+  fromWalletId?: InputMaybe<Scalars["String"]["input"]>;
+  id?: InputMaybe<Scalars["String"]["input"]>;
+  participationId?: InputMaybe<Scalars["String"]["input"]>;
+  reason?: InputMaybe<TransactionReason>;
+  toWalletId?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type TargetRemoveGroupInput = {
-  groupId: Scalars["String"]["input"];
+export type TransactionGiveRewardPointInput = {
+  fromPointChange: Scalars["Int"]["input"];
+  fromWalletId: Scalars["String"]["input"];
+  participationId: Scalars["String"]["input"];
+  toPointChange: Scalars["Int"]["input"];
+  toWalletId: Scalars["String"]["input"];
 };
 
-export type TargetRemoveOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
+export type TransactionGiveRewardPointPayload = TransactionGiveRewardPointSuccess;
+
+export type TransactionGiveRewardPointSuccess = {
+  __typename?: "TransactionGiveRewardPointSuccess";
+  transaction: Transaction;
 };
 
-export type TargetSortInput = {
-  updatedAt?: InputMaybe<SortDirection>;
+export type TransactionGrantCommunityPointInput = {
+  communityId: Scalars["String"]["input"];
+  fromPointChange: Scalars["Int"]["input"];
+  fromWalletId: Scalars["String"]["input"];
+  toPointChange: Scalars["Int"]["input"];
+  toUserId: Scalars["String"]["input"];
 };
 
-export type TargetUpdateContentInput = {
-  name: Scalars["String"]["input"];
-  validFrom: Scalars["Datetime"]["input"];
-  validTo: Scalars["Datetime"]["input"];
-  value: Scalars["Float"]["input"];
+export type TransactionGrantCommunityPointPayload = TransactionGrantCommunityPointSuccess;
+
+export type TransactionGrantCommunityPointSuccess = {
+  __typename?: "TransactionGrantCommunityPointSuccess";
+  transaction: Transaction;
 };
 
-export type TargetUpdateContentPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | TargetUpdateContentSuccess;
-
-export type TargetUpdateContentSuccess = {
-  __typename?: "TargetUpdateContentSuccess";
-  target?: Maybe<Target>;
+export type TransactionIssueCommunityPointInput = {
+  toPointChange: Scalars["Int"]["input"];
+  toWalletId: Scalars["String"]["input"];
 };
 
-export type TargetUpdateGroupPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | TargetUpdateGroupSuccess;
+export type TransactionIssueCommunityPointPayload = TransactionIssueCommunityPointSuccess;
 
-export type TargetUpdateGroupSuccess = {
-  __typename?: "TargetUpdateGroupSuccess";
-  group: Group;
-  target: Target;
+export type TransactionIssueCommunityPointSuccess = {
+  __typename?: "TransactionIssueCommunityPointSuccess";
+  transaction: Transaction;
 };
 
-export type TargetUpdateIndexInput = {
-  indexId: Scalars["Int"]["input"];
+export enum TransactionReason {
+  Donation = "DONATION",
+  Grant = "GRANT",
+  MembershipDeleted = "MEMBERSHIP_DELETED",
+  PointIssued = "POINT_ISSUED",
+  PointReward = "POINT_REWARD",
+  UtilityRedeemed = "UTILITY_REDEEMED",
+}
+
+export type TransactionRedeemUtilityInput = {
+  fromWalletId: Scalars["String"]["input"];
+  toWalletId: Scalars["String"]["input"];
+  transferPoints: Scalars["Int"]["input"];
 };
 
-export type TargetUpdateIndexPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | TargetUpdateIndexSuccess;
+export type TransactionRedeemUtilityPayload = TransactionRedeemUtilitySuccess;
 
-export type TargetUpdateIndexSuccess = {
-  __typename?: "TargetUpdateIndexSuccess";
-  index: Index;
-  target: Target;
+export type TransactionRedeemUtilitySuccess = {
+  __typename?: "TransactionRedeemUtilitySuccess";
+  transaction: Transaction;
 };
 
-export type TargetUpdateOrganizationPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | TargetUpdateOrganizationSuccess;
-
-export type TargetUpdateOrganizationSuccess = {
-  __typename?: "TargetUpdateOrganizationSuccess";
-  organization: Organization;
-  target: Target;
+export type TransactionSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
 };
 
-export type TargetsConnection = {
-  __typename?: "TargetsConnection";
-  edges?: Maybe<Array<Maybe<TargetEdge>>>;
+export type TransactionsConnection = {
+  __typename?: "TransactionsConnection";
+  edges?: Maybe<Array<Maybe<TransactionEdge>>>;
   pageInfo: PageInfo;
   totalCount: Scalars["Int"]["output"];
 };
 
 export type User = {
   __typename?: "User";
-  activities?: Maybe<Array<Activity>>;
-  agendas?: Maybe<Array<Agenda>>;
+  articlesAboutMe?: Maybe<ArticlesConnection>;
+  articlesWrittenByMe?: Maybe<ArticlesConnection>;
   bio?: Maybe<Scalars["String"]["output"]>;
-  cities?: Maybe<Array<City>>;
-  comments?: Maybe<Array<Comment>>;
   createdAt: Scalars["Datetime"]["output"];
-  email?: Maybe<Scalars["String"]["output"]>;
-  firstName: Scalars["String"]["output"];
-  groups?: Maybe<Array<Group>>;
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
-  isPublic: Scalars["Boolean"]["output"];
-  lastName: Scalars["String"]["output"];
-  likes?: Maybe<Array<Like>>;
-  middleName?: Maybe<Scalars["String"]["output"]>;
-  organizations?: Maybe<Array<Organization>>;
+  invitationHistories?: Maybe<OpportunityInvitationHistoriesConnection>;
+  invitations?: Maybe<OpportunityInvitationsConnection>;
+  memberships?: Maybe<MembershipsConnection>;
+  name: Scalars["String"]["output"];
+  opportunitiesCreatedByMe?: Maybe<OpportunitiesConnection>;
+  participationStatusChangedByMe?: Maybe<ParticipationStatusHistoriesConnection>;
+  participations?: Maybe<ParticipationsConnection>;
+  slug: Scalars["String"]["output"];
   sysRole: SysRole;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  urlFacebook?: Maybe<Scalars["String"]["output"]>;
+  urlInstagram?: Maybe<Scalars["String"]["output"]>;
+  urlTiktok?: Maybe<Scalars["String"]["output"]>;
+  urlWebsite?: Maybe<Scalars["String"]["output"]>;
+  urlX?: Maybe<Scalars["String"]["output"]>;
+  urlYoutube?: Maybe<Scalars["String"]["output"]>;
+  wallets?: Maybe<WalletsConnection>;
 };
 
-export type UserAddActivityInput = {
-  activityId: Scalars["String"]["input"];
+export type UserArticlesAboutMeArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ArticleFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ArticleSortInput>;
 };
 
-export type UserAddGroupInput = {
-  groupId: Scalars["String"]["input"];
+export type UserArticlesWrittenByMeArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ArticleFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ArticleSortInput>;
 };
 
-export type UserAddOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
+export type UserInvitationHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunityInvitationHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunityInvitationHistorySortInput>;
 };
 
-export type UserCreateInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
-  bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  firstName: Scalars["String"]["input"];
-  groupIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  lastName: Scalars["String"]["input"];
-  middleName?: InputMaybe<Scalars["String"]["input"]>;
-  organizationIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
+export type UserInvitationsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunityInvitationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunityInvitationSortInput>;
 };
 
-export type UserCreatePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserCreateSuccess;
-
-export type UserCreateSuccess = {
-  __typename?: "UserCreateSuccess";
-  user?: Maybe<User>;
+export type UserMembershipsArgs = {
+  cursor?: InputMaybe<MembershipCursorInput>;
+  filter?: InputMaybe<MembershipFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<MembershipSortInput>;
 };
 
-export type UserDeletePayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserDeleteSuccess;
+export type UserOpportunitiesCreatedByMeArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunitySortInput>;
+};
 
-export type UserDeleteSuccess = {
-  __typename?: "UserDeleteSuccess";
-  userId: Scalars["ID"]["output"];
+export type UserParticipationStatusChangedByMeArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ParticipationStatusHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ParticipationStatusHistorySortInput>;
+};
+
+export type UserParticipationsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ParticipationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ParticipationSortInput>;
+};
+
+export type UserWalletsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<WalletFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<WalletSortInput>;
+};
+
+export type UserDeleteInput = {
+  userId: Scalars["String"]["input"];
+};
+
+export type UserDeletePayload = {
+  __typename?: "UserDeletePayload";
+  userId: Scalars["String"]["output"];
 };
 
 export type UserEdge = Edge & {
@@ -2270,99 +1746,41 @@ export type UserEdge = Edge & {
 };
 
 export type UserFilterInput = {
-  agendaId?: InputMaybe<Scalars["Int"]["input"]>;
-  cityCode?: InputMaybe<Scalars["String"]["input"]>;
-  isPublic?: InputMaybe<Scalars["Boolean"]["input"]>;
+  articleAuthorId?: InputMaybe<Scalars["ID"]["input"]>;
+  articleWriterId?: InputMaybe<Scalars["ID"]["input"]>;
   keyword?: InputMaybe<Scalars["String"]["input"]>;
+  sysRole?: InputMaybe<SysRole>;
 };
 
-export type UserRemoveActivityInput = {
-  activityId: Scalars["String"]["input"];
-};
-
-export type UserRemoveGroupInput = {
-  groupId: Scalars["String"]["input"];
-};
-
-export type UserRemoveOrganizationInput = {
-  organizationId: Scalars["String"]["input"];
+export type UserSignUpInput = {
+  image?: InputMaybe<ImageInput>;
+  name: Scalars["String"]["input"];
+  slug?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type UserSortInput = {
-  updatedAt?: InputMaybe<SortDirection>;
+  createdAt?: InputMaybe<SortDirection>;
 };
 
-export type UserSwitchPrivacyInput = {
-  isPublic: Scalars["Boolean"]["input"];
-};
-
-export type UserSwitchPrivacyPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserSwitchPrivacySuccess;
-
-export type UserSwitchPrivacySuccess = {
-  __typename?: "UserSwitchPrivacySuccess";
-  user: User;
-};
-
-export type UserUpdateActivityPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserUpdateActivitySuccess;
-
-export type UserUpdateActivitySuccess = {
-  __typename?: "UserUpdateActivitySuccess";
-  activity: Activity;
-  user?: Maybe<User>;
-};
-
-export type UserUpdateContentInput = {
-  agendaIds?: InputMaybe<Array<Scalars["Int"]["input"]>>;
+export type UserUpdateProfileInput = {
   bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCodes?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  firstName: Scalars["String"]["input"];
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  lastName: Scalars["String"]["input"];
-  middleName?: InputMaybe<Scalars["String"]["input"]>;
+  id: Scalars["String"]["input"];
+  image?: InputMaybe<ImageInput>;
+  name: Scalars["String"]["input"];
+  slug: Scalars["String"]["input"];
+  urlFacebook?: InputMaybe<Scalars["String"]["input"]>;
+  urlInstagram?: InputMaybe<Scalars["String"]["input"]>;
+  urlTiktok?: InputMaybe<Scalars["String"]["input"]>;
+  urlWebsite?: InputMaybe<Scalars["String"]["input"]>;
+  urlX?: InputMaybe<Scalars["String"]["input"]>;
+  urlYoutube?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type UserUpdateContentPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserUpdateContentSuccess;
+export type UserUpdateProfilePayload = UserUpdateProfileSuccess;
 
-export type UserUpdateContentSuccess = {
-  __typename?: "UserUpdateContentSuccess";
+export type UserUpdateProfileSuccess = {
+  __typename?: "UserUpdateProfileSuccess";
   user?: Maybe<User>;
-};
-
-export type UserUpdateGroupPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserUpdateGroupSuccess;
-
-export type UserUpdateGroupSuccess = {
-  __typename?: "UserUpdateGroupSuccess";
-  group: Group;
-  user: User;
-};
-
-export type UserUpdateOrganizationPayload =
-  | AuthError
-  | ComplexQueryError
-  | InvalidInputValueError
-  | UserUpdateOrganizationSuccess;
-
-export type UserUpdateOrganizationSuccess = {
-  __typename?: "UserUpdateOrganizationSuccess";
-  organization: Organization;
-  user: User;
 };
 
 export type UsersConnection = {
@@ -2372,142 +1790,240 @@ export type UsersConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type UtilitiesConnection = {
+  __typename?: "UtilitiesConnection";
+  edges?: Maybe<Array<Maybe<UtilityEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type Utility = {
+  __typename?: "Utility";
+  community?: Maybe<Community>;
+  createdAt: Scalars["Datetime"]["output"];
+  description?: Maybe<Scalars["String"]["output"]>;
+  histories?: Maybe<UtilityHistoriesConnection>;
+  id: Scalars["ID"]["output"];
+  image?: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
+  pointsRequired: Scalars["Int"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type UtilityHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<UtilityHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<UtilityHistorySortInput>;
+};
+
+export type UtilityCreateInput = {
+  communityId: Scalars["String"]["input"];
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  image?: InputMaybe<ImageInput>;
+  name: Scalars["String"]["input"];
+  pointsRequired: Scalars["Int"]["input"];
+};
+
+export type UtilityCreatePayload = UtilityCreateSuccess;
+
+export type UtilityCreateSuccess = {
+  __typename?: "UtilityCreateSuccess";
+  utility: Utility;
+};
+
+export type UtilityDeletePayload = UtilityDeleteSuccess;
+
+export type UtilityDeleteSuccess = {
+  __typename?: "UtilityDeleteSuccess";
+  utilityId: Scalars["String"]["output"];
+};
+
+export type UtilityEdge = Edge & {
+  __typename?: "UtilityEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Utility>;
+};
+
+export type UtilityFilterInput = {
+  communityId?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type UtilityHistoriesConnection = {
+  __typename?: "UtilityHistoriesConnection";
+  edges: Array<UtilityHistoryEdge>;
+  pageInfo: PageInfo;
+};
+
+export type UtilityHistory = {
+  __typename?: "UtilityHistory";
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  transaction: Transaction;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  usedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  utility: Utility;
+  wallet: Wallet;
+};
+
+export type UtilityHistoryCreateInput = {
+  transactionId: Scalars["String"]["input"];
+  usedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  utilityId: Scalars["String"]["input"];
+  walletId: Scalars["String"]["input"];
+};
+
+export type UtilityHistoryCreatePayload = UtilityHistoryCreateSuccess;
+
+export type UtilityHistoryCreateSuccess = {
+  __typename?: "UtilityHistoryCreateSuccess";
+  utilityHistory: UtilityHistory;
+};
+
+export type UtilityHistoryEdge = {
+  __typename?: "UtilityHistoryEdge";
+  cursor: Scalars["String"]["output"];
+  node: UtilityHistory;
+};
+
+export type UtilityHistoryFilterInput = {
+  transactionId?: InputMaybe<Scalars["ID"]["input"]>;
+  usedAtExists?: InputMaybe<Scalars["Boolean"]["input"]>;
+  utilityId?: InputMaybe<Scalars["ID"]["input"]>;
+  walletId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type UtilityHistorySortInput = {
+  createdAt: SortDirection;
+  usedAt: SortDirection;
+};
+
+export type UtilityRedeemInput = {
+  communityId: Scalars["String"]["input"];
+  userWalletId: Scalars["String"]["input"];
+};
+
+export type UtilityRedeemPayload = UtilityRedeemSuccess;
+
+export type UtilityRedeemSuccess = {
+  __typename?: "UtilityRedeemSuccess";
+  transaction: Transaction;
+};
+
+export type UtilitySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+  pointsRequired?: InputMaybe<SortDirection>;
+};
+
+export type UtilityUpdateInfoInput = {
+  communityId: Scalars["String"]["input"];
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  image?: InputMaybe<ImageInput>;
+  name: Scalars["String"]["input"];
+  pointsRequired: Scalars["Int"]["input"];
+};
+
+export type UtilityUpdateInfoPayload = UtilityUpdateInfoSuccess;
+
+export type UtilityUpdateInfoSuccess = {
+  __typename?: "UtilityUpdateInfoSuccess";
+  utility: Utility;
+};
+
+export type UtilityUseInput = {
+  communityId: Scalars["String"]["input"];
+  utilityHistoryId: Scalars["String"]["input"];
+};
+
+export type UtilityUsePayload = UtilityUseSuccess;
+
+export type UtilityUseSuccess = {
+  __typename?: "UtilityUseSuccess";
+  utilityHistory: UtilityHistory;
+};
+
 export enum ValueType {
   Float = "FLOAT",
   Int = "INT",
 }
 
-export type ActivityCreateMutationVariables = Exact<{
-  input: ActivityCreateInput;
-}>;
-
-export type ActivityCreateMutation = {
-  __typename?: "Mutation";
-  activityCreate?:
-    | {
-        __typename?: "ActivityCreateSuccess";
-        activity?: { __typename?: "Activity"; id: string; description?: string | null } | null;
-      }
-    | { __typename?: "AuthError" }
-    | { __typename?: "ComplexQueryError" }
-    | { __typename?: "InvalidInputValueError" }
-    | null;
+export type Wallet = {
+  __typename?: "Wallet";
+  accumulatedPointView?: Maybe<AccumulatedPointView>;
+  community: Community;
+  createdAt: Scalars["Datetime"]["output"];
+  currentPointView?: Maybe<CurrentPointView>;
+  id: Scalars["ID"]["output"];
+  transactions?: Maybe<TransactionsConnection>;
+  type: WalletType;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  user?: Maybe<User>;
+  utilityHistories?: Maybe<UtilityHistoriesConnection>;
 };
 
-export type ActivityUpdateContentMutationVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  input: ActivityUpdateContentInput;
-}>;
-
-export type ActivityUpdateContentMutation = {
-  __typename?: "Mutation";
-  activityUpdateContent?:
-    | {
-        __typename?: "ActivityUpdateContentSuccess";
-        activity: { __typename?: "Activity"; id: string; description?: string | null };
-      }
-    | { __typename?: "AuthError" }
-    | { __typename?: "ComplexQueryError" }
-    | { __typename?: "InvalidInputValueError" }
-    | null;
-};
-
-export type DeleteActivityMutationVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type DeleteActivityMutation = {
-  __typename?: "Mutation";
-  activityDelete?:
-    | { __typename?: "ActivityDeleteSuccess"; activityId: string }
-    | { __typename?: "AuthError" }
-    | { __typename?: "ComplexQueryError" }
-    | { __typename?: "InvalidInputValueError" }
-    | null;
-};
-
-export type CreateUserMutationVariables = Exact<{
-  input: CreateUserInput;
-}>;
-
-export type CreateUserMutation = {
-  __typename?: "Mutation";
-  createUser?: {
-    __typename?: "CurrentUserPayload";
-    user?: { __typename?: "User"; id: string } | null;
-  } | null;
-};
-
-export type DeleteUserMutationVariables = Exact<{ [key: string]: never }>;
-
-export type DeleteUserMutation = {
-  __typename?: "Mutation";
-  deleteUser?: {
-    __typename?: "CurrentUserPayload";
-    user?: { __typename?: "User"; id: string } | null;
-  } | null;
-};
-
-export type ActivitiesQueryVariables = Exact<{
-  filter?: InputMaybe<ActivityFilterInput>;
-  sort?: InputMaybe<ActivitySortInput>;
+export type WalletTransactionsArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<TransactionFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-}>;
-
-export type ActivitiesQuery = {
-  __typename?: "Query";
-  activities: {
-    __typename?: "ActivitiesConnection";
-    edges?: Array<{
-      __typename?: "ActivityEdge";
-      node?: {
-        __typename?: "Activity";
-        id: string;
-        description?: string | null;
-        remark?: string | null;
-        startsAt: Date;
-        endsAt: Date;
-        isPublic: boolean;
-        event?: { __typename?: "Event"; id: string; description?: string | null } | null;
-        user?: {
-          __typename?: "User";
-          id: string;
-          firstName: string;
-          middleName?: string | null;
-          lastName: string;
-        } | null;
-        organization?: { __typename?: "Organization"; id: string; name: string } | null;
-      } | null;
-    } | null> | null;
-    pageInfo: { __typename?: "PageInfo"; endCursor?: string | null; hasNextPage: boolean };
-  };
+  sort?: InputMaybe<TransactionSortInput>;
 };
 
-export type ActivityQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
+export type WalletUtilityHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<UtilityHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<UtilityHistorySortInput>;
+};
 
-export type ActivityQuery = {
-  __typename?: "Query";
-  activity?: {
-    __typename?: "Activity";
-    id: string;
-    description?: string | null;
-    remark?: string | null;
-    startsAt: Date;
-    endsAt: Date;
-    isPublic: boolean;
-    event?: { __typename?: "Event"; id: string; description?: string | null } | null;
-    user?: {
-      __typename?: "User";
-      id: string;
-      firstName: string;
-      middleName?: string | null;
-      lastName: string;
-    } | null;
-    organization?: { __typename?: "Organization"; id: string; name: string } | null;
-  } | null;
+export type WalletCreatePayload = WalletCreateSuccess;
+
+export type WalletCreateSuccess = {
+  __typename?: "WalletCreateSuccess";
+  wallet: Wallet;
+};
+
+export type WalletCreateToCommunityInput = {
+  communityId: Scalars["String"]["input"];
+};
+
+export type WalletCreateToMemberInput = {
+  communityId: Scalars["String"]["input"];
+  userId: Scalars["String"]["input"];
+};
+
+export type WalletDeletePayload = WalletDeleteSuccess;
+
+export type WalletDeleteSuccess = {
+  __typename?: "WalletDeleteSuccess";
+  walletId: Scalars["String"]["output"];
+};
+
+export type WalletEdge = Edge & {
+  __typename?: "WalletEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Wallet>;
+};
+
+export type WalletFilterInput = {
+  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  type?: InputMaybe<WalletType>;
+  userId?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type WalletSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export enum WalletType {
+  Community = "COMMUNITY",
+  Member = "MEMBER",
+}
+
+export type WalletsConnection = {
+  __typename?: "WalletsConnection";
+  edges?: Maybe<Array<Maybe<WalletEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -2516,544 +2032,61 @@ export type CurrentUserQuery = {
   __typename?: "Query";
   currentUser?: {
     __typename?: "CurrentUserPayload";
-    user?: {
-      __typename?: "User";
-      id: string;
-      lastName: string;
-      middleName?: string | null;
-      firstName: string;
+    user?: { __typename?: "User"; id: string; name: string } | null;
+  } | null;
+};
+
+export type GetUserWithDetailsQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GetUserWithDetailsQuery = {
+  __typename?: "Query";
+  user?: {
+    __typename?: "User";
+    id: string;
+    name: string;
+    image?: string | null;
+    bio?: string | null;
+    sysRole: SysRole;
+    urlFacebook?: string | null;
+    urlInstagram?: string | null;
+    urlWebsite?: string | null;
+    urlX?: string | null;
+    urlYoutube?: string | null;
+  } | null;
+};
+
+export type GetUserActivitiesQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  articlesFirst?: InputMaybe<Scalars["Int"]["input"]>;
+  articlesCursor?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type GetUserActivitiesQuery = {
+  __typename?: "Query";
+  user?: {
+    __typename?: "User";
+    id: string;
+    articlesAboutMe?: {
+      __typename?: "ArticlesConnection";
+      edges?: Array<{
+        __typename?: "ArticleEdge";
+        cursor: string;
+        node?: { __typename?: "Article"; id: string } | null;
+      } | null> | null;
+    } | null;
+    articlesWrittenByMe?: {
+      __typename?: "ArticlesConnection";
+      edges?: Array<{
+        __typename?: "ArticleEdge";
+        cursor: string;
+        node?: { __typename?: "Article"; id: string } | null;
+      } | null> | null;
     } | null;
   } | null;
 };
 
-export type OrganizationsQueryVariables = Exact<{
-  filter?: InputMaybe<OrganizationFilterInput>;
-  sort?: InputMaybe<OrganizationSortInput>;
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-}>;
-
-export type OrganizationsQuery = {
-  __typename?: "Query";
-  organizations: {
-    __typename?: "OrganizationsConnection";
-    edges?: Array<{
-      __typename?: "OrganizationEdge";
-      node?: {
-        __typename?: "Organization";
-        id: string;
-        name: string;
-        city: { __typename?: "City"; name: string; state: { __typename?: "State"; name: string } };
-        users?: Array<{
-          __typename?: "User";
-          id: string;
-          firstName: string;
-          middleName?: string | null;
-          lastName: string;
-        }> | null;
-      } | null;
-    } | null> | null;
-    pageInfo: { __typename?: "PageInfo"; endCursor?: string | null; hasNextPage: boolean };
-  };
-};
-
-export const ActivityCreateDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "activityCreate" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ActivityCreateInput" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "activityCreate" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "ActivityCreateSuccess" },
-                  },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "activity" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            { kind: "Field", name: { kind: "Name", value: "id" } },
-                            { kind: "Field", name: { kind: "Name", value: "description" } },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<ActivityCreateMutation, ActivityCreateMutationVariables>;
-export const ActivityUpdateContentDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "activityUpdateContent" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "ActivityUpdateContentInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "activityUpdateContent" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "ActivityUpdateContentSuccess" },
-                  },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "activity" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            { kind: "Field", name: { kind: "Name", value: "id" } },
-                            { kind: "Field", name: { kind: "Name", value: "description" } },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<ActivityUpdateContentMutation, ActivityUpdateContentMutationVariables>;
-export const DeleteActivityDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "deleteActivity" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "activityDelete" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "ActivityDeleteSuccess" },
-                  },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [{ kind: "Field", name: { kind: "Name", value: "activityId" } }],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<DeleteActivityMutation, DeleteActivityMutationVariables>;
-export const CreateUserDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "createUser" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "CreateUserInput" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "createUser" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "user" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<CreateUserMutation, CreateUserMutationVariables>;
-export const DeleteUserDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "deleteUser" },
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "deleteUser" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "user" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<DeleteUserMutation, DeleteUserMutationVariables>;
-export const ActivitiesDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "activities" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "filter" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "ActivityFilterInput" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "sort" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "ActivitySortInput" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "first" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "activities" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "filter" },
-                value: { kind: "Variable", name: { kind: "Name", value: "filter" } },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "sort" },
-                value: { kind: "Variable", name: { kind: "Name", value: "sort" } },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "cursor" },
-                value: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "first" },
-                value: { kind: "Variable", name: { kind: "Name", value: "first" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "edges" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "node" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            { kind: "Field", name: { kind: "Name", value: "id" } },
-                            { kind: "Field", name: { kind: "Name", value: "description" } },
-                            { kind: "Field", name: { kind: "Name", value: "remark" } },
-                            { kind: "Field", name: { kind: "Name", value: "startsAt" } },
-                            { kind: "Field", name: { kind: "Name", value: "endsAt" } },
-                            { kind: "Field", name: { kind: "Name", value: "isPublic" } },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "event" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  { kind: "Field", name: { kind: "Name", value: "id" } },
-                                  { kind: "Field", name: { kind: "Name", value: "description" } },
-                                ],
-                              },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "user" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  { kind: "Field", name: { kind: "Name", value: "id" } },
-                                  { kind: "Field", name: { kind: "Name", value: "firstName" } },
-                                  { kind: "Field", name: { kind: "Name", value: "middleName" } },
-                                  { kind: "Field", name: { kind: "Name", value: "lastName" } },
-                                ],
-                              },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "organization" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  { kind: "Field", name: { kind: "Name", value: "id" } },
-                                  { kind: "Field", name: { kind: "Name", value: "name" } },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "pageInfo" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "endCursor" } },
-                      { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<ActivitiesQuery, ActivitiesQueryVariables>;
-export const ActivityDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "activity" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "activity" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "description" } },
-                { kind: "Field", name: { kind: "Name", value: "remark" } },
-                { kind: "Field", name: { kind: "Name", value: "startsAt" } },
-                { kind: "Field", name: { kind: "Name", value: "endsAt" } },
-                { kind: "Field", name: { kind: "Name", value: "isPublic" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "event" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "description" } },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "user" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "firstName" } },
-                      { kind: "Field", name: { kind: "Name", value: "middleName" } },
-                      { kind: "Field", name: { kind: "Name", value: "lastName" } },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "organization" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "name" } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<ActivityQuery, ActivityQueryVariables>;
 export const CurrentUserDocument = {
   kind: "Document",
   definitions: [
@@ -3077,9 +2110,7 @@ export const CurrentUserDocument = {
                     kind: "SelectionSet",
                     selections: [
                       { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "lastName" } },
-                      { kind: "Field", name: { kind: "Name", value: "middleName" } },
-                      { kind: "Field", name: { kind: "Name", value: "firstName" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
                     ],
                   },
                 },
@@ -3091,33 +2122,21 @@ export const CurrentUserDocument = {
     },
   ],
 } as unknown as DocumentNode<CurrentUserQuery, CurrentUserQueryVariables>;
-export const OrganizationsDocument = {
+export const GetUserWithDetailsDocument = {
   kind: "Document",
   definitions: [
     {
       kind: "OperationDefinition",
       operation: "query",
-      name: { kind: "Name", value: "organizations" },
+      name: { kind: "Name", value: "GetUserWithDetails" },
       variableDefinitions: [
         {
           kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "filter" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "OrganizationFilterInput" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "sort" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "OrganizationSortInput" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "first" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
         },
       ],
       selectionSet: {
@@ -3125,79 +2144,114 @@ export const OrganizationsDocument = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "organizations" },
+            name: { kind: "Name", value: "user" },
             arguments: [
               {
                 kind: "Argument",
-                name: { kind: "Name", value: "filter" },
-                value: { kind: "Variable", name: { kind: "Name", value: "filter" } },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "sort" },
-                value: { kind: "Variable", name: { kind: "Name", value: "sort" } },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "cursor" },
-                value: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "first" },
-                value: { kind: "Variable", name: { kind: "Name", value: "first" } },
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
               },
             ],
             selectionSet: {
               kind: "SelectionSet",
               selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "image" } },
+                { kind: "Field", name: { kind: "Name", value: "bio" } },
+                { kind: "Field", name: { kind: "Name", value: "sysRole" } },
+                { kind: "Field", name: { kind: "Name", value: "urlFacebook" } },
+                { kind: "Field", name: { kind: "Name", value: "urlInstagram" } },
+                { kind: "Field", name: { kind: "Name", value: "urlWebsite" } },
+                { kind: "Field", name: { kind: "Name", value: "urlX" } },
+                { kind: "Field", name: { kind: "Name", value: "urlYoutube" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetUserWithDetailsQuery, GetUserWithDetailsQueryVariables>;
+export const GetUserActivitiesDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetUserActivities" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "articlesFirst" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "articlesCursor" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "user" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
                 {
                   kind: "Field",
-                  name: { kind: "Name", value: "edges" },
+                  name: { kind: "Name", value: "articlesAboutMe" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "Variable", name: { kind: "Name", value: "articlesFirst" } },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "cursor" },
+                      value: { kind: "Variable", name: { kind: "Name", value: "articlesCursor" } },
+                    },
+                  ],
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [
                       {
                         kind: "Field",
-                        name: { kind: "Name", value: "node" },
+                        name: { kind: "Name", value: "edges" },
                         selectionSet: {
                           kind: "SelectionSet",
                           selections: [
-                            { kind: "Field", name: { kind: "Name", value: "id" } },
-                            { kind: "Field", name: { kind: "Name", value: "name" } },
                             {
                               kind: "Field",
-                              name: { kind: "Name", value: "city" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  { kind: "Field", name: { kind: "Name", value: "name" } },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "state" },
-                                    selectionSet: {
-                                      kind: "SelectionSet",
-                                      selections: [
-                                        { kind: "Field", name: { kind: "Name", value: "name" } },
-                                      ],
-                                    },
-                                  },
-                                ],
-                              },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "users" },
+                              name: { kind: "Name", value: "node" },
                               selectionSet: {
                                 kind: "SelectionSet",
                                 selections: [
                                   { kind: "Field", name: { kind: "Name", value: "id" } },
-                                  { kind: "Field", name: { kind: "Name", value: "firstName" } },
-                                  { kind: "Field", name: { kind: "Name", value: "middleName" } },
-                                  { kind: "Field", name: { kind: "Name", value: "lastName" } },
                                 ],
                               },
                             },
+                            { kind: "Field", name: { kind: "Name", value: "cursor" } },
                           ],
                         },
                       },
@@ -3206,12 +2260,42 @@ export const OrganizationsDocument = {
                 },
                 {
                   kind: "Field",
-                  name: { kind: "Name", value: "pageInfo" },
+                  name: { kind: "Name", value: "articlesWrittenByMe" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "Variable", name: { kind: "Name", value: "articlesFirst" } },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "cursor" },
+                      value: { kind: "Variable", name: { kind: "Name", value: "articlesCursor" } },
+                    },
+                  ],
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [
-                      { kind: "Field", name: { kind: "Name", value: "endCursor" } },
-                      { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "edges" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "node" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                ],
+                              },
+                            },
+                            { kind: "Field", name: { kind: "Name", value: "cursor" } },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
@@ -3222,4 +2306,4 @@ export const OrganizationsDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<OrganizationsQuery, OrganizationsQueryVariables>;
+} as unknown as DocumentNode<GetUserActivitiesQuery, GetUserActivitiesQueryVariables>;

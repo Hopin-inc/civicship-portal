@@ -30,9 +30,9 @@ const FormSchema = z
 
 const SignUpForm: React.FC = () => {
   const router = useRouter();
-  const [createUser] = useMutation(CREATE_USER, {
-    fetchPolicy: "no-cache",
-  });
+  // const [createUser] = useMutation(CREATE_USER, {
+  //   fetchPolicy: "no-cache",
+  // });
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -42,11 +42,11 @@ const SignUpForm: React.FC = () => {
   });
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    await createUser({
-      variables: {
-        input: data,
-      },
-    });
+    // await createUser({
+    //   variables: {
+    //     input: data,
+    //   },
+    // });
     toast.success("新規登録完了!");
     router.push("/");
   };

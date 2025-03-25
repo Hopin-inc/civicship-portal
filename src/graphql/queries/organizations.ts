@@ -1,30 +1,23 @@
-import { graphql } from "@/gql";
+// import { graphql } from "@/gql";
 
-export const GET_ALL_ORGANIZATIONS = graphql(`
-  query organizations($filter: OrganizationFilterInput, $sort: OrganizationSortInput, $cursor: String, $first: Int) {
-    organizations(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
-      edges {
-        node {
-          id
-          name
-          city {
-            name
-            state {
-              name
-            }
-          }
-          users {
-            id
-            firstName
-            middleName
-            lastName
-          }
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-    }
-  }
-`);
+// export const GET_ORGANIZATIONS = graphql(`
+//   query Organizations($filter: OrganizationFilterInput, $sort: OrganizationSortInput) {
+//     organizations(filter: $filter, sort: $sort) {
+//       edges {
+//         node {
+//           id
+//           name
+//           description
+//           users {
+//             id
+//             name
+//           }
+//         }
+//       }
+//       pageInfo {
+//         endCursor
+//         hasNextPage
+//       }
+//     }
+//   }
+// `);
