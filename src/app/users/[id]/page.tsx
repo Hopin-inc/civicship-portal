@@ -47,64 +47,6 @@ const MOCK_USER_DATA = {
   currentPoint: 500
 };
 
-// モック活動データ
-const MOCK_ACTIVITIES: ActivityItem[] = [
-  {
-    id: '1',
-    type: 'participation',
-    title: '解体屋さんから廃材を授かる会',
-    date: '2023/05/15',
-    location: '香川県高松市',
-    category: '体験',
-    participants: [
-      { id: '1', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user1' },
-      { id: '2', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user2' },
-      { id: '3', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user3' },
-    ],
-    image: 'https://images.unsplash.com/photo-1590247813693-5541d1c609fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: '2',
-    type: 'participation',
-    title: '空き家庭園の緑化Day',
-    date: '2023/04/15',
-    location: '徳島県徳島市',
-    category: 'クエスト',
-    participants: [
-      { id: '1', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user4' },
-      { id: '2', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user5' },
-      { id: '3', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user6' },
-    ],
-    image: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: '3',
-    type: 'article',
-    title: '伝統を守り続ける職人の想い',
-    date: '2023/04/15',
-    location: '高知県高知市',
-    category: '記事',
-    author: { id: '1', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=author1' },
-    image: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: '4',
-    type: 'participation',
-    title: '地域の夏祭り運営ボランティア',
-    date: '2023/07/20',
-    location: '香川県高松市',
-    category: 'イベント',
-    participants: [
-      { id: '1', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user7' },
-      { id: '2', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user8' },
-      { id: '3', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user9' },
-      { id: '4', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user10' },
-      { id: '5', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user11' },
-    ],
-    image: 'https://images.unsplash.com/photo-1529973625058-a665431328fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-  },
-];
-
 export default function UserPage({ params }: { params: { id: string } }) {
   const { user: currentUser } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -131,7 +73,6 @@ export default function UserPage({ params }: { params: { id: string } }) {
   }
 
   const userData = data.user;
-  const activities = MOCK_ACTIVITIES;
   const isOwner = true;
 
   const handleUpdateSocialLinks = async (socialLinks: { type: string; url: string }[]) => {
