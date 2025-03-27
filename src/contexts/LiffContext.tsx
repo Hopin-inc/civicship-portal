@@ -65,7 +65,6 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
       const idToken = liff.getIDToken();
       setLiffIdToken(idToken);
       
-      console.log("🔥 accessToken", accessToken);
     } catch (error) {
       console.error('Failed to get LIFF tokens:', error);
     }

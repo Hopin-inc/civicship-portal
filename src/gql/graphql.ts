@@ -20,7 +20,6 @@ export type Scalars = {
   Float: { input: number; output: number };
   DateTime: { input: any; output: any };
   Datetime: { input: Date; output: Date };
-  /** Custom scalar for high-precision decimal (serialized as string) */
   Decimal: { input: any; output: any };
   JSON: { input: any; output: any };
 };
@@ -33,75 +32,26 @@ export type AccumulatedPointView = {
 
 export type Article = {
   __typename?: "Article";
-  authors?: Maybe<UsersConnection>;
+  authors?: Maybe<Array<User>>;
   body: Scalars["String"]["output"];
   category: ArticleCategory;
   community?: Maybe<Community>;
   createdAt: Scalars["Datetime"]["output"];
   id: Scalars["ID"]["output"];
   introduction: Scalars["String"]["output"];
-  opportunities?: Maybe<OpportunitiesConnection>;
+  opportunities?: Maybe<Array<Opportunity>>;
   publishStatus: PublishStatus;
   publishedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  relatedUsers?: Maybe<UsersConnection>;
+  relatedUsers?: Maybe<Array<User>>;
   thumbnail?: Maybe<Scalars["JSON"]["output"]>;
   title: Scalars["String"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-};
-
-export type ArticleAuthorsArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<UserFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<UserSortInput>;
-};
-
-export type ArticleOpportunitiesArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<OpportunityFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<OpportunitySortInput>;
-};
-
-export type ArticleRelatedUsersArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<UserFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<UserSortInput>;
 };
 
 export enum ArticleCategory {
   ActivityReport = "ACTIVITY_REPORT",
   Interview = "INTERVIEW",
 }
-
-export type ArticleCreateInput = {
-  authorIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  body: Scalars["String"]["input"];
-  category: ArticleCategory;
-  communityId: Scalars["ID"]["input"];
-  introduction: Scalars["String"]["input"];
-  opportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  publishStatus?: InputMaybe<PublishStatus>;
-  publishedAt?: InputMaybe<Scalars["String"]["input"]>;
-  relatedUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  thumbnail?: InputMaybe<Scalars["JSON"]["input"]>;
-  title: Scalars["String"]["input"];
-};
-
-export type ArticleCreatePayload = ArticleCreateSuccess;
-
-export type ArticleCreateSuccess = {
-  __typename?: "ArticleCreateSuccess";
-  article?: Maybe<Article>;
-};
-
-export type ArticleDeletePayload = ArticleDeleteSuccess;
-
-export type ArticleDeleteSuccess = {
-  __typename?: "ArticleDeleteSuccess";
-  id: Scalars["ID"]["output"];
-};
 
 export type ArticleEdge = Edge & {
   __typename?: "ArticleEdge";
@@ -110,37 +60,25 @@ export type ArticleEdge = Edge & {
 };
 
 export type ArticleFilterInput = {
-  category?: InputMaybe<ArticleCategory>;
-  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  and?: InputMaybe<Array<ArticleFilterInput>>;
+  authors?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  categories?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  cityCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  dateFrom?: InputMaybe<Scalars["Datetime"]["input"]>;
+  dateTo?: InputMaybe<Scalars["Datetime"]["input"]>;
   keyword?: InputMaybe<Scalars["String"]["input"]>;
-  publishStatus?: InputMaybe<PublishStatus>;
-  writtenByUserId?: InputMaybe<Scalars["String"]["input"]>;
+  not?: InputMaybe<ArticleFilterInput>;
+  or?: InputMaybe<Array<ArticleFilterInput>>;
+  publishStatus?: InputMaybe<Array<PublishStatus>>;
+  relatedUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  stateCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
 export type ArticleSortInput = {
   createdAt?: InputMaybe<SortDirection>;
   publishedAt?: InputMaybe<SortDirection>;
-};
-
-export type ArticleUpdateInput = {
-  authorIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  body: Scalars["String"]["input"];
-  category: ArticleCategory;
-  communityId: Scalars["ID"]["input"];
-  introduction: Scalars["String"]["input"];
-  opportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  publishStatus?: InputMaybe<PublishStatus>;
-  publishedAt?: InputMaybe<Scalars["String"]["input"]>;
-  relatedUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  thumbnail?: InputMaybe<Scalars["JSON"]["input"]>;
-  title: Scalars["String"]["input"];
-};
-
-export type ArticleUpdatePayload = ArticleUpdateSuccess;
-
-export type ArticleUpdateSuccess = {
-  __typename?: "ArticleUpdateSuccess";
-  article?: Maybe<Article>;
+  startsAt?: InputMaybe<SortDirection>;
 };
 
 export type ArticlesConnection = {
@@ -150,17 +88,24 @@ export type ArticlesConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type CheckCommunityPermissionInput = {
+  communityId: Scalars["ID"]["input"];
+};
+
+export type CheckIsSelfPermissionInput = {
+  userId: Scalars["ID"]["input"];
+};
+
+export type CheckOpportunityPermissionInput = {
+  communityId: Scalars["ID"]["input"];
+  opportunityId: Scalars["ID"]["input"];
+};
+
 export type City = {
   __typename?: "City";
   code: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
   state: State;
-};
-
-export type Communities = {
-  __typename?: "Communities";
-  data: Array<Community>;
-  total: Scalars["Int"]["output"];
 };
 
 export type CommunitiesConnection = {
@@ -182,6 +127,7 @@ export type Community = {
   name: Scalars["String"]["output"];
   opportunities?: Maybe<OpportunitiesConnection>;
   participations?: Maybe<ParticipationsConnection>;
+  places?: Maybe<Array<Place>>;
   pointName: Scalars["String"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
   utilities?: Maybe<UtilitiesConnection>;
@@ -234,8 +180,9 @@ export type CommunityWalletsArgs = {
 export type CommunityCreateInput = {
   bio?: InputMaybe<Scalars["String"]["input"]>;
   establishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
+  image?: InputMaybe<ImageInput>;
   name: Scalars["String"]["input"];
+  places?: InputMaybe<Array<NestedPlaceCreateInput>>;
   pointName: Scalars["String"]["input"];
   website?: InputMaybe<Scalars["String"]["input"]>;
 };
@@ -245,10 +192,6 @@ export type CommunityCreatePayload = CommunityCreateSuccess;
 export type CommunityCreateSuccess = {
   __typename?: "CommunityCreateSuccess";
   community: Community;
-};
-
-export type CommunityDeleteInput = {
-  communityId: Scalars["ID"]["input"];
 };
 
 export type CommunityDeletePayload = CommunityDeleteSuccess;
@@ -265,8 +208,9 @@ export type CommunityEdge = Edge & {
 };
 
 export type CommunityFilterInput = {
-  cityCode?: InputMaybe<Scalars["String"]["input"]>;
-  stateCode?: InputMaybe<Scalars["String"]["input"]>;
+  cityCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
+  placeIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
 export type CommunitySortInput = {
@@ -275,13 +219,11 @@ export type CommunitySortInput = {
 
 export type CommunityUpdateProfileInput = {
   bio?: InputMaybe<Scalars["String"]["input"]>;
-  cityCode?: InputMaybe<Scalars["String"]["input"]>;
-  communityId: Scalars["ID"]["input"];
   establishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  pointName?: InputMaybe<Scalars["String"]["input"]>;
-  stateCode?: InputMaybe<Scalars["String"]["input"]>;
+  image?: InputMaybe<ImageInput>;
+  name: Scalars["String"]["input"];
+  places: NestedPlacesBulkUpdateInput;
+  pointName: Scalars["String"]["input"];
   website?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -298,6 +240,15 @@ export type CurrentPointView = {
   walletId: Scalars["String"]["output"];
 };
 
+export enum CurrentPrefecture {
+  Ehime = "EHIME",
+  Kagawa = "KAGAWA",
+  Kochi = "KOCHI",
+  OutsideShikoku = "OUTSIDE_SHIKOKU",
+  Tokushima = "TOKUSHIMA",
+  Unknown = "UNKNOWN",
+}
+
 export type CurrentUserPayload = {
   __typename?: "CurrentUserPayload";
   user?: Maybe<User>;
@@ -307,6 +258,102 @@ export type Edge = {
   cursor: Scalars["String"]["output"];
 };
 
+export type Evaluation = {
+  __typename?: "Evaluation";
+  comment?: Maybe<Scalars["String"]["output"]>;
+  createdAt: Scalars["Datetime"]["output"];
+  credentialUrl?: Maybe<Scalars["String"]["output"]>;
+  evaluator: User;
+  histories?: Maybe<EvaluationHistoriesConnection>;
+  id: Scalars["ID"]["output"];
+  issuedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  participation: Participation;
+  status: EvaluationStatus;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type EvaluationHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<EvaluationHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<EvaluationHistorySortInput>;
+};
+
+export type EvaluationCreateInput = {
+  comment?: InputMaybe<Scalars["String"]["input"]>;
+  participationId: Scalars["ID"]["input"];
+};
+
+export type EvaluationCreatePayload = EvaluationCreateSuccess;
+
+export type EvaluationCreateSuccess = {
+  __typename?: "EvaluationCreateSuccess";
+  evaluation: Evaluation;
+};
+
+export type EvaluationEdge = Edge & {
+  __typename?: "EvaluationEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Evaluation>;
+};
+
+export type EvaluationFilterInput = {
+  evaluatorId?: InputMaybe<Scalars["ID"]["input"]>;
+  participationId?: InputMaybe<Scalars["ID"]["input"]>;
+  status?: InputMaybe<EvaluationStatus>;
+};
+
+export type EvaluationHistoriesConnection = {
+  __typename?: "EvaluationHistoriesConnection";
+  edges: Array<EvaluationHistoryEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type EvaluationHistory = {
+  __typename?: "EvaluationHistory";
+  comment?: Maybe<Scalars["String"]["output"]>;
+  createdAt: Scalars["Datetime"]["output"];
+  createdByUser?: Maybe<User>;
+  evaluation: Evaluation;
+  id: Scalars["ID"]["output"];
+  status: EvaluationStatus;
+};
+
+export type EvaluationHistoryEdge = Edge & {
+  __typename?: "EvaluationHistoryEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<EvaluationHistory>;
+};
+
+export type EvaluationHistoryFilterInput = {
+  createdByUserId?: InputMaybe<Scalars["ID"]["input"]>;
+  evaluationId?: InputMaybe<Scalars["ID"]["input"]>;
+  status?: InputMaybe<EvaluationStatus>;
+};
+
+export type EvaluationHistorySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export type EvaluationSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+};
+
+export enum EvaluationStatus {
+  Failed = "FAILED",
+  Passed = "PASSED",
+  Pending = "PENDING",
+}
+
+export type EvaluationsConnection = {
+  __typename?: "EvaluationsConnection";
+  edges: Array<EvaluationEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
 export enum IdentityPlatform {
   Facebook = "FACEBOOK",
   Line = "LINE",
@@ -314,51 +361,24 @@ export enum IdentityPlatform {
 
 export type ImageInput = {
   base64: Scalars["String"]["input"];
+  caption?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type Membership = {
   __typename?: "Membership";
   community: Community;
   createdAt: Scalars["Datetime"]["output"];
+  histories?: Maybe<Array<MembershipHistory>>;
+  reason: MembershipStatusReason;
   role: Role;
-  status?: Maybe<MembershipStatus>;
+  status: MembershipStatus;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
   user: User;
-};
-
-export type MembershipAcceptMyInvitationInput = {
-  communityId: Scalars["String"]["input"];
-  userId: Scalars["String"]["input"];
-};
-
-export type MembershipAssignManagerInput = {
-  communityId: Scalars["String"]["input"];
-  userId: Scalars["String"]["input"];
-};
-
-export type MembershipAssignMemberInput = {
-  communityId: Scalars["String"]["input"];
-  userId: Scalars["String"]["input"];
-};
-
-export type MembershipAssignOwnerInput = {
-  communityId: Scalars["String"]["input"];
-  userId: Scalars["String"]["input"];
-};
-
-export type MembershipCancelInvitationInput = {
-  communityId: Scalars["String"]["input"];
-  userId: Scalars["String"]["input"];
 };
 
 export type MembershipCursorInput = {
   communityId: Scalars["ID"]["input"];
   userId: Scalars["ID"]["input"];
-};
-
-export type MembershipDenyMyInvitationInput = {
-  communityId: Scalars["String"]["input"];
-  userId: Scalars["String"]["input"];
 };
 
 export type MembershipEdge = Edge & {
@@ -368,16 +388,50 @@ export type MembershipEdge = Edge & {
 };
 
 export type MembershipFilterInput = {
-  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
   role?: InputMaybe<Role>;
   status?: InputMaybe<MembershipStatus>;
-  userId?: InputMaybe<Scalars["String"]["input"]>;
+  userId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type MembershipHistoriesConnection = {
+  __typename?: "MembershipHistoriesConnection";
+  edges?: Maybe<Array<Maybe<MembershipHistoryEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type MembershipHistory = {
+  __typename?: "MembershipHistory";
+  createdAt: Scalars["Datetime"]["output"];
+  createdByUser?: Maybe<User>;
+  id: Scalars["ID"]["output"];
+  membership: Membership;
+  reason: MembershipStatusReason;
+  role: Role;
+  status: MembershipStatus;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type MembershipHistoryEdge = Edge & {
+  __typename?: "MembershipHistoryEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<MembershipHistory>;
+};
+
+export type MembershipHistoryFilterInput = {
+  createdById?: InputMaybe<Scalars["ID"]["input"]>;
+  membershipId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type MembershipHistorySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
 };
 
 export type MembershipInviteInput = {
-  communityId: Scalars["String"]["input"];
+  communityId: Scalars["ID"]["input"];
   role?: InputMaybe<Role>;
-  userId: Scalars["String"]["input"];
+  userId: Scalars["ID"]["input"];
 };
 
 export type MembershipInvitePayload = MembershipInviteSuccess;
@@ -388,16 +442,21 @@ export type MembershipInviteSuccess = {
 };
 
 export type MembershipRemoveInput = {
-  communityId: Scalars["String"]["input"];
-  userId: Scalars["String"]["input"];
+  communityId: Scalars["ID"]["input"];
+  userId: Scalars["ID"]["input"];
 };
 
 export type MembershipRemovePayload = MembershipRemoveSuccess;
 
 export type MembershipRemoveSuccess = {
   __typename?: "MembershipRemoveSuccess";
-  communityId: Scalars["String"]["output"];
-  userId: Scalars["String"]["output"];
+  communityId: Scalars["ID"]["output"];
+  userId: Scalars["ID"]["output"];
+};
+
+export type MembershipSetInvitationStatusInput = {
+  communityId: Scalars["ID"]["input"];
+  userId: Scalars["ID"]["input"];
 };
 
 export type MembershipSetInvitationStatusPayload = MembershipSetInvitationStatusSuccess;
@@ -405,6 +464,11 @@ export type MembershipSetInvitationStatusPayload = MembershipSetInvitationStatus
 export type MembershipSetInvitationStatusSuccess = {
   __typename?: "MembershipSetInvitationStatusSuccess";
   membership: Membership;
+};
+
+export type MembershipSetRoleInput = {
+  communityId: Scalars["ID"]["input"];
+  userId: Scalars["ID"]["input"];
 };
 
 export type MembershipSetRolePayload = MembershipSetRoleSuccess;
@@ -419,23 +483,33 @@ export type MembershipSortInput = {
 };
 
 export enum MembershipStatus {
-  Canceled = "CANCELED",
-  Invited = "INVITED",
   Joined = "JOINED",
-  Withdrawed = "WITHDRAWED",
+  Left = "LEFT",
+  Pending = "PENDING",
+}
+
+export enum MembershipStatusReason {
+  AcceptedInvitation = "ACCEPTED_INVITATION",
+  Assigned = "ASSIGNED",
+  CanceledInvitation = "CANCELED_INVITATION",
+  CreatedCommunity = "CREATED_COMMUNITY",
+  DeclinedInvitation = "DECLINED_INVITATION",
+  Invited = "INVITED",
+  Removed = "REMOVED",
+  Withdrawn = "WITHDRAWN",
 }
 
 export type MembershipWithdrawInput = {
-  communityId: Scalars["String"]["input"];
-  userId: Scalars["String"]["input"];
+  communityId: Scalars["ID"]["input"];
+  userId: Scalars["ID"]["input"];
 };
 
 export type MembershipWithdrawPayload = MembershipWithdrawSuccess;
 
 export type MembershipWithdrawSuccess = {
   __typename?: "MembershipWithdrawSuccess";
-  communityId: Scalars["String"]["output"];
-  userId: Scalars["String"]["output"];
+  communityId: Scalars["ID"]["output"];
+  userId: Scalars["ID"]["output"];
 };
 
 export type MembershipsConnection = {
@@ -447,12 +521,11 @@ export type MembershipsConnection = {
 
 export type Mutation = {
   __typename?: "Mutation";
-  articleCreate?: Maybe<ArticleCreatePayload>;
-  articleDelete?: Maybe<ArticleDeletePayload>;
-  articleUpdate?: Maybe<ArticleUpdatePayload>;
   communityCreate?: Maybe<CommunityCreatePayload>;
   communityDelete?: Maybe<CommunityDeletePayload>;
   communityUpdateProfile?: Maybe<CommunityUpdateProfilePayload>;
+  evaluationFail?: Maybe<EvaluationCreatePayload>;
+  evaluationPass?: Maybe<EvaluationCreatePayload>;
   membershipAcceptMyInvitation?: Maybe<MembershipSetInvitationStatusPayload>;
   membershipAssignManager?: Maybe<MembershipSetRolePayload>;
   membershipAssignMember?: Maybe<MembershipSetRolePayload>;
@@ -466,21 +539,25 @@ export type Mutation = {
   opportunityCreate?: Maybe<OpportunityCreatePayload>;
   opportunityDelete?: Maybe<OpportunityDeletePayload>;
   opportunityInvitationCreate?: Maybe<OpportunityInvitationCreatePayload>;
-  opportunityInvitationDelete?: Maybe<OpportunityInvitationDeletePayload>;
   opportunityInvitationDisable?: Maybe<OpportunityInvitationDisablePayload>;
+  opportunitySetHostingStatus?: Maybe<OpportunitySetHostingStatusPayload>;
   opportunitySetPublishStatus?: Maybe<OpportunitySetPublishStatusPayload>;
   opportunitySlotsBulkUpdate?: Maybe<OpportunitySlotsBulkUpdatePayload>;
   opportunityUpdateContent?: Maybe<OpportunityUpdateContentPayload>;
-  participationAcceptApplication?: Maybe<ParticipationSetStatusPayload>;
-  participationAcceptMyInvitation?: Maybe<ParticipationSetStatusPayload>;
-  participationApply?: Maybe<ParticipationApplyPayload>;
-  participationApprovePerformance?: Maybe<ParticipationSetStatusPayload>;
-  participationCancelInvitation?: Maybe<ParticipationSetStatusPayload>;
-  participationCancelMyApplication?: Maybe<ParticipationSetStatusPayload>;
-  participationDenyApplication?: Maybe<ParticipationSetStatusPayload>;
-  participationDenyMyInvitation?: Maybe<ParticipationSetStatusPayload>;
-  participationDenyPerformance?: Maybe<ParticipationSetStatusPayload>;
-  participationInvite?: Maybe<ParticipationInvitePayload>;
+  participationCreatePersonalRecord?: Maybe<ParticipationCreatePersonalRecordPayload>;
+  participationDeletePersonalRecord?: Maybe<ParticipationDeletePayload>;
+  participationImageBulkUpdate?: Maybe<ParticipationImageBulkUpdatePayload>;
+  placeCreate?: Maybe<PlaceCreatePayload>;
+  placeDelete?: Maybe<PlaceDeletePayload>;
+  placeUpdate?: Maybe<PlaceUpdatePayload>;
+  reservationAccept?: Maybe<ReservationSetStatusPayload>;
+  reservationCancel?: Maybe<ReservationSetStatusPayload>;
+  reservationCreate?: Maybe<ReservationCreatePayload>;
+  reservationJoin?: Maybe<ReservationSetStatusPayload>;
+  reservationReject?: Maybe<ReservationSetStatusPayload>;
+  ticketPurchase?: Maybe<TicketPurchasePayload>;
+  ticketRefund?: Maybe<TicketRefundPayload>;
+  ticketUse?: Maybe<TicketUsePayload>;
   transactionDonateSelfPoint?: Maybe<TransactionDonateSelfPointPayload>;
   transactionGrantCommunityPoint?: Maybe<TransactionGrantCommunityPointPayload>;
   transactionIssueCommunityPoint?: Maybe<TransactionIssueCommunityPointPayload>;
@@ -489,22 +566,8 @@ export type Mutation = {
   userUpdateMyProfile?: Maybe<UserUpdateProfilePayload>;
   utilityCreate?: Maybe<UtilityCreatePayload>;
   utilityDelete?: Maybe<UtilityDeletePayload>;
-  utilityRedeem?: Maybe<UtilityRedeemPayload>;
+  utilitySetPublishStatus?: Maybe<UtilitySetPublishStatusPayload>;
   utilityUpdateInfo?: Maybe<UtilityUpdateInfoPayload>;
-  utilityUse?: Maybe<UtilityUsePayload>;
-};
-
-export type MutationArticleCreateArgs = {
-  input: ArticleCreateInput;
-};
-
-export type MutationArticleDeleteArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationArticleUpdateArgs = {
-  id: Scalars["ID"]["input"];
-  input: ArticleUpdateInput;
 };
 
 export type MutationCommunityCreateArgs = {
@@ -513,144 +576,201 @@ export type MutationCommunityCreateArgs = {
 
 export type MutationCommunityDeleteArgs = {
   id: Scalars["ID"]["input"];
-  input: CommunityDeleteInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationCommunityUpdateProfileArgs = {
   id: Scalars["ID"]["input"];
   input: CommunityUpdateProfileInput;
+  permission: CheckCommunityPermissionInput;
+};
+
+export type MutationEvaluationFailArgs = {
+  input: EvaluationCreateInput;
+  permission: CheckCommunityPermissionInput;
+};
+
+export type MutationEvaluationPassArgs = {
+  input: EvaluationCreateInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationMembershipAcceptMyInvitationArgs = {
-  input: MembershipAcceptMyInvitationInput;
+  input: MembershipSetInvitationStatusInput;
+  permission: CheckIsSelfPermissionInput;
 };
 
 export type MutationMembershipAssignManagerArgs = {
-  input: MembershipAssignManagerInput;
+  input: MembershipSetRoleInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationMembershipAssignMemberArgs = {
-  input: MembershipAssignMemberInput;
+  input: MembershipSetRoleInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationMembershipAssignOwnerArgs = {
-  input: MembershipAssignOwnerInput;
+  input: MembershipSetRoleInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationMembershipCancelInvitationArgs = {
-  input: MembershipCancelInvitationInput;
+  input: MembershipSetInvitationStatusInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationMembershipDenyMyInvitationArgs = {
-  input: MembershipDenyMyInvitationInput;
+  input: MembershipSetInvitationStatusInput;
+  permission: CheckIsSelfPermissionInput;
 };
 
 export type MutationMembershipInviteArgs = {
   input: MembershipInviteInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationMembershipRemoveArgs = {
   input: MembershipRemoveInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationMembershipWithdrawArgs = {
   input: MembershipWithdrawInput;
+  permission: CheckIsSelfPermissionInput;
 };
 
 export type MutationOpportunityCreateArgs = {
   input: OpportunityCreateInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationOpportunityDeleteArgs = {
   id: Scalars["ID"]["input"];
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationOpportunityInvitationCreateArgs = {
   input: OpportunityInvitationCreateInput;
-};
-
-export type MutationOpportunityInvitationDeleteArgs = {
-  id: Scalars["ID"]["input"];
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationOpportunityInvitationDisableArgs = {
   id: Scalars["ID"]["input"];
-  input: OpportunityInvitationDisableInput;
+  permission: CheckCommunityPermissionInput;
+};
+
+export type MutationOpportunitySetHostingStatusArgs = {
+  id: Scalars["ID"]["input"];
+  input: OpportunitySetHostingStatusInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationOpportunitySetPublishStatusArgs = {
   id: Scalars["ID"]["input"];
   input: OpportunitySetPublishStatusInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationOpportunitySlotsBulkUpdateArgs = {
   input: OpportunitySlotsBulkUpdateInput;
+  permission: CheckOpportunityPermissionInput;
 };
 
 export type MutationOpportunityUpdateContentArgs = {
   id: Scalars["ID"]["input"];
   input: OpportunityUpdateContentInput;
+  permission: CheckCommunityPermissionInput;
 };
 
-export type MutationParticipationAcceptApplicationArgs = {
+export type MutationParticipationCreatePersonalRecordArgs = {
+  input: ParticipationCreatePersonalRecordInput;
+};
+
+export type MutationParticipationDeletePersonalRecordArgs = {
   id: Scalars["ID"]["input"];
-  input: ParticipationSetStatusInput;
+  permission: CheckIsSelfPermissionInput;
 };
 
-export type MutationParticipationAcceptMyInvitationArgs = {
+export type MutationParticipationImageBulkUpdateArgs = {
+  input: ParticipationImageBulkUpdateInput;
+  permission: CheckIsSelfPermissionInput;
+};
+
+export type MutationPlaceCreateArgs = {
+  input: PlaceCreateInput;
+  permission: CheckCommunityPermissionInput;
+};
+
+export type MutationPlaceDeleteArgs = {
+  id: Scalars["ID"]["input"];
+  permission: CheckCommunityPermissionInput;
+};
+
+export type MutationPlaceUpdateArgs = {
+  id: Scalars["ID"]["input"];
+  input: PlaceUpdateInput;
+  permission: CheckCommunityPermissionInput;
+};
+
+export type MutationReservationAcceptArgs = {
+  id: Scalars["ID"]["input"];
+  permission: CheckCommunityPermissionInput;
+};
+
+export type MutationReservationCancelArgs = {
+  id: Scalars["ID"]["input"];
+  input: ReservationCancelInput;
+  permission: CheckIsSelfPermissionInput;
+};
+
+export type MutationReservationCreateArgs = {
+  input: ReservationCreateInput;
+};
+
+export type MutationReservationJoinArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type MutationParticipationApplyArgs = {
-  input: ParticipationApplyInput;
-};
-
-export type MutationParticipationApprovePerformanceArgs = {
+export type MutationReservationRejectArgs = {
   id: Scalars["ID"]["input"];
-  input: ParticipationSetStatusInput;
+  permission: CheckCommunityPermissionInput;
 };
 
-export type MutationParticipationCancelInvitationArgs = {
+export type MutationTicketPurchaseArgs = {
+  input: TicketPurchaseInput;
+  permission: CheckCommunityPermissionInput;
+};
+
+export type MutationTicketRefundArgs = {
   id: Scalars["ID"]["input"];
-  input: ParticipationSetStatusInput;
+  input: TicketRefundInput;
+  permission: CheckIsSelfPermissionInput;
 };
 
-export type MutationParticipationCancelMyApplicationArgs = {
+export type MutationTicketUseArgs = {
   id: Scalars["ID"]["input"];
-};
-
-export type MutationParticipationDenyApplicationArgs = {
-  id: Scalars["ID"]["input"];
-  input: ParticipationSetStatusInput;
-};
-
-export type MutationParticipationDenyMyInvitationArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type MutationParticipationDenyPerformanceArgs = {
-  id: Scalars["ID"]["input"];
-  input: ParticipationSetStatusInput;
-};
-
-export type MutationParticipationInviteArgs = {
-  input: ParticipationInviteInput;
+  permission: CheckIsSelfPermissionInput;
 };
 
 export type MutationTransactionDonateSelfPointArgs = {
   input: TransactionDonateSelfPointInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationTransactionGrantCommunityPointArgs = {
   input: TransactionGrantCommunityPointInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationTransactionIssueCommunityPointArgs = {
   input: TransactionIssueCommunityPointInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationUserDeleteMeArgs = {
   input: UserDeleteInput;
+  permission: CheckIsSelfPermissionInput;
 };
 
 export type MutationUserSignUpArgs = {
@@ -659,29 +779,72 @@ export type MutationUserSignUpArgs = {
 
 export type MutationUserUpdateMyProfileArgs = {
   input: UserUpdateProfileInput;
+  permission: CheckIsSelfPermissionInput;
 };
 
 export type MutationUtilityCreateArgs = {
   input: UtilityCreateInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationUtilityDeleteArgs = {
   id: Scalars["ID"]["input"];
+  permission: CheckCommunityPermissionInput;
 };
 
-export type MutationUtilityRedeemArgs = {
+export type MutationUtilitySetPublishStatusArgs = {
   id: Scalars["ID"]["input"];
-  input: UtilityRedeemInput;
+  input: UtilitySetPublishStatusInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationUtilityUpdateInfoArgs = {
   id: Scalars["ID"]["input"];
   input: UtilityUpdateInfoInput;
+  permission: CheckCommunityPermissionInput;
 };
 
-export type MutationUtilityUseArgs = {
-  input: UtilityUseInput;
+export type NestedPlaceConnectOrCreateInput = {
+  create?: InputMaybe<NestedPlaceCreateInput>;
+  where?: InputMaybe<Scalars["ID"]["input"]>;
 };
+
+export type NestedPlaceCreateInput = {
+  address: Scalars["String"]["input"];
+  cityCode: Scalars["ID"]["input"];
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  googlePlaceId?: InputMaybe<Scalars["String"]["input"]>;
+  isManual: Scalars["Boolean"]["input"];
+  latitude: Scalars["Decimal"]["input"];
+  longitude: Scalars["Decimal"]["input"];
+  mapLocation?: InputMaybe<Scalars["JSON"]["input"]>;
+  name: Scalars["String"]["input"];
+};
+
+export type NestedPlacesBulkConnectOrCreateInput = {
+  data?: InputMaybe<Array<NestedPlaceConnectOrCreateInput>>;
+};
+
+export type NestedPlacesBulkUpdateInput = {
+  connectOrCreate?: InputMaybe<Array<NestedPlaceConnectOrCreateInput>>;
+  disconnect?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+};
+
+export type Onboarding = {
+  __typename?: "Onboarding";
+  completedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  status: OnboardingStatus;
+  todo: Todo;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  user: User;
+};
+
+export enum OnboardingStatus {
+  Done = "DONE",
+  Wip = "WIP",
+}
 
 export type OpportunitiesConnection = {
   __typename?: "OpportunitiesConnection";
@@ -692,7 +855,7 @@ export type OpportunitiesConnection = {
 
 export type Opportunity = {
   __typename?: "Opportunity";
-  articles?: Maybe<ArticlesConnection>;
+  articles?: Maybe<Array<Article>>;
   body?: Maybe<Scalars["String"]["output"]>;
   capacity?: Maybe<Scalars["Int"]["output"]>;
   category: OpportunityCategory;
@@ -700,29 +863,20 @@ export type Opportunity = {
   createdAt: Scalars["Datetime"]["output"];
   createdByUser?: Maybe<User>;
   description: Scalars["String"]["output"];
-  endsAt?: Maybe<Scalars["Datetime"]["output"]>;
   feeRequired?: Maybe<Scalars["Int"]["output"]>;
   files?: Maybe<Scalars["JSON"]["output"]>;
+  hostingStatus: OpportunityHostingStatus;
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
   invitations?: Maybe<OpportunityInvitationsConnection>;
-  participations?: Maybe<ParticipationsConnection>;
   place?: Maybe<Place>;
-  pointsRequired?: Maybe<Scalars["Int"]["output"]>;
   pointsToEarn?: Maybe<Scalars["Int"]["output"]>;
   publishStatus: PublishStatus;
   requireApproval: Scalars["Boolean"]["output"];
+  requiredUtilities?: Maybe<Array<Utility>>;
   slots?: Maybe<OpportunitySlotsConnection>;
-  startsAt?: Maybe<Scalars["Datetime"]["output"]>;
   title: Scalars["String"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-};
-
-export type OpportunityArticlesArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<ArticleFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<ArticleSortInput>;
 };
 
 export type OpportunityInvitationsArgs = {
@@ -730,13 +884,6 @@ export type OpportunityInvitationsArgs = {
   filter?: InputMaybe<OpportunityInvitationFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<OpportunityInvitationSortInput>;
-};
-
-export type OpportunityParticipationsArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<ParticipationFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<ParticipationSortInput>;
 };
 
 export type OpportunitySlotsArgs = {
@@ -756,17 +903,17 @@ export type OpportunityCreateInput = {
   body?: InputMaybe<Scalars["String"]["input"]>;
   capacity?: InputMaybe<Scalars["Int"]["input"]>;
   category: OpportunityCategory;
-  communityId: Scalars["String"]["input"];
+  communityId: Scalars["ID"]["input"];
   description: Scalars["String"]["input"];
   endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
   files?: InputMaybe<Scalars["JSON"]["input"]>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  placeId?: InputMaybe<Scalars["String"]["input"]>;
-  pointsRequired?: InputMaybe<Scalars["Int"]["input"]>;
+  image?: InputMaybe<ImageInput>;
+  place?: InputMaybe<NestedPlaceConnectOrCreateInput>;
   pointsToEarn?: InputMaybe<Scalars["Int"]["input"]>;
   publishStatus: PublishStatus;
   requireApproval: Scalars["Boolean"]["input"];
+  requiredUtilityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   title: Scalars["String"]["input"];
 };
@@ -782,7 +929,7 @@ export type OpportunityDeletePayload = OpportunityDeleteSuccess;
 
 export type OpportunityDeleteSuccess = {
   __typename?: "OpportunityDeleteSuccess";
-  opportunityId: Scalars["String"]["output"];
+  opportunityId: Scalars["ID"]["output"];
 };
 
 export type OpportunityEdge = Edge & {
@@ -792,13 +939,25 @@ export type OpportunityEdge = Edge & {
 };
 
 export type OpportunityFilterInput = {
-  articleId?: InputMaybe<Scalars["String"]["input"]>;
+  and?: InputMaybe<Array<OpportunityFilterInput>>;
+  articleIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   category?: InputMaybe<OpportunityCategory>;
-  communityId?: InputMaybe<Scalars["String"]["input"]>;
-  createdByUserId?: InputMaybe<Scalars["String"]["input"]>;
-  placeId?: InputMaybe<Scalars["String"]["input"]>;
-  publishStatus?: InputMaybe<PublishStatus>;
+  cityCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  communityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  createdByUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  hostingStatus?: InputMaybe<Array<OpportunityHostingStatus>>;
+  not?: InputMaybe<OpportunityFilterInput>;
+  or?: InputMaybe<Array<OpportunityFilterInput>>;
+  placeIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  publishStatus?: InputMaybe<Array<PublishStatus>>;
+  requiredUtilityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
+
+export enum OpportunityHostingStatus {
+  Cancelled = "CANCELLED",
+  Completed = "COMPLETED",
+  Scheduled = "SCHEDULED",
+}
 
 export type OpportunityInvitation = {
   __typename?: "OpportunityInvitation";
@@ -821,7 +980,6 @@ export type OpportunityInvitationHistoriesArgs = {
 
 export type OpportunityInvitationCreateInput = {
   code: Scalars["String"]["input"];
-  communityId: Scalars["ID"]["input"];
   opportunityId: Scalars["ID"]["input"];
 };
 
@@ -830,17 +988,6 @@ export type OpportunityInvitationCreatePayload = OpportunityInvitationCreateSucc
 export type OpportunityInvitationCreateSuccess = {
   __typename?: "OpportunityInvitationCreateSuccess";
   opportunityInvitation?: Maybe<OpportunityInvitation>;
-};
-
-export type OpportunityInvitationDeletePayload = OpportunityInvitationDeleteSuccess;
-
-export type OpportunityInvitationDeleteSuccess = {
-  __typename?: "OpportunityInvitationDeleteSuccess";
-  id: Scalars["ID"]["output"];
-};
-
-export type OpportunityInvitationDisableInput = {
-  communityId: Scalars["ID"]["input"];
 };
 
 export type OpportunityInvitationDisablePayload = OpportunityInvitationDisableSuccess;
@@ -874,20 +1021,8 @@ export type OpportunityInvitationHistory = {
   createdAt: Scalars["Datetime"]["output"];
   id: Scalars["ID"]["output"];
   invitation?: Maybe<OpportunityInvitation>;
-  invitedUser?: Maybe<User>;
+  participations?: Maybe<Array<Participation>>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-};
-
-export type OpportunityInvitationHistoryCreateInput = {
-  invitationId: Scalars["ID"]["input"];
-  invitedUserId: Scalars["ID"]["input"];
-};
-
-export type OpportunityInvitationHistoryCreatePayload = OpportunityInvitationHistoryCreateSuccess;
-
-export type OpportunityInvitationHistoryCreateSuccess = {
-  __typename?: "OpportunityInvitationHistoryCreateSuccess";
-  opportunityInvitationHistory?: Maybe<OpportunityInvitationHistory>;
 };
 
 export type OpportunityInvitationHistoryEdge = Edge & {
@@ -898,7 +1033,7 @@ export type OpportunityInvitationHistoryEdge = Edge & {
 
 export type OpportunityInvitationHistoryFilterInput = {
   invitationId?: InputMaybe<Scalars["ID"]["input"]>;
-  invitedUserId?: InputMaybe<Scalars["ID"]["input"]>;
+  userId?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
 export type OpportunityInvitationHistorySortInput = {
@@ -916,9 +1051,19 @@ export type OpportunityInvitationsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type OpportunitySetHostingStatusInput = {
+  hostingStatus: OpportunityHostingStatus;
+};
+
+export type OpportunitySetHostingStatusPayload = OpportunitySetHostingStatusSuccess;
+
+export type OpportunitySetHostingStatusSuccess = {
+  __typename?: "OpportunitySetHostingStatusSuccess";
+  opportunity: Opportunity;
+};
+
 export type OpportunitySetPublishStatusInput = {
-  communityId: Scalars["String"]["input"];
-  status: PublishStatus;
+  publishStatus: PublishStatus;
 };
 
 export type OpportunitySetPublishStatusPayload = OpportunitySetPublishStatusSuccess;
@@ -930,11 +1075,13 @@ export type OpportunitySetPublishStatusSuccess = {
 
 export type OpportunitySlot = {
   __typename?: "OpportunitySlot";
+  capacity?: Maybe<Scalars["Int"]["output"]>;
   createdAt: Scalars["Datetime"]["output"];
   endsAt: Scalars["Datetime"]["output"];
   id: Scalars["ID"]["output"];
   opportunity?: Maybe<Opportunity>;
   participations?: Maybe<ParticipationsConnection>;
+  reservations?: Maybe<ReservationsConnection>;
   startsAt: Scalars["Datetime"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
 };
@@ -944,6 +1091,13 @@ export type OpportunitySlotParticipationsArgs = {
   filter?: InputMaybe<ParticipationFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<ParticipationSortInput>;
+};
+
+export type OpportunitySlotReservationsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ReservationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ReservationSortInput>;
 };
 
 export type OpportunitySlotCreateInput = {
@@ -968,9 +1122,9 @@ export type OpportunitySlotSortInput = {
 };
 
 export type OpportunitySlotUpdateInput = {
-  endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  endsAt: Scalars["Datetime"]["input"];
   id: Scalars["ID"]["input"];
-  startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  startsAt: Scalars["Datetime"]["input"];
 };
 
 export type OpportunitySlotsBulkUpdateInput = {
@@ -996,25 +1150,22 @@ export type OpportunitySlotsConnection = {
 
 export type OpportunitySortInput = {
   createdAt?: InputMaybe<SortDirection>;
-  pointsRequired?: InputMaybe<SortDirection>;
-  startsAt?: InputMaybe<SortDirection>;
 };
 
 export type OpportunityUpdateContentInput = {
   body?: InputMaybe<Scalars["String"]["input"]>;
   capacity?: InputMaybe<Scalars["Int"]["input"]>;
   category: OpportunityCategory;
-  communityId: Scalars["String"]["input"];
   description: Scalars["String"]["input"];
   endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
   files?: InputMaybe<Scalars["JSON"]["input"]>;
-  image?: InputMaybe<Scalars["String"]["input"]>;
-  placeId?: InputMaybe<Scalars["String"]["input"]>;
-  pointsRequired?: InputMaybe<Scalars["Int"]["input"]>;
+  image?: InputMaybe<ImageInput>;
+  place?: InputMaybe<NestedPlaceConnectOrCreateInput>;
   pointsToEarn?: InputMaybe<Scalars["Int"]["input"]>;
   publishStatus: PublishStatus;
   requireApproval: Scalars["Boolean"]["input"];
+  requiredUtilityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   title: Scalars["String"]["input"];
 };
@@ -1044,10 +1195,15 @@ export type Participation = {
   __typename?: "Participation";
   community?: Maybe<Community>;
   createdAt: Scalars["Datetime"]["output"];
+  description?: Maybe<Scalars["String"]["output"]>;
+  evaluation?: Maybe<Evaluation>;
   id: Scalars["ID"]["output"];
   images?: Maybe<Scalars["JSON"]["output"]>;
-  opportunity?: Maybe<Opportunity>;
+  opportunityInvitationHistory?: Maybe<OpportunityInvitationHistory>;
   opportunitySlot?: Maybe<OpportunitySlot>;
+  reason: ParticipationStatusReason;
+  reservation?: Maybe<Reservation>;
+  source: Source;
   status: ParticipationStatus;
   statusHistories?: Maybe<ParticipationStatusHistoriesConnection>;
   transactions?: Maybe<TransactionsConnection>;
@@ -1069,15 +1225,23 @@ export type ParticipationTransactionsArgs = {
   sort?: InputMaybe<TransactionSortInput>;
 };
 
-export type ParticipationApplyInput = {
-  opportunityId: Scalars["String"]["input"];
+export type ParticipationCreatePersonalRecordInput = {
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  images?: InputMaybe<Array<ImageInput>>;
 };
 
-export type ParticipationApplyPayload = ParticipationApplySuccess;
+export type ParticipationCreatePersonalRecordPayload = ParticipationCreatePersonalRecordSuccess;
 
-export type ParticipationApplySuccess = {
-  __typename?: "ParticipationApplySuccess";
+export type ParticipationCreatePersonalRecordSuccess = {
+  __typename?: "ParticipationCreatePersonalRecordSuccess";
   participation: Participation;
+};
+
+export type ParticipationDeletePayload = ParticipationDeleteSuccess;
+
+export type ParticipationDeleteSuccess = {
+  __typename?: "ParticipationDeleteSuccess";
+  participationId: Scalars["ID"]["output"];
 };
 
 export type ParticipationEdge = Edge & {
@@ -1087,50 +1251,75 @@ export type ParticipationEdge = Edge & {
 };
 
 export type ParticipationFilterInput = {
-  communityId?: InputMaybe<Scalars["String"]["input"]>;
-  opportunityId?: InputMaybe<Scalars["String"]["input"]>;
-  opportunitySlotId?: InputMaybe<Scalars["String"]["input"]>;
+  categories?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  cityCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  dateFrom?: InputMaybe<Scalars["Datetime"]["input"]>;
+  dateTo?: InputMaybe<Scalars["Datetime"]["input"]>;
+  opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
+  opportunityInvitationId?: InputMaybe<Scalars["ID"]["input"]>;
+  opportunitySlotId?: InputMaybe<Scalars["ID"]["input"]>;
+  reservationId?: InputMaybe<Scalars["ID"]["input"]>;
+  stateCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   status?: InputMaybe<ParticipationStatus>;
-  userId?: InputMaybe<Scalars["String"]["input"]>;
+  userIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
-export type ParticipationInviteInput = {
-  communityId: Scalars["String"]["input"];
-  invitedUserId: Scalars["String"]["input"];
-  opportunityId: Scalars["String"]["input"];
+export type ParticipationImage = {
+  __typename?: "ParticipationImage";
+  caption?: Maybe<Scalars["String"]["output"]>;
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  participation: Participation;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  url: Scalars["String"]["output"];
 };
 
-export type ParticipationInvitePayload = ParticipationInviteSuccess;
+export type ParticipationImageBulkUpdateInput = {
+  create?: InputMaybe<Array<ImageInput>>;
+  delete?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  participationId: Scalars["ID"]["input"];
+};
 
-export type ParticipationInviteSuccess = {
-  __typename?: "ParticipationInviteSuccess";
+export type ParticipationImageBulkUpdatePayload = ParticipationImageBulkUpdateSuccess;
+
+export type ParticipationImageBulkUpdateSuccess = {
+  __typename?: "ParticipationImageBulkUpdateSuccess";
   participation: Participation;
 };
 
-export type ParticipationSetStatusInput = {
-  communityId: Scalars["String"]["input"];
+export type ParticipationImageEdge = Edge & {
+  __typename?: "ParticipationImageEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<ParticipationImage>;
 };
 
-export type ParticipationSetStatusPayload = ParticipationSetStatusSuccess;
+export type ParticipationImageFilterInput = {
+  participationId?: InputMaybe<Scalars["ID"]["input"]>;
+};
 
-export type ParticipationSetStatusSuccess = {
-  __typename?: "ParticipationSetStatusSuccess";
-  participation: Participation;
+export type ParticipationImageSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export type ParticipationImagesConnection = {
+  __typename?: "ParticipationImagesConnection";
+  edges: Array<ParticipationImageEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type ParticipationSortInput = {
   createdAt?: InputMaybe<SortDirection>;
+  startsAt?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
 };
 
 export enum ParticipationStatus {
-  Applied = "APPLIED",
-  Approved = "APPROVED",
-  Canceled = "CANCELED",
-  Denied = "DENIED",
-  Invited = "INVITED",
   NotParticipating = "NOT_PARTICIPATING",
+  Participated = "PARTICIPATED",
   Participating = "PARTICIPATING",
+  Pending = "PENDING",
 }
 
 export type ParticipationStatusHistoriesConnection = {
@@ -1146,21 +1335,9 @@ export type ParticipationStatusHistory = {
   createdByUser?: Maybe<User>;
   id: Scalars["ID"]["output"];
   participation: Participation;
+  reason: ParticipationStatusReason;
   status: ParticipationStatus;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-};
-
-export type ParticipationStatusHistoryCreateInput = {
-  createdById: Scalars["String"]["input"];
-  participationId: Scalars["String"]["input"];
-  status: ParticipationStatus;
-};
-
-export type ParticipationStatusHistoryCreatePayload = ParticipationStatusHistoryCreateSuccess;
-
-export type ParticipationStatusHistoryCreateSuccess = {
-  __typename?: "ParticipationStatusHistoryCreateSuccess";
-  participationStatusHistory: ParticipationStatusHistory;
 };
 
 export type ParticipationStatusHistoryEdge = Edge & {
@@ -1170,14 +1347,24 @@ export type ParticipationStatusHistoryEdge = Edge & {
 };
 
 export type ParticipationStatusHistoryFilterInput = {
-  createdById?: InputMaybe<Scalars["String"]["input"]>;
-  participationId?: InputMaybe<Scalars["String"]["input"]>;
+  createdById?: InputMaybe<Scalars["ID"]["input"]>;
+  participationId?: InputMaybe<Scalars["ID"]["input"]>;
   status?: InputMaybe<ParticipationStatus>;
 };
 
 export type ParticipationStatusHistorySortInput = {
   createdAt?: InputMaybe<SortDirection>;
 };
+
+export enum ParticipationStatusReason {
+  OpportunityCanceled = "OPPORTUNITY_CANCELED",
+  PersonalRecord = "PERSONAL_RECORD",
+  ReservationAccepted = "RESERVATION_ACCEPTED",
+  ReservationApplied = "RESERVATION_APPLIED",
+  ReservationCanceled = "RESERVATION_CANCELED",
+  ReservationJoined = "RESERVATION_JOINED",
+  ReservationRejected = "RESERVATION_REJECTED",
+}
 
 export type ParticipationsConnection = {
   __typename?: "ParticipationsConnection";
@@ -1189,7 +1376,8 @@ export type ParticipationsConnection = {
 export type Place = {
   __typename?: "Place";
   address: Scalars["String"]["output"];
-  city?: Maybe<City>;
+  city: City;
+  community?: Maybe<Community>;
   createdAt: Scalars["Datetime"]["output"];
   googlePlaceId?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
@@ -1211,20 +1399,22 @@ export type PlaceOpportunitiesArgs = {
 
 export type PlaceCreateInput = {
   address: Scalars["String"]["input"];
-  cityCode: Scalars["String"]["input"];
+  cityCode: Scalars["ID"]["input"];
+  communityId: Scalars["ID"]["input"];
   googlePlaceId?: InputMaybe<Scalars["String"]["input"]>;
   isManual: Scalars["Boolean"]["input"];
   latitude: Scalars["Decimal"]["input"];
   longitude: Scalars["Decimal"]["input"];
   mapLocation?: InputMaybe<Scalars["JSON"]["input"]>;
   name: Scalars["String"]["input"];
+  opportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
 export type PlaceCreatePayload = PlaceCreateSuccess;
 
 export type PlaceCreateSuccess = {
   __typename?: "PlaceCreateSuccess";
-  place?: Maybe<Place>;
+  place: Place;
 };
 
 export type PlaceDeletePayload = PlaceDeleteSuccess;
@@ -1241,7 +1431,7 @@ export type PlaceEdge = Edge & {
 };
 
 export type PlaceFilterInput = {
-  cityCode?: InputMaybe<Scalars["String"]["input"]>;
+  cityCode?: InputMaybe<Scalars["ID"]["input"]>;
   keyword?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -1250,26 +1440,72 @@ export type PlaceSortInput = {
 };
 
 export type PlaceUpdateInput = {
-  address?: InputMaybe<Scalars["String"]["input"]>;
-  cityCode?: InputMaybe<Scalars["String"]["input"]>;
+  address: Scalars["String"]["input"];
+  cityCode: Scalars["ID"]["input"];
   googlePlaceId?: InputMaybe<Scalars["String"]["input"]>;
-  isManual?: InputMaybe<Scalars["Boolean"]["input"]>;
-  latitude?: InputMaybe<Scalars["Decimal"]["input"]>;
-  longitude?: InputMaybe<Scalars["Decimal"]["input"]>;
+  id: Scalars["ID"]["input"];
+  isManual: Scalars["Boolean"]["input"];
+  latitude: Scalars["Decimal"]["input"];
+  longitude: Scalars["Decimal"]["input"];
   mapLocation?: InputMaybe<Scalars["JSON"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  name: Scalars["String"]["input"];
+  opportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
 export type PlaceUpdatePayload = PlaceUpdateSuccess;
 
 export type PlaceUpdateSuccess = {
   __typename?: "PlaceUpdateSuccess";
-  place?: Maybe<Place>;
+  place: Place;
 };
 
 export type PlacesConnection = {
   __typename?: "PlacesConnection";
   edges?: Maybe<Array<Maybe<PlaceEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type Portfolio = {
+  __typename?: "Portfolio";
+  category: Scalars["String"]["output"];
+  date: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  participants: Array<User>;
+  place?: Maybe<Place>;
+  source: PortfolioSource;
+  thumbnailUrl?: Maybe<Scalars["String"]["output"]>;
+  title: Scalars["String"]["output"];
+};
+
+export type PortfolioEdge = Edge & {
+  __typename?: "PortfolioEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Portfolio>;
+};
+
+export type PortfolioFilterInput = {
+  categories?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  cityCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  dateFrom?: InputMaybe<Scalars["Datetime"]["input"]>;
+  dateTo?: InputMaybe<Scalars["Datetime"]["input"]>;
+  source?: InputMaybe<PortfolioSource>;
+  stateCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  userIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+};
+
+export type PortfolioSortInput = {
+  date?: InputMaybe<SortDirection>;
+};
+
+export enum PortfolioSource {
+  Article = "ARTICLE",
+  Opportunity = "OPPORTUNITY",
+}
+
+export type PortfoliosConnection = {
+  __typename?: "PortfoliosConnection";
+  edges?: Maybe<Array<Maybe<PortfolioEdge>>>;
   pageInfo: PageInfo;
   totalCount: Scalars["Int"]["output"];
 };
@@ -1289,7 +1525,13 @@ export type Query = {
   community?: Maybe<Community>;
   currentUser?: Maybe<CurrentUserPayload>;
   echo: Scalars["String"]["output"];
+  evaluation?: Maybe<Evaluation>;
+  evaluationHistories: EvaluationHistoriesConnection;
+  evaluationHistory?: Maybe<EvaluationHistory>;
+  evaluations: EvaluationsConnection;
   membership?: Maybe<Membership>;
+  membershipHistories: MembershipHistoriesConnection;
+  membershipHistory?: Maybe<MembershipHistory>;
   memberships: MembershipsConnection;
   opportunities: OpportunitiesConnection;
   opportunity?: Maybe<Opportunity>;
@@ -1300,26 +1542,36 @@ export type Query = {
   opportunitySlot?: Maybe<OpportunitySlot>;
   opportunitySlots: OpportunitySlotsConnection;
   participation?: Maybe<Participation>;
+  participationImage?: Maybe<ParticipationImage>;
+  participationImages: ParticipationImagesConnection;
   participationStatusHistories: ParticipationStatusHistoriesConnection;
   participationStatusHistory?: Maybe<ParticipationStatusHistory>;
   participations: ParticipationsConnection;
   place?: Maybe<Place>;
   places: PlacesConnection;
+  portfolios: PortfoliosConnection;
+  reservation?: Maybe<Reservation>;
+  reservationHistories: ReservationHistoriesConnection;
+  reservationHistory?: Maybe<ReservationHistory>;
+  reservations: ReservationsConnection;
   states: Array<State>;
+  ticket?: Maybe<Ticket>;
+  ticketStatusHistories: TicketStatusHistoriesConnection;
+  ticketStatusHistory?: Maybe<TicketStatusHistory>;
+  tickets: TicketsConnection;
   transaction?: Maybe<Transaction>;
   transactions: TransactionsConnection;
   user?: Maybe<User>;
   users: UsersConnection;
   utilities: UtilitiesConnection;
   utility?: Maybe<Utility>;
-  utilityHistories: UtilityHistoriesConnection;
-  utilityHistory?: Maybe<UtilityHistory>;
   wallet?: Maybe<Wallet>;
   wallets: WalletsConnection;
 };
 
 export type QueryArticleArgs = {
   id: Scalars["ID"]["input"];
+  permission: CheckCommunityPermissionInput;
 };
 
 export type QueryArticlesArgs = {
@@ -1344,9 +1596,42 @@ export type QueryCommunityArgs = {
   id: Scalars["ID"]["input"];
 };
 
+export type QueryEvaluationArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryEvaluationHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<EvaluationHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<EvaluationHistorySortInput>;
+};
+
+export type QueryEvaluationHistoryArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryEvaluationsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<EvaluationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<EvaluationSortInput>;
+};
+
 export type QueryMembershipArgs = {
   communityId: Scalars["ID"]["input"];
   userId: Scalars["ID"]["input"];
+};
+
+export type QueryMembershipHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<MembershipHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<MembershipHistorySortInput>;
+};
+
+export type QueryMembershipHistoryArgs = {
+  id: Scalars["ID"]["input"];
 };
 
 export type QueryMembershipsArgs = {
@@ -1365,6 +1650,7 @@ export type QueryOpportunitiesArgs = {
 
 export type QueryOpportunityArgs = {
   id: Scalars["ID"]["input"];
+  permission: CheckCommunityPermissionInput;
 };
 
 export type QueryOpportunityInvitationArgs = {
@@ -1404,6 +1690,17 @@ export type QueryParticipationArgs = {
   id: Scalars["ID"]["input"];
 };
 
+export type QueryParticipationImageArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryParticipationImagesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ParticipationImageFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ParticipationImageSortInput>;
+};
+
 export type QueryParticipationStatusHistoriesArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   filter?: InputMaybe<ParticipationStatusHistoryFilterInput>;
@@ -1433,8 +1730,59 @@ export type QueryPlacesArgs = {
   sort?: InputMaybe<PlaceSortInput>;
 };
 
+export type QueryPortfoliosArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<PortfolioFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<PortfolioSortInput>;
+};
+
+export type QueryReservationArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryReservationHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ReservationHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ReservationHistorySortInput>;
+};
+
+export type QueryReservationHistoryArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryReservationsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ReservationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ReservationSortInput>;
+};
+
 export type QueryStatesArgs = {
   name?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type QueryTicketArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryTicketStatusHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<TicketStatusHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<TicketStatusHistorySortInput>;
+};
+
+export type QueryTicketStatusHistoryArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryTicketsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<TicketFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<TicketSortInput>;
 };
 
 export type QueryTransactionArgs = {
@@ -1468,17 +1816,7 @@ export type QueryUtilitiesArgs = {
 
 export type QueryUtilityArgs = {
   id: Scalars["ID"]["input"];
-};
-
-export type QueryUtilityHistoriesArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<UtilityHistoryFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<UtilityHistorySortInput>;
-};
-
-export type QueryUtilityHistoryArgs = {
-  id: Scalars["ID"]["input"];
+  permission: CheckCommunityPermissionInput;
 };
 
 export type QueryWalletArgs = {
@@ -1492,6 +1830,113 @@ export type QueryWalletsArgs = {
   sort?: InputMaybe<WalletSortInput>;
 };
 
+export type Reservation = {
+  __typename?: "Reservation";
+  createdAt: Scalars["Datetime"]["output"];
+  createdByUser?: Maybe<User>;
+  histories?: Maybe<Array<ReservationHistory>>;
+  id: Scalars["ID"]["output"];
+  opportunitySlot: OpportunitySlot;
+  participations?: Maybe<Array<Participation>>;
+  status: ReservationStatus;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type ReservationCancelInput = {
+  paymentMethod: ReservationPaymentMethod;
+  ticketIdsIfExists?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+};
+
+export type ReservationCreateInput = {
+  opportunitySlotId: Scalars["ID"]["input"];
+  participantCount: Scalars["Int"]["input"];
+  paymentMethod: ReservationPaymentMethod;
+  userIdsIfExists?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+};
+
+export type ReservationCreatePayload = ReservationCreateSuccess;
+
+export type ReservationCreateSuccess = {
+  __typename?: "ReservationCreateSuccess";
+  reservation: Reservation;
+};
+
+export type ReservationEdge = Edge & {
+  __typename?: "ReservationEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Reservation>;
+};
+
+export type ReservationFilterInput = {
+  createdByUserId?: InputMaybe<Scalars["ID"]["input"]>;
+  opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
+  opportunitySlotId?: InputMaybe<Scalars["ID"]["input"]>;
+  status?: InputMaybe<ReservationStatus>;
+};
+
+export type ReservationHistoriesConnection = {
+  __typename?: "ReservationHistoriesConnection";
+  edges: Array<ReservationHistoryEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type ReservationHistory = {
+  __typename?: "ReservationHistory";
+  createdAt: Scalars["Datetime"]["output"];
+  createdByUser?: Maybe<User>;
+  id: Scalars["ID"]["output"];
+  reservation: Reservation;
+  status: ReservationStatus;
+};
+
+export type ReservationHistoryEdge = Edge & {
+  __typename?: "ReservationHistoryEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<ReservationHistory>;
+};
+
+export type ReservationHistoryFilterInput = {
+  createdByUserId?: InputMaybe<Scalars["ID"]["input"]>;
+  reservationId?: InputMaybe<Scalars["ID"]["input"]>;
+  status?: InputMaybe<ReservationStatus>;
+};
+
+export type ReservationHistorySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export enum ReservationPaymentMethod {
+  Fee = "FEE",
+  Point = "POINT",
+}
+
+export type ReservationSetStatusPayload = ReservationSetStatusSuccess;
+
+export type ReservationSetStatusSuccess = {
+  __typename?: "ReservationSetStatusSuccess";
+  reservation: Reservation;
+};
+
+export type ReservationSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+};
+
+export enum ReservationStatus {
+  Accepted = "ACCEPTED",
+  Applied = "APPLIED",
+  Canceled = "CANCELED",
+  Rejected = "REJECTED",
+}
+
+export type ReservationsConnection = {
+  __typename?: "ReservationsConnection";
+  edges: Array<ReservationEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
 export enum Role {
   Manager = "MANAGER",
   Member = "MEMBER",
@@ -1501,6 +1946,11 @@ export enum Role {
 export enum SortDirection {
   Asc = "asc",
   Desc = "desc",
+}
+
+export enum Source {
+  External = "EXTERNAL",
+  Internal = "INTERNAL",
 }
 
 export type State = {
@@ -1515,6 +1965,140 @@ export enum SysRole {
   User = "USER",
 }
 
+export type Ticket = {
+  __typename?: "Ticket";
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  reason: TicketStatusReason;
+  status: TicketStatus;
+  ticketStatusHistories?: Maybe<TicketStatusHistoriesConnection>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  utility: Utility;
+  wallet: Wallet;
+};
+
+export type TicketTicketStatusHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<TicketStatusHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<TicketStatusHistorySortInput>;
+};
+
+export type TicketEdge = Edge & {
+  __typename?: "TicketEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<Ticket>;
+};
+
+export type TicketFilterInput = {
+  status?: InputMaybe<TicketStatus>;
+  utilityId?: InputMaybe<Scalars["ID"]["input"]>;
+  walletId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type TicketPurchaseInput = {
+  communityId: Scalars["ID"]["input"];
+  pointsRequired: Scalars["Int"]["input"];
+  utilityId: Scalars["ID"]["input"];
+  walletId: Scalars["ID"]["input"];
+};
+
+export type TicketPurchasePayload = TicketPurchaseSuccess;
+
+export type TicketPurchaseSuccess = {
+  __typename?: "TicketPurchaseSuccess";
+  ticket: Ticket;
+};
+
+export type TicketRefundInput = {
+  communityId: Scalars["ID"]["input"];
+  pointsRequired: Scalars["Int"]["input"];
+  walletId: Scalars["ID"]["input"];
+};
+
+export type TicketRefundPayload = TicketRefundSuccess;
+
+export type TicketRefundSuccess = {
+  __typename?: "TicketRefundSuccess";
+  ticket: Ticket;
+};
+
+export type TicketSortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+  status?: InputMaybe<SortDirection>;
+};
+
+export enum TicketStatus {
+  Available = "AVAILABLE",
+  Disabled = "DISABLED",
+}
+
+export type TicketStatusHistoriesConnection = {
+  __typename?: "TicketStatusHistoriesConnection";
+  edges?: Maybe<Array<Maybe<TicketStatusHistoryEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type TicketStatusHistory = {
+  __typename?: "TicketStatusHistory";
+  createdAt: Scalars["Datetime"]["output"];
+  createdByUser?: Maybe<User>;
+  id: Scalars["ID"]["output"];
+  reason: TicketStatusReason;
+  status: TicketStatus;
+  ticket: Ticket;
+  transaction?: Maybe<Transaction>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type TicketStatusHistoryEdge = Edge & {
+  __typename?: "TicketStatusHistoryEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<TicketStatusHistory>;
+};
+
+export type TicketStatusHistoryFilterInput = {
+  createdById?: InputMaybe<Scalars["ID"]["input"]>;
+  reason?: InputMaybe<TicketStatusReason>;
+  status?: InputMaybe<TicketStatus>;
+  ticketId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type TicketStatusHistorySortInput = {
+  createdAt?: InputMaybe<SortDirection>;
+};
+
+export enum TicketStatusReason {
+  Canceled = "CANCELED",
+  Expired = "EXPIRED",
+  Purchased = "PURCHASED",
+  Refunded = "REFUNDED",
+  Reserved = "RESERVED",
+  Used = "USED",
+}
+
+export type TicketUsePayload = TicketUseSuccess;
+
+export type TicketUseSuccess = {
+  __typename?: "TicketUseSuccess";
+  ticket: Ticket;
+};
+
+export type TicketsConnection = {
+  __typename?: "TicketsConnection";
+  edges?: Maybe<Array<Maybe<TicketEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export enum Todo {
+  FirstActivity = "FIRST_ACTIVITY",
+  FirstQuest = "FIRST_QUEST",
+  PersonalRecord = "PERSONAL_RECORD",
+  Profile = "PROFILE",
+}
+
 export type Transaction = {
   __typename?: "Transaction";
   createdAt: Scalars["Datetime"]["output"];
@@ -1523,25 +2107,25 @@ export type Transaction = {
   id: Scalars["ID"]["output"];
   participation?: Maybe<Participation>;
   reason: TransactionReason;
+  ticketStatusHistories?: Maybe<TicketStatusHistoriesConnection>;
   toPointChange?: Maybe<Scalars["Int"]["output"]>;
   toWallet?: Maybe<Wallet>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  utilityHistories?: Maybe<UtilityHistoriesConnection>;
 };
 
-export type TransactionUtilityHistoriesArgs = {
+export type TransactionTicketStatusHistoriesArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<UtilityHistoryFilterInput>;
+  filter?: InputMaybe<TicketStatusHistoryFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<UtilityHistorySortInput>;
+  sort?: InputMaybe<TicketStatusHistorySortInput>;
 };
 
 export type TransactionDonateSelfPointInput = {
-  communityId: Scalars["String"]["input"];
+  communityId: Scalars["ID"]["input"];
   fromPointChange: Scalars["Int"]["input"];
-  fromWalletId: Scalars["String"]["input"];
+  fromWalletId: Scalars["ID"]["input"];
   toPointChange: Scalars["Int"]["input"];
-  toUserId: Scalars["String"]["input"];
+  toUserId: Scalars["ID"]["input"];
 };
 
 export type TransactionDonateSelfPointPayload = TransactionDonateSelfPointSuccess;
@@ -1558,34 +2142,17 @@ export type TransactionEdge = Edge & {
 };
 
 export type TransactionFilterInput = {
-  fromWalletId?: InputMaybe<Scalars["String"]["input"]>;
-  id?: InputMaybe<Scalars["String"]["input"]>;
-  participationId?: InputMaybe<Scalars["String"]["input"]>;
+  fromWalletId?: InputMaybe<Scalars["ID"]["input"]>;
   reason?: InputMaybe<TransactionReason>;
-  toWalletId?: InputMaybe<Scalars["String"]["input"]>;
-};
-
-export type TransactionGiveRewardPointInput = {
-  fromPointChange: Scalars["Int"]["input"];
-  fromWalletId: Scalars["String"]["input"];
-  participationId: Scalars["String"]["input"];
-  toPointChange: Scalars["Int"]["input"];
-  toWalletId: Scalars["String"]["input"];
-};
-
-export type TransactionGiveRewardPointPayload = TransactionGiveRewardPointSuccess;
-
-export type TransactionGiveRewardPointSuccess = {
-  __typename?: "TransactionGiveRewardPointSuccess";
-  transaction: Transaction;
+  toWalletId?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
 export type TransactionGrantCommunityPointInput = {
-  communityId: Scalars["String"]["input"];
+  communityId: Scalars["ID"]["input"];
   fromPointChange: Scalars["Int"]["input"];
-  fromWalletId: Scalars["String"]["input"];
+  fromWalletId: Scalars["ID"]["input"];
   toPointChange: Scalars["Int"]["input"];
-  toUserId: Scalars["String"]["input"];
+  toUserId: Scalars["ID"]["input"];
 };
 
 export type TransactionGrantCommunityPointPayload = TransactionGrantCommunityPointSuccess;
@@ -1597,7 +2164,7 @@ export type TransactionGrantCommunityPointSuccess = {
 
 export type TransactionIssueCommunityPointInput = {
   toPointChange: Scalars["Int"]["input"];
-  toWalletId: Scalars["String"]["input"];
+  toWalletId: Scalars["ID"]["input"];
 };
 
 export type TransactionIssueCommunityPointPayload = TransactionIssueCommunityPointSuccess;
@@ -1610,24 +2177,12 @@ export type TransactionIssueCommunityPointSuccess = {
 export enum TransactionReason {
   Donation = "DONATION",
   Grant = "GRANT",
-  MembershipDeleted = "MEMBERSHIP_DELETED",
+  Onboarding = "ONBOARDING",
   PointIssued = "POINT_ISSUED",
   PointReward = "POINT_REWARD",
-  UtilityRedeemed = "UTILITY_REDEEMED",
+  TicketPurchased = "TICKET_PURCHASED",
+  TicketRefunded = "TICKET_REFUNDED",
 }
-
-export type TransactionRedeemUtilityInput = {
-  fromWalletId: Scalars["String"]["input"];
-  toWalletId: Scalars["String"]["input"];
-  transferPoints: Scalars["Int"]["input"];
-};
-
-export type TransactionRedeemUtilityPayload = TransactionRedeemUtilitySuccess;
-
-export type TransactionRedeemUtilitySuccess = {
-  __typename?: "TransactionRedeemUtilitySuccess";
-  transaction: Transaction;
-};
 
 export type TransactionSortInput = {
   createdAt?: InputMaybe<SortDirection>;
@@ -1646,17 +2201,26 @@ export type User = {
   articlesWrittenByMe?: Maybe<ArticlesConnection>;
   bio?: Maybe<Scalars["String"]["output"]>;
   createdAt: Scalars["Datetime"]["output"];
+  currentPrefecture?: Maybe<CurrentPrefecture>;
+  evaluationCreatedByMe?: Maybe<EvaluationHistoriesConnection>;
+  evaluations?: Maybe<EvaluationsConnection>;
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
-  invitationHistories?: Maybe<OpportunityInvitationHistoriesConnection>;
-  invitations?: Maybe<OpportunityInvitationsConnection>;
+  membershipChangedByMe?: Maybe<MembershipHistoriesConnection>;
   memberships?: Maybe<MembershipsConnection>;
   name: Scalars["String"]["output"];
+  onboardings?: Maybe<Array<Onboarding>>;
   opportunitiesCreatedByMe?: Maybe<OpportunitiesConnection>;
+  opportunityInvitationHistories?: Maybe<OpportunityInvitationHistoriesConnection>;
+  opportunityInvitations?: Maybe<OpportunityInvitationsConnection>;
   participationStatusChangedByMe?: Maybe<ParticipationStatusHistoriesConnection>;
   participations?: Maybe<ParticipationsConnection>;
+  portfolios?: Maybe<PortfoliosConnection>;
+  reservationStatusChangedByMe?: Maybe<ReservationHistoriesConnection>;
+  reservations?: Maybe<ReservationsConnection>;
   slug: Scalars["String"]["output"];
   sysRole: SysRole;
+  ticketStatusChangedByMe?: Maybe<TicketStatusHistoriesConnection>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
   urlFacebook?: Maybe<Scalars["String"]["output"]>;
   urlInstagram?: Maybe<Scalars["String"]["output"]>;
@@ -1681,18 +2245,25 @@ export type UserArticlesWrittenByMeArgs = {
   sort?: InputMaybe<ArticleSortInput>;
 };
 
-export type UserInvitationHistoriesArgs = {
+export type UserEvaluationCreatedByMeArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<OpportunityInvitationHistoryFilterInput>;
+  filter?: InputMaybe<EvaluationHistoryFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<OpportunityInvitationHistorySortInput>;
+  sort?: InputMaybe<EvaluationHistorySortInput>;
 };
 
-export type UserInvitationsArgs = {
+export type UserEvaluationsArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<OpportunityInvitationFilterInput>;
+  filter?: InputMaybe<EvaluationFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<OpportunityInvitationSortInput>;
+  sort?: InputMaybe<EvaluationSortInput>;
+};
+
+export type UserMembershipChangedByMeArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<MembershipHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<MembershipHistorySortInput>;
 };
 
 export type UserMembershipsArgs = {
@@ -1709,6 +2280,20 @@ export type UserOpportunitiesCreatedByMeArgs = {
   sort?: InputMaybe<OpportunitySortInput>;
 };
 
+export type UserOpportunityInvitationHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunityInvitationHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunityInvitationHistorySortInput>;
+};
+
+export type UserOpportunityInvitationsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<OpportunityInvitationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<OpportunityInvitationSortInput>;
+};
+
 export type UserParticipationStatusChangedByMeArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   filter?: InputMaybe<ParticipationStatusHistoryFilterInput>;
@@ -1723,6 +2308,34 @@ export type UserParticipationsArgs = {
   sort?: InputMaybe<ParticipationSortInput>;
 };
 
+export type UserPortfoliosArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<PortfolioFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<PortfolioSortInput>;
+};
+
+export type UserReservationStatusChangedByMeArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ReservationHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ReservationHistorySortInput>;
+};
+
+export type UserReservationsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ReservationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<ReservationSortInput>;
+};
+
+export type UserTicketStatusChangedByMeArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<TicketStatusHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<TicketStatusHistorySortInput>;
+};
+
 export type UserWalletsArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   filter?: InputMaybe<WalletFilterInput>;
@@ -1731,12 +2344,13 @@ export type UserWalletsArgs = {
 };
 
 export type UserDeleteInput = {
-  userId: Scalars["String"]["input"];
+  /** Used for permission checking. */
+  userId: Scalars["ID"]["input"];
 };
 
 export type UserDeletePayload = {
   __typename?: "UserDeletePayload";
-  userId: Scalars["String"]["output"];
+  userId: Scalars["ID"]["output"];
 };
 
 export type UserEdge = Edge & {
@@ -1746,13 +2360,12 @@ export type UserEdge = Edge & {
 };
 
 export type UserFilterInput = {
-  articleAuthorId?: InputMaybe<Scalars["ID"]["input"]>;
-  articleWriterId?: InputMaybe<Scalars["ID"]["input"]>;
   keyword?: InputMaybe<Scalars["String"]["input"]>;
   sysRole?: InputMaybe<SysRole>;
 };
 
 export type UserSignUpInput = {
+  currentPrefecture?: InputMaybe<CurrentPrefecture>;
   image?: InputMaybe<ImageInput>;
   name: Scalars["String"]["input"];
   slug?: InputMaybe<Scalars["String"]["input"]>;
@@ -1764,7 +2377,7 @@ export type UserSortInput = {
 
 export type UserUpdateProfileInput = {
   bio?: InputMaybe<Scalars["String"]["input"]>;
-  id: Scalars["String"]["input"];
+  currentPrefecture?: InputMaybe<CurrentPrefecture>;
   image?: InputMaybe<ImageInput>;
   name: Scalars["String"]["input"];
   slug: Scalars["String"]["input"];
@@ -1799,26 +2412,35 @@ export type UtilitiesConnection = {
 
 export type Utility = {
   __typename?: "Utility";
-  community?: Maybe<Community>;
+  community: Community;
   createdAt: Scalars["Datetime"]["output"];
   description?: Maybe<Scalars["String"]["output"]>;
-  histories?: Maybe<UtilityHistoriesConnection>;
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
   name: Scalars["String"]["output"];
   pointsRequired: Scalars["Int"]["output"];
+  publishStatus: PublishStatus;
+  requiredForOpportunities?: Maybe<OpportunitiesConnection>;
+  tickets?: Maybe<TicketsConnection>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
 };
 
-export type UtilityHistoriesArgs = {
+export type UtilityRequiredForOpportunitiesArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<UtilityHistoryFilterInput>;
+  filter?: InputMaybe<OpportunityFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<UtilityHistorySortInput>;
+  sort?: InputMaybe<OpportunitySortInput>;
+};
+
+export type UtilityTicketsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<TicketFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<TicketSortInput>;
 };
 
 export type UtilityCreateInput = {
-  communityId: Scalars["String"]["input"];
+  communityId: Scalars["ID"]["input"];
   description?: InputMaybe<Scalars["String"]["input"]>;
   image?: InputMaybe<ImageInput>;
   name: Scalars["String"]["input"];
@@ -1846,68 +2468,22 @@ export type UtilityEdge = Edge & {
 };
 
 export type UtilityFilterInput = {
-  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  and?: InputMaybe<Array<UtilityFilterInput>>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  not?: InputMaybe<UtilityFilterInput>;
+  or?: InputMaybe<Array<UtilityFilterInput>>;
+  publishStatus?: InputMaybe<Array<PublishStatus>>;
 };
 
-export type UtilityHistoriesConnection = {
-  __typename?: "UtilityHistoriesConnection";
-  edges: Array<UtilityHistoryEdge>;
-  pageInfo: PageInfo;
+export type UtilitySetPublishStatusInput = {
+  publishStatus: PublishStatus;
 };
 
-export type UtilityHistory = {
-  __typename?: "UtilityHistory";
-  createdAt: Scalars["Datetime"]["output"];
-  id: Scalars["ID"]["output"];
-  transaction: Transaction;
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  usedAt?: Maybe<Scalars["Datetime"]["output"]>;
+export type UtilitySetPublishStatusPayload = UtilitySetPublishStatusSuccess;
+
+export type UtilitySetPublishStatusSuccess = {
+  __typename?: "UtilitySetPublishStatusSuccess";
   utility: Utility;
-  wallet: Wallet;
-};
-
-export type UtilityHistoryCreateInput = {
-  transactionId: Scalars["String"]["input"];
-  usedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
-  utilityId: Scalars["String"]["input"];
-  walletId: Scalars["String"]["input"];
-};
-
-export type UtilityHistoryCreatePayload = UtilityHistoryCreateSuccess;
-
-export type UtilityHistoryCreateSuccess = {
-  __typename?: "UtilityHistoryCreateSuccess";
-  utilityHistory: UtilityHistory;
-};
-
-export type UtilityHistoryEdge = {
-  __typename?: "UtilityHistoryEdge";
-  cursor: Scalars["String"]["output"];
-  node: UtilityHistory;
-};
-
-export type UtilityHistoryFilterInput = {
-  transactionId?: InputMaybe<Scalars["ID"]["input"]>;
-  usedAtExists?: InputMaybe<Scalars["Boolean"]["input"]>;
-  utilityId?: InputMaybe<Scalars["ID"]["input"]>;
-  walletId?: InputMaybe<Scalars["ID"]["input"]>;
-};
-
-export type UtilityHistorySortInput = {
-  createdAt: SortDirection;
-  usedAt: SortDirection;
-};
-
-export type UtilityRedeemInput = {
-  communityId: Scalars["String"]["input"];
-  userWalletId: Scalars["String"]["input"];
-};
-
-export type UtilityRedeemPayload = UtilityRedeemSuccess;
-
-export type UtilityRedeemSuccess = {
-  __typename?: "UtilityRedeemSuccess";
-  transaction: Transaction;
 };
 
 export type UtilitySortInput = {
@@ -1916,7 +2492,6 @@ export type UtilitySortInput = {
 };
 
 export type UtilityUpdateInfoInput = {
-  communityId: Scalars["String"]["input"];
   description?: InputMaybe<Scalars["String"]["input"]>;
   image?: InputMaybe<ImageInput>;
   name: Scalars["String"]["input"];
@@ -1928,18 +2503,6 @@ export type UtilityUpdateInfoPayload = UtilityUpdateInfoSuccess;
 export type UtilityUpdateInfoSuccess = {
   __typename?: "UtilityUpdateInfoSuccess";
   utility: Utility;
-};
-
-export type UtilityUseInput = {
-  communityId: Scalars["String"]["input"];
-  utilityHistoryId: Scalars["String"]["input"];
-};
-
-export type UtilityUsePayload = UtilityUseSuccess;
-
-export type UtilityUseSuccess = {
-  __typename?: "UtilityUseSuccess";
-  utilityHistory: UtilityHistory;
 };
 
 export enum ValueType {
@@ -1954,11 +2517,18 @@ export type Wallet = {
   createdAt: Scalars["Datetime"]["output"];
   currentPointView?: Maybe<CurrentPointView>;
   id: Scalars["ID"]["output"];
+  tickets?: Maybe<TicketsConnection>;
   transactions?: Maybe<TransactionsConnection>;
   type: WalletType;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
   user?: Maybe<User>;
-  utilityHistories?: Maybe<UtilityHistoriesConnection>;
+};
+
+export type WalletTicketsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<TicketFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<TicketSortInput>;
 };
 
 export type WalletTransactionsArgs = {
@@ -1968,36 +2538,6 @@ export type WalletTransactionsArgs = {
   sort?: InputMaybe<TransactionSortInput>;
 };
 
-export type WalletUtilityHistoriesArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<UtilityHistoryFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<UtilityHistorySortInput>;
-};
-
-export type WalletCreatePayload = WalletCreateSuccess;
-
-export type WalletCreateSuccess = {
-  __typename?: "WalletCreateSuccess";
-  wallet: Wallet;
-};
-
-export type WalletCreateToCommunityInput = {
-  communityId: Scalars["String"]["input"];
-};
-
-export type WalletCreateToMemberInput = {
-  communityId: Scalars["String"]["input"];
-  userId: Scalars["String"]["input"];
-};
-
-export type WalletDeletePayload = WalletDeleteSuccess;
-
-export type WalletDeleteSuccess = {
-  __typename?: "WalletDeleteSuccess";
-  walletId: Scalars["String"]["output"];
-};
-
 export type WalletEdge = Edge & {
   __typename?: "WalletEdge";
   cursor: Scalars["String"]["output"];
@@ -2005,9 +2545,9 @@ export type WalletEdge = Edge & {
 };
 
 export type WalletFilterInput = {
-  communityId?: InputMaybe<Scalars["String"]["input"]>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
   type?: InputMaybe<WalletType>;
-  userId?: InputMaybe<Scalars["String"]["input"]>;
+  userId?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
 export type WalletSortInput = {
@@ -2049,6 +2589,7 @@ export type GetUserWithDetailsQuery = {
     image?: string | null;
     bio?: string | null;
     sysRole: SysRole;
+    currentPrefecture?: CurrentPrefecture | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlWebsite?: string | null;
@@ -2057,32 +2598,42 @@ export type GetUserWithDetailsQuery = {
   } | null;
 };
 
-export type GetUserActivitiesQueryVariables = Exact<{
+export type GetUserPortfoliosQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
-  articlesFirst?: InputMaybe<Scalars["Int"]["input"]>;
-  articlesCursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<PortfolioFilterInput>;
+  sort?: InputMaybe<PortfolioSortInput>;
 }>;
 
-export type GetUserActivitiesQuery = {
+export type GetUserPortfoliosQuery = {
   __typename?: "Query";
   user?: {
     __typename?: "User";
     id: string;
-    articlesAboutMe?: {
-      __typename?: "ArticlesConnection";
+    portfolios?: {
+      __typename?: "PortfoliosConnection";
       edges?: Array<{
-        __typename?: "ArticleEdge";
+        __typename?: "PortfolioEdge";
         cursor: string;
-        node?: { __typename?: "Article"; id: string } | null;
+        node?: {
+          __typename?: "Portfolio";
+          id: string;
+          title: string;
+          category: string;
+          date: Date;
+          thumbnailUrl?: string | null;
+          source: PortfolioSource;
+          place?: { __typename?: "Place"; id: string; name: string } | null;
+          participants: Array<{
+            __typename?: "User";
+            id: string;
+            name: string;
+            image?: string | null;
+          }>;
+        } | null;
       } | null> | null;
-    } | null;
-    articlesWrittenByMe?: {
-      __typename?: "ArticlesConnection";
-      edges?: Array<{
-        __typename?: "ArticleEdge";
-        cursor: string;
-        node?: { __typename?: "Article"; id: string } | null;
-      } | null> | null;
+      pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
     } | null;
   } | null;
 };
@@ -2160,6 +2711,7 @@ export const GetUserWithDetailsDocument = {
                 { kind: "Field", name: { kind: "Name", value: "image" } },
                 { kind: "Field", name: { kind: "Name", value: "bio" } },
                 { kind: "Field", name: { kind: "Name", value: "sysRole" } },
+                { kind: "Field", name: { kind: "Name", value: "currentPrefecture" } },
                 { kind: "Field", name: { kind: "Name", value: "urlFacebook" } },
                 { kind: "Field", name: { kind: "Name", value: "urlInstagram" } },
                 { kind: "Field", name: { kind: "Name", value: "urlWebsite" } },
@@ -2173,13 +2725,13 @@ export const GetUserWithDetailsDocument = {
     },
   ],
 } as unknown as DocumentNode<GetUserWithDetailsQuery, GetUserWithDetailsQueryVariables>;
-export const GetUserActivitiesDocument = {
+export const GetUserPortfoliosDocument = {
   kind: "Document",
   definitions: [
     {
       kind: "OperationDefinition",
       operation: "query",
-      name: { kind: "Name", value: "GetUserActivities" },
+      name: { kind: "Name", value: "GetUserPortfolios" },
       variableDefinitions: [
         {
           kind: "VariableDefinition",
@@ -2191,13 +2743,23 @@ export const GetUserActivitiesDocument = {
         },
         {
           kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "articlesFirst" } },
+          variable: { kind: "Variable", name: { kind: "Name", value: "first" } },
           type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
         },
         {
           kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "articlesCursor" } },
+          variable: { kind: "Variable", name: { kind: "Name", value: "after" } },
           type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "PortfolioFilterInput" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "sort" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "PortfolioSortInput" } },
         },
       ],
       selectionSet: {
@@ -2219,17 +2781,27 @@ export const GetUserActivitiesDocument = {
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 {
                   kind: "Field",
-                  name: { kind: "Name", value: "articlesAboutMe" },
+                  name: { kind: "Name", value: "portfolios" },
                   arguments: [
                     {
                       kind: "Argument",
                       name: { kind: "Name", value: "first" },
-                      value: { kind: "Variable", name: { kind: "Name", value: "articlesFirst" } },
+                      value: { kind: "Variable", name: { kind: "Name", value: "first" } },
                     },
                     {
                       kind: "Argument",
                       name: { kind: "Name", value: "cursor" },
-                      value: { kind: "Variable", name: { kind: "Name", value: "articlesCursor" } },
+                      value: { kind: "Variable", name: { kind: "Name", value: "after" } },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "filter" },
+                      value: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "sort" },
+                      value: { kind: "Variable", name: { kind: "Name", value: "sort" } },
                     },
                   ],
                   selectionSet: {
@@ -2248,6 +2820,34 @@ export const GetUserActivitiesDocument = {
                                 kind: "SelectionSet",
                                 selections: [
                                   { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "title" } },
+                                  { kind: "Field", name: { kind: "Name", value: "category" } },
+                                  { kind: "Field", name: { kind: "Name", value: "date" } },
+                                  { kind: "Field", name: { kind: "Name", value: "thumbnailUrl" } },
+                                  { kind: "Field", name: { kind: "Name", value: "source" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "place" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                      ],
+                                    },
+                                  },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "participants" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                        { kind: "Field", name: { kind: "Name", value: "image" } },
+                                      ],
+                                    },
+                                  },
                                 ],
                               },
                             },
@@ -2255,44 +2855,14 @@ export const GetUserActivitiesDocument = {
                           ],
                         },
                       },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "articlesWrittenByMe" },
-                  arguments: [
-                    {
-                      kind: "Argument",
-                      name: { kind: "Name", value: "first" },
-                      value: { kind: "Variable", name: { kind: "Name", value: "articlesFirst" } },
-                    },
-                    {
-                      kind: "Argument",
-                      name: { kind: "Name", value: "cursor" },
-                      value: { kind: "Variable", name: { kind: "Name", value: "articlesCursor" } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
                       {
                         kind: "Field",
-                        name: { kind: "Name", value: "edges" },
+                        name: { kind: "Name", value: "pageInfo" },
                         selectionSet: {
                           kind: "SelectionSet",
                           selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "node" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  { kind: "Field", name: { kind: "Name", value: "id" } },
-                                ],
-                              },
-                            },
-                            { kind: "Field", name: { kind: "Name", value: "cursor" } },
+                            { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                            { kind: "Field", name: { kind: "Name", value: "endCursor" } },
                           ],
                         },
                       },
@@ -2306,4 +2876,4 @@ export const GetUserActivitiesDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<GetUserActivitiesQuery, GetUserActivitiesQueryVariables>;
+} as unknown as DocumentNode<GetUserPortfoliosQuery, GetUserPortfoliosQueryVariables>;

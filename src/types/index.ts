@@ -26,3 +26,23 @@ export type SocialLink = {
   type: SocialLinkType;
   url: string;
 };
+
+export type PortfolioType = 'opportunity' | 'activity_report' | 'quest';
+
+export type PortfolioParticipant = {
+  id: string;
+  name: string;
+  image: string | null;
+};
+
+export type Portfolio = {
+  id: string;
+  type: PortfolioType;
+  title: string;
+  date: string;
+  location: string | null;
+  category: string;
+  participants: PortfolioParticipant[];
+  image: string | null;
+  source: string | null;
+};

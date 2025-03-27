@@ -1,73 +1,222 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserSocialLinks } from "@/components/features/user/UserSocialLinks";
-import { UserActivityList } from "@/components/features/user/UserActivityList";
-import { GET_USER_WITH_DETAILS } from "@/graphql/queries/user";
+import { UserPortfolioList } from "@/app/components/features/user/UserPortfolioList";
+import { GET_USER_PORTFOLIOS, GET_USER_WITH_DETAILS } from "@/graphql/queries/user";
 import MapPinIcon from "@/../public/icons/map-pin.svg";
 import TicketIcon from "@/../public/icons/ticket.svg";
 import StarIcon from "@/../public/icons/star.svg";
+import { format } from "date-fns";
+import type { GetUserPortfoliosQuery, Portfolio as GqlPortfolio } from "@/gql/graphql";
+import type { Portfolio, PortfolioType } from "@/types";
 
-// 活動データの型定義
-type Participation = {
-  id: string;
-  type: 'participation';
-  title: string;
-  date: string;
-  location: string;
-  category: '体験' | 'クエスト' | 'イベント';
-  participants: { id: string; image: string }[];
-  image: string;
-};
+const ITEMS_PER_PAGE = 5;
 
-type Article = {
-  id: string;
-  type: 'article';
-  title: string;
-  date: string;
-  location: string;
-  category: '記事';
-  author: { id: string; image: string };
-  image: string;
-};
-
-type ActivityItem = Participation | Article;
-
-// モックデータ
-const MOCK_USER_DATA = {
-  location: "香川",
-  socialLinks: [
-    { type: "twitter", url: "https://twitter.com/yamada" },
-    { type: "github", url: "https://github.com/yamada" }
-  ],
-  tickets: 2,
-  currentPoint: 500
+const isValidPortfolioType = (category: string): category is PortfolioType => {
+  return ['opportunity', 'activity_report', 'quest'].includes(category.toLowerCase());
 };
 
 export default function UserPage({ params }: { params: { id: string } }) {
   const { user: currentUser } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastPortfolioRef = useRef<HTMLDivElement>(null);
   
   const { data, loading, error } = useQuery(GET_USER_WITH_DETAILS, {
     variables: { id: params.id },
+    fetchPolicy: "network-only",
   });
 
-  console.log('UserData', data);
+  const { data: portfolioData, loading: portfolioLoading, error: portfolioError, fetchMore } = useQuery(GET_USER_PORTFOLIOS, {
+    variables: { 
+      id: params.id,
+      first: ITEMS_PER_PAGE,
+      after: null
+    },
+    fetchPolicy: "network-only",
+  });
 
-  // ローディング中の表示
-  if (loading) {
+  console.log('PortfolioData', portfolioData);
+
+  useEffect(() => {
+    if (portfolioData?.user?.portfolios?.edges) {
+      console.log('初期データを設定します:', {
+        edgesCount: portfolioData.user.portfolios.edges.length,
+        hasNextPage: portfolioData.user.portfolios.pageInfo.hasNextPage,
+        pageInfo: portfolioData.user.portfolios.pageInfo
+      });
+
+      const initialPortfolios = portfolioData.user.portfolios.edges
+        .map(edge => edge?.node)
+        .filter((node): node is GqlPortfolio => node != null)
+        .map(portfolio => {
+          const category = portfolio.category.toLowerCase();
+          if (!isValidPortfolioType(category)) {
+            console.warn(`Invalid portfolio category: ${portfolio.category}`);
+          }
+          
+          return {
+            id: portfolio.id,
+            type: category as PortfolioType,
+            title: portfolio.title,
+            date: format(new Date(portfolio.date), 'yyyy/MM/dd'),
+            location: portfolio.place?.name ?? null,
+            category: portfolio.category,
+            participants: portfolio.participants.map(p => ({
+              id: p.id,
+              name: p.name,
+              image: p.image ?? null
+            })),
+            image: portfolio.thumbnailUrl ?? null,
+            source: portfolio.source
+          } satisfies Portfolio;
+        });
+      
+      setPortfolios(initialPortfolios);
+      setHasMore(portfolioData.user.portfolios.pageInfo.hasNextPage);
+      console.log('初期データの設定が完了しました:', {
+        portfoliosCount: initialPortfolios.length,
+        hasMore: portfolioData.user.portfolios.pageInfo.hasNextPage
+      });
+    }
+  }, [portfolioData]);
+
+  // 無限スクロール用のIntersectionObserver設定
+  useEffect(() => {
+    console.log('IntersectionObserverを設定します...', {
+      hasMore,
+      isLoadingMore,
+      portfoliosCount: portfolios.length
+    });
+    observer.current = new IntersectionObserver(
+      (entries) => {
+        console.log('IntersectionObserverが発火しました:', {
+          isIntersecting: entries[0].isIntersecting,
+          hasMore,
+          isLoadingMore,
+          portfoliosCount: portfolios.length
+        });
+        
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (lastPortfolioRef.current) {
+      observer.current.observe(lastPortfolioRef.current);
+      console.log('lastPortfolioRefを監視開始');
+    } else {
+      console.log('lastPortfolioRefが未設定です');
+    }
+
+    return () => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+    };
+  }, [hasMore, isLoadingMore, portfolios.length]);
+
+  const loadMore = useCallback(async () => {
+    console.log('loadMore called', {
+      hasMore,
+      isLoadingMore,
+      portfoliosCount: portfolios.length
+    });
+
+    if (!hasMore || isLoadingMore) {
+      console.log('loadMore skipped:', {
+        hasMore,
+        isLoadingMore
+      });
+      return;
+    }
+
+    console.log('追加データの読み込みを開始します...', {
+      currentPortfoliosCount: portfolios.length,
+      lastPortfolioId: portfolios[portfolios.length - 1]?.id
+    });
+
+    setIsLoadingMore(true);
+    const lastPortfolio = portfolios[portfolios.length - 1];
+    const lastCursor = portfolioData?.user?.portfolios?.edges?.find(
+      edge => edge?.node?.id === lastPortfolio.id
+    )?.cursor;
+
+    console.log('カーソル情報:', {
+      lastPortfolioId: lastPortfolio.id,
+      lastCursor
+    });
+
+    try {
+      const { data: moreData } = await fetchMore({
+        variables: {
+          id: params.id,
+          first: ITEMS_PER_PAGE,
+          after: lastCursor
+        }
+      });
+
+      if (moreData?.user?.portfolios?.edges) {
+        const newPortfolios = moreData.user.portfolios.edges
+          .map(edge => edge?.node)
+          .filter((node): node is GqlPortfolio => node != null)
+          .map(portfolio => {
+            const category = portfolio.category.toLowerCase();
+            if (!isValidPortfolioType(category)) {
+              console.warn(`Invalid portfolio category: ${portfolio.category}`);
+            }
+            
+            return {
+              id: portfolio.id,
+              type: category as PortfolioType,
+              title: portfolio.title,
+              date: format(new Date(portfolio.date), 'yyyy/MM/dd'),
+              location: portfolio.place?.name ?? null,
+              category: portfolio.category,
+              participants: portfolio.participants.map(p => ({
+                id: p.id,
+                name: p.name,
+                image: p.image ?? null
+              })),
+              image: portfolio.thumbnailUrl ?? null,
+              source: portfolio.source
+            } satisfies Portfolio;
+          });
+
+        console.log('新しいデータを取得しました:', {
+          newPortfoliosCount: newPortfolios.length,
+          hasMore: moreData.user.portfolios.pageInfo.hasNextPage,
+          pageInfo: moreData.user.portfolios.pageInfo
+        });
+
+        setPortfolios(prev => [...prev, ...newPortfolios]);
+        setHasMore(moreData.user.portfolios.pageInfo.hasNextPage);
+      }
+    } catch (error) {
+      console.error('追加データの読み込み中にエラーが発生しました:', error);
+    } finally {
+      setIsLoadingMore(false);
+      console.log('追加データの読み込みが完了しました');
+    }
+  }, [fetchMore, hasMore, isLoadingMore, params.id, portfolios, portfolioData]);
+
+  if (loading || portfolioLoading) {
     return <div className="container mx-auto px-4 py-6">Loading...</div>;
   }
 
-  // エラー時の表示
-  if (error) {
-    return <div className="container mx-auto px-4 py-6">Error: {error.message}</div>;
+  if (error || portfolioError) {
+    return <div className="container mx-auto px-4 py-6">Error: {error?.message || portfolioError?.message}</div>;
   }
 
-  // データが取得できない場合
   if (!data?.user) {
     return <div className="container mx-auto px-4 py-6">User not found</div>;
   }
@@ -80,7 +229,6 @@ export default function UserPage({ params }: { params: { id: string } }) {
     console.log("Update social links:", socialLinks);
   };
 
-  // bioの表示制御
   const truncateBio = (bio: string | null | undefined) => {
     if (!bio) return "";
     return isExpanded ? bio : bio.slice(0, 100);
@@ -123,7 +271,6 @@ export default function UserPage({ params }: { params: { id: string } }) {
           />
         </div>
 
-        {/* Bio */}
         <div className="text-gray-600 text-base leading-relaxed">
           <p className="whitespace-pre-wrap">
             {truncateBio(userData.bio)}
@@ -157,7 +304,14 @@ export default function UserPage({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      <UserActivityList userId={params.id} isOwner={isOwner} />
+      <UserPortfolioList 
+        userId={params.id} 
+        isOwner={isOwner} 
+        portfolios={portfolios}
+        isLoadingMore={isLoadingMore}
+        hasMore={hasMore}
+        lastPortfolioRef={lastPortfolioRef}
+      />
     </div>
   );
 } 
