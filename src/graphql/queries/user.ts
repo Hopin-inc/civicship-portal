@@ -1,7 +1,14 @@
 import { graphql } from "@/gql";
 
-export const GET_USER_WITH_DETAILS = graphql(`
-  query GetUserWithDetails($id: ID!) {
+
+export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = graphql(`
+  query GetUserWithDetailsAndPortfolios(
+    $id: ID!,
+    $first: Int,
+    $after: String,
+    $filter: PortfolioFilterInput,
+    $sort: PortfolioSortInput
+  ) {
     user(id: $id) {
       id
       name
@@ -14,20 +21,6 @@ export const GET_USER_WITH_DETAILS = graphql(`
       urlWebsite
       urlX
       urlYoutube
-    }
-  }
-`);
-
-export const GET_USER_PORTFOLIOS = graphql(`
-  query GetUserPortfolios(
-    $id: ID!,
-    $first: Int,
-    $after: String,
-    $filter: PortfolioFilterInput,
-    $sort: PortfolioSortInput
-  ) {
-    user(id: $id) {
-      id
       portfolios(
         first: $first,
         cursor: $after,

@@ -6,18 +6,23 @@ import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserSocialLinks } from "@/components/features/user/UserSocialLinks";
 import { UserPortfolioList } from "@/app/components/features/user/UserPortfolioList";
-import { GET_USER_PORTFOLIOS, GET_USER_WITH_DETAILS } from "@/graphql/queries/user";
+import { GET_USER_WITH_DETAILS_AND_PORTFOLIOS } from "@/graphql/queries/user";
 import MapPinIcon from "@/../public/icons/map-pin.svg";
 import TicketIcon from "@/../public/icons/ticket.svg";
 import StarIcon from "@/../public/icons/star.svg";
 import { format } from "date-fns";
-import type { GetUserPortfoliosQuery, Portfolio as GqlPortfolio } from "@/gql/graphql";
-import type { Portfolio, PortfolioType } from "@/types";
+import type { GetUserWithDetailsAndPortfoliosQuery, Portfolio as GqlPortfolio } from "@/gql/graphql";
+import type { Portfolio, PortfolioType, PortfolioCategory } from "@/types";
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 30;
+const BIO_TRUNCATE_LENGTH = 100;
 
 const isValidPortfolioType = (category: string): category is PortfolioType => {
   return ['opportunity', 'activity_report', 'quest'].includes(category.toLowerCase());
+};
+
+const isValidPortfolioCategory = (category: string): category is PortfolioCategory => {
+  return ['QUEST', 'ACTIVITY_REPORT', 'INTERVIEW', 'OPPORTUNITY'].includes(category.toUpperCase());
 };
 
 export default function UserPage({ params }: { params: { id: string } }) {
@@ -29,12 +34,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
   const observer = useRef<IntersectionObserver | null>(null);
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
   
-  const { data, loading, error } = useQuery(GET_USER_WITH_DETAILS, {
-    variables: { id: params.id },
-    fetchPolicy: "network-only",
-  });
-
-  const { data: portfolioData, loading: portfolioLoading, error: portfolioError, fetchMore } = useQuery(GET_USER_PORTFOLIOS, {
+  const { data, loading, error, fetchMore } = useQuery(GET_USER_WITH_DETAILS_AND_PORTFOLIOS, {
     variables: { 
       id: params.id,
       first: ITEMS_PER_PAGE,
@@ -43,22 +43,19 @@ export default function UserPage({ params }: { params: { id: string } }) {
     fetchPolicy: "network-only",
   });
 
-  console.log('PortfolioData', portfolioData);
-
   useEffect(() => {
-    if (portfolioData?.user?.portfolios?.edges) {
-      console.log('初期データを設定します:', {
-        edgesCount: portfolioData.user.portfolios.edges.length,
-        hasNextPage: portfolioData.user.portfolios.pageInfo.hasNextPage,
-        pageInfo: portfolioData.user.portfolios.pageInfo
-      });
-
-      const initialPortfolios = portfolioData.user.portfolios.edges
+    if (data?.user?.portfolios?.edges) {
+      const initialPortfolios = data.user.portfolios.edges
         .map(edge => edge?.node)
         .filter((node): node is GqlPortfolio => node != null)
         .map(portfolio => {
           const category = portfolio.category.toLowerCase();
           if (!isValidPortfolioType(category)) {
+            console.warn(`Invalid portfolio category: ${portfolio.category}`);
+          }
+
+          const portfolioCategory = portfolio.category.toUpperCase();
+          if (!isValidPortfolioCategory(portfolioCategory)) {
             console.warn(`Invalid portfolio category: ${portfolio.category}`);
           }
           
@@ -68,7 +65,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
             title: portfolio.title,
             date: format(new Date(portfolio.date), 'yyyy/MM/dd'),
             location: portfolio.place?.name ?? null,
-            category: portfolio.category,
+            category: portfolioCategory as PortfolioCategory,
             participants: portfolio.participants.map(p => ({
               id: p.id,
               name: p.name,
@@ -80,21 +77,11 @@ export default function UserPage({ params }: { params: { id: string } }) {
         });
       
       setPortfolios(initialPortfolios);
-      setHasMore(portfolioData.user.portfolios.pageInfo.hasNextPage);
-      console.log('初期データの設定が完了しました:', {
-        portfoliosCount: initialPortfolios.length,
-        hasMore: portfolioData.user.portfolios.pageInfo.hasNextPage
-      });
+      setHasMore(data.user.portfolios.pageInfo.hasNextPage);
     }
-  }, [portfolioData]);
+  }, [data]);
 
-  // 無限スクロール用のIntersectionObserver設定
   useEffect(() => {
-    console.log('IntersectionObserverを設定します...', {
-      hasMore,
-      isLoadingMore,
-      portfoliosCount: portfolios.length
-    });
     observer.current = new IntersectionObserver(
       (entries) => {
         console.log('IntersectionObserverが発火しました:', {
@@ -113,7 +100,6 @@ export default function UserPage({ params }: { params: { id: string } }) {
 
     if (lastPortfolioRef.current) {
       observer.current.observe(lastPortfolioRef.current);
-      console.log('lastPortfolioRefを監視開始');
     } else {
       console.log('lastPortfolioRefが未設定です');
     }
@@ -140,21 +126,11 @@ export default function UserPage({ params }: { params: { id: string } }) {
       return;
     }
 
-    console.log('追加データの読み込みを開始します...', {
-      currentPortfoliosCount: portfolios.length,
-      lastPortfolioId: portfolios[portfolios.length - 1]?.id
-    });
-
     setIsLoadingMore(true);
     const lastPortfolio = portfolios[portfolios.length - 1];
-    const lastCursor = portfolioData?.user?.portfolios?.edges?.find(
+    const lastCursor = data?.user?.portfolios?.edges?.find(
       edge => edge?.node?.id === lastPortfolio.id
     )?.cursor;
-
-    console.log('カーソル情報:', {
-      lastPortfolioId: lastPortfolio.id,
-      lastCursor
-    });
 
     try {
       const { data: moreData } = await fetchMore({
@@ -174,6 +150,11 @@ export default function UserPage({ params }: { params: { id: string } }) {
             if (!isValidPortfolioType(category)) {
               console.warn(`Invalid portfolio category: ${portfolio.category}`);
             }
+
+            const portfolioCategory = portfolio.category.toUpperCase();
+            if (!isValidPortfolioCategory(portfolioCategory)) {
+              console.warn(`Invalid portfolio category: ${portfolio.category}`);
+            }
             
             return {
               id: portfolio.id,
@@ -181,7 +162,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
               title: portfolio.title,
               date: format(new Date(portfolio.date), 'yyyy/MM/dd'),
               location: portfolio.place?.name ?? null,
-              category: portfolio.category,
+              category: portfolioCategory as PortfolioCategory,
               participants: portfolio.participants.map(p => ({
                 id: p.id,
                 name: p.name,
@@ -192,14 +173,10 @@ export default function UserPage({ params }: { params: { id: string } }) {
             } satisfies Portfolio;
           });
 
-        console.log('新しいデータを取得しました:', {
-          newPortfoliosCount: newPortfolios.length,
-          hasMore: moreData.user.portfolios.pageInfo.hasNextPage,
-          pageInfo: moreData.user.portfolios.pageInfo
-        });
-
         setPortfolios(prev => [...prev, ...newPortfolios]);
-        setHasMore(moreData.user.portfolios.pageInfo.hasNextPage);
+        
+        const newHasMore = moreData.user.portfolios.pageInfo.hasNextPage;
+        setHasMore(newHasMore);
       }
     } catch (error) {
       console.error('追加データの読み込み中にエラーが発生しました:', error);
@@ -207,14 +184,14 @@ export default function UserPage({ params }: { params: { id: string } }) {
       setIsLoadingMore(false);
       console.log('追加データの読み込みが完了しました');
     }
-  }, [fetchMore, hasMore, isLoadingMore, params.id, portfolios, portfolioData]);
+  }, [fetchMore, hasMore, isLoadingMore, params.id, portfolios, data]);
 
-  if (loading || portfolioLoading) {
+  if (loading) {
     return <div className="container mx-auto px-4 py-6">Loading...</div>;
   }
 
-  if (error || portfolioError) {
-    return <div className="container mx-auto px-4 py-6">Error: {error?.message || portfolioError?.message}</div>;
+  if (error) {
+    return <div className="container mx-auto px-4 py-6">Error: {error?.message}</div>;
   }
 
   if (!data?.user) {
@@ -231,11 +208,11 @@ export default function UserPage({ params }: { params: { id: string } }) {
 
   const truncateBio = (bio: string | null | undefined) => {
     if (!bio) return "";
-    return isExpanded ? bio : bio.slice(0, 100);
+    return isExpanded ? bio : bio.slice(0, BIO_TRUNCATE_LENGTH);
   };
 
   const shouldShowMore = (bio: string | null | undefined) => {
-    return bio ? bio.length > 100 : false;
+    return bio ? bio.length > BIO_TRUNCATE_LENGTH : false;
   };
 
   return (

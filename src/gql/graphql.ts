@@ -2576,11 +2576,15 @@ export type CurrentUserQuery = {
   } | null;
 };
 
-export type GetUserWithDetailsQueryVariables = Exact<{
+export type GetUserWithDetailsAndPortfoliosQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<PortfolioFilterInput>;
+  sort?: InputMaybe<PortfolioSortInput>;
 }>;
 
-export type GetUserWithDetailsQuery = {
+export type GetUserWithDetailsAndPortfoliosQuery = {
   __typename?: "Query";
   user?: {
     __typename?: "User";
@@ -2595,22 +2599,6 @@ export type GetUserWithDetailsQuery = {
     urlWebsite?: string | null;
     urlX?: string | null;
     urlYoutube?: string | null;
-  } | null;
-};
-
-export type GetUserPortfoliosQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  after?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<PortfolioFilterInput>;
-  sort?: InputMaybe<PortfolioSortInput>;
-}>;
-
-export type GetUserPortfoliosQuery = {
-  __typename?: "Query";
-  user?: {
-    __typename?: "User";
-    id: string;
     portfolios?: {
       __typename?: "PortfoliosConnection";
       edges?: Array<{
@@ -2673,65 +2661,13 @@ export const CurrentUserDocument = {
     },
   ],
 } as unknown as DocumentNode<CurrentUserQuery, CurrentUserQueryVariables>;
-export const GetUserWithDetailsDocument = {
+export const GetUserWithDetailsAndPortfoliosDocument = {
   kind: "Document",
   definitions: [
     {
       kind: "OperationDefinition",
       operation: "query",
-      name: { kind: "Name", value: "GetUserWithDetails" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "user" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "name" } },
-                { kind: "Field", name: { kind: "Name", value: "image" } },
-                { kind: "Field", name: { kind: "Name", value: "bio" } },
-                { kind: "Field", name: { kind: "Name", value: "sysRole" } },
-                { kind: "Field", name: { kind: "Name", value: "currentPrefecture" } },
-                { kind: "Field", name: { kind: "Name", value: "urlFacebook" } },
-                { kind: "Field", name: { kind: "Name", value: "urlInstagram" } },
-                { kind: "Field", name: { kind: "Name", value: "urlWebsite" } },
-                { kind: "Field", name: { kind: "Name", value: "urlX" } },
-                { kind: "Field", name: { kind: "Name", value: "urlYoutube" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetUserWithDetailsQuery, GetUserWithDetailsQueryVariables>;
-export const GetUserPortfoliosDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "GetUserPortfolios" },
+      name: { kind: "Name", value: "GetUserWithDetailsAndPortfolios" },
       variableDefinitions: [
         {
           kind: "VariableDefinition",
@@ -2779,6 +2715,16 @@ export const GetUserPortfoliosDocument = {
               kind: "SelectionSet",
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "image" } },
+                { kind: "Field", name: { kind: "Name", value: "bio" } },
+                { kind: "Field", name: { kind: "Name", value: "sysRole" } },
+                { kind: "Field", name: { kind: "Name", value: "currentPrefecture" } },
+                { kind: "Field", name: { kind: "Name", value: "urlFacebook" } },
+                { kind: "Field", name: { kind: "Name", value: "urlInstagram" } },
+                { kind: "Field", name: { kind: "Name", value: "urlWebsite" } },
+                { kind: "Field", name: { kind: "Name", value: "urlX" } },
+                { kind: "Field", name: { kind: "Name", value: "urlYoutube" } },
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "portfolios" },
@@ -2876,4 +2822,7 @@ export const GetUserPortfoliosDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<GetUserPortfoliosQuery, GetUserPortfoliosQueryVariables>;
+} as unknown as DocumentNode<
+  GetUserWithDetailsAndPortfoliosQuery,
+  GetUserWithDetailsAndPortfoliosQueryVariables
+>;

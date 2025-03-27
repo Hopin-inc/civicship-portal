@@ -2,9 +2,11 @@ import { History, Plus } from "lucide-react";
 import Image from "next/image";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { format } from "date-fns";
-import type { Portfolio as GqlPortfolio } from "@/gql/graphql";
-import type { Portfolio, PortfolioParticipant } from "@/types";
 import { RefObject } from "react";
+import type { Portfolio, PortfolioCategory, PortfolioStyle } from "@/types";
+import { PORTFOLIO_CATEGORY_STYLES } from "@/types";
+
+const MAX_DISPLAY_PARTICIPANTS = 3;
 
 type Props = {
   userId: string;
@@ -15,47 +17,18 @@ type Props = {
   lastPortfolioRef: RefObject<HTMLDivElement>;
 };
 
-const convertPortfolioToPortfolioItem = (portfolio: GqlPortfolio): Portfolio => {
-  return {
-    id: portfolio.id,
-    type: portfolio.category.toLowerCase() as Portfolio['type'],
-    title: portfolio.title,
-    date: format(new Date(portfolio.date), 'yyyy/MM/dd'),
-    location: portfolio.place?.name ?? null,
-    category: portfolio.category,
-    participants: portfolio.participants.map(p => ({
-      id: p.id,
-      name: p.name,
-      image: p.image ?? null
-    })),
-    image: portfolio.thumbnailUrl ?? null,
-    source: portfolio.source
-  };
-};
-
 const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }: { 
   portfolios: Portfolio[];
   isLoadingMore: boolean;
   hasMore: boolean;
   lastPortfolioRef: RefObject<HTMLDivElement>;
 }) => {
-  const getCategoryStyle = (category: string) => {
-    switch (category.toUpperCase()) {
-      case 'QUEST':
-        return { bg: '#FEF9C3', text: '#854D0E' };
-      case 'ACTIVITY_REPORT':
-        return { bg: '#DCE7DD', text: '#166534' };
-      case 'INTERVIEW':
-        return { bg: '#DCE7DD', text: '#166534' };
-      case 'OPPORTUNITY':
-        return { bg: '#DBEAFE', text: '#1E40AF' };
-      default:
-        return { bg: '#E5E7EB', text: '#374151' };
-    }
+  const getCategoryStyle = (category: PortfolioCategory): PortfolioStyle => {
+    return PORTFOLIO_CATEGORY_STYLES[category];
   };
 
-  const getCategoryLabel = (category: string) => {
-    switch (category.toUpperCase()) {
+  const getCategoryLabel = (category: PortfolioCategory): string => {
+    switch (category) {
       case 'QUEST':
         return 'クエスト';
       case 'ACTIVITY_REPORT':
@@ -64,18 +37,15 @@ const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }:
         return '記事';
       case 'OPPORTUNITY':
         return 'オポテュニティ';
-      default:
-        return category;
     }
   };
 
   const renderParticipants = (participants: Portfolio['participants']) => {
-    const maxDisplay = 3;
     const uniqueParticipants = Array.from(
       new Map(participants.map(p => [p.id, p])).values()
     );
-    const remainingCount = uniqueParticipants.length - maxDisplay;
-    const displayParticipants = uniqueParticipants.slice(0, maxDisplay);
+    const remainingCount = uniqueParticipants.length - MAX_DISPLAY_PARTICIPANTS;
+    const displayParticipants = uniqueParticipants.slice(0, MAX_DISPLAY_PARTICIPANTS);
 
     return (
       <div className="flex items-center">
@@ -83,15 +53,15 @@ const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }:
           {displayParticipants.map((participant, index) => (
             <div 
               key={`${participant.id}-${index}`}
-              className={`w-6 h-6 sm:w-8 sm:h-8 relative ${index === maxDisplay - 1 && remainingCount > 0 ? 'relative' : ''}`}
+              className={`w-6 h-6 sm:w-8 sm:h-8 relative ${index === MAX_DISPLAY_PARTICIPANTS - 1 && remainingCount > 0 ? 'relative' : ''}`}
             >
               <Image
                 src={participant.image ?? '/placeholder-avatar.png'}
                 alt={participant.name}
                 fill
-                className={`rounded-full border-2 border-white ${index === maxDisplay - 1 && remainingCount > 0 ? 'brightness-50' : ''}`}
+                className={`rounded-full border-2 border-white ${index === MAX_DISPLAY_PARTICIPANTS - 1 && remainingCount > 0 ? 'brightness-50' : ''}`}
               />
-              {index === maxDisplay - 1 && remainingCount > 0 && (
+              {index === MAX_DISPLAY_PARTICIPANTS - 1 && remainingCount > 0 && (
                 <div className="absolute inset-0 flex items-center justify-center text-xs sm:text-sm font-medium text-white">
                   +{remainingCount}
                 </div>
@@ -103,16 +73,12 @@ const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }:
     );
   };
 
-  const uniquePortfolios = Array.from(
-    new Map(portfolios.map(p => [p.id, p])).values()
-  );
-
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4">
-      {uniquePortfolios.map((portfolio, index) => (
+      {portfolios.map((portfolio, index) => (
         <div 
           key={portfolio.id} 
-          ref={index === uniquePortfolios.length - 1 ? lastPortfolioRef : undefined}
+          ref={index === portfolios.length - 1 ? lastPortfolioRef : undefined}
           className="border rounded-lg overflow-hidden bg-card"
         >
           <div className="relative h-32 sm:h-48">
