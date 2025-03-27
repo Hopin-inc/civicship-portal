@@ -30,7 +30,7 @@ const RootLayout = ({
               <AuthProvider>
                 <LoadingProvider>
                   <Header />
-                  <main className="flex-grow pt-16">{children}</main>
+                  <main className="max-w-lg mx-auto pt-16">{children}</main>
                   <Toaster richColors className="mx-8" />
                 </LoadingProvider>
               </AuthProvider>
