@@ -30,7 +30,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Share2 } from "lucide-react";
+import { MoreVertical, Share2, X } from "lucide-react";
 import { OpportunityConfirmModal } from "@/components/features/opportunity/OpportunityConfirmModal";
 import { OpportunityCompletedModal } from "@/components/features/opportunity/OpportunityCompletedModal";
 
@@ -643,9 +643,7 @@ export default function MapView({
       if (sheetState === "full") {
         setSheetState("half");
       } else if (sheetState === "half") {
-        if (selectedContent) {
-          handleClose();
-        }
+        handleClose();
       }
     } else if (velocity < -500 || offset < -100) {
       // 上に強くドラッグまたは大きく移動した場合
@@ -688,8 +686,11 @@ export default function MapView({
   };
 
   const handleClose = () => {
+    console.log('handleClose')
     setSelectedContent(null);
-    setSheetState("half");
+    setSheetState("closed");
+    setReservationItem(null);
+    setReservationSheetOpen(false);
   };
 
   const handleOnlineItemClick = (item: Opportunity | Activity) => {
@@ -901,9 +902,7 @@ export default function MapView({
 
   return (
     <div className="relative w-full h-full">
-      <LoadScript
-        googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
-      >
+      <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}>
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={mapConfig.center}
@@ -912,8 +911,11 @@ export default function MapView({
             styles: mapStyles,
             disableDefaultUI: true,
             zoomControl: true,
-            clickableIcons: false,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
           }}
+          onDragEnd={handleDragEnd}
           onClick={handleMapClick}
         >
           {markers.map((marker) => (
@@ -928,7 +930,7 @@ export default function MapView({
       </LoadScript>
 
       <AnimatePresence>
-        {!selectedContent && (
+        {!selectedContent && sheetState !== "closed" && (
           <motion.div
             initial={{ y: "100%" }}
             animate={{ y: sheetState === "full" ? 0 : "35vh" }}
@@ -942,8 +944,18 @@ export default function MapView({
             onDragEnd={handleDragEnd}
           >
             {/* ドラッグハンドル */}
-            <div className="sticky top-0 w-full flex justify-center pt-2 pb-1 bg-background z-10">
-              <div className="w-12 h-1 rounded-full bg-muted-foreground/20" />
+            <div className="sticky top-0 w-full flex justify-between items-center pt-2 pb-1 bg-background z-10">
+              <div className="w-full flex justify-center">
+                <div className="w-12 h-1 rounded-full bg-muted-foreground/20" />
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-2"
+                onClick={handleClose}
+              >
+                <X className="h-5 w-5" />
+              </Button>
             </div>
             <div
               className="overflow-y-auto"
@@ -968,7 +980,7 @@ export default function MapView({
       </AnimatePresence>
 
       <AnimatePresence>
-        {selectedContent && (
+        {selectedContent && sheetState !== "closed" && (
           <motion.div
             initial={{ y: "100%" }}
             animate={{ y: sheetState === "full" ? 0 : "35vh" }}
@@ -982,8 +994,18 @@ export default function MapView({
             onDragEnd={handleDragEnd}
           >
             {/* ドラッグハンドル */}
-            <div className="sticky top-0 w-full flex justify-center pt-2 pb-1 bg-background z-10">
-              <div className="w-12 h-1 rounded-full bg-muted-foreground/20" />
+            <div className="sticky top-0 w-full flex justify-between items-center pt-2 pb-1 bg-background z-10">
+              <div className="w-full flex justify-center">
+                <div className="w-12 h-1 rounded-full bg-muted-foreground/20" />
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-2"
+                onClick={handleClose}
+              >
+                <X className="h-5 w-5" />
+              </Button>
             </div>
             <div
               className="overflow-y-auto"
