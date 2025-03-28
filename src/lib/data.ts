@@ -629,122 +629,6 @@ export const mockOpportunities: Opportunity[] = [
     },
   },
   {
-    id: "shodoshima-olive-quest-1",
-    title: "オリーブ収穫サポート",
-    description:
-      "小豆島のオリーブ農家さんと一緒に、オリーブの収穫作業を体験します。収穫したオリーブは実際に商品化されます。\n\n形式：実践型クエスト（3時間程度）",
-    type: "QUEST",
-    status: "open",
-    communityId: "shodoshima-olive",
-    hostId: "member1",
-    startsAt: "2025-04-15T09:00:00.000Z",
-    endsAt: "2025-04-15T12:00:00.000Z",
-    createdAt: new Date("2025-01-15T00:00:00.000Z"),
-    updatedAt: new Date("2025-01-15T00:00:00.000Z"),
-    host: {
-      name: "山田太郎",
-      title: "オリーブ農家",
-      bio: "3代目のオリーブ農家。伝統的な栽培方法と新しい技術を組み合わせた栽培に取り組んでいます。",
-      image: "/placeholder.svg",
-    },
-    location: {
-      name: "小豆島オリーブ公園",
-      address: "香川県小豆郡小豆島町",
-      isOnline: false,
-      lat: 34.4784,
-      lng: 134.2384,
-    },
-    capacity: 10,
-    pointsForComplete: 600,
-    participants: [],
-    image: ACTIVITY_IMAGES.OLIVE,
-    images: [
-      {
-        url: "/placeholder.svg",
-        caption: "オリーブの収穫作業の様子",
-      },
-      {
-        url: "/placeholder.svg",
-        caption: "収穫したオリーブの選別",
-      },
-      {
-        url: "/placeholder.svg",
-        caption: "オリーブオイルの搾油工程",
-      },
-      {
-        url: "/placeholder.svg",
-        caption: "完成したオリーブオイル",
-      },
-      {
-        url: "/placeholder.svg",
-        caption: "地域の方々との交流会",
-      },
-    ],
-    recommendedFor: [
-      "農業に興味がある方",
-      "オリーブの栽培を学びたい方",
-      "自然の中での作業が好きな方",
-    ],
-  },
-  {
-    id: "shodoshima-olive-quest-2",
-    title: "オリーブオイル搾油体験",
-    description:
-      "収穫したオリーブからオイルを搾る工程を体験します。搾油所での作業を通じて、オリーブオイルができるまでの過程を学びます。\n\n形式：実践型クエスト（2時間程度）",
-    type: "QUEST",
-    status: "open",
-    communityId: "shodoshima-olive",
-    hostId: "member1",
-    startsAt: "2025-04-20T13:00:00.000Z",
-    endsAt: "2025-04-20T15:00:00.000Z",
-    createdAt: new Date("2025-01-15T00:00:00.000Z"),
-    updatedAt: new Date("2025-01-15T00:00:00.000Z"),
-    host: {
-      name: "山田太郎",
-      title: "オリーブ農家",
-      bio: "3代目のオリーブ農家。伝統的な栽培方法と新しい技術を組み合わせた栽培に取り組んでいます。",
-      image: "/placeholder.svg",
-    },
-    location: {
-      name: "小豆島オリーブ研究所",
-      address: "香川県小豆郡小豆島町",
-      isOnline: false,
-      lat: 34.4784,
-      lng: 134.2384,
-    },
-    capacity: 5,
-    pointsForComplete: 500,
-    participants: [],
-    image: ACTIVITY_IMAGES.OLIVE,
-    images: [
-      {
-        url: "/placeholder.svg",
-        caption: "オリーブの収穫作業の様子",
-      },
-      {
-        url: "/placeholder.svg",
-        caption: "収穫したオリーブの選別",
-      },
-      {
-        url: "/placeholder.svg",
-        caption: "オリーブオイルの搾油工程",
-      },
-      {
-        url: "/placeholder.svg",
-        caption: "完成したオリーブオイル",
-      },
-      {
-        url: "/placeholder.svg",
-        caption: "地域の方々との交流会",
-      },
-    ],
-    recommendedFor: [
-      "食品加工に興味がある方",
-      "オリーブオイルについて詳しく知りたい方",
-      "ものづくりが好きな方",
-    ],
-  },
-  {
     id: "shikoku-food-event-1",
     title: "デジタルで守る：四国の食文化と技",
     description:
@@ -2150,90 +2034,6 @@ export const mockOpportunities: Opportunity[] = [
     image: ACTIVITY_IMAGES.OLIVE,
   },
   {
-    id: "uchiko-renovation-event-1",
-    title: "内子町古民家リノベーション見学会",
-    description:
-      "内子町で実際に行われた古民家リノベーションの事例を見学し、改修のポイントや活用方法について学びます。地域の建築家から直接説明を受けることができます。",
-    type: "EVENT",
-    status: "open",
-    communityId: "uchiko-renovation",
-    hostId: "host1",
-    pointsForComplete: 0,
-    createdAt: new Date("2025-01-20"),
-    updatedAt: new Date("2025-01-20"),
-    startsAt: "2025-02-08T01:00:00.000Z",
-    endsAt: "2025-02-08T04:00:00.000Z",
-    location: {
-      name: "内子町古民家再生プロジェクト拠点",
-      address: "愛媛県喜多郡内子町",
-      isOnline: false,
-      lat: 34.4784,
-      lng: 134.2384,
-    },
-    participants: [CURRENT_USER],
-    images: [
-      {
-        url: "/placeholder.svg",
-        caption: "リノベーション事例の様子",
-      },
-    ],
-    host: {
-      name: "高橋一郎",
-      image: "https://api.dicebear.com/7.x/personas/svg?seed=host5",
-      title: "建築家",
-      bio: "内子町を中心に古民家再生プロジェクトを手がけています。伝統工法と現代的なニーズの調和を大切にしています。",
-    },
-    capacity: 20,
-    recommendedFor: [
-      "建築・リノベーションに興味がある方",
-      "古民家活用を検討している方",
-      "地域の歴史的建造物に関心のある方",
-    ],
-    image: ACTIVITY_IMAGES.RENOVATION,
-  },
-  {
-    id: "tokushima-maze-event-1",
-    title: "徳島路地裏フォトウォーク",
-    description:
-      "徳島市の路地裏を巡りながら、写真撮影のコツを学ぶワークショップです。プロのカメラマンが同行し、街の隠れた魅力の切り取り方をレクチャーします。",
-    type: "EVENT",
-    status: "open",
-    communityId: "tokushima-maze",
-    hostId: "host1",
-    pointsForComplete: 0,
-    createdAt: new Date("2025-01-22"),
-    updatedAt: new Date("2025-01-22"),
-    startsAt: "2025-02-10T00:00:00.000Z",
-    endsAt: "2025-02-10T03:00:00.000Z",
-    location: {
-      name: "徳島市観光案内所前",
-      address: "徳島県徳島市",
-      isOnline: false,
-      lat: 34.4784,
-      lng: 134.2384,
-    },
-    participants: [CURRENT_USER],
-    images: [
-      {
-        url: "/placeholder.svg",
-        caption: "フォトウォークの様子",
-      },
-    ],
-    host: {
-      name: "中村写真師",
-      image: "https://api.dicebear.com/7.x/personas/svg?seed=host6",
-      title: "フォトグラファー",
-      bio: "徳島を中心に活動するフォトグラファー。路地裏の何気ない風景を美しく切り取ることを得意としています。",
-    },
-    capacity: 12,
-    recommendedFor: [
-      "写真撮影に興味がある方",
-      "徳島の街並みに関心のある方",
-      "SNSでの発信を考えている方",
-    ],
-    image: ACTIVITY_IMAGES.COMMUNITY,
-  },
-  {
     id: "yoshinogawa-lab-event-1",
     title: "プログラミングで地域の未来",
     description:
@@ -2495,49 +2295,7 @@ export const mockOpportunities: Opportunity[] = [
     image: ACTIVITY_IMAGES.RENOVATION,
   },
   {
-    id: "tokushima-maze-event-1",
-    title: "徳島路地裏フォトウォーク",
-    description:
-      "徳島市の路地裏を巡りながら、写真撮影のコツを学ぶワークショップです。プロのカメラマンが同行し、街の隠れた魅力の切り取り方をレクチャーします。",
-    type: "EVENT",
-    status: "open",
-    communityId: "tokushima-maze",
-    hostId: "host1",
-    pointsForComplete: 0,
-    createdAt: new Date("2025-01-22"),
-    updatedAt: new Date("2025-01-22"),
-    startsAt: "2025-02-10T00:00:00.000Z",
-    endsAt: "2025-02-10T03:00:00.000Z",
-    location: {
-      name: "徳島市観光案内所前",
-      address: "徳島県徳島市",
-      isOnline: false,
-      lat: 34.4784,
-      lng: 134.2384,
-    },
-    participants: [CURRENT_USER],
-    images: [
-      {
-        url: "/placeholder.svg",
-        caption: "フォトウォークの様子",
-      },
-    ],
-    host: {
-      name: "中村写真師",
-      image: "https://api.dicebear.com/7.x/personas/svg?seed=host6",
-      title: "フォトグラファー",
-      bio: "徳島を中心に活動するフォトグラファー。路地裏の何気ない風景を美しく切り取ることを得意としています。",
-    },
-    capacity: 12,
-    recommendedFor: [
-      "写真撮影に興味がある方",
-      "徳島の街並みに関心のある方",
-      "SNSでの発信を考えている方",
-    ],
-    image: ACTIVITY_IMAGES.COMMUNITY,
-  },
-  {
-    id: "yoshinogawa-lab-event-1",
+    id: "yoshinogawa-lab-event-12222",
     title: "プログラミングで地域の未来",
     description:
       "地域課題をテクノロジーで解決する可能性について、実際の事例を交えながら学ぶワークショップです。参加者同士でアイデアを出し合い、簡単なプロトタイプ作成も行います。",
@@ -2579,49 +2337,7 @@ export const mockOpportunities: Opportunity[] = [
     image: ACTIVITY_IMAGES.PROGRAMMING,
   },
   {
-    id: "yamakawa-station-quest-2",
-    title: "駅前花壇のデザインワークショップ",
-    description:
-      "山川町駅前の新しい花壇のデザインを考えるワークショップです。地域の方々と一緒に、四季を通じて楽しめる植栽計画を立てます。",
-    type: "QUEST",
-    status: "open",
-    communityId: "yamakawa-station",
-    hostId: "host1",
-    pointsForComplete: 400,
-    createdAt: new Date("2025-01-28"),
-    updatedAt: new Date("2025-01-28"),
-    startsAt: "2025-02-15T01:00:00.000Z",
-    endsAt: "2025-02-15T03:00:00.000Z",
-    location: {
-      name: "山川町駅前広場",
-      address: "徳島県吉野川市",
-      isOnline: false,
-      lat: 34.4784,
-      lng: 134.2384,
-    },
-    participants: [CURRENT_USER],
-    images: [
-      {
-        url: "/placeholder.svg",
-        caption: "ワークショップの様子",
-      },
-    ],
-    host: {
-      name: "田中園芸家",
-      image: "https://api.dicebear.com/7.x/personas/svg?seed=host8",
-      title: "ガーデンデザイナー",
-      bio: "地域の気候や風土に合わせた持続可能な庭づくりを提案しています。",
-    },
-    capacity: 15,
-    recommendedFor: [
-      "ガーデニングに興味がある方",
-      "まちづくりに関心のある方",
-      "デザインが好きな方",
-    ],
-    image: ACTIVITY_IMAGES.COMMUNITY,
-  },
-  {
-    id: "yoshinogawa-kominka-cleaning",
+    id: "yoshinogawa-kominka-cleaningggg",
     title: "古民家の大掃除ボランティア",
     description:
       "吉野川市の歴史ある古民家を、地域の新たな交流拠点として活用するためのクリーニングプロジェクトです。昔ながらの建築様式を学びながら、みんなで協力して掃除を行います。\n\n作業内容：\n- 床や壁、建具などの清掃\n- 不要物の整理\n- 庭の手入れ\n- 簡単な補修作業\n\n※作業しやすい服装でお越しください。",
@@ -2668,7 +2384,7 @@ export const mockOpportunities: Opportunity[] = [
     image: ACTIVITY_IMAGES.RENOVATION,
   },
   {
-    id: "project-discussion-1",
+    id: "project-discussion-3",
     title: "オリーブ農家の後継者についての壁打ち",
     description:
       "小豆島のオリーブ農家の高齢化が進む中、新規就農者の育成と技術継承が課題となっています。\n\n今回は、以下のポイントについてフィードバックや色々な意見をもらいたいです：\n\n・就農希望者向けの体験プログラムの設計\n・技術継承のためのデジタルドキュメント化\n・農地継承の仕組みづくり\n・新規就農者の収入確保策\n\n実際に新規就農された方や、就農支援に関わる方々と共に、実現可能な育成プログラムの構築を目指します。",
@@ -2712,7 +2428,7 @@ export const mockOpportunities: Opportunity[] = [
     image: ACTIVITY_IMAGES.OLIVE,
   },
   {
-    id: "community-discussion-2",
+    id: "community-discussion-3",
     title: "オリーブオイルの新商品開発ブレスト",
     description:
       "小豆島産オリーブオイルの新しい活用方法と商品企画について、アイデアを出し合うセッションです。\n\n具体的なテーマ：\n・若年層向けの新商品企画\n・オリーブオイルを使った新しいレシピ開発\n・サステナブルなパッケージデザイン\n・ECでの販売戦略\n\n商品企画、デザイン、マーケティングなど、様々な視点からの意見を集め、実現可能な企画としてまとめていきます。",
@@ -3453,64 +3169,6 @@ export const mockCommunities: Community[] = [
           "まちづくりに興味がある方",
           "データ収集・分析が好きな方",
           "地域の未来を考えたい方",
-        ],
-      },
-      {
-        id: "yamakawa-station-quest-2",
-        title: "駅前の思い出インタビュー",
-        description:
-          "地域の方々から駅前の思い出や将来への期待をインタビューし、開発に活かすストーリーを集めます。\n\n形式：インタビュー（2時間程度）",
-        type: "QUEST",
-        status: "open",
-        communityId: "yamakawa-station",
-        hostId: "yoshinogawa-member2",
-        startsAt: "2025-02-10T08:00:00.000Z",
-        endsAt: "2025-02-10T10:00:00.000Z",
-        createdAt: new Date("2025-02-01"),
-        updatedAt: new Date("2025-02-01"),
-        host: {
-          name: "田中健一",
-          title: "都市計画コンサルタント",
-          bio: "20年以上にわたり、地方都市の駅前開発に携わってきました。人々の暮らしに寄り添った空間づくりを得意としています。",
-          image: "/placeholder.svg",
-        },
-        location: {
-          name: "JR山川駅前広場",
-          address: "徳島県吉野川市山川町",
-          isOnline: false,
-          lat: 34.4784,
-          lng: 134.2384,
-        },
-        capacity: 5,
-        pointsForComplete: 500,
-        participants: [],
-        image: ACTIVITY_IMAGES.COMMUNITY,
-        images: [
-          {
-            url: "/event-photos/yamakawa-1.jpg",
-            caption: "駅前での清掃活動",
-          },
-          {
-            url: "/event-photos/yamakawa-2.jpg",
-            caption: "コミュニティスペースでのワークショップ",
-          },
-          {
-            url: "/event-photos/yamakawa-3.jpg",
-            caption: "オリーブオイルの搾油工程",
-          },
-          {
-            url: "/event-photos/yamakawa-4.jpg",
-            caption: "完成したオリーブオイル",
-          },
-          {
-            url: "/event-photos/yamakawa-5.jpg",
-            caption: "地域の方々との交流会",
-          },
-        ],
-        recommendedFor: [
-          "コミュニケーションが得意な方",
-          "地域の歴史に興味がある方",
-          "インタビューの経験を積みたい方",
         ],
       },
     ],

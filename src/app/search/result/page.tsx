@@ -37,7 +37,7 @@ export default function Page({ searchParams = {} }: SearchResultPageProps) {
       showLogo: false,
       showBackButton: true,
     })
-  }, [searchParams, updateConfig])
+  }, [searchParams.location, searchParams.from, searchParams.to, searchParams.guests, updateConfig])
 
   useEffect(() => {
     const fetchOpportunities = async () => {
@@ -52,7 +52,7 @@ export default function Page({ searchParams = {} }: SearchResultPageProps) {
     }
 
     fetchOpportunities()
-  }, [searchParams])
+  }, [])
 
   const recommendedOpportunities = opportunities.filter(opp => opp.recommendedFor.length > 0)
 

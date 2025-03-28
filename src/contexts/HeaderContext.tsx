@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react'
 
 interface SearchParams {
   location?: string
@@ -36,16 +36,21 @@ const defaultConfig: HeaderConfig = {
 export const HeaderProvider = ({ children }: { children: ReactNode }) => {
   const [config, setConfig] = useState<HeaderConfig>(defaultConfig)
 
-  const updateConfig = (newConfig: Partial<HeaderConfig>) => {
-    setConfig(prev => ({
-      ...prev,
-      ...newConfig,
-    }))
-  }
+  const updateConfig = useCallback((newConfig: Partial<HeaderConfig>) => {
+    setConfig(prev => {
+      if (JSON.stringify(prev) === JSON.stringify(newConfig)) {
+        return prev
+      }
+      return {
+        ...prev,
+        ...newConfig,
+      }
+    })
+  }, [])
 
-  const resetConfig = () => {
+  const resetConfig = useCallback(() => {
     setConfig(defaultConfig)
-  }
+  }, [])
 
   return (
     <HeaderContext.Provider value={{ config, updateConfig, resetConfig }}>
