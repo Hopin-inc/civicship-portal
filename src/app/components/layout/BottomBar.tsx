@@ -9,6 +9,10 @@ const BottomBar = () => {
   const pathname = usePathname();
   const { user } = useAuth();
 
+  if (pathname === '/search') {
+    return null;
+  }
+
   const getLinkStyle = (path: string) => {
     return `flex flex-col items-center ${pathname === path ? 'text-blue-500' : 'text-gray-600'} hover:text-blue-500`;
   };

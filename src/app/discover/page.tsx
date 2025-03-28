@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import SearchForm from '../components/features/discover/SearchForm'
+import SearchTrigger from '../components/search/SearchTrigger'
 import OpportunityCard from '../components/features/discover/OpportunityCard'
 import FeaturedSection from '../components/features/discover/FeaturedSection'
 
@@ -79,7 +79,9 @@ const SAMPLE_OPPORTUNITIES = [
 export default function DiscoverPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
-      <SearchForm />
+      <div className="sticky top-0 z-10 bg-white px-4 py-3 shadow-sm">
+        <SearchTrigger />
+      </div>
       
       {/* おすすめの体験一覧 */}
       <FeaturedSection opportunities={SAMPLE_OPPORTUNITIES.slice(0, 5)} />
