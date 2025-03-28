@@ -15,10 +15,8 @@ import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/
 const documents = {
   "\n  query currentUser {\n    currentUser {\n      user {\n        id\n        name\n      }\n    }\n  }\n":
     types.CurrentUserDocument,
-  "\n  query GetUserWithDetails($id: ID!) {\n    user(id: $id) {\n      id\n      name\n      image\n      bio\n      sysRole\n      urlFacebook\n      urlInstagram\n      urlWebsite\n      urlX\n      urlYoutube\n    }\n  }\n":
-    types.GetUserWithDetailsDocument,
-  "\n  query GetUserActivities($id: ID!, $articlesFirst: Int, $articlesCursor: String) {\n    user(id: $id) {\n      id\n      articlesAboutMe(first: $articlesFirst, cursor: $articlesCursor) {\n        edges {\n          node {\n            id\n          }\n          cursor\n        }\n      }\n      articlesWrittenByMe(first: $articlesFirst, cursor: $articlesCursor) {\n        edges {\n          node {\n            id\n          }\n          cursor\n        }\n      }\n    }\n  }\n":
-    types.GetUserActivitiesDocument,
+  "\n  query GetUserWithDetailsAndPortfolios(\n    $id: ID!,\n    $first: Int,\n    $after: String,\n    $filter: PortfolioFilterInput,\n    $sort: PortfolioSortInput\n  ) {\n    user(id: $id) {\n      id\n      name\n      image\n      bio\n      sysRole\n      currentPrefecture\n      urlFacebook\n      urlInstagram\n      urlWebsite\n      urlX\n      urlYoutube\n      portfolios(\n        first: $first,\n        cursor: $after,\n        filter: $filter,\n        sort: $sort\n      ) {\n        edges {\n          node {\n            id\n            title\n            category\n            date\n            thumbnailUrl\n            source\n            place {\n              id\n              name\n            }\n            participants {\n              id\n              name\n              image\n            }\n          }\n          cursor\n        }\n        pageInfo {\n          hasNextPage\n          endCursor\n        }\n      }\n    }\n  }\n":
+    types.GetUserWithDetailsAndPortfoliosDocument,
 };
 
 /**
@@ -45,14 +43,8 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "\n  query GetUserWithDetails($id: ID!) {\n    user(id: $id) {\n      id\n      name\n      image\n      bio\n      sysRole\n      urlFacebook\n      urlInstagram\n      urlWebsite\n      urlX\n      urlYoutube\n    }\n  }\n",
-): (typeof documents)["\n  query GetUserWithDetails($id: ID!) {\n    user(id: $id) {\n      id\n      name\n      image\n      bio\n      sysRole\n      urlFacebook\n      urlInstagram\n      urlWebsite\n      urlX\n      urlYoutube\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(
-  source: "\n  query GetUserActivities($id: ID!, $articlesFirst: Int, $articlesCursor: String) {\n    user(id: $id) {\n      id\n      articlesAboutMe(first: $articlesFirst, cursor: $articlesCursor) {\n        edges {\n          node {\n            id\n          }\n          cursor\n        }\n      }\n      articlesWrittenByMe(first: $articlesFirst, cursor: $articlesCursor) {\n        edges {\n          node {\n            id\n          }\n          cursor\n        }\n      }\n    }\n  }\n",
-): (typeof documents)["\n  query GetUserActivities($id: ID!, $articlesFirst: Int, $articlesCursor: String) {\n    user(id: $id) {\n      id\n      articlesAboutMe(first: $articlesFirst, cursor: $articlesCursor) {\n        edges {\n          node {\n            id\n          }\n          cursor\n        }\n      }\n      articlesWrittenByMe(first: $articlesFirst, cursor: $articlesCursor) {\n        edges {\n          node {\n            id\n          }\n          cursor\n        }\n      }\n    }\n  }\n"];
+  source: "\n  query GetUserWithDetailsAndPortfolios(\n    $id: ID!,\n    $first: Int,\n    $after: String,\n    $filter: PortfolioFilterInput,\n    $sort: PortfolioSortInput\n  ) {\n    user(id: $id) {\n      id\n      name\n      image\n      bio\n      sysRole\n      currentPrefecture\n      urlFacebook\n      urlInstagram\n      urlWebsite\n      urlX\n      urlYoutube\n      portfolios(\n        first: $first,\n        cursor: $after,\n        filter: $filter,\n        sort: $sort\n      ) {\n        edges {\n          node {\n            id\n            title\n            category\n            date\n            thumbnailUrl\n            source\n            place {\n              id\n              name\n            }\n            participants {\n              id\n              name\n              image\n            }\n          }\n          cursor\n        }\n        pageInfo {\n          hasNextPage\n          endCursor\n        }\n      }\n    }\n  }\n",
+): (typeof documents)["\n  query GetUserWithDetailsAndPortfolios(\n    $id: ID!,\n    $first: Int,\n    $after: String,\n    $filter: PortfolioFilterInput,\n    $sort: PortfolioSortInput\n  ) {\n    user(id: $id) {\n      id\n      name\n      image\n      bio\n      sysRole\n      currentPrefecture\n      urlFacebook\n      urlInstagram\n      urlWebsite\n      urlX\n      urlYoutube\n      portfolios(\n        first: $first,\n        cursor: $after,\n        filter: $filter,\n        sort: $sort\n      ) {\n        edges {\n          node {\n            id\n            title\n            category\n            date\n            thumbnailUrl\n            source\n            place {\n              id\n              name\n            }\n            participants {\n              id\n              name\n              image\n            }\n          }\n          cursor\n        }\n        pageInfo {\n          hasNextPage\n          endCursor\n        }\n      }\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
