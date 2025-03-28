@@ -33,7 +33,7 @@ export default function FeaturedSection({ opportunities }: FeaturedSectionProps)
   }, [emblaApi])
 
   return (
-    <section className="relative h-[70vh] w-full overflow-hidden">
+    <section className="relative h-[70vh] w-full overflow-hidden [&]:mt-0">
       {/* タグライン */}
       <div className="absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/60 to-transparent p-6 text-white">
         <h1 className="text-4xl font-bold leading-tight">

@@ -7,22 +7,48 @@ import { DateRange } from 'react-day-picker'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { Calendar } from '@/app/components/ui/calendar'
-import { PREFECTURES } from '@/app/search/page'
+import { useHeader } from '@/contexts/HeaderContext'
+import { useRouter } from 'next/navigation'
 
-type Prefecture = typeof PREFECTURES[number]['id']
+const PREFECTURES = [
+  { id: 'kagawa', name: '香川県' },
+  { id: 'tokushima', name: '徳島県' },
+  { id: 'kochi', name: '高知県' },
+  { id: 'ehime', name: '愛媛県' },
+]
 
 const SearchPage: FC = () => {
+  const router = useRouter()
   const [selectedTab, setSelectedTab] = useState<'experience' | 'quest'>('experience')
   const [activeForm, setActiveForm] = useState<'location' | 'date' | 'guests' | null>(null)
-  const [location, setLocation] = useState<Prefecture | ''>('')
+  const [location, setLocation] = useState<string>('')
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
   const [guests, setGuests] = useState(0)
+  const { updateConfig, resetConfig } = useHeader()
   
   const locationFormRef = useRef<HTMLDivElement>(null)
   const dateFormRef = useRef<HTMLDivElement>(null)
   const guestsFormRef = useRef<HTMLDivElement>(null)
 
-  // フォーム以外をクリックした時の処理
+  useEffect(() => {
+    updateConfig({
+      showLogo: false,
+      title: '体験・クエストを検索',
+      showBackButton: true
+    })
+
+    return () => {
+      resetConfig()
+    }
+  }, [])
+
+  const handleClear = () => {
+    setLocation('')
+    setDateRange(undefined)
+    setGuests(0)
+    setActiveForm(null)
+  }
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node
@@ -41,15 +67,6 @@ const SearchPage: FC = () => {
     }
   }, [])
 
-  // 条件をクリアする処理
-  const handleClear = () => {
-    setLocation('')
-    setDateRange(undefined)
-    setGuests(0)
-    setActiveForm(null)
-  }
-
-  // 日付のフォーマット
   const formatDateRange = (range: DateRange | undefined) => {
     if (!range?.from) return ''
     if (!range.to) return format(range.from, 'M/d', { locale: ja })
@@ -58,7 +75,6 @@ const SearchPage: FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
       <header className="fixed top-0 left-0 right-0 bg-white border-b z-10">
         <div className="relative h-14 flex items-center justify-center px-4">
           <Link href="/" className="absolute left-4">
@@ -76,7 +92,6 @@ const SearchPage: FC = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="pt-32 px-4 pb-24">
         {/* Tabs */}
         <div className="mb-6">
@@ -104,13 +119,12 @@ const SearchPage: FC = () => {
           </div>
         </div>
 
-        {/* Location */}
         <div className="mb-6">
           {activeForm === 'location' ? (
             <div ref={locationFormRef} className="bg-white rounded-xl p-4 shadow-sm">
-              <div className="flex items-start space-x-3 mb-6">
-                <MapPin className="h-7 w-7 text-gray-500" strokeWidth={1.5} />
-                <span className="text-2xl">どこに行きますか？</span>
+              <div className="flex items-center space-x-3 mb-4">
+                <MapPin className="h-6 w-6 text-gray-400" />
+                <span className="text-lg">どこに行きますか？</span>
               </div>
               <button
                 onClick={() => {
@@ -158,7 +172,6 @@ const SearchPage: FC = () => {
           )}
         </div>
 
-        {/* Date */}
         <div className="mb-6">
           {activeForm === 'date' ? (
             <div ref={dateFormRef} className="bg-white rounded-xl p-4 shadow-sm">
@@ -196,13 +209,12 @@ const SearchPage: FC = () => {
           )}
         </div>
 
-        {/* Guests */}
         <div className="mb-6">
           {activeForm === 'guests' ? (
             <div ref={guestsFormRef} className="bg-white rounded-xl p-4 shadow-sm">
-              <div className="flex items-start space-x-3 mb-6">
-                <Users className="h-7 w-7 text-gray-500" strokeWidth={1.5} />
-                <span className="text-2xl">何人で行きますか？</span>
+              <div className="flex items-center space-x-3 mb-4">
+                <Users className="h-6 w-6 text-gray-400" />
+                <span className="text-lg">何人で行きますか？</span>
               </div>
               <div className="flex items-center justify-center space-x-8 py-4">
                 <button
@@ -237,17 +249,30 @@ const SearchPage: FC = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 flex items-center justify-between">
-        <button 
-          onClick={handleClear}
-          className="text-blue-600 underline text-sm"
-        >
-          条件をクリア
-        </button>
-        <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium">
-          検索
-        </button>
+      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t">
+        <div className="max-w-lg mx-auto px-4 h-16 flex justify-between items-center">
+          <button 
+            onClick={handleClear}
+            className="text-blue-600 underline text-sm"
+          >
+            条件をクリア
+          </button>
+          <button 
+            onClick={() => {
+              const params = new URLSearchParams()
+              if (location) params.set('location', location)
+              if (dateRange?.from) params.set('from', dateRange.from.toISOString())
+              if (dateRange?.to) params.set('to', dateRange.to.toISOString())
+              if (guests > 0) params.set('guests', guests.toString())
+              params.set('type', selectedTab)
+              
+              router.push(`/search/result?${params.toString()}`)
+            }}
+            className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium"
+          >
+            検索
+          </button>
+        </div>
       </footer>
     </div>
   )

@@ -8,6 +8,7 @@ import LoadingProvider from "@/app/components/providers/LoadingProvider";
 import Header from "@/app/components/layout/Header";
 import { LiffProvider } from "@/contexts/LiffContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { HeaderProvider } from "@/contexts/HeaderContext";
 import BottomBar from "./components/layout/BottomBar";
 
 const font = Inter({ subsets: ["latin"] });
@@ -29,12 +30,14 @@ const RootLayout = ({
           <ApolloProvider>
             <LiffProvider>
               <AuthProvider>
-                <LoadingProvider>
-                  <Header />
-                  <main className="max-w-lg mx-auto pt-16">{children}</main>
-                  <Toaster richColors className="mx-8" />
-                  <BottomBar />
-                </LoadingProvider>
+                <HeaderProvider>
+                  <LoadingProvider>
+                    <Header />
+                    <main className="max-w-lg mx-auto pt-16">{children}</main>
+                    <Toaster richColors className="mx-8" />
+                    <BottomBar />
+                  </LoadingProvider>
+                </HeaderProvider>
               </AuthProvider>
             </LiffProvider>
           </ApolloProvider>
