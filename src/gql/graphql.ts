@@ -2666,11 +2666,15 @@ export type GetOpportunityQuery = {
   } | null;
 };
 
-export type GetUserWithDetailsQueryVariables = Exact<{
+export type GetUserWithDetailsAndPortfoliosQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<PortfolioFilterInput>;
+  sort?: InputMaybe<PortfolioSortInput>;
 }>;
 
-export type GetUserWithDetailsQuery = {
+export type GetUserWithDetailsAndPortfoliosQuery = {
   __typename?: "Query";
   user?: {
     __typename?: "User";
@@ -2679,40 +2683,35 @@ export type GetUserWithDetailsQuery = {
     image?: string | null;
     bio?: string | null;
     sysRole: SysRole;
+    currentPrefecture?: CurrentPrefecture | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlWebsite?: string | null;
     urlX?: string | null;
     urlYoutube?: string | null;
-  } | null;
-};
-
-export type GetUserActivitiesQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  articlesFirst?: InputMaybe<Scalars["Int"]["input"]>;
-  articlesCursor?: InputMaybe<Scalars["String"]["input"]>;
-}>;
-
-export type GetUserActivitiesQuery = {
-  __typename?: "Query";
-  user?: {
-    __typename?: "User";
-    id: string;
-    articlesAboutMe?: {
-      __typename?: "ArticlesConnection";
+    portfolios?: {
+      __typename?: "PortfoliosConnection";
       edges?: Array<{
-        __typename?: "ArticleEdge";
+        __typename?: "PortfolioEdge";
         cursor: string;
-        node?: { __typename?: "Article"; id: string } | null;
+        node?: {
+          __typename?: "Portfolio";
+          id: string;
+          title: string;
+          category: string;
+          date: Date;
+          thumbnailUrl?: string | null;
+          source: PortfolioSource;
+          place?: { __typename?: "Place"; id: string; name: string } | null;
+          participants: Array<{
+            __typename?: "User";
+            id: string;
+            name: string;
+            image?: string | null;
+          }>;
+        } | null;
       } | null> | null;
-    } | null;
-    articlesWrittenByMe?: {
-      __typename?: "ArticlesConnection";
-      edges?: Array<{
-        __typename?: "ArticleEdge";
-        cursor: string;
-        node?: { __typename?: "Article"; id: string } | null;
-      } | null> | null;
+      pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
     } | null;
   } | null;
 };
@@ -3015,13 +3014,13 @@ export const GetOpportunityDocument = {
     },
   ],
 } as unknown as DocumentNode<GetOpportunityQuery, GetOpportunityQueryVariables>;
-export const GetUserWithDetailsDocument = {
+export const GetUserWithDetailsAndPortfoliosDocument = {
   kind: "Document",
   definitions: [
     {
       kind: "OperationDefinition",
       operation: "query",
-      name: { kind: "Name", value: "GetUserWithDetails" },
+      name: { kind: "Name", value: "GetUserWithDetailsAndPortfolios" },
       variableDefinitions: [
         {
           kind: "VariableDefinition",
@@ -3030,6 +3029,26 @@ export const GetUserWithDetailsDocument = {
             kind: "NonNullType",
             type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
           },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "first" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "after" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "PortfolioFilterInput" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "sort" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "PortfolioSortInput" } },
         },
       ],
       selectionSet: {
@@ -3053,76 +3072,35 @@ export const GetUserWithDetailsDocument = {
                 { kind: "Field", name: { kind: "Name", value: "image" } },
                 { kind: "Field", name: { kind: "Name", value: "bio" } },
                 { kind: "Field", name: { kind: "Name", value: "sysRole" } },
+                { kind: "Field", name: { kind: "Name", value: "currentPrefecture" } },
                 { kind: "Field", name: { kind: "Name", value: "urlFacebook" } },
                 { kind: "Field", name: { kind: "Name", value: "urlInstagram" } },
                 { kind: "Field", name: { kind: "Name", value: "urlWebsite" } },
                 { kind: "Field", name: { kind: "Name", value: "urlX" } },
                 { kind: "Field", name: { kind: "Name", value: "urlYoutube" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetUserWithDetailsQuery, GetUserWithDetailsQueryVariables>;
-export const GetUserActivitiesDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "GetUserActivities" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "articlesFirst" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "articlesCursor" } },
-          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "user" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
                 {
                   kind: "Field",
-                  name: { kind: "Name", value: "articlesAboutMe" },
+                  name: { kind: "Name", value: "portfolios" },
                   arguments: [
                     {
                       kind: "Argument",
                       name: { kind: "Name", value: "first" },
-                      value: { kind: "Variable", name: { kind: "Name", value: "articlesFirst" } },
+                      value: { kind: "Variable", name: { kind: "Name", value: "first" } },
                     },
                     {
                       kind: "Argument",
                       name: { kind: "Name", value: "cursor" },
-                      value: { kind: "Variable", name: { kind: "Name", value: "articlesCursor" } },
+                      value: { kind: "Variable", name: { kind: "Name", value: "after" } },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "filter" },
+                      value: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "sort" },
+                      value: { kind: "Variable", name: { kind: "Name", value: "sort" } },
                     },
                   ],
                   selectionSet: {
@@ -3141,6 +3119,34 @@ export const GetUserActivitiesDocument = {
                                 kind: "SelectionSet",
                                 selections: [
                                   { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "title" } },
+                                  { kind: "Field", name: { kind: "Name", value: "category" } },
+                                  { kind: "Field", name: { kind: "Name", value: "date" } },
+                                  { kind: "Field", name: { kind: "Name", value: "thumbnailUrl" } },
+                                  { kind: "Field", name: { kind: "Name", value: "source" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "place" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                      ],
+                                    },
+                                  },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "participants" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                        { kind: "Field", name: { kind: "Name", value: "image" } },
+                                      ],
+                                    },
+                                  },
                                 ],
                               },
                             },
@@ -3148,44 +3154,14 @@ export const GetUserActivitiesDocument = {
                           ],
                         },
                       },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "articlesWrittenByMe" },
-                  arguments: [
-                    {
-                      kind: "Argument",
-                      name: { kind: "Name", value: "first" },
-                      value: { kind: "Variable", name: { kind: "Name", value: "articlesFirst" } },
-                    },
-                    {
-                      kind: "Argument",
-                      name: { kind: "Name", value: "cursor" },
-                      value: { kind: "Variable", name: { kind: "Name", value: "articlesCursor" } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
                       {
                         kind: "Field",
-                        name: { kind: "Name", value: "edges" },
+                        name: { kind: "Name", value: "pageInfo" },
                         selectionSet: {
                           kind: "SelectionSet",
                           selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "node" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  { kind: "Field", name: { kind: "Name", value: "id" } },
-                                ],
-                              },
-                            },
-                            { kind: "Field", name: { kind: "Name", value: "cursor" } },
+                            { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                            { kind: "Field", name: { kind: "Name", value: "endCursor" } },
                           ],
                         },
                       },
@@ -3199,4 +3175,7 @@ export const GetUserActivitiesDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<GetUserActivitiesQuery, GetUserActivitiesQueryVariables>;
+} as unknown as DocumentNode<
+  GetUserWithDetailsAndPortfoliosQuery,
+  GetUserWithDetailsAndPortfoliosQueryVariables
+>;

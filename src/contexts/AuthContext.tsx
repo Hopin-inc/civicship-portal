@@ -64,7 +64,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     try {
       const success = await signInWithLiffToken(accessToken);
-      
       if (!success) {
         toast.error("認証に失敗しました");
       }
@@ -100,6 +99,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const { data } = await refetch();
         const fetchedUser = data.currentUser?.user ?? null;
+        console.log("fetchedUser", fetchedUser);
         login({ uid: user.uid, user: fetchedUser });
 
         // if (fetchedUser) {
