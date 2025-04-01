@@ -225,7 +225,7 @@ export default function ConfirmPage() {
         </div>
       </div>
 
-      <Link href="/reservation/complete">
+      <Link href={`/reservation/complete?opportunity_id=${opportunityId}`}>
         <Button className="w-full py-6 text-base rounded-lg" size="lg">
           申し込みを確定
         </Button>

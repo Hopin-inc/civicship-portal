@@ -37,6 +37,46 @@ export const GET_OPPORTUNITY = gql`
             }
           }
         }
+        opportunitiesCreatedByMe(first: 5) {
+          edges {
+            node {
+              id
+              title
+              description
+              category
+              capacity
+              pointsToEarn
+              feeRequired
+              requireApproval
+              publishStatus
+              image
+              createdAt
+              updatedAt
+              slots {
+                edges {
+                  node {
+                    id
+                    startsAt
+                    endsAt
+                    participations {
+                      edges {
+                        node {
+                          id
+                          status
+                          user {
+                            id
+                            name
+                            image
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
       place {
         id

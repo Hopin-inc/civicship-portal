@@ -12,6 +12,46 @@ interface UseOpportunityResult {
 const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | null => {
   if (!data) return null;
 
+  const transformOpportunityNode = (node: any): Opportunity => ({
+    id: node.id,
+    title: node.title,
+    description: node.description,
+    type: "EVENT",
+    status: "open",
+    communityId: data.community?.id || "",
+    hostId: data.createdByUser?.id || "",
+    startsAt: node.slots?.edges?.[0]?.node?.startsAt?.toString() || node.createdAt?.toString() || "",
+    endsAt: node.slots?.edges?.[0]?.node?.endsAt?.toString() || node.createdAt?.toString() || "",
+    createdAt: node.createdAt?.toString() || "",
+    updatedAt: node.updatedAt?.toString() || "",
+    host: {
+      name: data.createdByUser?.name || "",
+      image: data.createdByUser?.image || "",
+      title: "",
+      bio: "",
+    },
+    image: node.image,
+    location: {
+      name: "",
+      address: "",
+      isOnline: false,
+    },
+    community: data.community ? {
+      title: data.community.name,
+      description: "",
+      icon: data.community.image || "",
+    } : undefined,
+    recommendedFor: [],
+    capacity: node.capacity,
+    pointsForComplete: node.pointsToEarn,
+    participants: [],
+    body: node.description,
+    requireApproval: node.requireApproval,
+    pointsRequired: node.pointsToEarn,
+    feeRequired: node.feeRequired,
+    slots: node.slots,
+  });
+
   return {
     id: data.id,
     title: data.title,
@@ -65,6 +105,12 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
           },
         })) || [],
       } : undefined,
+      opportunitiesCreatedByMe: data.createdByUser.opportunitiesCreatedByMe ? {
+        edges: data.createdByUser.opportunitiesCreatedByMe.edges
+          ?.map(edge => edge.node)
+          .filter(node => node.id !== data.id)
+          .map(transformOpportunityNode) || [],
+      } : undefined,
     } : undefined,
     place: data.place ? {
       name: data.place.name || "",
@@ -113,6 +159,8 @@ export const useOpportunity = (id: string, communityId: string): UseOpportunityR
       console.error('Opportunity query error:', error);
     },
   });
+
+  console.log('data', data)
 
   return {
     opportunity: data ? transformOpportunity(data.opportunity) : null,

@@ -155,6 +155,9 @@ export type Opportunity = {
         };
       }>;
     };
+    opportunitiesCreatedByMe?: {
+      edges: Opportunity[];
+    };
   };
   place?: {
     name: string;

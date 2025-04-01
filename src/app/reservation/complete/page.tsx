@@ -2,13 +2,19 @@
 
 import { useEffect } from "react";
 import { useHeader } from "@/contexts/HeaderContext";
-import { RecommendedActivities } from "@/app/activities/RecommendedActivities";
 import { RecentActivities } from "@/app/activities/RecentActivities";
 import { Calendar, Clock1, Users, JapaneseYen, CircleDollarSign, CheckCircle } from 'lucide-react';
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { useOpportunity } from "@/hooks/useOpportunity";
+import type { Opportunity } from "@/types";
 
 export default function CompletePage() {
   const { updateConfig } = useHeader();
+  const searchParams = useSearchParams();
+  const opportunityId = searchParams.get("opportunity_id");
+
+  const { opportunity } = useOpportunity(opportunityId || "", "cm8qzi9z80000sbtm8z42st8e");
 
   useEffect(() => {
     updateConfig({
@@ -17,6 +23,36 @@ export default function CompletePage() {
       showLogo: false,
     });
   }, [updateConfig]);
+
+  if (!opportunity) {
+    return <div>Opportunity not found</div>;
+  }
+
+  const opportunitiesCreatedByHost = opportunity.createdByUser?.opportunitiesCreatedByMe?.edges || [];
+
+  const startDate = new Date(opportunity.startsAt);
+  const formattedDate = startDate.toLocaleDateString('ja-JP', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long'
+  });
+
+  const startTime = startDate.toLocaleTimeString('ja-JP', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+
+  const endDate = new Date(opportunity.endsAt);
+  const endTime = endDate.toLocaleTimeString('ja-JP', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+
+  const participantCount = opportunity.participants.length;
+  const totalPrice = (opportunity.feeRequired || 0) * participantCount;
 
   return (
     <main className="flex flex-col items-center px-4 pb-8">
@@ -32,19 +68,19 @@ export default function CompletePage() {
         <div className="flex gap-4 p-4">
           <div className="relative w-[72px] h-[72px] shrink-0">
             <Image
-              src="/images/activities/olive.jpg"
-              alt="陶芸工房で湯呑みづくり"
+              src={opportunity.image || "/placeholder.png"}
+              alt={opportunity.title}
               fill
               className="object-cover rounded-lg"
             />
           </div>
           <div className="flex flex-col justify-center">
-            <h2 className="text-base font-medium mb-2">陶芸工房で湯呑みづくり　最...</h2>
+            <h2 className="text-base font-medium mb-2">{opportunity.title}</h2>
             <div className="flex items-center text-sm text-gray-600">
-              <span>1人あたり2,000円から</span>
+              <span>1人あたり{opportunity.feeRequired?.toLocaleString() || '0'}円から</span>
             </div>
             <div className="flex items-center text-sm text-gray-600">
-              <span>観音寺市（香川県）</span>
+              <span>{opportunity.place?.name || "場所未定"}</span>
             </div>
           </div>
         </div>
@@ -54,24 +90,24 @@ export default function CompletePage() {
       <div className="w-full bg-gray-50 rounded-lg py-6 px-10 space-y-4">
         <div className="flex items-center gap-2">
           <Calendar className="w-6 h-6 text-[#3F3F46]" strokeWidth={1.5} />
-          <span>2025年3月29日（土）</span>
+          <span>{formattedDate}</span>
         </div>
         <div className="flex items-center gap-2">
           <Clock1 className="w-6 h-6 text-[#3F3F46]" strokeWidth={1.5} />
-          <span>13:00-15:30</span>
+          <span>{startTime}-{endTime}</span>
         </div>
         <div className="flex items-center gap-2">
           <Users className="w-6 h-6 text-[#3F3F46]" strokeWidth={1.5} />
-          <span>3人</span>
+          <span>{participantCount}人</span>
         </div>
         <div className="flex items-center gap-2">
           <JapaneseYen className="w-6 h-6 text-[#3F3F46]" strokeWidth={1.5} />
-          <span>6,000円（2,000円 × 3人）</span>
+          <span>{totalPrice.toLocaleString()}円（{opportunity.feeRequired?.toLocaleString() || '0'}円 × {participantCount}人）</span>
         </div>
       </div>
 
       <div className="w-full mt-8 mb-16">
-        <RecentActivities />
+        <RecentActivities opportunities={opportunitiesCreatedByHost} />
       </div>
     </main>
   );
