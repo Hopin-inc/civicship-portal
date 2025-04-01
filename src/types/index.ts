@@ -28,6 +28,41 @@ export type SocialLink = {
 };
 
 
+// Portfolio related types
+export type PortfolioCategory = 'QUEST' | 'ACTIVITY_REPORT' | 'INTERVIEW' | 'OPPORTUNITY' | 'ACTIVITY';
+export type PortfolioType = 'opportunity' | 'activity_report' | 'quest';
+
+export interface PortfolioStyle {
+  bg: string;
+  text: string;
+}
+
+export const PORTFOLIO_CATEGORY_STYLES: Record<PortfolioCategory, PortfolioStyle> = {
+  QUEST: { bg: '#FEF9C3', text: '#854D0E' },
+  ACTIVITY_REPORT: { bg: '#DCE7DD', text: '#166534' },
+  INTERVIEW: { bg: '#DCE7DD', text: '#166534' },
+  OPPORTUNITY: { bg: '#DBEAFE', text: '#1E40AF' },
+  ACTIVITY: { bg: '#FCE7F3', text: '#831843' },
+} as const;
+
+export interface PortfolioParticipant {
+  id: string;
+  name: string;
+  image: string | null;
+}
+
+export interface Portfolio {
+  id: string;
+  type: PortfolioType;
+  title: string;
+  date: string;
+  location: string | null;
+  category: PortfolioCategory;
+  participants: PortfolioParticipant[];
+  image: string | null;
+  source?: string;
+}
+
 export type Community = {
   id: string;
   title: string;
@@ -236,37 +271,3 @@ export type DateFilter = {
   startDate: Date | null;
   endDate: Date | null;
 };
-
-// Portfolio related types
-export type PortfolioCategory = 'QUEST' | 'ACTIVITY_REPORT' | 'INTERVIEW' | 'OPPORTUNITY';
-export type PortfolioType = 'opportunity' | 'activity_report' | 'quest';
-
-export interface PortfolioStyle {
-  bg: string;
-  text: string;
-}
-
-export const PORTFOLIO_CATEGORY_STYLES: Record<PortfolioCategory, PortfolioStyle> = {
-  QUEST: { bg: '#FEF9C3', text: '#854D0E' },
-  ACTIVITY_REPORT: { bg: '#DCE7DD', text: '#166534' },
-  INTERVIEW: { bg: '#DCE7DD', text: '#166534' },
-  OPPORTUNITY: { bg: '#DBEAFE', text: '#1E40AF' },
-} as const;
-
-export interface PortfolioParticipant {
-  id: string;
-  name: string;
-  image: string | null;
-}
-
-export interface Portfolio {
-  id: string;
-  type: PortfolioType;
-  title: string;
-  date: string;
-  location: string | null;
-  category: PortfolioCategory;
-  participants: PortfolioParticipant[];
-  image: string | null;
-  source?: string;
-}
