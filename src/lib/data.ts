@@ -3488,9 +3488,9 @@ export const mockActivities: Activity[] = [
       lng: 134.2384,
     },
     images: [
-      "/images/activities/olive.jpg",
-      "/images/activities/olive-tasting.jpg",
-      "/images/activities/olive-farm.jpg",
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3270&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3270&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3270&auto=format&fit=crop",
     ],
     capacity: 8,
     schedule: {
@@ -3668,9 +3668,9 @@ export const mockActivities: Activity[] = [
       lng: 134.5725,
     },
     images: [
-      "/images/activities/awa-indigo.jpg",
-      "/images/activities/awa-dyeing.jpg",
-      "/images/activities/awa-workshop.jpg",
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3270&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3270&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3270&auto=format&fit=crop",
     ],
     capacity: 8,
     schedule: {

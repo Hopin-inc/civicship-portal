@@ -1,10 +1,10 @@
-import { User } from "@/gql/graphql";
+import { User as GraphQLUser } from "@/gql/graphql";
 import { Required } from "utility-types";
 
 export type AuthInfo = {
   uid?: string;
   providerIds?: string[];
-  user?: Required<Partial<User>, "id" | "lastName" | "firstName"> | null;
+  user?: GraphQLUser | null;
 };
 
 export type User = {
@@ -71,10 +71,10 @@ export type Opportunity = {
   status: "open" | "in_progress" | "closed";
   communityId: string;
   hostId: string;
-  startsAt: string;
-  endsAt: string;
-  createdAt: Date;
-  updatedAt: Date;
+  startsAt: Date | string;
+  endsAt: Date | string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
   host: {
     name: string;
     image: string;
@@ -105,6 +105,52 @@ export type Opportunity = {
   pointsForComplete?: number;
   pointsForJoin?: number;
   participants: Participant[];
+  body?: string;
+  createdByUser?: {
+    id: string;
+    name: string;
+    image?: string;
+    articlesAboutMe?: {
+      edges: Array<{
+        node: {
+          title: string;
+          description: string;
+          image?: string;
+        };
+      }>;
+    };
+  };
+  place?: {
+    name: string;
+    address: string;
+    latitude?: number;
+    longitude?: number;
+  };
+  requireApproval?: boolean;
+  pointsRequired?: number;
+  feeRequired?: number;
+  slots?: {
+    edges: Array<{
+      node: {
+        id: string;
+        startsAt: Date | string;
+        endsAt: Date | string;
+        participations?: {
+          edges: Array<{
+            node: {
+              id: string;
+              status: string;
+              user: {
+                id: string;
+                name: string;
+                image?: string;
+              };
+            };
+          }>;
+        };
+      };
+    }>;
+  };
 };
 
 export type RelatedArticle = {
@@ -138,7 +184,6 @@ export type Article = {
   createdAt: string;
   updatedAt: string;
 };
-
 
 export type Activity = {
   id: string;
