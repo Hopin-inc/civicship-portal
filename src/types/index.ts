@@ -192,7 +192,7 @@ export type DateFilter = {
 };
 
 // Portfolio related types
-export type PortfolioCategory = 'QUEST' | 'ACTIVITY_REPORT' | 'INTERVIEW' | 'OPPORTUNITY';
+export type PortfolioCategory = 'QUEST' | 'ACTIVITY_REPORT' | 'INTERVIEW' | 'OPPORTUNITY' | 'ACTIVITY';
 export type PortfolioType = 'opportunity' | 'activity_report' | 'quest';
 
 export interface PortfolioStyle {
@@ -205,6 +205,7 @@ export const PORTFOLIO_CATEGORY_STYLES: Record<PortfolioCategory, PortfolioStyle
   ACTIVITY_REPORT: { bg: '#DCE7DD', text: '#166534' },
   INTERVIEW: { bg: '#DCE7DD', text: '#166534' },
   OPPORTUNITY: { bg: '#DBEAFE', text: '#1E40AF' },
+  ACTIVITY: { bg: '#FCE7F3', text: '#831843' },
 } as const;
 
 export interface PortfolioParticipant {

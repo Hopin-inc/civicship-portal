@@ -24,7 +24,7 @@ const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }:
   lastPortfolioRef: RefObject<HTMLDivElement>;
 }) => {
   const getCategoryStyle = (category: PortfolioCategory): PortfolioStyle => {
-    return PORTFOLIO_CATEGORY_STYLES[category];
+    return PORTFOLIO_CATEGORY_STYLES[category] ?? { bg: '#E5E7EB', text: '#374151' };
   };
 
   const getCategoryLabel = (category: PortfolioCategory): string => {
@@ -37,6 +37,8 @@ const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }:
         return '記事';
       case 'OPPORTUNITY':
         return 'オポテュニティ';
+      case 'ACTIVITY':
+        return '活動';
     }
   };
 
