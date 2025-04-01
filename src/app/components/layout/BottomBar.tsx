@@ -9,7 +9,8 @@ const BottomBar = () => {
   const pathname = usePathname();
   const { user } = useAuth();
 
-  if (pathname === '/search') {
+  // Hide BottomBar on search and reservation pages except complete page
+  if (pathname === '/search' || (pathname.startsWith('/reservation') && !pathname.includes('/complete'))) {
     return null;
   }
 
