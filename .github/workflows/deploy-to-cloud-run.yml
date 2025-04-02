@@ -1,0 +1,69 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      # - develop
+      - feature/migrate-to-gcp
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: kyoso-dev
+    timeout-minutes: 30
+
+    env:
+      # GCP settings
+      GCP_REGION: ${{ secrets.GCP_REGION }}
+      # GCP service account credentials
+      SERVICE_ACCOUNT_CREDENTIAL_JSON: ${{ secrets.SERVICE_ACCOUNT_CREDENTIAL_JSON }}
+      # application settings
+      ARTIFACT_REGISTRY: ${{ secrets.ARTIFACT_REGISTRY }}
+      APPLICATION_NAME: ${{ secrets.APPLICATION_NAME }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      run: |
+        pnpm install
+        find node_modules/.pnpm/graphql-query-complexity*/node_modules/ -type f -name "QueryComplexity.js" -exec sed -i 's|graphql/execution/values|graphql/execution/values.js|g' {} \;
+
+    - name: Build application
+      run: pnpm build
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ env.SERVICE_ACCOUNT_CREDENTIAL_JSON }}
+
+    - name: Configure Docker for GCP Artifact Registry
+      run: |
+        gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }}
+        gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
+
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest .
+
+    - name: Push Docker image to Artifact Registry
+      run: |
+        docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest
+
+    - name: Deploy to Cloud Run
+      id: 'deploy'
+      uses: 'google-github-actions/deploy-cloudrun@v2'
+      with:
+        service: ${{ env.APPLICATION_NAME }}
+        image: ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest
+        region: ${{ env.GCP_REGION }}
