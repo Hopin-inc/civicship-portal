@@ -49,10 +49,17 @@ interface ActivityPageProps {
   params: {
     id: string;
   };
+  searchParams: {
+    community_id?: string;
+  };
 }
 
-export default function ActivityPage({ params }: ActivityPageProps) {
-  const { opportunity, loading, error } = useOpportunity(params.id, "cm8qzi9z80000sbtm8z42st8e");
+export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
+  const { opportunity, loading, error } = useOpportunity(params.id, searchParams.community_id || "");
+
+  if (!searchParams.community_id) {
+    return <div>Community ID is required</div>;
+  }
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;

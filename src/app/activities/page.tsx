@@ -6,7 +6,7 @@ import { GET_OPPORTUNITIES } from '@/graphql/queries/opportunities'
 import OpportunityCard, { OpportunityCardProps } from '../components/features/activity/OpportunityCard'
 import FeaturedSection from '../components/features/activity/FeaturedSection'
 import { useHeader } from '@/contexts/HeaderContext'
-import { GetOpportunitiesData, OpportunityNode } from '@/types/opportunity'
+import { GetOpportunitiesData, Opportunity } from '@/types'
 import { OpportunityCategory } from '@/gql/graphql'
 
 export default function ActivitiesPage() {
@@ -90,12 +90,17 @@ export default function ActivitiesPage() {
 
   const { upcoming, featured, all } = data || { upcoming: { edges: [] }, featured: { edges: [] }, all: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } } }
 
-  const mapNodeToCardProps = (node: OpportunityNode): OpportunityCardProps => ({
+  console.log('upcoming', upcoming)
+
+  const mapNodeToCardProps = (node: Opportunity): OpportunityCardProps => ({
     id: node.id,
     title: node.title,
-    price: node.feeRequired,
-    location: node.place?.city?.name || '場所未定',
-    imageUrl: node.image,
+    price: node.feeRequired || null,
+    location: node.place?.name || '場所未定',
+    imageUrl: node.image || null,
+    community: {
+      id: node.community?.id || '',
+    },
   })
 
   return (

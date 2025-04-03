@@ -9,6 +9,9 @@ export interface OpportunityCardProps {
   location: string
   imageUrl: string | null
   vertical?: boolean
+  community: {
+    id: string
+  }
 }
 
 export default function OpportunityCard({
@@ -18,9 +21,10 @@ export default function OpportunityCard({
   location,
   imageUrl,
   vertical = false,
+  community,
 }: OpportunityCardProps) {
   return (
-    <Link href={`/activities/${id}`} className={`relative ${vertical ? 'w-full' : 'w-72'} flex-shrink-0`}>
+    <Link href={`/activities/${id}?community_id=${community.id}`} className={`relative ${vertical ? 'w-full' : 'w-72'} flex-shrink-0`}>
       <div className="aspect-square w-full overflow-hidden rounded-lg">
         <Image
           src={imageUrl || 'https://images.unsplash.com/photo-1578662996442-48f60103fc96'}

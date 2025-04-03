@@ -2412,6 +2412,18 @@ export type WalletsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type CreateReservationMutationVariables = Exact<{
+  input: ReservationCreateInput;
+}>;
+
+export type CreateReservationMutation = {
+  __typename?: "Mutation";
+  reservationCreate?: {
+    __typename?: "ReservationCreateSuccess";
+    reservation: { __typename?: "Reservation"; id: string; status: ReservationStatus };
+  } | null;
+};
+
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CurrentUserQuery = {
@@ -2430,6 +2442,7 @@ export type OpportunityFieldsFragment = {
   image?: string | null;
   feeRequired?: number | null;
   pointsToEarn?: number | null;
+  community?: { __typename?: "Community"; id: string } | null;
   place?: {
     __typename?: "Place";
     id: string;
@@ -2535,20 +2548,6 @@ export type GetOpportunityQuery = {
       id: string;
       name: string;
       image?: string | null;
-      articlesAboutMe?: {
-        __typename?: "ArticlesConnection";
-        edges?: Array<{
-          __typename?: "ArticleEdge";
-          node?: {
-            __typename?: "Article";
-            id: string;
-            title: string;
-            introduction: string;
-            thumbnail?: any | null;
-            createdAt: Date;
-          } | null;
-        } | null> | null;
-      } | null;
       opportunitiesCreatedByMe?: {
         __typename?: "OpportunitiesConnection";
         edges: Array<{
@@ -2782,6 +2781,14 @@ export const OpportunityFieldsFragmentDoc = {
           { kind: "Field", name: { kind: "Name", value: "image" } },
           {
             kind: "Field",
+            name: { kind: "Name", value: "community" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+          {
+            kind: "Field",
             name: { kind: "Name", value: "place" },
             selectionSet: {
               kind: "SelectionSet",
@@ -2848,6 +2855,70 @@ export const OpportunityFieldsFragmentDoc = {
     },
   ],
 } as unknown as DocumentNode<OpportunityFieldsFragment, unknown>;
+export const CreateReservationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "CreateReservation" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ReservationCreateInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "reservationCreate" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ReservationCreateSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "reservation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "status" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<CreateReservationMutation, CreateReservationMutationVariables>;
 export const CurrentUserDocument = {
   kind: "Document",
   definitions: [
@@ -3121,6 +3192,14 @@ export const GetOpportunitiesDocument = {
           { kind: "Field", name: { kind: "Name", value: "image" } },
           {
             kind: "Field",
+            name: { kind: "Name", value: "community" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+          {
+            kind: "Field",
             name: { kind: "Name", value: "place" },
             selectionSet: {
               kind: "SelectionSet",
@@ -3271,54 +3350,6 @@ export const GetOpportunityDocument = {
                       { kind: "Field", name: { kind: "Name", value: "id" } },
                       { kind: "Field", name: { kind: "Name", value: "name" } },
                       { kind: "Field", name: { kind: "Name", value: "image" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "articlesAboutMe" },
-                        arguments: [
-                          {
-                            kind: "Argument",
-                            name: { kind: "Name", value: "first" },
-                            value: { kind: "IntValue", value: "1" },
-                          },
-                        ],
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "edges" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "node" },
-                                    selectionSet: {
-                                      kind: "SelectionSet",
-                                      selections: [
-                                        { kind: "Field", name: { kind: "Name", value: "id" } },
-                                        { kind: "Field", name: { kind: "Name", value: "title" } },
-                                        {
-                                          kind: "Field",
-                                          name: { kind: "Name", value: "introduction" },
-                                        },
-                                        {
-                                          kind: "Field",
-                                          name: { kind: "Name", value: "thumbnail" },
-                                        },
-                                        {
-                                          kind: "Field",
-                                          name: { kind: "Name", value: "createdAt" },
-                                        },
-                                      ],
-                                    },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
                       {
                         kind: "Field",
                         name: { kind: "Name", value: "opportunitiesCreatedByMe" },

@@ -26,17 +26,6 @@ export const GET_OPPORTUNITY = gql`
         id
         name
         image
-        articlesAboutMe(first: 1) {
-          edges {
-            node {
-              id
-              title
-              introduction
-              thumbnail
-              createdAt
-            }
-          }
-        }
         opportunitiesCreatedByMe(first: 5) {
           edges {
             node {

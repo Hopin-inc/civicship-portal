@@ -130,6 +130,7 @@ export type Opportunity = {
     lng?: number;
   };
   community?: {
+    id: string;
     title: string;
     description: string;
     icon: string;
@@ -272,4 +273,23 @@ export type ContentType = "EXPERIENCE" | "QUEST" | "EVENT" | "ARTICLE";
 export type DateFilter = {
   startDate: Date | null;
   endDate: Date | null;
+};
+
+export type OpportunityEdge = {
+  node: Opportunity;
+};
+
+export type OpportunityConnection = {
+  edges: OpportunityEdge[];
+  pageInfo: {
+    hasNextPage: boolean;
+    endCursor: string;
+  };
+  totalCount?: number;
+};
+
+export type GetOpportunitiesData = {
+  upcoming: OpportunityConnection;
+  featured: OpportunityConnection;
+  all: OpportunityConnection;
 };
