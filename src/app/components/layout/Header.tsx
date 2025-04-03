@@ -79,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         
         <div className="flex items-center gap-2">
           {config.action}
-          {/* {user ? (
+          {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -105,7 +105,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             </DropdownMenu>
           ) : (
             <Button onClick={() => setIsLoginModalOpen(true)}>ログイン</Button>
-          )} */}
+          )}
         </div>
       </div>
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />

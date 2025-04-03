@@ -38,6 +38,7 @@ export const GET_OPPORTUNITIES = gql`
     $featuredFilter: OpportunityFilterInput
     $allFilter: OpportunityFilterInput
     $first: Int
+    $cursor: String
   ) {
     upcoming: opportunities(
       filter: $upcomingFilter
@@ -73,6 +74,7 @@ export const GET_OPPORTUNITIES = gql`
     all: opportunities(
       filter: $allFilter
       first: $first
+      cursor: $cursor
     ) {
       edges {
         node {

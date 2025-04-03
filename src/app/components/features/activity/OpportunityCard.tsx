@@ -20,7 +20,7 @@ export default function OpportunityCard({
   vertical = false,
 }: OpportunityCardProps) {
   return (
-    <Link href={`/opportunities/${id}`} className={`relative ${vertical ? 'w-full' : 'w-72'} flex-shrink-0`}>
+    <Link href={`/activities/${id}`} className={`relative ${vertical ? 'w-full' : 'w-72'} flex-shrink-0`}>
       <div className="aspect-square w-full overflow-hidden rounded-lg">
         <Image
           src={imageUrl || 'https://images.unsplash.com/photo-1578662996442-48f60103fc96'}
