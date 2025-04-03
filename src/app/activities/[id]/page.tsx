@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useOpportunity } from "@/hooks/useOpportunity";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
+import { RecentActivitiesList } from "@/app/components/features/activity/RecentActivitiesList";
 
 const ScheduleCard: React.FC<{
   startsAt: string;
@@ -101,48 +102,58 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             <p className="text-gray-700 whitespace-pre-wrap">{opportunity.body}</p>
           </section>
 
+          {/* 案内者情報 */}
           <section className="mb-12">
-            <div className="bg-gray-50 rounded-xl p-6">
-              <div className="flex items-center gap-6">
-                <div className="relative w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
-                  <Image
-                    src={opportunity.createdByUser?.image || "/placeholder.png"}
-                    alt={opportunity.createdByUser?.name || "案内者"}
-                    fill
-                    className="object-cover"
-                  />
+            <div className="rounded-xl">
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                    <Image
+                      src={opportunity.createdByUser?.image || "/placeholder.png"}
+                      alt={opportunity.createdByUser?.name || "案内者"}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold mb-1">
+                      <span className="text-xl">{opportunity.createdByUser?.name}</span>
+                      <span>さん</span>
+                    </h3>
+                    <p className="text-gray-600">が案内します</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold mb-1">
-                    <span className="text-xl">{opportunity.createdByUser?.name}</span>
-                    <span>さん</span>
-                  </h3>
-                  <p className="text-gray-600">が案内します</p>
-                  {opportunity.createdByUser?.articlesAboutMe?.edges?.[0]?.node && (
-                    <Link href="#" className="block mt-4">
-                      <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
-                        <div className="relative w-full h-[160px]">
-                          <Image
-                            src={opportunity.createdByUser.articlesAboutMe.edges[0].node.image || "/placeholder.png"}
-                            alt={opportunity.createdByUser.articlesAboutMe.edges[0].node.title}
-                            fill
-                            className="object-cover rounded-t-xl"
-                          />
-                        </div>
-                        <div className="p-4">
-                          <h5 className="text-xl font-bold mb-2 line-clamp-2">
-                            {opportunity.createdByUser.articlesAboutMe.edges[0].node.title}
-                          </h5>
-                          <p className="text-gray-600 text-sm line-clamp-2">
-                            {opportunity.createdByUser.articlesAboutMe.edges[0].node.description}
-                          </p>
-                        </div>
+                {opportunity.createdByUser?.articlesAboutMe?.edges?.[0]?.node && (
+                  <Link href="#" className="block">
+                    <div className="bg-white rounded-xl border hover:shadow-md transition-shadow duration-200">
+                      <div className="relative w-full h-[200px]">
+                        <Image
+                          src={opportunity.createdByUser.articlesAboutMe.edges[0].node.image || "/placeholder.png"}
+                          alt={opportunity.createdByUser.articlesAboutMe.edges[0].node.title}
+                          fill
+                          className="object-cover rounded-t-xl"
+                        />
                       </div>
-                    </Link>
-                  )}
-                </div>
+                      <div className="p-6">
+                        <h5 className="text-xl font-bold mb-2 line-clamp-2">
+                          {opportunity.createdByUser.articlesAboutMe.edges[0].node.title}
+                        </h5>
+                        <p className="text-gray-600 text-sm line-clamp-2">
+                          {opportunity.createdByUser.articlesAboutMe.edges[0].node.description}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                )}
               </div>
             </div>
+            {opportunity.createdByUser?.opportunitiesCreatedByMe?.edges && (
+              <div className="mt-8">
+                <RecentActivitiesList 
+                  opportunities={opportunity.createdByUser.opportunitiesCreatedByMe.edges.map(edge => edge).filter(Boolean)} 
+                />
+              </div>
+            )}
           </section>
 
           {/* 集合場所 */}
@@ -218,7 +229,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             <p className="text-sm text-gray-600">1人あたり</p>
             <p className="text-xl font-bold">¥{(opportunity.feeRequired || 0).toLocaleString()}</p>
           </div>
-          <Link href={`/reservation/select-date?activity_id=${opportunity.id}`}>
+          <Link href={`/reservation/select-date?id=${opportunity.id}&community_id=${searchParams.community_id}`}>
             <Button
               variant="default"
               className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium"

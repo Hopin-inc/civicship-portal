@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useHeader } from "@/contexts/HeaderContext";
-import { RecentActivities } from "@/app/activities/RecentActivities";
+import { RecentActivitiesTimeline } from "@/app/components/features/activity/RecentActivitiesTimeline";
 import { Calendar, Clock1, Users, JapaneseYen, CircleDollarSign, CheckCircle } from 'lucide-react';
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -13,8 +13,9 @@ export default function CompletePage() {
   const { updateConfig } = useHeader();
   const searchParams = useSearchParams();
   const opportunityId = searchParams.get("opportunity_id");
+  const communityId = searchParams.get("community_id");
 
-  const { opportunity } = useOpportunity(opportunityId || "", "cm8qzi9z80000sbtm8z42st8e");
+  const { opportunity } = useOpportunity(opportunityId || "", communityId || "");
 
   useEffect(() => {
     updateConfig({
@@ -107,7 +108,7 @@ export default function CompletePage() {
       </div>
 
       <div className="w-full mt-8 mb-16">
-        <RecentActivities opportunities={opportunitiesCreatedByHost} />
+        <RecentActivitiesTimeline opportunities={opportunitiesCreatedByHost} />
       </div>
     </main>
   );

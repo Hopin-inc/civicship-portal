@@ -90,8 +90,6 @@ export default function ActivitiesPage() {
 
   const { upcoming, featured, all } = data || { upcoming: { edges: [] }, featured: { edges: [] }, all: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } } }
 
-  console.log('upcoming', upcoming)
-
   const mapNodeToCardProps = (node: Opportunity): OpportunityCardProps => ({
     id: node.id,
     title: node.title,

@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { RefObject } from "react";
 import type { Portfolio, PortfolioCategory, PortfolioStyle } from "@/types";
 import { PORTFOLIO_CATEGORY_STYLES } from "@/types";
+import { ParticipantsList } from "@/app/components/shared/ParticipantsList";
 
 const MAX_DISPLAY_PARTICIPANTS = 3;
 
@@ -91,7 +92,7 @@ const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }:
               className="object-cover"
             />
             <div className="absolute bottom-2 left-2">
-              {portfolio.participants && renderParticipants(portfolio.participants)}
+              {portfolio.participants && <ParticipantsList participants={portfolio.participants} size="md" />}
             </div>
           </div>
           <div className="p-2 sm:p-4">

@@ -26,6 +26,21 @@ export const GET_OPPORTUNITY = gql`
         id
         name
         image
+        articlesAboutMe(
+          first: 1,
+          filter: { publishStatus: [PUBLIC], categories: ["INTERVIEW"] },
+          sort: { publishedAt: desc }
+        ) {
+          edges {
+            node {
+              id
+              title
+              introduction
+              thumbnail
+              createdAt
+            }
+          }
+        }
         opportunitiesCreatedByMe(first: 5) {
           edges {
             node {
@@ -34,6 +49,11 @@ export const GET_OPPORTUNITY = gql`
               description
               category
               capacity
+              community {
+                id
+                name
+                image
+              }
               pointsToEarn
               feeRequired
               requireApproval

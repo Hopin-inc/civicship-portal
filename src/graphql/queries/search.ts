@@ -16,6 +16,11 @@ export const SEARCH_OPPORTUNITIES = gql`
           description
           category
           capacity
+          community {
+            id
+            name
+            image
+          }
           pointsToEarn
           feeRequired
           requireApproval

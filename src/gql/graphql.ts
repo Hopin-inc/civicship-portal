@@ -2548,6 +2548,20 @@ export type GetOpportunityQuery = {
       id: string;
       name: string;
       image?: string | null;
+      articlesAboutMe?: {
+        __typename?: "ArticlesConnection";
+        edges?: Array<{
+          __typename?: "ArticleEdge";
+          node?: {
+            __typename?: "Article";
+            id: string;
+            title: string;
+            introduction: string;
+            thumbnail?: any | null;
+            createdAt: Date;
+          } | null;
+        } | null> | null;
+      } | null;
       opportunitiesCreatedByMe?: {
         __typename?: "OpportunitiesConnection";
         edges: Array<{
@@ -2566,6 +2580,12 @@ export type GetOpportunityQuery = {
             image?: string | null;
             createdAt: Date;
             updatedAt?: Date | null;
+            community?: {
+              __typename?: "Community";
+              id: string;
+              name: string;
+              image?: string | null;
+            } | null;
             slots?: {
               __typename?: "OpportunitySlotsConnection";
               edges?: Array<{
@@ -2666,6 +2686,12 @@ export type SearchOpportunitiesQuery = {
         image?: string | null;
         createdAt: Date;
         updatedAt?: Date | null;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name: string;
+          image?: string | null;
+        } | null;
         place?: {
           __typename?: "Place";
           id: string;
@@ -3352,6 +3378,95 @@ export const GetOpportunityDocument = {
                       { kind: "Field", name: { kind: "Name", value: "image" } },
                       {
                         kind: "Field",
+                        name: { kind: "Name", value: "articlesAboutMe" },
+                        arguments: [
+                          {
+                            kind: "Argument",
+                            name: { kind: "Name", value: "first" },
+                            value: { kind: "IntValue", value: "1" },
+                          },
+                          {
+                            kind: "Argument",
+                            name: { kind: "Name", value: "filter" },
+                            value: {
+                              kind: "ObjectValue",
+                              fields: [
+                                {
+                                  kind: "ObjectField",
+                                  name: { kind: "Name", value: "publishStatus" },
+                                  value: {
+                                    kind: "ListValue",
+                                    values: [{ kind: "EnumValue", value: "PUBLIC" }],
+                                  },
+                                },
+                                {
+                                  kind: "ObjectField",
+                                  name: { kind: "Name", value: "categories" },
+                                  value: {
+                                    kind: "ListValue",
+                                    values: [
+                                      { kind: "StringValue", value: "INTERVIEW", block: false },
+                                    ],
+                                  },
+                                },
+                              ],
+                            },
+                          },
+                          {
+                            kind: "Argument",
+                            name: { kind: "Name", value: "sort" },
+                            value: {
+                              kind: "ObjectValue",
+                              fields: [
+                                {
+                                  kind: "ObjectField",
+                                  name: { kind: "Name", value: "publishedAt" },
+                                  value: { kind: "EnumValue", value: "desc" },
+                                },
+                              ],
+                            },
+                          },
+                        ],
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "edges" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "node" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "title" } },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "introduction" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "thumbnail" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "createdAt" },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
                         name: { kind: "Name", value: "opportunitiesCreatedByMe" },
                         arguments: [
                           {
@@ -3388,6 +3503,27 @@ export const GetOpportunityDocument = {
                                         {
                                           kind: "Field",
                                           name: { kind: "Name", value: "capacity" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "community" },
+                                          selectionSet: {
+                                            kind: "SelectionSet",
+                                            selections: [
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "id" },
+                                              },
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "name" },
+                                              },
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "image" },
+                                              },
+                                            ],
+                                          },
                                         },
                                         {
                                           kind: "Field",
@@ -3737,6 +3873,18 @@ export const SearchOpportunitiesDocument = {
                             { kind: "Field", name: { kind: "Name", value: "description" } },
                             { kind: "Field", name: { kind: "Name", value: "category" } },
                             { kind: "Field", name: { kind: "Name", value: "capacity" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "community" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                  { kind: "Field", name: { kind: "Name", value: "image" } },
+                                ],
+                              },
+                            },
                             { kind: "Field", name: { kind: "Name", value: "pointsToEarn" } },
                             { kind: "Field", name: { kind: "Name", value: "feeRequired" } },
                             { kind: "Field", name: { kind: "Name", value: "requireApproval" } },

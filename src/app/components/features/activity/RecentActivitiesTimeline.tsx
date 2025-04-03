@@ -119,13 +119,17 @@ const transformOpportunityToHistory = (opportunity: Opportunity): OpportunityHis
     images.unshift({ url: opportunity.image, caption: opportunity.title });
   }
 
-  const participants = opportunity.participants.map(p => ({
-    id: p.id,
-    name: p.name,
-    image: p.image || undefined,
-  }));
+  const slotParticipants = opportunity.slots?.edges?.flatMap(edge => 
+    edge?.node?.participations?.edges?.map(p => ({
+      id: p?.node?.user?.id || '',
+      name: p?.node?.user?.name || '',
+      image: p?.node?.user?.image,
+    })) || []
+  ) || [];
 
-  const additionalParticipants = opportunity.capacity - participants.length;
+  const uniqueParticipants = Array.from(new Map(
+    slotParticipants.map(p => [p.id, p])
+  ).values());
 
   return {
     id: opportunity.id,
@@ -134,8 +138,8 @@ const transformOpportunityToHistory = (opportunity: Opportunity): OpportunityHis
     title: opportunity.title,
     description: opportunity.description,
     images: images.map(img => ({ url: img.url, alt: img.caption || opportunity.title })),
-    participants,
-    additionalParticipants: Math.max(0, additionalParticipants),
+    participants: uniqueParticipants,
+    additionalParticipants: 0,
   };
 };
 
@@ -154,11 +158,11 @@ const groupOpportunitiesByYear = (opportunities: OpportunityHistory[]): Opportun
   return Object.values(groups).sort((a, b) => b.year - a.year);
 };
 
-interface RecentActivitiesProps {
+interface RecentActivitiesTimelineProps {
   opportunities: Opportunity[];
 }
 
-export const RecentActivities = ({ opportunities }: RecentActivitiesProps) => {
+export const RecentActivitiesTimeline = ({ opportunities }: RecentActivitiesTimelineProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const opportunityHistories = opportunities.map(transformOpportunityToHistory);
   const groupedOpportunities = groupOpportunitiesByYear(opportunityHistories);

@@ -5,11 +5,18 @@ import { useHeader } from '@/contexts/HeaderContext'
 import { Button } from '@/app/components/ui/button'
 import { User, Calendar } from 'lucide-react'
 import Link from 'next/link'
+import { useOpportunity } from '@/hooks/useOpportunity'
+import { format } from 'date-fns'
+import { ja } from 'date-fns/locale'
+import { useRouter } from 'next/navigation'
 
 interface TimeSlot {
   time: string
   participants: number
   price: number
+  id: string
+  startsAt: string
+  endsAt: string
 }
 
 interface DateSection {
@@ -18,28 +25,14 @@ interface DateSection {
   timeSlots: TimeSlot[]
 }
 
-const mockDateSections: DateSection[] = [
-  {
-    date: '7月25日',
-    day: '木',
-    timeSlots: [
-      { time: '13:30~15:30', participants: 5, price: 2000 },
-      { time: '13:30~15:30', participants: 3, price: 2000 },
-    ]
-  },
-  {
-    date: '7月26日',
-    day: '金',
-    timeSlots: [
-      { time: '13:30~15:30', participants: 3, price: 2000 },
-    ]
-  }
-]
-
-export default function SelectDatePage() {
+export default function SelectDatePage({ searchParams }: { searchParams: { id: string; community_id: string } }) {
+  const router = useRouter()
   const { updateConfig } = useHeader()
-  const [selectedDate, setSelectedDate] = useState('2025年7月25日(木) ~ 29日(火)')
-  const [selectedGuests, setSelectedGuests] = useState('3人')
+  const { opportunity, loading, error } = useOpportunity(searchParams.id, searchParams.community_id)
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [selectedGuests, setSelectedGuests] = useState<number>(1)
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [showGuestPicker, setShowGuestPicker] = useState(false)
 
   useEffect(() => {
     updateConfig({
@@ -49,32 +42,135 @@ export default function SelectDatePage() {
     })
   }, [updateConfig])
 
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>Error: {error.message}</div>
+  if (!opportunity) return <div>No opportunity found</div>
+
+  const dateSections: DateSection[] = opportunity.slots?.edges?.reduce((acc: DateSection[], edge) => {
+    if (!edge?.node) return acc
+
+    const startDate = new Date(edge.node.startsAt)
+    const endDate = new Date(edge.node.endsAt)
+    const dateStr = format(startDate, 'M月d日', { locale: ja })
+    const dayStr = format(startDate, 'E', { locale: ja })
+    const timeStr = `${format(startDate, 'HH:mm')}~${format(endDate, 'HH:mm')}`
+    const participants = edge.node.participations?.edges?.length || 0
+    const price = opportunity.feeRequired || 0
+
+    const existingSection = acc.find(section => section.date === dateStr)
+    if (existingSection) {
+      existingSection.timeSlots.push({
+        time: timeStr,
+        participants,
+        price,
+        id: edge.node.id,
+        startsAt: edge.node.startsAt.toString(),
+        endsAt: edge.node.endsAt.toString()
+      })
+    } else {
+      acc.push({
+        date: dateStr,
+        day: dayStr,
+        timeSlots: [{
+          time: timeStr,
+          participants,
+          price,
+          id: edge.node.id,
+          startsAt: edge.node.startsAt.toString(),
+          endsAt: edge.node.endsAt.toString()
+        }]
+      })
+    }
+    return acc
+  }, []) || []
+
+  const handleDateSelect = (date: string) => {
+    setSelectedDate(date)
+    setShowDatePicker(false)
+  }
+
+  const handleGuestSelect = (count: number) => {
+    setSelectedGuests(count)
+    setShowGuestPicker(false)
+  }
+
+  const handleReservation = (slot: TimeSlot) => {
+    if (!selectedDate) return
+
+    const params = new URLSearchParams({
+      id: searchParams.id,
+      community_id: searchParams.community_id,
+      slot_id: slot.id,
+      starts_at: slot.startsAt,
+      ends_at: slot.endsAt,
+      guests: selectedGuests.toString()
+    })
+
+    router.push(`/reservation/confirm?${params.toString()}`)
+  }
+
   return (
     <main className="pt-16 px-4 pb-24">
       <div className="space-y-4 mb-8">
-        <button className="w-full bg-gray-50 rounded-xl p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-gray-500" />
-              <span className="text-gray-500">日付</span>
+        <div className="relative">
+          <button 
+            className="w-full bg-gray-50 rounded-xl p-4"
+            onClick={() => setShowDatePicker(!showDatePicker)}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-gray-500" />
+                <span className="text-gray-500">日付</span>
+              </div>
+              <div>{selectedDate || '日付を選択'}</div>
             </div>
-            <div>{selectedDate}</div>
-          </div>
-        </button>
+          </button>
+          {showDatePicker && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border p-4">
+              {dateSections.map((section, index) => (
+                <button
+                  key={index}
+                  className="w-full text-left p-2 hover:bg-gray-50 rounded-lg"
+                  onClick={() => handleDateSelect(`${section.date} (${section.day})`)}
+                >
+                  {section.date} ({section.day})
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
-        <button className="w-full bg-gray-50 rounded-xl p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <User className="h-5 w-5 text-gray-500" />
-              <span className="text-gray-500">人数</span>
+        <div className="relative">
+          <button 
+            className="w-full bg-gray-50 rounded-xl p-4"
+            onClick={() => setShowGuestPicker(!showGuestPicker)}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-gray-500" />
+                <span className="text-gray-500">人数</span>
+              </div>
+              <div>{selectedGuests}人</div>
             </div>
-            <div>{selectedGuests}</div>
-          </div>
-        </button>
+          </button>
+          {showGuestPicker && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border p-4">
+              {[1, 2, 3, 4, 5].map((count) => (
+                <button
+                  key={count}
+                  className="w-full text-left p-2 hover:bg-gray-50 rounded-lg"
+                  onClick={() => handleGuestSelect(count)}
+                >
+                  {count}人
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="space-y-8">
-        {mockDateSections.map((section, index) => (
+        {dateSections.map((section, index) => (
           <div key={index}>
             <h3 className="text-xl mb-4">{section.date} ({section.day})</h3>
             <div className="space-y-4">
@@ -88,15 +184,15 @@ export default function SelectDatePage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="text-xl font-bold">{slot.price.toLocaleString()}円/人〜</p>
-                    <Link href="/reservation/confirm">
-                      <Button
-                        variant="default"
-                        size="lg"
-                        className="rounded-full"
-                      >
-                        選択
-                      </Button>
-                    </Link>
+                    <Button
+                      variant="default"
+                      size="lg"
+                      className="rounded-full"
+                      onClick={() => handleReservation(slot)}
+                      disabled={!selectedDate}
+                    >
+                      選択
+                    </Button>
                   </div>
                 </div>
               ))}

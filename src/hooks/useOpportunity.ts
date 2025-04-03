@@ -37,6 +37,7 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
       isOnline: false,
     },
     community: data.community ? {
+      id: data.community.id,
       title: data.community.name,
       description: "",
       icon: data.community.image || "",
@@ -79,6 +80,7 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
       lng: data.place?.longitude || undefined,
     },
     community: data.community ? {
+      id: data.community.id,
       title: data.community.name,
       description: "",
       icon: data.community.image || "",
@@ -107,8 +109,8 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
       } : undefined,
       opportunitiesCreatedByMe: data.createdByUser.opportunitiesCreatedByMe ? {
         edges: data.createdByUser.opportunitiesCreatedByMe.edges
-          ?.map(edge => edge.node)
-          .filter(node => node.id !== data.id)
+          ?.map(edge => edge?.node)
+          .filter((node): node is NonNullable<typeof node> => node != null && node.id !== data.id)
           .map(transformOpportunityNode) || [],
       } : undefined,
     } : undefined,
