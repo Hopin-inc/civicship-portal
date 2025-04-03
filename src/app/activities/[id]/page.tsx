@@ -112,27 +112,26 @@ export default function ActivityPage({ params }: ActivityPageProps) {
                   </h3>
                   <p className="text-gray-600">が案内します</p>
                   {opportunity.createdByUser?.articlesAboutMe?.edges?.[0]?.node && (
-                    <div className="bg-white rounded-lg p-4">
-                      <h4 className="font-bold mb-2">最新の記事</h4>
-                      <div className="flex gap-4">
-                        <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                    <Link href="#" className="block mt-4">
+                      <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
+                        <div className="relative w-full h-[160px]">
                           <Image
                             src={opportunity.createdByUser.articlesAboutMe.edges[0].node.image || "/placeholder.png"}
                             alt={opportunity.createdByUser.articlesAboutMe.edges[0].node.title}
                             fill
-                            className="object-cover"
+                            className="object-cover rounded-t-xl"
                           />
                         </div>
-                        <div>
-                          <h5 className="font-bold mb-1 line-clamp-2">
+                        <div className="p-4">
+                          <h5 className="text-xl font-bold mb-2 line-clamp-2">
                             {opportunity.createdByUser.articlesAboutMe.edges[0].node.title}
                           </h5>
-                          <p className="text-sm text-gray-600 line-clamp-2">
+                          <p className="text-gray-600 text-sm line-clamp-2">
                             {opportunity.createdByUser.articlesAboutMe.edges[0].node.description}
                           </p>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   )}
                 </div>
               </div>

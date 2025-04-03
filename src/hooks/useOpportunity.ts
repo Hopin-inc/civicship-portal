@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { GET_OPPORTUNITY } from "../graphql/queries/opportunity";
 import type { Opportunity as GraphQLOpportunity } from "../gql/graphql";
-import type { Opportunity } from "../types";
+import type { Opportunity, Article } from "../types";
 
 interface UseOpportunityResult {
   opportunity: Opportunity | null;
@@ -101,9 +101,9 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
           node: {
             title: edge?.node?.title || "",
             description: edge?.node?.introduction || "",
-            image: edge?.node?.thumbnail ? (edge.node.thumbnail as any).url : undefined,
-          },
-        })) || [],
+            image: edge?.node?.thumbnail ? (edge.node.thumbnail as any).url : undefined
+          }
+        })) || []
       } : undefined,
       opportunitiesCreatedByMe: data.createdByUser.opportunitiesCreatedByMe ? {
         edges: data.createdByUser.opportunitiesCreatedByMe.edges

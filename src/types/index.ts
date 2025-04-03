@@ -27,7 +27,6 @@ export type SocialLink = {
   url: string;
 };
 
-
 // Portfolio related types
 export type PortfolioCategory = 'QUEST' | 'ACTIVITY_REPORT' | 'INTERVIEW' | 'OPPORTUNITY' | 'ACTIVITY';
 export type PortfolioType = 'opportunity' | 'activity_report' | 'quest';

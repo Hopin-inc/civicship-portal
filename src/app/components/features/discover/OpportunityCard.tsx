@@ -1,15 +1,18 @@
 import Image from 'next/image'
 import { MapPin } from 'lucide-react'
+import Link from 'next/link'
 
-interface OpportunityCardProps {
+export interface OpportunityCardProps {
+  id: string
   title: string
-  price: number
+  price: number | null
   location: string
-  imageUrl: string
+  imageUrl: string | null
   vertical?: boolean
 }
 
 export default function OpportunityCard({
+  id,
   title,
   price,
   location,
@@ -17,26 +20,28 @@ export default function OpportunityCard({
   vertical = false,
 }: OpportunityCardProps) {
   return (
-    <div className={`relative ${vertical ? 'w-full' : 'w-72'} flex-shrink-0`}>
+    <Link href={`/opportunities/${id}`} className={`relative ${vertical ? 'w-full' : 'w-72'} flex-shrink-0`}>
       <div className="aspect-square w-full overflow-hidden rounded-lg">
         <Image
-          src={imageUrl}
+          src={imageUrl || 'https://images.unsplash.com/photo-1578662996442-48f60103fc96'}
           alt={title}
-          width={200}
-          height={200}
+          width={400}
+          height={400}
           className="h-full w-full object-cover"
         />
       </div>
       <div className="mt-2">
-        <h3 className="text-sm font-medium text-gray-900">{title}</h3>
+        <h3 className="text-sm font-medium text-gray-900 line-clamp-2">{title}</h3>
         <div className="mt-1 flex flex-col">
-          <p className="text-sm text-gray-500">{`${price.toLocaleString()}円/人〜`}</p>
+          <p className="text-sm text-gray-500">
+            {price ? `${price.toLocaleString()}円/人〜` : '価格未定'}
+          </p>
           <div className="flex items-center text-sm text-gray-500 mt-1">
             <MapPin className="mr-1 h-4 w-4" />
             {location}
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   )
 } 
