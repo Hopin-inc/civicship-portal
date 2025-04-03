@@ -40,6 +40,7 @@ export const GET_OPPORTUNITIES = gql`
     $upcomingFilter: OpportunityFilterInput
     $featuredFilter: OpportunityFilterInput
     $allFilter: OpportunityFilterInput
+    $similarFilter: OpportunityFilterInput
     $first: Int
     $cursor: String
   ) {
@@ -62,6 +63,21 @@ export const GET_OPPORTUNITIES = gql`
     featured: opportunities(
       filter: $featuredFilter
       first: 5
+    ) {
+      edges {
+        node {
+          ...OpportunityFields
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+    
+    similar: opportunities(
+      filter: $similarFilter
+      first: 3
     ) {
       edges {
         node {

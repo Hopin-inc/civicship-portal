@@ -8,6 +8,8 @@ import { useOpportunity } from "@/hooks/useOpportunity";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { RecentActivitiesList } from "@/app/components/features/activity/RecentActivitiesList";
+import { useSimilarOpportunities } from "@/hooks/useSimilarOpportunities";
+import { SimilarActivitiesList } from "@/app/components/features/activity/SimilarActivitiesList";
 
 const ScheduleCard: React.FC<{
   startsAt: string;
@@ -57,6 +59,10 @@ interface ActivityPageProps {
 
 export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
   const { opportunity, loading, error } = useOpportunity(params.id, searchParams.community_id || "");
+  const { similarOpportunities, loading: similarLoading } = useSimilarOpportunities({
+    opportunityId: params.id,
+    communityId: searchParams.community_id || "",
+  });
 
   if (!searchParams.community_id) {
     return <div>Community ID is required</div>;
@@ -177,7 +183,6 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             </div>
           </section>
 
-          {/* 開催日 */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6">開催日</h2>
             <p className="text-gray-600 mb-4">申込可能な時間枠の数：{availableDates.length}</p>
@@ -197,8 +202,6 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
               </div>
             </div>
           </section>
-
-          {/* 注意事項 */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6">注意事項</h2>
             <ul className="space-y-4">
@@ -212,13 +215,16 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
                   <span>参加には承認が必要です</span>
                 </li>
               )}
-              {opportunity.pointsRequired && (
-                <li className="flex items-start gap-2">
-                  <AlertCircle className="h-5 w-5 text-gray-500 flex-shrink-0 mt-1" />
-                  <span>参加には{opportunity.pointsRequired}ポイントが必要です</span>
-                </li>
-              )}
             </ul>
+          </section>
+
+          <section className="mb-12">
+            {!similarLoading && similarOpportunities && (
+              <SimilarActivitiesList
+                opportunities={similarOpportunities}
+                currentOpportunityId={opportunity.id}
+              />
+            )}
           </section>
         </div>
       </main>

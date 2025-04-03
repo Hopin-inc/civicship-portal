@@ -3,11 +3,12 @@
 import { useEffect } from "react";
 import { useHeader } from "@/contexts/HeaderContext";
 import { RecentActivitiesTimeline } from "@/app/components/features/activity/RecentActivitiesTimeline";
+import { SimilarActivitiesList } from "@/app/components/features/activity/SimilarActivitiesList";
 import { Calendar, Clock1, Users, JapaneseYen, CircleDollarSign, CheckCircle } from 'lucide-react';
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useOpportunity } from "@/hooks/useOpportunity";
-import type { Opportunity } from "@/types";
+import { useSimilarOpportunities } from "@/hooks/useSimilarOpportunities";
 
 export default function CompletePage() {
   const { updateConfig } = useHeader();
@@ -16,6 +17,10 @@ export default function CompletePage() {
   const communityId = searchParams.get("community_id");
 
   const { opportunity } = useOpportunity(opportunityId || "", communityId || "");
+  const { similarOpportunities } = useSimilarOpportunities({ 
+    opportunityId: opportunityId || "",
+    communityId: communityId || ""
+  });
 
   useEffect(() => {
     updateConfig({
@@ -108,6 +113,10 @@ export default function CompletePage() {
       </div>
 
       <div className="w-full mt-8 mb-16">
+        <SimilarActivitiesList 
+          opportunities={similarOpportunities} 
+          currentOpportunityId={opportunity.id}
+        />
         <RecentActivitiesTimeline opportunities={opportunitiesCreatedByHost} />
       </div>
     </main>

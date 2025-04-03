@@ -10,6 +10,11 @@ type OpportunityHistory = {
   id: string
   title: string
   description: string
+  location?: {
+    name: string
+    address: string
+  }
+  date?: string
   images: {
     url: string
     alt: string
@@ -26,7 +31,7 @@ type OpportunityHistory = {
 
 const ActivityCard = memo(({ opportunity }: { opportunity: OpportunityHistory }) => (
   <Link href={`/activities/${opportunity.id}${opportunity.community?.id ? `?community_id=${opportunity.community.id}` : ''}`} className="block">
-    <div className="flex-shrink-0 w-[200px] bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <div className="flex-shrink-0 w-[200px] bg-white rounded-lg overflow-hidden">
       <div className="relative h-[250px] w-full">
         {opportunity.images[0] && (
           <Image
@@ -41,7 +46,11 @@ const ActivityCard = memo(({ opportunity }: { opportunity: OpportunityHistory })
         </div>
       </div>
       <div className="p-4">
-        <h3 className="text-base font-medium line-clamp-2">{opportunity.title}</h3>
+        <h3 className="text-base font-medium line-clamp-1 mb-1">{opportunity.title}</h3>
+        <div className="text-sm text-gray-500">
+          {opportunity.date && <p>{opportunity.date}</p>}
+          {opportunity.location && <p>・{opportunity.location.name}</p>}
+        </div>
       </div>
     </div>
   </Link>
@@ -66,10 +75,24 @@ const transformOpportunityToHistory = (opportunity: Opportunity): OpportunityHis
     slotParticipants.map(p => [p.id, p])
   ).values());
 
+  const firstSlot = opportunity.slots?.edges?.[0]?.node;
+  const date = firstSlot?.startsAt 
+    ? new Date(firstSlot.startsAt).toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      })
+    : undefined;
+
   return {
     id: opportunity.id,
     title: opportunity.title,
     description: opportunity.description,
+    location: opportunity.place ? {
+      name: opportunity.place.name,
+      address: opportunity.place.address
+    } : undefined,
+    date,
     images: images.map(img => ({ url: img.url, alt: img.caption || opportunity.title })),
     participants: uniqueParticipants,
     community: opportunity.community,
