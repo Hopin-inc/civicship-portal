@@ -175,7 +175,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
                   </div>
                 </div>
                 {opportunity.createdByUser?.articlesAboutMe?.edges?.[0]?.node && (
-                  <Link href="#" className="block">
+                  <Link href={`/articles/${opportunity.createdByUser.articlesAboutMe.edges[0].node.id}`} className="block">
                     <div className="bg-white rounded-xl border hover:shadow-md transition-shadow duration-200">
                       <div className="relative w-full h-[200px]">
                         <Image

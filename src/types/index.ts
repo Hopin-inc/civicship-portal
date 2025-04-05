@@ -149,6 +149,7 @@ export type Opportunity = {
     articlesAboutMe?: {
       edges: Array<{
         node: {
+          id: string;
           title: string;
           description: string;
           image?: string;
@@ -209,19 +210,15 @@ export type Article = {
   description: string;
   content: string;
   type: ArticleType;
-  thumbnail: string;
+  thumbnail: string | null;
   publishedAt: string;
   author: {
     name: string;
     image: string;
     bio?: string;
   };
-  relatedActivityId?: string;
-  relatedUserId?: string;
-  tags: string[];
-  status: "draft" | "published";
   createdAt: string;
-  updatedAt: string;
+  updatedAt: string | null;
 };
 
 export type Activity = {
