@@ -77,7 +77,6 @@ export const ArticleDetail = ({
   relatedArticles = [],
 }: ArticleDetailProps) => {
   const [contentHtml, setContentHtml] = useState<string>("");
-  const { updateConfig } = useHeader();
 
   useEffect(() => {
     convertMarkdownToHtml(article.content)
@@ -87,25 +86,6 @@ export const ArticleDetail = ({
       })
       .catch((error) => console.error("Error converting markdown:", error));
   }, [article.content]);
-
-  useEffect(() => {
-    // Update header with author name
-    updateConfig({
-      title: `${article.author?.name || 'ユーザー'}さんの記事`,
-      showBackButton: true,
-      showLogo: false,
-      showSearchForm: false,
-    });
-
-    // Cleanup function to reset header when component unmounts
-    return () => {
-      updateConfig({
-        showBackButton: false,
-        showLogo: true,
-        showSearchForm: false,
-      });
-    };
-  }, [article.author?.name, updateConfig]);
 
   return (
     <div className="max-w-[375px] mx-auto pt-10 pb-32 px-2">
@@ -137,7 +117,14 @@ export const ArticleDetail = ({
 
       <article className="px-4 py-6">
         <div
-          className="prose prose-slate max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-a:text-blue-600 prose-strong:text-gray-900 prose-img:rounded-lg prose-img:shadow-lg prose-p:my-4 prose-img:my-8 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic"
+          className="prose prose-slate max-w-none
+            prose-h1:text-2xl prose-h1:border-l-4 prose-h1:border-[#4361EE] prose-h1:pl-4 prose-h1:py-2 prose-h1:mb-6
+            prose-h2:text-xl prose-h2:border-l-4 prose-h2:border-[#4361EE] prose-h2:pl-4 prose-h2:py-2 prose-h2:mb-6
+            prose-p:text-base prose-p:leading-relaxed prose-p:text-gray-700 prose-p:mb-4
+            prose-a:text-blue-600 
+            prose-strong:text-gray-900 
+            prose-img:rounded-lg prose-img:shadow-lg prose-img:my-8 
+            prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic"
           dangerouslySetInnerHTML={{ __html: contentHtml }}
         />
       </article>

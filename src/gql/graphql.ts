@@ -2479,6 +2479,38 @@ export type GetArticleQuery = {
   };
 };
 
+export type GetArticlesQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ArticleFilterInput>;
+  sort?: InputMaybe<ArticleSortInput>;
+}>;
+
+export type GetArticlesQuery = {
+  __typename?: "Query";
+  articles: {
+    __typename?: "ArticlesConnection";
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+    edges?: Array<{
+      __typename?: "ArticleEdge";
+      node?: {
+        __typename?: "Article";
+        id: string;
+        title: string;
+        introduction: string;
+        thumbnail?: any | null;
+        publishedAt?: Date | null;
+        authors?: Array<{
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+        }> | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CurrentUserQuery = {
@@ -3196,6 +3228,120 @@ export const GetArticleDocument = {
     },
   ],
 } as unknown as DocumentNode<GetArticleQuery, GetArticleQueryVariables>;
+export const GetArticlesDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetArticles" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "first" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "ArticleFilterInput" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "sort" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "ArticleSortInput" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "articles" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "Variable", name: { kind: "Name", value: "first" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "cursor" },
+                value: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "filter" },
+                value: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "sort" },
+                value: { kind: "Variable", name: { kind: "Name", value: "sort" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                      { kind: "Field", name: { kind: "Name", value: "endCursor" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "edges" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "node" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "title" } },
+                            { kind: "Field", name: { kind: "Name", value: "introduction" } },
+                            { kind: "Field", name: { kind: "Name", value: "thumbnail" } },
+                            { kind: "Field", name: { kind: "Name", value: "publishedAt" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "authors" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                  { kind: "Field", name: { kind: "Name", value: "image" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetArticlesQuery, GetArticlesQueryVariables>;
 export const CurrentUserDocument = {
   kind: "Document",
   definitions: [

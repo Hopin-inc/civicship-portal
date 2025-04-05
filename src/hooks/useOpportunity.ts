@@ -116,6 +116,7 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
       articlesAboutMe: data.createdByUser.articlesAboutMe ? {
         edges: data.createdByUser.articlesAboutMe.edges?.map(edge => ({
           node: {
+            id: edge?.node?.id || "",
             title: edge?.node?.title || "",
             description: edge?.node?.introduction || "",
             image: edge?.node?.thumbnail ? (edge.node.thumbnail as any).url : undefined

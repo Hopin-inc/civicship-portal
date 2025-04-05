@@ -1,0 +1,70 @@
+import Image from 'next/image';
+import Link from 'next/link';
+import { format } from 'date-fns';
+
+interface Author {
+  id: string;
+  name: string;
+  image: string | null;
+}
+
+interface ArticleCardProps {
+  id: string;
+  title: string;
+  introduction: string;
+  thumbnail: any;
+  publishedAt: string;
+  authors: Author[];
+}
+
+export default function ArticleCard({
+  id,
+  title,
+  introduction,
+  thumbnail,
+  publishedAt,
+  authors,
+}: ArticleCardProps) {
+  const mainAuthor = authors[0];
+  const thumbnailUrl = thumbnail?.url || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3270&auto=format&fit=crop';
+  const authorImageUrl = mainAuthor?.image || '/images/default-avatar.jpg';
+
+  return (
+    <Link href={`/articles/${id}`} className="block group">
+      <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+        <div className="relative aspect-[16/9]">
+          <Image
+            src={thumbnailUrl}
+            alt={title}
+            fill
+            className="object-cover"
+          />
+        </div>
+        <div className="p-4">
+          <h2 className="text-xl font-bold mb-2 group-hover:text-blue-600 transition-colors">
+            {title}
+          </h2>
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+            {introduction}
+          </p>
+          <div className="flex items-center">
+            <div className="relative w-8 h-8 rounded-full overflow-hidden mr-3">
+              <Image
+                src={authorImageUrl}
+                alt={mainAuthor?.name || '著者'}
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <p className="text-sm font-medium">{mainAuthor?.name}</p>
+              <p className="text-xs text-gray-500">
+                {format(new Date(publishedAt), 'yyyy年MM月dd日')}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+} 
