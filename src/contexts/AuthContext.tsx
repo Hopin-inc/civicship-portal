@@ -67,7 +67,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (!success) {
         toast.error("認証に失敗しました");
       }
-      
       return success;
     } catch (error) {
       toast.error("認証に失敗しました");

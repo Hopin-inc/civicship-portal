@@ -10,6 +10,8 @@ import { ja } from "date-fns/locale";
 import { RecentActivitiesList } from "@/app/components/features/activity/RecentActivitiesList";
 import { useSimilarOpportunities } from "@/hooks/useSimilarOpportunities";
 import { SimilarActivitiesList } from "@/app/components/features/activity/SimilarActivitiesList";
+import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
+import { Participation } from "@/types";
 
 const ScheduleCard: React.FC<{
   startsAt: string;
@@ -107,6 +109,49 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             <h2 className="text-2xl font-bold mb-4">体験できること</h2>
             <p className="text-gray-700 whitespace-pre-wrap">{opportunity.body}</p>
           </section>
+
+          {opportunity.slots?.edges?.some(edge => 
+            edge?.node?.participations?.edges?.some(p => {
+              const participation = p as Participation;
+              return participation?.node?.images && Array.isArray(participation.node.images) && participation.node.images.length > 0;
+            })
+          ) && (
+            <section className="mb-12">
+              <div className="max-w-3xl">
+                {(() => {
+                  const allImages = opportunity.slots?.edges?.flatMap(edge => 
+                    edge?.node?.participations?.edges?.flatMap(p => {
+                      const participation = p as Participation;
+                      return (Array.isArray(participation?.node?.images) ? participation.node.images : []).map(img => ({
+                        url: (img as any).url || img,
+                        alt: "参加者の写真"
+                      }));
+                    }) || []
+                  ).filter(Boolean) || [];
+
+                  const displayImages = allImages.slice(0, 3);
+                  const remainingCount = Math.max(0, allImages.length - 3);
+
+                  return (
+                    <div className="space-y-4">
+                      <AsymmetricImageGrid images={displayImages} />
+                      {remainingCount > 0 && (
+                        <Button
+                          variant="outline"
+                          className="w-full border-2 border-[#4361EE] text-[#4361EE] hover:bg-[#4361EE] hover:text-white"
+                          onClick={() => {
+                            console.log(`残りの画像枚数: ${remainingCount}枚`);
+                          }}
+                        >
+                          {remainingCount + 3}枚の写真をすべて見る
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            </section>
+          )}
 
           {/* 案内者情報 */}
           <section className="mb-12">

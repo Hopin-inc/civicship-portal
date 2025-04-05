@@ -268,6 +268,28 @@ export type Participant = {
   image?: string;
 };
 
+export type ParticipationImage = {
+  id: string;
+  url: string;
+  caption: string | null;
+  participationId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Participation = {
+  node: {
+    id: string;
+    status: string;
+    images?: ParticipationImage[];
+    user: {
+      id: string;
+      name: string;
+      image?: string;
+    };
+  };
+};
+
 export type ContentType = "EXPERIENCE" | "QUEST" | "EVENT" | "ARTICLE";
 
 export type DateFilter = {

@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { GET_OPPORTUNITY } from "../graphql/queries/opportunity";
 import type { Opportunity as GraphQLOpportunity } from "../gql/graphql";
-import type { Opportunity, Article } from "../types";
+import type { Opportunity, Article, Participation } from "../types";
 
 interface UseOpportunityResult {
   opportunity: Opportunity | null;
@@ -52,6 +52,21 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
     feeRequired: node.feeRequired,
     slots: node.slots,
   });
+
+  const transformParticipationNode = (pEdge: any): Participation => ({
+    node: {
+      id: pEdge?.node?.id || "",
+      status: pEdge?.node?.status || "",
+      images: pEdge?.node?.images || [],
+      user: {
+        id: pEdge?.node?.user?.id || "",
+        name: pEdge?.node?.user?.name || "",
+        image: pEdge?.node?.user?.image || undefined,
+      },
+    },
+  });
+
+  console.log('transformOpportunity', data)
 
   return {
     id: data.id,
@@ -130,17 +145,7 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
           startsAt: edge?.node?.startsAt || "",
           endsAt: edge?.node?.endsAt || "",
           participations: edge?.node?.participations ? {
-            edges: edge.node.participations.edges?.map(pEdge => ({
-              node: {
-                id: pEdge?.node?.id || "",
-                status: pEdge?.node?.status || "",
-                user: {
-                  id: pEdge?.node?.user?.id || "",
-                  name: pEdge?.node?.user?.name || "",
-                  image: pEdge?.node?.user?.image || undefined,
-                },
-              },
-            })) || [],
+            edges: edge.node.participations.edges?.map(transformParticipationNode) || [],
           } : undefined,
         },
       })) || [],
@@ -161,8 +166,6 @@ export const useOpportunity = (id: string, communityId: string): UseOpportunityR
       console.error('Opportunity query error:', error);
     },
   });
-
-  console.log('data', data)
 
   return {
     opportunity: data ? transformOpportunity(data.opportunity) : null,

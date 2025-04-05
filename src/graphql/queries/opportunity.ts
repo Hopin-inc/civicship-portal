@@ -111,6 +111,7 @@ export const GET_OPPORTUNITY = gql`
                 node {
                   id
                   status
+                  images
                   user {
                     id
                     name
