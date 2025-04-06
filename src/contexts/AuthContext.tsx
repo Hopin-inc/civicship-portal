@@ -1,13 +1,14 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { User } from "@/gql/graphql";
+import { User, CurrentPrefecture, IdentityPlatform } from "@/gql/graphql";
 import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import { GET_CURRENT_USER } from "@/graphql/queries/identity";
+import { USER_SIGN_UP } from "@/graphql/mutations/identity";
 import { auth, signInWithLiffToken } from "@/lib/firebase";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
@@ -15,7 +16,7 @@ import { useLiff } from "./LiffContext";
 
 type UserInfo = {
   uid: string | null;
-  user: Required<Partial<User>, "id" | "lastName" | "firstName"> | null;
+  user: Required<Partial<User>, "id" | "name"> | null;
 };
 
 type AuthContextType = UserInfo & {
@@ -23,6 +24,7 @@ type AuthContextType = UserInfo & {
   logout: () => Promise<void>;
   loginWithLiff: () => Promise<void>;
   isAuthenticating: boolean;
+  createUser: (name: string, currentPrefecture: CurrentPrefecture) => Promise<Required<Partial<User>, "id" | "name"> | null>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,16 +44,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserInfo["user"]>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
+  const [userSignUpMutation] = useMutation(USER_SIGN_UP);
+
   const loginWithLiff = async () => {
     if (!liff) {
       return;
     }
 
     try {
-      // console.log("すでにLIFFログインしている場合はIDトークンでFirebase認証を試みる");
-      // if (isLiffLoggedIn && liffAccessToken) {
-      //   return authenticateWithLiffToken(liffAccessToken);
-      // }
       await liffLogin();
     } catch (error) {
       console.error("LIFF login failed:", error);
@@ -99,16 +99,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const { data } = await refetch();
         const fetchedUser = data.currentUser?.user ?? null;
         console.log("fetchedUser", fetchedUser);
-        login({ uid: user.uid, user: fetchedUser });
-
-        // if (fetchedUser) {
-        //   toast.success("ログインしました！");
-        //   if (next) {
-        //     router.push(next);
-        //   }
-        // } else {
-        //   router.push("/sign-up");
-        // }
+        if (fetchedUser) {
+          login({ 
+            uid: user.uid, 
+            user: {
+              id: fetchedUser.id,
+              name: fetchedUser.name
+            }
+          });
+          toast.success("ログインしました！");
+          if (next) {
+            router.push(next);
+          }
+        } else {
+          router.push("/sign-up");
+        }
       } else {
         login(null);
         cookies.remove("access_token");
@@ -148,6 +153,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const createUser = async (name: string, currentPrefecture: CurrentPrefecture): Promise<Required<Partial<User>, "id" | "name"> | null> => {
+    try {
+      const { data } = await userSignUpMutation({
+        variables: {
+          input: {
+            name,
+            currentPrefecture
+          },
+        },
+      });
+      return data?.userSignUp?.user ?? null;
+    } catch (error) {
+      console.error("Failed to create user:", error);
+      toast.error("ユーザー作成に失敗しました");
+      return null;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       uid, 
@@ -155,7 +178,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       login, 
       logout, 
       loginWithLiff,
-      isAuthenticating
+      isAuthenticating,
+      createUser
     }}>
       {children}
     </AuthContext.Provider>

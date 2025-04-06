@@ -13,7 +13,7 @@ type LoginModalProps = {
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { loginWithLiff, isAuthenticating } = useAuth();
+  const { loginWithLiff, isAuthenticating, logout } = useAuth();
 
   const handleLogin = async () => {
     setIsLoading(true);
