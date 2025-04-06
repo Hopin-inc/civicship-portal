@@ -22,13 +22,22 @@ function mapCategoryToArticleType(category: string | null | undefined): ArticleT
 }
 
 function transformGraphQLArticleToArticle(graphqlArticle: any): Article {
+  // Extract thumbnail data
+  const thumbnailData = graphqlArticle.thumbnail;
+  const thumbnail = thumbnailData && Array.isArray(thumbnailData) && thumbnailData.length > 0 
+    ? {
+        url: thumbnailData[0].url,
+        alt: thumbnailData[0].alt || graphqlArticle.title
+      }
+    : null;
+
   return {
     id: graphqlArticle.id,
     title: graphqlArticle.title,
     description: graphqlArticle.introduction,
     content: graphqlArticle.body ?? '',
     type: mapCategoryToArticleType(graphqlArticle.category),
-    thumbnail: graphqlArticle.thumbnail ?? null,
+    thumbnail: thumbnail,
     publishedAt: graphqlArticle.publishedAt,
     author: graphqlArticle.authors?.[0] ? {
       name: graphqlArticle.authors[0].name,

@@ -90,14 +90,17 @@ export const ArticleDetail = ({
   return (
     <div className="max-w-[375px] mx-auto pt-10 pb-32 px-2">
       <div className="bg-white relative rounded-[8px]">
-        {/* {article.thumbnail && ( */}
-          <div className="relative w-full h-[210px]">
-            <Image src={"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3270&auto=format&fit=crop"} alt={article.title} fill className="object-cover" />
-            <div className="absolute top-4 left-4">
-              <CategoryBadge type={article.type} />
-            </div>
+        <div className="relative w-full h-[210px]">
+          <Image
+            src={article.thumbnail?.url || "/placeholder.svg"}
+            alt={article.thumbnail?.alt || article.title}
+            fill
+            className="object-cover"
+          />
+          <div className="absolute top-4 left-4">
+            <CategoryBadge type={article.type} />
           </div>
-        {/* )} */}
+        </div>
 
         <div className="relative -mt-8 bg-white rounded-2xl shadow-md mx-4">
           <div className="px-4 pt-6 pb-4">
@@ -164,11 +167,8 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div className="relative w-full h-48">
           <Image
-            src={
-              article.thumbnail ||
-              "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3270&auto=format&fit=crop"
-            }
-            alt={article.title}
+            src={article.thumbnail?.url || "/placeholder.svg"}
+            alt={article.thumbnail?.alt || article.title}
             fill
             className="object-cover"
           />

@@ -179,8 +179,8 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
                     <div className="bg-white rounded-xl border hover:shadow-md transition-shadow duration-200">
                       <div className="relative w-full h-[200px]">
                         <Image
-                          src={opportunity.createdByUser.articlesAboutMe.edges[0].node.image || "/placeholder.png"}
-                          alt={opportunity.createdByUser.articlesAboutMe.edges[0].node.title}
+                          src={(opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail?.url ?? "/placeholder.png") as string}
+                          alt={opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail?.alt || opportunity.createdByUser.articlesAboutMe.edges[0].node.title || ""}
                           fill
                           className="object-cover rounded-t-xl"
                         />

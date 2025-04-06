@@ -148,12 +148,7 @@ export type Opportunity = {
     image?: string;
     articlesAboutMe?: {
       edges: Array<{
-        node: {
-          id: string;
-          title: string;
-          description: string;
-          image?: string;
-        };
+        node: Partial<Article>;
       }>;
     };
     opportunitiesCreatedByMe?: {
@@ -210,7 +205,10 @@ export type Article = {
   description: string;
   content: string;
   type: ArticleType;
-  thumbnail: string | null;
+  thumbnail: {
+    url: string;
+    alt: string;
+  } | null;
   publishedAt: string;
   author: {
     name: string;

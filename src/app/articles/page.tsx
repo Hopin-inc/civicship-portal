@@ -19,7 +19,10 @@ interface GetArticlesData {
         id: string;
         title: string;
         introduction: string;
-        thumbnail: any;
+        thumbnail: Array<{
+          url: string;
+          alt: string;
+        }>;
         publishedAt: string;
         authors: Array<{
           id: string;
@@ -101,12 +104,18 @@ export default function ArticlesPage() {
     );
   }
 
-  const articles = data?.articles.edges.map((edge) => edge.node) ?? [];
+  const articles = data?.articles.edges.map((edge) => {
+    const node = edge.node;
+    return {
+      ...node,
+      thumbnail: node.thumbnail?.[0] || null,
+    };
+  }) ?? [];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">記事一覧</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="container mx-auto px-4 py-8 max-w-xl">
+      <h1 className="text-2xl font-bold mb-8">記事一覧</h1>
+      <div className="grid grid-cols-1 gap-6">
         {articles.map((article) => (
           <ArticleCard key={article.id} {...article} />
         ))}

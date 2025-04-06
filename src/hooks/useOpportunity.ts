@@ -9,6 +9,23 @@ interface UseOpportunityResult {
   error: Error | null;
 }
 
+const transformArticle = (node: any): Partial<Article> => {
+  const thumbnailData = node.thumbnail;
+  const thumbnail = thumbnailData && Array.isArray(thumbnailData) && thumbnailData.length > 0
+    ? {
+        url: thumbnailData[0].url,
+        alt: thumbnailData[0].alt || node.title
+      }
+    : null;
+
+  return {
+    id: node.id,
+    title: node.title,
+    description: node.introduction || "",
+    thumbnail
+  };
+};
+
 const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | null => {
   if (!data) return null;
 
@@ -115,12 +132,7 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
       image: data.createdByUser.image || undefined,
       articlesAboutMe: data.createdByUser.articlesAboutMe ? {
         edges: data.createdByUser.articlesAboutMe.edges?.map(edge => ({
-          node: {
-            id: edge?.node?.id || "",
-            title: edge?.node?.title || "",
-            description: edge?.node?.introduction || "",
-            image: edge?.node?.thumbnail ? (edge.node.thumbnail as any).url : undefined
-          }
+          node: transformArticle(edge?.node)
         })) || []
       } : undefined,
       opportunitiesCreatedByMe: data.createdByUser.opportunitiesCreatedByMe ? {

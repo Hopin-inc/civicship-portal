@@ -12,7 +12,10 @@ interface ArticleCardProps {
   id: string;
   title: string;
   introduction: string;
-  thumbnail: any;
+  thumbnail: {
+    url: string;
+    alt: string;
+  } | null;
   publishedAt: string;
   authors: Author[];
 }
@@ -26,7 +29,7 @@ export default function ArticleCard({
   authors,
 }: ArticleCardProps) {
   const mainAuthor = authors[0];
-  const thumbnailUrl = thumbnail?.url || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3270&auto=format&fit=crop';
+  const thumbnailUrl = thumbnail?.url || '';
   const authorImageUrl = mainAuthor?.image || '/images/default-avatar.jpg';
 
   return (
@@ -40,11 +43,11 @@ export default function ArticleCard({
             className="object-cover"
           />
         </div>
-        <div className="p-4">
+        <div className="p-5">
           <h2 className="text-xl font-bold mb-2 group-hover:text-blue-600 transition-colors">
             {title}
           </h2>
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+          <p className="text-gray-600 text-sm mb-4 line-clamp-3">
             {introduction}
           </p>
           <div className="flex items-center">
