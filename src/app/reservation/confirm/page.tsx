@@ -53,10 +53,10 @@ const OpportunityInfo = ({ opportunity, pricePerPerson }: { opportunity: any; pr
   </div>
 );
 
-const ReservationDetails = ({ startDateTime, endDateTime, ticketCount }: { 
+const ReservationDetails = ({ startDateTime, endDateTime, participantCount }: { 
   startDateTime: Date | null; 
   endDateTime: Date | null;
-  ticketCount: number;
+  participantCount: number;
 }) => (
   <div className="rounded-lg p-4 mb-6">
     <h3 className="text-lg font-medium mb-4">申し込み内容</h3>
@@ -80,7 +80,7 @@ const ReservationDetails = ({ startDateTime, endDateTime, ticketCount }: {
         <IconWrapper>
           <Users size={18} strokeWidth={1.5} />
         </IconWrapper>
-        <span>{ticketCount}人</span>
+        <span>{participantCount}人</span>
       </div>
     </div>
   </div>
@@ -115,15 +115,15 @@ const TicketSelection = ({ ticketCount, onIncrement, onDecrement }: {
   </div>
 );
 
-const PriceDetails = ({ pricePerPerson, ticketCount }: { 
+const PriceDetails = ({ pricePerPerson, participantCount }: { 
   pricePerPerson: number;
-  ticketCount: number;
+  participantCount: number;
 }) => (
   <div className="rounded-lg p-4 mb-6">
     <h3 className="text-lg font-medium mb-2">料金詳細</h3>
     <div className="flex justify-between items-center">
-      <span className="text-xl font-bold">{(pricePerPerson * ticketCount).toLocaleString()}円</span>
-      <span className="text-sm text-gray-600">（{pricePerPerson.toLocaleString()}円 × {ticketCount}人）</span>
+      <span className="text-xl font-bold">{(pricePerPerson * participantCount).toLocaleString()}円</span>
+      <span className="text-sm text-gray-600">（{pricePerPerson.toLocaleString()}円 × {participantCount}人）</span>
     </div>
   </div>
 );
@@ -168,18 +168,20 @@ export default function ConfirmPage() {
   const { updateConfig } = useHeader();
   const [ticketCount, setTicketCount] = useState(1);
   const searchParams = useSearchParams();
-  const opportunityId = searchParams.get("opportunity_id");
-  const slotStartsAt = searchParams.get("slot_starts_at");
+  const opportunityId = searchParams.get("id");
+  const slotStartsAt = searchParams.get("starts_at");
+  const participantCount = parseInt(searchParams.get("guests") || "1", 10);
+  const communityId = searchParams.get("community_id") || "";
   
   const [createReservation, { loading: creatingReservation }] = useMutation(CREATE_RESERVATION_MUTATION);
 
-  const { opportunity, loading, error } = useOpportunity(opportunityId || "", "cm8qzi9z80000sbtm8z42st8e");
+  const { opportunity, loading, error } = useOpportunity(opportunityId || "", communityId);
 
   const selectedSlot = opportunity?.slots?.edges?.find(
     edge => {
       if (!edge?.node?.startsAt || !slotStartsAt) return false;
       
-      const slotDateTime = parseDateTime(edge.node.startsAt);
+      const slotDateTime = parseDateTime(String(edge.node.startsAt));
       const paramDateTime = parseDateTime(decodeURIComponent(slotStartsAt));
       
       if (!slotDateTime || !paramDateTime) return false;
@@ -214,7 +216,7 @@ export default function ConfirmPage() {
         variables: {
           input: {
             opportunitySlotId: selectedSlot.node.id,
-            participantCount: ticketCount,
+            totalParticipantCount: participantCount,
             paymentMethod: "FEE", // 現金支払いをデフォルトとする
           },
         },
@@ -222,7 +224,7 @@ export default function ConfirmPage() {
 
       if (result.data?.reservationCreate?.reservation) {
         toast.success("予約が完了しました");
-        window.location.href = `/reservation/complete?opportunity_id=${opportunityId}`;
+        window.location.href = `/reservation/complete?opportunity_id=${opportunityId}&community_id=${communityId}`;
       }
     } catch (error) {
       console.error("Reservation error:", error);
@@ -235,8 +237,8 @@ export default function ConfirmPage() {
   if (!opportunity) return <div>No opportunity found</div>;
   if (!selectedSlot?.node) return <div>Selected time slot not found</div>;
 
-  const startDateTime = selectedSlot?.node?.startsAt ? parseDateTime(selectedSlot.node.startsAt) : null;
-  const endDateTime = selectedSlot?.node?.endsAt ? parseDateTime(selectedSlot.node.endsAt) : null;
+  const startDateTime = selectedSlot?.node?.startsAt ? parseDateTime(String(selectedSlot.node.startsAt)) : null;
+  const endDateTime = selectedSlot?.node?.endsAt ? parseDateTime(String(selectedSlot.node.endsAt)) : null;
   
   if (!startDateTime || !endDateTime) {
     return <div>Invalid date format in time slot</div>;
@@ -256,7 +258,7 @@ export default function ConfirmPage() {
       <ReservationDetails 
         startDateTime={startDateTime}
         endDateTime={endDateTime}
-        ticketCount={ticketCount}
+        participantCount={participantCount}
       />
 
       <TicketSelection 
@@ -267,7 +269,7 @@ export default function ConfirmPage() {
 
       <PriceDetails 
         pricePerPerson={pricePerPerson}
-        ticketCount={ticketCount}
+        participantCount={participantCount}
       />
 
       <Notes requireApproval={opportunity.requireApproval} />

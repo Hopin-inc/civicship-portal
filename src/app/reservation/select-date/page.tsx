@@ -64,8 +64,8 @@ export default function SelectDatePage({ searchParams }: { searchParams: { id: s
         participants,
         price,
         id: edge.node.id,
-        startsAt: edge.node.startsAt.toString(),
-        endsAt: edge.node.endsAt.toString()
+        startsAt: String(edge.node.startsAt),
+        endsAt: String(edge.node.endsAt)
       })
     } else {
       acc.push({
@@ -76,8 +76,8 @@ export default function SelectDatePage({ searchParams }: { searchParams: { id: s
           participants,
           price,
           id: edge.node.id,
-          startsAt: edge.node.startsAt.toString(),
-          endsAt: edge.node.endsAt.toString()
+          startsAt: String(edge.node.startsAt),
+          endsAt: String(edge.node.endsAt)
         }]
       })
     }

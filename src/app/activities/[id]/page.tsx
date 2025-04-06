@@ -19,7 +19,8 @@ const ScheduleCard: React.FC<{
   participants: number;
   price: number;
   opportunityId: string;
-}> = ({ startsAt, endsAt, participants, price, opportunityId }) => {
+  communityId: string;
+}> = ({ startsAt, endsAt, participants, price, opportunityId, communityId }) => {
   const startDate = new Date(startsAt);
   const endDate = new Date(endsAt);
   
@@ -37,7 +38,7 @@ const ScheduleCard: React.FC<{
         <p className="text-lg font-bold mb-6">¥{price.toLocaleString()}</p>
       </div>
       <div className="flex justify-center">
-        <Link href={`/reservation/confirm?opportunity_id=${opportunityId}&slot_starts_at=${startsAt}`}>
+        <Link href={`/reservation/confirm?id=${opportunityId}&starts_at=${startsAt}&community_id=${communityId}`}>
           <Button
             variant="default"
             size="selection"
@@ -241,6 +242,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
                       participants={schedule.participants}
                       price={schedule.price}
                       opportunityId={opportunity.id}
+                      communityId={searchParams.community_id || ""}
                     />
                   </div>
                 ))}
