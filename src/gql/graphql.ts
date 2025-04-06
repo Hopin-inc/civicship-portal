@@ -18,6 +18,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
+  DateTime: { input: any; output: any };
   Datetime: { input: Date; output: Date };
   Decimal: { input: any; output: any };
   JSON: { input: any; output: any };
@@ -86,6 +87,30 @@ export type ArticlesConnection = {
   pageInfo: PageInfo;
   totalCount: Scalars["Int"]["output"];
 };
+
+export type AuthZDirectiveCompositeRulesInput = {
+  and?: InputMaybe<Array<InputMaybe<AuthZRules>>>;
+  not?: InputMaybe<AuthZRules>;
+  or?: InputMaybe<Array<InputMaybe<AuthZRules>>>;
+};
+
+export type AuthZDirectiveDeepCompositeRulesInput = {
+  and?: InputMaybe<Array<InputMaybe<AuthZDirectiveDeepCompositeRulesInput>>>;
+  id?: InputMaybe<AuthZRules>;
+  not?: InputMaybe<AuthZDirectiveDeepCompositeRulesInput>;
+  or?: InputMaybe<Array<InputMaybe<AuthZDirectiveDeepCompositeRulesInput>>>;
+};
+
+export enum AuthZRules {
+  IsAdmin = "IsAdmin",
+  IsCommunityManager = "IsCommunityManager",
+  IsCommunityMember = "IsCommunityMember",
+  IsCommunityOwner = "IsCommunityOwner",
+  IsOpportunityOwner = "IsOpportunityOwner",
+  IsSelf = "IsSelf",
+  IsUser = "IsUser",
+  VerifySanitizeInput = "VerifySanitizeInput",
+}
 
 export type CheckCommunityPermissionInput = {
   communityId: Scalars["ID"]["input"];
@@ -715,7 +740,7 @@ export type MutationPlaceUpdateArgs = {
 
 export type MutationReservationAcceptArgs = {
   id: Scalars["ID"]["input"];
-  permission: CheckCommunityPermissionInput;
+  permission: CheckOpportunityPermissionInput;
 };
 
 export type MutationReservationCancelArgs = {
@@ -734,7 +759,7 @@ export type MutationReservationJoinArgs = {
 
 export type MutationReservationRejectArgs = {
   id: Scalars["ID"]["input"];
-  permission: CheckCommunityPermissionInput;
+  permission: CheckOpportunityPermissionInput;
 };
 
 export type MutationTicketPurchaseArgs = {
@@ -1719,9 +1744,10 @@ export type ReservationCancelInput = {
 
 export type ReservationCreateInput = {
   opportunitySlotId: Scalars["ID"]["input"];
-  participantCount: Scalars["Int"]["input"];
+  otherUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   paymentMethod: ReservationPaymentMethod;
-  userIdsIfExists?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  ticketIdsIfNeed?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  totalParticipantCount: Scalars["Int"]["input"];
 };
 
 export type ReservationCreatePayload = ReservationCreateSuccess;
@@ -1778,7 +1804,7 @@ export type ReservationHistorySortInput = {
 
 export enum ReservationPaymentMethod {
   Fee = "FEE",
-  Point = "POINT",
+  Ticket = "TICKET",
 }
 
 export type ReservationSetStatusPayload = ReservationSetStatusSuccess;
@@ -2412,6 +2438,18 @@ export type WalletsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type UserSignUpMutationVariables = Exact<{
+  input: UserSignUpInput;
+}>;
+
+export type UserSignUpMutation = {
+  __typename?: "Mutation";
+  userSignUp?: {
+    __typename?: "CurrentUserPayload";
+    user?: { __typename?: "User"; id: string; name: string } | null;
+  } | null;
+};
+
 export type CreateReservationMutationVariables = Exact<{
   input: ReservationCreateInput;
 }>;
@@ -2982,6 +3020,58 @@ export const OpportunityFieldsFragmentDoc = {
     },
   ],
 } as unknown as DocumentNode<OpportunityFieldsFragment, unknown>;
+export const UserSignUpDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "userSignUp" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "UserSignUpInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "userSignUp" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UserSignUpMutation, UserSignUpMutationVariables>;
 export const CreateReservationDocument = {
   kind: "Document",
   definitions: [

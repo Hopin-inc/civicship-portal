@@ -26,14 +26,14 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ className }) => {
-  const { user } = useAuth();
+  const { uid, user, logout } = useAuth();
   const { config } = useHeader();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
   const handleLogout = async () => {
-    await auth.signOut();
+    await logout();
     router.refresh();
   };
 
@@ -79,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         
         <div className="flex items-center gap-2">
           {config.action}
-          {user ? (
+          {uid ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
