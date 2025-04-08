@@ -276,11 +276,30 @@ export type Participation = {
   node: {
     id: string;
     status: string;
+    reason: string;
     images?: ParticipationImage[];
     user: {
       id: string;
       name: string;
       image?: string;
+    };
+    reservation?: {
+      id: string;
+      opportunitySlot: {
+        id: string;
+        capacity: number;
+        startsAt: Date | string;
+        endsAt: Date | string;
+        hostingStatus: string;
+      };
+      participations?: Array<{
+        id: string;
+        user: {
+          id: string;
+          name: string;
+          image?: string;
+        };
+      }>;
     };
   };
 };

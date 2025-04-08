@@ -83,8 +83,6 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
     },
   });
 
-  console.log('transformOpportunity', data)
-
   return {
     id: data.id,
     title: data.title,
