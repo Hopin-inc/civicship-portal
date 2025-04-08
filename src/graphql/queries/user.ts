@@ -1,6 +1,26 @@
 import { graphql } from "@/gql";
 
 
+export const GET_USER_PROFILE = graphql(`
+  query GetUserProfile(
+    $id: ID!
+  ) {
+    user(id: $id) {
+      id
+      name
+      image
+      bio
+      sysRole
+      currentPrefecture
+      urlFacebook
+      urlInstagram
+      urlWebsite
+      urlX
+      urlYoutube
+    }
+  }
+`);
+
 export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = graphql(`
   query GetUserWithDetailsAndPortfolios(
     $id: ID!,

@@ -13,6 +13,7 @@ import StarIcon from "@/../public/icons/star.svg";
 import { format } from "date-fns";
 import type { GetUserWithDetailsAndPortfoliosQuery, Portfolio as GqlPortfolio } from "@/gql/graphql";
 import type { Portfolio, PortfolioType, PortfolioCategory } from "@/types";
+import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 30;
 const BIO_TRUNCATE_LENGTH = 100;
@@ -26,6 +27,7 @@ const isValidPortfolioCategory = (category: string): category is PortfolioCatego
 };
 
 export default function UserPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const { user: currentUser } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
@@ -49,6 +51,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
         .map(edge => edge?.node)
         .filter((node): node is GqlPortfolio => node != null)
         .map(portfolio => {
+          console.log('Portofolio', portfolio);
           const category = portfolio.category.toLowerCase();
           if (!isValidPortfolioType(category)) {
             console.warn(`Invalid portfolio category: ${portfolio.category}`);
@@ -215,6 +218,10 @@ export default function UserPage({ params }: { params: { id: string } }) {
     return bio ? bio.length > BIO_TRUNCATE_LENGTH : false;
   };
 
+  const handleEditClick = () => {
+    router.push('/users/me/edit');
+  };
+
   return (
     <div className="container mx-auto px-4 py-6 max-w-3xl">
       <div className="space-y-6">
@@ -228,7 +235,10 @@ export default function UserPage({ params }: { params: { id: string } }) {
             />
           </div>
           {isOwner && (
-            <button className="px-6 py-2 bg-gray-100 rounded-lg text-sm">
+            <button 
+              className="px-6 py-2 bg-gray-100 rounded-lg text-sm"
+              onClick={handleEditClick}
+            >
               編集
             </button>
           )}

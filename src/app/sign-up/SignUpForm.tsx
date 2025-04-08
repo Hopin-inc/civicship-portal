@@ -19,16 +19,18 @@ import { CurrentPrefecture, IdentityPlatform } from "@/gql/graphql";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 
-const prefectureOptions = [
-  { value: 'KAGAWA', label: '香川県' },
-  { value: 'TOKUSHIMA', label: '徳島県' },
-  { value: 'KOCHI', label: '高知県' },
-  { value: 'EHIME', label: '愛媛県' },
-] as const;
+const prefectureLabels: Record<CurrentPrefecture, string> = {
+  [CurrentPrefecture.Kagawa]: '香川県',
+  [CurrentPrefecture.Tokushima]: '徳島県',
+  [CurrentPrefecture.Kochi]: '高知県',
+  [CurrentPrefecture.Ehime]: '愛媛県',
+  [CurrentPrefecture.OutsideShikoku]: '四国以外',
+  [CurrentPrefecture.Unknown]: '不明',
+} as const;
 
 const FormSchema = z.object({
   name: z.string({ required_error: "名前を入力してください。" }),
-  prefecture: z.enum(['KAGAWA', 'TOKUSHIMA', 'KOCHI', 'EHIME', 'OTHER'], {
+  prefecture: z.nativeEnum(CurrentPrefecture, {
     required_error: "居住地を選択してください。"
   }),
 });
@@ -48,10 +50,17 @@ export function SignUpForm() {
     },
   });
 
+  const prefectures = [
+    CurrentPrefecture.Kagawa,
+    CurrentPrefecture.Tokushima,
+    CurrentPrefecture.Kochi,
+    CurrentPrefecture.Ehime,
+  ];
+
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     try {
-      const user = await createUser(values.name, values.prefecture as CurrentPrefecture);
+      const user = await createUser(values.name, values.prefecture);
       if (user) {
         router.push("/");
       }
@@ -96,19 +105,19 @@ export function SignUpForm() {
                 <FormControl>
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
-                      {prefectureOptions.map(({ value, label }) => (
+                      {prefectures.map((prefecture) => (
                         <Button
-                          key={value}
+                          key={prefecture}
                           type="button"
                           variant="outline"
                           className={`h-12 rounded-2xl border-2 ${
-                            field.value === value 
-                              ? 'border-primary bg-primary/10 text-primary font-medium' 
+                            field.value === prefecture
+                              ? 'bg-blue-600 text-white border-blue-600'
                               : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                           }`}
-                          onClick={() => field.onChange(value)}
+                          onClick={() => field.onChange(prefecture)}
                         >
-                          {label}
+                          {prefectureLabels[prefecture]}
                         </Button>
                       ))}
                     </div>
@@ -116,13 +125,13 @@ export function SignUpForm() {
                       type="button"
                       variant="outline"
                       className={`w-full h-12 rounded-2xl border-2 ${
-                        field.value === 'OTHER'
-                          ? 'border-primary bg-primary/10 text-primary font-medium'
+                        field.value === CurrentPrefecture.OutsideShikoku
+                          ? 'bg-blue-600 text-white border-blue-600'
                           : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                       }`}
-                      onClick={() => field.onChange('OTHER')}
+                      onClick={() => field.onChange(CurrentPrefecture.OutsideShikoku)}
                     >
-                      四国以外
+                      {prefectureLabels[CurrentPrefecture.OutsideShikoku]}
                     </Button>
                   </div>
                 </FormControl>
