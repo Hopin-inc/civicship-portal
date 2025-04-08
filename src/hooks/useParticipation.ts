@@ -4,11 +4,12 @@ import type { GetParticipationQuery, GetParticipationQueryVariables } from '@/gq
 import type { Opportunity, Participation, Article } from '@/types';
 
 export const useParticipation = (id: string) => {
-  const { data, loading, error } = useQuery<GetParticipationQuery, GetParticipationQueryVariables>(
+  const { data, loading, error, refetch } = useQuery<GetParticipationQuery, GetParticipationQueryVariables>(
     GetParticipationDocument,
     {
       variables: { id },
       skip: !id,
+      fetchPolicy: "network-only",
     }
   );
 
@@ -119,8 +120,8 @@ export const useParticipation = (id: string) => {
         participations: data.participation.reservation.participations?.map(participation => ({
           id: participation.id,
           user: {
-            id: participation.user?.id,
-            name: participation.user?.name,
+            id: participation.user?.id || "",
+            name: participation.user?.name || "",
             image: participation.user?.image || undefined,
           }
         })) || [],
@@ -133,5 +134,6 @@ export const useParticipation = (id: string) => {
     opportunity: formattedOpportunity,
     loading,
     error,
+    refetch,
   };
 }; 

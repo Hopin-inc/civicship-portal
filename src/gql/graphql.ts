@@ -2450,6 +2450,19 @@ export type UserSignUpMutation = {
   } | null;
 };
 
+export type ParticipationImageBulkUpdateMutationVariables = Exact<{
+  input: ParticipationImageBulkUpdateInput;
+  permission: CheckIsSelfPermissionInput;
+}>;
+
+export type ParticipationImageBulkUpdateMutation = {
+  __typename?: "Mutation";
+  participationImageBulkUpdate?: {
+    __typename?: "ParticipationImageBulkUpdateSuccess";
+    participation: { __typename?: "Participation"; id: string; images?: any | null };
+  } | null;
+};
+
 export type CreateReservationMutationVariables = Exact<{
   input: ReservationCreateInput;
 }>;
@@ -3193,6 +3206,92 @@ export const UserSignUpDocument = {
     },
   ],
 } as unknown as DocumentNode<UserSignUpMutation, UserSignUpMutationVariables>;
+export const ParticipationImageBulkUpdateDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "ParticipationImageBulkUpdate" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "ParticipationImageBulkUpdateInput" },
+            },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "permission" } },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "CheckIsSelfPermissionInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participationImageBulkUpdate" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "permission" },
+                value: { kind: "Variable", name: { kind: "Name", value: "permission" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ParticipationImageBulkUpdateSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "participation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "images" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ParticipationImageBulkUpdateMutation,
+  ParticipationImageBulkUpdateMutationVariables
+>;
 export const CreateReservationDocument = {
   kind: "Document",
   definitions: [

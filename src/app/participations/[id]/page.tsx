@@ -5,11 +5,13 @@ import { ja } from "date-fns/locale";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useParticipation } from "@/hooks/useParticipation";
+import { useParticipationImageUpload } from "@/hooks/useParticipationImageUpload";
 import { ParticipationStatus, ParticipationStatusReason } from "@/gql/graphql";
 import { AsymmetricImageGrid } from "@/app/components/ui/asymmetric-image-grid";
 import { Button } from "@/app/components/ui/button";
 import { AlertCircle, Check, Calendar, MapPin, Users, Banknote } from "lucide-react";
 import Link from "next/link";
+import { AddParticipationPhotosModal } from "@/app/components/features/participations/AddParticipationPhotosModal";
 
 interface ParticipationProps {
   params: {
@@ -66,7 +68,7 @@ const getStatusInfo = (
 };
 
 export default function ParticipationPage({ params }: ParticipationProps) {
-  const { participation, opportunity, loading, error } = useParticipation(params.id);
+  const { participation, opportunity, loading, error, refetch } = useParticipation(params.id);
   const [currentStatus, setCurrentStatus] = useState<ReservationStatus | null>(
     participation?.node.status
       ? getStatusInfo(
@@ -75,6 +77,25 @@ export default function ParticipationPage({ params }: ParticipationProps) {
         )
       : null,
   );
+  const [isAddPhotosModalOpen, setIsAddPhotosModalOpen] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const { uploadImages, isUploading } = useParticipationImageUpload({
+    participationId: params.id,
+    onSuccess: () => {
+      setUploadSuccess(true);
+      // Reset success message after 3 seconds
+      setTimeout(() => setUploadSuccess(false), 3000);
+      // Refetch participation data to show the new images
+      refetch();
+    },
+    onError: (error) => {
+      setUploadError(error.message);
+      // Reset error message after 3 seconds
+      setTimeout(() => setUploadError(null), 3000);
+    },
+  });
 
   useEffect(() => {
     if (participation?.node.status) {
@@ -113,8 +134,41 @@ export default function ParticipationPage({ params }: ParticipationProps) {
   //   new Date() <= cancellationDeadline;
   const isCancellable = false;
 
+  const handleAddPhotos = async (images: File[], comment: string) => {
+    try {
+      await uploadImages(images, comment);
+    } catch (error) {
+      console.error("Error uploading photos:", error);
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto p-4 pb-[120px]">
+      {/* Success message */}
+      {uploadSuccess && (
+        <div className="p-3 rounded-xl border-[1px] bg-green-50 border-green-200 mb-6">
+          <div className="flex items-start gap-2">
+            <Check className="w-5 h-5 mt-[3px] text-green-600" />
+            <div className="flex-1">
+              <p className="font-bold leading-6">写真が正常にアップロードされました</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error message */}
+      {uploadError && (
+        <div className="p-3 rounded-xl border-[1px] bg-red-50 border-red-200 mb-6">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="w-5 h-5 mt-[3px] text-red-600" />
+            <div className="flex-1">
+              <p className="font-bold leading-6">写真のアップロードに失敗しました</p>
+              <p className="text-sm text-gray-600 mt-1">{uploadError}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ステータス通知 */}
       {currentStatus && (
         <div className={`p-3 rounded-xl border-[1px] ${currentStatus.statusClass} mb-6`}>
@@ -257,25 +311,39 @@ export default function ParticipationPage({ params }: ParticipationProps) {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
         <div className="max-w-lg mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex flex-col text-gray-600 min-w-fit">
-              <span className="text-sm">キャンセル期限:</span>
-              <span className="text-sm font-bold">
-                {format(cancellationDeadline, "M/d(E)", { locale: ja })}
-              </span>
-            </div>
-            {isCancellable ? (
-              <button
-                className="shrink-0 py-4 px-8 rounded-full text-center whitespace-nowrap bg-[#E94A47] text-white hover:bg-[#D43F3C]"
-              >
-                予約をキャンセル
-              </button>
+            {participation?.node.status === ParticipationStatus.Participated ? (
+              <AddParticipationPhotosModal
+                trigger={
+                  <button 
+                    className="w-full py-4 px-8 rounded-full text-center bg-[#4361EE] text-white hover:bg-[#3651DE] disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    disabled={isUploading}
+                  >
+                    {isUploading ? "アップロード中..." : "写真を追加"}
+                  </button>
+                }
+                onSubmit={handleAddPhotos}
+              />
             ) : (
-              <button
-                className="shrink-0 py-4 px-8 rounded-full text-center whitespace-nowrap bg-gray-100 text-gray-400 cursor-not-allowed"
-                disabled
-              >
-                キャンセル不可
-              </button>
+              <>
+                <div className="flex flex-col text-gray-600 min-w-fit">
+                  <span className="text-sm">キャンセル期限:</span>
+                  <span className="text-sm font-bold">
+                    {format(cancellationDeadline, "M/d(E)", { locale: ja })}
+                  </span>
+                </div>
+                {isCancellable ? (
+                  <button className="shrink-0 py-4 px-8 rounded-full text-center whitespace-nowrap bg-[#E94A47] text-white hover:bg-[#D43F3C]">
+                    予約をキャンセル
+                  </button>
+                ) : (
+                  <button
+                    className="shrink-0 py-4 px-8 rounded-full text-center whitespace-nowrap bg-gray-100 text-gray-400 cursor-not-allowed"
+                    disabled
+                  >
+                    キャンセル不可
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>

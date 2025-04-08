@@ -15,6 +15,8 @@ import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/
 const documents = {
   "\n  mutation userSignUp($input: UserSignUpInput!) {\n    userSignUp(input: $input) {\n      user {\n        id\n        name\n      }\n    }\n  }\n":
     types.UserSignUpDocument,
+  "\n  mutation ParticipationImageBulkUpdate($input: ParticipationImageBulkUpdateInput!, $permission: CheckIsSelfPermissionInput!) {\n    participationImageBulkUpdate(input: $input, permission: $permission) {\n      ... on ParticipationImageBulkUpdateSuccess {\n        participation {\n          id\n          images\n        }\n      }\n    }\n  }\n":
+    types.ParticipationImageBulkUpdateDocument,
   "\n  mutation CreateReservation($input: ReservationCreateInput!) {\n    reservationCreate(input: $input) {\n      ... on ReservationCreateSuccess {\n        reservation {\n          id\n          status\n        }\n      }\n    }\n  }\n":
     types.CreateReservationDocument,
   '\n  query GetArticle($id: ID!, $permission: CheckCommunityPermissionInput!) {\n    article(id: $id, permission: $permission) {\n      id\n      title\n      introduction\n      body\n      category\n      thumbnail\n      publishedAt\n      createdAt\n      updatedAt\n      authors {\n        id\n        name\n        image\n        bio\n      }\n      relatedUsers {\n        id\n        name\n        image\n        bio\n      }\n    }\n\n    articles(\n      first: 4,\n      filter: {\n        categories: ["INTERVIEW"],\n        publishStatus: [PUBLIC]\n      },\n      sort: { publishedAt: desc }\n    ) {\n      edges {\n        node {\n          id\n          title\n          introduction\n          thumbnail\n          publishedAt\n          authors {\n            id\n            name\n            image\n          }\n        }\n      }\n    }\n  }\n':
@@ -57,6 +59,12 @@ export function graphql(source: string): unknown;
 export function graphql(
   source: "\n  mutation userSignUp($input: UserSignUpInput!) {\n    userSignUp(input: $input) {\n      user {\n        id\n        name\n      }\n    }\n  }\n",
 ): (typeof documents)["\n  mutation userSignUp($input: UserSignUpInput!) {\n    userSignUp(input: $input) {\n      user {\n        id\n        name\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "\n  mutation ParticipationImageBulkUpdate($input: ParticipationImageBulkUpdateInput!, $permission: CheckIsSelfPermissionInput!) {\n    participationImageBulkUpdate(input: $input, permission: $permission) {\n      ... on ParticipationImageBulkUpdateSuccess {\n        participation {\n          id\n          images\n        }\n      }\n    }\n  }\n",
+): (typeof documents)["\n  mutation ParticipationImageBulkUpdate($input: ParticipationImageBulkUpdateInput!, $permission: CheckIsSelfPermissionInput!) {\n    participationImageBulkUpdate(input: $input, permission: $permission) {\n      ... on ParticipationImageBulkUpdateSuccess {\n        participation {\n          id\n          images\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
