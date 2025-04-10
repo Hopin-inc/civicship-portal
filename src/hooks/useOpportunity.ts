@@ -1,13 +1,30 @@
 import { useQuery } from "@apollo/client";
 import { GET_OPPORTUNITY } from "../graphql/queries/opportunity";
 import type { Opportunity as GraphQLOpportunity } from "../gql/graphql";
-import type { Opportunity, Article } from "../types";
+import type { Opportunity, Article, Participation } from "../types";
 
 interface UseOpportunityResult {
   opportunity: Opportunity | null;
   loading: boolean;
   error: Error | null;
 }
+
+const transformArticle = (node: any): Partial<Article> => {
+  const thumbnailData = node.thumbnail;
+  const thumbnail = thumbnailData && Array.isArray(thumbnailData) && thumbnailData.length > 0
+    ? {
+        url: thumbnailData[0].url,
+        alt: thumbnailData[0].alt || node.title
+      }
+    : null;
+
+  return {
+    id: node.id,
+    title: node.title,
+    description: node.introduction || "",
+    thumbnail
+  };
+};
 
 const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | null => {
   if (!data) return null;
@@ -52,6 +69,21 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
     feeRequired: node.feeRequired,
     slots: node.slots,
   });
+
+  const transformParticipationNode = (pEdge: any): Participation => ({
+    node: {
+      id: pEdge?.node?.id || "",
+      status: pEdge?.node?.status || "",
+      images: pEdge?.node?.images || [],
+      user: {
+        id: pEdge?.node?.user?.id || "",
+        name: pEdge?.node?.user?.name || "",
+        image: pEdge?.node?.user?.image || undefined,
+      },
+    },
+  });
+
+  console.log('transformOpportunity', data)
 
   return {
     id: data.id,
@@ -100,11 +132,7 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
       image: data.createdByUser.image || undefined,
       articlesAboutMe: data.createdByUser.articlesAboutMe ? {
         edges: data.createdByUser.articlesAboutMe.edges?.map(edge => ({
-          node: {
-            title: edge?.node?.title || "",
-            description: edge?.node?.introduction || "",
-            image: edge?.node?.thumbnail ? (edge.node.thumbnail as any).url : undefined
-          }
+          node: transformArticle(edge?.node)
         })) || []
       } : undefined,
       opportunitiesCreatedByMe: data.createdByUser.opportunitiesCreatedByMe ? {
@@ -130,17 +158,7 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
           startsAt: edge?.node?.startsAt || "",
           endsAt: edge?.node?.endsAt || "",
           participations: edge?.node?.participations ? {
-            edges: edge.node.participations.edges?.map(pEdge => ({
-              node: {
-                id: pEdge?.node?.id || "",
-                status: pEdge?.node?.status || "",
-                user: {
-                  id: pEdge?.node?.user?.id || "",
-                  name: pEdge?.node?.user?.name || "",
-                  image: pEdge?.node?.user?.image || undefined,
-                },
-              },
-            })) || [],
+            edges: edge.node.participations.edges?.map(transformParticipationNode) || [],
           } : undefined,
         },
       })) || [],
@@ -161,8 +179,6 @@ export const useOpportunity = (id: string, communityId: string): UseOpportunityR
       console.error('Opportunity query error:', error);
     },
   });
-
-  console.log('data', data)
 
   return {
     opportunity: data ? transformOpportunity(data.opportunity) : null,

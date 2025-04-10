@@ -10,6 +10,8 @@ import { ja } from "date-fns/locale";
 import { RecentActivitiesList } from "@/app/components/features/activity/RecentActivitiesList";
 import { useSimilarOpportunities } from "@/hooks/useSimilarOpportunities";
 import { SimilarActivitiesList } from "@/app/components/features/activity/SimilarActivitiesList";
+import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
+import { Participation } from "@/types";
 
 const ScheduleCard: React.FC<{
   startsAt: string;
@@ -17,7 +19,8 @@ const ScheduleCard: React.FC<{
   participants: number;
   price: number;
   opportunityId: string;
-}> = ({ startsAt, endsAt, participants, price, opportunityId }) => {
+  communityId: string;
+}> = ({ startsAt, endsAt, participants, price, opportunityId, communityId }) => {
   const startDate = new Date(startsAt);
   const endDate = new Date(endsAt);
   
@@ -35,7 +38,7 @@ const ScheduleCard: React.FC<{
         <p className="text-lg font-bold mb-6">¥{price.toLocaleString()}</p>
       </div>
       <div className="flex justify-center">
-        <Link href={`/reservation/confirm?opportunity_id=${opportunityId}&slot_starts_at=${startsAt}`}>
+        <Link href={`/reservation/confirm?id=${opportunityId}&starts_at=${startsAt}&community_id=${communityId}`}>
           <Button
             variant="default"
             size="selection"
@@ -108,6 +111,49 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             <p className="text-gray-700 whitespace-pre-wrap">{opportunity.body}</p>
           </section>
 
+          {opportunity.slots?.edges?.some(edge => 
+            edge?.node?.participations?.edges?.some(p => {
+              const participation = p as Participation;
+              return participation?.node?.images && Array.isArray(participation.node.images) && participation.node.images.length > 0;
+            })
+          ) && (
+            <section className="mb-12">
+              <div className="max-w-3xl">
+                {(() => {
+                  const allImages = opportunity.slots?.edges?.flatMap(edge => 
+                    edge?.node?.participations?.edges?.flatMap(p => {
+                      const participation = p as Participation;
+                      return (Array.isArray(participation?.node?.images) ? participation.node.images : []).map(img => ({
+                        url: (img as any).url || img,
+                        alt: "参加者の写真"
+                      }));
+                    }) || []
+                  ).filter(Boolean) || [];
+
+                  const displayImages = allImages.slice(0, 3);
+                  const remainingCount = Math.max(0, allImages.length - 3);
+
+                  return (
+                    <div className="space-y-4">
+                      <AsymmetricImageGrid images={displayImages} />
+                      {remainingCount > 0 && (
+                        <Button
+                          variant="outline"
+                          className="w-full border-2 border-[#4361EE] text-[#4361EE] hover:bg-[#4361EE] hover:text-white"
+                          onClick={() => {
+                            console.log(`残りの画像枚数: ${remainingCount}枚`);
+                          }}
+                        >
+                          {remainingCount + 3}枚の写真をすべて見る
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            </section>
+          )}
+
           {/* 案内者情報 */}
           <section className="mb-12">
             <div className="rounded-xl">
@@ -130,12 +176,12 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
                   </div>
                 </div>
                 {opportunity.createdByUser?.articlesAboutMe?.edges?.[0]?.node && (
-                  <Link href="#" className="block">
+                  <Link href={`/articles/${opportunity.createdByUser.articlesAboutMe.edges[0].node.id}`} className="block">
                     <div className="bg-white rounded-xl border hover:shadow-md transition-shadow duration-200">
                       <div className="relative w-full h-[200px]">
                         <Image
-                          src={opportunity.createdByUser.articlesAboutMe.edges[0].node.image || "/placeholder.png"}
-                          alt={opportunity.createdByUser.articlesAboutMe.edges[0].node.title}
+                          src={(opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail?.url ?? "/placeholder.png") as string}
+                          alt={opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail?.alt || opportunity.createdByUser.articlesAboutMe.edges[0].node.title || ""}
                           fill
                           className="object-cover rounded-t-xl"
                         />
@@ -196,6 +242,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
                       participants={schedule.participants}
                       price={schedule.price}
                       opportunityId={opportunity.id}
+                      communityId={searchParams.community_id || ""}
                     />
                   </div>
                 ))}

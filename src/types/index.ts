@@ -148,11 +148,7 @@ export type Opportunity = {
     image?: string;
     articlesAboutMe?: {
       edges: Array<{
-        node: {
-          title: string;
-          description: string;
-          image?: string;
-        };
+        node: Partial<Article>;
       }>;
     };
     opportunitiesCreatedByMe?: {
@@ -209,19 +205,18 @@ export type Article = {
   description: string;
   content: string;
   type: ArticleType;
-  thumbnail: string;
+  thumbnail: {
+    url: string;
+    alt: string;
+  } | null;
   publishedAt: string;
   author: {
     name: string;
     image: string;
     bio?: string;
   };
-  relatedActivityId?: string;
-  relatedUserId?: string;
-  tags: string[];
-  status: "draft" | "published";
   createdAt: string;
-  updatedAt: string;
+  updatedAt: string | null;
 };
 
 export type Activity = {
@@ -266,6 +261,28 @@ export type Participant = {
   id: string;
   name: string;
   image?: string;
+};
+
+export type ParticipationImage = {
+  id: string;
+  url: string;
+  caption: string | null;
+  participationId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Participation = {
+  node: {
+    id: string;
+    status: string;
+    images?: ParticipationImage[];
+    user: {
+      id: string;
+      name: string;
+      image?: string;
+    };
+  };
 };
 
 export type ContentType = "EXPERIENCE" | "QUEST" | "EVENT" | "ARTICLE";

@@ -16,6 +16,8 @@ export const AsymmetricImageGrid = memo(({ images, className = '' }: AsymmetricI
 
   const [featured, ...thumbnails] = images
 
+  console.log('AsymmetricImageGrid image count', images.length)
+
   return (
     <div className={`grid h-full grid-cols-12 gap-2 ${className}`}>
       {/* Featured Image */}
