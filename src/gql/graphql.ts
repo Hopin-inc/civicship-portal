@@ -396,9 +396,12 @@ export type ImageInput = {
 
 export type Membership = {
   __typename?: "Membership";
+  bio?: Maybe<Scalars["String"]["output"]>;
   community: Community;
   createdAt: Scalars["Datetime"]["output"];
+  headline?: Maybe<Scalars["String"]["output"]>;
   membershipHistories?: Maybe<MembershipHistoriesConnection>;
+  participationView?: Maybe<MembershipParticipationView>;
   reason: MembershipStatusReason;
   role: Role;
   status: MembershipStatus;
@@ -465,6 +468,12 @@ export type MembershipHistorySortInput = {
   createdAt?: InputMaybe<SortDirection>;
 };
 
+export type MembershipHostedMetrics = {
+  __typename?: "MembershipHostedMetrics";
+  geo: Array<MembershipParticipationLocation>;
+  totalParticipantCount: Scalars["Int"]["output"];
+};
+
 export type MembershipInviteInput = {
   communityId: Scalars["ID"]["input"];
   role?: InputMaybe<Role>;
@@ -476,6 +485,25 @@ export type MembershipInvitePayload = MembershipInviteSuccess;
 export type MembershipInviteSuccess = {
   __typename?: "MembershipInviteSuccess";
   membership: Membership;
+};
+
+export type MembershipParticipatedMetrics = {
+  __typename?: "MembershipParticipatedMetrics";
+  geo: Array<MembershipParticipationLocation>;
+  totalParticipatedCount: Scalars["Int"]["output"];
+};
+
+export type MembershipParticipationLocation = {
+  __typename?: "MembershipParticipationLocation";
+  latitude: Scalars["Decimal"]["output"];
+  longitude: Scalars["Decimal"]["output"];
+  placeId: Scalars["ID"]["output"];
+};
+
+export type MembershipParticipationView = {
+  __typename?: "MembershipParticipationView";
+  hosted: MembershipHostedMetrics;
+  participated: MembershipParticipatedMetrics;
 };
 
 export type MembershipRemoveInput = {
@@ -1115,7 +1143,6 @@ export type Participation = {
   evaluation?: Maybe<Evaluation>;
   id: Scalars["ID"]["output"];
   images?: Maybe<Scalars["JSON"]["output"]>;
-  opportunitySlot?: Maybe<OpportunitySlot>;
   reason: ParticipationStatusReason;
   reservation?: Maybe<Reservation>;
   source: Source;
@@ -1279,6 +1306,11 @@ export enum ParticipationStatusReason {
   ReservationCanceled = "RESERVATION_CANCELED",
   ReservationJoined = "RESERVATION_JOINED",
   ReservationRejected = "RESERVATION_REJECTED",
+}
+
+export enum ParticipationType {
+  Hosted = "HOSTED",
+  Participated = "PARTICIPATED",
 }
 
 export type ParticipationsConnection = {
@@ -2475,6 +2507,30 @@ export type CreateReservationMutation = {
   } | null;
 };
 
+export type UpdateMyProfileMutationVariables = Exact<{
+  input: UserUpdateProfileInput;
+  permission: CheckIsSelfPermissionInput;
+}>;
+
+export type UpdateMyProfileMutation = {
+  __typename?: "Mutation";
+  userUpdateMyProfile?: {
+    __typename?: "UserUpdateProfileSuccess";
+    user?: {
+      __typename?: "User";
+      id: string;
+      name: string;
+      image?: string | null;
+      bio?: string | null;
+      currentPrefecture?: CurrentPrefecture | null;
+      urlFacebook?: string | null;
+      urlInstagram?: string | null;
+      urlX?: string | null;
+      slug: string;
+    } | null;
+  } | null;
+};
+
 export type GetArticleQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   permission: CheckCommunityPermissionInput;
@@ -3014,6 +3070,28 @@ export type SearchOpportunitiesQuery = {
   };
 };
 
+export type GetUserProfileQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GetUserProfileQuery = {
+  __typename?: "Query";
+  user?: {
+    __typename?: "User";
+    id: string;
+    name: string;
+    image?: string | null;
+    bio?: string | null;
+    sysRole: SysRole;
+    currentPrefecture?: CurrentPrefecture | null;
+    urlFacebook?: string | null;
+    urlInstagram?: string | null;
+    urlWebsite?: string | null;
+    urlX?: string | null;
+    urlYoutube?: string | null;
+  } | null;
+};
+
 export type GetUserWithDetailsAndPortfoliosQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   first?: InputMaybe<Scalars["Int"]["input"]>;
@@ -3356,6 +3434,93 @@ export const CreateReservationDocument = {
     },
   ],
 } as unknown as DocumentNode<CreateReservationMutation, CreateReservationMutationVariables>;
+export const UpdateMyProfileDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateMyProfile" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "UserUpdateProfileInput" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "permission" } },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "CheckIsSelfPermissionInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "userUpdateMyProfile" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "permission" },
+                value: { kind: "Variable", name: { kind: "Name", value: "permission" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "UserUpdateProfileSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "user" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                            { kind: "Field", name: { kind: "Name", value: "image" } },
+                            { kind: "Field", name: { kind: "Name", value: "bio" } },
+                            { kind: "Field", name: { kind: "Name", value: "currentPrefecture" } },
+                            { kind: "Field", name: { kind: "Name", value: "urlFacebook" } },
+                            { kind: "Field", name: { kind: "Name", value: "urlInstagram" } },
+                            { kind: "Field", name: { kind: "Name", value: "urlX" } },
+                            { kind: "Field", name: { kind: "Name", value: "slug" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UpdateMyProfileMutation, UpdateMyProfileMutationVariables>;
 export const GetArticleDocument = {
   kind: "Document",
   definitions: [
@@ -5212,6 +5377,58 @@ export const SearchOpportunitiesDocument = {
     },
   ],
 } as unknown as DocumentNode<SearchOpportunitiesQuery, SearchOpportunitiesQueryVariables>;
+export const GetUserProfileDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetUserProfile" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "user" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "image" } },
+                { kind: "Field", name: { kind: "Name", value: "bio" } },
+                { kind: "Field", name: { kind: "Name", value: "sysRole" } },
+                { kind: "Field", name: { kind: "Name", value: "currentPrefecture" } },
+                { kind: "Field", name: { kind: "Name", value: "urlFacebook" } },
+                { kind: "Field", name: { kind: "Name", value: "urlInstagram" } },
+                { kind: "Field", name: { kind: "Name", value: "urlWebsite" } },
+                { kind: "Field", name: { kind: "Name", value: "urlX" } },
+                { kind: "Field", name: { kind: "Name", value: "urlYoutube" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetUserProfileQuery, GetUserProfileQueryVariables>;
 export const GetUserWithDetailsAndPortfoliosDocument = {
   kind: "Document",
   definitions: [
