@@ -92,7 +92,7 @@ export const ArticleDetail = ({
       <div className="bg-white relative rounded-[8px]">
         <div className="relative w-full h-[210px]">
           <Image
-            src={article.thumbnail?.url || "/placeholder.svg"}
+            src={article.thumbnail?.image || "/placeholder.svg"}
             alt={article.thumbnail?.alt || article.title}
             fill
             className="object-cover"

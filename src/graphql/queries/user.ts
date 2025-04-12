@@ -75,3 +75,29 @@ export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = graphql(`
     }
   }
 `);
+
+export const GET_USER_WALLET = graphql(`
+  query GetUserWallet($id: ID!) {
+    user(id: $id) {
+      id
+      wallets {
+        edges {
+          node {
+            id
+            tickets(filter: { status: AVAILABLE }) {
+              edges {
+                node {
+                  id
+                  status
+                  utility {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`);

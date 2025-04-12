@@ -2636,6 +2636,7 @@ export type OpportunityFieldsFragment = {
   image?: string | null;
   feeRequired?: number | null;
   pointsToEarn?: number | null;
+  isReservableWithTicket?: boolean | null;
   community?: { __typename?: "Community"; id: string } | null;
   place?: {
     __typename?: "Place";
@@ -2737,6 +2738,7 @@ export type GetOpportunityQuery = {
     category: OpportunityCategory;
     capacity?: number | null;
     pointsToEarn?: number | null;
+    isReservableWithTicket?: boolean | null;
     feeRequired?: number | null;
     requireApproval: boolean;
     publishStatus: PublishStatus;
@@ -2835,6 +2837,7 @@ export type GetOpportunityQuery = {
       longitude: any;
       city: { __typename?: "City"; name: string; state: { __typename?: "State"; name: string } };
     } | null;
+    requiredUtilities?: Array<{ __typename?: "Utility"; id: string }> | null;
     slots?: {
       __typename?: "OpportunitySlotsConnection";
       edges?: Array<{
@@ -3142,6 +3145,40 @@ export type GetUserWithDetailsAndPortfoliosQuery = {
   } | null;
 };
 
+export type GetUserWalletQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GetUserWalletQuery = {
+  __typename?: "Query";
+  user?: {
+    __typename?: "User";
+    id: string;
+    wallets?: {
+      __typename?: "WalletsConnection";
+      edges?: Array<{
+        __typename?: "WalletEdge";
+        node?: {
+          __typename?: "Wallet";
+          id: string;
+          tickets?: {
+            __typename?: "TicketsConnection";
+            edges?: Array<{
+              __typename?: "TicketEdge";
+              node?: {
+                __typename?: "Ticket";
+                id: string;
+                status: TicketStatus;
+                utility: { __typename?: "Utility"; id: string };
+              } | null;
+            } | null> | null;
+          } | null;
+        } | null;
+      } | null> | null;
+    } | null;
+  } | null;
+};
+
 export const OpportunityFieldsFragmentDoc = {
   kind: "Document",
   definitions: [
@@ -3227,6 +3264,7 @@ export const OpportunityFieldsFragmentDoc = {
           },
           { kind: "Field", name: { kind: "Name", value: "feeRequired" } },
           { kind: "Field", name: { kind: "Name", value: "pointsToEarn" } },
+          { kind: "Field", name: { kind: "Name", value: "isReservableWithTicket" } },
         ],
       },
     },
@@ -4219,6 +4257,7 @@ export const GetOpportunitiesDocument = {
           },
           { kind: "Field", name: { kind: "Name", value: "feeRequired" } },
           { kind: "Field", name: { kind: "Name", value: "pointsToEarn" } },
+          { kind: "Field", name: { kind: "Name", value: "isReservableWithTicket" } },
         ],
       },
     },
@@ -4280,6 +4319,7 @@ export const GetOpportunityDocument = {
                 { kind: "Field", name: { kind: "Name", value: "category" } },
                 { kind: "Field", name: { kind: "Name", value: "capacity" } },
                 { kind: "Field", name: { kind: "Name", value: "pointsToEarn" } },
+                { kind: "Field", name: { kind: "Name", value: "isReservableWithTicket" } },
                 { kind: "Field", name: { kind: "Name", value: "feeRequired" } },
                 { kind: "Field", name: { kind: "Name", value: "requireApproval" } },
                 { kind: "Field", name: { kind: "Name", value: "publishStatus" } },
@@ -4652,6 +4692,14 @@ export const GetOpportunityDocument = {
                         },
                       },
                     ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "requiredUtilities" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
                   },
                 },
                 {
@@ -5594,3 +5642,137 @@ export const GetUserWithDetailsAndPortfoliosDocument = {
   GetUserWithDetailsAndPortfoliosQuery,
   GetUserWithDetailsAndPortfoliosQueryVariables
 >;
+export const GetUserWalletDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetUserWallet" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "user" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "wallets" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "edges" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "node" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "tickets" },
+                                    arguments: [
+                                      {
+                                        kind: "Argument",
+                                        name: { kind: "Name", value: "filter" },
+                                        value: {
+                                          kind: "ObjectValue",
+                                          fields: [
+                                            {
+                                              kind: "ObjectField",
+                                              name: { kind: "Name", value: "status" },
+                                              value: { kind: "EnumValue", value: "AVAILABLE" },
+                                            },
+                                          ],
+                                        },
+                                      },
+                                    ],
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "edges" },
+                                          selectionSet: {
+                                            kind: "SelectionSet",
+                                            selections: [
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "node" },
+                                                selectionSet: {
+                                                  kind: "SelectionSet",
+                                                  selections: [
+                                                    {
+                                                      kind: "Field",
+                                                      name: { kind: "Name", value: "id" },
+                                                    },
+                                                    {
+                                                      kind: "Field",
+                                                      name: { kind: "Name", value: "status" },
+                                                    },
+                                                    {
+                                                      kind: "Field",
+                                                      name: { kind: "Name", value: "utility" },
+                                                      selectionSet: {
+                                                        kind: "SelectionSet",
+                                                        selections: [
+                                                          {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "id" },
+                                                          },
+                                                        ],
+                                                      },
+                                                    },
+                                                  ],
+                                                },
+                                              },
+                                            ],
+                                          },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetUserWalletQuery, GetUserWalletQueryVariables>;

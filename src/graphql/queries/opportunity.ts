@@ -10,6 +10,7 @@ export const GET_OPPORTUNITY = gql`
       category
       capacity
       pointsToEarn
+      isReservableWithTicket
       feeRequired
       requireApproval
       publishStatus
@@ -99,6 +100,9 @@ export const GET_OPPORTUNITY = gql`
             name
           }
         }
+      }
+      requiredUtilities {
+        id
       }
       slots {
         edges {

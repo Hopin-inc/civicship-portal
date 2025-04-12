@@ -1,19 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useHeader } from "@/contexts/HeaderContext";
 import { useOpportunity } from "@/hooks/useOpportunity";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Share, X, Calendar, Clock, Users, AlertCircle } from "lucide-react";
+import { Share, X, Calendar, Clock, Users, AlertCircle, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ja } from "date-fns/locale";
 import { Toaster } from "@/app/components/ui/sonner";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { toast } from "sonner";
 import { CREATE_RESERVATION_MUTATION } from "@/graphql/mutations/reservation";
 import { parseDateTime, formatDateTime } from "@/utils/date";
+import { useAuth } from "@/contexts/AuthContext";
+import { GetUserWalletDocument } from "@/gql/graphql";
+import { Switch } from "@/components/ui/switch";
 
 const IconWrapper = ({ children }: { children: React.ReactNode }) => (
   <div className="w-9 h-9 flex-shrink-0 rounded-full bg-[#F4F4F5] flex items-center justify-center">
@@ -86,44 +89,96 @@ const ReservationDetails = ({ startDateTime, endDateTime, participantCount }: {
   </div>
 );
 
-const TicketSelection = ({ ticketCount, onIncrement, onDecrement }: { 
+const PaymentSection = ({ 
+  ticketCount, 
+  onIncrement, 
+  onDecrement, 
+  maxTickets,
+  pricePerPerson,
+  participantCount,
+  useTickets,
+  setUseTickets,
+}: { 
   ticketCount: number;
   onIncrement: () => void;
   onDecrement: () => void;
-}) => (
-  <div className="rounded-lg p-4 mb-6">
-    <h3 className="text-lg font-medium mb-4">利用するチケット</h3>
-    <div className="flex items-center justify-between border rounded-lg p-3">
-      <Button
-        onClick={onDecrement}
-        variant="outline"
-        size="icon"
-        className="w-8 h-8 rounded-full"
-      >
-        -
-      </Button>
-      <span className="text-xl font-medium">{ticketCount}</span>
-      <Button
-        onClick={onIncrement}
-        variant="outline"
-        size="icon"
-        className="w-8 h-8 rounded-full"
-      >
-        +
-      </Button>
-    </div>
-  </div>
-);
-
-const PriceDetails = ({ pricePerPerson, participantCount }: { 
+  maxTickets: number;
   pricePerPerson: number;
   participantCount: number;
+  useTickets: boolean;
+  setUseTickets: (value: boolean) => void;
 }) => (
   <div className="rounded-lg p-4 mb-6">
-    <h3 className="text-lg font-medium mb-2">料金詳細</h3>
-    <div className="flex justify-between items-center">
-      <span className="text-xl font-bold">{(pricePerPerson * participantCount).toLocaleString()}円</span>
-      <span className="text-sm text-gray-600">（{pricePerPerson.toLocaleString()}円 × {participantCount}人）</span>
+    <h3 className="text-xl font-bold mb-6">お支払い</h3>
+    
+    <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center gap-2">
+        <Switch 
+          checked={useTickets} 
+          onCheckedChange={setUseTickets}
+          className="scale-125"
+        />
+        <span className="text-lg">チケットを利用する</span>
+      </div>
+    </div>
+    <p className="text-gray-500 mb-4">保有しているチケット: {maxTickets}枚</p>
+
+    {useTickets && (
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+          <Button
+            onClick={onDecrement}
+            variant="outline"
+            size="icon"
+            className="w-12 h-12 rounded-full text-2xl"
+            disabled={ticketCount <= 1}
+          >
+            -
+          </Button>
+          <span className="text-2xl font-medium">{ticketCount}</span>
+          <Button
+            onClick={onIncrement}
+            variant="outline"
+            size="icon"
+            className="w-12 h-12 rounded-full text-2xl"
+            disabled={ticketCount >= maxTickets}
+          >
+            +
+          </Button>
+        </div>
+      </div>
+    )}
+
+    <div className="bg-gray-50 rounded-lg p-4">
+      <h4 className="text-xl font-bold mb-4">当日のお支払い</h4>
+      <div className="space-y-3">
+        <div className="flex justify-between text-base">
+          <span>通常申し込み</span>
+          <div>
+            <span>{pricePerPerson.toLocaleString()}円</span>
+            <span className="mx-2">×</span>
+            <span>{participantCount - (useTickets ? ticketCount : 0)}名</span>
+            <span className="mx-2">=</span>
+            <span>{(pricePerPerson * (participantCount - (useTickets ? ticketCount : 0))).toLocaleString()}円</span>
+          </div>
+        </div>
+        {useTickets && (
+          <div className="flex justify-between text-base">
+            <span>チケット利用</span>
+            <div>
+              <span>0円</span>
+              <span className="mx-2">×</span>
+              <span>{ticketCount}名</span>
+              <span className="mx-2">=</span>
+              <span>0円</span>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="flex justify-between mt-6 text-xl font-bold">
+        <span>合計</span>
+        <span>{(pricePerPerson * (participantCount - (useTickets ? ticketCount : 0))).toLocaleString()}円</span>
+      </div>
     </div>
   </div>
 );
@@ -172,10 +227,37 @@ export default function ConfirmPage() {
   const slotStartsAt = searchParams.get("starts_at");
   const participantCount = parseInt(searchParams.get("guests") || "1", 10);
   const communityId = searchParams.get("community_id") || "";
+  const { user: currentUser } = useAuth();
   
-  const [createReservation, { loading: creatingReservation }] = useMutation(CREATE_RESERVATION_MUTATION);
-
   const { opportunity, loading, error } = useOpportunity(opportunityId || "", communityId);
+  
+  const { data: walletData } = useQuery(GetUserWalletDocument, {
+    variables: { id: currentUser?.id || "" },
+    skip: !currentUser?.id,
+  });
+
+  const availableTickets = useMemo(() => {
+    if (!opportunity?.requiredUtilities?.length) {
+      return walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.length || 0;
+    }
+
+    const requiredUtilityIds = new Set(
+      opportunity.requiredUtilities.map(u => u.id)
+    );
+
+    const availableTickets = walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.filter(
+      edge => {
+        const utilityId = edge?.node?.utility?.id;
+        return utilityId ? requiredUtilityIds.has(utilityId) : false;
+      }
+    ) || [];
+
+    return availableTickets.length;
+  }, [opportunity?.requiredUtilities, walletData]);
+
+  console.log("walletData", walletData);
+
+  const [createReservation, { loading: creatingReservation }] = useMutation(CREATE_RESERVATION_MUTATION);
 
   const selectedSlot = opportunity?.slots?.edges?.find(
     edge => {
@@ -191,11 +273,15 @@ export default function ConfirmPage() {
   );
 
   const incrementTicket = () => {
-    setTicketCount((prev) => prev + 1);
+    if (ticketCount < availableTickets) {
+      setTicketCount((prev) => prev + 1);
+    }
   };
 
   const decrementTicket = () => {
-    setTicketCount((prev) => Math.max(1, prev - 1));
+    if (ticketCount > 1) {
+      setTicketCount((prev) => prev - 1);
+    }
   };
 
   useEffect(() => {
@@ -206,10 +292,26 @@ export default function ConfirmPage() {
     });
   }, [updateConfig]);
 
+  const [useTickets, setUseTickets] = useState(false);
+
   const handleConfirmReservation = async () => {
     try {
       if (!opportunityId || !slotStartsAt || !selectedSlot?.node) {
         throw new Error("必要な情報が不足しています");
+      }
+
+      const ticketIds = walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges
+        ?.filter(edge => {
+          if (!opportunity?.requiredUtilities?.length) return true;
+          const utilityId = edge?.node?.utility?.id;
+          return utilityId && opportunity.requiredUtilities.some(u => u.id === utilityId);
+        })
+        ?.slice(0, ticketCount)
+        ?.map(edge => edge?.node?.id)
+        ?.filter((id): id is string => id !== undefined) || [];
+
+      if (ticketCount > 0 && ticketIds.length < ticketCount) {
+        throw new Error("必要なチケットが不足しています");
       }
 
       const result = await createReservation({
@@ -217,7 +319,8 @@ export default function ConfirmPage() {
           input: {
             opportunitySlotId: selectedSlot.node.id,
             totalParticipantCount: participantCount,
-            paymentMethod: "FEE", // 現金支払いをデフォルトとする
+            paymentMethod: ticketCount > 0 ? "TICKET" : "FEE",
+            ticketIdsIfNeed: ticketCount > 0 ? ticketIds : undefined,
           },
         },
       });
@@ -228,7 +331,7 @@ export default function ConfirmPage() {
       }
     } catch (error) {
       console.error("Reservation error:", error);
-      toast.error("予約に失敗しました。もう一度お試しください。");
+      toast.error(error instanceof Error ? error.message : "予約に失敗しました。もう一度お試しください。");
     }
   };
 
@@ -254,22 +357,21 @@ export default function ConfirmPage() {
         opportunity={opportunity} 
         pricePerPerson={pricePerPerson} 
       />
-
       <ReservationDetails 
         startDateTime={startDateTime}
         endDateTime={endDateTime}
         participantCount={participantCount}
       />
 
-      <TicketSelection 
+      <PaymentSection
         ticketCount={ticketCount}
         onIncrement={incrementTicket}
         onDecrement={decrementTicket}
-      />
-
-      <PriceDetails 
+        maxTickets={availableTickets}
         pricePerPerson={pricePerPerson}
         participantCount={participantCount}
+        useTickets={useTickets}
+        setUseTickets={setUseTickets}
       />
 
       <Notes requireApproval={opportunity.requireApproval} />
@@ -278,7 +380,7 @@ export default function ConfirmPage() {
         className="w-full py-6 text-base rounded-lg" 
         size="lg"
         onClick={handleConfirmReservation}
-        disabled={creatingReservation}
+        disabled={creatingReservation || (useTickets && ticketCount > availableTickets)}
       >
         {creatingReservation ? "処理中..." : "申し込みを確定"}
       </Button>

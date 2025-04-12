@@ -186,6 +186,9 @@ export type Opportunity = {
       };
     }>;
   };
+  requiredUtilities?: {
+    id: string;
+  }[];
 };
 
 export type RelatedArticle = {
