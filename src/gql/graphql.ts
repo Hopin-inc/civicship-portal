@@ -2462,6 +2462,30 @@ export type CreateReservationMutation = {
   } | null;
 };
 
+export type UpdateMyProfileMutationVariables = Exact<{
+  input: UserUpdateProfileInput;
+  permission: CheckIsSelfPermissionInput;
+}>;
+
+export type UpdateMyProfileMutation = {
+  __typename?: "Mutation";
+  userUpdateMyProfile?: {
+    __typename?: "UserUpdateProfileSuccess";
+    user?: {
+      __typename?: "User";
+      id: string;
+      name: string;
+      image?: string | null;
+      bio?: string | null;
+      currentPrefecture?: CurrentPrefecture | null;
+      urlFacebook?: string | null;
+      urlInstagram?: string | null;
+      urlX?: string | null;
+      slug: string;
+    } | null;
+  } | null;
+};
+
 export type GetArticleQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   permission: CheckCommunityPermissionInput;
@@ -2799,6 +2823,50 @@ export type GetOpportunityQuery = {
   } | null;
 };
 
+export type GetParticipationQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GetParticipationQuery = {
+  __typename?: "Query";
+  participation?: {
+    __typename?: "Participation";
+    id: string;
+    images?: any | null;
+    reason: ParticipationStatusReason;
+    source: Source;
+    status: ParticipationStatus;
+    updatedAt?: Date | null;
+    reservation?: {
+      __typename?: "Reservation";
+      id: string;
+      opportunitySlot: {
+        __typename?: "OpportunitySlot";
+        id: string;
+        capacity?: number | null;
+        startsAt: Date;
+        endsAt: Date;
+        hostingStatus: OpportunitySlotHostingStatus;
+      };
+    } | null;
+    statusHistories?: {
+      __typename?: "ParticipationStatusHistoriesConnection";
+      edges: Array<{
+        __typename?: "ParticipationStatusHistoryEdge";
+        node?: {
+          __typename?: "ParticipationStatusHistory";
+          id: string;
+          status: ParticipationStatus;
+          reason: ParticipationStatusReason;
+          createdAt: Date;
+          createdByUser?: { __typename?: "User"; id: string; name: string } | null;
+        } | null;
+      }>;
+    } | null;
+    user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+  } | null;
+};
+
 export type SearchOpportunitiesQueryVariables = Exact<{
   filter?: InputMaybe<OpportunityFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
@@ -2878,6 +2946,28 @@ export type SearchOpportunitiesQuery = {
     }>;
     pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
   };
+};
+
+export type GetUserProfileQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GetUserProfileQuery = {
+  __typename?: "Query";
+  user?: {
+    __typename?: "User";
+    id: string;
+    name: string;
+    image?: string | null;
+    bio?: string | null;
+    sysRole: SysRole;
+    currentPrefecture?: CurrentPrefecture | null;
+    urlFacebook?: string | null;
+    urlInstagram?: string | null;
+    urlWebsite?: string | null;
+    urlX?: string | null;
+    urlYoutube?: string | null;
+  } | null;
 };
 
 export type GetUserWithDetailsAndPortfoliosQueryVariables = Exact<{
@@ -3136,6 +3226,93 @@ export const CreateReservationDocument = {
     },
   ],
 } as unknown as DocumentNode<CreateReservationMutation, CreateReservationMutationVariables>;
+export const UpdateMyProfileDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateMyProfile" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "UserUpdateProfileInput" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "permission" } },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "CheckIsSelfPermissionInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "userUpdateMyProfile" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "permission" },
+                value: { kind: "Variable", name: { kind: "Name", value: "permission" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "UserUpdateProfileSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "user" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                            { kind: "Field", name: { kind: "Name", value: "image" } },
+                            { kind: "Field", name: { kind: "Name", value: "bio" } },
+                            { kind: "Field", name: { kind: "Name", value: "currentPrefecture" } },
+                            { kind: "Field", name: { kind: "Name", value: "urlFacebook" } },
+                            { kind: "Field", name: { kind: "Name", value: "urlInstagram" } },
+                            { kind: "Field", name: { kind: "Name", value: "urlX" } },
+                            { kind: "Field", name: { kind: "Name", value: "slug" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UpdateMyProfileMutation, UpdateMyProfileMutationVariables>;
 export const GetArticleDocument = {
   kind: "Document",
   definitions: [
@@ -4367,6 +4544,131 @@ export const GetOpportunityDocument = {
     },
   ],
 } as unknown as DocumentNode<GetOpportunityQuery, GetOpportunityQueryVariables>;
+export const GetParticipationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetParticipation" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participation" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "images" } },
+                { kind: "Field", name: { kind: "Name", value: "reason" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "reservation" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "opportunitySlot" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "capacity" } },
+                            { kind: "Field", name: { kind: "Name", value: "startsAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "endsAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "hostingStatus" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "source" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "statusHistories" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "edges" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "node" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "status" } },
+                                  { kind: "Field", name: { kind: "Name", value: "reason" } },
+                                  { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "createdByUser" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "image" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetParticipationQuery, GetParticipationQueryVariables>;
 export const SearchOpportunitiesDocument = {
   kind: "Document",
   definitions: [
@@ -4623,6 +4925,58 @@ export const SearchOpportunitiesDocument = {
     },
   ],
 } as unknown as DocumentNode<SearchOpportunitiesQuery, SearchOpportunitiesQueryVariables>;
+export const GetUserProfileDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetUserProfile" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "user" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "image" } },
+                { kind: "Field", name: { kind: "Name", value: "bio" } },
+                { kind: "Field", name: { kind: "Name", value: "sysRole" } },
+                { kind: "Field", name: { kind: "Name", value: "currentPrefecture" } },
+                { kind: "Field", name: { kind: "Name", value: "urlFacebook" } },
+                { kind: "Field", name: { kind: "Name", value: "urlInstagram" } },
+                { kind: "Field", name: { kind: "Name", value: "urlWebsite" } },
+                { kind: "Field", name: { kind: "Name", value: "urlX" } },
+                { kind: "Field", name: { kind: "Name", value: "urlYoutube" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetUserProfileQuery, GetUserProfileQueryVariables>;
 export const GetUserWithDetailsAndPortfoliosDocument = {
   kind: "Document",
   definitions: [
