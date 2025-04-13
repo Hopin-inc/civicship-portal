@@ -1,20 +1,11 @@
 import { graphql } from "@/gql";
 
-export const CREATE_USER = graphql(`
-  mutation createUser($input: CreateUserInput!) {
-    createUser(input: $input) {
+export const USER_SIGN_UP = graphql(`
+  mutation userSignUp($input: UserSignUpInput!) {
+    userSignUp(input: $input) {
       user {
         id
-      }
-    }
-  }
-`);
-
-export const DELETE_USER = graphql(`
-  mutation deleteUser {
-    deleteUser {
-      user {
-        id
+        name
       }
     }
   }
