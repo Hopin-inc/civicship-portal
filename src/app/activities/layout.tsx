@@ -1,4 +1,4 @@
-export default function DiscoverLayout({
+export default function ActivitiesLayout({
   children,
 }: {
   children: React.ReactNode;

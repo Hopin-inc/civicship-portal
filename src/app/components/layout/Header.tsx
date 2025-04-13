@@ -26,14 +26,14 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ className }) => {
-  const { user } = useAuth();
+  const { uid, user, logout } = useAuth();
   const { config } = useHeader();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
   const handleLogout = async () => {
-    await auth.signOut();
+    await logout();
     router.refresh();
   };
 
@@ -54,7 +54,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           )}
           {config.showLogo && (
             <Link href="/" className="flex items-center space-x-2">
-              <Image src="images/neo88-logo.jpg" alt="NEO88" width={88} height={80} />
+              <Image src="/images/neo88-logo.jpg" alt="NEO88" width={88} height={80} />
             </Link>
           )}
           {config.showSearchForm && (
@@ -79,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         
         <div className="flex items-center gap-2">
           {config.action}
-          {/* {user ? (
+          {uid ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -105,7 +105,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             </DropdownMenu>
           ) : (
             <Button onClick={() => setIsLoginModalOpen(true)}>ログイン</Button>
-          )} */}
+          )}
         </div>
       </div>
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />

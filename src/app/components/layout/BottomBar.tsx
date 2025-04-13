@@ -9,7 +9,13 @@ const BottomBar = () => {
   const pathname = usePathname();
   const { user } = useAuth();
 
-  if (pathname === '/search') {
+  // Hide BottomBar on search and reservation pages except complete page
+  if (
+    pathname === '/search' || 
+    (pathname.startsWith('/reservation') && !pathname.includes('/complete')) ||
+    pathname.startsWith('/activities/') ||
+    pathname === '/users/me/edit'
+  ) {
     return null;
   }
 
@@ -23,7 +29,7 @@ const BottomBar = () => {
     <div className="max-w-lg mx-auto fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2">
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
-          <Link href="/discover" className={getLinkStyle('/explore')}>
+          <Link href="/activities" className={getLinkStyle('/explore')}>
             <Search size={24} />
             <span className="text-xs mt-1">見つける</span>
           </Link>

@@ -19,7 +19,7 @@ const PREFECTURES = [
 
 export default function Page() {
   const router = useRouter()
-  const [selectedTab, setSelectedTab] = useState<'experience' | 'quest'>('experience')
+  const [selectedTab, setSelectedTab] = useState<'activity' | 'quest'>('activity')
   const [activeForm, setActiveForm] = useState<'location' | 'date' | 'guests' | null>(null)
   const [location, setLocation] = useState<string>('')
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
@@ -71,6 +71,17 @@ export default function Page() {
     if (!range?.from) return ''
     if (!range.to) return format(range.from, 'M/d', { locale: ja })
     return `${format(range.from, 'M/d', { locale: ja })} - ${format(range.to, 'M/d', { locale: ja })}`
+  }
+
+  const handleSearch = () => {
+    const params = new URLSearchParams()
+    if (location) params.set('location', location)
+    if (dateRange?.from) params.set('from', dateRange.from.toISOString())
+    if (dateRange?.to) params.set('to', dateRange.to.toISOString())
+    if (guests > 0) params.set('guests', guests.toString())
+    params.set('type', selectedTab)
+    
+    router.push(`/search/result?${params.toString()}`)
   }
 
   return (
@@ -258,16 +269,7 @@ export default function Page() {
             条件をクリア
           </button>
           <button 
-            onClick={() => {
-              const params = new URLSearchParams()
-              if (location) params.set('location', location)
-              if (dateRange?.from) params.set('from', dateRange.from.toISOString())
-              if (dateRange?.to) params.set('to', dateRange.to.toISOString())
-              if (guests > 0) params.set('guests', guests.toString())
-              params.set('type', selectedTab)
-              
-              router.push(`/search/result?${params.toString()}`)
-            }}
+            onClick={handleSearch}
             className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium"
           >
             検索

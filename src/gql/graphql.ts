@@ -88,6 +88,30 @@ export type ArticlesConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type AuthZDirectiveCompositeRulesInput = {
+  and?: InputMaybe<Array<InputMaybe<AuthZRules>>>;
+  not?: InputMaybe<AuthZRules>;
+  or?: InputMaybe<Array<InputMaybe<AuthZRules>>>;
+};
+
+export type AuthZDirectiveDeepCompositeRulesInput = {
+  and?: InputMaybe<Array<InputMaybe<AuthZDirectiveDeepCompositeRulesInput>>>;
+  id?: InputMaybe<AuthZRules>;
+  not?: InputMaybe<AuthZDirectiveDeepCompositeRulesInput>;
+  or?: InputMaybe<Array<InputMaybe<AuthZDirectiveDeepCompositeRulesInput>>>;
+};
+
+export enum AuthZRules {
+  IsAdmin = "IsAdmin",
+  IsCommunityManager = "IsCommunityManager",
+  IsCommunityMember = "IsCommunityMember",
+  IsCommunityOwner = "IsCommunityOwner",
+  IsOpportunityOwner = "IsOpportunityOwner",
+  IsSelf = "IsSelf",
+  IsUser = "IsUser",
+  VerifySanitizeInput = "VerifySanitizeInput",
+}
+
 export type CheckCommunityPermissionInput = {
   communityId: Scalars["ID"]["input"];
 };
@@ -254,6 +278,12 @@ export type CurrentUserPayload = {
   user?: Maybe<User>;
 };
 
+export type EarliestReservableSlotView = {
+  __typename?: "EarliestReservableSlotView";
+  earliestReservableAt?: Maybe<Scalars["Datetime"]["output"]>;
+  opportunityId: Scalars["ID"]["output"];
+};
+
 export type Edge = {
   cursor: Scalars["String"]["output"];
 };
@@ -368,12 +398,19 @@ export type Membership = {
   __typename?: "Membership";
   community: Community;
   createdAt: Scalars["Datetime"]["output"];
-  histories?: Maybe<Array<MembershipHistory>>;
+  membershipHistories?: Maybe<MembershipHistoriesConnection>;
   reason: MembershipStatusReason;
   role: Role;
   status: MembershipStatus;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
   user: User;
+};
+
+export type MembershipMembershipHistoriesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<MembershipHistoryFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<MembershipHistorySortInput>;
 };
 
 export type MembershipCursorInput = {
@@ -538,10 +575,8 @@ export type Mutation = {
   mutationEcho: Scalars["String"]["output"];
   opportunityCreate?: Maybe<OpportunityCreatePayload>;
   opportunityDelete?: Maybe<OpportunityDeletePayload>;
-  opportunityInvitationCreate?: Maybe<OpportunityInvitationCreatePayload>;
-  opportunityInvitationDisable?: Maybe<OpportunityInvitationDisablePayload>;
-  opportunitySetHostingStatus?: Maybe<OpportunitySetHostingStatusPayload>;
   opportunitySetPublishStatus?: Maybe<OpportunitySetPublishStatusPayload>;
+  opportunitySlotSetHostingStatus?: Maybe<OpportunitySlotSetHostingStatusPayload>;
   opportunitySlotsBulkUpdate?: Maybe<OpportunitySlotsBulkUpdatePayload>;
   opportunityUpdateContent?: Maybe<OpportunityUpdateContentPayload>;
   participationCreatePersonalRecord?: Maybe<ParticipationCreatePersonalRecordPayload>;
@@ -650,26 +685,16 @@ export type MutationOpportunityDeleteArgs = {
   permission: CheckCommunityPermissionInput;
 };
 
-export type MutationOpportunityInvitationCreateArgs = {
-  input: OpportunityInvitationCreateInput;
-  permission: CheckCommunityPermissionInput;
-};
-
-export type MutationOpportunityInvitationDisableArgs = {
-  id: Scalars["ID"]["input"];
-  permission: CheckCommunityPermissionInput;
-};
-
-export type MutationOpportunitySetHostingStatusArgs = {
-  id: Scalars["ID"]["input"];
-  input: OpportunitySetHostingStatusInput;
-  permission: CheckCommunityPermissionInput;
-};
-
 export type MutationOpportunitySetPublishStatusArgs = {
   id: Scalars["ID"]["input"];
   input: OpportunitySetPublishStatusInput;
   permission: CheckCommunityPermissionInput;
+};
+
+export type MutationOpportunitySlotSetHostingStatusArgs = {
+  id: Scalars["ID"]["input"];
+  input: OpportunitySlotSetHostingStatusInput;
+  permission: CheckOpportunityPermissionInput;
 };
 
 export type MutationOpportunitySlotsBulkUpdateArgs = {
@@ -715,7 +740,7 @@ export type MutationPlaceUpdateArgs = {
 
 export type MutationReservationAcceptArgs = {
   id: Scalars["ID"]["input"];
-  permission: CheckCommunityPermissionInput;
+  permission: CheckOpportunityPermissionInput;
 };
 
 export type MutationReservationCancelArgs = {
@@ -734,7 +759,7 @@ export type MutationReservationJoinArgs = {
 
 export type MutationReservationRejectArgs = {
   id: Scalars["ID"]["input"];
-  permission: CheckCommunityPermissionInput;
+  permission: CheckOpportunityPermissionInput;
 };
 
 export type MutationTicketPurchaseArgs = {
@@ -830,22 +855,6 @@ export type NestedPlacesBulkUpdateInput = {
   disconnect?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
-export type Onboarding = {
-  __typename?: "Onboarding";
-  completedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  createdAt: Scalars["Datetime"]["output"];
-  id: Scalars["ID"]["output"];
-  status: OnboardingStatus;
-  todo: Todo;
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  user: User;
-};
-
-export enum OnboardingStatus {
-  Done = "DONE",
-  Wip = "WIP",
-}
-
 export type OpportunitiesConnection = {
   __typename?: "OpportunitiesConnection";
   edges: Array<OpportunityEdge>;
@@ -863,12 +872,12 @@ export type Opportunity = {
   createdAt: Scalars["Datetime"]["output"];
   createdByUser?: Maybe<User>;
   description: Scalars["String"]["output"];
+  earliestReservableSlotView?: Maybe<EarliestReservableSlotView>;
   feeRequired?: Maybe<Scalars["Int"]["output"]>;
   files?: Maybe<Scalars["JSON"]["output"]>;
-  hostingStatus: OpportunityHostingStatus;
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
-  invitations?: Maybe<OpportunityInvitationsConnection>;
+  isReservableWithTicket?: Maybe<Scalars["Boolean"]["output"]>;
   place?: Maybe<Place>;
   pointsToEarn?: Maybe<Scalars["Int"]["output"]>;
   publishStatus: PublishStatus;
@@ -877,13 +886,6 @@ export type Opportunity = {
   slots?: Maybe<OpportunitySlotsConnection>;
   title: Scalars["String"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-};
-
-export type OpportunityInvitationsArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<OpportunityInvitationFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<OpportunityInvitationSortInput>;
 };
 
 export type OpportunitySlotsArgs = {
@@ -945,121 +947,15 @@ export type OpportunityFilterInput = {
   cityCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   communityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   createdByUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  hostingStatus?: InputMaybe<Array<OpportunityHostingStatus>>;
   not?: InputMaybe<OpportunityFilterInput>;
   or?: InputMaybe<Array<OpportunityFilterInput>>;
   placeIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   publishStatus?: InputMaybe<Array<PublishStatus>>;
   requiredUtilityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-};
-
-export enum OpportunityHostingStatus {
-  Cancelled = "CANCELLED",
-  Completed = "COMPLETED",
-  Scheduled = "SCHEDULED",
-}
-
-export type OpportunityInvitation = {
-  __typename?: "OpportunityInvitation";
-  code: Scalars["String"]["output"];
-  createdAt: Scalars["Datetime"]["output"];
-  createdByUser?: Maybe<User>;
-  histories?: Maybe<OpportunityInvitationHistoriesConnection>;
-  id: Scalars["ID"]["output"];
-  isValid: Scalars["Boolean"]["output"];
-  opportunity?: Maybe<Opportunity>;
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-};
-
-export type OpportunityInvitationHistoriesArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<OpportunityInvitationHistoryFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<OpportunityInvitationHistorySortInput>;
-};
-
-export type OpportunityInvitationCreateInput = {
-  code: Scalars["String"]["input"];
-  opportunityId: Scalars["ID"]["input"];
-};
-
-export type OpportunityInvitationCreatePayload = OpportunityInvitationCreateSuccess;
-
-export type OpportunityInvitationCreateSuccess = {
-  __typename?: "OpportunityInvitationCreateSuccess";
-  opportunityInvitation?: Maybe<OpportunityInvitation>;
-};
-
-export type OpportunityInvitationDisablePayload = OpportunityInvitationDisableSuccess;
-
-export type OpportunityInvitationDisableSuccess = {
-  __typename?: "OpportunityInvitationDisableSuccess";
-  opportunityInvitation?: Maybe<OpportunityInvitation>;
-};
-
-export type OpportunityInvitationEdge = Edge & {
-  __typename?: "OpportunityInvitationEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<OpportunityInvitation>;
-};
-
-export type OpportunityInvitationFilterInput = {
-  createdByUserId?: InputMaybe<Scalars["ID"]["input"]>;
-  isValid?: InputMaybe<Scalars["Boolean"]["input"]>;
-  opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
-};
-
-export type OpportunityInvitationHistoriesConnection = {
-  __typename?: "OpportunityInvitationHistoriesConnection";
-  edges?: Maybe<Array<Maybe<OpportunityInvitationHistoryEdge>>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars["Int"]["output"];
-};
-
-export type OpportunityInvitationHistory = {
-  __typename?: "OpportunityInvitationHistory";
-  createdAt: Scalars["Datetime"]["output"];
-  id: Scalars["ID"]["output"];
-  invitation?: Maybe<OpportunityInvitation>;
-  participations?: Maybe<Array<Participation>>;
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-};
-
-export type OpportunityInvitationHistoryEdge = Edge & {
-  __typename?: "OpportunityInvitationHistoryEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<OpportunityInvitationHistory>;
-};
-
-export type OpportunityInvitationHistoryFilterInput = {
-  invitationId?: InputMaybe<Scalars["ID"]["input"]>;
-  userId?: InputMaybe<Scalars["ID"]["input"]>;
-};
-
-export type OpportunityInvitationHistorySortInput = {
-  createdAt?: InputMaybe<SortDirection>;
-};
-
-export type OpportunityInvitationSortInput = {
-  createdAt?: InputMaybe<SortDirection>;
-};
-
-export type OpportunityInvitationsConnection = {
-  __typename?: "OpportunityInvitationsConnection";
-  edges?: Maybe<Array<Maybe<OpportunityInvitationEdge>>>;
-  pageInfo: PageInfo;
-  totalCount: Scalars["Int"]["output"];
-};
-
-export type OpportunitySetHostingStatusInput = {
-  hostingStatus: OpportunityHostingStatus;
-};
-
-export type OpportunitySetHostingStatusPayload = OpportunitySetHostingStatusSuccess;
-
-export type OpportunitySetHostingStatusSuccess = {
-  __typename?: "OpportunitySetHostingStatusSuccess";
-  opportunity: Opportunity;
+  slotEndsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  slotHostingStatus?: InputMaybe<Array<OpportunitySlotHostingStatus>>;
+  slotRemainingCapacity?: InputMaybe<Scalars["Int"]["input"]>;
+  slotStartsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
 };
 
 export type OpportunitySetPublishStatusInput = {
@@ -1078,9 +974,11 @@ export type OpportunitySlot = {
   capacity?: Maybe<Scalars["Int"]["output"]>;
   createdAt: Scalars["Datetime"]["output"];
   endsAt: Scalars["Datetime"]["output"];
+  hostingStatus: OpportunitySlotHostingStatus;
   id: Scalars["ID"]["output"];
   opportunity?: Maybe<Opportunity>;
   participations?: Maybe<ParticipationsConnection>;
+  remainingCapacityView?: Maybe<RemainingCapacityView>;
   reservations?: Maybe<ReservationsConnection>;
   startsAt: Scalars["Datetime"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
@@ -1113,6 +1011,23 @@ export type OpportunitySlotEdge = Edge & {
 
 export type OpportunitySlotFilterInput = {
   opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export enum OpportunitySlotHostingStatus {
+  Cancelled = "CANCELLED",
+  Completed = "COMPLETED",
+  Scheduled = "SCHEDULED",
+}
+
+export type OpportunitySlotSetHostingStatusInput = {
+  status: OpportunitySlotHostingStatus;
+};
+
+export type OpportunitySlotSetHostingStatusPayload = OpportunitySlotSetHostingStatusSuccess;
+
+export type OpportunitySlotSetHostingStatusSuccess = {
+  __typename?: "OpportunitySlotSetHostingStatusSuccess";
+  slot: OpportunitySlot;
 };
 
 export type OpportunitySlotSortInput = {
@@ -1150,6 +1065,7 @@ export type OpportunitySlotsConnection = {
 
 export type OpportunitySortInput = {
   createdAt?: InputMaybe<SortDirection>;
+  earliestSlotStartsAt?: InputMaybe<SortDirection>;
 };
 
 export type OpportunityUpdateContentInput = {
@@ -1199,13 +1115,13 @@ export type Participation = {
   evaluation?: Maybe<Evaluation>;
   id: Scalars["ID"]["output"];
   images?: Maybe<Scalars["JSON"]["output"]>;
-  opportunityInvitationHistory?: Maybe<OpportunityInvitationHistory>;
   opportunitySlot?: Maybe<OpportunitySlot>;
   reason: ParticipationStatusReason;
   reservation?: Maybe<Reservation>;
   source: Source;
   status: ParticipationStatus;
   statusHistories?: Maybe<ParticipationStatusHistoriesConnection>;
+  ticketStatusHistories?: Maybe<Array<TicketStatusHistory>>;
   transactions?: Maybe<TransactionsConnection>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
   user?: Maybe<User>;
@@ -1257,7 +1173,6 @@ export type ParticipationFilterInput = {
   dateFrom?: InputMaybe<Scalars["Datetime"]["input"]>;
   dateTo?: InputMaybe<Scalars["Datetime"]["input"]>;
   opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
-  opportunityInvitationId?: InputMaybe<Scalars["ID"]["input"]>;
   opportunitySlotId?: InputMaybe<Scalars["ID"]["input"]>;
   reservationId?: InputMaybe<Scalars["ID"]["input"]>;
   stateCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
@@ -1535,10 +1450,6 @@ export type Query = {
   memberships: MembershipsConnection;
   opportunities: OpportunitiesConnection;
   opportunity?: Maybe<Opportunity>;
-  opportunityInvitation?: Maybe<OpportunityInvitation>;
-  opportunityInvitationHistories: OpportunityInvitationHistoriesConnection;
-  opportunityInvitationHistory?: Maybe<OpportunityInvitationHistory>;
-  opportunityInvitations: OpportunityInvitationsConnection;
   opportunitySlot?: Maybe<OpportunitySlot>;
   opportunitySlots: OpportunitySlotsConnection;
   participation?: Maybe<Participation>;
@@ -1651,28 +1562,6 @@ export type QueryOpportunitiesArgs = {
 export type QueryOpportunityArgs = {
   id: Scalars["ID"]["input"];
   permission: CheckCommunityPermissionInput;
-};
-
-export type QueryOpportunityInvitationArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type QueryOpportunityInvitationHistoriesArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<OpportunityInvitationHistoryFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<OpportunityInvitationHistorySortInput>;
-};
-
-export type QueryOpportunityInvitationHistoryArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type QueryOpportunityInvitationsArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<OpportunityInvitationFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<OpportunityInvitationSortInput>;
 };
 
 export type QueryOpportunitySlotArgs = {
@@ -1830,6 +1719,12 @@ export type QueryWalletsArgs = {
   sort?: InputMaybe<WalletSortInput>;
 };
 
+export type RemainingCapacityView = {
+  __typename?: "RemainingCapacityView";
+  opportunitySlotId: Scalars["String"]["output"];
+  remainingCapacity?: Maybe<Scalars["Int"]["output"]>;
+};
+
 export type Reservation = {
   __typename?: "Reservation";
   createdAt: Scalars["Datetime"]["output"];
@@ -1849,9 +1744,10 @@ export type ReservationCancelInput = {
 
 export type ReservationCreateInput = {
   opportunitySlotId: Scalars["ID"]["input"];
-  participantCount: Scalars["Int"]["input"];
+  otherUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   paymentMethod: ReservationPaymentMethod;
-  userIdsIfExists?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  ticketIdsIfNeed?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  totalParticipantCount: Scalars["Int"]["input"];
 };
 
 export type ReservationCreatePayload = ReservationCreateSuccess;
@@ -1908,7 +1804,7 @@ export type ReservationHistorySortInput = {
 
 export enum ReservationPaymentMethod {
   Fee = "FEE",
-  Point = "POINT",
+  Ticket = "TICKET",
 }
 
 export type ReservationSetStatusPayload = ReservationSetStatusSuccess;
@@ -2092,13 +1988,6 @@ export type TicketsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
-export enum Todo {
-  FirstActivity = "FIRST_ACTIVITY",
-  FirstQuest = "FIRST_QUEST",
-  PersonalRecord = "PERSONAL_RECORD",
-  Profile = "PROFILE",
-}
-
 export type Transaction = {
   __typename?: "Transaction";
   createdAt: Scalars["Datetime"]["output"];
@@ -2209,10 +2098,7 @@ export type User = {
   membershipChangedByMe?: Maybe<MembershipHistoriesConnection>;
   memberships?: Maybe<MembershipsConnection>;
   name: Scalars["String"]["output"];
-  onboardings?: Maybe<Array<Onboarding>>;
   opportunitiesCreatedByMe?: Maybe<OpportunitiesConnection>;
-  opportunityInvitationHistories?: Maybe<OpportunityInvitationHistoriesConnection>;
-  opportunityInvitations?: Maybe<OpportunityInvitationsConnection>;
   participationStatusChangedByMe?: Maybe<ParticipationStatusHistoriesConnection>;
   participations?: Maybe<ParticipationsConnection>;
   portfolios?: Maybe<PortfoliosConnection>;
@@ -2278,20 +2164,6 @@ export type UserOpportunitiesCreatedByMeArgs = {
   filter?: InputMaybe<OpportunityFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<OpportunitySortInput>;
-};
-
-export type UserOpportunityInvitationHistoriesArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<OpportunityInvitationHistoryFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<OpportunityInvitationHistorySortInput>;
-};
-
-export type UserOpportunityInvitationsArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<OpportunityInvitationFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<OpportunityInvitationSortInput>;
 };
 
 export type UserParticipationStatusChangedByMeArgs = {
@@ -2365,7 +2237,7 @@ export type UserFilterInput = {
 };
 
 export type UserSignUpInput = {
-  currentPrefecture?: InputMaybe<CurrentPrefecture>;
+  currentPrefecture: CurrentPrefecture;
   image?: InputMaybe<ImageInput>;
   name: Scalars["String"]["input"];
   slug?: InputMaybe<Scalars["String"]["input"]>;
@@ -2566,6 +2438,141 @@ export type WalletsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type UserSignUpMutationVariables = Exact<{
+  input: UserSignUpInput;
+}>;
+
+export type UserSignUpMutation = {
+  __typename?: "Mutation";
+  userSignUp?: {
+    __typename?: "CurrentUserPayload";
+    user?: { __typename?: "User"; id: string; name: string } | null;
+  } | null;
+};
+
+export type CreateReservationMutationVariables = Exact<{
+  input: ReservationCreateInput;
+}>;
+
+export type CreateReservationMutation = {
+  __typename?: "Mutation";
+  reservationCreate?: {
+    __typename?: "ReservationCreateSuccess";
+    reservation: { __typename?: "Reservation"; id: string; status: ReservationStatus };
+  } | null;
+};
+
+export type UpdateMyProfileMutationVariables = Exact<{
+  input: UserUpdateProfileInput;
+  permission: CheckIsSelfPermissionInput;
+}>;
+
+export type UpdateMyProfileMutation = {
+  __typename?: "Mutation";
+  userUpdateMyProfile?: {
+    __typename?: "UserUpdateProfileSuccess";
+    user?: {
+      __typename?: "User";
+      id: string;
+      name: string;
+      image?: string | null;
+      bio?: string | null;
+      currentPrefecture?: CurrentPrefecture | null;
+      urlFacebook?: string | null;
+      urlInstagram?: string | null;
+      urlX?: string | null;
+      slug: string;
+    } | null;
+  } | null;
+};
+
+export type GetArticleQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  permission: CheckCommunityPermissionInput;
+}>;
+
+export type GetArticleQuery = {
+  __typename?: "Query";
+  article?: {
+    __typename?: "Article";
+    id: string;
+    title: string;
+    introduction: string;
+    body: string;
+    category: ArticleCategory;
+    thumbnail?: any | null;
+    publishedAt?: Date | null;
+    createdAt: Date;
+    updatedAt?: Date | null;
+    authors?: Array<{
+      __typename?: "User";
+      id: string;
+      name: string;
+      image?: string | null;
+      bio?: string | null;
+    }> | null;
+    relatedUsers?: Array<{
+      __typename?: "User";
+      id: string;
+      name: string;
+      image?: string | null;
+      bio?: string | null;
+    }> | null;
+  } | null;
+  articles: {
+    __typename?: "ArticlesConnection";
+    edges?: Array<{
+      __typename?: "ArticleEdge";
+      node?: {
+        __typename?: "Article";
+        id: string;
+        title: string;
+        introduction: string;
+        thumbnail?: any | null;
+        publishedAt?: Date | null;
+        authors?: Array<{
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+        }> | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
+export type GetArticlesQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<ArticleFilterInput>;
+  sort?: InputMaybe<ArticleSortInput>;
+}>;
+
+export type GetArticlesQuery = {
+  __typename?: "Query";
+  articles: {
+    __typename?: "ArticlesConnection";
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+    edges?: Array<{
+      __typename?: "ArticleEdge";
+      node?: {
+        __typename?: "Article";
+        id: string;
+        title: string;
+        introduction: string;
+        thumbnail?: any | null;
+        publishedAt?: Date | null;
+        authors?: Array<{
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+        }> | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CurrentUserQuery = {
@@ -2573,6 +2580,393 @@ export type CurrentUserQuery = {
   currentUser?: {
     __typename?: "CurrentUserPayload";
     user?: { __typename?: "User"; id: string; name: string } | null;
+  } | null;
+};
+
+export type OpportunityFieldsFragment = {
+  __typename?: "Opportunity";
+  id: string;
+  title: string;
+  description: string;
+  image?: string | null;
+  feeRequired?: number | null;
+  pointsToEarn?: number | null;
+  community?: { __typename?: "Community"; id: string } | null;
+  place?: {
+    __typename?: "Place";
+    id: string;
+    name: string;
+    address: string;
+    city: { __typename?: "City"; name: string; state: { __typename?: "State"; name: string } };
+  } | null;
+  slots?: {
+    __typename?: "OpportunitySlotsConnection";
+    edges?: Array<{
+      __typename?: "OpportunitySlotEdge";
+      node?: {
+        __typename?: "OpportunitySlot";
+        id: string;
+        startsAt: Date;
+        endsAt: Date;
+        capacity?: number | null;
+      } | null;
+    } | null> | null;
+  } | null;
+} & { " $fragmentName"?: "OpportunityFieldsFragment" };
+
+export type GetOpportunitiesQueryVariables = Exact<{
+  upcomingFilter?: InputMaybe<OpportunityFilterInput>;
+  featuredFilter?: InputMaybe<OpportunityFilterInput>;
+  allFilter?: InputMaybe<OpportunityFilterInput>;
+  similarFilter?: InputMaybe<OpportunityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type GetOpportunitiesQuery = {
+  __typename?: "Query";
+  upcoming: {
+    __typename?: "OpportunitiesConnection";
+    edges: Array<{
+      __typename?: "OpportunityEdge";
+      node?:
+        | ({ __typename?: "Opportunity" } & {
+            " $fragmentRefs"?: { OpportunityFieldsFragment: OpportunityFieldsFragment };
+          })
+        | null;
+    }>;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
+  featured: {
+    __typename?: "OpportunitiesConnection";
+    edges: Array<{
+      __typename?: "OpportunityEdge";
+      node?:
+        | ({ __typename?: "Opportunity" } & {
+            " $fragmentRefs"?: { OpportunityFieldsFragment: OpportunityFieldsFragment };
+          })
+        | null;
+    }>;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
+  similar: {
+    __typename?: "OpportunitiesConnection";
+    edges: Array<{
+      __typename?: "OpportunityEdge";
+      node?:
+        | ({ __typename?: "Opportunity" } & {
+            " $fragmentRefs"?: { OpportunityFieldsFragment: OpportunityFieldsFragment };
+          })
+        | null;
+    }>;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
+  all: {
+    __typename?: "OpportunitiesConnection";
+    totalCount: number;
+    edges: Array<{
+      __typename?: "OpportunityEdge";
+      node?:
+        | ({ __typename?: "Opportunity" } & {
+            " $fragmentRefs"?: { OpportunityFieldsFragment: OpportunityFieldsFragment };
+          })
+        | null;
+    }>;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
+};
+
+export type GetOpportunityQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  permission: CheckCommunityPermissionInput;
+}>;
+
+export type GetOpportunityQuery = {
+  __typename?: "Query";
+  opportunity?: {
+    __typename?: "Opportunity";
+    id: string;
+    title: string;
+    description: string;
+    body?: string | null;
+    category: OpportunityCategory;
+    capacity?: number | null;
+    pointsToEarn?: number | null;
+    feeRequired?: number | null;
+    requireApproval: boolean;
+    publishStatus: PublishStatus;
+    image?: string | null;
+    files?: any | null;
+    createdAt: Date;
+    updatedAt?: Date | null;
+    community?: {
+      __typename?: "Community";
+      id: string;
+      name: string;
+      image?: string | null;
+    } | null;
+    createdByUser?: {
+      __typename?: "User";
+      id: string;
+      name: string;
+      image?: string | null;
+      articlesAboutMe?: {
+        __typename?: "ArticlesConnection";
+        edges?: Array<{
+          __typename?: "ArticleEdge";
+          node?: {
+            __typename?: "Article";
+            id: string;
+            title: string;
+            introduction: string;
+            thumbnail?: any | null;
+            createdAt: Date;
+          } | null;
+        } | null> | null;
+      } | null;
+      opportunitiesCreatedByMe?: {
+        __typename?: "OpportunitiesConnection";
+        edges: Array<{
+          __typename?: "OpportunityEdge";
+          node?: {
+            __typename?: "Opportunity";
+            id: string;
+            title: string;
+            description: string;
+            category: OpportunityCategory;
+            capacity?: number | null;
+            pointsToEarn?: number | null;
+            feeRequired?: number | null;
+            requireApproval: boolean;
+            publishStatus: PublishStatus;
+            image?: string | null;
+            createdAt: Date;
+            updatedAt?: Date | null;
+            community?: {
+              __typename?: "Community";
+              id: string;
+              name: string;
+              image?: string | null;
+            } | null;
+            slots?: {
+              __typename?: "OpportunitySlotsConnection";
+              edges?: Array<{
+                __typename?: "OpportunitySlotEdge";
+                node?: {
+                  __typename?: "OpportunitySlot";
+                  id: string;
+                  startsAt: Date;
+                  endsAt: Date;
+                  participations?: {
+                    __typename?: "ParticipationsConnection";
+                    edges: Array<{
+                      __typename?: "ParticipationEdge";
+                      node?: {
+                        __typename?: "Participation";
+                        id: string;
+                        status: ParticipationStatus;
+                        user?: {
+                          __typename?: "User";
+                          id: string;
+                          name: string;
+                          image?: string | null;
+                        } | null;
+                      } | null;
+                    }>;
+                  } | null;
+                } | null;
+              } | null> | null;
+            } | null;
+          } | null;
+        }>;
+      } | null;
+    } | null;
+    place?: {
+      __typename?: "Place";
+      id: string;
+      name: string;
+      address: string;
+      latitude: any;
+      longitude: any;
+      city: { __typename?: "City"; name: string; state: { __typename?: "State"; name: string } };
+    } | null;
+    slots?: {
+      __typename?: "OpportunitySlotsConnection";
+      edges?: Array<{
+        __typename?: "OpportunitySlotEdge";
+        node?: {
+          __typename?: "OpportunitySlot";
+          id: string;
+          startsAt: Date;
+          endsAt: Date;
+          participations?: {
+            __typename?: "ParticipationsConnection";
+            edges: Array<{
+              __typename?: "ParticipationEdge";
+              node?: {
+                __typename?: "Participation";
+                id: string;
+                status: ParticipationStatus;
+                images?: any | null;
+                user?: {
+                  __typename?: "User";
+                  id: string;
+                  name: string;
+                  image?: string | null;
+                } | null;
+              } | null;
+            }>;
+          } | null;
+        } | null;
+      } | null> | null;
+    } | null;
+  } | null;
+};
+
+export type GetParticipationQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GetParticipationQuery = {
+  __typename?: "Query";
+  participation?: {
+    __typename?: "Participation";
+    id: string;
+    images?: any | null;
+    reason: ParticipationStatusReason;
+    source: Source;
+    status: ParticipationStatus;
+    updatedAt?: Date | null;
+    reservation?: {
+      __typename?: "Reservation";
+      id: string;
+      opportunitySlot: {
+        __typename?: "OpportunitySlot";
+        id: string;
+        capacity?: number | null;
+        startsAt: Date;
+        endsAt: Date;
+        hostingStatus: OpportunitySlotHostingStatus;
+      };
+    } | null;
+    statusHistories?: {
+      __typename?: "ParticipationStatusHistoriesConnection";
+      edges: Array<{
+        __typename?: "ParticipationStatusHistoryEdge";
+        node?: {
+          __typename?: "ParticipationStatusHistory";
+          id: string;
+          status: ParticipationStatus;
+          reason: ParticipationStatusReason;
+          createdAt: Date;
+          createdByUser?: { __typename?: "User"; id: string; name: string } | null;
+        } | null;
+      }>;
+    } | null;
+    user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+  } | null;
+};
+
+export type SearchOpportunitiesQueryVariables = Exact<{
+  filter?: InputMaybe<OpportunityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type SearchOpportunitiesQuery = {
+  __typename?: "Query";
+  opportunities: {
+    __typename?: "OpportunitiesConnection";
+    totalCount: number;
+    edges: Array<{
+      __typename?: "OpportunityEdge";
+      node?: {
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        category: OpportunityCategory;
+        capacity?: number | null;
+        pointsToEarn?: number | null;
+        feeRequired?: number | null;
+        requireApproval: boolean;
+        publishStatus: PublishStatus;
+        image?: string | null;
+        createdAt: Date;
+        updatedAt?: Date | null;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name: string;
+          image?: string | null;
+        } | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+          city: {
+            __typename?: "City";
+            name: string;
+            state: { __typename?: "State"; name: string };
+          };
+        } | null;
+        slots?: {
+          __typename?: "OpportunitySlotsConnection";
+          edges?: Array<{
+            __typename?: "OpportunitySlotEdge";
+            node?: {
+              __typename?: "OpportunitySlot";
+              id: string;
+              startsAt: Date;
+              endsAt: Date;
+              capacity?: number | null;
+              participations?: {
+                __typename?: "ParticipationsConnection";
+                edges: Array<{
+                  __typename?: "ParticipationEdge";
+                  node?: {
+                    __typename?: "Participation";
+                    id: string;
+                    status: ParticipationStatus;
+                    user?: {
+                      __typename?: "User";
+                      id: string;
+                      name: string;
+                      image?: string | null;
+                    } | null;
+                  } | null;
+                }>;
+              } | null;
+            } | null;
+          } | null> | null;
+        } | null;
+      } | null;
+    }>;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
+};
+
+export type GetUserProfileQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GetUserProfileQuery = {
+  __typename?: "Query";
+  user?: {
+    __typename?: "User";
+    id: string;
+    name: string;
+    image?: string | null;
+    bio?: string | null;
+    sysRole: SysRole;
+    currentPrefecture?: CurrentPrefecture | null;
+    urlFacebook?: string | null;
+    urlInstagram?: string | null;
+    urlWebsite?: string | null;
+    urlX?: string | null;
+    urlYoutube?: string | null;
   } | null;
 };
 
@@ -2626,6 +3020,595 @@ export type GetUserWithDetailsAndPortfoliosQuery = {
   } | null;
 };
 
+export const OpportunityFieldsFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OpportunityFields" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "Opportunity" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "image" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "community" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "place" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "address" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "city" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "state" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "name" } }],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "slots" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "edges" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "node" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "startsAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "endsAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "capacity" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "feeRequired" } },
+          { kind: "Field", name: { kind: "Name", value: "pointsToEarn" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<OpportunityFieldsFragment, unknown>;
+export const UserSignUpDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "userSignUp" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "UserSignUpInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "userSignUp" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UserSignUpMutation, UserSignUpMutationVariables>;
+export const CreateReservationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "CreateReservation" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ReservationCreateInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "reservationCreate" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ReservationCreateSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "reservation" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "status" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<CreateReservationMutation, CreateReservationMutationVariables>;
+export const UpdateMyProfileDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateMyProfile" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "UserUpdateProfileInput" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "permission" } },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "CheckIsSelfPermissionInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "userUpdateMyProfile" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "permission" },
+                value: { kind: "Variable", name: { kind: "Name", value: "permission" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "UserUpdateProfileSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "user" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                            { kind: "Field", name: { kind: "Name", value: "image" } },
+                            { kind: "Field", name: { kind: "Name", value: "bio" } },
+                            { kind: "Field", name: { kind: "Name", value: "currentPrefecture" } },
+                            { kind: "Field", name: { kind: "Name", value: "urlFacebook" } },
+                            { kind: "Field", name: { kind: "Name", value: "urlInstagram" } },
+                            { kind: "Field", name: { kind: "Name", value: "urlX" } },
+                            { kind: "Field", name: { kind: "Name", value: "slug" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UpdateMyProfileMutation, UpdateMyProfileMutationVariables>;
+export const GetArticleDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetArticle" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "permission" } },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "CheckCommunityPermissionInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "article" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "permission" },
+                value: { kind: "Variable", name: { kind: "Name", value: "permission" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "introduction" } },
+                { kind: "Field", name: { kind: "Name", value: "body" } },
+                { kind: "Field", name: { kind: "Name", value: "category" } },
+                { kind: "Field", name: { kind: "Name", value: "thumbnail" } },
+                { kind: "Field", name: { kind: "Name", value: "publishedAt" } },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "authors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "image" } },
+                      { kind: "Field", name: { kind: "Name", value: "bio" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "relatedUsers" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "image" } },
+                      { kind: "Field", name: { kind: "Name", value: "bio" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "articles" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "4" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "filter" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "categories" },
+                      value: {
+                        kind: "ListValue",
+                        values: [{ kind: "StringValue", value: "INTERVIEW", block: false }],
+                      },
+                    },
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "publishStatus" },
+                      value: {
+                        kind: "ListValue",
+                        values: [{ kind: "EnumValue", value: "PUBLIC" }],
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "sort" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "publishedAt" },
+                      value: { kind: "EnumValue", value: "desc" },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "edges" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "node" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "title" } },
+                            { kind: "Field", name: { kind: "Name", value: "introduction" } },
+                            { kind: "Field", name: { kind: "Name", value: "thumbnail" } },
+                            { kind: "Field", name: { kind: "Name", value: "publishedAt" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "authors" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                  { kind: "Field", name: { kind: "Name", value: "image" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetArticleQuery, GetArticleQueryVariables>;
+export const GetArticlesDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetArticles" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "first" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "ArticleFilterInput" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "sort" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "ArticleSortInput" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "articles" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "Variable", name: { kind: "Name", value: "first" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "cursor" },
+                value: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "filter" },
+                value: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "sort" },
+                value: { kind: "Variable", name: { kind: "Name", value: "sort" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                      { kind: "Field", name: { kind: "Name", value: "endCursor" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "edges" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "node" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "title" } },
+                            { kind: "Field", name: { kind: "Name", value: "introduction" } },
+                            { kind: "Field", name: { kind: "Name", value: "thumbnail" } },
+                            { kind: "Field", name: { kind: "Name", value: "publishedAt" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "authors" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                  { kind: "Field", name: { kind: "Name", value: "image" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetArticlesQuery, GetArticlesQueryVariables>;
 export const CurrentUserDocument = {
   kind: "Document",
   definitions: [
@@ -2661,6 +3644,1339 @@ export const CurrentUserDocument = {
     },
   ],
 } as unknown as DocumentNode<CurrentUserQuery, CurrentUserQueryVariables>;
+export const GetOpportunitiesDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetOpportunities" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "upcomingFilter" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "OpportunityFilterInput" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "featuredFilter" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "OpportunityFilterInput" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "allFilter" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "OpportunityFilterInput" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "similarFilter" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "OpportunityFilterInput" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "first" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            alias: { kind: "Name", value: "upcoming" },
+            name: { kind: "Name", value: "opportunities" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "filter" },
+                value: { kind: "Variable", name: { kind: "Name", value: "upcomingFilter" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "sort" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "createdAt" },
+                      value: { kind: "EnumValue", value: "desc" },
+                    },
+                  ],
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "5" },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "edges" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "node" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "FragmentSpread",
+                              name: { kind: "Name", value: "OpportunityFields" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                      { kind: "Field", name: { kind: "Name", value: "endCursor" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            alias: { kind: "Name", value: "featured" },
+            name: { kind: "Name", value: "opportunities" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "filter" },
+                value: { kind: "Variable", name: { kind: "Name", value: "featuredFilter" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "5" },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "edges" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "node" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "FragmentSpread",
+                              name: { kind: "Name", value: "OpportunityFields" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                      { kind: "Field", name: { kind: "Name", value: "endCursor" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            alias: { kind: "Name", value: "similar" },
+            name: { kind: "Name", value: "opportunities" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "filter" },
+                value: { kind: "Variable", name: { kind: "Name", value: "similarFilter" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "3" },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "edges" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "node" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "FragmentSpread",
+                              name: { kind: "Name", value: "OpportunityFields" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                      { kind: "Field", name: { kind: "Name", value: "endCursor" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            alias: { kind: "Name", value: "all" },
+            name: { kind: "Name", value: "opportunities" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "filter" },
+                value: { kind: "Variable", name: { kind: "Name", value: "allFilter" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "Variable", name: { kind: "Name", value: "first" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "cursor" },
+                value: { kind: "Variable", name: { kind: "Name", value: "cursor" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "edges" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "node" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "FragmentSpread",
+                              name: { kind: "Name", value: "OpportunityFields" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                      { kind: "Field", name: { kind: "Name", value: "endCursor" } },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "totalCount" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OpportunityFields" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "Opportunity" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "image" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "community" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "place" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "address" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "city" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "state" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "name" } }],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "slots" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "edges" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "node" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "startsAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "endsAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "capacity" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "feeRequired" } },
+          { kind: "Field", name: { kind: "Name", value: "pointsToEarn" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetOpportunitiesQuery, GetOpportunitiesQueryVariables>;
+export const GetOpportunityDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetOpportunity" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "permission" } },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "CheckCommunityPermissionInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "opportunity" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "permission" },
+                value: { kind: "Variable", name: { kind: "Name", value: "permission" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "description" } },
+                { kind: "Field", name: { kind: "Name", value: "body" } },
+                { kind: "Field", name: { kind: "Name", value: "category" } },
+                { kind: "Field", name: { kind: "Name", value: "capacity" } },
+                { kind: "Field", name: { kind: "Name", value: "pointsToEarn" } },
+                { kind: "Field", name: { kind: "Name", value: "feeRequired" } },
+                { kind: "Field", name: { kind: "Name", value: "requireApproval" } },
+                { kind: "Field", name: { kind: "Name", value: "publishStatus" } },
+                { kind: "Field", name: { kind: "Name", value: "image" } },
+                { kind: "Field", name: { kind: "Name", value: "files" } },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "community" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "image" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "createdByUser" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "image" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "articlesAboutMe" },
+                        arguments: [
+                          {
+                            kind: "Argument",
+                            name: { kind: "Name", value: "first" },
+                            value: { kind: "IntValue", value: "1" },
+                          },
+                          {
+                            kind: "Argument",
+                            name: { kind: "Name", value: "filter" },
+                            value: {
+                              kind: "ObjectValue",
+                              fields: [
+                                {
+                                  kind: "ObjectField",
+                                  name: { kind: "Name", value: "publishStatus" },
+                                  value: {
+                                    kind: "ListValue",
+                                    values: [{ kind: "EnumValue", value: "PUBLIC" }],
+                                  },
+                                },
+                                {
+                                  kind: "ObjectField",
+                                  name: { kind: "Name", value: "categories" },
+                                  value: {
+                                    kind: "ListValue",
+                                    values: [
+                                      { kind: "StringValue", value: "INTERVIEW", block: false },
+                                    ],
+                                  },
+                                },
+                              ],
+                            },
+                          },
+                          {
+                            kind: "Argument",
+                            name: { kind: "Name", value: "sort" },
+                            value: {
+                              kind: "ObjectValue",
+                              fields: [
+                                {
+                                  kind: "ObjectField",
+                                  name: { kind: "Name", value: "publishedAt" },
+                                  value: { kind: "EnumValue", value: "desc" },
+                                },
+                              ],
+                            },
+                          },
+                        ],
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "edges" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "node" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "title" } },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "introduction" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "thumbnail" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "createdAt" },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "opportunitiesCreatedByMe" },
+                        arguments: [
+                          {
+                            kind: "Argument",
+                            name: { kind: "Name", value: "first" },
+                            value: { kind: "IntValue", value: "5" },
+                          },
+                        ],
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "edges" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "node" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "title" } },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "description" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "category" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "capacity" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "community" },
+                                          selectionSet: {
+                                            kind: "SelectionSet",
+                                            selections: [
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "id" },
+                                              },
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "name" },
+                                              },
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "image" },
+                                              },
+                                            ],
+                                          },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "pointsToEarn" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "feeRequired" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "requireApproval" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "publishStatus" },
+                                        },
+                                        { kind: "Field", name: { kind: "Name", value: "image" } },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "createdAt" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "updatedAt" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "slots" },
+                                          selectionSet: {
+                                            kind: "SelectionSet",
+                                            selections: [
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "edges" },
+                                                selectionSet: {
+                                                  kind: "SelectionSet",
+                                                  selections: [
+                                                    {
+                                                      kind: "Field",
+                                                      name: { kind: "Name", value: "node" },
+                                                      selectionSet: {
+                                                        kind: "SelectionSet",
+                                                        selections: [
+                                                          {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "id" },
+                                                          },
+                                                          {
+                                                            kind: "Field",
+                                                            name: {
+                                                              kind: "Name",
+                                                              value: "startsAt",
+                                                            },
+                                                          },
+                                                          {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "endsAt" },
+                                                          },
+                                                          {
+                                                            kind: "Field",
+                                                            name: {
+                                                              kind: "Name",
+                                                              value: "participations",
+                                                            },
+                                                            selectionSet: {
+                                                              kind: "SelectionSet",
+                                                              selections: [
+                                                                {
+                                                                  kind: "Field",
+                                                                  name: {
+                                                                    kind: "Name",
+                                                                    value: "edges",
+                                                                  },
+                                                                  selectionSet: {
+                                                                    kind: "SelectionSet",
+                                                                    selections: [
+                                                                      {
+                                                                        kind: "Field",
+                                                                        name: {
+                                                                          kind: "Name",
+                                                                          value: "node",
+                                                                        },
+                                                                        selectionSet: {
+                                                                          kind: "SelectionSet",
+                                                                          selections: [
+                                                                            {
+                                                                              kind: "Field",
+                                                                              name: {
+                                                                                kind: "Name",
+                                                                                value: "id",
+                                                                              },
+                                                                            },
+                                                                            {
+                                                                              kind: "Field",
+                                                                              name: {
+                                                                                kind: "Name",
+                                                                                value: "status",
+                                                                              },
+                                                                            },
+                                                                            {
+                                                                              kind: "Field",
+                                                                              name: {
+                                                                                kind: "Name",
+                                                                                value: "user",
+                                                                              },
+                                                                              selectionSet: {
+                                                                                kind: "SelectionSet",
+                                                                                selections: [
+                                                                                  {
+                                                                                    kind: "Field",
+                                                                                    name: {
+                                                                                      kind: "Name",
+                                                                                      value: "id",
+                                                                                    },
+                                                                                  },
+                                                                                  {
+                                                                                    kind: "Field",
+                                                                                    name: {
+                                                                                      kind: "Name",
+                                                                                      value: "name",
+                                                                                    },
+                                                                                  },
+                                                                                  {
+                                                                                    kind: "Field",
+                                                                                    name: {
+                                                                                      kind: "Name",
+                                                                                      value:
+                                                                                        "image",
+                                                                                    },
+                                                                                  },
+                                                                                ],
+                                                                              },
+                                                                            },
+                                                                          ],
+                                                                        },
+                                                                      },
+                                                                    ],
+                                                                  },
+                                                                },
+                                                              ],
+                                                            },
+                                                          },
+                                                        ],
+                                                      },
+                                                    },
+                                                  ],
+                                                },
+                                              },
+                                            ],
+                                          },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "place" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "address" } },
+                      { kind: "Field", name: { kind: "Name", value: "latitude" } },
+                      { kind: "Field", name: { kind: "Name", value: "longitude" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "city" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "state" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "slots" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "edges" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "node" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "startsAt" } },
+                                  { kind: "Field", name: { kind: "Name", value: "endsAt" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "participations" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "edges" },
+                                          selectionSet: {
+                                            kind: "SelectionSet",
+                                            selections: [
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "node" },
+                                                selectionSet: {
+                                                  kind: "SelectionSet",
+                                                  selections: [
+                                                    {
+                                                      kind: "Field",
+                                                      name: { kind: "Name", value: "id" },
+                                                    },
+                                                    {
+                                                      kind: "Field",
+                                                      name: { kind: "Name", value: "status" },
+                                                    },
+                                                    {
+                                                      kind: "Field",
+                                                      name: { kind: "Name", value: "images" },
+                                                    },
+                                                    {
+                                                      kind: "Field",
+                                                      name: { kind: "Name", value: "user" },
+                                                      selectionSet: {
+                                                        kind: "SelectionSet",
+                                                        selections: [
+                                                          {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "id" },
+                                                          },
+                                                          {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "name" },
+                                                          },
+                                                          {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "image" },
+                                                          },
+                                                        ],
+                                                      },
+                                                    },
+                                                  ],
+                                                },
+                                              },
+                                            ],
+                                          },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetOpportunityQuery, GetOpportunityQueryVariables>;
+export const GetParticipationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetParticipation" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participation" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "images" } },
+                { kind: "Field", name: { kind: "Name", value: "reason" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "reservation" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "opportunitySlot" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "capacity" } },
+                            { kind: "Field", name: { kind: "Name", value: "startsAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "endsAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "hostingStatus" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "source" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "statusHistories" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "edges" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "node" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "status" } },
+                                  { kind: "Field", name: { kind: "Name", value: "reason" } },
+                                  { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "createdByUser" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "image" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetParticipationQuery, GetParticipationQueryVariables>;
+export const SearchOpportunitiesDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "SearchOpportunities" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "OpportunityFilterInput" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "first" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "opportunities" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "filter" },
+                value: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "Variable", name: { kind: "Name", value: "first" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "edges" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "node" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "title" } },
+                            { kind: "Field", name: { kind: "Name", value: "description" } },
+                            { kind: "Field", name: { kind: "Name", value: "category" } },
+                            { kind: "Field", name: { kind: "Name", value: "capacity" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "community" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                  { kind: "Field", name: { kind: "Name", value: "image" } },
+                                ],
+                              },
+                            },
+                            { kind: "Field", name: { kind: "Name", value: "pointsToEarn" } },
+                            { kind: "Field", name: { kind: "Name", value: "feeRequired" } },
+                            { kind: "Field", name: { kind: "Name", value: "requireApproval" } },
+                            { kind: "Field", name: { kind: "Name", value: "publishStatus" } },
+                            { kind: "Field", name: { kind: "Name", value: "image" } },
+                            { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "place" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                  { kind: "Field", name: { kind: "Name", value: "address" } },
+                                  { kind: "Field", name: { kind: "Name", value: "latitude" } },
+                                  { kind: "Field", name: { kind: "Name", value: "longitude" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "city" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "state" },
+                                          selectionSet: {
+                                            kind: "SelectionSet",
+                                            selections: [
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "name" },
+                                              },
+                                            ],
+                                          },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "slots" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "edges" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "node" },
+                                          selectionSet: {
+                                            kind: "SelectionSet",
+                                            selections: [
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "id" },
+                                              },
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "startsAt" },
+                                              },
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "endsAt" },
+                                              },
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "capacity" },
+                                              },
+                                              {
+                                                kind: "Field",
+                                                name: { kind: "Name", value: "participations" },
+                                                selectionSet: {
+                                                  kind: "SelectionSet",
+                                                  selections: [
+                                                    {
+                                                      kind: "Field",
+                                                      name: { kind: "Name", value: "edges" },
+                                                      selectionSet: {
+                                                        kind: "SelectionSet",
+                                                        selections: [
+                                                          {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "node" },
+                                                            selectionSet: {
+                                                              kind: "SelectionSet",
+                                                              selections: [
+                                                                {
+                                                                  kind: "Field",
+                                                                  name: {
+                                                                    kind: "Name",
+                                                                    value: "id",
+                                                                  },
+                                                                },
+                                                                {
+                                                                  kind: "Field",
+                                                                  name: {
+                                                                    kind: "Name",
+                                                                    value: "status",
+                                                                  },
+                                                                },
+                                                                {
+                                                                  kind: "Field",
+                                                                  name: {
+                                                                    kind: "Name",
+                                                                    value: "user",
+                                                                  },
+                                                                  selectionSet: {
+                                                                    kind: "SelectionSet",
+                                                                    selections: [
+                                                                      {
+                                                                        kind: "Field",
+                                                                        name: {
+                                                                          kind: "Name",
+                                                                          value: "id",
+                                                                        },
+                                                                      },
+                                                                      {
+                                                                        kind: "Field",
+                                                                        name: {
+                                                                          kind: "Name",
+                                                                          value: "name",
+                                                                        },
+                                                                      },
+                                                                      {
+                                                                        kind: "Field",
+                                                                        name: {
+                                                                          kind: "Name",
+                                                                          value: "image",
+                                                                        },
+                                                                      },
+                                                                    ],
+                                                                  },
+                                                                },
+                                                              ],
+                                                            },
+                                                          },
+                                                        ],
+                                                      },
+                                                    },
+                                                  ],
+                                                },
+                                              },
+                                            ],
+                                          },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                      { kind: "Field", name: { kind: "Name", value: "endCursor" } },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "totalCount" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SearchOpportunitiesQuery, SearchOpportunitiesQueryVariables>;
+export const GetUserProfileDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetUserProfile" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "user" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "image" } },
+                { kind: "Field", name: { kind: "Name", value: "bio" } },
+                { kind: "Field", name: { kind: "Name", value: "sysRole" } },
+                { kind: "Field", name: { kind: "Name", value: "currentPrefecture" } },
+                { kind: "Field", name: { kind: "Name", value: "urlFacebook" } },
+                { kind: "Field", name: { kind: "Name", value: "urlInstagram" } },
+                { kind: "Field", name: { kind: "Name", value: "urlWebsite" } },
+                { kind: "Field", name: { kind: "Name", value: "urlX" } },
+                { kind: "Field", name: { kind: "Name", value: "urlYoutube" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetUserProfileQuery, GetUserProfileQueryVariables>;
 export const GetUserWithDetailsAndPortfoliosDocument = {
   kind: "Document",
   definitions: [

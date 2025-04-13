@@ -1,10 +1,10 @@
-import { User } from "@/gql/graphql";
+import { User as GraphQLUser } from "@/gql/graphql";
 import { Required } from "utility-types";
 
 export type AuthInfo = {
   uid?: string;
   providerIds?: string[];
-  user?: Required<Partial<User>, "id" | "lastName" | "firstName"> | null;
+  user?: GraphQLUser | null;
 };
 
 export type User = {
@@ -26,6 +26,41 @@ export type SocialLink = {
   type: SocialLinkType;
   url: string;
 };
+
+// Portfolio related types
+export type PortfolioCategory = 'QUEST' | 'ACTIVITY_REPORT' | 'INTERVIEW' | 'OPPORTUNITY' | 'ACTIVITY';
+export type PortfolioType = 'opportunity' | 'activity_report' | 'quest';
+
+export interface PortfolioStyle {
+  bg: string;
+  text: string;
+}
+
+export const PORTFOLIO_CATEGORY_STYLES: Record<PortfolioCategory, PortfolioStyle> = {
+  QUEST: { bg: '#FEF9C3', text: '#854D0E' },
+  ACTIVITY_REPORT: { bg: '#DCE7DD', text: '#166534' },
+  INTERVIEW: { bg: '#DCE7DD', text: '#166534' },
+  OPPORTUNITY: { bg: '#DBEAFE', text: '#1E40AF' },
+  ACTIVITY: { bg: '#FCE7F3', text: '#831843' },
+} as const;
+
+export interface PortfolioParticipant {
+  id: string;
+  name: string;
+  image: string | null;
+}
+
+export interface Portfolio {
+  id: string;
+  type: PortfolioType;
+  title: string;
+  date: string;
+  location: string | null;
+  category: PortfolioCategory;
+  participants: PortfolioParticipant[];
+  image: string | null;
+  source?: string;
+}
 
 export type Community = {
   id: string;
@@ -71,10 +106,10 @@ export type Opportunity = {
   status: "open" | "in_progress" | "closed";
   communityId: string;
   hostId: string;
-  startsAt: string;
-  endsAt: string;
-  createdAt: Date;
-  updatedAt: Date;
+  startsAt: Date | string;
+  endsAt: Date | string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
   host: {
     name: string;
     image: string;
@@ -95,6 +130,7 @@ export type Opportunity = {
     lng?: number;
   };
   community?: {
+    id: string;
     title: string;
     description: string;
     icon: string;
@@ -105,6 +141,51 @@ export type Opportunity = {
   pointsForComplete?: number;
   pointsForJoin?: number;
   participants: Participant[];
+  body?: string;
+  createdByUser?: {
+    id: string;
+    name: string;
+    image?: string;
+    articlesAboutMe?: {
+      edges: Array<{
+        node: Partial<Article>;
+      }>;
+    };
+    opportunitiesCreatedByMe?: {
+      edges: Opportunity[];
+    };
+  };
+  place?: {
+    name: string;
+    address: string;
+    latitude?: number;
+    longitude?: number;
+  };
+  requireApproval?: boolean;
+  pointsRequired?: number;
+  feeRequired?: number;
+  slots?: {
+    edges: Array<{
+      node: {
+        id: string;
+        startsAt: Date | string;
+        endsAt: Date | string;
+        participations?: {
+          edges: Array<{
+            node: {
+              id: string;
+              status: string;
+              user: {
+                id: string;
+                name: string;
+                image?: string;
+              };
+            };
+          }>;
+        };
+      };
+    }>;
+  };
 };
 
 export type RelatedArticle = {
@@ -124,21 +205,19 @@ export type Article = {
   description: string;
   content: string;
   type: ArticleType;
-  thumbnail: string;
+  thumbnail: {
+    url: string;
+    alt: string;
+  } | null;
   publishedAt: string;
   author: {
     name: string;
     image: string;
     bio?: string;
   };
-  relatedActivityId?: string;
-  relatedUserId?: string;
-  tags: string[];
-  status: "draft" | "published";
   createdAt: string;
-  updatedAt: string;
+  updatedAt: string | null;
 };
-
 
 export type Activity = {
   id: string;
@@ -184,6 +263,28 @@ export type Participant = {
   image?: string;
 };
 
+export type ParticipationImage = {
+  id: string;
+  url: string;
+  caption: string | null;
+  participationId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Participation = {
+  node: {
+    id: string;
+    status: string;
+    images?: ParticipationImage[];
+    user: {
+      id: string;
+      name: string;
+      image?: string;
+    };
+  };
+};
+
 export type ContentType = "EXPERIENCE" | "QUEST" | "EVENT" | "ARTICLE";
 
 export type DateFilter = {
@@ -191,37 +292,21 @@ export type DateFilter = {
   endDate: Date | null;
 };
 
-// Portfolio related types
-export type PortfolioCategory = 'QUEST' | 'ACTIVITY_REPORT' | 'INTERVIEW' | 'OPPORTUNITY' | 'ACTIVITY';
-export type PortfolioType = 'opportunity' | 'activity_report' | 'quest';
+export type OpportunityEdge = {
+  node: Opportunity;
+};
 
-export interface PortfolioStyle {
-  bg: string;
-  text: string;
-}
+export type OpportunityConnection = {
+  edges: OpportunityEdge[];
+  pageInfo: {
+    hasNextPage: boolean;
+    endCursor: string;
+  };
+  totalCount?: number;
+};
 
-export const PORTFOLIO_CATEGORY_STYLES: Record<PortfolioCategory, PortfolioStyle> = {
-  QUEST: { bg: '#FEF9C3', text: '#854D0E' },
-  ACTIVITY_REPORT: { bg: '#DCE7DD', text: '#166534' },
-  INTERVIEW: { bg: '#DCE7DD', text: '#166534' },
-  OPPORTUNITY: { bg: '#DBEAFE', text: '#1E40AF' },
-  ACTIVITY: { bg: '#FCE7F3', text: '#831843' },
-} as const;
-
-export interface PortfolioParticipant {
-  id: string;
-  name: string;
-  image: string | null;
-}
-
-export interface Portfolio {
-  id: string;
-  type: PortfolioType;
-  title: string;
-  date: string;
-  location: string | null;
-  category: PortfolioCategory;
-  participants: PortfolioParticipant[];
-  image: string | null;
-  source?: string;
-}
+export type GetOpportunitiesData = {
+  upcoming: OpportunityConnection;
+  featured: OpportunityConnection;
+  all: OpportunityConnection;
+};

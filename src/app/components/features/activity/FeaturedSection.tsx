@@ -2,19 +2,13 @@
 
 import { useCallback } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import useEmblaCarousel from 'embla-carousel-react'
 import { MapPin } from 'lucide-react'
-
-interface FeaturedOpportunity {
-  id: number
-  title: string
-  price: number
-  location: string
-  imageUrl: string
-}
+import { OpportunityCardProps } from './OpportunityCard'
 
 interface FeaturedSectionProps {
-  opportunities: FeaturedOpportunity[]
+  opportunities: OpportunityCardProps[]
 }
 
 export default function FeaturedSection({ opportunities }: FeaturedSectionProps) {
@@ -31,6 +25,10 @@ export default function FeaturedSection({ opportunities }: FeaturedSectionProps)
   const scrollNext = useCallback(() => {
     if (emblaApi) emblaApi.scrollNext()
   }, [emblaApi])
+
+  if (opportunities.length === 0) {
+    return null
+  }
 
   return (
     <section className="relative h-[70vh] w-full overflow-hidden [&]:mt-0">
@@ -51,7 +49,7 @@ export default function FeaturedSection({ opportunities }: FeaturedSectionProps)
               {/* 背景画像 */}
               <div className="absolute inset-0">
                 <Image
-                  src={opportunity.imageUrl}
+                  src={opportunity.imageUrl || 'https://images.unsplash.com/photo-1578662996442-48f60103fc96'}
                   alt={opportunity.title}
                   fill
                   className="object-cover"
@@ -60,12 +58,15 @@ export default function FeaturedSection({ opportunities }: FeaturedSectionProps)
               </div>
 
               {/* カード */}
-              <div className="absolute inset-x-0 bottom-12 bg-gradient-to-t from-black/60 to-transparent px-6">
+              <Link
+                href={`/activities/${opportunity.id}?community_id=${opportunity.community.id}`}
+                className="absolute inset-x-0 bottom-12 bg-gradient-to-t from-black/60 to-transparent px-6"
+              >
                 <div className="mx-auto max-w-md">
                   <div className="flex overflow-hidden rounded-xl bg-white shadow-lg p-3">
                     <div className="relative h-[80px] w-[80px] flex-shrink-0">
                       <Image
-                        src={opportunity.imageUrl}
+                        src={opportunity.imageUrl || 'https://images.unsplash.com/photo-1578662996442-48f60103fc96'}
                         alt={opportunity.title}
                         fill
                         className="object-cover rounded-lg"
@@ -76,7 +77,7 @@ export default function FeaturedSection({ opportunities }: FeaturedSectionProps)
                         {opportunity.title}
                       </h2>
                       <p className="mt-1 text-base text-gray-600">
-                        {`${opportunity.price.toLocaleString()}円/人〜`}
+                        {opportunity.price ? `${opportunity.price.toLocaleString()}円/人〜` : '価格未定'}
                       </p>
                       <div className="mt-1 flex items-center text-gray-500 text-sm">
                         <MapPin className="mr-1 h-4 w-4" />
@@ -85,28 +86,10 @@ export default function FeaturedSection({ opportunities }: FeaturedSectionProps)
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             </div>
           ))}
         </div>
-
-        {/* ナビゲーションボタン
-        <button
-          className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/80 p-3 shadow-lg transition hover:bg-white"
-          onClick={scrollPrev}
-        >
-          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <button
-          className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/80 p-3 shadow-lg transition hover:bg-white"
-          onClick={scrollNext}
-        >
-          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button> */}
       </div>
     </section>
   )
