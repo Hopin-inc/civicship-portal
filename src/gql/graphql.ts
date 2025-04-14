@@ -22,6 +22,7 @@ export type Scalars = {
   Datetime: { input: Date; output: Date };
   Decimal: { input: any; output: any };
   JSON: { input: any; output: any };
+  Upload: { input: any; output: any };
 };
 
 export type AccumulatedPointView = {
@@ -390,15 +391,19 @@ export enum IdentityPlatform {
 }
 
 export type ImageInput = {
-  base64: Scalars["String"]["input"];
+  alt?: InputMaybe<Scalars["String"]["input"]>;
   caption?: InputMaybe<Scalars["String"]["input"]>;
+  file: Scalars["Upload"]["input"];
 };
 
 export type Membership = {
   __typename?: "Membership";
+  bio?: Maybe<Scalars["String"]["output"]>;
   community: Community;
   createdAt: Scalars["Datetime"]["output"];
+  headline?: Maybe<Scalars["String"]["output"]>;
   membershipHistories?: Maybe<MembershipHistoriesConnection>;
+  participationView?: Maybe<MembershipParticipationView>;
   reason: MembershipStatusReason;
   role: Role;
   status: MembershipStatus;
@@ -465,6 +470,12 @@ export type MembershipHistorySortInput = {
   createdAt?: InputMaybe<SortDirection>;
 };
 
+export type MembershipHostedMetrics = {
+  __typename?: "MembershipHostedMetrics";
+  geo: Array<MembershipParticipationLocation>;
+  totalParticipantCount: Scalars["Int"]["output"];
+};
+
 export type MembershipInviteInput = {
   communityId: Scalars["ID"]["input"];
   role?: InputMaybe<Role>;
@@ -476,6 +487,25 @@ export type MembershipInvitePayload = MembershipInviteSuccess;
 export type MembershipInviteSuccess = {
   __typename?: "MembershipInviteSuccess";
   membership: Membership;
+};
+
+export type MembershipParticipatedMetrics = {
+  __typename?: "MembershipParticipatedMetrics";
+  geo: Array<MembershipParticipationLocation>;
+  totalParticipatedCount: Scalars["Int"]["output"];
+};
+
+export type MembershipParticipationLocation = {
+  __typename?: "MembershipParticipationLocation";
+  latitude: Scalars["Decimal"]["output"];
+  longitude: Scalars["Decimal"]["output"];
+  placeId: Scalars["ID"]["output"];
+};
+
+export type MembershipParticipationView = {
+  __typename?: "MembershipParticipationView";
+  hosted: MembershipHostedMetrics;
+  participated: MembershipParticipatedMetrics;
 };
 
 export type MembershipRemoveInput = {
@@ -581,7 +611,6 @@ export type Mutation = {
   opportunityUpdateContent?: Maybe<OpportunityUpdateContentPayload>;
   participationCreatePersonalRecord?: Maybe<ParticipationCreatePersonalRecordPayload>;
   participationDeletePersonalRecord?: Maybe<ParticipationDeletePayload>;
-  participationImageBulkUpdate?: Maybe<ParticipationImageBulkUpdatePayload>;
   placeCreate?: Maybe<PlaceCreatePayload>;
   placeDelete?: Maybe<PlaceDeletePayload>;
   placeUpdate?: Maybe<PlaceUpdatePayload>;
@@ -714,11 +743,6 @@ export type MutationParticipationCreatePersonalRecordArgs = {
 
 export type MutationParticipationDeletePersonalRecordArgs = {
   id: Scalars["ID"]["input"];
-  permission: CheckIsSelfPermissionInput;
-};
-
-export type MutationParticipationImageBulkUpdateArgs = {
-  input: ParticipationImageBulkUpdateInput;
   permission: CheckIsSelfPermissionInput;
 };
 
@@ -874,9 +898,8 @@ export type Opportunity = {
   description: Scalars["String"]["output"];
   earliestReservableSlotView?: Maybe<EarliestReservableSlotView>;
   feeRequired?: Maybe<Scalars["Int"]["output"]>;
-  files?: Maybe<Scalars["JSON"]["output"]>;
   id: Scalars["ID"]["output"];
-  image?: Maybe<Scalars["String"]["output"]>;
+  images?: Maybe<Array<Scalars["String"]["output"]>>;
   isReservableWithTicket?: Maybe<Scalars["Boolean"]["output"]>;
   place?: Maybe<Place>;
   pointsToEarn?: Maybe<Scalars["Int"]["output"]>;
@@ -909,8 +932,7 @@ export type OpportunityCreateInput = {
   description: Scalars["String"]["input"];
   endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
-  files?: InputMaybe<Scalars["JSON"]["input"]>;
-  image?: InputMaybe<ImageInput>;
+  images?: InputMaybe<Array<ImageInput>>;
   place?: InputMaybe<NestedPlaceConnectOrCreateInput>;
   pointsToEarn?: InputMaybe<Scalars["Int"]["input"]>;
   publishStatus: PublishStatus;
@@ -1075,8 +1097,7 @@ export type OpportunityUpdateContentInput = {
   description: Scalars["String"]["input"];
   endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
-  files?: InputMaybe<Scalars["JSON"]["input"]>;
-  image?: InputMaybe<ImageInput>;
+  images?: InputMaybe<Array<ImageInput>>;
   place?: InputMaybe<NestedPlaceConnectOrCreateInput>;
   pointsToEarn?: InputMaybe<Scalars["Int"]["input"]>;
   publishStatus: PublishStatus;
@@ -1114,8 +1135,7 @@ export type Participation = {
   description?: Maybe<Scalars["String"]["output"]>;
   evaluation?: Maybe<Evaluation>;
   id: Scalars["ID"]["output"];
-  images?: Maybe<Scalars["JSON"]["output"]>;
-  opportunitySlot?: Maybe<OpportunitySlot>;
+  images?: Maybe<Array<Scalars["String"]["output"]>>;
   reason: ParticipationStatusReason;
   reservation?: Maybe<Reservation>;
   source: Source;
@@ -1180,50 +1200,6 @@ export type ParticipationFilterInput = {
   userIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
-export type ParticipationImage = {
-  __typename?: "ParticipationImage";
-  caption?: Maybe<Scalars["String"]["output"]>;
-  createdAt: Scalars["Datetime"]["output"];
-  id: Scalars["ID"]["output"];
-  participation: Participation;
-  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  url: Scalars["String"]["output"];
-};
-
-export type ParticipationImageBulkUpdateInput = {
-  create?: InputMaybe<Array<ImageInput>>;
-  delete?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  participationId: Scalars["ID"]["input"];
-};
-
-export type ParticipationImageBulkUpdatePayload = ParticipationImageBulkUpdateSuccess;
-
-export type ParticipationImageBulkUpdateSuccess = {
-  __typename?: "ParticipationImageBulkUpdateSuccess";
-  participation: Participation;
-};
-
-export type ParticipationImageEdge = Edge & {
-  __typename?: "ParticipationImageEdge";
-  cursor: Scalars["String"]["output"];
-  node?: Maybe<ParticipationImage>;
-};
-
-export type ParticipationImageFilterInput = {
-  participationId?: InputMaybe<Scalars["ID"]["input"]>;
-};
-
-export type ParticipationImageSortInput = {
-  createdAt?: InputMaybe<SortDirection>;
-};
-
-export type ParticipationImagesConnection = {
-  __typename?: "ParticipationImagesConnection";
-  edges: Array<ParticipationImageEdge>;
-  pageInfo: PageInfo;
-  totalCount: Scalars["Int"]["output"];
-};
-
 export type ParticipationSortInput = {
   createdAt?: InputMaybe<SortDirection>;
   startsAt?: InputMaybe<SortDirection>;
@@ -1279,6 +1255,11 @@ export enum ParticipationStatusReason {
   ReservationCanceled = "RESERVATION_CANCELED",
   ReservationJoined = "RESERVATION_JOINED",
   ReservationRejected = "RESERVATION_REJECTED",
+}
+
+export enum ParticipationType {
+  Hosted = "HOSTED",
+  Participated = "PARTICIPATED",
 }
 
 export type ParticipationsConnection = {
@@ -1453,8 +1434,6 @@ export type Query = {
   opportunitySlot?: Maybe<OpportunitySlot>;
   opportunitySlots: OpportunitySlotsConnection;
   participation?: Maybe<Participation>;
-  participationImage?: Maybe<ParticipationImage>;
-  participationImages: ParticipationImagesConnection;
   participationStatusHistories: ParticipationStatusHistoriesConnection;
   participationStatusHistory?: Maybe<ParticipationStatusHistory>;
   participations: ParticipationsConnection;
@@ -1577,17 +1556,6 @@ export type QueryOpportunitySlotsArgs = {
 
 export type QueryParticipationArgs = {
   id: Scalars["ID"]["input"];
-};
-
-export type QueryParticipationImageArgs = {
-  id: Scalars["ID"]["input"];
-};
-
-export type QueryParticipationImagesArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<ParticipationImageFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  sort?: InputMaybe<ParticipationImageSortInput>;
 };
 
 export type QueryParticipationStatusHistoriesArgs = {
@@ -2288,7 +2256,7 @@ export type Utility = {
   createdAt: Scalars["Datetime"]["output"];
   description?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
-  image?: Maybe<Scalars["String"]["output"]>;
+  images?: Maybe<Array<Scalars["String"]["output"]>>;
   name: Scalars["String"]["output"];
   pointsRequired: Scalars["Int"]["output"];
   publishStatus: PublishStatus;
@@ -2314,7 +2282,7 @@ export type UtilityTicketsArgs = {
 export type UtilityCreateInput = {
   communityId: Scalars["ID"]["input"];
   description?: InputMaybe<Scalars["String"]["input"]>;
-  image?: InputMaybe<ImageInput>;
+  images?: InputMaybe<Array<ImageInput>>;
   name: Scalars["String"]["input"];
   pointsRequired: Scalars["Int"]["input"];
 };
@@ -2365,7 +2333,7 @@ export type UtilitySortInput = {
 
 export type UtilityUpdateInfoInput = {
   description?: InputMaybe<Scalars["String"]["input"]>;
-  image?: InputMaybe<ImageInput>;
+  images?: InputMaybe<Array<ImageInput>>;
   name: Scalars["String"]["input"];
   pointsRequired: Scalars["Int"]["input"];
 };
@@ -2588,10 +2556,10 @@ export type OpportunityFieldsFragment = {
   id: string;
   title: string;
   description: string;
-  image?: string | null;
+  images?: Array<string> | null;
   feeRequired?: number | null;
   pointsToEarn?: number | null;
-  community?: { __typename?: "Community"; id: string } | null;
+  community?: { __typename?: "Community"; id: string; name: string; image?: string | null } | null;
   place?: {
     __typename?: "Place";
     id: string;
@@ -2695,8 +2663,7 @@ export type GetOpportunityQuery = {
     feeRequired?: number | null;
     requireApproval: boolean;
     publishStatus: PublishStatus;
-    image?: string | null;
-    files?: any | null;
+    images?: Array<string> | null;
     createdAt: Date;
     updatedAt?: Date | null;
     community?: {
@@ -2739,7 +2706,7 @@ export type GetOpportunityQuery = {
             feeRequired?: number | null;
             requireApproval: boolean;
             publishStatus: PublishStatus;
-            image?: string | null;
+            images?: Array<string> | null;
             createdAt: Date;
             updatedAt?: Date | null;
             community?: {
@@ -2807,7 +2774,7 @@ export type GetOpportunityQuery = {
                 __typename?: "Participation";
                 id: string;
                 status: ParticipationStatus;
-                images?: any | null;
+                images?: Array<string> | null;
                 user?: {
                   __typename?: "User";
                   id: string;
@@ -2820,50 +2787,6 @@ export type GetOpportunityQuery = {
         } | null;
       } | null> | null;
     } | null;
-  } | null;
-};
-
-export type GetParticipationQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type GetParticipationQuery = {
-  __typename?: "Query";
-  participation?: {
-    __typename?: "Participation";
-    id: string;
-    images?: any | null;
-    reason: ParticipationStatusReason;
-    source: Source;
-    status: ParticipationStatus;
-    updatedAt?: Date | null;
-    reservation?: {
-      __typename?: "Reservation";
-      id: string;
-      opportunitySlot: {
-        __typename?: "OpportunitySlot";
-        id: string;
-        capacity?: number | null;
-        startsAt: Date;
-        endsAt: Date;
-        hostingStatus: OpportunitySlotHostingStatus;
-      };
-    } | null;
-    statusHistories?: {
-      __typename?: "ParticipationStatusHistoriesConnection";
-      edges: Array<{
-        __typename?: "ParticipationStatusHistoryEdge";
-        node?: {
-          __typename?: "ParticipationStatusHistory";
-          id: string;
-          status: ParticipationStatus;
-          reason: ParticipationStatusReason;
-          createdAt: Date;
-          createdByUser?: { __typename?: "User"; id: string; name: string } | null;
-        } | null;
-      }>;
-    } | null;
-    user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
   } | null;
 };
 
@@ -2890,7 +2813,7 @@ export type SearchOpportunitiesQuery = {
         feeRequired?: number | null;
         requireApproval: boolean;
         publishStatus: PublishStatus;
-        image?: string | null;
+        images?: Array<string> | null;
         createdAt: Date;
         updatedAt?: Date | null;
         community?: {
@@ -3033,13 +2956,17 @@ export const OpportunityFieldsFragmentDoc = {
           { kind: "Field", name: { kind: "Name", value: "id" } },
           { kind: "Field", name: { kind: "Name", value: "title" } },
           { kind: "Field", name: { kind: "Name", value: "description" } },
-          { kind: "Field", name: { kind: "Name", value: "image" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "community" },
             selectionSet: {
               kind: "SelectionSet",
-              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "image" } },
+              ],
             },
           },
           {
@@ -3939,13 +3866,17 @@ export const GetOpportunitiesDocument = {
           { kind: "Field", name: { kind: "Name", value: "id" } },
           { kind: "Field", name: { kind: "Name", value: "title" } },
           { kind: "Field", name: { kind: "Name", value: "description" } },
-          { kind: "Field", name: { kind: "Name", value: "image" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "community" },
             selectionSet: {
               kind: "SelectionSet",
-              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "image" } },
+              ],
             },
           },
           {
@@ -4075,8 +4006,7 @@ export const GetOpportunityDocument = {
                 { kind: "Field", name: { kind: "Name", value: "feeRequired" } },
                 { kind: "Field", name: { kind: "Name", value: "requireApproval" } },
                 { kind: "Field", name: { kind: "Name", value: "publishStatus" } },
-                { kind: "Field", name: { kind: "Name", value: "image" } },
-                { kind: "Field", name: { kind: "Name", value: "files" } },
+                { kind: "Field", name: { kind: "Name", value: "images" } },
                 { kind: "Field", name: { kind: "Name", value: "createdAt" } },
                 { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
                 {
@@ -4265,7 +4195,7 @@ export const GetOpportunityDocument = {
                                           kind: "Field",
                                           name: { kind: "Name", value: "publishStatus" },
                                         },
-                                        { kind: "Field", name: { kind: "Name", value: "image" } },
+                                        { kind: "Field", name: { kind: "Name", value: "images" } },
                                         {
                                           kind: "Field",
                                           name: { kind: "Name", value: "createdAt" },
@@ -4544,131 +4474,6 @@ export const GetOpportunityDocument = {
     },
   ],
 } as unknown as DocumentNode<GetOpportunityQuery, GetOpportunityQueryVariables>;
-export const GetParticipationDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "GetParticipation" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "participation" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "images" } },
-                { kind: "Field", name: { kind: "Name", value: "reason" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "reservation" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "opportunitySlot" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            { kind: "Field", name: { kind: "Name", value: "id" } },
-                            { kind: "Field", name: { kind: "Name", value: "capacity" } },
-                            { kind: "Field", name: { kind: "Name", value: "startsAt" } },
-                            { kind: "Field", name: { kind: "Name", value: "endsAt" } },
-                            { kind: "Field", name: { kind: "Name", value: "hostingStatus" } },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-                { kind: "Field", name: { kind: "Name", value: "source" } },
-                { kind: "Field", name: { kind: "Name", value: "status" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "statusHistories" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "edges" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "node" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  { kind: "Field", name: { kind: "Name", value: "id" } },
-                                  { kind: "Field", name: { kind: "Name", value: "status" } },
-                                  { kind: "Field", name: { kind: "Name", value: "reason" } },
-                                  { kind: "Field", name: { kind: "Name", value: "createdAt" } },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "createdByUser" },
-                                    selectionSet: {
-                                      kind: "SelectionSet",
-                                      selections: [
-                                        { kind: "Field", name: { kind: "Name", value: "id" } },
-                                        { kind: "Field", name: { kind: "Name", value: "name" } },
-                                      ],
-                                    },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-                { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "user" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "name" } },
-                      { kind: "Field", name: { kind: "Name", value: "image" } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetParticipationQuery, GetParticipationQueryVariables>;
 export const SearchOpportunitiesDocument = {
   kind: "Document",
   definitions: [
@@ -4742,7 +4547,7 @@ export const SearchOpportunitiesDocument = {
                             { kind: "Field", name: { kind: "Name", value: "feeRequired" } },
                             { kind: "Field", name: { kind: "Name", value: "requireApproval" } },
                             { kind: "Field", name: { kind: "Name", value: "publishStatus" } },
-                            { kind: "Field", name: { kind: "Name", value: "image" } },
+                            { kind: "Field", name: { kind: "Name", value: "images" } },
                             { kind: "Field", name: { kind: "Name", value: "createdAt" } },
                             { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
                             {

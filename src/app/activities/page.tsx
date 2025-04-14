@@ -95,7 +95,7 @@ export default function ActivitiesPage() {
     title: node.title,
     price: node.feeRequired || null,
     location: node.place?.name || '場所未定',
-    imageUrl: node.image || null,
+    imageUrl: node.images?.[0] || null,
     community: {
       id: node.community?.id || '',
     },

@@ -88,7 +88,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
         <div className="max-w-7xl mx-auto px-4">
           <div className="relative w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden mb-8">
             <Image
-              src={opportunity.image || "/placeholder.png"}
+              src={opportunity.images?.[0] || "/placeholder.png"}
               alt={opportunity.title}
               fill
               className="object-cover"
@@ -113,7 +113,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
 
           {opportunity.slots?.edges?.some(edge => 
             edge?.node?.participations?.edges?.some(p => {
-              const participation = p as Participation;
+              const participation = p as any;
               return participation?.node?.images && Array.isArray(participation.node.images) && participation.node.images.length > 0;
             })
           ) && (
@@ -122,9 +122,9 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
                 {(() => {
                   const allImages = opportunity.slots?.edges?.flatMap(edge => 
                     edge?.node?.participations?.edges?.flatMap(p => {
-                      const participation = p as Participation;
+                      const participation = p as any;
                       return (Array.isArray(participation?.node?.images) ? participation.node.images : []).map(img => ({
-                        url: (img as any).url || img,
+                        url: img,
                         alt: "参加者の写真"
                       }));
                     }) || []
