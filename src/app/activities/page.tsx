@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useQuery } from '@apollo/client'
 import { GET_OPPORTUNITIES } from '@/graphql/queries/opportunities'
-import OpportunityCard, { OpportunityCardProps } from '../components/features/activity/OpportunityCard'
+import OpportunityCard, { OpportunityCardProps } from '../components/features/opportunity/OpportunityCard'
 import FeaturedSection from '../components/features/activity/FeaturedSection'
 import { useHeader } from '@/contexts/HeaderContext'
 import { GetOpportunitiesData, Opportunity } from '@/types'
@@ -16,9 +16,7 @@ export default function ActivitiesPage() {
   const queryVariables = useMemo(() => ({
     upcomingFilter: {
       category: OpportunityCategory.Activity,
-      slotStartsAt: new Date().toISOString(),
-      publishStatus: ["PUBLIC"],
-      slotHostingStatus: ["SCHEDULED"]
+      publishStatus: ["PUBLIC"]
     },
     featuredFilter: {
       category: OpportunityCategory.Activity,
@@ -99,6 +97,7 @@ export default function ActivitiesPage() {
     community: {
       id: node.community?.id || '',
     },
+    isReservableWithTicket: node.isReservableWithTicket || false,
   })
 
   return (

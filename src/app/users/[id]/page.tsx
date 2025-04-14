@@ -44,13 +44,14 @@ export default function UserPage({ params }: { params: { id: string } }) {
     },
     fetchPolicy: "network-only",
   });
+
+  console.log('Portfolios', data?.user?.portfolios?.edges);
   useEffect(() => {
     if (data?.user?.portfolios?.edges) {
       const initialPortfolios = data.user.portfolios.edges
         .map(edge => edge?.node)
         .filter((node): node is GqlPortfolio => node != null)
         .map(portfolio => {
-          console.log('Portofolio', portfolio);
           const category = portfolio.category.toLowerCase();
           if (!isValidPortfolioType(category)) {
             console.warn(`Invalid portfolio category: ${portfolio.category}`);
@@ -86,12 +87,6 @@ export default function UserPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     observer.current = new IntersectionObserver(
       (entries) => {
-        console.log('IntersectionObserverが発火しました:', {
-          isIntersecting: entries[0].isIntersecting,
-          hasMore,
-          isLoadingMore,
-          portfoliosCount: portfolios.length
-        });
         
         if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
           loadMore();
@@ -114,11 +109,6 @@ export default function UserPage({ params }: { params: { id: string } }) {
   }, [hasMore, isLoadingMore, portfolios.length]);
 
   const loadMore = useCallback(async () => {
-    console.log('loadMore called', {
-      hasMore,
-      isLoadingMore,
-      portfoliosCount: portfolios.length
-    });
 
     if (!hasMore || isLoadingMore) {
       console.log('loadMore skipped:', {
@@ -184,7 +174,6 @@ export default function UserPage({ params }: { params: { id: string } }) {
       console.error('追加データの読み込み中にエラーが発生しました:', error);
     } finally {
       setIsLoadingMore(false);
-      console.log('追加データの読み込みが完了しました');
     }
   }, [fetchMore, hasMore, isLoadingMore, params.id, portfolios, data]);
 

@@ -5,7 +5,7 @@ import { MapPin, CalendarIcon, Users } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import OpportunityCard, { OpportunityCardProps } from "@/app/components/features/activity/OpportunityCard";
+import OpportunityCard, { OpportunityCardProps } from "@/app/components/features/opportunity/OpportunityCard";
 import { useHeader } from "@/contexts/HeaderContext";
 import { useQuery } from "@apollo/client";
 import { SEARCH_OPPORTUNITIES } from "@/graphql/queries/search";
@@ -111,6 +111,7 @@ export default function Page({ searchParams = {} }: SearchResultPageProps) {
     location: node.place?.name || '場所未定',
     imageUrl: node.images?.[0] || null,
     community: node.community ? { id: node.community.id } : undefined,
+    isReservableWithTicket: node.isReservableWithTicket || false,
   });
 
   const recommendedOpportunities = opportunities.edges

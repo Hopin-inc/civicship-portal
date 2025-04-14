@@ -110,6 +110,7 @@ export type Opportunity = {
   endsAt: Date | string;
   createdAt: Date | string;
   updatedAt: Date | string;
+  isReservableWithTicket?: boolean;
   host: {
     name: string;
     image: string | null;

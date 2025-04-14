@@ -1,7 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronLeft, Clock, MapPin, CalendarDays, AlertCircle, ChevronRight } from "lucide-react";
+import {
+  ChevronLeft,
+  Clock,
+  MapPin,
+  CalendarDays,
+  AlertCircle,
+  ChevronRight,
+  Ticket,
+} from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useOpportunity } from "@/hooks/useOpportunity";
@@ -12,6 +20,10 @@ import { useSimilarOpportunities } from "@/hooks/useSimilarOpportunities";
 import { SimilarActivitiesList } from "@/app/components/features/activity/SimilarActivitiesList";
 import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
 import { Participation } from "@/types";
+import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@apollo/client";
+import { GetUserWalletDocument } from "@/gql/graphql";
+import { useMemo } from "react";
 
 const ScheduleCard: React.FC<{
   startsAt: string;
@@ -20,10 +32,21 @@ const ScheduleCard: React.FC<{
   price: number;
   opportunityId: string;
   communityId: string;
-}> = ({ startsAt, endsAt, participants, price, opportunityId, communityId }) => {
+  isReservableWithTicket?: boolean;
+  availableTickets?: number;
+}> = ({
+  startsAt,
+  endsAt,
+  participants,
+  price,
+  opportunityId,
+  communityId,
+  isReservableWithTicket,
+  availableTickets,
+}) => {
   const startDate = new Date(startsAt);
   const endDate = new Date(endsAt);
-  
+
   return (
     <div className="bg-white rounded-xl border px-10 py-8 w-[280px] h-[316px] flex flex-col">
       <div className="flex-1">
@@ -35,14 +58,15 @@ const ScheduleCard: React.FC<{
           {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
         </p>
         <p className="text-md text-gray-500 mb-4">参加予定 {participants}人</p>
-        <p className="text-lg font-bold mb-6">¥{price.toLocaleString()}</p>
+        <div className="space-y-2">
+          <p className="text-lg font-bold">¥{price.toLocaleString()}</p>
+        </div>
       </div>
       <div className="flex justify-center">
-        <Link href={`/reservation/confirm?id=${opportunityId}&starts_at=${startsAt}&community_id=${communityId}`}>
-          <Button
-            variant="default"
-            size="selection"
-          >
+        <Link
+          href={`/reservation/confirm?id=${opportunityId}&starts_at=${startsAt}&community_id=${communityId}`}
+        >
+          <Button variant="default" size="selection">
             選択
           </Button>
         </Link>
@@ -61,11 +85,35 @@ interface ActivityPageProps {
 }
 
 export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
-  const { opportunity, loading, error } = useOpportunity(params.id, searchParams.community_id || "");
+  const { opportunity, loading, error } = useOpportunity(
+    params.id,
+    searchParams.community_id || "",
+  );
   const { similarOpportunities, loading: similarLoading } = useSimilarOpportunities({
     opportunityId: params.id,
     communityId: searchParams.community_id || "",
   });
+  const { user: currentUser } = useAuth();
+  const { data: walletData } = useQuery(GetUserWalletDocument, {
+    variables: { id: currentUser?.id || "" },
+    skip: !currentUser?.id,
+  });
+
+  const availableTickets = useMemo(() => {
+    if (!opportunity?.requiredUtilities?.length) {
+      return walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.length || 0;
+    }
+
+    const requiredUtilityIds = new Set(opportunity.requiredUtilities.map((u) => u.id));
+
+    const availableTickets =
+      walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.filter((edge: any) => {
+        const utilityId = edge?.node?.utility?.id;
+        return utilityId ? requiredUtilityIds.has(utilityId) : false;
+      }) || [];
+
+    return availableTickets.length;
+  }, [opportunity?.requiredUtilities, walletData]);
 
   if (!searchParams.community_id) {
     return <div>Community ID is required</div>;
@@ -75,12 +123,19 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
   if (error) return <div>Error: {error.message}</div>;
   if (!opportunity) return <div>No opportunity found</div>;
 
-  const availableDates = opportunity.slots?.edges?.map(edge => ({
-    startsAt: edge?.node?.startsAt ? format(new Date(edge.node.startsAt), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx") : "",
-    endsAt: edge?.node?.endsAt ? format(new Date(edge.node.endsAt), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx") : "",
-    participants: edge?.node?.participations?.edges?.length || 0,
-    price: opportunity.feeRequired || 0
-  })).sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()) || [];
+  const availableDates =
+    opportunity.slots?.edges
+      ?.map((edge) => ({
+        startsAt: edge?.node?.startsAt
+          ? format(new Date(edge.node.startsAt), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
+          : "",
+        endsAt: edge?.node?.endsAt
+          ? format(new Date(edge.node.endsAt), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
+          : "",
+        participants: edge?.node?.participations?.edges?.length || 0,
+        price: opportunity.feeRequired || 0,
+      }))
+      .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()) || [];
 
   return (
     <>
@@ -105,30 +160,49 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             </div>
           </div>
 
+          {opportunity.isReservableWithTicket && availableTickets && availableTickets > 0 && (
+            <div className="flex items-center gap-2 bg-[#EEF0FF] rounded-lg px-4 py-3">
+              <Ticket className="w-5 h-5 text-[#4361EE]" />
+              <p className="text-[#4361EE] font-medium">利用できるチケット {availableTickets}枚</p>
+            </div>
+          )}
+
           {/* 体験内容 */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-4">体験できること</h2>
             <p className="text-gray-700 whitespace-pre-wrap">{opportunity.body}</p>
           </section>
 
-          {opportunity.slots?.edges?.some(edge => 
-            edge?.node?.participations?.edges?.some(p => {
+          {opportunity.slots?.edges?.some((edge) =>
+            edge?.node?.participations?.edges?.some((p) => {
               const participation = p as any;
-              return participation?.node?.images && Array.isArray(participation.node.images) && participation.node.images.length > 0;
-            })
+              return (
+                participation?.node?.images &&
+                Array.isArray(participation.node.images) &&
+                participation.node.images.length > 0
+              );
+            }),
           ) && (
             <section className="mb-12">
               <div className="max-w-3xl">
                 {(() => {
-                  const allImages = opportunity.slots?.edges?.flatMap(edge => 
-                    edge?.node?.participations?.edges?.flatMap(p => {
-                      const participation = p as any;
-                      return (Array.isArray(participation?.node?.images) ? participation.node.images : []).map(img => ({
-                        url: img,
-                        alt: "参加者の写真"
-                      }));
-                    }) || []
-                  ).filter(Boolean) || [];
+                  const allImages =
+                    opportunity.slots?.edges
+                      ?.flatMap(
+                        (edge) =>
+                          edge?.node?.participations?.edges?.flatMap((p) => {
+                            const participation = p as any;
+                            return (
+                              Array.isArray(participation?.node?.images)
+                                ? participation.node.images
+                                : []
+                            ).map((img: string) => ({
+                              url: img,
+                              alt: "参加者の写真",
+                            }));
+                          }) || [],
+                      )
+                      .filter(Boolean) || [];
 
                   const displayImages = allImages.slice(0, 3);
                   const remainingCount = Math.max(0, allImages.length - 3);
@@ -176,12 +250,23 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
                   </div>
                 </div>
                 {opportunity.createdByUser?.articlesAboutMe?.edges?.[0]?.node && (
-                  <Link href={`/articles/${opportunity.createdByUser.articlesAboutMe.edges[0].node.id}`} className="block">
+                  <Link
+                    href={`/articles/${opportunity.createdByUser.articlesAboutMe.edges[0].node.id}`}
+                    className="block"
+                  >
                     <div className="bg-white rounded-xl border hover:shadow-md transition-shadow duration-200">
                       <div className="relative w-full h-[200px]">
                         <Image
-                          src={(opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail?.url ?? "/placeholder.png") as string}
-                          alt={opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail?.alt || opportunity.createdByUser.articlesAboutMe.edges[0].node.title || ""}
+                          src={
+                            (opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail
+                              ?.url ?? "/placeholder.png") as string
+                          }
+                          alt={
+                            opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail
+                              ?.alt ||
+                            opportunity.createdByUser.articlesAboutMe.edges[0].node.title ||
+                            ""
+                          }
                           fill
                           className="object-cover rounded-t-xl"
                         />
@@ -201,8 +286,10 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             </div>
             {opportunity.createdByUser?.opportunitiesCreatedByMe?.edges && (
               <div className="mt-8">
-                <RecentActivitiesList 
-                  opportunities={opportunity.createdByUser.opportunitiesCreatedByMe.edges.map(edge => edge).filter(Boolean)} 
+                <RecentActivitiesList
+                  opportunities={opportunity.createdByUser.opportunitiesCreatedByMe.edges
+                    .map((edge) => edge)
+                    .filter(Boolean)}
                 />
               </div>
             )}
@@ -243,6 +330,8 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
                       price={schedule.price}
                       opportunityId={opportunity.id}
                       communityId={searchParams.community_id || ""}
+                      isReservableWithTicket={opportunity.isReservableWithTicket}
+                      availableTickets={availableTickets}
                     />
                   </div>
                 ))}
@@ -282,7 +371,9 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             <p className="text-sm text-gray-600">1人あたり</p>
             <p className="text-xl font-bold">¥{(opportunity.feeRequired || 0).toLocaleString()}</p>
           </div>
-          <Link href={`/reservation/select-date?id=${opportunity.id}&community_id=${searchParams.community_id}`}>
+          <Link
+            href={`/reservation/select-date?id=${opportunity.id}&community_id=${searchParams.community_id}`}
+          >
             <Button
               variant="default"
               className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium"
@@ -295,4 +386,3 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
     </>
   );
 }
-
