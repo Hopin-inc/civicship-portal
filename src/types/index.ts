@@ -112,15 +112,11 @@ export type Opportunity = {
   updatedAt: Date | string;
   host: {
     name: string;
-    image: string;
+    image: string | null;
     title: string;
     bio: string;
   };
-  image?: string;
-  images?: {
-    url: string;
-    caption?: string;
-  }[];
+  images: string[];
   location: {
     name: string;
     address: string;
@@ -145,7 +141,7 @@ export type Opportunity = {
   createdByUser?: {
     id: string;
     name: string;
-    image?: string;
+    image: string | null;
     articlesAboutMe?: {
       edges: Array<{
         node: Partial<Article>;
@@ -178,7 +174,7 @@ export type Opportunity = {
               user: {
                 id: string;
                 name: string;
-                image?: string;
+                image: string | null;
               };
             };
           }>;

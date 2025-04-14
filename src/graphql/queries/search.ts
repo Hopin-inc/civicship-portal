@@ -25,7 +25,7 @@ export const SEARCH_OPPORTUNITIES = gql`
           feeRequired
           requireApproval
           publishStatus
-          image
+          images
           createdAt
           updatedAt
           place {

@@ -58,9 +58,9 @@ const ActivityCard = memo(({ opportunity }: { opportunity: OpportunityHistory })
 ActivityCard.displayName = 'ActivityCard'
 
 const transformOpportunityToHistory = (opportunity: Opportunity): OpportunityHistory => {
-  const images = opportunity.images || [];
+  const images = [...(opportunity.images || [])];
   if (opportunity.image) {
-    images.unshift({ url: opportunity.image, caption: opportunity.title });
+    images.unshift(opportunity.image);
   }
 
   const slotParticipants = opportunity.slots?.edges?.flatMap(edge => 
@@ -93,7 +93,7 @@ const transformOpportunityToHistory = (opportunity: Opportunity): OpportunityHis
       address: opportunity.place.address
     } : undefined,
     date,
-    images: images.map(img => ({ url: img.url, alt: img.caption || opportunity.title })),
+    images: images.map(img => ({ url: img, alt: opportunity.title })),
     participants: uniqueParticipants,
     community: opportunity.community,
   };

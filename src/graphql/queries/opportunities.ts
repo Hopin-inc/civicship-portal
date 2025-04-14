@@ -5,9 +5,11 @@ const OPPORTUNITY_FRAGMENT = gql`
     id
     title
     description
-    image
+    images
     community {
       id
+      name
+      image
     }
     place {
       id

@@ -13,8 +13,7 @@ export const GET_OPPORTUNITY = gql`
       feeRequired
       requireApproval
       publishStatus
-      image
-      files
+      images
       createdAt
       updatedAt
       community {
@@ -58,7 +57,7 @@ export const GET_OPPORTUNITY = gql`
               feeRequired
               requireApproval
               publishStatus
-              image
+              images
               createdAt
               updatedAt
               slots {

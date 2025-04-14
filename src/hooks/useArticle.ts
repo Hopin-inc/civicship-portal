@@ -24,10 +24,10 @@ function mapCategoryToArticleType(category: string | null | undefined): ArticleT
 function transformGraphQLArticleToArticle(graphqlArticle: any): Article {
   // Extract thumbnail data
   const thumbnailData = graphqlArticle.thumbnail;
-  const thumbnail = thumbnailData && Array.isArray(thumbnailData) && thumbnailData.length > 0 
+  const thumbnail = thumbnailData && typeof thumbnailData === 'object'
     ? {
-        url: thumbnailData[0].url,
-        alt: thumbnailData[0].alt || graphqlArticle.title
+        url: thumbnailData.url,
+        alt: thumbnailData.alt || graphqlArticle.title
       }
     : null;
 

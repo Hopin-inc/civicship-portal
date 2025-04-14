@@ -9,22 +9,12 @@ interface UseOpportunityResult {
   error: Error | null;
 }
 
-const transformArticle = (node: any): Partial<Article> => {
-  const thumbnailData = node.thumbnail;
-  const thumbnail = thumbnailData && Array.isArray(thumbnailData) && thumbnailData.length > 0
-    ? {
-        url: thumbnailData[0].url,
-        alt: thumbnailData[0].alt || node.title
-      }
-    : null;
-
-  return {
-    id: node.id,
-    title: node.title,
-    description: node.introduction || "",
-    thumbnail
-  };
-};
+const transformArticle = (node: any): Partial<Article> => ({
+  id: node.id,
+  title: node.title,
+  description: node.introduction || "",
+  thumbnail: node.thumbnail || null,
+});
 
 const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | null => {
   if (!data) return null;
@@ -43,11 +33,12 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
     updatedAt: node.updatedAt?.toString() || "",
     host: {
       name: data.createdByUser?.name || "",
-      image: data.createdByUser?.image || "",
+      image: data.createdByUser?.image || null,
       title: "",
       bio: "",
     },
-    image: node.image,
+    image: node.images?.[0] || null,
+    images: node.images || [],
     location: {
       name: "",
       address: "",
@@ -78,12 +69,10 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
       user: {
         id: pEdge?.node?.user?.id || "",
         name: pEdge?.node?.user?.name || "",
-        image: pEdge?.node?.user?.image || undefined,
+        image: pEdge?.node?.user?.image || null,
       },
     },
   });
-
-  console.log('transformOpportunity', data)
 
   return {
     id: data.id,
@@ -99,11 +88,12 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
     updatedAt: data.updatedAt || new Date().toISOString(),
     host: {
       name: data.createdByUser?.name || "",
-      image: data.createdByUser?.image || "",
+      image: data.createdByUser?.image || null,
       title: "",
       bio: "",
     },
-    image: data.image || undefined,
+    image: data.images?.[0] || null,
+    images: data.images || [],
     location: {
       name: data.place?.name || "",
       address: data.place?.address || "",
@@ -123,13 +113,13 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
     participants: data.slots?.edges?.[0]?.node?.participations?.edges?.map(edge => ({
       id: edge?.node?.user?.id || "",
       name: edge?.node?.user?.name || "",
-      image: edge?.node?.user?.image || undefined,
+      image: edge?.node?.user?.image || null,
     })) || [],
     body: data.body || undefined,
     createdByUser: data.createdByUser ? {
       id: data.createdByUser.id,
       name: data.createdByUser.name || "",
-      image: data.createdByUser.image || undefined,
+      image: data.createdByUser.image || null,
       articlesAboutMe: data.createdByUser.articlesAboutMe ? {
         edges: data.createdByUser.articlesAboutMe.edges?.map(edge => ({
           node: transformArticle(edge?.node)

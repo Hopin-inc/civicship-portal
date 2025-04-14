@@ -44,7 +44,6 @@ export default function UserPage({ params }: { params: { id: string } }) {
     },
     fetchPolicy: "network-only",
   });
-
   useEffect(() => {
     if (data?.user?.portfolios?.edges) {
       const initialPortfolios = data.user.portfolios.edges
