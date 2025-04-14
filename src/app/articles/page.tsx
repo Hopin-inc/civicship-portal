@@ -19,10 +19,10 @@ interface GetArticlesData {
         id: string;
         title: string;
         introduction: string;
-        thumbnail: Array<{
+        thumbnail: {
           url: string;
           alt: string;
-        }>;
+        };
         publishedAt: string;
         authors: Array<{
           id: string;
@@ -52,6 +52,8 @@ export default function ArticlesPage() {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   });
+
+  console.log('GET_ARTICLES', data);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -108,7 +110,7 @@ export default function ArticlesPage() {
     const node = edge.node;
     return {
       ...node,
-      thumbnail: node.thumbnail?.[0] || null,
+      thumbnail: node.thumbnail || null,
     };
   }) ?? [];
 

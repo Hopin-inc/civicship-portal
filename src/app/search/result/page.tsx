@@ -109,7 +109,7 @@ export default function Page({ searchParams = {} }: SearchResultPageProps) {
     title: node.title,
     price: node.feeRequired || null,
     location: node.place?.name || '場所未定',
-    imageUrl: node.image || null,
+    imageUrl: node.images?.[0] || null,
     community: node.community ? { id: node.community.id } : undefined,
   });
 

@@ -25,8 +25,7 @@ export const GetParticipationDocument = graphql(`
             feeRequired
             requireApproval
             publishStatus
-            image
-            files
+            images
             createdAt
             updatedAt
             community {

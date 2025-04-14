@@ -30,7 +30,7 @@ export const SimilarActivitiesList: React.FC<SimilarActivitiesListProps> = ({
                 title={opportunity.title}
                 price={opportunity.feeRequired || 0}
                 location={opportunity.place?.name || "場所未定"}
-                imageUrl={opportunity.image || null}
+                imageUrl={opportunity.images?.[0] || null}
                 community={opportunity.community}
               />
             </div>
