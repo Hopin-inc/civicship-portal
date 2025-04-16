@@ -72,9 +72,9 @@ export default function Page() {
       case 'location':
         return 'h-[300px]'
       case 'date':
-        return 'h-[85vh]'
+        return 'h-[90vh]'
       case 'guests':
-        return 'h-[300px]'
+        return 'h-[240px]'
       case 'other':
         return 'h-[300px]'
       default:
@@ -206,15 +206,15 @@ export default function Page() {
         </div>
       ),
       guests: (
-        <div className="h-full pb-20 relative">
-          <SheetHeader className="text-left pb-6">
+        <div className="h-full pb-16 relative">
+          <SheetHeader className="text-left pb-4">
             <SheetTitle>
               <div className="flex items-center">
-                <span className="text-lg font-bold">人数を選択</span>
+                <span className="text-lg font-bold">参加人数を選択</span>
               </div>
             </SheetTitle>
           </SheetHeader>
-          <div className="flex items-center justify-center space-x-8 py-4">
+          <div className="flex items-center justify-center space-x-8">
             <button
               onClick={(e) => {
                 e.stopPropagation()
@@ -433,7 +433,7 @@ export default function Page() {
       <Sheet open={activeForm !== null} onOpenChange={(open) => !open && setActiveForm(null)}>
         <SheetContent 
           side="bottom" 
-          className={`${getSheetHeight()} rounded-t-3xl overflow-auto max-w-lg mx-auto`}
+          className={`${getSheetHeight()} rounded-t-3xl overflow-auto max-w-md mx-auto`}
           onPointerDownOutside={() => setActiveForm(null)}
         >
           {renderSheetContent()}

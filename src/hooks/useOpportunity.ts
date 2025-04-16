@@ -148,6 +148,9 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
           id: edge?.node?.id || "",
           startsAt: edge?.node?.startsAt || "",
           endsAt: edge?.node?.endsAt || "",
+          remainingCapacityView: edge?.node?.remainingCapacityView ? {
+            remainingCapacity: edge.node.remainingCapacityView.remainingCapacity || 0
+          } : undefined,
           participations: edge?.node?.participations ? {
             edges: edge.node.participations.edges?.map(transformParticipationNode) || [],
           } : undefined,

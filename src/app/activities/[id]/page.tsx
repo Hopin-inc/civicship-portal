@@ -303,7 +303,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
               {opportunity.place?.latitude && opportunity.place?.longitude && (
                 <div className="relative w-full h-[300px] rounded-lg overflow-hidden">
                   <iframe
-                    src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(opportunity.place.address)}`}
+                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}&q=${encodeURIComponent(opportunity.place.address)}`}
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}

@@ -109,6 +109,9 @@ export const GET_OPPORTUNITY = gql`
             id
             startsAt
             endsAt
+            remainingCapacityView {
+              remainingCapacity
+            }
             participations {
               edges {
                 node {
