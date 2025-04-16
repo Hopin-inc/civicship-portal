@@ -142,7 +142,7 @@ export const UserPortfolioList = ({ userId, isOwner, portfolios, isLoadingMore, 
     <section className="space-y-4">
       <div className="flex items-center justify-between py-4">
         <h2 className="text-lg font-semibold text-foreground">
-          地域との関わり
+          これまでの関わり
         </h2>
       </div>
       {portfolios.length > 0 ? (
