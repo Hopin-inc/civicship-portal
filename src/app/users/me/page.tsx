@@ -10,7 +10,7 @@ import { GET_USER_WALLET } from "@/graphql/queries/user";
 import StarIcon from "@/../public/icons/star.svg";
 import { format } from "date-fns";
 import type { GetUserWithDetailsAndPortfoliosQuery, Portfolio as GqlPortfolio, GetUserWalletQuery } from "@/gql/graphql";
-import type { Portfolio, PortfolioType, PortfolioCategory } from "@/types";
+import type { Portfolio, PortfolioType, PortfolioCategory, ReservationStatus } from "@/types";
 import Link from 'next/link';
 import { Ticket as TicketIcon } from 'lucide-react';
 
@@ -22,6 +22,35 @@ const isValidPortfolioType = (category: string): category is PortfolioType => {
 
 const isValidPortfolioCategory = (category: string): category is PortfolioCategory => {
   return ['QUEST', 'ACTIVITY_REPORT', 'INTERVIEW', 'OPPORTUNITY'].includes(category.toUpperCase());
+};
+
+const transformPortfolio = (portfolio: GqlPortfolio): Portfolio => {
+  const category = portfolio.category.toLowerCase();
+  if (!isValidPortfolioType(category)) {
+    console.warn(`Invalid portfolio category: ${portfolio.category}`);
+  }
+
+  const portfolioCategory = portfolio.category.toUpperCase();
+  if (!isValidPortfolioCategory(portfolioCategory)) {
+    console.warn(`Invalid portfolio category: ${portfolio.category}`);
+  }
+  
+  return {
+    id: portfolio.id,
+    type: category as PortfolioType,
+    title: portfolio.title,
+    date: format(new Date(portfolio.date), 'yyyy/MM/dd'),
+    location: portfolio.place?.name ?? null,
+    category: portfolioCategory as PortfolioCategory,
+    reservationStatus: portfolio.reservationStatus as ReservationStatus | null | undefined,
+    participants: portfolio.participants.map(p => ({
+      id: p.id,
+      name: p.name,
+      image: p.image ?? null
+    })),
+    image: portfolio.thumbnailUrl ?? null,
+    source: portfolio.source
+  };
 };
 
 export default function MyProfilePage() {
@@ -54,33 +83,7 @@ export default function MyProfilePage() {
       const initialPortfolios = data.user.portfolios.edges
         .map(edge => edge?.node)
         .filter((node): node is GqlPortfolio => node != null)
-        .map(portfolio => {
-          const category = portfolio.category.toLowerCase();
-          if (!isValidPortfolioType(category)) {
-            console.warn(`Invalid portfolio category: ${portfolio.category}`);
-          }
-
-          const portfolioCategory = portfolio.category.toUpperCase();
-          if (!isValidPortfolioCategory(portfolioCategory)) {
-            console.warn(`Invalid portfolio category: ${portfolio.category}`);
-          }
-          
-          return {
-            id: portfolio.id,
-            type: category as PortfolioType,
-            title: portfolio.title,
-            date: format(new Date(portfolio.date), 'yyyy/MM/dd'),
-            location: portfolio.place?.name ?? null,
-            category: portfolioCategory as PortfolioCategory,
-            participants: portfolio.participants.map(p => ({
-              id: p.id,
-              name: p.name,
-              image: p.image ?? null
-            })),
-            image: portfolio.thumbnailUrl ?? null,
-            source: portfolio.source
-          } satisfies Portfolio;
-        });
+        .map(transformPortfolio);
       
       setPortfolios(initialPortfolios);
       setHasMore(data.user.portfolios.pageInfo.hasNextPage);
@@ -130,33 +133,7 @@ export default function MyProfilePage() {
         const newPortfolios = moreData.user.portfolios.edges
           .map(edge => edge?.node)
           .filter((node): node is GqlPortfolio => node != null)
-          .map(portfolio => {
-            const category = portfolio.category.toLowerCase();
-            if (!isValidPortfolioType(category)) {
-              console.warn(`Invalid portfolio category: ${portfolio.category}`);
-            }
-
-            const portfolioCategory = portfolio.category.toUpperCase();
-            if (!isValidPortfolioCategory(portfolioCategory)) {
-              console.warn(`Invalid portfolio category: ${portfolio.category}`);
-            }
-            
-            return {
-              id: portfolio.id,
-              type: category as PortfolioType,
-              title: portfolio.title,
-              date: format(new Date(portfolio.date), 'yyyy/MM/dd'),
-              location: portfolio.place?.name ?? null,
-              category: portfolioCategory as PortfolioCategory,
-              participants: portfolio.participants.map(p => ({
-                id: p.id,
-                name: p.name,
-                image: p.image ?? null
-              })),
-              image: portfolio.thumbnailUrl ?? null,
-              source: portfolio.source
-            } satisfies Portfolio;
-          });
+          .map(transformPortfolio);
 
         setPortfolios(prev => [...prev, ...newPortfolios]);
         setHasMore(moreData.user.portfolios.pageInfo.hasNextPage);

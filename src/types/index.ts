@@ -50,6 +50,8 @@ export interface PortfolioParticipant {
   image: string | null;
 }
 
+export type ReservationStatus = 'APPLIED' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
+
 export interface Portfolio {
   id: string;
   type: PortfolioType;
@@ -60,6 +62,7 @@ export interface Portfolio {
   participants: PortfolioParticipant[];
   image: string | null;
   source?: string;
+  reservationStatus?: ReservationStatus | null;
 }
 
 export type Community = {

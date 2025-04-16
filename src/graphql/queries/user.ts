@@ -55,6 +55,7 @@ export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = graphql(`
             date
             thumbnailUrl
             source
+            reservationStatus
             place {
               id
               name

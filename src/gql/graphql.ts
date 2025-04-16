@@ -103,6 +103,7 @@ export type AuthZDirectiveDeepCompositeRulesInput = {
 };
 
 export enum AuthZRules {
+  CanReadPhoneNumber = "CanReadPhoneNumber",
   IsAdmin = "IsAdmin",
   IsCommunityManager = "IsCommunityManager",
   IsCommunityMember = "IsCommunityMember",
@@ -1369,6 +1370,7 @@ export type Portfolio = {
   id: Scalars["ID"]["output"];
   participants: Array<User>;
   place?: Maybe<Place>;
+  reservationStatus?: Maybe<ReservationStatus>;
   source: PortfolioSource;
   thumbnailUrl?: Maybe<Scalars["String"]["output"]>;
   title: Scalars["String"]["output"];
@@ -2069,6 +2071,7 @@ export type User = {
   opportunitiesCreatedByMe?: Maybe<OpportunitiesConnection>;
   participationStatusChangedByMe?: Maybe<ParticipationStatusHistoriesConnection>;
   participations?: Maybe<ParticipationsConnection>;
+  phoneNumber?: Maybe<Scalars["String"]["output"]>;
   portfolios?: Maybe<PortfoliosConnection>;
   reservationStatusChangedByMe?: Maybe<ReservationHistoriesConnection>;
   reservations?: Maybe<ReservationsConnection>;
@@ -3052,6 +3055,7 @@ export type GetUserWithDetailsAndPortfoliosQuery = {
           date: Date;
           thumbnailUrl?: string | null;
           source: PortfolioSource;
+          reservationStatus?: ReservationStatus | null;
           place?: { __typename?: "Place"; id: string; name: string } | null;
           participants: Array<{
             __typename?: "User";
@@ -5445,6 +5449,10 @@ export const GetUserWithDetailsAndPortfoliosDocument = {
                                   { kind: "Field", name: { kind: "Name", value: "date" } },
                                   { kind: "Field", name: { kind: "Name", value: "thumbnailUrl" } },
                                   { kind: "Field", name: { kind: "Name", value: "source" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "reservationStatus" },
+                                  },
                                   {
                                     kind: "Field",
                                     name: { kind: "Name", value: "place" },

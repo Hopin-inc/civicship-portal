@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
-import { UserSocialLinks } from "@/components/features/user/UserSocialLinks";
+import { UserProfile } from "@/app/components/features/user/UserProfile";
 import { UserPortfolioList } from "@/app/components/features/user/UserPortfolioList";
 import { GET_USER_WITH_DETAILS_AND_PORTFOLIOS } from "@/graphql/queries/user";
 import MapPinIcon from "@/../public/icons/map-pin.svg";
@@ -12,7 +12,7 @@ import TicketIcon from "@/../public/icons/ticket.svg";
 import StarIcon from "@/../public/icons/star.svg";
 import { format } from "date-fns";
 import type { GetUserWithDetailsAndPortfoliosQuery, Portfolio as GqlPortfolio } from "@/gql/graphql";
-import type { Portfolio, PortfolioType, PortfolioCategory } from "@/types";
+import type { Portfolio, PortfolioType, PortfolioCategory, ReservationStatus } from "@/types";
 import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 30;
@@ -26,10 +26,38 @@ const isValidPortfolioCategory = (category: string): category is PortfolioCatego
   return ['QUEST', 'ACTIVITY_REPORT', 'INTERVIEW', 'OPPORTUNITY'].includes(category.toUpperCase());
 };
 
+const transformPortfolio = (portfolio: GqlPortfolio): Portfolio => {
+  const category = portfolio.category.toLowerCase();
+  if (!isValidPortfolioType(category)) {
+    console.warn(`Invalid portfolio category: ${portfolio.category}`);
+  }
+
+  const portfolioCategory = portfolio.category.toUpperCase();
+  if (!isValidPortfolioCategory(portfolioCategory)) {
+    console.warn(`Invalid portfolio category: ${portfolio.category}`);
+  }
+  
+  return {
+    id: portfolio.id,
+    type: category as PortfolioType,
+    title: portfolio.title,
+    date: format(new Date(portfolio.date), 'yyyy/MM/dd'),
+    location: portfolio.place?.name ?? null,
+    category: portfolioCategory as PortfolioCategory,
+    reservationStatus: portfolio.reservationStatus as ReservationStatus | null | undefined,
+    participants: portfolio.participants.map(p => ({
+      id: p.id,
+      name: p.name,
+      image: p.image ?? null
+    })),
+    image: portfolio.thumbnailUrl ?? null,
+    source: portfolio.source
+  };
+};
+
 export default function UserPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { user: currentUser } = useAuth();
-  const [isExpanded, setIsExpanded] = useState(false);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -51,33 +79,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
       const initialPortfolios = data.user.portfolios.edges
         .map(edge => edge?.node)
         .filter((node): node is GqlPortfolio => node != null)
-        .map(portfolio => {
-          const category = portfolio.category.toLowerCase();
-          if (!isValidPortfolioType(category)) {
-            console.warn(`Invalid portfolio category: ${portfolio.category}`);
-          }
-
-          const portfolioCategory = portfolio.category.toUpperCase();
-          if (!isValidPortfolioCategory(portfolioCategory)) {
-            console.warn(`Invalid portfolio category: ${portfolio.category}`);
-          }
-          
-          return {
-            id: portfolio.id,
-            type: category as PortfolioType,
-            title: portfolio.title,
-            date: format(new Date(portfolio.date), 'yyyy/MM/dd'),
-            location: portfolio.place?.name ?? null,
-            category: portfolioCategory as PortfolioCategory,
-            participants: portfolio.participants.map(p => ({
-              id: p.id,
-              name: p.name,
-              image: p.image ?? null
-            })),
-            image: portfolio.thumbnailUrl ?? null,
-            source: portfolio.source
-          } satisfies Portfolio;
-        });
+        .map(transformPortfolio);
       
       setPortfolios(initialPortfolios);
       setHasMore(data.user.portfolios.pageInfo.hasNextPage);
@@ -137,33 +139,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
         const newPortfolios = moreData.user.portfolios.edges
           .map(edge => edge?.node)
           .filter((node): node is GqlPortfolio => node != null)
-          .map(portfolio => {
-            const category = portfolio.category.toLowerCase();
-            if (!isValidPortfolioType(category)) {
-              console.warn(`Invalid portfolio category: ${portfolio.category}`);
-            }
-
-            const portfolioCategory = portfolio.category.toUpperCase();
-            if (!isValidPortfolioCategory(portfolioCategory)) {
-              console.warn(`Invalid portfolio category: ${portfolio.category}`);
-            }
-            
-            return {
-              id: portfolio.id,
-              type: category as PortfolioType,
-              title: portfolio.title,
-              date: format(new Date(portfolio.date), 'yyyy/MM/dd'),
-              location: portfolio.place?.name ?? null,
-              category: portfolioCategory as PortfolioCategory,
-              participants: portfolio.participants.map(p => ({
-                id: p.id,
-                name: p.name,
-                image: p.image ?? null
-              })),
-              image: portfolio.thumbnailUrl ?? null,
-              source: portfolio.source
-            } satisfies Portfolio;
-          });
+          .map(transformPortfolio);
 
         setPortfolios(prev => [...prev, ...newPortfolios]);
         
@@ -190,94 +166,33 @@ export default function UserPage({ params }: { params: { id: string } }) {
   }
 
   const userData = data.user;
-  const isOwner = true;
+  const isOwner = currentUser?.id === params.id;
 
   const handleUpdateSocialLinks = async (socialLinks: { type: string; url: string }[]) => {
     // TODO: Implement social links update mutation
     console.log("Update social links:", socialLinks);
   };
 
-  const truncateBio = (bio: string | null | undefined) => {
-    if (!bio) return "";
-    return isExpanded ? bio : bio.slice(0, BIO_TRUNCATE_LENGTH);
-  };
-
-  const shouldShowMore = (bio: string | null | undefined) => {
-    return bio ? bio.length > BIO_TRUNCATE_LENGTH : false;
-  };
-
-  const handleEditClick = () => {
-    router.push('/users/me/edit');
-  };
-
   return (
     <div className="container mx-auto px-4 py-6 max-w-3xl">
-      <div className="space-y-6">
-        <div className="flex justify-between items-start">
-          <div className="w-20 h-20 relative">
-            <Image
-              src={userData.image || "/placeholder.svg"}
-              alt={userData.name}
-              fill
-              className="rounded-full object-cover"
-            />
-          </div>
-          {isOwner && (
-            <button 
-              className="px-6 py-2 bg-gray-100 rounded-lg text-sm"
-              onClick={handleEditClick}
-            >
-              編集
-            </button>
-          )}
-        </div>
-
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">
-              {userData.name}
-            </h1>
-          </div>
-          <UserSocialLinks
-            user={userData}
-            className="gap-4"
-            isOwner={isOwner}
-            onUpdate={isOwner ? handleUpdateSocialLinks : undefined}
-          />
-        </div>
-
-        <div className="text-gray-600 text-base leading-relaxed">
-          <p className="whitespace-pre-wrap">
-            {truncateBio(userData.bio)}
-            {shouldShowMore(userData.bio) && (
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="text-gray-500 hover:text-gray-700 ml-1 inline-flex items-center"
-              >
-                {!isExpanded ? "...もっと見る" : "閉じる"}
-              </button>
-            )}
-          </p>
-
-          {/* チケットとポイント情報 */}
-          <div className="space-y-2 mt-4">
-            <div className="bg-blue-50 p-4 rounded-lg flex items-center justify-between cursor-pointer">
-              <div className="flex items-center gap-2">
-                <TicketIcon className="w-4 h-4 text-blue-600" />
-                <span className="text-blue-600">利用可能なチケットが<span className="font-bold">0</span>枚あります。</span>
-              </div>
-              <span className="text-blue-600">›</span>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-lg flex items-center">
-              <div className="flex items-center gap-2">
-                <StarIcon className="w-4 h-4" />
-                <span>保有中のポイント</span>
-                <span className="font-bold">0pt</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <UserProfile
+        user={{
+          id: userData.id,
+          name: userData.name,
+          image: userData.image ?? null,
+          bio: userData.bio ?? null,
+          currentPrefecture: userData.currentPrefecture ?? null,
+          socialLinks: [
+            { type: 'facebook', url: userData.urlFacebook ?? null },
+            { type: 'instagram', url: userData.urlInstagram ?? null },
+            { type: 'website', url: userData.urlWebsite ?? null },
+            { type: 'x', url: userData.urlX ?? null },
+            { type: 'youtube', url: userData.urlYoutube ?? null }
+          ]
+        }}
+        isOwner={isOwner}
+        onUpdateSocialLinks={handleUpdateSocialLinks}
+      />
 
       <UserPortfolioList 
         userId={params.id} 
