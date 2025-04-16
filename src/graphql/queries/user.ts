@@ -92,6 +92,19 @@ export const GET_USER_WALLET = graphql(`
                   utility {
                     id
                   }
+                  ticketStatusHistories {
+                    edges {
+                      node {
+                        id
+                        status
+                        createdByUser {
+                          id
+                          name
+                          image
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

@@ -3091,6 +3091,23 @@ export type GetUserWalletQuery = {
                 id: string;
                 status: TicketStatus;
                 utility: { __typename?: "Utility"; id: string };
+                ticketStatusHistories?: {
+                  __typename?: "TicketStatusHistoriesConnection";
+                  edges?: Array<{
+                    __typename?: "TicketStatusHistoryEdge";
+                    node?: {
+                      __typename?: "TicketStatusHistory";
+                      id: string;
+                      status: TicketStatus;
+                      createdByUser?: {
+                        __typename?: "User";
+                        id: string;
+                        name: string;
+                        image?: string | null;
+                      } | null;
+                    } | null;
+                  } | null> | null;
+                } | null;
               } | null;
             } | null> | null;
           } | null;
@@ -5587,6 +5604,86 @@ export const GetUserWalletDocument = {
                                                           {
                                                             kind: "Field",
                                                             name: { kind: "Name", value: "id" },
+                                                          },
+                                                        ],
+                                                      },
+                                                    },
+                                                    {
+                                                      kind: "Field",
+                                                      name: {
+                                                        kind: "Name",
+                                                        value: "ticketStatusHistories",
+                                                      },
+                                                      selectionSet: {
+                                                        kind: "SelectionSet",
+                                                        selections: [
+                                                          {
+                                                            kind: "Field",
+                                                            name: { kind: "Name", value: "edges" },
+                                                            selectionSet: {
+                                                              kind: "SelectionSet",
+                                                              selections: [
+                                                                {
+                                                                  kind: "Field",
+                                                                  name: {
+                                                                    kind: "Name",
+                                                                    value: "node",
+                                                                  },
+                                                                  selectionSet: {
+                                                                    kind: "SelectionSet",
+                                                                    selections: [
+                                                                      {
+                                                                        kind: "Field",
+                                                                        name: {
+                                                                          kind: "Name",
+                                                                          value: "id",
+                                                                        },
+                                                                      },
+                                                                      {
+                                                                        kind: "Field",
+                                                                        name: {
+                                                                          kind: "Name",
+                                                                          value: "status",
+                                                                        },
+                                                                      },
+                                                                      {
+                                                                        kind: "Field",
+                                                                        name: {
+                                                                          kind: "Name",
+                                                                          value: "createdByUser",
+                                                                        },
+                                                                        selectionSet: {
+                                                                          kind: "SelectionSet",
+                                                                          selections: [
+                                                                            {
+                                                                              kind: "Field",
+                                                                              name: {
+                                                                                kind: "Name",
+                                                                                value: "id",
+                                                                              },
+                                                                            },
+                                                                            {
+                                                                              kind: "Field",
+                                                                              name: {
+                                                                                kind: "Name",
+                                                                                value: "name",
+                                                                              },
+                                                                            },
+                                                                            {
+                                                                              kind: "Field",
+                                                                              name: {
+                                                                                kind: "Name",
+                                                                                value: "image",
+                                                                              },
+                                                                            },
+                                                                          ],
+                                                                        },
+                                                                      },
+                                                                    ],
+                                                                  },
+                                                                },
+                                                              ],
+                                                            },
                                                           },
                                                         ],
                                                       },

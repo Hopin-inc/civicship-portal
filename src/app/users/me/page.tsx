@@ -6,11 +6,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserProfile } from "@/app/components/features/user/UserProfile";
 import { UserPortfolioList } from "@/app/components/features/user/UserPortfolioList";
 import { GET_USER_WITH_DETAILS_AND_PORTFOLIOS } from "@/graphql/queries/user";
-import TicketIcon from "@/../public/icons/ticket.svg";
+import { GET_USER_WALLET } from "@/graphql/queries/user";
 import StarIcon from "@/../public/icons/star.svg";
 import { format } from "date-fns";
-import type { GetUserWithDetailsAndPortfoliosQuery, Portfolio as GqlPortfolio } from "@/gql/graphql";
+import type { GetUserWithDetailsAndPortfoliosQuery, Portfolio as GqlPortfolio, GetUserWalletQuery } from "@/gql/graphql";
 import type { Portfolio, PortfolioType, PortfolioCategory } from "@/types";
+import Link from 'next/link';
+import { Ticket as TicketIcon } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 30;
 
@@ -38,6 +40,13 @@ export default function MyProfilePage() {
     },
     skip: !currentUser,
     fetchPolicy: "network-only",
+  });
+
+  const { data: walletData } = useQuery<GetUserWalletQuery>(GET_USER_WALLET, {
+    variables: {
+      id: currentUser?.id ?? "",
+    },
+    skip: !currentUser,
   });
 
   useEffect(() => {
@@ -203,13 +212,21 @@ export default function MyProfilePage() {
 
       {/* チケットとポイント情報 */}
       <div className="space-y-2 mt-8">
-        <div className="bg-blue-50 p-4 rounded-lg flex items-center justify-between cursor-pointer">
-          <div className="flex items-center gap-2">
-            <TicketIcon className="w-4 h-4 text-blue-600" />
-            <span className="text-blue-600">利用可能なチケットが<span className="font-bold">0</span>枚あります。</span>
+        <Link href="/tickets">
+          <div className="bg-[#EEF0FF] p-4 rounded-lg flex items-center justify-between cursor-pointer">
+            <div className="flex items-center gap-2">
+              <TicketIcon className="w-4 h-4 text-[#4361EE]" />
+              <span className="text-[#4361EE]">
+                利用可能なチケットが
+                <span className="font-bold">
+                  {walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.length || 0}
+                </span>
+                枚あります。
+              </span>
+            </div>
+            <span className="text-[#4361EE]">›</span>
           </div>
-          <span className="text-blue-600">›</span>
-        </div>
+        </Link>
         <div className="bg-gray-50 p-4 rounded-lg flex items-center">
           <div className="flex items-center gap-2">
             <StarIcon className="w-4 h-4" />
