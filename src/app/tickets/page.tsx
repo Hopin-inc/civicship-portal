@@ -2,7 +2,7 @@
 
 import { useQuery } from '@apollo/client';
 import TicketList from '../components/features/ticket/TicketList';
-import EmptyState from '../components/features/ticket/EmptyState';
+import EmptyState from '../components/shared/EmptyState';
 import TicketDescription from '../components/features/ticket/TicketDescription';
 import { Ticket } from '@/types/ticket';
 import { GET_USER_WALLET } from '@/graphql/queries/user';

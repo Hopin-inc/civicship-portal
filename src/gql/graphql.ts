@@ -3042,6 +3042,28 @@ export type GetUserWithDetailsAndPortfoliosQuery = {
     urlWebsite?: string | null;
     urlX?: string | null;
     urlYoutube?: string | null;
+    opportunitiesCreatedByMe?: {
+      __typename?: "OpportunitiesConnection";
+      edges: Array<{
+        __typename?: "OpportunityEdge";
+        node?: {
+          __typename?: "Opportunity";
+          id: string;
+          title: string;
+          description: string;
+          images?: Array<string> | null;
+          feeRequired?: number | null;
+          isReservableWithTicket?: boolean | null;
+          community?: {
+            __typename?: "Community";
+            id: string;
+            name: string;
+            image?: string | null;
+          } | null;
+          place?: { __typename?: "Place"; id: string; name: string } | null;
+        } | null;
+      }>;
+    } | null;
     portfolios?: {
       __typename?: "PortfoliosConnection";
       edges?: Array<{
@@ -5403,6 +5425,86 @@ export const GetUserWithDetailsAndPortfoliosDocument = {
                 { kind: "Field", name: { kind: "Name", value: "urlWebsite" } },
                 { kind: "Field", name: { kind: "Name", value: "urlX" } },
                 { kind: "Field", name: { kind: "Name", value: "urlYoutube" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "opportunitiesCreatedByMe" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "5" },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "filter" },
+                      value: {
+                        kind: "ObjectValue",
+                        fields: [
+                          {
+                            kind: "ObjectField",
+                            name: { kind: "Name", value: "slotHostingStatus" },
+                            value: { kind: "EnumValue", value: "SCHEDULED" },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "edges" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "node" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "title" } },
+                                  { kind: "Field", name: { kind: "Name", value: "description" } },
+                                  { kind: "Field", name: { kind: "Name", value: "images" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "community" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                        { kind: "Field", name: { kind: "Name", value: "image" } },
+                                      ],
+                                    },
+                                  },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "place" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                      ],
+                                    },
+                                  },
+                                  { kind: "Field", name: { kind: "Name", value: "feeRequired" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "isReservableWithTicket" },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "portfolios" },

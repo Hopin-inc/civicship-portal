@@ -41,6 +41,30 @@ export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = graphql(`
       urlWebsite
       urlX
       urlYoutube
+      opportunitiesCreatedByMe(
+        first: 5,
+        filter: { slotHostingStatus: SCHEDULED }
+      ) {
+        edges {
+          node {
+            id
+            title
+            description
+            images
+            community {
+              id
+              name
+              image
+            }
+            place {
+              id
+              name
+            }
+            feeRequired
+            isReservableWithTicket
+          }
+        }
+      }
       portfolios(
         first: $first,
         cursor: $after,

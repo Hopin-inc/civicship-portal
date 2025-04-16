@@ -168,6 +168,20 @@ export default function UserPage({ params }: { params: { id: string } }) {
   const userData = data.user;
   const isOwner = currentUser?.id === params.id;
 
+  const activeOpportunities = userData.opportunitiesCreatedByMe?.edges?.map(edge => {
+    const node = edge?.node;
+    if (!node) return null;
+    return {
+      id: node.id,
+      title: node.title,
+      price: node.feeRequired ?? null,
+      location: node.place?.name ?? '',
+      imageUrl: node.images?.[0] ?? null,
+      community: node.community,
+      isReservableWithTicket: node.isReservableWithTicket
+    };
+  }).filter(Boolean) ?? [];
+
   const handleUpdateSocialLinks = async (socialLinks: { type: string; url: string }[]) => {
     // TODO: Implement social links update mutation
     console.log("Update social links:", socialLinks);
@@ -201,6 +215,8 @@ export default function UserPage({ params }: { params: { id: string } }) {
         isLoadingMore={isLoadingMore}
         hasMore={hasMore}
         lastPortfolioRef={lastPortfolioRef}
+        isSysAdmin={userData.sysRole === 'SYS_ADMIN'}
+        activeOpportunities={activeOpportunities}
       />
     </div>
   );

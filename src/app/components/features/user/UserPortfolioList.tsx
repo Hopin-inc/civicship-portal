@@ -1,14 +1,14 @@
 import { History, Plus, Calendar, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { EmptyState } from "@/components/shared/EmptyState";
+import EmptyState from "@/components/shared/EmptyState";
 import { format } from "date-fns";
 import { RefObject } from "react";
 import type { Portfolio, PortfolioCategory, PortfolioStyle, ReservationStatus } from "@/types";
 import { PORTFOLIO_CATEGORY_STYLES } from "@/types";
 import { ParticipantsList } from "@/app/components/shared/ParticipantsList";
+import OpportunityCard, { OpportunityCardProps } from "@/app/components/features/opportunity/OpportunityCard";
 
-const MAX_DISPLAY_PARTICIPANTS = 3;
 
 type Props = {
   userId: string;
@@ -17,6 +17,34 @@ type Props = {
   isLoadingMore: boolean;
   hasMore: boolean;
   lastPortfolioRef: RefObject<HTMLDivElement>;
+  isSysAdmin?: boolean;
+  activeOpportunities?: OpportunityCardProps[];
+};
+
+const ActiveOpportunities = ({ opportunities }: { opportunities: OpportunityCardProps[] }) => {
+  if (opportunities.length === 0) return null;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+          現在募集中の関わり
+          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+            {opportunities.length}
+          </span>
+        </h2>
+      </div>
+      <div className="relative">
+        <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+          <div className="flex gap-4">
+            {opportunities.map((opportunity) => (
+              <OpportunityCard key={opportunity.id} {...opportunity} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }: { 
@@ -187,37 +215,54 @@ const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }:
   );
 };
 
-export const UserPortfolioList = ({ userId, isOwner, portfolios, isLoadingMore, hasMore, lastPortfolioRef }: Props) => {
+export const UserPortfolioList = ({ userId, isOwner, portfolios, isLoadingMore, hasMore, lastPortfolioRef, isSysAdmin, activeOpportunities = [] }: Props) => {
   return (
-    <section className="space-y-4 pb-20">
-      <div className="flex items-center justify-between py-4">
-        <h2 className="text-lg font-semibold text-foreground">
-          これまでの関わり
-        </h2>
+    <section className="space-y-8 pb-20">
+      {isSysAdmin && <ActiveOpportunities opportunities={activeOpportunities} />}
+      
+      <div className="space-y-4">
+        <div className="flex items-center justify-between py-4">
+          <h2 className="text-lg font-semibold text-foreground">
+            これまでの関わり
+          </h2>
+        </div>
+        {portfolios.length > 0 ? (
+          <PortfolioGrid 
+            portfolios={portfolios} 
+            isLoadingMore={isLoadingMore}
+            hasMore={hasMore}
+            lastPortfolioRef={lastPortfolioRef}
+          />
+        ) : (
+          <EmptyState
+            title="まだ活動がありません"
+            description={
+              isOwner
+                ? "地域の活動に参加して、タイムラインを作りましょう"
+                : "地域の活動に参加すると、タイムラインが作成されます"
+            }
+            actionLabel="関わりを探す"
+            onAction={() => {
+              window.location.href = "/";
+            }}
+            hideActionButton={!isOwner}
+            icon={<History className="w-8 h-8 text-muted-foreground font-thin" />}
+          />
+        )}
       </div>
-      {portfolios.length > 0 ? (
-        <PortfolioGrid 
-          portfolios={portfolios} 
-          isLoadingMore={isLoadingMore}
-          hasMore={hasMore}
-          lastPortfolioRef={lastPortfolioRef}
-        />
-      ) : (
-        <EmptyState
-          title="まだ活動がありません"
-          description={
-            isOwner
-              ? "地域の活動に参加して、タイムラインを作りましょう"
-              : "地域の活動に参加すると、タイムラインが作成されます"
-          }
-          actionLabel="関わりを探す"
-          onAction={() => {
-            window.location.href = "/";
-          }}
-          hideActionButton={!isOwner}
-          icon={<History className="w-8 h-8 text-muted-foreground font-thin" />}
-        />
-      )}
     </section>
   );
 };
+
+// Add scrollbar-hide utility class
+const style = document.createElement('style');
+style.textContent = `
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+`;
+document.head.appendChild(style);
