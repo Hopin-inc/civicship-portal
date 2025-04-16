@@ -86,8 +86,8 @@ export default function Page() {
     if (!activeForm) return null
 
     const renderFooterButtons = () => (
-      <div className="fixed bottom-0 left-0 right-0 bg-white p-4">
-        <div className="flex justify-between items-center max-w-md mx-auto">
+      <div className="absolute bottom-0 left-0 right-0 bg-white p-4">
+        <div className="flex justify-between items-center">
           <button
             onClick={() => {
               switch (activeForm) {
@@ -121,7 +121,7 @@ export default function Page() {
 
     const content = {
       location: (
-        <div className="h-full pb-20">
+        <div className="h-full pb-20 relative">
           <SheetHeader className="text-left pb-6">
             <SheetTitle>
               <div className="flex items-center">
@@ -150,7 +150,7 @@ export default function Page() {
         </div>
       ),
       date: (
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col relative">
           <SheetHeader className="text-left pb-6">
             <SheetTitle>
               <div className="flex items-center">
@@ -206,7 +206,7 @@ export default function Page() {
         </div>
       ),
       guests: (
-        <div className="h-full pb-20">
+        <div className="h-full pb-20 relative">
           <SheetHeader className="text-left pb-6">
             <SheetTitle>
               <div className="flex items-center">
@@ -239,7 +239,7 @@ export default function Page() {
         </div>
       ),
       other: (
-        <div className="h-full pb-20">
+        <div className="h-full pb-20 relative">
           <SheetHeader className="text-left pb-6">
             <SheetTitle>
               <div className="flex items-center">
@@ -285,7 +285,7 @@ export default function Page() {
         </div>
       </header>
 
-      <main className="pt-20 px-4 pb-24">
+      <main className="pt-20 px-4 pb-16">
         <div className="mb-6">
           <div className="flex">
             <button
@@ -417,7 +417,7 @@ export default function Page() {
         <div className="max-w-lg mx-auto px-4 h-16 flex justify-between items-center">
           <button 
             onClick={handleClear}
-            className="text-blue-600 underline text-sm"
+            className="text-gray-500 text-sm"
           >
             条件をクリア
           </button>
@@ -433,7 +433,7 @@ export default function Page() {
       <Sheet open={activeForm !== null} onOpenChange={(open) => !open && setActiveForm(null)}>
         <SheetContent 
           side="bottom" 
-          className={`${getSheetHeight()} rounded-t-3xl overflow-auto`}
+          className={`${getSheetHeight()} rounded-t-3xl overflow-auto max-w-lg mx-auto`}
           onPointerDownOutside={() => setActiveForm(null)}
         >
           {renderSheetContent()}
