@@ -13,6 +13,7 @@ import { auth, signInWithLiffToken } from "@/lib/firebase";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
 import { useLiff } from "./LiffContext";
+import { COMMUNITY_ID } from "@/utils";
 
 type UserInfo = {
   uid: string | null;
@@ -158,7 +159,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         variables: {
           input: {
             name,
-            currentPrefecture
+            currentPrefecture,
+            communityId: COMMUNITY_ID
           },
         },
       });

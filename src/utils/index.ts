@@ -1,5 +1,7 @@
 import dayjs from "dayjs";
 
+export const COMMUNITY_ID = "neo88"
+
 type Name = {
   lastName: string;
   middleName?: string | null;

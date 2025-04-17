@@ -2208,6 +2208,7 @@ export type UserFilterInput = {
 };
 
 export type UserSignUpInput = {
+  communityId: Scalars["ID"]["input"];
   currentPrefecture: CurrentPrefecture;
   image?: InputMaybe<ImageInput>;
   name: Scalars["String"]["input"];
@@ -2772,6 +2773,10 @@ export type GetOpportunityQuery = {
           id: string;
           startsAt: Date;
           endsAt: Date;
+          remainingCapacityView?: {
+            __typename?: "RemainingCapacityView";
+            remainingCapacity?: number | null;
+          } | null;
           participations?: {
             __typename?: "ParticipationsConnection";
             edges: Array<{
@@ -4608,6 +4613,19 @@ export const GetOpportunityDocument = {
                                   { kind: "Field", name: { kind: "Name", value: "id" } },
                                   { kind: "Field", name: { kind: "Name", value: "startsAt" } },
                                   { kind: "Field", name: { kind: "Name", value: "endsAt" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "remainingCapacityView" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "remainingCapacity" },
+                                        },
+                                      ],
+                                    },
+                                  },
                                   {
                                     kind: "Field",
                                     name: { kind: "Name", value: "participations" },
