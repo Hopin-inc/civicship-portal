@@ -27,6 +27,7 @@ type OpportunityHistory = {
   community?: {
     id: string
   }
+  isReservableWithTicket?: boolean
 }
 
 const ActivityCard = memo(({ opportunity }: { opportunity: OpportunityHistory }) => (
@@ -40,6 +41,11 @@ const ActivityCard = memo(({ opportunity }: { opportunity: OpportunityHistory })
             fill
             className="object-cover"
           />
+        )}
+        {opportunity.isReservableWithTicket && (
+          <div className="absolute top-2 left-2 bg-blue-50 text-blue-600 px-2 py-1 rounded-md text-xs font-medium z-10">
+            チケット利用可
+          </div>
         )}
         <div className="absolute bottom-2 left-2">
           <ParticipantsList participants={opportunity.participants} size="md" />
@@ -96,6 +102,7 @@ const transformOpportunityToHistory = (opportunity: Opportunity): OpportunityHis
     images: images.map(img => ({ url: img, alt: opportunity.title })),
     participants: uniqueParticipants,
     community: opportunity.community,
+    isReservableWithTicket: opportunity.isReservableWithTicket,
   };
 };
 

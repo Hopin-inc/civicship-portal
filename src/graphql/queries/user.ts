@@ -41,6 +41,30 @@ export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = graphql(`
       urlWebsite
       urlX
       urlYoutube
+      opportunitiesCreatedByMe(
+        first: 5,
+        filter: { slotHostingStatus: SCHEDULED }
+      ) {
+        edges {
+          node {
+            id
+            title
+            description
+            images
+            community {
+              id
+              name
+              image
+            }
+            place {
+              id
+              name
+            }
+            feeRequired
+            isReservableWithTicket
+          }
+        }
+      }
       portfolios(
         first: $first,
         cursor: $after,
@@ -55,6 +79,7 @@ export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = graphql(`
             date
             thumbnailUrl
             source
+            reservationStatus
             place {
               id
               name
@@ -70,6 +95,45 @@ export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = graphql(`
         pageInfo {
           hasNextPage
           endCursor
+        }
+      }
+    }
+  }
+`);
+
+export const GET_USER_WALLET = graphql(`
+  query GetUserWallet($id: ID!) {
+    user(id: $id) {
+      id
+      wallets {
+        edges {
+          node {
+            id
+            tickets(filter: { status: AVAILABLE }) {
+              edges {
+                node {
+                  id
+                  status
+                  utility {
+                    id
+                  }
+                  ticketStatusHistories {
+                    edges {
+                      node {
+                        id
+                        status
+                        createdByUser {
+                          id
+                          name
+                          image
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

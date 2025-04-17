@@ -1,43 +1,37 @@
-import { Button } from "@/components/ui/button";
-import { Gift, ArrowRight } from "lucide-react";
-import type { ReactNode } from "react";
+import { Button } from '@/components/ui/button';
+import { AsymmetricImageGrid } from '@/components/ui/asymmetric-image-grid';
 
-type EmptyStateProps = {
-  title: string;
-  description: string;
-  actionLabel?: string;
-  onAction?: () => void;
-  icon?: ReactNode;
-  hideActionButton?: boolean;
-};
+const emptyImages = [
+  {
+    url: '/images/tickets/empty-1.jpg',
+    alt: '体験の様子1'
+  },
+  {
+    url: '/images/tickets/empty-2.jpg',
+    alt: '体験の様子2'
+  },
+  {
+    url: '/images/tickets/empty-3.jpg',
+    alt: '体験の様子3'
+  }
+];
 
-export function EmptyState({
-  title,
-  description,
-  actionLabel,
-  onAction,
-  icon,
-  hideActionButton = false,
-}: EmptyStateProps) {
+export default function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center space-y-6">
-      {icon && (
-        <div className="w-16 h-16 flex items-center justify-center rounded-full bg-muted">
-          {icon}
-        </div>
-      )}
-      <div className="space-y-2 max-w-sm">
-        <p className="text-base font-semibold">{title}</p>
-        <p className="text-sm text-muted-foreground">{description}</p>
+    <div className="flex flex-col items-center text-center mt-8">
+      <div className="w-[224px] h-[220px] mb-8">
+        <AsymmetricImageGrid images={emptyImages} className="h-full" />
       </div>
-      {!hideActionButton && actionLabel && onAction && (
-        <div className="flex flex-col items-center gap-4">
-          <Button onClick={onAction} variant={"default"}>
-            <span>{actionLabel}</span>
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        </div>
-      )}
+      
+      <h2 className="text-2xl font-bold mb-3">チケットはありません</h2>
+      <p className="text-gray-600 mb-8">
+        四国の素敵な88人と関わって<br />
+        チケットをもらおう
+      </p>
+      
+      <Button size="lg" className="w-full max-w-[400px] text-base font-bold">
+        関わりをみつける
+      </Button>
     </div>
   );
-}
+} 

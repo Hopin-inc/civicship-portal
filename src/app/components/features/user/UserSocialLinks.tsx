@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import type { User, SocialLink, SocialLinkType } from "@/types";
 import { useState, useMemo } from "react";
 import { UserSocialLinksEditModal } from "./UserSocialLinksEditModal";
+import { cn } from "@/lib/utils";
 
 type Props = {
   user: User;
@@ -17,6 +18,8 @@ type Props = {
   onUpdate?: (socialLinks: SocialLink[]) => void;
 };
 
+const SOCIAL_LINKS: SocialLinkType[] = ['x', 'instagram', 'facebook'];
+
 export const UserSocialLinks = ({
   user,
   className,
@@ -24,28 +27,6 @@ export const UserSocialLinks = ({
   onUpdate,
 }: Props) => {
   const [showEditModal, setShowEditModal] = useState(false);
-
-  const socialLinks = useMemo(() => {
-    const links: SocialLink[] = [];
-    
-    if (user.urlX) {
-      links.push({ type: 'x', url: user.urlX });
-    }
-    if (user.urlInstagram) {
-      links.push({ type: 'instagram', url: user.urlInstagram });
-    }
-    if (user.urlFacebook) {
-      links.push({ type: 'facebook', url: user.urlFacebook });
-    }
-    if (user.urlYoutube) {
-      links.push({ type: 'youtube', url: user.urlYoutube });
-    }
-    if (user.urlWebsite) {
-      links.push({ type: 'website', url: user.urlWebsite });
-    }
-    
-    return links;
-  }, [user]);
 
   const getSocialIcon = (type: SocialLinkType) => {
     switch (type) {
@@ -77,28 +58,59 @@ export const UserSocialLinks = ({
     }
   };
 
+  const getSocialUrl = (type: SocialLinkType): string | null => {
+    switch (type) {
+      case "x":
+        return user.urlX ?? null;
+      case "instagram":
+        return user.urlInstagram ?? null;
+      case "facebook":
+        return user.urlFacebook ?? null;
+      case "youtube":
+        return user.urlYoutube ?? null;
+      case "website":
+        return user.urlWebsite ?? null;
+    }
+  };
+
   return (
     <>
       <div className={`flex items-center gap-2 ${className}`}>
         <div className="flex gap-2">
-          {socialLinks.map((link) => (
-            <Button
-              key={link.type}
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full bg-muted hover:bg-muted/80"
-              asChild
-            >
-              <a
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={getSocialLabel(link.type)}
+          {SOCIAL_LINKS.map((type) => {
+            const url = getSocialUrl(type);
+            const isActive = !!url;
+
+            return (
+              <Button
+                key={type}
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "h-8 w-8 rounded-full",
+                  isActive
+                    ? "bg-muted hover:bg-muted/80"
+                    : "bg-muted/50 text-muted-foreground/50 cursor-not-allowed hover:bg-muted/50"
+                )}
+                asChild
+                disabled={!isActive}
               >
-                {getSocialIcon(link.type)}
-              </a>
-            </Button>
-          ))}
+                <a
+                  href={url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={getSocialLabel(type)}
+                  onClick={(e) => {
+                    if (!isActive) {
+                      e.preventDefault();
+                    }
+                  }}
+                >
+                  {getSocialIcon(type)}
+                </a>
+              </Button>
+            );
+          })}
         </div>
       </div>
     </>

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import useEmblaCarousel from 'embla-carousel-react'
 import { MapPin } from 'lucide-react'
-import { OpportunityCardProps } from './OpportunityCard'
+import { OpportunityCardProps } from '../opportunity/OpportunityCard'
 
 interface FeaturedSectionProps {
   opportunities: OpportunityCardProps[]

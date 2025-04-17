@@ -34,6 +34,7 @@ const OPPORTUNITY_FRAGMENT = gql`
     }
     feeRequired
     pointsToEarn
+    isReservableWithTicket
   }
 `;
 

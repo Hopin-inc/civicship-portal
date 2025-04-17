@@ -14,6 +14,7 @@ const BottomBar = () => {
     pathname === '/search' || 
     (pathname.startsWith('/reservation') && !pathname.includes('/complete')) ||
     pathname.startsWith('/activities/') ||
+    pathname.startsWith('/participations/') ||
     pathname === '/users/me/edit'
   ) {
     return null;
@@ -26,7 +27,7 @@ const BottomBar = () => {
   const myPagePath = user?.id ? `/users/${user.id}` : '/mypage';
 
   return (
-    <div className="max-w-lg mx-auto fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2">
+    <div className="max-w-lg mx-auto fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 z-50">
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
           <Link href="/activities" className={getLinkStyle('/explore')}>

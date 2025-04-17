@@ -65,6 +65,7 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
     node: {
       id: pEdge?.node?.id || "",
       status: pEdge?.node?.status || "",
+      reason: "",
       images: pEdge?.node?.images || [],
       user: {
         id: pEdge?.node?.user?.id || "",
@@ -147,12 +148,18 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
           id: edge?.node?.id || "",
           startsAt: edge?.node?.startsAt || "",
           endsAt: edge?.node?.endsAt || "",
+          remainingCapacityView: edge?.node?.remainingCapacityView ? {
+            remainingCapacity: edge.node.remainingCapacityView.remainingCapacity || 0
+          } : undefined,
           participations: edge?.node?.participations ? {
             edges: edge.node.participations.edges?.map(transformParticipationNode) || [],
           } : undefined,
         },
       })) || [],
     } : undefined,
+    requiredUtilities: data.requiredUtilities?.map(utility => ({
+      id: utility?.id || "",
+    })) || undefined,
   };
 };
 
@@ -169,6 +176,8 @@ export const useOpportunity = (id: string, communityId: string): UseOpportunityR
       console.error('Opportunity query error:', error);
     },
   });
+
+  console.log("生データ", data);
 
   return {
     opportunity: data ? transformOpportunity(data.opportunity) : null,

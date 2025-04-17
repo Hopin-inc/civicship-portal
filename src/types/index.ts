@@ -50,6 +50,8 @@ export interface PortfolioParticipant {
   image: string | null;
 }
 
+export type ReservationStatus = 'APPLIED' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
+
 export interface Portfolio {
   id: string;
   type: PortfolioType;
@@ -60,6 +62,7 @@ export interface Portfolio {
   participants: PortfolioParticipant[];
   image: string | null;
   source?: string;
+  reservationStatus?: ReservationStatus | null;
 }
 
 export type Community = {
@@ -110,6 +113,7 @@ export type Opportunity = {
   endsAt: Date | string;
   createdAt: Date | string;
   updatedAt: Date | string;
+  isReservableWithTicket?: boolean;
   host: {
     name: string;
     image: string | null;
@@ -182,6 +186,9 @@ export type Opportunity = {
       };
     }>;
   };
+  requiredUtilities?: {
+    id: string;
+  }[];
 };
 
 export type RelatedArticle = {
@@ -272,11 +279,30 @@ export type Participation = {
   node: {
     id: string;
     status: string;
+    reason: string;
     images?: ParticipationImage[];
     user: {
       id: string;
       name: string;
       image?: string;
+    };
+    reservation?: {
+      id: string;
+      opportunitySlot: {
+        id: string;
+        capacity: number;
+        startsAt: Date | string;
+        endsAt: Date | string;
+        hostingStatus: string;
+      };
+      participations?: Array<{
+        id: string;
+        user: {
+          id: string;
+          name: string;
+          image?: string;
+        };
+      }>;
     };
   };
 };

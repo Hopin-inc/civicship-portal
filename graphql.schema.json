@@ -828,6 +828,12 @@
         "interfaces": null,
         "enumValues": [
           {
+            "name": "CanReadPhoneNumber",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "IsAdmin",
             "description": null,
             "isDeprecated": false,
@@ -11738,6 +11744,18 @@
             "deprecationReason": null
           },
           {
+            "name": "reservationStatus",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "ReservationStatus",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "source",
             "description": null,
             "args": [],
@@ -17728,6 +17746,18 @@
             "type": {
               "kind": "OBJECT",
               "name": "ParticipationsConnection",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "phoneNumber",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "isDeprecated": false,
