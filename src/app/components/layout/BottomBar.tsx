@@ -15,7 +15,8 @@ const BottomBar = () => {
     (pathname.startsWith('/reservation') && !pathname.includes('/complete')) ||
     pathname.startsWith('/activities/') ||
     pathname.startsWith('/participations/') ||
-    pathname === '/users/me/edit'
+    pathname === '/users/me/edit' ||
+    pathname.startsWith('/places')
   ) {
     return null;
   }
