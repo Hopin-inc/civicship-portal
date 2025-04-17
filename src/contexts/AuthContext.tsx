@@ -98,7 +98,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const { data } = await refetch();
         const fetchedUser = data.currentUser?.user ?? null;
-        console.log("fetchedUser", fetchedUser);
         if (fetchedUser) {
           login({ 
             uid: user.uid, 
