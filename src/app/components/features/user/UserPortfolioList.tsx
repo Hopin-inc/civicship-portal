@@ -101,39 +101,6 @@ const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }:
     }
   };
 
-  const renderParticipants = (participants: Portfolio['participants']) => {
-    const uniqueParticipants = Array.from(
-      new Map(participants.map(p => [p.id, p])).values()
-    );
-    const remainingCount = uniqueParticipants.length - MAX_DISPLAY_PARTICIPANTS;
-    const displayParticipants = uniqueParticipants.slice(0, MAX_DISPLAY_PARTICIPANTS);
-
-    return (
-      <div className="flex items-center">
-        <div className="flex -space-x-2">
-          {displayParticipants.map((participant, index) => (
-            <div 
-              key={`${participant.id}-${index}`}
-              className={`w-6 h-6 sm:w-8 sm:h-8 relative ${index === MAX_DISPLAY_PARTICIPANTS - 1 && remainingCount > 0 ? 'relative' : ''}`}
-            >
-              <Image
-                src={participant.image ?? '/placeholder-avatar.png'}
-                alt={participant.name}
-                fill
-                className={`rounded-full border-2 border-white ${index === MAX_DISPLAY_PARTICIPANTS - 1 && remainingCount > 0 ? 'brightness-50' : ''}`}
-              />
-              {index === MAX_DISPLAY_PARTICIPANTS - 1 && remainingCount > 0 && (
-                <div className="absolute inset-0 flex items-center justify-center text-xs sm:text-sm font-medium text-white">
-                  +{remainingCount}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4">
       {portfolios.map((portfolio, index) => (
@@ -253,16 +220,3 @@ export const UserPortfolioList = ({ userId, isOwner, portfolios, isLoadingMore, 
     </section>
   );
 };
-
-// Add scrollbar-hide utility class
-const style = document.createElement('style');
-style.textContent = `
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-`;
-document.head.appendChild(style);
