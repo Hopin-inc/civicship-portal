@@ -68,7 +68,6 @@ jobs:
           --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }} \
           --build-arg NEXT_PUBLIC_DOMAIN=${{ env.NEXT_PUBLIC_DOMAIN }} \
           --build-arg NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }}
-          --build-arg NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT=${{ env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }}
 
     - name: Push Docker image to Artifact Registry
       run: |
