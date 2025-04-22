@@ -273,6 +273,7 @@ export default function MapComponent({ memberships }: { memberships: MembershipN
     description: string;
     image: string;
     bio: string;
+    userId: string;
   }>>([]);
 
   const { isLoaded } = useJsApiLoader({
@@ -396,6 +397,7 @@ export default function MapComponent({ memberships }: { memberships: MembershipN
         description: string;
         image: string;
         bio: string;
+        userId: string;
       }> = [];
 
       memberships.forEach(({ node }) => {
@@ -423,7 +425,8 @@ export default function MapComponent({ memberships }: { memberships: MembershipN
             participantCount: node.participationView.participated.totalParticipatedCount,
             description: "イベントの説明",
             image: location.placeImage,
-            bio: node.bio || ""
+            bio: node.bio || "",
+            userId: node.user.id
           });
         });
 
@@ -451,7 +454,8 @@ export default function MapComponent({ memberships }: { memberships: MembershipN
             participantCount: node.participationView.hosted.totalParticipantCount,
             description: "イベントの説明",
             image: location.placeImage,
-            bio: node.bio || ""
+            bio: node.bio || "",
+            userId: node.user.id
           });
         });
       });

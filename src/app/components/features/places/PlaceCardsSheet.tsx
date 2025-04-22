@@ -1,5 +1,6 @@
 import { FC, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 interface PlaceCardsSheetProps {
   places: Array<{
@@ -10,6 +11,7 @@ interface PlaceCardsSheetProps {
     description: string;
     image: string;
     bio?: string;
+    userId: string;
   }>;
   selectedPlaceId: string | null;
   onClose: () => void;
@@ -17,6 +19,7 @@ interface PlaceCardsSheetProps {
 }
 
 const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, onClose, onPlaceSelect }) => {
+  const router = useRouter();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // 選択されたPlaceが変更された時に、そのPlaceまでスクロール
@@ -68,6 +71,14 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
     }, 150) as any;
   };
 
+  const handlePlaceClick = (placeId: string) => {
+    onPlaceSelect(placeId);
+    const place = places.find(p => p.placeId === placeId);
+    if (place) {
+      router.push(`/places/${placeId}?userId=${place.userId}`);
+    }
+  };
+
   if (!places.length) return null;
 
   return (
@@ -91,7 +102,7 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
               className={`flex-none w-[345px] bg-white rounded-2xl shadow-lg transform transition-transform duration-200 snap-center ${
                 selectedPlaceId === place.placeId ? 'scale-[1.02]' : 'scale-100'
               }`}
-              onClick={() => onPlaceSelect(place.placeId)}
+              onClick={() => handlePlaceClick(place.placeId)}
             >
               <div className="relative h-48 rounded-t-2xl overflow-hidden">
                 <img
