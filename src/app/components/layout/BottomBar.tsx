@@ -35,7 +35,7 @@ const BottomBar = () => {
             <Search size={24} />
             <span className="text-xs mt-1">見つける</span>
           </Link>
-          <Link href="/" className={getLinkStyle('/')}>
+          <Link href="/places" className={getLinkStyle('/places')}>
             <Globe size={24} />
             <span className="text-xs mt-1">探す</span>
           </Link>

@@ -8,12 +8,6 @@ const containerStyle = {
   height: '100%'
 };
 
-// 高知県の中心付近の座標
-const center = {
-  lat: 33.5590,
-  lng: 133.5290
-};
-
 interface Geo {
   latitude: string;
   longitude: string;
@@ -39,6 +33,7 @@ interface MarkerData {
 interface MembershipNode {
   node: {
     user: {
+      id: string;
       image: string;
       name: string;
     };
@@ -263,19 +258,13 @@ const CustomMarker: React.FC<{
   );
 };
 
-export default function MapComponent({ memberships }: { memberships: MembershipNode[] }) {
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
-  const [places, setPlaces] = useState<Array<{
-    placeId: string;
-    title: string;
-    address: string;
-    participantCount: number;
-    description: string;
-    image: string;
-    bio: string;
-    userId: string;
-  }>>([]);
+interface Props {
+  memberships: MembershipNode[];
+  selectedPlaceId?: string | null;
+  onPlaceSelect?: (placeId: string) => void;
+}
 
+export default function MapComponent({ memberships, selectedPlaceId, onPlaceSelect }: Props) {
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''
@@ -283,108 +272,29 @@ export default function MapComponent({ memberships }: { memberships: MembershipN
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [markers, setMarkers] = useState<MarkerData[]>([]);
+  const [center, setCenter] = useState<google.maps.LatLngLiteral>({
+    lat: 33.75,  // 四国のおおよその中心緯度
+    lng: 133.5,  // 四国のおおよその中心経度
+  });
 
-  const onLoad = useCallback((map: google.maps.Map) => {
-    const bounds = new window.google.maps.LatLngBounds(center);
-    map.fitBounds(bounds);
+  // 選択された場所にズームする
+  useEffect(() => {
+    if (map && selectedPlaceId) {
+      const selectedMarker = markers.find(marker => marker.placeId === selectedPlaceId);
+      if (selectedMarker) {
+        map.panTo(selectedMarker.position);
+        map.setZoom(15);
+      }
+    }
+  }, [selectedPlaceId, markers, map]);
+
+  const onLoad = useCallback(function callback(map: google.maps.Map) {
     setMap(map);
   }, []);
 
-  // BottomSheetの高さを考慮してマップの中心位置を調整
-  const adjustMapPosition = useCallback((position: google.maps.LatLngLiteral) => {
-    if (!map) return;
-
-    const BOTTOM_SHEET_HEIGHT = 390; // BottomSheetの高さ
-    const BOTTOM_SHEET_MARGIN = 16; // BottomSheetの上下マージン
-    const mapDiv = map.getDiv();
-    const mapHeight = mapDiv.clientHeight;
-    
-    // マーカーを画面の上部1/3に表示するように調整
-    const projection = map.getProjection();
-    if (!projection) return;
-
-    const targetLatLng = new google.maps.LatLng(position);
-    const targetPoint = projection.fromLatLngToPoint(targetLatLng);
-    if (!targetPoint) return;
-
-    // 画面の有効高さ（BottomSheetを除いた部分）
-    const effectiveHeight = mapHeight - BOTTOM_SHEET_HEIGHT - BOTTOM_SHEET_MARGIN * 2;
-    
-    // マーカーを表示したい位置（上から1/3）
-    const targetOffsetY = effectiveHeight * 0.33;
-    
-    // 現在の中心点を取得
-    const centerLatLng = map.getCenter();
-    if (!centerLatLng) return;
-    
-    const centerPoint = projection.fromLatLngToPoint(centerLatLng);
-    const zoomScale = Math.pow(2, map.getZoom() || 0);
-    
-    // 新しい中心点を計算
-    const newCenterPoint = new google.maps.Point(
-      targetPoint.x,
-      targetPoint.y + (targetOffsetY / zoomScale)
-    );
-    
-    const newCenter = projection.fromPointToLatLng(newCenterPoint);
-    if (!newCenter) return;
-    
-    map.panTo(newCenter);
-  }, [map]);
-
-  const handleMarkerClick = useCallback((marker: MarkerData) => {
-    if (map) {
-      setSelectedPlaceId(marker.placeId);
-      
-      // まずズームレベルを設定
-      map.setZoom(16);
-      
-      // ズームアニメーションが完了してから位置を調整
-      setTimeout(() => {
-        adjustMapPosition(marker.position);
-      }, 300);
-    }
-  }, [map, adjustMapPosition]);
-
-  const handlePlaceSelect = useCallback((placeId: string) => {
-    const marker = markers.find(m => m.placeId === placeId);
-    if (marker && map) {
-      setSelectedPlaceId(placeId);
-      
-      // まずズームレベルを設定
-      map.setZoom(16);
-      
-      // ズームアニメーションが完了してから位置を調整
-      setTimeout(() => {
-        adjustMapPosition(marker.position);
-      }, 300);
-    }
-  }, [map, markers, adjustMapPosition]);
-
-  // マップ上の任意の位置をクリックした時に最も近いマーカーを選択
-  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
-    if (!e.latLng || !markers.length) return;
-
-    const clickedPosition = e.latLng;
-    let nearestMarker = markers[0];
-    let minDistance = google.maps.geometry.spherical.computeDistanceBetween(
-      clickedPosition,
-      new google.maps.LatLng(nearestMarker.position)
-    );
-
-    markers.forEach((marker) => {
-      const distance = google.maps.geometry.spherical.computeDistanceBetween(
-        clickedPosition,
-        new google.maps.LatLng(marker.position)
-      );
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearestMarker = marker;
-      }
-    });
-
-    handleMarkerClick(nearestMarker);
-  }, [markers, handleMarkerClick]);
+  const onUnmount = useCallback(function callback() {
+    setMap(null);
+  }, []);
 
   useEffect(() => {
     const loadMarkers = async () => {
@@ -421,7 +331,7 @@ export default function MapComponent({ memberships }: { memberships: MembershipN
           allPlaces.push({
             placeId: location.placeId,
             title: node.headline || node.user.name,
-            address: "高知県高知市",
+            address: node.participationView.participated.geo[0].placeName,
             participantCount: node.participationView.participated.totalParticipatedCount,
             description: "イベントの説明",
             image: location.placeImage,
@@ -450,7 +360,7 @@ export default function MapComponent({ memberships }: { memberships: MembershipN
           allPlaces.push({
             placeId: location.placeId,
             title: node.headline || node.user.name,
-            address: "高知県高知市",
+            address: node.participationView.participated.geo[0].placeName,
             participantCount: node.participationView.hosted.totalParticipantCount,
             description: "イベントの説明",
             image: location.placeImage,
@@ -461,37 +371,32 @@ export default function MapComponent({ memberships }: { memberships: MembershipN
       });
 
       setMarkers(allMarkers);
-      setPlaces(allPlaces);
     };
 
     loadMarkers();
   }, [memberships]);
 
-  if (!isLoaded) return <div>Loading...</div>;
-
-  return (
-    <>
-      <GoogleMap
-        mapContainerStyle={containerStyle}
-        center={center}
-        zoom={20}
-        onLoad={onLoad}
-        onClick={handleMapClick}
-      >
-        {markers.map((marker) => (
-          <CustomMarker
-            key={marker.id}
-            data={marker}
-            onClick={() => handleMarkerClick(marker)}
-          />
-        ))}
-      </GoogleMap>
-      <PlaceCardsSheet
-        places={places}
-        selectedPlaceId={selectedPlaceId}
-        onClose={() => setSelectedPlaceId(null)}
-        onPlaceSelect={handlePlaceSelect}
-      />
-    </>
-  );
+  return isLoaded ? (
+    <GoogleMap
+      mapContainerStyle={containerStyle}
+      center={center}
+      zoom={9}
+      onLoad={onLoad}
+      onUnmount={onUnmount}
+      options={{
+        zoomControl: true,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+      }}
+    >
+      {markers.map((marker) => (
+        <CustomMarker
+          key={marker.id}
+          data={marker}
+          onClick={() => onPlaceSelect?.(marker.placeId)}
+        />
+      ))}
+    </GoogleMap>
+  ) : <></>;
 } 
