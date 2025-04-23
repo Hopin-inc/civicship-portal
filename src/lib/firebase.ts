@@ -14,6 +14,7 @@ export const app = initializeApp({
 });
 
 export const auth = getAuth(app);
+auth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
 
 const providers = {
   line: new OAuthProvider("oidc.line"),
@@ -49,9 +50,9 @@ export const signInWithLiffToken = async (accessToken: string): Promise<boolean>
     }
 
     const { customToken } = await response.json();
-    
+
     console.log("👏 customToken", customToken);
-    
+
     await signInWithCustomToken(auth, customToken);
     return true;
   } catch (error) {
