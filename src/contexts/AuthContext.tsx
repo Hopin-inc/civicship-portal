@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { User, CurrentPrefecture, IdentityPlatform } from "@/gql/graphql";
+import { User, CurrentPrefecture } from "@/gql/graphql";
 import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleAuthenticateWithLiffToken = async (accessToken: string): Promise<boolean> => {
     setIsAuthenticating(true);
-    
+
     try {
       const success = await signInWithLiffToken(accessToken);
       if (!success) {
@@ -84,14 +84,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         await handleAuthenticateWithLiffToken(liffAccessToken);
       }
     };
-    
+
     attemptAuthWithLiffToken();
   }, [liffAccessToken, isLiffLoggedIn, uid]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user: AuthUser | null) => {
       ready.resolve();
-      
+
       if (user) {
         const next = searchParams.get("next");
         const idToken = await user.getIdToken();
@@ -100,8 +100,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const { data } = await refetch();
         const fetchedUser = data.currentUser?.user ?? null;
         if (fetchedUser) {
-          login({ 
-            uid: user.uid, 
+          login({
+            uid: user.uid,
             user: {
               id: fetchedUser.id,
               name: fetchedUser.name
@@ -119,7 +119,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         cookies.remove("access_token");
       }
     });
-    
+
     return () => unsubscribe();
   }, [auth, ready]);
 
@@ -130,20 +130,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     setIsAuthenticating(true);
-    
+
     try {
       await auth.signOut();
-      
+
       liffLogout();
-      
+
       const response = await fetch("/api/logout", { method: "POST" });
       if (!response.ok) {
         console.warn("Backend logout failed:", response.status);
       }
-      
+
       setUser(null);
       setUid(null);
-      
+
       toast.success("ログアウトしました");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -173,11 +173,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      uid, 
-      user, 
-      login, 
-      logout, 
+    <AuthContext.Provider value={{
+      uid,
+      user,
+      login,
+      logout,
       loginWithLiff,
       isAuthenticating,
       createUser
