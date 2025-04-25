@@ -36,6 +36,14 @@ interface MembershipNode {
       id: string;
       image: string;
       name: string;
+      opportunitiesCreatedByMe?: {
+        edges: Array<{
+          node: {
+            id: string;
+            publishStatus: string;
+          };
+        }>;
+      };
     };
     headline?: string;
     bio?: string;
@@ -405,9 +413,15 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
         image: string;
         bio: string;
         userId: string;
+        activeOpportunityCount: number;
       }> = [];
 
       memberships.forEach(({ node }) => {
+        // アクティブな募集数を計算
+        const activeOpportunityCount = node.user.opportunitiesCreatedByMe?.edges
+          .filter(edge => edge.node.publishStatus === 'PUBLIC')
+          .length || 0;
+
         // 参加したイベントのマーカー
         node.participationView.participated.geo.forEach(location => {
           const marker: MarkerData = {
@@ -433,7 +447,8 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
             description: "イベントの説明",
             image: location.placeImage,
             bio: node.bio || "",
-            userId: node.user.id
+            userId: node.user.id,
+            activeOpportunityCount
           });
         });
 
@@ -462,16 +477,31 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
             description: "イベントの説明",
             image: location.placeImage,
             bio: node.bio || "",
-            userId: node.user.id
+            userId: node.user.id,
+            activeOpportunityCount
           });
         });
       });
 
       setMarkers(allMarkers);
+      setPlaces(allPlaces);
     };
 
     loadMarkers();
   }, [memberships]);
+
+  // places stateを追加
+  const [places, setPlaces] = useState<Array<{
+    placeId: string;
+    title: string;
+    address: string;
+    participantCount: number;
+    description: string;
+    image: string;
+    bio: string;
+    userId: string;
+    activeOpportunityCount: number;
+  }>>([]);
 
   return isLoaded ? (
     <GoogleMap

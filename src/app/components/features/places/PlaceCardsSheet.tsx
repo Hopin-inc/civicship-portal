@@ -12,6 +12,7 @@ interface PlaceCardsSheetProps {
     image: string;
     bio?: string;
     userId: string;
+    activeOpportunityCount?: number;
   }>;
   selectedPlaceId: string | null;
   onClose: () => void;
@@ -104,7 +105,7 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
               }`}
               onClick={() => handlePlaceClick(place.placeId)}
             >
-              <div className="relative h-48 rounded-t-2xl overflow-hidden">
+              <div className="relative h-40 rounded-t-2xl overflow-hidden">
                 <img
                   src={place.image}
                   alt={place.title}
@@ -112,14 +113,14 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
                 />
               </div>
               
-              <div className="p-4 h-[198px]"> {/* 390px - 192px(画像) = 198px */}
+              <div className="p-4 flex flex-col min-h-[200px]">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-1">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span className="text-gray-700 text-sm">{place.address}</span>
+                    <span className="text-gray-700 text-sm truncate max-w-[180px]">{place.address}</span>
                   </div>
                   
                   <div className="flex items-center gap-1">
@@ -131,11 +132,20 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
                 </div>
                 
                 <h2 className="text-lg font-bold mb-2 line-clamp-2">{place.title}</h2>
-                <p className="text-gray-600 text-sm line-clamp-3 mb-4">{place.bio || place.description}</p>
+                <p className="text-gray-600 text-sm line-clamp-2 mb-4">{place.bio || place.description}</p>
                 
-                <button className="w-full bg-blue-500 text-white py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors">
-                  もっと見る
-                </button>
+                <div className="flex items-center justify-between mt-auto pt-2">
+                  <div>
+                    {place.activeOpportunityCount !== undefined && place.activeOpportunityCount > 0 && (
+                      <span className="text-gray-700 text-sm">
+                        <strong>{place.activeOpportunityCount}件</strong>の関わり方を募集中
+                      </span>
+                    )}
+                  </div>
+                  <button className="bg-blue-500 text-white py-2 px-6 rounded-lg text-sm hover:bg-blue-600 transition-colors">
+                    もっと見る
+                  </button>
+                </div>
               </div>
             </motion.div>
           ))}

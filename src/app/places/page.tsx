@@ -93,9 +93,15 @@ export default function PlacesPage() {
       image: string;
       bio?: string;
       userId: string;
+      activeOpportunityCount: number;
     }> = [];
 
     memberships.forEach(({ node }) => {
+      // アクティブな募集数を計算
+      const activeOpportunityCount = node.user.opportunitiesCreatedByMe?.edges
+        .filter(edge => edge.node.publishStatus === 'PUBLIC')
+        .length || 0;
+
       // 参加したイベントの場所
       node.participationView.participated.geo.forEach((location: Place) => {
         allPlaces.push({
@@ -106,7 +112,8 @@ export default function PlacesPage() {
           description: "イベントの説明",
           image: location.placeImage,
           bio: node.bio,
-          userId: node.user.id
+          userId: node.user.id,
+          activeOpportunityCount
         });
       });
 
@@ -120,7 +127,8 @@ export default function PlacesPage() {
           description: "イベントの説明",
           image: location.placeImage,
           bio: node.bio,
-          userId: node.user.id
+          userId: node.user.id,
+          activeOpportunityCount
         });
       });
     });
