@@ -144,7 +144,7 @@ export function PlaceList({ memberships, onClose, isMapMode = false, selectedPla
   }
 
   return (
-    <Sheet defaultOpen>
+    <Sheet defaultOpen onOpenChange={() => router.push('/places?mode=map')}>
       <SheetContent 
         side="bottom" 
         className="h-[100dvh] overflow-y-auto px-6 mx-auto max-w-lg"
@@ -196,7 +196,7 @@ export function PlaceList({ memberships, onClose, isMapMode = false, selectedPla
         <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50">
           <button
             onClick={handleMapClick}
-            className="flex items-center justify-center gap-3 px-8 py-3.5 rounded-full border-2 border-[#4361ee] bg-white hover:bg-[#4361ee]/5 transition-colors text-[#4361ee] min-w-[200px]"
+            className="flex items-center justify-center gap-3 px-8 py-3.5 rounded-full border-2 border-[#4361ee] bg-white transition-colors text-[#4361ee] min-w-[200px]"
           >
             <span className="text-lg font-medium">地図</span>
             <Map className="w-6 h-6" />

@@ -91,7 +91,7 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
     >
       <div 
         ref={scrollContainerRef}
-        className="relative overflow-x-auto hide-scrollbar snap-x snap-mandatory"
+        className="relative overflow-x-auto hide-scrollbar snap-x snap-mandatory max-w-[510px] mx-auto"
         onScroll={handleScroll}
       >
         <div className="flex gap-4 pb-2 px-2">

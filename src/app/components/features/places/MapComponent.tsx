@@ -165,13 +165,13 @@ const drawCircleWithImage = async (
 };
 
 // カスタムマーカーSVGを生成する関数
-const createCustomMarkerIcon = async (placeImage: string, userImage: string): Promise<google.maps.Icon | null> => {
+const createCustomMarkerIcon = async (placeImage: string, userImage: string, isSelected: boolean = false): Promise<google.maps.Icon | null> => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
   if (!context) return null;
 
   // サイズ設定
-  const displaySize = 56;  // 表示サイズ
+  const displaySize = isSelected ? 80 : 56;  // 選択時は80px、非選択時は56px
   const scale = 2;        // 高解像度用のスケール
 
   const canvasWidth = displaySize * scale;
@@ -210,7 +210,6 @@ const createCustomMarkerIcon = async (placeImage: string, userImage: string): Pr
 
   } catch (error) {
     console.warn("Failed to create marker icon:", error);
-    // 完全なフォールバック: シンプルな円を描画
     const centerX = displaySize / 2;
     const centerY = displaySize / 2;
 
@@ -234,18 +233,82 @@ const createCustomMarkerIcon = async (placeImage: string, userImage: string): Pr
 const CustomMarker: React.FC<{
   data: MarkerData;
   onClick: () => void;
-}> = ({ data, onClick }) => {
+  isSelected: boolean;
+}> = ({ data, onClick, isSelected }) => {
   const [icon, setIcon] = useState<google.maps.Icon | null>(null);
+  const [currentSize, setCurrentSize] = useState<number>(56);
+
+  useEffect(() => {
+    if (isSelected && currentSize !== 80) {
+      setCurrentSize(80);
+    } else if (!isSelected && currentSize !== 56) {
+      // 選択が解除された時のみサイズを小さくする
+      setCurrentSize(56);
+    }
+  }, [isSelected]);
 
   useEffect(() => {
     const loadIcon = async () => {
-      const newIcon = await createCustomMarkerIcon(data.placeImage, data.userImage);
-      if (newIcon) {
-        setIcon(newIcon);
+      const displaySize = currentSize;
+      const scale = 2;
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      if (!context) return;
+
+      const canvasWidth = displaySize * scale;
+      const canvasHeight = displaySize * scale;
+
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      canvas.style.width = `${displaySize}px`;
+      canvas.style.height = `${displaySize}px`;
+
+      context.scale(scale, scale);
+
+      try {
+        const centerX = displaySize / 2;
+        const centerY = displaySize / 2;
+        const mainRadius = displaySize / 2 - 2;
+        const smallRadius = mainRadius * 0.4;
+        const smallX = centerX + mainRadius * 0.5;
+        const smallY = centerY + mainRadius * 0.5;
+
+        // メイン画像の描画
+        const mainImg = document.createElement("img");
+        mainImg.src = data.placeImage || defaultImageUrl;
+        await drawCircleWithImage(context, mainImg, centerX, centerY, mainRadius, true);
+
+        // ユーザー画像の描画
+        const userImg = document.createElement("img");
+        userImg.src = data.userImage || defaultImageUrl;
+        await drawCircleWithImage(context, userImg, smallX, smallY, smallRadius, false);
+
+        setIcon({
+          url: canvas.toDataURL("image/png", 1.0),
+          scaledSize: new google.maps.Size(displaySize, displaySize),
+          anchor: new google.maps.Point(displaySize / 2, displaySize / 2),
+        });
+      } catch (error) {
+        console.warn("Failed to create marker icon:", error);
+        // フォールバック処理
+        context.beginPath();
+        context.arc(displaySize / 2, displaySize / 2, displaySize / 2 - 4, 0, 2 * Math.PI);
+        context.fillStyle = "#F0F0F0";
+        context.fill();
+        context.strokeStyle = "#E0E0E0";
+        context.lineWidth = 2;
+        context.stroke();
+
+        setIcon({
+          url: canvas.toDataURL("image/png", 1.0),
+          scaledSize: new google.maps.Size(displaySize, displaySize),
+          anchor: new google.maps.Point(displaySize / 2, displaySize / 2),
+        });
       }
     };
+
     loadIcon();
-  }, [data.placeImage, data.userImage]);
+  }, [currentSize, data.placeImage, data.userImage]);
 
   if (!icon) return null;
 
@@ -254,6 +317,7 @@ const CustomMarker: React.FC<{
       position={data.position}
       icon={icon}
       onClick={onClick}
+      zIndex={isSelected ? 2 : 1} // 選択されたマーカーを前面に表示
     />
   );
 };
@@ -282,47 +346,40 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
     if (map && selectedPlaceId) {
       const selectedMarker = markers.find(marker => marker.placeId === selectedPlaceId);
       if (selectedMarker) {
-        // シートの高さを計算
+        // シートの高さを計算（画面の45%）
         const sheetHeight = window.innerHeight * 0.45;
         
-        // マップのピクセル座標系での計算
-        const projection = map.getProjection();
-        if (projection) {
-          // マーカーの位置をピクセル座標に変換
-          const markerPoint = projection.fromLatLngToPoint(
-            new google.maps.LatLng(
-              selectedMarker.position.lat,
-              selectedMarker.position.lng
-            )
+        // マップのコンテナの高さを取得
+        const mapDiv = map.getDiv();
+        const mapHeight = mapDiv.clientHeight;
+        
+        // マーカーの位置を取得
+        const markerLatLng = new google.maps.LatLng(
+          selectedMarker.position.lat,
+          selectedMarker.position.lng
+        );
+        
+        // よりズームした状態で表示
+        map.setZoom(17);
+        
+        // マーカーの位置から、シートの高さの25%分下にオフセットした位置を計算
+        // これにより、マーカーは見える部分の地図のちょうど中央に表示される
+        const offsetRatio = (sheetHeight * 0.25) / mapHeight;
+        const bounds = map.getBounds();
+        if (bounds) {
+          const ne = bounds.getNorthEast();
+          const sw = bounds.getSouthWest();
+          const latSpan = ne.lat() - sw.lat();
+          const latOffset = latSpan * offsetRatio;
+          
+          // 新しい中心位置を計算（オフセットを負の値にして下方向に移動）
+          const newCenter = new google.maps.LatLng(
+            selectedMarker.position.lat - latOffset,
+            selectedMarker.position.lng
           );
           
-          if (markerPoint) {
-            // マップのコンテナサイズを取得
-            const mapDiv = map.getDiv();
-            const mapHeight = mapDiv.clientHeight;
-            
-            // シートの高さを考慮してオフセットを計算（ピクセル座標系で）
-            const scale = Math.pow(2, map.getZoom() || 0);
-            const yOffset = (sheetHeight / 2) / scale;
-            
-            // 新しい中心位置を計算
-            const newPoint = new google.maps.Point(
-              markerPoint.x,
-              markerPoint.y - yOffset
-            );
-            
-            // ピクセル座標を緯度経度に戻す
-            const newCenter = projection.fromPointToLatLng(newPoint);
-            
-            if (newCenter) {
-              map.setZoom(15);
-              map.panTo(newCenter);
-            }
-          }
-        } else {
-          // projectionが利用できない場合は、従来の方法でフォールバック
-          map.setZoom(15);
-          map.panTo(selectedMarker.position);
+          // 地図の中心を移動
+          map.panTo(newCenter);
         }
       }
     }
@@ -435,6 +492,7 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
           key={marker.id}
           data={marker}
           onClick={() => onPlaceSelect?.(marker.placeId)}
+          isSelected={marker.placeId === selectedPlaceId}
         />
       ))}
     </GoogleMap>
