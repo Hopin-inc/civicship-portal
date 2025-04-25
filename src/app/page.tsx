@@ -1,11 +1,8 @@
-import MapView from "@/app/components/features/home/MapView";
+
+import { redirect } from "next/navigation";
 
 const Home: React.FC = async () => {
-  return (
-    <div className="h-[calc(100vh-88px)]">
-      <MapView />
-    </div>
-  );
+  redirect(`/places`);
 };
 
 export default Home;

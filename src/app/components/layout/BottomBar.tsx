@@ -15,7 +15,8 @@ const BottomBar = () => {
     (pathname.startsWith('/reservation') && !pathname.includes('/complete')) ||
     pathname.startsWith('/activities/') ||
     pathname.startsWith('/participations/') ||
-    pathname === '/users/me/edit'
+    pathname === '/users/me/edit' ||
+    pathname.startsWith('/places')
   ) {
     return null;
   }
@@ -34,7 +35,7 @@ const BottomBar = () => {
             <Search size={24} />
             <span className="text-xs mt-1">見つける</span>
           </Link>
-          <Link href="/" className={getLinkStyle('/')}>
+          <Link href="/places" className={getLinkStyle('/places')}>
             <Globe size={24} />
             <span className="text-xs mt-1">探す</span>
           </Link>

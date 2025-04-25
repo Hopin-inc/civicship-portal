@@ -5,15 +5,6 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { User, ArrowLeft, ChevronLeft } from "lucide-react";
-import { Button } from "@/app/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/app/components/ui/dropdown-menu";
-import { auth } from "@/lib/firebase";
 import LoginModal from "@/app/components/elements/LoginModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHeader } from "@/contexts/HeaderContext";
@@ -74,37 +65,6 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             )}>
               {config.title}
             </h1>
-          )}
-        </div>
-        
-        <div className="flex items-center gap-2">
-          {config.action}
-          {uid ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="p-2 hover:bg-accent rounded-full transition-colors"
-                >
-                  <Avatar>
-                    <AvatarImage src={user?.image ?? ""} alt={displayName(user)} />
-                    <AvatarFallback>
-                      <User className="h-6 w-6" />
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href="/users/me">プロフィール</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>
-                  ログアウト
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button onClick={() => setIsLoginModalOpen(true)}>ログイン</Button>
           )}
         </div>
       </div>
