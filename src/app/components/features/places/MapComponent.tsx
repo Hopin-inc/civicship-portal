@@ -282,8 +282,48 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
     if (map && selectedPlaceId) {
       const selectedMarker = markers.find(marker => marker.placeId === selectedPlaceId);
       if (selectedMarker) {
-        map.panTo(selectedMarker.position);
-        map.setZoom(15);
+        // シートの高さを計算
+        const sheetHeight = window.innerHeight * 0.45;
+        
+        // マップのピクセル座標系での計算
+        const projection = map.getProjection();
+        if (projection) {
+          // マーカーの位置をピクセル座標に変換
+          const markerPoint = projection.fromLatLngToPoint(
+            new google.maps.LatLng(
+              selectedMarker.position.lat,
+              selectedMarker.position.lng
+            )
+          );
+          
+          if (markerPoint) {
+            // マップのコンテナサイズを取得
+            const mapDiv = map.getDiv();
+            const mapHeight = mapDiv.clientHeight;
+            
+            // シートの高さを考慮してオフセットを計算（ピクセル座標系で）
+            const scale = Math.pow(2, map.getZoom() || 0);
+            const yOffset = (sheetHeight / 2) / scale;
+            
+            // 新しい中心位置を計算
+            const newPoint = new google.maps.Point(
+              markerPoint.x,
+              markerPoint.y - yOffset
+            );
+            
+            // ピクセル座標を緯度経度に戻す
+            const newCenter = projection.fromPointToLatLng(newPoint);
+            
+            if (newCenter) {
+              map.setZoom(15);
+              map.panTo(newCenter);
+            }
+          }
+        } else {
+          // projectionが利用できない場合は、従来の方法でフォールバック
+          map.setZoom(15);
+          map.panTo(selectedMarker.position);
+        }
       }
     }
   }, [selectedPlaceId, markers, map]);
