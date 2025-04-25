@@ -3318,6 +3318,11 @@ export type GetUserWalletQuery = {
         node?: {
           __typename?: "Wallet";
           id: string;
+          currentPointView?: {
+            __typename?: "CurrentPointView";
+            currentPoint: number;
+            walletId: string;
+          } | null;
           tickets?: {
             __typename?: "TicketsConnection";
             edges?: Array<{
@@ -3351,6 +3356,39 @@ export type GetUserWalletQuery = {
       } | null> | null;
     } | null;
   } | null;
+};
+
+export type WalletTransactionsQueryVariables = Exact<{
+  filter?: InputMaybe<TransactionFilterInput>;
+}>;
+
+export type WalletTransactionsQuery = {
+  __typename?: "Query";
+  transactions: {
+    __typename?: "TransactionsConnection";
+    edges?: Array<{
+      __typename?: "TransactionEdge";
+      node?: {
+        __typename?: "Transaction";
+        id: string;
+        createdAt: Date;
+        fromPointChange?: number | null;
+        toPointChange?: number | null;
+        reason: TransactionReason;
+        fromWallet?: {
+          __typename?: "Wallet";
+          id: string;
+          user?: { __typename?: "User"; id: string; name: string } | null;
+        } | null;
+        toWallet?: {
+          __typename?: "Wallet";
+          id: string;
+          user?: { __typename?: "User"; id: string; name: string } | null;
+        } | null;
+      } | null;
+    } | null> | null;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
 };
 
 export const OpportunityFieldsFragmentDoc = {
@@ -6624,6 +6662,23 @@ export const GetUserWalletDocument = {
                                   { kind: "Field", name: { kind: "Name", value: "id" } },
                                   {
                                     kind: "Field",
+                                    name: { kind: "Name", value: "currentPointView" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "currentPoint" },
+                                        },
+                                        {
+                                          kind: "Field",
+                                          name: { kind: "Name", value: "walletId" },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                  {
+                                    kind: "Field",
                                     name: { kind: "Name", value: "tickets" },
                                     arguments: [
                                       {
@@ -6783,3 +6838,131 @@ export const GetUserWalletDocument = {
     },
   ],
 } as unknown as DocumentNode<GetUserWalletQuery, GetUserWalletQueryVariables>;
+export const WalletTransactionsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "WalletTransactions" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "TransactionFilterInput" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "transactions" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "filter" },
+                value: { kind: "Variable", name: { kind: "Name", value: "filter" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "sort" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "createdAt" },
+                      value: { kind: "EnumValue", value: "desc" },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "edges" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "node" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                            { kind: "Field", name: { kind: "Name", value: "fromPointChange" } },
+                            { kind: "Field", name: { kind: "Name", value: "toPointChange" } },
+                            { kind: "Field", name: { kind: "Name", value: "reason" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "fromWallet" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "user" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "toWallet" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "user" },
+                                    selectionSet: {
+                                      kind: "SelectionSet",
+                                      selections: [
+                                        { kind: "Field", name: { kind: "Name", value: "id" } },
+                                        { kind: "Field", name: { kind: "Name", value: "name" } },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "hasNextPage" } },
+                      { kind: "Field", name: { kind: "Name", value: "endCursor" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<WalletTransactionsQuery, WalletTransactionsQueryVariables>;

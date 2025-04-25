@@ -204,13 +204,18 @@ export default function MyProfilePage() {
             <span className="text-[#4361EE]">›</span>
           </div>
         </Link>
-        <div className="bg-gray-50 p-4 rounded-lg flex items-center">
-          <div className="flex items-center gap-2">
-            <StarIcon className="w-4 h-4" />
-            <span>保有中のポイント</span>
-            <span className="font-bold">0pt</span>
+        <Link href="/wallets">
+          <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-between cursor-pointer">
+            <div className="flex items-center gap-2">
+              <StarIcon className="w-4 h-4" />
+              <span>保有ポイント</span>
+              <span className="font-bold">
+                {walletData?.user?.wallets?.edges?.[0]?.node?.currentPointView?.currentPoint || 0}pt
+              </span>
+            </div>
+            <span className="text-gray-500">›</span>
           </div>
-        </div>
+        </Link>
       </div>
 
       <UserPortfolioList 
