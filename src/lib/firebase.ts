@@ -5,7 +5,9 @@ import {
   OAuthProvider,
   signInWithPopup,
   signInWithCustomToken,
+  updateProfile,
 } from "@firebase/auth";
+import { LIFFLoginResponse } from "@/types";
 
 export const app = initializeApp({
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -14,6 +16,7 @@ export const app = initializeApp({
 });
 
 export const auth = getAuth(app);
+auth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
 
 const providers = {
   line: new OAuthProvider("oidc.line"),
@@ -48,11 +51,13 @@ export const signInWithLiffToken = async (accessToken: string): Promise<boolean>
       throw new Error(`LIFF authentication failed: ${response.status}`);
     }
 
-    const { customToken } = await response.json();
-    
-    console.log("👏 customToken", customToken);
-    
-    await signInWithCustomToken(auth, customToken);
+    const { customToken, profile } = await response.json() as LIFFLoginResponse;
+
+    const { user } = await signInWithCustomToken(auth, customToken);
+    await updateProfile(user, {
+      displayName: profile.displayName,
+      photoURL: profile.pictureUrl,
+    });
     return true;
   } catch (error) {
     console.error("Authentication with LIFF token failed:", error);

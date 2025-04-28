@@ -1,10 +1,23 @@
 import { User as GraphQLUser } from "@/gql/graphql";
-import { Required } from "utility-types";
 
 export type AuthInfo = {
   uid?: string;
   providerIds?: string[];
   user?: GraphQLUser | null;
+};
+
+export type LIFFLoginResponse = {
+  customToken: string;
+  profile: LINEProfile;
+};
+
+type LINEProfile = {
+  userId: string;
+  displayName: string;
+  pictureUrl?: string;
+  statusMessage?: string;
+  email?: string;
+  language?: string;
 };
 
 export type User = {
