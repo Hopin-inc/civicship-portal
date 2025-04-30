@@ -221,10 +221,7 @@ export type Article = {
   description: string;
   content: string;
   type: ArticleType;
-  thumbnail: {
-    url: string;
-    alt: string;
-  } | null;
+  thumbnail: string;
   publishedAt: string;
   author: {
     name: string;

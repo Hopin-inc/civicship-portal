@@ -38,8 +38,7 @@ export default function SelectDatePage({
   const router = useRouter();
   const { updateConfig } = useHeader();
   const { opportunity, loading, error } = useOpportunity(
-    searchParams.id,
-    searchParams.community_id,
+    searchParams.id
   );
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedGuests, setSelectedGuests] = useState<number>(1);

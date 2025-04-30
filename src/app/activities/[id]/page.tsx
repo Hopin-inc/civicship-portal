@@ -64,7 +64,7 @@ const ScheduleCard: React.FC<{
       </div>
       <div className="flex justify-center">
         <Link
-          href={`/reservation/confirm?id=${opportunityId}&starts_at=${startsAt}&community_id=${communityId}`}
+          href={`/reservation/confirm?id=${opportunityId}&starts_at=${startsAt}`}
         >
           <Button variant="default" size="selection">
             選択
@@ -86,12 +86,10 @@ interface ActivityPageProps {
 
 export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
   const { opportunity, loading, error } = useOpportunity(
-    params.id,
-    searchParams.community_id || "",
+    params.id
   );
   const { similarOpportunities, loading: similarLoading } = useSimilarOpportunities({
-    opportunityId: params.id,
-    communityId: searchParams.community_id || "",
+    opportunityId: params.id
   });
   const { user: currentUser } = useAuth();
   const { data: walletData } = useQuery(GetUserWalletDocument, {
@@ -114,10 +112,6 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
 
     return availableTickets.length;
   }, [opportunity?.requiredUtilities, walletData]);
-
-  if (!searchParams.community_id) {
-    return <div>Community ID is required</div>;
-  }
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -247,8 +241,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
                       <div className="relative w-full h-[200px]">
                         <Image
                           src={
-                            (opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail
-                              ?.url ?? "/placeholder.png") as string
+                            (opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail ?? "/placeholder.png") as string
                           }
                           alt={
                             opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail
@@ -287,12 +280,10 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
           {/* 集合場所 */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6">集合場所</h2>
-            <div className="bg-gray-50 rounded-xl p-6">
-              <p className="mb-4">{opportunity.place?.address || "住所は未定です"}</p>
               {opportunity.place?.latitude && opportunity.place?.longitude && (
                 <div className="relative w-full h-[300px] rounded-lg overflow-hidden">
                   <iframe
-                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY}&q=${encodeURIComponent(opportunity.place.address)}`}
+                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(opportunity.place.address)}`}
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
@@ -302,7 +293,6 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
                   />
                 </div>
               )}
-            </div>
           </section>
 
           <section className="mb-12">
@@ -361,7 +351,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             <p className="text-xl font-bold">¥{(opportunity.feeRequired || 0).toLocaleString()}</p>
           </div>
           <Link
-            href={`/reservation/select-date?id=${opportunity.id}&community_id=${searchParams.community_id}`}
+            href={`/reservation/select-date?id=${opportunity.id}`}
           >
             <Button
               variant="default"

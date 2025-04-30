@@ -261,10 +261,9 @@ export default function ConfirmPage() {
   const opportunityId = searchParams.get("id");
   const slotStartsAt = searchParams.get("starts_at");
   const participantCount = parseInt(searchParams.get("guests") || "1", 10);
-  const communityId = searchParams.get("community_id") || "";
   const { user: currentUser } = useAuth();
   
-  const { opportunity, loading, error } = useOpportunity(opportunityId || "", communityId);
+  const { opportunity, loading, error } = useOpportunity(opportunityId || "");
   
   const { data: walletData } = useQuery(GetUserWalletDocument, {
     variables: { id: currentUser?.id || "" },
@@ -365,7 +364,7 @@ export default function ConfirmPage() {
 
       if (result.data?.reservationCreate?.reservation) {
         toast.success("予約が完了しました");
-        window.location.href = `/reservation/complete?opportunity_id=${opportunityId}&community_id=${communityId}`;
+        window.location.href = `/reservation/complete?opportunity_id=${opportunityId}`;
       }
     } catch (error) {
       console.error("Reservation error:", error);

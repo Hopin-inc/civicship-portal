@@ -83,6 +83,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log("すでにLIFFログインしている場合はIDトークンでFirebase認証を試みる");
         await handleAuthenticateWithLiffToken(liffAccessToken);
       }
+      console.log("liffAccessToken", liffAccessToken);
+      console.log("isLiffLoggedIn", isLiffLoggedIn);
+      console.log("uid", uid);
     };
 
     attemptAuthWithLiffToken();
@@ -91,6 +94,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user: AuthUser | null) => {
       ready.resolve();
+      console.log("user", user);
 
       if (user) {
         const next = searchParams.get("next");

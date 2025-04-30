@@ -12,9 +12,7 @@ export default function ArticlePage({
   params: { id: string };
 }) {
   const searchParams = useSearchParams();
-  const communityId = searchParams.get('community_id') || 'community_id';
-  
-  const { article, recommendedArticles, loading, error } = useArticle(params.id, communityId);
+  const { article, recommendedArticles, loading, error } = useArticle(params.id);
   const { updateConfig, resetConfig } = useHeader();
 
   const updateHeaderConfig = useCallback(() => {
