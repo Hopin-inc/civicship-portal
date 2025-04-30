@@ -209,18 +209,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
 
                   return (
                     <div className="space-y-4">
-                      <AsymmetricImageGrid images={displayImages} />
-                      {remainingCount > 0 && (
-                        <Button
-                          variant="outline"
-                          className="w-full border-2 border-[#4361EE] text-[#4361EE] hover:bg-[#4361EE] hover:text-white"
-                          onClick={() => {
-                            console.log(`残りの画像枚数: ${remainingCount}枚`);
-                          }}
-                        >
-                          {remainingCount + 3}枚の写真をすべて見る
-                        </Button>
-                      )}
+                      <AsymmetricImageGrid images={displayImages} remainingCount={remainingCount > 0 ? remainingCount : undefined} />
                     </div>
                   );
                 })()}
