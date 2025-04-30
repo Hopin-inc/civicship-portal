@@ -17,6 +17,7 @@ import { parseDateTime, formatDateTime } from "@/utils/date";
 import { useAuth } from "@/contexts/AuthContext";
 import { GetUserWalletDocument } from "@/gql/graphql";
 import { Switch } from "@/components/ui/switch";
+import LoginModal from "@/app/components/elements/LoginModal";
 
 const IconWrapper = ({ children }: { children: React.ReactNode }) => (
   <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center text-gray-500">
@@ -257,6 +258,7 @@ const Notes = ({ requireApproval = false }: { requireApproval?: boolean }) => (
 export default function ConfirmPage() {
   const { updateConfig } = useHeader();
   const [ticketCount, setTicketCount] = useState(1);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const searchParams = useSearchParams();
   const opportunityId = searchParams.get("id");
   const slotStartsAt = searchParams.get("starts_at");
@@ -329,6 +331,11 @@ export default function ConfirmPage() {
   const [useTickets, setUseTickets] = useState(false);
 
   const handleConfirmReservation = async () => {
+    if (!currentUser) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
     try {
       if (!opportunityId || !slotStartsAt || !selectedSlot?.node) {
         throw new Error("必要な情報が不足しています");
@@ -389,6 +396,10 @@ export default function ConfirmPage() {
   return (
     <main className="pb-8 min-h-screen">
       <Toaster />
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+      />
       
       <OpportunityInfo 
         opportunity={opportunity} 

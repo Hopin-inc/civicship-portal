@@ -37,7 +37,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         <div className="flex flex-col items-center pt-8">
           <div className="mb-8">
             <Image
-              src="/neo88-logo.jpg"
+              src="/images/neo88-logo.jpg"
               alt="NEO88"
               width={120}
               height={40}
