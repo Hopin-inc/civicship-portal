@@ -300,7 +300,7 @@
     /* Semantic Colors */
     --background: var(--white);
     --background-hover: var(--zinc-100);
-    --foreground: var(--zinc-100);
+    --foreground: var(--zinc-950);
     --caption: var(--zinc-500);
     --border: var(--zinc-200);
     --input: var(--zinc-300);
@@ -398,14 +398,6 @@
 
 section {
   @apply mt-8
-}
-
-h1 {
-  @apply text-2xl font-bold;
-}
-
-h2 {
-  @apply text-xl font-bold;
 }
 
 li {
