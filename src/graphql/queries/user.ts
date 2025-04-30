@@ -109,6 +109,10 @@ export const GET_USER_WALLET = graphql(`
         edges {
           node {
             id
+            currentPointView {
+              currentPoint
+              walletId
+            }
             tickets(filter: { status: AVAILABLE }) {
               edges {
                 node {
