@@ -18,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { GetUserWalletDocument } from "@/gql/graphql";
 import { Switch } from "@/components/ui/switch";
 import LoginModal from "@/app/components/elements/LoginModal";
+import { useLoading } from '@/hooks/useLoading';
 
 const IconWrapper = ({ children }: { children: React.ReactNode }) => (
   <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center text-gray-500">
@@ -264,6 +265,7 @@ export default function ConfirmPage() {
   const slotStartsAt = searchParams.get("starts_at");
   const participantCount = parseInt(searchParams.get("guests") || "1", 10);
   const { user: currentUser } = useAuth();
+  const { setIsLoading } = useLoading();
   
   const { opportunity, loading, error } = useOpportunity(opportunityId || "");
   
@@ -379,7 +381,10 @@ export default function ConfirmPage() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  useEffect(() => {
+    setIsLoading(loading);
+  }, [loading, setIsLoading]);
+
   if (error) return <div>Error: {error.message}</div>;
   if (!opportunity) return <div>No opportunity found</div>;
   if (!selectedSlot?.node) return <div>Selected time slot not found</div>;

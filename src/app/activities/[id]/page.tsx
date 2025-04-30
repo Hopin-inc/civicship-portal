@@ -23,7 +23,8 @@ import { Participation } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@apollo/client";
 import { GetUserWalletDocument } from "@/gql/graphql";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
+import { useLoading } from '@/hooks/useLoading';
 
 const ScheduleCard: React.FC<{
   startsAt: string;
@@ -92,6 +93,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
     opportunityId: params.id
   });
   const { user: currentUser } = useAuth();
+  const { setIsLoading } = useLoading();
   const { data: walletData } = useQuery(GetUserWalletDocument, {
     variables: { id: currentUser?.id || "" },
     skip: !currentUser?.id,
@@ -113,7 +115,10 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
     return availableTickets.length;
   }, [opportunity?.requiredUtilities, walletData]);
 
-  if (loading) return <div>Loading...</div>;
+  useEffect(() => {
+    setIsLoading(loading || similarLoading);
+  }, [loading, similarLoading, setIsLoading]);
+
   if (error) return <div>Error: {error.message}</div>;
   if (!opportunity) return <div>No opportunity found</div>;
 
