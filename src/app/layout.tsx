@@ -10,6 +10,7 @@ import { LiffProvider } from "@/contexts/LiffContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { HeaderProvider } from "@/contexts/HeaderContext";
 import BottomBar from "./components/layout/BottomBar";
+import { cn } from "@/lib/utils";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -25,7 +26,7 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="ja">
-      <body className={font.className}>
+      <body className={cn(font.className, "h-screen max-h-screen flex flex-col max-w-lg mx-auto")}>
         <CookiesProvider>
           <ApolloProvider>
             <LiffProvider>
@@ -33,7 +34,7 @@ const RootLayout = ({
                 <HeaderProvider>
                   <LoadingProvider>
                     <Header />
-                    <main className="max-w-lg mx-auto pt-16">{children}</main>
+                    <main className="w-full flex-grow overflow-y-scroll">{children}</main>
                     <Toaster richColors className="mx-8" />
                     <BottomBar />
                   </LoadingProvider>
