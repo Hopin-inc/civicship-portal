@@ -298,7 +298,7 @@
 
   :root {
     /* Semantic Colors */
-    --background: var(--transparent);
+    --background: var(--white);
     --background-hover: var(--zinc-100);
     --foreground: var(--zinc-100);
     --caption: var(--zinc-500);

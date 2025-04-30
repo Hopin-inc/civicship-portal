@@ -17,6 +17,8 @@ const documents = {
     types.UserSignUpDocument,
   "\n  mutation CreateReservation($input: ReservationCreateInput!) {\n    reservationCreate(input: $input) {\n      ... on ReservationCreateSuccess {\n        reservation {\n          id\n          status\n        }\n      }\n    }\n  }\n":
     types.CreateReservationDocument,
+  "\n  mutation ticketClaim($input: TicketClaimInput!) {\n    ticketClaim(input: $input) {\n      ...on TicketClaimSuccess {\n        tickets {\n          id\n        }\n      }\n    }\n  }\n":
+    types.TicketClaimDocument,
   "\n  mutation UpdateMyProfile($input: UserUpdateProfileInput!, $permission: CheckIsSelfPermissionInput!) {\n    userUpdateMyProfile(input: $input, permission: $permission) {\n      ... on UserUpdateProfileSuccess {\n        user {\n          id\n          name\n          image\n          bio\n          currentPrefecture\n          urlFacebook\n          urlInstagram\n          urlX\n          slug\n        }\n      }\n    }\n  }\n":
     types.UpdateMyProfileDocument,
   '\n  query GetArticle($id: ID!, $permission: CheckCommunityPermissionInput!) {\n    article(id: $id, permission: $permission) {\n      id\n      title\n      introduction\n      body\n      category\n      thumbnail\n      publishedAt\n      createdAt\n      updatedAt\n      authors {\n        id\n        name\n        image\n        bio\n      }\n      relatedUsers {\n        id\n        name\n        image\n        bio\n      }\n    }\n\n    articles(\n      first: 4,\n      filter: {\n        categories: ["INTERVIEW"],\n        publishStatus: [PUBLIC]\n      },\n      sort: { publishedAt: desc }\n    ) {\n      edges {\n        node {\n          id\n          title\n          introduction\n          thumbnail\n          publishedAt\n          authors {\n            id\n            name\n            image\n          }\n        }\n      }\n    }\n  }\n':
@@ -75,6 +77,12 @@ export function graphql(
 export function graphql(
   source: "\n  mutation CreateReservation($input: ReservationCreateInput!) {\n    reservationCreate(input: $input) {\n      ... on ReservationCreateSuccess {\n        reservation {\n          id\n          status\n        }\n      }\n    }\n  }\n",
 ): (typeof documents)["\n  mutation CreateReservation($input: ReservationCreateInput!) {\n    reservationCreate(input: $input) {\n      ... on ReservationCreateSuccess {\n        reservation {\n          id\n          status\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "\n  mutation ticketClaim($input: TicketClaimInput!) {\n    ticketClaim(input: $input) {\n      ...on TicketClaimSuccess {\n        tickets {\n          id\n        }\n      }\n    }\n  }\n",
+): (typeof documents)["\n  mutation ticketClaim($input: TicketClaimInput!) {\n    ticketClaim(input: $input) {\n      ...on TicketClaimSuccess {\n        tickets {\n          id\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

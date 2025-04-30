@@ -134,9 +134,15 @@ export type City = {
   state: State;
 };
 
+export enum ClaimLinkStatus {
+  Claimed = "CLAIMED",
+  Expired = "EXPIRED",
+  Issued = "ISSUED",
+}
+
 export type CommunitiesConnection = {
   __typename?: "CommunitiesConnection";
-  edges?: Maybe<Array<Maybe<CommunityEdge>>>;
+  edges?: Maybe<Array<CommunityEdge>>;
   pageInfo: PageInfo;
   totalCount: Scalars["Int"]["output"];
 };
@@ -150,11 +156,11 @@ export type Community = {
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
   memberships?: Maybe<MembershipsConnection>;
-  name: Scalars["String"]["output"];
+  name?: Maybe<Scalars["String"]["output"]>;
   opportunities?: Maybe<OpportunitiesConnection>;
   participations?: Maybe<ParticipationsConnection>;
   places?: Maybe<Array<Place>>;
-  pointName: Scalars["String"]["output"];
+  pointName?: Maybe<Scalars["String"]["output"]>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
   utilities?: Maybe<UtilitiesConnection>;
   wallets?: Maybe<WalletsConnection>;
@@ -623,6 +629,8 @@ export type Mutation = {
   reservationCreate?: Maybe<ReservationCreatePayload>;
   reservationJoin?: Maybe<ReservationSetStatusPayload>;
   reservationReject?: Maybe<ReservationSetStatusPayload>;
+  ticketClaim?: Maybe<TicketClaimPayload>;
+  ticketIssue?: Maybe<TicketIssuePayload>;
   ticketPurchase?: Maybe<TicketPurchasePayload>;
   ticketRefund?: Maybe<TicketRefundPayload>;
   ticketUse?: Maybe<TicketUsePayload>;
@@ -788,6 +796,15 @@ export type MutationReservationJoinArgs = {
 export type MutationReservationRejectArgs = {
   id: Scalars["ID"]["input"];
   permission: CheckOpportunityPermissionInput;
+};
+
+export type MutationTicketClaimArgs = {
+  input: TicketClaimInput;
+};
+
+export type MutationTicketIssueArgs = {
+  input: TicketIssueInput;
+  permission: CheckCommunityPermissionInput;
 };
 
 export type MutationTicketPurchaseArgs = {
@@ -1837,14 +1854,15 @@ export enum SysRole {
 
 export type Ticket = {
   __typename?: "Ticket";
+  claimLink?: Maybe<TicketClaimLink>;
   createdAt: Scalars["Datetime"]["output"];
   id: Scalars["ID"]["output"];
   reason: TicketStatusReason;
   status: TicketStatus;
   ticketStatusHistories?: Maybe<TicketStatusHistoriesConnection>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  utility: Utility;
-  wallet: Wallet;
+  utility?: Maybe<Utility>;
+  wallet?: Maybe<Wallet>;
 };
 
 export type TicketTicketStatusHistoriesArgs = {
@@ -1852,6 +1870,29 @@ export type TicketTicketStatusHistoriesArgs = {
   filter?: InputMaybe<TicketStatusHistoryFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<TicketStatusHistorySortInput>;
+};
+
+export type TicketClaimInput = {
+  ticketClaimLinkId: Scalars["ID"]["input"];
+};
+
+export type TicketClaimLink = {
+  __typename?: "TicketClaimLink";
+  claimedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  issuer: TicketIssuer;
+  /** Max number of tickets a user can claim using this link */
+  qty: Scalars["Int"]["output"];
+  status: ClaimLinkStatus;
+  tickets?: Maybe<Array<Ticket>>;
+};
+
+export type TicketClaimPayload = TicketClaimSuccess;
+
+export type TicketClaimSuccess = {
+  __typename?: "TicketClaimSuccess";
+  tickets: Array<Ticket>;
 };
 
 export type TicketEdge = Edge & {
@@ -1864,6 +1905,30 @@ export type TicketFilterInput = {
   status?: InputMaybe<TicketStatus>;
   utilityId?: InputMaybe<Scalars["ID"]["input"]>;
   walletId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type TicketIssueInput = {
+  qtyToBeIssued: Scalars["Int"]["input"];
+  utilityId: Scalars["ID"]["input"];
+};
+
+export type TicketIssuePayload = TicketIssueSuccess;
+
+export type TicketIssueSuccess = {
+  __typename?: "TicketIssueSuccess";
+  issue: TicketIssuer;
+};
+
+export type TicketIssuer = {
+  __typename?: "TicketIssuer";
+  claimLink?: Maybe<TicketClaimLink>;
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  owner: User;
+  /** Maximum number of tickets claimable from this link */
+  qtyToBeIssued: Scalars["Int"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  utility: Utility;
 };
 
 export type TicketPurchaseInput = {
@@ -1942,6 +2007,7 @@ export type TicketStatusHistorySortInput = {
 export enum TicketStatusReason {
   Canceled = "CANCELED",
   Expired = "EXPIRED",
+  Gifted = "GIFTED",
   Purchased = "PURCHASED",
   Refunded = "REFUNDED",
   Reserved = "RESERVED",
@@ -1985,10 +2051,9 @@ export type TransactionTicketStatusHistoriesArgs = {
 
 export type TransactionDonateSelfPointInput = {
   communityId: Scalars["ID"]["input"];
-  fromPointChange: Scalars["Int"]["input"];
   fromWalletId: Scalars["ID"]["input"];
-  toPointChange: Scalars["Int"]["input"];
   toUserId: Scalars["ID"]["input"];
+  transferPoints: Scalars["Int"]["input"];
 };
 
 export type TransactionDonateSelfPointPayload = TransactionDonateSelfPointSuccess;
@@ -2012,10 +2077,9 @@ export type TransactionFilterInput = {
 
 export type TransactionGrantCommunityPointInput = {
   communityId: Scalars["ID"]["input"];
-  fromPointChange: Scalars["Int"]["input"];
   fromWalletId: Scalars["ID"]["input"];
-  toPointChange: Scalars["Int"]["input"];
   toUserId: Scalars["ID"]["input"];
+  transferPoints: Scalars["Int"]["input"];
 };
 
 export type TransactionGrantCommunityPointPayload = TransactionGrantCommunityPointSuccess;
@@ -2026,8 +2090,8 @@ export type TransactionGrantCommunityPointSuccess = {
 };
 
 export type TransactionIssueCommunityPointInput = {
-  toPointChange: Scalars["Int"]["input"];
   toWalletId: Scalars["ID"]["input"];
+  transferPoints: Scalars["Int"]["input"];
 };
 
 export type TransactionIssueCommunityPointPayload = TransactionIssueCommunityPointSuccess;
@@ -2269,6 +2333,7 @@ export type Utility = {
   pointsRequired: Scalars["Int"]["output"];
   publishStatus: PublishStatus;
   requiredForOpportunities?: Maybe<OpportunitiesConnection>;
+  ticketIssuers?: Maybe<Array<TicketIssuer>>;
   tickets?: Maybe<TicketsConnection>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
 };
@@ -2435,6 +2500,18 @@ export type CreateReservationMutation = {
   reservationCreate?: {
     __typename?: "ReservationCreateSuccess";
     reservation: { __typename?: "Reservation"; id: string; status: ReservationStatus };
+  } | null;
+};
+
+export type TicketClaimMutationVariables = Exact<{
+  input: TicketClaimInput;
+}>;
+
+export type TicketClaimMutation = {
+  __typename?: "Mutation";
+  ticketClaim?: {
+    __typename?: "TicketClaimSuccess";
+    tickets: Array<{ __typename?: "Ticket"; id: string }>;
   } | null;
 };
 
@@ -2642,7 +2719,7 @@ export type GetSingleMembershipQuery = {
             community?: {
               __typename?: "Community";
               id: string;
-              name: string;
+              name?: string | null;
               image?: string | null;
             } | null;
             slots?: {
@@ -2679,7 +2756,12 @@ export type GetSingleMembershipQuery = {
         }>;
       } | null;
     };
-    community: { __typename?: "Community"; id: string; name: string; image?: string | null };
+    community: {
+      __typename?: "Community";
+      id: string;
+      name?: string | null;
+      image?: string | null;
+    };
     membershipHistories?: {
       __typename?: "MembershipHistoriesConnection";
       edges?: Array<{
@@ -2754,7 +2836,12 @@ export type GetMembershipListQuery = {
           };
         } | null;
         user: { __typename?: "User"; id: string; name: string; image?: string | null };
-        community: { __typename?: "Community"; id: string; name: string; image?: string | null };
+        community: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
+        };
       } | null;
     } | null> | null;
   };
@@ -2769,7 +2856,12 @@ export type OpportunityFieldsFragment = {
   feeRequired?: number | null;
   pointsToEarn?: number | null;
   isReservableWithTicket?: boolean | null;
-  community?: { __typename?: "Community"; id: string; name: string; image?: string | null } | null;
+  community?: {
+    __typename?: "Community";
+    id: string;
+    name?: string | null;
+    image?: string | null;
+  } | null;
   place?: {
     __typename?: "Place";
     id: string;
@@ -2880,7 +2972,7 @@ export type GetOpportunityQuery = {
     community?: {
       __typename?: "Community";
       id: string;
-      name: string;
+      name?: string | null;
       image?: string | null;
     } | null;
     createdByUser?: {
@@ -2923,7 +3015,7 @@ export type GetOpportunityQuery = {
             community?: {
               __typename?: "Community";
               id: string;
-              name: string;
+              name?: string | null;
               image?: string | null;
             } | null;
             slots?: {
@@ -3048,7 +3140,7 @@ export type GetParticipationQuery = {
           community?: {
             __typename?: "Community";
             id: string;
-            name: string;
+            name?: string | null;
             image?: string | null;
           } | null;
           createdByUser?: {
@@ -3155,7 +3247,7 @@ export type SearchOpportunitiesQuery = {
         community?: {
           __typename?: "Community";
           id: string;
-          name: string;
+          name?: string | null;
           image?: string | null;
         } | null;
         place?: {
@@ -3267,7 +3359,7 @@ export type GetUserWithDetailsAndPortfoliosQuery = {
           community?: {
             __typename?: "Community";
             id: string;
-            name: string;
+            name?: string | null;
             image?: string | null;
           } | null;
           place?: { __typename?: "Place"; id: string; name: string } | null;
@@ -3331,7 +3423,7 @@ export type GetUserWalletQuery = {
                 __typename?: "Ticket";
                 id: string;
                 status: TicketStatus;
-                utility: { __typename?: "Utility"; id: string };
+                utility?: { __typename?: "Utility"; id: string } | null;
                 ticketStatusHistories?: {
                   __typename?: "TicketStatusHistoriesConnection";
                   edges?: Array<{
@@ -3602,6 +3694,67 @@ export const CreateReservationDocument = {
     },
   ],
 } as unknown as DocumentNode<CreateReservationMutation, CreateReservationMutationVariables>;
+export const TicketClaimDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "ticketClaim" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "TicketClaimInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "ticketClaim" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "TicketClaimSuccess" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "tickets" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<TicketClaimMutation, TicketClaimMutationVariables>;
 export const UpdateMyProfileDocument = {
   kind: "Document",
   definitions: [
