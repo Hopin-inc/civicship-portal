@@ -26,17 +26,19 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="ja">
-      <body className={cn(font.className, "h-screen max-h-screen flex flex-col max-w-lg mx-auto")}>
+      <body className={font.className}>
         <CookiesProvider>
           <ApolloProvider>
             <LiffProvider>
               <AuthProvider>
                 <HeaderProvider>
                   <LoadingProvider>
-                    <Header />
-                    <main className="w-full flex-grow overflow-y-scroll">{children}</main>
+                    <div className="h-screen max-h-screen flex flex-col max-w-lg mx-auto">
+                      <Header />
+                      <main className="w-full flex-grow overflow-y-scroll">{children}</main>
+                      <BottomBar />
+                    </div>
                     <Toaster richColors className="mx-8" />
-                    <BottomBar />
                   </LoadingProvider>
                 </HeaderProvider>
               </AuthProvider>
