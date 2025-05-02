@@ -17,6 +17,8 @@ const documents = {
     types.UserSignUpDocument,
   "\n  mutation CreateReservation($input: ReservationCreateInput!) {\n    reservationCreate(input: $input) {\n      ... on ReservationCreateSuccess {\n        reservation {\n          id\n          status\n        }\n      }\n    }\n  }\n":
     types.CreateReservationDocument,
+  "\n  query ticketClaimLink($id: ID!) {\n    ticketClaimLink(id: $id) {\n      qty\n      issuer {\n        owner {\n          id\n          name\n          image\n        }\n      }\n    }\n  }\n":
+    types.TicketClaimLinkDocument,
   "\n  mutation ticketClaim($input: TicketClaimInput!) {\n    ticketClaim(input: $input) {\n      ...on TicketClaimSuccess {\n        tickets {\n          id\n        }\n      }\n    }\n  }\n":
     types.TicketClaimDocument,
   "\n  mutation UpdateMyProfile($input: UserUpdateProfileInput!, $permission: CheckIsSelfPermissionInput!) {\n    userUpdateMyProfile(input: $input, permission: $permission) {\n      ... on UserUpdateProfileSuccess {\n        user {\n          id\n          name\n          image\n          bio\n          currentPrefecture\n          urlFacebook\n          urlInstagram\n          urlX\n          slug\n        }\n      }\n    }\n  }\n":
@@ -77,6 +79,12 @@ export function graphql(
 export function graphql(
   source: "\n  mutation CreateReservation($input: ReservationCreateInput!) {\n    reservationCreate(input: $input) {\n      ... on ReservationCreateSuccess {\n        reservation {\n          id\n          status\n        }\n      }\n    }\n  }\n",
 ): (typeof documents)["\n  mutation CreateReservation($input: ReservationCreateInput!) {\n    reservationCreate(input: $input) {\n      ... on ReservationCreateSuccess {\n        reservation {\n          id\n          status\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "\n  query ticketClaimLink($id: ID!) {\n    ticketClaimLink(id: $id) {\n      qty\n      issuer {\n        owner {\n          id\n          name\n          image\n        }\n      }\n    }\n  }\n",
+): (typeof documents)["\n  query ticketClaimLink($id: ID!) {\n    ticketClaimLink(id: $id) {\n      qty\n      issuer {\n        owner {\n          id\n          name\n          image\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
