@@ -92,8 +92,8 @@ export const ArticleDetail = ({
       <div className="bg-white relative rounded-[8px]">
         <div className="relative w-full h-[210px]">
           <Image
-            src={article.thumbnail?.image || "/placeholder.svg"}
-            alt={article.thumbnail?.alt || article.title}
+            src={article.thumbnail || "/placeholder.svg"}
+            alt={article.title}
             fill
             className="object-cover"
           />
@@ -167,8 +167,8 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div className="relative w-full h-48">
           <Image
-            src={article.thumbnail?.url || "/placeholder.svg"}
-            alt={article.thumbnail?.alt || article.title}
+            src={article.thumbnail || "/placeholder.svg"}
+            alt={article.title}
             fill
             className="object-cover"
           />

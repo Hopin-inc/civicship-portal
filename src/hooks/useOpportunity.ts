@@ -2,6 +2,7 @@ import { useQuery } from "@apollo/client";
 import { GET_OPPORTUNITY } from "../graphql/queries/opportunity";
 import type { Opportunity as GraphQLOpportunity } from "../gql/graphql";
 import type { Opportunity, Article, Participation } from "../types";
+import { COMMUNITY_ID } from "@/utils";
 
 interface UseOpportunityResult {
   opportunity: Opportunity | null;
@@ -163,21 +164,19 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
   };
 };
 
-export const useOpportunity = (id: string, communityId: string): UseOpportunityResult => {
+export const useOpportunity = (id: string): UseOpportunityResult => {
   const { data, loading, error } = useQuery(GET_OPPORTUNITY, {
     variables: {
       id,
       permission: {
-        communityId
+        communityId: COMMUNITY_ID
       }
     },
-    skip: !id || !communityId,
+    skip: !id,
     onError: (error) => {
       console.error('Opportunity query error:', error);
     },
   });
-
-  console.log("生データ", data);
 
   return {
     opportunity: data ? transformOpportunity(data.opportunity) : null,

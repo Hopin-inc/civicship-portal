@@ -26,7 +26,7 @@ export default function OpportunityCard({
   isReservableWithTicket = false,
 }: OpportunityCardProps) {
   return (
-    <Link href={`/activities/${id}${community?.id ? `?community_id=${community.id}` : ''}`} className={`relative ${vertical ? 'w-full' : 'w-[200px]'} flex-shrink-0`}>
+    <Link href={`/activities/${id}`} className={`relative ${vertical ? 'w-full' : 'w-[200px]'} flex-shrink-0`}>
       <div className="w-[200px] h-[250px] overflow-hidden rounded-lg relative">
         {isReservableWithTicket && (
           <div className="absolute top-2 left-2 bg-blue-50 text-blue-600 px-2 py-1 rounded-md text-xs font-medium z-10">

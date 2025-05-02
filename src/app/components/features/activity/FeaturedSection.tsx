@@ -59,7 +59,7 @@ export default function FeaturedSection({ opportunities }: FeaturedSectionProps)
 
               {/* カード */}
               <Link
-                href={`/activities/${opportunity.id}?community_id=${opportunity.community.id}`}
+                href={`/activities/${opportunity.id}`}
                 className="absolute inset-x-0 bottom-12 bg-gradient-to-t from-black/60 to-transparent px-6"
               >
                 <div className="mx-auto max-w-md">

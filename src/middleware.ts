@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
   // ログインが必要なページへのアクセスをチェック
   if (
     !session &&
-    (request.nextUrl.pathname.startsWith("/users/me") || request.nextUrl.pathname === "/register")
+    (request.nextUrl.pathname === "/register")
   ) {
     return NextResponse.redirect(new URL("/", request.url));
   }

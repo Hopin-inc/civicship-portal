@@ -8,11 +8,13 @@ import { GET_USER_WALLET } from '@/graphql/queries/user';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useHeader } from '@/contexts/HeaderContext';
+import { useLoading } from '@/hooks/useLoading';
 
 const WalletsPage: FC = () => {
   const router = useRouter();
   const { user } = useAuth();
   const { updateConfig } = useHeader();
+  const { setIsLoading } = useLoading();
   const { data, loading } = useQuery(GET_USER_WALLET, {
     variables: { id: user?.id ?? '' },
     skip: !user?.id,
@@ -25,6 +27,10 @@ const WalletsPage: FC = () => {
       showLogo: false,
     });
   }, [updateConfig]);
+
+  useEffect(() => {
+    setIsLoading(loading);
+  }, [loading, setIsLoading]);
 
   const currentPoint = data?.user?.wallets?.edges?.[0]?.node?.currentPointView?.currentPoint ?? 0;
 

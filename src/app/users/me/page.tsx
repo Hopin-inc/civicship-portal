@@ -3,6 +3,7 @@
 import { useQuery } from "@apollo/client";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import { UserProfile } from "@/app/components/features/user/UserProfile";
 import { UserPortfolioList } from "@/app/components/features/user/UserPortfolioList";
 import { GET_USER_WITH_DETAILS_AND_PORTFOLIOS } from "@/graphql/queries/user";
@@ -54,6 +55,7 @@ const transformPortfolio = (portfolio: GqlPortfolio): Portfolio => {
 };
 
 export default function MyProfilePage() {
+  const router = useRouter();
   const { user: currentUser } = useAuth();
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -77,6 +79,12 @@ export default function MyProfilePage() {
     },
     skip: !currentUser,
   });
+
+  useEffect(() => {
+    if (!currentUser) {
+      router.push('/login?next=/users/me');
+    }
+  }, [currentUser, router]);
 
   useEffect(() => {
     if (data?.user?.portfolios?.edges) {
@@ -145,11 +153,7 @@ export default function MyProfilePage() {
     }
   }, [fetchMore, hasMore, isLoadingMore, currentUser?.id, portfolios, data]);
 
-  if (!currentUser) {
-    return <div className="container mx-auto px-4 py-6">Loading...</div>;
-  }
-
-  if (loading) {
+  if (!currentUser || loading) {
     return <div className="container mx-auto px-4 py-6">Loading...</div>;
   }
 

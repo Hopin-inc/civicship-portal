@@ -14,12 +14,10 @@ export default function CompletePage() {
   const { updateConfig } = useHeader();
   const searchParams = useSearchParams();
   const opportunityId = searchParams.get("opportunity_id");
-  const communityId = searchParams.get("community_id");
 
-  const { opportunity } = useOpportunity(opportunityId || "", communityId || "");
+  const { opportunity } = useOpportunity(opportunityId || "");
   const { similarOpportunities } = useSimilarOpportunities({ 
-    opportunityId: opportunityId || "",
-    communityId: communityId || ""
+    opportunityId: opportunityId || ""
   });
 
   useEffect(() => {

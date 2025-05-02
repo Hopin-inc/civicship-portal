@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import { GET_ARTICLE } from "@/graphql/queries/article";
 import type { Article, ArticleType } from "@/types";
 import type { ArticleCategory } from "@/gql/graphql";
-
+import { COMMUNITY_ID } from "@/utils";
 interface UseArticleResult {
   article: Article | null;
   recommendedArticles: Article[];
@@ -22,14 +22,6 @@ function mapCategoryToArticleType(category: string | null | undefined): ArticleT
 }
 
 function transformGraphQLArticleToArticle(graphqlArticle: any): Article {
-  // Extract thumbnail data
-  const thumbnailData = graphqlArticle.thumbnail;
-  const thumbnail = thumbnailData && typeof thumbnailData === 'object'
-    ? {
-        url: thumbnailData.url,
-        alt: thumbnailData.alt || graphqlArticle.title
-      }
-    : null;
 
   return {
     id: graphqlArticle.id,
@@ -37,7 +29,7 @@ function transformGraphQLArticleToArticle(graphqlArticle: any): Article {
     description: graphqlArticle.introduction,
     content: graphqlArticle.body ?? '',
     type: mapCategoryToArticleType(graphqlArticle.category),
-    thumbnail: thumbnail,
+    thumbnail: graphqlArticle.thumbnail,
     publishedAt: graphqlArticle.publishedAt,
     author: graphqlArticle.authors?.[0] ? {
       name: graphqlArticle.authors[0].name,
@@ -53,15 +45,15 @@ function transformGraphQLArticleToArticle(graphqlArticle: any): Article {
   };
 }
 
-export const useArticle = (id: string, communityId: string): UseArticleResult => {
+export const useArticle = (id: string): UseArticleResult => {
   const { data, loading, error } = useQuery(GET_ARTICLE, {
     variables: {
       id,
       permission: {
-        communityId
+        communityId: COMMUNITY_ID
       }
     },
-    skip: !id || !communityId,
+    skip: !id,
     onError: (error) => {
       console.error('Article query error:', error);
     },

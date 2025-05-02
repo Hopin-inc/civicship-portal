@@ -9,9 +9,10 @@ type ImageData = {
 type AsymmetricImageGridProps = {
   images: ImageData[]
   className?: string
+  remainingCount?: number
 }
 
-export const AsymmetricImageGrid = memo(({ images, className = '' }: AsymmetricImageGridProps) => {
+export const AsymmetricImageGrid = memo(({ images, className = '', remainingCount }: AsymmetricImageGridProps) => {
   if (images.length === 0) return null
 
   const [featured, ...thumbnails] = images
@@ -50,6 +51,11 @@ export const AsymmetricImageGrid = memo(({ images, className = '' }: AsymmetricI
                 fill
                 sizes="(max-width: 112px) 100vw, 112px"
               />
+              {remainingCount && index === thumbnails.length - 1 && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-lg font-bold">+{remainingCount}</span>
+                </div>
+              )}
             </div>
           </div>
         ))}

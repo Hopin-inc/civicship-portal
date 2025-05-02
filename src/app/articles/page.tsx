@@ -19,10 +19,7 @@ interface GetArticlesData {
         id: string;
         title: string;
         introduction: string;
-        thumbnail: {
-          url: string;
-          alt: string;
-        };
+        thumbnail: string;
         publishedAt: string;
         authors: Array<{
           id: string;
@@ -110,7 +107,10 @@ export default function ArticlesPage() {
     const node = edge.node;
     return {
       ...node,
-      thumbnail: node.thumbnail || null,
+      thumbnail: node.thumbnail ? {
+        url: node.thumbnail,
+        alt: node.title
+      } : null,
     };
   }) ?? [];
 

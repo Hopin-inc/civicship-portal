@@ -17,6 +17,8 @@ import { parseDateTime, formatDateTime } from "@/utils/date";
 import { useAuth } from "@/contexts/AuthContext";
 import { GetUserWalletDocument } from "@/gql/graphql";
 import { Switch } from "@/components/ui/switch";
+import LoginModal from "@/app/components/elements/LoginModal";
+import { useLoading } from '@/hooks/useLoading';
 
 const IconWrapper = ({ children }: { children: React.ReactNode }) => (
   <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center text-gray-500">
@@ -257,14 +259,15 @@ const Notes = ({ requireApproval = false }: { requireApproval?: boolean }) => (
 export default function ConfirmPage() {
   const { updateConfig } = useHeader();
   const [ticketCount, setTicketCount] = useState(1);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const searchParams = useSearchParams();
   const opportunityId = searchParams.get("id");
   const slotStartsAt = searchParams.get("starts_at");
   const participantCount = parseInt(searchParams.get("guests") || "1", 10);
-  const communityId = searchParams.get("community_id") || "";
   const { user: currentUser } = useAuth();
+  const { setIsLoading } = useLoading();
   
-  const { opportunity, loading, error } = useOpportunity(opportunityId || "", communityId);
+  const { opportunity, loading, error } = useOpportunity(opportunityId || "");
   
   const { data: walletData } = useQuery(GetUserWalletDocument, {
     variables: { id: currentUser?.id || "" },
@@ -330,6 +333,11 @@ export default function ConfirmPage() {
   const [useTickets, setUseTickets] = useState(false);
 
   const handleConfirmReservation = async () => {
+    if (!currentUser) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
     try {
       if (!opportunityId || !slotStartsAt || !selectedSlot?.node) {
         throw new Error("必要な情報が不足しています");
@@ -365,7 +373,7 @@ export default function ConfirmPage() {
 
       if (result.data?.reservationCreate?.reservation) {
         toast.success("予約が完了しました");
-        window.location.href = `/reservation/complete?opportunity_id=${opportunityId}&community_id=${communityId}`;
+        window.location.href = `/reservation/complete?opportunity_id=${opportunityId}`;
       }
     } catch (error) {
       console.error("Reservation error:", error);
@@ -373,7 +381,10 @@ export default function ConfirmPage() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  useEffect(() => {
+    setIsLoading(loading);
+  }, [loading, setIsLoading]);
+
   if (error) return <div>Error: {error.message}</div>;
   if (!opportunity) return <div>No opportunity found</div>;
   if (!selectedSlot?.node) return <div>Selected time slot not found</div>;
@@ -390,6 +401,10 @@ export default function ConfirmPage() {
   return (
     <main className="pb-8 min-h-screen">
       <Toaster />
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+      />
       
       <OpportunityInfo 
         opportunity={opportunity} 

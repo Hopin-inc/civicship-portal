@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState, useCallback } from "react";
+import { FC, useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { usePlaceMembership } from "@/hooks/usePlaceMembership";
@@ -10,6 +10,7 @@ import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
 import { Opportunity, Participation, ParticipationImage } from "@/types";
 import Link from "next/link";
 import OpportunityCard from '@/app/components/features/opportunity/OpportunityCard';
+import { useLoading } from '@/hooks/useLoading';
 
 interface PlaceDetailProps {
   params: {
@@ -25,6 +26,7 @@ const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
     "neo88",
     searchParams.userId || "",
   );
+  const { setIsLoading } = useLoading();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -38,7 +40,10 @@ const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
     setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
   }, [allImages.length]);
 
-  if (loading) return <div>Loading...</div>;
+  useEffect(() => {
+    setIsLoading(loading);
+  }, [loading, setIsLoading]);
+
   if (error) return <div>Error: {error.message}</div>;
   if (!membership) return <div>Membership not found</div>;
 
@@ -190,18 +195,7 @@ const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
             <section className="mb-12">
               <div className="max-w-3xl">
                 <div className="space-y-4">
-                  <AsymmetricImageGrid images={displayImages} />
-                  {remainingCount > 0 && (
-                    <Button
-                      variant="outline"
-                      className="w-full border-2 border-[#4361EE] text-[#4361EE] hover:bg-[#4361EE] hover:text-white"
-                      onClick={() => {
-                        console.log(`残りの画像枚数: ${remainingCount}枚`);
-                      }}
-                    >
-                      {remainingCount + 3}枚の写真をすべて見る
-                    </Button>
-                  )}
+                  <AsymmetricImageGrid images={displayImages} remainingCount={remainingCount > 0 ? remainingCount : undefined} />
                 </div>
               </div>
             </section>
