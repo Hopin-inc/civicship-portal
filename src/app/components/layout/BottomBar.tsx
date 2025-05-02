@@ -14,7 +14,6 @@ interface HeaderProps {
 
 const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const pathname = usePathname();
-  const { user } = useAuth();
 
   // Hide BottomBar on search and reservation pages except complete page
   if (

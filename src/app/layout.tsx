@@ -10,7 +10,6 @@ import { LiffProvider } from "@/contexts/LiffContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { HeaderProvider } from "@/contexts/HeaderContext";
 import BottomBar from "./components/layout/BottomBar";
-import { cn } from "@/lib/utils";
 
 const font = Inter({ subsets: ["latin"] });
 
