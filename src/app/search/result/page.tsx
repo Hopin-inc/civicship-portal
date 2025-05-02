@@ -10,6 +10,7 @@ import { useHeader } from "@/contexts/HeaderContext";
 import { useQuery } from "@apollo/client";
 import { SEARCH_OPPORTUNITIES } from "@/graphql/queries/search";
 import { OpportunityCategory, PublishStatus, OpportunityFilterInput, OpportunityEdge, Opportunity as GraphQLOpportunity } from "@/gql/graphql";
+import { useLoading } from '@/hooks/useLoading';
 
 interface SearchResultPageProps {
   searchParams?: {
@@ -23,6 +24,7 @@ interface SearchResultPageProps {
 
 export default function Page({ searchParams = {} }: SearchResultPageProps) {
   const { updateConfig } = useHeader();
+  const { setIsLoading } = useLoading();
 
   const buildFilter = (): OpportunityFilterInput => {
     const filter: OpportunityFilterInput = {
@@ -99,7 +101,10 @@ export default function Page({ searchParams = {} }: SearchResultPageProps) {
     updateConfig,
   ]);
 
-  if (queryLoading && !data) return <div>Loading...</div>;
+  useEffect(() => {
+    setIsLoading(queryLoading && !data);
+  }, [queryLoading, data, setIsLoading]);
+
   if (error) return <div>Error: {error.message}</div>;
 
   const { opportunities } = data || { opportunities: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } } };

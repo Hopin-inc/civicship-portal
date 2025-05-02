@@ -31,7 +31,7 @@ type OpportunityHistory = {
 }
 
 const ActivityCard = memo(({ opportunity }: { opportunity: OpportunityHistory }) => (
-  <Link href={`/activities/${opportunity.id}${opportunity.community?.id ? `?community_id=${opportunity.community.id}` : ''}`} className="block">
+  <Link href={`/activities/${opportunity.id}`} className="block">
     <div className="flex-shrink-0 w-[200px] bg-white rounded-lg overflow-hidden">
       <div className="relative h-[250px] w-full">
         {opportunity.images[0] && (

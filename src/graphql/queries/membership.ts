@@ -170,6 +170,52 @@ export const GET_MEMBERSHIP_LIST = gql`
             id
             name
             image
+            opportunitiesCreatedByMe(first: 5) {
+              edges {
+                node {
+                  id
+                  title
+                  description
+                  category
+                  capacity
+                  community {
+                    id
+                    name
+                    image
+                  }
+                  pointsToEarn
+                  feeRequired
+                  requireApproval
+                  publishStatus
+                  images
+                  createdAt
+                  updatedAt
+                  slots {
+                    edges {
+                      node {
+                        id
+                        startsAt
+                        endsAt
+                        participations {
+                          edges {
+                            node {
+                              id
+                              status
+                              images
+                              user {
+                                id
+                                name
+                                image
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
           community {
             id

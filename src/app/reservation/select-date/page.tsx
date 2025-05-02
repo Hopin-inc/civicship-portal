@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useRouter } from "next/navigation";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/app/components/ui/sheet";
+import { useLoading } from '@/hooks/useLoading';
 
 interface TimeSlot {
   time: string;
@@ -38,9 +39,9 @@ export default function SelectDatePage({
   const router = useRouter();
   const { updateConfig } = useHeader();
   const { opportunity, loading, error } = useOpportunity(
-    searchParams.id,
-    searchParams.community_id,
+    searchParams.id
   );
+  const { setIsLoading } = useLoading();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedGuests, setSelectedGuests] = useState<number>(1);
   const [activeForm, setActiveForm] = useState<"date" | "guests" | null>(null);
@@ -53,7 +54,10 @@ export default function SelectDatePage({
     });
   }, [updateConfig]);
 
-  if (loading) return <div>Loading...</div>;
+  useEffect(() => {
+    setIsLoading(loading);
+  }, [loading, setIsLoading]);
+
   if (error) return <div>Error: {error.message}</div>;
   if (!opportunity) return <div>No opportunity found</div>;
 

@@ -8,6 +8,7 @@ import { ja } from 'date-fns/locale';
 import { TransactionReason } from '@/gql/graphql';
 import { useParams } from 'next/navigation';
 import { useHeader } from '@/contexts/HeaderContext';
+import { useLoading } from '@/hooks/useLoading';
 
 const getTransactionDescription = (
   reason: TransactionReason,
@@ -38,6 +39,7 @@ export default function HistoryPage() {
   const params = useParams();
   const userId = params.userId as string;
   const { updateConfig } = useHeader();
+  const { setIsLoading } = useLoading();
 
   useEffect(() => {
     updateConfig({
@@ -56,9 +58,9 @@ export default function HistoryPage() {
     },
   });
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    setIsLoading(loading);
+  }, [loading, setIsLoading]);
 
   if (error) {
     return <div>Error: {error.message}</div>;

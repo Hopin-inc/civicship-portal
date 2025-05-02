@@ -7,8 +7,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { PlaceList } from '../components/features/places/PlaceList';
 import PlaceCardsSheet from '../components/features/places/PlaceCardsSheet';
 import type { ComponentProps } from 'react';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { List, MapPin } from 'lucide-react';
+import { useLoading } from '@/hooks/useLoading';
 
 type MapComponentProps = {
   memberships: any[];
@@ -55,10 +56,15 @@ const MapComponent = dynamic<ComponentProps<React.ComponentType<MapComponentProp
 
 export default function PlacesPage() {
   const { data, loading, error } = useQuery(GET_MEMBERSHIP_LIST);
+  const { setIsLoading } = useLoading();
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedPlaceId = searchParams.get('placeId');
   const mode = searchParams.get('mode') || 'map';
+
+  useEffect(() => {
+    setIsLoading(loading);
+  }, [loading, setIsLoading]);
 
   console.log('GET_MEMBERSHIP_LIST', data)
 
@@ -93,9 +99,15 @@ export default function PlacesPage() {
       image: string;
       bio?: string;
       userId: string;
+      activeOpportunityCount: number;
     }> = [];
 
     memberships.forEach(({ node }) => {
+      // アクティブな募集数を計算
+      const activeOpportunityCount = node.user.opportunitiesCreatedByMe?.edges
+        .filter(edge => edge.node.publishStatus === 'PUBLIC')
+        .length || 0;
+
       // 参加したイベントの場所
       node.participationView.participated.geo.forEach((location: Place) => {
         allPlaces.push({
@@ -106,7 +118,8 @@ export default function PlacesPage() {
           description: "イベントの説明",
           image: location.placeImage,
           bio: node.bio,
-          userId: node.user.id
+          userId: node.user.id,
+          activeOpportunityCount
         });
       });
 
@@ -120,7 +133,8 @@ export default function PlacesPage() {
           description: "イベントの説明",
           image: location.placeImage,
           bio: node.bio,
-          userId: node.user.id
+          userId: node.user.id,
+          activeOpportunityCount
         });
       });
     });
@@ -128,7 +142,6 @@ export default function PlacesPage() {
     return allPlaces;
   }, [memberships]);
   
-  if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
   if (mode === 'list') {

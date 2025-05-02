@@ -8,9 +8,11 @@ import FeaturedSection from '../components/features/activity/FeaturedSection'
 import { useHeader } from '@/contexts/HeaderContext'
 import { GetOpportunitiesData, Opportunity } from '@/types'
 import { OpportunityCategory } from '@/gql/graphql'
+import { useLoading } from '@/hooks/useLoading'
 
 export default function ActivitiesPage() {
   const { updateConfig, resetConfig } = useHeader()
+  const { setIsLoading } = useLoading()
   const loadMoreRef = useRef<HTMLDivElement>(null)
   
   const queryVariables = useMemo(() => ({
@@ -83,7 +85,10 @@ export default function ActivitiesPage() {
     }
   }, [updateConfig, resetConfig])
 
-  if (loading && !data) return <div>Loading...</div>
+  useEffect(() => {
+    setIsLoading(loading && !data)
+  }, [loading, data, setIsLoading])
+
   if (error) return <div>Error: {error.message}</div>
 
   const { upcoming, featured, all } = data || { upcoming: { edges: [] }, featured: { edges: [] }, all: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } } }
