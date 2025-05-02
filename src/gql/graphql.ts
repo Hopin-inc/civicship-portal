@@ -2501,22 +2501,6 @@ export type CreateReservationMutation = {
   } | null;
 };
 
-export type TicketClaimLinkQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type TicketClaimLinkQuery = {
-  __typename?: "Query";
-  ticketClaimLink?: {
-    __typename?: "TicketClaimLink";
-    qty: number;
-    issuer: {
-      __typename?: "TicketIssuer";
-      owner: { __typename?: "User"; id: string; name: string; image?: string | null };
-    };
-  } | null;
-};
-
 export type TicketClaimMutationVariables = Exact<{
   input: TicketClaimInput;
 }>;
@@ -3375,6 +3359,23 @@ export type SearchOpportunitiesQuery = {
   };
 };
 
+export type TicketClaimLinkQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type TicketClaimLinkQuery = {
+  __typename?: "Query";
+  ticketClaimLink?: {
+    __typename?: "TicketClaimLink";
+    qty: number;
+    status: ClaimLinkStatus;
+    issuer: {
+      __typename?: "TicketIssuer";
+      owner: { __typename?: "User"; id: string; name: string; image?: string | null };
+    };
+  } | null;
+};
+
 export type GetUserProfileQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -3770,69 +3771,6 @@ export const CreateReservationDocument = {
     },
   ],
 } as unknown as DocumentNode<CreateReservationMutation, CreateReservationMutationVariables>;
-export const TicketClaimLinkDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "query",
-      name: { kind: "Name", value: "ticketClaimLink" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "ticketClaimLink" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "qty" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "issuer" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "owner" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [
-                            { kind: "Field", name: { kind: "Name", value: "id" } },
-                            { kind: "Field", name: { kind: "Name", value: "name" } },
-                            { kind: "Field", name: { kind: "Name", value: "image" } },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<TicketClaimLinkQuery, TicketClaimLinkQueryVariables>;
 export const TicketClaimDocument = {
   kind: "Document",
   definitions: [
@@ -6857,6 +6795,70 @@ export const SearchOpportunitiesDocument = {
     },
   ],
 } as unknown as DocumentNode<SearchOpportunitiesQuery, SearchOpportunitiesQueryVariables>;
+export const TicketClaimLinkDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "ticketClaimLink" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "ticketClaimLink" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "qty" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "issuer" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "owner" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                            { kind: "Field", name: { kind: "Name", value: "image" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<TicketClaimLinkQuery, TicketClaimLinkQueryVariables>;
 export const GetUserProfileDocument = {
   kind: "Document",
   definitions: [
