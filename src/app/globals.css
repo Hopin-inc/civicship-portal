@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :root { /* Primitive Colors */
     --transparent: 0 0% 100% 0;
     --white: 0 0% 100%;
     --black: 0 0% 0%;
@@ -293,7 +293,23 @@
     --rose-800: 343.4 79.7% 34.7%;
     --rose-900: 341.5 75.5% 30.4%;
     --rose-950: 343.1 87.7% 15.9%;
+  }
 
+  :root { /* Primitive Size */
+    /* font-size */
+    --font-size-xxs: 11px;
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-md: 16px;
+    --font-size-lg: 20px;
+    --font-size-xl: 24px;
+    --font-size-xxl: 28px;
+    --font-size-huge: 32px;
+
+    /* line-height */
+    --line-height-md: 160%;
+    --line-height-sm: 140%;
+    --line-height-xs: 100%;
   }
 
   :root {

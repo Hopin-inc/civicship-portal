@@ -1,14 +1,14 @@
-import type { Config } from "tailwindcss"
-import type plugin from 'tailwindcss/plugin'
+import type { Config } from "tailwindcss";
+import type plugin from "tailwindcss/plugin";
 
 const config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
-	],
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -73,40 +73,114 @@ const config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      fontSize: {
+        "display-xl": [
+          "var(--font-size-huge)",
+          { lineHeight: "var(--line-height-sm)", fontWeight: "700" },
+        ],
+        "display-lg": [
+          "var(--font-size-xxl)",
+          { lineHeight: "var(--line-height-sm)", fontWeight: "700" },
+        ],
+        "display-md": [
+          "var(--font-size-xl)",
+          { lineHeight: "var(--line-height-sm)", fontWeight: "700" },
+        ],
+        "display-sm": [
+          "var(--font-size-lg)",
+          { lineHeight: "var(--line-height-sm)", fontWeight: "700" },
+        ],
+        "title-lg": [
+          "var(--font-size-xl)",
+          { lineHeight: "var(--line-height-sm)", fontWeight: "700" },
+        ],
+        "title-md": [
+          "var(--font-size-lg)",
+          { lineHeight: "var(--line-height-sm)", fontWeight: "700" },
+        ],
+        "title-sm": [
+          "var(--font-size-md)",
+          { lineHeight: "var(--line-height-sm)", fontWeight: "700" },
+        ],
+        "body-lg": [
+          "var(--font-size-lg)",
+          { lineHeight: "var(--line-height-md)", fontWeight: "400" },
+        ],
+        "body-md": [
+          "var(--font-size-mg)",
+          { lineHeight: "var(--line-height-md)", fontWeight: "400" },
+        ],
+        "body-sm": [
+          "var(--font-size-sm)",
+          { lineHeight: "var(--line-height-md)", fontWeight: "400" },
+        ],
+        "body-xs": [
+          "var(--font-size-xs)",
+          { lineHeight: "var(--line-height-md)", fontWeight: "400" },
+        ],
+        "label-lg": [
+          "var(--font-size-lg)",
+          { lineHeight: "var(--line-height-xs)", fontWeight: "500" },
+        ],
+        "label-md": [
+          "var(--font-size-mg)",
+          { lineHeight: "var(--line-height-xs)", fontWeight: "500" },
+        ],
+        "label-sm": [
+          "var(--font-size-sm)",
+          { lineHeight: "var(--line-height-xs)", fontWeight: "500" },
+        ],
+        "label-xs": [
+          "var(--font-size-xs)",
+          { lineHeight: "var(--line-height-xs)", fontWeight: "500" },
+        ],
+      },
       typography: {
         DEFAULT: {
           css: {
-            maxWidth: 'none',
-            color: 'hsl(var(--foreground))',
+            maxWidth: "none",
+            color: "hsl(var(--foreground))",
             h1: {
-              color: 'hsl(var(--foreground))',
-              fontWeight: '700',
+              fontSize: "var(--font-size-huge)",
+              color: "hsl(var(--foreground))",
+              fontWeight: "700",
             },
             h2: {
-              color: 'hsl(var(--foreground))',
-              fontWeight: '600',
+              fontSize: "var(--font-size-xxl)",
+              color: "hsl(var(--foreground))",
+              fontWeight: "700",
             },
             h3: {
-              color: 'hsl(var(--foreground))',
-              fontWeight: '600',
+              fontSize: "var(--font-size-xl)",
+              color: "hsl(var(--foreground))",
+              fontWeight: "700",
             },
-            'h4,h5,h6': {
-              color: 'hsl(var(--foreground))',
+            h4: {
+              fontSize: "var(--font-size-lg)",
+              color: "hsl(var(--foreground))",
+              fontWeight: "600",
+            },
+            "h5,h6": {
+              fontSize: "var(--font-size-md)",
+              color: "hsl(var(--foreground))",
             },
             a: {
-              color: 'hsl(var(--primary))',
-              '&:hover': {
-                color: 'hsl(var(--primary))',
+              fontSize: "var(--font-size-md)",
+              color: "hsl(var(--primary))",
+              "&:hover": {
+                color: "hsl(var(--primary-hover))",
               },
             },
             p: {
-              color: 'hsl(var(--foreground))',
+              fontSize: "var(--font-size-md)",
+              color: "hsl(var(--foreground))",
             },
             li: {
-              color: 'hsl(var(--foreground))',
+              fontSize: "var(--font-size-md)",
+              color: "hsl(var(--foreground))",
             },
             img: {
-              borderRadius: '0.5rem',
+              borderRadius: "0.5rem",
             },
           },
         },
@@ -135,21 +209,21 @@ const config = {
   plugins: [
     require("tailwindcss-animate"),
     require("@tailwindcss/typography"),
-    function({ addUtilities }: { addUtilities: any }) {
+    function ({ addUtilities }: { addUtilities: any }) {
       addUtilities({
-        '.scrollbar-hide': {
+        ".scrollbar-hide": {
           /* IE and Edge */
-          '-ms-overflow-style': 'none',
+          "-ms-overflow-style": "none",
           /* Firefox */
-          'scrollbar-width': 'none',
+          "scrollbar-width": "none",
           /* Safari and Chrome */
-          '&::-webkit-scrollbar': {
-            display: 'none'
-          }
-        }
-      })
-    }
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        },
+      });
+    },
   ],
-} satisfies Config
+} satisfies Config;
 
-export default config
+export default config;
