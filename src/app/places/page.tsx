@@ -108,27 +108,15 @@ export default function PlacesPage() {
         .filter(edge => edge.node.publishStatus === 'PUBLIC')
         .length || 0;
 
-      // 参加したイベントの場所
-      node.participationView.participated.geo.forEach((location: Place) => {
-        allPlaces.push({
-          placeId: location.placeId,
-          title: node.user.name,
-          address: node.participationView.participated.geo[0].placeName,
-          participantCount: node.participationView.participated.totalParticipatedCount,
-          description: "イベントの説明",
-          image: location.placeImage,
-          bio: node.bio,
-          userId: node.user.id,
-          activeOpportunityCount
-        });
-      });
-
       // 主催したイベントの場所
       node.participationView.hosted.geo.forEach((location: Place) => {
+        const participatedGeo = node.participationView.participated.geo;
+        if (!participatedGeo || participatedGeo.length === 0) return;
+
         allPlaces.push({
           placeId: location.placeId,
           title: node.user.name,
-          address: node.participationView.participated.geo[0].placeName,
+          address: participatedGeo[0].placeName,
           participantCount: node.participationView.hosted.totalParticipantCount,
           description: "イベントの説明",
           image: location.placeImage,
@@ -137,6 +125,7 @@ export default function PlacesPage() {
           activeOpportunityCount
         });
       });
+
     });
 
     return allPlaces;

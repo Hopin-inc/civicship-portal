@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Ticket as TicketIcon } from 'lucide-react';
 import { Ticket } from '@/types/ticket';
+import React from "react";
 
 interface TicketListProps {
   tickets: Ticket[];
@@ -36,10 +37,7 @@ export default function TicketList({ tickets }: TicketListProps) {
                 <span className="text-[#4361EE] font-medium">{ticket.quantity}枚</span>
               </div>
             </div>
-            <Button
-              variant="outline"
-              className="h-12 px-8 rounded-full text-[#4361EE] border-[#4361EE] hover:bg-blue-50"
-            >
+            <Button variant={"secondary"} size="md">
               関わりを見つける
             </Button>
           </div>
