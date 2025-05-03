@@ -110,8 +110,8 @@ export default function TicketReceivePage() {
     <div className="flex flex-col h-full min-h-0 px-6 py-12 justify-center overflow-y-auto">
       <Card className="flex-1 min-h-0 grid content-center gap-6 p-6 w-full">
         <div className="flex flex-col justify-center items-center gap-2">
-          <p className="text-center text-lg">
-            <span className="text-2xl font-bold">{owner.name}</span>
+          <p className="text-center text-body-md">
+            <span className="text-display-sm">{owner.name}</span>
             さんから
             <br />
             招待チケットが届きました！
@@ -125,18 +125,18 @@ export default function TicketReceivePage() {
           </Avatar>
           <div className="m-6 flex flex-col gap-2">
             <div className="flex gap-4 items-baseline">
-              <p className="text-caption w-8 min-w-8">枚数</p>
-              <p className="flex-grow">{qty} 枚</p>
+              <p className="text-caption text-body-sm w-8 min-w-8">枚数</p>
+              <p className="text-body-sm flex-grow">{qty} 枚</p>
             </div>
             <div className="flex gap-4 items-baseline">
-              <p className="text-caption w-8 min-w-8">用途</p>
-              <p className="flex-grow">{owner.name}さんが主催する体験に無料参加できます</p>
+              <p className="text-caption text-body-sm w-8 min-w-8">用途</p>
+              <p className="text-body-sm flex-grow">{owner.name}さんが主催する体験に無料参加できます</p>
             </div>
           </div>
         </div>
         <div className="p-4 bg-primary-foreground">
-          <p className="text-lg font-bold">お願い🙏</p>
-          <ul className="list-disc">
+          <p className="text-title-sm font-bold">お願い🙏</p>
+          <ul className="text-body-sm list-disc">
             <li>ぜひ誰かを誘って参加してください！</li>
             <li>当日の様子を写真に撮って、投稿しましょう！関わりを残せます！</li>
           </ul>
