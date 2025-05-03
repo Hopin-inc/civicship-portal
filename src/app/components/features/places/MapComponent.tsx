@@ -427,10 +427,21 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
 
         // 参加したイベントのマーカー
         node.participationView.participated.geo.forEach(location => {
+          const lat = location.latitude as unknown as number;
+          const lng = location.longitude as unknown as number;
+          
+          const numLat = Number(lat);
+          const numLng = Number(lng);
+          
+          if (isNaN(numLat) || isNaN(numLng)) {
+            console.warn('Invalid coordinates:', location);
+            return;
+          }
+          
           const marker: MarkerData = {
             position: {
-              lat: location.latitude,
-              lng: location.longitude,
+              lat: numLat,
+              lng: numLng,
             },
             id: `${node.user.name}-${location.placeId}-participated`,
             placeImage: location.placeImage,
@@ -457,10 +468,21 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
 
         // 主催したイベントのマーカー
         node.participationView.hosted.geo.forEach(location => {
+          const lat = location.latitude as unknown as number;
+          const lng = location.longitude as unknown as number;
+          
+          const numLat = Number(lat);
+          const numLng = Number(lng);
+          
+          if (isNaN(numLat) || isNaN(numLng)) {
+            console.warn('Invalid coordinates:', location);
+            return;
+          }
+          
           const marker: MarkerData = {
             position: {
-              lat: location.latitude,
-              lng: location.longitude,
+              lat: numLat,
+              lng: numLng,
             },
             id: `${node.user.name}-${location.placeId}-hosted`,
             placeImage: location.placeImage,
@@ -531,4 +553,4 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
       ))}
     </GoogleMap>
   ) : <></>;
-}                
+}                                
