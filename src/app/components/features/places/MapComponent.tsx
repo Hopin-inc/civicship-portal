@@ -330,8 +330,10 @@ const CustomMarker: React.FC<{
   );
 };
 
+import { Membership } from '@/hooks/usePlaces';
+
 interface Props {
-  memberships: MembershipNode[];
+  memberships: Membership[];
   selectedPlaceId?: string | null;
   onPlaceSelect?: (placeId: string) => void;
 }
@@ -339,7 +341,7 @@ interface Props {
 export default function MapComponent({ memberships, selectedPlaceId, onPlaceSelect }: Props) {
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'YOUR_FALLBACK_API_KEY' // Add a fallback key
   });
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -403,6 +405,7 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
 
   useEffect(() => {
     const loadMarkers = async () => {
+      console.log('Memberships for markers:', memberships);
       const allMarkers: MarkerData[] = [];
       const allPlaces: Array<{
         placeId: string;
@@ -426,14 +429,14 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
         node.participationView.participated.geo.forEach(location => {
           const marker: MarkerData = {
             position: {
-              lat: parseFloat(location.latitude),
-              lng: parseFloat(location.longitude),
+              lat: location.latitude,
+              lng: location.longitude,
             },
             id: `${node.user.name}-${location.placeId}-participated`,
             placeImage: location.placeImage,
             userImage: node.user.image,
             contentType: "EXPERIENCE" as ContentType,
-            name: node.headline || node.user.name,
+            name: node.user.name,
             placeId: location.placeId,
             participantCount: node.participationView.participated.totalParticipatedCount,
           };
@@ -441,8 +444,8 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
           allMarkers.push(marker);
           allPlaces.push({
             placeId: location.placeId,
-            title: node.headline || node.user.name,
-            address: node.participationView.participated.geo[0].placeName,
+            title: node.user.name,
+            address: node.participationView.participated.geo[0]?.placeName || "住所不明",
             participantCount: node.participationView.participated.totalParticipatedCount,
             description: "イベントの説明",
             image: location.placeImage,
@@ -456,14 +459,14 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
         node.participationView.hosted.geo.forEach(location => {
           const marker: MarkerData = {
             position: {
-              lat: parseFloat(location.latitude),
-              lng: parseFloat(location.longitude),
+              lat: location.latitude,
+              lng: location.longitude,
             },
             id: `${node.user.name}-${location.placeId}-hosted`,
             placeImage: location.placeImage,
             userImage: node.user.image,
             contentType: "EXPERIENCE" as ContentType,
-            name: node.headline || node.user.name,
+            name: node.user.name,
             placeId: location.placeId,
             participantCount: node.participationView.hosted.totalParticipantCount,
           };
@@ -471,8 +474,8 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
           allMarkers.push(marker);
           allPlaces.push({
             placeId: location.placeId,
-            title: node.headline || node.user.name,
-            address: node.participationView.participated.geo[0].placeName,
+            title: node.user.name,
+            address: node.participationView.participated.geo[0]?.placeName || "住所不明",
             participantCount: node.participationView.hosted.totalParticipantCount,
             description: "イベントの説明",
             image: location.placeImage,
@@ -483,6 +486,7 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
         });
       });
 
+      console.log('Loading markers:', allMarkers.length);
       setMarkers(allMarkers);
       setPlaces(allPlaces);
     };
@@ -527,4 +531,4 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
       ))}
     </GoogleMap>
   ) : <></>;
-} 
+}                
