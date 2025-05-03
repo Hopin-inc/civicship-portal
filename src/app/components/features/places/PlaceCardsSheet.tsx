@@ -64,9 +64,9 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
         }
       });
 
-      if (closestCard && closestCard.dataset.placeId) {
-        const placeId = closestCard.dataset.placeId;
-        if (placeId !== selectedPlaceId) {
+      if (closestCard && (closestCard as HTMLElement).dataset.placeId) {
+        const placeId = (closestCard as HTMLElement).dataset.placeId;
+        if (placeId !== selectedPlaceId && placeId) {
           onPlaceSelect(placeId);
         }
       }
@@ -170,4 +170,4 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
   );
 };
 
-export default PlaceCardsSheet;    
+export default PlaceCardsSheet;        
