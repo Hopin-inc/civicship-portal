@@ -42,7 +42,7 @@ const PlaceMapView: React.FC<PlaceMapViewProps> = ({
   return (
     <div className="relative h-full w-full">
       <MapComponent 
-        memberships={memberships as any} 
+        memberships={memberships} 
         selectedPlaceId={selectedPlaceId}
         onPlaceSelect={onPlaceSelect}
       />
