@@ -4,11 +4,9 @@ import React, { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { User, ArrowLeft, ChevronLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import LoginModal from "@/app/components/elements/LoginModal";
-import { useAuth } from "@/contexts/AuthContext";
 import { useHeader } from "@/contexts/HeaderContext";
-import { displayName } from "@/utils";
 import { cn } from "@/lib/utils";
 import SearchBox from "../search/SearchBox";
 
@@ -17,21 +15,15 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ className }) => {
-  const { uid, user, logout } = useAuth();
   const { config } = useHeader();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleLogout = async () => {
-    await logout();
-    router.refresh();
-  };
-
   const shouldShowBackButton = config.showBackButton && pathname !== '/';
 
   return (
-    <header className="border-b border-border bg-background fixed w-full z-50">
+    <header className={cn(className, "border-b border-border bg-background w-full z-50")}>
       <div className="max-w-lg mx-auto px-4 h-16 flex justify-between items-center">
         <div className="flex-1 flex items-center">
           {shouldShowBackButton && (
@@ -59,10 +51,14 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             </div>
           )}
           {config.title && !config.showSearchForm && (
-            <h1 className={cn(
-              "text-lg font-bold text-secondary-foreground",
-              config.showLogo ? "ml-4" : "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-            )}>
+            <h1
+              className={cn(
+                "text-lg font-bold text-secondary-foreground",
+                config.showLogo
+                  ? "ml-4"
+                  : "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
+              )}
+            >
               {config.title}
             </h1>
           )}
