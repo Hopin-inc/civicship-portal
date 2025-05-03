@@ -3,6 +3,7 @@ import { Sheet, SheetContent } from '@/app/components/ui/sheet';
 import Image from 'next/image';
 import { Share2, X, MapPin, Users, Map } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 interface Place {
   placeId: string;
@@ -208,9 +209,13 @@ export function PlaceList({ memberships, onClose, isMapMode = false, selectedPla
                             <span className="text-gray-700 text-sm font-medium">{place.activeOpportunityCount}件の募集中</span>
                           </div>
                         )}
-                        <button className="flex-shrink-0 bg-white text-gray-900 py-2.5 px-6 rounded-lg text-sm border border-gray-200 hover:bg-gray-50 transition-colors">
+                        <Button 
+                          variant="secondary" 
+                          size="sm" 
+                          className="flex-shrink-0 py-2.5 px-6 rounded-lg text-sm"
+                        >
                           もっと見る
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -219,15 +224,16 @@ export function PlaceList({ memberships, onClose, isMapMode = false, selectedPla
           </div>
         </div>
         <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50">
-          <button
+          <Button
             onClick={handleMapClick}
-            className="flex items-center justify-center gap-3 px-8 py-3.5 rounded-full border-2 border-[#4361ee] bg-white transition-colors text-[#4361ee] min-w-[200px]"
+            variant="secondary"
+            className="flex items-center justify-center gap-3 px-8 py-3.5 rounded-full border-2 border-[#4361ee] text-[#4361ee] min-w-[200px]"
           >
             <span className="text-lg font-medium">地図</span>
             <Map className="w-6 h-6" />
-          </button>
+          </Button>
         </div>
       </SheetContent>
     </Sheet>
   );
-} 
+}        

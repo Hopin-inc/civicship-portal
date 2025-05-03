@@ -1,0 +1,66 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { Opportunity } from '@/types';
+import { Button } from '@/components/ui/button';
+
+interface PlaceOpportunitiesProps {
+  opportunities: Opportunity[];
+}
+
+const PlaceOpportunities: React.FC<PlaceOpportunitiesProps> = ({ opportunities }) => {
+  if (!opportunities.length) return null;
+
+  return (
+    <div className="px-4 space-y-4 mb-8">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+          募集中の関わり
+          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+            {opportunities.length}
+          </span>
+        </h2>
+      </div>
+      <div className="relative">
+        <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+          <div className="flex gap-4">
+            {opportunities.map((opportunity) => (
+              <div 
+                key={opportunity.id} 
+                className="flex-shrink-0 w-[280px] rounded-lg overflow-hidden border border-gray-200"
+              >
+                <div className="relative h-[160px] w-full">
+                  <img 
+                    src={opportunity.images?.[0] || "/placeholder.png"} 
+                    alt={opportunity.title} 
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-lg mb-2 line-clamp-2">{opportunity.title}</h3>
+                  <div className="flex justify-between items-center mt-4">
+                    <div className="text-sm text-gray-600">
+                      {opportunity.feeRequired ? `¥${opportunity.feeRequired.toLocaleString()}` : '無料'}
+                    </div>
+                    <Link href={`/activities/${opportunity.id}`}>
+                      <Button 
+                        variant="secondary" 
+                        size="sm" 
+                        className="px-4"
+                      >
+                        詳細
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PlaceOpportunities;

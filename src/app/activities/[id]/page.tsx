@@ -1,80 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import {
-  ChevronLeft,
-  Clock,
-  MapPin,
-  CalendarDays,
-  AlertCircle,
-  ChevronRight,
-  Ticket,
-} from "lucide-react";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { useOpportunity } from "@/hooks/useOpportunity";
-import { format } from "date-fns";
-import { ja } from "date-fns/locale";
-import { RecentActivitiesList } from "@/app/components/features/activity/RecentActivitiesList";
-import { useSimilarOpportunities } from "@/hooks/useSimilarOpportunities";
-import { SimilarActivitiesList } from "@/app/components/features/activity/SimilarActivitiesList";
-import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
-import { Participation } from "@/types";
-import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@apollo/client";
-import { GetUserWalletDocument } from "@/gql/graphql";
-import { useMemo, useEffect } from "react";
-import { useLoading } from '@/hooks/useLoading';
-
-const ScheduleCard: React.FC<{
-  startsAt: string;
-  endsAt: string;
-  participants: number;
-  price: number;
-  opportunityId: string;
-  communityId: string;
-  isReservableWithTicket?: boolean;
-  availableTickets?: number;
-}> = ({
-  startsAt,
-  endsAt,
-  participants,
-  price,
-  opportunityId,
-  communityId,
-  isReservableWithTicket,
-  availableTickets,
-}) => {
-  const startDate = new Date(startsAt);
-  const endDate = new Date(endsAt);
-
-  return (
-    <div className="bg-white rounded-xl border px-10 py-8 w-[280px] h-[316px] flex flex-col">
-      <div className="flex-1">
-        <h3 className="text-lg font-bold mb-1">
-          {format(startDate, "M月d日", { locale: ja })}
-          <span className="text-lg">（{format(startDate, "E", { locale: ja })}）</span>
-        </h3>
-        <p className="text-md text-gray-600 mb-4">
-          {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
-        </p>
-        <p className="text-md text-gray-500 mb-4">参加予定 {participants}人</p>
-        <div className="space-y-2">
-          <p className="text-lg font-bold">¥{price.toLocaleString()}</p>
-        </div>
-      </div>
-      <div className="flex justify-center">
-        <Link
-          href={`/reservation/confirm?id=${opportunityId}&starts_at=${startsAt}`}
-        >
-          <Button variant="default" size="selection">
-            選択
-          </Button>
-        </Link>
-      </div>
-    </div>
-  );
-};
+import { useActivityDetails } from "@/hooks/useActivityDetails";
+import ActivityDetailsHeader from "@/app/components/features/activity/ActivityDetailsHeader";
+import ActivityDetailsContent from "@/app/components/features/activity/ActivityDetailsContent";
+import ActivityDetailsFooter from "@/app/components/features/activity/ActivityDetailsFooter";
+import ErrorState from "@/app/components/shared/ErrorState";
+import { useEffect } from "react";
+import { useLoading } from "@/hooks/useLoading";
 
 interface ActivityPageProps {
   params: {
@@ -86,287 +18,47 @@ interface ActivityPageProps {
 }
 
 export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
-  const { opportunity, loading, error } = useOpportunity(
-    params.id
-  );
-  const { similarOpportunities, loading: similarLoading } = useSimilarOpportunities({
-    opportunityId: params.id
-  });
-  const { user: currentUser } = useAuth();
+  const { 
+    opportunity, 
+    similarOpportunities, 
+    availableTickets, 
+    availableDates,
+    loading, 
+    error 
+  } = useActivityDetails({ id: params.id });
+  
   const { setIsLoading } = useLoading();
-  const { data: walletData } = useQuery(GetUserWalletDocument, {
-    variables: { id: currentUser?.id || "" },
-    skip: !currentUser?.id,
-  });
-
-  const availableTickets = useMemo(() => {
-    if (!opportunity?.requiredUtilities?.length) {
-      return walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.length || 0;
-    }
-
-    const requiredUtilityIds = new Set(opportunity.requiredUtilities.map((u) => u.id));
-
-    const availableTickets =
-      walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.filter((edge: any) => {
-        const utilityId = edge?.node?.utility?.id;
-        return utilityId ? requiredUtilityIds.has(utilityId) : false;
-      }) || [];
-
-    return availableTickets.length;
-  }, [opportunity?.requiredUtilities, walletData]);
-
+  
   useEffect(() => {
-    setIsLoading(loading || similarLoading);
-  }, [loading, similarLoading, setIsLoading]);
+    setIsLoading(loading);
+  }, [loading, setIsLoading]);
 
-  if (error) return <div>Error: {error.message}</div>;
-  if (!opportunity) return <div>No opportunity found</div>;
-
-  const availableDates =
-    opportunity.slots?.edges
-      ?.map((edge) => ({
-        startsAt: edge?.node?.startsAt
-          ? format(new Date(edge.node.startsAt), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
-          : "",
-        endsAt: edge?.node?.endsAt
-          ? format(new Date(edge.node.endsAt), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
-          : "",
-        participants: edge?.node?.participations?.edges?.length || 0,
-        price: opportunity.feeRequired || 0,
-      }))
-      .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()) || [];
+  if (error) return <ErrorState message={`Error: ${error.message}`} />;
+  if (!opportunity) return <ErrorState message="No opportunity found" />;
 
   return (
     <>
       <main className="min-h-screen pb-24">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="relative w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden mb-8">
-            <Image
-              src={opportunity.images?.[0] || "/placeholder.png"}
-              alt={opportunity.title}
-              fill
-              className="object-cover"
-            />
-          </div>
-
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-4">{opportunity.title}</h1>
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-gray-500" />
-                <span>{opportunity.place?.name || "場所未定"}</span>
-              </div>
-            </div>
-          </div>
-
-          {opportunity.isReservableWithTicket && availableTickets && availableTickets > 0 && (
-            <div className="flex items-center gap-2 bg-[#EEF0FF] rounded-lg px-4 py-3">
-              <Ticket className="w-5 h-5 text-[#4361EE]" />
-              <p className="text-[#4361EE] font-medium">利用できるチケット {availableTickets}枚</p>
-            </div>
-          )}
-
-          {/* 体験内容 */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-4">体験できること</h2>
-            <p className="text-gray-700 whitespace-pre-wrap">{opportunity.body}</p>
-          </section>
-
-          {opportunity.slots?.edges?.some((edge) =>
-            edge?.node?.participations?.edges?.some((p) => {
-              const participation = p as any;
-              return (
-                participation?.node?.images &&
-                Array.isArray(participation.node.images) &&
-                participation.node.images.length > 0
-              );
-            }),
-          ) && (
-            <section className="mb-12">
-              <div className="max-w-3xl">
-                {(() => {
-                  const allImages =
-                    opportunity.slots?.edges
-                      ?.flatMap(
-                        (edge) =>
-                          edge?.node?.participations?.edges?.flatMap((p) => {
-                            const participation = p as any;
-                            return (
-                              Array.isArray(participation?.node?.images)
-                                ? participation.node.images
-                                : []
-                            ).map((img: string) => ({
-                              url: img,
-                              alt: "参加者の写真",
-                            }));
-                          }) || [],
-                      )
-                      .filter(Boolean) || [];
-
-                  const displayImages = allImages.slice(0, 3);
-                  const remainingCount = Math.max(0, allImages.length - 3);
-
-                  return (
-                    <div className="space-y-4">
-                      <AsymmetricImageGrid images={displayImages} remainingCount={remainingCount > 0 ? remainingCount : undefined} />
-                    </div>
-                  );
-                })()}
-              </div>
-            </section>
-          )}
-
-          {/* 案内者情報 */}
-          <section className="mb-12">
-            <div className="rounded-xl">
-              <div className="flex flex-col gap-6">
-                <div className="flex items-center gap-4">
-                  <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-                    <Image
-                      src={opportunity.createdByUser?.image || "/placeholder.png"}
-                      alt={opportunity.createdByUser?.name || "案内者"}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold mb-1">
-                      <span className="text-xl">{opportunity.createdByUser?.name}</span>
-                      <span>さん</span>
-                    </h3>
-                    <p className="text-gray-600">が案内します</p>
-                  </div>
-                </div>
-                {opportunity.createdByUser?.articlesAboutMe?.edges?.[0]?.node && (
-                  <Link
-                    href={`/articles/${opportunity.createdByUser.articlesAboutMe.edges[0].node.id}`}
-                    className="block"
-                  >
-                    <div className="bg-white rounded-xl border hover:shadow-md transition-shadow duration-200">
-                      <div className="relative w-full h-[200px]">
-                        <Image
-                          src={
-                            (opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail ?? "/placeholder.png") as string
-                          }
-                          alt={
-                            opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail
-                              ?.alt ||
-                            opportunity.createdByUser.articlesAboutMe.edges[0].node.title ||
-                            ""
-                          }
-                          fill
-                          className="object-cover rounded-t-xl"
-                        />
-                      </div>
-                      <div className="p-6">
-                        <h5 className="text-xl font-bold mb-2 line-clamp-2">
-                          {opportunity.createdByUser.articlesAboutMe.edges[0].node.title}
-                        </h5>
-                        <p className="text-gray-600 text-sm line-clamp-2">
-                          {opportunity.createdByUser.articlesAboutMe.edges[0].node.description}
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
-                )}
-              </div>
-            </div>
-            {opportunity.createdByUser?.opportunitiesCreatedByMe?.edges && (
-              <div className="mt-8">
-                <RecentActivitiesList
-                  opportunities={opportunity.createdByUser.opportunitiesCreatedByMe.edges
-                    .map((edge) => edge)
-                    .filter(Boolean)}
-                />
-              </div>
-            )}
-          </section>
-
-          {/* 集合場所 */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">集合場所</h2>
-              {opportunity.place?.latitude && opportunity.place?.longitude && (
-                <div className="relative w-full h-[300px] rounded-lg overflow-hidden">
-                  <iframe
-                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(opportunity.place.address)}`}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                </div>
-              )}
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">開催日</h2>
-            <p className="text-gray-600 mb-4">申込可能な時間枠の数：{availableDates.length}</p>
-            <div className="relative">
-              <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
-                {availableDates.map((schedule, index) => (
-                  <div key={index} className="flex-shrink-0 first:ml-0">
-                    <ScheduleCard
-                      startsAt={schedule.startsAt}
-                      endsAt={schedule.endsAt}
-                      participants={schedule.participants}
-                      price={schedule.price}
-                      opportunityId={opportunity.id}
-                      communityId={searchParams.community_id || ""}
-                      isReservableWithTicket={opportunity.isReservableWithTicket}
-                      availableTickets={availableTickets}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">注意事項</h2>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 text-gray-500 flex-shrink-0 mt-1" />
-                <span>参加には事前予約が必要です</span>
-              </li>
-              {opportunity.requireApproval && (
-                <li className="flex items-start gap-2">
-                  <AlertCircle className="h-5 w-5 text-gray-500 flex-shrink-0 mt-1" />
-                  <span>参加には承認が必要です</span>
-                </li>
-              )}
-            </ul>
-          </section>
-
-          <section className="mb-12">
-            {!similarLoading && similarOpportunities && (
-              <SimilarActivitiesList
-                opportunities={similarOpportunities}
-                currentOpportunityId={opportunity.id}
-              />
-            )}
-          </section>
+          <ActivityDetailsHeader 
+            opportunity={opportunity} 
+            availableTickets={availableTickets} 
+          />
+          
+          <ActivityDetailsContent 
+            opportunity={opportunity}
+            availableTickets={availableTickets}
+            availableDates={availableDates}
+            similarOpportunities={similarOpportunities}
+            communityId={searchParams.community_id}
+          />
         </div>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t">
-        <div className="max-w-lg mx-auto px-4 h-16 flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-600">1人あたり</p>
-            <p className="text-xl font-bold">¥{(opportunity.feeRequired || 0).toLocaleString()}</p>
-          </div>
-          <Link
-            href={`/reservation/select-date?id=${opportunity.id}`}
-          >
-            <Button
-              variant="default"
-              className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium"
-            >
-              予約する
-            </Button>
-          </Link>
-        </div>
-      </footer>
+      <ActivityDetailsFooter 
+        opportunityId={opportunity.id} 
+        price={opportunity.feeRequired || 0} 
+      />
     </>
   );
 }
