@@ -33,5 +33,10 @@ export const formatTransactionDate = (dateString: string): string => {
 
 export const formatWalletData = (data: any) => {
   const currentPoint = data?.user?.wallets?.edges?.[0]?.node?.currentPointView?.currentPoint ?? 0;
-  return { currentPoint };
+  const ticketCount = data?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.length ?? 0;
+  return { currentPoint, ticketCount };
+};
+
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('ja-JP').format(amount);
 };
