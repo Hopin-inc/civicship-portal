@@ -1,9 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useHeader } from '../contexts/HeaderContext';
 
-interface HeaderConfig {
+/**
+ * Header configuration interface
+ */
+export interface HeaderConfig {
   title?: string;
   showBackButton?: boolean;
   showLogo?: boolean;
@@ -11,14 +14,34 @@ interface HeaderConfig {
   action?: React.ReactNode;
 }
 
-export const useHeaderConfig = (config: HeaderConfig) => {
+/**
+ * Custom hook to manage header configuration
+ * Provides functions to update and reset header configuration
+ * Can be used in two ways:
+ * 1. With a config parameter to automatically apply config on mount and reset on unmount
+ * 2. Without parameters to get update and reset functions for manual control
+ */
+export const useHeaderConfig = (config?: HeaderConfig) => {
   const { updateConfig, resetConfig } = useHeader();
   
+  const updateHeaderConfig = useCallback((newConfig: HeaderConfig) => {
+    updateConfig(newConfig);
+  }, [updateConfig]);
+  
   useEffect(() => {
-    updateConfig(config);
-    
-    return () => {
-      resetConfig();
-    };
+    if (config) {
+      updateConfig(config);
+      
+      return () => {
+        resetConfig();
+      };
+    }
   }, [updateConfig, resetConfig, config]);
+  
+  return {
+    updateConfig: updateHeaderConfig,
+    resetConfig,
+  };
 };
+
+export default useHeaderConfig;
