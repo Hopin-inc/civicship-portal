@@ -5,11 +5,9 @@ import { GET_MEMBERSHIP_LIST } from '../graphql/queries/membership';
 import { useMemo, useEffect } from 'react';
 import { useLoading } from './useLoading';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Geo } from '../types/maps';
 
-export interface Place {
-  placeId: string;
-  placeName: string;
-  placeImage: string;
+export interface Place extends Omit<Geo, 'latitude' | 'longitude'> {
   latitude: number;
   longitude: number;
   activeOpportunityCount?: number;
