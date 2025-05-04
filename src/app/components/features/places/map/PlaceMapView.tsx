@@ -3,9 +3,9 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { Membership } from "@/hooks/usePlaces";
-import PlaceToggleButton from './PlaceToggleButton';
-import { PlaceList } from './PlaceList';
-import PlaceCardsSheet from './PlaceCardsSheet';
+import PlaceToggleButton from '../shared/PlaceToggleButton';
+import { PlaceList } from '../list/PlaceList';
+import PlaceCardsSheet from '../shared/PlaceCardsSheet';
 
 const MapComponent = dynamic(
   () => import('./MapComponent').then((mod) => mod.default),

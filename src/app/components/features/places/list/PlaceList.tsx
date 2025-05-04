@@ -3,9 +3,9 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Membership } from '@/hooks/usePlaces';
-import PlaceMapSheet from './PlaceMapSheet';
+import PlaceMapSheet from '../map/PlaceMapSheet';
 import PlaceListSheet from './PlaceListSheet';
-import { Button } from '@/app/components/ui/button';
+import { Button } from '@/components/ui/button';
 
 interface PlaceListProps {
   memberships: Membership[];

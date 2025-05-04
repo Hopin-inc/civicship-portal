@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { MapPin, Users } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import { Button } from '@/components/ui/button';
 
 interface PlaceCardProps {
   placeId: string;

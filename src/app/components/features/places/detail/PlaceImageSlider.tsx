@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from '@/app/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PlaceImageSliderProps {

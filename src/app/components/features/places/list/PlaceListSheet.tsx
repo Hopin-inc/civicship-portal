@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Sheet, SheetContent } from '@/app/components/ui/sheet';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Map } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import PlaceCard from './PlaceCard';
 import { Membership } from '@/hooks/usePlaces';

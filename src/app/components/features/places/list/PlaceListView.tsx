@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Membership } from '../../../../hooks/usePlaces';
+import { Membership } from '../../../../../hooks/usePlaces';
 import { PlaceList } from './PlaceList';
-import PlaceToggleButton from './PlaceToggleButton';
+import PlaceToggleButton from '../shared/PlaceToggleButton';
 
 interface PlaceListViewProps {
   memberships: Membership[];
