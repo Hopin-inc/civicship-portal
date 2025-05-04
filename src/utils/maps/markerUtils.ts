@@ -172,11 +172,11 @@ export const createCustomMarkerIcon = async (
  * 座標データを数値に変換する関数
  */
 export const parseCoordinates = (
-  latitude: string | number,
-  longitude: string | number
+  latitude: number,
+  longitude: number
 ): { lat: number; lng: number } | null => {
-  const numLat = typeof latitude === 'string' ? Number(latitude) : latitude;
-  const numLng = typeof longitude === 'string' ? Number(longitude) : longitude;
+  const numLat = latitude;
+  const numLng = longitude;
   
   if (isNaN(numLat) || isNaN(numLng)) {
     console.warn('Invalid coordinates:', { latitude, longitude });

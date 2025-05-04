@@ -2,8 +2,8 @@
 
 import ErrorState from '@/app/components/shared/ErrorState';
 import { usePlaces } from '@/hooks/usePlaces';
-import PlaceMapView from '@/components/features/places/map/PlaceMapView';
-import PlaceListView from '@/components/features/places/list/PlaceListView';
+import PlaceMapView from '@/app/components/features/places/PlaceMapView';
+import PlaceListView from '@/app/components/features/places/list/PlaceListView';
 import { useHeaderConfig } from '@/hooks/useHeaderConfig';
 
 export default function PlacesPage() {
