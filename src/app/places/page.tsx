@@ -7,13 +7,6 @@ import PlaceListView from '../components/features/places/PlaceListView';
 import { useHeaderConfig } from '@/hooks/useHeaderConfig';
 
 export default function PlacesPage() {
-  useHeaderConfig({
-    title: '拠点',
-    showBackButton: false,
-    showLogo: true,
-    showSearchForm: false
-  });
-
   const {
     memberships,
     places,
