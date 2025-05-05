@@ -5,8 +5,8 @@ import { useQuery, gql } from '@apollo/client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLoading } from './useLoading';
 import { formatWalletData, getTransactionDescription, formatTransactionDate } from '@/utils/walletUtils';
+import { useLoading } from "@/hooks";
 
 const GET_WALLET = gql`
   query GetWallet($userId: ID!) {
@@ -34,28 +34,19 @@ const GET_WALLET = gql`
 `;
 
 const GET_TRANSACTION_HISTORY = gql`
-  query GetTransactionHistory($userId: ID!, $first: Int, $after: String) {
+  query GetTransactionHistory($userId: ID!, $first: Int) {
     user(id: $userId) {
       id
       wallets {
         edges {
           node {
             id
-            transactions(first: $first, after: $after) {
+            transactions(first: $first) {
               edges {
                 node {
                   id
-                  amount
                   reason
                   createdAt
-                  fromUser {
-                    id
-                    name
-                  }
-                  toUser {
-                    id
-                    name
-                  }
                 }
                 cursor
               }
