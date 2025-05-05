@@ -11,13 +11,14 @@ export const formatUserProfileData = (data: GetUserProfileData | GetUserWithDeta
   return {
     id: data.user.id,
     name: data.user.name,
-    email: data.user.email,
     image: data.user.image,
     bio: data.user.bio,
-    prefecture: data.user.prefecture,
-    city: data.user.city,
-    createdAt: data.user.createdAt,
-    updatedAt: data.user.updatedAt,
+    sysRole: data.user.sysRole,
+    urlFacebook: data.user.urlFacebook,
+    urlInstagram: data.user.urlInstagram,
+    urlWebsite: data.user.urlWebsite,
+    urlX: data.user.urlX,
+    urlYoutube: data.user.urlYoutube,
     opportunities: 'opportunitiesCreatedByMe' in data.user && data.user.opportunitiesCreatedByMe
       ? data.user.opportunitiesCreatedByMe.edges.map(edge => ({
           id: edge.node.id,
