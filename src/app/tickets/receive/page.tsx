@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import LoginModal from "@/components/elements/LoginModal";
+import LoginModal from "@/components/features/login/LoginModal";
 import Loading from "@/app/components/layout/Loading";
 import { ErrorState } from "@/app/components/shared/ErrorState";
 import { useTicketClaim } from "@/hooks/features/ticket/useTicketClaim";

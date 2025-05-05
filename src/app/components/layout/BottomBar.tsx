@@ -46,7 +46,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
           </Link>
           <Link href="/places" className={getLinkStyle("/places", "/places/*")}>
             <Globe size={24} />
-            <span className="text-xs mt-1">探す</span>
+            <span className="text-xs mt-1">拠点</span>
           </Link>
           <Link href="/users/me" className={getLinkStyle("/users/me", "/users/me/*")}>
             <User size={24} />

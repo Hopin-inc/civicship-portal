@@ -5,10 +5,10 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
-import LoginModal from "@/app/components/elements/LoginModal";
+import LoginModal from "@/components/features/login/LoginModal";
 import { useHeader } from "@/contexts/HeaderContext";
 import { cn } from "@/lib/utils";
-import SearchBox from "../search/SearchBox";
+import SearchBox from "../features/search/SearchBox";
 
 interface HeaderProps {
   className?: string
@@ -63,14 +63,6 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             </h1>
           )}
         </div>
-        {/* {uid && (
-          <button
-            onClick={handleLogout}
-            className="ml-4 px-4 py-2 text-sm font-medium text-foreground hover:text-foreground/80 transition-colors"
-          >
-            ログアウト
-          </button>
-        )} */}
       </div>
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </header>

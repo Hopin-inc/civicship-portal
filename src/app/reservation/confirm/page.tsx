@@ -5,7 +5,7 @@ import { ErrorState } from "@/app/components/shared/ErrorState";
 import { LoadingIndicator } from "@/app/components/shared/LoadingIndicator";
 import { Button } from "@/app/components/ui/button";
 import { Toaster } from "@/app/components/ui/sonner";
-import LoginModal from "@/app/components/elements/LoginModal";
+import LoginModal from "@/components/features/login/LoginModal";
 import { OpportunityInfo } from "@/app/components/features/reservation/OpportunityInfo";
 import { ReservationDetailsCard } from "@/app/components/features/reservation/ReservationDetailsCard";
 import { PaymentSection } from "@/app/components/features/reservation/PaymentSection";

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Sheet, SheetContent } from "@/app/components/ui/sheet";
-import { Button } from "@/app/components/ui/button";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
