@@ -3,6 +3,21 @@
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
+import { 
+  OpportunityEdge, 
+  Opportunity as GraphQLOpportunity 
+} from '../../gql/graphql';
+import { OpportunityCardProps } from '../../app/components/features/opportunity/OpportunityCard';
+
+export interface SearchParams {
+  location?: string;
+  from?: string;
+  to?: string;
+  guests?: string;
+  type?: 'activity' | 'quest';
+  ticket?: string;
+  q?: string;
+}
 
 /**
  * Format date range for display
@@ -34,4 +49,46 @@ export const buildSearchParams = (
   params.set('type', selectedTab);
   
   return params;
+};
+
+/**
+ * Map GraphQL opportunity node to card props
+ */
+export const mapNodeToCardProps = (node: GraphQLOpportunity): OpportunityCardProps => ({
+  id: node.id,
+  title: node.title,
+  price: node.feeRequired || null,
+  location: node.place?.name || '場所未定',
+  imageUrl: node.images?.[0] || null,
+  community: node.community ? { id: node.community.id } : undefined,
+  isReservableWithTicket: node.isReservableWithTicket || false,
+});
+
+/**
+ * Transform opportunities into recommended opportunities
+ */
+export const transformRecommendedOpportunities = (opportunities: { edges: OpportunityEdge[] }): OpportunityCardProps[] => {
+  return opportunities.edges
+    .filter((edge: OpportunityEdge) => edge?.node?.slots?.edges?.[0]?.node?.startsAt)
+    .map((edge: OpportunityEdge) => edge.node && mapNodeToCardProps(edge.node))
+    .filter(Boolean) as OpportunityCardProps[];
+};
+
+/**
+ * Group opportunities by date
+ */
+export const groupOpportunitiesByDate = (opportunities: { edges: OpportunityEdge[] }): { [key: string]: OpportunityCardProps[] } => {
+  return opportunities.edges.reduce(
+    (acc: { [key: string]: OpportunityCardProps[] }, edge: OpportunityEdge) => {
+      if (!edge?.node?.slots?.edges?.[0]?.node?.startsAt) return acc;
+      
+      const dateKey = format(new Date(edge.node.slots.edges[0].node.startsAt), 'yyyy-MM-dd');
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
+      }
+      acc[dateKey].push(mapNodeToCardProps(edge.node));
+      return acc;
+    },
+    {},
+  );
 };
