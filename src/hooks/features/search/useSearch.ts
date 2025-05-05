@@ -3,7 +3,8 @@
 import { useSearchController } from './useSearchController';
 import { SearchTabType, SearchFilterType, Prefecture, PREFECTURES } from './useSearchState';
 
-export { SearchTabType, SearchFilterType, Prefecture, PREFECTURES };
+export type { SearchTabType, SearchFilterType, Prefecture };
+export { PREFECTURES };
 
 /**
  * Custom hook for managing search state and functionality
