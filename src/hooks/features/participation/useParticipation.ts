@@ -22,7 +22,7 @@ export const useParticipation = (id: string) => {
     title: opportunityData.title,
     description: opportunityData.description || "",
     type: opportunityData.category === 'EVENT' ? 'EVENT' : 'QUEST',
-    status: opportunityData.publishStatus === 'PUBLIC' ? 'open' : 'closed',
+    status: opportunityData.publishStatus === 'PUBLIC' ? 'open' : (opportunityData.publishStatus === 'COMMUNITY_INTERNAL' ? 'in_progress' : 'closed'),
     communityId: opportunityData.community?.id || "",
     hostId: opportunityData.createdByUser?.id || "",
     startsAt: opportunityData.slots?.edges?.[0]?.node?.startsAt || new Date(),
@@ -31,11 +31,11 @@ export const useParticipation = (id: string) => {
     updatedAt: opportunityData.updatedAt || new Date(),
     host: {
       name: opportunityData.createdByUser?.name || "",
-      image: opportunityData.createdByUser?.image || "",
+      image: opportunityData.createdByUser?.image || null,
       title: "",
       bio: "",
     },
-    image: opportunityData.image || undefined,
+    images: opportunityData.images || [],
     location: {
       name: opportunityData.place?.name || "",
       address: opportunityData.place?.address || "",
@@ -45,7 +45,7 @@ export const useParticipation = (id: string) => {
     },
     community: opportunityData.community ? {
       id: opportunityData.community.id,
-      title: opportunityData.community.name,
+      title: opportunityData.community.name || "",
       description: "",
       icon: opportunityData.community.image || "",
     } : undefined,
@@ -55,13 +55,15 @@ export const useParticipation = (id: string) => {
     participants: opportunityData.slots?.edges?.[0]?.node?.participations?.edges?.map(edge => ({
       id: edge?.node?.user?.id || "",
       name: edge?.node?.user?.name || "",
-      image: edge?.node?.user?.image || undefined,
+      image: edge?.node?.user?.image || null,
     })) || [],
     body: opportunityData.body || undefined,
     createdByUser: opportunityData.createdByUser ? {
       id: opportunityData.createdByUser.id,
       name: opportunityData.createdByUser.name || "",
-      image: opportunityData.createdByUser.image || undefined
+      image: opportunityData.createdByUser.image || null,
+      articlesAboutMe: undefined,
+      opportunitiesCreatedByMe: undefined
     } : undefined,
     place: opportunityData.place ? {
       name: opportunityData.place.name || "",
@@ -86,7 +88,7 @@ export const useParticipation = (id: string) => {
                 user: {
                   id: pEdge?.node?.user?.id || "",
                   name: pEdge?.node?.user?.name || "",
-                  image: pEdge?.node?.user?.image || undefined,
+                  image: pEdge?.node?.user?.image || null,
                 },
               },
             })) || [],
@@ -102,11 +104,18 @@ export const useParticipation = (id: string) => {
       id: data.participation.id,
       status: data.participation.status,
       reason: data.participation.reason,
-      images: data.participation.images || [],
+      images: (data.participation.images || []).map(url => ({
+        id: `img-${url.split('/').pop()}`,
+        url,
+        caption: null,
+        participationId: data.participation?.id || "",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      })),
       user: {
         id: data.participation.user?.id || "",
         name: data.participation.user?.name || "",
-        image: data.participation.user?.image || undefined,
+        image: data.participation.user?.image || null,
       },
       reservation: data.participation.reservation ? {
         id: data.participation.reservation.id,
@@ -122,7 +131,7 @@ export const useParticipation = (id: string) => {
           user: {
             id: participation.user?.id || "",
             name: participation.user?.name || "",
-            image: participation.user?.image || undefined,
+            image: participation.user?.image || null,
           }
         })) || [],
       } : undefined,
@@ -136,4 +145,4 @@ export const useParticipation = (id: string) => {
     error,
     refetch,
   };
-}; 
+};              
