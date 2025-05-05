@@ -6,11 +6,11 @@ import { useActivities } from '@/hooks/features/activity/useActivities'
 import { mapOpportunityToCardProps } from '@/utils/opportunityUtils'
 import { useHeaderConfig } from '@/hooks/core/useHeaderConfig'
 import { OpportunityEdge } from '@/types'
-import ActivitiesFeaturedSection from '../components/features/activity/ActivitiesFeaturedSection'
-import ActivitiesUpcomingSection from '../components/features/activity/ActivitiesUpcomingSection'
-import ActivitiesFeaturedItemsSection from '../components/features/activity/ActivitiesFeaturedItemsSection'
-import ActivitiesAllSection from '../components/features/activity/ActivitiesAllSection'
-import { ErrorState } from '../components/shared/ErrorState'
+import ActivitiesFeaturedSection from '@/components/features/activity/ActivitiesFeaturedSection'
+import ActivitiesUpcomingSection from '@/components/features/activity/ActivitiesUpcomingSection'
+import ActivitiesFeaturedItemsSection from '@/components/features/activity/ActivitiesFeaturedItemsSection'
+import ActivitiesAllSection from '@/components/features/activity/ActivitiesAllSection'
+import { ErrorState } from "@/components/shared/ErrorState"
 
 export default function ActivitiesPage() {
   const { setIsLoading } = useLoading()
@@ -35,8 +35,8 @@ export default function ActivitiesPage() {
 
   if (error) return <ErrorState message={`Error: ${error.message}`} />
 
-  const upcomingCards = upcomingActivities.edges.map(({ node }: OpportunityEdge) => mapOpportunityToCardProps(node))
   const featuredCards = featuredActivities.edges.map(({ node }: OpportunityEdge) => mapOpportunityToCardProps(node))
+  const upcomingCards = upcomingActivities.edges.map(({ node }: OpportunityEdge) => mapOpportunityToCardProps(node))
   const allCards = allActivities.edges.map(({ node }: OpportunityEdge) => mapOpportunityToCardProps(node))
 
   return (
@@ -44,7 +44,7 @@ export default function ActivitiesPage() {
       <ActivitiesFeaturedSection opportunities={upcomingCards} />
       <ActivitiesUpcomingSection opportunities={upcomingCards} />
       <ActivitiesFeaturedItemsSection opportunities={featuredCards} />
-      <ActivitiesAllSection 
+      <ActivitiesAllSection
         opportunities={allCards}
         loadMoreRef={loadMoreRef}
         isLoading={loading}
