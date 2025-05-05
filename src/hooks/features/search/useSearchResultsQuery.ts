@@ -2,7 +2,7 @@
 
 import { useQuery } from '@apollo/client';
 import { SEARCH_OPPORTUNITIES } from '../../../graphql/queries/search';
-import { OpportunityFilterInput } from '../../../gql/graphql';
+import { GqlOpportunityFilterInput as OpportunityFilterInput } from '@/types/graphql';
 
 /**
  * Hook for fetching search results from GraphQL

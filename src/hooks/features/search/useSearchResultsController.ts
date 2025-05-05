@@ -4,12 +4,12 @@ import { useEffect } from 'react';
 import { useHeader } from '@/contexts/HeaderContext';
 import { useLoading } from '@/hooks/core/useLoading';
 import { 
-  OpportunityCategory, 
-  PublishStatus, 
-  OpportunityFilterInput, 
-  OpportunityEdge, 
-  Opportunity as GraphQLOpportunity 
-} from '@/gql/graphql';
+  GqlOpportunityCategory as OpportunityCategory, 
+  GqlPublishStatus as PublishStatus, 
+  GqlOpportunityFilterInput as OpportunityFilterInput, 
+  GqlOpportunityEdge as OpportunityEdge, 
+  GqlOpportunity as GraphQLOpportunity 
+} from '@/types/graphql';
 import { OpportunityCardProps } from '@/components/features/opportunity/OpportunityCard';
 import { useSearchResultsQuery } from './useSearchResultsQuery';
 import { 

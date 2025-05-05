@@ -1,6 +1,6 @@
 'use client';
 
-import type { Opportunity as GraphQLOpportunity } from "@/gql/graphql";
+import type { GqlOpportunity as GraphQLOpportunity } from "@/types/graphql";
 import type { Opportunity, Article, Participation } from "@/types";
 
 /**

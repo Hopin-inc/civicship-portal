@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { GET_ARTICLE } from "@/graphql/queries/article";
 import type { Article, ArticleType } from "@/types";
-import type { ArticleCategory } from "@/gql/graphql";
+import type { GqlArticleCategory } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
 interface UseArticleResult {
   article: Article | null;
@@ -84,4 +84,4 @@ export const useArticle = (id: string): UseArticleResult => {
     loading,
     error: error || null,
   };
-};  
+};    
