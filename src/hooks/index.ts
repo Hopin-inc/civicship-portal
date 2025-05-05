@@ -48,4 +48,4 @@ export * from './features/wallet/useWallet';
 export * from './features/wallet/useTransactionHistory';
 
 // Other hooks
-export * from './useOpportunity';
+export * from './features/activity/useOpportunity';

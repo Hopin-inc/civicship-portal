@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHeader } from '@/contexts/HeaderContext';
-import { useOpportunity } from '@/hooks/useOpportunity';
+import { useOpportunity } from '@/hooks/features/activity/useOpportunity';
 import { useLoading } from '@/hooks/core/useLoading';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMutation, useQuery } from '@apollo/client';

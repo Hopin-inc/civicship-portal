@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { MapPin, Ticket } from 'lucide-react';
-import { Opportunity } from '@/types/index';
+import { Opportunity } from "@/types";
 
 interface ActivityDetailsHeaderProps {
   opportunity: Opportunity;
