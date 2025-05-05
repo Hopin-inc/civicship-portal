@@ -5,10 +5,10 @@ import {
   Youtube,
   Globe,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import type { User, SocialLink, SocialLinkType } from "@/types";
 import { useState, useMemo } from "react";
-import { UserSocialLinksEditModal } from "./UserSocialLinksEditModal";
+// import { UserSocialLinksEditModal } from "./UserSocialLinksEditModal";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -84,7 +84,7 @@ export const UserSocialLinks = ({
             return (
               <Button
                 key={type}
-                variant="ghost"
+                variant="tertiary"
                 size="icon"
                 className={cn(
                   "h-8 w-8 rounded-full",

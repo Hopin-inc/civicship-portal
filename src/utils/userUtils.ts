@@ -26,10 +26,12 @@ export const formatUserProfileData = (userData: any) => {
     image: user.image,
     bio: user.bio || '',
     currentPrefecture: user.currentPrefecture,
-    socialLinks: {
-      facebook: user.urlFacebook || '',
-      instagram: user.urlInstagram || '',
-      twitter: user.urlX || '',
-    }
+    socialLinks: [
+      { type: 'facebook', url: user.urlFacebook || null },
+      { type: 'instagram', url: user.urlInstagram || null },
+      { type: 'x', url: user.urlX || null },
+      { type: 'youtube', url: user.urlYoutube || null },
+      { type: 'website', url: user.urlWebsite || null }
+    ]
   };
 };
