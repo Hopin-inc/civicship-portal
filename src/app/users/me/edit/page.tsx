@@ -40,7 +40,7 @@ export default function ProfileEditPage() {
     if (userData?.user) {
       const { user: userDetails } = userData;
       setDisplayName(userDetails.name);
-      setProfileImage(userDetails.image || null);
+      setProfileImage(userDetails.image ? userDetails.image : null);
       setBio(userDetails.bio || '');
       setLocation(userDetails.currentPrefecture || undefined);
       setSocialLinks({
@@ -76,7 +76,7 @@ export default function ProfileEditPage() {
         variables: {
           input: {
             name: displayName,
-            image: profileImage ? { base64: profileImage } : undefined,
+            image: profileImage ? { base64: profileImage } : null,
             bio,
             currentPrefecture: location,
             urlFacebook: socialLinks.facebook,
