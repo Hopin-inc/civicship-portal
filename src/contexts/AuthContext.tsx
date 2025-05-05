@@ -130,7 +130,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [auth, ready, cookies, refetch, router, searchParams, login]);
+  }, [ready, cookies, refetch, router, searchParams, login]);
 
   const logout = async () => {
     setIsAuthenticating(true);
