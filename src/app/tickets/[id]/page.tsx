@@ -7,7 +7,7 @@ import TicketDetailProfile from '@/app/components/features/ticket/TicketDetailPr
 import TicketDetailInfo from '@/app/components/features/ticket/TicketDetailInfo';
 import TicketDetailRequests from '@/app/components/features/ticket/TicketDetailRequests';
 import TicketDetailAction from '@/app/components/features/ticket/TicketDetailAction';
-import { useTicketDetail } from '@/hooks/useTicketDetail';
+import { useTicketDetail } from '@/hooks/features/ticket/useTicketDetail';
 import { LoadingIndicator } from '@/app/components/shared/LoadingIndicator';
 import { ErrorState } from '@/app/components/shared/ErrorState';
 

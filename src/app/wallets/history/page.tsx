@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useTransactionHistory } from '@/hooks/useTransactionHistory';
+import { useTransactionHistory } from '@/hooks/features/wallet/useTransactionHistory';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHeader } from '@/contexts/HeaderContext';
 import { LoadingIndicator } from '@/app/components/shared/LoadingIndicator';

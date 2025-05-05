@@ -2,7 +2,7 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { Membership } from "@/hooks/usePlaces";
+import { Membership } from "@/hooks/features/place/usePlaces";
 import PlaceToggleButton from '../shared/PlaceToggleButton';
 import { PlaceList } from '../list/PlaceList';
 import PlaceCardsSheet from '../shared/PlaceCardsSheet';
