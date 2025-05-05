@@ -27,6 +27,7 @@ function transformGraphQLArticleToArticle(graphqlArticle: any): Article {
     id: graphqlArticle.id,
     title: graphqlArticle.title,
     description: graphqlArticle.introduction,
+    introduction: graphqlArticle.introduction,
     content: graphqlArticle.body ?? '',
     type: mapCategoryToArticleType(graphqlArticle.category),
     thumbnail: graphqlArticle.thumbnail,
@@ -83,4 +84,4 @@ export const useArticle = (id: string): UseArticleResult => {
     loading,
     error: error || null,
   };
-}; 
+};  

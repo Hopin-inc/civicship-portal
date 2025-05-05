@@ -14,6 +14,7 @@ const transformArticle = (node: any): Partial<Article> => ({
   id: node.id,
   title: node.title,
   description: node.introduction || "",
+  introduction: node.introduction || "",
   thumbnail: node.thumbnail || null,
 });
 
@@ -188,4 +189,4 @@ export const useOpportunity = (id: string): UseOpportunityResult => {
     loading,
     error: error || null,
   };
-};            
+};              

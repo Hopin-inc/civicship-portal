@@ -219,6 +219,7 @@ export type Article = {
   id: string;
   title: string;
   description: string;
+  introduction: string;
   content: string;
   type: ArticleType;
   thumbnail: string;

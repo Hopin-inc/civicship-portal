@@ -118,7 +118,7 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
                       {opportunity.createdByUser.articlesAboutMe.edges[0].node.title}
                     </h5>
                     <p className="text-gray-600 text-sm line-clamp-2">
-                      {opportunity.createdByUser.articlesAboutMe.edges[0].node.description}
+                      {opportunity.createdByUser.articlesAboutMe.edges[0].node.introduction}
                     </p>
                   </div>
                 </div>
