@@ -146,7 +146,7 @@ export const useUserPortfolios = (userId: string) => {
         first: ITEMS_PER_PAGE,
         after: null,
         filter: null,
-        sort: { field: "DATE", direction: "DESC" }
+        sort: { date: "DESC" }
       },
       fetchPolicy: "network-only",
       skip: !userId
@@ -187,7 +187,7 @@ export const useUserPortfolios = (userId: string) => {
           first: ITEMS_PER_PAGE,
           after: lastCursor,
           filter: null,
-          sort: { field: "DATE", direction: "DESC" }
+          sort: { date: "DESC" }
         }
       });
 
