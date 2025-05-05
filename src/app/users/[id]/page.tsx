@@ -3,9 +3,9 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/features/user/useUserProfile";
 import { useUserPortfolios } from "@/hooks/features/user/useUserPortfolios";
-import { UserProfileSection } from "@/app/components/features/user/UserProfileSection";
-import { LoadingIndicator } from "@/app/components/shared/LoadingIndicator";
-import { ErrorState } from "@/app/components/shared/ErrorState";
+import { UserProfileSection } from "@/components/features/user/UserProfileSection";
+import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export default function UserPage({ params }: { params: { id: string } }) {
   const { user: currentUser } = useAuth();

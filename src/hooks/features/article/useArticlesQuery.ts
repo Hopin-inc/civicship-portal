@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import { GET_ARTICLES } from "../../../graphql/queries/articles";
 import { SortDirection } from "../../../gql/graphql";
 
-import { GetArticlesData } from "../../../lib/transformers/article";
+import { GetArticlesData } from "../../../transformers/article";
 
 export const ARTICLES_PER_PAGE = 12;
 

@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { useTickets } from '@/hooks/features/ticket/useTickets';
-import TicketHeader from '../components/features/ticket/TicketHeader';
-import TicketContent from '../components/features/ticket/TicketContent';
-import Loading from '../components/layout/Loading';
-import { ErrorState } from '../components/shared/ErrorState';
+import TicketHeader from '@/components/features/ticket/TicketHeader';
+import TicketContent from '@/components/features/ticket/TicketContent';
+import Loading from '@/components/layout/Loading';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export default function TicketsPage() {
   const { tickets, loading, error } = useTickets();

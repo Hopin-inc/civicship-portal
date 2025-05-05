@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useSearchState } from './useSearchState';
-import { formatDateRange, buildSearchParams } from '../../../lib/transformers/search';
+import { formatDateRange, buildSearchParams } from '../../../transformers/search';
 
 /**
  * Controller hook for search functionality

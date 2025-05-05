@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUserProfileQuery } from './useUserProfileQuery';
-import { formatUserProfileData } from '../../../lib/transformers/user';
+import { formatUserProfileData } from '../../../transformers/user';
 import { useLoading } from '../../core/useLoading';
 import { toast } from 'sonner';
 

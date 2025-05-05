@@ -2,13 +2,13 @@
 
 import { FC, useState } from "react";
 import { usePlaceDetail } from "@/hooks/features/place/usePlaceDetail";
-import { RecentActivitiesTimeline } from "@/app/components/features/activity/RecentActivitiesTimeline";
+import { RecentActivitiesTimeline } from "@/components/features/activity/RecentActivitiesTimeline";
 import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
 import PlaceImageSlider from "@/components/features/places/detail/PlaceImageSlider";
 import PlaceHeader from "@/components/features/places/detail/PlaceHeader";
 import PlaceOpportunities from "@/components/features/places/detail/PlaceOpportunities";
 import PlaceFeaturedArticle from "@/components/features/places/detail/PlaceFeaturedArticle";
-import { ErrorState } from "@/app/components/shared/ErrorState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 interface PlaceDetailProps {
   params: {

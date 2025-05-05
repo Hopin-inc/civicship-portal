@@ -4,9 +4,9 @@ import React, { useEffect } from 'react';
 import { useTransactionHistory } from '@/hooks/features/wallet/useTransactionHistory';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHeader } from '@/contexts/HeaderContext';
-import { LoadingIndicator } from '@/app/components/shared/LoadingIndicator';
-import { ErrorState } from '@/app/components/shared/ErrorState';
-import { TransactionItem } from '@/app/components/features/wallet/TransactionItem';
+import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { TransactionItem } from '@/components/features/wallet/TransactionItem';
 
 export default function HistoryPage() {
   const { user } = useAuth();

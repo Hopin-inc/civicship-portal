@@ -1,12 +1,12 @@
 "use client";
 
-import { ErrorState } from "@/app/components/shared/ErrorState";
-import { LoadingIndicator } from "@/app/components/shared/LoadingIndicator";
-import { RecentActivitiesTimeline } from "@/app/components/features/activity/RecentActivitiesTimeline";
-import { SimilarActivitiesList } from "@/app/components/features/activity/SimilarActivitiesList";
-import { CompletionHeader } from "@/app/components/features/reservation/CompletionHeader";
-import { ActivitySummary } from "@/app/components/features/reservation/ActivitySummary";
-import { ReservationDetails } from "@/app/components/features/reservation/ReservationDetails";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
+import { RecentActivitiesTimeline } from "@/components/features/activity/RecentActivitiesTimeline";
+import { SimilarActivitiesList } from "@/components/features/activity/SimilarActivitiesList";
+import { CompletionHeader } from "@/components/features/reservation/CompletionHeader";
+import { ActivitySummary } from "@/components/features/reservation/ActivitySummary";
+import { ReservationDetails } from "@/components/features/reservation/ReservationDetails";
 import { useReservationComplete } from "@/hooks/features/reservation/useReservationComplete";
 
 /**

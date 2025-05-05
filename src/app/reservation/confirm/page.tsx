@@ -1,15 +1,15 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { ErrorState } from "@/app/components/shared/ErrorState";
-import { LoadingIndicator } from "@/app/components/shared/LoadingIndicator";
-import { Button } from "@/app/components/ui/button";
-import { Toaster } from "@/app/components/ui/sonner";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
+import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/sonner";
 import LoginModal from "@/components/features/login/LoginModal";
-import { OpportunityInfo } from "@/app/components/features/reservation/OpportunityInfo";
-import { ReservationDetailsCard } from "@/app/components/features/reservation/ReservationDetailsCard";
-import { PaymentSection } from "@/app/components/features/reservation/PaymentSection";
-import { NotesSection } from "@/app/components/features/reservation/NotesSection";
+import { OpportunityInfo } from "@/components/features/reservation/OpportunityInfo";
+import { ReservationDetailsCard } from "@/components/features/reservation/ReservationDetailsCard";
+import { PaymentSection } from "@/components/features/reservation/PaymentSection";
+import { NotesSection } from "@/components/features/reservation/NotesSection";
 import { useReservationConfirm } from "@/hooks/features/reservation/useReservationConfirm";
 
 /**

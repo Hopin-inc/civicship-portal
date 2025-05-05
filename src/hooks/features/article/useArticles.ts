@@ -1,7 +1,7 @@
 'use client';
 
 import { useArticlesController } from './useArticlesController';
-import type { Article } from '../../../lib/transformers/article';
+import type { Article } from '../../../transformers/article';
 
 interface UseArticlesResult {
   articles: Article[];

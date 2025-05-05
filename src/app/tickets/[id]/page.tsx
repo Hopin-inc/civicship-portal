@@ -2,14 +2,14 @@
 
 import React from 'react';
 import { useParams } from 'next/navigation';
-import { TicketDetailHeader } from '@/app/components/features/ticket/TicketDetailHeader';
-import { TicketDetailProfile } from '@/app/components/features/ticket/TicketDetailProfile';
-import { TicketDetailInfo } from '@/app/components/features/ticket/TicketDetailInfo';
-import { TicketDetailRequests } from '@/app/components/features/ticket/TicketDetailRequests';
-import { TicketDetailAction } from '@/app/components/features/ticket/TicketDetailAction';
+import { TicketDetailHeader } from '@/components/features/ticket/TicketDetailHeader';
+import { TicketDetailProfile } from '@/components/features/ticket/TicketDetailProfile';
+import { TicketDetailInfo } from '@/components/features/ticket/TicketDetailInfo';
+import { TicketDetailRequests } from '@/components/features/ticket/TicketDetailRequests';
+import { TicketDetailAction } from '@/components/features/ticket/TicketDetailAction';
 import { useTicketDetail } from '@/hooks/features/ticket/useTicketDetail';
-import { LoadingIndicator } from '@/app/components/shared/LoadingIndicator';
-import { ErrorState } from '@/app/components/shared/ErrorState';
+import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export default function TicketDetailPage() {
   const params = useParams();

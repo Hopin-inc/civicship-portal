@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import LoginModal from "@/components/features/login/LoginModal";
-import Loading from "@/app/components/layout/Loading";
-import { ErrorState } from "@/app/components/shared/ErrorState";
+import Loading from "@/components/layout/Loading";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { useTicketClaim } from "@/hooks/features/ticket/useTicketClaim";
-import TicketReceiveContent from "@/app/components/features/ticket/TicketReceiveContent";
+import TicketReceiveContent from "@/components/features/ticket/TicketReceiveContent";
 
 export default function TicketReceivePage() {
   const searchParams = useSearchParams();

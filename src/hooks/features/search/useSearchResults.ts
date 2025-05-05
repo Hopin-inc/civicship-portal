@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchResultsController } from './useSearchResultsController';
-import type { SearchParams } from '@/lib/transformers/search';
+import type { SearchParams } from '@/transformers/search';
 
 /**
  * Custom hook for managing search results

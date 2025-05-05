@@ -7,14 +7,14 @@ import { ParticipationStatus } from "@/gql/graphql";
 import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
 import { useParticipationState } from "@/hooks/features/participation/useParticipationState";
 import { calculateCancellationDeadline } from "@/utils/participationUtils";
-import { LoadingIndicator } from "@/app/components/shared/LoadingIndicator";
-import { ErrorState } from "@/app/components/shared/ErrorState";
-import { ParticipationStatusNotification } from "@/app/components/features/participation/ParticipationStatusNotification";
-import { NotificationMessage } from "@/app/components/features/participation/NotificationMessage";
-import { ParticipationHeader } from "@/app/components/features/participation/ParticipationHeader";
-import { ParticipationDetails } from "@/app/components/features/participation/ParticipationDetails";
-import { ParticipationImageGallery } from "@/app/components/features/participation/ParticipationImageGallery";
-import { ParticipationActions } from "@/app/components/features/participation/ParticipationActions";
+import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { ParticipationStatusNotification } from "@/components/features/participation/ParticipationStatusNotification";
+import { NotificationMessage } from "@/components/features/participation/NotificationMessage";
+import { ParticipationHeader } from "@/components/features/participation/ParticipationHeader";
+import { ParticipationDetails } from "@/components/features/participation/ParticipationDetails";
+import { ParticipationImageGallery } from "@/components/features/participation/ParticipationImageGallery";
+import { ParticipationActions } from "@/components/features/participation/ParticipationActions";
 
 interface ParticipationProps {
   params: {

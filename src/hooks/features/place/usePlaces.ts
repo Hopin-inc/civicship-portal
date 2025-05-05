@@ -7,7 +7,7 @@ import type {
   Membership, 
   PlaceData, 
   UsePlacesResult 
-} from '../../../lib/transformers/place';
+} from '../../../transformers/place';
 
 export type { 
   Place, 

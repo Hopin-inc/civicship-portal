@@ -1,5 +1,5 @@
 import { Opportunity } from '@/types';
-import { OpportunityCardProps } from '@/app/components/features/opportunity/OpportunityCard';
+import { OpportunityCardProps } from '@/components/features/opportunity/OpportunityCard';
 
 export const mapOpportunityToCardProps = (node: Opportunity): OpportunityCardProps => ({
   id: node.id,

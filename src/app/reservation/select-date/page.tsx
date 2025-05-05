@@ -1,11 +1,11 @@
 "use client";
 
-import { ErrorState } from "@/app/components/shared/ErrorState";
-import { LoadingIndicator } from "@/app/components/shared/LoadingIndicator";
-import { DateSelectionForm } from "@/app/components/features/reservation/DateSelectionForm";
-import { GuestSelectionForm } from "@/app/components/features/reservation/GuestSelectionForm";
-import { TimeSlotList } from "@/app/components/features/reservation/TimeSlotList";
-import { SelectionSheet } from "@/app/components/features/reservation/SelectionSheet";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
+import { DateSelectionForm } from "@/components/features/reservation/DateSelectionForm";
+import { GuestSelectionForm } from "@/components/features/reservation/GuestSelectionForm";
+import { TimeSlotList } from "@/components/features/reservation/TimeSlotList";
+import { SelectionSheet } from "@/components/features/reservation/SelectionSheet";
 import { useReservationDateSelection } from "@/hooks/features/reservation/useReservationDateSelection";
 
 /**

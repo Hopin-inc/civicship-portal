@@ -10,13 +10,13 @@ import {
   OpportunityEdge, 
   Opportunity as GraphQLOpportunity 
 } from '@/gql/graphql';
-import { OpportunityCardProps } from '@/app/components/features/opportunity/OpportunityCard';
+import { OpportunityCardProps } from '@/components/features/opportunity/OpportunityCard';
 import { useSearchResultsQuery } from './useSearchResultsQuery';
 import { 
   mapNodeToCardProps, 
   transformRecommendedOpportunities, 
   groupOpportunitiesByDate 
-} from '@/lib/transformers/search';
+} from '@/transformers/search';
 
 export interface SearchParams {
   location?: string;

@@ -11,7 +11,7 @@ import {
   transformMembershipsToPlaces, 
   calculateTotalPlaces,
   UsePlacesResult
-} from '../../../lib/transformers/place';
+} from '../../../transformers/place';
 
 
 /**

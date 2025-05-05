@@ -1,7 +1,7 @@
 'use client';
 
 import { useReservationDateSelectionController } from './useReservationDateSelectionController';
-import type { TimeSlot, DateSection } from '../../../lib/transformers/dateSelection';
+import type { TimeSlot, DateSection } from '../../../transformers/opportunitySlot';
 
 interface UseReservationDateSelectionProps {
   opportunityId: string;

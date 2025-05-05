@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { CookiesProvider } from "next-client-cookies/server";
-import ApolloProvider from "@/app/components/providers/ApolloProvider";
-import { Toaster } from "@/app/components/ui/sonner";
-import LoadingProvider from "@/app/components/providers/LoadingProvider";
-import Header from "@/app/components/layout/Header";
+import ApolloProvider from "@/components/providers/ApolloProvider";
+import { Toaster } from "@/components/ui/sonner";
+import LoadingProvider from "@/components/providers/LoadingProvider";
+import Header from "@/components/layout/Header";
 import { LiffProvider } from "@/contexts/LiffContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { HeaderProvider } from "@/contexts/HeaderContext";
-import BottomBar from "./components/layout/BottomBar";
+import BottomBar from "@/components/layout/BottomBar";
 
 const font = Inter({ subsets: ["latin"] });
 

@@ -4,9 +4,9 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { useProfileEdit } from '@/hooks/features/user/useProfileEdit';
-import { UserProfileEdit } from '@/app/components/features/user/UserProfileEdit';
-import { LoadingIndicator } from '@/app/components/shared/LoadingIndicator';
-import { ErrorState } from '@/app/components/shared/ErrorState';
+import { UserProfileEdit } from '@/components/features/user/UserProfileEdit';
+import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export default function ProfileEditPage() {
   const router = useRouter();

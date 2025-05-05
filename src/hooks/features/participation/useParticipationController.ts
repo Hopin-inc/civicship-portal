@@ -1,7 +1,7 @@
 'use client';
 
 import { useParticipationQuery } from './useParticipationQuery';
-import { transformOpportunity, transformParticipation } from '../../../lib/transformers/participation';
+import { transformOpportunity, transformParticipation } from '../../../transformers/participation';
 
 /**
  * Controller hook for managing participation data
