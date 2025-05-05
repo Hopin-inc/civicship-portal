@@ -2512,6 +2512,43 @@ export type GqlWalletsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type GqlOpportunityFieldsFragment = {
+  __typename?: "Opportunity";
+  id: string;
+  title: string;
+  description: string;
+  images?: Array<string> | null;
+  feeRequired?: number | null;
+  pointsToEarn?: number | null;
+  isReservableWithTicket?: boolean | null;
+  community?: {
+    __typename?: "Community";
+    id: string;
+    name?: string | null;
+    image?: string | null;
+  } | null;
+  place?: {
+    __typename?: "Place";
+    id: string;
+    name: string;
+    address: string;
+    city: { __typename?: "City"; name: string; state: { __typename?: "State"; name: string } };
+  } | null;
+  slots?: {
+    __typename?: "OpportunitySlotsConnection";
+    edges?: Array<{
+      __typename?: "OpportunitySlotEdge";
+      node?: {
+        __typename?: "OpportunitySlot";
+        id: string;
+        startsAt: Date;
+        endsAt: Date;
+        capacity?: number | null;
+      } | null;
+    } | null> | null;
+  } | null;
+};
+
 export type GqlUserSignUpMutationVariables = Exact<{
   input: GqlUserSignUpInput;
 }>;
@@ -2940,43 +2977,6 @@ export type GqlGetMembershipListQuery = {
       } | null;
     } | null> | null;
   };
-};
-
-export type GqlOpportunityFieldsFragment = {
-  __typename?: "Opportunity";
-  id: string;
-  title: string;
-  description: string;
-  images?: Array<string> | null;
-  feeRequired?: number | null;
-  pointsToEarn?: number | null;
-  isReservableWithTicket?: boolean | null;
-  community?: {
-    __typename?: "Community";
-    id: string;
-    name?: string | null;
-    image?: string | null;
-  } | null;
-  place?: {
-    __typename?: "Place";
-    id: string;
-    name: string;
-    address: string;
-    city: { __typename?: "City"; name: string; state: { __typename?: "State"; name: string } };
-  } | null;
-  slots?: {
-    __typename?: "OpportunitySlotsConnection";
-    edges?: Array<{
-      __typename?: "OpportunitySlotEdge";
-      node?: {
-        __typename?: "OpportunitySlot";
-        id: string;
-        startsAt: Date;
-        endsAt: Date;
-        capacity?: number | null;
-      } | null;
-    } | null> | null;
-  } | null;
 };
 
 export type GqlGetOpportunitiesQueryVariables = Exact<{
