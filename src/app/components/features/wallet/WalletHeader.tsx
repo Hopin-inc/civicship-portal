@@ -29,7 +29,7 @@ export const WalletHeader: React.FC<WalletHeaderProps> = ({
           {onSendPoints && (
             <Button 
               onClick={onSendPoints}
-              variant="outline"
+              variant="secondary"
               className="flex items-center justify-center"
             >
               <span className="mr-1">送る</span>
@@ -47,7 +47,7 @@ export const WalletHeader: React.FC<WalletHeaderProps> = ({
           
           <Link href="/wallets/history">
             <Button 
-              variant="outline"
+              variant="secondary"
               className="flex items-center justify-center"
             >
               <span className="mr-1">履歴</span>

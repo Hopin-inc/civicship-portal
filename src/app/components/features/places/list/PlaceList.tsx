@@ -33,13 +33,13 @@ export function PlaceList({ memberships, onClose, isMapMode = false, selectedPla
       .filter(edge => edge.node.publishStatus === 'PUBLIC')
       .length || 0;
 
-    const hostedPlaces = participationView.hosted.geo.map(place => ({
+    const hostedPlaces = participationView.hosted.geo.map((place: any) => ({
       ...place,
       participantCount: participationView.hosted.totalParticipantCount,
       activeOpportunityCount
     }));
     
-    const participatedPlaces = participationView.participated.geo.map(place => ({
+    const participatedPlaces = participationView.participated.geo.map((place: any) => ({
       ...place,
       participantCount: participationView.participated.totalParticipatedCount,
       activeOpportunityCount
@@ -69,4 +69,4 @@ export function PlaceList({ memberships, onClose, isMapMode = false, selectedPla
       getAllPlaces={getAllPlaces}
     />
   );
-}                                  
+}                                                                    

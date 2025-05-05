@@ -54,7 +54,7 @@ const DateTimePicker: React.FC<Props> = (props) => {
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          variant="secondary"
           className={cn(
             "w-full justify-start text-left font-normal",
             !date && "text-muted-foreground",
@@ -78,7 +78,7 @@ const DateTimePicker: React.FC<Props> = (props) => {
                   <Button
                     key={hour}
                     size="icon"
-                    variant={date && date.getHours() === hour ? "default" : "ghost"}
+                    variant={date && date.getHours() === hour ? "primary" : "tertiary"}
                     className="sm:w-full shrink-0 aspect-square"
                     onClick={() => handleTimeChange("hour", hour.toString())}
                   >
@@ -94,7 +94,7 @@ const DateTimePicker: React.FC<Props> = (props) => {
                   <Button
                     key={minute}
                     size="icon"
-                    variant={date && date.getMinutes() === minute ? "default" : "ghost"}
+                    variant={date && date.getMinutes() === minute ? "primary" : "tertiary"}
                     className="sm:w-full shrink-0 aspect-square"
                     onClick={() => handleTimeChange("minute", minute.toString())}
                   >

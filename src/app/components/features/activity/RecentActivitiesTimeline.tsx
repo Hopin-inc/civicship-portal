@@ -115,9 +115,8 @@ const transformOpportunityToHistory = (opportunity: Opportunity): OpportunityHis
   const displayDate = `${date.getMonth() + 1}月${date.getDate()}日(${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]})`;
 
   const images = opportunity.images || [];
-  if (opportunity.image) {
-    images.unshift({ url: opportunity.image, caption: opportunity.title });
-  }
+  
+  // Opportunity type doesn't have 'image' property, only 'images' array
 
   const slotParticipants = opportunity.slots?.edges?.flatMap(edge => 
     edge?.node?.participations?.edges?.map(p => ({
@@ -137,8 +136,8 @@ const transformOpportunityToHistory = (opportunity: Opportunity): OpportunityHis
     fullDate: fullDate,
     title: opportunity.title,
     description: opportunity.description,
-    images: images.map(img => ({ url: img.url, alt: img.caption || opportunity.title })),
-    participants: uniqueParticipants,
+    images: images.map(img => ({ url: img, alt: opportunity.title })),
+    participants: uniqueParticipants as Participant[],
     additionalParticipants: 0,
   };
 };
@@ -186,7 +185,7 @@ export const RecentActivitiesTimeline = ({ opportunities }: RecentActivitiesTime
       </div>
       {opportunityHistories.length > 2 && (
         <Button
-          variant="default"
+          variant="primary"
           className="w-full mt-6"
           onClick={() => setIsExpanded(!isExpanded)}
           aria-label={isExpanded ? "表示を減らす" : "すべての関わりを表示"}
@@ -206,4 +205,4 @@ export const RecentActivitiesTimeline = ({ opportunities }: RecentActivitiesTime
       )}
     </section>
   );
-}; 
+};      

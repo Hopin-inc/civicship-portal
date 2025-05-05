@@ -1,6 +1,19 @@
-import { Ticket } from '../../../../../app/types/ticket';
 import Image from 'next/image';
-import { HandRaisedIcon, PhotoIcon } from '@heroicons/react/24/outline';
+
+interface Ticket {
+  id: string;
+  senderName: string;
+  senderImage: string;
+  quantity: number;
+  purpose: string;
+  requests: string[];
+}
+
+const HandRaisedIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3.85c0 1.35-.65 2.6-1.725 3.4l-.05.05c-.2.2-.2.5 0 .7l.05.05c1.075.8 1.725 2.05 1.725 3.4v3.85a1.575 1.575 0 103.15 0v-3.85c0-1.35.65-2.6 1.725-3.4l.05-.05c.2-.2.2-.5 0-.7l-.05-.05c-1.075-.8-1.725-2.05-1.725-3.4v-3.85z" />
+  </svg>
+);
 
 interface TicketDetailProps {
   ticket: Ticket;
@@ -44,7 +57,7 @@ export default function TicketDetail({ ticket }: TicketDetailProps) {
           お願い
         </h2>
         <ul className="space-y-2">
-          {ticket.requests.map((request, index) => (
+          {ticket.requests.map((request: string, index: number) => (
             <li key={index} className="flex items-start">
               <span className="text-gray-700">{request}</span>
             </li>
@@ -57,4 +70,4 @@ export default function TicketDetail({ ticket }: TicketDetailProps) {
       </button>
     </div>
   );
-} 
+}      

@@ -38,7 +38,6 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
       title: "",
       bio: "",
     },
-    image: node.images?.[0] || null,
     images: node.images || [],
     location: {
       name: "",
@@ -47,9 +46,9 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
     },
     community: data.community ? {
       id: data.community.id,
-      title: data.community.name,
+      title: data.community.name ?? "",
       description: "",
-      icon: data.community.image || "",
+      icon: data.community.image ?? "",
     } : undefined,
     recommendedFor: [],
     capacity: node.capacity,
@@ -94,7 +93,6 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
       title: "",
       bio: "",
     },
-    image: data.images?.[0] || null,
     images: data.images || [],
     location: {
       name: data.place?.name || "",
@@ -105,9 +103,9 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
     },
     community: data.community ? {
       id: data.community.id,
-      title: data.community.name,
+      title: data.community.name ?? "",
       description: "",
-      icon: data.community.image || "",
+      icon: data.community.image ?? "",
     } : undefined,
     recommendedFor: [],
     capacity: data.capacity || 0,
@@ -115,7 +113,7 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
     participants: data.slots?.edges?.[0]?.node?.participations?.edges?.map(edge => ({
       id: edge?.node?.user?.id || "",
       name: edge?.node?.user?.name || "",
-      image: edge?.node?.user?.image || null,
+      image: edge?.node?.user?.image || undefined,
     })) || [],
     body: data.body || undefined,
     createdByUser: data.createdByUser ? {
@@ -149,11 +147,18 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
           id: edge?.node?.id || "",
           startsAt: edge?.node?.startsAt || "",
           endsAt: edge?.node?.endsAt || "",
-          remainingCapacityView: edge?.node?.remainingCapacityView ? {
-            remainingCapacity: edge.node.remainingCapacityView.remainingCapacity || 0
-          } : undefined,
           participations: edge?.node?.participations ? {
-            edges: edge.node.participations.edges?.map(transformParticipationNode) || [],
+            edges: edge.node.participations.edges?.map(pEdge => ({
+              node: {
+                id: pEdge?.node?.id || "",
+                status: pEdge?.node?.status || "",
+                user: {
+                  id: pEdge?.node?.user?.id || "",
+                  name: pEdge?.node?.user?.name || "",
+                  image: pEdge?.node?.user?.image || null,
+                }
+              }
+            })) || [],
           } : undefined,
         },
       })) || [],
@@ -183,4 +188,4 @@ export const useOpportunity = (id: string): UseOpportunityResult => {
     loading,
     error: error || null,
   };
-}; 
+};          

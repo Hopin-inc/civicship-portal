@@ -5,6 +5,7 @@ import { useLoading } from '@/hooks/core/useLoading'
 import { useActivities } from '@/hooks/features/activity/useActivities'
 import { mapOpportunityToCardProps } from '@/utils/opportunityUtils'
 import { useHeaderConfig } from '@/hooks/core/useHeaderConfig'
+import { OpportunityEdge } from '@/types'
 import ActivitiesFeaturedSection from '../components/features/activity/ActivitiesFeaturedSection'
 import ActivitiesUpcomingSection from '../components/features/activity/ActivitiesUpcomingSection'
 import ActivitiesFeaturedItemsSection from '../components/features/activity/ActivitiesFeaturedItemsSection'
@@ -34,9 +35,9 @@ export default function ActivitiesPage() {
 
   if (error) return <ErrorState message={`Error: ${error.message}`} />
 
-  const upcomingCards = upcomingActivities.edges.map(({ node }) => mapOpportunityToCardProps(node))
-  const featuredCards = featuredActivities.edges.map(({ node }) => mapOpportunityToCardProps(node))
-  const allCards = allActivities.edges.map(({ node }) => mapOpportunityToCardProps(node))
+  const upcomingCards = upcomingActivities.edges.map(({ node }: OpportunityEdge) => mapOpportunityToCardProps(node))
+  const featuredCards = featuredActivities.edges.map(({ node }: OpportunityEdge) => mapOpportunityToCardProps(node))
+  const allCards = allActivities.edges.map(({ node }: OpportunityEdge) => mapOpportunityToCardProps(node))
 
   return (
     <div className="min-h-screen pb-16">
