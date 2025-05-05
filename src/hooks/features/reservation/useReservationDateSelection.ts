@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHeader } from '@/contexts/HeaderContext';
 import { useOpportunity } from '@/hooks/useOpportunity';
-import { useLoading } from '@/hooks/useLoading';
+import { useLoading } from '@/hooks/core/useLoading';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
@@ -70,9 +70,11 @@ export const useReservationDateSelection = ({
       const dayStr = format(startDate, "E", { locale: ja });
       const timeStr = `${format(startDate, "HH:mm")}~${format(endDate, "HH:mm")}`;
       const participants = edge.node.participations?.edges?.length || 0;
-      const maxParticipants = edge.node.capacity || 10;
+      const maxParticipants = opportunity.capacity || 10;
       const price = opportunity.feeRequired || 0;
-      const remainingCapacityView = edge.node.remainingCapacityView;
+      const remainingCapacityView = {
+        remainingCapacity: maxParticipants - participants
+      };
 
       const existingSection = acc.find((section) => section.date === dateStr);
       if (existingSection) {

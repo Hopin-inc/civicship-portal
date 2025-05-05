@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { usePlaceMembership } from './usePlaceMembership';
-import { useLoading } from './useLoading';
+import { useLoading } from '@/hooks/core/useLoading';
 import { Opportunity, Participation } from '@/types';
 import { ApolloError } from '@apollo/client';
 

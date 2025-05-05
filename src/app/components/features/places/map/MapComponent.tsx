@@ -4,7 +4,7 @@ import React from 'react';
 import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
 import { MapComponentProps, MarkerData } from '@/types/maps';
 import CustomMarker from '@/components/features/places/map/markers/CustomMarker';
-import { useMapState } from '@/hooks/useMapState';
+import { useMapState } from '@/hooks/features/place/useMapState';
 
 const containerStyle = {
   width: '100%',
@@ -57,4 +57,4 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
       ))}
     </GoogleMap>
   );
-}        
+}                

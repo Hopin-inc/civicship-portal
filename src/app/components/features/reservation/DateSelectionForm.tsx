@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Calendar, ChevronRight } from 'lucide-react';
-import type { DateSection } from '@/hooks/useReservationDateSelection';
+import type { DateSection } from '@/hooks/features/reservation/useReservationDateSelection';
 
 interface DateSelectionFormProps {
   selectedDate: string | null;

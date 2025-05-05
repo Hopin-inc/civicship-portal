@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { SearchTabType } from '@/hooks/useSearch';
+import { SearchTabType } from '@/hooks/features/search/useSearch';
 
 interface SearchTabsProps {
   selectedTab: SearchTabType;

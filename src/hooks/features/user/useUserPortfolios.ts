@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_USER_WITH_DETAILS_AND_PORTFOLIOS } from '@/graphql/queries/user';
-import { useLoading } from './useLoading';
+import { useLoading } from '@/hooks/core/useLoading';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Membership } from '../../../../../hooks/usePlaces';
+import { Membership } from '@/hooks/features/place/usePlaces';
 import { PlaceList } from './PlaceList';
 import PlaceToggleButton from '../shared/PlaceToggleButton';
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_USER_PROFILE, GET_USER_WITH_DETAILS_AND_PORTFOLIOS } from '@/graphql/queries/user';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLoading } from './useLoading';
+import { useLoading } from '@/hooks/core/useLoading';
 import { formatUserProfileData } from '@/utils/userUtils';
 import { toast } from 'sonner';
 import { User } from '@/types';

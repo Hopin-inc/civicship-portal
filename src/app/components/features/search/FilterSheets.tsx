@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/app/components/u
 import { Calendar } from '@/app/components/ui/calendar';
 import { DateRange } from 'react-day-picker';
 import { ja } from 'date-fns/locale';
-import { SearchFilterType, Prefecture } from '@/hooks/useSearch';
+import { SearchFilterType, Prefecture } from '@/hooks/features/search/useSearch';
 
 interface FilterSheetsProps {
   activeForm: SearchFilterType;

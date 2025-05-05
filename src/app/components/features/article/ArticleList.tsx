@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Article } from '../../../../hooks/useArticles';
+import { Article } from '@/hooks/features/article/useArticles';
 import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';

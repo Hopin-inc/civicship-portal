@@ -15,7 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/app/components/ui/input';
 import { Button } from '@/app/components/ui/button';
 import { CurrentPrefecture } from '@/gql/graphql';
-import { useSignUp, SignUpFormValues } from '@/hooks/useSignUp';
+import { useSignUp, SignUpFormValues } from '@/hooks/features/user/useSignUp';
 import PrefectureSelector from './PrefectureSelector';
 
 const FormSchema = z.object({

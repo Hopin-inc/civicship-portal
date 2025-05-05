@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useCallback } from 'react';
-import { useHeader } from '../contexts/HeaderContext';
+import { useHeader } from '@/contexts/HeaderContext';
 
 /**
  * Header configuration interface

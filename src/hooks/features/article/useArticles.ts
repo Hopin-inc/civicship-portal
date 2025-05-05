@@ -1,10 +1,10 @@
 'use client';
 
 import { useQuery } from "@apollo/client";
-import { GET_ARTICLES } from "../graphql/queries/articles";
+import { GET_ARTICLES } from "@/graphql/queries/articles";
 import { useEffect, useMemo, useRef } from "react";
-import { useLoading } from "../hooks/useLoading";
-import { SortDirection } from "../gql/graphql";
+import { useLoading } from "@/hooks/core/useLoading";
+import { SortDirection } from "@/gql/graphql";
 
 export interface Article {
   id: string;

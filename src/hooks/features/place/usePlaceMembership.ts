@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { GET_SINGLE_MEMBERSHIP } from '../graphql/queries/membership';
+import { GET_SINGLE_MEMBERSHIP } from '@/graphql/queries/membership';
 import { Opportunity } from '@/types';
 
 export type TransformedOpportunity = {
@@ -71,4 +71,4 @@ export const usePlaceMembership = (communityId: string, userId: string) => {
     loading,
     error,
   };
-}; 
+};  

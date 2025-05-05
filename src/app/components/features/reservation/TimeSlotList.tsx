@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/app/components/ui/button';
-import type { DateSection, TimeSlot } from '@/hooks/useReservationDateSelection';
+import type { DateSection, TimeSlot } from '@/hooks/features/reservation/useReservationDateSelection';
 
 interface TimeSlotListProps {
   dateSections: DateSection[];
@@ -26,7 +26,7 @@ export const TimeSlotList: React.FC<TimeSlotListProps> = ({
             {section.date} ({section.day})
           </h3>
           <div className="space-y-2">
-            {section.timeSlots.map((slot, slotIndex) => {
+            {section.timeSlots.map((slot: TimeSlot, slotIndex: number) => {
               const remainingCapacity = slot.remainingCapacityView?.remainingCapacity || 0;
               const isFull = remainingCapacity === 0;
               const isAvailable = isSlotAvailable(slot);

@@ -1,11 +1,11 @@
 'use client';
 
 import { useQuery, ApolloError } from '@apollo/client';
-import { GET_MEMBERSHIP_LIST } from '../graphql/queries/membership';
+import { GET_MEMBERSHIP_LIST } from '@/graphql/queries/membership';
 import { useMemo, useEffect } from 'react';
-import { useLoading } from './useLoading';
+import { useLoading } from '@/hooks/core/useLoading';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Geo } from '../types/maps';
+import { Geo } from '@/types/maps';
 
 export interface Place extends Omit<Geo, 'latitude' | 'longitude'> {
   latitude: number;

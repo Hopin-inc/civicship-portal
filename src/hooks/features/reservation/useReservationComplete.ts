@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useOpportunity } from '@/hooks/useOpportunity';
-import { useSimilarOpportunities } from '@/hooks/useSimilarOpportunities';
+import { useSimilarOpportunities } from '@/hooks/features/activity/useSimilarOpportunities';
 import { useHeader } from '@/contexts/HeaderContext';
 
 /**

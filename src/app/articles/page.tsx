@@ -3,7 +3,7 @@
 import ErrorState from '../components/shared/ErrorState';
 import ArticleList from '../components/features/article/ArticleList';
 import ArticleLoadingIndicator from '../components/features/article/ArticleLoadingIndicator';
-import { useArticles } from '../../hooks/useArticles';
+import { useArticles } from '@/hooks/features/article/useArticles';
 
 export default function ArticlesPage() {
   const {

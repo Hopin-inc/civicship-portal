@@ -5,7 +5,7 @@ import { useQuery } from '@apollo/client';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { useHeader } from '@/contexts/HeaderContext';
-import { useLoading } from '@/hooks/useLoading';
+import { useLoading } from '@/hooks/core/useLoading';
 import { SEARCH_OPPORTUNITIES } from '@/graphql/queries/search';
 import { 
   OpportunityCategory, 
@@ -72,13 +72,7 @@ export const useSearchResults = (searchParams: SearchParams = {}) => {
       }
     }
 
-    if (searchParams.ticket === 'true') {
-      filter.isReservableWithTicket = true;
-    }
-
-    if (searchParams.q) {
-      filter.searchQuery = searchParams.q;
-    }
+    
 
     return filter;
   };

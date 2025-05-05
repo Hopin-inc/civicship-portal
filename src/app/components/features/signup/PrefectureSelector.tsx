@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button } from '@/app/components/ui/button';
 import { CurrentPrefecture } from '@/gql/graphql';
-import { prefectureLabels, prefectureOptions } from '@/hooks/useSignUp';
+import { prefectureLabels, prefectureOptions } from '@/hooks/features/user/useSignUp';
 
 interface PrefectureSelectorProps {
   value: CurrentPrefecture | undefined;
@@ -22,7 +22,7 @@ export const PrefectureSelector: React.FC<PrefectureSelectorProps> = ({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
-        {prefectureOptions.map((prefecture) => (
+        {prefectureOptions.map((prefecture: CurrentPrefecture) => (
           <Button
             key={prefecture}
             type="button"

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/app/components/ui/sheet';
-import type { DateSection } from '@/hooks/useReservationDateSelection';
+import type { DateSection } from '@/hooks/features/reservation/useReservationDateSelection';
 
 interface SelectionSheetProps {
   isOpen: boolean;
