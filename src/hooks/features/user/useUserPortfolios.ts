@@ -3,9 +3,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLoading } from '@/hooks/core/useLoading';
 import { toast } from 'sonner';
-import { useUserPortfolioQuery, UserWithPortfoliosData, GqlPortfolio } from './useUserPortfolioQuery';
+import { useUserPortfolioQuery,  GqlPortfolio } from './useUserPortfolioQuery';
 import { useUserOpportunities } from './useUserOpportunities';
-import { Portfolio, transformPortfolio } from '@/lib/transformers/portfolio';
+import { Portfolio, transformPortfolio } from '@/transformers/portfolio';
+import { SortDirection } from "@/gql/graphql";
 
 /**
  * Custom hook for implementing infinite scrolling
@@ -89,10 +90,10 @@ export const useUserPortfolios = (userId: string) => {
       const { data: moreData } = await fetchMore({
         variables: {
           id: userId,
-          first: 30, // ITEMS_PER_PAGE
+          first: 30,
           after: lastCursor,
           filter: null,
-          sort: { date: "DESC" }
+          sort: { date: SortDirection.Desc }
         }
       });
 
