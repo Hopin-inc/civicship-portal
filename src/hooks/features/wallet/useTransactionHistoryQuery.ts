@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, gql, QueryResult } from '@apollo/client';
-import { TransactionReason } from '../../../gql/graphql';
+import { TransactionReason } from "@/gql/graphql";
 import { WalletTransactionsDocument } from '@/graphql/queries/wallet';
 
 export interface TransactionNode {

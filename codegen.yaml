@@ -3,8 +3,11 @@ schema: https://localhost:3000/graphql
 documents:
   - src/**/*.ts?(x)
 generates:
-  ./src/gql/:
-    preset: client-preset
+  ./src/gql/graphql.tsx:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
     config:
       typesPrefix: Gql
       useIndexSignature: true
