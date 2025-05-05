@@ -16,7 +16,7 @@ import { Input } from '@/app/components/ui/input';
 import { Button } from '@/app/components/ui/button';
 import { CurrentPrefecture } from '@/gql/graphql';
 import { useSignUp, SignUpFormValues } from '@/hooks/features/user/useSignUp';
-import PrefectureSelector from './PrefectureSelector';
+import { PrefectureSelector } from './PrefectureSelector';
 
 const FormSchema = z.object({
   name: z.string({ required_error: '名前を入力してください。' }),

@@ -3,9 +3,9 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import RecommendedOpportunities from './RecommendedOpportunities';
-import DateGroupedOpportunities from './DateGroupedOpportunities';
-import EmptySearchResults from './EmptySearchResults';
+import { RecommendedOpportunities } from './RecommendedOpportunities';
+import { DateGroupedOpportunities } from './DateGroupedOpportunities';
+import { EmptySearchResults } from './EmptySearchResults';
 import { OpportunityCardProps } from '../opportunity/OpportunityCard';
 
 interface SearchResultListProps {

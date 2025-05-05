@@ -10,7 +10,7 @@ import ActivitiesFeaturedSection from '../components/features/activity/Activitie
 import ActivitiesUpcomingSection from '../components/features/activity/ActivitiesUpcomingSection'
 import ActivitiesFeaturedItemsSection from '../components/features/activity/ActivitiesFeaturedItemsSection'
 import ActivitiesAllSection from '../components/features/activity/ActivitiesAllSection'
-import ErrorState from '../components/shared/ErrorState'
+import { ErrorState } from '../components/shared/ErrorState'
 
 export default function ActivitiesPage() {
   const { setIsLoading } = useLoading()

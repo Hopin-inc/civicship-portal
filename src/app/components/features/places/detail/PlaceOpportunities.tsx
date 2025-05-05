@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Opportunity } from '@/types';
 import { Button } from '@/components/ui/button';
 
@@ -31,10 +32,12 @@ const PlaceOpportunities: React.FC<PlaceOpportunitiesProps> = ({ opportunities }
                 className="flex-shrink-0 w-[280px] rounded-lg overflow-hidden border border-gray-200"
               >
                 <div className="relative h-[160px] w-full">
-                  <img 
+                  <Image 
                     src={opportunity.images?.[0] || "/placeholder.png"} 
                     alt={opportunity.title} 
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 280px"
+                    className="object-cover"
                   />
                 </div>
                 <div className="p-4">

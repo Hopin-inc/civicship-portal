@@ -1,6 +1,6 @@
 'use client';
 
-import ErrorState from '@/app/components/shared/ErrorState';
+import { ErrorState } from '@/app/components/shared/ErrorState';
 import { usePlaces } from '@/hooks/features/place/usePlaces';
 import PlaceMapView from '@/app/components/features/places/PlaceMapView';
 import PlaceListView from '@/app/components/features/places/list/PlaceListView';

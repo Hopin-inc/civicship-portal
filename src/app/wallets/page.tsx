@@ -5,11 +5,11 @@ import { useWallet } from '@/hooks/features/wallet/useWallet';
 import { useHeader } from '@/contexts/HeaderContext';
 import { LoadingIndicator } from '@/app/components/shared/LoadingIndicator';
 import { ErrorState } from '@/app/components/shared/ErrorState';
-import WalletCard from '@/app/components/features/wallet/WalletCard';
-import WalletHistoryButton from '@/app/components/features/wallet/WalletHistoryButton';
-import WalletInfoSection from '@/app/components/features/wallet/WalletInfoSection';
-import WalletActionButton from '@/app/components/features/wallet/WalletActionButton';
-import WalletUsageSection from '@/app/components/features/wallet/WalletUsageSection';
+import { WalletCard } from '@/app/components/features/wallet/WalletCard';
+import { WalletHistoryButton } from '@/app/components/features/wallet/WalletHistoryButton';
+import { WalletInfoSection } from '@/app/components/features/wallet/WalletInfoSection';
+import { WalletActionButton } from '@/app/components/features/wallet/WalletActionButton';
+import { WalletUsageSection } from '@/app/components/features/wallet/WalletUsageSection';
 
 export default function WalletsPage() {
   const { currentPoint, isLoading, error } = useWallet();

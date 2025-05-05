@@ -6,8 +6,8 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useEffect, useState } from "react";
 import { convertMarkdownToHtml } from "../../../../utils/markdownUtils";
-import CategoryBadge from "./CategoryBadge";
-import ArticleRecommendations from "./ArticleRecommendations";
+import { CategoryBadge } from "./CategoryBadge";
+import { ArticleRecommendations } from "./ArticleRecommendations";
 
 type ArticleDetailProps = {
   article: Article;
