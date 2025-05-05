@@ -1,9 +1,9 @@
-import { User as GraphQLUser } from "@/gql/graphql";
+import { GqlUser } from '@/types/graphql';
 
 export type AuthInfo = {
   uid?: string;
   providerIds?: string[];
-  user?: GraphQLUser | null;
+  user?: GqlUser | null;
 };
 
 export type LIFFLoginResponse = {

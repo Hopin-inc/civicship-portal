@@ -5,13 +5,13 @@ import { useMutation, useQuery } from "@apollo/client";
 import { VIEW_TICKET_CLAIM } from "@/graphql/queries/ticket";
 import { TICKET_CLAIM } from "@/graphql/mutations/ticket";
 import { useAuth } from "@/contexts/AuthContext";
-import { ClaimLinkStatus } from "@/gql/graphql";
+import { GqlClaimLinkStatus } from '@/types/graphql';
 import { toast } from "sonner";
 
 export interface UseTicketClaimResult {
   claimLinkData: {
     qty: number;
-    status: ClaimLinkStatus;
+    status: GqlClaimLinkStatus;
     issuer: {
       owner: {
         id: string;
@@ -44,7 +44,7 @@ export const useTicketClaim = (ticketClaimLinkId: string): UseTicketClaimResult 
 
   useEffect(() => {
     if (viewData?.ticketClaimLink == null) return;
-    setHasIssued(viewData.ticketClaimLink.status !== ClaimLinkStatus.Issued);
+    setHasIssued(viewData.ticketClaimLink.status !== GqlClaimLinkStatus.Issued);
   }, [viewData]);
 
   useEffect(() => {

@@ -14,13 +14,13 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { CurrentPrefecture } from '@/gql/graphql';
+import { GqlCurrentPrefecture } from '@/types/graphql';
 import { useSignUp, SignUpFormValues } from '@/hooks/features/user/useSignUp';
 import { PrefectureSelector } from './PrefectureSelector';
 
 const FormSchema = z.object({
   name: z.string({ required_error: '名前を入力してください。' }),
-  prefecture: z.nativeEnum(CurrentPrefecture, {
+  prefecture: z.nativeEnum(GqlCurrentPrefecture, {
     required_error: '居住地を選択してください。'
   }),
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ParticipationStatus, ParticipationStatusReason } from "@/gql/graphql";
+import { GqlParticipationStatus, GqlParticipationStatusReason } from '@/types/graphql';
 import { getStatusInfo } from '@/utils/participationUtils';
 import type { Participation } from '@/types';
 
@@ -20,8 +20,8 @@ export const useParticipationState = ({ participation, onUploadSuccess }: UsePar
     if (participation?.node.status) {
       setCurrentStatus(
         getStatusInfo(
-          participation.node.status as ParticipationStatus,
-          participation.node.reason as ParticipationStatusReason,
+          participation.node.status as GqlParticipationStatus,
+          participation.node.reason as GqlParticipationStatusReason,
         ),
       );
     }

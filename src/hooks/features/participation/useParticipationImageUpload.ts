@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 // import { PARTICIPATION_IMAGE_BULK_UPDATE } from '@/graphql/mutations/participationImage';
 import { filesToBase64 } from '@/utils/file';
-import { ImageInput } from '@/gql/graphql';
+import { GqlImageInput } from '@/types/graphql';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface UseParticipationImageUploadProps {

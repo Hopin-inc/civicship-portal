@@ -2,7 +2,7 @@
 
 import { useQuery } from '@apollo/client';
 import { GET_USER_WITH_DETAILS_AND_PORTFOLIOS } from '@/graphql/queries/user';
-import { SortDirection } from '@/gql/graphql';
+import { GqlSortDirection } from '@/types/graphql';
 
 export const ITEMS_PER_PAGE = 30;
 
@@ -77,7 +77,7 @@ export const useUserPortfolioQuery = (userId: string) => {
         first: ITEMS_PER_PAGE,
         after: null,
         filter: null,
-        sort: { date: SortDirection.Desc }
+        sort: { date: GqlSortDirection.Desc }
       },
       fetchPolicy: "network-only",
       skip: !userId

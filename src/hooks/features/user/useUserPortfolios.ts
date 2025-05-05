@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { useUserPortfolioQuery,  GqlPortfolio } from './useUserPortfolioQuery';
 import { useUserOpportunities } from './useUserOpportunities';
 import { Portfolio, transformPortfolio } from '@/transformers/portfolio';
-import { SortDirection } from "@/gql/graphql";
+import { GqlSortDirection } from '@/types/graphql';
 
 /**
  * Custom hook for implementing infinite scrolling
@@ -93,7 +93,7 @@ export const useUserPortfolios = (userId: string) => {
           first: 30,
           after: lastCursor,
           filter: null,
-          sort: { date: SortDirection.Desc }
+          sort: { date: GqlSortDirection.Desc }
         }
       });
 

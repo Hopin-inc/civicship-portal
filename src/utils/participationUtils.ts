@@ -1,4 +1,4 @@
-import { ParticipationStatus, ParticipationStatusReason } from "../gql/graphql";
+import { GqlParticipationStatus as ParticipationStatus, GqlParticipationStatusReason as ParticipationStatusReason } from "@/types/graphql";
 
 interface ReservationStatus {
   status: "pending" | "confirmed" | "cancelled";

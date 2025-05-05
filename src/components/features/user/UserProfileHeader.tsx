@@ -5,14 +5,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { prefectureLabels } from '@/utils/userUtils';
-import { CurrentPrefecture } from '@/gql/graphql';
+import { GqlCurrentPrefecture } from '@/types/graphql';
 
 interface UserProfileHeaderProps {
   id: string;
   name: string;
   image: string;
   bio: string;
-  currentPrefecture?: CurrentPrefecture | null;
+  currentPrefecture?: GqlCurrentPrefecture | null;
   isOwner: boolean;
 }
 

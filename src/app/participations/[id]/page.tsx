@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useParticipation } from "@/hooks/features/participation/useParticipation";
 import { useParticipationImageUpload } from "@/hooks/features/participation/useParticipationImageUpload";
-import { ParticipationStatus } from "@/gql/graphql";
+import { GqlParticipationStatus } from '@/types/graphql';
 import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
 import { useParticipationState } from "@/hooks/features/participation/useParticipationState";
 import { calculateCancellationDeadline } from "@/utils/participationUtils";

@@ -6,14 +6,14 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { prefectureLabels } from '@/utils/userUtils';
-import { CurrentPrefecture } from '@/gql/graphql';
+import { GqlCurrentPrefecture } from '@/types/graphql';
 import { GET_USER_PROFILE } from '@/graphql/queries/user';
 import { UPDATE_MY_PROFILE } from '@/graphql/mutations/user';
 
 interface ProfileFormData {
   name: string;
   bio: string;
-  currentPrefecture: CurrentPrefecture;
+  currentPrefecture: GqlCurrentPrefecture;
   profileImage: string | null;
   socialLinks: {
     facebook: string;
@@ -30,7 +30,7 @@ export const useProfileEdit = () => {
   const { user } = useAuth();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState('');
-  const [location, setLocation] = useState<CurrentPrefecture | undefined>();
+  const [location, setLocation] = useState<GqlCurrentPrefecture | undefined>();
   const [bio, setBio] = useState('');
   const [socialLinks, setSocialLinks] = useState({
     facebook: '',
@@ -89,7 +89,7 @@ export const useProfileEdit = () => {
             name: displayName,
             image: profileImage ? { file: profileImage } : null,
             bio,
-            currentPrefecture: location,
+            currentPrefecture: location as any, // Type cast to resolve compatibility issue
             urlFacebook: socialLinks.facebook,
             urlInstagram: socialLinks.instagram,
             urlX: socialLinks.twitter,
@@ -118,7 +118,7 @@ export const useProfileEdit = () => {
     userError,
     updating,
     prefectureOptions: Object.entries(prefectureLabels).map(([key, label]) => ({
-      value: key as CurrentPrefecture,
+      value: key as GqlCurrentPrefecture,
       label
     })),
     setDisplayName,

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { ParticipationStatus } from "@/gql/graphql";
+import { GqlParticipationStatus } from '@/types/graphql';
 import { AddParticipationPhotosModal } from "@/components/features/participations/AddParticipationPhotosModal";
 import type { Opportunity, Participation } from '../../../types';
 
@@ -40,7 +40,7 @@ export const ParticipationActions: React.FC<ParticipationActionsProps> = ({
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
         <div className="max-w-lg mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-3">
-            {participation?.node.status === ParticipationStatus.Participated ? (
+            {participation?.node.status === GqlParticipationStatus.Participated ? (
               <AddParticipationPhotosModal
                 trigger={
                   <Button 

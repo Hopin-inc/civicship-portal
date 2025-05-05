@@ -3,28 +3,28 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { CurrentPrefecture } from '@/gql/graphql';
+import { GqlCurrentPrefecture } from '@/types/graphql';
 import { toast } from 'sonner';
 
 export interface SignUpFormValues {
   name: string;
-  prefecture: CurrentPrefecture | undefined;
+  prefecture: GqlCurrentPrefecture | undefined;
 }
 
-export const prefectureLabels: Record<CurrentPrefecture, string> = {
-  [CurrentPrefecture.Kagawa]: '香川県',
-  [CurrentPrefecture.Tokushima]: '徳島県',
-  [CurrentPrefecture.Kochi]: '高知県',
-  [CurrentPrefecture.Ehime]: '愛媛県',
-  [CurrentPrefecture.OutsideShikoku]: '四国以外',
-  [CurrentPrefecture.Unknown]: '不明',
+export const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
+  [GqlCurrentPrefecture.Kagawa]: '香川県',
+  [GqlCurrentPrefecture.Tokushima]: '徳島県',
+  [GqlCurrentPrefecture.Kochi]: '高知県',
+  [GqlCurrentPrefecture.Ehime]: '愛媛県',
+  [GqlCurrentPrefecture.OutsideShikoku]: '四国以外',
+  [GqlCurrentPrefecture.Unknown]: '不明',
 } as const;
 
 export const prefectureOptions = [
-  CurrentPrefecture.Kagawa,
-  CurrentPrefecture.Tokushima,
-  CurrentPrefecture.Kochi,
-  CurrentPrefecture.Ehime,
+  GqlCurrentPrefecture.Kagawa,
+  GqlCurrentPrefecture.Tokushima,
+  GqlCurrentPrefecture.Kochi,
+  GqlCurrentPrefecture.Ehime,
 ];
 
 /**

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { User, CurrentPrefecture } from "@/gql/graphql";
+import { GqlUser, GqlCurrentPrefecture } from '@/types/graphql';
 import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,7 +17,7 @@ import { COMMUNITY_ID } from "@/utils";
 
 type UserInfo = {
   uid: string | null;
-  user: Required<Partial<User>, "id" | "name"> | null;
+  user: Required<Partial<GqlUser>, "id" | "name"> | null;
 };
 
 type AuthContextType = UserInfo & {
@@ -25,7 +25,7 @@ type AuthContextType = UserInfo & {
   logout: () => Promise<void>;
   loginWithLiff: () => Promise<void>;
   isAuthenticating: boolean;
-  createUser: (name: string, currentPrefecture: CurrentPrefecture) => Promise<Required<Partial<User>, "id" | "name"> | null>;
+  createUser: (name: string, currentPrefecture: GqlCurrentPrefecture) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -157,13 +157,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const createUser = async (name: string, currentPrefecture: CurrentPrefecture): Promise<Required<Partial<User>, "id" | "name"> | null> => {
+  const createUser = async (name: string, currentPrefecture: GqlCurrentPrefecture): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
     try {
       const { data } = await userSignUpMutation({
         variables: {
           input: {
             name,
-            currentPrefecture,
+            currentPrefecture: currentPrefecture as any, // Type cast to resolve compatibility issue
             communityId: COMMUNITY_ID
           },
         },

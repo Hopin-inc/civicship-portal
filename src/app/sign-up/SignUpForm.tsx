@@ -15,22 +15,22 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { CurrentPrefecture, IdentityPlatform } from "@/gql/graphql";
+import { GqlCurrentPrefecture, GqlIdentityPlatform } from '@/types/graphql';
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 
-const prefectureLabels: Record<CurrentPrefecture, string> = {
-  [CurrentPrefecture.Kagawa]: '香川県',
-  [CurrentPrefecture.Tokushima]: '徳島県',
-  [CurrentPrefecture.Kochi]: '高知県',
-  [CurrentPrefecture.Ehime]: '愛媛県',
-  [CurrentPrefecture.OutsideShikoku]: '四国以外',
-  [CurrentPrefecture.Unknown]: '不明',
+const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
+  [GqlCurrentPrefecture.Kagawa]: '香川県',
+  [GqlCurrentPrefecture.Tokushima]: '徳島県',
+  [GqlCurrentPrefecture.Kochi]: '高知県',
+  [GqlCurrentPrefecture.Ehime]: '愛媛県',
+  [GqlCurrentPrefecture.OutsideShikoku]: '四国以外',
+  [GqlCurrentPrefecture.Unknown]: '不明',
 } as const;
 
 const FormSchema = z.object({
   name: z.string({ required_error: "名前を入力してください。" }),
-  prefecture: z.nativeEnum(CurrentPrefecture, {
+  prefecture: z.nativeEnum(GqlCurrentPrefecture, {
     required_error: "居住地を選択してください。"
   }),
 });
@@ -51,10 +51,10 @@ export function SignUpForm() {
   });
 
   const prefectures = [
-    CurrentPrefecture.Kagawa,
-    CurrentPrefecture.Tokushima,
-    CurrentPrefecture.Kochi,
-    CurrentPrefecture.Ehime,
+    GqlCurrentPrefecture.Kagawa,
+    GqlCurrentPrefecture.Tokushima,
+    GqlCurrentPrefecture.Kochi,
+    GqlCurrentPrefecture.Ehime,
   ];
 
   const onSubmit = async (values: FormValues) => {
@@ -125,13 +125,13 @@ export function SignUpForm() {
                       type="button"
                       variant="secondary"
                       className={`w-full h-12 rounded-2xl border-2 ${
-                        field.value === CurrentPrefecture.OutsideShikoku
+                        field.value === GqlCurrentPrefecture.OutsideShikoku
                           ? 'bg-blue-600 text-white border-blue-600'
                           : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                       }`}
-                      onClick={() => field.onChange(CurrentPrefecture.OutsideShikoku)}
+                      onClick={() => field.onChange(GqlCurrentPrefecture.OutsideShikoku)}
                     >
-                      {prefectureLabels[CurrentPrefecture.OutsideShikoku]}
+                      {prefectureLabels[GqlCurrentPrefecture.OutsideShikoku]}
                     </Button>
                   </div>
                 </FormControl>

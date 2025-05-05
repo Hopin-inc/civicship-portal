@@ -8,12 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useRouter } from 'next/navigation';
 import { prefectureLabels, prefectureOptions } from '@/utils/userUtils';
-import { CurrentPrefecture } from '@/gql/graphql';
+import { GqlCurrentPrefecture } from '@/types/graphql';
 
 interface UserProfileEditProps {
   profileImage: string | null;
   displayName: string;
-  location: CurrentPrefecture | undefined;
+  location: GqlCurrentPrefecture | undefined;
   bio: string;
   socialLinks: {
     facebook: string;
@@ -22,7 +22,7 @@ interface UserProfileEditProps {
   };
   updating: boolean;
   setDisplayName: (name: string) => void;
-  setLocation: (location: CurrentPrefecture) => void;
+  setLocation: (location: GqlCurrentPrefecture) => void;
   setBio: (bio: string) => void;
   setSocialLinks: (links: { facebook: string; instagram: string; twitter: string }) => void;
   handleImageSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -131,14 +131,14 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
             </div>
             <button
               type="button"
-              onClick={() => setLocation(CurrentPrefecture.OutsideShikoku)}
+              onClick={() => setLocation(GqlCurrentPrefecture.OutsideShikoku)}
               className={`w-full px-4 py-2 rounded-2xl border-2 ${
-                location === CurrentPrefecture.OutsideShikoku
+                location === GqlCurrentPrefecture.OutsideShikoku
                   ? 'bg-blue-600 text-white border-blue-600'
                   : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
-              {prefectureLabels[CurrentPrefecture.OutsideShikoku]}
+              {prefectureLabels[GqlCurrentPrefecture.OutsideShikoku]}
             </button>
           </div>
 

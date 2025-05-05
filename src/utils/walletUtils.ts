@@ -1,26 +1,26 @@
-import { TransactionReason } from '@/gql/graphql';
+import { GqlTransactionReason } from '@/types/graphql';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 export const getTransactionDescription = (
-  reason: TransactionReason,
+  reason: GqlTransactionReason,
   fromUserName?: string | null,
   toUserName?: string | null
 ): string => {
   switch (reason) {
-    case TransactionReason.Donation:
+    case GqlTransactionReason.Donation:
       return `${fromUserName}さんからのプレゼント`;
-    case TransactionReason.Grant:
+    case GqlTransactionReason.Grant:
       return `${fromUserName}さんからのポイント付与`;
-    case TransactionReason.Onboarding:
+    case GqlTransactionReason.Onboarding:
       return 'オンボーディングボーナス';
-    case TransactionReason.PointIssued:
+    case GqlTransactionReason.PointIssued:
       return 'ポイント発行';
-    case TransactionReason.PointReward:
+    case GqlTransactionReason.PointReward:
       return 'ポイント報酬';
-    case TransactionReason.TicketPurchased:
+    case GqlTransactionReason.TicketPurchased:
       return `${toUserName}さんのチケットを購入`;
-    case TransactionReason.TicketRefunded:
+    case GqlTransactionReason.TicketRefunded:
       return 'チケットの払い戻し';
     default:
       return '取引';
