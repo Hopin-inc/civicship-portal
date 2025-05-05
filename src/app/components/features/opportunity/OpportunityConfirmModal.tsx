@@ -45,7 +45,14 @@ export const OpportunityConfirmModal = ({
               })}
             </div>
             <div className="bg-muted/20 rounded-xl">
-              <OpportunityCard opportunity={opportunity} isJoined={isJoined} />
+              <OpportunityCard 
+                id={opportunity.id}
+                title={opportunity.title}
+                price={opportunity.feeRequired || null}
+                location={opportunity.location?.name || ''}
+                imageUrl={opportunity.images?.[0] || null}
+                isReservableWithTicket={opportunity.isReservableWithTicket}
+              />
             </div>
           </div>
           <div className="flex flex-col items-center justify-center mt-12 space-y-4">

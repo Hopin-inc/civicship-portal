@@ -18,7 +18,8 @@ export default function HistoryPage() {
       title: 'ポイント履歴',
       showBackButton: true,
       showLogo: false,
-      showBottomNav: false,
+      // showBottomNav is not a valid property in HeaderConfig
+
     });
   }, [updateConfig]);
 

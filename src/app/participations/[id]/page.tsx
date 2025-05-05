@@ -121,7 +121,7 @@ export default function ParticipationPage({ params }: ParticipationProps) {
       {participation?.node?.images && participation.node.images.length > 0 && (
         <ParticipationImageGallery
           images={participation.node.images}
-          onViewAllImages={() => console.log(`残りの画像枚数: ${Math.max(0, participation.node.images.length - 3)}枚`)}
+          onViewAllImages={() => console.log(`残りの画像枚数: ${Math.max(0, participation.node.images?.length ?? 0 - 3)}枚`)}
         />
       )}
       

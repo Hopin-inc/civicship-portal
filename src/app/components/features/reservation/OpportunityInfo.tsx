@@ -39,7 +39,7 @@ export const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
 
         <div className="relative w-[108px] h-[108px] rounded-lg overflow-hidden flex-shrink-0">
           <Image
-            src={opportunity.image || "/placeholder.png"}
+            src={opportunity.images?.[0] || "/placeholder.png"}
             alt={opportunity.title}
             fill
             className="object-cover"

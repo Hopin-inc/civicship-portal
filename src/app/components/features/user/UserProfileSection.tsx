@@ -43,12 +43,25 @@ export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
       />
       
       {isOwner && (
-        <UserTicketsAndPoints userId={userId} />
+        <UserTicketsAndPoints 
+          ticketCount={profileData.ticketCount || 0} 
+          pointCount={profileData.pointCount || 0} 
+        />
       )}
       
-      <UserActiveOpportunities userId={userId} />
+      <UserActiveOpportunities 
+        opportunities={profileData.activeOpportunities || []} 
+        isOwner={isOwner} 
+      />
       
-      <UserPortfolioSection userId={userId} />
+      <UserPortfolioSection 
+        portfolios={profileData.portfolios || []}
+        isLoading={false}
+        isLoadingMore={false}
+        hasMore={false}
+        lastPortfolioRef={{} as React.RefObject<HTMLDivElement>}
+        onLoadMore={() => {}}
+      />
     </div>
   );
 };

@@ -15,7 +15,7 @@ export const OpportunityDetailHeader = ({ opportunity }: Props) => {
       <div className="relative h-48 bg-gradient-to-b from-green-700 to-green-900">
         <div className="absolute inset-0">
           <Image
-            src={opportunity.image || "/placeholder.svg"}
+            src={opportunity.images?.[0] || "/placeholder.svg"}
             alt={opportunity.title}
             fill
             className="object-cover opacity-20"

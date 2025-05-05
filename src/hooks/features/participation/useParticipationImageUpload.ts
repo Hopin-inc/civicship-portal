@@ -45,7 +45,7 @@ export const useParticipationImageUpload = ({
       const base64Strings = await filesToBase64(files);
 
       // Create image inputs
-      const imageInputs: ImageInput[] = base64Strings.map((base64, index) => ({
+      const imageInputs = base64Strings.map((base64, index) => ({
         base64,
         caption: comment || undefined,
       }));
@@ -75,4 +75,4 @@ export const useParticipationImageUpload = ({
     isUploading,
     error,
   };
-}; 
+};  

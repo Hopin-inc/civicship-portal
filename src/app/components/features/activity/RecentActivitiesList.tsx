@@ -65,9 +65,6 @@ ActivityCard.displayName = 'ActivityCard'
 
 const transformOpportunityToHistory = (opportunity: Opportunity): OpportunityHistory => {
   const images = [...(opportunity.images || [])];
-  if (opportunity.image) {
-    images.unshift(opportunity.image);
-  }
 
   const slotParticipants = opportunity.slots?.edges?.flatMap(edge => 
     edge?.node?.participations?.edges?.map(p => ({
