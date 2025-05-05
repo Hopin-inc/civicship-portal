@@ -4,11 +4,8 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { useUserPortfolios } from '@/hooks/useUserPortfolios';
 import { useWallet } from '@/hooks/useWallet';
-import { UserProfile } from '@/app/components/features/user/UserProfile';
-import { UserPortfolioSection } from '@/app/components/features/user/UserPortfolioSection';
-import { UserTicketsAndPoints } from '@/app/components/features/user/UserTicketsAndPoints';
+import { UserProfileSection } from '@/app/components/features/user/UserProfileSection';
 import { LoadingIndicator } from '@/app/components/shared/LoadingIndicator';
 import { ErrorState } from '@/app/components/shared/ErrorState';
 
@@ -20,22 +17,11 @@ export default function MyProfilePage() {
     profileData, 
     isLoading: isProfileLoading, 
     error: profileError 
-  } = useUserProfile();
-  
-  const { 
-    portfolios, 
-    isLoading: isPortfoliosLoading, 
-    isLoadingMore,
-    hasMore,
-    error: portfoliosError,
-    lastPortfolioRef,
-    loadMore
-  } = useUserPortfolios(currentUser?.id || '');
+  } = useUserProfile(currentUser?.id);
   
   const {
     currentPoint,
     ticketCount,
-    transactions,
     isLoading: isWalletLoading,
     error: walletError
   } = useWallet(currentUser?.id);
@@ -46,50 +32,46 @@ export default function MyProfilePage() {
     }
   }, [currentUser, router]);
 
-  if (!currentUser || isProfileLoading) {
-    return <LoadingIndicator />;
+  if (!currentUser || isProfileLoading || isWalletLoading) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <LoadingIndicator />
+      </div>
+    );
   }
 
-  if (profileError) {
-    return <ErrorState message={profileError.message} />;
+  if (profileError || walletError) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <ErrorState message={
+          profileError?.message || 
+          walletError?.message || 
+          "ユーザー情報の取得に失敗しました"
+        } />
+      </div>
+    );
   }
 
   if (!profileData) {
-    return <ErrorState message="ユーザーが見つかりませんでした" />;
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <ErrorState message="ユーザーが見つかりませんでした" />
+      </div>
+    );
   }
-
-  const handleUpdateSocialLinks = async (socialLinks: { type: string; url: string }[]) => {
-    // TODO: Implement social links update mutation
-    console.log("Update social links:", socialLinks);
-  };
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-3xl">
-      <UserProfile
-        user={{
-          id: profileData.id,
-          name: profileData.name,
-          image: profileData.image,
-          bio: profileData.bio,
-          currentPrefecture: profileData.currentPrefecture,
-          socialLinks: profileData.socialLinks
+      <UserProfileSection
+        userId={currentUser.id}
+        isLoading={isProfileLoading}
+        error={profileError}
+        profileData={{
+          ...profileData,
+          ticketCount,
+          pointCount: currentPoint
         }}
         isOwner={true}
-        onUpdateSocialLinks={handleUpdateSocialLinks}
-      />
-
-      <UserTicketsAndPoints
-        ticketCount={ticketCount}
-        pointCount={currentPoint}
-      />
-
-      <UserPortfolioSection
-        portfolios={portfolios}
-        isLoading={isPortfoliosLoading}
-        isLoadingMore={isLoadingMore}
-        hasMore={hasMore}
-        lastPortfolioRef={lastPortfolioRef}
-        onLoadMore={loadMore}
       />
     </div>
   );
