@@ -6,7 +6,7 @@ import { DateSelectionForm } from "@/app/components/features/reservation/DateSel
 import { GuestSelectionForm } from "@/app/components/features/reservation/GuestSelectionForm";
 import { TimeSlotList } from "@/app/components/features/reservation/TimeSlotList";
 import { SelectionSheet } from "@/app/components/features/reservation/SelectionSheet";
-import { useReservationDateSelection } from "@/hooks/useReservationDateSelection";
+import { useReservationDateSelection } from "@/hooks/features/reservation/useReservationDateSelection";
 
 /**
  * Page component for selecting reservation date and guests

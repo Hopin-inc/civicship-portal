@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearch } from '@/hooks/features/search';
+import { useSearch, PREFECTURES } from '@/hooks/features/search/useSearch';
 import SearchHeader from '@/app/components/features/search/SearchHeader';
 import SearchTabs from '@/app/components/features/search/SearchTabs';
 import SearchForm from '@/app/components/features/search/SearchForm';
@@ -18,19 +18,24 @@ import FilterSheets from '@/app/components/features/search/FilterSheets';
  */
 export default function SearchContainer() {
   const {
-    searchParams,
-    activeTab,
-    showFilterSheet,
-    activeFilterSheet,
-    handleTabChange,
-    handleSearchSubmit,
-    handleFilterChange,
-    handleFilterSheetOpen,
-    handleFilterSheetClose,
-    handleFilterSheetApply,
-    handleFilterSheetReset,
-    handleFilterSheetCancel,
-    handleClearFilters,
+    selectedTab,
+    setSelectedTab,
+    activeForm,
+    setActiveForm,
+    location,
+    setLocation,
+    dateRange,
+    setDateRange,
+    guests,
+    setGuests,
+    searchQuery,
+    setSearchQuery,
+    useTicket,
+    setUseTicket,
+    formatDateRange,
+    handleClear,
+    handleSearch,
+    clearActiveFilter,
   } = useSearch();
 
   return (
@@ -40,36 +45,46 @@ export default function SearchContainer() {
       <div className="flex-1 overflow-auto">
         <div className="container px-4 py-6">
           <SearchTabs 
-            activeTab={activeTab} 
-            onTabChange={handleTabChange} 
+            selectedTab={selectedTab} 
+            onTabChange={setSelectedTab} 
           />
           
           <SearchForm 
-            initialKeyword={searchParams.get('keyword') || ''} 
-            onSubmit={handleSearchSubmit} 
+            searchQuery={searchQuery} 
+            onSearchQueryChange={setSearchQuery} 
           />
           
           <SearchFilters 
-            filters={searchParams}
-            onFilterChange={handleFilterChange}
-            onFilterSheetOpen={handleFilterSheetOpen}
-            onClearFilters={handleClearFilters}
+            location={location}
+            dateRange={dateRange}
+            guests={guests}
+            useTicket={useTicket}
+            onFilterClick={setActiveForm}
+            formatDateRange={formatDateRange}
+            prefectures={PREFECTURES}
           />
         </div>
       </div>
       
       <SearchFooter 
-        onFilterSheetOpen={handleFilterSheetOpen} 
+        onClear={handleClear}
+        onSearch={handleSearch}
       />
       
       <FilterSheets 
-        show={showFilterSheet}
-        activeSheet={activeFilterSheet}
-        filters={searchParams}
-        onClose={handleFilterSheetClose}
-        onApply={handleFilterSheetApply}
-        onReset={handleFilterSheetReset}
-        onCancel={handleFilterSheetCancel}
+        activeForm={activeForm}
+        setActiveForm={setActiveForm}
+        location={location}
+        setLocation={setLocation}
+        dateRange={dateRange}
+        setDateRange={setDateRange}
+        guests={guests}
+        setGuests={setGuests}
+        useTicket={useTicket}
+        setUseTicket={setUseTicket}
+        clearActiveFilter={clearActiveFilter}
+        getSheetHeight={() => '90vh'}
+        prefectures={PREFECTURES}
       />
     </div>
   );

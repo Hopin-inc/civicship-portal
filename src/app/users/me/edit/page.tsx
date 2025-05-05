@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
-import { useProfileEdit } from '@/hooks/useProfileEdit';
+import { useProfileEdit } from '@/hooks/features/user/useProfileEdit';
 import { UserProfileEdit } from '@/app/components/features/user/UserProfileEdit';
 import { LoadingIndicator } from '@/app/components/shared/LoadingIndicator';
 import { ErrorState } from '@/app/components/shared/ErrorState';

@@ -7,7 +7,7 @@ import { SimilarActivitiesList } from "@/app/components/features/activity/Simila
 import { CompletionHeader } from "@/app/components/features/reservation/CompletionHeader";
 import { ActivitySummary } from "@/app/components/features/reservation/ActivitySummary";
 import { ReservationDetails } from "@/app/components/features/reservation/ReservationDetails";
-import { useReservationComplete } from "@/hooks/useReservationComplete";
+import { useReservationComplete } from "@/hooks/features/reservation/useReservationComplete";
 
 /**
  * Page component for reservation completion

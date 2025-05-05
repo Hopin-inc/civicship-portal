@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, useState } from "react";
-import { usePlaceDetail } from "@/hooks/usePlaceDetail";
+import { usePlaceDetail } from "@/hooks/features/place/usePlaceDetail";
 import { RecentActivitiesTimeline } from "@/app/components/features/activity/RecentActivitiesTimeline";
 import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
 import PlaceImageSlider from "@/components/features/places/detail/PlaceImageSlider";

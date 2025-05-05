@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useTickets } from '@/hooks/useTickets';
+import { useTickets } from '@/hooks/features/ticket/useTickets';
 import TicketHeader from '../components/features/ticket/TicketHeader';
 import TicketContent from '../components/features/ticket/TicketContent';
 import Loading from '../components/layout/Loading';

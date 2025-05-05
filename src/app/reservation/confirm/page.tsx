@@ -10,7 +10,7 @@ import { OpportunityInfo } from "@/app/components/features/reservation/Opportuni
 import { ReservationDetailsCard } from "@/app/components/features/reservation/ReservationDetailsCard";
 import { PaymentSection } from "@/app/components/features/reservation/PaymentSection";
 import { NotesSection } from "@/app/components/features/reservation/NotesSection";
-import { useReservationConfirm } from "@/hooks/useReservationConfirm";
+import { useReservationConfirm } from "@/hooks/features/reservation/useReservationConfirm";
 
 /**
  * Page component for reservation confirmation

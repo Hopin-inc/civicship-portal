@@ -1,13 +1,13 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { useOpportunity } from './useOpportunity';
-import { useSimilarOpportunities } from './useSimilarOpportunities';
-import { useAuth } from '../contexts/AuthContext';
-import { GetUserWalletDocument } from '../gql/graphql';
+import { useOpportunity } from '@/hooks/useOpportunity';
+import { useSimilarOpportunities } from '@/hooks/features/activity/useSimilarOpportunities';
+import { useAuth } from '@/contexts/AuthContext';
+import { GetUserWalletDocument } from '@/gql/graphql';
 import { useMemo, useEffect } from 'react';
-import { useLoading } from './useLoading';
-import { Opportunity } from '../types';
+import { useLoading } from '@/hooks/core/useLoading';
+import { Opportunity } from '@/types';
 
 interface UseActivityDetailsProps {
   id: string;
@@ -45,7 +45,7 @@ export const useActivityDetails = ({ id }: UseActivityDetailsProps): UseActivity
       return walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.length || 0;
     }
 
-    const requiredUtilityIds = new Set(opportunity.requiredUtilities.map((u) => u.id));
+    const requiredUtilityIds = new Set(opportunity.requiredUtilities.map((u: { id: string }) => u.id));
 
     const availableTickets =
       walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.filter((edge: any) => {
@@ -64,7 +64,7 @@ export const useActivityDetails = ({ id }: UseActivityDetailsProps): UseActivity
     if (!opportunity || !opportunity.slots?.edges) return [];
     
     return opportunity.slots.edges
-      .map((edge) => ({
+      .map((edge: { node: { id: string; startsAt: string | Date; endsAt: string | Date; participations?: { edges: { node: { id: string; status: string; user: { id: string; name: string; image: string | null; }; }; }[]; } | undefined; } }) => ({
         startsAt: edge?.node?.startsAt
           ? new Date(edge.node.startsAt).toISOString()
           : "",
@@ -74,7 +74,7 @@ export const useActivityDetails = ({ id }: UseActivityDetailsProps): UseActivity
         participants: edge?.node?.participations?.edges?.length || 0,
         price: opportunity.feeRequired || 0,
       }))
-      .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
+      .sort((a: { startsAt: string }, b: { startsAt: string }) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
   }, [opportunity]);
 
   return {
