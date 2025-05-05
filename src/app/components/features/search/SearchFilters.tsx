@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { MapPin, Calendar as CalendarIcon, Users, Tags, ChevronRight } from 'lucide-react';
 import { SearchFilterType, Prefecture } from '@/hooks/features/search/useSearch';
