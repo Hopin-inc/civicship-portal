@@ -6,7 +6,7 @@ import { Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import PlaceCard from './PlaceCard';
-import { Membership } from '@/hooks/usePlaces';
+import { Membership } from '@/hooks/features/place/usePlaces';
 
 interface PlaceListSheetProps {
   memberships: Membership[];

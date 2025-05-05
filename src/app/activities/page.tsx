@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useLoading } from '@/hooks/useLoading'
-import { useActivities } from '@/hooks/useActivities'
+import { useLoading } from '@/hooks/core/useLoading'
+import { useActivities } from '@/hooks/features/activity/useActivities'
 import { mapOpportunityToCardProps } from '@/utils/opportunityUtils'
-import { useHeaderConfig } from '@/hooks/useHeaderConfig'
+import { useHeaderConfig } from '@/hooks/core/useHeaderConfig'
 import ActivitiesFeaturedSection from '../components/features/activity/ActivitiesFeaturedSection'
 import ActivitiesUpcomingSection from '../components/features/activity/ActivitiesUpcomingSection'
 import ActivitiesFeaturedItemsSection from '../components/features/activity/ActivitiesFeaturedItemsSection'

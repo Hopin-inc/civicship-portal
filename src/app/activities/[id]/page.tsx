@@ -1,12 +1,12 @@
 "use client";
 
-import { useActivityDetails } from "@/hooks/useActivityDetails";
+import { useActivityDetails } from "@/hooks/features/activity/useActivityDetails";
 import ActivityDetailsHeader from "@/app/components/features/activity/ActivityDetailsHeader";
 import ActivityDetailsContent from "@/app/components/features/activity/ActivityDetailsContent";
 import ActivityDetailsFooter from "@/app/components/features/activity/ActivityDetailsFooter";
 import ErrorState from "@/app/components/shared/ErrorState";
 import { useEffect } from "react";
-import { useLoading } from "@/hooks/useLoading";
+import { useLoading } from "@/hooks/core/useLoading";
 
 interface ActivityPageProps {
   params: {

@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { useParticipation } from "@/hooks/useParticipation";
-import { useParticipationImageUpload } from "@/hooks/useParticipationImageUpload";
+import { useParticipation } from "@/hooks/features/participation/useParticipation";
+import { useParticipationImageUpload } from "@/hooks/features/participation/useParticipationImageUpload";
 import { ParticipationStatus } from "@/gql/graphql";
-import { useHeaderConfig } from "@/hooks/useHeaderConfig";
-import { useParticipationState } from "@/hooks/useParticipationState";
+import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
+import { useParticipationState } from "@/hooks/features/participation/useParticipationState";
 import { calculateCancellationDeadline } from "@/utils/participationUtils";
 import LoadingIndicator from "@/app/components/shared/LoadingIndicator";
 import ErrorState from "@/app/components/shared/ErrorState";

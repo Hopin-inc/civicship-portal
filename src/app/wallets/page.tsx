@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useWallet } from '@/hooks/useWallet';
+import { useWallet } from '@/hooks/features/wallet/useWallet';
 import { useHeader } from '@/contexts/HeaderContext';
 import { LoadingIndicator } from '@/app/components/shared/LoadingIndicator';
 import { ErrorState } from '@/app/components/shared/ErrorState';

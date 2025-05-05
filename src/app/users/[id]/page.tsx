@@ -1,8 +1,8 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { useUserProfile } from "@/hooks/useUserProfile";
-import { useUserPortfolios } from "@/hooks/useUserPortfolios";
+import { useUserProfile } from "@/hooks/features/user/useUserProfile";
+import { useUserPortfolios } from "@/hooks/features/user/useUserPortfolios";
 import { UserProfileSection } from "@/app/components/features/user/UserProfileSection";
 import { LoadingIndicator } from "@/app/components/shared/LoadingIndicator";
 import { ErrorState } from "@/app/components/shared/ErrorState";
@@ -66,4 +66,4 @@ export default function UserPage({ params }: { params: { id: string } }) {
       />
     </div>
   );
-} 
+}    

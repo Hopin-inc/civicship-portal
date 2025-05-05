@@ -1,10 +1,10 @@
 'use client';
 
 import { ArticleDetail } from '../../components/features/article/ArticleDetail';
-import { useArticle } from '../../../hooks/useArticle';
+import { useArticle } from '@/hooks/features/article/useArticle';
 import { useEffect } from "react";
 import { useHeader } from "../../../contexts/HeaderContext";
-import { useLoading } from '../../../hooks/useLoading';
+import { useLoading } from '@/hooks/core/useLoading';
 import ErrorState from '../../components/shared/ErrorState';
 import ArticleLoadingIndicator from '../../components/features/article/ArticleLoadingIndicator';
 
@@ -56,4 +56,4 @@ export default function ArticlePage({
       recommendedArticles={recommendedArticles}
     />
   );
-} 
+}  

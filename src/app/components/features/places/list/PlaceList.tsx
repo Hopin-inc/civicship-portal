@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Membership } from '@/hooks/usePlaces';
+import { Membership } from '@/hooks/features/place/usePlaces';
 import PlaceMapSheet from '../map/PlaceMapSheet';
 import PlaceListSheet from './PlaceListSheet';
 import { Button } from '@/components/ui/button';
@@ -69,4 +69,4 @@ export function PlaceList({ memberships, onClose, isMapMode = false, selectedPla
       getAllPlaces={getAllPlaces}
     />
   );
-}                 
+}                                  
