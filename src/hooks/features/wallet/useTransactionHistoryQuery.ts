@@ -2,6 +2,7 @@
 
 import { useQuery, gql, QueryResult } from '@apollo/client';
 import { TransactionReason } from '../../../gql/graphql';
+import { WalletTransactionsDocument } from '@/graphql/queries/wallet';
 
 export interface TransactionNode {
   id: string;
@@ -47,7 +48,7 @@ export interface TransactionHistoryData {
  * @param first Number of transactions to fetch
  */
 export const useTransactionHistoryQuery = (userId: string | undefined, first: number = 10): QueryResult<TransactionHistoryData> => {
-  return useQuery<TransactionHistoryData>(GET_TRANSACTION_HISTORY, {
+  return useQuery<TransactionHistoryData>(WalletTransactionsDocument, {
     variables: { 
       userId: userId ?? '',
       first,
