@@ -1,8 +1,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { UserSocialLinks } from "@/components/features/user/UserSocialLinks";
+import { Button } from "@/app/components/ui/button";
+import { UserSocialLinks } from "@/app/components/features/user/UserSocialLinks";
 import MapPinIcon from "@/../public/icons/map-pin.svg";
 import { cn } from "@/lib/utils";
 
@@ -49,7 +49,7 @@ export function UserProfile({ user, isOwner, onUpdateSocialLinks }: UserProfileP
         </div>
         {isOwner && (
           <Button
-            variant="outline"
+            variant="secondary"
             className="border-[#4361EE] text-[#4361EE] absolute right-0 top-[50%] -translate-y-1/2"
             asChild
           >
@@ -90,26 +90,28 @@ export function UserProfile({ user, isOwner, onUpdateSocialLinks }: UserProfileP
           </p>
           {shouldShowMore(user.bio) && !isExpanded && (
             <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-b from-transparent to-white flex items-end justify-center">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => setIsExpanded(true)}
-                className="w-40 h-10 bg-white rounded-full text-gray-900 font-bold text-sm border border-gray-100 shadow-sm"
+                className="w-40 h-10"
               >
                 もっと見る
-              </button>
+              </Button>
             </div>
           )}
           {isExpanded && (
             <div className="flex justify-center mt-2">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => setIsExpanded(false)}
-                className="w-40 h-10 bg-white rounded-full text-gray-900 font-bold text-sm border border-gray-100 shadow-sm"
+                className="w-40 h-10"
               >
                 閉じる
-              </button>
+              </Button>
             </div>
           )}
         </div>
       </div>
     </div>
   );
-} 
+}        
