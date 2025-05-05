@@ -2,12 +2,12 @@
 
 import React from 'react';
 import { useSearchResults } from '@/hooks/features/search/useSearchResults';
-import SearchResultHeader from '@/app/components/features/search/SearchResultHeader';
-import RecommendedOpportunities from '@/app/components/features/search/RecommendedOpportunities';
-import DateGroupedOpportunities from '@/app/components/features/search/DateGroupedOpportunities';
-import EmptySearchResults from '@/app/components/features/search/EmptySearchResults';
-import LoadingIndicator from '@/app/components/shared/LoadingIndicator';
-import ErrorState from '@/app/components/shared/ErrorState';
+import { SearchResultHeader } from '@/app/components/features/search/SearchResultHeader';
+import { RecommendedOpportunities } from '@/app/components/features/search/RecommendedOpportunities';
+import { DateGroupedOpportunities } from '@/app/components/features/search/DateGroupedOpportunities';
+import { EmptySearchResults } from '@/app/components/features/search/EmptySearchResults';
+import { LoadingIndicator } from '@/app/components/shared/LoadingIndicator';
+import { ErrorState } from '@/app/components/shared/ErrorState';
 
 interface SearchResultPageProps {
   searchParams?: {

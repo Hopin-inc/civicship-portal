@@ -8,7 +8,7 @@ import PlaceImageSlider from "@/components/features/places/detail/PlaceImageSlid
 import PlaceHeader from "@/components/features/places/detail/PlaceHeader";
 import PlaceOpportunities from "@/components/features/places/detail/PlaceOpportunities";
 import PlaceFeaturedArticle from "@/components/features/places/detail/PlaceFeaturedArticle";
-import ErrorState from "@/app/components/shared/ErrorState";
+import { ErrorState } from "@/app/components/shared/ErrorState";
 
 interface PlaceDetailProps {
   params: {

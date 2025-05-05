@@ -169,27 +169,6 @@ export const useUserPortfolios = (userId: string) => {
     }
   }, [data]);
 
-  useEffect(() => {
-    observer.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (lastPortfolioRef.current) {
-      observer.current.observe(lastPortfolioRef.current);
-    }
-
-    return () => {
-      if (observer.current) {
-        observer.current.disconnect();
-      }
-    };
-  }, [hasMore, isLoadingMore, portfolios.length]);
-
   const loadMore = useCallback(async () => {
     if (!hasMore || isLoadingMore) {
       return;
@@ -231,16 +210,37 @@ export const useUserPortfolios = (userId: string) => {
     }
   }, [fetchMore, hasMore, isLoadingMore, userId, portfolios, data]);
 
-  const handleError = () => {
+  useEffect(() => {
+    observer.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (lastPortfolioRef.current) {
+      observer.current.observe(lastPortfolioRef.current);
+    }
+
+    return () => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+    };
+  }, [hasMore, isLoadingMore, portfolios.length, loadMore]);
+
+  const handleError = useCallback(() => {
     if (error) {
       console.error('Error fetching user portfolios:', error);
       toast.error('ポートフォリオの取得に失敗しました');
     }
-  };
+  }, [error]);
 
   useEffect(() => {
     handleError();
-  }, [error]);
+  }, [handleError]);
 
   const getActiveOpportunities = () => {
     return data?.user?.opportunitiesCreatedByMe?.edges?.map((edge: { 

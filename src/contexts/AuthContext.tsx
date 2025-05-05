@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { User, CurrentPrefecture } from "@/gql/graphql";
 import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
@@ -46,6 +46,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const [userSignUpMutation] = useMutation(USER_SIGN_UP);
+  
+  const login = useCallback((userInfo: UserInfo | null) => {
+    setUid(userInfo?.uid ?? null);
+    setUser(userInfo?.user ?? null);
+  }, []);
 
   const loginWithLiff = async () => {
     if (!liff) {
@@ -125,12 +130,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [auth, ready]);
-
-  const login = (userInfo: UserInfo | null) => {
-    setUid(userInfo?.uid ?? null);
-    setUser(userInfo?.user ?? null);
-  };
+  }, [auth, ready, cookies, refetch, router, searchParams, login]);
 
   const logout = async () => {
     setIsAuthenticating(true);

@@ -25,7 +25,7 @@ const DateTimePicker: React.FC<Props> = (props) => {
     if (props.value !== date) {
       setDate(props.value);
     }
-  }, [props.value]);
+  }, [props.value, date]);
 
   const minuteInterval = props.minuteInterval ?? 5;
   const hours = Array.from({ length: 24 }, (_, i) => i);

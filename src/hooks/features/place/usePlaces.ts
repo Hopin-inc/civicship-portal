@@ -101,14 +101,16 @@ export const usePlaces = (): UsePlacesResult => {
     router.push(`/places?${params.toString()}`);
   };
 
-  const memberships = (data?.memberships?.edges || []) as Membership[];
+  const memberships = useMemo(() => 
+    (data?.memberships?.edges || []) as Membership[],
+  [data?.memberships?.edges]);
 
   const places = useMemo(() => {
     const allPlaces: PlaceData[] = [];
 
     memberships.forEach(({ node }) => {
       const activeOpportunityCount = node.user.opportunitiesCreatedByMe?.edges
-        .filter((edge: any) => edge.node.publishStatus === 'PUBLIC')
+        .filter((edge) => edge.node.publishStatus === 'PUBLIC')
         .length || 0;
 
       node.participationView.participated.geo.forEach((location: Place) => {

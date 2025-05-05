@@ -15,8 +15,8 @@ const PlaceMapSheet: React.FC<PlaceMapSheetProps> = ({
 }) => {
   const sheetRef = useRef<HTMLDivElement>(null);
   const [sheetHeight, setSheetHeight] = useState('80px');
-  let startY = 0;
-  let startHeight = 0;
+  const startYRef = useRef(0);
+  const startHeightRef = useRef(0);
 
   useEffect(() => {
     if (selectedPlaceId) {
@@ -31,14 +31,14 @@ const PlaceMapSheet: React.FC<PlaceMapSheetProps> = ({
     if (!sheet) return;
 
     const handleTouchStart = (e: TouchEvent) => {
-      startY = e.touches[0].clientY;
-      startHeight = sheet.clientHeight;
+      startYRef.current = e.touches[0].clientY;
+      startHeightRef.current = sheet.clientHeight;
       sheet.style.transition = 'none';
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      const deltaY = startY - e.touches[0].clientY;
-      const newHeight = Math.max(100, startHeight + deltaY);
+      const deltaY = startYRef.current - e.touches[0].clientY;
+      const newHeight = Math.max(100, startHeightRef.current + deltaY);
       sheet.style.height = `${newHeight}px`;
     };
 

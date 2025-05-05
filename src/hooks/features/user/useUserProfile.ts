@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_USER_PROFILE, GET_USER_WITH_DETAILS_AND_PORTFOLIOS } from '@/graphql/queries/user';
 import { useAuth } from '@/contexts/AuthContext';
@@ -85,16 +85,16 @@ export const useUserProfile = (userId?: string) => {
   
   const profileData = formatUserProfileData(data);
   
-  const handleError = () => {
+  const handleError = useCallback(() => {
     if (error) {
       console.error('Error fetching user profile:', error);
       toast.error('プロフィールの取得に失敗しました');
     }
-  };
+  }, [error]);
 
   useEffect(() => {
     handleError();
-  }, [error]);
+  }, [handleError]);
 
   return {
     profileData,

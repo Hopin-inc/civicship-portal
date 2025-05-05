@@ -4,6 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 
 interface PlaceImageSliderProps {
   images: Array<{url: string; alt: string}>;
@@ -33,10 +34,12 @@ const PlaceImageSlider: React.FC<PlaceImageSliderProps> = ({
           transition={{ duration: 0.5 }}
           className="absolute inset-0"
         >
-          <img
+          <Image
             src={images[currentIndex]?.url || "/images/place-detail.jpg"}
             alt={images[currentIndex]?.alt || `スライド ${currentIndex + 1}`}
             className="w-full h-full object-cover rounded-lg"
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
         </motion.div>
       </AnimatePresence>

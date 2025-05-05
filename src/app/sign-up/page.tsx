@@ -1,5 +1,5 @@
 import { SignUpForm } from "@/app/components/features/signup/SignUpForm";
-import SignUpHeader from "@/app/components/features/signup/SignUpHeader";
+import { SignUpHeader } from "@/app/components/features/signup/SignUpHeader";
 
 const RegisterAccount: React.FC = async () => {
   return (

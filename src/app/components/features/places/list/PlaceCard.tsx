@@ -3,6 +3,7 @@
 import React from 'react';
 import { MapPin, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 interface PlaceCardProps {
   placeId: string;
@@ -29,10 +30,12 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
       onClick={() => onClick(placeId)}
     >
       <div className="relative h-48 overflow-hidden">
-        <img
+        <Image
           src={placeImage}
           alt={placeName}
-          className="w-full h-full object-cover"
+          className="object-cover"
+          fill
+          sizes="(max-width: 768px) 100vw, 345px"
         />
       </div>
       

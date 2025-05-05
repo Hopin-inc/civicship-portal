@@ -1,12 +1,12 @@
 'use client';
 
 import { useSearch, PREFECTURES } from '@/hooks/features/search/useSearch';
-import SearchHeader from '@/app/components/features/search/SearchHeader';
-import SearchTabs from '@/app/components/features/search/SearchTabs';
-import SearchForm from '@/app/components/features/search/SearchForm';
-import SearchFilters from '@/app/components/features/search/SearchFilters';
-import SearchFooter from '@/app/components/features/search/SearchFooter';
-import FilterSheets from '@/app/components/features/search/FilterSheets';
+import { SearchHeader } from '@/app/components/features/search/SearchHeader';
+import { SearchTabs } from '@/app/components/features/search/SearchTabs';
+import { SearchForm } from '@/app/components/features/search/SearchForm';
+import { SearchFilters } from '@/app/components/features/search/SearchFilters';
+import { SearchFooter } from '@/app/components/features/search/SearchFooter';
+import { FilterSheets } from '@/app/components/features/search/FilterSheets';
 
 /**
  * SearchPage - Main search page component

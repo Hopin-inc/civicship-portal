@@ -2,6 +2,7 @@ import { FC, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 interface PlaceCardsSheetProps {
   places: Array<{
@@ -107,10 +108,12 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
               onClick={() => handlePlaceClick(place.placeId)}
             >
               <div className="relative h-40 rounded-t-2xl overflow-hidden">
-                <img
+                <Image
                   src={place.image}
                   alt={place.title}
-                  className="w-full h-full object-cover"
+                  className="object-cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 345px"
                 />
               </div>
 
@@ -170,4 +173,4 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
   );
 };
 
-export default PlaceCardsSheet;        
+export default PlaceCardsSheet;                                

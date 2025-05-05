@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatWalletData, getTransactionDescription, formatTransactionDate } from '@/utils/walletUtils';
-import { useLoading } from "@/hooks";
+import { useLoading } from "@/hooks/core/useLoading";
+import { TransactionReason } from '@/gql/graphql';
 
 const GET_WALLET = gql`
   query GetWallet($userId: ID!) {
@@ -152,7 +153,7 @@ export const useWallet = (userId?: string) => {
     }
   }, [transactionData]);
   
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
     if (!hasMore || isLoadingMore) {
       return;
     }
@@ -162,7 +163,7 @@ export const useWallet = (userId?: string) => {
     try {
       const lastTransaction = transactions[transactions.length - 1];
       const lastCursor = transactionData?.user?.wallets?.edges?.[0]?.node?.transactions?.edges?.find(
-        (edge: any) => edge.node.id === lastTransaction.id
+        (edge: { node: { id: string }; cursor: string }) => edge.node.id === lastTransaction.id
       )?.cursor;
       
       const { data: moreData } = await fetchMore({
@@ -175,7 +176,16 @@ export const useWallet = (userId?: string) => {
       
       if (moreData?.user?.wallets?.edges?.[0]?.node?.transactions?.edges) {
         const edges = moreData.user.wallets.edges[0].node.transactions.edges;
-        const newTransactions = edges.map((edge: any) => {
+        const newTransactions = edges.map((edge: { 
+          node: { 
+            id: string; 
+            amount: number; 
+            reason: TransactionReason; 
+            createdAt: string;
+            fromUser?: { id: string; name: string } | null;
+            toUser?: { id: string; name: string } | null;
+          }; 
+        }) => {
           const node = edge.node;
           return {
             id: node.id,
@@ -202,18 +212,18 @@ export const useWallet = (userId?: string) => {
     } finally {
       setIsLoadingMore(false);
     }
-  };
+  }, [hasMore, isLoadingMore, transactions, transactionData, fetchMore, targetId, setIsLoadingMore, setTransactions, setHasMore]);
   
-  const handleError = () => {
+  const handleError = useCallback(() => {
     if (error || transactionError) {
       console.error('Error fetching wallet data:', error || transactionError);
       toast.error('ウォレットデータの取得に失敗しました');
     }
-  };
+  }, [error, transactionError]);
   
   useEffect(() => {
     handleError();
-  }, [error, transactionError]);
+  }, [handleError]);
   
   const [ticketCount, setTicketCount] = useState(0);
   
