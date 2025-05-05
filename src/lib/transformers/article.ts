@@ -1,0 +1,58 @@
+'use client';
+
+export interface GetArticlesData {
+  articles: {
+    pageInfo: {
+      hasNextPage: boolean;
+      endCursor: string | null;
+    };
+    edges: Array<{
+      node: {
+        id: string;
+        title: string;
+        introduction: string;
+        thumbnail: string;
+        publishedAt: string;
+        authors: Array<{
+          id: string;
+          name: string;
+          image: string;
+        }>;
+      };
+    }>;
+  };
+}
+
+export interface Article {
+  id: string;
+  title: string;
+  introduction: string;
+  thumbnail: {
+    url: string;
+    alt: string;
+  } | null;
+  publishedAt: string;
+  authors: Array<{
+    id: string;
+    name: string;
+    image: string;
+  }>;
+}
+
+/**
+ * Transform GraphQL article data to application format
+ */
+export const transformArticles = (data: GetArticlesData | undefined): Article[] => {
+  if (!data) return [];
+  
+  return data.articles.edges.map((edge) => {
+    const node = edge.node;
+    return {
+      ...node,
+      thumbnail: node.thumbnail ? {
+        url: node.thumbnail,
+        alt: node.title
+      } : null,
+    };
+  });
+};
