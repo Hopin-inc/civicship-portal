@@ -124,8 +124,8 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
       image: data.createdByUser.image || null,
       articlesAboutMe: data.createdByUser.articlesAboutMe ? {
         edges: data.createdByUser.articlesAboutMe.edges?.map(edge => ({
-          node: transformArticle(edge?.node)
-        })) || []
+          node: edge?.node ? transformArticle(edge.node) : null
+        })).filter(Boolean) || []
       } : undefined,
       opportunitiesCreatedByMe: data.createdByUser.opportunitiesCreatedByMe ? {
         edges: data.createdByUser.opportunitiesCreatedByMe.edges
@@ -183,4 +183,4 @@ export const useOpportunity = (id: string): UseOpportunityResult => {
     loading,
     error: error || null,
   };
-}; 
+};  

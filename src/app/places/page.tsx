@@ -113,7 +113,7 @@ export default function PlacesPage() {
         allPlaces.push({
           placeId: location.placeId,
           title: node.user.name,
-          address: node.participationView.participated.geo[0].placeName,
+          address: node.participationView.participated.geo[0]?.placeName ?? "住所不明",
           participantCount: node.participationView.participated.totalParticipatedCount,
           description: "イベントの説明",
           image: location.placeImage,
@@ -128,7 +128,7 @@ export default function PlacesPage() {
         allPlaces.push({
           placeId: location.placeId,
           title: node.user.name,
-          address: node.participationView.participated.geo[0].placeName,
+          address: node.participationView.participated.geo[0]?.placeName ?? "住所不明",
           participantCount: node.participationView.hosted.totalParticipantCount,
           description: "イベントの説明",
           image: location.placeImage,
