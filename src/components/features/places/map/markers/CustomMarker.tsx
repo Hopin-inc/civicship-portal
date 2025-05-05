@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Marker } from '@react-google-maps/api';
-import { MarkerData } from '@/types/maps';
+import { MarkerData } from '@/types/map';
 import { createCustomMarkerIcon, defaultImageUrl, drawCircleWithImage } from '@/utils/maps/markerUtils';
 
 interface CustomMarkerProps {

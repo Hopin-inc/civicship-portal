@@ -3,44 +3,6 @@
 import { useQuery, gql, QueryResult } from '@apollo/client';
 import { TransactionReason } from '../../../gql/graphql';
 
-export const GET_TRANSACTION_HISTORY = gql`
-  query GetTransactionHistory($userId: ID!, $first: Int, $after: String) {
-    user(id: $userId) {
-      id
-      wallets {
-        edges {
-          node {
-            id
-            transactions(first: $first, after: $after) {
-              edges {
-                node {
-                  id
-                  reason
-                  createdAt
-                  amount
-                  fromUser {
-                    id
-                    name
-                  }
-                  toUser {
-                    id
-                    name
-                  }
-                }
-                cursor
-              }
-              pageInfo {
-                hasNextPage
-                endCursor
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
 export interface TransactionNode {
   id: string;
   amount: number;

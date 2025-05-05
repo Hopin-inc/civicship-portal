@@ -1,4 +1,4 @@
-import { ContentType } from "../index";
+import { ContentType } from "./index";
 
 export interface Geo {
   latitude: number;

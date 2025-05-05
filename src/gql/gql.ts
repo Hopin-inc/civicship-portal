@@ -51,6 +51,8 @@ const documents = {
     types.GetUserWalletDocument,
   "\n  query WalletTransactions($filter: TransactionFilterInput) {\n    transactions(\n      filter: $filter,\n      sort: { createdAt: desc }\n    ) {\n      edges {\n        node {\n          id\n          createdAt\n          fromPointChange\n          toPointChange\n          reason\n          fromWallet {\n            id\n            user {\n              id\n              name\n            }\n          }\n          toWallet {\n            id\n            user {\n              id\n              name\n            }\n          }\n        }\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n":
     types.WalletTransactionsDocument,
+  "\n  query GetWallet($userId: ID!) {\n    user(id: $userId) {\n      id\n      wallets {\n        edges {\n          node {\n            id\n            currentPointView {\n              currentPoint\n            }\n            tickets {\n              edges {\n                node {\n                  id\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n":
+    types.GetWalletDocument,
 };
 
 /**
@@ -181,6 +183,12 @@ export function graphql(
 export function graphql(
   source: "\n  query WalletTransactions($filter: TransactionFilterInput) {\n    transactions(\n      filter: $filter,\n      sort: { createdAt: desc }\n    ) {\n      edges {\n        node {\n          id\n          createdAt\n          fromPointChange\n          toPointChange\n          reason\n          fromWallet {\n            id\n            user {\n              id\n              name\n            }\n          }\n          toWallet {\n            id\n            user {\n              id\n              name\n            }\n          }\n        }\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n",
 ): (typeof documents)["\n  query WalletTransactions($filter: TransactionFilterInput) {\n    transactions(\n      filter: $filter,\n      sort: { createdAt: desc }\n    ) {\n      edges {\n        node {\n          id\n          createdAt\n          fromPointChange\n          toPointChange\n          reason\n          fromWallet {\n            id\n            user {\n              id\n              name\n            }\n          }\n          toWallet {\n            id\n            user {\n              id\n              name\n            }\n          }\n        }\n      }\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "\n  query GetWallet($userId: ID!) {\n    user(id: $userId) {\n      id\n      wallets {\n        edges {\n          node {\n            id\n            currentPointView {\n              currentPoint\n            }\n            tickets {\n              edges {\n                node {\n                  id\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n",
+): (typeof documents)["\n  query GetWallet($userId: ID!) {\n    user(id: $userId) {\n      id\n      wallets {\n        edges {\n          node {\n            id\n            currentPointView {\n              currentPoint\n            }\n            tickets {\n              edges {\n                node {\n                  id\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

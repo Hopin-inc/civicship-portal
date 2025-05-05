@@ -6,6 +6,7 @@ generates:
   ./src/gql/:
     preset: client-preset
     config:
+      typesPrefix: Gql
       useIndexSignature: true
       maybeValue: T | null
       inputMaybeValue: T | undefined
