@@ -273,7 +273,7 @@ export type Activity = {
 export type Participant = {
   id: string;
   name: string;
-  image?: string;
+  image: string | null;
 };
 
 export type ParticipationImage = {
@@ -294,7 +294,7 @@ export type Participation = {
     user: {
       id: string;
       name: string;
-      image?: string;
+      image: string | null;
     };
     reservation?: {
       id: string;
@@ -310,7 +310,7 @@ export type Participation = {
         user: {
           id: string;
           name: string;
-          image?: string;
+          image: string | null;
         };
       }>;
     };

@@ -113,7 +113,7 @@ const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | nu
     participants: data.slots?.edges?.[0]?.node?.participations?.edges?.map(edge => ({
       id: edge?.node?.user?.id || "",
       name: edge?.node?.user?.name || "",
-      image: edge?.node?.user?.image || undefined,
+      image: edge?.node?.user?.image || null,
     })) || [],
     body: data.body || undefined,
     createdByUser: data.createdByUser ? {
@@ -188,4 +188,4 @@ export const useOpportunity = (id: string): UseOpportunityResult => {
     loading,
     error: error || null,
   };
-};          
+};            
