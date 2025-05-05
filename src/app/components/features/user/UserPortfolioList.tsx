@@ -1,7 +1,7 @@
 import { History, Plus, Calendar, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import EmptyState from "@/components/shared/EmptyState";
+import EmptyState from "@/app/components/shared/EmptyState";
 import { format } from "date-fns";
 import { RefObject } from "react";
 import type { Portfolio, PortfolioCategory, PortfolioStyle, ReservationStatus } from "@/types";
