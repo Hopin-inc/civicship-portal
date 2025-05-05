@@ -76,7 +76,7 @@ export default function ProfileEditPage() {
         variables: {
           input: {
             name: displayName,
-            image: profileImage ? { file: profileImage } : undefined,
+            image: profileImage ? { file: profileImage } : null,
             bio,
             currentPrefecture: location,
             urlFacebook: socialLinks.facebook,
