@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 interface ErrorStateProps {
   message?: string;
@@ -23,12 +25,14 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         <h2 className="text-xl font-bold text-red-700 mb-2">{title}</h2>
         <p className="text-red-600">{message}</p>
         {actionText && actionHref && (
-          <a 
-            href={actionHref} 
-            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-          >
-            {actionText}
-          </a>
+          <Link href={actionHref}>
+            <Button 
+              variant="destructive"
+              className="mt-4"
+            >
+              {actionText}
+            </Button>
+          </Link>
         )}
       </div>
     </div>
