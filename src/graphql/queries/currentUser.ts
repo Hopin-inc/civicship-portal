@@ -1,6 +1,6 @@
-import { graphql } from '@/gql/gql';
+import { gql } from '@apollo/client';
 
-export const CurrentUserDocument = graphql(`
+export const CurrentUserDocument = gql(`
   query currentUser {
     currentUser {
       user {
