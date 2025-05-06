@@ -71,6 +71,7 @@ export interface UsePlacesResult {
  */
 export const transformMembershipsToPlaces = (memberships: Membership[]): PlaceData[] => {
   const allPlaces: PlaceData[] = [];
+  const placeIdSet = new Set<string>(); // Track unique placeIds
 
   memberships.forEach(({ node }) => {
     const activeOpportunityCount = node.user.opportunitiesCreatedByMe?.edges
@@ -78,31 +79,37 @@ export const transformMembershipsToPlaces = (memberships: Membership[]): PlaceDa
       .length || 0;
 
     node.participationView.participated.geo.forEach((location: Place) => {
-      allPlaces.push({
-        placeId: location.placeId,
-        title: node.user.name,
-        address: location.placeName || "住所不明",
-        participantCount: node.participationView.participated.totalParticipatedCount,
-        description: "イベントの説明",
-        image: location.placeImage,
-        bio: node.bio,
-        userId: node.user.id,
-        activeOpportunityCount
-      });
+      if (!placeIdSet.has(location.placeId)) {
+        placeIdSet.add(location.placeId);
+        allPlaces.push({
+          placeId: location.placeId,
+          title: node.user.name,
+          address: location.placeName || "住所不明",
+          participantCount: node.participationView.participated.totalParticipatedCount,
+          description: "イベントの説明",
+          image: location.placeImage,
+          bio: node.bio,
+          userId: node.user.id,
+          activeOpportunityCount
+        });
+      }
     });
 
     node.participationView.hosted.geo.forEach((location: Place) => {
-      allPlaces.push({
-        placeId: location.placeId,
-        title: node.user.name,
-        address: location.placeName || "住所不明",
-        participantCount: node.participationView.hosted.totalParticipantCount,
-        description: "イベントの説明",
-        image: location.placeImage,
-        bio: node.bio,
-        userId: node.user.id,
-        activeOpportunityCount
-      });
+      if (!placeIdSet.has(location.placeId)) {
+        placeIdSet.add(location.placeId);
+        allPlaces.push({
+          placeId: location.placeId,
+          title: node.user.name,
+          address: location.placeName || "住所不明",
+          participantCount: node.participationView.hosted.totalParticipantCount,
+          description: "イベントの説明",
+          image: location.placeImage,
+          bio: node.bio,
+          userId: node.user.id,
+          activeOpportunityCount
+        });
+      }
     });
   });
 
