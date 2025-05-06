@@ -1,6 +1,13 @@
-import { Opportunity } from "@/types";
-import { useMemo } from "react";
+'use client';
 
+import { Opportunity } from "@/types";
+import { useAvailableDatesQuery } from "@/hooks/features/activity/useAvailableDatesQuery";
+
+/**
+ * Hook for available dates
+ * This is a wrapper around useAvailableDatesQuery
+ * for backward compatibility
+ */
 export const useAvailableDates = (
   opportunity: Opportunity | null
 ): Array<{
@@ -9,16 +16,6 @@ export const useAvailableDates = (
   participants: number;
   price: number;
 }> => {
-  return useMemo(() => {
-    if (!opportunity?.slots?.edges) return [];
-
-    return opportunity.slots.edges
-      .map(edge => ({
-        startsAt: new Date(edge.node.startsAt).toISOString(),
-        endsAt: new Date(edge.node.endsAt).toISOString(),
-        participants: edge.node.participations?.edges?.length || 0,
-        price: opportunity.feeRequired || 0,
-      }))
-      .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
-  }, [opportunity]);
+  const { availableDates } = useAvailableDatesQuery(opportunity);
+  return availableDates;
 };

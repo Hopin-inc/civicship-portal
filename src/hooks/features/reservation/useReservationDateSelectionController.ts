@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useHeader } from '../../../contexts/HeaderContext';
-import { useLoading } from '../../core/useLoading';
-import { useReservationDateSelectionQuery } from './useReservationDateSelectionQuery';
+import { useHeader } from '@/contexts/HeaderContext';
+import { useLoading } from '@/hooks/core/useLoading';
+import { useReservationDateSelectionQuery } from '@/hooks/features/reservation/useReservationDateSelectionQuery';
 import { 
   TimeSlot, 
   DateSection,
@@ -12,7 +12,7 @@ import {
   filterDateSectionsByDate,
   isSlotAvailable as checkSlotAvailability,
   buildReservationParams
-} from '../../../transformers/opportunitySlot';
+} from '@/transformers/opportunitySlot';
 
 interface UseReservationDateSelectionProps {
   opportunityId: string;

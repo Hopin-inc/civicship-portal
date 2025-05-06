@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { usePlaceMembership } from './usePlaceMembership';
+import { usePlaceMembership } from '@/hooks/features/place/usePlaceMembership';
 import { useLoading } from '@/hooks/core/useLoading';
 import { Opportunity, Participation } from '@/types';
 import { ApolloError } from '@apollo/client';

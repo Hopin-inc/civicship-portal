@@ -1,6 +1,6 @@
 'use client';
 
-import { useOpportunity } from '../activity/useOpportunity';
+import { useOpportunity } from '@/hooks/features/activity/useOpportunity';
 
 /**
  * Hook for fetching opportunity data for reservation date selection

@@ -1,28 +1,33 @@
-import { useGetOpportunitiesQuery } from "@/types/graphql";
-import { Opportunity } from "@/types";
-import { COMMUNITY_ID } from "@/utils";
+'use client';
+
+import { useSimilarOpportunitiesQuery } from '@/hooks/features/activity/useSimilarOpportunitiesQuery';
+import { Opportunity } from '@/types';
 
 interface UseSimilarOpportunitiesProps {
   opportunityId: string;
 }
 
+interface UseSimilarOpportunitiesResult {
+  similarOpportunities: Opportunity[];
+  loading: boolean;
+  error: any;
+}
+
+/**
+ * Hook for similar opportunities
+ * This is a wrapper around useSimilarOpportunitiesQuery
+ * for backward compatibility
+ */
 export const useSimilarOpportunities = ({
   opportunityId,
-}: UseSimilarOpportunitiesProps) => {
-  const { data, loading, error } = useGetOpportunitiesQuery({
-    variables: {
-      similarFilter: {
-        communityIds: [COMMUNITY_ID]
-      },
-    },
-    skip: !opportunityId
+}: UseSimilarOpportunitiesProps): UseSimilarOpportunitiesResult => {
+  const { similarOpportunities, loading, error } = useSimilarOpportunitiesQuery({
+    opportunityId
   });
 
   return {
-    similarOpportunities: data?.similar?.edges?.map(
-      (edge: any) => edge.node
-    ) as Opportunity[],
+    similarOpportunities,
     loading,
     error,
   };
-}; 
+};       

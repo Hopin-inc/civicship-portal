@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { DateRange } from 'react-day-picker';
-import { useHeader } from '../../../contexts/HeaderContext';
+import { useHeader } from '@/contexts/HeaderContext';
 
 export type SearchTabType = 'activity' | 'quest';
 export type SearchFilterType = 'location' | 'date' | 'guests' | 'other' | null;

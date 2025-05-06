@@ -1,8 +1,7 @@
 'use client';
 
-import { useQuery } from '@apollo/client';
-import { useGetUserWalletQuery } from '@/types/graphql';
-import { useAuth } from '@/contexts/AuthContext';
+import { useTicketsQuery } from '@/hooks/features/ticket/useTicketsQuery';
+import { transformTickets } from '@/transformers/ticket';
 import { Ticket } from '@/types/ticket';
 
 export interface UseTicketsResult {
@@ -11,23 +10,14 @@ export interface UseTicketsResult {
   error: any;
 }
 
+/**
+ * Custom hook for fetching and managing tickets
+ * This is a backward-compatible wrapper around useTicketsQuery
+ */
 export const useTickets = (): UseTicketsResult => {
-  const { user } = useAuth();
+  const { data, loading, error } = useTicketsQuery();
   
-  const { data, loading, error } = useGetUserWalletQuery({
-    variables: { id: user?.id ?? '' },
-    skip: !user?.id,
-  });
-
-  const tickets: Ticket[] = data?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.map((edge: any) => ({
-    id: edge?.node?.id,
-    status: edge?.node?.status,
-    utilityId: edge?.node?.utility?.id,
-    hostName: edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser?.name || '不明',
-    hostImage: edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser?.image || '/placeholder.png',
-    quantity: 1,
-    createdByUser: edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser,
-  })) || [];
+  const tickets = transformTickets(data);
 
   return {
     tickets,

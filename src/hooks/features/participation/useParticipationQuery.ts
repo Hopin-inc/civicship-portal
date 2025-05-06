@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { GetParticipationDocument } from '../../../graphql/queries/participation';
+import { GetParticipationDocument } from '@/graphql/queries/participation';
 import type { GqlGetParticipationQuery, GqlGetParticipationQueryVariables } from '@/types/graphql';
 
 /**

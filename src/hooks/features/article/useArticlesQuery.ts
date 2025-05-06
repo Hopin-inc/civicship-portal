@@ -1,10 +1,10 @@
 'use client';
 
 import { useQuery } from "@apollo/client";
-import { GET_ARTICLES } from "../../../graphql/queries/articles";
-import { GqlSortDirection } from "@/types/graphql";
+import { GET_ARTICLES } from "@/graphql/queries/articles";
+import { GqlSortDirection as SortDirection } from "@/types/graphql";
 
-import { GetArticlesData } from "../../../transformers/article";
+import { GetArticlesData } from "@/transformers/article";
 
 export const ARTICLES_PER_PAGE = 12;
 
@@ -18,7 +18,7 @@ export const useArticlesQuery = () => {
       publishStatus: ["PUBLIC"],
     },
     sort: {
-      publishedAt: GqlSortDirection.Desc,
+      publishedAt: SortDirection.Desc,
     },
   };
 

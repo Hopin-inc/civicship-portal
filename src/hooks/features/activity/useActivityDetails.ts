@@ -1,13 +1,10 @@
 'use client';
 
-import { useOpportunity } from '@/hooks/features/activity/useOpportunity';
-import { useSimilarOpportunities } from '@/hooks/features/activity/useSimilarOpportunities';
+import { useActivityDetailsQuery } from '@/hooks/features/activity/useActivityDetailsQuery';
 import { useAuth } from '@/contexts/AuthContext';
 import { Opportunity } from "@/types";
-import {  useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLoading } from '@/hooks/core/useLoading';
-import { useAvailableTickets } from "@/hooks/features/ticket/useAvailableTickets";
-import { useAvailableDates } from "@/hooks/features/activity/useAvailableDates";
 
 interface UseActivityDetailsProps {
   id: string;
@@ -27,16 +24,27 @@ interface UseActivityDetailsResult {
   error: Error | null;
 }
 
+/**
+ * Hook for activity details with UI control
+ * This is a wrapper around useActivityDetailsQuery with loading state management
+ * for backward compatibility
+ */
 export const useActivityDetails = ({ id }: UseActivityDetailsProps): UseActivityDetailsResult => {
-  const { opportunity, loading, error } = useOpportunity(id);
-  const { similarOpportunities, loading: similarLoading } = useSimilarOpportunities({
-    opportunityId: id
-  });
   const { user: currentUser } = useAuth();
   const { setIsLoading } = useLoading();
-
-  const availableTickets = useAvailableTickets(opportunity, currentUser?.id);
-  const availableDates = useAvailableDates(opportunity);
+  
+  const { 
+    opportunity, 
+    similarOpportunities, 
+    availableTickets,
+    availableDates,
+    loading,
+    similarLoading,
+    error 
+  } = useActivityDetailsQuery({ 
+    id, 
+    userId: currentUser?.id 
+  });
 
   useEffect(() => {
     setIsLoading(loading || similarLoading);

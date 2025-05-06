@@ -3,19 +3,20 @@
 import { useMemo, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ApolloError } from '@apollo/client';
-import { useLoading } from '../../../hooks/core/useLoading';
-import { usePlacesQuery } from './usePlacesQuery';
+import { useLoading } from '@/hooks/core/useLoading';
+import { usePlacesQuery } from '@/hooks/features/place/usePlacesQuery';
 import { 
   Membership, 
   PlaceData, 
   transformMembershipsToPlaces, 
   calculateTotalPlaces,
   UsePlacesResult
-} from '../../../transformers/place';
+} from '@/transformers/place';
 
 
 /**
  * Controller hook for places functionality
+ * Responsible for UI control and state management
  */
 export const usePlacesController = (): UsePlacesResult => {
   const { data, loading, error } = usePlacesQuery();
