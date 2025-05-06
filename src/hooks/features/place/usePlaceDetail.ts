@@ -34,8 +34,8 @@ export const usePlaceDetail = ({ placeId, userId }: UsePlaceDetailProps): UsePla
   const { setIsLoading } = useLoading();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const allImages = opportunities.flatMap((opportunity: Opportunity) => 
-    (opportunity.images || []).map(img => ({
+  const allImages = opportunities.flatMap((opportunity: any) => 
+    (opportunity.images || []).map((img: string) => ({
       url: img,
       alt: opportunity.title || "場所の写真"
     }))
@@ -57,9 +57,9 @@ export const usePlaceDetail = ({ placeId, userId }: UsePlaceDetailProps): UsePla
     setIsLoading(loading);
   }, [loading, setIsLoading]);
 
-  const participationImages = opportunities.flatMap((opportunity: Opportunity) =>
-    opportunity.slots?.edges?.flatMap((edge) =>
-      edge?.node?.participations?.edges?.flatMap((p) => {
+  const participationImages = opportunities.flatMap((opportunity: any) =>
+    opportunity.slots?.edges?.flatMap((edge: any) =>
+      edge?.node?.participations?.edges?.flatMap((p: any) => {
         const participation = p as any;
         return (
           participation?.node?.images &&

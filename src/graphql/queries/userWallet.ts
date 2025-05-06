@@ -1,6 +1,6 @@
-import { graphql } from '../../gql/gql';
+import { gql } from '@apollo/client';
 
-export const GetUserWalletDocument = graphql(`
+export const GetUserWalletDocument = gql(`
   query GetUserWallet($userId: ID!) {
     user(id: $userId) {
       id

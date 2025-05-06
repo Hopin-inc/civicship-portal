@@ -1,12 +1,12 @@
 'use client';
 
 import { useTicketClaimController } from './useTicketClaimController';
-import { ClaimLinkStatus } from '@/gql/graphql';
+import { GqlClaimLinkStatus } from '@/types/graphql';
 
 export interface UseTicketClaimResult {
   claimLinkData: {
     qty: number;
-    status: ClaimLinkStatus;
+    status: GqlClaimLinkStatus;
     issuer: {
       owner: {
         id: string;

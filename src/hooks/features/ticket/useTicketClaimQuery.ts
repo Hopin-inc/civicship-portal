@@ -3,7 +3,7 @@
 import { useQuery, useMutation } from "@apollo/client";
 import { VIEW_TICKET_CLAIM } from "@/graphql/queries/ticket";
 import { TICKET_CLAIM } from "@/graphql/mutations/ticket";
-import { ClaimLinkStatus } from '@/gql/graphql';
+import { GqlClaimLinkStatus } from '@/types/graphql';
 
 /**
  * Hook for fetching ticket claim data from GraphQL
