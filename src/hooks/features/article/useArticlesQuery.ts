@@ -2,7 +2,7 @@
 
 import { useQuery } from "@apollo/client";
 import { GET_ARTICLES } from "../../../graphql/queries/articles";
-import { SortDirection } from "../../../gql/graphql";
+import { GqlSortDirection } from "@/types/graphql";
 
 import { GetArticlesData } from "../../../transformers/article";
 
@@ -18,7 +18,7 @@ export const useArticlesQuery = () => {
       publishStatus: ["PUBLIC"],
     },
     sort: {
-      publishedAt: SortDirection.Desc,
+      publishedAt: GqlSortDirection.Desc,
     },
   };
 

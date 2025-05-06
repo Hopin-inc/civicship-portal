@@ -4,9 +4,9 @@ import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { 
-  OpportunityEdge, 
-  Opportunity as GraphQLOpportunity 
-} from '../gql/graphql';
+  GqlOpportunityEdge, 
+  GqlOpportunity as GraphQLOpportunity 
+} from '@/types/graphql';
 import { OpportunityCardProps } from "@/components/features/opportunity/OpportunityCard";
 
 export interface SearchParams {
@@ -67,19 +67,19 @@ export const mapNodeToCardProps = (node: GraphQLOpportunity): OpportunityCardPro
 /**
  * Transform opportunities into recommended opportunities
  */
-export const transformRecommendedOpportunities = (opportunities: { edges: OpportunityEdge[] }): OpportunityCardProps[] => {
+export const transformRecommendedOpportunities = (opportunities: { edges: GqlOpportunityEdge[] }): OpportunityCardProps[] => {
   return opportunities.edges
-    .filter((edge: OpportunityEdge) => edge?.node?.slots?.edges?.[0]?.node?.startsAt)
-    .map((edge: OpportunityEdge) => edge.node && mapNodeToCardProps(edge.node))
+    .filter((edge: GqlOpportunityEdge) => edge?.node?.slots?.edges?.[0]?.node?.startsAt)
+    .map((edge: GqlOpportunityEdge) => edge.node && mapNodeToCardProps(edge.node))
     .filter(Boolean) as OpportunityCardProps[];
 };
 
 /**
  * Group opportunities by date
  */
-export const groupOpportunitiesByDate = (opportunities: { edges: OpportunityEdge[] }): { [key: string]: OpportunityCardProps[] } => {
+export const groupOpportunitiesByDate = (opportunities: { edges: GqlOpportunityEdge[] }): { [key: string]: OpportunityCardProps[] } => {
   return opportunities.edges.reduce(
-    (acc: { [key: string]: OpportunityCardProps[] }, edge: OpportunityEdge) => {
+    (acc: { [key: string]: OpportunityCardProps[] }, edge: GqlOpportunityEdge) => {
       if (!edge?.node?.slots?.edges?.[0]?.node?.startsAt) return acc;
       
       const dateKey = format(new Date(edge.node.slots.edges[0].node.startsAt), 'yyyy-MM-dd');

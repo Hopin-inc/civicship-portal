@@ -5,7 +5,7 @@ import { useArticlesQuery, ARTICLES_PER_PAGE } from "./useArticlesQuery";
 import { transformArticles } from "../../../transformers/article";
 import { useLoading } from "../../core/useLoading";
 import { useInfiniteScroll } from "../../core/useInfiniteScroll";
-import { SortDirection } from "../../../gql/graphql";
+import { GqlSortDirection } from "@/types/graphql";
 
 /**
  * Controller hook for managing articles data and state
@@ -29,7 +29,7 @@ export const useArticlesController = () => {
           publishStatus: ["PUBLIC"],
         },
         sort: {
-          publishedAt: SortDirection.Desc,
+          publishedAt: GqlSortDirection.Desc,
         },
         cursor: data?.articles.pageInfo.endCursor,
       },

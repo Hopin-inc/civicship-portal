@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { GET_OPPORTUNITIES } from '@/graphql/queries/opportunities';
 import { GetOpportunitiesData, OpportunityConnection } from '@/types';
 import { GqlOpportunityCategory } from '@/types/graphql';

@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9d8e9427-ae26-45d1-b49b-4edd4ae6b1fb" name="変更" comment="refactor: rename component directory">
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useActivities.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useActivities.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="devin/1746433339-reorganize-directories" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;709sakata&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;ssh://git@github.com/Hopin-inc/civicship-portal.git&quot;,
+    &quot;accountId&quot;: &quot;2b425da0-8198-4adb-9f76-cbf939b8ea30&quot;
+  }
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+    <option name="showPreview" value="true" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2wOR18mvXEIdsWivUJES5rQRuii" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "devin/1746343585-unified-refactor",
+    "js.debugger.nextJs.config.created.client": "true",
+    "js.debugger.nextJs.config.created.server": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "pnpm",
+    "prettierjs.PrettierConfiguration.Package": "/Users/naokisakata/ghq/github.com/Hopin-inc/civicship-portal/node_modules/prettier",
+    "ts.external.directory.path": "/Users/naokisakata/ghq/github.com/Hopin-inc/civicship-portal/node_modules/typescript/lib"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/components/features/ticket/recieve" />
+      <recent name="$PROJECT_DIR$/src/components/features/ticket/detail" />
+      <recent name="$PROJECT_DIR$/src/components/features/user/portfolio" />
+      <recent name="$PROJECT_DIR$/src/components/features/user/profile" />
+      <recent name="$PROJECT_DIR$/src/components/features/participation" />
+    </key>
+  </component>
+  <component name="RunManager" selected="JavaScript デバッグ.Next.js: クライアントサイドのデバッグ">
+    <configuration name="Next.js: クライアントサイドのデバッグ" type="JavascriptDebugType" uri="http://localhost:8000/">
+      <method v="2" />
+    </configuration>
+    <configuration name="Next.js: サーバーサイド" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-WS-251.23774.424" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="デフォルトタスク">
+      <changelist id="9d8e9427-ae26-45d1-b49b-4edd4ae6b1fb" name="変更" comment="" />
+      <created>1745910415449</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1745910415449</updated>
+      <workItem from="1745910416661" duration="1404000" />
+      <workItem from="1746069776041" duration="3000" />
+      <workItem from="1746069782420" duration="8057000" />
+      <workItem from="1746112837722" duration="639000" />
+      <workItem from="1746290010459" duration="13924000" />
+      <workItem from="1746343337744" duration="2308000" />
+      <workItem from="1746418369231" duration="4804000" />
+      <workItem from="1746430971959" duration="3204000" />
+      <workItem from="1746435487718" duration="6161000" />
+      <workItem from="1746441672934" duration="190000" />
+      <workItem from="1746441878023" duration="19144000" />
+      <workItem from="1746495220931" duration="83000" />
+      <workItem from="1746495307440" duration="330000" />
+    </task>
+    <task id="LOCAL-00001" summary="refactor: delete not usage file">
+      <option name="closed" value="true" />
+      <created>1746292974163</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1746292974163</updated>
+    </task>
+    <task id="LOCAL-00002" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1746294868156</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1746294868156</updated>
+    </task>
+    <task id="LOCAL-00003" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1746320254398</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1746320254398</updated>
+    </task>
+    <task id="LOCAL-00004" summary="WIP: refactor place component directory">
+      <option name="closed" value="true" />
+      <created>1746320552864</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1746320552864</updated>
+    </task>
+    <task id="LOCAL-00005" summary="WIP: manual refactor">
+      <option name="closed" value="true" />
+      <created>1746435768069</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1746435768069</updated>
+    </task>
+    <task id="LOCAL-00006" summary="WIP: manual refactor">
+      <option name="closed" value="true" />
+      <created>1746435980162</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1746435980162</updated>
+    </task>
+    <task id="LOCAL-00007" summary="fix: fix TS71007">
+      <option name="closed" value="true" />
+      <created>1746442160728</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1746442160728</updated>
+    </task>
+    <task id="LOCAL-00008" summary="refactor: manual refactor">
+      <option name="closed" value="true" />
+      <created>1746444713411</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1746444713411</updated>
+    </task>
+    <task id="LOCAL-00009" summary="refactor: modify import">
+      <option name="closed" value="true" />
+      <created>1746474197441</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1746474197441</updated>
+    </task>
+    <task id="LOCAL-00010" summary="refactor: manual update">
+      <option name="closed" value="true" />
+      <created>1746476325539</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1746476325539</updated>
+    </task>
+    <task id="LOCAL-00011" summary="feat: try figma mcp">
+      <option name="closed" value="true" />
+      <created>1746478109329</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1746478109329</updated>
+    </task>
+    <task id="LOCAL-00012" summary="refactor:">
+      <option name="closed" value="true" />
+      <created>1746478119466</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1746478119466</updated>
+    </task>
+    <task id="LOCAL-00013" summary="refactor: component directory">
+      <option name="closed" value="true" />
+      <created>1746481956928</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1746481956928</updated>
+    </task>
+    <task id="LOCAL-00014" summary="refactor: manual">
+      <option name="closed" value="true" />
+      <created>1746482317411</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1746482317411</updated>
+    </task>
+    <task id="LOCAL-00015" summary="refactor: add prefix as Gql">
+      <option name="closed" value="true" />
+      <created>1746485937936</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1746485937936</updated>
+    </task>
+    <task id="LOCAL-00016" summary="refactor: remove use client">
+      <option name="closed" value="true" />
+      <created>1746485946579</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1746485946579</updated>
+    </task>
+    <task id="LOCAL-00017" summary="refactor: re generate graphql.tsx">
+      <option name="closed" value="true" />
+      <created>1746486047467</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1746486047467</updated>
+    </task>
+    <task id="LOCAL-00018" summary="refactor: delete read me">
+      <option name="closed" value="true" />
+      <created>1746486589185</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1746486589185</updated>
+    </task>
+    <task id="LOCAL-00019" summary="refactor: rename component directory">
+      <option name="closed" value="true" />
+      <created>1746486901942</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1746486901942</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="refactor: delete not usage file" />
+    <MESSAGE value="WIP" />
+    <MESSAGE value="WIP: refactor place component directory" />
+    <MESSAGE value="WIP: manual refactor" />
+    <MESSAGE value="fix: fix TS71007" />
+    <MESSAGE value="refactor: manual refactor" />
+    <MESSAGE value="refactor: modify import" />
+    <MESSAGE value="refactor: manual update" />
+    <MESSAGE value="feat: try figma mcp" />
+    <MESSAGE value="refactor:" />
+    <MESSAGE value="refactor: component directory" />
+    <MESSAGE value="refactor: manual" />
+    <MESSAGE value="refactor: add prefix as Gql" />
+    <MESSAGE value="refactor: remove use client" />
+    <MESSAGE value="refactor: re generate graphql.tsx" />
+    <MESSAGE value="refactor: delete read me" />
+    <MESSAGE value="refactor: rename component directory" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: rename component directory" />
+  </component>
+</project>
