@@ -1,6 +1,7 @@
 
 import React, { useRef } from 'react';
 import { TransactionItem } from './TransactionItem';
+import { Button } from "@/components/ui/button";
 
 interface Transaction {
   id: string;
@@ -67,13 +68,14 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       
       {hasMore && (
         <div className="flex justify-center mt-6">
-          <button
+          <Button
             onClick={onLoadMore}
             disabled={isLoadingMore}
-            className="px-4 py-2 rounded-full border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-50"
+            variant="tertiary"
+            className="px-4 py-2 bg-white hover:bg-gray-50 disabled:opacity-50"
           >
             {isLoadingMore ? '読み込み中...' : 'もっと見る'}
-          </button>
+          </Button>
         </div>
       )}
     </div>

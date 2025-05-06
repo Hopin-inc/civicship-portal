@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Button } from "@/components/ui/button";
 
 interface Community {
   id: string;
@@ -38,12 +39,14 @@ export const UserActiveOpportunities: React.FC<UserActiveOpportunitiesProps> = (
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">主催中の体験</h2>
             {onCreateOpportunity && (
-              <button 
+              <Button 
                 onClick={onCreateOpportunity}
-                className="px-3 py-2 text-sm rounded-full border border-gray-200 bg-white hover:bg-gray-50"
+                variant="tertiary"
+                size="sm"
+                className="bg-white hover:bg-gray-50"
               >
                 体験を作成
-              </button>
+              </Button>
             )}
           </div>
           <p className="text-gray-500 text-sm">主催中の体験はありません</p>
@@ -58,12 +61,14 @@ export const UserActiveOpportunities: React.FC<UserActiveOpportunitiesProps> = (
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">主催中の体験</h2>
         {isOwner && onCreateOpportunity && (
-          <button 
+          <Button 
             onClick={onCreateOpportunity}
-            className="px-3 py-2 text-sm rounded-full border border-gray-200 bg-white hover:bg-gray-50"
+            variant="tertiary"
+            size="sm"
+            className="bg-white hover:bg-gray-50"
           >
             体験を作成
-          </button>
+          </Button>
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

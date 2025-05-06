@@ -49,9 +49,9 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
     <div className="min-h-screen bg-white">
       <header className="fixed top-0 left-0 right-0 h-14 px-4 flex items-center justify-between border-b bg-white z-10">
         <div className="flex items-center">
-          <button onClick={() => router.back()} className="mr-4">
+          <Button onClick={() => router.back()} variant="link" className="mr-4 p-0 h-auto">
             <ChevronLeft />
-          </button>
+          </Button>
           <h1 className="text-lg font-semibold">プロフィール編集</h1>
         </div>
       </header>
@@ -66,12 +66,12 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
             <div className="flex items-center gap-3">
               <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100">
                 {profileImage ? (
-                  <Image 
-                    src={`data:image/jpeg;base64,${profileImage}`} 
-                    alt="Profile" 
-                    width={96} 
-                    height={96} 
-                    className="w-full h-full object-cover" 
+                  <Image
+                    src={`data:image/jpeg;base64,${profileImage}`}
+                    alt="Profile"
+                    width={96}
+                    height={96}
+                    className="w-full h-full object-cover"
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-200" />
@@ -115,10 +115,11 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
             </Label>
             <div className="grid grid-cols-2 gap-4 mb-4">
               {prefectureOptions.map((prefecture) => (
-                <button
+                <Button
                   key={prefecture}
                   type="button"
                   onClick={() => setLocation(prefecture)}
+                  variant={location === prefecture ? "primary" : "tertiary"}
                   className={`px-4 py-2 rounded-2xl border-2 ${
                     location === prefecture
                       ? 'bg-blue-600 text-white border-blue-600'
@@ -126,12 +127,13 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
                   }`}
                 >
                   {prefectureLabels[prefecture]}
-                </button>
+                </Button>
               ))}
             </div>
-            <button
+            <Button
               type="button"
               onClick={() => setLocation(GqlCurrentPrefecture.OutsideShikoku)}
+              variant={location === GqlCurrentPrefecture.OutsideShikoku ? "primary" : "tertiary"}
               className={`w-full px-4 py-2 rounded-2xl border-2 ${
                 location === GqlCurrentPrefecture.OutsideShikoku
                   ? 'bg-blue-600 text-white border-blue-600'
@@ -139,7 +141,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
               }`}
             >
               {prefectureLabels[GqlCurrentPrefecture.OutsideShikoku]}
-            </button>
+            </Button>
           </div>
 
           <div className="mb-8">
@@ -153,8 +155,8 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
           </div>
 
           <div className="w-[345px] mx-auto mb-8">
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               variant="primary"
               className="w-full h-[56px]"
               disabled={updating}
