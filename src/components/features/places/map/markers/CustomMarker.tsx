@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Marker } from '@react-google-maps/api';
+import React, { useState, useEffect, useRef } from 'react';
 import { MarkerData } from '@/types/map';
 import { createCustomMarkerIcon, defaultImageUrl, drawCircleWithImage } from '@/utils/maps/markerUtils';
 
@@ -14,6 +13,8 @@ interface CustomMarkerProps {
 const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }) => {
   const [icon, setIcon] = useState<google.maps.Icon | null>(null);
   const [currentSize, setCurrentSize] = useState<number>(56);
+  const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const markerDivRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (isSelected && currentSize !== 80) {
@@ -83,17 +84,57 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
     loadIcon();
   }, [currentSize, data.placeImage, data.userImage]);
 
-  if (!icon) return null;
+  useEffect(() => {
+    if (!icon || !icon.scaledSize) return;
 
-  return (
-    <Marker
-      position={data.position}
-      icon={icon}
-      onClick={onClick}
-      zIndex={isSelected ? 2 : 1}
-      title={data.name}
-    />
-  );
+    const createOrUpdateMarker = async () => {
+      try {
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
+        
+        const width = icon.scaledSize!.width;
+        const height = icon.scaledSize!.height;
+        
+        const imgElement = document.createElement('img');
+        imgElement.src = icon.url;
+        imgElement.style.width = `${width}px`;
+        imgElement.style.height = `${height}px`;
+        
+        if (!markerDivRef.current) {
+          markerDivRef.current = document.createElement('div');
+          markerDivRef.current.style.cursor = 'pointer';
+          markerDivRef.current.addEventListener('click', onClick);
+        }
+        
+        markerDivRef.current.innerHTML = '';
+        markerDivRef.current.appendChild(imgElement);
+        
+        if (!markerRef.current) {
+          markerRef.current = new AdvancedMarkerElement({
+            position: data.position,
+            content: markerDivRef.current,
+            title: data.name,
+            zIndex: isSelected ? 2 : 1,
+          });
+        } else {
+          markerRef.current.position = data.position;
+          markerRef.current.content = markerDivRef.current;
+          markerRef.current.zIndex = isSelected ? 2 : 1;
+        }
+      } catch (error) {
+        console.error("Error creating AdvancedMarkerElement:", error);
+      }
+    };
+
+    createOrUpdateMarker();
+
+    return () => {
+      if (markerRef.current) {
+        markerRef.current.map = null;
+      }
+    };
+  }, [icon, data.position, data.name, isSelected, onClick]);
+
+  return null; // The marker is managed imperatively
 };
 
 export default CustomMarker;
