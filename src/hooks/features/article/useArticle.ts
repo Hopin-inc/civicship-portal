@@ -1,5 +1,4 @@
-import { useQuery } from "@apollo/client";
-import { GET_ARTICLE } from "@/graphql/queries/article";
+import { useGetArticleQuery } from "@/types/graphql";
 import type { Article, ArticleType } from "@/types";
 import type { GqlArticleCategory } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
@@ -47,7 +46,7 @@ function transformGraphQLArticleToArticle(graphqlArticle: any): Article {
 }
 
 export const useArticle = (id: string): UseArticleResult => {
-  const { data, loading, error } = useQuery(GET_ARTICLE, {
+  const { data, loading, error } = useGetArticleQuery({
     variables: {
       id,
       permission: {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { GET_USER_WALLET } from '@/graphql/queries/user';
+import { useGetUserWalletQuery } from '@/types/graphql';
 import { useAuth } from '@/contexts/AuthContext';
 import { Ticket } from '@/types/ticket';
 
@@ -14,7 +14,7 @@ export interface UseTicketsResult {
 export const useTickets = (): UseTicketsResult => {
   const { user } = useAuth();
   
-  const { data, loading, error } = useQuery(GET_USER_WALLET, {
+  const { data, loading, error } = useGetUserWalletQuery({
     variables: { id: user?.id ?? '' },
     skip: !user?.id,
   });

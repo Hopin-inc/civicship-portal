@@ -1,5 +1,4 @@
-import { useQuery } from "@apollo/client";
-import { GET_OPPORTUNITIES } from "@/graphql/queries/opportunities";
+import { useGetOpportunitiesQuery } from "@/types/graphql";
 import { Opportunity } from "@/types";
 import { COMMUNITY_ID } from "@/utils";
 
@@ -10,7 +9,7 @@ interface UseSimilarOpportunitiesProps {
 export const useSimilarOpportunities = ({
   opportunityId,
 }: UseSimilarOpportunitiesProps) => {
-  const { data, loading, error } = useQuery(GET_OPPORTUNITIES, {
+  const { data, loading, error } = useGetOpportunitiesQuery({
     variables: {
       similarFilter: {
         communityIds: [COMMUNITY_ID]

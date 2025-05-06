@@ -4,6 +4,7 @@ import { useMutation } from '@apollo/client';
 import { filesToBase64 } from '@/utils/file';
 import { GqlImageInput } from '@/types/graphql';
 import { useAuth } from '@/contexts/AuthContext';
+// import { useParticipationImageBulkUpdateMutation } from '@/types/graphql';
 
 interface UseParticipationImageUploadProps {
   participationId: string;

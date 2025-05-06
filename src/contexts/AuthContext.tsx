@@ -1,14 +1,11 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { GqlUser, GqlCurrentPrefecture } from '@/types/graphql';
+import { GqlUser, GqlCurrentPrefecture, useCurrentUserQuery, useUserSignUpMutation } from '@/types/graphql';
 import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
-import { useQuery, useMutation } from "@apollo/client";
-import { GET_CURRENT_USER } from "@/graphql/queries/identity";
-import { USER_SIGN_UP } from "@/graphql/mutations/identity";
 import { auth, signInWithLiffToken } from "@/lib/firebase";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
@@ -36,7 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const cookies = useCookies();
   const { liff, isLiffLoggedIn, liffAccessToken, liffLogin, liffLogout } = useLiff();
 
-  const { refetch } = useQuery(GET_CURRENT_USER, {
+  const { refetch } = useCurrentUserQuery({
     fetchPolicy: "no-cache",
   });
 
@@ -45,7 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserInfo["user"]>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  const [userSignUpMutation] = useMutation(USER_SIGN_UP);
+  const [userSignUpMutation] = useUserSignUpMutation();
   
   const login = useCallback((userInfo: UserInfo | null) => {
     setUid(userInfo?.uid ?? null);

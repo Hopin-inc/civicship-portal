@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-import { WalletTransactionsDocument } from '@/graphql/queries/wallet';
+import { WalletTransactionsDocument, useWalletTransactionsQuery, GqlWalletTransactionsQuery } from '@/types/graphql';
 import { formatTransactionDate, getTransactionDescription } from '@/utils/walletUtils';
 
 interface Transaction {
@@ -29,7 +29,7 @@ export const useTransactionHistory = (userId: string) => {
   useEffect(() => {
     if (data?.transactions?.edges) {
       const formattedTransactions = data.transactions.edges
-        .map(edge => {
+        .map((edge: NonNullable<NonNullable<GqlWalletTransactionsQuery['transactions']['edges']>[number]>) => {
           if (!edge?.node) return null;
           
           const transaction = edge.node;

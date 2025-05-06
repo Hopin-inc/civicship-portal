@@ -1,11 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useMutation, useQuery } from "@apollo/client";
-import { VIEW_TICKET_CLAIM } from "@/graphql/queries/ticket";
-import { TICKET_CLAIM } from "@/graphql/mutations/ticket";
+import { useTicketClaimLinkQuery, useTicketClaimMutation, GqlClaimLinkStatus } from '@/types/graphql';
 import { useAuth } from "@/contexts/AuthContext";
-import { GqlClaimLinkStatus } from '@/types/graphql';
 import { toast } from "sonner";
 
 export interface UseTicketClaimResult {
@@ -35,12 +32,12 @@ export const useTicketClaim = (ticketClaimLinkId: string): UseTicketClaimResult 
     data: viewData,
     loading: viewLoading,
     error: viewError,
-  } = useQuery(VIEW_TICKET_CLAIM, {
+  } = useTicketClaimLinkQuery({
     variables: { id: ticketClaimLinkId },
   });
 
   const [claimTickets, { data: claimData, loading: claimLoading, error: claimError }] =
-    useMutation(TICKET_CLAIM);
+    useTicketClaimMutation();
 
   useEffect(() => {
     if (viewData?.ticketClaimLink == null) return;

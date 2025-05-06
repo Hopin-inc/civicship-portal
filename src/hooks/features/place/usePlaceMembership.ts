@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { GET_SINGLE_MEMBERSHIP } from '@/graphql/queries/membership';
+import { useGetSingleMembershipQuery } from '@/types/graphql';
 import { Opportunity } from '@/types';
 
 export type TransformedOpportunity = {
@@ -29,7 +29,7 @@ export type TransformedOpportunity = {
 };
 
 export const usePlaceMembership = (communityId: string, userId: string) => {
-  const { data, loading, error } = useQuery(GET_SINGLE_MEMBERSHIP, {
+  const { data, loading, error } = useGetSingleMembershipQuery({
     variables: {
       communityId,
       userId,

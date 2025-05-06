@@ -6,9 +6,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { prefectureLabels } from '@/utils/userUtils';
-import { GqlCurrentPrefecture } from '@/types/graphql';
-import { GET_USER_PROFILE } from '@/graphql/queries/user';
-import { UPDATE_MY_PROFILE } from '@/graphql/mutations/user';
+import { GqlCurrentPrefecture, useGetUserProfileQuery, useUpdateMyProfileMutation } from '@/types/graphql';
 
 interface ProfileFormData {
   name: string;
@@ -38,14 +36,14 @@ export const useProfileEdit = () => {
     twitter: ''
   });
 
-  const { data: userData, loading: userLoading, error: userError } = useQuery(GET_USER_PROFILE, {
+  const { data: userData, loading: userLoading, error: userError } = useGetUserProfileQuery({
     variables: { 
       id: user?.id ?? '',
     },
     skip: !user?.id,
   });
 
-  const [updateProfile, { loading: updating }] = useMutation(UPDATE_MY_PROFILE);
+  const [updateProfile, { loading: updating }] = useUpdateMyProfileMutation();
 
   useEffect(() => {
     if (userData?.user) {
@@ -87,7 +85,7 @@ export const useProfileEdit = () => {
         variables: {
           input: {
             name: displayName,
-            image: profileImage ? { file: profileImage } : null,
+            image: profileImage ? { file: profileImage } : undefined,
             bio,
             currentPrefecture: location as any, // Type cast to resolve compatibility issue
             urlFacebook: socialLinks.facebook,

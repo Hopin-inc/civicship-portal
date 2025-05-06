@@ -1,8 +1,6 @@
 'use client';
 
-import { useQuery } from '@apollo/client';
-import { GET_USER_WITH_DETAILS_AND_PORTFOLIOS } from '@/graphql/queries/user';
-import { GqlSortDirection } from '@/types/graphql';
+import { useGetUserWithDetailsAndPortfoliosQuery, GqlSortDirection } from '@/types/graphql';
 
 export const ITEMS_PER_PAGE = 30;
 
@@ -69,18 +67,15 @@ export interface UserWithPortfoliosData {
  * Hook for fetching user portfolios data from GraphQL
  */
 export const useUserPortfolioQuery = (userId: string) => {
-  return useQuery<UserWithPortfoliosData>(
-    GET_USER_WITH_DETAILS_AND_PORTFOLIOS,
-    {
-      variables: { 
-        id: userId,
-        first: ITEMS_PER_PAGE,
-        after: null,
-        filter: null,
-        sort: { date: GqlSortDirection.Desc }
-      },
-      fetchPolicy: "network-only",
-      skip: !userId
-    }
-  );
+  return useGetUserWithDetailsAndPortfoliosQuery({
+    variables: { 
+      id: userId,
+      first: ITEMS_PER_PAGE,
+      after: undefined,
+      filter: undefined,
+      sort: { date: GqlSortDirection.Desc }
+    },
+    fetchPolicy: "network-only",
+    skip: !userId
+  });
 };
