@@ -2,6 +2,7 @@
 import React from 'react';
 import { Calendar, ChevronRight } from 'lucide-react';
 import type { DateSection } from '@/hooks/features/reservation/useReservationDateSelection';
+import { Button } from '@/components/ui/button';
 
 interface DateSelectionFormProps {
   selectedDate: string | null;
@@ -16,8 +17,9 @@ export const DateSelectionForm: React.FC<DateSelectionFormProps> = ({
   onOpenDateForm
 }) => {
   return (
-    <button
+    <Button
       onClick={onOpenDateForm}
+      variant="tertiary"
       className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center justify-between"
     >
       <div className="flex items-center space-x-4">
@@ -32,7 +34,7 @@ export const DateSelectionForm: React.FC<DateSelectionFormProps> = ({
         <span className="text-base">{selectedDate || "日付を選択"}</span>
         <ChevronRight className="h-5 w-5 text-gray-400" />
       </div>
-    </button>
+    </Button>
   );
 };
 

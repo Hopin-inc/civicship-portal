@@ -2,6 +2,7 @@ import React from 'react';
 import { MapPin, Calendar as CalendarIcon, Users, Tags, ChevronRight } from 'lucide-react';
 import { SearchFilterType, Prefecture } from '@/hooks/features/search/useSearch';
 import { DateRange } from 'react-day-picker';
+import { Button } from '@/components/ui/button';
 
 interface SearchFiltersProps {
   location: string;
@@ -27,8 +28,9 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
 }) => {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">
-      <button
+      <Button
         onClick={() => onFilterClick('location')}
+        variant="tertiary"
         className="w-full px-4 py-4 flex items-center justify-between"
       >
         <div className="flex items-center space-x-4">
@@ -43,10 +45,11 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
           </span>
           <ChevronRight className="h-5 w-5 text-gray-400" />
         </div>
-      </button>
+      </Button>
 
-      <button
+      <Button
         onClick={() => onFilterClick('date')}
+        variant="tertiary"
         className="w-full px-4 py-4 flex items-center justify-between"
       >
         <div className="flex items-center space-x-4">
@@ -61,10 +64,11 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
           </span>
           <ChevronRight className="h-5 w-5 text-gray-400" />
         </div>
-      </button>
+      </Button>
 
-      <button
+      <Button
         onClick={() => onFilterClick('guests')}
+        variant="tertiary"
         className="w-full px-4 py-4 flex items-center justify-between"
       >
         <div className="flex items-center space-x-4">
@@ -79,10 +83,11 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
           </span>
           <ChevronRight className="h-5 w-5 text-gray-400" />
         </div>
-      </button>
+      </Button>
 
-      <button
+      <Button
         onClick={() => onFilterClick('other')}
+        variant="tertiary"
         className="w-full px-4 py-4 flex items-center justify-between"
       >
         <div className="flex flex-col space-y-1">
@@ -99,7 +104,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
           )}
         </div>
         <ChevronRight className="h-5 w-5 text-gray-400" />
-      </button>
+      </Button>
     </div>
   );
 };

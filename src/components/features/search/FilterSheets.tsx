@@ -3,6 +3,9 @@ import React from 'react';
 import { Minus, Plus, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { DateRange } from 'react-day-picker';
 import { ja } from 'date-fns/locale';
 import { SearchFilterType, Prefecture } from '@/hooks/features/search/useSearch';
@@ -44,18 +47,20 @@ export const FilterSheets: React.FC<FilterSheetsProps> = ({
   const renderFooterButtons = () => (
     <div className="absolute bottom-0 left-0 right-0 bg-white p-4">
       <div className="flex justify-between items-center">
-        <button
+        <Button
           onClick={clearActiveFilter}
+          variant="link"
           className="text-gray-500 text-sm"
         >
           選択を解除
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => setActiveForm(null)}
-          className="bg-blue-600 text-white px-8 py-3 rounded-2xl"
+          variant="primary"
+          className="px-8 py-3"
         >
           決定
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -75,19 +80,20 @@ export const FilterSheets: React.FC<FilterSheetsProps> = ({
           </SheetHeader>
           <div className="grid grid-cols-2 gap-2">
             {prefectures.map((pref) => (
-              <button
+              <Button
                 key={pref.id}
                 onClick={() => {
                   setLocation(pref.id);
                 }}
-                className={`py-3 rounded-lg border ${
+                variant={location === pref.id ? "primary" : "tertiary"}
+                className={`py-3 ${
                   location === pref.id
-                    ? 'border-blue-600 text-blue-600 bg-blue-50'
-                    : 'border-gray-200 text-gray-900'
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-900'
                 }`}
               >
                 {pref.name}
-              </button>
+              </Button>
             ))}
           </div>
           {renderFooterButtons()}
@@ -159,25 +165,29 @@ export const FilterSheets: React.FC<FilterSheetsProps> = ({
             </SheetTitle>
           </SheetHeader>
           <div className="flex items-center justify-center space-x-8">
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 setGuests(Math.max(0, guests - 1));
               }}
-              className="rounded-full border border-gray-200 p-2 hover:bg-gray-50"
+              variant="tertiary"
+              size="icon"
+              className="p-2"
             >
               <Minus className="h-6 w-6 text-gray-400" />
-            </button>
+            </Button>
             <span className="text-2xl font-medium w-8 text-center">{guests}</span>
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 setGuests(guests + 1);
               }}
-              className="rounded-full border border-gray-200 p-2 hover:bg-gray-50"
+              variant="tertiary"
+              size="icon"
+              className="p-2"
             >
               <Plus className="h-6 w-6 text-gray-400" />
-            </button>
+            </Button>
           </div>
           {renderFooterButtons()}
         </div>
@@ -192,15 +202,15 @@ export const FilterSheets: React.FC<FilterSheetsProps> = ({
             </SheetTitle>
           </SheetHeader>
           <div className="space-y-4">
-            <label className="flex items-center space-x-2">
-              <input
+            <Label className="flex items-center space-x-2">
+              <Input
                 type="checkbox"
                 checked={useTicket}
                 onChange={(e) => setUseTicket(e.target.checked)}
-                className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="h-5 w-5"
               />
               <span className="text-gray-700">チケットで支払える</span>
-            </label>
+            </Label>
           </div>
           {renderFooterButtons()}
         </div>

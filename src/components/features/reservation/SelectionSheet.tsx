@@ -2,6 +2,7 @@
 import React from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 import type { DateSection } from '@/hooks/features/reservation/useReservationDateSelection';
 
 interface SelectionSheetProps {
@@ -41,18 +42,20 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
   const renderFooterButtons = () => (
     <div className="max-w-md mx-auto fixed bottom-0 left-0 right-0 bg-white p-4 border-t">
       <div className="flex justify-between items-center">
-        <button
+        <Button
           onClick={handleClearSelection}
+          variant="link"
           className="text-gray-500 text-sm"
         >
           選択を解除
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onClose}
-          className="bg-blue-600 text-white px-8 py-3 rounded-2xl"
+          variant="primary"
+          className="px-8 py-3"
         >
           決定
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -61,17 +64,18 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
     <div className="flex-1 overflow-auto pb-24">
       <div className="space-y-2">
         {dateSections.map((section, index) => (
-          <button
+          <Button
             key={index}
             onClick={() => setSelectedDate(`${section.date} (${section.day})`)}
-            className={`w-full text-left p-4 rounded-lg border ${
+            variant={selectedDate === `${section.date} (${section.day})` ? "primary" : "tertiary"}
+            className={`w-full text-left p-4 ${
               selectedDate === `${section.date} (${section.day})`
-                ? "border-blue-600 text-blue-600 bg-blue-50"
-                : "border-gray-200 text-gray-900"
+                ? "text-blue-600 bg-blue-50"
+                : "text-gray-900"
             }`}
           >
             {section.date} ({section.day})
-          </button>
+          </Button>
         ))}
       </div>
     </div>
@@ -79,19 +83,23 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
 
   const renderGuestSelection = () => (
     <div className="flex items-center justify-center space-x-8 py-4">
-      <button
+      <Button
         onClick={() => setSelectedGuests(Math.max(1, selectedGuests - 1))}
-        className="rounded-full border border-gray-200 p-2 hover:bg-gray-50"
+        variant="tertiary"
+        size="icon"
+        className="p-2"
       >
         <Minus className="h-6 w-6 text-gray-400" />
-      </button>
+      </Button>
       <span className="text-2xl font-medium w-8 text-center">{selectedGuests}</span>
-      <button
+      <Button
         onClick={() => setSelectedGuests(selectedGuests + 1)}
-        className="rounded-full border border-gray-200 p-2 hover:bg-gray-50"
+        variant="tertiary"
+        size="icon"
+        className="p-2"
       >
         <Plus className="h-6 w-6 text-gray-400" />
-      </button>
+      </Button>
     </div>
   );
 

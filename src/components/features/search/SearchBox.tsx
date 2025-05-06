@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { Search, Calendar, Users } from 'lucide-react'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
+import { Button } from '@/components/ui/button'
 
 interface SearchFormProps {
   location?: string
@@ -55,8 +56,9 @@ const SearchForm = ({ location, from, to, guests }: SearchFormProps) => {
   const hasAnyCondition = location || from || to || guests
 
   return (
-    <button
+    <Button
       onClick={handleClick}
+      variant="tertiary"
       className="flex flex-col w-full max-w-xl bg-gray-100 rounded-full h-12 px-4 text-left hover:bg-gray-200 transition-colors relative"
     >
       <div className="absolute left-4 top-1/2 -translate-y-1/2">
@@ -82,8 +84,8 @@ const SearchForm = ({ location, from, to, guests }: SearchFormProps) => {
           </div>
         </div>
       )}
-    </button>
+    </Button>
   )
 }
 
-export default SearchForm 
+export default SearchForm      

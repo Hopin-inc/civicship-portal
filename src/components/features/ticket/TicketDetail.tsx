@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 
 interface Ticket {
   id: string;
@@ -65,9 +66,12 @@ export default function TicketDetail({ ticket }: TicketDetailProps) {
         </ul>
       </div>
 
-      <button className="w-full bg-primary text-white py-3 px-4 rounded-lg hover:bg-primary/90 transition-colors">
+      <Button 
+        variant="primary"
+        className="w-full py-3 px-4"
+      >
         関わりを見つける
-      </button>
+      </Button>
     </div>
   );
-}      
+}                        

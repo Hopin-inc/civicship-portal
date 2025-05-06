@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Share, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 /**
  * Header component for the search results page
@@ -16,9 +17,9 @@ export const SearchResultHeader: React.FC = () => {
         </Link>
         <h1 className="text-lg font-medium">検索結果</h1>
         <div className="absolute right-4 flex items-center space-x-4">
-          <button>
+          <Button variant="link" className="p-0 h-auto">
             <Share className="h-6 w-6" />
-          </button>
+          </Button>
           <Link href="/public">
             <X className="h-6 w-6" />
           </Link>

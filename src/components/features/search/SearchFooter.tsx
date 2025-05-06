@@ -18,12 +18,13 @@ export const SearchFooter: React.FC<SearchFooterProps> = ({
   return (
     <footer className="fixed bottom-0 left-0 right-0 bg-white border-t z-10">
       <div className="max-w-lg mx-auto px-4 h-16 flex justify-between items-center">
-        <button 
+        <Button 
           onClick={onClear}
+          variant="link"
           className="text-gray-500 text-sm"
         >
           条件をクリア
-        </button>
+        </Button>
         <Button 
           onClick={onSearch}
           className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium"

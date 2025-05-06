@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useProfileEdit } from '@/hooks/features/user/useProfileEdit';
 import { UserProfileEdit } from '@/components/features/user/UserProfileEdit';
 import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
@@ -39,9 +40,13 @@ export default function ProfileEditPage() {
     <div className="min-h-screen bg-white">
       <header className="fixed top-0 left-0 right-0 h-14 px-4 flex items-center justify-between border-b bg-white z-10">
         <div className="flex items-center">
-          <button onClick={() => router.back()} className="mr-4">
+          <Button 
+            onClick={() => router.back()} 
+            variant="link"
+            className="mr-4 p-0 h-auto"
+          >
             <ChevronLeft />
-          </button>
+          </Button>
           <h1 className="text-lg font-semibold">プロフィール編集</h1>
         </div>
       </header>

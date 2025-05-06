@@ -8,6 +8,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 interface AddParticipationPhotosModalProps {
   trigger: React.ReactNode;
@@ -78,23 +80,26 @@ export function AddParticipationPhotosModal({
                       fill
                       className="object-cover rounded-lg"
                     />
-                    <button
+                    <Button
                       onClick={() => handleRemoveImage(index)}
-                      className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md"
+                      variant="tertiary"
+                      size="icon"
+                      className="absolute -top-2 -right-2 bg-white p-1 shadow-md"
                     >
                       <X className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
             )}
-            <button
+            <Button
               onClick={() => document.getElementById('image-input')?.click()}
-              className="w-full h-[52px] flex items-center justify-center bg-white border border-gray-200 rounded-[16px] text-[#111111]"
+              variant="tertiary"
+              className="w-full h-[52px] flex items-center justify-center"
               disabled={previewUrls.length >= 6}
             >
               画像を選択
-            </button>
+            </Button>
             <input
               id="image-input"
               type="file"
@@ -109,21 +114,22 @@ export function AddParticipationPhotosModal({
             <div className="mb-2">
               <span className="text-base">感想</span>
             </div>
-            <textarea
+            <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="参加した感想を自由に入力してください"
-              className="w-full min-h-[120px] p-4 border border-gray-200 rounded-[16px] text-base resize-none"
+              className="w-full min-h-[120px]"
             />
           </div>
 
-          <button
+          <Button
             onClick={handleSubmit}
-            className="w-full py-4 rounded-full bg-[#4361EE] text-white text-base font-bold hover:bg-[#3651DE] disabled:bg-gray-300 disabled:cursor-not-allowed"
+            variant="primary"
+            className="w-full py-4"
             disabled={selectedImages.length === 0}
           >
             追加
-          </button>
+          </Button>
         </div>
       </SheetContent>
     </Sheet>

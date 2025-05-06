@@ -66,10 +66,11 @@ const PlaceImageSlider: React.FC<PlaceImageSliderProps> = ({
           {/* Dots Indicator */}
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
             {images.map((_, index) => (
-              <button
+              <Button
                 key={index}
                 onClick={() => onSelectIndex && onSelectIndex(index)}
-                className={`w-2 h-2 rounded-full transition-colors ${
+                variant="link"
+                className={`w-2 h-2 p-0 rounded-full transition-colors ${
                   index === currentIndex ? "bg-white" : "bg-white/50"
                 }`}
               />

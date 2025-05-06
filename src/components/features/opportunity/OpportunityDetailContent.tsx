@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Coins, Gift, HelpCircle } from "lucide-react";
 import { CardWrapper } from "@/components/ui/card-wrapper";
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
@@ -87,9 +88,9 @@ export const OpportunityDetailContent = ({
                 </div>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="cursor-help self-start">
+                    <Button variant="link" className="cursor-help self-start p-0 h-auto">
                       <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 transition-colors" />
-                    </button>
+                    </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-80 bg-[#fcfaf7] border-gray-200">
                     <div className="space-y-3 p-1">
@@ -284,9 +285,10 @@ export const OpportunityDetailContent = ({
               opportunity.participants?.length > 0 && (
                 <div className="space-y-4">
                   <div className="flex items-center">
-                    <button
+                    <Button
                       onClick={onParticipantsClick}
-                      className="flex items-center gap-4 hover:opacity-80"
+                      variant="link"
+                      className="flex items-center gap-4 p-0 h-auto"
                     >
                       <div className="flex">
                         {opportunity.participants
@@ -331,7 +333,7 @@ export const OpportunityDetailContent = ({
                           <span>ほか</span>
                         )}
                       </div>
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )

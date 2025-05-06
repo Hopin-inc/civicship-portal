@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { SearchTabType } from '@/hooks/features/search/useSearch';
+import { Button } from '@/components/ui/button';
 
 interface SearchTabsProps {
   selectedTab: SearchTabType;
@@ -17,8 +18,9 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
   return (
     <div className="mb-6">
       <div className="flex">
-        <button
+        <Button
           onClick={() => onTabChange('activity')}
+          variant="link"
           className={`flex-1 pb-3 text-center text-xl relative ${
             selectedTab === 'activity'
               ? 'text-blue-600 font-medium'
@@ -29,9 +31,10 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
           {selectedTab === 'activity' && (
             <div className="absolute bottom-0 left-0 w-full h-[2px] bg-blue-600" />
           )}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => onTabChange('quest')}
+          variant="link"
           className={`flex-1 pb-3 text-center text-xl relative ${
             selectedTab === 'quest'
               ? 'text-blue-600 font-medium'
@@ -42,7 +45,7 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
           {selectedTab === 'quest' && (
             <div className="absolute bottom-0 left-0 w-full h-[2px] bg-blue-600" />
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import LoginModal from "@/components/features/login/LoginModal";
 import { useHeader } from "@/contexts/HeaderContext";
 import { cn } from "@/lib/utils";
@@ -27,13 +28,14 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       <div className="max-w-lg mx-auto px-4 h-16 flex justify-between items-center">
         <div className="flex-1 flex items-center">
           {shouldShowBackButton && (
-            <button
+            <Button
               onClick={() => router.back()}
-              className="mr-4 hover:text-foreground/80 transition-colors"
+              variant="link"
+              className="mr-4 p-0 h-auto"
               aria-label="戻る"
             >
               <ChevronLeft className="h-6 w-6" />
-            </button>
+            </Button>
           )}
           {config.showLogo && (
             <Link href="/public" className="flex items-center space-x-2">
