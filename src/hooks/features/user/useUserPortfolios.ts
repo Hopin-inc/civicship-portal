@@ -1,51 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLoading } from '@/hooks/core/useLoading';
 import { toast } from 'sonner';
 import { useUserPortfolioQuery,  GqlPortfolio } from './useUserPortfolioQuery';
 import { useUserOpportunities } from './useUserOpportunities';
 import { Portfolio, transformPortfolio } from '@/transformers/portfolio';
 import { GqlSortDirection } from '@/types/graphql';
-
-/**
- * Custom hook for implementing infinite scrolling
- */
-const useInfiniteScroll = ({
-  hasMore,
-  isLoading,
-  onLoadMore,
-}: {
-  hasMore: boolean;
-  isLoading: boolean;
-  onLoadMore: () => void;
-}) => {
-  const observer = useRef<IntersectionObserver | null>(null);
-  const targetRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    observer.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          onLoadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (targetRef.current) {
-      observer.current.observe(targetRef.current);
-    }
-
-    return () => {
-      if (observer.current) {
-        observer.current.disconnect();
-      }
-    };
-  }, [hasMore, isLoading, onLoadMore]);
-
-  return targetRef;
-};
+import { useInfiniteScroll } from '@/hooks/core/useInfiniteScroll';
 
 /**
  * Custom hook for fetching and managing user portfolios

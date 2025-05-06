@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { useLoading } from '../../../hooks/core/useLoading';
+import { useLoading } from '@/hooks/core/useLoading';
 import { useWalletQuery } from './useWalletQuery';
 import { useTransactionHistoryQuery } from './useTransactionHistoryQuery';
-import { Transaction, TransactionNode, formatWalletData, transformTransaction } from '../../../transformers/wallet';
-import { useInfiniteScroll } from '../../../hooks/core/useInfiniteScroll';
+import { Transaction, TransactionNode, formatWalletData, transformTransaction } from '@/transformers/wallet';
+import { useInfiniteScroll } from '@/hooks/core/useInfiniteScroll';
 
 /**
  * Main controller hook for wallet functionality
