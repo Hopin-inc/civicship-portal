@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useSearchState } from './useSearchState';
-import { formatDateRange, buildSearchParams } from '../../../transformers/search';
+import { useSearchState } from '@/hooks/features/search/useSearchState';
+import { formatDateRange, buildSearchParams } from '@/transformers/search';
 
 /**
  * Controller hook for search functionality

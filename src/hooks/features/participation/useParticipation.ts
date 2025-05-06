@@ -1,7 +1,7 @@
 'use client';
 
-import { useParticipationController } from './useParticipationController';
-import type { Opportunity, Participation } from '../../../types';
+import { useParticipationController } from '@/hooks/features/participation/useParticipationController';
+import type { Opportunity, Participation } from '@/types';
 
 /**
  * Custom hook for managing participation data
@@ -10,4 +10,4 @@ import type { Opportunity, Participation } from '../../../types';
  */
 export const useParticipation = (id: string) => {
   return useParticipationController(id);
-};                 
+};                   

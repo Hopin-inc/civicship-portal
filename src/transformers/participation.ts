@@ -1,12 +1,12 @@
 'use client';
 
-import type { Opportunity, Participation, Article } from '../types';
-import type { GetParticipationQuery } from '../gql/graphql';
+import type { Opportunity, Participation, Article } from '@/types';
+import type { GqlGetParticipationQuery } from '@/types/graphql';
 
 /**
  * Type for opportunity data from GraphQL
  */
-type OpportunityData = NonNullable<NonNullable<NonNullable<GetParticipationQuery['participation']>['reservation']>['opportunitySlot']['opportunity']>;
+type OpportunityData = NonNullable<NonNullable<NonNullable<GqlGetParticipationQuery['participation']>['reservation']>['opportunitySlot']['opportunity']>;
 
 /**
  * Transform opportunity data from GraphQL to application format
@@ -99,7 +99,7 @@ export const transformOpportunity = (opportunityData: OpportunityData | undefine
 /**
  * Transform participation data from GraphQL to application format
  */
-export const transformParticipation = (participationData: GetParticipationQuery['participation'] | undefined): Participation | undefined => {
+export const transformParticipation = (participationData: GqlGetParticipationQuery['participation'] | undefined): Participation | undefined => {
   if (!participationData) return undefined;
 
   return {
