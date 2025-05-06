@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLoading } from '@/hooks/core/useLoading';
 import { toast } from 'sonner';
-import { useUserPortfolioQuery,  GqlPortfolio } from './useUserPortfolioQuery';
+import { useUserPortfolioQuery, GqlPortfolio } from './useUserPortfolioQuery';
 import { useUserOpportunities } from './useUserOpportunities';
 import { Portfolio, transformPortfolio } from '@/transformers/portfolio';
 import { GqlSortDirection } from '@/types/graphql';

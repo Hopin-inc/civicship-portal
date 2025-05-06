@@ -1,6 +1,6 @@
 'use client';
 
-import { UserWithPortfoliosData } from './useUserPortfolioQuery';
+import { GqlGetUserWithDetailsAndPortfoliosQuery } from '@/types/graphql';
 
 export interface UserOpportunity {
   id: string;
@@ -18,8 +18,9 @@ export interface UserOpportunity {
 
 /**
  * Hook for extracting and transforming user opportunities from user data
+ * Accepts either the legacy UserWithPortfoliosData or the new GqlGetUserWithDetailsAndPortfoliosQuery
  */
-export const useUserOpportunities = (data: UserWithPortfoliosData | undefined): UserOpportunity[] => {
+export const useUserOpportunities = (data: GqlGetUserWithDetailsAndPortfoliosQuery | undefined): UserOpportunity[] => {
   if (!data?.user?.opportunitiesCreatedByMe?.edges) {
     return [];
   }
