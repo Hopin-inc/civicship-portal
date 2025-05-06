@@ -1,8 +1,8 @@
 'use client';
 
 import { useActivitiesQuery } from './useActivitiesQuery';
-import { useInfiniteScroll } from '../../../hooks/core/useInfiniteScroll';
-import { OpportunityConnection } from '../../../types';
+import { useInfiniteScroll } from '@/hooks/core/useInfiniteScroll';
+import { OpportunityConnection } from '@/types';
 
 export interface UseActivitiesResult {
   upcomingActivities: OpportunityConnection;

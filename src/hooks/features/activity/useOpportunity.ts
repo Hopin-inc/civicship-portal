@@ -1,7 +1,7 @@
 'use client';
 
 import { useOpportunityController } from './useOpportunityController';
-import type { Opportunity } from '../../../types';
+import type { Opportunity } from '@/types';
 
 interface UseOpportunityResult {
   opportunity: Opportunity | null;

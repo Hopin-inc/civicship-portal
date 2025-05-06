@@ -1,8 +1,8 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { GET_USER_PROFILE, GET_USER_WITH_DETAILS_AND_PORTFOLIOS } from '../../../graphql/queries/user';
-import { User } from '../../../types';
+import { GET_USER_PROFILE, GET_USER_WITH_DETAILS_AND_PORTFOLIOS } from '@/graphql/queries/user';
+import { User } from '@/types';
 
 export interface GetUserProfileData {
   user: User;

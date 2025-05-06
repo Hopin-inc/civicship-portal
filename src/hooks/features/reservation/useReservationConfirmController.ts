@@ -3,13 +3,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { useHeader } from '../../../contexts/HeaderContext';
-import { useOpportunity } from '../activity/useOpportunity';
-import { useLoading } from '../../core/useLoading';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useHeader } from '@/contexts/HeaderContext';
+import { useOpportunity } from '@/hooks/features/activity/useOpportunity';
+import { useLoading } from '@/hooks/core/useLoading';
+import { useAuth } from '@/contexts/AuthContext';
 import { useReservationConfirmQuery } from './useReservationConfirmQuery';
-import { findMatchingSlot, calculateAvailableTickets, getTicketIds } from '../../../transformers/reservation';
-import { parseDateTime } from '../../../utils/date';
+import { findMatchingSlot, calculateAvailableTickets, getTicketIds } from '@/transformers/reservation';
+import { parseDateTime } from '@/utils/date';
 
 /**
  * Controller hook for managing reservation confirmation state and logic

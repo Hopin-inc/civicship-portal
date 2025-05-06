@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useOpportunityQuery } from './useOpportunityQuery';
-import { transformOpportunity } from '../../../transformers/opportunity';
-import type { Opportunity } from '../../../types';
+import { transformOpportunity } from '@/transformers/opportunity';
+import type { Opportunity } from '@/types';
 
 interface UseOpportunityControllerResult {
   opportunity: Opportunity | null;
