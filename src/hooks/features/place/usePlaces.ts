@@ -1,13 +1,13 @@
 'use client';
 
-import { usePlacesController } from './usePlacesController';
+import { usePlacesController } from '@/hooks/features/place/usePlacesController';
 import type { 
   Place, 
   ParticipationView, 
   Membership, 
   PlaceData, 
   UsePlacesResult 
-} from '../../../transformers/place';
+} from '@/transformers/place';
 
 export type { 
   Place, 
