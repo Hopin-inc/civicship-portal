@@ -122,8 +122,8 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
                   variant={location === prefecture ? "primary" : "tertiary"}
                   className={`px-4 py-2 rounded-2xl border-2 ${
                     location === prefecture
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-muted'
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'border-input hover:border-input/80 hover:bg-muted'
                   }`}
                 >
                   {prefectureLabels[prefecture]}
@@ -136,8 +136,8 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
               variant={location === GqlCurrentPrefecture.OutsideShikoku ? "primary" : "tertiary"}
               className={`w-full px-4 py-2 rounded-2xl border-2 ${
                 location === GqlCurrentPrefecture.OutsideShikoku
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-muted'
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'border-input hover:border-input/80 hover:bg-muted'
               }`}
             >
               {prefectureLabels[GqlCurrentPrefecture.OutsideShikoku]}

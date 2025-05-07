@@ -21,7 +21,7 @@ export default function TicketList({ tickets }: TicketListProps) {
       </div>
 
       {tickets.map((ticket) => (
-        <div key={ticket.id} className="bg-background rounded-[20px] p-6 border border-gray-100">
+        <div key={ticket.id} className="bg-background rounded-[20px] p-6 border border-input">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative w-12 h-12 rounded-full overflow-hidden">
@@ -48,4 +48,4 @@ export default function TicketList({ tickets }: TicketListProps) {
       ))}
     </div>
   );
-}    
+}

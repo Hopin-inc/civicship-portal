@@ -43,7 +43,7 @@ export default function OpportunityCard({
         />
       </Card>
       <div className="mt-2">
-        <h3 className="text-sm font-medium line-clamp-2">{title}</h3>
+        <h3 className="text-sm font-medium text-foreground line-clamp-2">{title}</h3>
         <div className="mt-1 flex flex-col">
           <p className="text-sm text-muted-foreground">
             {price ? `${price.toLocaleString()}円/人〜` : '価格未定'}
@@ -56,4 +56,4 @@ export default function OpportunityCard({
       </div>
     </Link>
   )
-} 
+}          

@@ -88,4 +88,4 @@ const SearchForm = ({ location, from, to, guests }: SearchFormProps) => {
   )
 }
 
-export default SearchForm                        
+export default SearchForm

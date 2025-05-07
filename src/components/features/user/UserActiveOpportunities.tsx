@@ -74,7 +74,7 @@ export const UserActiveOpportunities: React.FC<UserActiveOpportunitiesProps> = (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {opportunities.map((opportunity) => (
           <Link key={opportunity.id} href={`/activities/${opportunity.id}`}>
-            <div className="border border-gray-100 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+            <div className="border border-input rounded-lg overflow-hidden hover:shadow-md transition-shadow">
               <div className="relative w-full h-40">
                 <Image
                   src={opportunity.imageUrl || '/placeholder-activity.jpg'}

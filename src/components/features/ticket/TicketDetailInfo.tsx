@@ -22,7 +22,7 @@ export const TicketDetailInfo: React.FC<TicketDetailInfoProps> = ({
       </div>
       
       <div className="flex">
-        <span className="text-gray-600 w-16">用途</span>
+        <span className="text-muted-foreground w-16">用途</span>
         <span className="whitespace-pre-line flex-1">{purpose}</span>
       </div>
     </div>

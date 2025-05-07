@@ -29,7 +29,7 @@ const PlaceOpportunities: React.FC<PlaceOpportunitiesProps> = ({ opportunities }
             {opportunities.map((opportunity) => (
               <div 
                 key={opportunity.id} 
-                className="flex-shrink-0 w-[280px] rounded-lg overflow-hidden border border-gray-200"
+                className="flex-shrink-0 w-[280px] rounded-lg overflow-hidden border border-input"
               >
                 <div className="relative h-[160px] w-full">
                   <Image 

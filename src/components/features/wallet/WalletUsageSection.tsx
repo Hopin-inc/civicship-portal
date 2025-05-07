@@ -15,7 +15,7 @@ export const WalletUsageSection: React.FC<WalletUsageSectionProps> = ({
   return (
     <div className="mt-6 mb-6">
       <h2 className="text-[22px] font-bold mb-4">{title}</h2>
-      <div className="bg-background rounded-[20px] p-4 border border-gray-100">
+      <div className="bg-background rounded-[20px] p-4 border border-input">
         <div className="flex items-start gap-3">
           <Info className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
           <div>

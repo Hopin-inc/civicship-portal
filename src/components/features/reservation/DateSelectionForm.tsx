@@ -20,7 +20,7 @@ export const DateSelectionForm: React.FC<DateSelectionFormProps> = ({
     <Button
       onClick={onOpenDateForm}
       variant="tertiary"
-      className="w-full bg-background rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center justify-between"
+      className="w-full bg-background rounded-2xl shadow-sm border border-input p-4 flex items-center justify-between"
     >
       <div className="flex items-center space-x-4">
         <Calendar className="h-6 w-6 text-muted-foreground" />

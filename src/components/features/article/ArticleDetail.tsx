@@ -70,7 +70,7 @@ export const ArticleDetail = ({
             prose-a:text-primary 
             prose-strong:text-foreground 
             prose-img:rounded-lg prose-img:shadow-lg prose-img:my-8 
-            prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic"
+            prose-blockquote:border-l-4 prose-blockquote:border-input prose-blockquote:pl-4 prose-blockquote:italic"
           dangerouslySetInnerHTML={{ __html: contentHtml }}
         />
       </article>

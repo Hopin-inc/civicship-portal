@@ -93,4 +93,4 @@ export default function FeaturedSection({ opportunities }: FeaturedSectionProps)
       </div>
     </section>
   )
-}    
+}

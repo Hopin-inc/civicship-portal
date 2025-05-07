@@ -173,4 +173,4 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
   );
 };
 
-export default PlaceCardsSheet;                                                                                                                                
+export default PlaceCardsSheet;

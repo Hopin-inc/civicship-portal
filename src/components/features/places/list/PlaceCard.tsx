@@ -26,7 +26,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
 }) => {
   return (
     <div
-      className="bg-background rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow w-[345px] mx-auto"
+      className="bg-background rounded-xl overflow-hidden shadow-sm border border-input hover:shadow-md transition-shadow w-[345px] mx-auto"
       onClick={() => onClick(placeId)}
     >
       <div className="relative h-48 overflow-hidden">

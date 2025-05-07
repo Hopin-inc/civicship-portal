@@ -38,7 +38,7 @@ export const PaymentSection: React.FC<PaymentSectionProps> = ({
     <div className="rounded-lg p-4 mb-6">
       <h3 className="text-2xl font-bold mb-6">お支払い</h3>
       
-      <div className="rounded-2xl border border-gray-200 p-4 mb-6">
+      <div className="rounded-2xl border border-input p-4 mb-6">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-4">
             <Switch 

@@ -114,4 +114,4 @@ export function UserProfile({ user, isOwner, onUpdateSocialLinks }: UserProfileP
       </div>
     </div>
   );
-}                
+}

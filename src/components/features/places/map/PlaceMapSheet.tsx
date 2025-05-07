@@ -71,7 +71,7 @@ const PlaceMapSheet: React.FC<PlaceMapSheetProps> = ({
       style={{ height: sheetHeight }}
     >
       <div className="flex items-center justify-center h-1.5 w-12 mx-auto mt-6 mb-3">
-        <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
+        <div className="w-12 h-1 bg-muted rounded-full"></div>
       </div>
       <div className="text-center py-1.5 text-muted-foreground text-sm px-6">
         {selectedPlaceId ? "選択された拠点の情報" : `${totalPlaces}箇所の拠点が表示されています`}

@@ -87,7 +87,7 @@ export const UserPortfolioSection: React.FC<UserPortfolioSectionProps> = ({
             onClick={onLoadMore}
             disabled={isLoadingMore}
             variant="tertiary"
-            className="px-4 py-2 bg-white hover:bg-gray-50 disabled:opacity-50"
+            className="px-4 py-2 bg-background hover:bg-muted disabled:opacity-50"
           >
             {isLoadingMore ? '読み込み中...' : 'もっと見る'}
           </Button>

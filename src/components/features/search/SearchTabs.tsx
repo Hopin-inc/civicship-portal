@@ -29,7 +29,7 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
         >
           体験
           {selectedTab === 'activity' && (
-            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-blue-600" />
+            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary" />
           )}
         </Button>
         <Button
@@ -37,13 +37,13 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
           variant="link"
           className={`flex-1 pb-3 text-center text-xl relative ${
             selectedTab === 'quest'
-              ? 'text-blue-600 font-medium'
-              : 'text-gray-400'
+              ? 'text-primary font-medium'
+              : 'text-muted-foreground'
           }`}
         >
           お手伝い
           {selectedTab === 'quest' && (
-            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-blue-600" />
+            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary" />
           )}
         </Button>
       </div>

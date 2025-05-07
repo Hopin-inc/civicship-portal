@@ -29,8 +29,8 @@ export const PrefectureSelector: React.FC<PrefectureSelectorProps> = ({
             variant="secondary"
             className={`h-12 rounded-2xl border-2 ${
               value === prefecture
-                ? 'bg-primary text-white border-primary'
-                : 'border-gray-200 hover:border-gray-300 hover:bg-muted'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'border-input hover:border-input/80 hover:bg-muted'
             }`}
             onClick={() => onChange(prefecture)}
           >
@@ -43,8 +43,8 @@ export const PrefectureSelector: React.FC<PrefectureSelectorProps> = ({
         variant="secondary"
         className={`w-full h-12 rounded-2xl border-2 ${
           value === GqlCurrentPrefecture.OutsideShikoku
-            ? 'bg-blue-600 text-white border-blue-600'
-            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+            ? 'bg-primary text-primary-foreground border-primary'
+            : 'border-input hover:border-input/80 hover:bg-muted'
         }`}
         onClick={() => onChange(GqlCurrentPrefecture.OutsideShikoku)}
       >

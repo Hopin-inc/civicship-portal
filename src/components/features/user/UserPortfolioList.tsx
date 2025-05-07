@@ -175,7 +175,7 @@ const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }:
       ))}
       {isLoadingMore && (
         <div className="col-span-2 flex justify-center py-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground"></div>
         </div>
       )}
     </div>

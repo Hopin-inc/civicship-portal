@@ -74,4 +74,4 @@ export default function TicketDetail({ ticket }: TicketDetailProps) {
       </Button>
     </div>
   );
-}                                                                                                                                                
+}

@@ -15,4 +15,4 @@ export default function TicketDescription() {
       </div>
     </div>
   );
-}    
+}
