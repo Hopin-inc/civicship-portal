@@ -45,12 +45,12 @@ export const FilterSheets: React.FC<FilterSheetsProps> = ({
   prefectures
 }) => {
   const renderFooterButtons = () => (
-    <div className="absolute bottom-0 left-0 right-0 bg-white p-4">
+    <div className="absolute bottom-0 left-0 right-0 bg-background p-4">
       <div className="flex justify-between items-center">
         <Button
           onClick={clearActiveFilter}
           variant="link"
-          className="text-gray-500 text-sm"
+          className="text-muted-foreground text-sm"
         >
           選択を解除
         </Button>
@@ -88,8 +88,8 @@ export const FilterSheets: React.FC<FilterSheetsProps> = ({
                 variant={location === pref.id ? "primary" : "tertiary"}
                 className={`py-3 ${
                   location === pref.id
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-900'
+                    ? 'text-primary bg-primary-foreground'
+                    : 'text-foreground'
                 }`}
               >
                 {pref.name}
@@ -133,9 +133,9 @@ export const FilterSheets: React.FC<FilterSheetsProps> = ({
                   head_cell: "text-gray-500 w-10 font-normal text-[0.8rem]",
                   row: "flex w-full mt-2 justify-between",
                   cell: "relative p-0 text-center text-[16px] w-10",
-                  day: "h-10 w-10 p-0 font-normal hover:bg-gray-100 flex items-center justify-center rounded-full",
-                  day_selected: "bg-blue-600 text-white hover:bg-blue-600 focus:bg-blue-600",
-                  day_today: "bg-gray-100",
+                  day: "h-10 w-10 p-0 font-normal hover:bg-muted flex items-center justify-center rounded-full",
+                  day_selected: "bg-primary text-primary-foreground hover:bg-primary focus:bg-primary",
+                  day_today: "bg-muted",
                   day_outside: "text-gray-400 opacity-50",
                   day_disabled: "text-gray-400 opacity-50",
                   day_hidden: "invisible",

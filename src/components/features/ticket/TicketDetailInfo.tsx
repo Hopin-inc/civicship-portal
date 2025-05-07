@@ -17,12 +17,12 @@ export const TicketDetailInfo: React.FC<TicketDetailInfoProps> = ({
   return (
     <div className="space-y-4 mb-8">
       <div className="flex">
-        <span className="text-gray-600 w-16">枚数</span>
+        <span className="text-muted-foreground w-16">枚数</span>
         <span>{ticketCount}枚</span>
       </div>
       
       <div className="flex">
-        <span className="text-gray-600 w-16">用途</span>
+        <span className="text-muted-foreground w-16">用途</span>
         <span className="whitespace-pre-line flex-1">{purpose}</span>
       </div>
     </div>

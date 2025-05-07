@@ -27,7 +27,7 @@ export const ParticipationDetails: React.FC<ParticipationDetailsProps> = ({
     <div className="p-2 my-6">
       <div className="space-y-4">
         <div className="flex items-start gap-2">
-          <Calendar className="w-5 h-5 text-blue-600 flex-shrink-0" />
+          <Calendar className="w-5 h-5 text-primary flex-shrink-0" />
           <div>
             <p>{format(startTime, "yyyy年M月d日(E)", { locale: ja })}</p>
             <p>{duration}</p>
@@ -38,7 +38,7 @@ export const ParticipationDetails: React.FC<ParticipationDetailsProps> = ({
           <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0" />
           <div>
             <p>{opportunity.location?.name || opportunity.place?.name}</p>
-            <p className="text-sm text-gray-600">{opportunity.location?.address || opportunity.place?.address}</p>
+            <p className="text-sm text-muted-foreground">{opportunity.location?.address || opportunity.place?.address}</p>
           </div>
         </div>
 

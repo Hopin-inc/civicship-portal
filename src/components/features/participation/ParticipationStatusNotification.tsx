@@ -30,7 +30,7 @@ export const ParticipationStatusNotification: React.FC<StatusProps> = ({
         )}
         <div className="flex-1">
           <p className="font-bold leading-6">{statusText}</p>
-          {statusSubText && <p className="text-sm text-gray-600 mt-1">{statusSubText}</p>}
+          {statusSubText && <p className="text-sm text-muted-foreground mt-1">{statusSubText}</p>}
         </div>
       </div>
     </div>

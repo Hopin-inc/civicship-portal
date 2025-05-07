@@ -24,7 +24,7 @@ export const ReservationDetails: React.FC<ReservationDetailsProps> = ({
   pricePerPerson
 }) => {
   return (
-    <div className="w-full bg-gray-50 rounded-lg py-6 px-10 space-y-4">
+    <div className="w-full bg-muted rounded-lg py-6 px-10 space-y-4">
       <div className="flex items-center gap-2">
         <Calendar className="w-6 h-6 text-[#3F3F46]" strokeWidth={1.5} />
         <span>{formattedDate}</span>

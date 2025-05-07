@@ -27,7 +27,7 @@ const ActivitiesAllSection: React.FC<ActivitiesAllSectionProps> = ({
         ))}
       </div>
       <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
-        {isLoading && <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>}
+        {isLoading && <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-foreground"></div>}
       </div>
     </section>
   );

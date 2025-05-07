@@ -35,7 +35,7 @@ export const UserActiveOpportunities: React.FC<UserActiveOpportunitiesProps> = (
   if (opportunities.length === 0) {
     if (isOwner) {
       return (
-        <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
+        <div className="bg-background rounded-lg p-6 shadow-sm mb-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">主催中の体験</h2>
             {onCreateOpportunity && (
@@ -43,13 +43,13 @@ export const UserActiveOpportunities: React.FC<UserActiveOpportunitiesProps> = (
                 onClick={onCreateOpportunity}
                 variant="tertiary"
                 size="sm"
-                className="bg-white hover:bg-gray-50"
+                className="bg-background hover:bg-muted"
               >
                 体験を作成
               </Button>
             )}
           </div>
-          <p className="text-gray-500 text-sm">主催中の体験はありません</p>
+          <p className="text-muted-foreground text-sm">主催中の体験はありません</p>
         </div>
       );
     }
@@ -74,7 +74,7 @@ export const UserActiveOpportunities: React.FC<UserActiveOpportunitiesProps> = (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {opportunities.map((opportunity) => (
           <Link key={opportunity.id} href={`/activities/${opportunity.id}`}>
-            <div className="border border-gray-100 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+            <div className="border border-input rounded-lg overflow-hidden hover:shadow-md transition-shadow">
               <div className="relative w-full h-40">
                 <Image
                   src={opportunity.imageUrl || '/placeholder-activity.jpg'}
@@ -92,7 +92,7 @@ export const UserActiveOpportunities: React.FC<UserActiveOpportunitiesProps> = (
                   <div className="text-sm font-semibold">
                     {opportunity.price ? `${opportunity.price.toLocaleString()}円` : '無料'}
                     {opportunity.isReservableWithTicket && (
-                      <span className="ml-1 text-blue-600">
+                      <span className="ml-1 text-primary">
                         (チケット可)
                       </span>
                     )}

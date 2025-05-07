@@ -37,7 +37,7 @@ export const ParticipationActions: React.FC<ParticipationActionsProps> = ({
         </Link>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
         <div className="max-w-lg mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             {participation?.node.status === GqlParticipationStatus.Participated ? (
@@ -55,7 +55,7 @@ export const ParticipationActions: React.FC<ParticipationActionsProps> = ({
               />
             ) : (
               <>
-                <div className="flex flex-col text-gray-600 min-w-fit">
+                <div className="flex flex-col text-muted-foreground min-w-fit">
                   <span className="text-sm">キャンセル期限:</span>
                   <span className="text-sm font-bold">
                     {format(cancellationDeadline, "M/d(E)", { locale: ja })}

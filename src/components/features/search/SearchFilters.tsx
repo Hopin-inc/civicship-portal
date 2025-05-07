@@ -27,15 +27,15 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
   prefectures
 }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">
+    <div className="bg-background rounded-2xl shadow-sm border border-input divide-y divide-input">
       <Button
         onClick={() => onFilterClick('location')}
         variant="tertiary"
         className="w-full px-4 py-4 flex items-center justify-between"
       >
         <div className="flex items-center space-x-4">
-          <MapPin className="h-6 w-6 text-gray-400" />
-          <span className={`text-base ${location ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
+          <MapPin className="h-6 w-6 text-muted-foreground" />
+          <span className={`text-base ${location ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
             場所
           </span>
         </div>

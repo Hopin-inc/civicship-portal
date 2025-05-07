@@ -18,10 +18,10 @@ export const WalletHeader: React.FC<WalletHeaderProps> = ({
   const formattedPoints = new Intl.NumberFormat('ja-JP').format(currentPoint);
   
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm mb-6 max-w-mobile-l mx-auto w-full">
+    <div className="bg-background rounded-lg p-6 shadow-sm mb-6 max-w-mobile-l mx-auto w-full">
       <div className="flex flex-col items-center md:flex-row md:items-start md:justify-between">
         <div className="mb-4 md:mb-0">
-          <h2 className="text-lg font-semibold text-gray-600 mb-1">現在のポイント</h2>
+          <h2 className="text-lg font-semibold text-muted-foreground mb-1">現在のポイント</h2>
           <div className="text-3xl font-bold">{formattedPoints} <span className="text-lg">pt</span></div>
         </div>
         

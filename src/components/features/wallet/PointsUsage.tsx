@@ -15,12 +15,12 @@ export const PointsUsage: React.FC<PointsUsageProps> = ({
   return (
     <div className="mt-6 mb-6">
       <h2 className="text-[22px] font-bold mb-4">{title}</h2>
-      <div className="bg-white rounded-[20px] p-4 border border-gray-100">
+      <div className="bg-background rounded-[20px] p-4 border border-input">
         <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+          <Info className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-bold mb-2">リリース準備中</p>
-            <p className="text-gray-500 text-[15px] leading-relaxed">
+            <p className="text-muted-foreground text-[15px] leading-relaxed">
               {message}
             </p>
           </div>

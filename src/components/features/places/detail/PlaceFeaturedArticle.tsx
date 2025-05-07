@@ -24,7 +24,7 @@ const PlaceFeaturedArticle: React.FC<PlaceFeaturedArticleProps> = ({ article }) 
     <div className="px-4 mb-8">
       <h2 className="text-xl font-bold mb-4">関連記事</h2>
       <Link href={article.url} className="block">
-        <div className="bg-white rounded-xl border hover:shadow-md transition-shadow duration-200">
+        <div className="bg-background rounded-xl border hover:shadow-md transition-shadow duration-200">
           <div className="relative w-full h-[200px]">
             {article.thumbnail ? (
               <Image
@@ -34,15 +34,15 @@ const PlaceFeaturedArticle: React.FC<PlaceFeaturedArticleProps> = ({ article }) 
                 className="object-cover rounded-t-xl"
               />
             ) : (
-              <div className="w-full h-full bg-gray-200 rounded-t-xl flex items-center justify-center">
-                <span className="text-gray-500">No image</span>
+              <div className="w-full h-full bg-muted rounded-t-xl flex items-center justify-center">
+                <span className="text-muted-foreground">No image</span>
               </div>
             )}
           </div>
           <div className="p-6">
             <div className="flex items-center mb-2">
               {article.type && (
-                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full mr-2">
+                <span className="bg-primary-foreground text-primary text-xs font-medium px-2 py-0.5 rounded-full mr-2">
                   {article.type}
                 </span>
               )}

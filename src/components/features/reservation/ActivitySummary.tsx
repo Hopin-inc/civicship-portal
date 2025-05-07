@@ -13,7 +13,7 @@ interface ActivitySummaryProps {
  */
 export const ActivitySummary: React.FC<ActivitySummaryProps> = ({ opportunity }) => {
   return (
-    <div className="w-full bg-white rounded-lg mb-4">
+    <div className="w-full bg-background rounded-lg mb-4">
       <div className="flex gap-4 p-4">
         <div className="relative w-[72px] h-[72px] shrink-0">
           <Image
@@ -25,10 +25,10 @@ export const ActivitySummary: React.FC<ActivitySummaryProps> = ({ opportunity })
         </div>
         <div className="flex flex-col justify-center">
           <h2 className="text-base font-medium mb-2">{opportunity.title}</h2>
-          <div className="flex items-center text-sm text-gray-600">
+          <div className="flex items-center text-sm text-muted-foreground">
             <span>1人あたり{opportunity.feeRequired?.toLocaleString() || '0'}円から</span>
           </div>
-          <div className="flex items-center text-sm text-gray-600">
+          <div className="flex items-center text-sm text-muted-foreground">
             <span>{opportunity.place?.name || "場所未定"}</span>
           </div>
         </div>

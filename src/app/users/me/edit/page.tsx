@@ -37,8 +37,8 @@ export default function ProfileEditPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="fixed top-0 left-0 right-0 h-14 px-4 flex items-center justify-between border-b bg-white z-10">
+    <div className="min-h-screen bg-background">
+      <header className="fixed top-0 left-0 right-0 h-14 px-4 flex items-center justify-between border-b bg-background z-10">
         <div className="flex items-center">
           <Button 
             onClick={() => router.back()} 

@@ -33,23 +33,23 @@ export const TimeSlotList: React.FC<TimeSlotListProps> = ({
               return (
                 <div
                   key={slotIndex}
-                  className={`rounded-xl border p-4 ${isFull ? "bg-gray-50" : "bg-white"}`}
+                  className={`rounded-xl border p-4 ${isFull ? "bg-muted" : "bg-background"}`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={`text-lg font-bold ${isFull ? "text-gray-300" : ""}`}>
+                      <p className={`text-lg font-bold ${isFull ? "text-muted-foreground/50" : ""}`}>
                         {slot.time}
                       </p>
-                      <p className={`text-md font-bold ${isFull ? "text-gray-300" : ""}`}>
+                      <p className={`text-md font-bold ${isFull ? "text-muted-foreground/50" : ""}`}>
                         {slot.price.toLocaleString()}円/人
                       </p>
                     </div>
                     {isFull ? (
-                      <div className="text-gray-300 bg-gray-50 px-8 py-3 rounded-full">満員</div>
+                      <div className="text-muted-foreground/50 bg-muted px-8 py-3 rounded-full">満員</div>
                     ) : (
                       <div className="flex flex-col items-end gap-1">
                         {remainingCapacity <= 3 && remainingCapacity > 0 && (
-                          <span className="text-xs text-blue-600">
+                          <span className="text-xs text-primary">
                             定員まで残り{remainingCapacity}名
                           </span>
                         )}

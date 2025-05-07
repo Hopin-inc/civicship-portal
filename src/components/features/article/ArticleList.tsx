@@ -15,7 +15,7 @@ export const ArticleList: React.FC<ArticleListProps> = ({ articles }) => {
   if (articles.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">記事がありません</p>
+        <p className="text-muted-foreground">記事がありません</p>
       </div>
     );
   }
@@ -36,7 +36,7 @@ interface ArticleCardProps {
 const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
   return (
     <Link href={`/articles/${article.id}`} className="block">
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+      <div className="bg-background rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div className="relative w-full h-48">
           {article.thumbnail && (
             <Image

@@ -34,7 +34,7 @@ export default function ArticleCard({
 
   return (
     <Link href={`/articles/${id}`} className="block group">
-      <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <div className="bg-background rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
         <div className="relative aspect-[16/9]">
           <Image
             src={thumbnailUrl}
@@ -44,10 +44,10 @@ export default function ArticleCard({
           />
         </div>
         <div className="p-5">
-          <h2 className="text-xl font-bold mb-2 group-hover:text-blue-600 transition-colors">
+          <h2 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
             {title}
           </h2>
-          <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+          <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
             {introduction}
           </p>
           <div className="flex items-center">
@@ -70,4 +70,4 @@ export default function ArticleCard({
       </div>
     </Link>
   );
-} 
+}       

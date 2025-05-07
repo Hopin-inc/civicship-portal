@@ -32,7 +32,7 @@ type OpportunityHistory = {
 
 const ActivityCard = memo(({ opportunity }: { opportunity: OpportunityHistory }) => (
   <Link href={`/activities/${opportunity.id}`} className="block">
-    <div className="flex-shrink-0 w-[200px] bg-white rounded-lg overflow-hidden">
+    <div className="flex-shrink-0 w-[200px] bg-background rounded-lg overflow-hidden">
       <div className="relative h-[250px] w-full">
         {opportunity.images[0] && (
           <Image
@@ -43,7 +43,7 @@ const ActivityCard = memo(({ opportunity }: { opportunity: OpportunityHistory })
           />
         )}
         {opportunity.isReservableWithTicket && (
-          <div className="absolute top-2 left-2 bg-blue-50 text-blue-600 px-2 py-1 rounded-md text-xs font-medium z-10">
+          <div className="absolute top-2 left-2 bg-primary-foreground text-primary px-2 py-1 rounded-md text-xs font-medium z-10">
             チケット利用可
           </div>
         )}
@@ -53,7 +53,7 @@ const ActivityCard = memo(({ opportunity }: { opportunity: OpportunityHistory })
       </div>
       <div className="p-4">
         <h3 className="text-base font-medium line-clamp-1 mb-1">{opportunity.title}</h3>
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-muted-foreground">
           {opportunity.date && <p>{opportunity.date}</p>}
           {opportunity.location && <p>・{opportunity.location.name}</p>}
         </div>

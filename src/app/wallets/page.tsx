@@ -40,7 +40,7 @@ export default function WalletsPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white px-4 py-6">
+    <div className="flex flex-col min-h-screen bg-background px-4 py-6">
       <WalletCard currentPoint={currentPoint} isLoading={isLoading} />
       
       <WalletHistoryButton />

@@ -44,7 +44,7 @@ export default function HistoryPage() {
   if (!transactions || transactions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <p className="text-lg text-gray-500 text-center">
+        <p className="text-lg text-muted-foreground text-center">
           取引履歴はありません
         </p>
       </div>
@@ -52,7 +52,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="flex flex-col bg-white rounded-lg overflow-hidden p-4">
+    <div className="flex flex-col bg-background rounded-lg overflow-hidden p-4">
       <h1 className="text-xl font-bold mb-6">取引履歴</h1>
       <div className="space-y-4">
         {transactions.map((transaction) => (

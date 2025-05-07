@@ -44,14 +44,14 @@ export default function TicketDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <TicketDetailHeader 
         eventName={ticketDetail.eventName || "イベント"} 
         eventUrl={ticketDetail.eventUrl}
       />
 
       <main className="pt-20 px-4 pb-6">
-        <div className="bg-white rounded-lg p-6 max-w-md mx-auto">
+        <div className="bg-background rounded-lg p-6 max-w-md mx-auto">
           <TicketDetailProfile 
             hostName={ticketDetail.hostName} 
             hostImage={ticketDetail.hostImage || "/placeholder-profile.jpg"} 

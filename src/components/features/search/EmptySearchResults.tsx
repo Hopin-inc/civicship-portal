@@ -17,8 +17,8 @@ export const EmptySearchResults: React.FC<EmptySearchResultsProps> = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="bg-gray-100 rounded-full p-4 mb-4">
-        <SearchX className="h-10 w-10 text-gray-500" />
+      <div className="bg-muted rounded-full p-4 mb-4">
+        <SearchX className="h-10 w-10 text-muted-foreground" />
       </div>
       <h2 className="text-xl font-bold mb-2">検索結果が見つかりませんでした</h2>
       <p className="text-gray-500 mb-6">

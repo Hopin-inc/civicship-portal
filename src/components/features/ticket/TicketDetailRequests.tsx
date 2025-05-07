@@ -15,7 +15,7 @@ export const TicketDetailRequests: React.FC<TicketDetailRequestsProps> = ({
   if (!requests || requests.length === 0) return null;
   
   return (
-    <div className="bg-blue-50 p-4 rounded-lg mb-8 relative">
+    <div className="bg-primary-foreground p-4 rounded-lg mb-8 relative">
       <h3 className="font-bold mb-3">
         お願い🙏
       </h3>

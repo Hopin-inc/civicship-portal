@@ -22,7 +22,7 @@ interface TicketDetailProps {
 
 export default function TicketDetail({ ticket }: TicketDetailProps) {
   return (
-    <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+    <div className="max-w-md mx-auto bg-background rounded-xl shadow-md overflow-hidden p-6">
       <div className="text-center mb-6">
         <h1 className="text-xl font-semibold mb-2">
           {ticket.senderName}さんから
@@ -43,7 +43,7 @@ export default function TicketDetail({ ticket }: TicketDetailProps) {
 
       <div className="space-y-4 mb-8">
         <div className="flex justify-between items-center">
-          <span className="text-gray-600">枚数</span>
+          <span className="text-muted-foreground">枚数</span>
           <span className="font-semibold">{ticket.quantity}枚</span>
         </div>
         <div className="flex justify-between items-center">
@@ -52,7 +52,7 @@ export default function TicketDetail({ ticket }: TicketDetailProps) {
         </div>
       </div>
 
-      <div className="bg-blue-50 p-4 rounded-lg mb-8">
+      <div className="bg-primary-foreground p-4 rounded-lg mb-8">
         <h2 className="flex items-center text-lg font-semibold mb-3">
           <HandRaisedIcon className="w-6 h-6 mr-2" />
           お願い
@@ -74,4 +74,4 @@ export default function TicketDetail({ ticket }: TicketDetailProps) {
       </Button>
     </div>
   );
-}                        
+}                                                                                                                                                                        

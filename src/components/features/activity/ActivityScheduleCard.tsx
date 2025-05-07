@@ -31,16 +31,16 @@ const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
   const endDate = new Date(endsAt);
 
   return (
-    <div className="bg-white rounded-xl border px-10 py-8 w-[280px] h-[316px] flex flex-col">
+    <div className="bg-background rounded-xl border px-10 py-8 w-[280px] h-[316px] flex flex-col">
       <div className="flex-1">
         <h3 className="text-lg font-bold mb-1">
           {format(startDate, "M月d日", { locale: ja })}
           <span className="text-lg">（{format(startDate, "E", { locale: ja })}）</span>
         </h3>
-        <p className="text-md text-gray-600 mb-4">
+        <p className="text-md text-muted-foreground mb-4">
           {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
         </p>
-        <p className="text-md text-gray-500 mb-4">参加予定 {participants}人</p>
+        <p className="text-md text-muted-foreground mb-4">参加予定 {participants}人</p>
         <div className="space-y-2">
           <p className="text-lg font-bold">¥{price.toLocaleString()}</p>
         </div>

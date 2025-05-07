@@ -28,7 +28,7 @@ export const NotificationMessage: React.FC<NotificationMessageProps> = ({
         <Icon className={`w-5 h-5 mt-[3px] ${iconColor}`} />
         <div className="flex-1">
           <p className="font-bold leading-6">{title}</p>
-          {message && <p className="text-sm text-gray-600 mt-1">{message}</p>}
+          {message && <p className="text-sm text-muted-foreground mt-1">{message}</p>}
         </div>
       </div>
     </div>

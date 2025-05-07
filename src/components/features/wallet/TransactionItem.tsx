@@ -28,11 +28,11 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
   const isPositive = transaction.amount > 0;
   
   return (
-    <div className="bg-white rounded-lg p-4 shadow-sm">
+    <div className="bg-background rounded-lg p-4 shadow-sm">
       <div className="flex justify-between items-start">
         <div>
           <p className="font-medium">{transaction.description}</p>
-          <p className="text-sm text-gray-500">{transaction.date}</p>
+          <p className="text-sm text-muted-foreground">{transaction.date}</p>
         </div>
         <div className={`font-bold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
           {isPositive ? '+' : ''}{formatCurrency(transaction.amount)} pt

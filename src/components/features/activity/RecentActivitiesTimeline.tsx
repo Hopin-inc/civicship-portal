@@ -28,7 +28,7 @@ type OpportunityHistoryGroup = {
 
 const ParticipantAvatar = memo(({ participant }: { participant: Participant }) => (
   <div
-    className="w-6 h-6 rounded-full border-2 border-white bg-gray-200 overflow-hidden"
+    className="w-6 h-6 rounded-full border-2 border-white bg-muted overflow-hidden"
     role="img"
     aria-label={`参加者: ${participant.name}`}
   >
@@ -47,7 +47,7 @@ ParticipantAvatar.displayName = 'ParticipantAvatar'
 
 const AdditionalParticipantsBadge = memo(({ count }: { count: number }) => (
   <div
-    className="w-6 h-6 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs text-gray-600"
+    className="w-6 h-6 rounded-full border-2 border-background bg-muted flex items-center justify-center text-xs text-muted-foreground"
     role="status"
     aria-label={`追加の参加者: ${count}人`}
   >
@@ -66,11 +66,11 @@ const OpportunityCard = memo(({ opportunity, isLast }: { opportunity: Opportunit
     
     {/* Content */}
     <article className="pb-8">
-      <time dateTime={opportunity.date} className="text-sm text-gray-500 mb-1 block">
+      <time dateTime={opportunity.date} className="text-sm text-muted-foreground mb-1 block">
         {opportunity.date}
       </time>
       <h3 className="text-lg font-medium mb-2">{opportunity.title}</h3>
-      <p className="text-sm text-gray-600 mb-3">{opportunity.description}</p>
+      <p className="text-sm text-muted-foreground mb-3">{opportunity.description}</p>
       
       <AsymmetricImageGrid images={opportunity.images} className="mb-3" />
 
@@ -83,7 +83,7 @@ const OpportunityCard = memo(({ opportunity, isLast }: { opportunity: Opportunit
             <AdditionalParticipantsBadge count={opportunity.additionalParticipants} />
           )}
         </div>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-muted-foreground">
           {opportunity.participants.length + opportunity.additionalParticipants}人が参加
         </span>
       </div>
@@ -205,4 +205,4 @@ export const RecentActivitiesTimeline = ({ opportunities }: RecentActivitiesTime
       )}
     </section>
   );
-};      
+};                              

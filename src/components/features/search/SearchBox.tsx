@@ -59,10 +59,10 @@ const SearchForm = ({ location, from, to, guests }: SearchFormProps) => {
     <Button
       onClick={handleClick}
       variant="tertiary"
-      className="flex flex-col w-full max-w-xl bg-gray-100 rounded-full h-12 px-4 text-left hover:bg-gray-200 transition-colors relative"
+      className="flex flex-col w-full max-w-xl bg-muted rounded-full h-12 px-4 text-left hover:bg-muted transition-colors relative"
     >
       <div className="absolute left-4 top-1/2 -translate-y-1/2">
-        <Search className="h-6 w-6 text-gray-500" />
+        <Search className="h-6 w-6 text-muted-foreground" />
       </div>
       {!hasAnyCondition ? (
         <div className="flex items-center justify-center w-full h-full">
@@ -88,4 +88,4 @@ const SearchForm = ({ location, from, to, guests }: SearchFormProps) => {
   )
 }
 
-export default SearchForm      
+export default SearchForm                              

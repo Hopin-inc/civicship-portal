@@ -15,7 +15,7 @@ export const ArticleLoadingIndicator: React.FC<ArticleLoadingIndicatorProps> = (
 }) => {
   return (
     <div className="flex justify-center p-4">
-      <div className={`animate-spin rounded-full ${sizeClasses[size]} border-gray-900`}></div>
+      <div className={`animate-spin rounded-full ${sizeClasses[size]} border-foreground`}></div>
     </div>
   );
 };

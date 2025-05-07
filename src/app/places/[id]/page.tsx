@@ -44,7 +44,7 @@ const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
   if (!membership) return <ErrorState message="Membership not found" />;
 
   return (
-    <div className="min-h-screen bg-white overflow-auto">
+    <div className="min-h-screen bg-background overflow-auto">
       <div className="pb-6">
         <PlaceImageSlider
           images={allImages}
