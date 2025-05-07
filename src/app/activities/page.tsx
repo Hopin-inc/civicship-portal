@@ -14,12 +14,12 @@ import { ErrorState } from "@/components/shared/ErrorState"
 
 export default function ActivitiesPage() {
   const { setIsLoading } = useLoading()
-  
+
   useHeaderConfig({
     showLogo: true,
     showSearchForm: true,
   })
-  
+
   const {
     upcomingActivities,
     featuredActivities,
