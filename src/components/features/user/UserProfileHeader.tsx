@@ -25,7 +25,7 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   isOwner
 }) => {
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
+    <div className="relative w-full bg-white rounded-b-3xl shadow-md pb-6 max-w-mobile-l mx-auto w-full">
       <div className="flex flex-col items-center md:flex-row md:items-start gap-6">
         <div className="relative w-24 h-24 rounded-full overflow-hidden">
           <Image
@@ -43,7 +43,7 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
             {isOwner && (
               <Link href="/users/me/edit">
                 <Button variant="secondary" size="sm" className="mt-2 md:mt-0">
-                  プロフィールを編集
+                  編集
                 </Button>
               </Link>
             )}

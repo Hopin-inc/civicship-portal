@@ -22,12 +22,12 @@ export const SignUpHeader: React.FC = () => {
   };
 
   return (
-    <header className="mb-8">
-      <Link href="/public" onClick={handleCancel} className="inline-flex items-center text-gray-600 hover:text-gray-900">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b max-w-mobile-l mx-auto w-full h-16 flex items-center px-4">
+      <Link href="/public" onClick={handleCancel} className="absolute left-4 inline-flex items-center text-gray-600 hover:text-gray-900">
         <ChevronLeft className="h-5 w-5 mr-1" />
-        トップに戻る
+        戻る
       </Link>
-      <h1 className="text-2xl font-bold tracking-tight mt-6">アカウント情報の登録</h1>
+      <h1 className="flex-1 text-center text-lg font-bold truncate">アカウント情報の登録</h1>
     </header>
   );
 };

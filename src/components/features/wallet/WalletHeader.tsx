@@ -18,7 +18,7 @@ export const WalletHeader: React.FC<WalletHeaderProps> = ({
   const formattedPoints = new Intl.NumberFormat('ja-JP').format(currentPoint);
   
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
+    <div className="bg-white rounded-lg p-6 shadow-sm mb-6 max-w-mobile-l mx-auto w-full">
       <div className="flex flex-col items-center md:flex-row md:items-start md:justify-between">
         <div className="mb-4 md:mb-0">
           <h2 className="text-lg font-semibold text-gray-600 mb-1">現在のポイント</h2>
@@ -30,7 +30,6 @@ export const WalletHeader: React.FC<WalletHeaderProps> = ({
             <Button 
               onClick={onSendPoints}
               variant="secondary"
-              className="flex items-center justify-center"
             >
               <span className="mr-1">送る</span>
             </Button>
@@ -39,7 +38,6 @@ export const WalletHeader: React.FC<WalletHeaderProps> = ({
           {onReceivePoints && (
             <Button 
               onClick={onReceivePoints}
-              className="flex items-center justify-center"
             >
               <span className="mr-1">受け取る</span>
             </Button>
@@ -48,7 +46,6 @@ export const WalletHeader: React.FC<WalletHeaderProps> = ({
           <Link href="/wallets/history">
             <Button 
               variant="secondary"
-              className="flex items-center justify-center"
             >
               <span className="mr-1">履歴</span>
             </Button>

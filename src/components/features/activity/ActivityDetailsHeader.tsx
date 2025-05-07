@@ -15,7 +15,7 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
   availableTickets 
 }) => {
   return (
-    <>
+    <div className="relative w-full bg-white rounded-b-3xl shadow-md pb-6 max-w-mobile-l mx-auto w-full">
       <div className="relative w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden mb-8">
         <Image
           src={opportunity.images?.[0] || "/placeholder.png"}
@@ -41,7 +41,7 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
           <p className="text-[#4361EE] font-medium">利用できるチケット {availableTickets}枚</p>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

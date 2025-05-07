@@ -32,10 +32,10 @@ const RootLayout = ({
               <AuthProvider>
                 <HeaderProvider>
                   <LoadingProvider>
-                    <div className="h-screen max-h-screen flex flex-col max-w-lg mx-auto">
+                    <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full">
                       <Header />
-                      <main className="w-full flex-grow overflow-y-scroll">{children}</main>
-                      <BottomBar />
+                      <main className="w-full flex-grow pt-16 pb-16 overflow-y-auto">{children}</main>
+                      <BottomBar className="fixed bottom-0 left-0 right-0 z-50 max-w-mobile-l mx-auto w-full" />
                     </div>
                     <Toaster richColors className="mx-8" />
                   </LoadingProvider>

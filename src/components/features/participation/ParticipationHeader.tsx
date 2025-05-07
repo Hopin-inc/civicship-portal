@@ -13,7 +13,7 @@ export const ParticipationHeader: React.FC<ParticipationHeaderProps> = ({
   opportunity,
 }) => {
   return (
-    <div className="flex gap-6 mb-6">
+    <div className="flex gap-6 mb-6 max-w-mobile-l mx-auto w-full">
       <div className="flex-1">
         <h1 className="text-2xl font-bold mb-6">{opportunity.title}</h1>
         <div className="flex items-center gap-3">
