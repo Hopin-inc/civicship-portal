@@ -21,7 +21,7 @@ export default function TicketList({ tickets }: TicketListProps) {
       </div>
 
       {tickets.map((ticket) => (
-        <div key={ticket.id} className="bg-white rounded-[20px] p-6 border border-gray-100">
+        <div key={ticket.id} className="bg-background rounded-[20px] p-6 border border-gray-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative w-12 h-12 rounded-full overflow-hidden">
@@ -41,11 +41,11 @@ export default function TicketList({ tickets }: TicketListProps) {
               関わりを見つける
             </Button>
           </div>
-          <p className="mt-4 text-gray-900">
+          <p className="mt-4 text-foreground">
             {ticket.hostName}さんからの招待
           </p>
         </div>
       ))}
     </div>
   );
-} 
+}    

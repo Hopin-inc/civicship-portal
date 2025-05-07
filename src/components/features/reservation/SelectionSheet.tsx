@@ -39,7 +39,7 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
   };
 
   const renderFooterButtons = () => (
-    <div className="max-w-md mx-auto fixed bottom-0 left-0 right-0 bg-white p-4 border-t">
+    <div className="max-w-md mx-auto fixed bottom-0 left-0 right-0 bg-background p-4 border-t">
       <div className="flex justify-between items-center">
         <Button
           onClick={handleClearSelection}
@@ -81,7 +81,7 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
         size="icon"
         className="p-2"
       >
-        <Minus className="h-6 w-6 text-gray-400" />
+        <Minus className="h-6 w-6 text-muted-foreground" />
       </Button>
       <span className="text-2xl font-medium w-8 text-center">{selectedGuests}</span>
       <Button

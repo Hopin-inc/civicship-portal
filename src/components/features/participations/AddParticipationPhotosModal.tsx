@@ -59,7 +59,7 @@ export function AddParticipationPhotosModal({
         className="h-[85vh] w-full rounded-t-[10px] sm:max-w-none"
       >
         <div className="flex justify-center mb-2">
-          <div className="w-12 h-1.5 rounded-full bg-gray-300" />
+          <div className="w-12 h-1.5 rounded-full bg-muted" />
         </div>
         <SheetHeader>
           <SheetTitle className="text-center">写真を追加</SheetTitle>
@@ -84,7 +84,7 @@ export function AddParticipationPhotosModal({
                       onClick={() => handleRemoveImage(index)}
                       variant="tertiary"
                       size="icon"
-                      className="absolute -top-2 -right-2 bg-white p-1 shadow-md"
+                      className="absolute -top-2 -right-2 bg-background p-1 shadow-md"
                     >
                       <X className="w-4 h-4" />
                     </Button>

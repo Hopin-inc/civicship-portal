@@ -46,8 +46,8 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="fixed top-0 left-0 right-0 h-14 px-4 flex items-center justify-between border-b bg-white z-10">
+    <div className="min-h-screen bg-background">
+      <header className="fixed top-0 left-0 right-0 h-14 px-4 flex items-center justify-between border-b bg-background z-10">
         <div className="flex items-center">
           <Button onClick={() => router.back()} variant="link" className="mr-4 p-0 h-auto">
             <ChevronLeft />
@@ -61,10 +61,10 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
           <div className="mb-8">
             <Label className="block mb-2">
               プロフィール画像
-              <span className="text-blue-600 text-sm ml-1">必須</span>
+              <span className="text-primary text-sm ml-1">必須</span>
             </Label>
             <div className="flex items-center gap-3">
-              <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100">
+              <div className="w-24 h-24 rounded-full overflow-hidden bg-muted">
                 {profileImage ? (
                   <Image
                     src={`data:image/jpeg;base64,${profileImage}`}
@@ -74,7 +74,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-200" />
+                  <div className="w-full h-full bg-muted" />
                 )}
               </div>
               <Button
@@ -98,7 +98,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
           <div className="mb-8">
             <Label className="block mb-2">
               表示名
-              <span className="text-blue-600 text-sm ml-1">必須</span>
+              <span className="text-primary text-sm ml-1">必須</span>
             </Label>
             <Input
               value={displayName}
@@ -111,7 +111,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
           <div className="mb-8">
             <Label className="block mb-2">
               住んでいるところ
-              <span className="text-blue-600 text-sm ml-1">必須</span>
+              <span className="text-primary text-sm ml-1">必須</span>
             </Label>
             <div className="grid grid-cols-2 gap-4 mb-4">
               {prefectureOptions.map((prefecture) => (
@@ -123,7 +123,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
                   className={`px-4 py-2 rounded-2xl border-2 ${
                     location === prefecture
                       ? 'bg-blue-600 text-white border-blue-600'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-muted'
                   }`}
                 >
                   {prefectureLabels[prefecture]}
@@ -137,7 +137,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
               className={`w-full px-4 py-2 rounded-2xl border-2 ${
                 location === GqlCurrentPrefecture.OutsideShikoku
                   ? 'bg-blue-600 text-white border-blue-600'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  : 'border-gray-200 hover:border-gray-300 hover:bg-muted'
               }`}
             >
               {prefectureLabels[GqlCurrentPrefecture.OutsideShikoku]}

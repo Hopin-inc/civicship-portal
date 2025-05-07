@@ -27,7 +27,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
   prefectures
 }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">
+    <div className="bg-background rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">
       <Button
         onClick={() => onFilterClick('location')}
         variant="tertiary"

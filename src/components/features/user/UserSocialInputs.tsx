@@ -22,7 +22,7 @@ export const UserSocialInputs: React.FC<UserSocialInputsProps> = ({
       <Label className="block mb-2">SNSリンク</Label>
       <div className="space-y-4">
         <div className="relative">
-          <Facebook className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={20} />
+          <Facebook className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
           <Input
             value={socialLinks.facebook}
             onChange={(e) => setSocialLinks({ ...socialLinks, facebook: e.target.value })}

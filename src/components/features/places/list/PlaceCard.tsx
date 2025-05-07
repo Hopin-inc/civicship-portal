@@ -26,7 +26,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
 }) => {
   return (
     <div
-      className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow w-[345px] mx-auto"
+      className="bg-background rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow w-[345px] mx-auto"
       onClick={() => onClick(placeId)}
     >
       <div className="relative h-48 overflow-hidden">
@@ -42,8 +42,8 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
       <div className="p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-1.5">
-            <MapPin className="h-4 w-4 text-gray-600" />
-            <span className="text-gray-700 text-sm">{placeName}</span>
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+            <span className="text-foreground text-sm">{placeName}</span>
           </div>
           
           <div className="flex items-center gap-1.5">

@@ -28,7 +28,7 @@ type OpportunityHistoryGroup = {
 
 const ParticipantAvatar = memo(({ participant }: { participant: Participant }) => (
   <div
-    className="w-6 h-6 rounded-full border-2 border-white bg-gray-200 overflow-hidden"
+    className="w-6 h-6 rounded-full border-2 border-white bg-muted overflow-hidden"
     role="img"
     aria-label={`参加者: ${participant.name}`}
   >
@@ -47,7 +47,7 @@ ParticipantAvatar.displayName = 'ParticipantAvatar'
 
 const AdditionalParticipantsBadge = memo(({ count }: { count: number }) => (
   <div
-    className="w-6 h-6 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs text-gray-600"
+    className="w-6 h-6 rounded-full border-2 border-white bg-muted flex items-center justify-center text-xs text-muted-foreground"
     role="status"
     aria-label={`追加の参加者: ${count}人`}
   >
@@ -205,4 +205,4 @@ export const RecentActivitiesTimeline = ({ opportunities }: RecentActivitiesTime
       )}
     </section>
   );
-};      
+};                        

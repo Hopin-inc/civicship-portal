@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import { Card } from "@/components/ui/card";
 
 interface Author {
   id: string;
@@ -34,7 +35,7 @@ export default function ArticleCard({
 
   return (
     <Link href={`/articles/${id}`} className="block group">
-      <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <Card className="overflow-hidden hover:shadow-lg transition-shadow">
         <div className="relative aspect-[16/9]">
           <Image
             src={thumbnailUrl}
@@ -44,10 +45,10 @@ export default function ArticleCard({
           />
         </div>
         <div className="p-5">
-          <h2 className="text-xl font-bold mb-2 group-hover:text-blue-600 transition-colors">
+          <h2 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
             {title}
           </h2>
-          <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+          <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
             {introduction}
           </p>
           <div className="flex items-center">
@@ -61,13 +62,13 @@ export default function ArticleCard({
             </div>
             <div>
               <p className="text-sm font-medium">{mainAuthor?.name}</p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 {format(new Date(publishedAt), 'yyyy年MM月dd日')}
               </p>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     </Link>
   );
 } 

@@ -29,8 +29,8 @@ export const PrefectureSelector: React.FC<PrefectureSelectorProps> = ({
             variant="secondary"
             className={`h-12 rounded-2xl border-2 ${
               value === prefecture
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                ? 'bg-primary text-white border-primary'
+                : 'border-gray-200 hover:border-gray-300 hover:bg-muted'
             }`}
             onClick={() => onChange(prefecture)}
           >

@@ -66,7 +66,7 @@ export function UserProfile({ user, isOwner, onUpdateSocialLinks }: UserProfileP
             {user.name}
           </h1>
           {user.currentPrefecture && (
-            <div className="flex items-center gap-1 text-gray-600">
+            <div className="flex items-center gap-1 text-muted-foreground">
               <MapPinIcon className="w-4 h-4" />
               <span>{user.currentPrefecture}</span>
             </div>
@@ -114,4 +114,4 @@ export function UserProfile({ user, isOwner, onUpdateSocialLinks }: UserProfileP
       </div>
     </div>
   );
-}        
+}                

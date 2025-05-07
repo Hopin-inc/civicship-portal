@@ -31,7 +31,7 @@ export const UserTicketsAndPoints: React.FC<UserTicketsAndPointsProps> = ({
         </div>
       </Link>
       <Link href="/wallets">
-        <div className="bg-gray-50 p-4 rounded-lg flex items-center justify-between cursor-pointer">
+        <div className="bg-muted p-4 rounded-lg flex items-center justify-between cursor-pointer">
           <div className="flex items-center gap-2">
             <StarIcon className="w-4 h-4 text-yellow-500" />
             <span>保有ポイント</span>
@@ -39,7 +39,7 @@ export const UserTicketsAndPoints: React.FC<UserTicketsAndPointsProps> = ({
               {pointCount}pt
             </span>
           </div>
-          <span className="text-gray-500">›</span>
+          <span className="text-muted-foreground">›</span>
         </div>
       </Link>
     </div>

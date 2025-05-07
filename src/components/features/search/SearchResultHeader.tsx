@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
  */
 export const SearchResultHeader: React.FC = () => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b max-w-mobile-l mx-auto w-full h-14 flex items-center px-4">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b max-w-mobile-l mx-auto w-full h-14 flex items-center px-4">
       <Link href="/search" className="absolute left-4">
         <ArrowLeft className="h-6 w-6" />
       </Link>

@@ -85,7 +85,7 @@ export const UserPortfolioItem: React.FC<PortfolioItemProps> = ({
   const formattedDate = date ? format(new Date(date), 'yyyy年M月d日', { locale: ja }) : '';
 
   return (
-    <div ref={lastItemRef} className="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
+    <div ref={lastItemRef} className="bg-background rounded-lg shadow-sm overflow-hidden mb-4">
       <Link href={getPortfolioLink()}>
         <div className="flex flex-col md:flex-row">
           {image && (
@@ -101,11 +101,11 @@ export const UserPortfolioItem: React.FC<PortfolioItemProps> = ({
           <div className="p-4 flex-1">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
               <div className="flex items-center space-x-2 mb-2 md:mb-0">
-                <span className="text-sm bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                <span className="text-sm bg-muted text-foreground px-2 py-1 rounded">
                   {getCategoryLabel(category)}
                 </span>
                 {reservationStatus && (
-                  <span className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                  <span className="text-sm bg-primary-foreground text-primary px-2 py-1 rounded">
                     {getStatusLabel(reservationStatus)}
                   </span>
                 )}
@@ -137,7 +137,7 @@ export const UserPortfolioItem: React.FC<PortfolioItemProps> = ({
                     </div>
                   ))}
                   {participants.length > 3 && (
-                    <div className="relative w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-600 border-2 border-white">
+                    <div className="relative w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground border-2 border-background">
                       +{participants.length - 3}
                     </div>
                   )}

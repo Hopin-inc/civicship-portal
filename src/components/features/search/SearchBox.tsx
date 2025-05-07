@@ -59,27 +59,27 @@ const SearchForm = ({ location, from, to, guests }: SearchFormProps) => {
     <Button
       onClick={handleClick}
       variant="tertiary"
-      className="flex flex-col w-full max-w-xl bg-gray-100 rounded-full h-12 px-4 text-left hover:bg-gray-200 transition-colors relative"
+      className="flex flex-col w-full max-w-xl bg-muted rounded-full h-12 px-4 text-left hover:bg-muted transition-colors relative"
     >
       <div className="absolute left-4 top-1/2 -translate-y-1/2">
-        <Search className="h-6 w-6 text-gray-500" />
+        <Search className="h-6 w-6 text-muted-foreground" />
       </div>
       {!hasAnyCondition ? (
         <div className="flex items-center justify-center w-full h-full">
-          <span className="text-sm text-gray-500">タップして検索する</span>
+          <span className="text-sm text-muted-foreground">タップして検索する</span>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center w-full h-full">
-          <span className="text-sm font-medium text-gray-900">{getLocationText()}</span>
+          <span className="text-sm font-medium text-foreground">{getLocationText()}</span>
           <div className="flex items-center gap-1.5">
             <div className="flex items-center gap-1.5">
-              <Calendar className="h-4 w-4 text-gray-500" />
-              <span className="text-xs text-gray-500">{formatDateRange()}</span>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">{formatDateRange()}</span>
             </div>
-            <span className="text-xs text-gray-500 mx-1">・</span>
+            <span className="text-xs text-muted-foreground mx-1">・</span>
             <div className="flex items-center gap-1.5">
-              <Users className="h-4 w-4 text-gray-500" />
-              <span className="text-xs text-gray-500">{getGuestsText()}</span>
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">{getGuestsText()}</span>
             </div>
           </div>
         </div>
@@ -88,4 +88,4 @@ const SearchForm = ({ location, from, to, guests }: SearchFormProps) => {
   )
 }
 
-export default SearchForm      
+export default SearchForm                        
