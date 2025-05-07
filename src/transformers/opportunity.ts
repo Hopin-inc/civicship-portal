@@ -2,6 +2,22 @@
 
 import type { GqlOpportunity as GraphQLOpportunity } from "@/types/graphql";
 import type { Opportunity, Article, Participation } from "@/types";
+import { OpportunityCardProps } from '@/components/features/opportunity/OpportunityCard';
+
+/**
+ * Maps an opportunity to card props for display in UI
+ */
+export const mapOpportunityToCardProps = (node: Opportunity): OpportunityCardProps => ({
+  id: node.id,
+  title: node.title,
+  price: node.feeRequired || null,
+  location: node.place?.name || '場所未定',
+  imageUrl: node.images?.[0] || null,
+  community: {
+    id: node.community?.id || '',
+  },
+  isReservableWithTicket: node.isReservableWithTicket || false,
+});
 
 /**
  * Transforms an article node from GraphQL to a UI-friendly format
