@@ -25,9 +25,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-md mx-auto bg-white rounded-2xl p-6">
+        <div className="max-w-md mx-auto bg-background rounded-2xl p-6">
           <div className="flex flex-col items-center pt-8">
             <div className="mb-8">
               <Image
@@ -56,8 +56,8 @@ export default function LoginPage() {
               />
               {isLoading || isAuthenticating ? "ログイン中..." : "LINEでログイン"}
             </Button>
-            {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
-            <p className="text-sm text-gray-500 mt-4">
+            {error && <div className="text-destructive text-sm mt-2">{error}</div>}
+            <p className="text-sm text-muted-foreground mt-4">
               ログインすることで、
               <Link href="/terms" className="underline">
                 利用規約
@@ -73,4 +73,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-} 
+}    

@@ -1,9 +1,9 @@
 const Loading: React.FC = () => {
   return (
-    <div className="absolute w-full min-h-screen flex items-center justify-center bg-white bg-opacity-80">
+    <div className="absolute w-full min-h-screen flex items-center justify-center bg-background bg-opacity-80">
       <svg
         aria-hidden="true"
-        className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+        className="inline w-8 h-8 text-muted animate-spin dark:text-muted-foreground fill-primary"
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

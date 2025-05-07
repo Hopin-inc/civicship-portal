@@ -12,7 +12,7 @@ export default function TicketsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-background">
         <Loading />
       </div>
     );
@@ -23,7 +23,7 @@ export default function TicketsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <TicketHeader />
       <TicketContent tickets={tickets} />
     </div>
