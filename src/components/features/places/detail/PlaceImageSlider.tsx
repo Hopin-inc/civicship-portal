@@ -24,7 +24,7 @@ const PlaceImageSlider: React.FC<PlaceImageSliderProps> = ({
   if (!images.length) return null;
 
   return (
-    <div className="relative mx-auto" style={{ width: "100%", height: "480px" }}>
+    <div className="relative mx-auto w-full h-[480px]">
       <AnimatePresence initial={false}>
         <motion.div
           key={currentIndex}
@@ -50,7 +50,7 @@ const PlaceImageSlider: React.FC<PlaceImageSliderProps> = ({
             variant="secondary"
             size="icon"
             onClick={onPrev}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-foreground/50 text-background p-2 rounded-full hover:bg-foreground/70 transition-colors"
           >
             <ChevronLeft className="h-6 w-6" />
           </Button>
@@ -58,7 +58,7 @@ const PlaceImageSlider: React.FC<PlaceImageSliderProps> = ({
             variant="secondary"
             size="icon"
             onClick={onNext}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-foreground/50 text-background p-2 rounded-full hover:bg-foreground/70 transition-colors"
           >
             <ChevronRight className="h-6 w-6" />
           </Button>

@@ -57,18 +57,18 @@ const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }:
     if (source === 'OPPORTUNITY' && reservationStatus) {
       switch (reservationStatus) {
         case 'APPLIED':
-          return { bg: '#FEF3C7', text: '#92400E' }; // 黄色
+          return { bg: 'hsl(var(--status-pending) / 0.1)', text: 'hsl(var(--status-pending))' }; // 黄色
         case 'ACCEPTED':
-          return { bg: '#DBEAFE', text: '#1E40AF' }; // 青色
+          return { bg: 'hsl(var(--status-approved) / 0.1)', text: 'hsl(var(--status-approved))' }; // 青色
         case 'REJECTED':
-          return { bg: '#FEE2E2', text: '#991B1B' }; // 赤色
+          return { bg: 'hsl(var(--status-rejected) / 0.1)', text: 'hsl(var(--status-rejected))' }; // 赤色
         case 'CANCELED':
-          return { bg: '#F3F4F6', text: '#6B7280' }; // グレー
+          return { bg: 'hsl(var(--status-cancelled) / 0.1)', text: 'hsl(var(--status-cancelled))' }; // グレー
         default:
-          return { bg: '#E5E7EB', text: '#374151' };
+          return { bg: 'hsl(var(--muted))', text: 'hsl(var(--muted-foreground))' };
       }
     }
-    return PORTFOLIO_CATEGORY_STYLES[category] ?? { bg: '#E5E7EB', text: '#374151' };
+    return PORTFOLIO_CATEGORY_STYLES[category] ?? { bg: 'hsl(var(--muted))', text: 'hsl(var(--muted-foreground))' };
   };
 
   const getCategoryLabel = (category: PortfolioCategory, source?: string, reservationStatus?: ReservationStatus | null): string => {
@@ -119,7 +119,7 @@ const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }:
             ref={index === portfolios.length - 1 ? lastPortfolioRef : undefined}
             className="rounded-lg overflow-hidden bg-card hover:opacity-90 transition-opacity"
           >
-            <div className="relative w-full" style={{ paddingTop: 'calc(205 / 164 * 100%)' }}>
+            <div className="relative w-full aspect-[164/205]">
               <Image
                 src={portfolio.image ?? '/placeholder-image.png'}
                 alt={portfolio.title}
