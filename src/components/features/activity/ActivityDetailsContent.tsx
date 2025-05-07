@@ -146,7 +146,7 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
                 src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(opportunity.place.address)}`}
                 width="100%"
                 height="100%"
-                style={{ border: 0 }}
+                className="border-0"
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"

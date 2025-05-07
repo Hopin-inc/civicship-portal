@@ -295,9 +295,8 @@ export const OpportunityDetailContent = ({
                           .map((participant, index) => (
                             <div
                               key={participant.id}
-                              className="relative w-8 h-8 rounded-full border-2 border-background overflow-hidden hover:scale-110 transition-transform"
+                              className={`relative w-8 h-8 rounded-full border-2 border-background overflow-hidden hover:scale-110 transition-transform ${index === 0 ? '' : '-ml-2'}`}
                               style={{
-                                marginLeft: index === 0 ? 0 : "-8px",
                                 zIndex: index,
                               }}
                             >
@@ -311,8 +310,7 @@ export const OpportunityDetailContent = ({
                           ))}
                         {opportunity.participants.length > 2 && (
                           <div
-                            className="relative w-8 h-8 rounded-full border-2 border-background bg-muted flex items-center justify-center text-xs font-medium hover:scale-110 transition-transform"
-                            style={{ marginLeft: "-8px", zIndex: 2 }}
+                            className="relative w-8 h-8 rounded-full border-2 border-background bg-muted flex items-center justify-center text-xs font-medium hover:scale-110 transition-transform -ml-2 z-[2]"
                           >
                             +{opportunity.participants.length - 2}
                           </div>
