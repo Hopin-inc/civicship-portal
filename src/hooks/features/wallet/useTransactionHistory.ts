@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { WalletTransactionsDocument, useWalletTransactionsQuery, GqlWalletTransactionsQuery } from '@/types/graphql';
-import { formatTransactionDate, getTransactionDescription } from '@/utils/walletUtils';
+import { formatTransactionDate, getTransactionDescription } from '@/transformers/wallet';
 
 interface Transaction {
   id: string;

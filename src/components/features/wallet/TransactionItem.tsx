@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { formatCurrency } from '@/utils/walletUtils';
+import { formatCurrency } from '@/transformers/wallet';
 
 interface Transaction {
   id: string;

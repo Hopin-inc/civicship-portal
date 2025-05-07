@@ -126,3 +126,10 @@ export const transformTransaction = (node: TransactionNode): Transaction => {
     toUser: node.toUser
   };
 };
+
+/**
+ * Formats a currency amount for display
+ */
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('ja-JP').format(amount);
+};
