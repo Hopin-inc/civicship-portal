@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { prefectureLabels } from '@/utils/userUtils';
+import { prefectureLabels } from '@/transformers/user';
 import { GqlCurrentPrefecture, useGetUserProfileQuery, useUpdateMyProfileMutation } from '@/types/graphql';
 
 interface ProfileFormData {
