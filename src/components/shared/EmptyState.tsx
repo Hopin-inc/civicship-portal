@@ -52,7 +52,7 @@ export default function EmptyState({
       )}
       
       <h2 className="text-2xl font-bold mb-3">{title}</h2>
-      <div className="text-gray-600 mb-8">
+      <div className="text-muted-foreground mb-8">
         {typeof description === 'string' ? <p>{description}</p> : description}
       </div>
       
@@ -68,4 +68,4 @@ export default function EmptyState({
       )}
     </div>
   );
-} 
+}  
