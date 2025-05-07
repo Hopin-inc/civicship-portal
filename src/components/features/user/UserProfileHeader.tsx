@@ -42,7 +42,7 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
             <h1 className="text-2xl font-bold">{name}</h1>
             {isOwner && (
               <Link href="/users/me/edit">
-                <Button variant="secondary" size="sm" className="mt-2 md:mt-0">
+                <Button variant="secondary" size="sm">
                   編集
                 </Button>
               </Link>

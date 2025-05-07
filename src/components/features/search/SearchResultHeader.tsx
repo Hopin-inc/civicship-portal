@@ -16,7 +16,7 @@ export const SearchResultHeader: React.FC = () => {
       </Link>
       <h1 className="flex-1 text-center text-lg font-medium truncate">検索結果</h1>
       <div className="absolute right-4 flex items-center space-x-4">
-        <Button variant="link" className="p-0 h-auto">
+        <Button variant="link">
           <Share className="h-6 w-6" />
         </Button>
         <Link href="/public">

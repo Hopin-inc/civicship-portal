@@ -16,7 +16,7 @@ export const SearchHeader: React.FC = () => {
       </Link>
       <h1 className="flex-1 text-center text-lg font-medium truncate">体験・お手伝いを検索</h1>
       <div className="absolute right-4 flex items-center space-x-4">
-        <Button variant="link" className="p-0 h-auto">
+        <Button variant="link">
           <Share className="h-6 w-6" />
         </Button>
         <Link href="/public">

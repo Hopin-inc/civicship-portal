@@ -56,7 +56,7 @@ export const OpportunityConfirmModal = ({
             </div>
           </div>
           <div className="flex flex-col items-center justify-center mt-12 space-y-4">
-            <Button size="lg" className="w-full" onClick={onConfirm}>
+            <Button size="lg" onClick={onConfirm}>
               確定する
             </Button>
           </div>

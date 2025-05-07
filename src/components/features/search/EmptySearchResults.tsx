@@ -30,7 +30,7 @@ export const EmptySearchResults: React.FC<EmptySearchResultsProps> = ({
         別のキーワードや条件で再度検索してみてください。
       </p>
       <Link href="/search">
-        <Button className="bg-blue-600 text-white px-6 py-3 rounded-lg">
+        <Button>
           検索条件を変更する
         </Button>
       </Link>

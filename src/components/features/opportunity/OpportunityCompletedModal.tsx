@@ -65,7 +65,7 @@ export const OpportunityCompletedModal = ({
           <div className="flex flex-col items-center justify-center mt-12 space-y-4">
             {isEvent ? (
               <>
-                <Button size="lg" className="w-full" onClick={onAddToCalendar}>
+                <Button size="lg" onClick={onAddToCalendar}>
                   <Calendar className="mr-2 h-4 w-4" />
                   カレンダーに追加
                 </Button>

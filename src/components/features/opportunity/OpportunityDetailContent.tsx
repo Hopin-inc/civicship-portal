@@ -88,7 +88,7 @@ export const OpportunityDetailContent = ({
                 </div>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="link" className="cursor-help self-start p-0 h-auto">
+                    <Button variant="link">
                       <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 transition-colors" />
                     </Button>
                   </PopoverTrigger>
@@ -288,7 +288,6 @@ export const OpportunityDetailContent = ({
                     <Button
                       onClick={onParticipantsClick}
                       variant="link"
-                      className="flex items-center gap-4 p-0 h-auto"
                     >
                       <div className="flex">
                         {opportunity.participants
