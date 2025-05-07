@@ -36,7 +36,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         </Button>
       )}
       {config.showLogo && (
-        <Link href="/public" className="flex items-center space-x-2 absolute left-14">
+        <Link href="/" className="flex items-center space-x-2 absolute left-14">
           <Image src="/images/neo88-logo.jpg" alt="NEO88" width={88} height={80} />
         </Link>
       )}
