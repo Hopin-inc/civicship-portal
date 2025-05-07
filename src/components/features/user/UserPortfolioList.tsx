@@ -29,7 +29,7 @@ const ActiveOpportunities = ({ opportunities }: { opportunities: OpportunityCard
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
           現在募集中の関わり
-          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+          <span className="bg-primary-foreground text-primary text-xs font-medium px-2 py-0.5 rounded-full">
             {opportunities.length}
           </span>
         </h2>

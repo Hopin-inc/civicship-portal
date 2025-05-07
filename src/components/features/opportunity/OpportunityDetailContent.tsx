@@ -51,7 +51,7 @@ export const OpportunityDetailContent = ({
             {(opportunity?.pointsForJoin ?? 0) > 0 && (
               <div className="flex items-center gap-3 text-sm border border-gray-200 rounded-lg p-4 bg-[#fcfaf7] mt-4">
                 <div className="shrink-0 w-10 h-10 rounded-full bg-[#f3f0e9] flex items-center justify-center border border-gray-100">
-                  <Coins className="w-5 h-5 text-gray-700" />
+                  <Coins className="w-5 h-5 text-foreground" />
                 </div>
                 <div className="flex-1">
                   <span className="text-gray-700">

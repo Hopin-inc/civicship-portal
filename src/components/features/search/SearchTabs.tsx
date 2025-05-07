@@ -23,8 +23,8 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({
           variant="link"
           className={`flex-1 pb-3 text-center text-xl relative ${
             selectedTab === 'activity'
-              ? 'text-blue-600 font-medium'
-              : 'text-gray-400'
+              ? 'text-primary font-medium'
+              : 'text-muted-foreground'
           }`}
         >
           体験

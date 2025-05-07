@@ -18,7 +18,7 @@ const PlaceOpportunities: React.FC<PlaceOpportunitiesProps> = ({ opportunities }
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
           募集中の関わり
-          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+          <span className="bg-primary-foreground text-primary text-xs font-medium px-2 py-0.5 rounded-full">
             {opportunities.length}
           </span>
         </h2>
@@ -43,7 +43,7 @@ const PlaceOpportunities: React.FC<PlaceOpportunitiesProps> = ({ opportunities }
                 <div className="p-4">
                   <h3 className="font-bold text-lg mb-2 line-clamp-2">{opportunity.title}</h3>
                   <div className="flex justify-between items-center mt-4">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-muted-foreground">
                       {opportunity.feeRequired ? `¥${opportunity.feeRequired.toLocaleString()}` : '無料'}
                     </div>
                     <Link href={`/activities/${opportunity.id}`}>

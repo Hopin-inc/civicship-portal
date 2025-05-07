@@ -14,7 +14,7 @@ export const IconWrapper: React.FC<IconWrapperProps> = ({
   children, 
   color = 'default' 
 }) => {
-  const colorClass = color === 'warning' ? 'text-[#F0B03C]' : 'text-gray-500';
+  const colorClass = color === 'warning' ? 'text-[#F0B03C]' : 'text-muted-foreground';
   
   return (
     <div className={`w-6 h-6 flex-shrink-0 flex items-center justify-center ${colorClass}`}>

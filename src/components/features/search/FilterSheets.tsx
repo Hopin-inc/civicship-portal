@@ -45,12 +45,12 @@ export const FilterSheets: React.FC<FilterSheetsProps> = ({
   prefectures
 }) => {
   const renderFooterButtons = () => (
-    <div className="absolute bottom-0 left-0 right-0 bg-white p-4">
+    <div className="absolute bottom-0 left-0 right-0 bg-background p-4">
       <div className="flex justify-between items-center">
         <Button
           onClick={clearActiveFilter}
           variant="link"
-          className="text-gray-500 text-sm"
+          className="text-muted-foreground text-sm"
         >
           選択を解除
         </Button>
@@ -88,8 +88,8 @@ export const FilterSheets: React.FC<FilterSheetsProps> = ({
                 variant={location === pref.id ? "primary" : "tertiary"}
                 className={`py-3 ${
                   location === pref.id
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-900'
+                    ? 'text-primary bg-primary-foreground'
+                    : 'text-foreground'
                 }`}
               >
                 {pref.name}

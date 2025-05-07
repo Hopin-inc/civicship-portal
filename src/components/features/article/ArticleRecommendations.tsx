@@ -36,7 +36,7 @@ interface ArticleRecommendationCardProps {
 const ArticleRecommendationCard: React.FC<ArticleRecommendationCardProps> = ({ article }) => {
   return (
     <Link href={`/articles/${article.id}`} className="block">
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+      <div className="bg-background rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div className="relative w-full h-48">
           <Image
             src={article.thumbnail || "/placeholder.svg"}
@@ -50,10 +50,10 @@ const ArticleRecommendationCard: React.FC<ArticleRecommendationCardProps> = ({ a
         </div>
         <div className="p-4">
           <h3 className="text-xl font-bold mb-2">{article.title}</h3>
-          <div className="text-gray-600 text-sm mb-2">
+          <div className="text-muted-foreground text-sm mb-2">
             公開: {format(new Date(article.publishedAt), "yyyy年M月d日", { locale: ja })}
           </div>
-          <p className="text-gray-700 text-sm line-clamp-3">{article.description}</p>
+          <p className="text-foreground text-sm line-clamp-3">{article.description}</p>
         </div>
       </div>
     </Link>

@@ -28,7 +28,7 @@ export const ReservationDetailsCard: React.FC<ReservationDetailsCardProps> = ({
   if (!startDateTime || !endDateTime) return null;
   
   return (
-    <div className="bg-gray-50 rounded-lg p-6 mb-6 space-y-6">
+    <div className="bg-muted rounded-lg p-6 mb-6 space-y-6">
       <div className="flex items-center gap-3">
         <IconWrapper>
           <Calendar size={18} strokeWidth={1.5} />
@@ -37,7 +37,7 @@ export const ReservationDetailsCard: React.FC<ReservationDetailsCardProps> = ({
           <span className="text-base">
             {formatDateTime(startDateTime, "yyyy年M月d日（E）", { locale: ja })}
           </span>
-          <span className="text-base text-gray-600">
+          <span className="text-base text-muted-foreground">
             {formatDateTime(startDateTime, "HH:mm")}-
             {formatDateTime(endDateTime, "HH:mm")}
           </span>

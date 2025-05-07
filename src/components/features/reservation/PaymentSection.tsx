@@ -49,7 +49,7 @@ export const PaymentSection: React.FC<PaymentSectionProps> = ({
             />
             <div className="flex flex-col">
               <span className="text-lg">チケットを利用する</span>
-              <p className="text-gray-500">保有しているチケット: {maxTickets}枚</p>
+              <p className="text-muted-foreground">保有しているチケット: {maxTickets}枚</p>
             </div>
           </div>
         </div>
@@ -84,9 +84,9 @@ export const PaymentSection: React.FC<PaymentSectionProps> = ({
         <span className="text-lg font-bold">{(pricePerPerson * (participantCount - (useTickets ? ticketCount : 0))).toLocaleString()}円</span>
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-4">
+      <div className="bg-muted rounded-lg p-4">
         <div className="space-y-3">
-          <div className="flex justify-between text-base text-gray-600">
+          <div className="flex justify-between text-base text-muted-foreground">
             <span>通常申し込み</span>
             <div>
               <span>{pricePerPerson.toLocaleString()}円</span>

@@ -25,13 +25,13 @@ const experiences = [
 
 const ParticipationsVerify: React.FC = () => {
   return (
-    <Card className="max-w-md mx-auto p-6 rounded-2xl border-none shadow-lg bg-white">
+    <Card className="max-w-md mx-auto p-6 rounded-2xl border-none shadow-lg bg-background">
       {/* Infoエリア */}
       <div className="flex items-center gap-2 mb-6">
         <IconWrapper>
-          <Info className="w-5 h-5 text-blue-600" />
+          <Info className="w-5 h-5 text-primary" />
         </IconWrapper>
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-foreground">
           アプリを通じて参加した関わりの主催者に、実際に参加したかを確認できる機能です
         </span>
       </div>
@@ -60,4 +60,4 @@ const ParticipationsVerify: React.FC = () => {
   );
 };
 
-export default ParticipationsVerify; 
+export default ParticipationsVerify;      

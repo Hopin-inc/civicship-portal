@@ -49,8 +49,8 @@ export const UserPortfolioSection: React.FC<UserPortfolioSectionProps> = ({
 
   if (portfolios.length === 0) {
     return (
-      <div className="bg-white rounded-lg p-6 shadow-sm text-center">
-        <p className="text-gray-500">ポートフォリオがありません</p>
+      <div className="bg-background rounded-lg p-6 shadow-sm text-center">
+        <p className="text-muted-foreground">ポートフォリオがありません</p>
       </div>
     );
   }

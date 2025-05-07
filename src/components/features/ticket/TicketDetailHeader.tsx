@@ -41,12 +41,12 @@ export const TicketDetailHeader: React.FC<TicketDetailHeaderProps> = ({
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white z-50">
+    <header className="fixed top-0 left-0 right-0 bg-background z-50">
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex-1 text-center">
           <h1 className="text-lg font-medium">{eventName}</h1>
           {eventUrl && (
-            <p className="text-xs text-gray-500">{eventUrl}</p>
+            <p className="text-xs text-muted-foreground">{eventUrl}</p>
           )}
         </div>
         <div className="flex items-center space-x-4 absolute right-4">

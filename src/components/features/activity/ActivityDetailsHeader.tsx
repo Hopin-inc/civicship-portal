@@ -15,7 +15,7 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
   availableTickets 
 }) => {
   return (
-    <div className="relative w-full bg-white rounded-b-3xl shadow-md pb-6 max-w-mobile-l mx-auto w-full">
+    <div className="relative w-full bg-background rounded-b-3xl shadow-md pb-6 max-w-mobile-l mx-auto w-full">
       <div className="relative w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden mb-8">
         <Image
           src={opportunity.images?.[0] || "/placeholder.png"}
@@ -29,7 +29,7 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
         <h1 className="text-3xl font-bold mb-4">{opportunity.title}</h1>
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-gray-500" />
+            <MapPin className="h-5 w-5 text-muted-foreground" />
             <span>{opportunity.place?.name || "場所未定"}</span>
           </div>
         </div>

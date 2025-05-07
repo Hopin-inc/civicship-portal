@@ -56,7 +56,7 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
       {/* 体験内容 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">体験できること</h2>
-        <p className="text-gray-700 whitespace-pre-wrap">{opportunity.body}</p>
+        <p className="text-foreground whitespace-pre-wrap">{opportunity.body}</p>
       </section>
 
       {/* 参加者の写真 */}
@@ -99,7 +99,7 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
                 href={`/articles/${opportunity.createdByUser.articlesAboutMe.edges[0].node.id}`}
                 className="block"
               >
-                <div className="bg-white rounded-xl border hover:shadow-md transition-shadow duration-200">
+                <div className="bg-background rounded-xl border hover:shadow-md transition-shadow duration-200">
                   <div className="relative w-full h-[200px]">
                     <Image
                       src={

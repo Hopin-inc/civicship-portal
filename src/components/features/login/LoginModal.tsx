@@ -63,7 +63,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             {isLoading || isAuthenticating ? "ログイン中..." : "LINEでログイン"}
           </Button>
           {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
-          <p className="text-sm text-gray-500 mt-4">
+          <p className="text-sm text-muted-foreground mt-4">
             ログインすることで、
             <Link href="/terms" className="underline">
               利用規約

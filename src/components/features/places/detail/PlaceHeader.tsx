@@ -19,15 +19,15 @@ const PlaceHeader: React.FC<PlaceHeaderProps> = ({
   bio
 }) => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b max-w-mobile-l mx-auto w-full h-16 flex flex-col justify-center px-4">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b max-w-mobile-l mx-auto w-full h-16 flex flex-col justify-center px-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-1">
-          <MapPin className="h-4 w-4 text-gray-600" />
-          <span className="text-gray-700">{address}</span>
+          <MapPin className="h-4 w-4 text-muted-foreground" />
+          <span className="text-foreground">{address}</span>
         </div>
         <div className="flex items-center gap-1">
-          <Users className="h-4 w-4 text-gray-600" />
-          <span className="text-gray-700">
+          <Users className="h-4 w-4 text-muted-foreground" />
+          <span className="text-foreground">
             {participantCount}人
           </span>
         </div>

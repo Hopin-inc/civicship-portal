@@ -15,7 +15,7 @@ export const ArticleList: React.FC<ArticleListProps> = ({ articles }) => {
   if (articles.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">記事がありません</p>
+        <p className="text-muted-foreground">記事がありません</p>
       </div>
     );
   }
@@ -36,7 +36,7 @@ interface ArticleCardProps {
 const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
   return (
     <Link href={`/articles/${article.id}`} className="block">
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+      <div className="bg-background rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div className="relative w-full h-48">
           {article.thumbnail && (
             <Image
@@ -49,10 +49,10 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
         </div>
         <div className="p-4">
           <h3 className="text-xl font-bold mb-2">{article.title}</h3>
-          <div className="text-gray-600 text-sm mb-2">
+          <div className="text-muted-foreground text-sm mb-2">
             公開: {format(new Date(article.publishedAt), "yyyy年M月d日", { locale: ja })}
           </div>
-          <p className="text-gray-700 text-sm line-clamp-3">{article.introduction}</p>
+          <p className="text-foreground text-sm line-clamp-3">{article.introduction}</p>
           {article.authors && article.authors.length > 0 && (
             <div className="flex items-center mt-4">
               <div className="relative w-8 h-8 rounded-full overflow-hidden mr-2">

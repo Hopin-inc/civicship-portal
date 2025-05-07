@@ -25,7 +25,7 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   isOwner
 }) => {
   return (
-    <div className="relative w-full bg-white rounded-b-3xl shadow-md pb-6 max-w-mobile-l mx-auto w-full">
+    <div className="relative w-full bg-background rounded-b-3xl shadow-md pb-6 max-w-mobile-l mx-auto w-full">
       <div className="flex flex-col items-center md:flex-row md:items-start gap-6">
         <div className="relative w-24 h-24 rounded-full overflow-hidden">
           <Image
@@ -50,13 +50,13 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           </div>
           
           {currentPrefecture && (
-            <div className="text-sm text-gray-500 mb-2">
+            <div className="text-sm text-muted-foreground mb-2">
               {prefectureLabels[currentPrefecture] || '不明'}
             </div>
           )}
           
           {bio && (
-            <div className="mt-2 text-gray-700 whitespace-pre-line">
+            <div className="mt-2 text-foreground whitespace-pre-line">
               {bio}
             </div>
           )}

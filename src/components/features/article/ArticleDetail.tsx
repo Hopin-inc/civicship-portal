@@ -32,7 +32,7 @@ export const ArticleDetail = ({
 
   return (
     <div className="max-w-[375px] mx-auto pt-10 pb-32 px-2">
-      <div className="bg-white relative rounded-[8px]">
+      <div className="bg-background relative rounded-[8px]">
         <div className="relative w-full h-[210px]">
           <Image
             src={article.thumbnail || "/placeholder.svg"}
@@ -45,18 +45,18 @@ export const ArticleDetail = ({
           </div>
         </div>
 
-        <div className="relative -mt-8 bg-white rounded-2xl shadow-md mx-4">
+        <div className="relative -mt-8 bg-background rounded-2xl shadow-md mx-4">
           <div className="px-4 pt-6 pb-4">
             <h1 className="text-2xl font-bold mb-4">{article.title}</h1>
-            <div className="text-gray-600 text-sm">
+            <div className="text-muted-foreground text-sm">
               公開: {format(new Date(article.publishedAt), "yyyy年M月d日", { locale: ja })}
             </div>
           </div>
 
-          <div className="h-px bg-gray-200" />
+          <div className="h-px bg-muted" />
 
           <div className="px-4 py-4">
-            <p className="text-gray-700 text-base leading-relaxed">{article.description}</p>
+            <p className="text-foreground text-base leading-relaxed">{article.description}</p>
           </div>
         </div>
       </div>
@@ -66,9 +66,9 @@ export const ArticleDetail = ({
           className="prose prose-slate max-w-none
             prose-h1:text-2xl prose-h1:border-l-4 prose-h1:border-[#4361EE] prose-h1:pl-4 prose-h1:py-2 prose-h1:mb-6
             prose-h2:text-xl prose-h2:border-l-4 prose-h2:border-[#4361EE] prose-h2:pl-4 prose-h2:py-2 prose-h2:mb-6
-            prose-p:text-base prose-p:leading-relaxed prose-p:text-gray-700 prose-p:mb-4
-            prose-a:text-blue-600 
-            prose-strong:text-gray-900 
+            prose-p:text-base prose-p:leading-relaxed prose-p:text-foreground prose-p:mb-4
+            prose-a:text-primary 
+            prose-strong:text-foreground 
             prose-img:rounded-lg prose-img:shadow-lg prose-img:my-8 
             prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic"
           dangerouslySetInnerHTML={{ __html: contentHtml }}

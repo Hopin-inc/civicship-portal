@@ -15,14 +15,14 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   onSearchQueryChange 
 }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+    <div className="bg-background rounded-2xl shadow-sm border border-gray-100">
       <div className="relative">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchQueryChange(e.target.value)}
           placeholder="検索ワードを入力"
-          className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white outline-none text-base placeholder:text-gray-400"
+          className="w-full pl-12 pr-4 py-4 rounded-2xl bg-background outline-none text-base placeholder:text-muted-foreground"
         />
         <div className="absolute left-4 top-1/2 -translate-y-1/2">
           <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
