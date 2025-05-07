@@ -28,39 +28,73 @@ export const prefectureOptions = [
 /**
  * Transform user profile data from GraphQL to application format
  */
-export const formatUserProfileData = (data: GetUserProfileData | GetUserWithDetailsData | undefined) => {
+export interface UserProfileData {
+  id: string;
+  name: string;
+  image: string | null;
+  bio: string | null;
+  sysRole: string | null;
+  urlFacebook: string | null;
+  urlInstagram: string | null;
+  urlWebsite: string | null;
+  urlX: string | null;
+  urlYoutube: string | null;
+  opportunities: Array<{
+    id: string;
+    title: string;
+    description: string | null;
+    images: string[] | null;
+    feeRequired: number | null;
+    isReservableWithTicket: boolean | null;
+  }>;
+  portfolios: Array<{
+    id: string;
+    title: string;
+    category: string | null;
+    date: string | null;
+    thumbnailUrl: string | null;
+    source: string | null;
+    reservationStatus: string | null;
+  }>;
+  hasMorePortfolios: boolean;
+  endCursor: string | null;
+}
+
+export const formatUserProfileData = (
+  data: GetUserProfileData | GetUserWithDetailsData | undefined
+): UserProfileData | null => {
   if (!data) return null;
   
   return {
     id: data.user.id,
     name: data.user.name,
-    image: data.user.image,
-    bio: data.user.bio,
-    sysRole: data.user.sysRole,
-    urlFacebook: data.user.urlFacebook,
-    urlInstagram: data.user.urlInstagram,
-    urlWebsite: data.user.urlWebsite,
-    urlX: data.user.urlX,
-    urlYoutube: data.user.urlYoutube,
+    image: data.user.image ?? null,
+    bio: data.user.bio ?? null,
+    sysRole: data.user.sysRole ?? null,
+    urlFacebook: data.user.urlFacebook ?? null,
+    urlInstagram: data.user.urlInstagram ?? null,
+    urlWebsite: data.user.urlWebsite ?? null,
+    urlX: data.user.urlX ?? null,
+    urlYoutube: data.user.urlYoutube ?? null,
     opportunities: 'opportunitiesCreatedByMe' in data.user && data.user.opportunitiesCreatedByMe
       ? data.user.opportunitiesCreatedByMe.edges.map(edge => ({
           id: edge.node.id,
           title: edge.node.title,
-          description: edge.node.description,
-          images: edge.node.images,
-          feeRequired: edge.node.feeRequired,
-          isReservableWithTicket: edge.node.isReservableWithTicket,
+          description: edge.node.description ?? null,
+          images: edge.node.images ?? null,
+          feeRequired: edge.node.feeRequired ?? null,
+          isReservableWithTicket: edge.node.isReservableWithTicket ?? null,
         }))
       : [],
     portfolios: 'portfolios' in data.user && data.user.portfolios
       ? data.user.portfolios.edges.map(edge => ({
           id: edge.node.id,
           title: edge.node.title,
-          category: edge.node.category,
-          date: edge.node.date,
-          thumbnailUrl: edge.node.thumbnailUrl,
-          source: edge.node.source,
-          reservationStatus: edge.node.reservationStatus,
+          category: edge.node.category ?? null,
+          date: edge.node.date ?? null,
+          thumbnailUrl: edge.node.thumbnailUrl ?? null,
+          source: edge.node.source ?? null,
+          reservationStatus: edge.node.reservationStatus ?? null,
         }))
       : [],
     hasMorePortfolios: 'portfolios' in data.user && data.user.portfolios?.pageInfo.hasNextPage || false,
@@ -71,7 +105,34 @@ export const formatUserProfileData = (data: GetUserProfileData | GetUserWithDeta
 /**
  * Format user profile data from any user data structure
  */
-export const formatSimpleUserProfileData = (userData: any) => {
+export interface SimpleUserData {
+  user?: {
+    id: string;
+    name: string;
+    image: string | null;
+    bio?: string | null;
+    currentPrefecture?: GqlCurrentPrefecture | null;
+    urlFacebook?: string | null;
+    urlInstagram?: string | null;
+    urlX?: string | null;
+    urlYoutube?: string | null;
+    urlWebsite?: string | null;
+  } | null;
+}
+
+export interface SimpleUserProfile {
+  id: string;
+  name: string;
+  image: string | null;
+  bio: string;
+  currentPrefecture?: GqlCurrentPrefecture | null;
+  socialLinks: Array<{
+    type: string;
+    url: string | null;
+  }>;
+}
+
+export const formatSimpleUserProfileData = (userData: SimpleUserData): SimpleUserProfile | null => {
   if (!userData?.user) return null;
   
   const { user } = userData;

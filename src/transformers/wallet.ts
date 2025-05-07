@@ -61,7 +61,7 @@ export interface Transaction {
 /**
  * Formats wallet data from GraphQL response
  */
-export const formatWalletData = (data: WalletData) => {
+export const formatWalletData = (data: WalletData): { currentPoint: number; ticketCount: number } => {
   const walletNode = data?.user?.wallets?.edges?.[0]?.node;
   const currentPoint = walletNode?.currentPointView?.currentPoint ?? 0;
   const ticketCount = walletNode?.tickets?.edges?.length ?? 0;

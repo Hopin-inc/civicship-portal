@@ -1,5 +1,8 @@
 'use client';
 
+import { format } from 'date-fns';
+import { ja } from 'date-fns/locale';
+
 export interface GetArticlesData {
   articles: {
     pageInfo: {
@@ -55,4 +58,33 @@ export const transformArticles = (data: GetArticlesData | undefined): Article[] 
       } : null,
     };
   });
+};
+
+/**
+ * Format article date for display
+ */
+export const formatArticleDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return format(date, 'yyyy年M月d日', { locale: ja });
+};
+
+/**
+ * Extract article categories from GraphQL data
+ */
+export interface ArticleWithCategories {
+  categories?: {
+    edges?: Array<{
+      node?: {
+        name: string;
+      } | null;
+    } | null>;
+  } | null;
+}
+
+export const extractArticleCategories = (article: ArticleWithCategories): string[] => {
+  if (!article?.categories?.edges) return [];
+  
+  return article.categories.edges
+    .filter((edge): edge is NonNullable<typeof edge> => edge !== null && edge?.node !== null && edge?.node !== undefined)
+    .map((edge) => edge.node!.name);
 };

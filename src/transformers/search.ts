@@ -22,7 +22,7 @@ export interface SearchParams {
 /**
  * Format date range for display
  */
-export const formatDateRange = (range: DateRange | undefined) => {
+export const formatDateRange = (range: DateRange | undefined): string => {
   if (!range?.from) return '';
   if (!range.to) return format(range.from, 'M/d', { locale: ja });
   return `${format(range.from, 'M/d', { locale: ja })} - ${format(range.to, 'M/d', { locale: ja })}`;
@@ -38,7 +38,7 @@ export const buildSearchParams = (
   guests: number,
   useTicket: boolean,
   selectedTab: string
-) => {
+): URLSearchParams => {
   const params = new URLSearchParams();
   if (searchQuery) params.set('q', searchQuery);
   if (location) params.set('location', location);

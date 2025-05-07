@@ -6,11 +6,16 @@ import { GqlOpportunityFilterInput as OpportunityFilterInput } from '@/types/gra
 
 /**
  * Hook for fetching search results from GraphQL
+ * Accepts either a filter object or a function that returns a filter object
  */
-export const useSearchResultsQuery = (filter: OpportunityFilterInput) => {
+export const useSearchResultsQuery = (
+  filter: OpportunityFilterInput | (() => OpportunityFilterInput)
+) => {
+  const filterValue = typeof filter === 'function' ? filter() : filter;
+  
   return useQuery(SEARCH_OPPORTUNITIES, {
     variables: {
-      filter,
+      filter: filterValue,
       first: 20,
     },
     fetchPolicy: 'network-only',

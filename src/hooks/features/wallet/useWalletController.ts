@@ -1,12 +1,30 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
 import { useLoading } from '@/hooks/core/useLoading';
 import { useWalletQuery } from './useWalletQuery';
 import { useTransactionHistoryQuery } from './useTransactionHistoryQuery';
 import { Transaction, TransactionNode, formatWalletData, transformTransaction } from '@/transformers/wallet';
 import { useInfiniteScroll } from '@/hooks/core/useInfiniteScroll';
+
+/**
+ * Error interface for consistent error handling
+ */
+export interface ErrorWithMessage {
+  message: string;
+}
+
+/**
+ * Format error object with consistent structure
+ */
+export const formatError = (error: any): ErrorWithMessage | null => {
+  if (!error) return null;
+  
+  return {
+    message: error.message || 'エラーが発生しました'
+  };
+};
 
 /**
  * Main controller hook for wallet functionality
@@ -98,16 +116,15 @@ export const useWalletController = (userId?: string) => {
     onLoadMore: loadMore
   });
   
-  const handleError = useCallback(() => {
-    if (walletError || transactionError) {
-      console.error('Error fetching wallet data:', walletError || transactionError);
+  const error = useMemo(() => {
+    const combinedError = walletError || transactionError;
+    if (combinedError) {
+      console.error('Error fetching wallet data:', combinedError);
       toast.error('ウォレットデータの取得に失敗しました');
+      return formatError(combinedError);
     }
+    return null;
   }, [walletError, transactionError]);
-  
-  useEffect(() => {
-    handleError();
-  }, [handleError]);
   
   return {
     currentPoint,
@@ -116,7 +133,7 @@ export const useWalletController = (userId?: string) => {
     isLoading: walletLoading || transactionLoading,
     isLoadingMore,
     hasMore,
-    error: walletError || transactionError,
+    error,
     loadMore,
     lastTransactionRef
   };
