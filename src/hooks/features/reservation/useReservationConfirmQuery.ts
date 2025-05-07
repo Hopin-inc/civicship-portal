@@ -2,15 +2,15 @@
 
 import { useMutation, useQuery } from '@apollo/client';
 import { CREATE_RESERVATION_MUTATION } from '@/graphql/mutations/reservation';
-import { GetUserWalletDocument } from '@/types/graphql';
+import { GET_USER_WALLET } from '@/graphql/queries/user';
 
 /**
  * Hook for fetching wallet data for reservation confirmation
  * @param userId User ID to fetch wallet data for
  */
 export const useWalletQuery = (userId: string | undefined) => {
-  return useQuery(GetUserWalletDocument, {
-    variables: { id: userId || '' },
+  return useQuery(GET_USER_WALLET, {
+    variables: userId ? { id: userId } : undefined,
     skip: !userId,
   });
 };

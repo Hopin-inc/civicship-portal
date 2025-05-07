@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from "@apollo/client";
-import { GetUserWalletDocument } from '@/graphql/queries/userWallet';
+import { GET_USER_WALLET } from '@/graphql/queries/user';
 import { DocumentNode } from 'graphql';
 
 /**
@@ -10,7 +10,7 @@ import { DocumentNode } from 'graphql';
  * @param userId User ID to fetch wallet data for
  */
 export const useAvailableTicketsQuery = (userId: string | undefined) => {
-  return useQuery(GetUserWalletDocument as DocumentNode, {
+  return useQuery(GET_USER_WALLET as DocumentNode, {
     variables: userId ? { id: userId } : undefined,
     skip: !userId,
   });

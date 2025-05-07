@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, DocumentNode } from '@apollo/client';
-import { GetUserWalletDocument } from '@/graphql/queries/userWallet';
+import { GET_USER_WALLET } from '@/graphql/queries/user';
 import { useAuth } from '@/contexts/AuthContext';
 
 /**
@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export const useTicketsQuery = () => {
   const { user } = useAuth();
   
-  return useQuery((GetUserWalletDocument as unknown) as DocumentNode, {
+  return useQuery((GET_USER_WALLET as unknown) as DocumentNode, {
     variables: { id: user?.id ?? '' },
     skip: !user?.id,
   });

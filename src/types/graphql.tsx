@@ -2512,43 +2512,6 @@ export type GqlWalletsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
-export type GqlOpportunityFieldsFragment = {
-  __typename?: "Opportunity";
-  id: string;
-  title: string;
-  description: string;
-  images?: Array<string> | null;
-  feeRequired?: number | null;
-  pointsToEarn?: number | null;
-  isReservableWithTicket?: boolean | null;
-  community?: {
-    __typename?: "Community";
-    id: string;
-    name?: string | null;
-    image?: string | null;
-  } | null;
-  place?: {
-    __typename?: "Place";
-    id: string;
-    name: string;
-    address: string;
-    city: { __typename?: "City"; name: string; state: { __typename?: "State"; name: string } };
-  } | null;
-  slots?: {
-    __typename?: "OpportunitySlotsConnection";
-    edges?: Array<{
-      __typename?: "OpportunitySlotEdge";
-      node?: {
-        __typename?: "OpportunitySlot";
-        id: string;
-        startsAt: Date;
-        endsAt: Date;
-        capacity?: number | null;
-      } | null;
-    } | null> | null;
-  } | null;
-};
-
 export type GqlUserSignUpMutationVariables = Exact<{
   input: GqlUserSignUpInput;
 }>;
@@ -2977,6 +2940,43 @@ export type GqlGetMembershipListQuery = {
       } | null;
     } | null> | null;
   };
+};
+
+export type GqlOpportunityFieldsFragment = {
+  __typename?: "Opportunity";
+  id: string;
+  title: string;
+  description: string;
+  images?: Array<string> | null;
+  feeRequired?: number | null;
+  pointsToEarn?: number | null;
+  isReservableWithTicket?: boolean | null;
+  community?: {
+    __typename?: "Community";
+    id: string;
+    name?: string | null;
+    image?: string | null;
+  } | null;
+  place?: {
+    __typename?: "Place";
+    id: string;
+    name: string;
+    address: string;
+    city: { __typename?: "City"; name: string; state: { __typename?: "State"; name: string } };
+  } | null;
+  slots?: {
+    __typename?: "OpportunitySlotsConnection";
+    edges?: Array<{
+      __typename?: "OpportunitySlotEdge";
+      node?: {
+        __typename?: "OpportunitySlot";
+        id: string;
+        startsAt: Date;
+        endsAt: Date;
+        capacity?: number | null;
+      } | null;
+    } | null> | null;
+  } | null;
 };
 
 export type GqlGetOpportunitiesQueryVariables = Exact<{
@@ -3733,36 +3733,6 @@ export type GqlWalletTransactionsQuery = {
     } | null> | null;
     pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
   };
-};
-
-export type GqlGetWalletQueryVariables = Exact<{
-  userId: Scalars["ID"]["input"];
-}>;
-
-export type GqlGetWalletQuery = {
-  __typename?: "Query";
-  user?: {
-    __typename?: "User";
-    id: string;
-    wallets?: {
-      __typename?: "WalletsConnection";
-      edges?: Array<{
-        __typename?: "WalletEdge";
-        node?: {
-          __typename?: "Wallet";
-          id: string;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
-          tickets?: {
-            __typename?: "TicketsConnection";
-            edges?: Array<{
-              __typename?: "TicketEdge";
-              node?: { __typename?: "Ticket"; id: string } | null;
-            } | null> | null;
-          } | null;
-        } | null;
-      } | null> | null;
-    } | null;
-  } | null;
 };
 
 export const OpportunityFieldsFragmentDoc = gql`
@@ -5749,80 +5719,4 @@ export type WalletTransactionsSuspenseQueryHookResult = ReturnType<
 export type WalletTransactionsQueryResult = Apollo.QueryResult<
   GqlWalletTransactionsQuery,
   GqlWalletTransactionsQueryVariables
->;
-export const GetWalletDocument = gql`
-  query GetWallet($userId: ID!) {
-    user(id: $userId) {
-      id
-      wallets {
-        edges {
-          node {
-            id
-            currentPointView {
-              currentPoint
-            }
-            tickets {
-              edges {
-                node {
-                  id
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useGetWalletQuery__
- *
- * To run a query within a React component, call `useGetWalletQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetWalletQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetWalletQuery({
- *   variables: {
- *      userId: // value for 'userId'
- *   },
- * });
- */
-export function useGetWalletQuery(
-  baseOptions: Apollo.QueryHookOptions<GqlGetWalletQuery, GqlGetWalletQueryVariables> &
-    ({ variables: GqlGetWalletQueryVariables; skip?: boolean } | { skip: boolean }),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetWalletQuery, GqlGetWalletQueryVariables>(GetWalletDocument, options);
-}
-export function useGetWalletLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetWalletQuery, GqlGetWalletQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetWalletQuery, GqlGetWalletQueryVariables>(
-    GetWalletDocument,
-    options,
-  );
-}
-export function useGetWalletSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlGetWalletQuery, GqlGetWalletQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlGetWalletQuery, GqlGetWalletQueryVariables>(
-    GetWalletDocument,
-    options,
-  );
-}
-export type GetWalletQueryHookResult = ReturnType<typeof useGetWalletQuery>;
-export type GetWalletLazyQueryHookResult = ReturnType<typeof useGetWalletLazyQuery>;
-export type GetWalletSuspenseQueryHookResult = ReturnType<typeof useGetWalletSuspenseQuery>;
-export type GetWalletQueryResult = Apollo.QueryResult<
-  GqlGetWalletQuery,
-  GqlGetWalletQueryVariables
 >;
