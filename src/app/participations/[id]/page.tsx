@@ -6,7 +6,7 @@ import { useParticipationImageUpload } from "@/hooks/features/participation/useP
 import { GqlParticipationStatus } from '@/types/graphql';
 import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
 import { useParticipationState } from "@/hooks/features/participation/useParticipationState";
-import { calculateCancellationDeadline } from "@/utils/participationUtils";
+import { calculateCancellationDeadline } from "@/transformers/participation";
 import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { ParticipationStatusNotification } from "@/components/features/participation/ParticipationStatusNotification";

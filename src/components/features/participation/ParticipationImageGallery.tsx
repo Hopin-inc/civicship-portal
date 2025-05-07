@@ -3,7 +3,7 @@
 import React from 'react';
 import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
 import { Button } from "@/components/ui/button";
-import { formatImageData } from '@/utils/participationUtils';
+import { formatImageData } from '@/transformers/participation';
 import type { ParticipationImage } from '@/types';
 
 interface ParticipationImageGalleryProps {
