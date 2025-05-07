@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 
@@ -13,8 +12,7 @@ export const HistoryButton: React.FC<HistoryButtonProps> = ({
     <div className="flex justify-center mb-10">
       <Button 
         onClick={onClick}
-        variant="tertiary"
-        className="w-[104px] h-[48px] bg-white border border-gray-200"
+
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 4V8L10.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

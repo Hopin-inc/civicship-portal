@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -21,13 +19,11 @@ export const SearchFooter: React.FC<SearchFooterProps> = ({
         <Button 
           onClick={onClear}
           variant="link"
-          className="text-gray-500 text-sm"
         >
           条件をクリア
         </Button>
         <Button 
           onClick={onSearch}
-          className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium"
         >
           検索
         </Button>

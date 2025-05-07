@@ -15,9 +15,6 @@ export const WalletActionButton: React.FC<WalletActionButtonProps> = ({
   return (
     <Button 
       onClick={onClick}
-      variant="primary"
-      size="lg"
-      className="w-full mb-8"
     >
       {children}
     </Button>

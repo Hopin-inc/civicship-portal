@@ -16,7 +16,6 @@ const PlaceToggleButton: React.FC<PlaceToggleButtonProps> = ({ isMapMode, onClic
         <Button
           onClick={onClick}
           variant="secondary"
-          className="w-[104px] h-[48px] rounded-full flex items-center justify-center gap-1.5"
         >
           <List className="h-4 w-4" />
           一覧
@@ -30,7 +29,6 @@ const PlaceToggleButton: React.FC<PlaceToggleButtonProps> = ({ isMapMode, onClic
       <Button 
         onClick={onClick}
         variant="primary"
-        className="w-[104px] h-[48px] rounded-full flex items-center justify-center gap-1.5"
       >
         <MapPin className="h-4 w-4" />
         地図

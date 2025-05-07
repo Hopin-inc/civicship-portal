@@ -70,9 +70,6 @@ const PlaceImageSlider: React.FC<PlaceImageSliderProps> = ({
                 key={index}
                 onClick={() => onSelectIndex && onSelectIndex(index)}
                 variant="link"
-                className={`w-2 h-2 p-0 rounded-full transition-colors ${
-                  index === currentIndex ? "bg-white" : "bg-white/50"
-                }`}
               />
             ))}
           </div>

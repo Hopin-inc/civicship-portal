@@ -86,12 +86,6 @@ export const UserSocialLinks = ({
                 key={type}
                 variant="tertiary"
                 size="icon"
-                className={cn(
-                  "h-8 w-8 rounded-full",
-                  isActive
-                    ? "bg-muted hover:bg-muted/80"
-                    : "bg-muted/50 text-muted-foreground/50 cursor-not-allowed hover:bg-muted/50"
-                )}
                 asChild
                 disabled={!isActive}
               >

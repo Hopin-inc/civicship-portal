@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -18,7 +17,6 @@ export const TicketDetailAction: React.FC<TicketDetailActionProps> = ({
     <Button 
       onClick={onFindRelatedOpportunities}
       disabled={isLoading}
-      className="w-full py-3 px-6 rounded-full font-bold"
     >
       {isLoading ? "読み込み中..." : "関わりを見つける"}
     </Button>

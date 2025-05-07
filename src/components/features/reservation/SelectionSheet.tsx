@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -45,14 +44,12 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
         <Button
           onClick={handleClearSelection}
           variant="link"
-          className="text-gray-500 text-sm"
         >
           選択を解除
         </Button>
         <Button
           onClick={onClose}
           variant="primary"
-          className="px-8 py-3"
         >
           決定
         </Button>
@@ -68,11 +65,6 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
             key={index}
             onClick={() => setSelectedDate(`${section.date} (${section.day})`)}
             variant={selectedDate === `${section.date} (${section.day})` ? "primary" : "tertiary"}
-            className={`w-full text-left p-4 ${
-              selectedDate === `${section.date} (${section.day})`
-                ? "text-blue-600 bg-blue-50"
-                : "text-gray-900"
-            }`}
           >
             {section.date} ({section.day})
           </Button>
