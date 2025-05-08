@@ -60,10 +60,4 @@ const ParticipationsVerify: React.FC = () => {
   );
 };
 
-<<<<<<< HEAD
-export default ParticipationsVerify;      
-||||||| b891eea
-export default ParticipationsVerify; 
-=======
-export default ParticipationsVerify;       
->>>>>>> origin/devin/1746601107-remaining-color-classes
+export default ParticipationsVerify;
