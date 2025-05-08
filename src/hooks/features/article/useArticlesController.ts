@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useArticlesQuery, ARTICLES_PER_PAGE } from "@/hooks/features/article/useArticlesQuery";
-import { transformArticles } from "@/transformers/article";
+import { transformArticles } from "@/presenters/article";
 import { useLoading } from "@/hooks/core/useLoading";
 import { useInfiniteScroll } from "@/hooks/core/useInfiniteScroll";
 import { GqlSortDirection as SortDirection } from "@/types/graphql";

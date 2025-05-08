@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useOpportunityQuery } from './useOpportunityQuery';
-import { transformOpportunity } from '@/transformers/opportunity';
+import { transformOpportunity } from '@/presenters/opportunity';
 import type { Opportunity } from '@/types';
 
 interface UseOpportunityControllerResult {

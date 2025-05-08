@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { useProfileEditQuery, useProfileEditMutation } from './useProfileEditQuery';
 import { GqlCurrentPrefecture } from '@/types/graphql';
 import { ErrorWithMessage, formatError } from '../wallet/useWalletController';
-import { prefectureLabels } from '@/transformers/user';
+import { prefectureLabels } from '@/presenters/user';
 
 /**
  * Controller hook for profile editing

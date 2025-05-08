@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useRouter } from 'next/navigation';
-import { prefectureLabels, prefectureOptions } from '@/transformers/user';
+import { prefectureLabels, prefectureOptions } from '@/presenters/user';
 import { GqlCurrentPrefecture } from '@/types/graphql';
 
 interface UserProfileEditProps {

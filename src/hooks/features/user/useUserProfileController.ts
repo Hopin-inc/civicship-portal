@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUserProfileQuery } from './useUserProfileQuery';
-import { formatUserProfileData } from '@/transformers/user';
+import { formatUserProfileData } from '@/presenters/user';
 import { useLoading } from '@/hooks/core/useLoading';
 import { toast } from 'sonner';
 

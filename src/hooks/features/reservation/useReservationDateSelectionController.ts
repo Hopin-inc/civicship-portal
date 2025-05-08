@@ -12,7 +12,7 @@ import {
   filterDateSectionsByDate,
   isSlotAvailable as checkSlotAvailability,
   buildReservationParams
-} from '@/transformers/opportunitySlot';
+} from '@/presenters/opportunitySlot';
 
 interface UseReservationDateSelectionProps {
   opportunityId: string;

@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useArticleQuery } from './useArticleQuery';
-import { formatArticleDate, extractArticleCategories } from '@/transformers/article';
+import { formatArticleDate, extractArticleCategories } from '@/presenters/article';
 import type { Article, ArticleType } from "@/types";
 import { ErrorWithMessage, formatError } from '../wallet/useWalletController';
 import { toast } from 'sonner';

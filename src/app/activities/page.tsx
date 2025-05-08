@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useLoading } from '@/hooks/core/useLoading'
 import { useActivities } from '@/hooks/features/activity/useActivities'
-import { mapOpportunityToCardProps } from '@/transformers/opportunity'
+import { mapOpportunityToCardProps } from '@/presenters/opportunity'
 import { useHeaderConfig } from '@/hooks/core/useHeaderConfig'
 import { OpportunityEdge } from '@/types'
 import ActivitiesFeaturedSection from '@/components/features/activity/ActivitiesFeaturedSection'

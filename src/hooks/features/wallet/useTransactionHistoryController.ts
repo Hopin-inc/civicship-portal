@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import { useTransactionHistoryQuery } from './useTransactionHistoryQuery';
-import { formatTransactionDate, getTransactionDescription, transformTransaction } from '@/transformers/wallet';
+import { formatTransactionDate, getTransactionDescription, transformTransaction } from '@/presenters/wallet';
 import { ErrorWithMessage, formatError } from './useWalletController';
 
 /**

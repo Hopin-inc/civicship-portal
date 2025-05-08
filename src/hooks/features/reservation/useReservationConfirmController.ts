@@ -8,7 +8,7 @@ import { useOpportunity } from '@/hooks/features/activity/useOpportunity';
 import { useLoading } from '@/hooks/core/useLoading';
 import { useAuth } from '@/contexts/AuthContext';
 import { useReservationConfirmQuery } from './useReservationConfirmQuery';
-import { findMatchingSlot, calculateAvailableTickets, getTicketIds } from '@/transformers/reservation';
+import { findMatchingSlot, calculateAvailableTickets, getTicketIds } from '@/presenters/reservation';
 import { parseDateTime } from '@/utils/date';
 
 /**

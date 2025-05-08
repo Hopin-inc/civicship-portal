@@ -1,7 +1,7 @@
 'use client';
 
 import { useTicketsQuery } from '@/hooks/features/ticket/useTicketsQuery';
-import { transformTickets } from '@/transformers/ticket';
+import { transformTickets } from '@/presenters/ticket';
 import { Ticket } from '@/types/ticket';
 
 export interface UseTicketsResult {

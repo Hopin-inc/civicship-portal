@@ -15,7 +15,7 @@ import {
   transformRecommendedOpportunities, 
   groupOpportunitiesByDate,
   SearchParams
-} from '@/transformers/search';
+} from '@/presenters/search';
 import { ErrorWithMessage, formatError } from '../wallet/useWalletController';
 import { toast } from 'sonner';
 

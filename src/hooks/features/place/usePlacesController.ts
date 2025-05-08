@@ -11,7 +11,7 @@ import {
   transformMembershipsToPlaces, 
   calculateTotalPlaces,
   UsePlacesResult
-} from '@/transformers/place';
+} from '@/presenters/place';
 
 
 /**

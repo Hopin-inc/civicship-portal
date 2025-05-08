@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchResultsController } from './useSearchResultsController';
-import type { SearchParams } from '@/transformers/search';
+import type { SearchParams } from '@/presenters/search';
 import type { OpportunityCardProps } from '@/components/features/opportunity/OpportunityCard';
 import type { ErrorWithMessage } from '../wallet/useWalletController';
 
