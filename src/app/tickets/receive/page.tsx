@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import LoginModal from "@/components/features/login/LoginModal";
-import Loading from "@/components/layout/Loading";
+import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useTicketClaim } from "@/hooks/features/ticket/useTicketClaim";
 import TicketReceiveContent from "@/components/features/ticket/TicketReceiveContent";
@@ -31,7 +31,7 @@ export default function TicketReceivePage() {
   if (viewLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Loading />
+        <LoadingIndicator fullScreen={true} />
       </div>
     );
   }

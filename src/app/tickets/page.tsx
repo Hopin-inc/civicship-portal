@@ -4,7 +4,7 @@ import React from 'react';
 import { useTickets } from '@/hooks/features/ticket/useTickets';
 import TicketHeader from '@/components/features/ticket/TicketHeader';
 import TicketContent from '@/components/features/ticket/TicketContent';
-import Loading from '@/components/layout/Loading';
+import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
 
 export default function TicketsPage() {
@@ -13,7 +13,7 @@ export default function TicketsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Loading />
+        <LoadingIndicator fullScreen={true} />
       </div>
     );
   }
