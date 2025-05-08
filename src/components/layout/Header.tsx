@@ -24,19 +24,19 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const shouldShowBackButton = config.showBackButton && pathname !== '/';
 
   return (
-    <header className={cn(className, "fixed top-0 left-0 right-0 z-50 bg-background border-b border-border max-w-mobile-l mx-auto w-full h-16 flex items-center px-4")}>
+    <header
+      className={cn(
+        className,
+        "fixed top-0 left-0 right-0 z-50 bg-background border-b border-border max-w-mobile-l mx-auto w-full h-16 flex items-center px-4",
+      )}
+    >
       {shouldShowBackButton && (
-        <Button
-          onClick={() => router.back()}
-          variant="link"
-          className="absolute left-4 p-0 h-auto"
-          aria-label="戻る"
-        >
+        <Button onClick={() => router.back()} variant="icon-only" size="sm" aria-label="戻る">
           <ChevronLeft className="h-6 w-6" />
         </Button>
       )}
       {config.showLogo && (
-        <Link href="/" className="flex items-center space-x-2 absolute left-14">
+        <Link href="/" className="flex items-center space-x-2">
           <Image src="/images/neo88-logo.jpg" alt="NEO88" width={88} height={80} />
         </Link>
       )}
@@ -51,9 +51,9 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         </div>
       )}
       {config.title && !config.showSearchForm && (
-        <h1 className="flex-1 text-center text-lg font-bold text-secondary-foreground truncate">
-          {config.title}
-        </h1>
+        <div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col content-center justify-center -z-10">
+          <h1 className="text-center text-title-md truncate">{config.title}</h1>
+        </div>
       )}
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </header>
