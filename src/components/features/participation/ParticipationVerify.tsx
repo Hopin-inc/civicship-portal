@@ -1,29 +1,44 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Info } from 'lucide-react';
-import {IconWrapper} from '@/components/features/reservation/IconWrapper';
+import { IconWrapper } from '@/components/features/reservation/IconWrapper';
 
-// Figmaから抽出した体験リスト（仮データ）
-const experiences = [
+export interface ParticipationExperience {
+  id: string;
+  title: string;
+  date: string;
+}
+
+interface ParticipationVerifyProps {
+  experiences: ParticipationExperience[];
+}
+
+const defaultExperiences = [
   {
+    id: '1',
     title: '棚田でおにぎりづくり体験　最後は藁でしめ縄作り！',
     date: '2025/7/25に参加',
   },
   {
+    id: '2',
     title: '伝統建築の町並みで写真散歩　最後は自家製プリントで写真展！',
     date: '2025/7/25に参加',
   },
   {
+    id: '3',
     title: '牧場でチーズ作り体験　最後はできたてモッツァレラで乾杯！',
     date: '2025/7/25に参加',
   },
   {
+    id: '4',
     title: '渓谷で天然石拾い　最後はアクセサリー作り体験！',
     date: '2025/7/25に参加',
   },
 ];
 
-const ParticipationsVerify: React.FC = () => {
+const ParticipationVerify: React.FC<ParticipationVerifyProps> = ({ 
+  experiences = defaultExperiences 
+}) => {
   return (
     <Card className="max-w-md mx-auto p-6 rounded-2xl border-none shadow-lg bg-background">
       {/* Infoエリア */}
@@ -37,9 +52,9 @@ const ParticipationsVerify: React.FC = () => {
       </div>
       {/* 体験リスト */}
       <div className="space-y-4">
-        {experiences.map((item, idx) => (
+        {experiences.map((item) => (
           <div
-            key={idx}
+            key={item.id}
             className="flex items-center gap-3 p-4 rounded-xl border bg-[#EFF6FF] border-blue-100"
           >
             <input
@@ -60,4 +75,4 @@ const ParticipationsVerify: React.FC = () => {
   );
 };
 
-export default ParticipationsVerify;
+export default ParticipationVerify;

@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { LoadingContext } from "@/contexts/LoadingContext";
-import Loading from "@/components/layout/Loading";
+import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
 
 const LoadingProvider = ({ children }: React.PropsWithChildren) => {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
     <>
-      {isLoading && <Loading />}
+      {isLoading && <LoadingIndicator fullScreen={true} />}
       <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
         {children}
       </LoadingContext.Provider>
