@@ -27,6 +27,7 @@ const requestLink = new ApolloLink((operation, forward) => {
     headers: {
       ...headers,
       Authorization: accessToken ? `Bearer ${accessToken}` : "",
+      "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
     },
   }));
   return forward(operation);

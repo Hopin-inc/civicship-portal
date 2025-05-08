@@ -1,5 +1,7 @@
 import dayjs from "dayjs";
 
+export const COMMUNITY_ID = "neo88"
+
 type Name = {
   lastName: string;
   middleName?: string | null;
@@ -27,3 +29,7 @@ export const displayDuration = (start: Date | string, end: Date | string) => {
     return `${ dStart.format("YYYY-MM-DD HH:mm") } 〜 ${ dEnd.format("YYYY-MM-DD HH:mm") }`;
   }
 };
+
+export const wait = async (seconds: number) => {
+  return new Promise(resolve => setTimeout(resolve, 1_000 * seconds));
+}
