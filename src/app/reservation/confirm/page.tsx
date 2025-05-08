@@ -164,7 +164,7 @@ const PaymentSection = ({
           <div className="flex items-center justify-center gap-8">
             <Button
               onClick={onDecrement}
-              variant="outline"
+              variant="secondary"
               size="icon"
               className="w-12 h-12 rounded-full text-2xl"
               disabled={!useTickets || ticketCount <= 1}
@@ -174,7 +174,7 @@ const PaymentSection = ({
             <span className="text-2xl font-medium w-8 text-center">{ticketCount}</span>
             <Button
               onClick={onIncrement}
-              variant="outline"
+              variant="secondary"
               size="icon"
               className="w-12 h-12 rounded-full text-2xl"
               disabled={!useTickets || ticketCount >= maxTickets}

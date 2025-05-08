@@ -49,7 +49,7 @@ export function UserProfile({ user, isOwner, onUpdateSocialLinks }: UserProfileP
         </div>
         {isOwner && (
           <Button
-            variant="outline"
+            variant="secondary"
             className="border-[#4361EE] text-[#4361EE] absolute right-0 top-[50%] -translate-y-1/2"
             asChild
           >

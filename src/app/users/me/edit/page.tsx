@@ -152,7 +152,7 @@ export default function ProfileEditPage() {
               </div>
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 onClick={() => document.getElementById('profile-image-input')?.click()}
                 className="h-10"
               >

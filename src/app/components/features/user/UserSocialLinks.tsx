@@ -84,7 +84,7 @@ export const UserSocialLinks = ({
             return (
               <Button
                 key={type}
-                variant="ghost"
+                variant="text"
                 size="icon"
                 className={cn(
                   "h-8 w-8 rounded-full",

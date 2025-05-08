@@ -186,7 +186,7 @@ export const RecentActivitiesTimeline = ({ opportunities }: RecentActivitiesTime
       </div>
       {opportunityHistories.length > 2 && (
         <Button
-          variant="default"
+          variant="primary"
           className="w-full mt-6"
           onClick={() => setIsExpanded(!isExpanded)}
           aria-label={isExpanded ? "表示を減らす" : "すべての関わりを表示"}

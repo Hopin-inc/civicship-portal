@@ -191,7 +191,7 @@ const ActivityEditModal: React.FC<Props> = ({ id }) => {
             <div className="flex gap-2">
               <Button type="submit">保存</Button>
               <DialogClose asChild>
-                <Button variant="outline">キャンセル</Button>
+                <Button variant="secondary">キャンセル</Button>
               </DialogClose>
             </div>
           </form>

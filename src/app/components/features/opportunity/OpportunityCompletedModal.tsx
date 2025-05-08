@@ -64,7 +64,7 @@ export const OpportunityCompletedModal = ({
                 </Button>
                 <Button
                   size="lg"
-                  variant="outline"
+                  variant="secondary"
                   className="w-full"
                   onClick={onShare}
                 >
@@ -89,7 +89,7 @@ export const OpportunityCompletedModal = ({
                 </Button>
                 <Button
                   size="lg"
-                  variant="outline"
+                  variant="secondary"
                   className="w-full"
                   onClick={onShare}
                 >

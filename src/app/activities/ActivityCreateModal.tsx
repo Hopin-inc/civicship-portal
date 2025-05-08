@@ -199,7 +199,7 @@ const ActivityCreateModal: React.FC = () => {
             <div className="flex gap-2">
               <Button type="submit">送信</Button>
               <DialogClose asChild>
-                <Button variant="outline">キャンセル</Button>
+                <Button variant="secondary">キャンセル</Button>
               </DialogClose>
             </div>
           </form>

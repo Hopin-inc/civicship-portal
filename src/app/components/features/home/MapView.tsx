@@ -796,7 +796,7 @@ export default function MapView({
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="icon">
+                        <Button variant="secondary" size="icon">
                           <MoreVertical className="h-5 w-5" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -809,7 +809,7 @@ export default function MapView({
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <Button variant="outline" onClick={() => {}}>
+                    <Button variant="secondary" onClick={() => {}}>
                       <Share2 className="h-5 w-5" />
                     </Button>
                   </>
@@ -822,7 +822,7 @@ export default function MapView({
                     >
                       {getButtonLabel(isEvent, isFull)}
                     </Button>
-                    <Button variant="outline" onClick={() => {}}>
+                    <Button variant="secondary" onClick={() => {}}>
                       <Share2 className="h-5 w-5" />
                     </Button>
                   </>
@@ -949,7 +949,7 @@ export default function MapView({
                 <div className="w-12 h-1 rounded-full bg-muted-foreground/20" />
               </div>
               <Button
-                variant="ghost"
+                variant="text"
                 size="icon"
                 className="absolute right-2 top-2"
                 onClick={handleClose}
@@ -999,7 +999,7 @@ export default function MapView({
                 <div className="w-12 h-1 rounded-full bg-muted-foreground/20" />
               </div>
               <Button
-                variant="ghost"
+                variant="text"
                 size="icon"
                 className="absolute right-2 top-2"
                 onClick={handleClose}

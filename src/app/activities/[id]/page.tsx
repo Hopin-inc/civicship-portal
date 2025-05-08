@@ -67,7 +67,7 @@ const ScheduleCard: React.FC<{
         <Link
           href={`/reservation/confirm?id=${opportunityId}&starts_at=${startsAt}`}
         >
-          <Button variant="default" size="selection">
+          <Button variant="primary" size="selection">
             選択
           </Button>
         </Link>
@@ -359,7 +359,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             href={`/reservation/select-date?id=${opportunity.id}`}
           >
             <Button
-              variant="default"
+              variant="primary"
               className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium"
             >
               予約する

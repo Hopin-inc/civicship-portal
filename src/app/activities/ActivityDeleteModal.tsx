@@ -49,7 +49,7 @@ const ActivityDeleteModal: React.FC<Props> = ({ id }) => {
         <DialogFooter className="flex gap-2">
           <Button onClick={onSubmit} variant="destructive">削除</Button>
           <DialogClose asChild>
-            <Button variant="outline">キャンセル</Button>
+            <Button variant="secondary">キャンセル</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

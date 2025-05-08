@@ -37,7 +37,7 @@ export default function TicketList({ tickets }: TicketListProps) {
               </div>
             </div>
             <Button
-              variant="outline"
+              variant="secondary"
               className="h-12 px-8 rounded-full text-[#4361EE] border-[#4361EE] hover:bg-blue-50"
             >
               関わりを見つける

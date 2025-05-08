@@ -109,7 +109,7 @@ export function SignUpForm() {
                         <Button
                           key={prefecture}
                           type="button"
-                          variant="outline"
+                          variant="secondary"
                           className={`h-12 rounded-2xl border-2 ${
                             field.value === prefecture
                               ? 'bg-blue-600 text-white border-blue-600'
@@ -123,7 +123,7 @@ export function SignUpForm() {
                     </div>
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="secondary"
                       className={`w-full h-12 rounded-2xl border-2 ${
                         field.value === CurrentPrefecture.OutsideShikoku
                           ? 'bg-blue-600 text-white border-blue-600'

@@ -281,7 +281,7 @@ export default function ParticipationPage({ params }: ParticipationProps) {
                   <AsymmetricImageGrid images={displayImages} />
                   {remainingCount > 0 && (
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       className="w-full border-2 border-[#4361EE] text-[#4361EE] hover:bg-[#4361EE] hover:text-white"
                       onClick={() => {
                         console.log(`残りの画像枚数: ${remainingCount}枚`);

@@ -43,7 +43,7 @@ const CommunityLayout = ({
             className="object-cover"
           />
           <Button
-            variant="ghost"
+            variant="text"
             size="icon"
             className="absolute top-2 left-2 bg-background/50 hover:bg-background/70"
             asChild

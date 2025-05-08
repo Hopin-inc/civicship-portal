@@ -304,7 +304,7 @@ export default function SelectDatePage({
                             </span>
                           )}
                           <Button
-                            variant="default"
+                            variant="primary"
                             className="rounded-full px-8 py-3"
                             onClick={() => handleReservation(slot)}
                             disabled={!isAvailable}
