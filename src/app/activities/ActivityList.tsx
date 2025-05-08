@@ -12,8 +12,6 @@ import {
 } from "@/app/components/ui/card";
 import { Building, Clock, User } from "lucide-react";
 import { displayDuration, displayName } from "@/utils";
-import Link from "next/link";
-import { Button } from "@/app/components/ui/button";
 import ActivityEditModal from "@/app/activities/ActivityEditModal";
 import ActivityDeleteModal from "@/app/activities/ActivityDeleteModal";
 import { Suspense } from "react";
@@ -36,7 +34,7 @@ const ActivityList: React.FC = () => {
           activity && (
             <li key={activity.id} className="list-none ml-0">
               <Card>
-                {/*<Link href={`/activities/${activity.id}`} passHref className="card-link">*/}
+                {/*<Link href={`/opportunities/${activity.id}`} passHref className="card-link">*/}
                   <CardHeader>
                     <CardTitle>{activity.id}</CardTitle>
                     {activity.event && (

@@ -1,9 +1,344 @@
-import { User } from "@/gql/graphql";
-import { Required } from "utility-types";
+import { User as GraphQLUser } from "@/gql/graphql";
 
-export type CurrentUser = {
-  uid: string;
-  providerIds: string[];
-  displayName: string | null;
-  user: Required<Partial<User>, "id" | "lastName" | "firstName"> | null;
+export type AuthInfo = {
+  uid?: string;
+  providerIds?: string[];
+  user?: GraphQLUser | null;
+};
+
+export type LIFFLoginResponse = {
+  customToken: string;
+  profile: LINEProfile;
+};
+
+type LINEProfile = {
+  userId: string;
+  displayName: string;
+  pictureUrl?: string;
+  statusMessage?: string;
+  email?: string;
+  language?: string;
+};
+
+export type User = {
+  id: string;
+  name: string;
+  image?: string | null;
+  bio?: string | null;
+  sysRole?: string | null;
+  urlFacebook?: string | null;
+  urlInstagram?: string | null;
+  urlWebsite?: string | null;
+  urlX?: string | null;
+  urlYoutube?: string | null;
+};
+
+export type SocialLinkType = 'x' | 'instagram' | 'facebook' | 'youtube' | 'website';
+
+export type SocialLink = {
+  type: SocialLinkType;
+  url: string;
+};
+
+// Portfolio related types
+export type PortfolioCategory = 'QUEST' | 'ACTIVITY_REPORT' | 'INTERVIEW' | 'OPPORTUNITY' | 'ACTIVITY';
+export type PortfolioType = 'opportunity' | 'activity_report' | 'quest';
+
+export interface PortfolioStyle {
+  bg: string;
+  text: string;
+}
+
+export const PORTFOLIO_CATEGORY_STYLES: Record<PortfolioCategory, PortfolioStyle> = {
+  QUEST: { bg: '#FEF9C3', text: '#854D0E' },
+  ACTIVITY_REPORT: { bg: '#DCE7DD', text: '#166534' },
+  INTERVIEW: { bg: '#DCE7DD', text: '#166534' },
+  OPPORTUNITY: { bg: '#DBEAFE', text: '#1E40AF' },
+  ACTIVITY: { bg: '#FCE7F3', text: '#831843' },
+} as const;
+
+export interface PortfolioParticipant {
+  id: string;
+  name: string;
+  image: string | null;
+}
+
+export type ReservationStatus = 'APPLIED' | 'ACCEPTED' | 'REJECTED' | 'CANCELED';
+
+export interface Portfolio {
+  id: string;
+  type: PortfolioType;
+  title: string;
+  date: string;
+  location: string | null;
+  category: PortfolioCategory;
+  participants: PortfolioParticipant[];
+  image: string | null;
+  source?: string;
+  reservationStatus?: ReservationStatus | null;
+}
+
+export type Community = {
+  id: string;
+  title: string;
+  description: string;
+  icon?: string;
+  location: {
+    prefecture: string;
+    city: string;
+    address: string;
+    lat?: number;
+    lng?: number;
+  };
+  members: {
+    id: string;
+    name: string;
+    title: string;
+    bio?: string;
+    image?: string;
+  }[];
+  socialLinks?: {
+    type: "twitter" | "instagram" | "facebook" | "website" | "youtube";
+    url: string;
+  }[];
+  customLinks?: {
+    title: string;
+    url: string;
+  }[];
+  speakerDeckEmbed?: {
+    title: string;
+    embedUrl: string;
+  };
+  opportunities: Opportunity[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type Opportunity = {
+  id: string;
+  title: string;
+  description: string;
+  type: "EVENT" | "QUEST";
+  status: "open" | "in_progress" | "closed";
+  communityId: string;
+  hostId: string;
+  startsAt: Date | string;
+  endsAt: Date | string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  isReservableWithTicket?: boolean;
+  host: {
+    name: string;
+    image: string | null;
+    title: string;
+    bio: string;
+  };
+  images: string[];
+  location: {
+    name: string;
+    address: string;
+    isOnline: boolean;
+    meetingUrl?: string;
+    lat?: number;
+    lng?: number;
+  };
+  community?: {
+    id: string;
+    title: string;
+    description: string;
+    icon: string;
+  };
+  recommendedFor: string[];
+  relatedArticles?: RelatedArticle[];
+  capacity: number;
+  pointsForComplete?: number;
+  pointsForJoin?: number;
+  participants: Participant[];
+  body?: string;
+  createdByUser?: {
+    id: string;
+    name: string;
+    image: string | null;
+    articlesAboutMe?: {
+      edges: Array<{
+        node: Partial<Article>;
+      }>;
+    };
+    opportunitiesCreatedByMe?: {
+      edges: Opportunity[];
+    };
+  };
+  place?: {
+    name: string;
+    address: string;
+    latitude?: number;
+    longitude?: number;
+  };
+  requireApproval?: boolean;
+  pointsRequired?: number;
+  feeRequired?: number;
+  slots?: {
+    edges: Array<{
+      node: {
+        id: string;
+        startsAt: Date | string;
+        endsAt: Date | string;
+        participations?: {
+          edges: Array<{
+            node: {
+              id: string;
+              status: string;
+              user: {
+                id: string;
+                name: string;
+                image: string | null;
+              };
+            };
+          }>;
+        };
+      };
+    }>;
+  };
+  requiredUtilities?: {
+    id: string;
+  }[];
+};
+
+export type RelatedArticle = {
+  title: string;
+  url: string;
+  type: "interview" | "article";
+  image?: string;
+  description?: string;
+  publishedAt: string;
+};
+
+export type ArticleType = "activity_report" | "interview" | "column";
+
+export type Article = {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  type: ArticleType;
+  thumbnail: string;
+  publishedAt: string;
+  author: {
+    name: string;
+    image: string;
+    bio?: string;
+  };
+  createdAt: string;
+  updatedAt: string | null;
+};
+
+export type Activity = {
+  id: string;
+  title: string;
+  description: string;
+  communityId: string;
+  price: number;
+  duration: number; // minutes
+  location: {
+    name: string;
+    address: string;
+    prefecture: string;
+    city: string;
+    lat?: number;
+    lng?: number;
+  };
+  images: string[];
+  capacity: number;
+  participants?: User[];
+  schedule: {
+    startTime: string;
+    endTime: string;
+    daysOfWeek: number[]; // 0-6, 0 is Sunday
+  };
+  timeSchedule: {
+    time: string;
+    description: string;
+  }[];
+  precautions: string[];
+  host: {
+    name: string;
+    image: string;
+    bio: string;
+  };
+  status: "open" | "closed";
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Participant = {
+  id: string;
+  name: string;
+  image?: string;
+};
+
+export type ParticipationImage = {
+  id: string;
+  url: string;
+  caption: string | null;
+  participationId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Participation = {
+  node: {
+    id: string;
+    status: string;
+    reason: string;
+    images?: ParticipationImage[];
+    user: {
+      id: string;
+      name: string;
+      image?: string;
+    };
+    reservation?: {
+      id: string;
+      opportunitySlot: {
+        id: string;
+        capacity: number;
+        startsAt: Date | string;
+        endsAt: Date | string;
+        hostingStatus: string;
+      };
+      participations?: Array<{
+        id: string;
+        user: {
+          id: string;
+          name: string;
+          image?: string;
+        };
+      }>;
+    };
+  };
+};
+
+export type ContentType = "EXPERIENCE" | "QUEST" | "EVENT" | "ARTICLE";
+
+export type DateFilter = {
+  startDate: Date | null;
+  endDate: Date | null;
+};
+
+export type OpportunityEdge = {
+  node: Opportunity;
+};
+
+export type OpportunityConnection = {
+  edges: OpportunityEdge[];
+  pageInfo: {
+    hasNextPage: boolean;
+    endCursor: string;
+  };
+  totalCount?: number;
+};
+
+export type GetOpportunitiesData = {
+  upcoming: OpportunityConnection;
+  featured: OpportunityConnection;
+  all: OpportunityConnection;
 };
