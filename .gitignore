@@ -19,6 +19,7 @@
 # misc
 .DS_Store
 *.pem
+certificates
 /.idea
 
 # debug
@@ -35,5 +36,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-certificates
