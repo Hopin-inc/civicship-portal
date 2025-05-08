@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { GqlParticipationStatus } from '@/types/graphql';
-import { AddParticipationPhotosModal } from "@/components/features/participations/AddParticipationPhotosModal";
+import { AddParticipationPhotosModal } from "@/components/features/participation/AddParticipationPhotosModal";
 import type { Opportunity, Participation } from '../../../types';
 
 interface ParticipationActionsProps {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { GqlParticipationStatus, GqlParticipationStatusReason } from '@/types/graphql';
-import { getStatusInfo } from '@/utils/participationUtils';
+import { getStatusInfo } from '@/transformers/participation';
 import type { Participation } from '@/types';
 
 interface UseParticipationStateProps {

@@ -1,44 +1,43 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useHeader } from '@/contexts/HeaderContext';
 import { useLoading } from '@/hooks/core/useLoading';
 import { 
   GqlOpportunityCategory as OpportunityCategory, 
   GqlPublishStatus as PublishStatus, 
-  GqlOpportunityFilterInput as OpportunityFilterInput, 
-  GqlOpportunityEdge as OpportunityEdge, 
-  GqlOpportunity as GraphQLOpportunity 
+  GqlOpportunityFilterInput as OpportunityFilterInput
 } from '@/types/graphql';
 import { OpportunityCardProps } from '@/components/features/opportunity/OpportunityCard';
 import { useSearchResultsQuery } from './useSearchResultsQuery';
 import { 
   mapNodeToCardProps, 
   transformRecommendedOpportunities, 
-  groupOpportunitiesByDate 
+  groupOpportunitiesByDate,
+  SearchParams
 } from '@/transformers/search';
-
-export interface SearchParams {
-  location?: string;
-  from?: string;
-  to?: string;
-  guests?: string;
-  type?: 'activity' | 'quest';
-  ticket?: string;
-  q?: string;
-}
+import { ErrorWithMessage, formatError } from '../wallet/useWalletController';
+import { toast } from 'sonner';
 
 /**
  * Controller hook for managing search results
+ * Handles business logic and state management for search results
  */
-export const useSearchResultsController = (searchParams: SearchParams = {}) => {
+export const useSearchResultsController = (searchParams: SearchParams = {}): {
+  opportunities: any;
+  recommendedOpportunities: OpportunityCardProps[];
+  groupedOpportunities: { [key: string]: OpportunityCardProps[] };
+  loading: boolean;
+  error: ErrorWithMessage | null;
+  hasResults: boolean;
+} => {
   const { updateConfig } = useHeader();
   const { setIsLoading } = useLoading();
 
   /**
    * Build filter for GraphQL query based on search parameters
    */
-  const buildFilter = (): OpportunityFilterInput => {
+  const buildFilter = useMemo((): OpportunityFilterInput => {
     const filter: OpportunityFilterInput = {
       publishStatus: [PublishStatus.Public],
     };
@@ -57,13 +56,13 @@ export const useSearchResultsController = (searchParams: SearchParams = {}) => {
       if (searchParams.from) {
         const fromDate = new Date(searchParams.from);
         fromDate.setUTCHours(0, 0, 0, 0);
-        filter.slotStartsAt = fromDate.toISOString() as any;
+        (filter as any).slotStartsAt = fromDate.toISOString();
       }
 
       if (searchParams.to) {
         const toDate = new Date(searchParams.to);
         toDate.setUTCHours(23, 59, 59, 999);
-        filter.slotEndsAt = toDate.toISOString() as any;
+        (filter as any).slotEndsAt = toDate.toISOString();
       }
     }
 
@@ -83,13 +82,13 @@ export const useSearchResultsController = (searchParams: SearchParams = {}) => {
     }
 
     return filter;
-  };
+  }, [searchParams]);
 
   const {
     data,
     loading: queryLoading,
     error,
-  } = useSearchResultsQuery(buildFilter());
+  } = useSearchResultsQuery(buildFilter);
 
   useEffect(() => {
     updateConfig({
@@ -115,16 +114,37 @@ export const useSearchResultsController = (searchParams: SearchParams = {}) => {
     setIsLoading(queryLoading && !data);
   }, [queryLoading, data, setIsLoading]);
 
-  const opportunities = data?.opportunities || { edges: [], pageInfo: { hasNextPage: false, endCursor: null } };
+  const opportunities = useMemo(() => {
+    return data?.opportunities || { edges: [], pageInfo: { hasNextPage: false, endCursor: null } };
+  }, [data]);
 
-  const recommendedOpportunities = transformRecommendedOpportunities(opportunities);
-  const groupedOpportunities = groupOpportunitiesByDate(opportunities);
+  const recommendedOpportunities = useMemo(() => {
+    return transformRecommendedOpportunities(opportunities);
+  }, [opportunities]);
+  
+  const groupedOpportunities = useMemo(() => {
+    return groupOpportunitiesByDate(opportunities);
+  }, [opportunities]);
+
+  const hasResults = useMemo(() => {
+    return recommendedOpportunities.length > 0;
+  }, [recommendedOpportunities]);
+
+  const formattedError = useMemo(() => {
+    if (error) {
+      console.error('Error fetching search results:', error);
+      toast.error('検索結果の取得に失敗しました');
+      return formatError(error);
+    }
+    return null;
+  }, [error]);
 
   return {
     opportunities,
     recommendedOpportunities,
     groupedOpportunities,
     loading: queryLoading,
-    error,
+    error: formattedError,
+    hasResults,
   };
 };

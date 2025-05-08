@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { prefectureLabels } from '@/utils/userUtils';
+import { prefectureLabels } from '@/transformers/user';
 import { GqlCurrentPrefecture } from '@/types/graphql';
 
 interface UserProfileHeaderProps {

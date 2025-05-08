@@ -61,7 +61,7 @@ export interface Transaction {
 /**
  * Formats wallet data from GraphQL response
  */
-export const formatWalletData = (data: WalletData) => {
+export const formatWalletData = (data: WalletData): { currentPoint: number; ticketCount: number } => {
   const walletNode = data?.user?.wallets?.edges?.[0]?.node;
   const currentPoint = walletNode?.currentPointView?.currentPoint ?? 0;
   const ticketCount = walletNode?.tickets?.edges?.length ?? 0;
@@ -125,4 +125,11 @@ export const transformTransaction = (node: TransactionNode): Transaction => {
     fromUser: node.fromUser,
     toUser: node.toUser
   };
+};
+
+/**
+ * Formats a currency amount for display
+ */
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('ja-JP').format(amount);
 };
