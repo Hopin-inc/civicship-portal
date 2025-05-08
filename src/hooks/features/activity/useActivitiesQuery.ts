@@ -1,52 +1,93 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { gql } from '@apollo/client';
+import { useMemo } from 'react';
+import { GET_OPPORTUNITIES } from '@/graphql/queries/opportunities';
+import { GetOpportunitiesData, OpportunityConnection } from '@/types';
+import { GqlOpportunityCategory } from '@/types/graphql';
 
-export const GET_ACTIVITIES = gql`
-  query GetActivities($filter: ActivityFilter, $sort: ActivitySort, $first: Int) {
-    activities(filter: $filter, sort: $sort, first: $first) {
-      edges {
-        node {
-          id
-          description
-          remark
-          startsAt
-          endsAt
-          isPublic
-          event {
-            id
-            description
-          }
-          user {
-            id
-            firstName
-            middleName
-            lastName
-          }
-          organization {
-            id
-            name
-          }
-        }
-      }
-    }
-  }
-`;
+export interface UseActivitiesQueryResult {
+  upcomingActivities: OpportunityConnection;
+  featuredActivities: OpportunityConnection;
+  allActivities: OpportunityConnection;
+  loading: boolean;
+  error: any;
+  fetchMore: () => void;
+  hasNextPage: boolean;
+  endCursor: string;
+}
 
 /**
- * Hook for fetching activities data
+ * Hook for fetching activities data from GraphQL
+ * Responsible only for data fetching, not UI control
  */
-export const useActivitiesQuery = (options = {}) => {
-  const { data, loading, error } = useQuery(GET_ACTIVITIES, {
-    variables: {
-      filter: { isPublic: true },
-      sort: { startsAt: 'DESC' },
-      first: 10,
+export const useActivitiesQuery = (): UseActivitiesQueryResult => {
+  const queryVariables = useMemo(() => ({
+    upcomingFilter: {
+      category: GqlOpportunityCategory.Activity,
+      publishStatus: ["PUBLIC"]
     },
-    fetchPolicy: "no-cache",
-    ...options
+    featuredFilter: {
+      category: GqlOpportunityCategory.Activity,
+      publishStatus: ["PUBLIC"],
+      not: {
+        articleIds: null
+      }
+    },
+    allFilter: {
+      category: GqlOpportunityCategory.Activity,
+      publishStatus: ["PUBLIC"]
+    },
+    first: 20,
+    cursor: null
+  }), []);
+
+  const { data, loading, error, fetchMore: apolloFetchMore } = useQuery<GetOpportunitiesData>(GET_OPPORTUNITIES, {
+    variables: queryVariables,
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-first',
   });
-  
-  return { data, loading, error };
+
+  const emptyConnection: OpportunityConnection = {
+    edges: [],
+    pageInfo: { hasNextPage: false, endCursor: '' },
+    totalCount: 0
+  };
+
+  const upcomingActivities = data?.upcoming || emptyConnection;
+  const featuredActivities = data?.featured || emptyConnection;
+  const allActivities = data?.all || emptyConnection;
+  const hasNextPage = data?.all.pageInfo.hasNextPage || false;
+  const endCursor = data?.all.pageInfo.endCursor || '';
+
+  const fetchMore = () => {
+    apolloFetchMore({
+      variables: {
+        ...queryVariables,
+        cursor: endCursor,
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return prev;
+        return {
+          ...prev,
+          all: {
+            ...prev.all,
+            edges: [...prev.all.edges, ...fetchMoreResult.all.edges],
+            pageInfo: fetchMoreResult.all.pageInfo,
+          },
+        };
+      },
+    });
+  };
+
+  return {
+    upcomingActivities,
+    featuredActivities,
+    allActivities,
+    loading,
+    error,
+    fetchMore,
+    hasNextPage,
+    endCursor
+  };
 };

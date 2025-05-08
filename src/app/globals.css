@@ -363,6 +363,33 @@
     --success-hover: var(--green-600);
     --success-background: var(--green-50);
 
+    /* Brand Colors */
+    --brand-line: 145 100% 40%;      /* #06C755 */
+    --brand-facebook: 214 89% 52%;   /* #1877F2 */
+    --brand-twitter: 203 89% 53%;    /* #1DA1F2 */
+    --brand-instagram: 319 71% 49%;  /* #E1306C */
+
+    /* Category Colors */
+    --category-event: var(--blue-600);
+    --category-opportunity: var(--green-600);
+    --category-article: var(--purple-600);
+    --category-place: var(--orange-600);
+    --category-default: var(--zinc-600);
+
+    /* Status Colors */
+    --status-pending: var(--yellow-500);
+    --status-approved: var(--green-500);
+    --status-rejected: var(--red-500);
+    --status-completed: var(--blue-500);
+    --status-cancelled: var(--zinc-500);
+
+    /* Shadow Values */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-card: 0 2px 20px 0 rgba(0, 0, 0, 0.08);
+
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;

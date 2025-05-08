@@ -1,109 +1,64 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useQuery } from '@apollo/client';
-import { WalletTransactionsDocument } from '@/graphql/queries/wallet';
-import { format } from 'date-fns';
-import { ja } from 'date-fns/locale';
-import { TransactionReason } from '@/gql/graphql';
-import { useParams } from 'next/navigation';
+import React, { useEffect } from 'react';
+import { useTransactionHistory } from '@/hooks/features/wallet/useTransactionHistory';
+import { useAuth } from '@/contexts/AuthContext';
 import { useHeader } from '@/contexts/HeaderContext';
-import { useLoading } from '@/hooks/useLoading';
-
-const getTransactionDescription = (
-  reason: TransactionReason,
-  fromUserName?: string | null,
-  toUserName?: string | null
-): string => {
-  switch (reason) {
-    case TransactionReason.Donation:
-      return `${fromUserName}さんからのプレゼント`;
-    case TransactionReason.Grant:
-      return `${fromUserName}さんからのポイント付与`;
-    case TransactionReason.Onboarding:
-      return 'オンボーディングボーナス';
-    case TransactionReason.PointIssued:
-      return 'ポイント発行';
-    case TransactionReason.PointReward:
-      return 'ポイント報酬';
-    case TransactionReason.TicketPurchased:
-      return `${toUserName}さんのチケットを購入`;
-    case TransactionReason.TicketRefunded:
-      return 'チケットの払い戻し';
-    default:
-      return '取引';
-  }
-};
+import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { TransactionItem } from '@/components/features/wallet/TransactionItem';
 
 export default function HistoryPage() {
-  const params = useParams();
-  const userId = params.userId as string;
+  const { user } = useAuth();
   const { updateConfig } = useHeader();
-  const { setIsLoading } = useLoading();
+  const { transactions, isLoading, error } = useTransactionHistory(user?.id ?? '');
 
   useEffect(() => {
     updateConfig({
       title: 'ポイント履歴',
       showBackButton: true,
       showLogo: false,
+      // showBottomNav is not a valid property in HeaderConfig
+
     });
   }, [updateConfig]);
 
-  const { data, loading, error } = useQuery(WalletTransactionsDocument, {
-    variables: { 
-      filter: {
-        fromWalletId: userId,
-        toWalletId: userId,
-      }
-    },
-  });
-
-  useEffect(() => {
-    setIsLoading(loading);
-  }, [loading, setIsLoading]);
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingIndicator />
+      </div>
+    );
   }
 
-  const transactions = data?.transactions?.edges
-    ?.map(edge => edge?.node)
-    .filter(Boolean) ?? [];
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <ErrorState 
+          message="取引履歴の取得に失敗しました" 
+        />
+      </div>
+    );
+  }
+
+  if (!transactions || transactions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <p className="text-lg text-muted-foreground text-center">
+          取引履歴はありません
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col bg-white rounded-lg overflow-hidden">
-      {transactions.map((transaction) => {
-        if (!transaction) return null;
-
-        const isIncome = transaction.toPointChange != null && transaction.toPointChange > 0;
-        const amount = isIncome ? transaction.toPointChange : transaction.fromPointChange;
-        const description = getTransactionDescription(
-          transaction.reason,
-          transaction.fromWallet?.user?.name,
-          transaction.toWallet?.user?.name
-        );
-
-        return (
-          <div
-            key={transaction.id}
-            className="p-4 border-b border-gray-200 last:border-b-0"
-          >
-            <p className="text-sm text-gray-600 mb-1">
-              {format(new Date(transaction.createdAt), 'yyyy年M月d日', { locale: ja })}
-            </p>
-            <div className="flex justify-between items-center">
-              <p>{description}</p>
-              <p
-                className={`font-bold ${
-                  isIncome ? 'text-blue-500' : 'text-red-500'
-                }`}
-              >
-                {isIncome ? `+${amount}` : amount}
-              </p>
-            </div>
-          </div>
-        );
-      })}
+    <div className="flex flex-col bg-background rounded-lg overflow-hidden p-4">
+      <h1 className="text-xl font-bold mb-6">取引履歴</h1>
+      <div className="space-y-4">
+        {transactions.map((transaction) => (
+          <TransactionItem key={transaction.id} transaction={transaction} />
+        ))}
+      </div>
     </div>
   );
 }

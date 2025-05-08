@@ -1,7 +1,6 @@
-import { graphql } from "@/gql";
+import { gql } from '@apollo/client';
 
-
-export const GET_USER_PROFILE = graphql(`
+export const GET_USER_PROFILE = gql(`
   query GetUserProfile(
     $id: ID!
   ) {
@@ -21,7 +20,7 @@ export const GET_USER_PROFILE = graphql(`
   }
 `);
 
-export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = graphql(`
+export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = gql(`
   query GetUserWithDetailsAndPortfolios(
     $id: ID!,
     $first: Int,
@@ -101,7 +100,7 @@ export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = graphql(`
   }
 `);
 
-export const GET_USER_WALLET = graphql(`
+export const GET_USER_WALLET = gql(`
   query GetUserWallet($id: ID!) {
     user(id: $id) {
       id

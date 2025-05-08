@@ -1,6 +1,6 @@
-import { graphql } from '@/gql/gql';
+import { gql } from '@apollo/client';
 
-export const GetParticipationDocument = graphql(`
+export const GetParticipationDocument = gql(`
   query GetParticipation($id: ID!) {
     participation(id: $id) {
       id

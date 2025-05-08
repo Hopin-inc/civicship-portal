@@ -1,28 +1,59 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { useActivitiesQuery } from './useActivitiesQuery';
-import { transformActivity } from '../../../transformers/activity';
-import type { Activity } from '../../../transformers/activity';
+import { useInfiniteScroll } from '@/hooks/core/useInfiniteScroll';
+import { OpportunityConnection } from '@/types';
 
 /**
- * Controller hook for activities
- * Handles business logic and state management
+ * Controller hook for activities with additional UI state management
+ * Combines data fetching with UI control in a more flexible way
  */
-export const useActivitiesController = (options = {}) => {
-  const { data, loading, error } = useActivitiesQuery(options);
+export const useActivitiesController = () => {
+  const [activeTab, setActiveTab] = useState<'upcoming' | 'featured' | 'all'>('all');
   
-  const activities = useMemo(() => {
-    if (!data?.activities?.edges) return [];
-    
-    return data.activities.edges
-      .filter((edge: any) => edge?.node)
-      .map((edge: any) => transformActivity(edge.node));
-  }, [data]);
-  
-  return {
-    activities,
+  const {
+    upcomingActivities,
+    featuredActivities,
+    allActivities,
     loading,
     error,
+    fetchMore,
+    hasNextPage
+  } = useActivitiesQuery();
+
+  const loadMoreRef = useInfiniteScroll({
+    hasMore: hasNextPage,
+    isLoading: loading,
+    onLoadMore: fetchMore
+  });
+
+  const handleTabChange = useCallback((tab: 'upcoming' | 'featured' | 'all') => {
+    setActiveTab(tab);
+  }, []);
+
+  const activeActivities = (() => {
+    switch (activeTab) {
+      case 'upcoming':
+        return upcomingActivities;
+      case 'featured':
+        return featuredActivities;
+      case 'all':
+      default:
+        return allActivities;
+    }
+  })();
+
+  return {
+    upcomingActivities,
+    featuredActivities,
+    allActivities,
+    activeActivities,
+    loading,
+    error,
+    
+    activeTab,
+    handleTabChange,
+    loadMoreRef
   };
 };
