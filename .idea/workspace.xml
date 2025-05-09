@@ -4,13 +4,56 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9d8e9427-ae26-45d1-b49b-4edd4ae6b1fb" name="変更" comment="...">
+    <list default="true" id="9d8e9427-ae26-45d1-b49b-4edd4ae6b1fb" name="変更" comment="feat: create graphql">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/component-data-formatting.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/component-data-formatting.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/data-flow-evaluation.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/data-flow-evaluation.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/role-duplication-analysis.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/role-duplication-analysis.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/summary-report.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary-report.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphql.schema.json" beforeDir="false" afterPath="$PROJECT_DIR$/graphql.schema.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/activity/ActivitiesAllSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/ActivitiesAllSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/activity/ActivitiesFeaturedItemsSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/ActivitiesFeaturedItemsSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/activity/ActivitiesFeaturedSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/ActivitiesFeaturedSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/activity/ActivitiesUpcomingSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/ActivitiesUpcomingSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/activity/ActivityDetailsContent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/ActivityDetailsContent.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/activity/ActivityDetailsHeader.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/ActivityDetailsHeader.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/activity/FeaturedSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/FeaturedSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/activity/RecentActivitiesList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/RecentActivitiesList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/activity/RecentActivitiesTimeline.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/RecentActivitiesTimeline.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useActivitiesQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useActivitiesQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useActivityDetails.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useActivityDetails.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useActivityDetailsQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useActivityDetailsQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useAvailableDates.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useAvailableDates.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useAvailableDatesQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useAvailableDatesQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useOpportunity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useOpportunity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useOpportunityController.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useOpportunityController.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useOpportunityQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useOpportunityQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useSimilarOpportunities.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useSimilarOpportunities.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useSimilarOpportunitiesQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useSimilarOpportunitiesQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/article/useArticleQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/article/useArticleQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/article/useArticlesQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/article/useArticlesQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/participation/useParticipationQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/participation/useParticipationQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirmQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirmQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/search/useSearchResultsQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/search/useSearchResultsQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/ticket/useAvailableTicketsQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/ticket/useAvailableTicketsQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/ticket/useTicketClaimQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/ticket/useTicketClaimQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/ticket/useTicketsQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/ticket/useTicketsQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/user/useUserProfileQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/user/useUserProfileQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/wallet/useWalletQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/wallet/useWalletQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/transformers/activity.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/transformers/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/graphql.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/graphql.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+      <option value="repository" />
+    </option>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -78,11 +121,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/components/features/ticket/recieve" />
-      <recent name="$PROJECT_DIR$/src/components/features/ticket/detail" />
-      <recent name="$PROJECT_DIR$/src/components/features/user/portfolio" />
-      <recent name="$PROJECT_DIR$/src/components/features/user/profile" />
-      <recent name="$PROJECT_DIR$/src/components/features/participation" />
+      <recent name="$PROJECT_DIR$/src/graphql/account/user" />
+      <recent name="$PROJECT_DIR$/src/graphql/reward/ticket" />
+      <recent name="$PROJECT_DIR$/src/graphql/reward/utility" />
+      <recent name="$PROJECT_DIR$/src/graphql/transaction" />
+      <recent name="$PROJECT_DIR$/src/graphql/experience/opportunity" />
     </key>
   </component>
   <component name="RunManager" selected="JavaScript デバッグ.Next.js: クライアントサイドのデバッグ">
@@ -128,7 +171,15 @@
       <workItem from="1746495220931" duration="83000" />
       <workItem from="1746495307440" duration="330000" />
       <workItem from="1746605164737" duration="116000" />
-      <workItem from="1746774652361" duration="283000" />
+      <workItem from="1746774652361" duration="322000" />
+      <workItem from="1746775198261" duration="24000" />
+      <workItem from="1746775319713" duration="1565000" />
+      <workItem from="1746776906719" duration="76000" />
+      <workItem from="1746776992121" duration="859000" />
+      <workItem from="1746778266204" duration="304000" />
+      <workItem from="1746780162019" duration="1404000" />
+      <workItem from="1746782096946" duration="376000" />
+      <workItem from="1746783030492" duration="1105000" />
     </task>
     <task id="LOCAL-00001" summary="refactor: delete not usage file">
       <option name="closed" value="true" />
@@ -290,7 +341,39 @@
       <option name="project" value="LOCAL" />
       <updated>1746774909532</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="...">
+      <option name="closed" value="true" />
+      <created>1746774943533</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1746774943533</updated>
+    </task>
+    <task id="LOCAL-00022" summary="feat: create graphql">
+      <option name="closed" value="true" />
+      <created>1746783555967</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1746783555967</updated>
+    </task>
+    <task id="LOCAL-00023" summary="feat: create graphql">
+      <option name="closed" value="true" />
+      <created>1746783564282</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1746783564282</updated>
+    </task>
+    <task id="LOCAL-00024" summary="feat: create graphql">
+      <option name="closed" value="true" />
+      <created>1746783868330</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1746783868330</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -326,6 +409,7 @@
     <MESSAGE value="refactor: delete read me" />
     <MESSAGE value="refactor: rename component directory" />
     <MESSAGE value="..." />
-    <option name="LAST_COMMIT_MESSAGE" value="..." />
+    <MESSAGE value="feat: create graphql" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: create graphql" />
   </component>
 </project>
