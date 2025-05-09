@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
-import { MapComponentProps, MarkerData } from '@/types/map';
+import { MapComponentProps, MarkerData } from '@/types/place';
 import CustomMarker from '@/components/features/places/map/markers/CustomMarker';
 import { useMapState } from '@/hooks/features/place/useMapState';
 
