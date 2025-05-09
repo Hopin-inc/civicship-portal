@@ -7,6 +7,7 @@ export const GET_ARTICLES = gql`
         hasNextPage
         endCursor
       }
+      totalCount
       edges {
         node {
           id

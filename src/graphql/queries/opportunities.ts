@@ -6,6 +6,9 @@ const OPPORTUNITY_FRAGMENT = gql`
     title
     description
     images
+    feeRequired
+    pointsToEarn
+    isReservableWithTicket
     community {
       id
       name
@@ -23,18 +26,11 @@ const OPPORTUNITY_FRAGMENT = gql`
       }
     }
     slots {
-      edges {
-        node {
-          id
-          startsAt
-          endsAt
-          capacity
-        }
-      }
+      id
+      startsAt
+      endsAt
+      capacity
     }
-    feeRequired
-    pointsToEarn
-    isReservableWithTicket
   }
 `;
 
@@ -52,32 +48,34 @@ export const GET_OPPORTUNITIES = gql`
       sort: { createdAt: desc }
       first: 5
     ) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
       edges {
         node {
           ...OpportunityFields
         }
       }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
     }
-    
+
     featured: opportunities(
       filter: $featuredFilter
       first: 5
     ) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
       edges {
         node {
           ...OpportunityFields
         }
       }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
     }
-    
+
     similar: opportunities(
       filter: $similarFilter
       first: 3
@@ -92,23 +90,23 @@ export const GET_OPPORTUNITIES = gql`
         endCursor
       }
     }
-    
+
     all: opportunities(
       filter: $allFilter
       first: $first
       cursor: $cursor
     ) {
-      edges {
-        node {
-          ...OpportunityFields
-        }
-      }
       pageInfo {
         hasNextPage
         endCursor
       }
       totalCount
+      edges {
+        node {
+          ...OpportunityFields
+        }
+      }
     }
   }
   ${OPPORTUNITY_FRAGMENT}
-`; 
+`;

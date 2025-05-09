@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const GetParticipationDocument = gql(`
   query GetParticipation($id: ID!) {
@@ -52,53 +52,23 @@ export const GetParticipationDocument = gql(`
               }
             }
             slots {
-              edges {
-                node {
-                  id
-                  startsAt
-                  endsAt
-                  participations {
-                    edges {
-                      node {
-                        id
-                        status
-                        images
-                        user {
-                          id
-                          name
-                          image
-                        }
-                      }
-                    }
-                  }
-                }
-              }
+              id
+              startsAt
+              endsAt
             }
-          }
-        }
-        participations {
-          id
-          user {
-            id
-            name
-            image
           }
         }
       }
       source
       status
       statusHistories {
-        edges {
-          node {
-            id
-            status
-            reason
-            createdAt
-            createdByUser {
-              id
-              name
-            }
-          }
+        id
+        status
+        reason
+        createdAt
+        createdByUser {
+          id
+          name
         }
       }
       updatedAt

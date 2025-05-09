@@ -69,7 +69,7 @@ export const mapNodeToCardProps = (node: GraphQLOpportunity): OpportunityCardPro
  */
 export const transformRecommendedOpportunities = (opportunities: { edges: GqlOpportunityEdge[] }): OpportunityCardProps[] => {
   return opportunities.edges
-    .filter((edge: GqlOpportunityEdge) => edge?.node?.slots?.edges?.[0]?.node?.startsAt)
+    .filter((edge: GqlOpportunityEdge) => edge?.node?.slots?.[0]?.startsAt)
     .map((edge: GqlOpportunityEdge) => edge.node && mapNodeToCardProps(edge.node))
     .filter(Boolean) as OpportunityCardProps[];
 };
@@ -80,9 +80,9 @@ export const transformRecommendedOpportunities = (opportunities: { edges: GqlOpp
 export const groupOpportunitiesByDate = (opportunities: { edges: GqlOpportunityEdge[] }): { [key: string]: OpportunityCardProps[] } => {
   return opportunities.edges.reduce(
     (acc: { [key: string]: OpportunityCardProps[] }, edge: GqlOpportunityEdge) => {
-      if (!edge?.node?.slots?.edges?.[0]?.node?.startsAt) return acc;
+      if (!edge?.node?.slots?.[0]?.startsAt) return acc;
       
-      const dateKey = format(new Date(edge.node.slots.edges[0].node.startsAt), 'yyyy-MM-dd');
+      const dateKey = format(new Date(edge.node.slots[0].startsAt), 'yyyy-MM-dd');
       if (!acc[dateKey]) {
         acc[dateKey] = [];
       }

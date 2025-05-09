@@ -34,6 +34,11 @@ export const GET_ARTICLE = gql`
       },
       sort: { publishedAt: desc }
     ) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
       edges {
         node {
           id
