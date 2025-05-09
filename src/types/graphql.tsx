@@ -1302,6 +1302,15 @@ export type GqlPortfolio = {
   title: Scalars["String"]["output"];
 };
 
+export const GqlPortfolioCategory = {
+  Activity: "ACTIVITY",
+  ActivityReport: "ACTIVITY_REPORT",
+  Event: "EVENT",
+  Interview: "INTERVIEW",
+  Quest: "QUEST",
+} as const;
+
+export type GqlPortfolioCategory = (typeof GqlPortfolioCategory)[keyof typeof GqlPortfolioCategory];
 export const GqlPortfolioSource = {
   Article: "ARTICLE",
   Opportunity: "OPPORTUNITY",
@@ -2880,12 +2889,15 @@ export type GqlGetOpportunityQuery = {
           id: string;
           startsAt: Date;
           endsAt: Date;
+          remainingCapacity?: number | null;
           reservations?: Array<{
             __typename?: "Reservation";
+            status: GqlReservationStatus;
             participations?: Array<{
               __typename?: "Participation";
               id: string;
               status: GqlParticipationStatus;
+              images?: Array<string> | null;
               user?: {
                 __typename?: "User";
                 id: string;
@@ -2919,10 +2931,12 @@ export type GqlGetOpportunityQuery = {
       remainingCapacity?: number | null;
       reservations?: Array<{
         __typename?: "Reservation";
+        status: GqlReservationStatus;
         participations?: Array<{
           __typename?: "Participation";
           id: string;
           status: GqlParticipationStatus;
+          images?: Array<string> | null;
           user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
         }> | null;
       }> | null;
@@ -3025,7 +3039,6 @@ export type GqlSearchOpportunitiesQuery = {
   opportunities: {
     __typename?: "OpportunitiesConnection";
     totalCount: number;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
     edges: Array<{
       __typename?: "OpportunityEdge";
       node?: {
@@ -3066,13 +3079,15 @@ export type GqlSearchOpportunitiesQuery = {
           id: string;
           startsAt: Date;
           endsAt: Date;
-          capacity?: number | null;
+          remainingCapacity?: number | null;
           reservations?: Array<{
             __typename?: "Reservation";
+            status: GqlReservationStatus;
             participations?: Array<{
               __typename?: "Participation";
               id: string;
               status: GqlParticipationStatus;
+              images?: Array<string> | null;
               user?: {
                 __typename?: "User";
                 id: string;
@@ -3084,6 +3099,7 @@ export type GqlSearchOpportunitiesQuery = {
         }> | null;
       } | null;
     }>;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
   };
 };
 
@@ -4266,10 +4282,13 @@ export const GetOpportunityDocument = gql`
             id
             startsAt
             endsAt
+            remainingCapacity
             reservations {
+              status
               participations {
                 id
                 status
+                images
                 user {
                   id
                   name
@@ -4302,9 +4321,11 @@ export const GetOpportunityDocument = gql`
         endsAt
         remainingCapacity
         reservations {
+          status
           participations {
             id
             status
+            images
             user {
               id
               name
@@ -4523,11 +4544,6 @@ export type GetParticipationQueryResult = Apollo.QueryResult<
 export const SearchOpportunitiesDocument = gql`
   query SearchOpportunities($filter: OpportunityFilterInput, $first: Int) {
     opportunities(filter: $filter, first: $first) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      totalCount
       edges {
         node {
           id
@@ -4564,11 +4580,13 @@ export const SearchOpportunitiesDocument = gql`
             id
             startsAt
             endsAt
-            capacity
+            remainingCapacity
             reservations {
+              status
               participations {
                 id
                 status
+                images
                 user {
                   id
                   name
@@ -4579,6 +4597,11 @@ export const SearchOpportunitiesDocument = gql`
           }
         }
       }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
     }
   }
 `;
