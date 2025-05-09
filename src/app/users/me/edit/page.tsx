@@ -18,7 +18,7 @@ export default function ProfileEditPage() {
     bio,
     socialLinks,
     userLoading,
-    userError,
+    error,
     updating,
     setDisplayName,
     setLocation,
@@ -32,7 +32,7 @@ export default function ProfileEditPage() {
     return <LoadingIndicator />;
   }
 
-  if (userError) {
+  if (error) {
     return <ErrorState message="プロフィールの取得に失敗しました" />;
   }
 
