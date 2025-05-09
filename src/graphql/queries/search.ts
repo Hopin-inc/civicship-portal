@@ -42,24 +42,20 @@ export const SEARCH_OPPORTUNITIES = gql`
             }
           }
           slots {
-            edges {
-              node {
+            id
+            startsAt
+            endsAt
+            remainingCapacity
+            reservations {
+              status
+              participations {
                 id
-                startsAt
-                endsAt
-                capacity
-                participations {
-                  edges {
-                    node {
-                      id
-                      status
-                      user {
-                        id
-                        name
-                        image
-                      }
-                    }
-                  }
+                status
+                images
+                user {
+                  id
+                  name
+                  image
                 }
               }
             }

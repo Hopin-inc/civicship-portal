@@ -23,10 +23,6 @@ export const GET_USER_PROFILE = gql(`
 export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = gql(`
   query GetUserWithDetailsAndPortfolios(
     $id: ID!,
-    $first: Int,
-    $after: String,
-    $filter: PortfolioFilterInput,
-    $sort: PortfolioSortInput
   ) {
     user(id: $id) {
       id
@@ -40,60 +36,39 @@ export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = gql(`
       urlWebsite
       urlX
       urlYoutube
-      opportunitiesCreatedByMe(
-        first: 5,
-        filter: { slotHostingStatus: SCHEDULED }
-      ) {
-        edges {
-          node {
-            id
-            title
-            description
-            images
-            community {
-              id
-              name
-              image
-            }
-            place {
-              id
-              name
-            }
-            feeRequired
-            isReservableWithTicket
-          }
+      opportunitiesCreatedByMe{
+        id
+        title
+        description
+        images
+        community {
+          id
+          name
+          image
         }
+        place {
+          id
+          name
+        }
+        feeRequired
+        isReservableWithTicket
       }
-      portfolios(
-        first: $first,
-        cursor: $after,
-        filter: $filter,
-        sort: $sort
-      ) {
-        edges {
-          node {
-            id
-            title
-            category
-            date
-            thumbnailUrl
-            source
-            reservationStatus
-            place {
-              id
-              name
-            }
-            participants {
-              id
-              name
-              image
-            }
-          }
-          cursor
+      portfolios {
+        id
+        title
+        category
+        date
+        thumbnailUrl
+        source
+        reservationStatus
+        place {
+          id
+          name
         }
-        pageInfo {
-          hasNextPage
-          endCursor
+        participants {
+          id
+          name
+          image
         }
       }
     }
@@ -105,36 +80,24 @@ export const GET_USER_WALLET = gql(`
     user(id: $id) {
       id
       wallets {
-        edges {
-          node {
+        id
+        currentPointView {
+          currentPoint
+          walletId
+        }
+        tickets {
+          id
+          status
+          utility {
             id
-            currentPointView {
-              currentPoint
-              walletId
-            }
-            tickets(filter: { status: AVAILABLE }) {
-              edges {
-                node {
-                  id
-                  status
-                  utility {
-                    id
-                  }
-                  ticketStatusHistories {
-                    edges {
-                      node {
-                        id
-                        status
-                        createdByUser {
-                          id
-                          name
-                          image
-                        }
-                      }
-                    }
-                  }
-                }
-              }
+          }
+          ticketStatusHistories {
+            id
+            status
+            createdByUser {
+              id
+              name
+              image
             }
           }
         }
