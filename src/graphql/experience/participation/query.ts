@@ -1,5 +1,18 @@
 import { gql } from "@apollo/client";
 
+export const GET_PARTICIPATIONS = gql`
+  query GetParticipations {
+    participations {
+      edges {
+        node {
+          id
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
 export const GetParticipationDocument = gql(`
   query GetParticipation($id: ID!) {
     participation(id: $id) {
