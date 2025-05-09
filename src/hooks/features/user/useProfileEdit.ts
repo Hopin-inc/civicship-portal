@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProfileEditController } from './useProfileEditController';
 import { GqlCurrentPrefecture } from '@/types/graphql';
 import type { ErrorWithMessage } from '../wallet/useWalletController';
+import React from "react";
 
 /**
  * Public API hook for editing user profile
