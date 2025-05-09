@@ -1,6 +1,6 @@
 'use client';
 
-import type { GqlOpportunity as GraphQLOpportunity } from "@/types/graphql";
+import type { GqlOpportunity, GqlParticipation } from "@/types/graphql";
 import type { Opportunity, Article, Participation } from "@/types";
 import { OpportunityCardProps } from '@/components/features/opportunity/OpportunityCard';
 
@@ -34,7 +34,7 @@ export const transformArticle = (node: any): Partial<Article> => ({
  * Transforms an opportunity node from GraphQL to a UI-friendly format
  * Used for nested opportunities within a parent opportunity
  */
-export const transformOpportunityNode = (node: any, parent: GraphQLOpportunity): Opportunity => ({
+export const transformOpportunityNode = (node: any, parent: GqlOpportunity): Opportunity => ({
   id: node?.id || "",
   title: node?.title || "",
   description: node?.description || "",
@@ -75,27 +75,45 @@ export const transformOpportunityNode = (node: any, parent: GraphQLOpportunity):
   slots: node?.slots || { edges: [] },
 });
 
-/**
- * Transforms a participation node from GraphQL to a UI-friendly format
- */
-export const transformParticipationNode = (pEdge: any): Participation => ({
-  node: {
-    id: pEdge?.node?.id || "",
-    status: pEdge?.node?.status || "",
-    reason: "",
-    images: pEdge?.node?.images || [],
+function transformParticipationNode(p: GqlParticipation): {
+  id: string;
+  status: string;
+  user: {
+    id: string;
+    name: string;
+    image: string | null;
+  };
+} {
+  return {
+    id: p.id,
+    status: p.status,
     user: {
-      id: pEdge?.node?.user?.id || "",
-      name: pEdge?.node?.user?.name || "",
-      image: pEdge?.node?.user?.image || null,
+      id: p.user?.id || "",
+      name: p.user?.name || "",
+      image: p.user?.image || "",
     },
-  },
-});
+  };
+}
+
+function presenterOpportunitySlot(slots: GqlOpportunity["slots"]) {
+  return {
+    slots: slots?.map((slot) => ({
+      id: slot?.id ?? "",
+      startsAt: slot?.startsAt ?? "",
+      endsAt: slot?.endsAt ?? "",
+      participations:
+        slot?.reservations?.flatMap((reservation) =>
+          reservation?.participations?.map(transformParticipationNode) ?? []
+        ) ?? [],
+    })) ?? [],
+  };
+}
+
 
 /**
  * Transforms a complete opportunity from GraphQL to a UI-friendly format
  */
-export const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | null => {
+export const transformOpportunity = (data: GqlOpportunity | null): Opportunity | null => {
   if (!data) return null;
 
   try {
@@ -107,8 +125,8 @@ export const transformOpportunity = (data: GraphQLOpportunity | null): Opportuni
       status: "open",
       communityId: data.community?.id || "",
       hostId: data.createdByUser?.id || "",
-      startsAt: data.slots?.edges?.[0]?.node?.startsAt || "",
-      endsAt: data.slots?.edges?.[0]?.node?.endsAt || "",
+      startsAt: data.slots?.[0].startsAt || "",
+      endsAt: data.slots?.[0]?.endsAt || "",
       createdAt: data.createdAt || new Date().toISOString(),
       updatedAt: data.updatedAt || new Date().toISOString(),
       host: {
@@ -134,10 +152,10 @@ export const transformOpportunity = (data: GraphQLOpportunity | null): Opportuni
       recommendedFor: [],
       capacity: data.capacity || 0,
       pointsForComplete: data.pointsToEarn || undefined,
-      participants: data.slots?.edges?.[0]?.node?.participations?.edges?.map(edge => ({
-        id: edge?.node?.user?.id || "",
-        name: edge?.node?.user?.name || "",
-        image: edge?.node?.user?.image || null,
+      participants: data.slots?.[0]?.reservations?.[0].participations?.map(participation => ({
+        id: participation.user?.id || "",
+        name: participation.user?.name || "",
+        image: participation.user?.image || null,
       })) || [],
       body: data.body || undefined,
       createdByUser: data.createdByUser ? {
@@ -145,14 +163,13 @@ export const transformOpportunity = (data: GraphQLOpportunity | null): Opportuni
         name: data.createdByUser.name || "",
         image: data.createdByUser.image || null,
         articlesAboutMe: data.createdByUser.articlesAboutMe ? {
-          edges: data.createdByUser.articlesAboutMe.edges?.map(edge => ({
-            node: transformArticle(edge?.node),
+          edges: data.createdByUser.articlesAboutMe.map(article => ({
+            node: transformArticle(article),
           })) || [],
         } : undefined,
         opportunitiesCreatedByMe: data.createdByUser.opportunitiesCreatedByMe ? {
-          edges: data.createdByUser.opportunitiesCreatedByMe.edges
-            ?.map(edge => edge?.node)
-            .filter((node): node is NonNullable<typeof node> => node != null && node.id !== data.id)
+          edges: data.createdByUser.opportunitiesCreatedByMe
+            ?.map(opportunity => opportunity)
             .map(node => transformOpportunityNode(node, data)) || [],
         } : undefined,
       } : undefined,
@@ -165,21 +182,7 @@ export const transformOpportunity = (data: GraphQLOpportunity | null): Opportuni
       requireApproval: data.requireApproval || undefined,
       pointsRequired: data.pointsToEarn || undefined,
       feeRequired: data.feeRequired || undefined,
-      slots: data.slots ? {
-        edges: data.slots.edges?.map(edge => ({
-          node: {
-            id: edge?.node?.id || "",
-            startsAt: edge?.node?.startsAt || "",
-            endsAt: edge?.node?.endsAt || "",
-            participations: edge?.node?.participations ? {
-              edges: edge.node.participations.edges?.map(transformParticipationNode) || [],
-            } : undefined,
-          },
-        })) || [],
-      } : { edges: [] },
-      requiredUtilities: data.requiredUtilities?.map(utility => ({
-        id: utility?.id || "",
-      })) || undefined,
+      slots: presenterOpportunitySlot(data.slots)
     };
   } catch (e) {
     console.error("transformOpportunity failed", e);
