@@ -1,15 +1,10 @@
 'use client';
 
-import { Opportunity } from "@/types";
 import { useAvailableDatesQuery } from "@/hooks/features/activity/useAvailableDatesQuery";
+import { GqlOpportunity } from "@/types/graphql";
 
-/**
- * Hook for available dates
- * This is a wrapper around useAvailableDatesQuery
- * for backward compatibility
- */
 export const useAvailableDates = (
-  opportunity: Opportunity | null
+  opportunity: GqlOpportunity | null
 ): Array<{
   startsAt: string;
   endsAt: string;

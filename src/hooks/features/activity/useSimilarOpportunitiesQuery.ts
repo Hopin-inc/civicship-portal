@@ -2,23 +2,19 @@
 
 import { useQuery } from "@apollo/client";
 import { GET_OPPORTUNITIES } from "@/graphql/queries/opportunities";
-import { Opportunity } from "@/types";
 import { COMMUNITY_ID } from "@/utils";
+import { GqlOpportunity } from "@/types/graphql";
 
 interface UseSimilarOpportunitiesQueryProps {
   opportunityId: string;
 }
 
 export interface UseSimilarOpportunitiesQueryResult {
-  similarOpportunities: Opportunity[];
+  similarOpportunities: GqlOpportunity[];
   loading: boolean;
   error: any;
 }
 
-/**
- * Hook for fetching similar opportunities data from GraphQL
- * Responsible only for data fetching, not UI control
- */
 export const useSimilarOpportunitiesQuery = ({
   opportunityId,
 }: UseSimilarOpportunitiesQueryProps): UseSimilarOpportunitiesQueryResult => {
@@ -34,7 +30,7 @@ export const useSimilarOpportunitiesQuery = ({
   return {
     similarOpportunities: data?.similar?.edges?.map(
       (edge: any) => edge.node
-    ) as Opportunity[],
+    ),
     loading,
     error,
   };

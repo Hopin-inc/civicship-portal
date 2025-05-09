@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { GET_ARTICLE } from '@/graphql/queries/article';
+import { GET_ARTICLE } from '@/graphql/content/article/query';
 import { COMMUNITY_ID } from '@/utils';
 
 /**

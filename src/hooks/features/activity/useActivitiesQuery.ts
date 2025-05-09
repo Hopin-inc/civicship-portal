@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client';
 import { useMemo } from 'react';
 import { GET_OPPORTUNITIES } from '@/graphql/queries/opportunities';
 import { GetOpportunitiesData, OpportunityConnection } from '@/types';
-import { GqlOpportunityCategory } from '@/types/graphql';
+import { GqlOpportunityCategory, GqlPublishStatus } from "@/types/graphql";
 
 export interface UseActivitiesQueryResult {
   upcomingActivities: OpportunityConnection;
@@ -17,26 +17,22 @@ export interface UseActivitiesQueryResult {
   endCursor: string;
 }
 
-/**
- * Hook for fetching activities data from GraphQL
- * Responsible only for data fetching, not UI control
- */
 export const useActivitiesQuery = (): UseActivitiesQueryResult => {
   const queryVariables = useMemo(() => ({
     upcomingFilter: {
       category: GqlOpportunityCategory.Activity,
-      publishStatus: ["PUBLIC"]
+      publishStatus: GqlPublishStatus.Public
     },
     featuredFilter: {
       category: GqlOpportunityCategory.Activity,
-      publishStatus: ["PUBLIC"],
+      publishStatus: GqlPublishStatus.Public,
       not: {
         articleIds: null
       }
     },
     allFilter: {
       category: GqlOpportunityCategory.Activity,
-      publishStatus: ["PUBLIC"]
+      publishStatus: GqlPublishStatus.Public,
     },
     first: 20,
     cursor: null

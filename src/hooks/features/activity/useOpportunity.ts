@@ -1,10 +1,10 @@
 'use client';
 
 import { useOpportunityController } from './useOpportunityController';
-import type { Opportunity } from '@/types';
+import { GqlOpportunity } from "@/types/graphql";
 
 interface UseOpportunityResult {
-  opportunity: Opportunity | null;
+  opportunity: GqlOpportunity | null;
   loading: boolean;
   error: Error | null;
 }

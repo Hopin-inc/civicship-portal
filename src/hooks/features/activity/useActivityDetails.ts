@@ -2,17 +2,17 @@
 
 import { useActivityDetailsQuery } from '@/hooks/features/activity/useActivityDetailsQuery';
 import { useAuth } from '@/contexts/AuthContext';
-import { Opportunity } from "@/types";
 import { useEffect } from 'react';
 import { useLoading } from '@/hooks/core/useLoading';
+import { GqlOpportunity } from "@/types/graphql";
 
 interface UseActivityDetailsProps {
   id: string;
 }
 
 interface UseActivityDetailsResult {
-  opportunity: Opportunity | null;
-  similarOpportunities: Opportunity[];
+  opportunity: GqlOpportunity | null;
+  similarOpportunities: GqlOpportunity[];
   availableTickets: number;
   availableDates: Array<{
     startsAt: string;

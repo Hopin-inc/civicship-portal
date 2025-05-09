@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useOpportunityQuery } from './useOpportunityQuery';
 import { transformOpportunity } from '@/presenters/opportunity';
-import type { Opportunity } from '@/types';
+import { GqlOpportunity } from "@/types/graphql";
 
 interface UseOpportunityControllerResult {
-  opportunity: Opportunity | null;
+  opportunity: GqlOpportunity | null;
   loading: boolean;
   error: Error | null;
 }
@@ -17,7 +17,7 @@ interface UseOpportunityControllerResult {
  * @param id Opportunity ID to fetch
  */
 export const useOpportunityController = (id: string): UseOpportunityControllerResult => {
-  const [opportunity, setOpportunity] = useState<Opportunity | null>(null);
+  const [opportunity, setOpportunity] = useState<GqlOpportunity | null>(null);
   
   const { data, loading, error } = useOpportunityQuery(id);
   

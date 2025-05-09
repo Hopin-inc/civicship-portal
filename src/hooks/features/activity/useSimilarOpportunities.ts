@@ -1,14 +1,14 @@
 'use client';
 
 import { useSimilarOpportunitiesQuery } from '@/hooks/features/activity/useSimilarOpportunitiesQuery';
-import { Opportunity } from '@/types';
+import { GqlOpportunity } from "@/types/graphql";
 
 interface UseSimilarOpportunitiesProps {
   opportunityId: string;
 }
 
 interface UseSimilarOpportunitiesResult {
-  similarOpportunities: Opportunity[];
+  similarOpportunities: GqlOpportunity[];
   loading: boolean;
   error: any;
 }

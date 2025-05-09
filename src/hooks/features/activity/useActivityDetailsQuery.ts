@@ -4,7 +4,7 @@ import { useOpportunity } from '@/hooks/features/activity/useOpportunity';
 import { useSimilarOpportunitiesQuery } from '@/hooks/features/activity/useSimilarOpportunitiesQuery';
 import { useAvailableTickets } from "@/hooks/features/ticket/useAvailableTickets";
 import { useAvailableDatesQuery } from "@/hooks/features/activity/useAvailableDatesQuery";
-import { Opportunity } from "@/types";
+import { GqlOpportunity } from "@/types/graphql";
 
 interface UseActivityDetailsQueryProps {
   id: string;
@@ -12,8 +12,8 @@ interface UseActivityDetailsQueryProps {
 }
 
 export interface UseActivityDetailsQueryResult {
-  opportunity: Opportunity | null;
-  similarOpportunities: Opportunity[];
+  opportunity: GqlOpportunity | null;
+  similarOpportunities: GqlOpportunity[];
   availableTickets: number;
   availableDates: Array<{
     startsAt: string;

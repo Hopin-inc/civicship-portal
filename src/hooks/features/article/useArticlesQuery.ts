@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from "@apollo/client";
-import { GET_ARTICLES } from "@/graphql/queries/articles";
+import { GET_ARTICLES } from "@/graphql/content/article/articles";
 import { GqlSortDirection as SortDirection } from "@/types/graphql";
 
 import { GetArticlesData } from "@/presenters/article";

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from "react";
-import { Opportunity } from "@/types";
+import { GqlOpportunity } from "@/types/graphql";
 
 export interface UseAvailableDatesQueryResult {
   availableDates: Array<{
@@ -12,21 +12,17 @@ export interface UseAvailableDatesQueryResult {
   }>;
 }
 
-/**
- * Hook for fetching available dates from an opportunity
- * Responsible only for data transformation, not UI control
- */
 export const useAvailableDatesQuery = (
-  opportunity: Opportunity | null
+  opportunity: GqlOpportunity | null
 ): UseAvailableDatesQueryResult => {
   const availableDates = useMemo(() => {
-    if (!opportunity?.slots?.edges) return [];
+    if (!opportunity?.slots) return [];
 
-    return opportunity.slots.edges
-      .map(edge => ({
-        startsAt: new Date(edge.node.startsAt).toISOString(),
-        endsAt: new Date(edge.node.endsAt).toISOString(),
-        participants: edge.node.participations?.edges?.length || 0,
+    return opportunity.slots
+      .map(slot => ({
+        startsAt: new Date(slot.startsAt).toISOString(),
+        endsAt: new Date(slot.endsAt).toISOString(),
+        participants:  slot.reservations?.flatMap(r => r.participations ?? []).length ?? 0,
         price: opportunity.feeRequired || 0,
       }))
       .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());

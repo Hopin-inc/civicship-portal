@@ -1,13 +1,9 @@
 'use client';
 
 import { useQuery } from "@apollo/client";
-import { GET_OPPORTUNITY } from "../../../graphql/queries/opportunity";
-import { COMMUNITY_ID } from "../../../utils";
+import { GET_OPPORTUNITY } from "@/graphql/experience/opportunity/query";
+import { COMMUNITY_ID } from "@/utils";
 
-/**
- * Hook for fetching opportunity data from GraphQL
- * @param id Opportunity ID to fetch
- */
 export const useOpportunityQuery = (id: string) => {
   const isValidId = Boolean(id && id.trim());
 

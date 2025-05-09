@@ -1,8 +1,8 @@
 'use client';
 
 import { useMutation, useQuery } from '@apollo/client';
-import { CREATE_RESERVATION_MUTATION } from '@/graphql/mutations/reservation';
-import { GET_USER_WALLET } from '@/graphql/queries/user';
+import { CREATE_RESERVATION_MUTATION } from '@/graphql/experience/reservation/mutation';
+import { GET_USER_WALLET } from '@/graphql/account/user/query';
 
 /**
  * Hook for fetching wallet data for reservation confirmation
