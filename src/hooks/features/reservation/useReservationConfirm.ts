@@ -153,10 +153,11 @@ function useSlotAndTicketInfo(
     creatingReservation,
   } = useReservationConfirmQuery(userId);
 
-  const selectedSlot = useMemo(
-    () => findMatchingSlot(opportunity?.slots, slotStartsAt),
-    [opportunity?.slots, slotStartsAt]
-  );
+  const selectedSlot = useMemo(() => {
+    console.log("Finding slot with startsAt:", slotStartsAt);
+    console.log("Available slots:", opportunity?.slots);
+    return findMatchingSlot(opportunity?.slots, slotStartsAt);
+  }, [opportunity?.slots, slotStartsAt]);
 
   const availableTickets = useMemo(
     () => calculateAvailableTickets(walletData, opportunity?.requiredTicket),
