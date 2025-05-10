@@ -74,7 +74,13 @@ export const useReservationDateSelection = ({
   }, [groupedSlots, selectedDate]);
 
   const handleReservation = (slot: ActivitySlot) => {
-    if (!selectedDate) return;
+    if (!selectedDate) {
+      const date = new Date(slot.startsAt);
+      const dateLabel = date.toLocaleDateString("ja-JP", {
+        year: "numeric", month: "long", day: "numeric", weekday: "long",
+      });
+      setSelectedDate(dateLabel);
+    }
     const params = buildReservationParams(opportunityId, communityId, slot, selectedGuests);
     router.push(`/reservation/confirm?${params.toString()}`);
   };
