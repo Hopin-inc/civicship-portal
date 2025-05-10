@@ -47,9 +47,12 @@ export const findMatchingSlot = (slots: any, slotStartsAt: string) => {
       return false;
     }
     
-    const isMatch = slotDateTime.getTime() === paramDateTime.getTime();
+    const slotTimeSec = Math.floor(slotDateTime.getTime() / 1000);
+    const paramTimeSec = Math.floor(paramDateTime.getTime() / 1000);
+    const isMatch = slotTimeSec === paramTimeSec;
+    
     if (isMatch) {
-      console.log("Found matching slot!");
+      console.log("Found matching slot! (second-level comparison)");
     }
     
     return isMatch;
