@@ -7,7 +7,15 @@ export const useReservationConfirmQuery = (userId: string | undefined) => {
     variables: userId ? { id: userId } : undefined,
     skip: !userId,
   });
-  const [createReservation, { loading: creatingReservation }] = useCreateReservationMutation()
+  const [createReservation, { loading: creatingReservation }] = useCreateReservationMutation({
+    variables: {
+      input: {
+        opportunitySlotId: "",
+        paymentMethod: "FREE" as any,
+        totalParticipantCount: 1
+      }
+    }
+  })
   
   return {
     walletData,
