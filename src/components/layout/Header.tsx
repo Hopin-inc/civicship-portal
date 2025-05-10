@@ -32,10 +32,10 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       )}
     >
       {shouldShowBackButton && (
-        <Button 
-          onClick={navigateBack} 
-          variant="icon-only" 
-          size="sm" 
+        <Button
+          onClick={navigateBack}
+          variant="icon-only"
+          size="sm"
           aria-label="戻る"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -52,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             location={config.searchParams?.location}
             from={config.searchParams?.from}
             to={config.searchParams?.to}
-            guests={config.searchParams?.guests}
+            guests={config.searchParams?.guests?.toString()}
           />
         </div>
       )}
