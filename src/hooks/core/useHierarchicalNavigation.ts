@@ -3,6 +3,7 @@
 import React, { useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useHeader } from '@/contexts/HeaderContext';
+import { matchPaths } from '@/utils/path';
 
 interface PathHierarchy {
   [path: string]: string;
@@ -45,8 +46,15 @@ export const useHierarchicalNavigation = () => {
 
   const getPathPattern = useCallback((path: string): string => {
     const pathWithoutQuery = path.split('?')[0];
-    const segments = pathWithoutQuery.split('/');
     
+    const patterns = Object.keys(pathHierarchy);
+    for (const pattern of patterns) {
+      if (!pattern.includes('?') && matchPaths(pathWithoutQuery, pattern)) {
+        return pattern;
+      }
+    }
+    
+    const segments = pathWithoutQuery.split('/');
     for (let i = 0; i < segments.length; i++) {
       if (/^[a-z0-9]{10,}$/i.test(segments[i])) {
         segments[i] = '[id]';
@@ -105,17 +113,27 @@ export const useHierarchicalNavigation = () => {
     
     if (searchParams.toString()) {
       const basePathWithQuery = `${pathPattern}?${searchParams.toString()}`;
-      if (pathHierarchy[basePathWithQuery]) {
-        return pathHierarchy[basePathWithQuery];
+      
+      const queryPatterns = Object.keys(pathHierarchy).filter(p => p.includes('?'));
+      for (const pattern of queryPatterns) {
+        if (matchPaths(basePathWithQuery, pattern)) {
+          return pathHierarchy[pattern];
+        }
       }
       
-      if (searchParams.has('q') && pathHierarchy[`${pathPattern}?q=`]) {
-        return pathHierarchy[`${pathPattern}?q=`];
+      if (searchParams.has('q')) {
+        const qPattern = `${pathPattern}?q=`;
+        if (pathHierarchy[qPattern]) {
+          return pathHierarchy[qPattern];
+        }
       }
     }
     
-    if (pathHierarchy[pathPattern]) {
-      return pathHierarchy[pathPattern];
+    const patterns = Object.keys(pathHierarchy).filter(p => !p.includes('?'));
+    for (const pattern of patterns) {
+      if (matchPaths(pathPattern, pattern)) {
+        return pathHierarchy[pattern];
+      }
     }
     
     const segments = pathname.split('/').filter(Boolean);
@@ -125,7 +143,7 @@ export const useHierarchicalNavigation = () => {
     }
     
     return '/';
-  }, [pathname, config.backTo, getPathPattern, searchParams, lastVisitedUrls, getPageType, isSearchResultPath]);
+  }, [pathname, config.backTo, getPathPattern, searchParams, lastVisitedUrls, getPageType, isSearchResultPath, matchPaths]);
 
   const isChildOf = useCallback((parentPath: string): boolean => {
     return pathname.startsWith(parentPath) && pathname !== parentPath;
