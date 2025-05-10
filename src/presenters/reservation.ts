@@ -4,32 +4,23 @@ import { parseDateTime } from "@/utils/date";
 
 export const findMatchingSlot = (slots: any, slotStartsAt: string, slotId?: string) => {
   console.log("findMatchingSlot called with:", { slotStartsAt, slotId });
-  console.log("Slots structure:", slots);
   
   if (!slots) {
     console.log("Missing slots");
     return null;
   }
   
-  if (!slotStartsAt && !slotId) {
-    console.log("Missing both slotStartsAt and slotId");
+  const hasEdges = slots.edges && Array.isArray(slots.edges);
+  const isArray = Array.isArray(slots);
+  const slotsArray = hasEdges ? slots.edges : isArray ? slots : [];
+  
+  if (slotsArray.length === 0) {
+    console.log("Empty slots array");
     return null;
   }
   
-  const hasEdges = slots.edges && Array.isArray(slots.edges);
-  const isArray = Array.isArray(slots);
-  
-  console.log("Slots structure type:", { hasEdges, isArray });
-  
-  const slotsArray = hasEdges ? slots.edges : isArray ? slots : [];
-  
-  console.log("Slots array length:", slotsArray.length);
-  if (slotsArray.length > 0) {
-    console.log("First slot sample:", JSON.stringify(slotsArray[0]));
-  }
-  
   if (slotId) {
-    console.log("Attempting to match by ID:", slotId);
+    console.log("Matching by ID:", slotId);
     const foundById = slotsArray.find((item: any) => {
       const hasNode = item && item.node;
       const slot = hasNode ? item.node : item;
@@ -37,73 +28,19 @@ export const findMatchingSlot = (slots: any, slotStartsAt: string, slotId?: stri
     });
     
     if (foundById) {
-      console.log("Found matching slot by ID!");
-      return foundById;
+      console.log("Found matching slot by ID:", foundById);
+      if (foundById.node) {
+        return foundById;
+      } else {
+        return { node: foundById };
+      }
     }
   }
   
-  const foundItem = slotsArray.find((item: any) => {
-    const hasNode = item && item.node;
-    const slot = hasNode ? item.node : item;
-    
-    if (!slot?.startsAt) {
-      console.log("Slot missing startsAt:", slot);
-      return false;
-    }
-    
-    const slotDateTime = parseDateTime(String(slot.startsAt));
-    const paramDateTime = parseDateTime(decodeURIComponent(slotStartsAt));
-    
-    console.log("Comparing dates:", {
-      slotStartsAt: slot.startsAt,
-      paramStartsAt: slotStartsAt,
-      slotDateTime,
-      paramDateTime
-    });
-    
-    if (!slotDateTime || !paramDateTime) {
-      console.log("Invalid date format");
-      return false;
-    }
-    
-    const slotHour = slotDateTime.getHours();
-    const paramHour = paramDateTime.getHours();
-    const slotDay = slotDateTime.getDate();
-    const paramDay = paramDateTime.getDate();
-    const slotMonth = slotDateTime.getMonth();
-    const paramMonth = paramDateTime.getMonth();
-    
-    const isMatch = slotHour === paramHour && 
-                    slotDay === paramDay && 
-                    slotMonth === paramMonth;
-    
-    if (isMatch) {
-      console.log("Found matching slot by timestamp!");
-    }
-    
-    return isMatch;
-  });
-  
-  console.log("findMatchingSlot result:", foundItem);
-  
-  if (foundItem) {
-    if (foundItem.node) {
-      console.log("Returning existing node structure");
-      return foundItem;
-    } else {
-      console.log("Wrapping slot in node structure");
-      return { node: foundItem };
-    }
-  }
-  
-  if (slotsArray.length > 0) {
-    console.log("No match found, creating node structure from first slot");
-    const firstItem = slotsArray[0];
-    const slot = firstItem.node || firstItem;
-    return { node: slot };
-  }
-  
-  return null;
+  console.log("ID not found, using first slot as fallback");
+  const firstItem = slotsArray[0];
+  const slot = firstItem.node || firstItem;
+  return { node: slot };
 };
 
 export const calculateAvailableTickets = (walletData: any, requiredUtilities: any[] | undefined) => {
