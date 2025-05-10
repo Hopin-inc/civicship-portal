@@ -2,12 +2,17 @@
 
 import { parseDateTime } from "@/utils/date";
 
-export const findMatchingSlot = (slots: any, slotStartsAt: string) => {
-  console.log("findMatchingSlot called with slotStartsAt:", slotStartsAt);
+export const findMatchingSlot = (slots: any, slotStartsAt: string, slotId?: string) => {
+  console.log("findMatchingSlot called with:", { slotStartsAt, slotId });
   console.log("Slots structure:", slots);
   
-  if (!slots || !slotStartsAt) {
-    console.log("Missing slots or slotStartsAt");
+  if (!slots) {
+    console.log("Missing slots");
+    return null;
+  }
+  
+  if (!slotStartsAt && !slotId) {
+    console.log("Missing both slotStartsAt and slotId");
     return null;
   }
   
@@ -21,6 +26,20 @@ export const findMatchingSlot = (slots: any, slotStartsAt: string) => {
   console.log("Slots array length:", slotsArray.length);
   if (slotsArray.length > 0) {
     console.log("First slot sample:", JSON.stringify(slotsArray[0]));
+  }
+  
+  if (slotId) {
+    console.log("Attempting to match by ID:", slotId);
+    const foundById = slotsArray.find((item: any) => {
+      const hasNode = item && item.node;
+      const slot = hasNode ? item.node : item;
+      return slot?.id === slotId;
+    });
+    
+    if (foundById) {
+      console.log("Found matching slot by ID!");
+      return foundById;
+    }
   }
   
   const foundItem = slotsArray.find((item: any) => {
@@ -59,7 +78,7 @@ export const findMatchingSlot = (slots: any, slotStartsAt: string) => {
                     slotMonth === paramMonth;
     
     if (isMatch) {
-      console.log("Found matching slot! (second-level comparison)");
+      console.log("Found matching slot by timestamp!");
     }
     
     return isMatch;
