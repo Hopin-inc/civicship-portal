@@ -3,12 +3,15 @@
 import { parseDateTime } from "@/utils/date";
 
 export const findMatchingSlot = (slots: any, slotStartsAt: string) => {
-  if (!slots?.edges || !slotStartsAt) return null;
+  if (!slots || !slotStartsAt) return null;
   
-  return slots.edges.find((edge: any) => {
-    if (!edge?.node?.startsAt) return false;
+  const slotsArray = slots.edges ? slots.edges : Array.isArray(slots) ? slots : [];
+  
+  return slotsArray.find((item: any) => {
+    const slot = item.node || item;
+    if (!slot?.startsAt) return false;
     
-    const slotDateTime = parseDateTime(String(edge.node.startsAt));
+    const slotDateTime = parseDateTime(String(slot.startsAt));
     const paramDateTime = parseDateTime(decodeURIComponent(slotStartsAt));
     
     if (!slotDateTime || !paramDateTime) return false;
