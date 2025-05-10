@@ -5,6 +5,7 @@ import ActivityDetailsHeader from "@/components/features/activity/ActivityDetail
 import ActivityDetailsContent from "@/components/features/activity/ActivityDetailsContent";
 import ActivityDetailsFooter from "@/components/features/activity/ActivityDetailsFooter";
 import { ErrorState } from "@/components/shared/ErrorState";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 interface ActivityPageProps {
   params: {
@@ -24,11 +25,17 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
     availableTickets,
     availableDates,
     error,
+    initialLoading,
   } = useActivityDetails(id);
+
+  if (initialLoading) {
+    return <LoadingIndicator fullScreen />;
+  }
 
   if (error && !opportunity) {
     return <ErrorState message={`Error: ${error.message}`} />;
   }
+
   if (!opportunity) {
     return <ErrorState message="No opportunity found" />;
   }

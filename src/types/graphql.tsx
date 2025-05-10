@@ -2516,6 +2516,7 @@ export type GqlUserFieldsFragment = {
   id: string;
   name: string;
   image?: string | null;
+  bio?: string | null;
   currentPrefecture: GqlCurrentPrefecture;
 };
 
@@ -2718,21 +2719,33 @@ export type GqlGetArticlesQuery = {
   articles: {
     __typename?: "ArticlesConnection";
     totalCount: number;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
     edges?: Array<{
       __typename?: "ArticleEdge";
+      cursor: string;
       node?: {
         __typename?: "Article";
         id: string;
         title: string;
+        body?: string | null;
         introduction: string;
         thumbnail?: any | null;
+        category: GqlArticleCategory;
+        publishStatus: GqlPublishStatus;
         publishedAt?: Date | null;
         authors?: Array<{
           __typename?: "User";
           id: string;
           name: string;
           image?: string | null;
+          bio?: string | null;
+          currentPrefecture: GqlCurrentPrefecture;
         }> | null;
       } | null;
     } | null> | null;
@@ -2750,19 +2763,19 @@ export type GqlGetArticleQuery = {
     __typename?: "Article";
     id: string;
     title: string;
-    introduction: string;
     body?: string | null;
-    category: GqlArticleCategory;
+    introduction: string;
     thumbnail?: any | null;
+    category: GqlArticleCategory;
+    publishStatus: GqlPublishStatus;
     publishedAt?: Date | null;
-    createdAt?: Date | null;
-    updatedAt?: Date | null;
     authors?: Array<{
       __typename?: "User";
       id: string;
       name: string;
       image?: string | null;
       bio?: string | null;
+      currentPrefecture: GqlCurrentPrefecture;
     }> | null;
     relatedUsers?: Array<{
       __typename?: "User";
@@ -2770,26 +2783,39 @@ export type GqlGetArticleQuery = {
       name: string;
       image?: string | null;
       bio?: string | null;
+      currentPrefecture: GqlCurrentPrefecture;
     }> | null;
   } | null;
   articles: {
     __typename?: "ArticlesConnection";
     totalCount: number;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
     edges?: Array<{
       __typename?: "ArticleEdge";
+      cursor: string;
       node?: {
         __typename?: "Article";
         id: string;
         title: string;
+        body?: string | null;
         introduction: string;
         thumbnail?: any | null;
+        category: GqlArticleCategory;
+        publishStatus: GqlPublishStatus;
         publishedAt?: Date | null;
         authors?: Array<{
           __typename?: "User";
           id: string;
           name: string;
           image?: string | null;
+          bio?: string | null;
+          currentPrefecture: GqlCurrentPrefecture;
         }> | null;
       } | null;
     } | null> | null;
@@ -2975,6 +3001,14 @@ export type GqlGetOpportunitiesQuery = {
   };
   similar: {
     __typename?: "OpportunitiesConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
     edges: Array<{
       __typename?: "OpportunityEdge";
       cursor: string;
@@ -3022,13 +3056,6 @@ export type GqlGetOpportunitiesQuery = {
         } | null;
       } | null;
     }>;
-    pageInfo: {
-      __typename?: "PageInfo";
-      startCursor?: string | null;
-      endCursor?: string | null;
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-    };
   };
   all: {
     __typename?: "OpportunitiesConnection";
@@ -3150,6 +3177,7 @@ export type GqlGetOpportunityQuery = {
             id: string;
             name: string;
             image?: string | null;
+            bio?: string | null;
             currentPrefecture: GqlCurrentPrefecture;
           } | null;
         }> | null;
@@ -3160,6 +3188,7 @@ export type GqlGetOpportunityQuery = {
       id: string;
       name: string;
       image?: string | null;
+      bio?: string | null;
       currentPrefecture: GqlCurrentPrefecture;
       articlesAboutMe?: Array<{
         __typename?: "Article";
@@ -3211,6 +3240,7 @@ export type GqlGetOpportunityQuery = {
                 id: string;
                 name: string;
                 image?: string | null;
+                bio?: string | null;
                 currentPrefecture: GqlCurrentPrefecture;
               } | null;
             }> | null;
@@ -3678,6 +3708,7 @@ export const UserFieldsFragmentDoc = gql`
     id
     name
     image
+    bio
     currentPrefecture
   }
 `;
@@ -4869,25 +4900,24 @@ export const GetArticlesDocument = gql`
     articles(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
       pageInfo {
         hasNextPage
+        hasPreviousPage
+        startCursor
         endCursor
       }
       totalCount
       edges {
+        cursor
         node {
-          id
-          title
-          introduction
-          thumbnail
-          publishedAt
+          ...ArticleFields
           authors {
-            id
-            name
-            image
+            ...UserFields
           }
         }
       }
     }
   }
+  ${ArticleFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
 `;
 
 /**
@@ -4949,26 +4979,12 @@ export type GetArticlesQueryResult = Apollo.QueryResult<
 export const GetArticleDocument = gql`
   query GetArticle($id: ID!, $permission: CheckCommunityPermissionInput!) {
     article(id: $id, permission: $permission) {
-      id
-      title
-      introduction
-      body
-      category
-      thumbnail
-      publishedAt
-      createdAt
-      updatedAt
+      ...ArticleFields
       authors {
-        id
-        name
-        image
-        bio
+        ...UserFields
       }
       relatedUsers {
-        id
-        name
-        image
-        bio
+        ...UserFields
       }
     }
     articles(
@@ -4978,25 +4994,24 @@ export const GetArticleDocument = gql`
     ) {
       pageInfo {
         hasNextPage
+        hasPreviousPage
+        startCursor
         endCursor
       }
       totalCount
       edges {
+        cursor
         node {
-          id
-          title
-          introduction
-          thumbnail
-          publishedAt
+          ...ArticleFields
           authors {
-            id
-            name
-            image
+            ...UserFields
           }
         }
       }
     }
   }
+  ${ArticleFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
 `;
 
 /**
@@ -5238,6 +5253,13 @@ export const GetOpportunitiesDocument = gql`
       }
     }
     similar: opportunities(filter: $similarFilter, first: 3) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
       edges {
         cursor
         node {
@@ -5249,12 +5271,6 @@ export const GetOpportunitiesDocument = gql`
             ...PlaceFields
           }
         }
-      }
-      pageInfo {
-        startCursor
-        endCursor
-        hasNextPage
-        hasPreviousPage
       }
     }
     all: opportunities(filter: $allFilter, first: $first, cursor: $cursor) {

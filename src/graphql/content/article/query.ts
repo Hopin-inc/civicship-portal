@@ -1,54 +1,41 @@
 import { gql } from '@apollo/client';
+import { ARTICLE_FRAGMENT } from "@/graphql/content/article/fragment";
+import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
 
 export const GET_ARTICLES = gql`
   query GetArticles($first: Int, $cursor: String, $filter: ArticleFilterInput, $sort: ArticleSortInput) {
     articles(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
       pageInfo {
         hasNextPage
+        hasPreviousPage
+        startCursor
         endCursor
       }
       totalCount
       edges {
+        cursor
         node {
-          id
-          title
-          introduction
-          thumbnail
-          publishedAt
+          ...ArticleFields
           authors {
-            id
-            name
-            image
+            ...UserFields
           }
         }
       }
     }
   }
+  ${ARTICLE_FRAGMENT}
+  ${USER_FRAGMENT}
 `;
 
 export const GET_ARTICLE = gql`
   query GetArticle($id: ID!, $permission: CheckCommunityPermissionInput!) {
     article(id: $id, permission: $permission) {
-      id
-      title
-      introduction
-      body
-      category
-      thumbnail
-      publishedAt
-      createdAt
-      updatedAt
+      ...ArticleFields
       authors {
-        id
-        name
-        image
-        bio
+        ...UserFields
       }
       relatedUsers {
-        id
-        name
-        image
-        bio
+        ...UserFields
       }
     }
 
@@ -62,20 +49,17 @@ export const GET_ARTICLE = gql`
     ) {
       pageInfo {
         hasNextPage
+        hasPreviousPage
+        startCursor
         endCursor
       }
       totalCount
       edges {
+        cursor
         node {
-          id
-          title
-          introduction
-          thumbnail
-          publishedAt
+          ...ArticleFields
           authors {
-            id
-            name
-            image
+            ...UserFields
           }
         }
       }

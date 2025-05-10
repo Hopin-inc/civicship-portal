@@ -1,13 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
-import {
-  GqlGetOpportunitiesQueryVariables,
-  GqlOpportunitiesConnection,
-  GqlOpportunityCategory,
-  GqlPublishStatus,
-  useGetOpportunitiesQuery,
-} from "@/types/graphql";
+import { useFeaturedActivities } from "@/hooks/features/activity/useFeaturedActivities";
+import { useUpcomingActivities } from "@/hooks/features/activity/useUpcomingActivities";
+import { useAllActivities } from "@/hooks/features/activity/useAllActivities";
+import { useInfiniteScroll } from "@/hooks/core/useInfiniteScroll";
+import { GqlOpportunitiesConnection } from "@/types/graphql";
+import React from "react";
 
 export interface UseActivitiesQueryResult {
   upcomingActivities: GqlOpportunitiesConnection;
@@ -16,84 +14,35 @@ export interface UseActivitiesQueryResult {
   loading: boolean;
   error: any;
   fetchMore: () => void;
-  startCursor: string;
-  endCursor: string;
   hasNextPage: boolean;
-  hasPreviousPage: boolean;
+  loadMoreRef: React.RefObject<HTMLDivElement>;
 }
 
 export const useActivitiesQuery = (): UseActivitiesQueryResult => {
-  const queryVariables: GqlGetOpportunitiesQueryVariables = useMemo(() => ({
-    upcomingFilter: {
-      category: GqlOpportunityCategory.Activity,
-      publishStatus: [GqlPublishStatus.Public]
-    },
-    featuredFilter: {
-      category: GqlOpportunityCategory.Activity,
-      publishStatus: [GqlPublishStatus.Public],
-    },
-    allFilter: {
-      category: GqlOpportunityCategory.Activity,
-      publishStatus: [GqlPublishStatus.Public],
-    },
-    first: 20,
-    cursor: undefined
-  }), []);
+  const { featuredActivities, loading: loadingFeatured, error: errorFeatured } = useFeaturedActivities();
+  const { upcomingActivities, loading: loadingUpcoming, error: errorUpcoming } = useUpcomingActivities();
+  const {
+    allActivities,
+    fetchMore,
+    hasNextPage,
+    loading: loadingAll,
+    error: errorAll
+  } = useAllActivities();
 
-  const { data, loading, error, fetchMore: apolloFetchMore } = useGetOpportunitiesQuery({
-    variables: queryVariables,
-    fetchPolicy: 'network-only',
-    nextFetchPolicy: 'cache-first',
+  const loadMoreRef = useInfiniteScroll({
+    hasMore: hasNextPage,
+    isLoading: loadingAll,
+    onLoadMore: fetchMore
   });
 
-  const emptyConnection: GqlOpportunitiesConnection = {
-    edges: [],
-    pageInfo: {
-      hasNextPage: false,
-      hasPreviousPage: false,
-      startCursor: "",
-      endCursor: "" },
-    totalCount: 0
-  };
-
-  const upcomingActivities = data?.upcoming || emptyConnection;
-  const featuredActivities = data?.featured || emptyConnection;
-  const allActivities = data?.all || emptyConnection;
-  const startCursor = data?.all.pageInfo.startCursor || '';
-  const endCursor = data?.all.pageInfo.endCursor || '';
-  const hasNextPage = data?.all.pageInfo.hasNextPage || false;
-  const hasPreviousPage = data?.all.pageInfo.hasPreviousPage || false;
-
-  const fetchMore = async () => {
-    await apolloFetchMore({
-      variables: {
-        ...queryVariables,
-        cursor: endCursor,
-      },
-      updateQuery: (prev, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return prev;
-        return {
-          ...prev,
-          all: {
-            ...prev.all,
-            edges: [...prev.all.edges, ...fetchMoreResult.all.edges],
-            pageInfo: fetchMoreResult.all.pageInfo,
-          },
-        };
-      },
-    });
-  };
-
   return {
-    upcomingActivities,
     featuredActivities,
+    upcomingActivities,
     allActivities,
-    loading,
-    error,
     fetchMore,
-    startCursor,
-    endCursor,
     hasNextPage,
-    hasPreviousPage
+    loadMoreRef,
+    loading: loadingFeatured || loadingUpcoming || loadingAll,
+    error: errorFeatured || errorUpcoming || errorAll,
   };
 };

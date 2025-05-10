@@ -1,14 +1,10 @@
 'use client';
 
-import { useQuery } from '@apollo/client';
-import { GET_ARTICLE } from '@/graphql/content/article/query';
 import { COMMUNITY_ID } from '@/utils';
+import { useGetArticleQuery } from "@/types/graphql";
 
-/**
- * Hook for fetching article data from GraphQL
- */
 export const useArticleQuery = (id: string) => {
-  return useQuery(GET_ARTICLE, {
+  return useGetArticleQuery({
     variables: {
       id,
       permission: {

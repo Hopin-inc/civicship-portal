@@ -21,6 +21,7 @@ interface UseActivityDetailsResult {
     price: number;
   }[];
   loading: boolean;
+  initialLoading: boolean;
   error: Error | null;
 }
 
@@ -54,6 +55,7 @@ export const useActivityDetails = (id: string): UseActivityDetailsResult => {
   const { availableDates } = useAvailableDatesQuery(opportunity?.slots);
 
   const isLoading = loading || similarLoading;
+  const initialLoading = isLoading && !data?.opportunity && !error;
 
   useEffect(() => {
     setIsLoading(isLoading);
@@ -65,6 +67,7 @@ export const useActivityDetails = (id: string): UseActivityDetailsResult => {
     availableTickets,
     availableDates,
     loading: isLoading,
+    initialLoading,
     error: error || null,
   };
 };

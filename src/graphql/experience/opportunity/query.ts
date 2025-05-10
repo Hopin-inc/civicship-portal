@@ -72,6 +72,13 @@ export const GET_OPPORTUNITIES = gql`
       filter: $similarFilter
       first: 3
     ) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
       edges {
         cursor
         node {
@@ -83,12 +90,6 @@ export const GET_OPPORTUNITIES = gql`
             ...PlaceFields
           }
         }
-      }
-      pageInfo {
-        startCursor
-        endCursor
-        hasNextPage
-        hasPreviousPage
       }
     }
 

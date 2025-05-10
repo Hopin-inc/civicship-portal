@@ -1,20 +1,47 @@
 'use client';
 
-import { useArticleController } from './useArticleController';
-import type { Article } from "@/types";
-import type { ErrorWithMessage } from '../wallet/useWalletController';
+import { useEffect, useMemo } from "react";
+import { useArticleQuery } from './useArticleQuery';
+import { presenterArticleCard, presenterArticleDetail } from '@/presenters/article';
+import type { ArticleDetail, ArticleCard } from "@/types/article";
+import { ErrorWithMessage, formatError } from '../wallet/useWalletController';
+import { toast } from 'sonner';
 
 interface UseArticleResult {
-  article: Article | null;
-  recommendedArticles: Article[];
+  article: ArticleDetail | null;
+  recommendedArticles: ArticleCard[];
   loading: boolean;
   error: ErrorWithMessage | null;
 }
 
-/**
- * Public API hook for article
- * This is the hook that should be used by components
- */
 export const useArticle = (id: string): UseArticleResult => {
-  return useArticleController(id);
-};                
+  const { data, loading, error } = useArticleQuery(id);
+
+  const article = useMemo(() => {
+    return data?.article ? presenterArticleDetail(data.article) : null;
+  }, [data]);
+
+  const recommendedArticles = useMemo(() => {
+    return (
+      data?.articles?.edges
+        ?.map(edge => edge?.node)
+        .filter((node): node is NonNullable<typeof node> => !!node && node.id !== article?.id)
+        .map(presenterArticleCard) ?? []
+    );
+  }, [data?.articles?.edges, article?.id]);
+
+  const formattedError = useMemo(() => error ? formatError(error) : null, [error]);
+  useEffect(() => {
+    if (error) {
+      console.error('Error fetching article data:', error);
+      toast.error('記事データの取得に失敗しました');
+    }
+  }, [error]);
+
+  return {
+    article,
+    recommendedArticles,
+    loading,
+    error: formattedError,
+  };
+};

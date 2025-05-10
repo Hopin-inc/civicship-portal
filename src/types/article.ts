@@ -15,14 +15,14 @@ export type ArticleCard = {
 export type ArticleDetail = ArticleCard & {
   body: string;
 
-  authors: User[];
-  relatedUsers: User[];
+  authors: ArticleRelatedUser[];
+  relatedUsers: ArticleRelatedUser[];
 
   hostedOpportunitiesByAuthors: OpportunityCard[];
   relatedArticles: ArticleCard[];
 }
 
-type User = {
+export type ArticleRelatedUser = {
   id: string;
   name: string;
   image: string;

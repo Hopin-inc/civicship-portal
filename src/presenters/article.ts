@@ -1,65 +1,15 @@
 'use client';
 
-import { format } from 'date-fns';
-import { ja } from 'date-fns/locale';
-import { GqlArticle, GqlArticleCategory } from "@/types/graphql";
-import { ArticleCard } from "@/types/article";
+import { GqlArticle, GqlArticleCategory, GqlArticleEdge, GqlUser, Maybe } from "@/types/graphql";
+import { ArticleCard, ArticleDetail, ArticleRelatedUser } from "@/types/article";
 
-export interface GetArticlesData {
-  articles: {
-    pageInfo: {
-      hasNextPage: boolean;
-      endCursor: string | null;
-    };
-    edges: Array<{
-      node: {
-        id: string;
-        title: string;
-        introduction: string;
-        thumbnail: string;
-        publishedAt: string;
-        authors: Array<{
-          id: string;
-          name: string;
-          image: string;
-        }>;
-      };
-    }>;
-  };
-}
-
-export interface Article {
-  id: string;
-  title: string;
-  introduction: string;
-  thumbnail: {
-    url: string;
-    alt: string;
-  } | null;
-  publishedAt: string;
-  authors: Array<{
-    id: string;
-    name: string;
-    image: string;
-  }>;
-}
-
-/**
- * Transform GraphQL article data to application format
- */
-export const transformArticles = (data: GetArticlesData | undefined): Article[] => {
-  if (!data) return [];
-  
-  return data.articles.edges.map((edge) => {
-    const node = edge.node;
-    return {
-      ...node,
-      thumbnail: node.thumbnail ? {
-        url: node.thumbnail,
-        alt: node.title
-      } : null,
-    };
-  });
+export const presenterArticleCards = (
+  edges?: (GqlArticleEdge | null | undefined)[]
+): ArticleCard[] => {
+  return (edges ?? [])
+    .map(edge => edge?.node)
+    .filter((node): node is GqlArticle => !!node)
+    .map(presenterArticleCard);
 };
 
 export const presenterArticleCard = (node?: GqlArticle): ArticleCard => ({
@@ -73,31 +23,32 @@ export const presenterArticleCard = (node?: GqlArticle): ArticleCard => ({
     : "",
 });
 
-/**
- * Format article date for display
- */
-export const formatArticleDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  return format(date, 'yyyy年M月d日', { locale: ja });
+export const presenterArticleDetail = (article: GqlArticle): ArticleDetail => {
+  return {
+    id: article.id,
+    title: article.title,
+    category: article.category,
+    introduction: article.introduction || "",
+    body: article.body || "",
+
+    thumbnail: typeof article.thumbnail === "string" ? article.thumbnail : "",
+    publishedAt: article.publishedAt
+      ? new Date(article.publishedAt).toISOString()
+      : "",
+
+    authors: article.authors?.map(presenterUser) || [],
+    relatedUsers: article.relatedUsers?.map(presenterUser) || [],
+
+    hostedOpportunitiesByAuthors: [],
+    relatedArticles: [],
+  }
 };
 
-/**
- * Extract article categories from GraphQL data
- */
-export interface ArticleWithCategories {
-  categories?: {
-    edges?: Array<{
-      node?: {
-        name: string;
-      } | null;
-    } | null>;
-  } | null;
+function presenterUser(host?: Maybe<GqlUser> | undefined): ArticleRelatedUser {
+  return {
+    id: host?.id || "",
+    name: host?.name || "",
+    image: host?.image || "",
+    bio: host?.bio || "",
+  }
 }
-
-export const extractArticleCategories = (article: ArticleWithCategories): string[] => {
-  if (!article?.categories?.edges) return [];
-  
-  return article.categories.edges
-    .filter((edge): edge is NonNullable<typeof edge> => edge !== null && edge?.node !== null && edge?.node !== undefined)
-    .map((edge) => edge.node!.name);
-};
