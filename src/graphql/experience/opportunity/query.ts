@@ -1,38 +1,8 @@
 import { gql } from "@apollo/client";
-
-const OPPORTUNITY_FRAGMENT = gql`
-  fragment OpportunityFields on Opportunity {
-    id
-    title
-    description
-    images
-    feeRequired
-    pointsToEarn
-    isReservableWithTicket
-    community {
-      id
-      name
-      image
-    }
-    place {
-      id
-      name
-      address
-      city {
-        name
-        state {
-          name
-        }
-      }
-    }
-    slots {
-      id
-      startsAt
-      endsAt
-      capacity
-    }
-  }
-`;
+import { OPPORTUNITY_FRAGMENT } from "@/graphql/experience/opportunity/fragment";
+import { COMMUNITY_FRAGMENT } from "@/graphql/account/community/fragment";
+import { PLACE_FRAGMENT } from "@/graphql/location/place/fragment";
+import { SLOT_FRAGMENT } from "@/graphql/experience/opportunitySlot/fragment";
 
 export const GET_OPPORTUNITIES = gql`
   query GetOpportunities(
@@ -104,101 +74,34 @@ export const GET_OPPORTUNITIES = gql`
       edges {
         node {
           ...OpportunityFields
+          slots {
+            ...OpportunitySlotFields
+          }
+          place {
+            ...PlaceFields
+          }
         }
       }
     }
   }
   ${OPPORTUNITY_FRAGMENT}
+  ${SLOT_FRAGMENT}
+  ${PLACE_FRAGMENT}
 `;
 
 export const GET_OPPORTUNITY = gql`
   query GetOpportunity($id: ID!, $permission: CheckCommunityPermissionInput!) {
     opportunity(id: $id, permission: $permission) {
-      id
-      title
-      description
-      body
-      category
-      capacity
-      pointsToEarn
-      isReservableWithTicket
-      feeRequired
-      requireApproval
-      publishStatus
-      images
-      createdAt
-      updatedAt
+      ...OpportunityFields
+      
       community {
-        id
-        name
-        image
+        ...CommunityFields
       }
-      createdByUser {
-        id
-        name
-        image
-        articlesAboutMe{
-          id
-          title
-          introduction
-          thumbnail
-          createdAt
-        }
-        opportunitiesCreatedByMe {
-          id
-          title
-          description
-          category
-          capacity
-          community {
-            id
-            name
-            image
-          }
-          pointsToEarn
-          feeRequired
-          requireApproval
-          publishStatus
-          images
-          createdAt
-          updatedAt
-          slots {
-            id
-            startsAt
-            endsAt
-            remainingCapacity
-            reservations {
-              status
-              participations {
-                id
-                status
-                images
-                user {
-                  id
-                  name
-                  image
-                }
-              }
-            }
-          }
-        }
-      }
+      
       place {
-        id
-        name
-        address
-        latitude
-        longitude
-        city {
-          name
-          state {
-            name
-          }
-        }
+        ...PlaceFields
       }
-      requiredUtilities {
-        id
-      }
+      
       slots {
         id
         startsAt
@@ -218,6 +121,65 @@ export const GET_OPPORTUNITY = gql`
           }
         }
       }
+
+      createdByUser {
+        id
+        name
+        image
+
+        articlesAboutMe{
+          id
+          title
+          introduction
+          thumbnail
+          publishedAt
+        }
+
+        opportunitiesCreatedByMe {
+          id
+          title
+          description
+          images
+          
+          category
+          publishStatus
+          requireApproval
+          isReservableWithTicket
+
+          pointsToEarn
+          feeRequired
+          
+          community {
+            id
+          }
+          
+          slots {
+            id
+            hostingStatus
+            startsAt
+            endsAt
+            remainingCapacity
+
+            reservations {
+              status
+
+              participations {
+                id
+                status
+                images
+                user {
+                  id
+                  name
+                  image
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
+  ${OPPORTUNITY_FRAGMENT}
+  ${COMMUNITY_FRAGMENT}
+  ${PLACE_FRAGMENT}
 `; 
