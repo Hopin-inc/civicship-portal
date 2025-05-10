@@ -1,11 +1,12 @@
 'use client'
 
-import { Participant, Opportunity } from '@/types'
+import { Participant } from '@/types'
 import Image from 'next/image'
 import { memo, useState } from 'react'
 import { AsymmetricImageGrid } from '@/components/ui/asymmetric-image-grid'
 import { Button } from '@/components/ui/button'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import { GqlOpportunity, GqlUser } from "@/types/graphql";
 
 type OpportunityHistory = {
   id: string
@@ -17,7 +18,7 @@ type OpportunityHistory = {
     url: string
     alt: string
   }[]
-  participants: Participant[]
+  participants: GqlUser[]
   additionalParticipants: number
 }
 
@@ -109,7 +110,7 @@ const YearGroup = memo(({ group }: { group: OpportunityHistoryGroup }) => (
 ))
 YearGroup.displayName = 'YearGroup'
 
-const transformOpportunityToHistory = (opportunity: Opportunity): OpportunityHistory => {
+const transformOpportunityToHistory = (opportunity: GqlOpportunity): OpportunityHistory => {
   const date = new Date(opportunity.startsAt);
   const fullDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日(${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]})`;
   const displayDate = `${date.getMonth() + 1}月${date.getDate()}日(${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]})`;
@@ -158,7 +159,7 @@ const groupOpportunitiesByYear = (opportunities: OpportunityHistory[]): Opportun
 };
 
 interface RecentActivitiesTimelineProps {
-  opportunities: Opportunity[];
+  opportunities: GqlOpportunity[];
 }
 
 export const RecentActivitiesTimeline = ({ opportunities }: RecentActivitiesTimelineProps) => {

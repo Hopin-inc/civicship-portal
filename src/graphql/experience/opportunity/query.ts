@@ -3,6 +3,10 @@ import { OPPORTUNITY_FRAGMENT } from "@/graphql/experience/opportunity/fragment"
 import { COMMUNITY_FRAGMENT } from "@/graphql/account/community/fragment";
 import { PLACE_FRAGMENT } from "@/graphql/location/place/fragment";
 import { SLOT_FRAGMENT } from "@/graphql/experience/opportunitySlot/fragment";
+import { RESERVATION_FRAGMENT } from "@/graphql/experience/reservation/fragment";
+import { PARTICIPATION_FRAGMENT } from "@/graphql/experience/participation/fragment";
+import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
+import { ARTICLE_FRAGMENT } from "@/graphql/content/article/fragment";
 
 export const GET_OPPORTUNITIES = gql`
   query GetOpportunities(
@@ -19,13 +23,22 @@ export const GET_OPPORTUNITIES = gql`
       first: 5
     ) {
       pageInfo {
-        hasNextPage
+        startCursor
         endCursor
+        hasNextPage
+        hasPreviousPage
       }
       totalCount
       edges {
+        cursor
         node {
           ...OpportunityFields
+          slots {
+            ...OpportunitySlotFields
+          }
+          place {
+            ...PlaceFields
+          }
         }
       }
     }
@@ -35,13 +48,22 @@ export const GET_OPPORTUNITIES = gql`
       first: 5
     ) {
       pageInfo {
-        hasNextPage
+        startCursor
         endCursor
+        hasNextPage
+        hasPreviousPage
       }
       totalCount
       edges {
+        cursor
         node {
           ...OpportunityFields
+          slots {
+            ...OpportunitySlotFields
+          }
+          place {
+            ...PlaceFields
+          }
         }
       }
     }
@@ -51,13 +73,22 @@ export const GET_OPPORTUNITIES = gql`
       first: 3
     ) {
       edges {
+        cursor
         node {
           ...OpportunityFields
+          slots {
+            ...OpportunitySlotFields
+          }
+          place {
+            ...PlaceFields
+          }
         }
       }
       pageInfo {
-        hasNextPage
+        startCursor
         endCursor
+        hasNextPage
+        hasPreviousPage
       }
     }
 
@@ -67,11 +98,14 @@ export const GET_OPPORTUNITIES = gql`
       cursor: $cursor
     ) {
       pageInfo {
-        hasNextPage
+        startCursor
         endCursor
+        hasNextPage
+        hasPreviousPage
       }
       totalCount
       edges {
+        cursor
         node {
           ...OpportunityFields
           slots {
@@ -101,76 +135,36 @@ export const GET_OPPORTUNITY = gql`
       place {
         ...PlaceFields
       }
-      
       slots {
-        id
-        startsAt
-        endsAt
-        remainingCapacity
+        ...OpportunitySlotFields
         reservations {
-          status
+          ...ReservationFields
           participations {
-            id
-            status
-            images
+            ...ParticipationFields
             user {
-              id
-              name
-              image
+              ...UserFields
             }
           }
         }
       }
-
       createdByUser {
-        id
-        name
-        image
-
-        articlesAboutMe{
-          id
-          title
-          introduction
-          thumbnail
-          publishedAt
+        ...UserFields
+        articlesAboutMe {
+          ...ArticleFields
         }
-
         opportunitiesCreatedByMe {
-          id
-          title
-          description
-          images
-          
-          category
-          publishStatus
-          requireApproval
-          isReservableWithTicket
-
-          pointsToEarn
-          feeRequired
-          
+          ...OpportunityFields
           community {
-            id
+            ...CommunityFields
           }
-          
           slots {
-            id
-            hostingStatus
-            startsAt
-            endsAt
-            remainingCapacity
-
+            ...OpportunitySlotFields
             reservations {
-              status
-
+              ...ReservationFields
               participations {
-                id
-                status
-                images
+                ...ParticipationFields
                 user {
-                  id
-                  name
-                  image
+                  ...UserFields
                 }
               }
             }
@@ -182,4 +176,9 @@ export const GET_OPPORTUNITY = gql`
   ${OPPORTUNITY_FRAGMENT}
   ${COMMUNITY_FRAGMENT}
   ${PLACE_FRAGMENT}
+  ${SLOT_FRAGMENT}
+  ${RESERVATION_FRAGMENT}
+  ${PARTICIPATION_FRAGMENT}
+  ${USER_FRAGMENT}
+  ${ARTICLE_FRAGMENT}
 `; 

@@ -1,6 +1,6 @@
 import { GqlCurrentPrefecture, GqlPortfolioCategory, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
-import { OpportunityCard } from "@/types/types/opportunity";
-import { Participant } from "@/types/types/utils";
+import { OpportunityCard } from "@/types/opportunity";
+import { Participant } from "@/types/utils";
 
 // ---------------------------------------------
 // 👤 基本ユーザー型（すべてのユーザー共通）

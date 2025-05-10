@@ -5,13 +5,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { AlertCircle } from 'lucide-react';
 import { AsymmetricImageGrid } from '@/components/ui/asymmetric-image-grid';
-import { Opportunity } from '@/types';
 import { RecentActivitiesList } from './RecentActivitiesList';
 import { SimilarActivitiesList } from './SimilarActivitiesList';
 import ActivityScheduleCard from './ActivityScheduleCard';
+import { GqlOpportunity } from "@/types/graphql";
 
 interface ActivityDetailsContentProps {
-  opportunity: Opportunity;
+  opportunity: GqlOpportunity;
   availableTickets: number;
   availableDates: Array<{
     startsAt: string;
@@ -19,7 +19,7 @@ interface ActivityDetailsContentProps {
     participants: number;
     price: number;
   }>;
-  similarOpportunities: Opportunity[];
+  similarOpportunities: GqlOpportunity[];
   communityId?: string;
 }
 
@@ -30,20 +30,17 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
   similarOpportunities,
   communityId = '',
 }) => {
-  const participationImages = opportunity.slots?.edges
+  const participationImages = opportunity.slots
     ?.flatMap(
-      (edge) =>
-        edge?.node?.participations?.edges?.flatMap((p) => {
-          const participation = p as any;
-          return (
-            Array.isArray(participation?.node?.images)
-              ? participation.node.images
-              : []
-          ).map((img: string) => ({
-            url: img,
-            alt: "参加者の写真",
-          }));
-        }) || [],
+      (slot) =>
+        slot.reservations?.flatMap(reservation =>
+          reservation.participations?.flatMap(participation =>
+            (participation.images ?? []).map((img) => ({
+              url: img,
+              alt: "参加者の写真",
+            }))
+          ) ?? []
+        ) ?? [],
     )
     .filter(Boolean) || [];
 
@@ -94,20 +91,19 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
                 <p className="text-gray-600">が案内します</p>
               </div>
             </div>
-            {opportunity.createdByUser?.articlesAboutMe?.edges?.[0]?.node && (
+            {opportunity.createdByUser?.articlesAboutMe?.[0] && (
               <Link
-                href={`/articles/${opportunity.createdByUser.articlesAboutMe.edges[0].node.id}`}
+                href={`/articles/${opportunity.createdByUser.articlesAboutMe[0].id}`}
                 className="block"
               >
                 <div className="bg-background rounded-xl border hover:shadow-md transition-shadow duration-200">
                   <div className="relative w-full h-[200px]">
                     <Image
                       src={
-                        (opportunity.createdByUser.articlesAboutMe.edges[0].node.thumbnail ?? "/placeholder.png") as string
+                        opportunity.createdByUser.articlesAboutMe[0].thumbnail ?? "/placeholder.png"
                       }
                       alt={
-                        opportunity.createdByUser.articlesAboutMe.edges[0].node.title ||
-                        "案内者の記事"
+                        opportunity.createdByUser.articlesAboutMe[0].title || "案内者の記事"
                       }
                       fill
                       className="object-cover rounded-t-xl"
@@ -115,10 +111,10 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
                   </div>
                   <div className="p-6">
                     <h5 className="text-xl font-bold mb-2 line-clamp-2">
-                      {opportunity.createdByUser.articlesAboutMe.edges[0].node.title}
+                      {opportunity.createdByUser.articlesAboutMe[0].title}
                     </h5>
                     <p className="text-gray-600 text-sm line-clamp-2">
-                      {opportunity.createdByUser.articlesAboutMe.edges[0].node.introduction}
+                      {opportunity.createdByUser.articlesAboutMe[0].introduction}
                     </p>
                   </div>
                 </div>
@@ -126,11 +122,11 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
             )}
           </div>
         </div>
-        {opportunity.createdByUser?.opportunitiesCreatedByMe?.edges && (
+        {opportunity.createdByUser?.opportunitiesCreatedByMe && (
           <div className="mt-8">
             <RecentActivitiesList
-              opportunities={opportunity.createdByUser.opportunitiesCreatedByMe.edges
-                .map((edge) => edge)
+              opportunities={opportunity.createdByUser.opportunitiesCreatedByMe
+                .map((opportunity) => opportunity)
                 .filter(Boolean)}
             />
           </div>

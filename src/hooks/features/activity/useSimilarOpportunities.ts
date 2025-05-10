@@ -13,11 +13,6 @@ interface UseSimilarOpportunitiesResult {
   error: any;
 }
 
-/**
- * Hook for similar opportunities
- * This is a wrapper around useSimilarOpportunitiesQuery
- * for backward compatibility
- */
 export const useSimilarOpportunities = ({
   opportunityId,
 }: UseSimilarOpportunitiesProps): UseSimilarOpportunitiesResult => {

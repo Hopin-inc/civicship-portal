@@ -1,16 +1,16 @@
 'use client';
 
 import { useQuery } from "@apollo/client";
-import { GET_OPPORTUNITIES } from "@/graphql/queries/opportunities";
 import { COMMUNITY_ID } from "@/utils";
-import { GqlOpportunity } from "@/types/graphql";
+import { GET_OPPORTUNITIES } from "@/graphql/experience/opportunity/query";
+import { ActivityCard } from "@/types/opportunity";
 
 interface UseSimilarOpportunitiesQueryProps {
   opportunityId: string;
 }
 
 export interface UseSimilarOpportunitiesQueryResult {
-  similarOpportunities: GqlOpportunity[];
+  similarOpportunities: ActivityCard[];
   loading: boolean;
   error: any;
 }

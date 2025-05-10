@@ -8,8 +8,11 @@ export const PLACE_FRAGMENT = gql`
     latitude
     longitude
     city {
+      code
       name
       state {
+        code
+        countryCode
         name
       }
     }

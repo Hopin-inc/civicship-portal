@@ -4,7 +4,7 @@ import { useOpportunity } from '@/hooks/features/activity/useOpportunity';
 import { useSimilarOpportunitiesQuery } from '@/hooks/features/activity/useSimilarOpportunitiesQuery';
 import { useAvailableTickets } from "@/hooks/features/ticket/useAvailableTickets";
 import { useAvailableDatesQuery } from "@/hooks/features/activity/useAvailableDatesQuery";
-import { GqlOpportunity } from "@/types/graphql";
+import { ActivityCard, ActivityDetail } from "@/types/opportunity";
 
 interface UseActivityDetailsQueryProps {
   id: string;
@@ -12,8 +12,8 @@ interface UseActivityDetailsQueryProps {
 }
 
 export interface UseActivityDetailsQueryResult {
-  opportunity: GqlOpportunity | null;
-  similarOpportunities: GqlOpportunity[];
+  opportunity: ActivityDetail | null;
+  similarOpportunities: ActivityCard[];
   availableTickets: number;
   availableDates: Array<{
     startsAt: string;
@@ -26,10 +26,6 @@ export interface UseActivityDetailsQueryResult {
   error: Error | null;
 }
 
-/**
- * Hook for fetching activity details data
- * Responsible only for data fetching and transformation, not UI control
- */
 export const useActivityDetailsQuery = ({ 
   id, 
   userId 
@@ -40,7 +36,7 @@ export const useActivityDetailsQuery = ({
   });
 
   const availableTickets = useAvailableTickets(opportunity, userId);
-  const { availableDates } = useAvailableDatesQuery(opportunity);
+  const { availableDates } = useAvailableDatesQuery(opportunity?.slots);
 
   return {
     opportunity,

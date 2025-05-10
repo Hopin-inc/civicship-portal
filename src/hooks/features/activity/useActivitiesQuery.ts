@@ -1,63 +1,71 @@
 'use client';
 
-import { useQuery } from '@apollo/client';
 import { useMemo } from 'react';
-import { GET_OPPORTUNITIES } from '@/graphql/queries/opportunities';
-import { GetOpportunitiesData, OpportunityConnection } from '@/types';
-import { GqlOpportunityCategory, GqlPublishStatus } from "@/types/graphql";
+import {
+  GqlGetOpportunitiesQueryVariables,
+  GqlOpportunitiesConnection,
+  GqlOpportunityCategory,
+  GqlPublishStatus,
+  useGetOpportunitiesQuery,
+} from "@/types/graphql";
 
 export interface UseActivitiesQueryResult {
-  upcomingActivities: OpportunityConnection;
-  featuredActivities: OpportunityConnection;
-  allActivities: OpportunityConnection;
+  upcomingActivities: GqlOpportunitiesConnection;
+  featuredActivities: GqlOpportunitiesConnection;
+  allActivities: GqlOpportunitiesConnection;
   loading: boolean;
   error: any;
   fetchMore: () => void;
-  hasNextPage: boolean;
+  startCursor: string;
   endCursor: string;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
 export const useActivitiesQuery = (): UseActivitiesQueryResult => {
-  const queryVariables = useMemo(() => ({
+  const queryVariables: GqlGetOpportunitiesQueryVariables = useMemo(() => ({
     upcomingFilter: {
       category: GqlOpportunityCategory.Activity,
-      publishStatus: GqlPublishStatus.Public
+      publishStatus: [GqlPublishStatus.Public]
     },
     featuredFilter: {
       category: GqlOpportunityCategory.Activity,
-      publishStatus: GqlPublishStatus.Public,
-      not: {
-        articleIds: null
-      }
+      publishStatus: [GqlPublishStatus.Public],
     },
     allFilter: {
       category: GqlOpportunityCategory.Activity,
-      publishStatus: GqlPublishStatus.Public,
+      publishStatus: [GqlPublishStatus.Public],
     },
     first: 20,
-    cursor: null
+    cursor: undefined
   }), []);
 
-  const { data, loading, error, fetchMore: apolloFetchMore } = useQuery<GetOpportunitiesData>(GET_OPPORTUNITIES, {
+  const { data, loading, error, fetchMore: apolloFetchMore } = useGetOpportunitiesQuery({
     variables: queryVariables,
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-first',
   });
 
-  const emptyConnection: OpportunityConnection = {
+  const emptyConnection: GqlOpportunitiesConnection = {
     edges: [],
-    pageInfo: { hasNextPage: false, endCursor: '' },
+    pageInfo: {
+      hasNextPage: false,
+      hasPreviousPage: false,
+      startCursor: "",
+      endCursor: "" },
     totalCount: 0
   };
 
   const upcomingActivities = data?.upcoming || emptyConnection;
   const featuredActivities = data?.featured || emptyConnection;
   const allActivities = data?.all || emptyConnection;
-  const hasNextPage = data?.all.pageInfo.hasNextPage || false;
+  const startCursor = data?.all.pageInfo.startCursor || '';
   const endCursor = data?.all.pageInfo.endCursor || '';
+  const hasNextPage = data?.all.pageInfo.hasNextPage || false;
+  const hasPreviousPage = data?.all.pageInfo.hasPreviousPage || false;
 
-  const fetchMore = () => {
-    apolloFetchMore({
+  const fetchMore = async () => {
+    await apolloFetchMore({
       variables: {
         ...queryVariables,
         cursor: endCursor,
@@ -83,7 +91,9 @@ export const useActivitiesQuery = (): UseActivitiesQueryResult => {
     loading,
     error,
     fetchMore,
+    startCursor,
+    endCursor,
     hasNextPage,
-    endCursor
+    hasPreviousPage
   };
 };

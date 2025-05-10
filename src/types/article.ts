@@ -1,10 +1,10 @@
 import { GqlArticleCategory } from "@/types/graphql";
-import { OpportunityCard } from "@/types/types/opportunity";
+import { OpportunityCard } from "@/types/opportunity";
 
 export type ArticleCard = {
   id: string;
   title: string;
-  category: typeof GqlArticleCategory
+  category: GqlArticleCategory
   introduction: string;
 
   thumbnail: string;

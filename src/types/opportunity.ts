@@ -1,7 +1,6 @@
 import { GqlOpportunityCategory } from "@/types/graphql";
-import { CommunityId } from "@/types";
-import { AppImage } from "@/types/types/utils";
-import { ArticleCard } from "@/types/types/article";
+import { CommunityId } from "@/types/index";
+import { ArticleCard } from "@/types/article";
 
 // ---------------------------------------------
 // 📦 Opportunity カード型（サマリ表示用）
@@ -30,12 +29,16 @@ export type BaseCard = CommunityId & {
 // 📄 Opportunity 詳細型（個別ページ用）
 // ---------------------------------------------
 export type ActivityDetail = OpportunityDetail & {
+  feeRequired: number;
+  slots: ActivitySlot[]
+
   reservableTickets: ReservableActivityTicket[];
   relatedActivities: ActivityCard[];
 };
 
 // ⚠️直近では使わない⚠️
 export type QuestDetail = OpportunityDetail & {
+  slots: QuestSlot[]
   relatedQuests: QuestCard[];
 };
 
@@ -44,14 +47,15 @@ export type OpportunityDetail = CommunityId & {
   title: string;
   place: OpportunityPlace;
 
+  requiredApproval: boolean;
+
   description: string;
-  images: AppImage[];
+  body: string;
+  images: string[];
   totalImageCount: number;
 
   host: OpportunityHost;
   recentOpportunities: OpportunityCard[];
-
-  slots: OpportunitySlot[];
   notes: string;
 };
 
@@ -61,7 +65,7 @@ export type OpportunityDetail = CommunityId & {
 export type OpportunityHost = {
   id: string;
   name: string;
-  image: string;
+  image: string | null;
   bio: string;
 
   interview?: ArticleCard;

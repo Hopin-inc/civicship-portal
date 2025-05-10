@@ -2,6 +2,8 @@
 
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
+import { GqlArticle, GqlArticleCategory } from "@/types/graphql";
+import { ArticleCard } from "@/types/article";
 
 export interface GetArticlesData {
   articles: {
@@ -59,6 +61,17 @@ export const transformArticles = (data: GetArticlesData | undefined): Article[] 
     };
   });
 };
+
+export const presenterArticleCard = (node?: GqlArticle): ArticleCard => ({
+  id: node?.id || "",
+  category: node?.category || GqlArticleCategory.Interview,
+  title: node?.title || "",
+  introduction: node?.introduction || "",
+  thumbnail: node?.thumbnail || null,
+  publishedAt: node?.publishedAt
+    ? new Date(node.publishedAt).toISOString()
+    : "",
+});
 
 /**
  * Format article date for display

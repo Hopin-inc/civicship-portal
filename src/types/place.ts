@@ -1,69 +1,56 @@
-import { ContentType } from "./index";
+import { AppImage, Participant } from "@/types/utils";
+import { OpportunityCard } from "@/types/opportunity";
+import { ArticleWithAuthor } from "@/types/article";
 
-export interface Geo {
-  placeId: string;
+export type PlacePin = {
+  id: string;
+  image: string;        // 拠点の代表画像（例：施設写真）
+  hostImage: string;    // 主催者やロゴなどの顔となる画像
 
   latitude: number;
   longitude: number;
-  placeImage: string;
-  placeName: string;
 }
 
-export interface MarkerData {
-  position: {
-    lat: number;
-    lng: number;
-  };
-  id: string;
-  placeImage: string;
-  userImage: string;
-  contentType: ContentType;
-  name: string;
-  placeId: string;
-  participantCount: number;
-}
-
-export interface PlaceData {
-  placeId: string;
-  title: string;
+export type PlaceCard = PlacePin & {
+  name: string;         // 拠点名
   address: string;
+  headline: string;     // 強調キャッチコピー（短文）
+  bio: string;          // 紹介文（長文）
+
+  publicOpportunityCount: number;
   participantCount: number;
-  description: string;
-  image: string;
-  bio?: string;
-  userId: string;
-  activeOpportunityCount?: number;
 }
 
-export interface MapComponentProps {
-  memberships: Array<{
-    node: {
-      user: {
-        id: string;
-        image: string;
-        name: string;
-        opportunitiesCreatedByMe?: {
-          edges: Array<{
-            node: {
-              id: string;
-              publishStatus: string;
-            };
-          }>;
-        };
-      };
-      bio?: string;
-      participationView: {
-        participated: {
-          geo: Geo[];
-          totalParticipatedCount: number;
-        };
-        hosted: {
-          geo: Geo[];
-          totalParticipantCount: number;
-        };
-      };
-    };
-  }>;
-  selectedPlaceId?: string | null;
-  onPlaceSelect?: (placeId: string) => void;
+export type PlaceDetail = PlaceCard & {
+  images: AppImage[];
+  totalImageCount: number;
+
+  currentlyHiringOpportunities: OpportunityCard[];
+  relatedArticles: ArticleWithAuthor[];
+  pastHistories: PlaceHistoryGrouped;
+}
+
+type PlaceHistoryGrouped = HistoryYearGroup[];
+
+type HistoryYearGroup = {
+  year: string;
+  months: HistoryMonthGroup[];
+};
+
+type HistoryMonthGroup = {
+  month: string;
+  entries: PlaceHistoryEntry[];
+};
+
+type PlaceHistoryEntry = {
+  id: string;
+  date: string;
+  title: string;
+  description: string;
+
+  images: AppImage[];
+  totalImageCount: number;
+
+  participants: Participant[];
+  participantCount: number;
 }

@@ -2,22 +2,18 @@
 
 import { useActivitiesQuery } from './useActivitiesQuery';
 import { useInfiniteScroll } from '@/hooks/core/useInfiniteScroll';
-import { OpportunityConnection } from '@/types';
+import React from "react";
+import { GqlOpportunitiesConnection } from "@/types/graphql";
 
 export interface UseActivitiesResult {
-  upcomingActivities: OpportunityConnection;
-  featuredActivities: OpportunityConnection;
-  allActivities: OpportunityConnection;
+  upcomingActivities: GqlOpportunitiesConnection;
+  featuredActivities: GqlOpportunitiesConnection;
+  allActivities: GqlOpportunitiesConnection;
   loading: boolean;
   error: any;
   loadMoreRef: React.RefObject<HTMLDivElement>;
 }
 
-/**
- * Hook for activities with infinite scroll functionality
- * This is a wrapper around useActivitiesQuery and useInfiniteScroll
- * for backward compatibility
- */
 export const useActivities = (): UseActivitiesResult => {
   const {
     upcomingActivities,

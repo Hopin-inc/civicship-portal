@@ -3,14 +3,14 @@
 import { useEffect } from 'react'
 import { useLoading } from '@/hooks/core/useLoading'
 import { useActivities } from '@/hooks/features/activity/useActivities'
-import { mapOpportunityToCardProps } from '@/presenters/opportunity'
 import { useHeaderConfig } from '@/hooks/core/useHeaderConfig'
-import { OpportunityEdge } from '@/types'
 import ActivitiesFeaturedSection from '@/components/features/activity/ActivitiesFeaturedSection'
 import ActivitiesUpcomingSection from '@/components/features/activity/ActivitiesUpcomingSection'
 import ActivitiesFeaturedItemsSection from '@/components/features/activity/ActivitiesFeaturedItemsSection'
 import ActivitiesAllSection from '@/components/features/activity/ActivitiesAllSection'
 import { ErrorState } from "@/components/shared/ErrorState"
+import { GqlOpportunityEdge } from "@/types/graphql";
+import { presenterActivityCard } from "@/presenters/opportunity";
 
 export default function ActivitiesPage() {
   const { setIsLoading } = useLoading()
@@ -35,9 +35,9 @@ export default function ActivitiesPage() {
 
   if (error) return <ErrorState message={`Error: ${error.message}`} />
 
-  const featuredCards = featuredActivities.edges.map(({ node }: OpportunityEdge) => mapOpportunityToCardProps(node))
-  const upcomingCards = upcomingActivities.edges.map(({ node }: OpportunityEdge) => mapOpportunityToCardProps(node))
-  const allCards = allActivities.edges.map(({ node }: OpportunityEdge) => mapOpportunityToCardProps(node))
+  const featuredCards = featuredActivities.edges.map(({ node }: GqlOpportunityEdge) => presenterActivityCard(node))
+  const upcomingCards = upcomingActivities.edges.map(({ node }: GqlOpportunityEdge) => presenterActivityCard(node))
+  const allCards = allActivities.edges.map(({ node }: GqlOpportunityEdge) => presenterActivityCard(node))
 
   return (
     <div className="min-h-screen pb-16">

@@ -2,13 +2,11 @@ import { gql } from "@apollo/client";
 
 export const MEMBERSHIP_FRAGMENT = gql`
   fragment MembershipFields on Membership {
-    id
-    bio
     headline
-    reason
+    bio
+
     role
     status
-    createdAt
-    updatedAt
+    reason
   }
 `; 

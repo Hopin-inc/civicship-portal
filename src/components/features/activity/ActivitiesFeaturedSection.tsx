@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { OpportunityCardProps } from '../opportunity/OpportunityCard';
-import FeaturedSection from './FeaturedSection';
+import FeaturedSection from "@/components/features/activity/FeaturedSection";
+import { ActivityCard } from "@/types/opportunity";
 
 interface ActivitiesFeaturedSectionProps {
-  opportunities: OpportunityCardProps[];
+  opportunities: ActivityCard[];
 }
 
 const ActivitiesFeaturedSection: React.FC<ActivitiesFeaturedSectionProps> = ({ 

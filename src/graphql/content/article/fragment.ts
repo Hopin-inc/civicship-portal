@@ -5,12 +5,12 @@ export const ARTICLE_FRAGMENT = gql`
     id
     title
     body
-    category
     introduction
     thumbnail
+
+    category
     publishStatus
+    
     publishedAt
-    createdAt
-    updatedAt
   }
 `; 

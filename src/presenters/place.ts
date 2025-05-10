@@ -1,6 +1,4 @@
 'use client';
-
-import { Geo } from '../types/place';
 import { ApolloError } from '@apollo/client';
 
 export interface Place extends Omit<Geo, 'latitude' | 'longitude'> {

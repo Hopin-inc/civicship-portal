@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from "react";
-import { GqlOpportunity } from "@/types/graphql";
+import { ActivitySlot } from "@/types/opportunity";
 
 export interface UseAvailableDatesQueryResult {
   availableDates: Array<{
@@ -13,20 +13,20 @@ export interface UseAvailableDatesQueryResult {
 }
 
 export const useAvailableDatesQuery = (
-  opportunity: GqlOpportunity | null
+  slots: ActivitySlot[] | undefined
 ): UseAvailableDatesQueryResult => {
   const availableDates = useMemo(() => {
-    if (!opportunity?.slots) return [];
+    if (!slots) return [];
 
-    return opportunity.slots
+    return slots
       .map(slot => ({
-        startsAt: new Date(slot.startsAt).toISOString(),
-        endsAt: new Date(slot.endsAt).toISOString(),
-        participants:  slot.reservations?.flatMap(r => r.participations ?? []).length ?? 0,
-        price: opportunity.feeRequired || 0,
+        startsAt: slot.startsAt,
+        endsAt: slot.endsAt,
+        participants:  slot.capacity - slot.remainingCapacity,
+        price: slot.feeRequired || 0,
       }))
       .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
-  }, [opportunity]);
+  }, [slots]);
 
   return {
     availableDates

@@ -2,16 +2,16 @@ import {
   OpportunityCard,
   OpportunityHost,
   OpportunityPlace,
-} from "@/types/types/opportunity";
-import { CommunityId } from "@/types";
+} from "@/types/opportunity";
+import { CommunityId } from "@/types/index";
 import {
   GqlOpportunityCategory,
   GqlOpportunitySlotHostingStatus,
   GqlParticipationStatus,
   GqlReservationStatus,
 } from "@/types/graphql";
-import { AppImage } from "@/types/types/utils";
-import { ArticleWithAuthor } from "@/types/types/article";
+import { AppImage } from "@/types/utils";
+import { ArticleWithAuthor } from "@/types/article";
 
 // ---------------------------------------------
 // 🎯 予約型の全体ユニオン

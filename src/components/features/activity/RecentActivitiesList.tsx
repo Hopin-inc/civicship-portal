@@ -1,10 +1,10 @@
 'use client'
 
-import { Opportunity } from '@/types'
 import Image from 'next/image'
 import Link from 'next/link'
 import { memo } from 'react'
 import { ParticipantsList } from '@/components/shared/ParticipantsList'
+import { GqlOpportunity } from "@/types/graphql";
 
 type OpportunityHistory = {
   id: string
@@ -63,22 +63,29 @@ const ActivityCard = memo(({ opportunity }: { opportunity: OpportunityHistory })
 ))
 ActivityCard.displayName = 'ActivityCard'
 
-const transformOpportunityToHistory = (opportunity: Opportunity): OpportunityHistory => {
+const transformOpportunityToHistory = (opportunity: GqlOpportunity): OpportunityHistory => {
   const images = [...(opportunity.images || [])];
 
-  const slotParticipants = opportunity.slots?.edges?.flatMap(edge => 
-    edge?.node?.participations?.edges?.map(p => ({
-      id: p?.node?.user?.id || '',
-      name: p?.node?.user?.name || '',
-      image: p?.node?.user?.image,
-    })) || []
-  ) || [];
+  const slotParticipants =
+    opportunity.slots?.flatMap(slot =>
+      slot.reservations?.flatMap(reservation =>
+        reservation?.participations?.flatMap(participation =>
+          participation?.user
+            ? [{
+              id: participation.user.id,
+              name: participation.user.name,
+              image: participation.user.image,
+            }]
+            : []
+        ) ?? []
+      ) ?? []
+    ) ?? [];
 
   const uniqueParticipants = Array.from(new Map(
     slotParticipants.map(p => [p.id, p])
   ).values());
 
-  const firstSlot = opportunity.slots?.edges?.[0]?.node;
+  const firstSlot = opportunity.slots?.[0];
   const date = firstSlot?.startsAt 
     ? new Date(firstSlot.startsAt).toLocaleDateString('ja-JP', {
         year: 'numeric',
@@ -98,13 +105,13 @@ const transformOpportunityToHistory = (opportunity: Opportunity): OpportunityHis
     date,
     images: images.map(img => ({ url: img, alt: opportunity.title })),
     participants: uniqueParticipants,
-    community: opportunity.community,
+    community: opportunity.community? opportunity.community : undefined,
     isReservableWithTicket: opportunity.isReservableWithTicket,
   };
 };
 
 interface RecentActivitiesListProps {
-  opportunities: Opportunity[];
+  opportunities: GqlOpportunity[];
 }
 
 export const RecentActivitiesList = ({ opportunities }: RecentActivitiesListProps) => {

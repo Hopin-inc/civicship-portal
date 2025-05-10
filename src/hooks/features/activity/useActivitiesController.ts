@@ -3,12 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useActivitiesQuery } from './useActivitiesQuery';
 import { useInfiniteScroll } from '@/hooks/core/useInfiniteScroll';
-import { OpportunityConnection } from '@/types';
 
-/**
- * Controller hook for activities with additional UI state management
- * Combines data fetching with UI control in a more flexible way
- */
 export const useActivitiesController = () => {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'featured' | 'all'>('all');
   

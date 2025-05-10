@@ -14,7 +14,7 @@ export const OPPORTUNITY_FRAGMENT = gql`
     requireApproval
 
     feeRequired
-#    pointsToEarn
+    pointsToEarn
     
     earliestReservableAt
   }

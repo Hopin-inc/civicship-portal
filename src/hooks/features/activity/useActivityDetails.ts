@@ -4,15 +4,15 @@ import { useActivityDetailsQuery } from '@/hooks/features/activity/useActivityDe
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect } from 'react';
 import { useLoading } from '@/hooks/core/useLoading';
-import { GqlOpportunity } from "@/types/graphql";
+import { ActivityCard, ActivityDetail } from "@/types/opportunity";
 
 interface UseActivityDetailsProps {
   id: string;
 }
 
 interface UseActivityDetailsResult {
-  opportunity: GqlOpportunity | null;
-  similarOpportunities: GqlOpportunity[];
+  opportunity: ActivityDetail | null;
+  similarOpportunities: ActivityCard[];
   availableTickets: number;
   availableDates: Array<{
     startsAt: string;
@@ -24,11 +24,6 @@ interface UseActivityDetailsResult {
   error: Error | null;
 }
 
-/**
- * Hook for activity details with UI control
- * This is a wrapper around useActivityDetailsQuery with loading state management
- * for backward compatibility
- */
 export const useActivityDetails = ({ id }: UseActivityDetailsProps): UseActivityDetailsResult => {
   const { user: currentUser } = useAuth();
   const { setIsLoading } = useLoading();
