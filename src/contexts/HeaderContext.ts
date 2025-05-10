@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import React, { createContext, useContext } from "react";
 
 /**
  * Header configuration interface
@@ -20,15 +20,29 @@ export interface HeaderConfig {
   };
 }
 
-type HeaderContextState = {
+export type HeaderContextState = {
   config: HeaderConfig;
-  updateConfig: (config: HeaderConfig) => void;
+  updateConfig: (config: Partial<HeaderConfig>) => void;
   resetConfig: () => void;
   lastVisitedUrls: Record<string, string>;
   addToHistory: (pageType: string, url: string) => void;
 };
 
-export const HeaderContext = createContext<HeaderContextState | undefined>(undefined);
+export const HeaderContext = createContext<HeaderContextState>({
+  config: {
+    title: undefined,
+    showBackButton: false,
+    showLogo: true,
+    showSearchForm: false,
+    action: undefined,
+    backTo: undefined,
+    searchParams: undefined,
+  },
+  updateConfig: () => {},
+  resetConfig: () => {},
+  lastVisitedUrls: {},
+  addToHistory: () => {},
+});
 
 export const useHeader = () => {
   const context = useContext(HeaderContext);
