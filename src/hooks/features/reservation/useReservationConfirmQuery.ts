@@ -1,6 +1,6 @@
 'use client';
 
-import { useCreateReservationMutation, useGetUserWalletQuery } from "@/types/graphql";
+import { GqlReservationPaymentMethod, useCreateReservationMutation, useGetUserWalletQuery } from "@/types/graphql";
 
 export const useReservationConfirmQuery = (userId: string | undefined) => {
   const { data: walletData, loading: walletLoading, error: walletError } = useGetUserWalletQuery( {
@@ -11,8 +11,8 @@ export const useReservationConfirmQuery = (userId: string | undefined) => {
     variables: {
       input: {
         opportunitySlotId: "",
-        paymentMethod: "FREE" as any,
-        totalParticipantCount: 1
+        totalParticipantCount: 1,
+        paymentMethod: GqlReservationPaymentMethod.Fee
       }
     }
   })
