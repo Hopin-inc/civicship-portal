@@ -5,6 +5,9 @@ import { CookiesProvider } from "next-client-cookies/server";
 import LiffProvider from "@/app/components/providers/LiffProvider";
 import ApolloProvider from "@/app/components/providers/ApolloProvider";
 import FirebaseAuthProvider from "@/app/components/providers/FirebaseAuthProvider";
+import HeaderProvider from "@/app/components/providers/HeaderProvider";
+import NavigationTracker from "@/app/components/providers/NavigationTracker";
+import Header from "@/app/components/layout/Header";
 import { Toaster } from "@/app/components/ui/sonner";
 import { Suspense } from "react";
 import Loading from "@/app/components/layout/Loading";
@@ -48,8 +51,13 @@ const RootLayout = ({
             <ApolloProvider>
               <FirebaseAuthProvider>
                 <LoadingProvider>
-                  {children}
-                  <Toaster richColors className="mx-8" />
+                  <HeaderProvider>
+                    <NavigationTracker>
+                      <Header />
+                      {children}
+                      <Toaster richColors className="mx-8" />
+                    </NavigationTracker>
+                  </HeaderProvider>
                 </LoadingProvider>
               </FirebaseAuthProvider>
             </ApolloProvider>

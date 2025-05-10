@@ -1,16 +1,19 @@
-import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+"use client";
 
-const ActivityDetail: React.FC = async () => {
+import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
+import { useEffect } from "react";
+
+const ActivityDetail: React.FC = () => {
+  useHeaderConfig({
+    title: "活動詳細",
+    showBackButton: true,
+    backTo: "/activities", // 明示的に戻り先を指定
+  });
+
   return (
     <main className="min-h-screen p-24">
-      <Link href="/activities" className="inline-flex">
-        <ChevronLeft />
-        活動一覧に戻る
-      </Link>
       <div className="w-full flex justify-between">
         <h1>活動詳細</h1>
-
       </div>
     </main>
   );
