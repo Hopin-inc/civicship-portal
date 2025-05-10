@@ -12,6 +12,13 @@ export interface HeaderConfig {
   showLogo?: boolean;
   showSearchForm?: boolean;
   action?: React.ReactNode;
+  backTo?: string; // 戻るボタンのカスタム遷移先
+  searchParams?: {
+    location?: string;
+    from?: string;
+    to?: string;
+    guests?: number;
+  };
 }
 
 /**
