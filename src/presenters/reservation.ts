@@ -1,12 +1,7 @@
 'use client';
 
-import { parseDateTime } from '../utils/date';
+import { parseDateTime } from "@/utils/date";
 
-/**
- * Finds a slot that matches the provided start time
- * @param slots Array of slot edges from GraphQL
- * @param slotStartsAt Start time to match
- */
 export const findMatchingSlot = (slots: any, slotStartsAt: string) => {
   if (!slots?.edges || !slotStartsAt) return null;
   
@@ -22,11 +17,6 @@ export const findMatchingSlot = (slots: any, slotStartsAt: string) => {
   });
 };
 
-/**
- * Calculates the number of available tickets for an opportunity
- * @param walletData Wallet data from GraphQL
- * @param requiredUtilities Required utilities for the opportunity
- */
 export const calculateAvailableTickets = (walletData: any, requiredUtilities: any[] | undefined) => {
   if (!requiredUtilities?.length) {
     return walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.length || 0;
@@ -46,12 +36,6 @@ export const calculateAvailableTickets = (walletData: any, requiredUtilities: an
   return availableTickets.length;
 };
 
-/**
- * Gets ticket IDs for reservation
- * @param walletData Wallet data from GraphQL
- * @param requiredUtilities Required utilities for the opportunity
- * @param ticketCount Number of tickets to use
- */
 export const getTicketIds = (walletData: any, requiredUtilities: any[] | undefined, ticketCount: number) => {
   return walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges
     ?.filter((edge: any) => {

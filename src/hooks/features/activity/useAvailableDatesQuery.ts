@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from "react";
-import { ActivitySlot } from "@/types/opportunity";
+import { ActivitySlot } from "@/types/opportunitySlot";
 
 export interface UseAvailableDatesQueryResult {
   availableDates: Array<{

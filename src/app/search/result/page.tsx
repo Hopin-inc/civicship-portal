@@ -6,8 +6,8 @@ import { SearchResultHeader } from '@/components/features/search/SearchResultHea
 import { RecommendedOpportunities } from '@/components/features/search/RecommendedOpportunities';
 import { DateGroupedOpportunities } from '@/components/features/search/DateGroupedOpportunities';
 import { EmptySearchResults } from '@/components/features/search/EmptySearchResults';
-import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 interface SearchResultPageProps {
   searchParams?: {

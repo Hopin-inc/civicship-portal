@@ -1,126 +1,94 @@
 'use client';
+import { GqlOpportunitySlot } from "@/types/graphql";
+import { ActivitySlot, ActivitySlotGroup } from "@/types/opportunitySlot";
 
-import { format } from 'date-fns';
-import { ja } from 'date-fns/locale';
-import { Opportunity } from '@/types';
+export const presenterOpportunitySlot = (
+  slot: GqlOpportunitySlot,
+  feeRequired: number,
+): ActivitySlot => {
+  return {
+    id: slot.id,
+    hostingStatus: slot.hostingStatus,
+    feeRequired: feeRequired,
 
-export interface TimeSlot {
-  time: string;
-  participants: number;
-  maxParticipants: number;
-  price: number;
-  id: string;
-  startsAt: string;
-  endsAt: string;
-  remainingCapacityView?: {
-    remainingCapacity: number;
+    capacity: slot.capacity ?? 0,
+    remainingCapacity: slot.remainingCapacity ?? 0,
+
+    startsAt: new Date(slot.startsAt).toISOString(),
+    endsAt: new Date(slot.endsAt).toISOString(),
   };
-}
+};
 
-export interface DateSection {
-  date: string;
-  day: string;
-  timeSlots: TimeSlot[];
-}
+export const filterSlotGroupsBySelectedDate = (
+  groups: ActivitySlotGroup[],
+  selectedDates: string[]
+): ActivitySlotGroup[] => {
+  if (!selectedDates || selectedDates.length === 0) return groups;
 
-/**
- * Transform opportunity slots into date sections
- */
-export const transformSlotsToDateSections = (opportunity: Opportunity | null): DateSection[] => {
-  if (!opportunity?.slots?.edges) return [];
+  return groups.filter(group => selectedDates.includes(group.dateLabel));
+};
 
-  return opportunity.slots.edges
-    .reduce((acc: DateSection[], edge: any) => {
-      if (!edge?.node) return acc;
+export const presenterActivitySlots = (
+  slots: GqlOpportunitySlot[] | null | undefined,
+  feeRequired: number
+): ActivitySlot[] => {
+  if (!slots || slots.length === 0) return [];
+  return slots.map((slot) => presenterOpportunitySlot(slot, feeRequired));
+};
 
-      const startDate = new Date(edge.node.startsAt);
-      const endDate = new Date(edge.node.endsAt);
-      const dateStr = format(startDate, "M月d日", { locale: ja });
-      const dayStr = format(startDate, "E", { locale: ja });
-      const timeStr = `${format(startDate, "HH:mm")}~${format(endDate, "HH:mm")}`;
-      const participants = edge.node.participations?.edges?.length || 0;
-      const maxParticipants = opportunity.capacity || 10;
-      const price = opportunity.feeRequired || 0;
-      const remainingCapacityView = {
-        remainingCapacity: maxParticipants - participants
-      };
+export const groupActivitySlotsByDate = (
+  slots: ActivitySlot[]
+): ActivitySlotGroup[] => {
+  const groups: Record<string, ActivitySlot[]> = {};
 
-      const existingSection = acc.find((section) => section.date === dateStr);
-      if (existingSection) {
-        existingSection.timeSlots.push({
-          time: timeStr,
-          participants,
-          maxParticipants,
-          price,
-          id: edge.node.id,
-          startsAt: String(edge.node.startsAt),
-          endsAt: String(edge.node.endsAt),
-          remainingCapacityView,
-        });
-      } else {
-        acc.push({
-          date: dateStr,
-          day: dayStr,
-          timeSlots: [
-            {
-              time: timeStr,
-              participants,
-              maxParticipants,
-              price,
-              id: edge.node.id,
-              startsAt: String(edge.node.startsAt),
-              endsAt: String(edge.node.endsAt),
-              remainingCapacityView,
-            },
-          ],
-        });
-      }
-      return acc;
-    }, [])
-    .sort((a, b) => {
-      const dateA = new Date(a.timeSlots[0].startsAt);
-      const dateB = new Date(b.timeSlots[0].startsAt);
-      return dateA.getTime() - dateB.getTime();
+  for (const slot of slots) {
+    const date = new Date(slot.startsAt);
+    const dateLabel = date.toLocaleDateString("ja-JP", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "long",
     });
+
+    if (!groups[dateLabel]) {
+      groups[dateLabel] = [];
+    }
+
+    groups[dateLabel].push(slot);
+  }
+
+  return Object.entries(groups)
+    .map(([dateLabel, slots]) => ({
+      dateLabel,
+      slots: slots.sort(
+        (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
+      ),
+    }))
+    .sort(
+      (a, b) =>
+        new Date(a.slots[0].startsAt).getTime() -
+        new Date(b.slots[0].startsAt).getTime()
+    );
 };
 
-/**
- * Filter date sections by selected date
- */
-export const filterDateSectionsByDate = (
-  dateSections: DateSection[], 
-  selectedDate: string | null
-): DateSection[] => {
-  if (!selectedDate) return dateSections;
-  
-  return dateSections.filter((section) => {
-    return `${section.date} (${section.day})` === selectedDate;
-  });
-};
-
-/**
- * Check if a slot has enough capacity for the selected number of guests
- */
-export const isSlotAvailable = (slot: TimeSlot, selectedGuests: number): boolean => {
-  const remainingCapacity = slot.remainingCapacityView?.remainingCapacity || 0;
+export const isSlotAvailable = (slot: ActivitySlot, selectedGuests: number): boolean => {
+  const remainingCapacity = slot.remainingCapacity;
   return remainingCapacity >= selectedGuests;
 };
 
-/**
- * Build URL parameters for reservation confirmation
- */
 export const buildReservationParams = (
   opportunityId: string,
   communityId: string,
-  slot: TimeSlot,
+  slot: ActivitySlot,
   selectedGuests: number
 ): URLSearchParams => {
   return new URLSearchParams({
     id: opportunityId,
     community_id: communityId,
     slot_id: slot.id,
-    starts_at: slot.startsAt,
-    ends_at: slot.endsAt,
+    starts_at: new Date(slot.startsAt).toISOString(),
+    ends_at: new Date(slot.endsAt).toISOString(),
     guests: selectedGuests.toString(),
   });
 };
+

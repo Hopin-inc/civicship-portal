@@ -1,8 +1,9 @@
 "use client";
 
+import { useReservationConfirm } from "@/hooks";
 import { useSearchParams } from "next/navigation";
+import React, { useMemo } from "react";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import LoginModal from "@/components/features/login/LoginModal";
@@ -10,82 +11,97 @@ import { OpportunityInfo } from "@/components/features/reservation/OpportunityIn
 import { ReservationDetailsCard } from "@/components/features/reservation/ReservationDetailsCard";
 import { PaymentSection } from "@/components/features/reservation/PaymentSection";
 import { NotesSection } from "@/components/features/reservation/NotesSection";
-import { useReservationConfirm } from "@/hooks/features/reservation/useReservationConfirm";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
-/**
- * Page component for reservation confirmation
- */
 export default function ConfirmPage() {
   const searchParams = useSearchParams();
-  const params = {
-    id: searchParams.get("id"),
-    starts_at: searchParams.get("starts_at"),
-    guests: searchParams.get("guests"),
-    community_id: searchParams.get("community_id")
-  };
-  
-  const {
-    opportunity,
+  const params = useMemo(() => ({
+    id: searchParams.get("id") ?? "",
+    starts_at: searchParams.get("starts_at") ?? "",
+    guests: searchParams.get("guests") ?? "",
+    community_id: searchParams.get("community_id") ?? ""
+  }), [searchParams]);
+
+  const result = useReservationConfirm(params);
+
+  return (
+    <ReservationConfirmGate
+      loading={result.loading}
+      error={result.error}
+      opportunity={result.opportunity}
+      slot={result.selectedSlot}
+      startDateTime={result.startDateTime}
+      endDateTime={result.endDateTime}
+    >
+      <ConfirmUI {...result} />
+    </ReservationConfirmGate>
+  );
+}
+
+function ReservationConfirmGate({
     loading,
     error,
-    selectedSlot,
+    opportunity,
+    slot,
     startDateTime,
     endDateTime,
-    participantCount,
-    pricePerPerson,
-    ticketCount,
-    useTickets,
-    setUseTickets,
-    availableTickets,
-    isLoginModalOpen,
-    setIsLoginModalOpen,
-    creatingReservation,
-    incrementTicket,
-    decrementTicket,
-    handleConfirmReservation
-  } = useReservationConfirm(params);
+    children,
+  }: {
+  loading: boolean;
+  error: Error | null;
+  opportunity: any;
+  slot: any;
+  startDateTime: Date | null;
+  endDateTime: Date | null;
+  children: React.ReactNode;
+}) {
+  if (loading) return <LoadingIndicator />;
+  if (error) return <ErrorState message={error.message} />;
+  if (!opportunity) return <ErrorState message="予約情報が見つかりませんでした" />;
+  if (!slot?.node) return <ErrorState message="選択された時間枠が見つかりませんでした" />;
+  if (!startDateTime || !endDateTime) return <ErrorState message="時間枠の日付形式が無効です" />;
+  return <>{children}</>;
+}
 
-  if (loading) {
-    return <LoadingIndicator message="読み込み中..." />;
-  }
-
-  if (error) {
-    return <ErrorState message={error.message} />;
-  }
-
-  if (!opportunity) {
-    return <ErrorState message="予約情報が見つかりませんでした" />;
-  }
-  
-  if (!selectedSlot?.node) {
-    return <ErrorState message="選択された時間枠が見つかりませんでした" />;
-  }
-
-  if (!startDateTime || !endDateTime) {
-    return <ErrorState message="時間枠の日付形式が無効です" />;
-  }
-
+function ConfirmUI({
+   opportunity,
+   selectedSlot,
+   startDateTime,
+   endDateTime,
+   participantCount,
+   pricePerPerson,
+   ticketCount,
+   useTickets,
+   setUseTickets,
+   availableTickets,
+   isLoginModalOpen,
+   setIsLoginModalOpen,
+   incrementTicket,
+   decrementTicket,
+   handleConfirmReservation,
+   creatingReservation,
+ }: ReturnType<typeof useReservationConfirm>) {
   return (
     <main className="pb-8 min-h-screen">
       <Toaster />
-      <LoginModal 
-        isOpen={isLoginModalOpen} 
-        onClose={() => setIsLoginModalOpen(false)} 
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
       />
-      
-      <OpportunityInfo 
-        opportunity={opportunity} 
-        pricePerPerson={pricePerPerson} 
+
+      <OpportunityInfo
+        opportunity={opportunity}
+        pricePerPerson={pricePerPerson}
       />
 
       <div className="px-4">
-        <ReservationDetailsCard 
+        <ReservationDetailsCard
           startDateTime={startDateTime}
           endDateTime={endDateTime}
           participantCount={participantCount}
           location={{
-            name: opportunity.place?.name || '高松市役所',
-            address: opportunity.place?.address || '香川県高松市番町1丁目8-15'
+            name: opportunity?.place?.name || "",
+            address: opportunity?.place?.address || "",
           }}
         />
 
@@ -100,13 +116,14 @@ export default function ConfirmPage() {
           setUseTickets={setUseTickets}
         />
 
-        <NotesSection requireApproval={opportunity.requireApproval} />
+        <NotesSection requireApproval={opportunity?.requiredApproval} />
 
-        <Button 
-          className="w-full py-6 text-base rounded-lg bg-[#4361EE] hover:bg-[#3651DE]" 
-          size="lg"
+        <Button
           onClick={handleConfirmReservation}
-          disabled={creatingReservation || (useTickets && ticketCount > availableTickets)}
+          disabled={
+            creatingReservation ||
+            (useTickets && ticketCount > availableTickets)
+          }
         >
           {creatingReservation ? "処理中..." : "申し込みを確定"}
         </Button>

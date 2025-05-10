@@ -1,46 +1,63 @@
 "use client";
 
 import { ErrorState } from "@/components/shared/ErrorState";
-import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
 import { RecentActivitiesTimeline } from "@/components/features/activity/RecentActivitiesTimeline";
 import { SimilarActivitiesList } from "@/components/features/activity/SimilarActivitiesList";
 import { CompletionHeader } from "@/components/features/reservation/CompletionHeader";
 import { ActivitySummary } from "@/components/features/reservation/ActivitySummary";
 import { ReservationDetails } from "@/components/features/reservation/ReservationDetails";
 import { useReservationComplete } from "@/hooks/features/reservation/useReservationComplete";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
-/**
- * Page component for reservation completion
- */
 export default function CompletePage() {
-  const {
-    opportunity,
-    similarOpportunities,
-    opportunitiesCreatedByHost,
-    dateTimeInfo,
-    isLoading,
-    error
-  } = useReservationComplete();
+  const result = useReservationComplete();
 
-  if (isLoading) {
-    return <LoadingIndicator message="読み込み中..." />;
-  }
+  return (
+    <ReservationCompletionGate {...result}>
+      <ReservationCompletionUI {...result} />
+    </ReservationCompletionGate>
+  );
+}
 
-  if (error) {
-    return <ErrorState message={error.message} />;
-  }
+function ReservationCompletionGate({
+   isLoading,
+   error,
+   opportunity,
+   dateTimeInfo,
+   children,
+ }: {
+  isLoading: boolean;
+  error: Error | null;
+  opportunity: any;
+  dateTimeInfo: {
+    formattedDate: string;
+    startTime: string;
+    endTime: string;
+    participantCount: number;
+    totalPrice: number;
+  } | null;
+  children: React.ReactNode;
+}) {
+  if (isLoading) return <LoadingIndicator/>;
+  if (error) return <ErrorState message={error.message} />;
+  if (!opportunity || !dateTimeInfo) return <ErrorState message="予約情報が見つかりませんでした" />;
 
-  if (!opportunity || !dateTimeInfo) {
-    return <ErrorState message="予約情報が見つかりませんでした" />;
-  }
+  return <>{children}</>;
+}
 
+function ReservationCompletionUI({
+   opportunity,
+   similarOpportunities,
+   opportunitiesCreatedByHost,
+   dateTimeInfo,
+ }: ReturnType<typeof useReservationComplete>) {
   return (
     <main className="flex flex-col items-center px-4 pb-8">
       <CompletionHeader />
 
       <ActivitySummary opportunity={opportunity} />
 
-      <ReservationDetails 
+      <ReservationDetails
         formattedDate={dateTimeInfo.formattedDate}
         startTime={dateTimeInfo.startTime}
         endTime={dateTimeInfo.endTime}
@@ -50,9 +67,9 @@ export default function CompletePage() {
       />
 
       <div className="w-full mt-8 mb-16">
-        <SimilarActivitiesList 
-          opportunities={similarOpportunities} 
-          currentOpportunityId={opportunity.id}
+        <SimilarActivitiesList
+          opportunities={similarOpportunities}
+          currentOpportunityId={opportunity?.id}
         />
         <RecentActivitiesTimeline opportunities={opportunitiesCreatedByHost} />
       </div>

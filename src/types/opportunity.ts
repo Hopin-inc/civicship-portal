@@ -1,6 +1,7 @@
-import { GqlOpportunityCategory } from "@/types/graphql";
+import { GqlOpportunityCategory, GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 import { CommunityId } from "@/types/index";
 import { ArticleCard } from "@/types/article";
+import { ActivitySlot, QuestSlot } from "@/types/opportunitySlot";
 
 // ---------------------------------------------
 // 📦 Opportunity カード型（サマリ表示用）
@@ -70,26 +71,6 @@ export type OpportunityHost = {
   bio: string;
 
   interview?: ArticleCard;
-};
-
-// ---------------------------------------------
-// 📆 スロット（開催枠）情報
-// ---------------------------------------------
-export type ActivitySlot = OpportunitySlot & {
-  feeRequired: number;
-};
-
-export type QuestSlot = OpportunitySlot & {
-  pointsToEarn: number;
-};
-
-type OpportunitySlot = {
-  id: string;
-  capacity: number;
-  remainingCapacity: number;
-
-  startsAt: string;
-  endsAt: string;
 };
 
 // ---------------------------------------------

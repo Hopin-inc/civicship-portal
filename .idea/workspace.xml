@@ -4,33 +4,34 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9d8e9427-ae26-45d1-b49b-4edd4ae6b1fb" name="変更" comment="refactor: update activities">
-      <change afterPath="$PROJECT_DIR$/src/hooks/features/activity/useAllActivities.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/hooks/features/activity/useFeaturedActivities.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/hooks/features/activity/useUpcomingActivities.ts" afterDir="false" />
+    <list default="true" id="9d8e9427-ae26-45d1-b49b-4edd4ae6b1fb" name="変更" comment="refactor: update articles">
+      <change afterPath="$PROJECT_DIR$/src/types/opportunitySlot.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/activities/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/activities/[id]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/activities/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/activities/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/articles/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/articles/[id]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/articles/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/articles/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/participations/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/participations/[id]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/providers/LoadingProvider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/providers/LoadingProvider.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/shared/LoadingIndicator.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/shared/LoadingIndicator.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/graphql/account/user/fragment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphql/account/user/fragment.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/graphql/content/article/query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphql/content/article/query.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/graphql/experience/opportunity/query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphql/experience/opportunity/query.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/core/useInfiniteScroll.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/core/useInfiniteScroll.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useActivitiesController.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useActivitiesQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useActivitiesQuery.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useActivityDetails.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useActivityDetails.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useActivityDetailsQuery.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useAvailableDates.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/article/useArticle.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/article/useArticle.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/article/useArticleQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/article/useArticleQuery.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/article/useArticles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/article/useArticles.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/presenters/article.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/presenters/article.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/article.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/article.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/graphql.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/graphql.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/reservation/complete/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/reservation/complete/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/reservation/confirm/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/reservation/confirm/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/reservation/select-date/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/reservation/select-date/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/search/result/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/search/result/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/reservation/DateSelectionForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/reservation/DateSelectionForm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/reservation/GuestSelectionForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/reservation/GuestSelectionForm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/reservation/SelectionSheet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/reservation/SelectionSheet.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/reservation/TimeSlotList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/reservation/TimeSlotList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useAvailableDatesQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useAvailableDatesQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/article/useArticleController.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/article/useArticlesController.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/article/useArticlesQuery.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/place/usePlaceMembership.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/place/usePlaceMembership.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/place/usePlacesQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/place/usePlacesQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationComplete.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationComplete.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirm.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirm.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirmController.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirmQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirmQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationDateSelection.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationDateSelection.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationDateSelectionController.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationDateSelectionQuery.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/presenters/opportunitySlot.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/presenters/opportunitySlot.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/presenters/reservation.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/presenters/reservation.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/opportunity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/opportunity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/date.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/date.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -175,7 +176,7 @@
       <workItem from="1746784394527" duration="198000" />
       <workItem from="1746784931351" duration="27000" />
       <workItem from="1746785215423" duration="22464000" />
-      <workItem from="1746855543634" duration="16757000" />
+      <workItem from="1746855543634" duration="22923000" />
     </task>
     <task id="LOCAL-00001" summary="refactor: delete not usage file">
       <option name="closed" value="true" />
@@ -441,7 +442,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746868752906</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="refactor: update articles">
+      <option name="closed" value="true" />
+      <created>1746872621639</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1746872621639</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -459,7 +468,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="WIP: refactor place component directory" />
     <MESSAGE value="WIP: manual refactor" />
     <MESSAGE value="fix: fix TS71007" />
     <MESSAGE value="refactor: manual refactor" />
@@ -484,6 +492,7 @@
     <MESSAGE value="refactor: create fragments" />
     <MESSAGE value="refactor: -&gt; activities detail" />
     <MESSAGE value="refactor: update activities" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: update activities" />
+    <MESSAGE value="refactor: update articles" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: update articles" />
   </component>
 </project>

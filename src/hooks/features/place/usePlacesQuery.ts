@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { GET_MEMBERSHIP_LIST } from '@/graphql/queries/membership';
+import { GET_MEMBERSHIP_LIST } from "@/graphql/account/membership/query";
 
 /**
  * Hook for fetching membership data from GraphQL
