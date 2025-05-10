@@ -23,6 +23,7 @@ export const useReservationConfirm = (params: {
   starts_at: string | null;
   guests: string | null;
   community_id: string | null;
+  slot_id?: string | null;
 }) => {
   const router = useRouter();
   const { updateConfig } = useHeader();
@@ -31,6 +32,7 @@ export const useReservationConfirm = (params: {
 
   const opportunityId = params.id || '';
   const slotStartsAt = params.starts_at || '';
+  const slotId = params.slot_id || '';
   const participantCount = parseInt(params.guests || '1', 10);
 
   // -------------------------------
@@ -54,7 +56,7 @@ export const useReservationConfirm = (params: {
     endDateTime,
     createReservation,
     creatingReservation
-  } = useSlotAndTicketInfo(opportunity, slotStartsAt, user?.id);
+  } = useSlotAndTicketInfo(opportunity, slotStartsAt, user?.id, slotId);
 
   // -------------------------------
   // 3. チケットUI制御・予約実行
@@ -144,7 +146,8 @@ function useOpportunityData(opportunityId: string) {
 function useSlotAndTicketInfo(
   opportunity: ActivityDetail | null,
   slotStartsAt: string,
-  userId?: string
+  userId?: string,
+  slotId?: string
 ) {
   const {
     walletData,
@@ -154,10 +157,10 @@ function useSlotAndTicketInfo(
   } = useReservationConfirmQuery(userId);
 
   const selectedSlot = useMemo(() => {
-    console.log("Finding slot with startsAt:", slotStartsAt);
+    console.log("Finding slot with:", { startsAt: slotStartsAt, slotId });
     console.log("Available slots:", opportunity?.slots);
-    return findMatchingSlot(opportunity?.slots, slotStartsAt);
-  }, [opportunity?.slots, slotStartsAt]);
+    return findMatchingSlot(opportunity?.slots, slotStartsAt, slotId);
+  }, [opportunity?.slots, slotStartsAt, slotId]);
 
   const availableTickets = useMemo(
     () => calculateAvailableTickets(walletData, opportunity?.requiredTicket),
