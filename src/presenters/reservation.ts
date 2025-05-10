@@ -57,14 +57,24 @@ export const findMatchingSlot = (slots: any, slotStartsAt: string) => {
   
   console.log("findMatchingSlot result:", foundItem);
   
-  if (!foundItem && slotsArray.length > 0) {
-    console.log("No match found, creating fake node for debugging");
+  if (foundItem) {
+    if (foundItem.node) {
+      console.log("Returning existing node structure");
+      return foundItem;
+    } else {
+      console.log("Wrapping slot in node structure");
+      return { node: foundItem };
+    }
+  }
+  
+  if (slotsArray.length > 0) {
+    console.log("No match found, creating node structure from first slot");
     const firstItem = slotsArray[0];
     const slot = firstItem.node || firstItem;
     return { node: slot };
   }
   
-  return foundItem;
+  return null;
 };
 
 export const calculateAvailableTickets = (walletData: any, requiredUtilities: any[] | undefined) => {
