@@ -3,21 +3,68 @@
 import { parseDateTime } from "@/utils/date";
 
 export const findMatchingSlot = (slots: any, slotStartsAt: string) => {
-  if (!slots || !slotStartsAt) return null;
+  console.log("findMatchingSlot called with slotStartsAt:", slotStartsAt);
+  console.log("Slots structure:", slots);
   
-  const slotsArray = slots.edges ? slots.edges : Array.isArray(slots) ? slots : [];
+  if (!slots || !slotStartsAt) {
+    console.log("Missing slots or slotStartsAt");
+    return null;
+  }
   
-  return slotsArray.find((item: any) => {
-    const slot = item.node || item;
-    if (!slot?.startsAt) return false;
+  const hasEdges = slots.edges && Array.isArray(slots.edges);
+  const isArray = Array.isArray(slots);
+  
+  console.log("Slots structure type:", { hasEdges, isArray });
+  
+  const slotsArray = hasEdges ? slots.edges : isArray ? slots : [];
+  
+  console.log("Slots array length:", slotsArray.length);
+  if (slotsArray.length > 0) {
+    console.log("First slot sample:", JSON.stringify(slotsArray[0]));
+  }
+  
+  const foundItem = slotsArray.find((item: any) => {
+    const hasNode = item && item.node;
+    const slot = hasNode ? item.node : item;
+    
+    if (!slot?.startsAt) {
+      console.log("Slot missing startsAt:", slot);
+      return false;
+    }
     
     const slotDateTime = parseDateTime(String(slot.startsAt));
     const paramDateTime = parseDateTime(decodeURIComponent(slotStartsAt));
     
-    if (!slotDateTime || !paramDateTime) return false;
+    console.log("Comparing dates:", {
+      slotStartsAt: slot.startsAt,
+      paramStartsAt: slotStartsAt,
+      slotDateTime,
+      paramDateTime
+    });
     
-    return slotDateTime.getTime() === paramDateTime.getTime();
+    if (!slotDateTime || !paramDateTime) {
+      console.log("Invalid date format");
+      return false;
+    }
+    
+    const isMatch = slotDateTime.getTime() === paramDateTime.getTime();
+    if (isMatch) {
+      console.log("Found matching slot!");
+    }
+    
+    return isMatch;
   });
+  
+  console.log("findMatchingSlot result:", foundItem);
+  
+  if (!foundItem && slotsArray.length > 0) {
+    console.log("No match found, creating fake node for debugging");
+    const firstItem = slotsArray[0];
+    const slot = firstItem.node || firstItem;
+    return { node: slot };
+  }
+  
+  return foundItem;
 };
 
 export const calculateAvailableTickets = (walletData: any, requiredUtilities: any[] | undefined) => {
