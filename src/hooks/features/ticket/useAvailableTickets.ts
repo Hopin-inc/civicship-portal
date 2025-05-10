@@ -1,17 +1,30 @@
 'use client';
 
-import { useAvailableTicketsController } from './useAvailableTicketsController';
-import { Opportunity } from "@/types";
+import { useMemo } from "react";
+import {  useGetUserWalletQuery } from "@/types/graphql";
+import { ActivityDetail } from "@/types/opportunity";
 
-/**
- * Custom hook for checking available tickets
- * This is a backward-compatible wrapper around useAvailableTicketsController
- * @param opportunity Opportunity to check tickets for
- * @param userId User ID to check tickets for
- */
 export const useAvailableTickets = (
-  opportunity: Opportunity | null,
+  opportunity: ActivityDetail | null,
   userId: string | undefined
 ): number => {
-  return useAvailableTicketsController(opportunity, userId);
+  const { data } = useGetUserWalletQuery({
+    variables: userId ? { id: userId } : undefined,
+    skip: !userId,
+  });
+
+  return useMemo(() => {
+    const tickets = data?.user?.wallets?.[0]?.tickets || [];
+
+    if (!opportunity?.requiredTicket.length) {
+      return tickets.length;
+    }
+
+    const requiredUtilityIds = new Set(opportunity.requiredTicket.map(u => u.id));
+
+    return tickets.filter(edge => {
+      const utilityId = edge?.utility?.id;
+      return utilityId && requiredUtilityIds.has(utilityId);
+    }).length;
+  }, [opportunity?.requiredTicket, data]);
 };

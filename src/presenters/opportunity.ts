@@ -9,7 +9,7 @@ import {
 import { ActivityCard, ActivityDetail, ActivitySlot, OpportunityHost, OpportunityPlace } from "@/types/opportunity";
 import { presenterArticleCard } from "@/presenters/article";
 
-export const presenterActivityCard = (node: Maybe<GqlOpportunity> | undefined ): ActivityCard => ({
+export const presenterActivityCard = (node: GqlOpportunity ): ActivityCard => ({
   id: node?.id || "",
   title: node?.title || "",
   category: node?.category || GqlOpportunityCategory.Activity,
@@ -35,6 +35,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail=> 
     totalImageCount: images?.length || 0,
 
     requiredApproval: data.requireApproval,
+    requiredTicket: data.requiredUtilities?.map((u)=> u) || [],
     feeRequired: data.feeRequired || 0,
 
     place: presenterPlace(place),

@@ -5,8 +5,6 @@ import ActivityDetailsHeader from "@/components/features/activity/ActivityDetail
 import ActivityDetailsContent from "@/components/features/activity/ActivityDetailsContent";
 import ActivityDetailsFooter from "@/components/features/activity/ActivityDetailsFooter";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { useEffect } from "react";
-import { useLoading } from "@/hooks/core/useLoading";
 
 interface ActivityPageProps {
   params: {
@@ -18,46 +16,43 @@ interface ActivityPageProps {
 }
 
 export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
-  const { 
-    opportunity, 
-    similarOpportunities, 
-    availableTickets, 
-    availableDates,
-    loading, 
-    error 
-  } = useActivityDetails({ id: params.id });
-  
-  const { setIsLoading } = useLoading();
-  
-  useEffect(() => {
-    setIsLoading(loading);
-  }, [loading, setIsLoading]);
+  const { id } = params;
 
-  if (error) return <ErrorState message={`Error: ${error.message}`} />;
-  if (!opportunity) return <ErrorState message="No opportunity found" />;
+  const {
+    opportunity,
+    similarActivities,
+    availableTickets,
+    availableDates,
+    error,
+  } = useActivityDetails(id);
+
+  if (error && !opportunity) {
+    return <ErrorState message={`Error: ${error.message}`} />;
+  }
+  if (!opportunity) {
+    return <ErrorState message="No opportunity found" />;
+  }
 
   return (
     <>
       <main className="min-h-screen pb-24">
         <div className="max-w-7xl mx-auto px-4">
-          <ActivityDetailsHeader 
-            opportunity={opportunity} 
-            availableTickets={availableTickets} 
+          <ActivityDetailsHeader
+            opportunity={opportunity}
+            availableTickets={availableTickets}
           />
-          
-          <ActivityDetailsContent 
+          <ActivityDetailsContent
             opportunity={opportunity}
             availableTickets={availableTickets}
             availableDates={availableDates}
-            similarOpportunities={similarOpportunities}
+            similarActivities={similarActivities}
             communityId={searchParams.community_id}
           />
         </div>
       </main>
-
-      <ActivityDetailsFooter 
-        opportunityId={opportunity.id} 
-        price={opportunity.feeRequired || 0} 
+      <ActivityDetailsFooter
+        opportunityId={opportunity.id}
+        price={opportunity.feeRequired || 0}
       />
     </>
   );

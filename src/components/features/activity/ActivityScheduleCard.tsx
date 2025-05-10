@@ -13,7 +13,7 @@ interface ActivityScheduleCardProps {
   price: number;
   opportunityId: string;
   communityId: string;
-  isReservableWithTicket?: boolean;
+  reservableTickets?: number;
   availableTickets?: number;
 }
 
@@ -24,7 +24,7 @@ const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
   price,
   opportunityId,
   communityId,
-  isReservableWithTicket,
+  reservableTickets,
   availableTickets,
 }) => {
   const startDate = new Date(startsAt);

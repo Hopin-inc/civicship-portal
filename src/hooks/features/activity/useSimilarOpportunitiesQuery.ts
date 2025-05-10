@@ -1,16 +1,14 @@
 'use client';
 
-import { useQuery } from "@apollo/client";
 import { COMMUNITY_ID } from "@/utils";
-import { GET_OPPORTUNITIES } from "@/graphql/experience/opportunity/query";
-import { ActivityCard } from "@/types/opportunity";
+import { GqlOpportunity, GqlOpportunityEdge, useGetOpportunitiesQuery } from "@/types/graphql";
 
 interface UseSimilarOpportunitiesQueryProps {
   opportunityId: string;
 }
 
 export interface UseSimilarOpportunitiesQueryResult {
-  similarOpportunities: ActivityCard[];
+  similarOpportunities: GqlOpportunity[];
   loading: boolean;
   error: any;
 }
@@ -18,7 +16,7 @@ export interface UseSimilarOpportunitiesQueryResult {
 export const useSimilarOpportunitiesQuery = ({
   opportunityId,
 }: UseSimilarOpportunitiesQueryProps): UseSimilarOpportunitiesQueryResult => {
-  const { data, loading, error } = useQuery(GET_OPPORTUNITIES, {
+  const { data, loading, error } = useGetOpportunitiesQuery({
     variables: {
       similarFilter: {
         communityIds: [COMMUNITY_ID]
@@ -28,10 +26,11 @@ export const useSimilarOpportunitiesQuery = ({
   });
 
   return {
-    similarOpportunities: data?.similar?.edges?.map(
-      (edge: any) => edge.node
-    ),
+    similarOpportunities: (data?.similar?.edges ?? [])
+      .map((edge: GqlOpportunityEdge) => edge.node)
+      .filter((node): node is GqlOpportunity => !!node),
     loading,
     error,
   };
+
 };

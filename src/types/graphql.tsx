@@ -35,10 +35,10 @@ export type GqlAccumulatedPointView = {
 export type GqlArticle = {
   __typename?: "Article";
   authors?: Maybe<Array<GqlUser>>;
-  body: Scalars["String"]["output"];
+  body?: Maybe<Scalars["String"]["output"]>;
   category: GqlArticleCategory;
   community?: Maybe<GqlCommunity>;
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   id: Scalars["ID"]["output"];
   introduction: Scalars["String"]["output"];
   opportunities?: Maybe<Array<GqlOpportunity>>;
@@ -154,7 +154,7 @@ export type GqlCommunity = {
   __typename?: "Community";
   articles?: Maybe<Array<GqlArticle>>;
   bio?: Maybe<Scalars["String"]["output"]>;
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   establishedAt?: Maybe<Scalars["Datetime"]["output"]>;
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
@@ -1585,7 +1585,7 @@ export type GqlQueryWalletsArgs = {
 
 export type GqlReservation = {
   __typename?: "Reservation";
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   createdByUser?: Maybe<GqlUser>;
   histories?: Maybe<Array<GqlReservationHistory>>;
   id: Scalars["ID"]["output"];
@@ -2008,7 +2008,7 @@ export type GqlUser = {
   portfolios?: Maybe<Array<GqlPortfolio>>;
   reservationStatusChangedByMe?: Maybe<Array<GqlReservationHistory>>;
   reservations?: Maybe<Array<GqlReservation>>;
-  slug: Scalars["String"]["output"];
+  slug?: Maybe<Scalars["String"]["output"]>;
   sysRole?: Maybe<GqlSysRole>;
   ticketStatusChangedByMe?: Maybe<Array<GqlTicketStatusHistory>>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
@@ -2333,7 +2333,7 @@ export type GqlGetSingleMembershipQuery = {
         title: string;
         introduction: string;
         thumbnail?: any | null;
-        createdAt: Date;
+        createdAt?: Date | null;
       }> | null;
       opportunitiesCreatedByMe?: Array<{
         __typename?: "Opportunity";
@@ -2538,7 +2538,7 @@ export type GqlUpdateMyProfileMutation = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
-      slug: string;
+      slug?: string | null;
     } | null;
   } | null;
 };
@@ -2698,7 +2698,7 @@ export type GqlArticleFieldsFragment = {
   __typename?: "Article";
   id: string;
   title: string;
-  body: string;
+  body?: string | null;
   introduction: string;
   thumbnail?: any | null;
   category: GqlArticleCategory;
@@ -2751,11 +2751,11 @@ export type GqlGetArticleQuery = {
     id: string;
     title: string;
     introduction: string;
-    body: string;
+    body?: string | null;
     category: GqlArticleCategory;
     thumbnail?: any | null;
     publishedAt?: Date | null;
-    createdAt: Date;
+    createdAt?: Date | null;
     updatedAt?: Date | null;
     authors?: Array<{
       __typename?: "User";
@@ -3136,6 +3136,7 @@ export type GqlGetOpportunityQuery = {
       remainingCapacity?: number | null;
       reservations?: Array<{
         __typename?: "Reservation";
+        id: string;
         status: GqlReservationStatus;
         participations?: Array<{
           __typename?: "Participation";
@@ -3164,7 +3165,7 @@ export type GqlGetOpportunityQuery = {
         __typename?: "Article";
         id: string;
         title: string;
-        body: string;
+        body?: string | null;
         introduction: string;
         thumbnail?: any | null;
         category: GqlArticleCategory;
@@ -3196,6 +3197,7 @@ export type GqlGetOpportunityQuery = {
           remainingCapacity?: number | null;
           reservations?: Array<{
             __typename?: "Reservation";
+            id: string;
             status: GqlReservationStatus;
             participations?: Array<{
               __typename?: "Participation";
@@ -3436,6 +3438,7 @@ export type GqlGetParticipationQuery = {
 
 export type GqlReservationFieldsFragment = {
   __typename?: "Reservation";
+  id: string;
   status: GqlReservationStatus;
 };
 
@@ -3746,6 +3749,7 @@ export const ParticipationFieldsFragmentDoc = gql`
 `;
 export const ReservationFieldsFragmentDoc = gql`
   fragment ReservationFields on Reservation {
+    id
     status
   }
 `;

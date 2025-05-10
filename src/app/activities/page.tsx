@@ -9,8 +9,15 @@ import ActivitiesUpcomingSection from '@/components/features/activity/Activities
 import ActivitiesFeaturedItemsSection from '@/components/features/activity/ActivitiesFeaturedItemsSection'
 import ActivitiesAllSection from '@/components/features/activity/ActivitiesAllSection'
 import { ErrorState } from "@/components/shared/ErrorState"
-import { GqlOpportunityEdge } from "@/types/graphql";
+import { GqlOpportunity, GqlOpportunityEdge } from "@/types/graphql";
 import { presenterActivityCard } from "@/presenters/opportunity";
+import { ActivityCard } from "@/types/opportunity";
+
+const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
+  edges
+    .map(edge => edge.node)
+    .filter((node): node is GqlOpportunity => !!node)
+    .map(presenterActivityCard);
 
 export default function ActivitiesPage() {
   const { setIsLoading } = useLoading()
@@ -35,9 +42,9 @@ export default function ActivitiesPage() {
 
   if (error) return <ErrorState message={`Error: ${error.message}`} />
 
-  const featuredCards = featuredActivities.edges.map(({ node }: GqlOpportunityEdge) => presenterActivityCard(node))
-  const upcomingCards = upcomingActivities.edges.map(({ node }: GqlOpportunityEdge) => presenterActivityCard(node))
-  const allCards = allActivities.edges.map(({ node }: GqlOpportunityEdge) => presenterActivityCard(node))
+  const featuredCards = mapOpportunityCards(featuredActivities.edges);
+  const upcomingCards = mapOpportunityCards(upcomingActivities.edges);
+  const allCards = mapOpportunityCards(allActivities.edges);
 
   return (
     <div className="min-h-screen pb-16">

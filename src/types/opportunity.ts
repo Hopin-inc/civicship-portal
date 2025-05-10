@@ -48,6 +48,7 @@ export type OpportunityDetail = CommunityId & {
   place: OpportunityPlace;
 
   requiredApproval: boolean;
+  requiredTicket: RequiredUtility[];
 
   description: string;
   body: string;
@@ -111,3 +112,6 @@ export type ReservableActivityTicket = {
   id: string;
 };
 
+export type RequiredUtility = {
+  id: string;
+}
