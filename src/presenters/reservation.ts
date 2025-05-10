@@ -47,9 +47,16 @@ export const findMatchingSlot = (slots: any, slotStartsAt: string) => {
       return false;
     }
     
-    const slotTimeSec = Math.floor(slotDateTime.getTime() / 1000);
-    const paramTimeSec = Math.floor(paramDateTime.getTime() / 1000);
-    const isMatch = slotTimeSec === paramTimeSec;
+    const slotHour = slotDateTime.getHours();
+    const paramHour = paramDateTime.getHours();
+    const slotDay = slotDateTime.getDate();
+    const paramDay = paramDateTime.getDate();
+    const slotMonth = slotDateTime.getMonth();
+    const paramMonth = paramDateTime.getMonth();
+    
+    const isMatch = slotHour === paramHour && 
+                    slotDay === paramDay && 
+                    slotMonth === paramMonth;
     
     if (isMatch) {
       console.log("Found matching slot! (second-level comparison)");
