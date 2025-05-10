@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
   // ログインが必要なページへのアクセスをチェック
   if (
     !session &&
-    (request.nextUrl.pathname === "/register")
+    (request.nextUrl.pathname === "/sign-up")
   ) {
     return NextResponse.redirect(new URL("/", request.url));
   }
@@ -16,5 +16,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/users/me/:path*", "/register"],
+  matcher: ["/users/me/:path*", "/sign-up"],
 };

@@ -1,6 +1,6 @@
-import { graphql } from "@/gql";
+import { gql } from '@apollo/client';
 
-export const TICKET_CLAIM = graphql(`
+export const TICKET_CLAIM = gql(`
   mutation ticketClaim($input: TicketClaimInput!) {
     ticketClaim(input: $input) {
       ...on TicketClaimSuccess {

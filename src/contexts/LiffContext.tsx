@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import liff from '@line/liff';
 
 type LiffProfile = {
@@ -38,7 +38,33 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
   const [liffIdToken, setLiffIdToken] = useState<string | null>(null);
   const [liffAccessToken, setLiffAccessToken] = useState<string | null>(null);
 
-  const liffInit = async () => {
+  const updateLiffProfile = useCallback(async () => {
+    try {
+      const profile = await liff.getProfile();
+      setLiffProfile({
+        userId: profile.userId,
+        displayName: profile.displayName,
+        pictureUrl: profile.pictureUrl
+      });
+    } catch (error) {
+      console.error('Failed to get LIFF profile:', error);
+    }
+  }, []);
+
+  const updateLiffTokens = useCallback(() => {
+    try {
+      const accessToken = liff.getAccessToken();
+      setLiffAccessToken(accessToken);
+      
+      const idToken = liff.getIDToken();
+      setLiffIdToken(idToken);
+      
+    } catch (error) {
+      console.error('Failed to get LIFF tokens:', error);
+    }
+  }, []);
+
+  const liffInit = useCallback(async () => {
     try {
       await liff.init({ liffId });
       setIsLiffInitialized(true);
@@ -55,35 +81,9 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
       setLiffError(errorMessage);
       console.error('LIFF initialization failed:', error);
     }
-  };
+  }, [liffId, updateLiffProfile, updateLiffTokens]);
 
-  const updateLiffTokens = () => {
-    try {
-      const accessToken = liff.getAccessToken();
-      setLiffAccessToken(accessToken);
-      
-      const idToken = liff.getIDToken();
-      setLiffIdToken(idToken);
-      
-    } catch (error) {
-      console.error('Failed to get LIFF tokens:', error);
-    }
-  };
-
-  const updateLiffProfile = async () => {
-    try {
-      const profile = await liff.getProfile();
-      setLiffProfile({
-        userId: profile.userId,
-        displayName: profile.displayName,
-        pictureUrl: profile.pictureUrl
-      });
-    } catch (error) {
-      console.error('Failed to get LIFF profile:', error);
-    }
-  };
-
-  const liffLogin = () => {
+  const liffLogin = useCallback(() => {
     if (!isLiffInitialized) {
       liffInit().then(() => {
         liff.login({ redirectUri: window.location.href });
@@ -92,9 +92,9 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
     }
     
     liff.login({ redirectUri: window.location.href });
-  };
+  }, [isLiffInitialized, liffInit]);
 
-  const liffLogout = () => {
+  const liffLogout = useCallback(() => {
     if (liff.isLoggedIn()) {
       liff.logout();
       setIsLiffLoggedIn(false);
@@ -102,11 +102,11 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
       setLiffIdToken(null);
       setLiffAccessToken(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     liffInit().catch(console.error);
-  }, [liffId]);
+  }, [liffId, liffInit]);
 
   useEffect(() => {
     if (isLiffInitialized && liff.isLoggedIn() && !liffProfile) {
@@ -114,7 +114,7 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
       updateLiffTokens();
       setIsLiffLoggedIn(true);
     }
-  }, [isLiffInitialized, liffProfile]);
+  }, [isLiffInitialized, liffProfile, updateLiffProfile, updateLiffTokens]);
 
   return (
     <LiffContext.Provider

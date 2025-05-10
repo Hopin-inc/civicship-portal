@@ -195,6 +195,19 @@ const config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        sm: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
+        xl: "var(--shadow-xl)",
+        card: "var(--shadow-card)",
+      },
+      aspectRatio: {
+        card: "16/9",
+        portrait: "3/4",
+        thumbnail: "4/3",
+        square: "1/1",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -208,6 +221,9 @@ const config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      maxWidth: {
+        'mobile-l': '425px',
       },
     },
   },

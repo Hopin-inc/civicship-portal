@@ -1,6 +1,6 @@
-import { graphql } from '@/gql/gql';
+import { gql } from '@apollo/client';
 
-export const WalletTransactionsDocument = graphql(`
+export const WalletTransactionsDocument = gql(`
   query WalletTransactions($filter: TransactionFilterInput) {
     transactions(
       filter: $filter,
