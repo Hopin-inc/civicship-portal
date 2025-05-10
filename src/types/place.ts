@@ -1,9 +1,10 @@
 import { ContentType } from "./index";
 
 export interface Geo {
+  placeId: string;
+
   latitude: number;
   longitude: number;
-  placeId: string;
   placeImage: string;
   placeName: string;
 }
