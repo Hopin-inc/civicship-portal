@@ -48,7 +48,7 @@ export const useHierarchicalNavigation = () => {
     const segments = pathWithoutQuery.split('/');
     
     for (let i = 0; i < segments.length; i++) {
-      if (/^\d+$/.test(segments[i])) {
+      if (/^[a-z0-9]{10,}$/i.test(segments[i])) {
         segments[i] = '[id]';
       }
     }
