@@ -1,3 +1,4 @@
+
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
@@ -15,7 +16,7 @@ const PAGE_TYPES = {
 const NavigationTracker: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { addToHistory } = useHeader();
+  const { addToHistory } = useHeader() as any;
 
   const getPageType = (path: string): string => {
     if (path.startsWith('/activities')) {
@@ -33,10 +34,10 @@ const NavigationTracker: React.FC<{ children: React.ReactNode }> = ({ children }
   useEffect(() => {
     if (pathname) {
       const pageType = getPageType(pathname);
-      const fullPath = searchParams.toString() 
-        ? `${pathname}?${searchParams.toString()}` 
+      const fullPath = searchParams.toString()
+        ? `${pathname}?${searchParams.toString()}`
         : pathname;
-      
+
       addToHistory(pageType, fullPath);
     }
   }, [pathname, searchParams, addToHistory]);

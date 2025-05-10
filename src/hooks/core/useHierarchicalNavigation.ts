@@ -1,8 +1,8 @@
 'use client';
 
+import React, { useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useHeader } from '@/contexts/HeaderContext';
-import { useCallback } from 'react';
 
 interface PathHierarchy {
   [path: string]: string;
@@ -41,7 +41,7 @@ export const useHierarchicalNavigation = () => {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { config, lastVisitedUrls } = useHeader();
+  const { config, lastVisitedUrls } = useHeader() as any;
 
   const getPathPattern = useCallback((path: string): string => {
     const pathWithoutQuery = path.split('?')[0];
