@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LoginModal from "@/components/features/login/LoginModal";
 import { useHeader } from "@/contexts/HeaderContext";
+import { useHierarchicalNavigation } from "@/hooks/core/useHierarchicalNavigation";
 import { cn } from "@/lib/utils";
 import SearchBox from "../features/search/SearchBox";
 
@@ -17,8 +18,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ className }) => {
   const { config } = useHeader();
+  const { navigateBack } = useHierarchicalNavigation();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const router = useRouter();
   const pathname = usePathname();
 
   const shouldShowBackButton = config.showBackButton && pathname !== '/';
@@ -31,7 +32,12 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       )}
     >
       {shouldShowBackButton && (
-        <Button onClick={() => router.back()} variant="icon-only" size="sm" aria-label="戻る">
+        <Button 
+          onClick={navigateBack} 
+          variant="icon-only" 
+          size="sm" 
+          aria-label="戻る"
+        >
           <ChevronLeft className="h-6 w-6" />
         </Button>
       )}
