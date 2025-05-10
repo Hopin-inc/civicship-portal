@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, useEffect } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import { HeaderConfig, HeaderContext } from "@/contexts/HeaderContext";
 import { usePathname } from "next/navigation";
 
@@ -22,7 +22,7 @@ const PAGE_TYPES = {
   HOME: "home",
 };
 
-const HeaderProvider = ({ children }: { children: ReactNode }) => {
+const HeaderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [config, setConfig] = useState<HeaderConfig>(defaultConfig);
   const [lastVisitedUrls, setLastVisitedUrls] = useState<Record<string, string>>({});
   const pathname = usePathname();
@@ -47,8 +47,8 @@ const HeaderProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [pathname, lastVisitedUrls]);
 
-  const updateConfig = (newConfig: HeaderConfig) => {
-    setConfig((prevConfig) => ({ ...prevConfig, ...newConfig }));
+  const updateConfig = (newConfig: Partial<HeaderConfig>) => {
+    setConfig((prevConfig: HeaderConfig) => ({ ...prevConfig, ...newConfig }));
   };
 
   const resetConfig = () => {
@@ -56,7 +56,7 @@ const HeaderProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addToHistory = (pageType: string, url: string) => {
-    setLastVisitedUrls((prev) => {
+    setLastVisitedUrls((prev: Record<string, string>) => {
       const newHistory = { ...prev };
       
       if (url !== prev[pageType]) {
