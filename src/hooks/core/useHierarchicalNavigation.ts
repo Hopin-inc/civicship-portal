@@ -2,7 +2,7 @@
 
 import React, { useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useHeader } from '@/contexts/HeaderContext';
+import { useHeader } from '@/components/providers/HeaderProvider';
 import { matchPaths } from '@/utils/path';
 
 interface PathHierarchy {

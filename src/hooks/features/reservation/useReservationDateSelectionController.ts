@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useHeader } from '@/contexts/HeaderContext';
+import { useHeader } from '@/components/providers/HeaderProvider';
 import { useLoading } from '@/hooks/core/useLoading';
 import { useReservationDateSelectionQuery } from '@/hooks/features/reservation/useReservationDateSelectionQuery';
 import { 

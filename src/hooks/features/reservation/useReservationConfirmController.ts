@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { useHeader } from '@/contexts/HeaderContext';
+import { useHeader } from '@/components/providers/HeaderProvider';
 import { useOpportunity } from '@/hooks/features/activity/useOpportunity';
 import { useLoading } from '@/hooks/core/useLoading';
 import { useAuth } from '@/contexts/AuthContext';
