@@ -5,7 +5,7 @@ import { UserProfileHeader } from './UserProfileHeader';
 import { UserPortfolioSection } from './UserPortfolioSection';
 import { UserActiveOpportunities } from './UserActiveOpportunities';
 import { UserTicketsAndPoints } from './UserTicketsAndPoints';
-import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
+import LoadingIndicator from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
 
 interface UserProfileSectionProps {
@@ -41,20 +41,20 @@ export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
         currentPrefecture={profileData.currentPrefecture}
         isOwner={isOwner}
       />
-      
+
       {isOwner && (
-        <UserTicketsAndPoints 
-          ticketCount={profileData.ticketCount || 0} 
-          pointCount={profileData.pointCount || 0} 
+        <UserTicketsAndPoints
+          ticketCount={profileData.ticketCount || 0}
+          pointCount={profileData.pointCount || 0}
         />
       )}
-      
-      <UserActiveOpportunities 
-        opportunities={profileData.activeOpportunities || []} 
-        isOwner={isOwner} 
+
+      <UserActiveOpportunities
+        opportunities={profileData.activeOpportunities || []}
+        isOwner={isOwner}
       />
-      
-      <UserPortfolioSection 
+
+      <UserPortfolioSection
         portfolios={profileData.portfolios || []}
         isLoading={false}
         isLoadingMore={false}
