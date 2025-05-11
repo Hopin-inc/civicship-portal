@@ -8,8 +8,15 @@ import { useWallet } from '@/hooks/features/wallet/useWallet';
 import { UserProfileSection } from '@/components/features/user/UserProfileSection';
 import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 
 export default function MyProfilePage() {
+  useHeaderConfig({
+    title: "マイページ",
+    showBackButton: false,
+    showLogo: true,
+  });
+  
   const router = useRouter();
   const { user: currentUser } = useAuth();
   
