@@ -148,7 +148,7 @@ export const transformOpportunity = (opportunityData: OpportunityData | undefine
     host: {
       name: opportunityData.createdByUser?.name || "",
       image: opportunityData.createdByUser?.image || null,
-      title: opportunityData.createdByUser?.headline || "",
+      title: "",
       bio: opportunityData.createdByUser?.bio || "",
     },
     images: opportunityData.images || [],
@@ -162,7 +162,7 @@ export const transformOpportunity = (opportunityData: OpportunityData | undefine
     community: opportunityData.community ? {
       id: opportunityData.community.id,
       title: opportunityData.community.name || "",
-      description: opportunityData.community.bio || "",
+      description: "",
       icon: opportunityData.community.image || "",
     } : undefined,
     recommendedFor: [],
