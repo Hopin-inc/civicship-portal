@@ -79,11 +79,12 @@ const HeaderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         pageType = PAGE_TYPES.USER;
       }
       
-      if (lastVisitedUrls[pageType] !== pathname) {
+      const lastUrl = lastVisitedUrls[pageType];
+      if (lastUrl !== pathname) {
         addToHistory(pageType, pathname);
       }
     }
-  }, [pathname, lastVisitedUrls]);
+  }, [pathname]);
 
   const updateConfig = (newConfig: Partial<HeaderConfig>) => {
     setConfig((prevConfig: HeaderConfig) => ({ ...prevConfig, ...newConfig }));
