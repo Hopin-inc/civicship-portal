@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { GqlParticipationStatus, GqlParticipationStatusReason } from '@/types/graphql';
 import { getStatusInfo } from '@/presenters/participation';
 import type { Participation } from '@/types/participation';
+import { useParticipationImageUploadState } from '@/hooks/features/participation/useParticipationImageUploadState';
+import { ReservationStatus } from '@/types/participationStatus';
 
 interface UseParticipationStateProps {
   participation?: Participation;
@@ -11,37 +12,31 @@ interface UseParticipationStateProps {
 }
 
 export const useParticipationState = ({ participation, onUploadSuccess }: UseParticipationStateProps) => {
-  const [currentStatus, setCurrentStatus] = useState<ReturnType<typeof getStatusInfo>>(null);
-  const [isAddPhotosModalOpen, setIsAddPhotosModalOpen] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [currentStatus, setCurrentStatus] = useState<ReservationStatus | null>(null);
+  const {
+    uploadSuccess,
+    uploadError,
+    isAddPhotosModalOpen,
+    handleUploadSuccess,
+    handleUploadError,
+    togglePhotosModal,
+  } = useParticipationImageUploadState();
 
   useEffect(() => {
     if (participation?.node.status) {
-      setCurrentStatus(
-        getStatusInfo(
-          participation.node.status as GqlParticipationStatus,
-          participation.node.reason as GqlParticipationStatusReason,
-        ),
+      const statusInfo = getStatusInfo(
+        participation.node.status,
+        participation.node.reason
       );
+      setCurrentStatus(statusInfo);
     }
   }, [participation?.node.status, participation?.node.reason]);
 
-  const handleUploadSuccess = () => {
-    setUploadSuccess(true);
-    setTimeout(() => setUploadSuccess(false), 3000);
+  const handleUploadSuccessWrapper = () => {
+    handleUploadSuccess();
     if (onUploadSuccess) {
       onUploadSuccess();
     }
-  };
-
-  const handleUploadError = (error: Error) => {
-    setUploadError(error.message);
-    setTimeout(() => setUploadError(null), 3000);
-  };
-
-  const togglePhotosModal = (isOpen: boolean) => {
-    setIsAddPhotosModalOpen(isOpen);
   };
 
   return {
@@ -49,7 +44,7 @@ export const useParticipationState = ({ participation, onUploadSuccess }: UsePar
     uploadSuccess,
     uploadError,
     isAddPhotosModalOpen,
-    handleUploadSuccess,
+    handleUploadSuccess: handleUploadSuccessWrapper,
     handleUploadError,
     togglePhotosModal,
   };
