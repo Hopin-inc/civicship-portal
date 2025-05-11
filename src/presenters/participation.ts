@@ -1,8 +1,20 @@
 'use client';
 
 import type { GqlGetParticipationQuery } from '@/types/graphql';
-import { GqlParticipation, GqlOpportunityCategory, } from '@/types/graphql';
-import { ParticipationDetail } from "@/types/participation";
+import { GqlParticipation, GqlOpportunityCategory } from '@/types/graphql';
+import { 
+  ParticipationDetail, 
+  ActivityParticipation, 
+  QuestParticipation, 
+  ParticipationImage,
+  Participation,
+  Opportunity
+} from "@/types/participation";
+import { 
+  ParticipationStatus, 
+  ParticipationStatusReason, 
+  ReservationStatus 
+} from "@/types/participationStatus";
 import { presenterOpportunityHost } from "@/presenters/opportunity";
 import { presenterPlace } from "@/presenters/place";
 
@@ -13,57 +25,77 @@ export const presenterParticipation = (raw: GqlParticipation): ParticipationDeta
 
   const opportunity = raw.reservation.opportunitySlot.opportunity;
   const reservation = raw.reservation;
+  const isActivity = opportunity.category === GqlOpportunityCategory.Activity;
 
-  return {
+  const commonInfo = {
     id: raw.id,
     status: raw.status,
+    reason: raw.reason,
     communityId: opportunity.community?.id ?? '',
-
-    reservation: {
-      id: reservation.id,
-      status: reservation.status,
-      opportunity: {
-        id: opportunity.id,
-        title: opportunity.title,
-        images: opportunity.images ?? [],
-        host: presenterOpportunityHost(opportunity.createdByUser),
-      },
-      communityId: opportunity.community?.id ?? '',
+    
+    opportunity: {
+      id: opportunity.id,
+      title: opportunity.title,
       images: opportunity.images ?? [],
-      totalImageCount: opportunity.images?.length ?? 0,
-      date: new Date(reservation.opportunitySlot?.startsAt ?? "").toISOString(),
-      participantsCount: reservation.participations?.length ?? 0,
-      place: presenterPlace(opportunity.place),
-      feeRequired: opportunity.feeRequired ?? 0,
-      totalFeeRequired: opportunity.feeRequired ?? 0,
-      category: GqlOpportunityCategory.Activity,
-      isCancelable: false, // 条件に応じて補完
-      cancelDue: '',        // 条件に応じて補完
-    }
+      host: presenterOpportunityHost(opportunity.createdByUser),
+    },
+    
+    images: (raw.images || []).map((url: string) => ({
+      id: `img-${url.split('/').pop()}`,
+      url,
+      caption: null,
+      participationId: raw.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    })),
+    totalImageCount: (raw.images || []).length,
+    
+    date: new Date(reservation.opportunitySlot?.startsAt ?? "").toISOString(),
+    participantsCount: reservation.participations?.length ?? 0,
+    place: presenterPlace(opportunity.place),
+    
+    isCancelable: false,
+    cancelDue: '',
   };
+
+  if (isActivity) {
+    return {
+      ...commonInfo,
+      feeRequired: opportunity.feeRequired ?? 0,
+      totalFeeRequired: (opportunity.feeRequired ?? 0) * (commonInfo.participantsCount || 1),
+      category: GqlOpportunityCategory.Activity,
+    };
+  } else {
+    return {
+      ...commonInfo,
+      pointsToEarn: opportunity.pointsToEarn ?? 0,
+      totalPointsToEarn: (opportunity.pointsToEarn ?? 0) * (commonInfo.participantsCount || 1),
+      category: GqlOpportunityCategory.Quest,
+    };
+  }
 };
 
 export const getStatusInfo = (
-  status: ParticipationStatus,
-  reason: ParticipationStatusReason,
+  status: GqlParticipationStatus,
+  reason: GqlParticipationStatusReason,
 ): ReservationStatus | null => {
   switch (status) {
-    case ParticipationStatus.Pending:
+    case "PENDING":
       return {
         status: "pending",
         statusText: "案内人による承認待ちです。",
         statusSubText: "承認されると、予約が確定します。",
         statusClass: "bg-yellow-50 border-yellow-200",
       };
-    case ParticipationStatus.Participating:
+    case "PARTICIPATING":
       return {
         status: "confirmed",
         statusText: "予約が確定しました。",
         statusSubText: "",
         statusClass: "bg-green-50 border-green-200",
       };
-    case ParticipationStatus.NotParticipating:
-      const isCanceled = reason === ParticipationStatusReason.OpportunityCanceled;
+    case "NOT_PARTICIPATING":
+      const isCanceled = reason === "OPPORTUNITY_CANCELED";
       return {
         status: "cancelled",
         statusText: isCanceled ? "開催が中止されました。" : "予約がキャンセルされました。",
@@ -72,7 +104,7 @@ export const getStatusInfo = (
           : "予約のキャンセルが完了しました。",
         statusClass: "bg-red-50 border-red-200",
       };
-    case ParticipationStatus.Participated:
+    case "PARTICIPATED":
       return null;
     default:
       return {
@@ -88,14 +120,14 @@ export const calculateCancellationDeadline = (startTime: Date): Date => {
   return new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
 };
 
-export const formatImageData = (images: any[]): { url: string; alt: string }[] => {
+export const formatImageData = (images: ParticipationImage[]): { url: string; alt: string }[] => {
   return images.map((img) => ({
-    url: (img as any).url || img,
+    url: img.url,
     alt: "参加者の写真",
   }));
 };
 
-type OpportunityData = NonNullable<NonNullable<NonNullable<GqlGetParticipationQuery['participation']>['reservation']>['opportunitySlot']['opportunity']>;
+type OpportunityData = NonNullable<NonNullable<NonNullable<GqlGetParticipationQuery['participation']>['reservation']>['opportunitySlot']>['opportunity'];
 
 export const transformOpportunity = (opportunityData: OpportunityData | undefined): Opportunity | undefined => {
   if (!opportunityData) return undefined;
@@ -203,7 +235,7 @@ export const transformParticipation = (participationData: GqlGetParticipationQue
         name: participationData.user?.name || "",
         image: participationData.user?.image || null,
       },
-      reservation: participationData.reservation ? {
+      reservation: participationData.reservation && participationData.reservation.opportunitySlot ? {
         id: participationData.reservation.id,
         opportunitySlot: {
           id: participationData.reservation.opportunitySlot.id,
@@ -212,14 +244,7 @@ export const transformParticipation = (participationData: GqlGetParticipationQue
           endsAt: participationData.reservation.opportunitySlot.endsAt,
           hostingStatus: participationData.reservation.opportunitySlot.hostingStatus,
         },
-        participations: participationData.reservation.participations?.map((participation: any) => ({
-          id: participation.id,
-          user: {
-            id: participation.user?.id || "",
-            name: participation.user?.name || "",
-            image: participation.user?.image || null,
-          }
-        })) || [],
+        participations: [],
       } : undefined,
     },
   };
