@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-おimport type { Opportunity } from '@/types/participation';
+import type { Opportunity } from '@/types/participation';
 
 interface ParticipationHeaderProps {
   opportunity: Opportunity;
