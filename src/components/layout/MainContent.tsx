@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
+import { useHeader } from "@/components/providers/HeaderProvider";
 import Header from "@/components/layout/Header";
 import BottomBar from "@/components/layout/BottomBar";
 import AdminBottomBar from "@/components/layout/AdminBottomBar";
@@ -11,8 +11,7 @@ interface MainContentProps {
 }
 
 const MainContent: React.FC<MainContentProps> = ({ children }) => {
-  const headerConfig = useHeaderConfig();
-  const config = headerConfig?.config || { hideHeader: false };
+  const { config } = useHeader();
   const showHeader = !config?.hideHeader;
   
   return (
