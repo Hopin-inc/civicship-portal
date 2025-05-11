@@ -19,7 +19,7 @@ export const GET_OPPORTUNITIES = gql`
   ) {
     upcoming: opportunities(
       filter: $upcomingFilter
-      sort: { createdAt: desc }
+      sort: { earliestSlotStartsAt: desc }
       first: 5
     ) {
       pageInfo {

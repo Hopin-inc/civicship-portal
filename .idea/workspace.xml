@@ -4,34 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9d8e9427-ae26-45d1-b49b-4edd4ae6b1fb" name="変更" comment="refactor: update articles">
-      <change afterPath="$PROJECT_DIR$/src/types/opportunitySlot.ts" afterDir="false" />
+    <list default="true" id="9d8e9427-ae26-45d1-b49b-4edd4ae6b1fb" name="変更" comment="refactor: update reservation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphql.schema.json" beforeDir="false" afterPath="$PROJECT_DIR$/graphql.schema.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/reservation/complete/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/reservation/complete/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/reservation/confirm/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/reservation/confirm/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/reservation/select-date/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/reservation/select-date/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/search/result/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/search/result/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/features/reservation/DateSelectionForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/reservation/DateSelectionForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/features/reservation/GuestSelectionForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/reservation/GuestSelectionForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/features/reservation/SelectionSheet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/reservation/SelectionSheet.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/features/reservation/TimeSlotList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/reservation/TimeSlotList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useAvailableDatesQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useAvailableDatesQuery.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/article/useArticleController.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/article/useArticlesController.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/article/useArticlesQuery.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/place/usePlaceMembership.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/place/usePlaceMembership.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/place/usePlacesQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/place/usePlacesQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/activity/RecentActivitiesTimeline.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/RecentActivitiesTimeline.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/activity/SimilarActivitiesList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/SimilarActivitiesList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/reservation/ReservationDetails.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/reservation/ReservationDetails.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graphql/experience/opportunity/query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphql/experience/opportunity/query.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graphql/experience/opportunitySlot/query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphql/experience/opportunitySlot/query.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graphql/experience/reservation/query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphql/experience/reservation/query.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useOpportunity.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useOpportunityController.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useOpportunityQuery.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useSimilarOpportunities.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationComplete.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationComplete.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirm.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirm.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirmController.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirmQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirmQuery.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationDateSelection.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationDateSelection.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationDateSelectionController.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationDateSelectionQuery.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/presenters/opportunity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/presenters/opportunity.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/presenters/opportunitySlot.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/presenters/opportunitySlot.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/presenters/reservation.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/presenters/reservation.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/opportunity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/opportunity.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/date.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/date.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/graphql.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/graphql.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/opportunitySlot.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/opportunitySlot.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/reservation.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/reservation.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -176,7 +173,7 @@
       <workItem from="1746784394527" duration="198000" />
       <workItem from="1746784931351" duration="27000" />
       <workItem from="1746785215423" duration="22464000" />
-      <workItem from="1746855543634" duration="22923000" />
+      <workItem from="1746855543634" duration="33240000" />
     </task>
     <task id="LOCAL-00001" summary="refactor: delete not usage file">
       <option name="closed" value="true" />
@@ -450,7 +447,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746872621639</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="refactor: update reservation">
+      <option name="closed" value="true" />
+      <created>1746878810138</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1746878810138</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -468,7 +473,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="WIP: manual refactor" />
     <MESSAGE value="fix: fix TS71007" />
     <MESSAGE value="refactor: manual refactor" />
     <MESSAGE value="refactor: modify import" />
@@ -493,6 +497,7 @@
     <MESSAGE value="refactor: -&gt; activities detail" />
     <MESSAGE value="refactor: update activities" />
     <MESSAGE value="refactor: update articles" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: update articles" />
+    <MESSAGE value="refactor: update reservation" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: update reservation" />
   </component>
 </project>

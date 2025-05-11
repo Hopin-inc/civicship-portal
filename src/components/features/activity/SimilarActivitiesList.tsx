@@ -1,8 +1,10 @@
-import { Opportunity } from "@/types";
 import OpportunityCard from "../opportunity/OpportunityCard";
+import React from "react";
+import { ActivityCard } from "@/types/opportunity";
+import { COMMUNITY_ID } from "@/utils";
 
 interface SimilarActivitiesListProps {
-  opportunities: Opportunity[];
+  opportunities: ActivityCard[];
   currentOpportunityId: string;
 }
 
@@ -28,11 +30,12 @@ export const SimilarActivitiesList: React.FC<SimilarActivitiesListProps> = ({
               <OpportunityCard
                 id={opportunity.id}
                 title={opportunity.title}
-                price={opportunity.feeRequired || 0}
-                location={opportunity.place?.name || "場所未定"}
-                imageUrl={opportunity.images?.[0] || null}
-                community={opportunity.community}
-                isReservableWithTicket={opportunity.isReservableWithTicket}
+                category={opportunity.category}
+                feeRequired={opportunity.feeRequired || 0}
+                location={opportunity.location || "要確認"}
+                images={opportunity.images || null}
+                communityId={COMMUNITY_ID}
+                hasReservableTicket={opportunity.hasReservableTicket}
               />
             </div>
           ))}

@@ -3,11 +3,23 @@
 import {
   GqlArticle,
   GqlOpportunity,
-  GqlOpportunityCategory, GqlOpportunitySlot, GqlPlace, GqlUser,
+  GqlOpportunityCategory, GqlOpportunityEdge, GqlOpportunitySlot, GqlPlace, GqlUser,
   Maybe,
 } from "@/types/graphql";
-import { ActivityCard, ActivityDetail, ActivitySlot, OpportunityHost, OpportunityPlace } from "@/types/opportunity";
+import { ActivityCard, ActivityDetail, OpportunityHost, OpportunityPlace } from "@/types/opportunity";
 import { presenterArticleCard } from "@/presenters/article";
+import { ActivitySlot } from "@/types/opportunitySlot";
+
+export const presenterActivityCards = (
+  edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined
+): ActivityCard[] => {
+  if (!edges) return [];
+
+  return edges
+    .map((edge) => edge?.node)
+    .filter((node): node is GqlOpportunity => !!node)
+    .map((node) => presenterActivityCard(node));
+};
 
 export const presenterActivityCard = (node: GqlOpportunity ): ActivityCard => ({
   id: node?.id || "",
@@ -72,7 +84,8 @@ function presenterOpportunityHost(host?: Maybe<GqlUser> | undefined, interview?:
 function presenterActivitySlot(slots:  Maybe<GqlOpportunitySlot[]> | undefined, feeRequired?: Maybe<number> | undefined ): ActivitySlot[] {
   return (
     slots?.map((slot): ActivitySlot => ({
-      id: slot?.id ?? "",
+      id: slot?.id,
+      hostingStatus: slot?.hostingStatus,
       startsAt: slot?.startsAt
         ? new Date(slot.startsAt).toISOString()
         : "",
@@ -81,7 +94,7 @@ function presenterActivitySlot(slots:  Maybe<GqlOpportunitySlot[]> | undefined, 
         : "",
       capacity: slot?.capacity ?? 0,
       remainingCapacity: slot?.remainingCapacity ?? 0,
-      feeRequired: feeRequired ?? 0,
+      feeRequired: feeRequired ?? null,
     })) ?? []
   );
 }

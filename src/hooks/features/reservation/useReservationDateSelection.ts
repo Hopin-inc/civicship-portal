@@ -4,14 +4,13 @@ import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHeader } from '@/contexts/HeaderContext';
 import { useLoading } from '@/hooks/core/useLoading';
-import { useGetOpportunityQuery } from "@/types/graphql";
-import { COMMUNITY_ID } from '@/utils';
+import { useGetOpportunitySlotsQuery } from "@/types/graphql";
 import { presenterActivityDetail } from '@/presenters/opportunity';
 import {
   groupActivitySlotsByDate,
   filterSlotGroupsBySelectedDate,
   buildReservationParams,
-  isSlotAvailable as checkSlotAvailability,
+  isSlotAvailable as checkSlotAvailability, presenterOpportunitySlots,
 } from "@/presenters";
 import { ActivitySlot, ActivitySlotGroup } from '@/types/opportunitySlot';
 import { ActivityDetail } from "@/types/opportunity";
@@ -29,29 +28,35 @@ export const useReservationDateSelection = ({
   const { updateConfig } = useHeader();
   const { setIsLoading } = useLoading();
 
-  const { data, loading, error } = useGetOpportunityQuery({
+  const { data, loading, error } = useGetOpportunitySlotsQuery({
     variables: {
-      id: opportunityId,
-      permission: { communityId: COMMUNITY_ID },
+      filter: {
+        opportunityId: opportunityId,
+        hostingStatus: "SCHEDULED",
+      },
     },
     skip: !opportunityId,
     fetchPolicy: 'network-only',
     errorPolicy: 'all',
     onError: (err) => {
-      console.error("Opportunity query error:", err);
+      console.error("OpportunitySlot query error:", err);
     },
   });
 
-  const opportunity: ActivityDetail | null = useMemo(() => {
-    return data?.opportunity ? presenterActivityDetail(data.opportunity) : null;
+  const { groupedSlots }: { groupedSlots: ActivitySlotGroup[] } = useMemo(() => {
+    const slots = presenterOpportunitySlots(data?.opportunitySlots?.edges);
+    const groupedSlots = groupActivitySlotsByDate(slots);
+    return { groupedSlots };
   }, [data]);
 
-  const activitySlots: ActivitySlot[] = useMemo(() => {
-    return opportunity?.slots ?? [];
-  }, [opportunity?.slots]);
-  const groupedSlots: ActivitySlotGroup[] = useMemo(() => {
-    return groupActivitySlotsByDate(activitySlots);
-  }, [activitySlots]);
+  console.log("groupedSlots:", groupedSlots);
+
+  const opportunity: ActivityDetail | null = useMemo(() => {
+    const opportunity = data?.opportunitySlots?.edges?.find(
+      (edge) => edge?.node?.opportunity != null
+    )?.node?.opportunity;
+    return opportunity ? presenterActivityDetail(opportunity) : null;
+  }, [data]);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedGuests, setSelectedGuests] = useState<number>(1);

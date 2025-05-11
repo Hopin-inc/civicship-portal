@@ -971,6 +971,7 @@ export type GqlOpportunitySlotEdge = GqlEdge & {
 };
 
 export type GqlOpportunitySlotFilterInput = {
+  hostingStatus?: InputMaybe<GqlOpportunitySlotHostingStatus>;
   opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
@@ -3335,16 +3336,49 @@ export type GqlOpportunitySlotFieldsFragment = {
   remainingCapacity?: number | null;
 };
 
-export type GqlGetOpportunitySlotsQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetOpportunitySlotsQueryVariables = Exact<{
+  filter?: InputMaybe<GqlOpportunitySlotFilterInput>;
+}>;
 
 export type GqlGetOpportunitySlotsQuery = {
   __typename?: "Query";
   opportunitySlots: {
     __typename?: "OpportunitySlotsConnection";
     totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
     edges?: Array<{
       __typename?: "OpportunitySlotEdge";
-      node?: { __typename?: "OpportunitySlot"; id: string } | null;
+      cursor: string;
+      node?: {
+        __typename?: "OpportunitySlot";
+        id: string;
+        hostingStatus: GqlOpportunitySlotHostingStatus;
+        startsAt: Date;
+        endsAt: Date;
+        capacity?: number | null;
+        remainingCapacity?: number | null;
+        opportunity?: {
+          __typename?: "Opportunity";
+          id: string;
+          title: string;
+          description: string;
+          body?: string | null;
+          images?: Array<string> | null;
+          category: GqlOpportunityCategory;
+          publishStatus: GqlPublishStatus;
+          isReservableWithTicket?: boolean | null;
+          requireApproval: boolean;
+          feeRequired?: number | null;
+          pointsToEarn?: number | null;
+          earliestReservableAt?: Date | null;
+        } | null;
+      } | null;
     } | null> | null;
   };
 };
@@ -3504,7 +3538,43 @@ export type GqlGetReservationQueryVariables = Exact<{
 
 export type GqlGetReservationQuery = {
   __typename?: "Query";
-  reservation?: { __typename?: "Reservation"; id: string } | null;
+  reservation?: {
+    __typename?: "Reservation";
+    id: string;
+    status: GqlReservationStatus;
+    opportunitySlot?: {
+      __typename?: "OpportunitySlot";
+      id: string;
+      hostingStatus: GqlOpportunitySlotHostingStatus;
+      startsAt: Date;
+      endsAt: Date;
+      capacity?: number | null;
+      remainingCapacity?: number | null;
+      opportunity?: {
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        body?: string | null;
+        images?: Array<string> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        earliestReservableAt?: Date | null;
+      } | null;
+    } | null;
+    participations?: Array<{
+      __typename?: "Participation";
+      id: string;
+      status: GqlParticipationStatus;
+      reason: GqlParticipationStatusReason;
+      images?: Array<string> | null;
+      description?: string | null;
+    }> | null;
+  } | null;
 };
 
 export type GqlPlaceFieldsFragment = {
@@ -5210,7 +5280,11 @@ export const GetOpportunitiesDocument = gql`
     $first: Int
     $cursor: String
   ) {
-    upcoming: opportunities(filter: $upcomingFilter, sort: { createdAt: desc }, first: 5) {
+    upcoming: opportunities(
+      filter: $upcomingFilter
+      sort: { earliestSlotStartsAt: desc }
+      first: 5
+    ) {
       pageInfo {
         startCursor
         endCursor
@@ -5617,16 +5691,32 @@ export type SearchOpportunitiesQueryResult = Apollo.QueryResult<
   GqlSearchOpportunitiesQueryVariables
 >;
 export const GetOpportunitySlotsDocument = gql`
-  query GetOpportunitySlots {
-    opportunitySlots {
-      edges {
-        node {
-          id
-        }
+  query GetOpportunitySlots($filter: OpportunitySlotFilterInput) {
+    opportunitySlots(filter: $filter, sort: { startsAt: desc }) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
       }
       totalCount
+      edges {
+        cursor
+        node {
+          id
+          hostingStatus
+          startsAt
+          endsAt
+          capacity
+          remainingCapacity
+          opportunity {
+            ...OpportunityFields
+          }
+        }
+      }
     }
   }
+  ${OpportunityFieldsFragmentDoc}
 `;
 
 /**
@@ -5641,6 +5731,7 @@ export const GetOpportunitySlotsDocument = gql`
  * @example
  * const { data, loading, error } = useGetOpportunitySlotsQuery({
  *   variables: {
+ *      filter: // value for 'filter'
  *   },
  * });
  */
@@ -6113,9 +6204,22 @@ export type GetReservationsQueryResult = Apollo.QueryResult<
 export const GetReservationDocument = gql`
   query GetReservation($id: ID!) {
     reservation(id: $id) {
-      id
+      ...ReservationFields
+      opportunitySlot {
+        ...OpportunitySlotFields
+        opportunity {
+          ...OpportunityFields
+        }
+      }
+      participations {
+        ...ParticipationFields
+      }
     }
   }
+  ${ReservationFieldsFragmentDoc}
+  ${OpportunitySlotFieldsFragmentDoc}
+  ${OpportunityFieldsFragmentDoc}
+  ${ParticipationFieldsFragmentDoc}
 `;
 
 /**

@@ -12,9 +12,6 @@ interface ReservationDetailsProps {
   pricePerPerson: number;
 }
 
-/**
- * Component to display the details of a reservation
- */
 export const ReservationDetails: React.FC<ReservationDetailsProps> = ({
   formattedDate,
   startTime,

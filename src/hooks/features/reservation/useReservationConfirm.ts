@@ -254,9 +254,10 @@ function useReservationActions({
         },
       });
 
-      if (result.data?.reservationCreate?.reservation) {
+      const reservation = result.data?.reservationCreate?.reservation;
+      if (reservation) {
         toast.success("予約が完了しました");
-        router.push(`/reservation/complete?opportunity_id=${opportunityId}`);
+        router.push(`/reservation/complete?opportunity_id=${opportunityId}&reservation_id=${reservation.id}`);
       }
     } catch (err) {
       console.error("Reservation error:", err);

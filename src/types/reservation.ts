@@ -59,7 +59,7 @@ type PublicReservationInfo = CommunityId & {
 
   opportunity: ReserveOpportunity;
 
-  images: AppImage[];
+  images: string[];
   totalImageCount: number;
 
   date: string;

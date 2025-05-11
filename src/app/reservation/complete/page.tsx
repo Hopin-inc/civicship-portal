@@ -1,13 +1,13 @@
 "use client";
 
 import { ErrorState } from "@/components/shared/ErrorState";
-import { RecentActivitiesTimeline } from "@/components/features/activity/RecentActivitiesTimeline";
 import { SimilarActivitiesList } from "@/components/features/activity/SimilarActivitiesList";
 import { CompletionHeader } from "@/components/features/reservation/CompletionHeader";
 import { ActivitySummary } from "@/components/features/reservation/ActivitySummary";
 import { ReservationDetails } from "@/components/features/reservation/ReservationDetails";
 import { useReservationComplete } from "@/hooks/features/reservation/useReservationComplete";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import React from "react";
 
 export default function CompletePage() {
   const result = useReservationComplete();
@@ -48,9 +48,12 @@ function ReservationCompletionGate({
 function ReservationCompletionUI({
    opportunity,
    similarOpportunities,
-   opportunitiesCreatedByHost,
+   // opportunitiesCreatedByHost,
    dateTimeInfo,
  }: ReturnType<typeof useReservationComplete>) {
+  if (!opportunity || !dateTimeInfo) {
+    throw new Error("ReservationCompletionUI should only be rendered when opportunity and dateTimeInfo are present");
+  }
   return (
     <main className="flex flex-col items-center px-4 pb-8">
       <CompletionHeader />
@@ -69,9 +72,9 @@ function ReservationCompletionUI({
       <div className="w-full mt-8 mb-16">
         <SimilarActivitiesList
           opportunities={similarOpportunities}
-          currentOpportunityId={opportunity?.id}
+          currentOpportunityId={opportunity.id}
         />
-        <RecentActivitiesTimeline opportunities={opportunitiesCreatedByHost} />
+        {/*<RecentActivitiesTimeline opportunities={opportunitiesCreatedByHost} />*/}
       </div>
     </main>
   );

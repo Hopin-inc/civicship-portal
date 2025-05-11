@@ -1,6 +1,23 @@
 'use client';
-import { GqlOpportunitySlot } from "@/types/graphql";
+import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
 import { ActivitySlot, ActivitySlotGroup } from "@/types/opportunitySlot";
+
+export const presenterOpportunitySlots = (
+  edges: (GqlOpportunitySlotEdge | null | undefined)[] | null | undefined
+): ActivitySlot[] => {
+  if (!edges) return [];
+
+  return edges
+    .map((edge) => {
+      const node = edge?.node;
+      const opportunity = node?.opportunity;
+
+      if (!node || !opportunity) return null;
+
+      return presenterOpportunitySlot(node, opportunity.feeRequired ?? 0);
+    })
+    .filter((slot): slot is ActivitySlot => slot !== null);
+};
 
 export const presenterOpportunitySlot = (
   slot: GqlOpportunitySlot,

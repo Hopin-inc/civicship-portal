@@ -4,34 +4,33 @@ import { useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useHeader } from '@/contexts/HeaderContext';
 import { COMMUNITY_ID } from '@/utils';
-import { presenterActivityDetail } from '@/presenters/opportunity';
-import { GqlOpportunity, GqlOpportunityEdge, useGetOpportunitiesQuery, useGetOpportunityQuery } from "@/types/graphql";
-import { ActivityDetail } from '@/types/opportunity';
+import { presenterActivityCards, presenterActivityDetail } from "@/presenters/opportunity";
+import {
+  useGetOpportunitiesQuery,
+  useGetReservationQuery,
+} from "@/types/graphql";
+import { ActivityCard, ActivityDetail } from "@/types/opportunity";
 
 export const useReservationComplete = () => {
   const { updateConfig } = useHeader();
   const searchParams = useSearchParams();
-  const opportunityId = searchParams.get('opportunity_id') || '';
+  const opportunityId = searchParams.get("opportunity_id");
+  const reservationId = searchParams.get("reservation_id");
 
-  const {
-    data: opportunityData,
-    loading: opportunityLoading,
-    error: opportunityError,
-  } = useGetOpportunityQuery({
-    variables: {
-      id: opportunityId,
-      permission: { communityId: COMMUNITY_ID },
-    },
-    skip: !opportunityId,
+  const { data, loading, error:opportunityError } = useGetReservationQuery({
+    variables: { id: reservationId ?? ""},
+    skip: !reservationId,
     fetchPolicy: 'network-only',
     errorPolicy: 'all',
   });
 
+  const reservation = data?.reservation ?? null;
+  const gqlOpportunitySlot = reservation?.opportunitySlot ?? null;
+  const gqlOpportunity = gqlOpportunitySlot?.opportunity ?? null;
+
   const opportunity: ActivityDetail | null = useMemo(() => {
-    return opportunityData?.opportunity
-      ? presenterActivityDetail(opportunityData.opportunity)
-      : null;
-  }, [opportunityData]);
+    return gqlOpportunity ? presenterActivityDetail(gqlOpportunity) : null;
+  }, [gqlOpportunity]);
 
   const {
     data: similarData,
@@ -46,17 +45,15 @@ export const useReservationComplete = () => {
     skip: !opportunityId,
   });
 
-  const similarOpportunities: GqlOpportunity[] = useMemo(() => {
-    return (similarData?.similar?.edges ?? [])
-      .map((edge: GqlOpportunityEdge) => edge?.node)
-      .filter((node): node is GqlOpportunity => !!node);
+  const similarOpportunities: ActivityCard[] = useMemo(() => {
+    return presenterActivityCards(similarData?.similar?.edges);
   }, [similarData]);
 
   const dateTimeInfo = useMemo(() => {
-    if (!opportunity) return null;
+    if (!gqlOpportunity || !gqlOpportunitySlot || !reservation) return null;
 
-    const startDate = new Date(opportunity.startsAt);
-    const endDate = new Date(opportunity.endsAt);
+    const startDate = new Date(gqlOpportunitySlot.startsAt);
+    const endDate = new Date(gqlOpportunitySlot.endsAt);
 
     return {
       formattedDate: startDate.toLocaleDateString('ja-JP', {
@@ -75,17 +72,13 @@ export const useReservationComplete = () => {
         minute: '2-digit',
         hour12: false,
       }),
-      participantCount: opportunity.participants?.length || 0,
-      totalPrice: (opportunity.feeRequired || 0) * (opportunity.participants?.length || 0),
+      participantCount: reservation.participations?.length || 0,
+      totalPrice: (gqlOpportunity.feeRequired || 0) * (reservation.participations?.length || 0),
     };
-  }, [opportunity]);
+  }, [reservation, gqlOpportunitySlot, gqlOpportunity]);
 
-  const opportunitiesCreatedByHost = useMemo(() => {
-    return opportunity?.createdByUser?.opportunitiesCreatedByMe?.edges ?? [];
-  }, [opportunity]);
-
-  const isLoading = opportunityLoading || similarLoading;
-  const error = opportunityError || similarError;
+  const isLoading = loading || similarLoading;
+  const error: Error | null = (opportunityError || similarError) ?? null;
 
   useEffect(() => {
     updateConfig({
@@ -98,9 +91,9 @@ export const useReservationComplete = () => {
   return {
     opportunity,
     similarOpportunities,
-    opportunitiesCreatedByHost,
+    // opportunitiesCreatedByHost,
     dateTimeInfo,
     isLoading,
-    error,
+    error: error ?? null,
   };
 };

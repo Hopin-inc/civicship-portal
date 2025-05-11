@@ -6,11 +6,11 @@ export type ActivitySlotGroup = {
 }
 
 export type ActivitySlot = OpportunitySlot & {
-  feeRequired: number;
+  feeRequired: number | null;
 };
 
 export type QuestSlot = OpportunitySlot & {
-  pointsToEarn: number;
+  pointsToEarn: number | null;
 };
 
 type OpportunitySlot = {

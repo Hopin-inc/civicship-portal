@@ -6,7 +6,6 @@ export * from './core/useHeaderConfig';
 // Activity
 export * from './features/activity/useActivities';
 export * from './features/activity/useActivityDetails';
-export * from './features/activity/useSimilarOpportunities';
 
 // Article
 export * from './features/article/useArticle';
@@ -20,7 +19,6 @@ export * from './features/participation/useParticipationImageUpload';
 // Place
 export * from './features/place/usePlaces';
 export * from './features/place/usePlaceDetail';
-export * from './features/place/usePlaceMembership';
 export * from './features/place/useMapState';
 
 // Reservation
@@ -46,6 +44,3 @@ export * from './features/user/useSignUp';
 // Wallet
 export * from './features/wallet/useWallet';
 export * from './features/wallet/useTransactionHistory';
-
-// Other hooks
-export * from './features/activity/useOpportunity';
