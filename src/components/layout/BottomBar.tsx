@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { Search, Globe, User } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
-import micromatch from "micromatch";
 import React from "react";
 import { cn } from "@/lib/utils";
+import { matchPaths } from "@/utils/path";
 
 interface HeaderProps {
   className?: string
@@ -28,8 +27,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   }
 
   const getLinkStyle = (...paths: string[]) => {
-    const pathOnly = pathname.split(/[?#]/, 1)[0];
-    const isActive = paths.some((path) => micromatch.isMatch(pathOnly, path));
+    const isActive = matchPaths(pathname, ...paths)
     return `flex flex-col items-center ${isActive ? "text-primary" : "text-muted-foreground"} hover:text-primary`;
   };
 

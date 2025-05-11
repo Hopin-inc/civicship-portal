@@ -8,7 +8,7 @@ import LoadingProvider from "@/components/providers/LoadingProvider";
 import Header from "@/components/layout/Header";
 import { LiffProvider } from "@/contexts/LiffContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { HeaderProvider } from "@/contexts/HeaderContext";
+import HeaderProvider from "@/components/providers/HeaderProvider";
 import BottomBar from "@/components/layout/BottomBar";
 
 const font = Inter({ subsets: ["latin"] });
