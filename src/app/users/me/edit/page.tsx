@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProfileEdit } from '@/hooks/features/user/useProfileEdit';
 import { UserProfileEdit } from '@/components/features/user/UserProfileEdit';
@@ -9,11 +9,12 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 
 export default function ProfileEditPage() {
-  useHeaderConfig({
+  const headerConfig = useMemo(() => ({
     title: "プロフィール編集",
     showBackButton: true,
     showLogo: false,
-  });
+  }), []);
+  useHeaderConfig(headerConfig);
   
   const router = useRouter();
   const {

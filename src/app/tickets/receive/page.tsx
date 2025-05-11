@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import LoginModal from "@/components/features/login/LoginModal";
@@ -17,11 +17,12 @@ export default function TicketReceivePage() {
     throw new Error("URLが無効か、既に使用されています。");
   }
 
-  useHeaderConfig({
+  const headerConfig = useMemo(() => ({
     title: "チケット受け取り",
     showBackButton: true,
     showLogo: false,
-  });
+  }), []);
+  useHeaderConfig(headerConfig);
 
   const { user } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);

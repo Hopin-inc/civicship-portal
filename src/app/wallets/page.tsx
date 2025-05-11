@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useWallet } from '@/hooks/features/wallet/useWallet';
 import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
@@ -14,11 +14,12 @@ import { WalletUsageSection } from '@/components/features/wallet/WalletUsageSect
 export default function WalletsPage() {
   const { currentPoint, isLoading, error } = useWallet();
   
-  useHeaderConfig({
+  const headerConfig = useMemo(() => ({
     title: '保有ポイント',
     showBackButton: true,
     showLogo: false,
-  });
+  }), []);
+  useHeaderConfig(headerConfig);
 
   if (isLoading) {
     return (

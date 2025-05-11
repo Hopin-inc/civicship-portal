@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTickets } from '@/hooks/features/ticket/useTickets';
 import TicketContent from '@/components/features/ticket/TicketContent';
 import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
@@ -10,11 +10,12 @@ import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 export default function TicketsPage() {
   const { tickets, loading, error } = useTickets();
   
-  useHeaderConfig({
+  const headerConfig = useMemo(() => ({
     title: "チケット一覧",
     showBackButton: true,
     showLogo: false,
-  });
+  }), []);
+  useHeaderConfig(headerConfig);
 
   if (loading) {
     return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, useMemo } from "react";
 import { usePlaceDetail } from "@/hooks/features/place/usePlaceDetail";
 import { RecentActivitiesTimeline } from "@/components/features/activity/RecentActivitiesTimeline";
 import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
@@ -21,11 +21,12 @@ interface PlaceDetailProps {
 }
 
 const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
-  useHeaderConfig({
+  const headerConfig = useMemo(() => ({
     title: "拠点詳細",
     showBackButton: true,
     showLogo: false,
-  });
+  }), []);
+  useHeaderConfig(headerConfig);
 
   const {
     membership,
