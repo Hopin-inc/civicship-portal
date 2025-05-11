@@ -5,13 +5,10 @@ import { CookiesProvider } from "next-client-cookies/server";
 import ApolloProvider from "@/components/providers/ApolloProvider";
 import { Toaster } from "@/components/ui/sonner";
 import LoadingProvider from "@/components/providers/LoadingProvider";
-import Header from "@/components/layout/Header";
 import { LiffProvider } from "@/contexts/LiffContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import HeaderProvider from "@/components/providers/HeaderProvider";
-import BottomBar from "@/components/layout/BottomBar";
-import AdminBottomBar from "@/components/layout/AdminBottomBar";
-import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
+import MainContent from "@/components/layout/MainContent";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -47,18 +44,6 @@ const RootLayout = ({
   );
 };
 
-const MainContent = ({ children }: { children: React.ReactNode }) => {
-  const { config } = useHeaderConfig();
-  const showHeader = !config.hideHeader;
-  
-  return (
-    <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full">
-      <Header />
-      <main className={`w-full flex-grow ${showHeader ? 'pt-16' : ''} pb-16 overflow-y-auto`}>{children}</main>
-      <BottomBar className="fixed bottom-0 left-0 right-0 z-50 max-w-mobile-l mx-auto w-full" />
-      <AdminBottomBar className="fixed bottom-0 left-0 right-0 z-50 max-w-mobile-l mx-auto w-full" />
-    </div>
-  );
-};
+
 
 export default RootLayout;
