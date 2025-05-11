@@ -1,8 +1,16 @@
 "use client";
 
-import React, { ReactNode, useState, useEffect } from "react";
-import { HeaderConfig, HeaderContextState, HeaderContext } from "@/contexts/HeaderContext";
+import React, { ReactNode, useState, useEffect, createContext, useContext } from "react";
+import { HeaderConfig } from "@/contexts/HeaderContext";
 import { usePathname } from "next/navigation";
+
+export type HeaderContextState = {
+  config: HeaderConfig;
+  updateConfig: (config: Partial<HeaderConfig>) => void;
+  resetConfig: () => void;
+  lastVisitedUrls: Record<string, string>;
+  addToHistory: (pageType: string, url: string) => void;
+};
 
 const defaultConfig: HeaderConfig = {
   title: undefined,
@@ -12,6 +20,22 @@ const defaultConfig: HeaderConfig = {
   action: undefined,
   backTo: undefined,
   searchParams: undefined,
+};
+
+export const HeaderContext = createContext<HeaderContextState>({
+  config: defaultConfig,
+  updateConfig: () => {},
+  resetConfig: () => {},
+  lastVisitedUrls: {},
+  addToHistory: () => {},
+});
+
+export const useHeader = () => {
+  const context = useContext(HeaderContext);
+  if (!context) {
+    throw new Error("useHeader must be used within a HeaderProvider");
+  }
+  return context;
 };
 
 const PAGE_TYPES = {
