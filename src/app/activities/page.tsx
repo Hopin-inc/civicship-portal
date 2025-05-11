@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useLoading } from '@/hooks/core/useLoading'
 import { useActivities } from '@/hooks/features/activity/useActivities'
 import { mapOpportunityToCardProps } from '@/presenters/opportunity'
@@ -15,10 +15,11 @@ import { ErrorState } from "@/components/shared/ErrorState"
 export default function ActivitiesPage() {
   const { setIsLoading } = useLoading()
 
-  useHeaderConfig({
-    showLogo: true,
-    showSearchForm: true,
-  })
+  const headerConfig = useMemo(() => ({ 
+    showLogo: true, 
+    showSearchForm: true 
+  }), [])
+  useHeaderConfig(headerConfig)
 
   const {
     upcomingActivities,
