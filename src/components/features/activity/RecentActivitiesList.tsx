@@ -86,7 +86,7 @@ const transformOpportunityToHistory = (opportunity: GqlOpportunity): Opportunity
   ).values());
 
   const firstSlot = opportunity.slots?.[0];
-  const date = firstSlot?.startsAt 
+  const date = firstSlot?.startsAt
     ? new Date(firstSlot.startsAt).toLocaleDateString('ja-JP', {
         year: 'numeric',
         month: '2-digit',
@@ -105,8 +105,8 @@ const transformOpportunityToHistory = (opportunity: GqlOpportunity): Opportunity
     date,
     images: images.map(img => ({ url: img, alt: opportunity.title })),
     participants: uniqueParticipants,
-    community: opportunity.community? opportunity.community : undefined,
-    isReservableWithTicket: opportunity.isReservableWithTicket,
+    community: opportunity.community ? opportunity.community : undefined,
+    isReservableWithTicket: opportunity.isReservableWithTicket ?? undefined,
   };
 };
 

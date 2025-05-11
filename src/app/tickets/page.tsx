@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import { useTickets } from '@/hooks/features/ticket/useTickets';
 import TicketContent from '@/components/features/ticket/TicketContent';
-import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
+import LoadingIndicator from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 

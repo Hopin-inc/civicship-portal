@@ -8,7 +8,7 @@ import { TicketDetailInfo } from '@/components/features/ticket/TicketDetailInfo'
 import { TicketDetailRequests } from '@/components/features/ticket/TicketDetailRequests';
 import { TicketDetailAction } from '@/components/features/ticket/TicketDetailAction';
 import { useTicketDetail } from '@/hooks/features/ticket/useTicketDetail';
-import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
+import LoadingIndicator from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 
