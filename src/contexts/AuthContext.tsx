@@ -14,7 +14,9 @@ import { COMMUNITY_ID } from "@/utils";
 
 type UserInfo = {
   uid: string | null;
-  user: Required<Partial<GqlUser>, "id" | "name"> | null;
+  user: Required<Partial<GqlUser>, "id" | "name"> & {
+    memberships?: any[];
+  } | null;
 };
 
 type AuthContextType = UserInfo & {
@@ -33,7 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const cookies = useCookies();
   const { liff, isLiffLoggedIn, liffAccessToken, liffLogin, liffLogout } = useLiff();
 
-  const { refetch } = useCurrentUserQuery({
+  const { data: currentUserData, loading: queryLoading, refetch } = useCurrentUserQuery({
     fetchPolicy: "no-cache",
   });
 
@@ -43,12 +45,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isExplicitLogin, setIsExplicitLogin] = useState(false);
 
-  const [userSignUpMutation] = useUserSignUpMutation();
-
   const login = useCallback((userInfo: UserInfo | null) => {
     setUid(userInfo?.uid ?? null);
     setUser(userInfo?.user ?? null);
   }, []);
+
+  useEffect(() => {
+    if (currentUserData?.currentUser?.user && uid) {
+      const fetchedUser = currentUserData.currentUser.user;
+      login({
+        uid,
+        user: {
+          id: fetchedUser.id,
+          name: fetchedUser.name,
+          memberships: fetchedUser.memberships || []
+        }
+      });
+    }
+  }, [currentUserData, uid, login]);
+
+  const [userSignUpMutation] = useUserSignUpMutation();
 
   const loginWithLiff = async () => {
     if (!liff) {
@@ -108,7 +124,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             uid: user.uid,
             user: {
               id: fetchedUser.id,
-              name: fetchedUser.name
+              name: fetchedUser.name,
+              memberships: fetchedUser.memberships || []
             }
           });
 

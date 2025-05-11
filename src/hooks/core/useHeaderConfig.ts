@@ -27,7 +27,7 @@ type HeaderConfig = {
  * 2. Without parameters to get update and reset functions for manual control
  */
 export const useHeaderConfig = (config?: Partial<HeaderConfig>) => {
-  const { updateConfig, resetConfig, lastVisitedUrls } = useHeader() as any;
+  const { updateConfig, resetConfig, lastVisitedUrls } = useHeader();
 
   const updateHeaderConfig = useCallback((newConfig: Partial<HeaderConfig>) => {
     updateConfig(newConfig);

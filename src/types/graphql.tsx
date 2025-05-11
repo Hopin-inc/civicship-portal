@@ -2267,7 +2267,18 @@ export type GqlCurrentUserQuery = {
   __typename?: "Query";
   currentUser?: {
     __typename?: "CurrentUserPayload";
-    user?: { __typename?: "User"; id: string; name: string } | null;
+    user?: {
+      __typename?: "User";
+      id: string;
+      name: string;
+      memberships?: Array<{
+        __typename?: "Membership";
+        role: GqlRole;
+        status: GqlMembershipStatus;
+        user?: { __typename?: "User"; id: string } | null;
+        community?: { __typename?: "Community"; id: string } | null;
+      }> | null;
+    } | null;
   } | null;
 };
 
@@ -4104,6 +4115,16 @@ export const CurrentUserDocument = gql`
       user {
         id
         name
+        memberships {
+          user {
+            id
+          }
+          community {
+            id
+          }
+          role
+          status
+        }
       }
     }
   }
