@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useWallet } from '@/hooks/features/wallet/useWallet';
-import { useHeader } from '@/contexts/HeaderContext';
 import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 import { WalletCard } from '@/components/features/wallet/WalletCard';
 import { WalletHistoryButton } from '@/components/features/wallet/WalletHistoryButton';
 import { WalletInfoSection } from '@/components/features/wallet/WalletInfoSection';
@@ -13,15 +13,12 @@ import { WalletUsageSection } from '@/components/features/wallet/WalletUsageSect
 
 export default function WalletsPage() {
   const { currentPoint, isLoading, error } = useWallet();
-  const { updateConfig } = useHeader();
-
-  useEffect(() => {
-    updateConfig({
-      title: '保有ポイント',
-      showBackButton: true,
-      showLogo: false,
-    });
-  }, [updateConfig]);
+  
+  useHeaderConfig({
+    title: '保有ポイント',
+    showBackButton: true,
+    showLogo: false,
+  });
 
   if (isLoading) {
     return (
