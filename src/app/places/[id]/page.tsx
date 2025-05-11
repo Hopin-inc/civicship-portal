@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { usePlaceDetail } from "@/hooks/features/place/usePlaceDetail";
 import { RecentActivitiesTimeline } from "@/components/features/activity/RecentActivitiesTimeline";
 import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
@@ -9,6 +9,7 @@ import PlaceHeader from "@/components/features/places/detail/PlaceHeader";
 import PlaceOpportunities from "@/components/features/places/detail/PlaceOpportunities";
 import PlaceFeaturedArticle from "@/components/features/places/detail/PlaceFeaturedArticle";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
 
 interface PlaceDetailProps {
   params: {
@@ -20,6 +21,12 @@ interface PlaceDetailProps {
 }
 
 const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
+  useHeaderConfig({
+    title: "拠点詳細",
+    showBackButton: true,
+    showLogo: false,
+  });
+
   const {
     membership,
     opportunities,

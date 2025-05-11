@@ -4,8 +4,15 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { ArticleList } from '@/components/features/article/ArticleList';
 import { ArticleLoadingIndicator } from '@/components/features/article/ArticleLoadingIndicator';
 import { useArticles } from '@/hooks/features/article/useArticles';
+import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 
 export default function ArticlesPage() {
+  useHeaderConfig({
+    title: "記事一覧",
+    showBackButton: true,
+    showLogo: false,
+  });
+
   const {
     articles,
     loading,
