@@ -76,15 +76,34 @@ export const signInWithLiffToken = async (accessToken: string): Promise<boolean>
   }
 };
 
+let recaptchaVerifier: RecaptchaVerifier | null = null;
+
 export const startPhoneNumberVerification = async (phoneNumber: string): Promise<string> => {
   switchTenant(null);
   
-  const appVerifier = new RecaptchaVerifier('recaptcha-container', {
-    size: 'invisible',
-  }, auth);
-  
   try {
-    const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+    if (recaptchaVerifier) {
+      recaptchaVerifier.clear();
+      recaptchaVerifier = null;
+    }
+    
+    recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+      size: 'normal', // 'invisible'から'normal'に変更
+      callback: () => {
+        console.log('reCAPTCHA solved!');
+      },
+      'expired-callback': () => {
+        console.log('reCAPTCHA expired');
+        if (recaptchaVerifier) {
+          recaptchaVerifier.clear();
+          recaptchaVerifier = null;
+        }
+      }
+    }, auth);
+    
+    await recaptchaVerifier.render();
+    
+    const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
     return confirmationResult.verificationId;
   } catch (error) {
     console.error("Phone verification failed:", error);
@@ -99,7 +118,8 @@ export const verifyPhoneCode = async (verificationId: string, code: string): Pro
   
   try {
     const credential = PhoneAuthProvider.credential(verificationId, code);
-    return signInWithCustomToken(auth, credential.token);
+    // PhoneAuthProvider.credential doesn't have a token property
+    return signInWithCredential(auth, credential);
   } catch (error) {
     console.error("Code verification failed:", error);
     throw error;

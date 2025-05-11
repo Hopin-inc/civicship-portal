@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -10,10 +10,23 @@ export function PhoneVerificationForm() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
+  const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
+  const recaptchaContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  
+  useEffect(() => {
+    if (recaptchaContainerRef.current) {
+      setIsRecaptchaReady(true);
+    }
+  }, [recaptchaContainerRef.current]);
   
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isRecaptchaReady) {
+      toast.error("reCAPTCHAの読み込みが完了していません。ページを再読み込みしてください。");
+      return;
+    }
+    
     const formattedPhone = formatPhoneNumber(phoneNumber);
     const success = await phoneAuth.startPhoneVerification(formattedPhone);
     if (success) {
@@ -70,7 +83,7 @@ export function PhoneVerificationForm() {
               required
             />
           </div>
-          <div id="recaptcha-container"></div>
+          <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
           <button
             type="submit"
             className="w-full h-12 bg-primary text-white rounded-md"
