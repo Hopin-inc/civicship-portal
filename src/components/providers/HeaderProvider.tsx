@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ReactNode, useState, useEffect } from "react";
-import { HeaderConfig, HeaderContext } from "@/contexts/HeaderContext";
+import { HeaderConfig, HeaderContextState, HeaderContext } from "@/contexts/HeaderContext";
 import { usePathname } from "next/navigation";
 
 const defaultConfig: HeaderConfig = {
