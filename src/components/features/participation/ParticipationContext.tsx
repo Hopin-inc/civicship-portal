@@ -1,11 +1,27 @@
 'use client';
 
-import {ParticipationDetails} from "@/components/features/participation/ParticipationDetails";
-import {NotificationMessage} from "@/components/features/participation/NotificationMessage";
-import {ParticipationStatusNotification} from "@/components/features/participation/ParticipationStatusNotification";
-import {ParticipationHeader} from "@/components/features/participation/ParticipationHeader";
-import {ParticipationImageGallery} from "@/components/features/participation/ParticipationImageGallery";
-import {ParticipationActions} from "@/components/features/participation/ParticipationActions";
+import { ParticipationDetails } from "@/components/features/participation/ParticipationDetails";
+import { NotificationMessage } from "@/components/features/participation/NotificationMessage";
+import { ParticipationStatusNotification } from "@/components/features/participation/ParticipationStatusNotification";
+import { ParticipationHeader } from "@/components/features/participation/ParticipationHeader";
+import { ParticipationImageGallery } from "@/components/features/participation/ParticipationImageGallery";
+import { ParticipationActions } from "@/components/features/participation/ParticipationActions";
+import { Participation, Opportunity } from "@/types/participation";
+import { ReservationStatus } from "@/types/participationStatus";
+
+interface ParticipationContentProps {
+  opportunity: Opportunity;
+  participation: Participation;
+  currentStatus: ReservationStatus | null;
+  uploadSuccess: boolean;
+  uploadError: string | null;
+  isUploading: boolean;
+  handleAddPhotos: (images: File[], comment: string) => Promise<void>;
+  startTime: Date;
+  endTime: Date;
+  participantCount: number;
+  cancellationDeadline: Date;
+}
 
 export const ParticipationContent = ({
    opportunity,
@@ -19,8 +35,8 @@ export const ParticipationContent = ({
    endTime,
    participantCount,
    cancellationDeadline,
- }: any) => {
-  const isCancellable = false;
+ }: ParticipationContentProps) => {
+  const isCancellable = new Date() < cancellationDeadline;
 
   return (
     <>
@@ -40,7 +56,13 @@ export const ParticipationContent = ({
       )}
 
       {currentStatus && (
-        <ParticipationStatusNotification {...currentStatus} />
+        <ParticipationStatusNotification 
+          status={currentStatus.status === "confirmed" ? "confirmed" : 
+                 currentStatus.status === "cancelled" ? "cancelled" : "pending"}
+          statusText={currentStatus.statusText}
+          statusSubText={currentStatus.statusSubText}
+          statusClass={currentStatus.statusClass}
+        />
       )}
 
       <ParticipationHeader opportunity={opportunity} />
