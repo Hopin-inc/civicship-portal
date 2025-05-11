@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MarkerData } from '@/types/map';
+import { MarkerData } from '@/types/place';
 import { createCustomMarkerIcon, defaultImageUrl, drawCircleWithImage } from '@/utils/maps/markerUtils';
 import { Marker } from '@react-google-maps/api';
 

@@ -35,10 +35,10 @@ export type GqlAccumulatedPointView = {
 export type GqlArticle = {
   __typename?: "Article";
   authors?: Maybe<Array<GqlUser>>;
-  body: Scalars["String"]["output"];
+  body?: Maybe<Scalars["String"]["output"]>;
   category: GqlArticleCategory;
   community?: Maybe<GqlCommunity>;
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   id: Scalars["ID"]["output"];
   introduction: Scalars["String"]["output"];
   opportunities?: Maybe<Array<GqlOpportunity>>;
@@ -154,7 +154,7 @@ export type GqlCommunity = {
   __typename?: "Community";
   articles?: Maybe<Array<GqlArticle>>;
   bio?: Maybe<Scalars["String"]["output"]>;
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   establishedAt?: Maybe<Scalars["Datetime"]["output"]>;
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
@@ -847,7 +847,7 @@ export type GqlOpportunity = {
   capacity?: Maybe<Scalars["Int"]["output"]>;
   category: GqlOpportunityCategory;
   community?: Maybe<GqlCommunity>;
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   createdByUser?: Maybe<GqlUser>;
   description: Scalars["String"]["output"];
   earliestReservableAt?: Maybe<Scalars["Datetime"]["output"]>;
@@ -971,6 +971,7 @@ export type GqlOpportunitySlotEdge = GqlEdge & {
 };
 
 export type GqlOpportunitySlotFilterInput = {
+  hostingStatus?: InputMaybe<GqlOpportunitySlotHostingStatus>;
   opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
@@ -1207,11 +1208,11 @@ export type GqlPlace = {
   address: Scalars["String"]["output"];
   city?: Maybe<GqlCity>;
   community?: Maybe<GqlCommunity>;
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   googlePlaceId?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
-  isManual: Scalars["Boolean"]["output"];
+  isManual?: Maybe<Scalars["Boolean"]["output"]>;
   latitude: Scalars["Decimal"]["output"];
   longitude: Scalars["Decimal"]["output"];
   mapLocation?: Maybe<Scalars["JSON"]["output"]>;
@@ -1302,6 +1303,15 @@ export type GqlPortfolio = {
   title: Scalars["String"]["output"];
 };
 
+export const GqlPortfolioCategory = {
+  Activity: "ACTIVITY",
+  ActivityReport: "ACTIVITY_REPORT",
+  Event: "EVENT",
+  Interview: "INTERVIEW",
+  Quest: "QUEST",
+} as const;
+
+export type GqlPortfolioCategory = (typeof GqlPortfolioCategory)[keyof typeof GqlPortfolioCategory];
 export const GqlPortfolioSource = {
   Article: "ARTICLE",
   Opportunity: "OPPORTUNITY",
@@ -1576,7 +1586,7 @@ export type GqlQueryWalletsArgs = {
 
 export type GqlReservation = {
   __typename?: "Reservation";
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   createdByUser?: Maybe<GqlUser>;
   histories?: Maybe<Array<GqlReservationHistory>>;
   id: Scalars["ID"]["output"];
@@ -1983,7 +1993,7 @@ export type GqlUser = {
   articlesWrittenByMe?: Maybe<Array<GqlArticle>>;
   bio?: Maybe<Scalars["String"]["output"]>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
-  currentPrefecture: GqlCurrentPrefecture;
+  currentPrefecture?: Maybe<GqlCurrentPrefecture>;
   evaluationCreatedByMe?: Maybe<Array<GqlEvaluationHistory>>;
   evaluations?: Maybe<Array<GqlEvaluation>>;
   id: Scalars["ID"]["output"];
@@ -1999,7 +2009,7 @@ export type GqlUser = {
   portfolios?: Maybe<Array<GqlPortfolio>>;
   reservationStatusChangedByMe?: Maybe<Array<GqlReservationHistory>>;
   reservations?: Maybe<Array<GqlReservation>>;
-  slug: Scalars["String"]["output"];
+  slug?: Maybe<Scalars["String"]["output"]>;
   sysRole?: Maybe<GqlSysRole>;
   ticketStatusChangedByMe?: Maybe<Array<GqlTicketStatusHistory>>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
@@ -2078,11 +2088,11 @@ export type GqlUtilitiesConnection = {
 export type GqlUtility = {
   __typename?: "Utility";
   community?: Maybe<GqlCommunity>;
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   description?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
   images?: Maybe<Array<Scalars["String"]["output"]>>;
-  name: Scalars["String"]["output"];
+  name?: Maybe<Scalars["String"]["output"]>;
   pointsRequired: Scalars["Int"]["output"];
   publishStatus: GqlPublishStatus;
   requiredForOpportunities?: Maybe<Array<GqlOpportunity>>;
@@ -2206,6 +2216,39 @@ export type GqlWalletsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type GqlCommunityFieldsFragment = { __typename?: "Community"; id: string };
+
+export type GqlGetCommunitiesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetCommunitiesQuery = {
+  __typename?: "Query";
+  communities: {
+    __typename?: "CommunitiesConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "CommunityEdge";
+      node?: { __typename?: "Community"; id: string; name?: string | null } | null;
+    }> | null;
+  };
+};
+
+export type GqlGetCommunityQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetCommunityQuery = {
+  __typename?: "Query";
+  community?: { __typename?: "Community"; id: string; name?: string | null } | null;
+};
+
+export type GqlIdentityFieldsFragment = {
+  __typename?: "Identity";
+  uid: string;
+  platform?: GqlIdentityPlatform | null;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+};
+
 export type GqlUserSignUpMutationVariables = Exact<{
   input: GqlUserSignUpInput;
 }>;
@@ -2218,144 +2261,6 @@ export type GqlUserSignUpMutation = {
   } | null;
 };
 
-export type GqlCreateReservationMutationVariables = Exact<{
-  input: GqlReservationCreateInput;
-}>;
-
-export type GqlCreateReservationMutation = {
-  __typename?: "Mutation";
-  reservationCreate?: {
-    __typename?: "ReservationCreateSuccess";
-    reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
-  } | null;
-};
-
-export type GqlTicketClaimMutationVariables = Exact<{
-  input: GqlTicketClaimInput;
-}>;
-
-export type GqlTicketClaimMutation = {
-  __typename?: "Mutation";
-  ticketClaim?: {
-    __typename?: "TicketClaimSuccess";
-    tickets: Array<{ __typename?: "Ticket"; id: string }>;
-  } | null;
-};
-
-export type GqlUpdateMyProfileMutationVariables = Exact<{
-  input: GqlUserUpdateProfileInput;
-  permission: GqlCheckIsSelfPermissionInput;
-}>;
-
-export type GqlUpdateMyProfileMutation = {
-  __typename?: "Mutation";
-  userUpdateMyProfile?: {
-    __typename?: "UserUpdateProfileSuccess";
-    user?: {
-      __typename?: "User";
-      id: string;
-      name: string;
-      image?: string | null;
-      bio?: string | null;
-      currentPrefecture: GqlCurrentPrefecture;
-      urlFacebook?: string | null;
-      urlInstagram?: string | null;
-      urlX?: string | null;
-      slug: string;
-    } | null;
-  } | null;
-};
-
-export type GqlGetArticleQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
-}>;
-
-export type GqlGetArticleQuery = {
-  __typename?: "Query";
-  article?: {
-    __typename?: "Article";
-    id: string;
-    title: string;
-    introduction: string;
-    body: string;
-    category: GqlArticleCategory;
-    thumbnail?: any | null;
-    publishedAt?: Date | null;
-    createdAt: Date;
-    updatedAt?: Date | null;
-    authors?: Array<{
-      __typename?: "User";
-      id: string;
-      name: string;
-      image?: string | null;
-      bio?: string | null;
-    }> | null;
-    relatedUsers?: Array<{
-      __typename?: "User";
-      id: string;
-      name: string;
-      image?: string | null;
-      bio?: string | null;
-    }> | null;
-  } | null;
-  articles: {
-    __typename?: "ArticlesConnection";
-    totalCount: number;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
-    edges?: Array<{
-      __typename?: "ArticleEdge";
-      node?: {
-        __typename?: "Article";
-        id: string;
-        title: string;
-        introduction: string;
-        thumbnail?: any | null;
-        publishedAt?: Date | null;
-        authors?: Array<{
-          __typename?: "User";
-          id: string;
-          name: string;
-          image?: string | null;
-        }> | null;
-      } | null;
-    } | null> | null;
-  };
-};
-
-export type GqlGetArticlesQueryVariables = Exact<{
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<GqlArticleFilterInput>;
-  sort?: InputMaybe<GqlArticleSortInput>;
-}>;
-
-export type GqlGetArticlesQuery = {
-  __typename?: "Query";
-  articles: {
-    __typename?: "ArticlesConnection";
-    totalCount: number;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
-    edges?: Array<{
-      __typename?: "ArticleEdge";
-      node?: {
-        __typename?: "Article";
-        id: string;
-        title: string;
-        introduction: string;
-        thumbnail?: any | null;
-        publishedAt?: Date | null;
-        authors?: Array<{
-          __typename?: "User";
-          id: string;
-          name: string;
-          image?: string | null;
-        }> | null;
-      } | null;
-    } | null> | null;
-  };
-};
-
 export type GqlCurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GqlCurrentUserQuery = {
@@ -2364,6 +2269,15 @@ export type GqlCurrentUserQuery = {
     __typename?: "CurrentUserPayload";
     user?: { __typename?: "User"; id: string; name: string } | null;
   } | null;
+};
+
+export type GqlMembershipFieldsFragment = {
+  __typename?: "Membership";
+  headline?: string | null;
+  bio?: string | null;
+  role: GqlRole;
+  status: GqlMembershipStatus;
+  reason: GqlMembershipStatusReason;
 };
 
 export type GqlGetSingleMembershipQueryVariables = Exact<{
@@ -2420,7 +2334,7 @@ export type GqlGetSingleMembershipQuery = {
         title: string;
         introduction: string;
         thumbnail?: any | null;
-        createdAt: Date;
+        createdAt?: Date | null;
       }> | null;
       opportunitiesCreatedByMe?: Array<{
         __typename?: "Opportunity";
@@ -2434,7 +2348,7 @@ export type GqlGetSingleMembershipQuery = {
         requireApproval: boolean;
         publishStatus: GqlPublishStatus;
         images?: Array<string> | null;
-        createdAt: Date;
+        createdAt?: Date | null;
         updatedAt?: Date | null;
         community?: {
           __typename?: "Community";
@@ -2556,7 +2470,7 @@ export type GqlGetMembershipListQuery = {
             requireApproval: boolean;
             publishStatus: GqlPublishStatus;
             images?: Array<string> | null;
-            createdAt: Date;
+            createdAt?: Date | null;
             updatedAt?: Date | null;
             community?: {
               __typename?: "Community";
@@ -2598,510 +2512,51 @@ export type GqlGetMembershipListQuery = {
   };
 };
 
-export type GqlOpportunityFieldsFragment = {
-  __typename?: "Opportunity";
+export type GqlUserFieldsFragment = {
+  __typename?: "User";
   id: string;
-  title: string;
-  description: string;
-  images?: Array<string> | null;
-  feeRequired?: number | null;
-  pointsToEarn?: number | null;
-  isReservableWithTicket?: boolean | null;
-  community?: {
-    __typename?: "Community";
-    id: string;
-    name?: string | null;
-    image?: string | null;
-  } | null;
-  place?: {
-    __typename?: "Place";
-    id: string;
-    name: string;
-    address: string;
-    city?: {
-      __typename?: "City";
-      name: string;
-      state?: { __typename?: "State"; name: string } | null;
-    } | null;
-  } | null;
-  slots?: Array<{
-    __typename?: "OpportunitySlot";
-    id: string;
-    startsAt: Date;
-    endsAt: Date;
-    capacity?: number | null;
-  }> | null;
+  name: string;
+  image?: string | null;
+  bio?: string | null;
+  currentPrefecture?: GqlCurrentPrefecture | null;
 };
 
-export type GqlGetOpportunitiesQueryVariables = Exact<{
-  upcomingFilter?: InputMaybe<GqlOpportunityFilterInput>;
-  featuredFilter?: InputMaybe<GqlOpportunityFilterInput>;
-  allFilter?: InputMaybe<GqlOpportunityFilterInput>;
-  similarFilter?: InputMaybe<GqlOpportunityFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
+export type GqlUpdateMyProfileMutationVariables = Exact<{
+  input: GqlUserUpdateProfileInput;
+  permission: GqlCheckIsSelfPermissionInput;
 }>;
 
-export type GqlGetOpportunitiesQuery = {
-  __typename?: "Query";
-  upcoming: {
-    __typename?: "OpportunitiesConnection";
-    totalCount: number;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
-    edges: Array<{
-      __typename?: "OpportunityEdge";
-      node?: {
-        __typename?: "Opportunity";
-        id: string;
-        title: string;
-        description: string;
-        images?: Array<string> | null;
-        feeRequired?: number | null;
-        pointsToEarn?: number | null;
-        isReservableWithTicket?: boolean | null;
-        community?: {
-          __typename?: "Community";
-          id: string;
-          name?: string | null;
-          image?: string | null;
-        } | null;
-        place?: {
-          __typename?: "Place";
-          id: string;
-          name: string;
-          address: string;
-          city?: {
-            __typename?: "City";
-            name: string;
-            state?: { __typename?: "State"; name: string } | null;
-          } | null;
-        } | null;
-        slots?: Array<{
-          __typename?: "OpportunitySlot";
-          id: string;
-          startsAt: Date;
-          endsAt: Date;
-          capacity?: number | null;
-        }> | null;
-      } | null;
-    }>;
-  };
-  featured: {
-    __typename?: "OpportunitiesConnection";
-    totalCount: number;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
-    edges: Array<{
-      __typename?: "OpportunityEdge";
-      node?: {
-        __typename?: "Opportunity";
-        id: string;
-        title: string;
-        description: string;
-        images?: Array<string> | null;
-        feeRequired?: number | null;
-        pointsToEarn?: number | null;
-        isReservableWithTicket?: boolean | null;
-        community?: {
-          __typename?: "Community";
-          id: string;
-          name?: string | null;
-          image?: string | null;
-        } | null;
-        place?: {
-          __typename?: "Place";
-          id: string;
-          name: string;
-          address: string;
-          city?: {
-            __typename?: "City";
-            name: string;
-            state?: { __typename?: "State"; name: string } | null;
-          } | null;
-        } | null;
-        slots?: Array<{
-          __typename?: "OpportunitySlot";
-          id: string;
-          startsAt: Date;
-          endsAt: Date;
-          capacity?: number | null;
-        }> | null;
-      } | null;
-    }>;
-  };
-  similar: {
-    __typename?: "OpportunitiesConnection";
-    edges: Array<{
-      __typename?: "OpportunityEdge";
-      node?: {
-        __typename?: "Opportunity";
-        id: string;
-        title: string;
-        description: string;
-        images?: Array<string> | null;
-        feeRequired?: number | null;
-        pointsToEarn?: number | null;
-        isReservableWithTicket?: boolean | null;
-        community?: {
-          __typename?: "Community";
-          id: string;
-          name?: string | null;
-          image?: string | null;
-        } | null;
-        place?: {
-          __typename?: "Place";
-          id: string;
-          name: string;
-          address: string;
-          city?: {
-            __typename?: "City";
-            name: string;
-            state?: { __typename?: "State"; name: string } | null;
-          } | null;
-        } | null;
-        slots?: Array<{
-          __typename?: "OpportunitySlot";
-          id: string;
-          startsAt: Date;
-          endsAt: Date;
-          capacity?: number | null;
-        }> | null;
-      } | null;
-    }>;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
-  };
-  all: {
-    __typename?: "OpportunitiesConnection";
-    totalCount: number;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
-    edges: Array<{
-      __typename?: "OpportunityEdge";
-      node?: {
-        __typename?: "Opportunity";
-        id: string;
-        title: string;
-        description: string;
-        images?: Array<string> | null;
-        feeRequired?: number | null;
-        pointsToEarn?: number | null;
-        isReservableWithTicket?: boolean | null;
-        community?: {
-          __typename?: "Community";
-          id: string;
-          name?: string | null;
-          image?: string | null;
-        } | null;
-        place?: {
-          __typename?: "Place";
-          id: string;
-          name: string;
-          address: string;
-          city?: {
-            __typename?: "City";
-            name: string;
-            state?: { __typename?: "State"; name: string } | null;
-          } | null;
-        } | null;
-        slots?: Array<{
-          __typename?: "OpportunitySlot";
-          id: string;
-          startsAt: Date;
-          endsAt: Date;
-          capacity?: number | null;
-        }> | null;
-      } | null;
-    }>;
-  };
-};
-
-export type GqlGetOpportunityQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
-}>;
-
-export type GqlGetOpportunityQuery = {
-  __typename?: "Query";
-  opportunity?: {
-    __typename?: "Opportunity";
-    id: string;
-    title: string;
-    description: string;
-    body?: string | null;
-    category: GqlOpportunityCategory;
-    capacity?: number | null;
-    pointsToEarn?: number | null;
-    isReservableWithTicket?: boolean | null;
-    feeRequired?: number | null;
-    requireApproval: boolean;
-    publishStatus: GqlPublishStatus;
-    images?: Array<string> | null;
-    createdAt: Date;
-    updatedAt?: Date | null;
-    community?: {
-      __typename?: "Community";
-      id: string;
-      name?: string | null;
-      image?: string | null;
-    } | null;
-    createdByUser?: {
+export type GqlUpdateMyProfileMutation = {
+  __typename?: "Mutation";
+  userUpdateMyProfile?: {
+    __typename?: "UserUpdateProfileSuccess";
+    user?: {
       __typename?: "User";
       id: string;
       name: string;
       image?: string | null;
-      articlesAboutMe?: Array<{
-        __typename?: "Article";
-        id: string;
-        title: string;
-        introduction: string;
-        thumbnail?: any | null;
-        createdAt: Date;
-      }> | null;
-      opportunitiesCreatedByMe?: Array<{
-        __typename?: "Opportunity";
-        id: string;
-        title: string;
-        description: string;
-        category: GqlOpportunityCategory;
-        capacity?: number | null;
-        pointsToEarn?: number | null;
-        feeRequired?: number | null;
-        requireApproval: boolean;
-        publishStatus: GqlPublishStatus;
-        images?: Array<string> | null;
-        createdAt: Date;
-        updatedAt?: Date | null;
-        community?: {
-          __typename?: "Community";
-          id: string;
-          name?: string | null;
-          image?: string | null;
-        } | null;
-        slots?: Array<{
-          __typename?: "OpportunitySlot";
-          id: string;
-          startsAt: Date;
-          endsAt: Date;
-          reservations?: Array<{
-            __typename?: "Reservation";
-            participations?: Array<{
-              __typename?: "Participation";
-              id: string;
-              status: GqlParticipationStatus;
-              user?: {
-                __typename?: "User";
-                id: string;
-                name: string;
-                image?: string | null;
-              } | null;
-            }> | null;
-          }> | null;
-        }> | null;
-      }> | null;
+      bio?: string | null;
+      currentPrefecture?: GqlCurrentPrefecture | null;
+      urlFacebook?: string | null;
+      urlInstagram?: string | null;
+      urlX?: string | null;
+      slug?: string | null;
     } | null;
-    place?: {
-      __typename?: "Place";
-      id: string;
-      name: string;
-      address: string;
-      latitude: any;
-      longitude: any;
-      city?: {
-        __typename?: "City";
-        name: string;
-        state?: { __typename?: "State"; name: string } | null;
-      } | null;
-    } | null;
-    requiredUtilities?: Array<{ __typename?: "Utility"; id: string }> | null;
-    slots?: Array<{
-      __typename?: "OpportunitySlot";
-      id: string;
-      startsAt: Date;
-      endsAt: Date;
-      remainingCapacity?: number | null;
-      reservations?: Array<{
-        __typename?: "Reservation";
-        participations?: Array<{
-          __typename?: "Participation";
-          id: string;
-          status: GqlParticipationStatus;
-          user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
-        }> | null;
-      }> | null;
-    }> | null;
   } | null;
 };
 
-export type GqlGetParticipationQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
+export type GqlGetUsersQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GqlGetParticipationQuery = {
+export type GqlGetUsersQuery = {
   __typename?: "Query";
-  participation?: {
-    __typename?: "Participation";
-    id: string;
-    images?: Array<string> | null;
-    reason: GqlParticipationStatusReason;
-    source: GqlSource;
-    status: GqlParticipationStatus;
-    updatedAt?: Date | null;
-    reservation?: {
-      __typename?: "Reservation";
-      id: string;
-      opportunitySlot?: {
-        __typename?: "OpportunitySlot";
-        id: string;
-        capacity?: number | null;
-        startsAt: Date;
-        endsAt: Date;
-        hostingStatus: GqlOpportunitySlotHostingStatus;
-        opportunity?: {
-          __typename?: "Opportunity";
-          id: string;
-          title: string;
-          description: string;
-          body?: string | null;
-          category: GqlOpportunityCategory;
-          capacity?: number | null;
-          pointsToEarn?: number | null;
-          feeRequired?: number | null;
-          requireApproval: boolean;
-          publishStatus: GqlPublishStatus;
-          images?: Array<string> | null;
-          createdAt: Date;
-          updatedAt?: Date | null;
-          community?: {
-            __typename?: "Community";
-            id: string;
-            name?: string | null;
-            image?: string | null;
-          } | null;
-          createdByUser?: {
-            __typename?: "User";
-            id: string;
-            name: string;
-            image?: string | null;
-          } | null;
-          place?: {
-            __typename?: "Place";
-            id: string;
-            name: string;
-            address: string;
-            latitude: any;
-            longitude: any;
-            city?: {
-              __typename?: "City";
-              name: string;
-              state?: { __typename?: "State"; name: string } | null;
-            } | null;
-          } | null;
-          slots?: Array<{
-            __typename?: "OpportunitySlot";
-            id: string;
-            startsAt: Date;
-            endsAt: Date;
-          }> | null;
-        } | null;
-      } | null;
-    } | null;
-    statusHistories?: Array<{
-      __typename?: "ParticipationStatusHistory";
-      id: string;
-      status: GqlParticipationStatus;
-      reason: GqlParticipationStatusReason;
-      createdAt?: Date | null;
-      createdByUser?: { __typename?: "User"; id: string; name: string } | null;
-    }> | null;
-    user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
-  } | null;
-};
-
-export type GqlSearchOpportunitiesQueryVariables = Exact<{
-  filter?: InputMaybe<GqlOpportunityFilterInput>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-}>;
-
-export type GqlSearchOpportunitiesQuery = {
-  __typename?: "Query";
-  opportunities: {
-    __typename?: "OpportunitiesConnection";
+  users: {
+    __typename?: "UsersConnection";
     totalCount: number;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
-    edges: Array<{
-      __typename?: "OpportunityEdge";
-      node?: {
-        __typename?: "Opportunity";
-        id: string;
-        title: string;
-        description: string;
-        category: GqlOpportunityCategory;
-        capacity?: number | null;
-        pointsToEarn?: number | null;
-        feeRequired?: number | null;
-        requireApproval: boolean;
-        publishStatus: GqlPublishStatus;
-        images?: Array<string> | null;
-        createdAt: Date;
-        updatedAt?: Date | null;
-        community?: {
-          __typename?: "Community";
-          id: string;
-          name?: string | null;
-          image?: string | null;
-        } | null;
-        place?: {
-          __typename?: "Place";
-          id: string;
-          name: string;
-          address: string;
-          latitude: any;
-          longitude: any;
-          city?: {
-            __typename?: "City";
-            name: string;
-            state?: { __typename?: "State"; name: string } | null;
-          } | null;
-        } | null;
-        slots?: Array<{
-          __typename?: "OpportunitySlot";
-          id: string;
-          startsAt: Date;
-          endsAt: Date;
-          capacity?: number | null;
-          reservations?: Array<{
-            __typename?: "Reservation";
-            participations?: Array<{
-              __typename?: "Participation";
-              id: string;
-              status: GqlParticipationStatus;
-              user?: {
-                __typename?: "User";
-                id: string;
-                name: string;
-                image?: string | null;
-              } | null;
-            }> | null;
-          }> | null;
-        }> | null;
-      } | null;
-    }>;
+    edges?: Array<{
+      __typename?: "UserEdge";
+      node?: { __typename?: "User"; id: string; name: string } | null;
+    } | null> | null;
   };
-};
-
-export type GqlTicketClaimLinkQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type GqlTicketClaimLinkQuery = {
-  __typename?: "Query";
-  ticketClaimLink?: {
-    __typename?: "TicketClaimLink";
-    qty: number;
-    status: GqlClaimLinkStatus;
-    issuer?: {
-      __typename?: "TicketIssuer";
-      owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
-    } | null;
-  } | null;
 };
 
 export type GqlGetUserProfileQueryVariables = Exact<{
@@ -3117,7 +2572,7 @@ export type GqlGetUserProfileQuery = {
     image?: string | null;
     bio?: string | null;
     sysRole?: GqlSysRole | null;
-    currentPrefecture: GqlCurrentPrefecture;
+    currentPrefecture?: GqlCurrentPrefecture | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlWebsite?: string | null;
@@ -3139,7 +2594,7 @@ export type GqlGetUserWithDetailsAndPortfoliosQuery = {
     image?: string | null;
     bio?: string | null;
     sysRole?: GqlSysRole | null;
-    currentPrefecture: GqlCurrentPrefecture;
+    currentPrefecture?: GqlCurrentPrefecture | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlWebsite?: string | null;
@@ -3193,6 +2648,7 @@ export type GqlGetUserWalletQuery = {
     wallets?: Array<{
       __typename?: "Wallet";
       id: string;
+      type: GqlWalletType;
       currentPointView?: {
         __typename?: "CurrentPointView";
         currentPoint: number;
@@ -3202,11 +2658,18 @@ export type GqlGetUserWalletQuery = {
         __typename?: "Ticket";
         id: string;
         status: GqlTicketStatus;
-        utility?: { __typename?: "Utility"; id: string } | null;
+        reason: GqlTicketStatusReason;
+        utility?: {
+          __typename?: "Utility";
+          id: string;
+          publishStatus: GqlPublishStatus;
+          pointsRequired: number;
+        } | null;
         ticketStatusHistories?: Array<{
           __typename?: "TicketStatusHistory";
           id: string;
           status: GqlTicketStatus;
+          reason: GqlTicketStatusReason;
           createdByUser?: {
             __typename?: "User";
             id: string;
@@ -3217,6 +2680,1041 @@ export type GqlGetUserWalletQuery = {
       }> | null;
     }> | null;
   } | null;
+};
+
+export type GqlWalletFieldsFragment = {
+  __typename?: "Wallet";
+  id: string;
+  type: GqlWalletType;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+};
+
+export type GqlGetWalletsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetWalletsQuery = {
+  __typename?: "Query";
+  wallets: {
+    __typename?: "WalletsConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "WalletEdge";
+      node?: { __typename?: "Wallet"; id: string } | null;
+    } | null> | null;
+  };
+};
+
+export type GqlArticleFieldsFragment = {
+  __typename?: "Article";
+  id: string;
+  title: string;
+  body?: string | null;
+  introduction: string;
+  thumbnail?: any | null;
+  category: GqlArticleCategory;
+  publishStatus: GqlPublishStatus;
+  publishedAt?: Date | null;
+};
+
+export type GqlGetArticlesQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlArticleFilterInput>;
+  sort?: InputMaybe<GqlArticleSortInput>;
+}>;
+
+export type GqlGetArticlesQuery = {
+  __typename?: "Query";
+  articles: {
+    __typename?: "ArticlesConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
+    edges?: Array<{
+      __typename?: "ArticleEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Article";
+        id: string;
+        title: string;
+        body?: string | null;
+        introduction: string;
+        thumbnail?: any | null;
+        category: GqlArticleCategory;
+        publishStatus: GqlPublishStatus;
+        publishedAt?: Date | null;
+        authors?: Array<{
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
+        }> | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
+export type GqlGetArticleQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlGetArticleQuery = {
+  __typename?: "Query";
+  article?: {
+    __typename?: "Article";
+    id: string;
+    title: string;
+    body?: string | null;
+    introduction: string;
+    thumbnail?: any | null;
+    category: GqlArticleCategory;
+    publishStatus: GqlPublishStatus;
+    publishedAt?: Date | null;
+    authors?: Array<{
+      __typename?: "User";
+      id: string;
+      name: string;
+      image?: string | null;
+      bio?: string | null;
+      currentPrefecture?: GqlCurrentPrefecture | null;
+    }> | null;
+    relatedUsers?: Array<{
+      __typename?: "User";
+      id: string;
+      name: string;
+      image?: string | null;
+      bio?: string | null;
+      currentPrefecture?: GqlCurrentPrefecture | null;
+    }> | null;
+  } | null;
+  articles: {
+    __typename?: "ArticlesConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
+    edges?: Array<{
+      __typename?: "ArticleEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Article";
+        id: string;
+        title: string;
+        body?: string | null;
+        introduction: string;
+        thumbnail?: any | null;
+        category: GqlArticleCategory;
+        publishStatus: GqlPublishStatus;
+        publishedAt?: Date | null;
+        authors?: Array<{
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
+        }> | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
+export type GqlEvaluationFieldsFragment = {
+  __typename?: "Evaluation";
+  id: string;
+  comment?: string | null;
+  credentialUrl?: string | null;
+  status: GqlEvaluationStatus;
+  createdAt: Date;
+  updatedAt?: Date | null;
+  issuedAt?: Date | null;
+};
+
+export type GqlGetEvaluationsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetEvaluationsQuery = {
+  __typename?: "Query";
+  evaluations: {
+    __typename?: "EvaluationsConnection";
+    totalCount: number;
+    edges: Array<{
+      __typename?: "EvaluationEdge";
+      node?: { __typename?: "Evaluation"; id: string } | null;
+    }>;
+  };
+};
+
+export type GqlGetEvaluationQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetEvaluationQuery = {
+  __typename?: "Query";
+  evaluation?: { __typename?: "Evaluation"; id: string } | null;
+};
+
+export type GqlOpportunityFieldsFragment = {
+  __typename?: "Opportunity";
+  id: string;
+  title: string;
+  description: string;
+  body?: string | null;
+  images?: Array<string> | null;
+  category: GqlOpportunityCategory;
+  publishStatus: GqlPublishStatus;
+  isReservableWithTicket?: boolean | null;
+  requireApproval: boolean;
+  feeRequired?: number | null;
+  pointsToEarn?: number | null;
+  earliestReservableAt?: Date | null;
+};
+
+export type GqlGetOpportunitiesQueryVariables = Exact<{
+  upcomingFilter?: InputMaybe<GqlOpportunityFilterInput>;
+  featuredFilter?: InputMaybe<GqlOpportunityFilterInput>;
+  allFilter?: InputMaybe<GqlOpportunityFilterInput>;
+  similarFilter?: InputMaybe<GqlOpportunityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type GqlGetOpportunitiesQuery = {
+  __typename?: "Query";
+  upcoming: {
+    __typename?: "OpportunitiesConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+    edges: Array<{
+      __typename?: "OpportunityEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        body?: string | null;
+        images?: Array<string> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        earliestReservableAt?: Date | null;
+        slots?: Array<{
+          __typename?: "OpportunitySlot";
+          id: string;
+          hostingStatus: GqlOpportunitySlotHostingStatus;
+          startsAt: Date;
+          endsAt: Date;
+          capacity?: number | null;
+          remainingCapacity?: number | null;
+        }> | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+          city?: {
+            __typename?: "City";
+            code: string;
+            name: string;
+            state?: {
+              __typename?: "State";
+              code: string;
+              countryCode: string;
+              name: string;
+            } | null;
+          } | null;
+        } | null;
+      } | null;
+    }>;
+  };
+  featured: {
+    __typename?: "OpportunitiesConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+    edges: Array<{
+      __typename?: "OpportunityEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        body?: string | null;
+        images?: Array<string> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        earliestReservableAt?: Date | null;
+        slots?: Array<{
+          __typename?: "OpportunitySlot";
+          id: string;
+          hostingStatus: GqlOpportunitySlotHostingStatus;
+          startsAt: Date;
+          endsAt: Date;
+          capacity?: number | null;
+          remainingCapacity?: number | null;
+        }> | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+          city?: {
+            __typename?: "City";
+            code: string;
+            name: string;
+            state?: {
+              __typename?: "State";
+              code: string;
+              countryCode: string;
+              name: string;
+            } | null;
+          } | null;
+        } | null;
+      } | null;
+    }>;
+  };
+  similar: {
+    __typename?: "OpportunitiesConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+    edges: Array<{
+      __typename?: "OpportunityEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        body?: string | null;
+        images?: Array<string> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        earliestReservableAt?: Date | null;
+        slots?: Array<{
+          __typename?: "OpportunitySlot";
+          id: string;
+          hostingStatus: GqlOpportunitySlotHostingStatus;
+          startsAt: Date;
+          endsAt: Date;
+          capacity?: number | null;
+          remainingCapacity?: number | null;
+        }> | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+          city?: {
+            __typename?: "City";
+            code: string;
+            name: string;
+            state?: {
+              __typename?: "State";
+              code: string;
+              countryCode: string;
+              name: string;
+            } | null;
+          } | null;
+        } | null;
+      } | null;
+    }>;
+  };
+  all: {
+    __typename?: "OpportunitiesConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+    edges: Array<{
+      __typename?: "OpportunityEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        body?: string | null;
+        images?: Array<string> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        earliestReservableAt?: Date | null;
+        slots?: Array<{
+          __typename?: "OpportunitySlot";
+          id: string;
+          hostingStatus: GqlOpportunitySlotHostingStatus;
+          startsAt: Date;
+          endsAt: Date;
+          capacity?: number | null;
+          remainingCapacity?: number | null;
+        }> | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+          city?: {
+            __typename?: "City";
+            code: string;
+            name: string;
+            state?: {
+              __typename?: "State";
+              code: string;
+              countryCode: string;
+              name: string;
+            } | null;
+          } | null;
+        } | null;
+      } | null;
+    }>;
+  };
+};
+
+export type GqlGetOpportunityQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlGetOpportunityQuery = {
+  __typename?: "Query";
+  opportunity?: {
+    __typename?: "Opportunity";
+    id: string;
+    title: string;
+    description: string;
+    body?: string | null;
+    images?: Array<string> | null;
+    category: GqlOpportunityCategory;
+    publishStatus: GqlPublishStatus;
+    isReservableWithTicket?: boolean | null;
+    requireApproval: boolean;
+    feeRequired?: number | null;
+    pointsToEarn?: number | null;
+    earliestReservableAt?: Date | null;
+    community?: { __typename?: "Community"; id: string } | null;
+    place?: {
+      __typename?: "Place";
+      id: string;
+      name: string;
+      address: string;
+      latitude: any;
+      longitude: any;
+      city?: {
+        __typename?: "City";
+        code: string;
+        name: string;
+        state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
+      } | null;
+    } | null;
+    slots?: Array<{
+      __typename?: "OpportunitySlot";
+      id: string;
+      hostingStatus: GqlOpportunitySlotHostingStatus;
+      startsAt: Date;
+      endsAt: Date;
+      capacity?: number | null;
+      remainingCapacity?: number | null;
+      reservations?: Array<{
+        __typename?: "Reservation";
+        id: string;
+        status: GqlReservationStatus;
+        participations?: Array<{
+          __typename?: "Participation";
+          id: string;
+          status: GqlParticipationStatus;
+          reason: GqlParticipationStatusReason;
+          images?: Array<string> | null;
+          description?: string | null;
+          user?: {
+            __typename?: "User";
+            id: string;
+            name: string;
+            image?: string | null;
+            bio?: string | null;
+            currentPrefecture?: GqlCurrentPrefecture | null;
+          } | null;
+        }> | null;
+      }> | null;
+    }> | null;
+    createdByUser?: {
+      __typename?: "User";
+      id: string;
+      name: string;
+      image?: string | null;
+      bio?: string | null;
+      currentPrefecture?: GqlCurrentPrefecture | null;
+      articlesAboutMe?: Array<{
+        __typename?: "Article";
+        id: string;
+        title: string;
+        body?: string | null;
+        introduction: string;
+        thumbnail?: any | null;
+        category: GqlArticleCategory;
+        publishStatus: GqlPublishStatus;
+        publishedAt?: Date | null;
+      }> | null;
+      opportunitiesCreatedByMe?: Array<{
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        body?: string | null;
+        images?: Array<string> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        earliestReservableAt?: Date | null;
+        community?: { __typename?: "Community"; id: string } | null;
+        slots?: Array<{
+          __typename?: "OpportunitySlot";
+          id: string;
+          hostingStatus: GqlOpportunitySlotHostingStatus;
+          startsAt: Date;
+          endsAt: Date;
+          capacity?: number | null;
+          remainingCapacity?: number | null;
+          reservations?: Array<{
+            __typename?: "Reservation";
+            id: string;
+            status: GqlReservationStatus;
+            participations?: Array<{
+              __typename?: "Participation";
+              id: string;
+              status: GqlParticipationStatus;
+              reason: GqlParticipationStatusReason;
+              images?: Array<string> | null;
+              description?: string | null;
+              user?: {
+                __typename?: "User";
+                id: string;
+                name: string;
+                image?: string | null;
+                bio?: string | null;
+                currentPrefecture?: GqlCurrentPrefecture | null;
+              } | null;
+            }> | null;
+          }> | null;
+        }> | null;
+      }> | null;
+    } | null;
+  } | null;
+};
+
+export type GqlSearchOpportunitiesQueryVariables = Exact<{
+  filter?: InputMaybe<GqlOpportunityFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlSearchOpportunitiesQuery = {
+  __typename?: "Query";
+  opportunities: {
+    __typename?: "OpportunitiesConnection";
+    totalCount: number;
+    edges: Array<{
+      __typename?: "OpportunityEdge";
+      node?: {
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        category: GqlOpportunityCategory;
+        capacity?: number | null;
+        pointsToEarn?: number | null;
+        feeRequired?: number | null;
+        requireApproval: boolean;
+        publishStatus: GqlPublishStatus;
+        images?: Array<string> | null;
+        createdAt?: Date | null;
+        updatedAt?: Date | null;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
+        } | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+          city?: {
+            __typename?: "City";
+            name: string;
+            state?: { __typename?: "State"; name: string } | null;
+          } | null;
+        } | null;
+        slots?: Array<{
+          __typename?: "OpportunitySlot";
+          id: string;
+          startsAt: Date;
+          endsAt: Date;
+          remainingCapacity?: number | null;
+          reservations?: Array<{
+            __typename?: "Reservation";
+            status: GqlReservationStatus;
+            participations?: Array<{
+              __typename?: "Participation";
+              id: string;
+              status: GqlParticipationStatus;
+              images?: Array<string> | null;
+              user?: {
+                __typename?: "User";
+                id: string;
+                name: string;
+                image?: string | null;
+              } | null;
+            }> | null;
+          }> | null;
+        }> | null;
+      } | null;
+    }>;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
+};
+
+export type GqlOpportunitySlotFieldsFragment = {
+  __typename?: "OpportunitySlot";
+  id: string;
+  hostingStatus: GqlOpportunitySlotHostingStatus;
+  startsAt: Date;
+  endsAt: Date;
+  capacity?: number | null;
+  remainingCapacity?: number | null;
+};
+
+export type GqlGetOpportunitySlotsQueryVariables = Exact<{
+  filter?: InputMaybe<GqlOpportunitySlotFilterInput>;
+}>;
+
+export type GqlGetOpportunitySlotsQuery = {
+  __typename?: "Query";
+  opportunitySlots: {
+    __typename?: "OpportunitySlotsConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+    edges?: Array<{
+      __typename?: "OpportunitySlotEdge";
+      cursor: string;
+      node?: {
+        __typename?: "OpportunitySlot";
+        id: string;
+        hostingStatus: GqlOpportunitySlotHostingStatus;
+        startsAt: Date;
+        endsAt: Date;
+        capacity?: number | null;
+        remainingCapacity?: number | null;
+        opportunity?: {
+          __typename?: "Opportunity";
+          id: string;
+          title: string;
+          description: string;
+          body?: string | null;
+          images?: Array<string> | null;
+          category: GqlOpportunityCategory;
+          publishStatus: GqlPublishStatus;
+          isReservableWithTicket?: boolean | null;
+          requireApproval: boolean;
+          feeRequired?: number | null;
+          pointsToEarn?: number | null;
+          earliestReservableAt?: Date | null;
+        } | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
+export type GqlGetOpportunitySlotQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetOpportunitySlotQuery = {
+  __typename?: "Query";
+  opportunitySlot?: { __typename?: "OpportunitySlot"; id: string } | null;
+};
+
+export type GqlParticipationFieldsFragment = {
+  __typename?: "Participation";
+  id: string;
+  status: GqlParticipationStatus;
+  reason: GqlParticipationStatusReason;
+  images?: Array<string> | null;
+  description?: string | null;
+};
+
+export type GqlGetParticipationsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetParticipationsQuery = {
+  __typename?: "Query";
+  participations: {
+    __typename?: "ParticipationsConnection";
+    totalCount: number;
+    edges: Array<{
+      __typename?: "ParticipationEdge";
+      node?: { __typename?: "Participation"; id: string } | null;
+    }>;
+  };
+};
+
+export type GqlGetParticipationQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetParticipationQuery = {
+  __typename?: "Query";
+  participation?: {
+    __typename?: "Participation";
+    id: string;
+    images?: Array<string> | null;
+    reason: GqlParticipationStatusReason;
+    source: GqlSource;
+    status: GqlParticipationStatus;
+    updatedAt?: Date | null;
+    reservation?: {
+      __typename?: "Reservation";
+      id: string;
+      opportunitySlot?: {
+        __typename?: "OpportunitySlot";
+        id: string;
+        capacity?: number | null;
+        startsAt: Date;
+        endsAt: Date;
+        hostingStatus: GqlOpportunitySlotHostingStatus;
+        opportunity?: {
+          __typename?: "Opportunity";
+          id: string;
+          title: string;
+          description: string;
+          body?: string | null;
+          category: GqlOpportunityCategory;
+          capacity?: number | null;
+          pointsToEarn?: number | null;
+          feeRequired?: number | null;
+          requireApproval: boolean;
+          publishStatus: GqlPublishStatus;
+          images?: Array<string> | null;
+          createdAt?: Date | null;
+          updatedAt?: Date | null;
+          community?: {
+            __typename?: "Community";
+            id: string;
+            name?: string | null;
+            image?: string | null;
+          } | null;
+          createdByUser?: {
+            __typename?: "User";
+            id: string;
+            name: string;
+            image?: string | null;
+          } | null;
+          place?: {
+            __typename?: "Place";
+            id: string;
+            name: string;
+            address: string;
+            latitude: any;
+            longitude: any;
+            city?: {
+              __typename?: "City";
+              name: string;
+              state?: { __typename?: "State"; name: string } | null;
+            } | null;
+          } | null;
+          slots?: Array<{
+            __typename?: "OpportunitySlot";
+            id: string;
+            startsAt: Date;
+            endsAt: Date;
+          }> | null;
+        } | null;
+      } | null;
+    } | null;
+    statusHistories?: Array<{
+      __typename?: "ParticipationStatusHistory";
+      id: string;
+      status: GqlParticipationStatus;
+      reason: GqlParticipationStatusReason;
+      createdAt?: Date | null;
+      createdByUser?: { __typename?: "User"; id: string; name: string } | null;
+    }> | null;
+    user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+  } | null;
+};
+
+export type GqlReservationFieldsFragment = {
+  __typename?: "Reservation";
+  id: string;
+  status: GqlReservationStatus;
+};
+
+export type GqlCreateReservationMutationVariables = Exact<{
+  input: GqlReservationCreateInput;
+}>;
+
+export type GqlCreateReservationMutation = {
+  __typename?: "Mutation";
+  reservationCreate?: {
+    __typename?: "ReservationCreateSuccess";
+    reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
+  } | null;
+};
+
+export type GqlGetReservationsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetReservationsQuery = {
+  __typename?: "Query";
+  reservations: {
+    __typename?: "ReservationsConnection";
+    totalCount: number;
+    edges: Array<{
+      __typename?: "ReservationEdge";
+      node?: { __typename?: "Reservation"; id: string } | null;
+    }>;
+  };
+};
+
+export type GqlGetReservationQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetReservationQuery = {
+  __typename?: "Query";
+  reservation?: {
+    __typename?: "Reservation";
+    id: string;
+    status: GqlReservationStatus;
+    opportunitySlot?: {
+      __typename?: "OpportunitySlot";
+      id: string;
+      hostingStatus: GqlOpportunitySlotHostingStatus;
+      startsAt: Date;
+      endsAt: Date;
+      capacity?: number | null;
+      remainingCapacity?: number | null;
+      opportunity?: {
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        body?: string | null;
+        images?: Array<string> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        earliestReservableAt?: Date | null;
+      } | null;
+    } | null;
+    participations?: Array<{
+      __typename?: "Participation";
+      id: string;
+      status: GqlParticipationStatus;
+      reason: GqlParticipationStatusReason;
+      images?: Array<string> | null;
+      description?: string | null;
+    }> | null;
+  } | null;
+};
+
+export type GqlPlaceFieldsFragment = {
+  __typename?: "Place";
+  id: string;
+  name: string;
+  address: string;
+  latitude: any;
+  longitude: any;
+  city?: {
+    __typename?: "City";
+    code: string;
+    name: string;
+    state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
+  } | null;
+};
+
+export type GqlGetPlacesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetPlacesQuery = {
+  __typename?: "Query";
+  places: {
+    __typename?: "PlacesConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "PlaceEdge";
+      node?: { __typename?: "Place"; id: string; name: string } | null;
+    } | null> | null;
+  };
+};
+
+export type GqlTicketFieldsFragment = {
+  __typename?: "Ticket";
+  id: string;
+  reason: GqlTicketStatusReason;
+  status: GqlTicketStatus;
+};
+
+export type GqlTicketClaimMutationVariables = Exact<{
+  input: GqlTicketClaimInput;
+}>;
+
+export type GqlTicketClaimMutation = {
+  __typename?: "Mutation";
+  ticketClaim?: {
+    __typename?: "TicketClaimSuccess";
+    tickets: Array<{ __typename?: "Ticket"; id: string }>;
+  } | null;
+};
+
+export type GqlGetTicketsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetTicketsQuery = {
+  __typename?: "Query";
+  tickets: {
+    __typename?: "TicketsConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "TicketEdge";
+      node?: { __typename?: "Ticket"; id: string } | null;
+    } | null> | null;
+  };
+};
+
+export type GqlGetTicketQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetTicketQuery = {
+  __typename?: "Query";
+  ticket?: { __typename?: "Ticket"; id: string } | null;
+};
+
+export type GqlTicketClaimLinkFieldsFragment = {
+  __typename?: "TicketClaimLink";
+  id: string;
+  qty: number;
+  status: GqlClaimLinkStatus;
+  claimedAt?: Date | null;
+};
+
+export type GqlTicketClaimLinkQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlTicketClaimLinkQuery = {
+  __typename?: "Query";
+  ticketClaimLink?: {
+    __typename?: "TicketClaimLink";
+    qty: number;
+    status: GqlClaimLinkStatus;
+    issuer?: {
+      __typename?: "TicketIssuer";
+      owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+    } | null;
+  } | null;
+};
+
+export type GqlUtilityFieldsFragment = {
+  __typename?: "Utility";
+  id: string;
+  name?: string | null;
+  description?: string | null;
+  images?: Array<string> | null;
+  pointsRequired: number;
+  publishStatus: GqlPublishStatus;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+};
+
+export type GqlGetUtilitiesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetUtilitiesQuery = {
+  __typename?: "Query";
+  utilities: {
+    __typename?: "UtilitiesConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "UtilityEdge";
+      node?: { __typename?: "Utility"; id: string; name?: string | null } | null;
+    } | null> | null;
+  };
+};
+
+export type GqlTransactionFieldsFragment = {
+  __typename?: "Transaction";
+  id: string;
+  createdAt: Date;
+  updatedAt?: Date | null;
+  fromPointChange?: number | null;
+  toPointChange?: number | null;
+  reason: GqlTransactionReason;
 };
 
 export type GqlWalletTransactionsQueryVariables = Exact<{
@@ -3252,39 +3750,307 @@ export type GqlWalletTransactionsQuery = {
   };
 };
 
+export type GqlGetTransactionQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetTransactionQuery = {
+  __typename?: "Query";
+  transaction?: { __typename?: "Transaction"; id: string } | null;
+};
+
+export const CommunityFieldsFragmentDoc = gql`
+  fragment CommunityFields on Community {
+    id
+  }
+`;
+export const IdentityFieldsFragmentDoc = gql`
+  fragment IdentityFields on Identity {
+    uid
+    platform
+    createdAt
+    updatedAt
+  }
+`;
+export const MembershipFieldsFragmentDoc = gql`
+  fragment MembershipFields on Membership {
+    headline
+    bio
+    role
+    status
+    reason
+  }
+`;
+export const UserFieldsFragmentDoc = gql`
+  fragment UserFields on User {
+    id
+    name
+    image
+    bio
+    currentPrefecture
+  }
+`;
+export const WalletFieldsFragmentDoc = gql`
+  fragment WalletFields on Wallet {
+    id
+    type
+    createdAt
+    updatedAt
+  }
+`;
+export const ArticleFieldsFragmentDoc = gql`
+  fragment ArticleFields on Article {
+    id
+    title
+    body
+    introduction
+    thumbnail
+    category
+    publishStatus
+    publishedAt
+  }
+`;
+export const EvaluationFieldsFragmentDoc = gql`
+  fragment EvaluationFields on Evaluation {
+    id
+    comment
+    credentialUrl
+    status
+    createdAt
+    updatedAt
+    issuedAt
+  }
+`;
 export const OpportunityFieldsFragmentDoc = gql`
   fragment OpportunityFields on Opportunity {
     id
     title
     description
+    body
     images
+    category
+    publishStatus
+    isReservableWithTicket
+    requireApproval
     feeRequired
     pointsToEarn
-    isReservableWithTicket
-    community {
-      id
+    earliestReservableAt
+  }
+`;
+export const OpportunitySlotFieldsFragmentDoc = gql`
+  fragment OpportunitySlotFields on OpportunitySlot {
+    id
+    hostingStatus
+    startsAt
+    endsAt
+    capacity
+    remainingCapacity
+  }
+`;
+export const ParticipationFieldsFragmentDoc = gql`
+  fragment ParticipationFields on Participation {
+    id
+    status
+    reason
+    images
+    description
+  }
+`;
+export const ReservationFieldsFragmentDoc = gql`
+  fragment ReservationFields on Reservation {
+    id
+    status
+  }
+`;
+export const PlaceFieldsFragmentDoc = gql`
+  fragment PlaceFields on Place {
+    id
+    name
+    address
+    latitude
+    longitude
+    city {
+      code
       name
-      image
-    }
-    place {
-      id
-      name
-      address
-      city {
+      state {
+        code
+        countryCode
         name
-        state {
-          name
-        }
       }
-    }
-    slots {
-      id
-      startsAt
-      endsAt
-      capacity
     }
   }
 `;
+export const TicketFieldsFragmentDoc = gql`
+  fragment TicketFields on Ticket {
+    id
+    reason
+    status
+  }
+`;
+export const TicketClaimLinkFieldsFragmentDoc = gql`
+  fragment TicketClaimLinkFields on TicketClaimLink {
+    id
+    qty
+    status
+    claimedAt
+  }
+`;
+export const UtilityFieldsFragmentDoc = gql`
+  fragment UtilityFields on Utility {
+    id
+    name
+    description
+    images
+    pointsRequired
+    publishStatus
+    createdAt
+    updatedAt
+  }
+`;
+export const TransactionFieldsFragmentDoc = gql`
+  fragment TransactionFields on Transaction {
+    id
+    createdAt
+    updatedAt
+    fromPointChange
+    toPointChange
+    reason
+  }
+`;
+export const GetCommunitiesDocument = gql`
+  query GetCommunities {
+    communities {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetCommunitiesQuery__
+ *
+ * To run a query within a React component, call `useGetCommunitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommunitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCommunitiesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCommunitiesQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetCommunitiesQuery, GqlGetCommunitiesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetCommunitiesQuery, GqlGetCommunitiesQueryVariables>(
+    GetCommunitiesDocument,
+    options,
+  );
+}
+export function useGetCommunitiesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetCommunitiesQuery,
+    GqlGetCommunitiesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetCommunitiesQuery, GqlGetCommunitiesQueryVariables>(
+    GetCommunitiesDocument,
+    options,
+  );
+}
+export function useGetCommunitiesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetCommunitiesQuery, GqlGetCommunitiesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetCommunitiesQuery, GqlGetCommunitiesQueryVariables>(
+    GetCommunitiesDocument,
+    options,
+  );
+}
+export type GetCommunitiesQueryHookResult = ReturnType<typeof useGetCommunitiesQuery>;
+export type GetCommunitiesLazyQueryHookResult = ReturnType<typeof useGetCommunitiesLazyQuery>;
+export type GetCommunitiesSuspenseQueryHookResult = ReturnType<
+  typeof useGetCommunitiesSuspenseQuery
+>;
+export type GetCommunitiesQueryResult = Apollo.QueryResult<
+  GqlGetCommunitiesQuery,
+  GqlGetCommunitiesQueryVariables
+>;
+export const GetCommunityDocument = gql`
+  query GetCommunity($id: ID!) {
+    community(id: $id) {
+      id
+      name
+    }
+  }
+`;
+
+/**
+ * __useGetCommunityQuery__
+ *
+ * To run a query within a React component, call `useGetCommunityQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommunityQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCommunityQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetCommunityQuery(
+  baseOptions: Apollo.QueryHookOptions<GqlGetCommunityQuery, GqlGetCommunityQueryVariables> &
+    ({ variables: GqlGetCommunityQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetCommunityQuery, GqlGetCommunityQueryVariables>(
+    GetCommunityDocument,
+    options,
+  );
+}
+export function useGetCommunityLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetCommunityQuery, GqlGetCommunityQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetCommunityQuery, GqlGetCommunityQueryVariables>(
+    GetCommunityDocument,
+    options,
+  );
+}
+export function useGetCommunitySuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetCommunityQuery, GqlGetCommunityQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetCommunityQuery, GqlGetCommunityQueryVariables>(
+    GetCommunityDocument,
+    options,
+  );
+}
+export type GetCommunityQueryHookResult = ReturnType<typeof useGetCommunityQuery>;
+export type GetCommunityLazyQueryHookResult = ReturnType<typeof useGetCommunityLazyQuery>;
+export type GetCommunitySuspenseQueryHookResult = ReturnType<typeof useGetCommunitySuspenseQuery>;
+export type GetCommunityQueryResult = Apollo.QueryResult<
+  GqlGetCommunityQuery,
+  GqlGetCommunityQueryVariables
+>;
 export const UserSignUpDocument = gql`
   mutation userSignUp($input: UserSignUpInput!) {
     userSignUp(input: $input) {
@@ -3331,364 +4097,6 @@ export type UserSignUpMutationResult = Apollo.MutationResult<GqlUserSignUpMutati
 export type UserSignUpMutationOptions = Apollo.BaseMutationOptions<
   GqlUserSignUpMutation,
   GqlUserSignUpMutationVariables
->;
-export const CreateReservationDocument = gql`
-  mutation CreateReservation($input: ReservationCreateInput!) {
-    reservationCreate(input: $input) {
-      ... on ReservationCreateSuccess {
-        reservation {
-          id
-          status
-        }
-      }
-    }
-  }
-`;
-export type GqlCreateReservationMutationFn = Apollo.MutationFunction<
-  GqlCreateReservationMutation,
-  GqlCreateReservationMutationVariables
->;
-
-/**
- * __useCreateReservationMutation__
- *
- * To run a mutation, you first call `useCreateReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createReservationMutation, { data, loading, error }] = useCreateReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    GqlCreateReservationMutation,
-    GqlCreateReservationMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<GqlCreateReservationMutation, GqlCreateReservationMutationVariables>(
-    CreateReservationDocument,
-    options,
-  );
-}
-export type CreateReservationMutationHookResult = ReturnType<typeof useCreateReservationMutation>;
-export type CreateReservationMutationResult = Apollo.MutationResult<GqlCreateReservationMutation>;
-export type CreateReservationMutationOptions = Apollo.BaseMutationOptions<
-  GqlCreateReservationMutation,
-  GqlCreateReservationMutationVariables
->;
-export const TicketClaimDocument = gql`
-  mutation ticketClaim($input: TicketClaimInput!) {
-    ticketClaim(input: $input) {
-      ... on TicketClaimSuccess {
-        tickets {
-          id
-        }
-      }
-    }
-  }
-`;
-export type GqlTicketClaimMutationFn = Apollo.MutationFunction<
-  GqlTicketClaimMutation,
-  GqlTicketClaimMutationVariables
->;
-
-/**
- * __useTicketClaimMutation__
- *
- * To run a mutation, you first call `useTicketClaimMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useTicketClaimMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [ticketClaimMutation, { data, loading, error }] = useTicketClaimMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useTicketClaimMutation(
-  baseOptions?: Apollo.MutationHookOptions<GqlTicketClaimMutation, GqlTicketClaimMutationVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<GqlTicketClaimMutation, GqlTicketClaimMutationVariables>(
-    TicketClaimDocument,
-    options,
-  );
-}
-export type TicketClaimMutationHookResult = ReturnType<typeof useTicketClaimMutation>;
-export type TicketClaimMutationResult = Apollo.MutationResult<GqlTicketClaimMutation>;
-export type TicketClaimMutationOptions = Apollo.BaseMutationOptions<
-  GqlTicketClaimMutation,
-  GqlTicketClaimMutationVariables
->;
-export const UpdateMyProfileDocument = gql`
-  mutation UpdateMyProfile(
-    $input: UserUpdateProfileInput!
-    $permission: CheckIsSelfPermissionInput!
-  ) {
-    userUpdateMyProfile(input: $input, permission: $permission) {
-      ... on UserUpdateProfileSuccess {
-        user {
-          id
-          name
-          image
-          bio
-          currentPrefecture
-          urlFacebook
-          urlInstagram
-          urlX
-          slug
-        }
-      }
-    }
-  }
-`;
-export type GqlUpdateMyProfileMutationFn = Apollo.MutationFunction<
-  GqlUpdateMyProfileMutation,
-  GqlUpdateMyProfileMutationVariables
->;
-
-/**
- * __useUpdateMyProfileMutation__
- *
- * To run a mutation, you first call `useUpdateMyProfileMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateMyProfileMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateMyProfileMutation, { data, loading, error }] = useUpdateMyProfileMutation({
- *   variables: {
- *      input: // value for 'input'
- *      permission: // value for 'permission'
- *   },
- * });
- */
-export function useUpdateMyProfileMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    GqlUpdateMyProfileMutation,
-    GqlUpdateMyProfileMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<GqlUpdateMyProfileMutation, GqlUpdateMyProfileMutationVariables>(
-    UpdateMyProfileDocument,
-    options,
-  );
-}
-export type UpdateMyProfileMutationHookResult = ReturnType<typeof useUpdateMyProfileMutation>;
-export type UpdateMyProfileMutationResult = Apollo.MutationResult<GqlUpdateMyProfileMutation>;
-export type UpdateMyProfileMutationOptions = Apollo.BaseMutationOptions<
-  GqlUpdateMyProfileMutation,
-  GqlUpdateMyProfileMutationVariables
->;
-export const GetArticleDocument = gql`
-  query GetArticle($id: ID!, $permission: CheckCommunityPermissionInput!) {
-    article(id: $id, permission: $permission) {
-      id
-      title
-      introduction
-      body
-      category
-      thumbnail
-      publishedAt
-      createdAt
-      updatedAt
-      authors {
-        id
-        name
-        image
-        bio
-      }
-      relatedUsers {
-        id
-        name
-        image
-        bio
-      }
-    }
-    articles(
-      first: 4
-      filter: { categories: ["INTERVIEW"], publishStatus: [PUBLIC] }
-      sort: { publishedAt: desc }
-    ) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      totalCount
-      edges {
-        node {
-          id
-          title
-          introduction
-          thumbnail
-          publishedAt
-          authors {
-            id
-            name
-            image
-          }
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useGetArticleQuery__
- *
- * To run a query within a React component, call `useGetArticleQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetArticleQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetArticleQuery({
- *   variables: {
- *      id: // value for 'id'
- *      permission: // value for 'permission'
- *   },
- * });
- */
-export function useGetArticleQuery(
-  baseOptions: Apollo.QueryHookOptions<GqlGetArticleQuery, GqlGetArticleQueryVariables> &
-    ({ variables: GqlGetArticleQueryVariables; skip?: boolean } | { skip: boolean }),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetArticleQuery, GqlGetArticleQueryVariables>(
-    GetArticleDocument,
-    options,
-  );
-}
-export function useGetArticleLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetArticleQuery, GqlGetArticleQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetArticleQuery, GqlGetArticleQueryVariables>(
-    GetArticleDocument,
-    options,
-  );
-}
-export function useGetArticleSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlGetArticleQuery, GqlGetArticleQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlGetArticleQuery, GqlGetArticleQueryVariables>(
-    GetArticleDocument,
-    options,
-  );
-}
-export type GetArticleQueryHookResult = ReturnType<typeof useGetArticleQuery>;
-export type GetArticleLazyQueryHookResult = ReturnType<typeof useGetArticleLazyQuery>;
-export type GetArticleSuspenseQueryHookResult = ReturnType<typeof useGetArticleSuspenseQuery>;
-export type GetArticleQueryResult = Apollo.QueryResult<
-  GqlGetArticleQuery,
-  GqlGetArticleQueryVariables
->;
-export const GetArticlesDocument = gql`
-  query GetArticles(
-    $first: Int
-    $cursor: String
-    $filter: ArticleFilterInput
-    $sort: ArticleSortInput
-  ) {
-    articles(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      totalCount
-      edges {
-        node {
-          id
-          title
-          introduction
-          thumbnail
-          publishedAt
-          authors {
-            id
-            name
-            image
-          }
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useGetArticlesQuery__
- *
- * To run a query within a React component, call `useGetArticlesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetArticlesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetArticlesQuery({
- *   variables: {
- *      first: // value for 'first'
- *      cursor: // value for 'cursor'
- *      filter: // value for 'filter'
- *      sort: // value for 'sort'
- *   },
- * });
- */
-export function useGetArticlesQuery(
-  baseOptions?: Apollo.QueryHookOptions<GqlGetArticlesQuery, GqlGetArticlesQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetArticlesQuery, GqlGetArticlesQueryVariables>(
-    GetArticlesDocument,
-    options,
-  );
-}
-export function useGetArticlesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetArticlesQuery, GqlGetArticlesQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetArticlesQuery, GqlGetArticlesQueryVariables>(
-    GetArticlesDocument,
-    options,
-  );
-}
-export function useGetArticlesSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlGetArticlesQuery, GqlGetArticlesQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlGetArticlesQuery, GqlGetArticlesQueryVariables>(
-    GetArticlesDocument,
-    options,
-  );
-}
-export type GetArticlesQueryHookResult = ReturnType<typeof useGetArticlesQuery>;
-export type GetArticlesLazyQueryHookResult = ReturnType<typeof useGetArticlesLazyQuery>;
-export type GetArticlesSuspenseQueryHookResult = ReturnType<typeof useGetArticlesSuspenseQuery>;
-export type GetArticlesQueryResult = Apollo.QueryResult<
-  GqlGetArticlesQuery,
-  GqlGetArticlesQueryVariables
 >;
 export const CurrentUserDocument = gql`
   query currentUser {
@@ -4085,646 +4493,129 @@ export type GetMembershipListQueryResult = Apollo.QueryResult<
   GqlGetMembershipListQuery,
   GqlGetMembershipListQueryVariables
 >;
-export const GetOpportunitiesDocument = gql`
-  query GetOpportunities(
-    $upcomingFilter: OpportunityFilterInput
-    $featuredFilter: OpportunityFilterInput
-    $allFilter: OpportunityFilterInput
-    $similarFilter: OpportunityFilterInput
-    $first: Int
-    $cursor: String
+export const UpdateMyProfileDocument = gql`
+  mutation UpdateMyProfile(
+    $input: UserUpdateProfileInput!
+    $permission: CheckIsSelfPermissionInput!
   ) {
-    upcoming: opportunities(filter: $upcomingFilter, sort: { createdAt: desc }, first: 5) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      totalCount
-      edges {
-        node {
-          ...OpportunityFields
-        }
-      }
-    }
-    featured: opportunities(filter: $featuredFilter, first: 5) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      totalCount
-      edges {
-        node {
-          ...OpportunityFields
-        }
-      }
-    }
-    similar: opportunities(filter: $similarFilter, first: 3) {
-      edges {
-        node {
-          ...OpportunityFields
-        }
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-    }
-    all: opportunities(filter: $allFilter, first: $first, cursor: $cursor) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      totalCount
-      edges {
-        node {
-          ...OpportunityFields
-        }
-      }
-    }
-  }
-  ${OpportunityFieldsFragmentDoc}
-`;
-
-/**
- * __useGetOpportunitiesQuery__
- *
- * To run a query within a React component, call `useGetOpportunitiesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetOpportunitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetOpportunitiesQuery({
- *   variables: {
- *      upcomingFilter: // value for 'upcomingFilter'
- *      featuredFilter: // value for 'featuredFilter'
- *      allFilter: // value for 'allFilter'
- *      similarFilter: // value for 'similarFilter'
- *      first: // value for 'first'
- *      cursor: // value for 'cursor'
- *   },
- * });
- */
-export function useGetOpportunitiesQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GqlGetOpportunitiesQuery,
-    GqlGetOpportunitiesQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetOpportunitiesQuery, GqlGetOpportunitiesQueryVariables>(
-    GetOpportunitiesDocument,
-    options,
-  );
-}
-export function useGetOpportunitiesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetOpportunitiesQuery,
-    GqlGetOpportunitiesQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetOpportunitiesQuery, GqlGetOpportunitiesQueryVariables>(
-    GetOpportunitiesDocument,
-    options,
-  );
-}
-export function useGetOpportunitiesSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlGetOpportunitiesQuery, GqlGetOpportunitiesQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlGetOpportunitiesQuery, GqlGetOpportunitiesQueryVariables>(
-    GetOpportunitiesDocument,
-    options,
-  );
-}
-export type GetOpportunitiesQueryHookResult = ReturnType<typeof useGetOpportunitiesQuery>;
-export type GetOpportunitiesLazyQueryHookResult = ReturnType<typeof useGetOpportunitiesLazyQuery>;
-export type GetOpportunitiesSuspenseQueryHookResult = ReturnType<
-  typeof useGetOpportunitiesSuspenseQuery
->;
-export type GetOpportunitiesQueryResult = Apollo.QueryResult<
-  GqlGetOpportunitiesQuery,
-  GqlGetOpportunitiesQueryVariables
->;
-export const GetOpportunityDocument = gql`
-  query GetOpportunity($id: ID!, $permission: CheckCommunityPermissionInput!) {
-    opportunity(id: $id, permission: $permission) {
-      id
-      title
-      description
-      body
-      category
-      capacity
-      pointsToEarn
-      isReservableWithTicket
-      feeRequired
-      requireApproval
-      publishStatus
-      images
-      createdAt
-      updatedAt
-      community {
-        id
-        name
-        image
-      }
-      createdByUser {
-        id
-        name
-        image
-        articlesAboutMe {
+    userUpdateMyProfile(input: $input, permission: $permission) {
+      ... on UserUpdateProfileSuccess {
+        user {
           id
-          title
-          introduction
-          thumbnail
-          createdAt
-        }
-        opportunitiesCreatedByMe {
-          id
-          title
-          description
-          category
-          capacity
-          community {
-            id
-            name
-            image
-          }
-          pointsToEarn
-          feeRequired
-          requireApproval
-          publishStatus
-          images
-          createdAt
-          updatedAt
-          slots {
-            id
-            startsAt
-            endsAt
-            reservations {
-              participations {
-                id
-                status
-                user {
-                  id
-                  name
-                  image
-                }
-              }
-            }
-          }
-        }
-      }
-      place {
-        id
-        name
-        address
-        latitude
-        longitude
-        city {
           name
-          state {
-            name
-          }
-        }
-      }
-      requiredUtilities {
-        id
-      }
-      slots {
-        id
-        startsAt
-        endsAt
-        remainingCapacity
-        reservations {
-          participations {
-            id
-            status
-            user {
-              id
-              name
-              image
-            }
-          }
+          image
+          bio
+          currentPrefecture
+          urlFacebook
+          urlInstagram
+          urlX
+          slug
         }
       }
     }
   }
 `;
+export type GqlUpdateMyProfileMutationFn = Apollo.MutationFunction<
+  GqlUpdateMyProfileMutation,
+  GqlUpdateMyProfileMutationVariables
+>;
 
 /**
- * __useGetOpportunityQuery__
+ * __useUpdateMyProfileMutation__
  *
- * To run a query within a React component, call `useGetOpportunityQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetOpportunityQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
+ * To run a mutation, you first call `useUpdateMyProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateMyProfileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
  *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const { data, loading, error } = useGetOpportunityQuery({
+ * const [updateMyProfileMutation, { data, loading, error }] = useUpdateMyProfileMutation({
  *   variables: {
- *      id: // value for 'id'
+ *      input: // value for 'input'
  *      permission: // value for 'permission'
  *   },
  * });
  */
-export function useGetOpportunityQuery(
-  baseOptions: Apollo.QueryHookOptions<GqlGetOpportunityQuery, GqlGetOpportunityQueryVariables> &
-    ({ variables: GqlGetOpportunityQueryVariables; skip?: boolean } | { skip: boolean }),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetOpportunityQuery, GqlGetOpportunityQueryVariables>(
-    GetOpportunityDocument,
-    options,
-  );
-}
-export function useGetOpportunityLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetOpportunityQuery,
-    GqlGetOpportunityQueryVariables
+export function useUpdateMyProfileMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlUpdateMyProfileMutation,
+    GqlUpdateMyProfileMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetOpportunityQuery, GqlGetOpportunityQueryVariables>(
-    GetOpportunityDocument,
+  return Apollo.useMutation<GqlUpdateMyProfileMutation, GqlUpdateMyProfileMutationVariables>(
+    UpdateMyProfileDocument,
     options,
   );
 }
-export function useGetOpportunitySuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlGetOpportunityQuery, GqlGetOpportunityQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlGetOpportunityQuery, GqlGetOpportunityQueryVariables>(
-    GetOpportunityDocument,
-    options,
-  );
-}
-export type GetOpportunityQueryHookResult = ReturnType<typeof useGetOpportunityQuery>;
-export type GetOpportunityLazyQueryHookResult = ReturnType<typeof useGetOpportunityLazyQuery>;
-export type GetOpportunitySuspenseQueryHookResult = ReturnType<
-  typeof useGetOpportunitySuspenseQuery
+export type UpdateMyProfileMutationHookResult = ReturnType<typeof useUpdateMyProfileMutation>;
+export type UpdateMyProfileMutationResult = Apollo.MutationResult<GqlUpdateMyProfileMutation>;
+export type UpdateMyProfileMutationOptions = Apollo.BaseMutationOptions<
+  GqlUpdateMyProfileMutation,
+  GqlUpdateMyProfileMutationVariables
 >;
-export type GetOpportunityQueryResult = Apollo.QueryResult<
-  GqlGetOpportunityQuery,
-  GqlGetOpportunityQueryVariables
->;
-export const GetParticipationDocument = gql`
-  query GetParticipation($id: ID!) {
-    participation(id: $id) {
-      id
-      images
-      reason
-      reservation {
-        id
-        opportunitySlot {
-          id
-          capacity
-          startsAt
-          endsAt
-          hostingStatus
-          opportunity {
-            id
-            title
-            description
-            body
-            category
-            capacity
-            pointsToEarn
-            feeRequired
-            requireApproval
-            publishStatus
-            images
-            createdAt
-            updatedAt
-            community {
-              id
-              name
-              image
-            }
-            createdByUser {
-              id
-              name
-              image
-            }
-            place {
-              id
-              name
-              address
-              latitude
-              longitude
-              city {
-                name
-                state {
-                  name
-                }
-              }
-            }
-            slots {
-              id
-              startsAt
-              endsAt
-            }
-          }
-        }
-      }
-      source
-      status
-      statusHistories {
-        id
-        status
-        reason
-        createdAt
-        createdByUser {
-          id
-          name
-        }
-      }
-      updatedAt
-      user {
-        id
-        name
-        image
-      }
-    }
-  }
-`;
-
-/**
- * __useGetParticipationQuery__
- *
- * To run a query within a React component, call `useGetParticipationQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetParticipationQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetParticipationQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useGetParticipationQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GqlGetParticipationQuery,
-    GqlGetParticipationQueryVariables
-  > &
-    ({ variables: GqlGetParticipationQueryVariables; skip?: boolean } | { skip: boolean }),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetParticipationQuery, GqlGetParticipationQueryVariables>(
-    GetParticipationDocument,
-    options,
-  );
-}
-export function useGetParticipationLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetParticipationQuery,
-    GqlGetParticipationQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetParticipationQuery, GqlGetParticipationQueryVariables>(
-    GetParticipationDocument,
-    options,
-  );
-}
-export function useGetParticipationSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlGetParticipationQuery, GqlGetParticipationQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlGetParticipationQuery, GqlGetParticipationQueryVariables>(
-    GetParticipationDocument,
-    options,
-  );
-}
-export type GetParticipationQueryHookResult = ReturnType<typeof useGetParticipationQuery>;
-export type GetParticipationLazyQueryHookResult = ReturnType<typeof useGetParticipationLazyQuery>;
-export type GetParticipationSuspenseQueryHookResult = ReturnType<
-  typeof useGetParticipationSuspenseQuery
->;
-export type GetParticipationQueryResult = Apollo.QueryResult<
-  GqlGetParticipationQuery,
-  GqlGetParticipationQueryVariables
->;
-export const SearchOpportunitiesDocument = gql`
-  query SearchOpportunities($filter: OpportunityFilterInput, $first: Int) {
-    opportunities(filter: $filter, first: $first) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      totalCount
+export const GetUsersDocument = gql`
+  query GetUsers {
+    users {
       edges {
         node {
           id
-          title
-          description
-          category
-          capacity
-          community {
-            id
-            name
-            image
-          }
-          pointsToEarn
-          feeRequired
-          requireApproval
-          publishStatus
-          images
-          createdAt
-          updatedAt
-          place {
-            id
-            name
-            address
-            latitude
-            longitude
-            city {
-              name
-              state {
-                name
-              }
-            }
-          }
-          slots {
-            id
-            startsAt
-            endsAt
-            capacity
-            reservations {
-              participations {
-                id
-                status
-                user {
-                  id
-                  name
-                  image
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useSearchOpportunitiesQuery__
- *
- * To run a query within a React component, call `useSearchOpportunitiesQuery` and pass it any options that fit your needs.
- * When your component renders, `useSearchOpportunitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSearchOpportunitiesQuery({
- *   variables: {
- *      filter: // value for 'filter'
- *      first: // value for 'first'
- *   },
- * });
- */
-export function useSearchOpportunitiesQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GqlSearchOpportunitiesQuery,
-    GqlSearchOpportunitiesQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlSearchOpportunitiesQuery, GqlSearchOpportunitiesQueryVariables>(
-    SearchOpportunitiesDocument,
-    options,
-  );
-}
-export function useSearchOpportunitiesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlSearchOpportunitiesQuery,
-    GqlSearchOpportunitiesQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlSearchOpportunitiesQuery, GqlSearchOpportunitiesQueryVariables>(
-    SearchOpportunitiesDocument,
-    options,
-  );
-}
-export function useSearchOpportunitiesSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GqlSearchOpportunitiesQuery,
-        GqlSearchOpportunitiesQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlSearchOpportunitiesQuery, GqlSearchOpportunitiesQueryVariables>(
-    SearchOpportunitiesDocument,
-    options,
-  );
-}
-export type SearchOpportunitiesQueryHookResult = ReturnType<typeof useSearchOpportunitiesQuery>;
-export type SearchOpportunitiesLazyQueryHookResult = ReturnType<
-  typeof useSearchOpportunitiesLazyQuery
->;
-export type SearchOpportunitiesSuspenseQueryHookResult = ReturnType<
-  typeof useSearchOpportunitiesSuspenseQuery
->;
-export type SearchOpportunitiesQueryResult = Apollo.QueryResult<
-  GqlSearchOpportunitiesQuery,
-  GqlSearchOpportunitiesQueryVariables
->;
-export const TicketClaimLinkDocument = gql`
-  query ticketClaimLink($id: ID!) {
-    ticketClaimLink(id: $id) {
-      qty
-      status
-      issuer {
-        owner {
-          id
           name
-          image
         }
       }
+      totalCount
     }
   }
 `;
 
 /**
- * __useTicketClaimLinkQuery__
+ * __useGetUsersQuery__
  *
- * To run a query within a React component, call `useTicketClaimLinkQuery` and pass it any options that fit your needs.
- * When your component renders, `useTicketClaimLinkQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useTicketClaimLinkQuery({
+ * const { data, loading, error } = useGetUsersQuery({
  *   variables: {
- *      id: // value for 'id'
  *   },
  * });
  */
-export function useTicketClaimLinkQuery(
-  baseOptions: Apollo.QueryHookOptions<GqlTicketClaimLinkQuery, GqlTicketClaimLinkQueryVariables> &
-    ({ variables: GqlTicketClaimLinkQueryVariables; skip?: boolean } | { skip: boolean }),
+export function useGetUsersQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetUsersQuery, GqlGetUsersQueryVariables>,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlTicketClaimLinkQuery, GqlTicketClaimLinkQueryVariables>(
-    TicketClaimLinkDocument,
+  return Apollo.useQuery<GqlGetUsersQuery, GqlGetUsersQueryVariables>(GetUsersDocument, options);
+}
+export function useGetUsersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetUsersQuery, GqlGetUsersQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetUsersQuery, GqlGetUsersQueryVariables>(
+    GetUsersDocument,
     options,
   );
 }
-export function useTicketClaimLinkLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlTicketClaimLinkQuery,
-    GqlTicketClaimLinkQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlTicketClaimLinkQuery, GqlTicketClaimLinkQueryVariables>(
-    TicketClaimLinkDocument,
-    options,
-  );
-}
-export function useTicketClaimLinkSuspenseQuery(
+export function useGetUsersSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlTicketClaimLinkQuery, GqlTicketClaimLinkQueryVariables>,
+    | Apollo.SuspenseQueryHookOptions<GqlGetUsersQuery, GqlGetUsersQueryVariables>,
 ) {
   const options =
     baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlTicketClaimLinkQuery, GqlTicketClaimLinkQueryVariables>(
-    TicketClaimLinkDocument,
+  return Apollo.useSuspenseQuery<GqlGetUsersQuery, GqlGetUsersQueryVariables>(
+    GetUsersDocument,
     options,
   );
 }
-export type TicketClaimLinkQueryHookResult = ReturnType<typeof useTicketClaimLinkQuery>;
-export type TicketClaimLinkLazyQueryHookResult = ReturnType<typeof useTicketClaimLinkLazyQuery>;
-export type TicketClaimLinkSuspenseQueryHookResult = ReturnType<
-  typeof useTicketClaimLinkSuspenseQuery
->;
-export type TicketClaimLinkQueryResult = Apollo.QueryResult<
-  GqlTicketClaimLinkQuery,
-  GqlTicketClaimLinkQueryVariables
->;
+export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
+export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
+export type GetUsersSuspenseQueryHookResult = ReturnType<typeof useGetUsersSuspenseQuery>;
+export type GetUsersQueryResult = Apollo.QueryResult<GqlGetUsersQuery, GqlGetUsersQueryVariables>;
 export const GetUserProfileDocument = gql`
   query GetUserProfile($id: ID!) {
     user(id: $id) {
@@ -4933,6 +4824,7 @@ export const GetUserWalletDocument = gql`
       id
       wallets {
         id
+        type
         currentPointView {
           currentPoint
           walletId
@@ -4940,12 +4832,16 @@ export const GetUserWalletDocument = gql`
         tickets {
           id
           status
+          reason
           utility {
             id
+            publishStatus
+            pointsRequired
           }
           ticketStatusHistories {
             id
             status
+            reason
             createdByUser {
               id
               name
@@ -5011,6 +4907,1768 @@ export type GetUserWalletSuspenseQueryHookResult = ReturnType<typeof useGetUserW
 export type GetUserWalletQueryResult = Apollo.QueryResult<
   GqlGetUserWalletQuery,
   GqlGetUserWalletQueryVariables
+>;
+export const GetWalletsDocument = gql`
+  query GetWallets {
+    wallets {
+      edges {
+        node {
+          id
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetWalletsQuery__
+ *
+ * To run a query within a React component, call `useGetWalletsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWalletsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWalletsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetWalletsQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetWalletsQuery, GqlGetWalletsQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetWalletsQuery, GqlGetWalletsQueryVariables>(
+    GetWalletsDocument,
+    options,
+  );
+}
+export function useGetWalletsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetWalletsQuery, GqlGetWalletsQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetWalletsQuery, GqlGetWalletsQueryVariables>(
+    GetWalletsDocument,
+    options,
+  );
+}
+export function useGetWalletsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetWalletsQuery, GqlGetWalletsQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetWalletsQuery, GqlGetWalletsQueryVariables>(
+    GetWalletsDocument,
+    options,
+  );
+}
+export type GetWalletsQueryHookResult = ReturnType<typeof useGetWalletsQuery>;
+export type GetWalletsLazyQueryHookResult = ReturnType<typeof useGetWalletsLazyQuery>;
+export type GetWalletsSuspenseQueryHookResult = ReturnType<typeof useGetWalletsSuspenseQuery>;
+export type GetWalletsQueryResult = Apollo.QueryResult<
+  GqlGetWalletsQuery,
+  GqlGetWalletsQueryVariables
+>;
+export const GetArticlesDocument = gql`
+  query GetArticles(
+    $first: Int
+    $cursor: String
+    $filter: ArticleFilterInput
+    $sort: ArticleSortInput
+  ) {
+    articles(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          ...ArticleFields
+          authors {
+            ...UserFields
+          }
+        }
+      }
+    }
+  }
+  ${ArticleFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetArticlesQuery__
+ *
+ * To run a query within a React component, call `useGetArticlesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetArticlesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetArticlesQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *   },
+ * });
+ */
+export function useGetArticlesQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetArticlesQuery, GqlGetArticlesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetArticlesQuery, GqlGetArticlesQueryVariables>(
+    GetArticlesDocument,
+    options,
+  );
+}
+export function useGetArticlesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetArticlesQuery, GqlGetArticlesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetArticlesQuery, GqlGetArticlesQueryVariables>(
+    GetArticlesDocument,
+    options,
+  );
+}
+export function useGetArticlesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetArticlesQuery, GqlGetArticlesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetArticlesQuery, GqlGetArticlesQueryVariables>(
+    GetArticlesDocument,
+    options,
+  );
+}
+export type GetArticlesQueryHookResult = ReturnType<typeof useGetArticlesQuery>;
+export type GetArticlesLazyQueryHookResult = ReturnType<typeof useGetArticlesLazyQuery>;
+export type GetArticlesSuspenseQueryHookResult = ReturnType<typeof useGetArticlesSuspenseQuery>;
+export type GetArticlesQueryResult = Apollo.QueryResult<
+  GqlGetArticlesQuery,
+  GqlGetArticlesQueryVariables
+>;
+export const GetArticleDocument = gql`
+  query GetArticle($id: ID!, $permission: CheckCommunityPermissionInput!) {
+    article(id: $id, permission: $permission) {
+      ...ArticleFields
+      authors {
+        ...UserFields
+      }
+      relatedUsers {
+        ...UserFields
+      }
+    }
+    articles(
+      first: 4
+      filter: { categories: ["INTERVIEW"], publishStatus: [PUBLIC] }
+      sort: { publishedAt: desc }
+    ) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          ...ArticleFields
+          authors {
+            ...UserFields
+          }
+        }
+      }
+    }
+  }
+  ${ArticleFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetArticleQuery__
+ *
+ * To run a query within a React component, call `useGetArticleQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetArticleQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetArticleQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useGetArticleQuery(
+  baseOptions: Apollo.QueryHookOptions<GqlGetArticleQuery, GqlGetArticleQueryVariables> &
+    ({ variables: GqlGetArticleQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetArticleQuery, GqlGetArticleQueryVariables>(
+    GetArticleDocument,
+    options,
+  );
+}
+export function useGetArticleLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetArticleQuery, GqlGetArticleQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetArticleQuery, GqlGetArticleQueryVariables>(
+    GetArticleDocument,
+    options,
+  );
+}
+export function useGetArticleSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetArticleQuery, GqlGetArticleQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetArticleQuery, GqlGetArticleQueryVariables>(
+    GetArticleDocument,
+    options,
+  );
+}
+export type GetArticleQueryHookResult = ReturnType<typeof useGetArticleQuery>;
+export type GetArticleLazyQueryHookResult = ReturnType<typeof useGetArticleLazyQuery>;
+export type GetArticleSuspenseQueryHookResult = ReturnType<typeof useGetArticleSuspenseQuery>;
+export type GetArticleQueryResult = Apollo.QueryResult<
+  GqlGetArticleQuery,
+  GqlGetArticleQueryVariables
+>;
+export const GetEvaluationsDocument = gql`
+  query GetEvaluations {
+    evaluations {
+      edges {
+        node {
+          id
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetEvaluationsQuery__
+ *
+ * To run a query within a React component, call `useGetEvaluationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetEvaluationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetEvaluationsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetEvaluationsQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetEvaluationsQuery, GqlGetEvaluationsQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetEvaluationsQuery, GqlGetEvaluationsQueryVariables>(
+    GetEvaluationsDocument,
+    options,
+  );
+}
+export function useGetEvaluationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetEvaluationsQuery,
+    GqlGetEvaluationsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetEvaluationsQuery, GqlGetEvaluationsQueryVariables>(
+    GetEvaluationsDocument,
+    options,
+  );
+}
+export function useGetEvaluationsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetEvaluationsQuery, GqlGetEvaluationsQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetEvaluationsQuery, GqlGetEvaluationsQueryVariables>(
+    GetEvaluationsDocument,
+    options,
+  );
+}
+export type GetEvaluationsQueryHookResult = ReturnType<typeof useGetEvaluationsQuery>;
+export type GetEvaluationsLazyQueryHookResult = ReturnType<typeof useGetEvaluationsLazyQuery>;
+export type GetEvaluationsSuspenseQueryHookResult = ReturnType<
+  typeof useGetEvaluationsSuspenseQuery
+>;
+export type GetEvaluationsQueryResult = Apollo.QueryResult<
+  GqlGetEvaluationsQuery,
+  GqlGetEvaluationsQueryVariables
+>;
+export const GetEvaluationDocument = gql`
+  query GetEvaluation($id: ID!) {
+    evaluation(id: $id) {
+      id
+    }
+  }
+`;
+
+/**
+ * __useGetEvaluationQuery__
+ *
+ * To run a query within a React component, call `useGetEvaluationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetEvaluationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetEvaluationQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetEvaluationQuery(
+  baseOptions: Apollo.QueryHookOptions<GqlGetEvaluationQuery, GqlGetEvaluationQueryVariables> &
+    ({ variables: GqlGetEvaluationQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetEvaluationQuery, GqlGetEvaluationQueryVariables>(
+    GetEvaluationDocument,
+    options,
+  );
+}
+export function useGetEvaluationLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetEvaluationQuery, GqlGetEvaluationQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetEvaluationQuery, GqlGetEvaluationQueryVariables>(
+    GetEvaluationDocument,
+    options,
+  );
+}
+export function useGetEvaluationSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetEvaluationQuery, GqlGetEvaluationQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetEvaluationQuery, GqlGetEvaluationQueryVariables>(
+    GetEvaluationDocument,
+    options,
+  );
+}
+export type GetEvaluationQueryHookResult = ReturnType<typeof useGetEvaluationQuery>;
+export type GetEvaluationLazyQueryHookResult = ReturnType<typeof useGetEvaluationLazyQuery>;
+export type GetEvaluationSuspenseQueryHookResult = ReturnType<typeof useGetEvaluationSuspenseQuery>;
+export type GetEvaluationQueryResult = Apollo.QueryResult<
+  GqlGetEvaluationQuery,
+  GqlGetEvaluationQueryVariables
+>;
+export const GetOpportunitiesDocument = gql`
+  query GetOpportunities(
+    $upcomingFilter: OpportunityFilterInput
+    $featuredFilter: OpportunityFilterInput
+    $allFilter: OpportunityFilterInput
+    $similarFilter: OpportunityFilterInput
+    $first: Int
+    $cursor: String
+  ) {
+    upcoming: opportunities(
+      filter: $upcomingFilter
+      sort: { earliestSlotStartsAt: desc }
+      first: 5
+    ) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          ...OpportunityFields
+          slots {
+            ...OpportunitySlotFields
+          }
+          place {
+            ...PlaceFields
+          }
+        }
+      }
+    }
+    featured: opportunities(filter: $featuredFilter, first: 5) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          ...OpportunityFields
+          slots {
+            ...OpportunitySlotFields
+          }
+          place {
+            ...PlaceFields
+          }
+        }
+      }
+    }
+    similar: opportunities(filter: $similarFilter, first: 3) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          ...OpportunityFields
+          slots {
+            ...OpportunitySlotFields
+          }
+          place {
+            ...PlaceFields
+          }
+        }
+      }
+    }
+    all: opportunities(filter: $allFilter, first: $first, cursor: $cursor) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          ...OpportunityFields
+          slots {
+            ...OpportunitySlotFields
+          }
+          place {
+            ...PlaceFields
+          }
+        }
+      }
+    }
+  }
+  ${OpportunityFieldsFragmentDoc}
+  ${OpportunitySlotFieldsFragmentDoc}
+  ${PlaceFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetOpportunitiesQuery__
+ *
+ * To run a query within a React component, call `useGetOpportunitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOpportunitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOpportunitiesQuery({
+ *   variables: {
+ *      upcomingFilter: // value for 'upcomingFilter'
+ *      featuredFilter: // value for 'featuredFilter'
+ *      allFilter: // value for 'allFilter'
+ *      similarFilter: // value for 'similarFilter'
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
+ *   },
+ * });
+ */
+export function useGetOpportunitiesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetOpportunitiesQuery,
+    GqlGetOpportunitiesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetOpportunitiesQuery, GqlGetOpportunitiesQueryVariables>(
+    GetOpportunitiesDocument,
+    options,
+  );
+}
+export function useGetOpportunitiesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetOpportunitiesQuery,
+    GqlGetOpportunitiesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetOpportunitiesQuery, GqlGetOpportunitiesQueryVariables>(
+    GetOpportunitiesDocument,
+    options,
+  );
+}
+export function useGetOpportunitiesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetOpportunitiesQuery, GqlGetOpportunitiesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetOpportunitiesQuery, GqlGetOpportunitiesQueryVariables>(
+    GetOpportunitiesDocument,
+    options,
+  );
+}
+export type GetOpportunitiesQueryHookResult = ReturnType<typeof useGetOpportunitiesQuery>;
+export type GetOpportunitiesLazyQueryHookResult = ReturnType<typeof useGetOpportunitiesLazyQuery>;
+export type GetOpportunitiesSuspenseQueryHookResult = ReturnType<
+  typeof useGetOpportunitiesSuspenseQuery
+>;
+export type GetOpportunitiesQueryResult = Apollo.QueryResult<
+  GqlGetOpportunitiesQuery,
+  GqlGetOpportunitiesQueryVariables
+>;
+export const GetOpportunityDocument = gql`
+  query GetOpportunity($id: ID!, $permission: CheckCommunityPermissionInput!) {
+    opportunity(id: $id, permission: $permission) {
+      ...OpportunityFields
+      community {
+        ...CommunityFields
+      }
+      place {
+        ...PlaceFields
+      }
+      slots {
+        ...OpportunitySlotFields
+        reservations {
+          ...ReservationFields
+          participations {
+            ...ParticipationFields
+            user {
+              ...UserFields
+            }
+          }
+        }
+      }
+      createdByUser {
+        ...UserFields
+        articlesAboutMe {
+          ...ArticleFields
+        }
+        opportunitiesCreatedByMe {
+          ...OpportunityFields
+          community {
+            ...CommunityFields
+          }
+          slots {
+            ...OpportunitySlotFields
+            reservations {
+              ...ReservationFields
+              participations {
+                ...ParticipationFields
+                user {
+                  ...UserFields
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  ${OpportunityFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
+  ${PlaceFieldsFragmentDoc}
+  ${OpportunitySlotFieldsFragmentDoc}
+  ${ReservationFieldsFragmentDoc}
+  ${ParticipationFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+  ${ArticleFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetOpportunityQuery__
+ *
+ * To run a query within a React component, call `useGetOpportunityQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOpportunityQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOpportunityQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useGetOpportunityQuery(
+  baseOptions: Apollo.QueryHookOptions<GqlGetOpportunityQuery, GqlGetOpportunityQueryVariables> &
+    ({ variables: GqlGetOpportunityQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetOpportunityQuery, GqlGetOpportunityQueryVariables>(
+    GetOpportunityDocument,
+    options,
+  );
+}
+export function useGetOpportunityLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetOpportunityQuery,
+    GqlGetOpportunityQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetOpportunityQuery, GqlGetOpportunityQueryVariables>(
+    GetOpportunityDocument,
+    options,
+  );
+}
+export function useGetOpportunitySuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetOpportunityQuery, GqlGetOpportunityQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetOpportunityQuery, GqlGetOpportunityQueryVariables>(
+    GetOpportunityDocument,
+    options,
+  );
+}
+export type GetOpportunityQueryHookResult = ReturnType<typeof useGetOpportunityQuery>;
+export type GetOpportunityLazyQueryHookResult = ReturnType<typeof useGetOpportunityLazyQuery>;
+export type GetOpportunitySuspenseQueryHookResult = ReturnType<
+  typeof useGetOpportunitySuspenseQuery
+>;
+export type GetOpportunityQueryResult = Apollo.QueryResult<
+  GqlGetOpportunityQuery,
+  GqlGetOpportunityQueryVariables
+>;
+export const SearchOpportunitiesDocument = gql`
+  query SearchOpportunities($filter: OpportunityFilterInput, $first: Int) {
+    opportunities(filter: $filter, first: $first) {
+      edges {
+        node {
+          id
+          title
+          description
+          category
+          capacity
+          community {
+            id
+            name
+            image
+          }
+          pointsToEarn
+          feeRequired
+          requireApproval
+          publishStatus
+          images
+          createdAt
+          updatedAt
+          place {
+            id
+            name
+            address
+            latitude
+            longitude
+            city {
+              name
+              state {
+                name
+              }
+            }
+          }
+          slots {
+            id
+            startsAt
+            endsAt
+            remainingCapacity
+            reservations {
+              status
+              participations {
+                id
+                status
+                images
+                user {
+                  id
+                  name
+                  image
+                }
+              }
+            }
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useSearchOpportunitiesQuery__
+ *
+ * To run a query within a React component, call `useSearchOpportunitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchOpportunitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchOpportunitiesQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useSearchOpportunitiesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlSearchOpportunitiesQuery,
+    GqlSearchOpportunitiesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlSearchOpportunitiesQuery, GqlSearchOpportunitiesQueryVariables>(
+    SearchOpportunitiesDocument,
+    options,
+  );
+}
+export function useSearchOpportunitiesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlSearchOpportunitiesQuery,
+    GqlSearchOpportunitiesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlSearchOpportunitiesQuery, GqlSearchOpportunitiesQueryVariables>(
+    SearchOpportunitiesDocument,
+    options,
+  );
+}
+export function useSearchOpportunitiesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlSearchOpportunitiesQuery,
+        GqlSearchOpportunitiesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlSearchOpportunitiesQuery, GqlSearchOpportunitiesQueryVariables>(
+    SearchOpportunitiesDocument,
+    options,
+  );
+}
+export type SearchOpportunitiesQueryHookResult = ReturnType<typeof useSearchOpportunitiesQuery>;
+export type SearchOpportunitiesLazyQueryHookResult = ReturnType<
+  typeof useSearchOpportunitiesLazyQuery
+>;
+export type SearchOpportunitiesSuspenseQueryHookResult = ReturnType<
+  typeof useSearchOpportunitiesSuspenseQuery
+>;
+export type SearchOpportunitiesQueryResult = Apollo.QueryResult<
+  GqlSearchOpportunitiesQuery,
+  GqlSearchOpportunitiesQueryVariables
+>;
+export const GetOpportunitySlotsDocument = gql`
+  query GetOpportunitySlots($filter: OpportunitySlotFilterInput) {
+    opportunitySlots(filter: $filter, sort: { startsAt: desc }) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          hostingStatus
+          startsAt
+          endsAt
+          capacity
+          remainingCapacity
+          opportunity {
+            ...OpportunityFields
+          }
+        }
+      }
+    }
+  }
+  ${OpportunityFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetOpportunitySlotsQuery__
+ *
+ * To run a query within a React component, call `useGetOpportunitySlotsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOpportunitySlotsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOpportunitySlotsQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetOpportunitySlotsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetOpportunitySlotsQuery,
+    GqlGetOpportunitySlotsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetOpportunitySlotsQuery, GqlGetOpportunitySlotsQueryVariables>(
+    GetOpportunitySlotsDocument,
+    options,
+  );
+}
+export function useGetOpportunitySlotsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetOpportunitySlotsQuery,
+    GqlGetOpportunitySlotsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetOpportunitySlotsQuery, GqlGetOpportunitySlotsQueryVariables>(
+    GetOpportunitySlotsDocument,
+    options,
+  );
+}
+export function useGetOpportunitySlotsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetOpportunitySlotsQuery,
+        GqlGetOpportunitySlotsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetOpportunitySlotsQuery, GqlGetOpportunitySlotsQueryVariables>(
+    GetOpportunitySlotsDocument,
+    options,
+  );
+}
+export type GetOpportunitySlotsQueryHookResult = ReturnType<typeof useGetOpportunitySlotsQuery>;
+export type GetOpportunitySlotsLazyQueryHookResult = ReturnType<
+  typeof useGetOpportunitySlotsLazyQuery
+>;
+export type GetOpportunitySlotsSuspenseQueryHookResult = ReturnType<
+  typeof useGetOpportunitySlotsSuspenseQuery
+>;
+export type GetOpportunitySlotsQueryResult = Apollo.QueryResult<
+  GqlGetOpportunitySlotsQuery,
+  GqlGetOpportunitySlotsQueryVariables
+>;
+export const GetOpportunitySlotDocument = gql`
+  query GetOpportunitySlot($id: ID!) {
+    opportunitySlot(id: $id) {
+      id
+    }
+  }
+`;
+
+/**
+ * __useGetOpportunitySlotQuery__
+ *
+ * To run a query within a React component, call `useGetOpportunitySlotQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOpportunitySlotQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOpportunitySlotQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetOpportunitySlotQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetOpportunitySlotQuery,
+    GqlGetOpportunitySlotQueryVariables
+  > &
+    ({ variables: GqlGetOpportunitySlotQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetOpportunitySlotQuery, GqlGetOpportunitySlotQueryVariables>(
+    GetOpportunitySlotDocument,
+    options,
+  );
+}
+export function useGetOpportunitySlotLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetOpportunitySlotQuery,
+    GqlGetOpportunitySlotQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetOpportunitySlotQuery, GqlGetOpportunitySlotQueryVariables>(
+    GetOpportunitySlotDocument,
+    options,
+  );
+}
+export function useGetOpportunitySlotSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetOpportunitySlotQuery,
+        GqlGetOpportunitySlotQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetOpportunitySlotQuery, GqlGetOpportunitySlotQueryVariables>(
+    GetOpportunitySlotDocument,
+    options,
+  );
+}
+export type GetOpportunitySlotQueryHookResult = ReturnType<typeof useGetOpportunitySlotQuery>;
+export type GetOpportunitySlotLazyQueryHookResult = ReturnType<
+  typeof useGetOpportunitySlotLazyQuery
+>;
+export type GetOpportunitySlotSuspenseQueryHookResult = ReturnType<
+  typeof useGetOpportunitySlotSuspenseQuery
+>;
+export type GetOpportunitySlotQueryResult = Apollo.QueryResult<
+  GqlGetOpportunitySlotQuery,
+  GqlGetOpportunitySlotQueryVariables
+>;
+export const GetParticipationsDocument = gql`
+  query GetParticipations {
+    participations {
+      edges {
+        node {
+          id
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetParticipationsQuery__
+ *
+ * To run a query within a React component, call `useGetParticipationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetParticipationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetParticipationsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetParticipationsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetParticipationsQuery,
+    GqlGetParticipationsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetParticipationsQuery, GqlGetParticipationsQueryVariables>(
+    GetParticipationsDocument,
+    options,
+  );
+}
+export function useGetParticipationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetParticipationsQuery,
+    GqlGetParticipationsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetParticipationsQuery, GqlGetParticipationsQueryVariables>(
+    GetParticipationsDocument,
+    options,
+  );
+}
+export function useGetParticipationsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetParticipationsQuery,
+        GqlGetParticipationsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetParticipationsQuery, GqlGetParticipationsQueryVariables>(
+    GetParticipationsDocument,
+    options,
+  );
+}
+export type GetParticipationsQueryHookResult = ReturnType<typeof useGetParticipationsQuery>;
+export type GetParticipationsLazyQueryHookResult = ReturnType<typeof useGetParticipationsLazyQuery>;
+export type GetParticipationsSuspenseQueryHookResult = ReturnType<
+  typeof useGetParticipationsSuspenseQuery
+>;
+export type GetParticipationsQueryResult = Apollo.QueryResult<
+  GqlGetParticipationsQuery,
+  GqlGetParticipationsQueryVariables
+>;
+export const GetParticipationDocument = gql`
+  query GetParticipation($id: ID!) {
+    participation(id: $id) {
+      id
+      images
+      reason
+      reservation {
+        id
+        opportunitySlot {
+          id
+          capacity
+          startsAt
+          endsAt
+          hostingStatus
+          opportunity {
+            id
+            title
+            description
+            body
+            category
+            capacity
+            pointsToEarn
+            feeRequired
+            requireApproval
+            publishStatus
+            images
+            createdAt
+            updatedAt
+            community {
+              id
+              name
+              image
+            }
+            createdByUser {
+              id
+              name
+              image
+            }
+            place {
+              id
+              name
+              address
+              latitude
+              longitude
+              city {
+                name
+                state {
+                  name
+                }
+              }
+            }
+            slots {
+              id
+              startsAt
+              endsAt
+            }
+          }
+        }
+      }
+      source
+      status
+      statusHistories {
+        id
+        status
+        reason
+        createdAt
+        createdByUser {
+          id
+          name
+        }
+      }
+      updatedAt
+      user {
+        id
+        name
+        image
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetParticipationQuery__
+ *
+ * To run a query within a React component, call `useGetParticipationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetParticipationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetParticipationQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetParticipationQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetParticipationQuery,
+    GqlGetParticipationQueryVariables
+  > &
+    ({ variables: GqlGetParticipationQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetParticipationQuery, GqlGetParticipationQueryVariables>(
+    GetParticipationDocument,
+    options,
+  );
+}
+export function useGetParticipationLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetParticipationQuery,
+    GqlGetParticipationQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetParticipationQuery, GqlGetParticipationQueryVariables>(
+    GetParticipationDocument,
+    options,
+  );
+}
+export function useGetParticipationSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetParticipationQuery, GqlGetParticipationQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetParticipationQuery, GqlGetParticipationQueryVariables>(
+    GetParticipationDocument,
+    options,
+  );
+}
+export type GetParticipationQueryHookResult = ReturnType<typeof useGetParticipationQuery>;
+export type GetParticipationLazyQueryHookResult = ReturnType<typeof useGetParticipationLazyQuery>;
+export type GetParticipationSuspenseQueryHookResult = ReturnType<
+  typeof useGetParticipationSuspenseQuery
+>;
+export type GetParticipationQueryResult = Apollo.QueryResult<
+  GqlGetParticipationQuery,
+  GqlGetParticipationQueryVariables
+>;
+export const CreateReservationDocument = gql`
+  mutation CreateReservation($input: ReservationCreateInput!) {
+    reservationCreate(input: $input) {
+      ... on ReservationCreateSuccess {
+        reservation {
+          id
+          status
+        }
+      }
+    }
+  }
+`;
+export type GqlCreateReservationMutationFn = Apollo.MutationFunction<
+  GqlCreateReservationMutation,
+  GqlCreateReservationMutationVariables
+>;
+
+/**
+ * __useCreateReservationMutation__
+ *
+ * To run a mutation, you first call `useCreateReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createReservationMutation, { data, loading, error }] = useCreateReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlCreateReservationMutation,
+    GqlCreateReservationMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlCreateReservationMutation, GqlCreateReservationMutationVariables>(
+    CreateReservationDocument,
+    options,
+  );
+}
+export type CreateReservationMutationHookResult = ReturnType<typeof useCreateReservationMutation>;
+export type CreateReservationMutationResult = Apollo.MutationResult<GqlCreateReservationMutation>;
+export type CreateReservationMutationOptions = Apollo.BaseMutationOptions<
+  GqlCreateReservationMutation,
+  GqlCreateReservationMutationVariables
+>;
+export const GetReservationsDocument = gql`
+  query GetReservations {
+    reservations {
+      edges {
+        node {
+          id
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetReservationsQuery__
+ *
+ * To run a query within a React component, call `useGetReservationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetReservationsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetReservationsQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetReservationsQuery, GqlGetReservationsQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetReservationsQuery, GqlGetReservationsQueryVariables>(
+    GetReservationsDocument,
+    options,
+  );
+}
+export function useGetReservationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetReservationsQuery,
+    GqlGetReservationsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetReservationsQuery, GqlGetReservationsQueryVariables>(
+    GetReservationsDocument,
+    options,
+  );
+}
+export function useGetReservationsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetReservationsQuery, GqlGetReservationsQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetReservationsQuery, GqlGetReservationsQueryVariables>(
+    GetReservationsDocument,
+    options,
+  );
+}
+export type GetReservationsQueryHookResult = ReturnType<typeof useGetReservationsQuery>;
+export type GetReservationsLazyQueryHookResult = ReturnType<typeof useGetReservationsLazyQuery>;
+export type GetReservationsSuspenseQueryHookResult = ReturnType<
+  typeof useGetReservationsSuspenseQuery
+>;
+export type GetReservationsQueryResult = Apollo.QueryResult<
+  GqlGetReservationsQuery,
+  GqlGetReservationsQueryVariables
+>;
+export const GetReservationDocument = gql`
+  query GetReservation($id: ID!) {
+    reservation(id: $id) {
+      ...ReservationFields
+      opportunitySlot {
+        ...OpportunitySlotFields
+        opportunity {
+          ...OpportunityFields
+        }
+      }
+      participations {
+        ...ParticipationFields
+      }
+    }
+  }
+  ${ReservationFieldsFragmentDoc}
+  ${OpportunitySlotFieldsFragmentDoc}
+  ${OpportunityFieldsFragmentDoc}
+  ${ParticipationFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetReservationQuery__
+ *
+ * To run a query within a React component, call `useGetReservationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetReservationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetReservationQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetReservationQuery(
+  baseOptions: Apollo.QueryHookOptions<GqlGetReservationQuery, GqlGetReservationQueryVariables> &
+    ({ variables: GqlGetReservationQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetReservationQuery, GqlGetReservationQueryVariables>(
+    GetReservationDocument,
+    options,
+  );
+}
+export function useGetReservationLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetReservationQuery,
+    GqlGetReservationQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetReservationQuery, GqlGetReservationQueryVariables>(
+    GetReservationDocument,
+    options,
+  );
+}
+export function useGetReservationSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetReservationQuery, GqlGetReservationQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetReservationQuery, GqlGetReservationQueryVariables>(
+    GetReservationDocument,
+    options,
+  );
+}
+export type GetReservationQueryHookResult = ReturnType<typeof useGetReservationQuery>;
+export type GetReservationLazyQueryHookResult = ReturnType<typeof useGetReservationLazyQuery>;
+export type GetReservationSuspenseQueryHookResult = ReturnType<
+  typeof useGetReservationSuspenseQuery
+>;
+export type GetReservationQueryResult = Apollo.QueryResult<
+  GqlGetReservationQuery,
+  GqlGetReservationQueryVariables
+>;
+export const GetPlacesDocument = gql`
+  query GetPlaces {
+    places {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetPlacesQuery__
+ *
+ * To run a query within a React component, call `useGetPlacesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPlacesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPlacesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetPlacesQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetPlacesQuery, GqlGetPlacesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetPlacesQuery, GqlGetPlacesQueryVariables>(GetPlacesDocument, options);
+}
+export function useGetPlacesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetPlacesQuery, GqlGetPlacesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetPlacesQuery, GqlGetPlacesQueryVariables>(
+    GetPlacesDocument,
+    options,
+  );
+}
+export function useGetPlacesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetPlacesQuery, GqlGetPlacesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetPlacesQuery, GqlGetPlacesQueryVariables>(
+    GetPlacesDocument,
+    options,
+  );
+}
+export type GetPlacesQueryHookResult = ReturnType<typeof useGetPlacesQuery>;
+export type GetPlacesLazyQueryHookResult = ReturnType<typeof useGetPlacesLazyQuery>;
+export type GetPlacesSuspenseQueryHookResult = ReturnType<typeof useGetPlacesSuspenseQuery>;
+export type GetPlacesQueryResult = Apollo.QueryResult<
+  GqlGetPlacesQuery,
+  GqlGetPlacesQueryVariables
+>;
+export const TicketClaimDocument = gql`
+  mutation ticketClaim($input: TicketClaimInput!) {
+    ticketClaim(input: $input) {
+      ... on TicketClaimSuccess {
+        tickets {
+          id
+        }
+      }
+    }
+  }
+`;
+export type GqlTicketClaimMutationFn = Apollo.MutationFunction<
+  GqlTicketClaimMutation,
+  GqlTicketClaimMutationVariables
+>;
+
+/**
+ * __useTicketClaimMutation__
+ *
+ * To run a mutation, you first call `useTicketClaimMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTicketClaimMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [ticketClaimMutation, { data, loading, error }] = useTicketClaimMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useTicketClaimMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlTicketClaimMutation, GqlTicketClaimMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlTicketClaimMutation, GqlTicketClaimMutationVariables>(
+    TicketClaimDocument,
+    options,
+  );
+}
+export type TicketClaimMutationHookResult = ReturnType<typeof useTicketClaimMutation>;
+export type TicketClaimMutationResult = Apollo.MutationResult<GqlTicketClaimMutation>;
+export type TicketClaimMutationOptions = Apollo.BaseMutationOptions<
+  GqlTicketClaimMutation,
+  GqlTicketClaimMutationVariables
+>;
+export const GetTicketsDocument = gql`
+  query GetTickets {
+    tickets {
+      edges {
+        node {
+          id
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetTicketsQuery__
+ *
+ * To run a query within a React component, call `useGetTicketsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTicketsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTicketsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetTicketsQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetTicketsQuery, GqlGetTicketsQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetTicketsQuery, GqlGetTicketsQueryVariables>(
+    GetTicketsDocument,
+    options,
+  );
+}
+export function useGetTicketsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetTicketsQuery, GqlGetTicketsQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetTicketsQuery, GqlGetTicketsQueryVariables>(
+    GetTicketsDocument,
+    options,
+  );
+}
+export function useGetTicketsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetTicketsQuery, GqlGetTicketsQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetTicketsQuery, GqlGetTicketsQueryVariables>(
+    GetTicketsDocument,
+    options,
+  );
+}
+export type GetTicketsQueryHookResult = ReturnType<typeof useGetTicketsQuery>;
+export type GetTicketsLazyQueryHookResult = ReturnType<typeof useGetTicketsLazyQuery>;
+export type GetTicketsSuspenseQueryHookResult = ReturnType<typeof useGetTicketsSuspenseQuery>;
+export type GetTicketsQueryResult = Apollo.QueryResult<
+  GqlGetTicketsQuery,
+  GqlGetTicketsQueryVariables
+>;
+export const GetTicketDocument = gql`
+  query GetTicket($id: ID!) {
+    ticket(id: $id) {
+      id
+    }
+  }
+`;
+
+/**
+ * __useGetTicketQuery__
+ *
+ * To run a query within a React component, call `useGetTicketQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTicketQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTicketQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetTicketQuery(
+  baseOptions: Apollo.QueryHookOptions<GqlGetTicketQuery, GqlGetTicketQueryVariables> &
+    ({ variables: GqlGetTicketQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetTicketQuery, GqlGetTicketQueryVariables>(GetTicketDocument, options);
+}
+export function useGetTicketLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetTicketQuery, GqlGetTicketQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetTicketQuery, GqlGetTicketQueryVariables>(
+    GetTicketDocument,
+    options,
+  );
+}
+export function useGetTicketSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetTicketQuery, GqlGetTicketQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetTicketQuery, GqlGetTicketQueryVariables>(
+    GetTicketDocument,
+    options,
+  );
+}
+export type GetTicketQueryHookResult = ReturnType<typeof useGetTicketQuery>;
+export type GetTicketLazyQueryHookResult = ReturnType<typeof useGetTicketLazyQuery>;
+export type GetTicketSuspenseQueryHookResult = ReturnType<typeof useGetTicketSuspenseQuery>;
+export type GetTicketQueryResult = Apollo.QueryResult<
+  GqlGetTicketQuery,
+  GqlGetTicketQueryVariables
+>;
+export const TicketClaimLinkDocument = gql`
+  query ticketClaimLink($id: ID!) {
+    ticketClaimLink(id: $id) {
+      qty
+      status
+      issuer {
+        owner {
+          id
+          name
+          image
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useTicketClaimLinkQuery__
+ *
+ * To run a query within a React component, call `useTicketClaimLinkQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTicketClaimLinkQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTicketClaimLinkQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useTicketClaimLinkQuery(
+  baseOptions: Apollo.QueryHookOptions<GqlTicketClaimLinkQuery, GqlTicketClaimLinkQueryVariables> &
+    ({ variables: GqlTicketClaimLinkQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlTicketClaimLinkQuery, GqlTicketClaimLinkQueryVariables>(
+    TicketClaimLinkDocument,
+    options,
+  );
+}
+export function useTicketClaimLinkLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlTicketClaimLinkQuery,
+    GqlTicketClaimLinkQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlTicketClaimLinkQuery, GqlTicketClaimLinkQueryVariables>(
+    TicketClaimLinkDocument,
+    options,
+  );
+}
+export function useTicketClaimLinkSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlTicketClaimLinkQuery, GqlTicketClaimLinkQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlTicketClaimLinkQuery, GqlTicketClaimLinkQueryVariables>(
+    TicketClaimLinkDocument,
+    options,
+  );
+}
+export type TicketClaimLinkQueryHookResult = ReturnType<typeof useTicketClaimLinkQuery>;
+export type TicketClaimLinkLazyQueryHookResult = ReturnType<typeof useTicketClaimLinkLazyQuery>;
+export type TicketClaimLinkSuspenseQueryHookResult = ReturnType<
+  typeof useTicketClaimLinkSuspenseQuery
+>;
+export type TicketClaimLinkQueryResult = Apollo.QueryResult<
+  GqlTicketClaimLinkQuery,
+  GqlTicketClaimLinkQueryVariables
+>;
+export const GetUtilitiesDocument = gql`
+  query GetUtilities {
+    utilities {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetUtilitiesQuery__
+ *
+ * To run a query within a React component, call `useGetUtilitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUtilitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUtilitiesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUtilitiesQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetUtilitiesQuery, GqlGetUtilitiesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetUtilitiesQuery, GqlGetUtilitiesQueryVariables>(
+    GetUtilitiesDocument,
+    options,
+  );
+}
+export function useGetUtilitiesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetUtilitiesQuery, GqlGetUtilitiesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetUtilitiesQuery, GqlGetUtilitiesQueryVariables>(
+    GetUtilitiesDocument,
+    options,
+  );
+}
+export function useGetUtilitiesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetUtilitiesQuery, GqlGetUtilitiesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetUtilitiesQuery, GqlGetUtilitiesQueryVariables>(
+    GetUtilitiesDocument,
+    options,
+  );
+}
+export type GetUtilitiesQueryHookResult = ReturnType<typeof useGetUtilitiesQuery>;
+export type GetUtilitiesLazyQueryHookResult = ReturnType<typeof useGetUtilitiesLazyQuery>;
+export type GetUtilitiesSuspenseQueryHookResult = ReturnType<typeof useGetUtilitiesSuspenseQuery>;
+export type GetUtilitiesQueryResult = Apollo.QueryResult<
+  GqlGetUtilitiesQuery,
+  GqlGetUtilitiesQueryVariables
 >;
 export const WalletTransactionsDocument = gql`
   query WalletTransactions($filter: TransactionFilterInput) {
@@ -5111,4 +6769,71 @@ export type WalletTransactionsSuspenseQueryHookResult = ReturnType<
 export type WalletTransactionsQueryResult = Apollo.QueryResult<
   GqlWalletTransactionsQuery,
   GqlWalletTransactionsQueryVariables
+>;
+export const GetTransactionDocument = gql`
+  query GetTransaction($id: ID!) {
+    transaction(id: $id) {
+      id
+    }
+  }
+`;
+
+/**
+ * __useGetTransactionQuery__
+ *
+ * To run a query within a React component, call `useGetTransactionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTransactionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTransactionQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetTransactionQuery(
+  baseOptions: Apollo.QueryHookOptions<GqlGetTransactionQuery, GqlGetTransactionQueryVariables> &
+    ({ variables: GqlGetTransactionQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetTransactionQuery, GqlGetTransactionQueryVariables>(
+    GetTransactionDocument,
+    options,
+  );
+}
+export function useGetTransactionLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetTransactionQuery,
+    GqlGetTransactionQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetTransactionQuery, GqlGetTransactionQueryVariables>(
+    GetTransactionDocument,
+    options,
+  );
+}
+export function useGetTransactionSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetTransactionQuery, GqlGetTransactionQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetTransactionQuery, GqlGetTransactionQueryVariables>(
+    GetTransactionDocument,
+    options,
+  );
+}
+export type GetTransactionQueryHookResult = ReturnType<typeof useGetTransactionQuery>;
+export type GetTransactionLazyQueryHookResult = ReturnType<typeof useGetTransactionLazyQuery>;
+export type GetTransactionSuspenseQueryHookResult = ReturnType<
+  typeof useGetTransactionSuspenseQuery
+>;
+export type GetTransactionQueryResult = Apollo.QueryResult<
+  GqlGetTransactionQuery,
+  GqlGetTransactionQueryVariables
 >;

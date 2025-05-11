@@ -83,13 +83,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -127,13 +123,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Datetime",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "Datetime",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -1182,13 +1174,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Datetime",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "Datetime",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -6965,13 +6953,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Datetime",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "Datetime",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -8227,6 +8211,18 @@
         "isOneOf": false,
         "fields": null,
         "inputFields": [
+          {
+            "name": "hostingStatus",
+            "description": null,
+            "type": {
+              "kind": "ENUM",
+              "name": "OpportunitySlotHostingStatus",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "opportunityId",
             "description": null,
@@ -10240,13 +10236,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Datetime",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "Datetime",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -10296,13 +10288,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -11188,6 +11176,48 @@
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "PortfolioCategory",
+        "description": null,
+        "isOneOf": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "ACTIVITY",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ACTIVITY_REPORT",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "EVENT",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "INTERVIEW",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "QUEST",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -13154,13 +13184,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Datetime",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "Datetime",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -16414,13 +16440,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "CurrentPrefecture",
-                "ofType": null
-              }
+              "kind": "ENUM",
+              "name": "CurrentPrefecture",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -16706,13 +16728,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -17409,13 +17427,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Datetime",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "Datetime",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -17473,13 +17487,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null

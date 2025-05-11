@@ -1,10 +1,16 @@
 'use client';
 
-import { useArticlesController } from '@/hooks/features/article/useArticlesController';
-import type { Article } from '@/presenters/article';
+import React, { useEffect } from "react";
+import { useInfiniteScroll } from "@/hooks/core/useInfiniteScroll";
+import { useLoading } from "@/hooks/core/useLoading";
+import { GqlSortDirection as SortDirection, useGetArticlesQuery } from "@/types/graphql";
+import {  presenterArticleCards } from "@/presenters/article";
+import { ArticleCard } from "@/types/article";
+
+export const ARTICLES_PER_PAGE = 10;
 
 interface UseArticlesResult {
-  articles: Article[];
+  articles: ArticleCard[];
   loading: boolean;
   initialLoading: boolean;
   error: Error | null;
@@ -12,13 +18,65 @@ interface UseArticlesResult {
   hasMore: boolean;
 }
 
-/**
- * Custom hook for fetching and managing articles
- * This is a backward-compatible wrapper around useArticlesController
- */
 export const useArticles = (): UseArticlesResult => {
-  return useArticlesController();
-};
+  const { setIsLoading } = useLoading();
 
-export type { Article };
-export { ARTICLES_PER_PAGE } from './useArticlesQuery';
+  const { data, loading, error, fetchMore } = useGetArticlesQuery({
+    variables: {
+      first: ARTICLES_PER_PAGE,
+      filter: { publishStatus: ["PUBLIC"] },
+      sort: { publishedAt: SortDirection.Desc },
+    },
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+  });
+
+  const articles = presenterArticleCards(data?.articles?.edges ?? undefined);
+  const hasMore = data?.articles.pageInfo.hasNextPage || false;
+
+  const handleLoadMore = async () => {
+    if (!hasMore || loading) return;
+
+    await fetchMore({
+      variables: {
+        first: ARTICLES_PER_PAGE,
+        filter: { publishStatus: ["PUBLIC"] },
+        sort: { publishedAt: SortDirection.Desc },
+        cursor: data?.articles.pageInfo.endCursor,
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return prev;
+        return {
+          ...prev,
+          articles: {
+            ...prev.articles,
+            edges: [
+              ...(prev.articles.edges ?? []),
+              ...(fetchMoreResult.articles.edges ?? [])
+            ],
+            pageInfo: fetchMoreResult.articles.pageInfo,
+          },
+        };
+      },
+    });
+  };
+
+  const loadMoreRef = useInfiniteScroll({
+    hasMore,
+    isLoading: loading,
+    onLoadMore: handleLoadMore,
+  });
+
+  useEffect(() => {
+    setIsLoading(loading && !data);
+  }, [loading, data, setIsLoading]);
+
+  return {
+    articles,
+    loading,
+    initialLoading: loading && !data,
+    error: error || null,
+    loadMoreRef,
+    hasMore,
+  };
+};

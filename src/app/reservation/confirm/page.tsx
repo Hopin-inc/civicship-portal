@@ -1,8 +1,8 @@
 "use client";
 
+import { useReservationConfirm } from "@/hooks";
 import { useSearchParams } from "next/navigation";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
+import React, { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import LoginModal from "@/components/features/login/LoginModal";
@@ -10,107 +10,78 @@ import { OpportunityInfo } from "@/components/features/reservation/OpportunityIn
 import { ReservationDetailsCard } from "@/components/features/reservation/ReservationDetailsCard";
 import { PaymentSection } from "@/components/features/reservation/PaymentSection";
 import { NotesSection } from "@/components/features/reservation/NotesSection";
-import { useReservationConfirm } from "@/hooks/features/reservation/useReservationConfirm";
+import { ReservationContentGate } from "@/app/reservation/contentGate";
 
-/**
- * Page component for reservation confirmation
- */
 export default function ConfirmPage() {
   const searchParams = useSearchParams();
-  const params = {
-    id: searchParams.get("id"),
-    starts_at: searchParams.get("starts_at"),
-    guests: searchParams.get("guests"),
-    community_id: searchParams.get("community_id")
-  };
-  
-  const {
-    opportunity,
-    loading,
-    error,
-    selectedSlot,
-    startDateTime,
-    endDateTime,
-    participantCount,
-    pricePerPerson,
-    ticketCount,
-    useTickets,
-    setUseTickets,
-    availableTickets,
-    isLoginModalOpen,
-    setIsLoginModalOpen,
-    creatingReservation,
-    incrementTicket,
-    decrementTicket,
-    handleConfirmReservation
-  } = useReservationConfirm(params);
+  const params = useMemo(() => ({
+    id: searchParams.get("id") ?? "",
+    starts_at: searchParams.get("starts_at") ?? "",
+    guests: searchParams.get("guests") ?? "",
+    community_id: searchParams.get("community_id") ?? ""
+  }), [searchParams]);
 
-  if (loading) {
-    return <LoadingIndicator message="読み込み中..." />;
-  }
-
-  if (error) {
-    return <ErrorState message={error.message} />;
-  }
-
-  if (!opportunity) {
-    return <ErrorState message="予約情報が見つかりませんでした" />;
-  }
-  
-  if (!selectedSlot?.node) {
-    return <ErrorState message="選択された時間枠が見つかりませんでした" />;
-  }
-
-  if (!startDateTime || !endDateTime) {
-    return <ErrorState message="時間枠の日付形式が無効です" />;
-  }
+  const result = useReservationConfirm(params);
 
   return (
-    <main className="pb-8 min-h-screen">
-      <Toaster />
-      <LoginModal 
-        isOpen={isLoginModalOpen} 
-        onClose={() => setIsLoginModalOpen(false)} 
-      />
-      
-      <OpportunityInfo 
-        opportunity={opportunity} 
-        pricePerPerson={pricePerPerson} 
-      />
-
-      <div className="px-4">
-        <ReservationDetailsCard 
-          startDateTime={startDateTime}
-          endDateTime={endDateTime}
-          participantCount={participantCount}
-          location={{
-            name: opportunity.place?.name || '高松市役所',
-            address: opportunity.place?.address || '香川県高松市番町1丁目8-15'
-          }}
+    <ReservationContentGate
+      loading={result.loading}
+      error={result.error}
+      nullChecks={[
+        { label: "予約情報", value: result.opportunity },
+        { label: "スロット情報", value: result.selectedSlot?.node },
+        { label: "開始日時", value: result.startDateTime },
+        { label: "終了日時", value: result.endDateTime },
+      ]}
+    >
+      <main className="pb-8 min-h-screen">
+        <Toaster />
+        <LoginModal
+          isOpen={result.isLoginModalOpen}
+          onClose={() => result.setIsLoginModalOpen(false)}
         />
 
-        <PaymentSection
-          ticketCount={ticketCount}
-          onIncrement={incrementTicket}
-          onDecrement={decrementTicket}
-          maxTickets={availableTickets}
-          pricePerPerson={pricePerPerson}
-          participantCount={participantCount}
-          useTickets={useTickets}
-          setUseTickets={setUseTickets}
+        <OpportunityInfo
+          opportunity={result.opportunity}
+          pricePerPerson={result.pricePerPerson}
         />
 
-        <NotesSection requireApproval={opportunity.requireApproval} />
+        <div className="px-4">
+          <ReservationDetailsCard
+            startDateTime={result.startDateTime}
+            endDateTime={result.endDateTime}
+            participantCount={result.participantCount}
+            location={{
+              name: result.opportunity?.place?.name || "",
+              address: result.opportunity?.place?.address || "",
+            }}
+          />
 
-        <Button 
-          className="w-full py-6 text-base rounded-lg bg-[#4361EE] hover:bg-[#3651DE]" 
-          size="lg"
-          onClick={handleConfirmReservation}
-          disabled={creatingReservation || (useTickets && ticketCount > availableTickets)}
-        >
-          {creatingReservation ? "処理中..." : "申し込みを確定"}
-        </Button>
-      </div>
-    </main>
+          <PaymentSection
+            ticketCount={result.ticketCount}
+            onIncrement={result.incrementTicket}
+            onDecrement={result.decrementTicket}
+            maxTickets={result.availableTickets}
+            pricePerPerson={result.pricePerPerson}
+            participantCount={result.participantCount}
+            useTickets={result.useTickets}
+            setUseTickets={result.setUseTickets}
+          />
+
+          <NotesSection requireApproval={result.opportunity?.requiredApproval} />
+
+          <Button
+            onClick={result.handleConfirmReservation}
+            disabled={
+              result.creatingReservation ||
+              (result.useTickets && result.ticketCount > result.availableTickets)
+            }
+          >
+            {result.creatingReservation ? "処理中..." : "申し込みを確定"}
+          </Button>
+        </div>
+      </main>
+    </ReservationContentGate>
+
   );
 }

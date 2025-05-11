@@ -7,37 +7,33 @@ interface UseInfiniteScrollProps {
   threshold?: number;
 }
 
-/**
- * Hook for implementing infinite scrolling
- * Returns a ref to be attached to the last item in the list
- */
 export const useInfiniteScroll = ({
-  hasMore,
-  isLoading,
-  onLoadMore,
-  threshold = 0.1
-}: UseInfiniteScrollProps) => {
+    hasMore,
+    isLoading,
+    onLoadMore,
+    threshold = 0.1,
+  }: UseInfiniteScrollProps) => {
   const observer = useRef<IntersectionObserver | null>(null);
   const targetRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    const el = targetRef.current;
+    if (!el) return;
+
     observer.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
+      ([entry]) => {
+        if (entry.isIntersecting && hasMore && !isLoading) {
           onLoadMore();
         }
       },
       { threshold }
     );
 
-    if (targetRef.current) {
-      observer.current.observe(targetRef.current);
-    }
+    observer.current.observe(el);
 
     return () => {
-      if (observer.current) {
-        observer.current.disconnect();
-      }
+      observer.current?.unobserve(el);
+      observer.current?.disconnect();
     };
   }, [hasMore, isLoading, onLoadMore, threshold]);
 

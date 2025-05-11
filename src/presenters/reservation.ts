@@ -1,65 +1,35 @@
 'use client';
 
-import { parseDateTime } from '../utils/date';
+import { ActivitySlot } from "@/types/opportunitySlot";
+import { GqlTicket, GqlWallet } from "@/types/graphql";
+import { RequiredUtility } from "@/types/opportunity";
 
-/**
- * Finds a slot that matches the provided start time
- * @param slots Array of slot edges from GraphQL
- * @param slotStartsAt Start time to match
- */
-export const findMatchingSlot = (slots: any, slotStartsAt: string) => {
-  if (!slots?.edges || !slotStartsAt) return null;
-  
-  return slots.edges.find((edge: any) => {
-    if (!edge?.node?.startsAt) return false;
-    
-    const slotDateTime = parseDateTime(String(edge.node.startsAt));
-    const paramDateTime = parseDateTime(decodeURIComponent(slotStartsAt));
-    
-    if (!slotDateTime || !paramDateTime) return false;
-    
-    return slotDateTime.getTime() === paramDateTime.getTime();
-  });
-};
-
-/**
- * Calculates the number of available tickets for an opportunity
- * @param walletData Wallet data from GraphQL
- * @param requiredUtilities Required utilities for the opportunity
- */
-export const calculateAvailableTickets = (walletData: any, requiredUtilities: any[] | undefined) => {
-  if (!requiredUtilities?.length) {
-    return walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.length || 0;
+export const findMatchingSlot = (
+  slots: ActivitySlot[],
+  slotId?: string
+): ActivitySlot | null => {
+  if (!Array.isArray(slots) || slots.length === 0) {
+    return null;
   }
 
-  const requiredUtilityIds = new Set(
-    requiredUtilities.map(u => u.id)
-  );
-
-  const availableTickets = walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.filter(
-    (edge: any) => {
-      const utilityId = edge?.node?.utility?.id;
-      return utilityId ? requiredUtilityIds.has(utilityId) : false;
+  if (slotId) {
+    const match = slots.find((slot) => slot.id === slotId);
+    if (match) {
+      return match;
     }
-  ) || [];
+  }
 
-  return availableTickets.length;
+  return slots[0] ;
 };
 
-/**
- * Gets ticket IDs for reservation
- * @param walletData Wallet data from GraphQL
- * @param requiredUtilities Required utilities for the opportunity
- * @param ticketCount Number of tickets to use
- */
-export const getTicketIds = (walletData: any, requiredUtilities: any[] | undefined, ticketCount: number) => {
-  return walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges
-    ?.filter((edge: any) => {
+export const getTicketIds = (wallets: GqlWallet[] | null, requiredUtilities: RequiredUtility[] | undefined, ticketCount: number) => {
+  return wallets?.[0]?.tickets
+    ?.filter((edge: GqlTicket) => {
       if (!requiredUtilities?.length) return true;
-      const utilityId = edge?.node?.utility?.id;
+      const utilityId = edge?.utility?.id;
       return utilityId && requiredUtilities.some(u => u.id === utilityId);
     })
     ?.slice(0, ticketCount)
-    ?.map((edge: any) => edge?.node?.id)
-    ?.filter((id: any): id is string => id !== undefined) || [];
+    ?.map((edge: GqlTicket) => edge?.id)
+    ?.filter((id) => id !== undefined) || [];
 };

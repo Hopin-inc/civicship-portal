@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
-import OpportunityCard, { OpportunityCardProps } from '../opportunity/OpportunityCard';
+import OpportunityCard from "@/components/features/opportunity/OpportunityCard";
+import { ActivityCard } from "@/types/opportunity";
 
 interface ActivitiesAllSectionProps {
-  opportunities: OpportunityCardProps[];
+  opportunities: ActivityCard[];
   loadMoreRef: React.RefObject<HTMLDivElement>;
   isLoading: boolean;
 }
@@ -22,7 +23,6 @@ const ActivitiesAllSection: React.FC<ActivitiesAllSectionProps> = ({
           <OpportunityCard 
             key={opportunity.id}
             {...opportunity}
-            vertical
           />
         ))}
       </div>

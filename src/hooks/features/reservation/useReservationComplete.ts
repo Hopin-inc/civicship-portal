@@ -1,23 +1,84 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useOpportunity } from '@/hooks/features/activity/useOpportunity';
-import { useSimilarOpportunities } from '@/hooks/features/activity/useSimilarOpportunities';
-import { useHeader } from '@/components/providers/HeaderProvider';
+import { useHeader } from '@/contexts/HeaderContext';
+import { COMMUNITY_ID } from '@/utils';
+import { presenterActivityCards, presenterActivityDetail } from "@/presenters/opportunity";
+import {
+  useGetOpportunitiesQuery,
+  useGetReservationQuery,
+} from "@/types/graphql";
+import { ActivityCard, ActivityDetail } from "@/types/opportunity";
 
-/**
- * Custom hook for managing reservation complete page data and state
- */
 export const useReservationComplete = () => {
   const { updateConfig } = useHeader();
   const searchParams = useSearchParams();
-  const opportunityId = searchParams.get('opportunity_id');
+  const opportunityId = searchParams.get("opportunity_id");
+  const reservationId = searchParams.get("reservation_id");
 
-  const { opportunity, loading: opportunityLoading, error: opportunityError } = useOpportunity(opportunityId || '');
-  const { similarOpportunities, loading: similarLoading, error: similarError } = useSimilarOpportunities({ 
-    opportunityId: opportunityId || '' 
+  const { data, loading, error:opportunityError } = useGetReservationQuery({
+    variables: { id: reservationId ?? ""},
+    skip: !reservationId,
+    fetchPolicy: 'network-only',
+    errorPolicy: 'all',
   });
+
+  const reservation = data?.reservation ?? null;
+  const gqlOpportunitySlot = reservation?.opportunitySlot ?? null;
+  const gqlOpportunity = gqlOpportunitySlot?.opportunity ?? null;
+
+  const opportunity: ActivityDetail | null = useMemo(() => {
+    return gqlOpportunity ? presenterActivityDetail(gqlOpportunity) : null;
+  }, [gqlOpportunity]);
+
+  const {
+    data: similarData,
+    loading: similarLoading,
+    error: similarError,
+  } = useGetOpportunitiesQuery({
+    variables: {
+      similarFilter: {
+        communityIds: [COMMUNITY_ID],
+      },
+    },
+    skip: !opportunityId,
+  });
+
+  const similarOpportunities: ActivityCard[] = useMemo(() => {
+    return presenterActivityCards(similarData?.similar?.edges);
+  }, [similarData]);
+
+  const dateTimeInfo = useMemo(() => {
+    if (!gqlOpportunity || !gqlOpportunitySlot || !reservation) return null;
+
+    const startDate = new Date(gqlOpportunitySlot.startsAt);
+    const endDate = new Date(gqlOpportunitySlot.endsAt);
+
+    return {
+      formattedDate: startDate.toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long',
+      }),
+      startTime: startDate.toLocaleTimeString('ja-JP', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }),
+      endTime: endDate.toLocaleTimeString('ja-JP', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }),
+      participantCount: reservation.participations?.length || 0,
+      totalPrice: (gqlOpportunity.feeRequired || 0) * (reservation.participations?.length || 0),
+    };
+  }, [reservation, gqlOpportunitySlot, gqlOpportunity]);
+
+  const isLoading = loading || similarLoading;
+  const error: Error | null = (opportunityError || similarError) ?? null;
 
   useEffect(() => {
     updateConfig({
@@ -27,56 +88,12 @@ export const useReservationComplete = () => {
     });
   }, [updateConfig]);
 
-  const formatDateTimeInfo = () => {
-    if (!opportunity) return null;
-
-    const startDate = new Date(opportunity.startsAt);
-    const endDate = new Date(opportunity.endsAt);
-    
-    const formattedDate = startDate.toLocaleDateString('ja-JP', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'long'
-    });
-
-    const startTime = startDate.toLocaleTimeString('ja-JP', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-
-    const endTime = endDate.toLocaleTimeString('ja-JP', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-
-    const participantCount = opportunity.participants?.length || 0;
-    const totalPrice = (opportunity.feeRequired || 0) * participantCount;
-
-    return {
-      formattedDate,
-      startTime,
-      endTime,
-      participantCount,
-      totalPrice
-    };
-  };
-
-  const dateTimeInfo = opportunity ? formatDateTimeInfo() : null;
-  const opportunitiesCreatedByHost = opportunity?.createdByUser?.opportunitiesCreatedByMe?.edges || [];
-  const isLoading = opportunityLoading || similarLoading;
-  const error = opportunityError || similarError;
-
   return {
     opportunity,
     similarOpportunities,
-    opportunitiesCreatedByHost,
+    // opportunitiesCreatedByHost,
     dateTimeInfo,
     isLoading,
-    error
+    error: error ?? null,
   };
 };
-
-export default useReservationComplete;

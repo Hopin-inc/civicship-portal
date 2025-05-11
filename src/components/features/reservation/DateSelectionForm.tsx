@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Calendar, ChevronRight } from 'lucide-react';
-import type { DateSection } from '@/hooks/features/reservation/useReservationDateSelection';
 import { Button } from '@/components/ui/button';
 
 interface DateSelectionFormProps {
@@ -9,9 +8,6 @@ interface DateSelectionFormProps {
   onOpenDateForm: () => void;
 }
 
-/**
- * Component for selecting a date
- */
 export const DateSelectionForm: React.FC<DateSelectionFormProps> = ({
   selectedDate,
   onOpenDateForm

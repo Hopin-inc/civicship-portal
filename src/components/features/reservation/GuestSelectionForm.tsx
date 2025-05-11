@@ -7,9 +7,6 @@ interface GuestSelectionFormProps {
   onOpenGuestForm: () => void;
 }
 
-/**
- * Component for selecting number of guests
- */
 export const GuestSelectionForm: React.FC<GuestSelectionFormProps> = ({
   selectedGuests,
   onOpenGuestForm

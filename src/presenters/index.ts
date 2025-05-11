@@ -1,17 +1,7 @@
 'use client';
 
 export * from './article';
-
-export { 
-  mapOpportunityToCardProps,
-  transformArticle,
-  transformOpportunityNode,
-  transformParticipationNode
-} from './opportunity';
-export { transformOpportunity } from './opportunity';
-
 export * from './opportunitySlot';
-
 export * from './participation';
 export * from './place';
 export * from './portfolio';
