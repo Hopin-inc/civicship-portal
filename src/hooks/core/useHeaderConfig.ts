@@ -4,6 +4,7 @@ import { useEffect, useCallback } from 'react';
 import { useHeader } from '@/components/providers/HeaderProvider';
 
 type HeaderConfig = {
+  hideHeader?: boolean;
   title?: string;
   showBackButton?: boolean;
   showLogo?: boolean;
@@ -27,21 +28,21 @@ type HeaderConfig = {
  */
 export const useHeaderConfig = (config?: Partial<HeaderConfig>) => {
   const { updateConfig, resetConfig, lastVisitedUrls } = useHeader() as any;
-  
+
   const updateHeaderConfig = useCallback((newConfig: Partial<HeaderConfig>) => {
     updateConfig(newConfig);
   }, [updateConfig]);
-  
+
   useEffect(() => {
     if (config) {
       updateConfig(config);
-      
+
       return () => {
         resetConfig();
       };
     }
   }, [updateConfig, resetConfig, config]);
-  
+
   return {
     updateConfig: updateHeaderConfig,
     resetConfig,

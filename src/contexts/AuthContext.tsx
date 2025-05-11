@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isExplicitLogin, setIsExplicitLogin] = useState(false);
 
   const [userSignUpMutation] = useUserSignUpMutation();
-  
+
   const login = useCallback((userInfo: UserInfo | null) => {
     setUid(userInfo?.uid ?? null);
     setUser(userInfo?.user ?? null);
@@ -85,12 +85,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const attemptAuthWithLiffToken = async () => {
       if (liffAccessToken && isLiffLoggedIn && !uid) {
-        console.log("すでにLIFFログインしている場合はIDトークンでFirebase認証を試みる");
         await handleAuthenticateWithLiffToken(liffAccessToken);
       }
-      console.log("liffAccessToken", liffAccessToken);
-      console.log("isLiffLoggedIn", isLiffLoggedIn);
-      console.log("uid", uid);
     };
 
     attemptAuthWithLiffToken();
@@ -99,7 +95,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user: AuthUser | null) => {
       ready.resolve();
-      console.log("user", user);
 
       if (user) {
         const next = searchParams.get("next");
@@ -116,12 +111,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               name: fetchedUser.name
             }
           });
-          
+
           if (isExplicitLogin) {
             toast.success("ログインしました！");
             setIsExplicitLogin(false); // フラグをリセットして再表示を防止
           }
-          
+
           if (next) {
             router.push(next);
           }
@@ -135,7 +130,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [ready, cookies, refetch, router, searchParams, login]);
+  }, [ready, cookies, refetch, router, searchParams, login, isExplicitLogin]);
 
   const logout = async () => {
     setIsAuthenticating(true);
