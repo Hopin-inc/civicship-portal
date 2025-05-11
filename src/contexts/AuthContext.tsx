@@ -6,7 +6,7 @@ import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
-import { auth, signInWithLiffToken } from "@/lib/firebase";
+import { auth, signInWithLiffToken, startPhoneNumberVerification, linkPhoneCredential, fetchSignInMethodsForEmail } from "@/lib/firebase";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
 import { useLiff } from "./LiffContext";
@@ -25,6 +25,15 @@ type AuthContextType = UserInfo & {
   loginWithLiff: () => Promise<void>;
   isAuthenticating: boolean;
   createUser: (name: string, currentPrefecture: GqlCurrentPrefecture) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
+  
+  phoneNumber: string | null;
+  phoneAuth: {
+    isVerifying: boolean;
+    verificationId: string | null;
+    startPhoneVerification: (phoneNumber: string) => Promise<boolean>;
+    verifyPhoneCode: (code: string) => Promise<boolean>;
+  };
+  isLinkedWithPhone: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,6 +53,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserInfo["user"]>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isExplicitLogin, setIsExplicitLogin] = useState(false);
+  
+  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
+  const [verificationId, setVerificationId] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isLinkedWithPhone, setIsLinkedWithPhone] = useState(false);
 
   const login = useCallback((userInfo: UserInfo | null) => {
     setUid(userInfo?.uid ?? null);
@@ -66,6 +80,50 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [userSignUpMutation] = useUserSignUpMutation();
 
+  const startPhoneVerification = async (phoneNumber: string): Promise<boolean> => {
+    setIsVerifying(true);
+    try {
+      const verId = await startPhoneNumberVerification(phoneNumber);
+      setVerificationId(verId);
+      setPhoneNumber(phoneNumber);
+      return true;
+    } catch (error) {
+      console.error("Failed to start phone verification:", error);
+      toast.error("電話番号認証の開始に失敗しました");
+      return false;
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+  
+  const verifyPhoneCode = async (code: string): Promise<boolean> => {
+    if (!verificationId) {
+      toast.error("認証IDがありません。もう一度電話番号を入力してください");
+      return false;
+    }
+    
+    setIsVerifying(true);
+    try {
+      const currentUser = auth.currentUser;
+      
+      if (currentUser) {
+        await linkPhoneCredential(verificationId, code);
+        setIsLinkedWithPhone(true);
+        toast.success("電話番号認証が完了しました");
+        return true;
+      } else {
+        toast.error("LINEアカウントでログインしていません");
+        return false;
+      }
+    } catch (error) {
+      console.error("Failed to verify phone code:", error);
+      toast.error("認証コードの検証に失敗しました");
+      return false;
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   const loginWithLiff = async () => {
     if (!liff) {
       return;
@@ -74,6 +132,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setIsExplicitLogin(true);
       await liffLogin();
+      
+      if (auth.currentUser) {
+        const providers = await fetchSignInMethodsForEmail(auth.currentUser.email || '');
+        setIsLinkedWithPhone(providers.includes('phone'));
+      }
     } catch (error) {
       console.error("LIFF login failed:", error);
       toast.error("LINEログインに失敗しました");
@@ -138,7 +201,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             router.push(next);
           }
         } else {
-          router.push("/sign-up");
+          router.push("/phone-verification");
         }
       } else {
         login(null);
@@ -201,7 +264,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       logout,
       loginWithLiff,
       isAuthenticating,
-      createUser
+      createUser,
+      
+      phoneNumber,
+      phoneAuth: {
+        isVerifying,
+        verificationId,
+        startPhoneVerification,
+        verifyPhoneCode,
+      },
+      isLinkedWithPhone
     }}>
       {children}
     </AuthContext.Provider>

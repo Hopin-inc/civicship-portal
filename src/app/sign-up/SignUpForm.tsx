@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { GqlCurrentPrefecture } from '@/types/graphql';
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
   [GqlCurrentPrefecture.Kagawa]: '香川県',
@@ -38,7 +39,7 @@ type FormValues = z.infer<typeof FormSchema>;
 
 export function SignUpForm() {
   const router = useRouter();
-  const { createUser } = useAuth();
+  const { createUser, isLinkedWithPhone } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormValues>({
@@ -59,6 +60,12 @@ export function SignUpForm() {
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     try {
+      if (!isLinkedWithPhone) {
+        toast.error("電話番号認証が完了していません");
+        router.push("/phone-verification");
+        return;
+      }
+      
       const user = await createUser(values.name, values.prefecture);
       if (user) {
         router.push("/");

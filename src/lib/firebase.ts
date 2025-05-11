@@ -6,6 +6,12 @@ import {
   signInWithPopup,
   signInWithCustomToken,
   updateProfile,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  PhoneAuthProvider,
+  linkWithCredential,
+  UserCredential,
+  fetchSignInMethodsForEmail as firebaseFetchSignInMethodsForEmail,
 } from "@firebase/auth";
 import { LIFFLoginResponse } from "@/types/line";
 
@@ -17,6 +23,11 @@ export const app = initializeApp({
 
 export const auth = getAuth(app);
 auth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
+
+export const switchTenant = (tenantId: string | null) => {
+  auth.tenantId = tenantId;
+  return auth;
+};
 
 const providers = {
   line: new OAuthProvider("oidc.line"),
@@ -63,4 +74,49 @@ export const signInWithLiffToken = async (accessToken: string): Promise<boolean>
     console.error("Authentication with LIFF token failed:", error);
     return false;
   }
+};
+
+export const startPhoneNumberVerification = async (phoneNumber: string): Promise<string> => {
+  switchTenant(null);
+  
+  const appVerifier = new RecaptchaVerifier('recaptcha-container', {
+    size: 'invisible',
+  }, auth);
+  
+  try {
+    const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+    return confirmationResult.verificationId;
+  } catch (error) {
+    console.error("Phone verification failed:", error);
+    throw error;
+  } finally {
+    switchTenant(process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID);
+  }
+};
+
+export const verifyPhoneCode = async (verificationId: string, code: string): Promise<UserCredential> => {
+  switchTenant(null);
+  
+  try {
+    const credential = PhoneAuthProvider.credential(verificationId, code);
+    return signInWithCustomToken(auth, credential.token);
+  } catch (error) {
+    console.error("Code verification failed:", error);
+    throw error;
+  } finally {
+    switchTenant(process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID);
+  }
+};
+
+export const linkPhoneCredential = async (verificationId: string, code: string): Promise<UserCredential> => {
+  if (!auth.currentUser) {
+    throw new Error("No user is signed in");
+  }
+  
+  const credential = PhoneAuthProvider.credential(verificationId, code);
+  return linkWithCredential(auth.currentUser, credential);
+};
+
+export const fetchSignInMethodsForEmail = async (email: string): Promise<string[]> => {
+  return firebaseFetchSignInMethodsForEmail(auth, email);
 };
