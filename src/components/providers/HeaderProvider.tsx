@@ -1,8 +1,22 @@
 "use client";
 
 import React, { ReactNode, useState, useEffect, createContext, useContext } from "react";
-import { HeaderConfig } from "@/contexts/HeaderContext";
 import { usePathname } from "next/navigation";
+
+export interface HeaderConfig {
+  title?: string;
+  showBackButton?: boolean;
+  showLogo?: boolean;
+  showSearchForm?: boolean;
+  action?: React.ReactNode;
+  backTo?: string;
+  searchParams?: {
+    location?: string;
+    from?: string;
+    to?: string;
+    guests?: number;
+  };
+}
 
 export type HeaderContextState = {
   config: HeaderConfig;

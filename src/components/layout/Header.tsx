@@ -7,7 +7,7 @@ import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LoginModal from "@/components/features/login/LoginModal";
-import { useHeader } from "@/contexts/HeaderContext";
+import { useHeader } from "@/components/providers/HeaderProvider";
 import { useHierarchicalNavigation } from "@/hooks/core/useHierarchicalNavigation";
 import { cn } from "@/lib/utils";
 import SearchBox from "../features/search/SearchBox";
