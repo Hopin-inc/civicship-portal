@@ -17,13 +17,13 @@ const pathHierarchy: PathHierarchy = {
   '/activities/[id]/slots': '/activities/[id]',
   '/activities/[id]/confirm': '/activities/[id]/slots',
   '/activities/[id]/complete': '/activities/[id]',
-  '/places': '/activities',
+  '/places': '/',
   '/places/[id]': '/places',
   '/users/me': '/',
   '/wallets': '/users/me',
   '/wallets/[id]': '/wallets',
   '/tickets': '/users/me',
-  '/tickets/receive': '/tickets',
+  '/tickets/receive': '/',
 };
 
 export const PAGE_TYPES = {
@@ -82,11 +82,16 @@ export const useHierarchicalNavigation = () => {
   }, []);
 
   const getParentPath = useCallback((): string => {
+    if (searchParams.has('back')) {
+      const backRoute = searchParams.get('back');
+      if (backRoute) {
+        return backRoute;
+      }
+    }
+    
     if (config.backTo) {
       return config.backTo;
     }
-    
-    const currentPageType = getPageType(pathname);
     
     if (isSearchResultPath(pathname)) {
       const previousSearchResults = Object.keys(lastVisitedUrls)
@@ -96,16 +101,6 @@ export const useHierarchicalNavigation = () => {
       
       if (previousSearchResults.length > 0) {
         return lastVisitedUrls[previousSearchResults[0]];
-      }
-    }
-    
-    const previousPageTypes = Object.keys(PAGE_TYPES)
-      .filter(key => PAGE_TYPES[key as keyof typeof PAGE_TYPES] !== currentPageType)
-      .map(key => PAGE_TYPES[key as keyof typeof PAGE_TYPES]);
-    
-    for (const type of previousPageTypes) {
-      if (lastVisitedUrls[type] && lastVisitedUrls[type] !== pathname) {
-        return lastVisitedUrls[type];
       }
     }
     
