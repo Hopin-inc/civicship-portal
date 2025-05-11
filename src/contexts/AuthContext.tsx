@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [uid, setUid] = useState<UserInfo["uid"]>(null);
   const [user, setUser] = useState<UserInfo["user"]>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isExplicitLogin, setIsExplicitLogin] = useState(false);
 
   const [userSignUpMutation] = useUserSignUpMutation();
   
@@ -55,10 +56,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     try {
+      setIsExplicitLogin(true);
       await liffLogin();
     } catch (error) {
       console.error("LIFF login failed:", error);
       toast.error("LINEログインに失敗しました");
+      setIsExplicitLogin(false);
     }
   };
 
@@ -113,7 +116,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               name: fetchedUser.name
             }
           });
-          toast.success("ログインしました！");
+          
+          if (isExplicitLogin) {
+            toast.success("ログインしました！");
+            setIsExplicitLogin(false); // フラグをリセットして再表示を防止
+          }
+          
           if (next) {
             router.push(next);
           }
