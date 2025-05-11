@@ -9,6 +9,7 @@ import { GqlReservationStatus } from "@/types/graphql";
 
 export const useUserPortfolios = (userId: string) => {
   const { setIsLoading } = useLoading();
+  console.log(userId);
   const { data, loading, error } = useUserPortfolioQuery(userId);
 
   useEffect(() => {
