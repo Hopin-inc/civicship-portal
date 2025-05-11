@@ -4,7 +4,7 @@ import React from 'react';
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Calendar, MapPin, Users, Banknote } from "lucide-react";
-import type { Opportunity, Participation } from '../../../types';
+import type { Opportunity, Participation } from '@/types/participation';
 
 interface ParticipationDetailsProps {
   opportunity: Opportunity;
