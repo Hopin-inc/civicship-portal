@@ -8,9 +8,10 @@ import LoadingProvider from "@/components/providers/LoadingProvider";
 import Header from "@/components/layout/Header";
 import { LiffProvider } from "@/contexts/LiffContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import HeaderProvider, { useHeader } from "@/components/providers/HeaderProvider";
+import HeaderProvider from "@/components/providers/HeaderProvider";
 import BottomBar from "@/components/layout/BottomBar";
 import AdminBottomBar from "@/components/layout/AdminBottomBar";
+import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -47,7 +48,7 @@ const RootLayout = ({
 };
 
 const MainContent = ({ children }: { children: React.ReactNode }) => {
-  const { config } = useHeader();
+  const { config } = useHeaderConfig();
   const showHeader = !config.hideHeader;
   
   return (
