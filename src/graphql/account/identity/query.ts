@@ -7,11 +7,10 @@ export const GET_CURRENT_USER = gql(`
         id
         name
         memberships {
-          user {
-            id
-          }
+          id
           community {
             id
+            name
           }
           role
           status

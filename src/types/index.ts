@@ -4,7 +4,10 @@ export type CommunityId ={
 
 export type Membership = {
   id?: string;
-  communityId?: string;
+  community?: {
+    id: string;
+    name?: string;
+  };
   role?: string;
   status?: string;
 }
