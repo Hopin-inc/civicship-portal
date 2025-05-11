@@ -4,10 +4,9 @@ import React from 'react';
 import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
 import { Button } from "@/components/ui/button";
 import { formatImageData } from '@/presenters/participation';
-import type { ParticipationImage } from '@/types/participation';
 
 interface ParticipationImageGalleryProps {
-  images: ParticipationImage[];
+  images: string[];
   onViewAllImages?: () => void;
 }
 

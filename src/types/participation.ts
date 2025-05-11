@@ -1,20 +1,20 @@
-import { CommunityId } from "@/types/index";
 import { GqlOpportunityCategory } from "@/types/graphql";
-import { OpportunityPlace, OpportunityHost, OpportunityCard } from "@/types/opportunity";
+import { OpportunityPlace, OpportunityHost, ActivityCard } from "@/types/opportunity";
 import { ParticipationStatus, ParticipationStatusReason } from "@/types/participationStatus";
 import { ArticleWithAuthor } from "@/types/article";
 
 
 export type ParticipationInfo = PublicParticipationInfo & Partial<PrivateParticipationInfo>;
 
-type PublicParticipationInfo = CommunityId & {
+type PublicParticipationInfo = {
   id: string;
+  communityId: string;
   status: ParticipationStatus;
   reason: ParticipationStatusReason;
 
   opportunity: ParticipationOpportunity;
 
-  images: ParticipationImage[];
+  images: string[];
   totalImageCount: number;
 
   date: string;
@@ -23,7 +23,7 @@ type PublicParticipationInfo = CommunityId & {
 };
 
 type PrivateParticipationInfo = {
-  emergencyContactPhone: string;
+  emergencyContactPhone?: string;
 };
 
 
@@ -40,7 +40,7 @@ export type QuestField = {
 
 export type ParticipationOptionalInfo = {
   interview?: ArticleWithAuthor;
-  relatedOpportunity?: OpportunityCard[];
+  relatedOpportunity?: ActivityCard[];
   isCancelable?: boolean;
   cancelDue?: string;
 };
@@ -76,12 +76,13 @@ export type ParticipationImage = {
   updatedAt: string;
 };
 
+
 export type Participation = {
   node: {
     id: string;
     status: ParticipationStatus;
     reason: ParticipationStatusReason;
-    images: ParticipationImage[];
+    images: string[];
     user: {
       id: string;
       name: string;
@@ -107,6 +108,7 @@ export type Participation = {
     };
   };
 };
+
 
 export type Opportunity = {
   id: string;

@@ -41,15 +41,8 @@ export const presenterParticipation = (raw: GqlParticipation): ParticipationDeta
       host: presenterOpportunityHost(opportunity.createdByUser),
     },
     
-    images: (raw.images || []).map((url: string) => ({
-      id: `img-${url.split('/').pop()}`,
-      url,
-      caption: null,
-      participationId: raw.id,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    })),
-    totalImageCount: (raw.images || []).length,
+    images: raw.images ?? [],
+    totalImageCount: (raw.images ?? []).length,
     
     date: new Date(reservation.opportunitySlot?.startsAt ?? "").toISOString(),
     participantsCount: reservation.participations?.length ?? 0,
@@ -60,19 +53,21 @@ export const presenterParticipation = (raw: GqlParticipation): ParticipationDeta
   };
 
   if (isActivity) {
-    return {
+    const activityParticipation: ActivityParticipation = {
       ...commonInfo,
       feeRequired: opportunity.feeRequired ?? 0,
       totalFeeRequired: (opportunity.feeRequired ?? 0) * (commonInfo.participantsCount || 1),
       category: GqlOpportunityCategory.Activity,
     };
+    return activityParticipation;
   } else {
-    return {
+    const questParticipation: QuestParticipation = {
       ...commonInfo,
       pointsToEarn: opportunity.pointsToEarn ?? 0,
       totalPointsToEarn: (opportunity.pointsToEarn ?? 0) * (commonInfo.participantsCount || 1),
       category: GqlOpportunityCategory.Quest,
     };
+    return questParticipation;
   }
 };
 
@@ -121,9 +116,9 @@ export const calculateCancellationDeadline = (startTime: Date): Date => {
   return new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
 };
 
-export const formatImageData = (images: ParticipationImage[]): { url: string; alt: string }[] => {
-  return images.map((img) => ({
-    url: img.url,
+export const formatImageData = (images: string[]): { url: string; alt: string }[] => {
+  return images.map((url) => ({
+    url,
     alt: "参加者の写真",
   }));
 };
@@ -200,36 +195,22 @@ export const transformParticipation = (participationData: GqlGetParticipationQue
       id: participationData.id,
       status: participationData.status,
       reason: participationData.reason,
-      images: (participationData.images || []).map((url: string) => ({
-        id: `img-${url.split('/').pop()}`,
-        url,
-        caption: null,
-        participationId: participationData.id || "",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      })),
+      images: participationData.images ?? [],
       user: {
-        id: participationData.user?.id || "",
-        name: participationData.user?.name || "",
-        image: participationData.user?.image || null,
+        id: participationData.user?.id ?? "",
+        name: participationData.user?.name ?? "",
+        image: participationData.user?.image ?? null,
       },
       reservation: participationData.reservation && participationData.reservation.opportunitySlot ? {
         id: participationData.reservation.id,
         opportunitySlot: {
           id: participationData.reservation.opportunitySlot.id,
-          capacity: participationData.reservation.opportunitySlot.capacity || 0,
-          startsAt: participationData.reservation.opportunitySlot.startsAt.toString(),
-          endsAt: participationData.reservation.opportunitySlot.endsAt.toString(),
-          hostingStatus: participationData.reservation.opportunitySlot.hostingStatus,
+          capacity: participationData.reservation.opportunitySlot.capacity ?? 0,
+          startsAt: participationData.reservation.opportunitySlot.startsAt?.toString() ?? "",
+          endsAt: participationData.reservation.opportunitySlot.endsAt?.toString() ?? "",
+          hostingStatus: participationData.reservation.opportunitySlot.hostingStatus ?? "",
         },
-        participations: [{
-          id: "",
-          user: {
-            id: "",
-            name: "",
-            image: null
-          }
-        }],
+        participations: [],
       } : undefined,
     },
   };
