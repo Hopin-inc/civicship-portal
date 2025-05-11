@@ -3,8 +3,8 @@
 import { useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLoading } from "@/hooks/core/useLoading";
-import { transformMembershipsToPlaces, calculateTotalPlaces } from "@/presenters/membership";
 import { useGetMembershipListQuery } from "@/types/graphql";
+import { calculateTotalBases, presenterBaseCard } from "@/presenters";
 
 export const usePlaces = () => {
   const { data, loading, error } = useGetMembershipListQuery({
@@ -46,8 +46,8 @@ export const usePlaces = () => {
     [data?.memberships?.edges],
   );
 
-  const places = useMemo(() => transformMembershipsToPlaces(memberships), [memberships]);
-  const totalPlaces = useMemo(() => calculateTotalPlaces(memberships), [memberships]);
+  const places = useMemo(() => presenterBaseCard(memberships), [memberships]);
+  const totalPlaces = useMemo(() => calculateTotalBases(memberships), [memberships]);
 
   return {
     memberships,

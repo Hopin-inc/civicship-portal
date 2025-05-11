@@ -5,23 +5,24 @@ import {
   GqlPublishStatus,
   GqlUser,
 } from "@/types/graphql";
-import { PlaceCard, PlaceDetail, PlacePin } from "@/types/place";
 import { presenterActivityCard, presenterOpportunityHost } from "@/presenters/opportunity";
 import { presenterArticleWithAuthor } from "@/presenters/article";
+import { OpportunityHost } from "@/types/opportunity";
+import { BaseCardInfo, BaseDetail, BasePin } from "@/types/place";
 
-export const presenterPlacePin = (
+export const presenterBasePin = (
   location: GqlMembershipParticipationLocation,
-  hostImage: string | null | undefined,
-): PlacePin => ({
+  host: OpportunityHost,
+): BasePin => ({
   id: location.placeId,
   image: location.placeImage,
-  hostImage: hostImage || "",
+  host,
   latitude: Number(location.latitude),
   longitude: Number(location.longitude),
 });
 
-export const transformMembershipsToPlaces = (memberships: GqlMembership[]): PlaceCard[] => {
-  const places: PlaceCard[] = [];
+export const presenterBaseCard = (memberships: GqlMembership[]): BaseCardInfo[] => {
+  const places: BaseCardInfo[] = [];
   const seen = new Set<string>();
 
   memberships.forEach((membership) => {
@@ -36,7 +37,7 @@ export const transformMembershipsToPlaces = (memberships: GqlMembership[]): Plac
       if (seen.has(location.placeId)) return;
       seen.add(location.placeId);
 
-      const pin = presenterPlacePin(location, host.image);
+      const pin = presenterBasePin(location, host);
 
       places.push({
         ...pin,
@@ -53,14 +54,14 @@ export const transformMembershipsToPlaces = (memberships: GqlMembership[]): Plac
   return places;
 };
 
-export const calculateTotalPlaces = (memberships: GqlMembership[]): number => {
+export const calculateTotalBases = (memberships: GqlMembership[]): number => {
   return memberships.reduce((total, membership) => {
     const hostedCount = membership.participationView?.hosted.geo.length ?? 0;
     return total + hostedCount;
   }, 0);
 };
 
-export const presenterPlaceDetail = (membership: GqlMembership, placeId: string): PlaceDetail => {
+export const presenterBaseDetail = (membership: GqlMembership, placeId: string): BaseDetail => {
   const user = membership.user;
   if (!user) throw new Error("membership.user is required");
 
@@ -68,10 +69,10 @@ export const presenterPlaceDetail = (membership: GqlMembership, placeId: string)
   const hosted = membership.participationView?.hosted;
   const location = hosted?.geo.find((l) => l.placeId === placeId);
   if (!location) {
-    throw new Error(`Place ${placeId} not found in membership.hosted.geo`);
+    throw new Error(`Base ${placeId} not found in membership.hosted.geo`);
   }
 
-  const pin = presenterPlacePin(location, host.image);
+  const pin = presenterBasePin(location, host);
   const opportunities = user.opportunitiesCreatedByMe || [];
   const publicOpportunities = opportunities.filter(
     (o) => o.publishStatus === GqlPublishStatus.Public,

@@ -2,16 +2,23 @@ import { AppImage, Participant } from "@/types/utils";
 import { OpportunityCard } from "@/types/opportunity";
 import { ArticleWithAuthor } from "@/types/article";
 
-export type PlacePin = {
+export type BasePin = {
   id: string;
   image: string; // 拠点の代表画像（例：施設写真）
-  hostImage: string; // 主催者やロゴなどの顔となる画像
+  host: BaseHost;
 
   latitude: number;
   longitude: number;
 };
 
-export type PlaceCard = PlacePin & {
+export type BaseHost = {
+  id: string;
+  name: string;
+  image: string | null;
+  bio: string;
+};
+
+export type BaseCardInfo = BasePin & {
   name: string; // 拠点名
   address: string;
   headline: string; // 強調キャッチコピー（短文）
@@ -21,16 +28,16 @@ export type PlaceCard = PlacePin & {
   participantCount: number;
 };
 
-export type PlaceDetail = PlaceCard & {
+export type BaseDetail = BaseCardInfo & {
   images: string[];
   totalImageCount: number;
 
   currentlyHiringOpportunities: OpportunityCard[];
   relatedArticles: ArticleWithAuthor[];
-  // pastHistories: PlaceHistoryGrouped;
+  // pastHistories: BaseHistoryGrouped;
 };
 
-// export type PlaceHistoryGrouped = HistoryYearGroup[];
+// export type BaseHistoryGrouped = HistoryYearGroup[];
 
 export type HistoryYearGroup = {
   year: string;
@@ -39,10 +46,10 @@ export type HistoryYearGroup = {
 
 export type HistoryMonthGroup = {
   month: string;
-  entries: PlaceHistoryEntry[];
+  entries: BaseHistoryEntry[];
 };
 
-export type PlaceHistoryEntry = {
+export type BaseHistoryEntry = {
   id: string;
   date: string;
   title: string;

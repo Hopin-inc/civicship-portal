@@ -1,33 +1,37 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
-import { MapComponentProps, MarkerData } from '@/types/place';
-import CustomMarker from '@/components/features/places/map/markers/CustomMarker';
-import { useMapState } from '@/hooks/features/place/useMapState';
+import React from "react";
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import CustomMarker from "@/components/features/places/map/markers/CustomMarker";
+import { useMapState } from "@/hooks/features/place/useMapState";
+import { BasePin } from "@/types/place";
 
 const containerStyle = {
-  width: '100%',
-  height: '100%'
+  width: "100%",
+  height: "100%",
 };
 
-/**
- * マップコンポーネント
- * Google Mapsを使用して場所を表示するコンポーネント
- */
-export default function MapComponent({ memberships, selectedPlaceId, onPlaceSelect }: MapComponentProps) {
+interface MapComponentProps {
+  places: BasePin[];
+  selectedPlaceId: string | null;
+  onPlaceSelect: (placeId: string) => void;
+}
+
+export default function MapComponent({
+  places,
+  selectedPlaceId,
+  onPlaceSelect,
+}: MapComponentProps) {
   const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''
+    id: "google-map-script",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
   });
 
-  const {
-    markers,
-    center,
-    map,
-    onLoad,
-    onUnmount,
-  } = useMapState({ memberships, selectedPlaceId, onPlaceSelect });
+  const { markers, center, map, onLoad, onUnmount } = useMapState({
+    places,
+    selectedPlaceId,
+    onPlaceSelect,
+  });
 
   if (!isLoaded) {
     return <></>;
@@ -47,14 +51,14 @@ export default function MapComponent({ memberships, selectedPlaceId, onPlaceSele
         fullscreenControl: false,
       }}
     >
-      {markers.map((marker: MarkerData) => (
+      {markers.map((marker: BasePin) => (
         <CustomMarker
           key={marker.id}
           data={marker}
-          onClick={() => onPlaceSelect?.(marker.placeId)}
-          isSelected={marker.placeId === selectedPlaceId}
+          onClick={() => onPlaceSelect?.(marker.id)}
+          isSelected={marker.id === selectedPlaceId}
         />
       ))}
     </GoogleMap>
   );
-}                
+}
