@@ -3,7 +3,6 @@ import {
   GqlMembership,
   GqlMembershipParticipationLocation,
   GqlPublishStatus,
-  GqlUser,
 } from "@/types/graphql";
 import { presenterActivityCard, presenterOpportunityHost } from "@/presenters/opportunity";
 import { presenterArticleWithAuthor } from "@/presenters/article";
@@ -31,7 +30,6 @@ export const presenterBaseCard = (memberships: GqlMembership[]): BaseCardInfo[] 
 
     const host = presenterOpportunityHost(user);
     const hosted = membership.participationView?.hosted;
-    const publicOpportunityCount = getPublicOpportunityCount(user);
 
     hosted?.geo.forEach((location) => {
       if (seen.has(location.placeId)) return;
@@ -45,8 +43,9 @@ export const presenterBaseCard = (memberships: GqlMembership[]): BaseCardInfo[] 
         address: location.address,
         headline: membership.headline || "",
         bio: membership.bio || "",
-        publicOpportunityCount,
+        publicOpportunityCount: membership.hostOpportunityCount ?? 0,
         participantCount: hosted.totalParticipantCount ?? 0,
+        communityId: membership.community?.id || "",
       });
     });
   });
@@ -97,6 +96,7 @@ export const presenterBaseDetail = (membership: GqlMembership, placeId: string):
     bio: membership.bio || "",
     publicOpportunityCount: publicOpportunities.length,
     participantCount: hosted?.totalParticipantCount ?? 0,
+    communityId: membership.community?.id || "",
 
     images,
     totalImageCount: images.length,
@@ -104,11 +104,4 @@ export const presenterBaseDetail = (membership: GqlMembership, placeId: string):
     currentlyHiringOpportunities,
     relatedArticles,
   };
-};
-
-const getPublicOpportunityCount = (user: GqlUser): number => {
-  return (
-    user?.opportunitiesCreatedByMe?.filter((o) => o.publishStatus === GqlPublishStatus.Public)
-      .length ?? 0
-  );
 };

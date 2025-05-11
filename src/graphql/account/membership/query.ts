@@ -63,14 +63,9 @@ export const GET_MEMBERSHIP_LIST = gql`
               ...HostedGeoFields
             }
           }
+          hostOpportunityCount
           user {
             ...UserFields
-            opportunitiesCreatedByMe {
-              ...OpportunityFields
-              community {
-                ...CommunityFields
-              }
-            }
           }
           community {
             ...CommunityFields

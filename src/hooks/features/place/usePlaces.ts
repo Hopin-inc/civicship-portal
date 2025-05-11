@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useLoading } from "@/hooks/core/useLoading";
 import { useGetMembershipListQuery } from "@/types/graphql";
 import { calculateTotalBases, presenterBaseCard } from "@/presenters/membership";
-import { BaseCardInfo, BasePin } from "@/types/place";
 
 export const usePlaces = () => {
   const { data, loading, error } = useGetMembershipListQuery({
@@ -16,6 +15,7 @@ export const usePlaces = () => {
       },
     },
   });
+  
   const { setIsLoading } = useLoading();
   const router = useRouter();
   const searchParams = useSearchParams();

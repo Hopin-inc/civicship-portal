@@ -1,5 +1,5 @@
 import { AppImage, Participant } from "@/types/utils";
-import { OpportunityCard } from "@/types/opportunity";
+import { ActivityCard, OpportunityCard } from "@/types/opportunity";
 import { ArticleWithAuthor } from "@/types/article";
 
 export type BasePin = {
@@ -26,13 +26,15 @@ export type BaseCardInfo = BasePin & {
 
   publicOpportunityCount: number;
   participantCount: number;
+
+  communityId: string;
 };
 
 export type BaseDetail = BaseCardInfo & {
   images: string[];
   totalImageCount: number;
 
-  currentlyHiringOpportunities: OpportunityCard[];
+  currentlyHiringOpportunities: ActivityCard[];
   relatedArticles: ArticleWithAuthor[];
   // pastHistories: BaseHistoryGrouped;
 };

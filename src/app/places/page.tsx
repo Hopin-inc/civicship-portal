@@ -27,7 +27,6 @@ export default function PlacesPage() {
         <PlaceMapView
           selectedPlaceId={selectedPlaceId}
           onPlaceSelect={handlePlaceSelect}
-          // onClose={handleClose}
           toggleMode={toggleMode}
           places={places}
         />

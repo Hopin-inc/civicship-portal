@@ -41,7 +41,7 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
 
       let closestCard: HTMLElement | null = null;
       let minDistance = Infinity;
-      
+
       const cards = Array.from(container.querySelectorAll("[data-place-id]")) as HTMLElement[];
 
       for (const card of cards) {
@@ -132,9 +132,7 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
                       </span>
                     )}
                   </div>
-                  <Button variant="primary" size="sm" className="py-2 px-6 rounded-lg text-sm">
-                    もっと見る
-                  </Button>
+                  <Button>もっと見る</Button>
                 </div>
               </div>
             </motion.div>

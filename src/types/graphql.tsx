@@ -370,6 +370,7 @@ export type GqlMembership = {
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   headline?: Maybe<Scalars["String"]["output"]>;
   histories?: Maybe<Array<GqlMembershipHistory>>;
+  hostOpportunityCount?: Maybe<Scalars["Int"]["output"]>;
   participationView?: Maybe<GqlMembershipParticipationView>;
   reason: GqlMembershipStatusReason;
   role: GqlRole;
@@ -2387,6 +2388,7 @@ export type GqlGetMembershipListQuery = {
       cursor: string;
       node?: {
         __typename?: "Membership";
+        hostOpportunityCount?: number | null;
         headline?: string | null;
         bio?: string | null;
         role: GqlRole;
@@ -2415,22 +2417,6 @@ export type GqlGetMembershipListQuery = {
           image?: string | null;
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
-          opportunitiesCreatedByMe?: Array<{
-            __typename?: "Opportunity";
-            id: string;
-            title: string;
-            description: string;
-            body?: string | null;
-            images?: Array<string> | null;
-            category: GqlOpportunityCategory;
-            publishStatus: GqlPublishStatus;
-            isReservableWithTicket?: boolean | null;
-            requireApproval: boolean;
-            feeRequired?: number | null;
-            pointsToEarn?: number | null;
-            earliestReservableAt?: Date | null;
-            community?: { __typename?: "Community"; id: string } | null;
-          }> | null;
         } | null;
         community?: { __typename?: "Community"; id: string } | null;
       } | null;
@@ -4264,14 +4250,9 @@ export const GetMembershipListDocument = gql`
               ...HostedGeoFields
             }
           }
+          hostOpportunityCount
           user {
             ...UserFields
-            opportunitiesCreatedByMe {
-              ...OpportunityFields
-              community {
-                ...CommunityFields
-              }
-            }
           }
           community {
             ...CommunityFields
@@ -4283,7 +4264,6 @@ export const GetMembershipListDocument = gql`
   ${MembershipFieldsFragmentDoc}
   ${HostedGeoFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
-  ${OpportunityFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
 

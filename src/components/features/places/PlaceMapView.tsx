@@ -21,14 +21,9 @@ interface PlaceMapViewProps {
 const PlaceMapView: React.FC<PlaceMapViewProps> = ({
   selectedPlaceId,
   onPlaceSelect,
-  // onClose,
   toggleMode,
   places,
 }) => {
-  const handlePlaceSelect = (placeId: string) => {
-    console.log("Selected:", placeId);
-  };
-
   return (
     <div className="relative h-full w-full">
       <MapComponent

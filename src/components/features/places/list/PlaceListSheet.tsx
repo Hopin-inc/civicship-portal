@@ -18,14 +18,12 @@ export const PlaceListPage: React.FC<PlaceListSheetProps> = ({
 }) => {
   const router = useRouter();
 
-  const handlePlaceClick = (placeId: string, userId: string) => {
+  const handlePlaceClick = (placeId: string, userId: string, communityId: string) => {
     router.push(`/places/${placeId}?userId=${userId}`);
   };
 
   return (
     <div className="min-h-screen w-full px-6 pt-16 pb-24 max-w-lg mx-auto">
-      <h1 className="text-xl font-bold mb-4 text-center">拠点一覧</h1>
-
       <div className="grid gap-4">
         {places
           .filter((place) => !selectedPlaceId || place.id === selectedPlaceId)
