@@ -99,12 +99,12 @@ const HeaderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     if (!pathname) return;
     
     const pageType = getPageType(pathname);
-    const lastUrl = lastVisitedUrls[pageType];
+    const currentLastUrl = lastVisitedUrls[pageType];
     
-    if (lastUrl !== pathname) {
+    if (currentLastUrl !== pathname) {
       addToHistory(pageType, pathname);
     }
-  }, [pathname, getPageType, addToHistory, lastVisitedUrls]);
+  }, [pathname, getPageType, addToHistory]);
 
   const contextValue = useMemo(() => ({
     config, 
