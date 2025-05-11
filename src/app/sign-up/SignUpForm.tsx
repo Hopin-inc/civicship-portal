@@ -13,9 +13,8 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { GqlCurrentPrefecture, GqlIdentityPlatform } from '@/types/graphql';
+import { GqlCurrentPrefecture } from '@/types/graphql';
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 
@@ -41,7 +40,7 @@ export function SignUpForm() {
   const router = useRouter();
   const { createUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -85,9 +84,9 @@ export function SignUpForm() {
               <FormItem className="space-y-3">
                 <FormLabel className="text-base">表示名</FormLabel>
                 <FormControl>
-                  <Input 
-                    placeholder="名前を入力" 
-                    {...field} 
+                  <Input
+                    placeholder="名前を入力"
+                    {...field}
                     className="h-12"
                   />
                 </FormControl>
@@ -140,8 +139,8 @@ export function SignUpForm() {
             )}
           />
 
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full h-12 text-base"
             disabled={isLoading}
           >
