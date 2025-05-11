@@ -22,6 +22,10 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const pathname = usePathname();
 
+  if (config.hideHeader) {
+    return null;
+  }
+
   const shouldShowBackButton = config.showBackButton && pathname !== '/';
 
   return (

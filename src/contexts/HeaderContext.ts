@@ -12,6 +12,7 @@ export interface HeaderConfig {
   showSearchForm?: boolean;
   action?: React.ReactNode;
   backTo?: string; // 戻るボタンのカスタム遷移先
+  hideHeader?: boolean; // ヘッダー全体を非表示にする
   searchParams?: {
     location?: string;
     from?: string;

@@ -10,6 +10,7 @@ export interface HeaderConfig {
   showSearchForm?: boolean;
   action?: React.ReactNode;
   backTo?: string;
+  hideHeader?: boolean; // ヘッダー全体を非表示にする
   searchParams?: {
     location?: string;
     from?: string;
@@ -33,6 +34,7 @@ const defaultConfig: HeaderConfig = {
   showSearchForm: false,
   action: undefined,
   backTo: undefined,
+  hideHeader: false,
   searchParams: undefined,
 };
 

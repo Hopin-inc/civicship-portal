@@ -35,8 +35,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
   const { navigateBack } = useHierarchicalNavigation();
   
   const headerConfig = useMemo(() => ({
-    showBackButton: false,
-    showLogo: false,
+    hideHeader: true, // ヘッダー全体を非表示
   }), []);
   useHeaderConfig(headerConfig);
   
