@@ -1,7 +1,12 @@
 'use client';
 
 import type { GqlGetParticipationQuery } from '@/types/graphql';
-import { GqlParticipation, GqlOpportunityCategory } from '@/types/graphql';
+import { 
+  GqlParticipation, 
+  GqlOpportunityCategory, 
+  GqlParticipationStatus, 
+  GqlParticipationStatusReason 
+} from '@/types/graphql';
 import { 
   ParticipationDetail, 
   ActivityParticipation, 
@@ -10,11 +15,7 @@ import {
   Participation,
   Opportunity
 } from "@/types/participation";
-import { 
-  ParticipationStatus, 
-  ParticipationStatusReason, 
-  ReservationStatus 
-} from "@/types/participationStatus";
+import { ReservationStatus } from "@/types/participationStatus";
 import { presenterOpportunityHost } from "@/presenters/opportunity";
 import { presenterPlace } from "@/presenters/place";
 
@@ -136,19 +137,19 @@ export const transformOpportunity = (opportunityData: OpportunityData | undefine
     id: opportunityData.id,
     title: opportunityData.title,
     description: opportunityData.description || "",
-    type: opportunityData.category === 'EVENT' ? 'EVENT' : 'QUEST',
+    type: opportunityData.category,
     status: opportunityData.publishStatus === 'PUBLIC' ? 'open' : (opportunityData.publishStatus === 'COMMUNITY_INTERNAL' ? 'in_progress' : 'closed'),
     communityId: opportunityData.community?.id || "",
     hostId: opportunityData.createdByUser?.id || "",
-    startsAt: opportunityData.slots?.edges?.[0]?.node?.startsAt || new Date(),
-    endsAt: opportunityData.slots?.edges?.[0]?.node?.endsAt || new Date(),
-    createdAt: opportunityData.createdAt,
-    updatedAt: opportunityData.updatedAt || new Date(),
+    startsAt: new Date(),
+    endsAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     host: {
       name: opportunityData.createdByUser?.name || "",
       image: opportunityData.createdByUser?.image || null,
-      title: "",
-      bio: "",
+      title: opportunityData.createdByUser?.headline || "",
+      bio: opportunityData.createdByUser?.bio || "",
     },
     images: opportunityData.images || [],
     location: {
@@ -161,24 +162,20 @@ export const transformOpportunity = (opportunityData: OpportunityData | undefine
     community: opportunityData.community ? {
       id: opportunityData.community.id,
       title: opportunityData.community.name || "",
-      description: "",
+      description: opportunityData.community.bio || "",
       icon: opportunityData.community.image || "",
     } : undefined,
     recommendedFor: [],
-    capacity: opportunityData.capacity || 0,
+    capacity: 0,
     pointsForComplete: opportunityData.pointsToEarn || undefined,
-    participants: opportunityData.slots?.edges?.[0]?.node?.participations?.edges?.map((edge: any) => ({
-      id: edge?.node?.user?.id || "",
-      name: edge?.node?.user?.name || "",
-      image: edge?.node?.user?.image || null,
-    })) || [],
+    participants: [],
     body: opportunityData.body || undefined,
     createdByUser: opportunityData.createdByUser ? {
       id: opportunityData.createdByUser.id,
       name: opportunityData.createdByUser.name || "",
       image: opportunityData.createdByUser.image || null,
-      articlesAboutMe: undefined,
-      opportunitiesCreatedByMe: undefined
+      articlesAboutMe: [],
+      opportunitiesCreatedByMe: [],
     } : undefined,
     place: opportunityData.place ? {
       name: opportunityData.place.name || "",
@@ -189,28 +186,9 @@ export const transformOpportunity = (opportunityData: OpportunityData | undefine
     requireApproval: opportunityData.requireApproval || undefined,
     pointsRequired: opportunityData.pointsToEarn || undefined,
     feeRequired: opportunityData.feeRequired || undefined,
-    slots: opportunityData.slots ? {
-      edges: opportunityData.slots.edges?.map((edge: any) => ({
-        node: {
-          id: edge?.node?.id || "",
-          startsAt: edge?.node?.startsAt || "",
-          endsAt: edge?.node?.endsAt || "",
-          participations: edge?.node?.participations ? {
-            edges: edge.node.participations.edges?.map((pEdge: any) => ({
-              node: {
-                id: pEdge?.node?.id || "",
-                status: pEdge?.node?.status || "",
-                user: {
-                  id: pEdge?.node?.user?.id || "",
-                  name: pEdge?.node?.user?.name || "",
-                  image: pEdge?.node?.user?.image || null,
-                },
-              },
-            })) || [],
-          } : undefined,
-        },
-      })) || [],
-    } : undefined,
+    slots: {
+      edges: [],
+    },
   };
 };
 
@@ -240,11 +218,18 @@ export const transformParticipation = (participationData: GqlGetParticipationQue
         opportunitySlot: {
           id: participationData.reservation.opportunitySlot.id,
           capacity: participationData.reservation.opportunitySlot.capacity || 0,
-          startsAt: participationData.reservation.opportunitySlot.startsAt,
-          endsAt: participationData.reservation.opportunitySlot.endsAt,
+          startsAt: participationData.reservation.opportunitySlot.startsAt.toString(),
+          endsAt: participationData.reservation.opportunitySlot.endsAt.toString(),
           hostingStatus: participationData.reservation.opportunitySlot.hostingStatus,
         },
-        participations: [],
+        participations: [{
+          id: "",
+          user: {
+            id: "",
+            name: "",
+            image: null
+          }
+        }],
       } : undefined,
     },
   };
