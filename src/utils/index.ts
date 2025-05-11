@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-export const COMMUNITY_ID = "neo88"
+export const COMMUNITY_ID = "neo88";
 
 type Name = {
   lastName: string;
@@ -24,12 +24,12 @@ export const displayDuration = (start: Date | string, end: Date | string) => {
   const dStart = dayjs(start);
   const dEnd = dayjs(end);
   if (dStart.isSame(dEnd, "date")) {
-    return `${ dStart.format("YYYY-MM-DD HH:mm") } 〜 ${ dEnd.format("HH:mm") }`;
+    return `${dStart.format("YYYY-MM-DD HH:mm")} 〜 ${dEnd.format("HH:mm")}`;
   } else {
-    return `${ dStart.format("YYYY-MM-DD HH:mm") } 〜 ${ dEnd.format("YYYY-MM-DD HH:mm") }`;
+    return `${dStart.format("YYYY-MM-DD HH:mm")} 〜 ${dEnd.format("YYYY-MM-DD HH:mm")}`;
   }
 };
 
 export const wait = async (seconds: number) => {
-  return new Promise(resolve => setTimeout(resolve, 1_000 * seconds));
-}
+  return new Promise((resolve) => setTimeout(resolve, 1_000 * seconds));
+};

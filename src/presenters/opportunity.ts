@@ -1,17 +1,27 @@
-'use client';
+"use client";
 
 import {
   GqlArticle,
   GqlOpportunity,
-  GqlOpportunityCategory, GqlOpportunityEdge, GqlOpportunitySlot, GqlPlace, GqlUser,
+  GqlOpportunityCategory,
+  GqlOpportunityEdge,
+  GqlOpportunitySlot,
+  GqlPlace,
+  GqlUser,
   Maybe,
 } from "@/types/graphql";
-import { ActivityCard, ActivityDetail, OpportunityHost, OpportunityPlace } from "@/types/opportunity";
+import {
+  ActivityCard,
+  ActivityDetail,
+  OpportunityHost,
+  OpportunityPlace,
+} from "@/types/opportunity";
 import { presenterArticleCard } from "@/presenters/article";
 import { ActivitySlot } from "@/types/opportunitySlot";
+import { presenterPlace } from "@/presenters/place";
 
 export const presenterActivityCards = (
-  edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined
+  edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
 ): ActivityCard[] => {
   if (!edges) return [];
 
@@ -21,19 +31,19 @@ export const presenterActivityCards = (
     .map((node) => presenterActivityCard(node));
 };
 
-export const presenterActivityCard = (node: GqlOpportunity ): ActivityCard => ({
+export const presenterActivityCard = (node: GqlOpportunity): ActivityCard => ({
   id: node?.id || "",
   title: node?.title || "",
   category: node?.category || GqlOpportunityCategory.Activity,
   feeRequired: node?.feeRequired || 0,
-  location: node?.place?.name || '場所未定',
+  location: node?.place?.name || "場所未定",
   images: node?.images || [],
-  communityId: node?.community?.id || '',
+  communityId: node?.community?.id || "",
   hasReservableTicket: node?.isReservableWithTicket || false,
 });
 
-export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail=> {
-  const {images, place, slots, articles, createdByUser, ...prop} = data;
+export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail => {
+  const { images, place, slots, articles, createdByUser, ...prop } = data;
 
   return {
     communityId: data.community?.id || "",
@@ -47,7 +57,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail=> 
     totalImageCount: images?.length || 0,
 
     requiredApproval: data.requireApproval,
-    requiredTicket: data.requiredUtilities?.map((u)=> u) || [],
+    requiredTicket: data.requiredUtilities?.map((u) => u) || [],
     feeRequired: data.feeRequired || 0,
 
     place: presenterPlace(place),
@@ -60,41 +70,34 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail=> 
   };
 };
 
-function presenterPlace(place?: Maybe<GqlPlace>): OpportunityPlace {
-  return {
-    id: place?.id || "",
-    name: place?.name || "",
-    description: "",
-    address: place?.address || "",
-    latitude: place?.latitude ?? undefined,
-    longitude: place?.longitude ?? undefined,
-  }
-}
-
-function presenterOpportunityHost(host?: Maybe<GqlUser> | undefined, interview?: GqlArticle): OpportunityHost {
+export function presenterOpportunityHost(
+  host?: Maybe<GqlUser> | undefined,
+  interview?: GqlArticle,
+): OpportunityHost {
   return {
     id: host?.id || "",
     name: host?.name || "",
     image: host?.image || "",
     bio: host?.bio || "",
-    interview: presenterArticleCard(interview)
-  }
+    interview: presenterArticleCard(interview),
+  };
 }
 
-function presenterActivitySlot(slots:  Maybe<GqlOpportunitySlot[]> | undefined, feeRequired?: Maybe<number> | undefined ): ActivitySlot[] {
+function presenterActivitySlot(
+  slots: Maybe<GqlOpportunitySlot[]> | undefined,
+  feeRequired?: Maybe<number> | undefined,
+): ActivitySlot[] {
   return (
-    slots?.map((slot): ActivitySlot => ({
-      id: slot?.id,
-      hostingStatus: slot?.hostingStatus,
-      startsAt: slot?.startsAt
-        ? new Date(slot.startsAt).toISOString()
-        : "",
-      endsAt: slot?.endsAt
-        ? new Date(slot.endsAt).toISOString()
-        : "",
-      capacity: slot?.capacity ?? 0,
-      remainingCapacity: slot?.remainingCapacity ?? 0,
-      feeRequired: feeRequired ?? null,
-    })) ?? []
+    slots?.map(
+      (slot): ActivitySlot => ({
+        id: slot?.id,
+        hostingStatus: slot?.hostingStatus,
+        startsAt: slot?.startsAt ? new Date(slot.startsAt).toISOString() : "",
+        endsAt: slot?.endsAt ? new Date(slot.endsAt).toISOString() : "",
+        capacity: slot?.capacity ?? 0,
+        remainingCapacity: slot?.remainingCapacity ?? 0,
+        feeRequired: feeRequired ?? null,
+      }),
+    ) ?? []
   );
 }

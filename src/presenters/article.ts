@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
 import { GqlArticle, GqlArticleCategory, GqlArticleEdge, GqlUser, Maybe } from "@/types/graphql";
-import { ArticleCard, ArticleDetail, ArticleRelatedUser } from "@/types/article";
+import { ArticleCard, ArticleDetail, ArticleRelatedUser, ArticleWithAuthor } from "@/types/article";
 
 export const presenterArticleCards = (
-  edges?: (GqlArticleEdge | null | undefined)[]
+  edges?: (GqlArticleEdge | null | undefined)[],
 ): ArticleCard[] => {
   return (edges ?? [])
-    .map(edge => edge?.node)
+    .map((edge) => edge?.node)
     .filter((node): node is GqlArticle => !!node)
     .map(presenterArticleCard);
 };
@@ -18,9 +18,15 @@ export const presenterArticleCard = (node?: GqlArticle): ArticleCard => ({
   title: node?.title || "",
   introduction: node?.introduction || "",
   thumbnail: node?.thumbnail || null,
-  publishedAt: node?.publishedAt
-    ? new Date(node.publishedAt).toISOString()
-    : "",
+  publishedAt: node?.publishedAt ? new Date(node.publishedAt).toISOString() : "",
+});
+
+export const presenterArticleWithAuthor = (node?: GqlArticle): ArticleWithAuthor => ({
+  ...presenterArticleCard(node),
+  author: {
+    name: node?.authors?.[0]?.name || "",
+    image: node?.authors?.[0]?.image || "",
+  },
 });
 
 export const presenterArticleDetail = (article: GqlArticle): ArticleDetail => {
@@ -32,16 +38,14 @@ export const presenterArticleDetail = (article: GqlArticle): ArticleDetail => {
     body: article.body || "",
 
     thumbnail: typeof article.thumbnail === "string" ? article.thumbnail : "",
-    publishedAt: article.publishedAt
-      ? new Date(article.publishedAt).toISOString()
-      : "",
+    publishedAt: article.publishedAt ? new Date(article.publishedAt).toISOString() : "",
 
     authors: article.authors?.map(presenterUser) || [],
     relatedUsers: article.relatedUsers?.map(presenterUser) || [],
 
     hostedOpportunitiesByAuthors: [],
     relatedArticles: [],
-  }
+  };
 };
 
 function presenterUser(host?: Maybe<GqlUser> | undefined): ArticleRelatedUser {
@@ -50,5 +54,5 @@ function presenterUser(host?: Maybe<GqlUser> | undefined): ArticleRelatedUser {
     name: host?.name || "",
     image: host?.image || "",
     bio: host?.bio || "",
-  }
+  };
 }
