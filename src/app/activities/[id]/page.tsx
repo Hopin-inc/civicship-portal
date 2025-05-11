@@ -5,8 +5,12 @@ import ActivityDetailsHeader from "@/components/features/activity/ActivityDetail
 import ActivityDetailsContent from "@/components/features/activity/ActivityDetailsContent";
 import ActivityDetailsFooter from "@/components/features/activity/ActivityDetailsFooter";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useLoading } from "@/hooks/core/useLoading";
+import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
+import { useHierarchicalNavigation } from "@/hooks/core/useHierarchicalNavigation";
+import { ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ActivityPageProps {
   params: {
@@ -28,6 +32,13 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
   } = useActivityDetails({ id: params.id });
   
   const { setIsLoading } = useLoading();
+  const { navigateBack } = useHierarchicalNavigation();
+  
+  const headerConfig = useMemo(() => ({
+    showBackButton: false,
+    showLogo: false,
+  }), []);
+  useHeaderConfig(headerConfig);
   
   useEffect(() => {
     setIsLoading(loading);
@@ -38,6 +49,19 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
 
   return (
     <>
+      {/* フローティングアクションボタン（戻るボタン） */}
+      <div className="fixed top-4 left-4 z-50">
+        <Button
+          onClick={navigateBack}
+          variant="secondary"
+          size="icon"
+          className="rounded-full shadow-md"
+          aria-label="戻る"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
+      </div>
+      
       <main className="min-h-screen pb-24">
         <div className="max-w-7xl mx-auto px-4">
           <ActivityDetailsHeader 
