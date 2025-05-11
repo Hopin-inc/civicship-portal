@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useOpportunity } from '@/hooks/features/activity/useOpportunity';
 import { useSimilarOpportunities } from '@/hooks/features/activity/useSimilarOpportunities';
-import { useHeader } from '@/contexts/HeaderContext';
+import { useHeader } from '@/components/providers/HeaderProvider';
 
 /**
  * Custom hook for managing reservation complete page data and state
