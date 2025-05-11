@@ -22,28 +22,28 @@ interface ActivityPageProps {
 }
 
 export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
-  const { 
-    opportunity, 
-    similarOpportunities, 
-    availableTickets, 
+  const {
+    opportunity,
+    similarOpportunities,
+    availableTickets,
     availableDates,
-    loading, 
-    error 
+    loading,
+    error
   } = useActivityDetails({ id: params.id });
-  
+
   const { setIsLoading } = useLoading();
   const { navigateBack } = useHierarchicalNavigation();
-  
+
   const headerConfig = useMemo(() => ({
     hideHeader: true, // ヘッダー全体を非表示
   }), []);
   useHeaderConfig(headerConfig);
-  
+
   useEffect(() => {
     setIsLoading(loading);
   }, [loading, setIsLoading]);
 
-  if (error) return <ErrorState message={`Error: ${error.message}`} />;
+  if (error && !opportunity) return <ErrorState message={`Error: ${error.message}`} />;
   if (!opportunity) return <ErrorState message="No opportunity found" />;
 
   return (
@@ -60,15 +60,15 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
           <ChevronLeft className="h-5 w-5" />
         </Button>
       </div>
-      
+
       <main className="min-h-screen pb-24">
         <div className="max-w-7xl mx-auto px-4">
-          <ActivityDetailsHeader 
-            opportunity={opportunity} 
-            availableTickets={availableTickets} 
+          <ActivityDetailsHeader
+            opportunity={opportunity}
+            availableTickets={availableTickets}
           />
-          
-          <ActivityDetailsContent 
+
+          <ActivityDetailsContent
             opportunity={opportunity}
             availableTickets={availableTickets}
             availableDates={availableDates}
@@ -78,9 +78,9 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
         </div>
       </main>
 
-      <ActivityDetailsFooter 
-        opportunityId={opportunity.id} 
-        price={opportunity.feeRequired || 0} 
+      <ActivityDetailsFooter
+        opportunityId={opportunity.id}
+        price={opportunity.feeRequired || 0}
       />
     </>
   );
