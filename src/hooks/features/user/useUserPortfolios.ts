@@ -1,113 +1,61 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import {  useEffect, useMemo } from "react";
 import { useLoading } from '@/hooks/core/useLoading';
-import { toast } from 'sonner';
-import { useUserPortfolioQuery, GqlPortfolio } from './useUserPortfolioQuery';
+import { useUserPortfolioQuery } from './useUserPortfolioQuery';
 import { useUserOpportunities } from './useUserOpportunities';
-import { Portfolio, transformPortfolio } from '@/presenters/portfolio';
-import { GqlSortDirection } from '@/types/graphql';
-import { useInfiniteScroll } from '@/hooks/core/useInfiniteScroll';
+import { Portfolio, PortfolioCategory, ReservationStatus } from "@/presenters/portfolio";
+import { GqlReservationStatus } from "@/types/graphql";
 
-/**
- * Custom hook for fetching and managing user portfolios
- * @param userId User ID to fetch portfolios for
- */
 export const useUserPortfolios = (userId: string) => {
   const { setIsLoading } = useLoading();
-  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  
-  const { data, loading, error, fetchMore } = useUserPortfolioQuery(userId);
-  
+  const { data, loading, error } = useUserPortfolioQuery(userId);
+
   useEffect(() => {
     setIsLoading(loading);
   }, [loading, setIsLoading]);
 
-  useEffect(() => {
-    if (data?.user?.portfolios?.edges) {
-      const initialPortfolios = data.user.portfolios.edges
-        .map((edge: any) => edge?.node)
-        .filter((node: any): node is GqlPortfolio => node != null)
-        .map(transformPortfolio);
-      
-      setPortfolios(initialPortfolios);
-      setHasMore(data.user.portfolios.pageInfo.hasNextPage);
-    }
+  const activeOpportunities = useUserOpportunities(data);
+
+  const mapReservationStatus = (status: GqlReservationStatus | null | undefined): ReservationStatus | null => {
+    if (!status) return null;
+    return status.toLowerCase() as ReservationStatus;
+  };
+
+  const portfolios: Portfolio[] = useMemo(() => {
+    if (!data?.user?.portfolios) return [];
+
+    return data.user.portfolios.map((p): Portfolio => ({
+      id: p.id,
+      title: p.title,
+      date: new Date(p.date).toISOString(),
+      category: p.category as PortfolioCategory,
+      type:
+        p.source === "OPPORTUNITY"
+          ? "opportunity"
+          : p.source === "ARTICLE"
+            ? "activity_report"
+            : "quest",
+      location: p.place?.name ?? null,
+      image: p.thumbnailUrl ?? null,
+      reservationStatus: mapReservationStatus(p.reservationStatus),
+      participants: (p.participants ?? []).map((participant) => ({
+        id: participant.id,
+        name: participant.name,
+        image: participant.image ?? null,
+      }))
+    }));
   }, [data]);
 
-  const loadMore = useCallback(async () => {
-    if (!hasMore || isLoadingMore) {
-      return;
-    }
-
-    setIsLoadingMore(true);
-    const lastPortfolio = portfolios[portfolios.length - 1];
-    const lastCursor = data?.user?.portfolios?.edges?.find(
-      (edge: any) => edge?.node?.id === lastPortfolio.id
-    )?.cursor;
-
-    try {
-      const { data: moreData } = await fetchMore({
-        variables: {
-          id: userId,
-          first: 30,
-          after: lastCursor,
-          filter: null,
-          sort: { date: GqlSortDirection.Desc }
-        }
-      });
-
-      if (moreData?.user?.portfolios?.edges) {
-        const newPortfolios = moreData.user.portfolios.edges
-          .map((edge: any) => edge?.node)
-          .filter((node: any): node is GqlPortfolio => node != null)
-          .map(transformPortfolio);
-
-        setPortfolios(prev => [...prev, ...newPortfolios]);
-        
-        const newHasMore = moreData.user.portfolios.pageInfo.hasNextPage;
-        setHasMore(newHasMore);
-      }
-    } catch (error) {
-      console.error('Error loading more portfolios:', error);
-      toast.error('ポートフォリオの読み込みに失敗しました');
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [fetchMore, hasMore, isLoadingMore, userId, portfolios, data]);
-
-  const lastPortfolioRef = useInfiniteScroll({
-    hasMore,
-    isLoading: isLoadingMore,
-    onLoadMore: loadMore
-  });
-
-  const handleError = useCallback(() => {
-    if (error) {
-      console.error('Error fetching user portfolios:', error);
-      toast.error('ポートフォリオの取得に失敗しました');
-    }
-  }, [error]);
-
-  useEffect(() => {
-    handleError();
-  }, [handleError]);
-
-  const activeOpportunities = useUserOpportunities(data);
 
   return {
     portfolios,
     isLoading: loading,
-    isLoadingMore,
-    hasMore,
     error,
-    lastPortfolioRef,
-    loadMore,
     activeOpportunities,
     userData: data?.user
   };
 };
+
 
 export default useUserPortfolios;

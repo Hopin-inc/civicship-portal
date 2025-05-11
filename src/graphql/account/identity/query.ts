@@ -7,7 +7,10 @@ export const GET_CURRENT_USER = gql(`
         id
         name
         memberships {
-          id
+          user {
+            id
+            name
+          }
           community {
             id
             name

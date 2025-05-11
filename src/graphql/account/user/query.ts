@@ -39,33 +39,17 @@ export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = gql(`
     $id: ID!,
   ) {
     user(id: $id) {
-      id
-      name
-      image
-      bio
-      sysRole
-      currentPrefecture
-      urlFacebook
-      urlInstagram
-      urlWebsite
-      urlX
-      urlYoutube
+      ...UserFields
       opportunitiesCreatedByMe{
-        id
-        title
-        description
-        images
+        ...OpportunityFields
         community {
           id
           name
           image
         }
         place {
-          id
-          name
+          ...PlaceFields
         }
-        feeRequired
-        isReservableWithTicket
       }
       portfolios {
         id
@@ -76,8 +60,7 @@ export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = gql(`
         source
         reservationStatus
         place {
-          id
-          name
+          ...PlaceFields
         }
         participants {
           id

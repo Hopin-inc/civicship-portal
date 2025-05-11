@@ -27,7 +27,7 @@ export const useUserProfileController = (userId?: string, authUserId?: string) =
     setIsOwner(isMe || authUserId === userId);
   }, [authUserId, userId, isMe]);
   
-  const profileData = formatUserProfileData(data);
+  const profileData = formatUserProfileData(data?.user);
   
   const handleError = useCallback(() => {
     if (error) {

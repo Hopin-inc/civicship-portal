@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/features/user/useUserProfile";
 import { useUserPortfolios } from "@/hooks/features/user/useUserPortfolios";
@@ -8,8 +8,11 @@ import { UserProfileSection } from "@/components/features/user/UserProfileSectio
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
+import { UserPortfolioList } from "@/components/features/user/UserPortfolioList";
 
 export default function UserPage({ params }: { params: { id: string } }) {
+  const lastPortfolioRef = useRef<HTMLDivElement>(null);
+
   const headerConfig = useMemo(() => ({
     title: "ユーザープロフィール",
     showBackButton: true,
@@ -30,9 +33,6 @@ export default function UserPage({ params }: { params: { id: string } }) {
     portfolios,
     isLoading: portfoliosLoading,
     error: portfoliosError,
-    hasMore,
-    isLoadingMore,
-    lastPortfolioRef,
     activeOpportunities
   } = useUserPortfolios(params.id);
 
@@ -73,6 +73,18 @@ export default function UserPage({ params }: { params: { id: string } }) {
         profileData={profileData}
         isOwner={isOwner}
       />
+
+      <UserPortfolioList
+        userId={params.id}
+        isOwner={isOwner}
+        portfolios={portfolios}
+        isLoadingMore={false} // ← 常に false で OK
+        hasMore={false}       // ← 常に false で OK
+        lastPortfolioRef={lastPortfolioRef}
+        isSysAdmin={false}    // ← 管理者権限に応じて true に
+        activeOpportunities={activeOpportunities}
+      />
     </div>
   );
+
 }

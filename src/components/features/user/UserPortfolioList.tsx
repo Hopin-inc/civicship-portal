@@ -1,13 +1,12 @@
-import { History, Plus, Calendar, MapPin } from "lucide-react";
+import { History, Calendar, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import EmptyState from "@/components/shared/EmptyState";
-import { format } from "date-fns";
 import { RefObject } from "react";
-import type { Portfolio, PortfolioCategory, PortfolioStyle, ReservationStatus } from "@/types";
-import { PORTFOLIO_CATEGORY_STYLES } from "@/types";
 import { ParticipantsList } from "@/components/shared/ParticipantsList";
-import OpportunityCard, { OpportunityCardProps } from "@/components/features/opportunity/OpportunityCard";
+import OpportunityCard from "@/components/features/opportunity/OpportunityCard";
+import { Portfolio, PortfolioCategory, ReservationStatus } from "@/presenters";
+import { ActivityCard } from "@/types/opportunity";
 
 
 type Props = {
@@ -18,10 +17,29 @@ type Props = {
   hasMore: boolean;
   lastPortfolioRef: RefObject<HTMLDivElement>;
   isSysAdmin?: boolean;
-  activeOpportunities?: OpportunityCardProps[];
+  activeOpportunities?: ActivityCard[];
 };
 
-const ActiveOpportunities = ({ opportunities }: { opportunities: OpportunityCardProps[] }) => {
+const getCategoryLabel = (category: PortfolioCategory, source?: string, reservationStatus?: ReservationStatus | null): string | undefined => {
+  if (source === 'OPPORTUNITY' && reservationStatus) {
+    switch (reservationStatus) {
+      // case 'APPLIED':
+      //   return '予約承認待ち';
+      // case 'ACCEPTED':
+      //   return '予約確定';
+      // case 'REJECTED':
+      //   return '非承認';
+      case 'CANCELED':
+        return 'キャンセル';
+      default:
+        return 'オポテュニティ';
+    }
+  }
+
+  return undefined;
+};
+
+const ActiveOpportunities = ({ opportunities }: { opportunities: ActivityCard[] }) => {
   if (opportunities.length === 0) return null;
 
   return (
@@ -47,60 +65,12 @@ const ActiveOpportunities = ({ opportunities }: { opportunities: OpportunityCard
   );
 };
 
-const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }: { 
+export const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }: {
   portfolios: Portfolio[];
   isLoadingMore: boolean;
   hasMore: boolean;
   lastPortfolioRef: RefObject<HTMLDivElement>;
 }) => {
-  const getCategoryStyle = (category: PortfolioCategory, source?: string, reservationStatus?: ReservationStatus | null): PortfolioStyle => {
-    if (source === 'OPPORTUNITY' && reservationStatus) {
-      switch (reservationStatus) {
-        case 'APPLIED':
-          return { bg: 'hsl(var(--status-pending) / 0.1)', text: 'hsl(var(--status-pending))' }; // 黄色
-        case 'ACCEPTED':
-          return { bg: 'hsl(var(--status-approved) / 0.1)', text: 'hsl(var(--status-approved))' }; // 青色
-        case 'REJECTED':
-          return { bg: 'hsl(var(--status-rejected) / 0.1)', text: 'hsl(var(--status-rejected))' }; // 赤色
-        case 'CANCELED':
-          return { bg: 'hsl(var(--status-cancelled) / 0.1)', text: 'hsl(var(--status-cancelled))' }; // グレー
-        default:
-          return { bg: 'hsl(var(--muted))', text: 'hsl(var(--muted-foreground))' };
-      }
-    }
-    return PORTFOLIO_CATEGORY_STYLES[category] ?? { bg: 'hsl(var(--muted))', text: 'hsl(var(--muted-foreground))' };
-  };
-
-  const getCategoryLabel = (category: PortfolioCategory, source?: string, reservationStatus?: ReservationStatus | null): string => {
-    if (source === 'OPPORTUNITY' && reservationStatus) {
-      switch (reservationStatus) {
-        case 'APPLIED':
-          return '予約承認待ち';
-        case 'ACCEPTED':
-          return '予約確定';
-        case 'REJECTED':
-          return '非承認';
-        case 'CANCELED':
-          return 'キャンセル';
-        default:
-          return 'オポテュニティ';
-      }
-    }
-
-    switch (category) {
-      case 'QUEST':
-        return 'クエスト';
-      case 'ACTIVITY_REPORT':
-        return '活動報告';
-      case 'INTERVIEW':
-        return '記事';
-      case 'OPPORTUNITY':
-        return 'オポテュニティ';
-      case 'ACTIVITY':
-        return '活動';
-    }
-  };
-
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4">
       {portfolios.map((portfolio, index) => (
@@ -129,13 +99,7 @@ const PortfolioGrid = ({ portfolios, isLoadingMore, hasMore, lastPortfolioRef }:
               />
               {portfolio.source === 'OPPORTUNITY' && portfolio.reservationStatus && (
                 <div className="absolute top-2 left-2 z-10">
-                  <div 
-                    className="px-2 py-1 text-xs sm:text-sm rounded-full font-bold"
-                    style={{
-                      backgroundColor: getCategoryStyle(portfolio.category, portfolio.source, portfolio.reservationStatus).bg,
-                      color: getCategoryStyle(portfolio.category, portfolio.source, portfolio.reservationStatus).text,
-                    }}
-                  >
+                  <div className="px-2 py-1 text-xs sm:text-sm rounded-full font-bold bg-muted text-foreground">
                     {getCategoryLabel(portfolio.category, portfolio.source, portfolio.reservationStatus)}
                   </div>
                 </div>

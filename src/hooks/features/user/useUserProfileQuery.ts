@@ -2,29 +2,25 @@
 
 import { useQuery } from '@apollo/client';
 import { GET_USER_PROFILE, GET_USER_WITH_DETAILS_AND_PORTFOLIOS } from '@/graphql/account/user/query';
-import { User } from '@/types';
+import { GqlUser } from "@/types/graphql";
 
 export interface GetUserProfileData {
-  user: User;
+  user: GqlUser;
 }
 
 export interface GetUserWithDetailsData {
-  user: User & {
-    opportunitiesCreatedByMe?: {
-      edges: Array<{
-        node: {
+  user: GqlUser & {
+    opportunitiesCreatedByMe?:
+      Array<{
           id: string;
           title: string;
           description: string;
           images: string[];
           feeRequired?: number;
           isReservableWithTicket?: boolean;
-        };
-      }>;
-    };
-    portfolios?: {
-      edges: Array<{
-        node: {
+    }>;
+    portfolios?:
+      Array<{
           id: string;
           title: string;
           category: string;
@@ -32,22 +28,10 @@ export interface GetUserWithDetailsData {
           thumbnailUrl: string;
           source?: string;
           reservationStatus?: string;
-        };
-        cursor: string;
-      }>;
-      pageInfo: {
-        hasNextPage: boolean;
-        endCursor: string;
-      };
-    };
+    }>;
   };
 }
 
-/**
- * Hook for fetching user profile data from GraphQL
- * @param userId Optional user ID. If not provided, fetches current user's profile
- * @param authUserId Current authenticated user ID
- */
 export const useUserProfileQuery = (userId?: string, authUserId?: string) => {
   const targetId = userId || authUserId;
   const isMe = !userId || userId === authUserId;
@@ -57,10 +41,6 @@ export const useUserProfileQuery = (userId?: string, authUserId?: string) => {
     {
       variables: { 
         id: targetId ?? '',
-        first: 10,
-        after: null,
-        filter: null,
-        sort: { date: "DESC" }
       },
       skip: !targetId,
       fetchPolicy: 'cache-and-network',

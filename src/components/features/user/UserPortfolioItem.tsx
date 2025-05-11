@@ -54,23 +54,8 @@ export const UserPortfolioItem: React.FC<PortfolioItemProps> = ({
     }
   };
 
-  const getCategoryLabel = (category: string) => {
-    switch (category.toUpperCase()) {
-      case 'QUEST':
-        return 'クエスト';
-      case 'ACTIVITY_REPORT':
-        return '活動レポート';
-      case 'INTERVIEW':
-        return 'インタビュー';
-      case 'OPPORTUNITY':
-        return '機会';
-      default:
-        return category;
-    }
-  };
-
   const getPortfolioLink = () => {
-    switch (type.toLowerCase()) {
+    switch (type) {
       case 'opportunity':
         return `/activities/${id}`;
       case 'activity_report':
@@ -101,9 +86,6 @@ export const UserPortfolioItem: React.FC<PortfolioItemProps> = ({
           <div className="p-4 flex-1">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
               <div className="flex items-center space-x-2 mb-2 md:mb-0">
-                <span className="text-sm bg-muted text-foreground px-2 py-1 rounded">
-                  {getCategoryLabel(category)}
-                </span>
                 {reservationStatus && (
                   <span className="text-sm bg-primary-foreground text-primary px-2 py-1 rounded">
                     {getStatusLabel(reservationStatus)}
@@ -121,8 +103,8 @@ export const UserPortfolioItem: React.FC<PortfolioItemProps> = ({
                 {location}
               </div>
             )}
-            
-            {participants.length > 0 && (
+
+            {Array.isArray(participants) && participants.length > 0 && (
               <div className="flex items-center mt-2">
                 <span className="text-sm text-gray-500 mr-2">参加者:</span>
                 <div className="flex -space-x-2">

@@ -1,7 +1,6 @@
 'use client';
 
 import { useParticipationController } from '@/hooks/features/participation/useParticipationController';
-import type { Opportunity, Participation } from '@/types';
 
 /**
  * Custom hook for managing participation data

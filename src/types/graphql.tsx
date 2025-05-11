@@ -2276,8 +2276,8 @@ export type GqlCurrentUserQuery = {
         __typename?: "Membership";
         role: GqlRole;
         status: GqlMembershipStatus;
-        user?: { __typename?: "User"; id: string } | null;
-        community?: { __typename?: "Community"; id: string } | null;
+        user?: { __typename?: "User"; id: string; name: string } | null;
+        community?: { __typename?: "Community"; id: string; name?: string | null } | null;
       }> | null;
     } | null;
   } | null;
@@ -2516,28 +2516,41 @@ export type GqlGetUserWithDetailsAndPortfoliosQuery = {
     name: string;
     image?: string | null;
     bio?: string | null;
-    sysRole?: GqlSysRole | null;
     currentPrefecture?: GqlCurrentPrefecture | null;
-    urlFacebook?: string | null;
-    urlInstagram?: string | null;
-    urlWebsite?: string | null;
-    urlX?: string | null;
-    urlYoutube?: string | null;
     opportunitiesCreatedByMe?: Array<{
       __typename?: "Opportunity";
       id: string;
       title: string;
       description: string;
+      body?: string | null;
       images?: Array<string> | null;
-      feeRequired?: number | null;
+      category: GqlOpportunityCategory;
+      publishStatus: GqlPublishStatus;
       isReservableWithTicket?: boolean | null;
+      requireApproval: boolean;
+      feeRequired?: number | null;
+      pointsToEarn?: number | null;
+      earliestReservableAt?: Date | null;
       community?: {
         __typename?: "Community";
         id: string;
         name?: string | null;
         image?: string | null;
       } | null;
-      place?: { __typename?: "Place"; id: string; name: string } | null;
+      place?: {
+        __typename?: "Place";
+        id: string;
+        name: string;
+        address: string;
+        latitude: any;
+        longitude: any;
+        city?: {
+          __typename?: "City";
+          code: string;
+          name: string;
+          state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
+        } | null;
+      } | null;
     }> | null;
     portfolios?: Array<{
       __typename?: "Portfolio";
@@ -2548,7 +2561,20 @@ export type GqlGetUserWithDetailsAndPortfoliosQuery = {
       thumbnailUrl?: string | null;
       source: GqlPortfolioSource;
       reservationStatus?: GqlReservationStatus | null;
-      place?: { __typename?: "Place"; id: string; name: string } | null;
+      place?: {
+        __typename?: "Place";
+        id: string;
+        name: string;
+        address: string;
+        latitude: any;
+        longitude: any;
+        city?: {
+          __typename?: "City";
+          code: string;
+          name: string;
+          state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
+        } | null;
+      } | null;
       participants?: Array<{
         __typename?: "User";
         id: string;
@@ -3100,6 +3126,7 @@ export type GqlGetOpportunityQuery = {
         participations?: Array<{
           __typename?: "Participation";
           id: string;
+          source?: GqlSource | null;
           status: GqlParticipationStatus;
           reason: GqlParticipationStatusReason;
           images?: Array<string> | null;
@@ -3163,6 +3190,7 @@ export type GqlGetOpportunityQuery = {
             participations?: Array<{
               __typename?: "Participation";
               id: string;
+              source?: GqlSource | null;
               status: GqlParticipationStatus;
               reason: GqlParticipationStatusReason;
               images?: Array<string> | null;
@@ -3326,6 +3354,7 @@ export type GqlGetOpportunitySlotQuery = {
 export type GqlParticipationFieldsFragment = {
   __typename?: "Participation";
   id: string;
+  source?: GqlSource | null;
   status: GqlParticipationStatus;
   reason: GqlParticipationStatusReason;
   images?: Array<string> | null;
@@ -3355,47 +3384,45 @@ export type GqlGetParticipationQuery = {
   participation?: {
     __typename?: "Participation";
     id: string;
-    images?: Array<string> | null;
-    reason: GqlParticipationStatusReason;
     source?: GqlSource | null;
     status: GqlParticipationStatus;
-    updatedAt?: Date | null;
+    reason: GqlParticipationStatusReason;
+    images?: Array<string> | null;
+    description?: string | null;
     reservation?: {
       __typename?: "Reservation";
       id: string;
+      status: GqlReservationStatus;
       opportunitySlot?: {
         __typename?: "OpportunitySlot";
         id: string;
-        capacity?: number | null;
+        hostingStatus: GqlOpportunitySlotHostingStatus;
         startsAt: Date;
         endsAt: Date;
-        hostingStatus: GqlOpportunitySlotHostingStatus;
+        capacity?: number | null;
+        remainingCapacity?: number | null;
         opportunity?: {
           __typename?: "Opportunity";
           id: string;
           title: string;
           description: string;
           body?: string | null;
-          category: GqlOpportunityCategory;
-          capacity?: number | null;
-          pointsToEarn?: number | null;
-          feeRequired?: number | null;
-          requireApproval: boolean;
-          publishStatus: GqlPublishStatus;
           images?: Array<string> | null;
-          createdAt?: Date | null;
-          updatedAt?: Date | null;
-          community?: {
-            __typename?: "Community";
-            id: string;
-            name?: string | null;
-            image?: string | null;
-          } | null;
+          category: GqlOpportunityCategory;
+          publishStatus: GqlPublishStatus;
+          isReservableWithTicket?: boolean | null;
+          requireApproval: boolean;
+          feeRequired?: number | null;
+          pointsToEarn?: number | null;
+          earliestReservableAt?: Date | null;
+          community?: { __typename?: "Community"; id: string } | null;
           createdByUser?: {
             __typename?: "User";
             id: string;
             name: string;
             image?: string | null;
+            bio?: string | null;
+            currentPrefecture?: GqlCurrentPrefecture | null;
           } | null;
           place?: {
             __typename?: "Place";
@@ -3406,16 +3433,16 @@ export type GqlGetParticipationQuery = {
             longitude: any;
             city?: {
               __typename?: "City";
+              code: string;
               name: string;
-              state?: { __typename?: "State"; name: string } | null;
+              state?: {
+                __typename?: "State";
+                code: string;
+                countryCode: string;
+                name: string;
+              } | null;
             } | null;
           } | null;
-          slots?: Array<{
-            __typename?: "OpportunitySlot";
-            id: string;
-            startsAt: Date;
-            endsAt: Date;
-          }> | null;
         } | null;
       } | null;
     } | null;
@@ -3425,9 +3452,23 @@ export type GqlGetParticipationQuery = {
       status: GqlParticipationStatus;
       reason: GqlParticipationStatusReason;
       createdAt?: Date | null;
-      createdByUser?: { __typename?: "User"; id: string; name: string } | null;
+      createdByUser?: {
+        __typename?: "User";
+        id: string;
+        name: string;
+        image?: string | null;
+        bio?: string | null;
+        currentPrefecture?: GqlCurrentPrefecture | null;
+      } | null;
     }> | null;
-    user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+    user?: {
+      __typename?: "User";
+      id: string;
+      name: string;
+      image?: string | null;
+      bio?: string | null;
+      currentPrefecture?: GqlCurrentPrefecture | null;
+    } | null;
   } | null;
 };
 
@@ -3538,6 +3579,7 @@ export type GqlGetReservationQuery = {
     participations?: Array<{
       __typename?: "Participation";
       id: string;
+      source?: GqlSource | null;
       status: GqlParticipationStatus;
       reason: GqlParticipationStatusReason;
       images?: Array<string> | null;
@@ -3824,6 +3866,7 @@ export const OpportunitySlotFieldsFragmentDoc = gql`
 export const ParticipationFieldsFragmentDoc = gql`
   fragment ParticipationFields on Participation {
     id
+    source
     status
     reason
     images
@@ -4081,9 +4124,11 @@ export const CurrentUserDocument = gql`
         memberships {
           user {
             id
+            name
           }
           community {
             id
+            name
           }
           role
           status
@@ -4558,33 +4603,17 @@ export type GetUserProfileQueryResult = Apollo.QueryResult<
 export const GetUserWithDetailsAndPortfoliosDocument = gql`
   query GetUserWithDetailsAndPortfolios($id: ID!) {
     user(id: $id) {
-      id
-      name
-      image
-      bio
-      sysRole
-      currentPrefecture
-      urlFacebook
-      urlInstagram
-      urlWebsite
-      urlX
-      urlYoutube
+      ...UserFields
       opportunitiesCreatedByMe {
-        id
-        title
-        description
-        images
+        ...OpportunityFields
         community {
           id
           name
           image
         }
         place {
-          id
-          name
+          ...PlaceFields
         }
-        feeRequired
-        isReservableWithTicket
       }
       portfolios {
         id
@@ -4595,8 +4624,7 @@ export const GetUserWithDetailsAndPortfoliosDocument = gql`
         source
         reservationStatus
         place {
-          id
-          name
+          ...PlaceFields
         }
         participants {
           id
@@ -4606,6 +4634,9 @@ export const GetUserWithDetailsAndPortfoliosDocument = gql`
       }
     }
   }
+  ${UserFieldsFragmentDoc}
+  ${OpportunityFieldsFragmentDoc}
+  ${PlaceFieldsFragmentDoc}
 `;
 
 /**
@@ -5814,82 +5845,46 @@ export type GetParticipationsQueryResult = Apollo.QueryResult<
 export const GetParticipationDocument = gql`
   query GetParticipation($id: ID!) {
     participation(id: $id) {
-      id
-      images
-      reason
+      ...ParticipationFields
       reservation {
-        id
+        ...ReservationFields
         opportunitySlot {
-          id
-          capacity
-          startsAt
-          endsAt
-          hostingStatus
+          ...OpportunitySlotFields
           opportunity {
-            id
-            title
-            description
-            body
-            category
-            capacity
-            pointsToEarn
-            feeRequired
-            requireApproval
-            publishStatus
-            images
-            createdAt
-            updatedAt
+            ...OpportunityFields
             community {
-              id
-              name
-              image
+              ...CommunityFields
             }
             createdByUser {
-              id
-              name
-              image
+              ...UserFields
             }
             place {
-              id
-              name
-              address
-              latitude
-              longitude
-              city {
-                name
-                state {
-                  name
-                }
-              }
-            }
-            slots {
-              id
-              startsAt
-              endsAt
+              ...PlaceFields
             }
           }
         }
       }
-      source
-      status
       statusHistories {
         id
         status
         reason
         createdAt
         createdByUser {
-          id
-          name
+          ...UserFields
         }
       }
-      updatedAt
       user {
-        id
-        name
-        image
+        ...UserFields
       }
     }
   }
+  ${ParticipationFieldsFragmentDoc}
+  ${ReservationFieldsFragmentDoc}
+  ${OpportunitySlotFieldsFragmentDoc}
+  ${OpportunityFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+  ${PlaceFieldsFragmentDoc}
 `;
 
 /**

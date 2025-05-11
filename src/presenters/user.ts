@@ -1,7 +1,6 @@
 'use client';
 
-import { GetUserProfileData, GetUserWithDetailsData } from "@/hooks/features/user/useUserProfileQuery";
-import { GqlCurrentPrefecture } from '@/types/graphql';
+import { GqlCurrentPrefecture, GqlUser } from "@/types/graphql";
 
 export const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
   [GqlCurrentPrefecture.Kagawa]: '香川県',
@@ -49,49 +48,45 @@ export interface UserProfileData {
     source: string | null;
     reservationStatus: string | null;
   }>;
-  hasMorePortfolios: boolean;
-  endCursor: string | null;
 }
 
 export const formatUserProfileData = (
-  data: GetUserProfileData | GetUserWithDetailsData | undefined
+  user: GqlUser | null | undefined,
 ): UserProfileData | null => {
-  if (!data) return null;
+  if (!user) return null;
   
   return {
-    id: data.user.id,
-    name: data.user.name,
-    image: data.user.image ?? null,
-    bio: data.user.bio ?? null,
-    sysRole: data.user.sysRole ?? null,
-    urlFacebook: data.user.urlFacebook ?? null,
-    urlInstagram: data.user.urlInstagram ?? null,
-    urlWebsite: data.user.urlWebsite ?? null,
-    urlX: data.user.urlX ?? null,
-    urlYoutube: data.user.urlYoutube ?? null,
-    opportunities: 'opportunitiesCreatedByMe' in data.user && data.user.opportunitiesCreatedByMe
-      ? data.user.opportunitiesCreatedByMe.edges.map(edge => ({
-          id: edge.node.id,
-          title: edge.node.title,
-          description: edge.node.description ?? null,
-          images: edge.node.images ?? null,
-          feeRequired: edge.node.feeRequired ?? null,
-          isReservableWithTicket: edge.node.isReservableWithTicket ?? null,
+    id: user.id,
+    name: user.name,
+    image: user.image ?? null,
+    bio: user.bio ?? null,
+    sysRole: user.sysRole ?? null,
+    urlFacebook: user.urlFacebook ?? null,
+    urlInstagram: user.urlInstagram ?? null,
+    urlWebsite: user.urlWebsite ?? null,
+    urlX: user.urlX ?? null,
+    urlYoutube: user.urlYoutube ?? null,
+    opportunities: 'opportunitiesCreatedByMe' in user && user.opportunitiesCreatedByMe
+      ? user.opportunitiesCreatedByMe.map(node => ({
+          id: node.id,
+          title: node.title,
+          description: node.description ?? null,
+          images: node.images ?? null,
+          feeRequired: node.feeRequired ?? null,
+          isReservableWithTicket: node.isReservableWithTicket ?? null,
         }))
       : [],
-    portfolios: 'portfolios' in data.user && data.user.portfolios
-      ? data.user.portfolios.edges.map(edge => ({
-          id: edge.node.id,
-          title: edge.node.title,
-          category: edge.node.category ?? null,
-          date: edge.node.date ?? null,
-          thumbnailUrl: edge.node.thumbnailUrl ?? null,
-          source: edge.node.source ?? null,
-          reservationStatus: edge.node.reservationStatus ?? null,
+    portfolios: 'portfolios' in user && user.portfolios
+      ? user.portfolios.map(node => ({
+          id: node.id,
+          title: node.title,
+          category: node.category ?? null,
+          date: new Date(node.date).toISOString() ?? null,
+          thumbnailUrl: node.thumbnailUrl ?? null,
+          source: node.source ?? null,
+          reservationStatus: node.reservationStatus ?? null,
         }))
       : [],
-    hasMorePortfolios: 'portfolios' in data.user && data.user.portfolios?.pageInfo.hasNextPage || false,
-    endCursor: 'portfolios' in data.user && data.user.portfolios?.pageInfo.endCursor || null,
   };
 };
 
