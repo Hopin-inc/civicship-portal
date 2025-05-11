@@ -5,7 +5,8 @@ import {
   GqlParticipation, 
   GqlOpportunityCategory, 
   GqlParticipationStatus, 
-  GqlParticipationStatusReason 
+  GqlParticipationStatusReason,
+  Maybe
 } from '@/types/graphql';
 import { 
   ParticipationDetail, 
@@ -13,7 +14,9 @@ import {
   QuestParticipation, 
   ParticipationImage,
   Participation,
-  Opportunity
+  Opportunity,
+  ActivityField,
+  QuestField
 } from "@/types/participation";
 import { ReservationStatus } from "@/types/participationStatus";
 import { presenterOpportunityHost } from "@/presenters/opportunity";
@@ -26,9 +29,12 @@ export const presenterParticipation = (raw: GqlParticipation): ParticipationDeta
 
   const opportunity = raw.reservation.opportunitySlot.opportunity;
   const reservation = raw.reservation;
-  const isActivity = opportunity.category === GqlOpportunityCategory.Activity;
+  
+  const category = opportunity.category;
+  if (!category) throw new Error("Opportunity must have a category");
 
-  const commonInfo = {
+  const participantsCount = reservation.participations?.length ?? 0;
+  const base = {
     id: raw.id,
     status: raw.status,
     reason: raw.reason,
@@ -45,30 +51,76 @@ export const presenterParticipation = (raw: GqlParticipation): ParticipationDeta
     totalImageCount: (raw.images ?? []).length,
     
     date: new Date(reservation.opportunitySlot?.startsAt ?? "").toISOString(),
-    participantsCount: reservation.participations?.length ?? 0,
+    participantsCount,
     place: presenterPlace(opportunity.place),
     
-    isCancelable: false,
-    cancelDue: '',
+    isCancelable: getIsCancelable(reservation.opportunitySlot?.startsAt),
+    cancelDue: getCancelDue(reservation.opportunitySlot?.startsAt),
   };
 
-  if (isActivity) {
-    const activityParticipation: ActivityParticipation = {
-      ...commonInfo,
-      feeRequired: opportunity.feeRequired ?? 0,
-      totalFeeRequired: (opportunity.feeRequired ?? 0) * (commonInfo.participantsCount || 1),
-      category: GqlOpportunityCategory.Activity,
-    };
-    return activityParticipation;
-  } else {
-    const questParticipation: QuestParticipation = {
-      ...commonInfo,
-      pointsToEarn: opportunity.pointsToEarn ?? 0,
-      totalPointsToEarn: (opportunity.pointsToEarn ?? 0) * (commonInfo.participantsCount || 1),
-      category: GqlOpportunityCategory.Quest,
-    };
-    return questParticipation;
+  switch (category) {
+    case GqlOpportunityCategory.Activity:
+      return {
+        ...base,
+        category,
+        ...presenterActivityFields(participantsCount, opportunity.feeRequired),
+      };
+
+    case GqlOpportunityCategory.Quest:
+      return {
+        ...base,
+        category,
+        ...presenterQuestFields(participantsCount, opportunity.pointsToEarn),
+      };
+
+    default:
+      throw new Error(`Unsupported category: ${category}`);
   }
+};
+
+const getIsCancelable = (startsAt?: Date | string | null): boolean => {
+  if (!startsAt) return false;
+
+  const startDate = typeof startsAt === 'string' ? new Date(startsAt) : startsAt;
+  const now = new Date();
+  const diff = startDate.getTime() - now.getTime();
+  return diff >= 24 * 60 * 60 * 1000; // 24時間以上あるか
+};
+
+const getCancelDue = (startsAt?: Date | string | null): string | undefined => {
+  if (!startsAt) return undefined;
+
+  const startDate = typeof startsAt === 'string' ? new Date(startsAt) : startsAt;
+  const cancelDate = new Date(startDate.getTime() - 24 * 60 * 60 * 1000);
+  return cancelDate.toISOString();
+};
+
+const presenterActivityFields = (
+  participantsCount: number,
+  feeRequired?: Maybe<number> | undefined,
+): ActivityField => {
+  if (feeRequired == null) {
+    throw new Error("Missing ActivityField values");
+  }
+
+  return {
+    feeRequired,
+    totalFeeRequired: feeRequired * participantsCount,
+  };
+};
+
+const presenterQuestFields = (
+  participantsCount: number,
+  pointsToEarn?: Maybe<number> | undefined,
+): QuestField => {
+  if (pointsToEarn == null) {
+    throw new Error("Missing QuestField values");
+  }
+
+  return {
+    pointsToEarn,
+    totalPointsToEarn: pointsToEarn * participantsCount,
+  };
 };
 
 export const getStatusInfo = (
