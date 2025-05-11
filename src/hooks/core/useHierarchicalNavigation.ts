@@ -138,7 +138,7 @@ export const useHierarchicalNavigation = () => {
     }
     
     return '/';
-  }, [pathname, config.backTo, getPathPattern, searchParams, lastVisitedUrls, getPageType, isSearchResultPath, matchPaths]);
+  }, [pathname, config.backTo, getPathPattern, searchParams, isSearchResultPath, getPageType]);
 
   const isChildOf = useCallback((parentPath: string): boolean => {
     return pathname.startsWith(parentPath) && pathname !== parentPath;
