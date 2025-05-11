@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
+import { ja } from "date-fns/locale";
 
 interface ActivityScheduleCardProps {
+  id: string;
   startsAt: string;
   endsAt: string;
   participants: number;
@@ -18,6 +19,7 @@ interface ActivityScheduleCardProps {
 }
 
 const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
+  id,
   startsAt,
   endsAt,
   participants,
@@ -47,7 +49,7 @@ const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
       </div>
       <div className="flex justify-center">
         <Link
-          href={`/reservation/confirm?id=${opportunityId}&starts_at=${startsAt}`}
+          href={`/reservation/confirm?id=${opportunityId}&community_id=${communityId}&slot_id=${id}&guests=${participants}`}
         >
           <Button variant="primary" size="selection">
             選択

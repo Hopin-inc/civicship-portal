@@ -1,9 +1,9 @@
-'use client';
+"use client";
 import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
 import { ActivitySlot, ActivitySlotGroup } from "@/types/opportunitySlot";
 
 export const presenterOpportunitySlots = (
-  edges: (GqlOpportunitySlotEdge | null | undefined)[] | null | undefined
+  edges: (GqlOpportunitySlotEdge | null | undefined)[] | null | undefined,
 ): ActivitySlot[] => {
   if (!edges) return [];
 
@@ -38,24 +38,22 @@ export const presenterOpportunitySlot = (
 
 export const filterSlotGroupsBySelectedDate = (
   groups: ActivitySlotGroup[],
-  selectedDates: string[]
+  selectedDates: string[],
 ): ActivitySlotGroup[] => {
   if (!selectedDates || selectedDates.length === 0) return groups;
 
-  return groups.filter(group => selectedDates.includes(group.dateLabel));
+  return groups.filter((group) => selectedDates.includes(group.dateLabel));
 };
 
 export const presenterActivitySlots = (
   slots: GqlOpportunitySlot[] | null | undefined,
-  feeRequired: number
+  feeRequired: number,
 ): ActivitySlot[] => {
   if (!slots || slots.length === 0) return [];
   return slots.map((slot) => presenterOpportunitySlot(slot, feeRequired));
 };
 
-export const groupActivitySlotsByDate = (
-  slots: ActivitySlot[]
-): ActivitySlotGroup[] => {
+export const groupActivitySlotsByDate = (slots: ActivitySlot[]): ActivitySlotGroup[] => {
   const groups: Record<string, ActivitySlot[]> = {};
 
   for (const slot of slots) {
@@ -77,14 +75,10 @@ export const groupActivitySlotsByDate = (
   return Object.entries(groups)
     .map(([dateLabel, slots]) => ({
       dateLabel,
-      slots: slots.sort(
-        (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
-      ),
+      slots: slots.sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()),
     }))
     .sort(
-      (a, b) =>
-        new Date(a.slots[0].startsAt).getTime() -
-        new Date(b.slots[0].startsAt).getTime()
+      (a, b) => new Date(a.slots[0].startsAt).getTime() - new Date(b.slots[0].startsAt).getTime(),
     );
 };
 
@@ -97,15 +91,12 @@ export const buildReservationParams = (
   opportunityId: string,
   communityId: string,
   slot: ActivitySlot,
-  selectedGuests: number
+  selectedGuests: number,
 ): URLSearchParams => {
   return new URLSearchParams({
     id: opportunityId,
     community_id: communityId,
     slot_id: slot.id,
-    starts_at: new Date(slot.startsAt).toISOString(),
-    ends_at: new Date(slot.endsAt).toISOString(),
     guests: selectedGuests.toString(),
   });
 };
-

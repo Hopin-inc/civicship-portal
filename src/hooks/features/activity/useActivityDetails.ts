@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useMemo } from "react";
 import { COMMUNITY_ID } from "@/utils";
@@ -15,6 +15,7 @@ interface UseActivityDetailsResult {
   similarActivities: ActivityCard[];
   availableTickets: number;
   availableDates: {
+    id: string;
     startsAt: string;
     endsAt: string;
     participants: number;
@@ -42,8 +43,9 @@ export const useActivityDetails = (id: string): UseActivityDetailsResult => {
     return data?.opportunity ? presenterActivityDetail(data.opportunity) : null;
   }, [data?.opportunity]);
 
-  const { similarOpportunities, loading: similarLoading } =
-    useSimilarOpportunitiesQuery({ opportunityId: id });
+  const { similarOpportunities, loading: similarLoading } = useSimilarOpportunitiesQuery({
+    opportunityId: id,
+  });
 
   const similarActivities: ActivityCard[] = useMemo(() => {
     return (similarOpportunities ?? [])

@@ -255,7 +255,7 @@ export type GqlEdge = {
 export type GqlEvaluation = {
   __typename?: "Evaluation";
   comment?: Maybe<Scalars["String"]["output"]>;
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   credentialUrl?: Maybe<Scalars["String"]["output"]>;
   evaluator?: Maybe<GqlUser>;
   histories?: Maybe<Array<GqlEvaluationHistory>>;
@@ -300,7 +300,7 @@ export type GqlEvaluationHistoriesConnection = {
 export type GqlEvaluationHistory = {
   __typename?: "EvaluationHistory";
   comment?: Maybe<Scalars["String"]["output"]>;
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   createdByUser?: Maybe<GqlUser>;
   evaluation?: Maybe<GqlEvaluation>;
   id: Scalars["ID"]["output"];
@@ -367,7 +367,7 @@ export type GqlMembership = {
   __typename?: "Membership";
   bio?: Maybe<Scalars["String"]["output"]>;
   community?: Maybe<GqlCommunity>;
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   headline?: Maybe<Scalars["String"]["output"]>;
   histories?: Maybe<Array<GqlMembershipHistory>>;
   participationView?: Maybe<GqlMembershipParticipationView>;
@@ -398,7 +398,7 @@ export type GqlMembershipFilterInput = {
 
 export type GqlMembershipHistory = {
   __typename?: "MembershipHistory";
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   createdByUser?: Maybe<GqlUser>;
   id: Scalars["ID"]["output"];
   membership: GqlMembership;
@@ -1073,14 +1073,14 @@ export type GqlPaging = {
 export type GqlParticipation = {
   __typename?: "Participation";
   community?: Maybe<GqlCommunity>;
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   description?: Maybe<Scalars["String"]["output"]>;
   evaluation?: Maybe<GqlEvaluation>;
   id: Scalars["ID"]["output"];
   images?: Maybe<Array<Scalars["String"]["output"]>>;
   reason: GqlParticipationStatusReason;
   reservation?: Maybe<GqlReservation>;
-  source: GqlSource;
+  source?: Maybe<GqlSource>;
   status: GqlParticipationStatus;
   statusHistories?: Maybe<Array<GqlParticipationStatusHistory>>;
   ticketStatusHistories?: Maybe<Array<GqlTicketStatusHistory>>;
@@ -1638,7 +1638,7 @@ export type GqlReservationHistoriesConnection = {
 
 export type GqlReservationHistory = {
   __typename?: "ReservationHistory";
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   createdByUser?: Maybe<GqlUser>;
   id: Scalars["ID"]["output"];
   reservation: GqlReservation;
@@ -1901,7 +1901,7 @@ export type GqlTicketsConnection = {
 
 export type GqlTransaction = {
   __typename?: "Transaction";
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   fromPointChange?: Maybe<Scalars["Int"]["output"]>;
   fromWallet?: Maybe<GqlWallet>;
   id: Scalars["ID"]["output"];
@@ -2294,7 +2294,7 @@ export type GqlGetSingleMembershipQuery = {
     role: GqlRole;
     status: GqlMembershipStatus;
     reason: GqlMembershipStatusReason;
-    createdAt: Date;
+    createdAt?: Date | null;
     updatedAt?: Date | null;
     participationView?: {
       __typename?: "MembershipParticipationView";
@@ -2391,7 +2391,7 @@ export type GqlGetSingleMembershipQuery = {
       status: GqlMembershipStatus;
       reason: GqlMembershipStatusReason;
       role: GqlRole;
-      createdAt: Date;
+      createdAt?: Date | null;
       createdByUser?: {
         __typename?: "User";
         id: string;
@@ -2424,7 +2424,7 @@ export type GqlGetMembershipListQuery = {
         role: GqlRole;
         status: GqlMembershipStatus;
         reason: GqlMembershipStatusReason;
-        createdAt: Date;
+        createdAt?: Date | null;
         updatedAt?: Date | null;
         participationView?: {
           __typename?: "MembershipParticipationView";
@@ -2837,7 +2837,7 @@ export type GqlEvaluationFieldsFragment = {
   comment?: string | null;
   credentialUrl?: string | null;
   status: GqlEvaluationStatus;
-  createdAt: Date;
+  createdAt?: Date | null;
   updatedAt?: Date | null;
   issuedAt?: Date | null;
 };
@@ -3434,7 +3434,7 @@ export type GqlGetParticipationQuery = {
     id: string;
     images?: Array<string> | null;
     reason: GqlParticipationStatusReason;
-    source: GqlSource;
+    source?: GqlSource | null;
     status: GqlParticipationStatus;
     updatedAt?: Date | null;
     reservation?: {
@@ -3710,7 +3710,7 @@ export type GqlGetUtilitiesQuery = {
 export type GqlTransactionFieldsFragment = {
   __typename?: "Transaction";
   id: string;
-  createdAt: Date;
+  createdAt?: Date | null;
   updatedAt?: Date | null;
   fromPointChange?: number | null;
   toPointChange?: number | null;
@@ -3730,7 +3730,7 @@ export type GqlWalletTransactionsQuery = {
       node?: {
         __typename?: "Transaction";
         id: string;
-        createdAt: Date;
+        createdAt?: Date | null;
         fromPointChange?: number | null;
         toPointChange?: number | null;
         reason: GqlTransactionReason;
