@@ -1,27 +1,57 @@
 "use client";
 
-import ActivityList from "@/app/activities/ActivityList";
-import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
-import ActivityCreateModal from "@/app/activities/ActivityCreateModal";
-import { Suspense } from "react";
+import { useEffect, useMemo } from "react";
+import { useLoading } from "@/hooks/core/useLoading";
+import { useActivities } from "@/hooks/features/activity/useActivities";
+import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
+import ActivitiesFeaturedSection from "@/components/features/activity/ActivitiesFeaturedSection";
+import ActivitiesUpcomingSection from "@/components/features/activity/ActivitiesUpcomingSection";
+import ActivitiesAllSection from "@/components/features/activity/ActivitiesAllSection";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { GqlOpportunity, GqlOpportunityEdge } from "@/types/graphql";
+import { presenterActivityCard } from "@/presenters/opportunity";
+import { ActivityCard } from "@/types/opportunity";
 
-const Activities: React.FC = async () => {
-  return (
-    <main className="min-h-screen p-24">
-      <Link href="/" className="inline-flex">
-        <ChevronLeft />
-        トップに戻る
-      </Link>
-      <div className="w-full flex justify-between">
-        <h1>活動一覧</h1>
-        <Suspense>
-          <ActivityCreateModal />
-        </Suspense>
-      </div>
-      <ActivityList />
-    </main>
+const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
+  edges
+    .map((edge) => edge.node)
+    .filter((node): node is GqlOpportunity => !!node)
+    .map(presenterActivityCard);
+
+export default function ActivitiesPage() {
+  const { setIsLoading } = useLoading();
+
+  const headerConfig = useMemo(
+    () => ({
+      showLogo: true,
+      showSearchForm: true,
+    }),
+    [],
   );
-};
+  useHeaderConfig(headerConfig);
 
-export default Activities;
+  const { upcomingActivities, featuredActivities, allActivities, loading, error, loadMoreRef } =
+    useActivities();
+
+  useEffect(() => {
+    setIsLoading(loading && !upcomingActivities?.edges?.length);
+  }, [loading, upcomingActivities, setIsLoading]);
+
+  if (error) return <ErrorState message={`Error: ${error.message}`} />;
+
+  const featuredCards = mapOpportunityCards(featuredActivities.edges);
+  const upcomingCards = mapOpportunityCards(upcomingActivities.edges);
+  const allCards = mapOpportunityCards(allActivities.edges);
+
+  return (
+    <div className="min-h-screen pb-16">
+      <ActivitiesFeaturedSection opportunities={featuredCards} />
+      <ActivitiesUpcomingSection opportunities={upcomingCards} />
+      <ActivitiesAllSection
+        opportunities={allCards}
+        loadMoreRef={loadMoreRef}
+        isLoading={loading}
+      />
+    </div>
+  );
+}

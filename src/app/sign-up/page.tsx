@@ -1,12 +1,13 @@
-import SignUpForm from "@/app/sign-up/SignUpForm";
-import CancelButton from "@/app/sign-up/CancelButton";
+import { SignUpForm } from "@/components/features/signup/SignUpForm";
+import { SignUpHeader } from "@/components/features/signup/SignUpHeader";
 
 const RegisterAccount: React.FC = async () => {
   return (
-    <main className="min-h-screen p-24">
-      <CancelButton />
-      <h1>アカウント情報の登録</h1>
-      <SignUpForm />
+    <main className="min-h-screen p-8">
+      <div className="max-w-md mx-auto">
+        <SignUpHeader />
+        <SignUpForm />
+      </div>
     </main>
   );
 };

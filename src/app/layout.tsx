@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { CookiesProvider } from "next-client-cookies/server";
-import LiffProvider from "@/app/components/providers/LiffProvider";
-import ApolloProvider from "@/app/components/providers/ApolloProvider";
-import FirebaseAuthProvider from "@/app/components/providers/FirebaseAuthProvider";
-import { Toaster } from "@/app/components/ui/sonner";
-import { Suspense } from "react";
-import Loading from "@/app/components/layout/Loading";
-import LoadingProvider from "@/app/components/providers/LoadingProvider";
+import ApolloProvider from "@/components/providers/ApolloProvider";
+import { Toaster } from "@/components/ui/sonner";
+import LoadingProvider from "@/components/providers/LoadingProvider";
+import { LiffProvider } from "@/contexts/LiffContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import HeaderProvider from "@/components/providers/HeaderProvider";
+import MainContent from "@/components/layout/MainContent";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -22,42 +22,28 @@ const RootLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  // Avoid displaying intentionally thrown error.
-  if (typeof window === "undefined") {
-    const originalConsoleError = console.error;
-    if (!(console.error as any)["_patched"]) {
-      console.error = (...args) => {
-        if (
-          args?.some((e) => {
-            const message = e?.message ?? (e as string | undefined);
-            return message?.includes("POSTPONE:");
-          })
-        )
-          return;
-        originalConsoleError(...args);
-      };
-      (console.error as any)["_patched"] = true;
-    }
-  }
-
   return (
     <html lang="ja">
       <body className={font.className}>
         <CookiesProvider>
-          <LiffProvider>
-            <ApolloProvider>
-              <FirebaseAuthProvider>
-                <LoadingProvider>
-                  {children}
-                  <Toaster richColors className="mx-8" />
-                </LoadingProvider>
-              </FirebaseAuthProvider>
-            </ApolloProvider>
-          </LiffProvider>
+          <ApolloProvider>
+            <LiffProvider>
+              <AuthProvider>
+                <HeaderProvider>
+                  <LoadingProvider>
+                    <MainContent>{children}</MainContent>
+                    <Toaster richColors className="mx-8" />
+                  </LoadingProvider>
+                </HeaderProvider>
+              </AuthProvider>
+            </LiffProvider>
+          </ApolloProvider>
         </CookiesProvider>
       </body>
     </html>
   );
 };
+
+
 
 export default RootLayout;
