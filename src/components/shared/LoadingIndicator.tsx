@@ -8,8 +8,8 @@ interface LoadingIndicatorProps {
   fullScreen?: boolean;
 }
 
-export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ 
-  message = 'Loading...', 
+const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
+  message = '読み込み中',
   className = '',
   fullScreen = false
 }) => {

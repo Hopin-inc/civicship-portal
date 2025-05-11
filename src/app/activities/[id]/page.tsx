@@ -11,6 +11,7 @@ import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
 import { useHierarchicalNavigation } from "@/hooks/core/useHierarchicalNavigation";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 interface ActivityPageProps {
   params: {
@@ -22,14 +23,16 @@ interface ActivityPageProps {
 }
 
 export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
+  const { id } = params;
+
   const {
     opportunity,
-    similarOpportunities,
+    similarActivities,
     availableTickets,
     availableDates,
     loading,
-    error
-  } = useActivityDetails({ id: params.id });
+    error,
+  } = useActivityDetails(id);
 
   const { setIsLoading } = useLoading();
   const { navigateBack } = useHierarchicalNavigation();
@@ -43,8 +46,12 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
     setIsLoading(loading);
   }, [loading, setIsLoading]);
 
-  if (error && !opportunity) return <ErrorState message={`Error: ${error.message}`} />;
-  if (!opportunity) return <ErrorState message="No opportunity found" />;
+  if (error && !opportunity) {
+    return <ErrorState message={`Error: ${error.message}`} />;
+  }
+  if (!opportunity) {
+    return <ErrorState message="No opportunity found" />;
+  }
 
   return (
     <>
@@ -67,17 +74,15 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             opportunity={opportunity}
             availableTickets={availableTickets}
           />
-
           <ActivityDetailsContent
             opportunity={opportunity}
             availableTickets={availableTickets}
             availableDates={availableDates}
-            similarOpportunities={similarOpportunities}
+            similarActivities={similarActivities}
             communityId={searchParams.community_id}
           />
         </div>
       </main>
-
       <ActivityDetailsFooter
         opportunityId={opportunity.id}
         price={opportunity.feeRequired || 0}

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { LoadingContext } from "@/contexts/LoadingContext";
-import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 const LoadingProvider = ({ children }: React.PropsWithChildren) => {
   const [isLoading, setIsLoading] = useState(false);

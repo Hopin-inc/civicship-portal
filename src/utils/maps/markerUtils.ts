@@ -1,4 +1,4 @@
-import { Geo, MarkerData, PlaceData } from "../../types/map";
+import { Geo, MarkerData, PlaceData } from "../../types/place";
 import { ContentType } from "../../types";
 
 /**

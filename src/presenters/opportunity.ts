@@ -1,188 +1,100 @@
 'use client';
 
-import type { GqlOpportunity as GraphQLOpportunity } from "@/types/graphql";
-import type { Opportunity, Article, Participation } from "@/types";
-import { OpportunityCardProps } from '@/components/features/opportunity/OpportunityCard';
+import {
+  GqlArticle,
+  GqlOpportunity,
+  GqlOpportunityCategory, GqlOpportunityEdge, GqlOpportunitySlot, GqlPlace, GqlUser,
+  Maybe,
+} from "@/types/graphql";
+import { ActivityCard, ActivityDetail, OpportunityHost, OpportunityPlace } from "@/types/opportunity";
+import { presenterArticleCard } from "@/presenters/article";
+import { ActivitySlot } from "@/types/opportunitySlot";
 
-/**
- * Maps an opportunity to card props for display in UI
- */
-export const mapOpportunityToCardProps = (node: Opportunity): OpportunityCardProps => ({
-  id: node.id,
-  title: node.title,
-  price: node.feeRequired || null,
-  location: node.place?.name || '場所未定',
-  imageUrl: node.images?.[0] || null,
-  community: {
-    id: node.community?.id || '',
-  },
-  isReservableWithTicket: node.isReservableWithTicket || false,
-});
+export const presenterActivityCards = (
+  edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined
+): ActivityCard[] => {
+  if (!edges) return [];
 
-/**
- * Transforms an article node from GraphQL to a UI-friendly format
- */
-export const transformArticle = (node: any): Partial<Article> => ({
-  id: node?.id || "",
-  title: node?.title || "",
-  description: node?.introduction || "",
-  introduction: node?.introduction || "",
-  thumbnail: node?.thumbnail || null,
-});
-
-/**
- * Transforms an opportunity node from GraphQL to a UI-friendly format
- * Used for nested opportunities within a parent opportunity
- */
-export const transformOpportunityNode = (node: any, parent: GraphQLOpportunity): Opportunity => ({
-  id: node?.id || "",
-  title: node?.title || "",
-  description: node?.description || "",
-  type: "EVENT",
-  status: "open",
-  communityId: parent?.community?.id || "",
-  hostId: parent?.createdByUser?.id || "",
-  startsAt: node?.slots?.edges?.[0]?.node?.startsAt || node?.createdAt || "",
-  endsAt: node?.slots?.edges?.[0]?.node?.endsAt || node?.createdAt || "",
-  createdAt: node?.createdAt || "",
-  updatedAt: node?.updatedAt || "",
-  host: {
-    name: parent?.createdByUser?.name || "",
-    image: parent?.createdByUser?.image || null,
-    title: "",
-    bio: "",
-  },
-  images: node?.images || [],
-  location: {
-    name: "",
-    address: "",
-    isOnline: false,
-  },
-  community: parent?.community ? {
-    id: parent.community.id,
-    title: parent.community.name || "",
-    description: "",
-    icon: parent.community.image || "",
-  } : undefined,
-  recommendedFor: [],
-  capacity: node?.capacity || 0,
-  pointsForComplete: node?.pointsToEarn,
-  participants: [],
-  body: node?.description,
-  requireApproval: node?.requireApproval,
-  pointsRequired: node?.pointsToEarn,
-  feeRequired: node?.feeRequired,
-  slots: node?.slots || { edges: [] },
-});
-
-/**
- * Transforms a participation node from GraphQL to a UI-friendly format
- */
-export const transformParticipationNode = (pEdge: any): Participation => ({
-  node: {
-    id: pEdge?.node?.id || "",
-    status: pEdge?.node?.status || "",
-    reason: "",
-    images: pEdge?.node?.images || [],
-    user: {
-      id: pEdge?.node?.user?.id || "",
-      name: pEdge?.node?.user?.name || "",
-      image: pEdge?.node?.user?.image || null,
-    },
-  },
-});
-
-/**
- * Transforms a complete opportunity from GraphQL to a UI-friendly format
- */
-export const transformOpportunity = (data: GraphQLOpportunity | null): Opportunity | null => {
-  if (!data) return null;
-
-  try {
-    return {
-      id: data.id,
-      title: data.title,
-      description: data.description || "",
-      type: "EVENT",
-      status: "open",
-      communityId: data.community?.id || "",
-      hostId: data.createdByUser?.id || "",
-      startsAt: data.slots?.edges?.[0]?.node?.startsAt || "",
-      endsAt: data.slots?.edges?.[0]?.node?.endsAt || "",
-      createdAt: data.createdAt || new Date().toISOString(),
-      updatedAt: data.updatedAt || new Date().toISOString(),
-      host: {
-        name: data.createdByUser?.name || "",
-        image: data.createdByUser?.image || null,
-        title: "",
-        bio: "",
-      },
-      images: data.images || [],
-      location: {
-        name: data.place?.name || "",
-        address: data.place?.address || "",
-        isOnline: false,
-        lat: data.place?.latitude || undefined,
-        lng: data.place?.longitude || undefined,
-      },
-      community: data.community ? {
-        id: data.community.id,
-        title: data.community.name || "",
-        description: "",
-        icon: data.community.image || "",
-      } : undefined,
-      recommendedFor: [],
-      capacity: data.capacity || 0,
-      pointsForComplete: data.pointsToEarn || undefined,
-      participants: data.slots?.edges?.[0]?.node?.participations?.edges?.map(edge => ({
-        id: edge?.node?.user?.id || "",
-        name: edge?.node?.user?.name || "",
-        image: edge?.node?.user?.image || null,
-      })) || [],
-      body: data.body || undefined,
-      createdByUser: data.createdByUser ? {
-        id: data.createdByUser.id,
-        name: data.createdByUser.name || "",
-        image: data.createdByUser.image || null,
-        articlesAboutMe: data.createdByUser.articlesAboutMe ? {
-          edges: data.createdByUser.articlesAboutMe.edges?.map(edge => ({
-            node: transformArticle(edge?.node),
-          })) || [],
-        } : undefined,
-        opportunitiesCreatedByMe: data.createdByUser.opportunitiesCreatedByMe ? {
-          edges: data.createdByUser.opportunitiesCreatedByMe.edges
-            ?.map(edge => edge?.node)
-            .filter((node): node is NonNullable<typeof node> => node != null && node.id !== data.id)
-            .map(node => transformOpportunityNode(node, data)) || [],
-        } : undefined,
-      } : undefined,
-      place: data.place ? {
-        name: data.place.name || "",
-        address: data.place.address || "",
-        latitude: data.place.latitude || undefined,
-        longitude: data.place.longitude || undefined,
-      } : undefined,
-      requireApproval: data.requireApproval || undefined,
-      pointsRequired: data.pointsToEarn || undefined,
-      feeRequired: data.feeRequired || undefined,
-      slots: data.slots ? {
-        edges: data.slots.edges?.map(edge => ({
-          node: {
-            id: edge?.node?.id || "",
-            startsAt: edge?.node?.startsAt || "",
-            endsAt: edge?.node?.endsAt || "",
-            participations: edge?.node?.participations ? {
-              edges: edge.node.participations.edges?.map(transformParticipationNode) || [],
-            } : undefined,
-          },
-        })) || [],
-      } : { edges: [] },
-      requiredUtilities: data.requiredUtilities?.map(utility => ({
-        id: utility?.id || "",
-      })) || undefined,
-    };
-  } catch (e) {
-    console.error("transformOpportunity failed", e);
-    return null;
-  }
+  return edges
+    .map((edge) => edge?.node)
+    .filter((node): node is GqlOpportunity => !!node)
+    .map((node) => presenterActivityCard(node));
 };
+
+export const presenterActivityCard = (node: GqlOpportunity ): ActivityCard => ({
+  id: node?.id || "",
+  title: node?.title || "",
+  category: node?.category || GqlOpportunityCategory.Activity,
+  feeRequired: node?.feeRequired || 0,
+  location: node?.place?.name || '場所未定',
+  images: node?.images || [],
+  communityId: node?.community?.id || '',
+  hasReservableTicket: node?.isReservableWithTicket || false,
+});
+
+export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail=> {
+  const {images, place, slots, articles, createdByUser, ...prop} = data;
+
+  return {
+    communityId: data.community?.id || "",
+
+    id: data.id,
+    title: data.title,
+    description: data.description || "",
+    body: data.body || "",
+    notes: "",
+    images: images?.map((image) => image) || [],
+    totalImageCount: images?.length || 0,
+
+    requiredApproval: data.requireApproval,
+    requiredTicket: data.requiredUtilities?.map((u)=> u) || [],
+    feeRequired: data.feeRequired || 0,
+
+    place: presenterPlace(place),
+    host: presenterOpportunityHost(createdByUser, articles?.[0]),
+    slots: presenterActivitySlot(slots, data.feeRequired),
+
+    recentOpportunities: [],
+    reservableTickets: [],
+    relatedActivities: [],
+  };
+};
+
+function presenterPlace(place?: Maybe<GqlPlace>): OpportunityPlace {
+  return {
+    id: place?.id || "",
+    name: place?.name || "",
+    description: "",
+    address: place?.address || "",
+    latitude: place?.latitude ?? undefined,
+    longitude: place?.longitude ?? undefined,
+  }
+}
+
+function presenterOpportunityHost(host?: Maybe<GqlUser> | undefined, interview?: GqlArticle): OpportunityHost {
+  return {
+    id: host?.id || "",
+    name: host?.name || "",
+    image: host?.image || "",
+    bio: host?.bio || "",
+    interview: presenterArticleCard(interview)
+  }
+}
+
+function presenterActivitySlot(slots:  Maybe<GqlOpportunitySlot[]> | undefined, feeRequired?: Maybe<number> | undefined ): ActivitySlot[] {
+  return (
+    slots?.map((slot): ActivitySlot => ({
+      id: slot?.id,
+      hostingStatus: slot?.hostingStatus,
+      startsAt: slot?.startsAt
+        ? new Date(slot.startsAt).toISOString()
+        : "",
+      endsAt: slot?.endsAt
+        ? new Date(slot.endsAt).toISOString()
+        : "",
+      capacity: slot?.capacity ?? 0,
+      remainingCapacity: slot?.remainingCapacity ?? 0,
+      feeRequired: feeRequired ?? null,
+    })) ?? []
+  );
+}

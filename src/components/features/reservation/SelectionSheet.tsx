@@ -2,7 +2,7 @@ import React from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import type { DateSection } from '@/hooks/features/reservation/useReservationDateSelection';
+import { ActivitySlotGroup } from "@/types/opportunitySlot";
 
 interface SelectionSheetProps {
   isOpen: boolean;
@@ -12,7 +12,7 @@ interface SelectionSheetProps {
   setSelectedDate: (date: string | null) => void;
   selectedGuests: number;
   setSelectedGuests: (guests: number) => void;
-  dateSections: DateSection[];
+  dateSections: ActivitySlotGroup[];
 }
 
 /**
@@ -63,10 +63,10 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
         {dateSections.map((section, index) => (
           <Button
             key={index}
-            onClick={() => setSelectedDate(`${section.date} (${section.day})`)}
-            variant={selectedDate === `${section.date} (${section.day})` ? "primary" : "tertiary"}
+            onClick={() => setSelectedDate(`${section.dateLabel}`)}
+            variant={selectedDate === `${section.dateLabel}` ? "primary" : "tertiary"}
           >
-            {section.date} ({section.day})
+            {section.dateLabel}
           </Button>
         ))}
       </div>

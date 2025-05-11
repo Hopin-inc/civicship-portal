@@ -1,9 +1,8 @@
 'use client';
 
 import { useQuery, useMutation } from "@apollo/client";
-import { VIEW_TICKET_CLAIM } from "@/graphql/queries/ticket";
-import { TICKET_CLAIM } from "@/graphql/mutations/ticket";
-import { GqlClaimLinkStatus } from '@/types/graphql';
+import { TICKET_CLAIM } from "@/graphql/reward/ticket/mutation";
+import { VIEW_TICKET_CLAIM } from "@/graphql/reward/ticketClaimLink/query";
 
 /**
  * Hook for fetching ticket claim data from GraphQL

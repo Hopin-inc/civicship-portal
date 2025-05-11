@@ -38,3 +38,20 @@ export function formatDuration(minutes: number): string {
   }
   return `${hours}時間${remainingMinutes}分`;
 }
+
+
+export function formatTimeRange(startsAt: string, endsAt: string): string {
+  const start = new Date(startsAt);
+  const end = new Date(endsAt);
+
+  const formatOptions: Intl.DateTimeFormatOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  };
+
+  const startStr = start.toLocaleTimeString('ja-JP', formatOptions);
+  const endStr = end.toLocaleTimeString('ja-JP', formatOptions);
+
+  return `${startStr}〜${endStr}`;
+}

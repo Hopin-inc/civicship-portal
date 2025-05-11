@@ -1,11 +1,8 @@
 'use client';
 
-import { GetUserProfileData, GetUserWithDetailsData } from '../hooks/features/user/useUserProfileQuery';
+import { GetUserProfileData, GetUserWithDetailsData } from "@/hooks/features/user/useUserProfileQuery";
 import { GqlCurrentPrefecture } from '@/types/graphql';
 
-/**
- * Prefecture labels for display
- */
 export const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
   [GqlCurrentPrefecture.Kagawa]: '香川県',
   [GqlCurrentPrefecture.Tokushima]: '徳島県',
@@ -15,9 +12,6 @@ export const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
   [GqlCurrentPrefecture.Unknown]: '不明',
 } as const;
 
-/**
- * Prefecture options for selection
- */
 export const prefectureOptions = [
   GqlCurrentPrefecture.Kagawa,
   GqlCurrentPrefecture.Tokushima,
@@ -25,9 +19,8 @@ export const prefectureOptions = [
   GqlCurrentPrefecture.Ehime,
 ];
 
-/**
- * Transform user profile data from GraphQL to application format
- */
+
+
 export interface UserProfileData {
   id: string;
   name: string;

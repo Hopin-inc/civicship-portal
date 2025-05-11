@@ -1,7 +1,7 @@
 'use client';
 
 import { useReducer, useCallback, useEffect } from 'react';
-import { MarkerData, PlaceData, MapComponentProps } from '@/types/map';
+import { MarkerData, PlaceData, MapComponentProps } from '@/types/place';
 import { processMapData } from '@/utils/maps/markerUtils';
 
 interface MapState {

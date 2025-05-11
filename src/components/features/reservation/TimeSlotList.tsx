@@ -1,17 +1,15 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import type { DateSection, TimeSlot } from '@/hooks/features/reservation/useReservationDateSelection';
+import { ActivitySlot, ActivitySlotGroup } from "@/types/opportunitySlot";
+import { formatTimeRange } from "@/utils/date";
 
 interface TimeSlotListProps {
-  dateSections: DateSection[];
-  isSlotAvailable: (slot: TimeSlot) => boolean;
-  onSelectSlot: (slot: TimeSlot) => void;
+  dateSections: ActivitySlotGroup[];
+  isSlotAvailable: (slot: ActivitySlot) => boolean;
+  onSelectSlot: (slot: ActivitySlot) => void;
 }
 
-/**
- * Component to display a list of time slots grouped by date
- */
 export const TimeSlotList: React.FC<TimeSlotListProps> = ({
   dateSections,
   isSlotAvailable,
@@ -22,11 +20,11 @@ export const TimeSlotList: React.FC<TimeSlotListProps> = ({
       {dateSections.map((section, sectionIndex) => (
         <div key={sectionIndex}>
           <h3 className="text-lg font-bold mb-4">
-            {section.date} ({section.day})
+            {section.dateLabel}
           </h3>
           <div className="space-y-2">
-            {section.timeSlots.map((slot: TimeSlot, slotIndex: number) => {
-              const remainingCapacity = slot.remainingCapacityView?.remainingCapacity || 0;
+            {section.slots.map((slot: ActivitySlot, slotIndex: number) => {
+              const remainingCapacity = slot.remainingCapacity || 0;
               const isFull = remainingCapacity === 0;
               const isAvailable = isSlotAvailable(slot);
 
@@ -38,10 +36,10 @@ export const TimeSlotList: React.FC<TimeSlotListProps> = ({
                   <div className="flex items-center justify-between">
                     <div>
                       <p className={`text-lg font-bold ${isFull ? "text-muted-foreground/50" : ""}`}>
-                        {slot.time}
+                        {formatTimeRange(slot.startsAt, slot.endsAt)}
                       </p>
                       <p className={`text-md font-bold ${isFull ? "text-muted-foreground/50" : ""}`}>
-                        {slot.price.toLocaleString()}円/人
+                        {slot.feeRequired.toLocaleString()}円/人
                       </p>
                     </div>
                     {isFull ? (

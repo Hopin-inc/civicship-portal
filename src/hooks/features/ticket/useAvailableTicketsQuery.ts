@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from "@apollo/client";
-import { GET_USER_WALLET } from '@/graphql/queries/user';
+import { GET_USER_WALLET } from '@/graphql/account/user/query';
 import { DocumentNode } from 'graphql';
 
 /**
