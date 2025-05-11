@@ -1,16 +1,18 @@
 'use client';
 
-import { useCreateReservationMutation, useGetUserWalletQuery } from "@/types/graphql";
+import { GqlWallet, useCreateReservationMutation, useGetUserWalletQuery } from "@/types/graphql";
 
 export const useReservationConfirmQuery = (userId: string | undefined) => {
-  const { data: walletData, loading: walletLoading, error: walletError } = useGetUserWalletQuery( {
+  const { data, loading: walletLoading, error: walletError } = useGetUserWalletQuery({
     variables: userId ? { id: userId } : undefined,
     skip: !userId,
   });
+  const wallets: GqlWallet[] | null = data?.user?.wallets ?? null;
+
   const [createReservation, { loading: creatingReservation }] = useCreateReservationMutation();
   
   return {
-    walletData,
+    wallets,
     walletLoading,
     walletError,
     createReservation,

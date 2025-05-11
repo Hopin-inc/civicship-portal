@@ -7,16 +7,17 @@ import { useHeader } from '@/contexts/HeaderContext';
 import { useLoading } from '@/hooks/core/useLoading';
 import { useAuth } from '@/contexts/AuthContext';
 import { COMMUNITY_ID } from '@/utils';
-import { parseDateTime } from '@/utils/date';
 import { presenterActivityDetail } from '@/presenters/opportunity';
 import { useReservationConfirmQuery } from './useReservationConfirmQuery';
-import {
-  findMatchingSlot,
-  calculateAvailableTickets,
-  getTicketIds,
-} from '@/presenters/reservation';
 import type { ActivityDetail } from '@/types/opportunity';
-import { useGetOpportunityQuery } from "@/types/graphql";
+import {
+  GqlUser, GqlWallet,
+  useGetOpportunityQuery,
+} from "@/types/graphql";
+import { useAvailableTickets } from "@/hooks/features/ticket/useAvailableTickets";
+import { useSlotDateRange } from "@/hooks/features/reservation/confirm/useSlotDateRange";
+import { ActivitySlot } from "@/types/opportunitySlot";
+import { useCreateReservationHandler } from "@/hooks/features/reservation/confirm/useCreateReservationHandler";
 
 export const useReservationConfirm = (params: {
   id: string | null;
@@ -31,36 +32,24 @@ export const useReservationConfirm = (params: {
   const { user } = useAuth();
 
   const opportunityId = params.id || '';
-  const slotStartsAt = params.starts_at || '';
   const slotId = params.slot_id || '';
   const participantCount = parseInt(params.guests || '1', 10);
 
-  // -------------------------------
-  // 1. Opportunityデータ取得
-  // -------------------------------
   const {
     opportunity,
     loading: oppLoading,
     error: oppError
   } = useOpportunityData(opportunityId);
 
-  // -------------------------------
-  // 2. チケット・スロット関連情報
-  // -------------------------------
   const {
-    walletData,
+    wallets,
     walletLoading,
     selectedSlot,
     availableTickets,
     startDateTime,
     endDateTime,
-    createReservation,
-    creatingReservation
-  } = useSlotAndTicketInfo(opportunity, slotStartsAt, user?.id, slotId);
+  } = useSlotAndTicketInfo(opportunity, user?.id, slotId);
 
-  // -------------------------------
-  // 3. チケットUI制御・予約実行
-  // -------------------------------
   const {
     ticketCount,
     useTickets,
@@ -70,22 +59,18 @@ export const useReservationConfirm = (params: {
     incrementTicket,
     decrementTicket,
     handleConfirmReservation,
+    creatingReservation,
   } = useReservationActions({
-    opportunityId,
-    selectedSlot,
     opportunity,
-    walletData,
+    selectedSlot,
+    wallets,
     participantCount,
     useTicketsInitial: false,
-    router,
-    createReservation,
     user,
     availableTickets,
   });
 
-  // -------------------------------
-  // 4. ヘッダー / ローディング
-  // -------------------------------
+
   useEffect(() => {
     updateConfig({
       title: '申し込み内容の確認',
@@ -145,71 +130,46 @@ function useOpportunityData(opportunityId: string) {
 
 function useSlotAndTicketInfo(
   opportunity: ActivityDetail | null,
-  slotStartsAt: string,
   userId?: string,
   slotId?: string
 ) {
-  const {
-    walletData,
-    walletLoading,
-    createReservation,
-    creatingReservation,
-  } = useReservationConfirmQuery(userId);
-
+  const reservation = useReservationConfirmQuery(userId);
   const selectedSlot = useMemo(() => {
-    console.log("Finding slot with:", { startsAt: slotStartsAt, slotId });
-    console.log("Available slots:", opportunity?.slots);
-    return findMatchingSlot(opportunity?.slots, slotStartsAt, slotId);
-  }, [opportunity?.slots, slotStartsAt, slotId]);
-
-  const availableTickets = useMemo(
-    () => calculateAvailableTickets(walletData, opportunity?.requiredTicket),
-    [walletData, opportunity?.requiredTicket]
-  );
-
-  const startDateTime = selectedSlot?.node?.startsAt
-    ? parseDateTime(String(selectedSlot.node.startsAt))
-    : null;
-
-  const endDateTime = selectedSlot?.node?.endsAt
-    ? parseDateTime(String(selectedSlot.node.endsAt))
-    : null;
+    if (!opportunity || !slotId) return null;
+    return opportunity.slots.find((slot) => slot.id === slotId) ?? null;
+  }, [opportunity, slotId]);
+  const availableTickets = useAvailableTickets(opportunity, userId);
+  const { startDateTime, endDateTime } = useSlotDateRange(selectedSlot);
 
   return {
-    walletData,
-    walletLoading,
+    ...reservation,
     selectedSlot,
     availableTickets,
     startDateTime,
     endDateTime,
-    createReservation,
-    creatingReservation,
   };
 }
 
 function useReservationActions({
-                                 opportunityId,
-                                 selectedSlot,
                                  opportunity,
-                                 walletData,
+                                 selectedSlot,
+                                 wallets,
                                  participantCount,
                                  useTicketsInitial,
-                                 router,
-                                 createReservation,
                                  user,
                                  availableTickets,
                                }: {
-  opportunityId: string;
-  selectedSlot: any;
   opportunity: ActivityDetail | null;
-  walletData: any;
+  selectedSlot: ActivitySlot | null;
+  wallets: GqlWallet[] | null;
   participantCount: number;
   useTicketsInitial: boolean;
-  router: ReturnType<typeof useRouter>;
-  createReservation: any;
-  user: any;
+  user: Pick<GqlUser, "id"> | null;
   availableTickets: number;
 }) {
+  const router = useRouter();
+  const { execute: createReservation, creatingReservation } = useCreateReservationHandler();
+
   const [ticketCount, setTicketCount] = useState(1);
   const [useTickets, setUseTickets] = useState(useTicketsInitial);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -228,55 +188,20 @@ function useReservationActions({
       return;
     }
 
-    if (!opportunityId || !selectedSlot?.node) {
+    if (!selectedSlot || !opportunity) {
       toast.error("必要な情報が不足しています");
       return;
     }
 
-    const ticketIds = useTickets
-      ? getTicketIds(walletData, opportunity?.requiredTicket, ticketCount)
-      : [];
+    const result = await createReservation({
+      opportunity,
+      selectedSlot,
+      participantCount: ticketCount,
+      wallets,
+      useTickets,
+    });
 
-    if (useTickets && ticketIds.length < ticketCount) {
-      toast.error("必要なチケットが不足しています");
-      return;
-    }
-
-    try {
-      const result = await createReservation({
-        variables: {
-          input: {
-            opportunitySlotId: selectedSlot.node.id,
-            totalParticipantCount: participantCount,
-            paymentMethod: useTickets ? "TICKET" : "FEE",
-            ticketIdsIfNeed: useTickets ? ticketIds : undefined,
-          },
-        },
-      });
-
-      const reservation = result.data?.reservationCreate?.reservation;
-      if (reservation) {
-        toast.success("予約が完了しました");
-        router.push(`/reservation/complete?opportunity_id=${opportunityId}&reservation_id=${reservation.id}`);
-      }
-    } catch (err) {
-      console.error("Reservation error:", err);
-      toast.error(
-        err instanceof Error ? err.message : "予約に失敗しました。もう一度お試しください。"
-      );
-    }
-  }, [
-    user,
-    selectedSlot?.node,
-    opportunityId,
-    ticketCount,
-    walletData,
-    opportunity?.requiredTicket,
-    participantCount,
-    useTickets,
-    createReservation,
-    router,
-  ]);
+  }, [user, opportunity, selectedSlot, ticketCount, wallets, useTickets, createReservation]);
 
   return {
     ticketCount,
@@ -287,5 +212,6 @@ function useReservationActions({
     incrementTicket,
     decrementTicket,
     handleConfirmReservation,
+    creatingReservation,
   };
 }

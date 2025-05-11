@@ -3,7 +3,6 @@
 import { useReservationConfirm } from "@/hooks";
 import { useSearchParams } from "next/navigation";
 import React, { useMemo } from "react";
-import { ErrorState } from "@/components/shared/ErrorState";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import LoginModal from "@/components/features/login/LoginModal";
@@ -11,7 +10,7 @@ import { OpportunityInfo } from "@/components/features/reservation/OpportunityIn
 import { ReservationDetailsCard } from "@/components/features/reservation/ReservationDetailsCard";
 import { PaymentSection } from "@/components/features/reservation/PaymentSection";
 import { NotesSection } from "@/components/features/reservation/NotesSection";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { ReservationContentGate } from "@/app/reservation/contentGate";
 
 export default function ConfirmPage() {
   const searchParams = useSearchParams();
@@ -25,109 +24,64 @@ export default function ConfirmPage() {
   const result = useReservationConfirm(params);
 
   return (
-    <ReservationConfirmGate
+    <ReservationContentGate
       loading={result.loading}
       error={result.error}
-      opportunity={result.opportunity}
-      slot={result.selectedSlot}
-      startDateTime={result.startDateTime}
-      endDateTime={result.endDateTime}
+      nullChecks={[
+        { label: "予約情報", value: result.opportunity },
+        { label: "スロット情報", value: result.selectedSlot?.node },
+        { label: "開始日時", value: result.startDateTime },
+        { label: "終了日時", value: result.endDateTime },
+      ]}
     >
-      <ConfirmUI {...result} />
-    </ReservationConfirmGate>
-  );
-}
-
-function ReservationConfirmGate({
-    loading,
-    error,
-    opportunity,
-    slot,
-    startDateTime,
-    endDateTime,
-    children,
-  }: {
-  loading: boolean;
-  error: Error | null;
-  opportunity: any;
-  slot: any;
-  startDateTime: Date | null;
-  endDateTime: Date | null;
-  children: React.ReactNode;
-}) {
-  if (loading) return <LoadingIndicator />;
-  if (error) return <ErrorState message={error.message} />;
-  if (!opportunity) return <ErrorState message="予約情報が見つかりませんでした" />;
-  if (!slot?.node) return <ErrorState message="選択された時間枠が見つかりませんでした" />;
-  if (!startDateTime || !endDateTime) return <ErrorState message="時間枠の日付形式が無効です" />;
-  return <>{children}</>;
-}
-
-function ConfirmUI({
-   opportunity,
-   selectedSlot,
-   startDateTime,
-   endDateTime,
-   participantCount,
-   pricePerPerson,
-   ticketCount,
-   useTickets,
-   setUseTickets,
-   availableTickets,
-   isLoginModalOpen,
-   setIsLoginModalOpen,
-   incrementTicket,
-   decrementTicket,
-   handleConfirmReservation,
-   creatingReservation,
- }: ReturnType<typeof useReservationConfirm>) {
-  return (
-    <main className="pb-8 min-h-screen">
-      <Toaster />
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-      />
-
-      <OpportunityInfo
-        opportunity={opportunity}
-        pricePerPerson={pricePerPerson}
-      />
-
-      <div className="px-4">
-        <ReservationDetailsCard
-          startDateTime={startDateTime}
-          endDateTime={endDateTime}
-          participantCount={participantCount}
-          location={{
-            name: opportunity?.place?.name || "",
-            address: opportunity?.place?.address || "",
-          }}
+      <main className="pb-8 min-h-screen">
+        <Toaster />
+        <LoginModal
+          isOpen={result.isLoginModalOpen}
+          onClose={() => result.setIsLoginModalOpen(false)}
         />
 
-        <PaymentSection
-          ticketCount={ticketCount}
-          onIncrement={incrementTicket}
-          onDecrement={decrementTicket}
-          maxTickets={availableTickets}
-          pricePerPerson={pricePerPerson}
-          participantCount={participantCount}
-          useTickets={useTickets}
-          setUseTickets={setUseTickets}
+        <OpportunityInfo
+          opportunity={result.opportunity}
+          pricePerPerson={result.pricePerPerson}
         />
 
-        <NotesSection requireApproval={opportunity?.requiredApproval} />
+        <div className="px-4">
+          <ReservationDetailsCard
+            startDateTime={result.startDateTime}
+            endDateTime={result.endDateTime}
+            participantCount={result.participantCount}
+            location={{
+              name: result.opportunity?.place?.name || "",
+              address: result.opportunity?.place?.address || "",
+            }}
+          />
 
-        <Button
-          onClick={handleConfirmReservation}
-          disabled={
-            creatingReservation ||
-            (useTickets && ticketCount > availableTickets)
-          }
-        >
-          {creatingReservation ? "処理中..." : "申し込みを確定"}
-        </Button>
-      </div>
-    </main>
+          <PaymentSection
+            ticketCount={result.ticketCount}
+            onIncrement={result.incrementTicket}
+            onDecrement={result.decrementTicket}
+            maxTickets={result.availableTickets}
+            pricePerPerson={result.pricePerPerson}
+            participantCount={result.participantCount}
+            useTickets={result.useTickets}
+            setUseTickets={result.setUseTickets}
+          />
+
+          <NotesSection requireApproval={result.opportunity?.requiredApproval} />
+
+          <Button
+            onClick={result.handleConfirmReservation}
+            disabled={
+              result.creatingReservation ||
+              (result.useTickets && result.ticketCount > result.availableTickets)
+            }
+          >
+            {result.creatingReservation ? "処理中..." : "申し込みを確定"}
+          </Button>
+        </div>
+      </main>
+    </ReservationContentGate>
+
   );
 }

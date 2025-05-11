@@ -1993,7 +1993,7 @@ export type GqlUser = {
   articlesWrittenByMe?: Maybe<Array<GqlArticle>>;
   bio?: Maybe<Scalars["String"]["output"]>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
-  currentPrefecture: GqlCurrentPrefecture;
+  currentPrefecture?: Maybe<GqlCurrentPrefecture>;
   evaluationCreatedByMe?: Maybe<Array<GqlEvaluationHistory>>;
   evaluations?: Maybe<Array<GqlEvaluation>>;
   id: Scalars["ID"]["output"];
@@ -2088,11 +2088,11 @@ export type GqlUtilitiesConnection = {
 export type GqlUtility = {
   __typename?: "Utility";
   community?: Maybe<GqlCommunity>;
-  createdAt: Scalars["Datetime"]["output"];
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   description?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
   images?: Maybe<Array<Scalars["String"]["output"]>>;
-  name: Scalars["String"]["output"];
+  name?: Maybe<Scalars["String"]["output"]>;
   pointsRequired: Scalars["Int"]["output"];
   publishStatus: GqlPublishStatus;
   requiredForOpportunities?: Maybe<Array<GqlOpportunity>>;
@@ -2518,7 +2518,7 @@ export type GqlUserFieldsFragment = {
   name: string;
   image?: string | null;
   bio?: string | null;
-  currentPrefecture: GqlCurrentPrefecture;
+  currentPrefecture?: GqlCurrentPrefecture | null;
 };
 
 export type GqlUpdateMyProfileMutationVariables = Exact<{
@@ -2536,7 +2536,7 @@ export type GqlUpdateMyProfileMutation = {
       name: string;
       image?: string | null;
       bio?: string | null;
-      currentPrefecture: GqlCurrentPrefecture;
+      currentPrefecture?: GqlCurrentPrefecture | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -2572,7 +2572,7 @@ export type GqlGetUserProfileQuery = {
     image?: string | null;
     bio?: string | null;
     sysRole?: GqlSysRole | null;
-    currentPrefecture: GqlCurrentPrefecture;
+    currentPrefecture?: GqlCurrentPrefecture | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlWebsite?: string | null;
@@ -2594,7 +2594,7 @@ export type GqlGetUserWithDetailsAndPortfoliosQuery = {
     image?: string | null;
     bio?: string | null;
     sysRole?: GqlSysRole | null;
-    currentPrefecture: GqlCurrentPrefecture;
+    currentPrefecture?: GqlCurrentPrefecture | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlWebsite?: string | null;
@@ -2648,6 +2648,7 @@ export type GqlGetUserWalletQuery = {
     wallets?: Array<{
       __typename?: "Wallet";
       id: string;
+      type: GqlWalletType;
       currentPointView?: {
         __typename?: "CurrentPointView";
         currentPoint: number;
@@ -2657,11 +2658,18 @@ export type GqlGetUserWalletQuery = {
         __typename?: "Ticket";
         id: string;
         status: GqlTicketStatus;
-        utility?: { __typename?: "Utility"; id: string } | null;
+        reason: GqlTicketStatusReason;
+        utility?: {
+          __typename?: "Utility";
+          id: string;
+          publishStatus: GqlPublishStatus;
+          pointsRequired: number;
+        } | null;
         ticketStatusHistories?: Array<{
           __typename?: "TicketStatusHistory";
           id: string;
           status: GqlTicketStatus;
+          reason: GqlTicketStatusReason;
           createdByUser?: {
             __typename?: "User";
             id: string;
@@ -2746,7 +2754,7 @@ export type GqlGetArticlesQuery = {
           name: string;
           image?: string | null;
           bio?: string | null;
-          currentPrefecture: GqlCurrentPrefecture;
+          currentPrefecture?: GqlCurrentPrefecture | null;
         }> | null;
       } | null;
     } | null> | null;
@@ -2776,7 +2784,7 @@ export type GqlGetArticleQuery = {
       name: string;
       image?: string | null;
       bio?: string | null;
-      currentPrefecture: GqlCurrentPrefecture;
+      currentPrefecture?: GqlCurrentPrefecture | null;
     }> | null;
     relatedUsers?: Array<{
       __typename?: "User";
@@ -2784,7 +2792,7 @@ export type GqlGetArticleQuery = {
       name: string;
       image?: string | null;
       bio?: string | null;
-      currentPrefecture: GqlCurrentPrefecture;
+      currentPrefecture?: GqlCurrentPrefecture | null;
     }> | null;
   } | null;
   articles: {
@@ -2816,7 +2824,7 @@ export type GqlGetArticleQuery = {
           name: string;
           image?: string | null;
           bio?: string | null;
-          currentPrefecture: GqlCurrentPrefecture;
+          currentPrefecture?: GqlCurrentPrefecture | null;
         }> | null;
       } | null;
     } | null> | null;
@@ -3179,7 +3187,7 @@ export type GqlGetOpportunityQuery = {
             name: string;
             image?: string | null;
             bio?: string | null;
-            currentPrefecture: GqlCurrentPrefecture;
+            currentPrefecture?: GqlCurrentPrefecture | null;
           } | null;
         }> | null;
       }> | null;
@@ -3190,7 +3198,7 @@ export type GqlGetOpportunityQuery = {
       name: string;
       image?: string | null;
       bio?: string | null;
-      currentPrefecture: GqlCurrentPrefecture;
+      currentPrefecture?: GqlCurrentPrefecture | null;
       articlesAboutMe?: Array<{
         __typename?: "Article";
         id: string;
@@ -3242,7 +3250,7 @@ export type GqlGetOpportunityQuery = {
                 name: string;
                 image?: string | null;
                 bio?: string | null;
-                currentPrefecture: GqlCurrentPrefecture;
+                currentPrefecture?: GqlCurrentPrefecture | null;
               } | null;
             }> | null;
           }> | null;
@@ -3676,12 +3684,12 @@ export type GqlTicketClaimLinkQuery = {
 export type GqlUtilityFieldsFragment = {
   __typename?: "Utility";
   id: string;
-  name: string;
+  name?: string | null;
   description?: string | null;
   images?: Array<string> | null;
   pointsRequired: number;
   publishStatus: GqlPublishStatus;
-  createdAt: Date;
+  createdAt?: Date | null;
   updatedAt?: Date | null;
 };
 
@@ -3694,7 +3702,7 @@ export type GqlGetUtilitiesQuery = {
     totalCount: number;
     edges?: Array<{
       __typename?: "UtilityEdge";
-      node?: { __typename?: "Utility"; id: string; name: string } | null;
+      node?: { __typename?: "Utility"; id: string; name?: string | null } | null;
     } | null> | null;
   };
 };
@@ -4816,6 +4824,7 @@ export const GetUserWalletDocument = gql`
       id
       wallets {
         id
+        type
         currentPointView {
           currentPoint
           walletId
@@ -4823,12 +4832,16 @@ export const GetUserWalletDocument = gql`
         tickets {
           id
           status
+          reason
           utility {
             id
+            publishStatus
+            pointsRequired
           }
           ticketStatusHistories {
             id
             status
+            reason
             createdByUser {
               id
               name

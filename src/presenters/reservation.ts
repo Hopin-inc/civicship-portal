@@ -1,75 +1,35 @@
 'use client';
 
-import { parseDateTime } from "@/utils/date";
+import { ActivitySlot } from "@/types/opportunitySlot";
+import { GqlTicket, GqlWallet } from "@/types/graphql";
+import { RequiredUtility } from "@/types/opportunity";
 
-export const findMatchingSlot = (slots: any, slotStartsAt: string, slotId?: string) => {
-  console.log("findMatchingSlot called with:", { slotStartsAt, slotId });
-  
-  if (!slots) {
-    console.log("Missing slots");
+export const findMatchingSlot = (
+  slots: ActivitySlot[],
+  slotId?: string
+): ActivitySlot | null => {
+  if (!Array.isArray(slots) || slots.length === 0) {
     return null;
   }
-  
-  const hasEdges = slots.edges && Array.isArray(slots.edges);
-  const isArray = Array.isArray(slots);
-  const slotsArray = hasEdges ? slots.edges : isArray ? slots : [];
-  
-  if (slotsArray.length === 0) {
-    console.log("Empty slots array");
-    return null;
-  }
-  
+
   if (slotId) {
-    console.log("Matching by ID:", slotId);
-    const foundById = slotsArray.find((item: any) => {
-      const hasNode = item && item.node;
-      const slot = hasNode ? item.node : item;
-      return slot?.id === slotId;
-    });
-    
-    if (foundById) {
-      console.log("Found matching slot by ID:", foundById);
-      if (foundById.node) {
-        return foundById;
-      } else {
-        return { node: foundById };
-      }
+    const match = slots.find((slot) => slot.id === slotId);
+    if (match) {
+      return match;
     }
   }
-  
-  console.log("ID not found, using first slot as fallback");
-  const firstItem = slotsArray[0];
-  const slot = firstItem.node || firstItem;
-  return { node: slot };
+
+  return slots[0] ;
 };
 
-export const calculateAvailableTickets = (walletData: any, requiredUtilities: any[] | undefined) => {
-  if (!requiredUtilities?.length) {
-    return walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.length || 0;
-  }
-
-  const requiredUtilityIds = new Set(
-    requiredUtilities.map(u => u.id)
-  );
-
-  const availableTickets = walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.filter(
-    (edge: any) => {
-      const utilityId = edge?.node?.utility?.id;
-      return utilityId ? requiredUtilityIds.has(utilityId) : false;
-    }
-  ) || [];
-
-  return availableTickets.length;
-};
-
-export const getTicketIds = (walletData: any, requiredUtilities: any[] | undefined, ticketCount: number) => {
-  return walletData?.user?.wallets?.edges?.[0]?.node?.tickets?.edges
-    ?.filter((edge: any) => {
+export const getTicketIds = (wallets: GqlWallet[] | null, requiredUtilities: RequiredUtility[] | undefined, ticketCount: number) => {
+  return wallets?.[0]?.tickets
+    ?.filter((edge: GqlTicket) => {
       if (!requiredUtilities?.length) return true;
-      const utilityId = edge?.node?.utility?.id;
+      const utilityId = edge?.utility?.id;
       return utilityId && requiredUtilities.some(u => u.id === utilityId);
     })
     ?.slice(0, ticketCount)
-    ?.map((edge: any) => edge?.node?.id)
-    ?.filter((id: any): id is string => id !== undefined) || [];
+    ?.map((edge: GqlTicket) => edge?.id)
+    ?.filter((id) => id !== undefined) || [];
 };

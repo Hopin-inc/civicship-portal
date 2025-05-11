@@ -1,48 +1,28 @@
 "use client";
 
-import { ErrorState } from "@/components/shared/ErrorState";
 import { SimilarActivitiesList } from "@/components/features/activity/SimilarActivitiesList";
 import { CompletionHeader } from "@/components/features/reservation/CompletionHeader";
 import { ActivitySummary } from "@/components/features/reservation/ActivitySummary";
 import { ReservationDetails } from "@/components/features/reservation/ReservationDetails";
 import { useReservationComplete } from "@/hooks/features/reservation/useReservationComplete";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import React from "react";
+import { ReservationContentGate } from "@/app/reservation/contentGate";
 
 export default function CompletePage() {
   const result = useReservationComplete();
 
   return (
-    <ReservationCompletionGate {...result}>
+    <ReservationContentGate
+      loading={result.isLoading}
+      error={result.error}
+      nullChecks={[
+        { label: "予約情報", value: result.opportunity },
+        { label: "日付情報", value: result.dateTimeInfo },
+      ]}
+    >
       <ReservationCompletionUI {...result} />
-    </ReservationCompletionGate>
+    </ReservationContentGate>
   );
-}
-
-function ReservationCompletionGate({
-   isLoading,
-   error,
-   opportunity,
-   dateTimeInfo,
-   children,
- }: {
-  isLoading: boolean;
-  error: Error | null;
-  opportunity: any;
-  dateTimeInfo: {
-    formattedDate: string;
-    startTime: string;
-    endTime: string;
-    participantCount: number;
-    totalPrice: number;
-  } | null;
-  children: React.ReactNode;
-}) {
-  if (isLoading) return <LoadingIndicator/>;
-  if (error) return <ErrorState message={error.message} />;
-  if (!opportunity || !dateTimeInfo) return <ErrorState message="予約情報が見つかりませんでした" />;
-
-  return <>{children}</>;
 }
 
 function ReservationCompletionUI({

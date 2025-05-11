@@ -95,6 +95,7 @@ export const GET_USER_WALLET = gql(`
       id
       wallets {
         id
+        type
         currentPointView {
           currentPoint
           walletId
@@ -102,12 +103,16 @@ export const GET_USER_WALLET = gql(`
         tickets {
           id
           status
+          reason
           utility {
             id
+            publishStatus
+            pointsRequired
           }
           ticketStatusHistories {
             id
             status
+            reason
             createdByUser {
               id
               name
