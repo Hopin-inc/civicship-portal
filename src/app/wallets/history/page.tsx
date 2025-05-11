@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useTransactionHistory } from '@/hooks/features/wallet/useTransactionHistory';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHeader } from '@/components/providers/HeaderProvider';
-import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
+import LoadingIndicator from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { TransactionItem } from '@/components/features/wallet/TransactionItem';
 

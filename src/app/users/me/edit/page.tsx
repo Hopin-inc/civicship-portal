@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProfileEdit } from '@/hooks/features/user/useProfileEdit';
 import { UserProfileEdit } from '@/components/features/user/UserProfileEdit';
-import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
+import LoadingIndicator from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 

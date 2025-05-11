@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/features/user/useUserProfile';
 import { useWallet } from '@/hooks/features/wallet/useWallet';
 import { UserProfileSection } from '@/components/features/user/UserProfileSection';
-import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
+import LoadingIndicator from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 

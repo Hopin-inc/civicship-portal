@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/features/user/useUserProfile";
 import { useUserPortfolios } from "@/hooks/features/user/useUserPortfolios";
 import { UserProfileSection } from "@/components/features/user/UserProfileSection";
-import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
 
@@ -16,16 +16,16 @@ export default function UserPage({ params }: { params: { id: string } }) {
     showLogo: false,
   }), []);
   useHeaderConfig(headerConfig);
-  
+
   const { user: currentUser } = useAuth();
   const isOwner = currentUser?.id === params.id;
-  
-  const { 
-    profileData, 
-    isLoading: profileLoading, 
-    error: profileError 
+
+  const {
+    profileData,
+    isLoading: profileLoading,
+    error: profileError
   } = useUserProfile(params.id);
-  
+
   const {
     portfolios,
     isLoading: portfoliosLoading,
@@ -48,8 +48,8 @@ export default function UserPage({ params }: { params: { id: string } }) {
     return (
       <div className="container mx-auto px-4 py-6">
         <ErrorState message={
-          profileError?.message || 
-          portfoliosError?.message || 
+          profileError?.message ||
+          portfoliosError?.message ||
           "ユーザー情報の取得に失敗しました"
         } />
       </div>
@@ -75,4 +75,4 @@ export default function UserPage({ params }: { params: { id: string } }) {
       />
     </div>
   );
-}                        
+}
