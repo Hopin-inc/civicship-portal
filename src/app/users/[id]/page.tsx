@@ -1,13 +1,22 @@
 "use client";
 
+import { useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/features/user/useUserProfile";
 import { useUserPortfolios } from "@/hooks/features/user/useUserPortfolios";
 import { UserProfileSection } from "@/components/features/user/UserProfileSection";
 import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
 
 export default function UserPage({ params }: { params: { id: string } }) {
+  const headerConfig = useMemo(() => ({
+    title: "ユーザープロフィール",
+    showBackButton: true,
+    showLogo: false,
+  }), []);
+  useHeaderConfig(headerConfig);
+  
   const { user: currentUser } = useAuth();
   const isOwner = currentUser?.id === params.id;
   
@@ -66,4 +75,4 @@ export default function UserPage({ params }: { params: { id: string } }) {
       />
     </div>
   );
-}    
+}                        

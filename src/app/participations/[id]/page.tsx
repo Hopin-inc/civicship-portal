@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useParticipation } from "@/hooks/features/participation/useParticipation";
 import { useParticipationImageUpload } from "@/hooks/features/participation/useParticipationImageUpload";
 import { GqlParticipationStatus } from '@/types/graphql';
@@ -25,12 +25,13 @@ interface ParticipationProps {
 export default function ParticipationPage({ params }: ParticipationProps) {
   const { participation, opportunity, loading, error, refetch } = useParticipation(params.id);
   
-  useHeaderConfig({
+  const headerConfig = useMemo(() => ({
     title: opportunity?.title ? `${opportunity.title} - 予約詳細` : "予約詳細",
     showBackButton: true,
     showLogo: false,
     showSearchForm: false,
-  });
+  }), [opportunity?.title]);
+  useHeaderConfig(headerConfig);
   
   const {
     currentStatus,

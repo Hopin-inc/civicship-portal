@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
-import { useHeader } from '@/contexts/HeaderContext';
+import { useHeader } from '@/components/providers/HeaderProvider';
 import { useLoading } from '@/hooks/core/useLoading';
 import { 
   GqlOpportunityCategory as OpportunityCategory, 

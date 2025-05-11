@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { TicketDetailHeader } from '@/components/features/ticket/TicketDetailHeader';
 import { TicketDetailProfile } from '@/components/features/ticket/TicketDetailProfile';
@@ -10,10 +10,18 @@ import { TicketDetailAction } from '@/components/features/ticket/TicketDetailAct
 import { useTicketDetail } from '@/hooks/features/ticket/useTicketDetail';
 import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 
 export default function TicketDetailPage() {
   const params = useParams();
   const ticketId = params?.id as string;
+  
+  const headerConfig = useMemo(() => ({
+    title: "チケット詳細",
+    showBackButton: true,
+    showLogo: false,
+  }), []);
+  useHeaderConfig(headerConfig);
   
   const { 
     isLoading, 

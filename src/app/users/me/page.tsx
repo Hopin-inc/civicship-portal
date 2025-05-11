@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from "react";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/features/user/useUserProfile';
@@ -8,17 +8,26 @@ import { useWallet } from '@/hooks/features/wallet/useWallet';
 import { UserProfileSection } from '@/components/features/user/UserProfileSection';
 import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 
 export default function MyProfilePage() {
+  const headerConfig = useMemo(() => ({
+    title: "マイページ",
+    showLogo: true,
+    showBackButton: false,
+    showSearchForm: false,
+  }), [])
+  useHeaderConfig(headerConfig);
+
   const router = useRouter();
   const { user: currentUser } = useAuth();
-  
-  const { 
-    profileData, 
-    isLoading: isProfileLoading, 
-    error: profileError 
+
+  const {
+    profileData,
+    isLoading: isProfileLoading,
+    error: profileError
   } = useUserProfile(currentUser?.id);
-  
+
   const {
     currentPoint,
     ticketCount,
@@ -44,8 +53,8 @@ export default function MyProfilePage() {
     return (
       <div className="container mx-auto px-4 py-6">
         <ErrorState message={
-          profileError?.message || 
-          walletError?.message || 
+          profileError?.message ||
+          walletError?.message ||
           "ユーザー情報の取得に失敗しました"
         } />
       </div>

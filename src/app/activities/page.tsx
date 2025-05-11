@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useLoading } from '@/hooks/core/useLoading'
 import { useActivities } from '@/hooks/features/activity/useActivities'
 import { useHeaderConfig } from '@/hooks/core/useHeaderConfig'
@@ -21,10 +21,11 @@ const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
 export default function ActivitiesPage() {
   const { setIsLoading } = useLoading()
 
-  useHeaderConfig({
+  const headerConfig = useMemo(() => ({
     showLogo: true,
-    showSearchForm: true,
-  })
+    showSearchForm: true
+  }), [])
+  useHeaderConfig(headerConfig);
 
   const {
     upcomingActivities,
