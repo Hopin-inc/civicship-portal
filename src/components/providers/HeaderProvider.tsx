@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode, useState, useEffect, createContext, useContext } from "react";
+import React, { ReactNode, useState, useEffect, createContext, useContext, useCallback, useMemo } from "react";
 import { usePathname } from "next/navigation";
 
 export interface HeaderConfig {
@@ -65,57 +65,57 @@ const HeaderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [lastVisitedUrls, setLastVisitedUrls] = useState<Record<string, string>>({});
   const pathname = usePathname();
 
-  useEffect(() => {
-    if (pathname) {
-      let pageType = PAGE_TYPES.HOME;
-      
-      if (pathname.startsWith("/activities")) {
-        pageType = PAGE_TYPES.ACTIVITIES;
-      } else if (pathname.startsWith("/search")) {
-        pageType = PAGE_TYPES.SEARCH;
-      } else if (pathname.startsWith("/places")) {
-        pageType = PAGE_TYPES.PLACES;
-      } else if (pathname.startsWith("/users") || pathname.startsWith("/wallets") || pathname.startsWith("/tickets")) {
-        pageType = PAGE_TYPES.USER;
-      }
-      
-      const lastUrl = lastVisitedUrls[pageType];
-      if (lastUrl !== pathname) {
-        addToHistory(pageType, pathname);
-      }
-    }
-  }, [pathname]);
-
-  const updateConfig = (newConfig: Partial<HeaderConfig>) => {
+  const updateConfig = useCallback((newConfig: Partial<HeaderConfig>) => {
     setConfig((prevConfig: HeaderConfig) => ({ ...prevConfig, ...newConfig }));
-  };
+  }, []);
 
-  const resetConfig = () => {
+  const resetConfig = useCallback(() => {
     setConfig(defaultConfig);
-  };
+  }, []);
 
-  const addToHistory = (pageType: string, url: string) => {
+  const getPageType = useCallback((path: string): string => {
+    if (path.startsWith("/activities")) {
+      return PAGE_TYPES.ACTIVITIES;
+    } else if (path.startsWith("/search")) {
+      return PAGE_TYPES.SEARCH;
+    } else if (path.startsWith("/places")) {
+      return PAGE_TYPES.PLACES;
+    } else if (path.startsWith("/users") || path.startsWith("/wallets") || path.startsWith("/tickets")) {
+      return PAGE_TYPES.USER;
+    }
+    return PAGE_TYPES.HOME;
+  }, []);
+
+  const addToHistory = useCallback((pageType: string, url: string) => {
     setLastVisitedUrls((prev: Record<string, string>) => {
-      const newHistory = { ...prev };
-      
       if (url !== prev[pageType]) {
-        newHistory[pageType] = url;
+        return { ...prev, [pageType]: url };
       }
-      
-      return newHistory;
+      return prev; // Return the same object if no change to prevent re-renders
     });
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!pathname) return;
+    
+    const pageType = getPageType(pathname);
+    const lastUrl = lastVisitedUrls[pageType];
+    
+    if (lastUrl !== pathname) {
+      addToHistory(pageType, pathname);
+    }
+  }, [pathname, getPageType, addToHistory, lastVisitedUrls]);
+
+  const contextValue = useMemo(() => ({
+    config, 
+    updateConfig, 
+    resetConfig, 
+    lastVisitedUrls,
+    addToHistory
+  }), [config, updateConfig, resetConfig, lastVisitedUrls, addToHistory]);
 
   return (
-    <HeaderContext.Provider 
-      value={{ 
-        config, 
-        updateConfig, 
-        resetConfig, 
-        lastVisitedUrls,
-        addToHistory
-      }}
-    >
+    <HeaderContext.Provider value={contextValue}>
       {children}
     </HeaderContext.Provider>
   );
