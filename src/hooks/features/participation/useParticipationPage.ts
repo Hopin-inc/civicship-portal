@@ -5,8 +5,27 @@ import { useParticipation } from '@/hooks/features/participation/useParticipatio
 import { useParticipationState } from '@/hooks/features/participation/useParticipationState';
 import { useParticipationImageUpload } from '@/hooks/features/participation/useParticipationImageUpload';
 import { calculateCancellationDeadline } from '@/presenters/participation';
+import { Participation, Opportunity } from '@/types/participation';
+import { ReservationStatus } from '@/types/participationStatus';
+import { ApolloError } from '@apollo/client';
 
-export const useParticipationPage = (id: string) => {
+interface UseParticipationPageResult {
+  participation?: Participation;
+  opportunity?: Opportunity;
+  loading: boolean;
+  error: ApolloError | undefined;
+  currentStatus: ReservationStatus | null;
+  uploadSuccess: boolean;
+  uploadError: string | null;
+  isUploading: boolean;
+  handleAddPhotos: (images: File[], comment: string) => Promise<void>;
+  startTime: Date;
+  endTime: Date;
+  participantCount: number;
+  cancellationDeadline: Date;
+}
+
+export const useParticipationPage = (id: string): UseParticipationPageResult => {
   const { participation, opportunity, loading, error, refetch } = useParticipation(id);
 
   const {
@@ -19,17 +38,26 @@ export const useParticipationPage = (id: string) => {
     togglePhotosModal,
   } = useParticipationState({ participation, onUploadSuccess: refetch });
 
+  const handleErrorAdapter = (error: Error): void => {
+    handleUploadError(error.message);
+  };
+
   const { uploadImages, isUploading } = useParticipationImageUpload({
     participationId: id,
     onSuccess: handleUploadSuccess,
-    onError: handleUploadError,
+    onError: handleErrorAdapter,
   });
 
-  const handleAddPhotos = async (images: File[], comment: string) => {
+  const handleAddPhotos = async (images: File[], comment: string): Promise<void> => {
     try {
       await uploadImages(images, comment);
     } catch (error) {
       console.error('Error uploading photos:', error);
+      if (error instanceof Error) {
+        handleUploadError(error.message);
+      } else {
+        handleUploadError('画像のアップロードに失敗しました');
+      }
     }
   };
 
