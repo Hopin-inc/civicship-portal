@@ -1,6 +1,47 @@
 'use client';
 
-import { GqlCurrentPrefecture, GqlUser } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlUser, GqlWallet } from "@/types/graphql";
+import {  AppUser, AppUserSelf, GeneralUserProfile, ManagerProfile } from "@/types/user";
+import { presenterActivityCard } from "@/presenters/opportunity";
+import { presenterUserAsset } from "@/presenters/wallet";
+import { presenterPortfolio } from "@/presenters/portfolio";
+
+export const presenterAppUser = (gqlUser: GqlUser): AppUser => {
+  return {
+    id: gqlUser.id,
+    profile: presenterUserProfile(gqlUser),
+    portfolios: (gqlUser.portfolios ?? []).map(presenterPortfolio),
+  };
+};
+
+export const presenterAppUserSelf = (gqlUser: GqlUser): AppUserSelf => {
+  return {
+    ...presenterAppUser(gqlUser),
+    asset: presenterUserAsset(gqlUser.wallets?.[0]),
+    portfolios: (gqlUser.portfolios ?? []).map(presenterPortfolio),
+  };
+};
+
+export const presenterManagerProfile = (gqlUser: GqlUser): ManagerProfile => {
+  return {
+    ...presenterAppUser(gqlUser),
+    asset: presenterUserAsset(gqlUser.wallets?.[0]),
+    currentlyHiringOpportunities: (gqlUser.opportunitiesCreatedByMe ?? []).map(presenterActivityCard),
+  };
+};
+
+const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
+  return {
+    name: gqlUser.name,
+    image: gqlUser.image ?? null,
+    bio: gqlUser.bio ?? null,
+    currentPrefecture: gqlUser.currentPrefecture ?? undefined,
+    urlFacebook: gqlUser.urlFacebook ?? null,
+    urlInstagram: gqlUser.urlInstagram ?? null,
+    urlX: gqlUser.urlX ?? null,
+  };
+};
+
 
 export const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
   [GqlCurrentPrefecture.Kagawa]: '香川県',
@@ -18,81 +59,6 @@ export const prefectureOptions = [
   GqlCurrentPrefecture.Ehime,
 ];
 
-
-
-export interface UserProfileData {
-  id: string;
-  name: string;
-  image: string | null;
-  bio: string | null;
-  sysRole: string | null;
-  urlFacebook: string | null;
-  urlInstagram: string | null;
-  urlWebsite: string | null;
-  urlX: string | null;
-  urlYoutube: string | null;
-  opportunities: Array<{
-    id: string;
-    title: string;
-    description: string | null;
-    images: string[] | null;
-    feeRequired: number | null;
-    isReservableWithTicket: boolean | null;
-  }>;
-  portfolios: Array<{
-    id: string;
-    title: string;
-    category: string | null;
-    date: string | null;
-    thumbnailUrl: string | null;
-    source: string | null;
-    reservationStatus: string | null;
-  }>;
-}
-
-export const formatUserProfileData = (
-  user: GqlUser | null | undefined,
-): UserProfileData | null => {
-  if (!user) return null;
-  
-  return {
-    id: user.id,
-    name: user.name,
-    image: user.image ?? null,
-    bio: user.bio ?? null,
-    sysRole: user.sysRole ?? null,
-    urlFacebook: user.urlFacebook ?? null,
-    urlInstagram: user.urlInstagram ?? null,
-    urlWebsite: user.urlWebsite ?? null,
-    urlX: user.urlX ?? null,
-    urlYoutube: user.urlYoutube ?? null,
-    opportunities: 'opportunitiesCreatedByMe' in user && user.opportunitiesCreatedByMe
-      ? user.opportunitiesCreatedByMe.map(node => ({
-          id: node.id,
-          title: node.title,
-          description: node.description ?? null,
-          images: node.images ?? null,
-          feeRequired: node.feeRequired ?? null,
-          isReservableWithTicket: node.isReservableWithTicket ?? null,
-        }))
-      : [],
-    portfolios: 'portfolios' in user && user.portfolios
-      ? user.portfolios.map(node => ({
-          id: node.id,
-          title: node.title,
-          category: node.category ?? null,
-          date: new Date(node.date).toISOString() ?? null,
-          thumbnailUrl: node.thumbnailUrl ?? null,
-          source: node.source ?? null,
-          reservationStatus: node.reservationStatus ?? null,
-        }))
-      : [],
-  };
-};
-
-/**
- * Format user profile data from any user data structure
- */
 export interface SimpleUserData {
   user?: {
     id: string;

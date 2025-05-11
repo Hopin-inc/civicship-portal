@@ -4,11 +4,15 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
-export const WalletHistoryButton: React.FC = () => {
+type WalletHistoryButtonProps = {
+  walletId: string;
+};
+
+export const WalletHistoryButton: React.FC<WalletHistoryButtonProps> = ({ walletId }) => {
   const router = useRouter();
 
   const handleHistoryClick = () => {
-    router.push('/wallets/history');
+    router.push(`/wallets/${walletId}`);
   };
 
   return (

@@ -1,38 +1,56 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { useWalletController } from './useWalletController';
+import { useLoading } from '@/hooks/core/useLoading';
+import { useGetUserWalletQuery } from '@/types/graphql';
+import { presenterUserAsset } from '@/presenters/wallet';
+import { UserAsset } from '@/types/wallet';
 
-/**
- * Custom hook for fetching and managing wallet data
- * This is a backward-compatible wrapper around useWalletController
- * @param userId Optional user ID. If not provided, fetches current user's wallet
- */
 export const useWallet = (userId?: string) => {
   const { user: authUser } = useAuth();
   const targetId = userId || authUser?.id;
-  
-  const {
-    currentPoint,
-    ticketCount,
-    transactions,
-    isLoading,
-    isLoadingMore,
-    hasMore,
-    error,
-    loadMore,
-    lastTransactionRef
-  } = useWalletController(targetId);
-  
+
+  const { setIsLoading } = useLoading();
+
+  const [userAsset, setUserAsset] = useState<UserAsset>({
+    points: {
+      walletId: '',
+      currentPoint: 0,
+    },
+    tickets: [],
+  });
+
+  const [isLoadingMore] = useState(false);
+
+  const { data, loading, error } = useGetUserWalletQuery({
+    variables: targetId ? { id: targetId } : undefined,
+    skip: !targetId,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  useEffect(() => {
+    setIsLoading(loading);
+  }, [loading, setIsLoading]);
+
+  useEffect(() => {
+    if (data?.user?.wallets?.[0]) {
+      const asset = presenterUserAsset(data.user.wallets[0]);
+      setUserAsset(asset);
+    }
+  }, [data]);
+
+  if (error) {
+    console.error('Error fetching wallet data:', error);
+    toast.error('ウォレットの取得に失敗しました');
+  }
+
   return {
-    currentPoint,
-    ticketCount,
-    transactions,
-    isLoading,
+    userAsset,
+    isLoading: loading || false,
     isLoadingMore,
-    hasMore,
     error,
-    loadMore
   };
 };
 

@@ -2,21 +2,10 @@ import { GqlTransaction, GqlTransactionReason, GqlWallet, GqlWalletType } from "
 import { AppTransaction } from "@/types/transaction";
 
 export const presenterTransaction = (
-  node: GqlTransaction,
-  walletId: string
-): AppTransaction => {
-  const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
-    if (!wallet) return '';
-    switch (wallet.type) {
-      case GqlWalletType.Member:
-        return wallet.user?.name ?? '';
-      case GqlWalletType.Community:
-        return wallet.community?.name ?? '';
-      default:
-        return '';
-    }
-  };
-
+  node: GqlTransaction | null | undefined,
+  walletId: string,
+): AppTransaction | null  => {
+  if(!node) return null;
   const from = getNameFromWallet(node.fromWallet);
   const to = getNameFromWallet(node.toWallet);
   const rawPoint = node.fromPointChange ?? 0;
@@ -34,7 +23,7 @@ export const presenterTransaction = (
   };
 };
 
-export const formatTransactionDescription = (
+const formatTransactionDescription = (
   reason: GqlTransactionReason,
   fromUserName: string,
   toUserName: string,
@@ -76,6 +65,18 @@ export const formatTransactionDescription = (
 
     default:
       return `ポイントが移動しました`;
+  }
+};
+
+const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
+  if (!wallet) return '';
+  switch (wallet.type) {
+    case GqlWalletType.Member:
+      return wallet.user?.name ?? '';
+    case GqlWalletType.Community:
+      return wallet.community?.name ?? '';
+    default:
+      return '';
   }
 };
 

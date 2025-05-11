@@ -1,12 +1,7 @@
 import Image from "next/image";
+import { Participant } from "@/types/utils";
 
 const MAX_DISPLAY_PARTICIPANTS = 3;
-
-export interface Participant {
-  id: string;
-  name: string;
-  image?: string | null;
-}
 
 interface ParticipantsListProps {
   participants: Participant[];

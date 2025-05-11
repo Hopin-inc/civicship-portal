@@ -1,7 +1,32 @@
 'use client';
 
 import { format } from 'date-fns';
-import { GqlPortfolio } from "@/types/graphql";
+import { GqlPortfolio, GqlUser } from "@/types/graphql";
+import { AppPortfolio } from "@/types/user";
+import { Participant } from "@/types/utils";
+
+export const presenterPortfolio = (gqlPortfolio: GqlPortfolio): AppPortfolio => {
+  return {
+    id: gqlPortfolio.id,
+    source: gqlPortfolio.source,
+    category: gqlPortfolio.category,
+    reservationStatus: gqlPortfolio.reservationStatus ?? null,
+    title: gqlPortfolio.title,
+    image: gqlPortfolio.thumbnailUrl ?? null,
+    date: new Date(gqlPortfolio.date).toISOString() ?? null,
+    location: gqlPortfolio.place?.name ?? null,
+    participants: (gqlPortfolio.participants ?? []).map(presentParticipant),
+  };
+};
+
+export const presentParticipant = (gqlParticipant: GqlUser): Participant => {
+  return {
+    id: gqlParticipant.id,
+    image: gqlParticipant.image ?? null,
+    name: gqlParticipant.name,
+  };
+};
+
 
 export type PortfolioType = 'opportunity' | 'activity_report' | 'quest';
 export type PortfolioCategory = 'QUEST' | 'ACTIVITY_REPORT' | 'INTERVIEW' | 'OPPORTUNITY';
