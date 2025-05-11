@@ -1,18 +1,14 @@
 "use client";
 
 import { useHeaderConfig } from "@/hooks/core";
-import { useEffect } from "react";
+import { useMemo } from "react";
 
 export default function TicketDetailPage({ params }: { params: { id: string } }) {
-  const { setHeaderConfig } = useHeaderConfig();
-
-  useEffect(() => {
-    setHeaderConfig({ 
-      show: true,
-      title: `チケット #${params.id}`,
-      showBackButton: true
-    });
-  }, [setHeaderConfig, params.id]);
+  const headerConfig = useMemo(() => ({
+    title: `チケット ${params.id}`,
+    showBackButton: true,
+  }), [params.id]);
+  useHeaderConfig(headerConfig);
 
   return (
     <div className="p-4 pt-16">
@@ -21,7 +17,7 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
           <h2 className="font-semibold">チケット詳細</h2>
           <p className="text-gray-600">ID: {params.id}</p>
         </div>
-        
+
         {/* Placeholder content - data fetching not required yet */}
         <div className="space-y-2">
           <div className="border-b pb-2">

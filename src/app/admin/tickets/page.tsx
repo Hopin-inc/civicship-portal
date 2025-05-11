@@ -1,14 +1,13 @@
 "use client";
 
 import { useHeaderConfig } from "@/hooks/core";
-import { useEffect } from "react";
+import { useMemo } from "react";
 
 export default function TicketsPage() {
-  const { setHeaderConfig } = useHeaderConfig();
-
-  useEffect(() => {
-    setHeaderConfig({ show: false });
-  }, [setHeaderConfig]);
+  const headerConfig = useMemo(() => ({
+    hideHeader: true,
+  }), []);
+  useHeaderConfig(headerConfig);
 
   return (
     <div className="p-4">
