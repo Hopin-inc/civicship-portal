@@ -1,12 +1,10 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useRouter } from 'next/navigation';
 import { prefectureLabels, prefectureOptions } from '@/presenters/user';
 import { GqlCurrentPrefecture } from '@/types/graphql';
 
@@ -34,29 +32,18 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
   displayName,
   location,
   bio,
-  socialLinks,
+  // socialLinks,
   updating,
   setDisplayName,
   setLocation,
   setBio,
-  setSocialLinks,
+  // setSocialLinks,
   handleImageSelect,
   handleSave
 }) => {
-  const router = useRouter();
-
   return (
     <div className="min-h-screen bg-background">
-      <header className="fixed top-0 left-0 right-0 h-14 px-4 flex items-center justify-between border-b bg-background z-10">
-        <div className="flex items-center">
-          <Button onClick={() => router.back()} variant="link" className="mr-4 p-0 h-auto">
-            <ChevronLeft />
-          </Button>
-          <h1 className="text-lg font-semibold">プロフィール編集</h1>
-        </div>
-      </header>
-
-      <main className="pt-20 px-4 pb-24 max-w-md mx-auto">
+      <main className="py-6 px-4 pb-24 max-w-md mx-auto">
         <form onSubmit={handleSave}>
           <div className="mb-8">
             <Label className="block mb-2">
