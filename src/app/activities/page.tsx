@@ -15,11 +15,11 @@ import { ErrorState } from "@/components/shared/ErrorState"
 export default function ActivitiesPage() {
   const { setIsLoading } = useLoading()
 
-  const headerConfig = useMemo(() => ({ 
-    showLogo: true, 
-    showSearchForm: true 
+  const headerConfig = useMemo(() => ({
+    showLogo: true,
+    showSearchForm: true
   }), [])
-  useHeaderConfig(headerConfig)
+  useHeaderConfig(headerConfig);
 
   const {
     upcomingActivities,
