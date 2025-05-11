@@ -4,7 +4,8 @@ import { useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLoading } from "@/hooks/core/useLoading";
 import { useGetMembershipListQuery } from "@/types/graphql";
-import { calculateTotalBases, presenterBaseCard } from "@/presenters";
+import { calculateTotalBases, presenterBaseCard } from "@/presenters/membership";
+import { BaseCardInfo, BasePin } from "@/types/place";
 
 export const usePlaces = () => {
   const { data, loading, error } = useGetMembershipListQuery({

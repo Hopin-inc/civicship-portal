@@ -4,7 +4,7 @@ import React from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import CustomMarker from "@/components/features/places/map/markers/CustomMarker";
 import { useMapState } from "@/hooks/features/place/useMapState";
-import { BasePin } from "@/types/place";
+import { BasePin, BaseCardInfo } from "@/types/place";
 
 const containerStyle = {
   width: "100%",
@@ -12,7 +12,7 @@ const containerStyle = {
 };
 
 interface MapComponentProps {
-  places: BasePin[];
+  places: BaseCardInfo[];
   selectedPlaceId: string | null;
   onPlaceSelect: (placeId: string) => void;
 }
@@ -32,6 +32,8 @@ export default function MapComponent({
     selectedPlaceId,
     onPlaceSelect,
   });
+  
+  console.log('MapComponent - markers:', markers);
 
   if (!isLoaded) {
     return <></>;
