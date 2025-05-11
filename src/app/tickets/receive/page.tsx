@@ -8,6 +8,7 @@ import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useTicketClaim } from "@/hooks/features/ticket/useTicketClaim";
 import TicketReceiveContent from "@/components/features/ticket/TicketReceiveContent";
+import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
 
 export default function TicketReceivePage() {
   const searchParams = useSearchParams();
@@ -15,6 +16,12 @@ export default function TicketReceivePage() {
   if (!ticketClaimLinkId) {
     throw new Error("URLが無効か、既に使用されています。");
   }
+
+  useHeaderConfig({
+    title: "チケット受け取り",
+    showBackButton: true,
+    showLogo: false,
+  });
 
   const { user } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);

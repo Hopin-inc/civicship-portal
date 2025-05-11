@@ -10,10 +10,17 @@ import { TicketDetailAction } from '@/components/features/ticket/TicketDetailAct
 import { useTicketDetail } from '@/hooks/features/ticket/useTicketDetail';
 import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 
 export default function TicketDetailPage() {
   const params = useParams();
   const ticketId = params?.id as string;
+  
+  useHeaderConfig({
+    title: "チケット詳細",
+    showBackButton: true,
+    showLogo: false,
+  });
   
   const { 
     isLoading, 
