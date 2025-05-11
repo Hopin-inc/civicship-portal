@@ -12,7 +12,6 @@ import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 
 export default function MyProfilePage() {
   const headerConfig = useMemo(() => ({
-    title: "マイページ",
     showLogo: true,
     showBackButton: false,
     showSearchForm: false,
