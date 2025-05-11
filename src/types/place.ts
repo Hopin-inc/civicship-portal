@@ -1,48 +1,57 @@
 import { AppImage, Participant } from "@/types/utils";
-import { OpportunityCard } from "@/types/opportunity";
+import { ActivityCard, OpportunityCard } from "@/types/opportunity";
 import { ArticleWithAuthor } from "@/types/article";
 
-export type PlacePin = {
+export type BasePin = {
   id: string;
-  image: string;        // 拠点の代表画像（例：施設写真）
-  hostImage: string;    // 主催者やロゴなどの顔となる画像
+  image: string; // 拠点の代表画像（例：施設写真）
+  host: BaseHost;
 
   latitude: number;
   longitude: number;
-}
+};
 
-export type PlaceCard = PlacePin & {
-  name: string;         // 拠点名
+export type BaseHost = {
+  id: string;
+  name: string;
+  image: string | null;
+  bio: string;
+};
+
+export type BaseCardInfo = BasePin & {
+  name: string; // 拠点名
   address: string;
-  headline: string;     // 強調キャッチコピー（短文）
-  bio: string;          // 紹介文（長文）
+  headline: string; // 強調キャッチコピー（短文）
+  bio: string; // 紹介文（長文）
 
   publicOpportunityCount: number;
   participantCount: number;
-}
 
-export type PlaceDetail = PlaceCard & {
-  images: AppImage[];
+  communityId: string;
+};
+
+export type BaseDetail = BaseCardInfo & {
+  images: string[];
   totalImageCount: number;
 
-  currentlyHiringOpportunities: OpportunityCard[];
+  currentlyHiringOpportunities: ActivityCard[];
   relatedArticles: ArticleWithAuthor[];
-  pastHistories: PlaceHistoryGrouped;
-}
+  // pastHistories: BaseHistoryGrouped;
+};
 
-type PlaceHistoryGrouped = HistoryYearGroup[];
+// export type BaseHistoryGrouped = HistoryYearGroup[];
 
-type HistoryYearGroup = {
+export type HistoryYearGroup = {
   year: string;
   months: HistoryMonthGroup[];
 };
 
-type HistoryMonthGroup = {
+export type HistoryMonthGroup = {
   month: string;
-  entries: PlaceHistoryEntry[];
+  entries: BaseHistoryEntry[];
 };
 
-type PlaceHistoryEntry = {
+export type BaseHistoryEntry = {
   id: string;
   date: string;
   title: string;
@@ -53,4 +62,4 @@ type PlaceHistoryEntry = {
 
   participants: Participant[];
   participantCount: number;
-}
+};

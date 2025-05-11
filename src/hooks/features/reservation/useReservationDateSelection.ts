@@ -1,18 +1,19 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import { useHeader } from '@/contexts/HeaderContext';
-import { useLoading } from '@/hooks/core/useLoading';
+import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { useHeader } from "@/contexts/HeaderContext";
+import { useLoading } from "@/hooks/core/useLoading";
 import { useGetOpportunitySlotsQuery } from "@/types/graphql";
-import { presenterActivityDetail } from '@/presenters/opportunity';
+import { presenterActivityDetail } from "@/presenters/opportunity";
 import {
   groupActivitySlotsByDate,
   filterSlotGroupsBySelectedDate,
   buildReservationParams,
-  isSlotAvailable as checkSlotAvailability, presenterOpportunitySlots,
+  isSlotAvailable as checkSlotAvailability,
+  presenterOpportunitySlots,
 } from "@/presenters";
-import { ActivitySlot, ActivitySlotGroup } from '@/types/opportunitySlot';
+import { ActivitySlot, ActivitySlotGroup } from "@/types/opportunitySlot";
 import { ActivityDetail } from "@/types/opportunity";
 
 interface UseReservationDateSelectionProps {
@@ -21,9 +22,9 @@ interface UseReservationDateSelectionProps {
 }
 
 export const useReservationDateSelection = ({
-    opportunityId,
-    communityId,
-  }: UseReservationDateSelectionProps) => {
+  opportunityId,
+  communityId,
+}: UseReservationDateSelectionProps) => {
   const router = useRouter();
   const { updateConfig } = useHeader();
   const { setIsLoading } = useLoading();
@@ -36,8 +37,8 @@ export const useReservationDateSelection = ({
       },
     },
     skip: !opportunityId,
-    fetchPolicy: 'network-only',
-    errorPolicy: 'all',
+    fetchPolicy: "network-only",
+    errorPolicy: "all",
     onError: (err) => {
       console.error("OpportunitySlot query error:", err);
     },
@@ -53,7 +54,7 @@ export const useReservationDateSelection = ({
 
   const opportunity: ActivityDetail | null = useMemo(() => {
     const opportunity = data?.opportunitySlots?.edges?.find(
-      (edge) => edge?.node?.opportunity != null
+      (edge) => edge?.node?.opportunity != null,
     )?.node?.opportunity;
     return opportunity ? presenterActivityDetail(opportunity) : null;
   }, [data]);
@@ -82,11 +83,15 @@ export const useReservationDateSelection = ({
     if (!selectedDate) {
       const date = new Date(slot.startsAt);
       const dateLabel = date.toLocaleDateString("ja-JP", {
-        year: "numeric", month: "long", day: "numeric", weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        weekday: "long",
       });
       setSelectedDate(dateLabel);
     }
     const params = buildReservationParams(opportunityId, communityId, slot, selectedGuests);
+    console.log(params.toString());
     router.push(`/reservation/confirm?${params.toString()}`);
   };
 

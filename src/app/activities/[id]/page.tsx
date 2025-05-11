@@ -11,7 +11,6 @@ import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
 import { useHierarchicalNavigation } from "@/hooks/core/useHierarchicalNavigation";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 interface ActivityPageProps {
   params: {
@@ -25,21 +24,18 @@ interface ActivityPageProps {
 export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
   const { id } = params;
 
-  const {
-    opportunity,
-    similarActivities,
-    availableTickets,
-    availableDates,
-    loading,
-    error,
-  } = useActivityDetails(id);
+  const { opportunity, similarActivities, availableTickets, availableDates, loading, error } =
+    useActivityDetails(id);
 
   const { setIsLoading } = useLoading();
   const { navigateBack } = useHierarchicalNavigation();
 
-  const headerConfig = useMemo(() => ({
-    hideHeader: true, // ヘッダー全体を非表示
-  }), []);
+  const headerConfig = useMemo(
+    () => ({
+      hideHeader: true,
+    }),
+    [],
+  );
   useHeaderConfig(headerConfig);
 
   useEffect(() => {
@@ -55,7 +51,6 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
 
   return (
     <>
-      {/* フローティングアクションボタン（戻るボタン） */}
       <div className="fixed top-4 left-4 z-50">
         <Button
           onClick={navigateBack}
@@ -70,10 +65,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
 
       <main className="min-h-screen pb-24">
         <div className="max-w-7xl mx-auto px-4">
-          <ActivityDetailsHeader
-            opportunity={opportunity}
-            availableTickets={availableTickets}
-          />
+          <ActivityDetailsHeader opportunity={opportunity} availableTickets={availableTickets} />
           <ActivityDetailsContent
             opportunity={opportunity}
             availableTickets={availableTickets}
@@ -83,10 +75,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
           />
         </div>
       </main>
-      <ActivityDetailsFooter
-        opportunityId={opportunity.id}
-        price={opportunity.feeRequired || 0}
-      />
+      <ActivityDetailsFooter opportunityId={opportunity.id} price={opportunity.feeRequired || 0} />
     </>
   );
 }

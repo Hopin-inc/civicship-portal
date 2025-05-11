@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-export { 
-  HeaderContext, 
+export {
+  HeaderContext,
   useHeader,
   HeaderProvider,
-  type HeaderContextState,
-  type HeaderConfig
-} from '@/components/providers/HeaderProvider';    
+  HeaderContextState,
+  HeaderConfig,
+} from "@/components/providers/HeaderProvider";
