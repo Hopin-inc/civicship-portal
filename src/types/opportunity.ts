@@ -8,15 +8,15 @@ import { ActivitySlot, QuestSlot } from "@/types/opportunitySlot";
 // ---------------------------------------------
 export type OpportunityCard = ActivityCard | QuestCard;
 
-export type ActivityCard = BaseCard & {
+export type ActivityCard = OpportunityBaseCard & {
   feeRequired: number;
 };
 
-export type QuestCard = BaseCard & {
+export type QuestCard = OpportunityBaseCard & {
   pointsToEarn: number;
 };
 
-export type BaseCard = CommunityId & {
+export type OpportunityBaseCard = CommunityId & {
   id: string;
   category: GqlOpportunityCategory;
   title: string;

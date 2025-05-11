@@ -1,4 +1,3 @@
-export * from './useUserProfileOther';
-export * from './useUserPortfolios';
+export * from './useUserProfile';
 export * from './useProfileEdit';
 export * from './useSignUp';

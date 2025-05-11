@@ -2,8 +2,6 @@
 
 import React from 'react';
 import { UserProfileHeader } from './UserProfileHeader';
-import { UserPortfolioSection } from './UserPortfolioSection';
-import { UserActiveOpportunities } from './UserActiveOpportunities';
 import { UserTicketsAndPoints } from './UserTicketsAndPoints';
 import LoadingIndicator from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';

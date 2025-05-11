@@ -30,7 +30,7 @@ export const presenterManagerProfile = (gqlUser: GqlUser): ManagerProfile => {
   };
 };
 
-const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
+export const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
   return {
     name: gqlUser.name,
     image: gqlUser.image ?? null,
@@ -41,7 +41,6 @@ const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
     urlX: gqlUser.urlX ?? null,
   };
 };
-
 
 export const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
   [GqlCurrentPrefecture.Kagawa]: '香川県',
@@ -58,50 +57,3 @@ export const prefectureOptions = [
   GqlCurrentPrefecture.Kochi,
   GqlCurrentPrefecture.Ehime,
 ];
-
-export interface SimpleUserData {
-  user?: {
-    id: string;
-    name: string;
-    image: string | null;
-    bio?: string | null;
-    currentPrefecture?: GqlCurrentPrefecture | null;
-    urlFacebook?: string | null;
-    urlInstagram?: string | null;
-    urlX?: string | null;
-    urlYoutube?: string | null;
-    urlWebsite?: string | null;
-  } | null;
-}
-
-export interface SimpleUserProfile {
-  id: string;
-  name: string;
-  image: string | null;
-  bio: string;
-  currentPrefecture?: GqlCurrentPrefecture | null;
-  socialLinks: Array<{
-    type: string;
-    url: string | null;
-  }>;
-}
-
-export const formatSimpleUserProfileData = (userData: SimpleUserData): SimpleUserProfile | null => {
-  if (!userData?.user) return null;
-  
-  const { user } = userData;
-  return {
-    id: user.id,
-    name: user.name,
-    image: user.image,
-    bio: user.bio || '',
-    currentPrefecture: user.currentPrefecture,
-    socialLinks: [
-      { type: 'facebook', url: user.urlFacebook || null },
-      { type: 'instagram', url: user.urlInstagram || null },
-      { type: 'x', url: user.urlX || null },
-      { type: 'youtube', url: user.urlYoutube || null },
-      { type: 'website', url: user.urlWebsite || null }
-    ]
-  };
-};

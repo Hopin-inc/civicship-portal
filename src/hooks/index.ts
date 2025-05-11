@@ -36,8 +36,7 @@ export * from './features/ticket/useTicketClaim';
 export * from './features/ticket/useTicketDetail';
 
 // User
-export * from './features/user/useUserProfileOther';
-export * from './features/user/useUserPortfolios';
+export * from './features/user/useUserProfile';
 export * from './features/user/useProfileEdit';
 export * from './features/user/useSignUp';
 

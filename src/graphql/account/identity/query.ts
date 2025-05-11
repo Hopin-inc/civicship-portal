@@ -7,6 +7,7 @@ export const GET_CURRENT_USER = gql(`
         id
         name
         memberships {
+          ...MembershipFields
           user {
             id
             name

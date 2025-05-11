@@ -7,7 +7,7 @@ import {
   GqlOpportunityEdge, 
   GqlOpportunity as GraphQLOpportunity 
 } from '@/types/graphql';
-import { OpportunityCardProps } from "@/components/features/opportunity/OpportunityCard";
+import { ActivityCard } from "@/types/opportunity";
 
 export interface SearchParams {
   location?: string;
@@ -19,18 +19,12 @@ export interface SearchParams {
   q?: string;
 }
 
-/**
- * Format date range for display
- */
 export const formatDateRange = (range: DateRange | undefined): string => {
   if (!range?.from) return '';
   if (!range.to) return format(range.from, 'M/d', { locale: ja });
   return `${format(range.from, 'M/d', { locale: ja })} - ${format(range.to, 'M/d', { locale: ja })}`;
 };
 
-/**
- * Build search params from search state
- */
 export const buildSearchParams = (
   searchQuery: string,
   location: string,
@@ -51,35 +45,20 @@ export const buildSearchParams = (
   return params;
 };
 
-/**
- * Map GraphQL opportunity node to card props
- */
-export const mapNodeToCardProps = (node: GraphQLOpportunity): OpportunityCardProps => ({
+export const mapNodeToCardProps = (node: GraphQLOpportunity): ActivityCard => ({
   id: node.id,
   title: node.title,
-  price: node.feeRequired || null,
+  category: node.category,
+  feeRequired: node.feeRequired || 0,
   location: node.place?.name || '場所未定',
-  imageUrl: node.images?.[0] || null,
-  community: node.community ? { id: node.community.id } : undefined,
-  isReservableWithTicket: node.isReservableWithTicket || false,
+  images: node.images || [],
+  communityId: node.community?.id || "",
+  hasReservableTicket: node.isReservableWithTicket || false,
 });
 
-/**
- * Transform opportunities into recommended opportunities
- */
-export const transformRecommendedOpportunities = (opportunities: { edges: GqlOpportunityEdge[] }): OpportunityCardProps[] => {
-  return opportunities.edges
-    .filter((edge: GqlOpportunityEdge) => edge?.node?.slots?.[0]?.startsAt)
-    .map((edge: GqlOpportunityEdge) => edge.node && mapNodeToCardProps(edge.node))
-    .filter(Boolean) as OpportunityCardProps[];
-};
-
-/**
- * Group opportunities by date
- */
-export const groupOpportunitiesByDate = (opportunities: { edges: GqlOpportunityEdge[] }): { [key: string]: OpportunityCardProps[] } => {
+export const groupOpportunitiesByDate = (opportunities: { edges: GqlOpportunityEdge[] }): { [key: string]: ActivityCard[] } => {
   return opportunities.edges.reduce(
-    (acc: { [key: string]: OpportunityCardProps[] }, edge: GqlOpportunityEdge) => {
+    (acc: { [key: string]: ActivityCard[] }, edge: GqlOpportunityEdge) => {
       if (!edge?.node?.slots?.[0]?.startsAt) return acc;
       
       const dateKey = format(new Date(edge.node.slots[0].startsAt), 'yyyy-MM-dd');

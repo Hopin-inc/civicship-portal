@@ -18,7 +18,7 @@ export const PlaceListPage: React.FC<PlaceListSheetProps> = ({
 }) => {
   const router = useRouter();
 
-  const handlePlaceClick = (placeId: string, userId: string, communityId: string) => {
+  const handlePlaceClick = (placeId: string, userId: string) => {
     router.push(`/places/${placeId}?userId=${userId}`);
   };
 

@@ -1,15 +1,13 @@
 'use client';
 
 import React from 'react';
-import OpportunityCard, { OpportunityCardProps } from '../opportunity/OpportunityCard';
+import OpportunityCard from '../opportunity/OpportunityCard';
+import { ActivityCard } from "@/types/opportunity";
 
 interface RecommendedOpportunitiesProps {
-  opportunities: OpportunityCardProps[];
+  opportunities: ActivityCard[];
 }
 
-/**
- * Component to display recommended opportunities
- */
 export const RecommendedOpportunities: React.FC<RecommendedOpportunitiesProps> = ({ 
   opportunities 
 }) => {
@@ -19,7 +17,7 @@ export const RecommendedOpportunities: React.FC<RecommendedOpportunitiesProps> =
     <section>
       <h2 className="text-xl font-bold mb-4">おすすめの体験</h2>
       <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-        {opportunities.map((props: OpportunityCardProps) => (
+        {opportunities.map((props: ActivityCard) => (
           <OpportunityCard key={props.id} {...props} />
         ))}
       </div>

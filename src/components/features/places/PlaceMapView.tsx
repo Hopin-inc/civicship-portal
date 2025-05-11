@@ -1,15 +1,11 @@
 "use client";
 
 import React from "react";
-import dynamic from "next/dynamic";
 import PlaceToggleButton from "./shared/PlaceToggleButton";
 import PlaceCardsSheet from "./shared/PlaceCardsSheet";
 import { BaseCardInfo } from "@/types/place";
+import MapComponent from "./map/MapComponent";
 
-const MapComponent = dynamic(() => import("./map/MapComponent"), {
-  ssr: false,
-  loading: () => <></>,
-});
 
 interface PlaceMapViewProps {
   selectedPlaceId: string | null;

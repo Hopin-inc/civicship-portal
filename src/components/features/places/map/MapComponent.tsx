@@ -2,7 +2,7 @@
 
 import React from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-import CustomMarker from "@/components/features/places/map/markers/CustomMarker";
+import CustomMarker from "@/components/features/places/map/CustomMarker";
 import { useMapState } from "@/hooks/features/place/useMapState";
 import { BasePin, BaseCardInfo } from "@/types/place";
 

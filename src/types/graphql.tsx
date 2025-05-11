@@ -2283,6 +2283,9 @@ export type GqlCurrentUserQuery = {
         __typename?: "Membership";
         role: GqlRole;
         status: GqlMembershipStatus;
+        headline?: string | null;
+        bio?: string | null;
+        reason: GqlMembershipStatusReason;
         user?: { __typename?: "User"; id: string; name: string } | null;
         community?: { __typename?: "Community"; id: string; name?: string | null } | null;
       }> | null;
@@ -3446,22 +3449,30 @@ export type GqlSearchOpportunitiesQuery = {
   opportunities: {
     __typename?: "OpportunitiesConnection";
     totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
     edges: Array<{
       __typename?: "OpportunityEdge";
+      cursor: string;
       node?: {
         __typename?: "Opportunity";
         id: string;
         title: string;
         description: string;
-        category: GqlOpportunityCategory;
-        capacity?: number | null;
-        pointsToEarn?: number | null;
-        feeRequired?: number | null;
-        requireApproval: boolean;
-        publishStatus: GqlPublishStatus;
+        body?: string | null;
         images?: Array<string> | null;
-        createdAt?: Date | null;
-        updatedAt?: Date | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        earliestReservableAt?: Date | null;
         community?: {
           __typename?: "Community";
           id: string;
@@ -3477,36 +3488,52 @@ export type GqlSearchOpportunitiesQuery = {
           longitude: any;
           city?: {
             __typename?: "City";
+            code: string;
             name: string;
-            state?: { __typename?: "State"; name: string } | null;
+            state?: {
+              __typename?: "State";
+              code: string;
+              countryCode: string;
+              name: string;
+            } | null;
           } | null;
         } | null;
         slots?: Array<{
           __typename?: "OpportunitySlot";
           id: string;
+          hostingStatus: GqlOpportunitySlotHostingStatus;
           startsAt: Date;
           endsAt: Date;
+          capacity?: number | null;
           remainingCapacity?: number | null;
           reservations?: Array<{
             __typename?: "Reservation";
+            id: string;
             status: GqlReservationStatus;
             participations?: Array<{
               __typename?: "Participation";
               id: string;
+              source?: GqlSource | null;
               status: GqlParticipationStatus;
+              reason: GqlParticipationStatusReason;
               images?: Array<string> | null;
+              description?: string | null;
               user?: {
                 __typename?: "User";
                 id: string;
                 name: string;
                 image?: string | null;
+                bio?: string | null;
+                currentPrefecture?: GqlCurrentPrefecture | null;
+                urlFacebook?: string | null;
+                urlInstagram?: string | null;
+                urlX?: string | null;
               } | null;
             }> | null;
           }> | null;
         }> | null;
       } | null;
     }>;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
   };
 };
 
@@ -4415,6 +4442,7 @@ export const CurrentUserDocument = gql`
         id
         name
         memberships {
+          ...MembershipFields
           user {
             id
             name
@@ -4429,6 +4457,7 @@ export const CurrentUserDocument = gql`
       }
     }
   }
+  ${MembershipFieldsFragmentDoc}
 `;
 
 /**
@@ -5753,66 +5782,46 @@ export type GetOpportunityQueryResult = Apollo.QueryResult<
 export const SearchOpportunitiesDocument = gql`
   query SearchOpportunities($filter: OpportunityFilterInput, $first: Int) {
     opportunities(filter: $filter, first: $first) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
       edges {
+        cursor
         node {
-          id
-          title
-          description
-          category
-          capacity
+          ...OpportunityFields
           community {
-            id
-            name
-            image
+            ...CommunityFields
           }
-          pointsToEarn
-          feeRequired
-          requireApproval
-          publishStatus
-          images
-          createdAt
-          updatedAt
           place {
-            id
-            name
-            address
-            latitude
-            longitude
-            city {
-              name
-              state {
-                name
-              }
-            }
+            ...PlaceFields
           }
           slots {
-            id
-            startsAt
-            endsAt
-            remainingCapacity
+            ...OpportunitySlotFields
             reservations {
-              status
+              ...ReservationFields
               participations {
-                id
-                status
-                images
+                ...ParticipationFields
                 user {
-                  id
-                  name
-                  image
+                  ...UserFields
                 }
               }
             }
           }
         }
       }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      totalCount
     }
   }
+  ${OpportunityFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
+  ${PlaceFieldsFragmentDoc}
+  ${OpportunitySlotFieldsFragmentDoc}
+  ${ReservationFieldsFragmentDoc}
+  ${ParticipationFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
 `;
 
 /**

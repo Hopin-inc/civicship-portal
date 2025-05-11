@@ -1,16 +1,16 @@
 'use client';
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useInfiniteScroll } from "@/hooks/core/useInfiniteScroll";
 import { useLoading } from "@/hooks/core/useLoading";
 import { GqlSortDirection as SortDirection, useGetArticlesQuery } from "@/types/graphql";
-import {  presenterArticleCards } from "@/presenters/article";
-import { ArticleCard } from "@/types/article";
+import { presenterArticleWithAuthorList, } from "@/presenters/article";
+import {  ArticleWithAuthor } from "@/types/article";
 
 export const ARTICLES_PER_PAGE = 10;
 
 interface UseArticlesResult {
-  articles: ArticleCard[];
+  articles: ArticleWithAuthor[];
   loading: boolean;
   initialLoading: boolean;
   error: Error | null;
@@ -31,7 +31,10 @@ export const useArticles = (): UseArticlesResult => {
     nextFetchPolicy: "cache-first",
   });
 
-  const articles = presenterArticleCards(data?.articles?.edges ?? undefined);
+  const articles = useMemo(() => {
+    return data?.articles?.edges ? presenterArticleWithAuthorList(data.articles.edges) : [];
+  }, [data]);
+
   const hasMore = data?.articles.pageInfo.hasNextPage || false;
 
   const handleLoadMore = async () => {

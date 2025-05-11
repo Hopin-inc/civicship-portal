@@ -1,22 +1,48 @@
 'use client';
 
-import type { Opportunity, Participation, Article } from '@/types';
 import type { GqlGetParticipationQuery } from '@/types/graphql';
-import { GqlParticipationStatus as ParticipationStatus, GqlParticipationStatusReason as ParticipationStatusReason } from '@/types/graphql';
+import { GqlParticipation, GqlOpportunityCategory, } from '@/types/graphql';
+import { ParticipationDetail } from "@/types/participation";
+import { presenterOpportunityHost } from "@/presenters/opportunity";
+import { presenterPlace } from "@/presenters/place";
 
-/**
- * Interface for reservation status information
- */
-interface ReservationStatus {
-  status: "pending" | "confirmed" | "cancelled";
-  statusText: string;
-  statusSubText: string;
-  statusClass: string;
-}
+export const presenterParticipation = (raw: GqlParticipation): ParticipationDetail => {
+  if (!raw || !raw.reservation || !raw.reservation.opportunitySlot || !raw.reservation.opportunitySlot.opportunity) {
+    throw new Error('参加情報に必要なデータが不足しています');
+  }
 
-/**
- * Get status information for a participation
- */
+  const opportunity = raw.reservation.opportunitySlot.opportunity;
+  const reservation = raw.reservation;
+
+  return {
+    id: raw.id,
+    status: raw.status,
+    communityId: opportunity.community?.id ?? '',
+
+    reservation: {
+      id: reservation.id,
+      status: reservation.status,
+      opportunity: {
+        id: opportunity.id,
+        title: opportunity.title,
+        images: opportunity.images ?? [],
+        host: presenterOpportunityHost(opportunity.createdByUser),
+      },
+      communityId: opportunity.community?.id ?? '',
+      images: opportunity.images ?? [],
+      totalImageCount: opportunity.images?.length ?? 0,
+      date: new Date(reservation.opportunitySlot?.startsAt ?? "").toISOString(),
+      participantsCount: reservation.participations?.length ?? 0,
+      place: presenterPlace(opportunity.place),
+      feeRequired: opportunity.feeRequired ?? 0,
+      totalFeeRequired: opportunity.feeRequired ?? 0,
+      category: GqlOpportunityCategory.Activity,
+      isCancelable: false, // 条件に応じて補完
+      cancelDue: '',        // 条件に応じて補完
+    }
+  };
+};
+
 export const getStatusInfo = (
   status: ParticipationStatus,
   reason: ParticipationStatusReason,
@@ -58,16 +84,10 @@ export const getStatusInfo = (
   }
 };
 
-/**
- * Calculate cancellation deadline (24 hours before start time)
- */
 export const calculateCancellationDeadline = (startTime: Date): Date => {
   return new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
 };
 
-/**
- * Format image data for display in UI
- */
 export const formatImageData = (images: any[]): { url: string; alt: string }[] => {
   return images.map((img) => ({
     url: (img as any).url || img,
@@ -75,14 +95,8 @@ export const formatImageData = (images: any[]): { url: string; alt: string }[] =
   }));
 };
 
-/**
- * Type for opportunity data from GraphQL
- */
 type OpportunityData = NonNullable<NonNullable<NonNullable<GqlGetParticipationQuery['participation']>['reservation']>['opportunitySlot']['opportunity']>;
 
-/**
- * Transform opportunity data from GraphQL to application format
- */
 export const transformOpportunity = (opportunityData: OpportunityData | undefined): Opportunity | undefined => {
   if (!opportunityData) return undefined;
 
@@ -168,9 +182,6 @@ export const transformOpportunity = (opportunityData: OpportunityData | undefine
   };
 };
 
-/**
- * Transform participation data from GraphQL to application format
- */
 export const transformParticipation = (participationData: GqlGetParticipationQuery['participation'] | undefined): Participation | undefined => {
   if (!participationData) return undefined;
 

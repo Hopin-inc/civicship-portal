@@ -1,6 +1,6 @@
 'use client';
 
-import { ArticleDetail } from '@/components/features/article/ArticleDetail';
+import { ArticleDetailUI } from '@/components/features/article/ArticleDetail';
 import { useArticle } from '@/hooks/features/article/useArticle';
 import { useEffect } from "react";
 import { useHeader } from "@/contexts/HeaderContext";
@@ -36,7 +36,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
   if (!article) {return <ErrorState message="記事が見つかりませんでした" title="Not Found" />;}
 
   return (
-    <ArticleDetail
+    <ArticleDetailUI
       article={article}
       recommendedArticles={recommendedArticles}
     />

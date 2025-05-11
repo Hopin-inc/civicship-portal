@@ -1,21 +1,21 @@
 'use client';
 
 import Image from "next/image";
-import { Article } from "../../../types";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useEffect, useState } from "react";
-import { convertMarkdownToHtml } from "../../../utils/markdownUtils";
+import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import { CategoryBadge } from "./CategoryBadge";
 import { ArticleRecommendations } from "./ArticleRecommendations";
+import { ArticleCard, ArticleDetail } from "@/types/article";
 
 type ArticleDetailProps = {
-  article: Article;
-  recommendedArticles?: Article[];
-  relatedArticles?: Article[];
+  article: ArticleDetail;
+  recommendedArticles?: ArticleCard[];
+  relatedArticles?: ArticleCard[];
 };
 
-export const ArticleDetail = ({
+export const ArticleDetailUI = ({
   article,
   recommendedArticles = [],
   relatedArticles = [],
@@ -23,12 +23,12 @@ export const ArticleDetail = ({
   const [contentHtml, setContentHtml] = useState<string>("");
 
   useEffect(() => {
-    convertMarkdownToHtml(article.content)
+    convertMarkdownToHtml(article.body)
       .then((html) => {
         setContentHtml(html);
       })
       .catch((error) => console.error("Error converting markdown:", error));
-  }, [article.content]);
+  }, [article.body]);
 
   return (
     <div className="max-w-[375px] mx-auto pt-10 pb-32 px-2">
@@ -41,7 +41,7 @@ export const ArticleDetail = ({
             className="object-cover"
           />
           <div className="absolute top-4 left-4">
-            <CategoryBadge type={article.type} />
+            <CategoryBadge category={article.category} />
           </div>
         </div>
 
@@ -56,7 +56,7 @@ export const ArticleDetail = ({
           <div className="h-px bg-muted" />
 
           <div className="px-4 py-4">
-            <p className="text-foreground text-base leading-relaxed">{article.description}</p>
+            <p className="text-foreground text-base leading-relaxed">{article.body}</p>
           </div>
         </div>
       </div>
@@ -92,4 +92,4 @@ export const ArticleDetail = ({
   );
 };
 
-export default ArticleDetail;
+export default ArticleDetailUI;
