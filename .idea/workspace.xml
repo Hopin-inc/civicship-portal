@@ -4,37 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9d8e9427-ae26-45d1-b49b-4edd4ae6b1fb" name="変更" comment="refactor: update reservation">
-      <change afterPath="$PROJECT_DIR$/src/hooks/features/reservation/confirm/useOpportunity.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/hooks/features/reservation/confirm/useReservationAction.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/hooks/features/reservation/confirm/useSlotAndTicket.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/hooks/features/reservation/confirm/useTicketCounter.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/prettier.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/prettier.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/2025_05_04_3_33______.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/2025_05_04_3_33_の_更新_前の未コミットの変更_[変更]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/2025_05_04_3_36______.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/2025_05_04_3_36_の_更新_前の未コミットの変更_[変更]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/2025_05_04_4_04______.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/2025_05_04_4_04_の_更新_前の未コミットの変更_[変更]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/2025_05_04_4_15______.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/2025_05_04_4_15_の_更新_前の未コミットの変更_[変更]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/2025_05_04_9_51______.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/2025_05_04_9_51_の_更新_前の未コミットの変更_[変更]/shelved.patch" beforeDir="false" />
+    <list default="true" id="9d8e9427-ae26-45d1-b49b-4edd4ae6b1fb" name="変更" comment="refactor: auto-format">
+      <change afterPath="$PROJECT_DIR$/src/types/participation.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/graphql.schema.json" beforeDir="false" afterPath="$PROJECT_DIR$/graphql.schema.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/activities/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/activities/[id]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/reservation/confirm/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/reservation/confirm/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/features/activity/ActivityDetailsContent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/ActivityDetailsContent.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/features/activity/ActivityScheduleCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/activity/ActivityScheduleCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/features/reservation/TimeSlotList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/reservation/TimeSlotList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useActivityDetails.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useActivityDetails.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/activity/useAvailableDatesQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/activity/useAvailableDatesQuery.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/confirm/useCreateReservationHandler.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirm.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirm.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirmQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationConfirmQuery.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationDateSelection.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/reservation/useReservationDateSelection.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/presenters/opportunitySlot.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/presenters/opportunitySlot.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/features/places/PlaceMapView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features/places/PlaceMapView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graphql/account/membership/fragment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphql/account/membership/fragment.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graphql/account/membership/query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphql/account/membership/query.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graphql/experience/reservation/query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/graphql/experience/reservation/query.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/place/usePlaceMembership.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/place/usePlaceMembership.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/place/usePlaces.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/features/place/usePlaces.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/place/usePlacesController.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/features/place/usePlacesQuery.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/presenters/membership.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/presenters/membership.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/types/graphql.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/graphql.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/reservation.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/reservation.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -195,7 +179,7 @@
       <workItem from="1746785215423" duration="22464000" />
       <workItem from="1746855543634" duration="40357000" />
       <workItem from="1746934995767" duration="26000" />
-      <workItem from="1746935027210" duration="2782000" />
+      <workItem from="1746935027210" duration="9851000" />
     </task>
     <task id="LOCAL-00001" summary="refactor: delete not usage file">
       <option name="closed" value="true" />
@@ -485,7 +469,55 @@
       <option name="project" value="LOCAL" />
       <updated>1746926738850</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="refactor: update reservation">
+      <option name="closed" value="true" />
+      <created>1746937885288</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1746937885288</updated>
+    </task>
+    <task id="LOCAL-00038" summary="feat: create reservation presenter">
+      <option name="closed" value="true" />
+      <created>1746943184601</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1746943184601</updated>
+    </task>
+    <task id="LOCAL-00039" summary="feat: create membership &amp; place presenter">
+      <option name="closed" value="true" />
+      <created>1746943213125</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1746943213125</updated>
+    </task>
+    <task id="LOCAL-00040" summary="feat: create article presenter">
+      <option name="closed" value="true" />
+      <created>1746943226243</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1746943226243</updated>
+    </task>
+    <task id="LOCAL-00041" summary="refactor: update opportunity presenter">
+      <option name="closed" value="true" />
+      <created>1746943242563</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1746943242563</updated>
+    </task>
+    <task id="LOCAL-00042" summary="refactor: auto-format">
+      <option name="closed" value="true" />
+      <created>1746943259087</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1746943259087</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -503,11 +535,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: fix TS71007" />
-    <MESSAGE value="refactor: manual refactor" />
-    <MESSAGE value="refactor: modify import" />
-    <MESSAGE value="refactor: manual update" />
-    <MESSAGE value="feat: try figma mcp" />
     <MESSAGE value="refactor:" />
     <MESSAGE value="refactor: component directory" />
     <MESSAGE value="refactor: manual" />
@@ -528,6 +555,11 @@
     <MESSAGE value="refactor: update activities" />
     <MESSAGE value="refactor: update articles" />
     <MESSAGE value="refactor: update reservation" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: update reservation" />
+    <MESSAGE value="feat: create reservation presenter" />
+    <MESSAGE value="feat: create membership &amp; place presenter" />
+    <MESSAGE value="feat: create article presenter" />
+    <MESSAGE value="refactor: update opportunity presenter" />
+    <MESSAGE value="refactor: auto-format" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: auto-format" />
   </component>
 </project>

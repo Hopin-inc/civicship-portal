@@ -1,19 +1,18 @@
-'use client';
+"use client";
 
-import React from 'react';
-import dynamic from 'next/dynamic';
-import { Membership } from '@/hooks/features/place/usePlaces';
-import PlaceToggleButton from './shared/PlaceToggleButton';
-import { PlaceList } from './list/PlaceList';
-import PlaceCardsSheet from './shared/PlaceCardsSheet';
+import React from "react";
+import dynamic from "next/dynamic";
+import PlaceToggleButton from "./shared/PlaceToggleButton";
+import { PlaceList } from "./list/PlaceList";
+import PlaceCardsSheet from "./shared/PlaceCardsSheet";
+import { GqlMembership } from "@/types/graphql";
 
-const MapComponent = dynamic(
-  () => import('./map/MapComponent').then((mod) => mod.default),
-  { ssr: false }
-);
+const MapComponent = dynamic(() => import("./map/MapComponent").then((mod) => mod.default), {
+  ssr: false,
+});
 
 interface PlaceMapViewProps {
-  memberships: Membership[];
+  memberships: GqlMembership[];
   selectedPlaceId: string | null;
   onPlaceSelect: (placeId: string) => void;
   onClose: () => void;
@@ -37,23 +36,19 @@ const PlaceMapView: React.FC<PlaceMapViewProps> = ({
   onPlaceSelect,
   onClose,
   toggleMode,
-  places
+  places,
 }) => {
   return (
     <div className="relative h-full w-full">
-      <MapComponent 
-        memberships={memberships} 
+      <MapComponent
+        memberships={memberships}
         selectedPlaceId={selectedPlaceId}
         onPlaceSelect={onPlaceSelect}
       />
       {!selectedPlaceId && (
         <>
           <PlaceToggleButton isMapMode={true} onClick={toggleMode} />
-          <PlaceList 
-            memberships={memberships} 
-            isMapMode={true} 
-            selectedPlaceId={selectedPlaceId}
-          />
+          <PlaceList memberships={memberships} isMapMode={true} selectedPlaceId={selectedPlaceId} />
         </>
       )}
       {selectedPlaceId && (

@@ -429,7 +429,7 @@ export type GqlMembershipInviteSuccess = {
 
 export type GqlMembershipParticipatedMetrics = {
   __typename?: "MembershipParticipatedMetrics";
-  geo: Array<GqlMembershipParticipationLocation>;
+  geo?: Maybe<Array<GqlMembershipParticipationLocation>>;
   totalParticipatedCount: Scalars["Int"]["output"];
 };
 
@@ -446,7 +446,7 @@ export type GqlMembershipParticipationLocation = {
 export type GqlMembershipParticipationView = {
   __typename?: "MembershipParticipationView";
   hosted: GqlMembershipHostedMetrics;
-  participated: GqlMembershipParticipatedMetrics;
+  participated?: Maybe<GqlMembershipParticipatedMetrics>;
 };
 
 export type GqlMembershipRemoveInput = {
@@ -2280,6 +2280,20 @@ export type GqlMembershipFieldsFragment = {
   reason: GqlMembershipStatusReason;
 };
 
+export type GqlHostedGeoFieldsFragment = {
+  __typename?: "MembershipHostedMetrics";
+  totalParticipantCount: number;
+  geo: Array<{
+    __typename?: "MembershipParticipationLocation";
+    placeId: string;
+    placeName: string;
+    placeImage: string;
+    latitude: any;
+    longitude: any;
+    address: string;
+  }>;
+};
+
 export type GqlGetSingleMembershipQueryVariables = Exact<{
   communityId: Scalars["ID"]["input"];
   userId: Scalars["ID"]["input"];
@@ -2289,37 +2303,24 @@ export type GqlGetSingleMembershipQuery = {
   __typename?: "Query";
   membership?: {
     __typename?: "Membership";
-    bio?: string | null;
     headline?: string | null;
+    bio?: string | null;
     role: GqlRole;
     status: GqlMembershipStatus;
     reason: GqlMembershipStatusReason;
-    createdAt?: Date | null;
-    updatedAt?: Date | null;
     participationView?: {
       __typename?: "MembershipParticipationView";
-      participated: {
-        __typename?: "MembershipParticipatedMetrics";
-        totalParticipatedCount: number;
-        geo: Array<{
-          __typename?: "MembershipParticipationLocation";
-          latitude: any;
-          longitude: any;
-          placeId: string;
-          placeImage: string;
-          placeName: string;
-        }>;
-      };
       hosted: {
         __typename?: "MembershipHostedMetrics";
         totalParticipantCount: number;
         geo: Array<{
           __typename?: "MembershipParticipationLocation";
+          placeId: string;
+          placeName: string;
+          placeImage: string;
           latitude: any;
           longitude: any;
-          placeId: string;
-          placeImage: string;
-          placeName: string;
+          address: string;
         }>;
       };
     } | null;
@@ -2328,77 +2329,37 @@ export type GqlGetSingleMembershipQuery = {
       id: string;
       name: string;
       image?: string | null;
+      bio?: string | null;
+      currentPrefecture?: GqlCurrentPrefecture | null;
       articlesAboutMe?: Array<{
         __typename?: "Article";
         id: string;
         title: string;
+        body?: string | null;
         introduction: string;
         thumbnail?: any | null;
-        createdAt?: Date | null;
+        category: GqlArticleCategory;
+        publishStatus: GqlPublishStatus;
+        publishedAt?: Date | null;
       }> | null;
       opportunitiesCreatedByMe?: Array<{
         __typename?: "Opportunity";
         id: string;
         title: string;
         description: string;
-        category: GqlOpportunityCategory;
-        capacity?: number | null;
-        pointsToEarn?: number | null;
-        feeRequired?: number | null;
-        requireApproval: boolean;
-        publishStatus: GqlPublishStatus;
+        body?: string | null;
         images?: Array<string> | null;
-        createdAt?: Date | null;
-        updatedAt?: Date | null;
-        community?: {
-          __typename?: "Community";
-          id: string;
-          name?: string | null;
-          image?: string | null;
-        } | null;
-        slots?: Array<{
-          __typename?: "OpportunitySlot";
-          id: string;
-          startsAt: Date;
-          endsAt: Date;
-          reservations?: Array<{
-            __typename?: "Reservation";
-            participations?: Array<{
-              __typename?: "Participation";
-              id: string;
-              status: GqlParticipationStatus;
-              images?: Array<string> | null;
-              user?: {
-                __typename?: "User";
-                id: string;
-                name: string;
-                image?: string | null;
-              } | null;
-            }> | null;
-          }> | null;
-        }> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        earliestReservableAt?: Date | null;
+        community?: { __typename?: "Community"; id: string } | null;
       }> | null;
     } | null;
-    community?: {
-      __typename?: "Community";
-      id: string;
-      name?: string | null;
-      image?: string | null;
-    } | null;
-    histories?: Array<{
-      __typename?: "MembershipHistory";
-      id: string;
-      status: GqlMembershipStatus;
-      reason: GqlMembershipStatusReason;
-      role: GqlRole;
-      createdAt?: Date | null;
-      createdByUser?: {
-        __typename?: "User";
-        id: string;
-        name: string;
-        image?: string | null;
-      } | null;
-    }> | null;
+    community?: { __typename?: "Community"; id: string } | null;
   } | null;
 };
 
@@ -2414,42 +2375,36 @@ export type GqlGetMembershipListQuery = {
   memberships: {
     __typename?: "MembershipsConnection";
     totalCount: number;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
     edges?: Array<{
       __typename?: "MembershipEdge";
+      cursor: string;
       node?: {
         __typename?: "Membership";
-        bio?: string | null;
         headline?: string | null;
+        bio?: string | null;
         role: GqlRole;
         status: GqlMembershipStatus;
         reason: GqlMembershipStatusReason;
-        createdAt?: Date | null;
-        updatedAt?: Date | null;
         participationView?: {
           __typename?: "MembershipParticipationView";
-          participated: {
-            __typename?: "MembershipParticipatedMetrics";
-            totalParticipatedCount: number;
-            geo: Array<{
-              __typename?: "MembershipParticipationLocation";
-              latitude: any;
-              longitude: any;
-              placeId: string;
-              placeImage: string;
-              placeName: string;
-            }>;
-          };
           hosted: {
             __typename?: "MembershipHostedMetrics";
             totalParticipantCount: number;
             geo: Array<{
               __typename?: "MembershipParticipationLocation";
+              placeId: string;
+              placeName: string;
+              placeImage: string;
               latitude: any;
               longitude: any;
-              placeId: string;
-              placeImage: string;
-              placeName: string;
+              address: string;
             }>;
           };
         } | null;
@@ -2458,55 +2413,26 @@ export type GqlGetMembershipListQuery = {
           id: string;
           name: string;
           image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
           opportunitiesCreatedByMe?: Array<{
             __typename?: "Opportunity";
             id: string;
             title: string;
             description: string;
-            category: GqlOpportunityCategory;
-            capacity?: number | null;
-            pointsToEarn?: number | null;
-            feeRequired?: number | null;
-            requireApproval: boolean;
-            publishStatus: GqlPublishStatus;
+            body?: string | null;
             images?: Array<string> | null;
-            createdAt?: Date | null;
-            updatedAt?: Date | null;
-            community?: {
-              __typename?: "Community";
-              id: string;
-              name?: string | null;
-              image?: string | null;
-            } | null;
-            slots?: Array<{
-              __typename?: "OpportunitySlot";
-              id: string;
-              startsAt: Date;
-              endsAt: Date;
-              reservations?: Array<{
-                __typename?: "Reservation";
-                participations?: Array<{
-                  __typename?: "Participation";
-                  id: string;
-                  status: GqlParticipationStatus;
-                  images?: Array<string> | null;
-                  user?: {
-                    __typename?: "User";
-                    id: string;
-                    name: string;
-                    image?: string | null;
-                  } | null;
-                }> | null;
-              }> | null;
-            }> | null;
+            category: GqlOpportunityCategory;
+            publishStatus: GqlPublishStatus;
+            isReservableWithTicket?: boolean | null;
+            requireApproval: boolean;
+            feeRequired?: number | null;
+            pointsToEarn?: number | null;
+            earliestReservableAt?: Date | null;
+            community?: { __typename?: "Community"; id: string } | null;
           }> | null;
         } | null;
-        community?: {
-          __typename?: "Community";
-          id: string;
-          name?: string | null;
-          image?: string | null;
-        } | null;
+        community?: { __typename?: "Community"; id: string } | null;
       } | null;
     } | null> | null;
   };
@@ -3572,6 +3498,44 @@ export type GqlGetReservationQuery = {
         feeRequired?: number | null;
         pointsToEarn?: number | null;
         earliestReservableAt?: Date | null;
+        createdByUser?: {
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
+          articlesAboutMe?: Array<{
+            __typename?: "Article";
+            id: string;
+            title: string;
+            body?: string | null;
+            introduction: string;
+            thumbnail?: any | null;
+            category: GqlArticleCategory;
+            publishStatus: GqlPublishStatus;
+            publishedAt?: Date | null;
+          }> | null;
+        } | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+          city?: {
+            __typename?: "City";
+            code: string;
+            name: string;
+            state?: {
+              __typename?: "State";
+              code: string;
+              countryCode: string;
+              name: string;
+            } | null;
+          } | null;
+        } | null;
       } | null;
     } | null;
     participations?: Array<{
@@ -3779,6 +3743,19 @@ export const MembershipFieldsFragmentDoc = gql`
     role
     status
     reason
+  }
+`;
+export const HostedGeoFieldsFragmentDoc = gql`
+  fragment HostedGeoFields on MembershipHostedMetrics {
+    totalParticipantCount
+    geo {
+      placeId
+      placeName
+      placeImage
+      latitude
+      longitude
+      address
+    }
   }
 `;
 export const UserFieldsFragmentDoc = gql`
@@ -4164,102 +4141,35 @@ export type CurrentUserQueryResult = Apollo.QueryResult<
 export const GetSingleMembershipDocument = gql`
   query GetSingleMembership($communityId: ID!, $userId: ID!) {
     membership(communityId: $communityId, userId: $userId) {
-      bio
-      headline
-      role
-      status
-      reason
-      createdAt
-      updatedAt
+      ...MembershipFields
       participationView {
-        participated {
-          totalParticipatedCount
-          geo {
-            latitude
-            longitude
-            placeId
-            placeImage
-            placeName
-          }
-        }
         hosted {
-          totalParticipantCount
-          geo {
-            latitude
-            longitude
-            placeId
-            placeImage
-            placeName
-          }
+          ...HostedGeoFields
         }
       }
       user {
-        id
-        name
-        image
+        ...UserFields
         articlesAboutMe {
-          id
-          title
-          introduction
-          thumbnail
-          createdAt
+          ...ArticleFields
         }
         opportunitiesCreatedByMe {
-          id
-          title
-          description
-          category
-          capacity
+          ...OpportunityFields
           community {
-            id
-            name
-            image
-          }
-          pointsToEarn
-          feeRequired
-          requireApproval
-          publishStatus
-          images
-          createdAt
-          updatedAt
-          slots {
-            id
-            startsAt
-            endsAt
-            reservations {
-              participations {
-                id
-                status
-                images
-                user {
-                  id
-                  name
-                  image
-                }
-              }
-            }
+            ...CommunityFields
           }
         }
       }
       community {
-        id
-        name
-        image
-      }
-      histories {
-        id
-        status
-        reason
-        role
-        createdAt
-        createdByUser {
-          id
-          name
-          image
-        }
+        ...CommunityFields
       }
     }
   }
+  ${MembershipFieldsFragmentDoc}
+  ${HostedGeoFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+  ${ArticleFieldsFragmentDoc}
+  ${OpportunityFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
 `;
 
 /**
@@ -4340,90 +4250,41 @@ export const GetMembershipListDocument = gql`
     memberships(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
       pageInfo {
         hasNextPage
+        hasPreviousPage
+        startCursor
         endCursor
       }
       totalCount
       edges {
+        cursor
         node {
-          bio
-          headline
-          role
-          status
-          reason
-          createdAt
-          updatedAt
+          ...MembershipFields
           participationView {
-            participated {
-              totalParticipatedCount
-              geo {
-                latitude
-                longitude
-                placeId
-                placeImage
-                placeName
-              }
-            }
             hosted {
-              totalParticipantCount
-              geo {
-                latitude
-                longitude
-                placeId
-                placeImage
-                placeName
-              }
+              ...HostedGeoFields
             }
           }
           user {
-            id
-            name
-            image
+            ...UserFields
             opportunitiesCreatedByMe {
-              id
-              title
-              description
-              category
-              capacity
+              ...OpportunityFields
               community {
-                id
-                name
-                image
-              }
-              pointsToEarn
-              feeRequired
-              requireApproval
-              publishStatus
-              images
-              createdAt
-              updatedAt
-              slots {
-                id
-                startsAt
-                endsAt
-                reservations {
-                  participations {
-                    id
-                    status
-                    images
-                    user {
-                      id
-                      name
-                      image
-                    }
-                  }
-                }
+                ...CommunityFields
               }
             }
           }
           community {
-            id
-            name
-            image
+            ...CommunityFields
           }
         }
       }
     }
   }
+  ${MembershipFieldsFragmentDoc}
+  ${HostedGeoFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+  ${OpportunityFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
 `;
 
 /**
@@ -6222,6 +6083,15 @@ export const GetReservationDocument = gql`
         ...OpportunitySlotFields
         opportunity {
           ...OpportunityFields
+          createdByUser {
+            ...UserFields
+            articlesAboutMe {
+              ...ArticleFields
+            }
+          }
+          place {
+            ...PlaceFields
+          }
         }
       }
       participations {
@@ -6232,6 +6102,9 @@ export const GetReservationDocument = gql`
   ${ReservationFieldsFragmentDoc}
   ${OpportunitySlotFieldsFragmentDoc}
   ${OpportunityFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+  ${ArticleFieldsFragmentDoc}
+  ${PlaceFieldsFragmentDoc}
   ${ParticipationFieldsFragmentDoc}
 `;
 

@@ -39,9 +39,9 @@ export const GET_RESERVATION = gql`
           }
         }
       }
-    }
-    participations {
-      ...ParticipationFields
+      participations {
+        ...ParticipationFields
+      }
     }
   }
   ${RESERVATION_FRAGMENT}

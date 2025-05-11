@@ -1,9 +1,4 @@
-import {
-  GqlReservationStatus,
-  GqlParticipationStatus,
-  GqlOpportunitySlotHostingStatus,
-  GqlOpportunityCategory,
-} from "@/types/graphql";
+import { GqlReservationStatus, GqlOpportunityCategory } from "@/types/graphql";
 import { CommunityId } from "@/types/index";
 import { OpportunityPlace, OpportunityHost, OpportunityCard } from "@/types/opportunity";
 import { ArticleWithAuthor } from "@/types/article";

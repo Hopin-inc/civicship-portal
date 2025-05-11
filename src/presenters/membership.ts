@@ -55,9 +55,8 @@ export const transformMembershipsToPlaces = (memberships: GqlMembership[]): Plac
 
 export const calculateTotalPlaces = (memberships: GqlMembership[]): number => {
   return memberships.reduce((total, membership) => {
-    const participatedCount = membership.participationView?.participated.geo.length ?? 0;
     const hostedCount = membership.participationView?.hosted.geo.length ?? 0;
-    return total + participatedCount + hostedCount;
+    return total + hostedCount;
   }, 0);
 };
 

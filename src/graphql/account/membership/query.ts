@@ -1,193 +1,87 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
+import { HOSTED_GEO_FRAGMENT, MEMBERSHIP_FRAGMENT } from "@/graphql/account/membership/fragment";
+import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
+import { OPPORTUNITY_FRAGMENT } from "@/graphql/experience/opportunity/fragment";
+import { ARTICLE_FRAGMENT } from "@/graphql/content/article/fragment";
+import { COMMUNITY_FRAGMENT } from "@/graphql/account/community/fragment";
 
 export const GET_SINGLE_MEMBERSHIP = gql`
   query GetSingleMembership($communityId: ID!, $userId: ID!) {
     membership(communityId: $communityId, userId: $userId) {
-      bio
-      headline
-      role
-      status
-      reason
-      createdAt
-      updatedAt
+      ...MembershipFields
       participationView {
-        participated {
-          totalParticipatedCount
-          geo {
-            latitude
-            longitude
-            placeId
-            placeImage
-            placeName
-          }
-        }
         hosted {
-          totalParticipantCount
-          geo {
-            latitude
-            longitude
-            placeId
-            placeImage
-            placeName
-          }
+          ...HostedGeoFields
         }
       }
       user {
-        id
-        name
-        image
+        ...UserFields
         articlesAboutMe {
-          id
-          title
-          introduction
-          thumbnail
-          createdAt
+          ...ArticleFields
         }
         opportunitiesCreatedByMe {
-          id
-          title
-          description
-          category
-          capacity
+          ...OpportunityFields
           community {
-            id
-            name
-            image
-          }
-          pointsToEarn
-          feeRequired
-          requireApproval
-          publishStatus
-          images
-          createdAt
-          updatedAt
-          slots {
-            id
-            startsAt
-            endsAt
-            reservations {
-              participations {
-                id
-                status
-                images
-                user {
-                  id
-                  name
-                  image
-                }
-              }
-            }
+            ...CommunityFields
           }
         }
       }
       community {
-        id
-        name
-        image
-      }
-      histories {
-        id
-        status
-        reason
-        role
-        createdAt
-        createdByUser {
-          id
-          name
-          image
-        }
+        ...CommunityFields
       }
     }
   }
+  ${MEMBERSHIP_FRAGMENT}
+  ${HOSTED_GEO_FRAGMENT}
+  ${USER_FRAGMENT}
+  ${ARTICLE_FRAGMENT}
+  ${OPPORTUNITY_FRAGMENT}
+  ${COMMUNITY_FRAGMENT}
 `;
 
 export const GET_MEMBERSHIP_LIST = gql`
-  query GetMembershipList($first: Int, $cursor: MembershipCursorInput, $filter: MembershipFilterInput, $sort: MembershipSortInput) {
+  query GetMembershipList(
+    $first: Int
+    $cursor: MembershipCursorInput
+    $filter: MembershipFilterInput
+    $sort: MembershipSortInput
+  ) {
     memberships(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
       pageInfo {
         hasNextPage
+        hasPreviousPage
+        startCursor
         endCursor
       }
       totalCount
       edges {
+        cursor
         node {
-          bio
-          headline
-          role
-          status
-          reason
-          createdAt
-          updatedAt
+          ...MembershipFields
           participationView {
-            participated {
-              totalParticipatedCount
-              geo {
-                latitude
-                longitude
-                placeId
-                placeImage
-                placeName
-              }
-            }
             hosted {
-              totalParticipantCount
-              geo {
-                latitude
-                longitude
-                placeId
-                placeImage
-                placeName
-              }
+              ...HostedGeoFields
             }
           }
           user {
-            id
-            name
-            image
+            ...UserFields
             opportunitiesCreatedByMe {
-              id
-              title
-              description
-              category
-              capacity
+              ...OpportunityFields
               community {
-                id
-                name
-                image
-              }
-              pointsToEarn
-              feeRequired
-              requireApproval
-              publishStatus
-              images
-              createdAt
-              updatedAt
-              slots {
-                id
-                startsAt
-                endsAt
-                reservations {
-                  participations {
-                    id
-                    status
-                    images
-                    user {
-                      id
-                      name
-                      image
-                    }
-                  }
-                }
+                ...CommunityFields
               }
             }
           }
           community {
-            id
-            name
-            image
+            ...CommunityFields
           }
         }
       }
     }
   }
-`; 
+  ${MEMBERSHIP_FRAGMENT}
+  ${HOSTED_GEO_FRAGMENT}
+  ${USER_FRAGMENT}
+  ${OPPORTUNITY_FRAGMENT}
+  ${COMMUNITY_FRAGMENT}
+`;
