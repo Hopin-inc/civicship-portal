@@ -11,8 +11,9 @@ interface MainContentProps {
 }
 
 const MainContent: React.FC<MainContentProps> = ({ children }) => {
-  const { config } = useHeaderConfig();
-  const showHeader = !config.hideHeader;
+  const headerConfig = useHeaderConfig();
+  const config = headerConfig?.config || { hideHeader: false };
+  const showHeader = !config?.hideHeader;
   
   return (
     <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full">
