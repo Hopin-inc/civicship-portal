@@ -2,14 +2,19 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useProfileEdit } from '@/hooks/features/user/useProfileEdit';
 import { UserProfileEdit } from '@/components/features/user/UserProfileEdit';
 import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 
 export default function ProfileEditPage() {
+  useHeaderConfig({
+    title: "プロフィール編集",
+    showBackButton: true,
+    showLogo: false,
+  });
+  
   const router = useRouter();
   const {
     profileImage,
@@ -18,7 +23,7 @@ export default function ProfileEditPage() {
     bio,
     socialLinks,
     userLoading,
-    userError,
+    error,
     updating,
     setDisplayName,
     setLocation,
@@ -32,26 +37,13 @@ export default function ProfileEditPage() {
     return <LoadingIndicator />;
   }
 
-  if (userError) {
+  if (error) {
     return <ErrorState message="プロフィールの取得に失敗しました" />;
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="fixed top-0 left-0 right-0 h-14 px-4 flex items-center justify-between border-b bg-background z-10">
-        <div className="flex items-center">
-          <Button 
-            onClick={() => router.back()} 
-            variant="link"
-            className="mr-4 p-0 h-auto"
-          >
-            <ChevronLeft />
-          </Button>
-          <h1 className="text-lg font-semibold">プロフィール編集</h1>
-        </div>
-      </header>
-
-      <main className="pt-20 px-4 pb-24 max-w-md mx-auto">
+      <main className="px-4 pb-24 max-w-md mx-auto">
         <UserProfileEdit
           profileImage={profileImage}
           displayName={displayName}
