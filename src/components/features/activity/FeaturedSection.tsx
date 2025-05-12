@@ -24,7 +24,7 @@ export default function FeaturedSection({ opportunities }: FeaturedSectionProps)
 
   return (
     <section className="relative h-[70vh] w-full overflow-hidden [&]:mt-0">
-      <div className="absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/60 to-transparent p-6 text-white">
+      <div className="absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/60 to-transparent py-10 px-8 text-white">
         <h1 className="text-4xl font-bold leading-tight">
           四国にふれる
           <br />
@@ -51,11 +51,11 @@ export default function FeaturedSection({ opportunities }: FeaturedSectionProps)
 
               <Link
                 href={`/activities/${opportunity.id}`}
-                className="absolute inset-x-0 bottom-12 bg-gradient-to-t from-black/60 to-transparent px-6"
+                className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent px-6 pb-8 pt-16"
               >
                 <div className="mx-auto max-w-md">
-                  <div className="flex overflow-hidden rounded-xl bg-background shadow-lg p-3">
-                    <div className="relative h-[80px] w-[80px] flex-shrink-0">
+                  <div className="flex overflow-hidden rounded-xl bg-background shadow-lg">
+                    <div className="relative h-[108px] w-[88px] flex-shrink-0">
                       <Image
                         src={getImage(opportunity.images)}
                         alt={`四国アクティビティ - ${opportunity.title}`}
@@ -63,16 +63,14 @@ export default function FeaturedSection({ opportunities }: FeaturedSectionProps)
                         className="object-cover rounded-lg"
                       />
                     </div>
-                    <div className="flex-1 pl-4">
-                      <h2 className="text-lg font-bold text-foreground line-clamp-1">
-                        {opportunity.title}
-                      </h2>
-                      <p className="mt-1 text-base text-muted-foreground">
+                    <div className="flex-1 px-4 p-3">
+                      <h2 className="text-title-md text-foreground line-clamp-1">{opportunity.title}</h2>
+                      <p className="mt-1 text-body-sm text-muted-foreground">
                         {opportunity.feeRequired
                           ? `1人当たり${opportunity.feeRequired.toLocaleString()}円から`
-                          : '要問い合わせ'}
+                          : "要問い合わせ"}
                       </p>
-                      <div className="mt-1 flex items-center text-muted-foreground text-sm">
+                      <div className="mt-1 flex items-center text-muted-foreground text-body-sm">
                         <MapPin className="mr-1 h-4 w-4" />
                         <span>{opportunity.location}</span>
                       </div>

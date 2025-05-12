@@ -6,6 +6,7 @@ import { useActivities } from "@/hooks/features/activity/useActivities";
 import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
 import ActivitiesFeaturedSection from "@/components/features/activity/ActivitiesFeaturedSection";
 import ActivitiesUpcomingSection from "@/components/features/activity/ActivitiesUpcomingSection";
+import ActivitiesFeaturedItemsSection from '@/components/features/activity/ActivitiesFeaturedItemsSection';
 import ActivitiesAllSection from "@/components/features/activity/ActivitiesAllSection";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { GqlOpportunity, GqlOpportunityEdge } from "@/types/graphql";
@@ -47,6 +48,7 @@ export default function ActivitiesPage() {
     <div className="min-h-screen pb-16">
       <ActivitiesFeaturedSection opportunities={featuredCards} />
       <ActivitiesUpcomingSection opportunities={upcomingCards} />
+      <ActivitiesFeaturedItemsSection opportunities={featuredCards} />
       <ActivitiesAllSection
         opportunities={allCards}
         loadMoreRef={loadMoreRef}
