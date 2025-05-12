@@ -1,16 +1,38 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserProfileController } from './useUserProfileController';
 
-/**
- * Custom hook for fetching and managing user profile data
- * This is a backward-compatible wrapper around useUserProfileController
- * @param userId Optional user ID. If not provided, fetches current user's profile
- */
-export const useUserProfile = (userId?: string) => {
-  const { user: authUser } = useAuth();
-  return useUserProfileController(userId, authUser?.id);
+import { useLoading } from "@/hooks";
+import { useEffect, useMemo } from "react";
+import { presenterManagerProfile } from "@/presenters";
+import { useGetUserFlexibleQuery } from "@/types/graphql";
+
+export const useUserProfile = (userId: string) => {
+  const { setIsLoading } = useLoading();
+
+  const result = useGetUserFlexibleQuery({
+    variables: {
+      id: userId,
+      withPortfolios: true,
+      withOpportunities: true,
+      withWallets: true
+    },
+    skip: !userId,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  useEffect(() => {
+    setIsLoading(result.loading);
+  }, [result.loading, setIsLoading]);
+
+  const userData = useMemo(() => {
+    const user = result.data?.user;
+    return user ? presenterManagerProfile(user) : null;
+  }, [result.data]);
+
+  return {
+    userData,
+    isLoading: result.loading,
+    error: result.error,
+    refetch: result.refetch,
+  };
 };
-
-export default useUserProfile;

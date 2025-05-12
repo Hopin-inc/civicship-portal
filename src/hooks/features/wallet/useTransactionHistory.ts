@@ -1,28 +1,55 @@
 'use client';
 
-import { useTransactionHistoryController } from './useTransactionHistoryController';
-import type { ErrorWithMessage } from './useWalletController';
-
-/**
- * Public API hook for transaction history
- * This is the hook that should be used by components
- */
-export interface Transaction {
-  id: string;
-  amount: number;
-  description: string;
-  date: string;
-  isIncome: boolean;
-}
+import { AppTransaction } from "@/types/transaction";
+import { useEffect, useMemo, useState } from "react";
+import { useGetTransactionsQuery } from "@/types/graphql";
+import { presenterTransaction } from "@/presenters/transaction";
+import { toast } from "sonner";
 
 export interface UseTransactionHistoryResult {
-  transactions: Transaction[];
+  transactions: AppTransaction[];
   isLoading: boolean;
-  error: ErrorWithMessage | null;
+  error: Error | null;
 }
 
-export const useTransactionHistory = (userId: string): UseTransactionHistoryResult => {
-  return useTransactionHistoryController(userId);
+export const useTransactionHistory = (
+  userId: string,
+  walletId: string
+): UseTransactionHistoryResult => {
+  const [transactions, setTransactions] = useState<AppTransaction[]>([]);
+
+  const { data, loading, error } = useGetTransactionsQuery({
+    variables: { filter: { fromUserId: userId, toUserId: userId } },
+    skip: !userId,
+  });
+
+  useEffect(() => {
+    if (!data?.transactions?.edges) return;
+
+    const txList: AppTransaction[] = data.transactions.edges
+      .map((edge) => {
+        if (!edge?.node) return null;
+        return presenterTransaction(edge.node, walletId);
+      })
+      .filter((tx): tx is AppTransaction => tx !== null);
+
+    setTransactions(txList);
+  }, [data, walletId]);
+
+  const formattedError = useMemo(() => {
+    if (error) {
+      console.error('Error fetching transaction history:', error);
+      toast.error('取引履歴の取得に失敗しました');
+      return error;
+    }
+    return null;
+  }, [error]);
+
+  return {
+    transactions,
+    isLoading: loading,
+    error: formattedError,
+  };
 };
 
 export default useTransactionHistory;

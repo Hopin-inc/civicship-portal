@@ -6,9 +6,8 @@ export const UTILITY_FRAGMENT = gql`
     name
     description
     images
-    pointsRequired
     publishStatus
-    createdAt
-    updatedAt
+    
+    pointsRequired
   }
 `; 

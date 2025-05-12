@@ -1,37 +1,35 @@
 import { gql } from '@apollo/client';
 
-export const WALLET_TRANSACTIONS = gql`
-  query WalletTransactions($filter: TransactionFilterInput) {
+export const GET_TRANSACTIONS = gql`
+  query getTransactions($filter: TransactionFilterInput) {
     transactions(
       filter: $filter,
       sort: { createdAt: desc }
     ) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
       edges {
+        cursor
         node {
-          id
-          createdAt
-          fromPointChange
-          toPointChange
-          reason
+          ...TransactionFields
           fromWallet {
-            id
+            ...WalletFields
             user {
-              id
-              name
+              ...UserFields
             }
           }
           toWallet {
-            id
+            ...WalletFields
             user {
-              id
-              name
+              ...UserFields
             }
           }
         }
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
       }
     }
   }

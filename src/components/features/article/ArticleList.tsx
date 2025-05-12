@@ -1,14 +1,17 @@
 'use client';
 
 import React from 'react';
-import { Article } from '@/hooks/features/article/useArticles';
 import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
+import { ArticleWithAuthor } from "@/types/article";
 
 interface ArticleListProps {
-  articles: Article[];
+  articles: ArticleWithAuthor[];
+}
+interface ArticleCardProps {
+  article: ArticleWithAuthor;
 }
 
 export const ArticleList: React.FC<ArticleListProps> = ({ articles }) => {
@@ -23,25 +26,21 @@ export const ArticleList: React.FC<ArticleListProps> = ({ articles }) => {
   return (
     <div className="grid grid-cols-1 gap-6">
       {articles.map((article) => (
-        <ArticleCard key={article.id} article={article} />
+        <ArticleCardUI key={article.id} article={article} />
       ))}
     </div>
   );
 };
 
-interface ArticleCardProps {
-  article: Article;
-}
-
-const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
+const ArticleCardUI: React.FC<ArticleCardProps> = ({ article }) => {
   return (
     <Link href={`/articles/${article.id}`} className="block">
       <div className="bg-background rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div className="relative w-full h-48">
           {article.thumbnail && (
             <Image
-              src={article.thumbnail.url}
-              alt={article.thumbnail.alt}
+              src={article.thumbnail}
+              alt={article.title}
               fill
               className="object-cover"
             />
@@ -53,17 +52,17 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
             公開: {format(new Date(article.publishedAt), "yyyy年M月d日", { locale: ja })}
           </div>
           <p className="text-foreground text-sm line-clamp-3">{article.introduction}</p>
-          {article.authors && article.authors.length > 0 && (
+          {article.author && (
             <div className="flex items-center mt-4">
               <div className="relative w-8 h-8 rounded-full overflow-hidden mr-2">
                 <Image
-                  src={article.authors[0].image || "/placeholder-avatar.svg"}
-                  alt={article.authors[0].name}
+                  src={article.author.image || "/placeholder-avatar.svg"}
+                  alt={article.author.name}
                   fill
                   className="object-cover"
                 />
               </div>
-              <span className="text-sm font-medium">{article.authors[0].name}</span>
+              <span className="text-sm font-medium">{article.author.name}</span>
             </div>
           )}
         </div>

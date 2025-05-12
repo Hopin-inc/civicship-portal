@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import type { Opportunity } from '@/types';
+import type { Opportunity } from '@/types/participation';
 
 interface ParticipationHeaderProps {
   opportunity: Opportunity;
@@ -19,9 +19,9 @@ export const ParticipationHeader: React.FC<ParticipationHeaderProps> = ({
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
             {opportunity.createdByUser?.image ? (
-              <AvatarImage 
-                src={opportunity.createdByUser.image} 
-                alt={opportunity.createdByUser.name || ""} 
+              <AvatarImage
+                src={opportunity.createdByUser.image}
+                alt={opportunity.createdByUser.name || ""}
               />
             ) : null}
             <AvatarFallback>

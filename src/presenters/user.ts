@@ -1,7 +1,46 @@
 'use client';
 
-import { GetUserProfileData, GetUserWithDetailsData } from "@/hooks/features/user/useUserProfileQuery";
-import { GqlCurrentPrefecture } from '@/types/graphql';
+import { GqlCurrentPrefecture, GqlUser, GqlWallet } from "@/types/graphql";
+import {  AppUser, AppUserSelf, GeneralUserProfile, ManagerProfile } from "@/types/user";
+import { presenterActivityCard } from "@/presenters/opportunity";
+import { presenterUserAsset } from "@/presenters/wallet";
+import { presenterPortfolio } from "@/presenters/portfolio";
+
+export const presenterAppUser = (gqlUser: GqlUser): AppUser => {
+  return {
+    id: gqlUser.id,
+    profile: presenterUserProfile(gqlUser),
+    portfolios: (gqlUser.portfolios ?? []).map(presenterPortfolio),
+  };
+};
+
+export const presenterAppUserSelf = (gqlUser: GqlUser): AppUserSelf => {
+  return {
+    ...presenterAppUser(gqlUser),
+    asset: presenterUserAsset(gqlUser.wallets?.[0]),
+    portfolios: (gqlUser.portfolios ?? []).map(presenterPortfolio),
+  };
+};
+
+export const presenterManagerProfile = (gqlUser: GqlUser): ManagerProfile => {
+  return {
+    ...presenterAppUser(gqlUser),
+    asset: presenterUserAsset(gqlUser.wallets?.[0]),
+    currentlyHiringOpportunities: (gqlUser.opportunitiesCreatedByMe ?? []).map(presenterActivityCard),
+  };
+};
+
+export const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
+  return {
+    name: gqlUser.name,
+    image: gqlUser.image ?? null,
+    bio: gqlUser.bio ?? null,
+    currentPrefecture: gqlUser.currentPrefecture ?? undefined,
+    urlFacebook: gqlUser.urlFacebook ?? null,
+    urlInstagram: gqlUser.urlInstagram ?? null,
+    urlX: gqlUser.urlX ?? null,
+  };
+};
 
 export const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
   [GqlCurrentPrefecture.Kagawa]: '香川県',
@@ -18,129 +57,3 @@ export const prefectureOptions = [
   GqlCurrentPrefecture.Kochi,
   GqlCurrentPrefecture.Ehime,
 ];
-
-
-
-export interface UserProfileData {
-  id: string;
-  name: string;
-  image: string | null;
-  bio: string | null;
-  sysRole: string | null;
-  urlFacebook: string | null;
-  urlInstagram: string | null;
-  urlWebsite: string | null;
-  urlX: string | null;
-  urlYoutube: string | null;
-  opportunities: Array<{
-    id: string;
-    title: string;
-    description: string | null;
-    images: string[] | null;
-    feeRequired: number | null;
-    isReservableWithTicket: boolean | null;
-  }>;
-  portfolios: Array<{
-    id: string;
-    title: string;
-    category: string | null;
-    date: string | null;
-    thumbnailUrl: string | null;
-    source: string | null;
-    reservationStatus: string | null;
-  }>;
-  hasMorePortfolios: boolean;
-  endCursor: string | null;
-}
-
-export const formatUserProfileData = (
-  data: GetUserProfileData | GetUserWithDetailsData | undefined
-): UserProfileData | null => {
-  if (!data) return null;
-  
-  return {
-    id: data.user.id,
-    name: data.user.name,
-    image: data.user.image ?? null,
-    bio: data.user.bio ?? null,
-    sysRole: data.user.sysRole ?? null,
-    urlFacebook: data.user.urlFacebook ?? null,
-    urlInstagram: data.user.urlInstagram ?? null,
-    urlWebsite: data.user.urlWebsite ?? null,
-    urlX: data.user.urlX ?? null,
-    urlYoutube: data.user.urlYoutube ?? null,
-    opportunities: 'opportunitiesCreatedByMe' in data.user && data.user.opportunitiesCreatedByMe
-      ? data.user.opportunitiesCreatedByMe.edges.map(edge => ({
-          id: edge.node.id,
-          title: edge.node.title,
-          description: edge.node.description ?? null,
-          images: edge.node.images ?? null,
-          feeRequired: edge.node.feeRequired ?? null,
-          isReservableWithTicket: edge.node.isReservableWithTicket ?? null,
-        }))
-      : [],
-    portfolios: 'portfolios' in data.user && data.user.portfolios
-      ? data.user.portfolios.edges.map(edge => ({
-          id: edge.node.id,
-          title: edge.node.title,
-          category: edge.node.category ?? null,
-          date: edge.node.date ?? null,
-          thumbnailUrl: edge.node.thumbnailUrl ?? null,
-          source: edge.node.source ?? null,
-          reservationStatus: edge.node.reservationStatus ?? null,
-        }))
-      : [],
-    hasMorePortfolios: 'portfolios' in data.user && data.user.portfolios?.pageInfo.hasNextPage || false,
-    endCursor: 'portfolios' in data.user && data.user.portfolios?.pageInfo.endCursor || null,
-  };
-};
-
-/**
- * Format user profile data from any user data structure
- */
-export interface SimpleUserData {
-  user?: {
-    id: string;
-    name: string;
-    image: string | null;
-    bio?: string | null;
-    currentPrefecture?: GqlCurrentPrefecture | null;
-    urlFacebook?: string | null;
-    urlInstagram?: string | null;
-    urlX?: string | null;
-    urlYoutube?: string | null;
-    urlWebsite?: string | null;
-  } | null;
-}
-
-export interface SimpleUserProfile {
-  id: string;
-  name: string;
-  image: string | null;
-  bio: string;
-  currentPrefecture?: GqlCurrentPrefecture | null;
-  socialLinks: Array<{
-    type: string;
-    url: string | null;
-  }>;
-}
-
-export const formatSimpleUserProfileData = (userData: SimpleUserData): SimpleUserProfile | null => {
-  if (!userData?.user) return null;
-  
-  const { user } = userData;
-  return {
-    id: user.id,
-    name: user.name,
-    image: user.image,
-    bio: user.bio || '',
-    currentPrefecture: user.currentPrefecture,
-    socialLinks: [
-      { type: 'facebook', url: user.urlFacebook || null },
-      { type: 'instagram', url: user.urlInstagram || null },
-      { type: 'x', url: user.urlX || null },
-      { type: 'youtube', url: user.urlYoutube || null },
-      { type: 'website', url: user.urlWebsite || null }
-    ]
-  };
-};

@@ -1,123 +1,61 @@
 import { gql } from '@apollo/client';
 
-export const GET_USERS = gql`
-  query GetUsers {
-    users {
-      edges {
-        node {
-          id
-          name
-        }
-      }
-      totalCount
-    }
-  }
-`;
-
-export const GET_USER_PROFILE = gql(`
-  query GetUserProfile(
-    $id: ID!
-  ) {
-    user(id: $id) {
-      id
-      name
-      image
-      bio
-      sysRole
-      currentPrefecture
-      urlFacebook
-      urlInstagram
-      urlWebsite
-      urlX
-      urlYoutube
-    }
-  }
-`);
-
-export const GET_USER_WITH_DETAILS_AND_PORTFOLIOS = gql(`
-  query GetUserWithDetailsAndPortfolios(
+export const GET_USER_FLEXIBLE = gql(`
+  query GetUserFlexible(
     $id: ID!,
+    $withPortfolios: Boolean! = false,
+    $withWallets: Boolean! = false,
+    $withOpportunities: Boolean! = false
   ) {
     user(id: $id) {
-      id
-      name
-      image
-      bio
-      sysRole
-      currentPrefecture
-      urlFacebook
-      urlInstagram
-      urlWebsite
-      urlX
-      urlYoutube
-      opportunitiesCreatedByMe{
-        id
-        title
-        description
-        images
-        community {
-          id
-          name
-          image
-        }
-        place {
-          id
-          name
-        }
-        feeRequired
-        isReservableWithTicket
+      ...UserFields
+      portfolios @include(if: $withPortfolios) {
+        ...UserPortfolioFields
       }
-      portfolios {
-        id
-        title
-        category
-        date
-        thumbnailUrl
-        source
-        reservationStatus
-        place {
-          id
-          name
+      wallets @include(if: $withWallets) {
+        ...WalletFields
+        tickets {
+          ...TicketFields
         }
-        participants {
-          id
-          name
-          image
+      }
+      opportunitiesCreatedByMe @include(if: $withOpportunities) {
+        ...OpportunityFields
+        community {
+          ...CommunityFields
+        }
+        place {
+          ...PlaceFields
         }
       }
     }
-  }
+  } 
 `);
 
-export const GET_USER_WALLET = gql(`
+  export const GET_USER_WALLET = gql(`
   query GetUserWallet($id: ID!) {
     user(id: $id) {
-      id
+      ...UserFields
       wallets {
-        id
-        type
-        currentPointView {
-          currentPoint
-          walletId
+        ...WalletFields
+        transactions {
+          ...TransactionFields
+          fromWallet {
+            ...WalletFields
+            user {
+              ...UserFields
+            }
+          }
+          toWallet {
+            ...WalletFields
+            user {
+              ...UserFields
+            }
+          }
         }
         tickets {
-          id
-          status
-          reason
+          ...TicketFields
           utility {
-            id
-            publishStatus
-            pointsRequired
-          }
-          ticketStatusHistories {
-            id
-            status
-            reason
-            createdByUser {
-              id
-              name
-              image
-            }
+            ...UtilityFields
           }
         }
       }

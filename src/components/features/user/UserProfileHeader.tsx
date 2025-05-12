@@ -25,7 +25,7 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   isOwner
 }) => {
   return (
-    <div className="relative w-full bg-background rounded-b-3xl shadow-md pb-6 max-w-mobile-l mx-auto w-full">
+    <div className="relative bg-background rounded-b-3xl shadow-md pb-6 max-w-mobile-l mx-auto w-full">
       <div className="flex flex-col items-center md:flex-row md:items-start gap-6">
         <div className="relative w-24 h-24 rounded-full overflow-hidden">
           <Image

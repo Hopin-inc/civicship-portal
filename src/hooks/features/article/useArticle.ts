@@ -4,14 +4,13 @@ import { useEffect, useMemo } from "react";
 import { useArticleQuery } from './useArticleQuery';
 import { presenterArticleCard, presenterArticleDetail } from '@/presenters/article';
 import type { ArticleDetail, ArticleCard } from "@/types/article";
-import { ErrorWithMessage, formatError } from '../wallet/useWalletController';
 import { toast } from 'sonner';
 
 interface UseArticleResult {
   article: ArticleDetail | null;
   recommendedArticles: ArticleCard[];
   loading: boolean;
-  error: ErrorWithMessage | null;
+  error: Error | null;
 }
 
 export const useArticle = (id: string): UseArticleResult => {
@@ -30,7 +29,6 @@ export const useArticle = (id: string): UseArticleResult => {
     );
   }, [data?.articles?.edges, article?.id]);
 
-  const formattedError = useMemo(() => error ? formatError(error) : null, [error]);
   useEffect(() => {
     if (error) {
       console.error('Error fetching article data:', error);
@@ -42,6 +40,6 @@ export const useArticle = (id: string): UseArticleResult => {
     article,
     recommendedArticles,
     loading,
-    error: formattedError,
+    error: error || null,
   };
 };

@@ -1,39 +1,20 @@
 'use client';
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserProfile } from '@/hooks/features/user/useUserProfile';
-import { useWallet } from '@/hooks/features/wallet/useWallet';
 import { UserProfileSection } from '@/components/features/user/UserProfileSection';
 import LoadingIndicator from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
-import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
+import { UserPortfolioList } from "@/components/features/user/UserPortfolioList";
+import { useUserProfile } from "@/hooks";
+import loading from "@/components/layout/Loading";
 
 export default function MyProfilePage() {
-  const headerConfig = useMemo(() => ({
-    title: "マイページ",
-    showLogo: true,
-    showBackButton: false,
-    showSearchForm: false,
-  }), [])
-  useHeaderConfig(headerConfig);
+  const lastPortfolioRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
   const { user: currentUser } = useAuth();
-
-  const {
-    profileData,
-    isLoading: isProfileLoading,
-    error: profileError
-  } = useUserProfile(currentUser?.id);
-
-  const {
-    currentPoint,
-    ticketCount,
-    isLoading: isWalletLoading,
-    error: walletError
-  } = useWallet(currentUser?.id);
 
   useEffect(() => {
     if (!currentUser) {
@@ -41,7 +22,9 @@ export default function MyProfilePage() {
     }
   }, [currentUser, router]);
 
-  if (!currentUser || isProfileLoading || isWalletLoading) {
+  const { userData, isLoading, error} = useUserProfile(currentUser?.id ?? "");
+
+  if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-6">
         <LoadingIndicator />
@@ -49,19 +32,17 @@ export default function MyProfilePage() {
     );
   }
 
-  if (profileError || walletError) {
+  if (error) {
     return (
       <div className="container mx-auto px-4 py-6">
         <ErrorState message={
-          profileError?.message ||
-          walletError?.message ||
-          "ユーザー情報の取得に失敗しました"
+          error.message || "ユーザー情報の取得に失敗しました"
         } />
       </div>
     );
   }
 
-  if (!profileData) {
+  if (!userData) {
     return (
       <div className="container mx-auto px-4 py-6">
         <ErrorState message="ユーザーが見つかりませんでした" />
@@ -72,15 +53,22 @@ export default function MyProfilePage() {
   return (
     <div className="container mx-auto px-4 py-6 max-w-3xl">
       <UserProfileSection
-        userId={currentUser.id}
-        isLoading={isProfileLoading}
-        error={profileError}
-        profileData={{
-          ...profileData,
-          ticketCount,
-          pointCount: currentPoint
-        }}
+        userId={currentUser?.id ?? ""}
+        isLoading={isLoading}
+        error={error}
+        profile={userData.profile}
+        userAsset={userData.asset}
         isOwner={true}
+      />
+      <UserPortfolioList
+        userId={currentUser?.id ?? ""}
+        isOwner={true}
+        portfolios={userData.portfolios}
+        isLoadingMore={false}
+        hasMore={false}
+        lastPortfolioRef={lastPortfolioRef}
+        isSysAdmin={false}
+        activeOpportunities={userData.currentlyHiringOpportunities}
       />
     </div>
   );

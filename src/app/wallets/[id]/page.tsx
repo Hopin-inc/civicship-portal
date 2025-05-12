@@ -8,18 +8,23 @@ import LoadingIndicator from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { TransactionItem } from '@/components/features/wallet/TransactionItem';
 
-export default function HistoryPage() {
+type WalletPageProps = {
+  params: {
+    id: string;
+  };
+};
+
+export default function WalletPage({ params }: WalletPageProps) {
+  const walletId = params.id;
   const { user } = useAuth();
   const { updateConfig } = useHeader();
-  const { transactions, isLoading, error } = useTransactionHistory(user?.id ?? '');
+  const { transactions, isLoading, error } = useTransactionHistory(user?.id ?? '', walletId);
 
   useEffect(() => {
     updateConfig({
       title: 'ポイント履歴',
       showBackButton: true,
       showLogo: false,
-      // showBottomNav is not a valid property in HeaderConfig
-
     });
   }, [updateConfig]);
 

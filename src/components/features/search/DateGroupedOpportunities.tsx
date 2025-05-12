@@ -3,15 +3,13 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import OpportunityCard, { OpportunityCardProps } from '@/components/features/opportunity/OpportunityCard';
+import OpportunityCard from '@/components/features/opportunity/OpportunityCard';
+import { ActivityCard } from "@/types/opportunity";
 
 interface DateGroupedOpportunitiesProps {
-  groupedOpportunities: Record<string, OpportunityCardProps[]>;
+  groupedOpportunities: Record<string, ActivityCard[]>;
 }
 
-/**
- * Component to display opportunities grouped by date
- */
 export const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({ 
   groupedOpportunities 
 }) => {
@@ -26,8 +24,8 @@ export const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> =
             {format(new Date(dateKey), 'M月d日（E）', { locale: ja })}
           </h3>
           <div className="grid grid-cols-2 gap-4">
-            {opportunities.map((props: OpportunityCardProps) => (
-              <OpportunityCard key={props.id} {...props} vertical />
+            {opportunities.map((props: ActivityCard) => (
+              <OpportunityCard key={props.id} {...props} />
             ))}
           </div>
         </div>

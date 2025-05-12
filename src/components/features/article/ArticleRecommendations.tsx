@@ -1,14 +1,14 @@
 import React from 'react';
-import { Article } from '../../../types';
 import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { CategoryBadge } from './CategoryBadge';
+import { ArticleCard } from "@/types/article";
 
 interface ArticleRecommendationsProps {
   title: string;
-  articles: Article[];
+  articles: ArticleCard[];
 }
 
 export const ArticleRecommendations: React.FC<ArticleRecommendationsProps> = ({ 
@@ -30,7 +30,7 @@ export const ArticleRecommendations: React.FC<ArticleRecommendationsProps> = ({
 };
 
 interface ArticleRecommendationCardProps {
-  article: Article;
+  article: ArticleCard;
 }
 
 const ArticleRecommendationCard: React.FC<ArticleRecommendationCardProps> = ({ article }) => {
@@ -45,7 +45,7 @@ const ArticleRecommendationCard: React.FC<ArticleRecommendationCardProps> = ({ a
             className="object-cover"
           />
           <div className="absolute top-4 left-4">
-            <CategoryBadge type={article.type} />
+            <CategoryBadge category={article.category} />
           </div>
         </div>
         <div className="p-4">
@@ -53,7 +53,7 @@ const ArticleRecommendationCard: React.FC<ArticleRecommendationCardProps> = ({ a
           <div className="text-muted-foreground text-sm mb-2">
             公開: {format(new Date(article.publishedAt), "yyyy年M月d日", { locale: ja })}
           </div>
-          <p className="text-foreground text-sm line-clamp-3">{article.description}</p>
+          <p className="text-foreground text-sm line-clamp-3">{article.introduction}</p>
         </div>
       </div>
     </Link>

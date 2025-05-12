@@ -1,30 +1,32 @@
 import { GqlCurrentPrefecture, GqlPortfolioCategory, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
-import { OpportunityCard } from "@/types/opportunity";
+import { ActivityCard, OpportunityCard } from "@/types/opportunity";
 import { Participant } from "@/types/utils";
+import { UserAsset } from "@/types/wallet";
 
 // ---------------------------------------------
 // 👤 基本ユーザー型（すべてのユーザー共通）
 // ---------------------------------------------
 export type AppUser = {
   id: string;
-  profile: UserProfile;
-  portfolios: Portfolio[]
+  profile: GeneralUserProfile;
+  portfolios: AppPortfolio[]
 };
 
 export type AppUserSelf = AppUser & {
-  asset: Asset;
+  asset: UserAsset;
 };
 
 export type ManagerProfile = AppUser & {
-  currentlyHiringOpportunities: OpportunityCard[];
+  asset: UserAsset;
+  currentlyHiringOpportunities: ActivityCard[];
 };
 
 // ---------------------------------------------
 // 🧑‍💼 プロフィール情報（公開・非公開）
 // ---------------------------------------------
-export type UserProfile = PublicUserProfile & Partial<PrivateUserProfile>;
+export type GeneralUserProfile = PublicUserProfile & Partial<PrivateUserProfile>;
 
-type PublicUserProfile = {
+export type PublicUserProfile = {
   name: string;
   image: string | null;
   bio: string | null;
@@ -35,37 +37,19 @@ type PublicUserProfile = {
   urlX?: string | null;
 }
 
-type PrivateUserProfile = {
+export type PrivateUserProfile = {
   phone: string;
 };
 
 // ---------------------------------------------
-// 💰 資産情報（自分のみアクセス可能）
+// 📁 ポートフォリオ
 // ---------------------------------------------
-type Asset = {
-  tickets: AvailableTicket;
-  points: AvailablePoint;
-}
-
-type AvailableTicket = {
+export type AppPortfolio = {
   id: string;
-  quantity: number;
-}
+  source: GqlPortfolioSource;
+  category: GqlPortfolioCategory;
 
-type AvailablePoint = {
-  id: string;
-  amount: number;
-}
-
-// ---------------------------------------------
-// 📁 ポートフォリオ（実績または参加予定）
-// ---------------------------------------------
-type Portfolio = {
-  id: string;
-  source: typeof GqlPortfolioSource;
-  category: typeof GqlPortfolioCategory;
-
-  reservationStatus?: typeof GqlReservationStatus | null;
+  reservationStatus?: GqlReservationStatus | null;
 
   title: string;
   image: string | null;

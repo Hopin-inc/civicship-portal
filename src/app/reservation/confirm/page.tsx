@@ -44,7 +44,7 @@ export default function ConfirmPage() {
           onClose={() => result.setIsLoginModalOpen(false)}
         />
 
-        <OpportunityInfo opportunity={result.opportunity} pricePerPerson={result.pricePerPerson} />
+        <OpportunityInfo opportunity={result.opportunity} />
 
         <div className="px-4">
           <ReservationDetailsCard

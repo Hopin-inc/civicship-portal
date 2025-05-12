@@ -12,7 +12,7 @@ import { WalletActionButton } from '@/components/features/wallet/WalletActionBut
 import { WalletUsageSection } from '@/components/features/wallet/WalletUsageSection';
 
 export default function WalletsPage() {
-  const { currentPoint, isLoading, error } = useWallet();
+  const { userAsset, isLoading, error } = useWallet();
   
   const headerConfig = useMemo(() => ({
     title: '保有ポイント',
@@ -39,21 +39,14 @@ export default function WalletsPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background px-4 py-6">
-      <WalletCard currentPoint={currentPoint} isLoading={isLoading} />
-      
-      <WalletHistoryButton />
-      
+      <WalletCard currentPoint={userAsset.points.currentPoint} isLoading={isLoading} />
+      <WalletHistoryButton walletId={userAsset.points.walletId}/>
       <WalletInfoSection />
-      
-      <WalletActionButton>
-        投稿してみる
-      </WalletActionButton>
-      
+      <WalletActionButton> 投稿してみる </WalletActionButton>
       <WalletUsageSection 
         title="ポイントを使う"
         message="ポイントを使ってサービスを利用できるようになったら、LINEからお伝えします💪"
       />
-      
       <WalletUsageSection 
         title="ポイントをもらう"
         message="ポイントをもらえるお手伝いに参加できるようになったら、LINEからお伝えします💪"

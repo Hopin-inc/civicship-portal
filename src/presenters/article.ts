@@ -21,6 +21,15 @@ export const presenterArticleCard = (node?: GqlArticle): ArticleCard => ({
   publishedAt: node?.publishedAt ? new Date(node.publishedAt).toISOString() : "",
 });
 
+export const presenterArticleWithAuthorList = (
+  edges?: (GqlArticleEdge | null | undefined)[],
+): ArticleWithAuthor[] => {
+  return (edges ?? [])
+    .map((edge) => edge?.node)
+    .filter((node): node is GqlArticle => !!node)
+    .map(presenterArticleWithAuthor);
+};
+
 export const presenterArticleWithAuthor = (node?: GqlArticle): ArticleWithAuthor => ({
   ...presenterArticleCard(node),
   author: {

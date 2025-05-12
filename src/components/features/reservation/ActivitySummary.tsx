@@ -2,10 +2,10 @@
 
 import React from 'react';
 import Image from 'next/image';
-import type { Opportunity } from '@/types';
+import { ActivityDetail } from "@/types/opportunity";
 
 interface ActivitySummaryProps {
-  opportunity: Opportunity;
+  opportunity: ActivityDetail;
 }
 
 /**
@@ -29,7 +29,7 @@ export const ActivitySummary: React.FC<ActivitySummaryProps> = ({ opportunity })
             <span>1人あたり{opportunity.feeRequired?.toLocaleString() || '0'}円から</span>
           </div>
           <div className="flex items-center text-sm text-muted-foreground">
-            <span>{opportunity.place?.name || "場所未定"}</span>
+            <span>{opportunity.place.name || "場所未定"}</span>
           </div>
         </div>
       </div>

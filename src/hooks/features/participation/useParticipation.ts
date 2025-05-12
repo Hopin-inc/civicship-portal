@@ -1,13 +1,27 @@
 'use client';
 
-import { useParticipationController } from '@/hooks/features/participation/useParticipationController';
-import type { Opportunity, Participation } from '@/types';
+import { useGetParticipationQuery } from "@/types/graphql";
+import { transformOpportunity, transformParticipation } from '@/presenters/participation';
 
-/**
- * Custom hook for managing participation data
- * This is a backward-compatible wrapper around useParticipationController
- * @param id Participation ID to fetch
- */
 export const useParticipation = (id: string) => {
-  return useParticipationController(id);
-};                   
+  const { data, loading, error, refetch } = useGetParticipationQuery(
+    {
+      variables: { id },
+      skip: !id,
+      fetchPolicy: 'network-only',
+    }
+  )
+  const opportunityData = data?.participation?.reservation?.opportunitySlot?.opportunity;
+  const formattedOpportunity = transformOpportunity(opportunityData);
+  const formattedParticipation = transformParticipation(data?.participation);
+
+  return {
+    participation: formattedParticipation,
+    opportunity: formattedOpportunity,
+    loading,
+    error,
+    refetch,
+  };
+};
+
+export default useParticipation;
