@@ -1,42 +1,96 @@
 'use client';
 
-import { useActivitiesQuery } from './useActivitiesQuery';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
-import React from "react";
-import { GqlOpportunitiesConnection } from "@/types/graphql";
+import React from 'react';
+import {
+  GqlOpportunitiesConnection,
+  GqlOpportunityCategory,
+  GqlPublishStatus,
+  useGetOpportunitiesQuery,
+} from "@/types/graphql";
 
 export interface UseActivitiesResult {
-  upcomingActivities: GqlOpportunitiesConnection;
-  featuredActivities: GqlOpportunitiesConnection;
-  allActivities: GqlOpportunitiesConnection;
+  opportunities: GqlOpportunitiesConnection;
   loading: boolean;
   error: any;
   loadMoreRef: React.RefObject<HTMLDivElement>;
 }
 
+const fallbackConnection: GqlOpportunitiesConnection = {
+  edges: [],
+  pageInfo: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+    startCursor: null,
+    endCursor: null,
+  },
+  totalCount: 0,
+};
+
 export const useActivities = (): UseActivitiesResult => {
   const {
-    upcomingActivities,
-    featuredActivities,
-    allActivities,
+    data,
     loading,
     error,
     fetchMore,
-    hasNextPage
-  } = useActivitiesQuery();
+  } = useGetOpportunitiesQuery({
+    variables: {
+      filter: {
+        category: GqlOpportunityCategory.Activity,
+        publishStatus: [GqlPublishStatus.Public],
+      },
+      first: 20,
+    },
+    fetchPolicy: 'cache-and-network',
+    nextFetchPolicy: 'cache-first',
+  });
+
+  const opportunities = data?.opportunities ?? fallbackConnection;
+  const endCursor = opportunities.pageInfo?.endCursor;
+  const hasNextPage = opportunities.pageInfo?.hasNextPage ?? false;
+
+  const handleFetchMore = async () => {
+    if (!hasNextPage) return;
+
+    await fetchMore({
+      variables: {
+        filter: {
+          category: GqlOpportunityCategory.Activity,
+          publishStatus: [GqlPublishStatus.Public],
+        },
+        cursor: endCursor,
+        first: 10,
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult || !prev.opportunities || !fetchMoreResult.opportunities) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          opportunities: {
+            ...prev.opportunities,
+            edges: [
+              ...prev.opportunities.edges,
+              ...fetchMoreResult.opportunities.edges,
+            ],
+            pageInfo: fetchMoreResult.opportunities.pageInfo,
+          },
+        };
+      },
+    });
+  };
 
   const loadMoreRef = useInfiniteScroll({
     hasMore: hasNextPage,
     isLoading: loading,
-    onLoadMore: fetchMore
+    onLoadMore: handleFetchMore,
   });
 
   return {
-    upcomingActivities,
-    featuredActivities,
-    allActivities,
+    opportunities,
     loading,
     error,
-    loadMoreRef
+    loadMoreRef,
   };
 };

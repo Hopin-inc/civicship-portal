@@ -30,14 +30,10 @@ export default function ActivitiesPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { upcomingActivities, featuredActivities, allActivities, loading, error, loadMoreRef } =
+  const { opportunities, loading, error, loadMoreRef } =
     useActivities();
 
-  const isInitialLoading =
-    loading &&
-    !upcomingActivities?.edges?.length &&
-    !featuredActivities?.edges?.length &&
-    !allActivities?.edges?.length;
+  const isInitialLoading = loading && !opportunities?.edges?.length
   const isSectionLoading = loading && !isInitialLoading;
 
   useEffect(() => {
@@ -46,9 +42,10 @@ export default function ActivitiesPage() {
 
   if (error) return <ErrorState message={`Error: ${error.message}`} />;
 
-  const featuredCards = mapOpportunityCards(featuredActivities.edges);
-  const upcomingCards = mapOpportunityCards(upcomingActivities.edges);
-  const allCards = mapOpportunityCards(allActivities.edges);
+  const activityCards = mapOpportunityCards(opportunities.edges);
+  const upcomingCards = activityCards.slice(0, 5);
+  const featuredCards = activityCards.slice(5, 10);
+  const listCards = activityCards.slice(10);
 
   return (
     <div className="min-h-screen pb-16">
@@ -56,18 +53,18 @@ export default function ActivitiesPage() {
         opportunities={featuredCards}
         isInitialLoading={isInitialLoading}
       />
-      <ActivitiesCarouselSection
-        title="特集"
-        opportunities={featuredCards}
-        isInitialLoading={isInitialLoading}
-      />
+      {/*<ActivitiesCarouselSection*/}
+      {/*  title="特集"*/}
+      {/*  opportunities={featuredCards}*/}
+      {/*  isInitialLoading={isInitialLoading}*/}
+      {/*/>*/}
       <ActivitiesCarouselSection
         title="もうすぐ開催予定"
         opportunities={upcomingCards}
         isInitialLoading={isInitialLoading}
       />
       <ActivitiesListSection
-        opportunities={allCards}
+        opportunities={listCards}
         loadMoreRef={loadMoreRef}
         isInitialLoading={isInitialLoading}
         isSectionLoading={isSectionLoading}

@@ -10,91 +10,13 @@ import { ARTICLE_FRAGMENT } from "@/graphql/content/article/fragment";
 
 export const GET_OPPORTUNITIES = gql`
   query GetOpportunities(
-    $upcomingFilter: OpportunityFilterInput
-    $featuredFilter: OpportunityFilterInput
-    $allFilter: OpportunityFilterInput
-    $similarFilter: OpportunityFilterInput
+    $filter: OpportunityFilterInput
     $first: Int
     $cursor: String
   ) {
-    upcoming: opportunities(
-      filter: $upcomingFilter
+    opportunities(
+      filter: $filter
       sort: { earliestSlotStartsAt: desc }
-      first: 5
-    ) {
-      pageInfo {
-        startCursor
-        endCursor
-        hasNextPage
-        hasPreviousPage
-      }
-      totalCount
-      edges {
-        cursor
-        node {
-          ...OpportunityFields
-          slots {
-            ...OpportunitySlotFields
-          }
-          place {
-            ...PlaceFields
-          }
-        }
-      }
-    }
-
-    featured: opportunities(
-      filter: $featuredFilter
-      first: 5
-    ) {
-      pageInfo {
-        startCursor
-        endCursor
-        hasNextPage
-        hasPreviousPage
-      }
-      totalCount
-      edges {
-        cursor
-        node {
-          ...OpportunityFields
-          slots {
-            ...OpportunitySlotFields
-          }
-          place {
-            ...PlaceFields
-          }
-        }
-      }
-    }
-
-    similar: opportunities(
-      filter: $similarFilter
-      first: 3
-    ) {
-      pageInfo {
-        startCursor
-        endCursor
-        hasNextPage
-        hasPreviousPage
-      }
-      totalCount
-      edges {
-        cursor
-        node {
-          ...OpportunityFields
-          slots {
-            ...OpportunitySlotFields
-          }
-          place {
-            ...PlaceFields
-          }
-        }
-      }
-    }
-
-    all: opportunities(
-      filter: $allFilter
       first: $first
       cursor: $cursor
     ) {
