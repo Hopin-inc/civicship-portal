@@ -69,7 +69,7 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
 
   return (
     <div className="relative w-full bg-background rounded-b-3xl shadow-md pb-6 max-w-mobile-l mx-auto">
-      <div className="relative w-full h-[480px] rounded-xl overflow-hidden mb-8">
+      <div className="relative h-[480px] overflow-hidden mb-8 mx-[-1rem] sm:mx-[-1.5rem] md:mx-[-2rem]">
         <div
           className="embla h-full relative"
           ref={emblaRef}
@@ -93,8 +93,8 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
           </div>
 
           {/* 左右のクリック領域 */}
-          <div className="absolute left-0 top-0 h-full w-[30%] cursor-w-resize z-[1] hover:bg-gradient-to-r hover:from-black/10 hover:to-transparent" />
-          <div className="absolute right-0 top-0 h-full w-[30%] cursor-e-resize z-[1] hover:bg-gradient-to-l hover:from-black/10 hover:to-transparent" />
+          <div className="absolute left-0 top-0 h-full w-[30%] cursor-pointer z-[1] hover:bg-gradient-to-r hover:from-black/10 hover:to-transparent" />
+          <div className="absolute right-0 top-0 h-full w-[30%] cursor-pointer z-[1] hover:bg-gradient-to-l hover:from-black/10 hover:to-transparent" />
         </div>
 
         <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1 z-10">
