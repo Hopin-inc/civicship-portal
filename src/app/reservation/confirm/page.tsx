@@ -1,16 +1,19 @@
 "use client";
 
-import { ReservationParams, useReservationConfirm } from "@/hooks";
 import { useSearchParams } from "next/navigation";
 import React, { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
-import LoginModal from "@/components/features/login/LoginModal";
-import { OpportunityInfo } from "@/components/features/reservation/OpportunityInfo";
-import { ReservationDetailsCard } from "@/components/features/reservation/ReservationDetailsCard";
-import { PaymentSection } from "@/components/features/reservation/PaymentSection";
-import { NotesSection } from "@/components/features/reservation/NotesSection";
+import LoginModal from "@/app/login/components/LoginModal";
+import { OpportunityInfo } from "@/app/reservation/components/OpportunityInfo";
+import { ReservationDetailsCard } from "@/app/reservation/components/ReservationDetailsCard";
+import { PaymentSection } from "@/app/reservation/components/PaymentSection";
+import { NotesSection } from "@/app/reservation/components/NotesSection";
 import { ReservationContentGate } from "@/app/reservation/contentGate";
+import {
+  ReservationParams,
+  useReservationConfirm,
+} from "@/app/reservation/hooks/useReservationConfirm";
 
 export default function ConfirmPage() {
   const searchParams = useSearchParams();

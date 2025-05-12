@@ -1,16 +1,16 @@
 "use client";
 
-import { DateSelectionForm } from "@/components/features/reservation/DateSelectionForm";
-import { GuestSelectionForm } from "@/components/features/reservation/GuestSelectionForm";
-import { TimeSlotList } from "@/components/features/reservation/TimeSlotList";
-import { SelectionSheet } from "@/components/features/reservation/SelectionSheet";
-import { useReservationDateSelection } from "@/hooks/features/reservation/useReservationDateSelection";
+import { DateSelectionForm } from "@/app/reservation/components/DateSelectionForm";
+import { GuestSelectionForm } from "@/app/reservation/components/GuestSelectionForm";
+import { TimeSlotList } from "@/app/reservation/components/TimeSlotList";
+import { SelectionSheet } from "@/app/reservation/components/SelectionSheet";
+import { useReservationDateSelection } from "@/app/reservation/hooks/useReservationDateSelection";
 import React from "react";
 import { ReservationContentGate } from "@/app/reservation/contentGate";
 
 export default function SelectDatePage({
-   searchParams,
- }: {
+  searchParams,
+}: {
   searchParams: { id: string; community_id: string };
 }) {
   const selection = useReservationDateSelection({

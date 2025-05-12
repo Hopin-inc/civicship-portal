@@ -1,4 +1,4 @@
-import { BasePin, BaseCardInfo } from "@/types/place";
+import { BasePin, BaseCardInfo } from "@/app/places/data/type";
 
 export const defaultImageUrl = "https://via.placeholder.com/200";
 

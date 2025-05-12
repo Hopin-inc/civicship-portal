@@ -1,20 +1,23 @@
-'use client';
+"use client";
 
-import React, { useMemo } from 'react';
-import { useTickets } from '@/hooks/features/ticket/useTickets';
-import TicketContent from '@/components/features/ticket/TicketContent';
-import LoadingIndicator from '@/components/shared/LoadingIndicator';
-import { ErrorState } from '@/components/shared/ErrorState';
-import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
+import React, { useMemo } from "react";
+import { useTickets } from "@/app/tickets/hooks/useTickets";
+import TicketContent from "@/app/tickets/components/TicketContent";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { ErrorState } from "@/components/shared/ErrorState";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function TicketsPage() {
   const { tickets, loading, error } = useTickets();
-  
-  const headerConfig = useMemo(() => ({
-    title: "チケット一覧",
-    showBackButton: true,
-    showLogo: false,
-  }), []);
+
+  const headerConfig = useMemo(
+    () => ({
+      title: "チケット一覧",
+      showBackButton: true,
+      showLogo: false,
+    }),
+    [],
+  );
   useHeaderConfig(headerConfig);
 
   if (loading) {

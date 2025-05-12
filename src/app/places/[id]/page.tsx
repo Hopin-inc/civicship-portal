@@ -1,14 +1,14 @@
 "use client";
 
 import { FC, useState, useMemo } from "react";
-import { usePlaceDetail } from "@/hooks/features/place/usePlaceDetail";
+import { usePlaceDetail } from "@/app/places/hooks/usePlaceDetail";
 import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
-import PlaceImageSlider from "@/components/features/places/detail/PlaceImageSlider";
-import PlaceHeader from "@/components/features/places/detail/PlaceHeader";
-import PlaceOpportunities from "@/components/features/places/detail/PlaceOpportunities";
-import PlaceFeaturedArticle from "@/components/features/places/detail/PlaceFeaturedArticle";
+import PlaceImageSlider from "@/app/places/[id]/components/PlaceImageSlider";
+import PlaceHeader from "@/app/places/[id]/components/PlaceHeader";
+import PlaceOpportunities from "@/app/places/[id]/components/PlaceOpportunities";
+import PlaceFeaturedArticle from "@/app/places/[id]/components/PlaceFeaturedArticle";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface PlaceDetailProps {
   params: {
