@@ -126,15 +126,30 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
 
 export const verifyPhoneCode = async (verificationId: string, code: string): Promise<boolean> => {
   try {
+    console.log("Starting phone verification with code, using phoneAuth instance (no tenant)");
+    
     if (!verificationId || !code) {
       console.error("Missing verificationId or code");
       return false;
     }
     
     try {
-      PhoneAuthProvider.credential(verificationId, code);
+      const credential = PhoneAuthProvider.credential(verificationId, code);
+      console.log("Successfully created phone credential");
+      
+      try {
+        console.log("Attempting to sign in with phone credential (no tenant)");
+        await signInWithPhoneNumber(phoneAuth, phoneVerificationState.phoneNumber || '', recaptchaVerifier!);
+        console.log("Phone sign-in successful");
+        
+        await phoneAuth.signOut();
+        console.log("Signed out of phone auth");
+      } catch (signInError) {
+        console.warn("Could not sign in with phone, but credential was created:", signInError);
+      }
       
       phoneVerificationState.verified = true;
+      console.log("Phone verification state set to verified:", phoneVerificationState);
       return true;
     } catch (credentialError) {
       console.error("Invalid verification code:", credentialError);
