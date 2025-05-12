@@ -43,8 +43,11 @@ export const useActivityDetails = (id: string): UseActivityDetailsResult => {
     return data?.opportunity ? presenterActivityDetail(data.opportunity) : null;
   }, [data?.opportunity]);
 
+  const cityCode = data?.opportunity?.place?.city?.code ?? "";
+
   const { similarOpportunities, loading: similarLoading } = useSimilarOpportunitiesQuery({
     opportunityId: id,
+    cityCode,
   });
 
   const similarActivities: ActivityCard[] = useMemo(() => {

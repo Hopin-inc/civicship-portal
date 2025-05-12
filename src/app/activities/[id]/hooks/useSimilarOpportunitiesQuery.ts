@@ -5,6 +5,7 @@ import { GqlOpportunity, GqlOpportunityEdge, useGetOpportunitiesQuery } from "@/
 
 interface UseSimilarOpportunitiesQueryProps {
   opportunityId: string;
+  cityCode: string;
 }
 
 export interface UseSimilarOpportunitiesQueryResult {
@@ -15,20 +16,23 @@ export interface UseSimilarOpportunitiesQueryResult {
 
 export const useSimilarOpportunitiesQuery = ({
   opportunityId,
+  cityCode
 }: UseSimilarOpportunitiesQueryProps): UseSimilarOpportunitiesQueryResult => {
   const { data, loading, error } = useGetOpportunitiesQuery({
     variables: {
-      similarFilter: {
-        communityIds: [COMMUNITY_ID]
+      filter: {
+        communityIds: [COMMUNITY_ID],
+        cityCodes: [cityCode]
       },
     },
     skip: !opportunityId
   });
+  const similarOpportunities = (data?.opportunities.edges ?? [])
+    .map((edge) => edge.node)
+    .filter((node): node is GqlOpportunity => !!node);
 
   return {
-    similarOpportunities: (data?.similar?.edges ?? [])
-      .map((edge: GqlOpportunityEdge) => edge.node)
-      .filter((node): node is GqlOpportunity => !!node),
+    similarOpportunities,
     loading,
     error,
   };

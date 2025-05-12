@@ -33,21 +33,24 @@ export const useReservationComplete = () => {
     return gqlOpportunity ? presenterActivityDetail(gqlOpportunity) : null;
   }, [gqlOpportunity]);
 
+  const cityCode = gqlOpportunity?.place?.city?.code ?? "";
+
   const {
     data: similarData,
     loading: similarLoading,
     error: similarError,
   } = useGetOpportunitiesQuery({
     variables: {
-      similarFilter: {
+      filter: {
         communityIds: [COMMUNITY_ID],
+        cityCodes: [cityCode]
       },
     },
     skip: !opportunityId,
   });
 
   const similarOpportunities: ActivityCard[] = useMemo(() => {
-    return presenterActivityCards(similarData?.similar?.edges);
+    return presenterActivityCards(similarData?.opportunities?.edges ?? []);
   }, [similarData]);
 
   const dateTimeInfo = useMemo(() => {
