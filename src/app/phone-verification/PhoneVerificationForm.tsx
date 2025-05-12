@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { useLinkPhoneAuthMutation } from "@/types/graphql";
+import { useMutation } from "@apollo/client";
+import { LINK_PHONE_AUTH } from "@/graphql/account/identity/mutation";
 import { getVerifiedPhoneNumber } from "@/lib/firebase";
 
 export function PhoneVerificationForm() {
@@ -15,12 +16,18 @@ export function PhoneVerificationForm() {
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const [linkPhoneAuth] = useLinkPhoneAuthMutation();
+  const [linkPhoneAuth] = useMutation(LINK_PHONE_AUTH);
   
   useEffect(() => {
     if (recaptchaContainerRef.current) {
       setIsRecaptchaReady(true);
     }
+    
+    return () => {
+      import('@/lib/firebase').then(({ clearRecaptcha }) => {
+        clearRecaptcha();
+      });
+    };
   }, [recaptchaContainerRef.current]);
   
   const handlePhoneSubmit = async (e: React.FormEvent) => {
