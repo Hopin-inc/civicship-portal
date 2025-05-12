@@ -5,6 +5,7 @@ import {
   OAuthProvider,
   signInWithPopup,
   signInWithCustomToken,
+  signInWithCredential,
   updateProfile,
   RecaptchaVerifier,
   signInWithPhoneNumber,
@@ -90,14 +91,39 @@ export const signInWithLiffToken = async (accessToken: string): Promise<boolean>
 };
 
 let recaptchaVerifier: RecaptchaVerifier | null = null;
+let recaptchaContainerElement: HTMLElement | null = null;
 
-export const startPhoneNumberVerification = async (phoneNumber: string): Promise<string> => {
+export const clearRecaptcha = () => {
   try {
     if (recaptchaVerifier) {
       recaptchaVerifier.clear();
       recaptchaVerifier = null;
     }
+    
+    if (recaptchaContainerElement) {
+      if (document.getElementById('recaptcha-container')) {
+        const iframes = recaptchaContainerElement.querySelectorAll('iframe');
+        iframes.forEach(iframe => iframe.remove());
+        
+        const divs = recaptchaContainerElement.querySelectorAll('div[id^="rc-"]');
+        divs.forEach(div => div.remove());
+      }
+      recaptchaContainerElement = null;
+    }
+  } catch (e) {
+    console.error("Error clearing reCAPTCHA:", e);
+  }
+};
 
+export const startPhoneNumberVerification = async (phoneNumber: string): Promise<string> => {
+  try {
+    clearRecaptcha();
+    
+    recaptchaContainerElement = document.getElementById('recaptcha-container');
+    if (!recaptchaContainerElement) {
+      throw new Error("reCAPTCHA container element not found");
+    }
+    
     recaptchaVerifier = new RecaptchaVerifier(phoneAuth, 'recaptcha-container', {
       size: 'normal',
       callback: () => {
@@ -105,10 +131,7 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
       },
       'expired-callback': () => {
         console.log('reCAPTCHA expired');
-        if (recaptchaVerifier) {
-          recaptchaVerifier.clear();
-          recaptchaVerifier = null;
-        }
+        clearRecaptcha();
       }
     });
 
@@ -140,19 +163,35 @@ export const verifyPhoneCode = async (verificationId: string, code: string): Pro
       console.log("Successfully created phone credential");
       
       try {
-        console.log("Attempting to sign in with phone credential (no tenant)");
-        const result = await signInWithPhoneNumber(phoneAuth, phoneVerificationState.phoneNumber || '', recaptchaVerifier!);
-        console.log("Phone sign-in successful");
+        console.log("Signing in with credential to get user ID");
+        const userCredential = await signInWithCredential(phoneAuth, credential);
+        console.log("Phone sign-in successful with credential");
         
-        if (phoneAuth.currentUser) {
-          phoneVerificationState.phoneUid = phoneAuth.currentUser.uid;
+        if (userCredential.user) {
+          phoneVerificationState.phoneUid = userCredential.user.uid;
           console.log("Stored phone UID:", phoneVerificationState.phoneUid);
+        } else {
+          console.error("No user returned from signInWithCredential");
         }
         
         await phoneAuth.signOut();
         console.log("Signed out of phone auth");
       } catch (signInError) {
-        console.warn("Could not sign in with phone, but credential was created:", signInError);
+        console.warn("Could not sign in with phone credential:", signInError);
+        
+        try {
+          console.log("Attempting fallback with signInWithPhoneNumber");
+          const result = await signInWithPhoneNumber(phoneAuth, phoneVerificationState.phoneNumber || '', recaptchaVerifier!);
+          
+          if (phoneAuth.currentUser) {
+            phoneVerificationState.phoneUid = phoneAuth.currentUser.uid;
+            console.log("Stored phone UID from fallback:", phoneVerificationState.phoneUid);
+          }
+          
+          await phoneAuth.signOut();
+        } catch (fallbackError) {
+          console.error("Fallback also failed:", fallbackError);
+        }
       }
       
       phoneVerificationState.verified = true;
