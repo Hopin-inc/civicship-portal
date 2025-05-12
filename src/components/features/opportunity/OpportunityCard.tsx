@@ -16,8 +16,8 @@ export default function OpportunityCard({
   const vertical = false;
 
   return (
-    <Link href={`/activities/${id}`} className={`relative ${vertical ? 'w-full' : 'w-[200px]'} flex-shrink-0`}>
-      <Card className="w-[200px] h-[250px] overflow-hidden relative">
+    <Link href={`/activities/${id}`} className={`relative ${vertical ? 'w-full' : 'w-[164px]'} flex-shrink-0`}>
+      <Card className="w-[164px] h-[205px] overflow-hidden relative">
         {hasReservableTicket && (
           <div className="absolute top-2 left-2 bg-primary-foreground text-primary px-2.5 py-1 rounded-xl text-label-xs font-bold z-10">
             チケット利用可
