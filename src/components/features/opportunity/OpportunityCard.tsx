@@ -19,7 +19,7 @@ export default function OpportunityCard({
     <Link href={`/activities/${id}`} className={`relative ${vertical ? 'w-full' : 'w-[200px]'} flex-shrink-0`}>
       <Card className="w-[200px] h-[250px] overflow-hidden relative">
         {hasReservableTicket && (
-          <div className="absolute top-2 left-2 bg-primary-foreground text-primary px-2 py-1 rounded-md text-xs font-medium z-10">
+          <div className="absolute top-2 left-2 bg-primary-foreground text-primary px-2.5 py-1 rounded-xl text-label-xs font-bold z-10">
             チケット利用可
           </div>
         )}
@@ -31,13 +31,13 @@ export default function OpportunityCard({
           className="h-full w-full object-cover"
         />
       </Card>
-      <div className="mt-2">
-        <h3 className="text-sm font-medium text-foreground line-clamp-2">{title}</h3>
-        <div className="mt-1 flex flex-col">
-          <p className="text-sm text-muted-foreground">
+      <div className="mt-3">
+        <h3 className="text-title-sm text-foreground line-clamp-2">{title}</h3>
+        <div className="mt-2 flex flex-col">
+          <p className="text-body-sm text-muted-foreground">
             {feeRequired ? `1人あたり${feeRequired.toLocaleString()}円から` : '要問い合わせ'}
           </p>
-          <div className="flex items-center text-sm text-muted-foreground mt-1">
+          <div className="flex items-center text-body-sm text-muted-foreground mt-1">
             <MapPin className="mr-1 h-4 w-4" />
             {location}
           </div>
@@ -45,4 +45,4 @@ export default function OpportunityCard({
       </div>
     </Link>
   )
-}          
+}
