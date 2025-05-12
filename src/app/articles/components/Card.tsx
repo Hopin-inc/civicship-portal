@@ -5,12 +5,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { TArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleCard, TArticleWithAuthor } from "@/app/articles/data/type";
 import { Card, CardContent } from "@/components/ui/card";
 import CategoryBadge from "@/app/articles/components/CategoryBadge";
 
 interface ArticleCardProps {
-  article: TArticleWithAuthor;
+  article: TArticleWithAuthor | TArticleCard;
   showCategory?: boolean;
 }
 
@@ -34,7 +34,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory }) => {
             公開: {format(new Date(article.publishedAt), "yyyy年M月d日", { locale: ja })}
           </div>
           <p className="text-foreground text-sm line-clamp-3">{article.introduction}</p>
-          {article.author && (
+          { "author" in article && article.author && (
             <div className="flex items-center mt-4">
               <div className="relative w-8 h-8 rounded-full overflow-hidden mr-2">
                 <Image

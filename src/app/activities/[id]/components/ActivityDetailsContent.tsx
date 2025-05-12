@@ -7,6 +7,7 @@ import { AlertCircle } from "lucide-react";
 import { SimilarActivitiesList } from "./SimilarActivitiesList";
 import ActivityScheduleCard from "./ActivityScheduleCard";
 import { ActivityCard, ActivityDetail } from "@/app/activities/data/type";
+import ArticleCard from "@/app/articles/components/Card";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
@@ -57,26 +58,7 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
               </div>
             </div>
             {opportunity.host.interview && (
-              <Link href={`/articles/${opportunity.host.interview.id}`} className="block">
-                <div className="bg-background rounded-xl border hover:shadow-md transition-shadow duration-200">
-                  <div className="relative w-full h-[200px]">
-                    <Image
-                      src={opportunity.host.interview.thumbnail ?? "/placeholder.png"}
-                      alt={opportunity.host.interview.title || "案内者の記事"}
-                      fill
-                      className="object-cover rounded-t-xl"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h5 className="text-xl font-bold mb-2 line-clamp-2">
-                      {opportunity.host.interview.title}
-                    </h5>
-                    <p className="text-gray-600 text-sm line-clamp-2">
-                      {opportunity.host.interview.introduction}
-                    </p>
-                  </div>
-                </div>
-              </Link>
+              <ArticleCard article={opportunity.host.interview} />
             )}
           </div>
         </div>
