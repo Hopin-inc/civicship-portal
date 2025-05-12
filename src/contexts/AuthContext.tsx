@@ -6,7 +6,8 @@ import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
-import { auth, signInWithLiffToken, startPhoneNumberVerification, linkPhoneCredential, fetchSignInMethodsForEmail } from "@/lib/firebase";
+import { auth, phoneAuth, signInWithLiffToken, startPhoneNumberVerification, linkPhoneCredential, fetchSignInMethodsForEmail } from "@/lib/firebase";
+import { PhoneAuthProvider, signInWithCredential } from "@firebase/auth";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
 import { useLiff } from "./LiffContext";
@@ -104,6 +105,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     setIsVerifying(true);
     try {
+      const credential = PhoneAuthProvider.credential(verificationId, code);
+      const phoneUserCredential = await signInWithCredential(phoneAuth, credential);
+      
       const currentUser = auth.currentUser;
       
       if (currentUser) {

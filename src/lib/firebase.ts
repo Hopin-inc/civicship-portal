@@ -10,9 +10,12 @@ import {
   signInWithPhoneNumber,
   PhoneAuthProvider,
   linkWithCredential,
+  signInWithCredential,
   UserCredential,
   fetchSignInMethodsForEmail as firebaseFetchSignInMethodsForEmail,
 } from "@firebase/auth";
+
+export { PhoneAuthProvider, signInWithCredential };
 import { LIFFLoginResponse } from "@/types/line";
 
 export const app = initializeApp({
@@ -24,10 +27,13 @@ export const app = initializeApp({
 export const auth = getAuth(app);
 auth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
 
-export const switchTenant = (tenantId: string | null) => {
-  auth.tenantId = tenantId;
-  return auth;
-};
+const phoneApp = initializeApp({
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+}, 'phoneAuth'); // Use a different name to avoid conflicts
+
+export const phoneAuth = getAuth(phoneApp);
 
 const providers = {
   line: new OAuthProvider("oidc.line"),
@@ -79,8 +85,6 @@ export const signInWithLiffToken = async (accessToken: string): Promise<boolean>
 let recaptchaVerifier: RecaptchaVerifier | null = null;
 
 export const startPhoneNumberVerification = async (phoneNumber: string): Promise<string> => {
-  switchTenant(null);
-  
   try {
     if (recaptchaVerifier) {
       recaptchaVerifier.clear();
@@ -88,7 +92,7 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
     }
     
     recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-      size: 'normal', // 'invisible'から'normal'に変更
+      size: 'normal',
       callback: () => {
         console.log('reCAPTCHA solved!');
       },
@@ -99,32 +103,25 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
           recaptchaVerifier = null;
         }
       }
-    }, auth);
+    }, phoneAuth); // Use the separate auth instance for phone
     
     await recaptchaVerifier.render();
     
-    const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+    const confirmationResult = await signInWithPhoneNumber(phoneAuth, phoneNumber, recaptchaVerifier);
     return confirmationResult.verificationId;
   } catch (error) {
     console.error("Phone verification failed:", error);
     throw error;
-  } finally {
-    switchTenant(process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID);
   }
 };
 
 export const verifyPhoneCode = async (verificationId: string, code: string): Promise<UserCredential> => {
-  switchTenant(null);
-  
   try {
     const credential = PhoneAuthProvider.credential(verificationId, code);
-    // PhoneAuthProvider.credential doesn't have a token property
-    return signInWithCredential(auth, credential);
+    return signInWithCredential(phoneAuth, credential);
   } catch (error) {
     console.error("Code verification failed:", error);
     throw error;
-  } finally {
-    switchTenant(process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID);
   }
 };
 
