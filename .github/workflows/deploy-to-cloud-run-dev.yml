@@ -31,6 +31,7 @@ jobs:
       NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
       NEXT_PUBLIC_API_ENDPOINT: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT }}
       NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT: ${{ secrets.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }}
+      NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
 
     steps:
     - name: Checkout code
@@ -71,6 +72,7 @@ jobs:
           --build-arg NEXT_PUBLIC_DOMAIN=${{ env.NEXT_PUBLIC_DOMAIN }} \
           --build-arg NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }} \
           --build-arg NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT=${{ env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }}
+          --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
 
     - name: Push Docker image to Artifact Registry
       run: |
