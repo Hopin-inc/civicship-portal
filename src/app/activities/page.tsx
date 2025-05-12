@@ -6,12 +6,12 @@ import { useActivities } from "@/hooks/features/activity/useActivities";
 import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
 import ActivitiesFeaturedSection from "@/components/features/activity/ActivitiesFeaturedSection";
 import ActivitiesUpcomingSection from "@/components/features/activity/ActivitiesUpcomingSection";
-import ActivitiesFeaturedItemsSection from '@/components/features/activity/ActivitiesFeaturedItemsSection';
 import ActivitiesAllSection from "@/components/features/activity/ActivitiesAllSection";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { GqlOpportunity, GqlOpportunityEdge } from "@/types/graphql";
 import { presenterActivityCard } from "@/presenters/opportunity";
 import { ActivityCard } from "@/types/opportunity";
+import ActivitiesFeaturedItemsSection from "@/components/features/activity/ActivitiesFeaturedItemsSection";
 
 const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
   edges
