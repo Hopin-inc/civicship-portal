@@ -101,3 +101,57 @@ function presenterActivitySlot(
     ) ?? []
   );
 }
+
+export const sliceActivitiesBySection = (
+  activityCards: ActivityCard[]
+): {
+  upcomingCards: ActivityCard[];
+  featuredCards: ActivityCard[];
+  listCards: ActivityCard[];
+} => {
+  const safe = <T>(cards: (T | undefined)[]): T[] =>
+    cards.filter((c): c is T => !!c);
+
+  const N = activityCards.length;
+
+  const featuredHead = activityCards[0];
+
+  if (N < 10) {
+    const maxUpcoming = N >= 6 ? 3 : 2;
+
+    const usedIndices = new Set<number>();
+    if (featuredHead) usedIndices.add(0);
+
+    const featuredCards = safe([featuredHead]);
+
+    const upcomingCards = safe(
+      activityCards
+        .slice(1, 1 + maxUpcoming)
+        .map((card, i) => {
+          usedIndices.add(i + 1);
+          return card;
+        })
+    );
+
+    const listCards = safe(
+      activityCards.filter((_, idx) => !usedIndices.has(idx))
+    );
+
+    return { upcomingCards, featuredCards, listCards };
+  }
+
+  const featuredTail = activityCards.slice(6, 10);
+  const featuredCards = safe([featuredHead, ...featuredTail]);
+
+  const upcomingCards = safe(activityCards.slice(1, 6));
+
+  const listCards = safe([
+    ...activityCards.slice(3, 6),
+    ...activityCards.slice(6, 10),
+    ...activityCards.slice(10),
+  ]);
+
+  return { upcomingCards, featuredCards, listCards };
+};
+
+

@@ -9,7 +9,7 @@ import { ErrorState } from "@/components/shared/ErrorState";
 import { GqlOpportunity, GqlOpportunityEdge } from "@/types/graphql";
 import { ActivityCard } from "@/app/activities/data/type";
 import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
-import { presenterActivityCard } from "@/app/activities/data/presenter";
+import { presenterActivityCard, sliceActivitiesBySection } from "@/app/activities/data/presenter";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
@@ -43,9 +43,11 @@ export default function ActivitiesPage() {
   if (error) return <ErrorState message={`Error: ${error.message}`} />;
 
   const activityCards = mapOpportunityCards(opportunities.edges);
-  const upcomingCards = activityCards.slice(0, 5);
-  const featuredCards = activityCards.slice(5, 10);
-  const listCards = activityCards.slice(10);
+  const {
+    upcomingCards,
+    featuredCards,
+    listCards
+  } = sliceActivitiesBySection(activityCards);
 
   return (
     <div className="min-h-screen pb-16">
