@@ -28,7 +28,7 @@ export function PhoneVerificationForm() {
         clearRecaptcha();
       });
     };
-  }, [recaptchaContainerRef.current]);
+  }, []);
   
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
