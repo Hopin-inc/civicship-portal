@@ -10,24 +10,23 @@ interface ActivitiesAllSectionProps {
   isLoading: boolean;
 }
 
-const ActivitiesAllSection: React.FC<ActivitiesAllSectionProps> = ({ 
+const ActivitiesAllSection: React.FC<ActivitiesAllSectionProps> = ({
   opportunities,
   loadMoreRef,
   isLoading
 }) => {
   return (
-    <section className="mt-8 px-4 pb-8">
-      <h2 className="text-xl font-bold">すべての体験</h2>
-      <div className="mt-4 grid grid-cols-2 gap-4">
+    <section className="mt-6 px-6">
+      <h2 className="text-display-md">すべての体験</h2>
+      <div className="mt-6 flex flex-wrap gap-4 pb-8">
         {opportunities.map((opportunity) => (
-          <OpportunityCard 
-            key={opportunity.id}
-            {...opportunity}
-          />
+          <OpportunityCard key={opportunity.id} {...opportunity} />
         ))}
       </div>
       <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
-        {isLoading && <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-foreground"></div>}
+        {isLoading && (
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-foreground"></div>
+        )}
       </div>
     </section>
   );
