@@ -6,7 +6,6 @@ import {
   GqlOpportunityCategory,
   GqlOpportunityEdge,
   GqlOpportunitySlot,
-  GqlPlace,
   GqlUser,
   Maybe,
 } from "@/types/graphql";
@@ -14,7 +13,6 @@ import {
   ActivityCard,
   ActivityDetail,
   OpportunityHost,
-  OpportunityPlace,
 } from "@/app/activities/data/type";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
@@ -43,7 +41,7 @@ export const presenterActivityCard = (node: GqlOpportunity): ActivityCard => ({
 });
 
 export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail => {
-  const { images, place, slots, articles, createdByUser, ...prop } = data;
+  const { images, place, slots, articles, createdByUser } = data;
 
   return {
     communityId: data.community?.id || "",
