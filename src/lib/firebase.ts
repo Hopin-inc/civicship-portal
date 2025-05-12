@@ -32,12 +32,14 @@ type PhoneVerificationState = {
   phoneNumber: string | null;
   verificationId: string | null;
   verified: boolean;
+  phoneUid: string | null;
 };
 
 export const phoneVerificationState: PhoneVerificationState = {
   phoneNumber: null,
   verificationId: null,
   verified: false,
+  phoneUid: null,
 };
 
 const providers = {
@@ -139,8 +141,13 @@ export const verifyPhoneCode = async (verificationId: string, code: string): Pro
       
       try {
         console.log("Attempting to sign in with phone credential (no tenant)");
-        await signInWithPhoneNumber(phoneAuth, phoneVerificationState.phoneNumber || '', recaptchaVerifier!);
+        const result = await signInWithPhoneNumber(phoneAuth, phoneVerificationState.phoneNumber || '', recaptchaVerifier!);
         console.log("Phone sign-in successful");
+        
+        if (phoneAuth.currentUser) {
+          phoneVerificationState.phoneUid = phoneAuth.currentUser.uid;
+          console.log("Stored phone UID:", phoneVerificationState.phoneUid);
+        }
         
         await phoneAuth.signOut();
         console.log("Signed out of phone auth");

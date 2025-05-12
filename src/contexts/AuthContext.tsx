@@ -6,7 +6,7 @@ import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
-import { auth, signInWithLiffToken, startPhoneNumberVerification, verifyPhoneCode, isPhoneVerified, getVerifiedPhoneNumber } from "@/lib/firebase";
+import { auth, signInWithLiffToken, startPhoneNumberVerification, verifyPhoneCode, isPhoneVerified, getVerifiedPhoneNumber, phoneVerificationState } from "@/lib/firebase";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
 import { useLiff } from "./LiffContext";
@@ -30,6 +30,7 @@ type AuthContextType = UserInfo & {
   phoneAuth: {
     isVerifying: boolean;
     verificationId: string | null;
+    phoneUid: string | null;
     startPhoneVerification: (phoneNumber: string) => Promise<boolean>;
     verifyPhoneCode: (code: string) => Promise<boolean>;
   };
@@ -266,6 +267,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       phoneAuth: {
         isVerifying,
         verificationId,
+        phoneUid: phoneVerificationState.phoneUid,
         startPhoneVerification,
         verifyPhoneCode: verifyPhoneCodeLocal,
       },

@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useLinkPhoneAuthMutation } from "@/types/graphql";
+import { getVerifiedPhoneNumber } from "@/lib/firebase";
 
 export function PhoneVerificationForm() {
   const { phoneAuth } = useAuth();
@@ -13,6 +15,7 @@ export function PhoneVerificationForm() {
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [linkPhoneAuth] = useLinkPhoneAuthMutation();
   
   useEffect(() => {
     if (recaptchaContainerRef.current) {
@@ -38,7 +41,30 @@ export function PhoneVerificationForm() {
     e.preventDefault();
     const success = await phoneAuth.verifyPhoneCode(verificationCode);
     if (success) {
-      router.push("/sign-up");
+      try {
+        const phoneUid = phoneAuth.phoneUid;
+        if (phoneUid) {
+          const { data } = await linkPhoneAuth({
+            variables: {
+              input: {
+                phoneUid
+              }
+            }
+          });
+          
+          if (data?.linkPhoneAuth?.success) {
+            toast.success("電話番号認証が完了しました");
+            router.push("/sign-up");
+          } else {
+            toast.error("電話番号認証の連携に失敗しました");
+          }
+        } else {
+          toast.error("電話番号認証IDが取得できませんでした");
+        }
+      } catch (error) {
+        console.error("Failed to link phone auth:", error);
+        toast.error("電話番号認証の連携に失敗しました");
+      }
     }
   };
 
