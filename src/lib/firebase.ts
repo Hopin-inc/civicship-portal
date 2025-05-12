@@ -14,14 +14,19 @@ import {
 export { PhoneAuthProvider };
 import { LIFFLoginResponse } from "@/types/line";
 
-export const app = initializeApp({
+const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-});
+};
 
+export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 auth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
+
+export const phoneApp = initializeApp(firebaseConfig, "phone-auth-app");
+export const phoneAuth = getAuth(phoneApp);
+phoneAuth.tenantId = null;
 
 type PhoneVerificationState = {
   phoneNumber: string | null;
@@ -91,9 +96,7 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
       recaptchaVerifier = null;
     }
 
-    const tempAuth = getAuth(app);
-
-    recaptchaVerifier = new RecaptchaVerifier(tempAuth, 'recaptcha-container', {
+    recaptchaVerifier = new RecaptchaVerifier(phoneAuth, 'recaptcha-container', {
       size: 'normal',
       callback: () => {
         console.log('reCAPTCHA solved!');
@@ -109,7 +112,7 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
 
     await recaptchaVerifier.render();
 
-    const confirmationResult = await signInWithPhoneNumber(tempAuth, phoneNumber, recaptchaVerifier);
+    const confirmationResult = await signInWithPhoneNumber(phoneAuth, phoneNumber, recaptchaVerifier);
 
     phoneVerificationState.phoneNumber = phoneNumber;
     phoneVerificationState.verificationId = confirmationResult.verificationId;
