@@ -9,7 +9,7 @@ import { LINK_PHONE_AUTH } from "@/graphql/account/identity/mutation";
 import { getVerifiedPhoneNumber } from "@/lib/firebase";
 
 export function PhoneVerificationForm() {
-  const { phoneAuth } = useAuth();
+  const { phoneAuth, uid } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -55,6 +55,9 @@ export function PhoneVerificationForm() {
             variables: {
               input: {
                 phoneUid
+              },
+              permission: {
+                userId: uid
               }
             }
           });
