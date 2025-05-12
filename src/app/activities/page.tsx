@@ -1,17 +1,16 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useLoading } from "@/hooks/core/useLoading";
-import { useActivities } from "@/hooks/features/activity/useActivities";
-import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
-import ActivitiesFeaturedSection from "@/components/features/activity/ActivitiesFeaturedSection";
-import ActivitiesUpcomingSection from "@/components/features/activity/ActivitiesUpcomingSection";
-import ActivitiesAllSection from "@/components/features/activity/ActivitiesAllSection";
+import { useLoading } from "@/hooks/useLoading";
+import { useActivities } from "@/app/activities/hooks/useActivities";
+import ActivitiesFeaturedSection from "@/app/activities/components/FeaturedSection/FeaturedSection";
+import ActivitiesListSection from "@/app/activities/components/ListSection/ListSection";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { GqlOpportunity, GqlOpportunityEdge } from "@/types/graphql";
-import { presenterActivityCard } from "@/presenters/opportunity";
-import { ActivityCard } from "@/types/opportunity";
-import ActivitiesFeaturedItemsSection from "@/components/features/activity/ActivitiesFeaturedItemsSection";
+import { ActivityCard } from "@/app/activities/data/type";
+import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
+import { presenterActivityCard } from "@/app/activities/data/presenter";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
   edges
@@ -31,28 +30,44 @@ export default function ActivitiesPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { upcomingActivities, featuredActivities, allActivities, loading, error, loadMoreRef } =
+  const { opportunities, loading, error, loadMoreRef } =
     useActivities();
 
+  const isInitialLoading = loading && !opportunities?.edges?.length
+  const isSectionLoading = loading && !isInitialLoading;
+
   useEffect(() => {
-    setIsLoading(loading && !upcomingActivities?.edges?.length);
-  }, [loading, upcomingActivities, setIsLoading]);
+    setIsLoading(isInitialLoading);
+  }, [isInitialLoading, setIsLoading]);
 
   if (error) return <ErrorState message={`Error: ${error.message}`} />;
 
-  const featuredCards = mapOpportunityCards(featuredActivities.edges);
-  const upcomingCards = mapOpportunityCards(upcomingActivities.edges);
-  const allCards = mapOpportunityCards(allActivities.edges);
+  const activityCards = mapOpportunityCards(opportunities.edges);
+  const upcomingCards = activityCards.slice(0, 5);
+  const featuredCards = activityCards.slice(5, 10);
+  const listCards = activityCards.slice(10);
 
   return (
     <div className="min-h-screen pb-16">
-      <ActivitiesFeaturedSection opportunities={featuredCards} />
-      <ActivitiesUpcomingSection opportunities={upcomingCards} />
-      <ActivitiesFeaturedItemsSection opportunities={featuredCards} />
-      <ActivitiesAllSection
-        opportunities={allCards}
+      <ActivitiesFeaturedSection
+        opportunities={featuredCards}
+        isInitialLoading={isInitialLoading}
+      />
+      {/*<ActivitiesCarouselSection*/}
+      {/*  title="特集"*/}
+      {/*  opportunities={featuredCards}*/}
+      {/*  isInitialLoading={isInitialLoading}*/}
+      {/*/>*/}
+      <ActivitiesCarouselSection
+        title="もうすぐ開催予定"
+        opportunities={upcomingCards}
+        isInitialLoading={isInitialLoading}
+      />
+      <ActivitiesListSection
+        opportunities={listCards}
         loadMoreRef={loadMoreRef}
-        isLoading={loading}
+        isInitialLoading={isInitialLoading}
+        isSectionLoading={isSectionLoading}
       />
     </div>
   );

@@ -3040,191 +3040,14 @@ export type GqlOpportunityFieldsFragment = {
 };
 
 export type GqlGetOpportunitiesQueryVariables = Exact<{
-  upcomingFilter?: InputMaybe<GqlOpportunityFilterInput>;
-  featuredFilter?: InputMaybe<GqlOpportunityFilterInput>;
-  allFilter?: InputMaybe<GqlOpportunityFilterInput>;
-  similarFilter?: InputMaybe<GqlOpportunityFilterInput>;
+  filter?: InputMaybe<GqlOpportunityFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type GqlGetOpportunitiesQuery = {
   __typename?: "Query";
-  upcoming: {
-    __typename?: "OpportunitiesConnection";
-    totalCount: number;
-    pageInfo: {
-      __typename?: "PageInfo";
-      startCursor?: string | null;
-      endCursor?: string | null;
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-    };
-    edges: Array<{
-      __typename?: "OpportunityEdge";
-      cursor: string;
-      node?: {
-        __typename?: "Opportunity";
-        id: string;
-        title: string;
-        description: string;
-        body?: string | null;
-        images?: Array<string> | null;
-        category: GqlOpportunityCategory;
-        publishStatus: GqlPublishStatus;
-        isReservableWithTicket?: boolean | null;
-        requireApproval: boolean;
-        feeRequired?: number | null;
-        pointsToEarn?: number | null;
-        earliestReservableAt?: Date | null;
-        slots?: Array<{
-          __typename?: "OpportunitySlot";
-          id: string;
-          hostingStatus: GqlOpportunitySlotHostingStatus;
-          startsAt: Date;
-          endsAt: Date;
-          capacity?: number | null;
-          remainingCapacity?: number | null;
-        }> | null;
-        place?: {
-          __typename?: "Place";
-          id: string;
-          name: string;
-          address: string;
-          latitude: any;
-          longitude: any;
-          city?: {
-            __typename?: "City";
-            code: string;
-            name: string;
-            state?: {
-              __typename?: "State";
-              code: string;
-              countryCode: string;
-              name: string;
-            } | null;
-          } | null;
-        } | null;
-      } | null;
-    }>;
-  };
-  featured: {
-    __typename?: "OpportunitiesConnection";
-    totalCount: number;
-    pageInfo: {
-      __typename?: "PageInfo";
-      startCursor?: string | null;
-      endCursor?: string | null;
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-    };
-    edges: Array<{
-      __typename?: "OpportunityEdge";
-      cursor: string;
-      node?: {
-        __typename?: "Opportunity";
-        id: string;
-        title: string;
-        description: string;
-        body?: string | null;
-        images?: Array<string> | null;
-        category: GqlOpportunityCategory;
-        publishStatus: GqlPublishStatus;
-        isReservableWithTicket?: boolean | null;
-        requireApproval: boolean;
-        feeRequired?: number | null;
-        pointsToEarn?: number | null;
-        earliestReservableAt?: Date | null;
-        slots?: Array<{
-          __typename?: "OpportunitySlot";
-          id: string;
-          hostingStatus: GqlOpportunitySlotHostingStatus;
-          startsAt: Date;
-          endsAt: Date;
-          capacity?: number | null;
-          remainingCapacity?: number | null;
-        }> | null;
-        place?: {
-          __typename?: "Place";
-          id: string;
-          name: string;
-          address: string;
-          latitude: any;
-          longitude: any;
-          city?: {
-            __typename?: "City";
-            code: string;
-            name: string;
-            state?: {
-              __typename?: "State";
-              code: string;
-              countryCode: string;
-              name: string;
-            } | null;
-          } | null;
-        } | null;
-      } | null;
-    }>;
-  };
-  similar: {
-    __typename?: "OpportunitiesConnection";
-    totalCount: number;
-    pageInfo: {
-      __typename?: "PageInfo";
-      startCursor?: string | null;
-      endCursor?: string | null;
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-    };
-    edges: Array<{
-      __typename?: "OpportunityEdge";
-      cursor: string;
-      node?: {
-        __typename?: "Opportunity";
-        id: string;
-        title: string;
-        description: string;
-        body?: string | null;
-        images?: Array<string> | null;
-        category: GqlOpportunityCategory;
-        publishStatus: GqlPublishStatus;
-        isReservableWithTicket?: boolean | null;
-        requireApproval: boolean;
-        feeRequired?: number | null;
-        pointsToEarn?: number | null;
-        earliestReservableAt?: Date | null;
-        slots?: Array<{
-          __typename?: "OpportunitySlot";
-          id: string;
-          hostingStatus: GqlOpportunitySlotHostingStatus;
-          startsAt: Date;
-          endsAt: Date;
-          capacity?: number | null;
-          remainingCapacity?: number | null;
-        }> | null;
-        place?: {
-          __typename?: "Place";
-          id: string;
-          name: string;
-          address: string;
-          latitude: any;
-          longitude: any;
-          city?: {
-            __typename?: "City";
-            code: string;
-            name: string;
-            state?: {
-              __typename?: "State";
-              code: string;
-              countryCode: string;
-              name: string;
-            } | null;
-          } | null;
-        } | null;
-      } | null;
-    }>;
-  };
-  all: {
+  opportunities: {
     __typename?: "OpportunitiesConnection";
     totalCount: number;
     pageInfo: {
@@ -5493,82 +5316,13 @@ export type GetEvaluationQueryResult = Apollo.QueryResult<
   GqlGetEvaluationQueryVariables
 >;
 export const GetOpportunitiesDocument = gql`
-  query GetOpportunities(
-    $upcomingFilter: OpportunityFilterInput
-    $featuredFilter: OpportunityFilterInput
-    $allFilter: OpportunityFilterInput
-    $similarFilter: OpportunityFilterInput
-    $first: Int
-    $cursor: String
-  ) {
-    upcoming: opportunities(
-      filter: $upcomingFilter
+  query GetOpportunities($filter: OpportunityFilterInput, $first: Int, $cursor: String) {
+    opportunities(
+      filter: $filter
       sort: { earliestSlotStartsAt: desc }
-      first: 5
+      first: $first
+      cursor: $cursor
     ) {
-      pageInfo {
-        startCursor
-        endCursor
-        hasNextPage
-        hasPreviousPage
-      }
-      totalCount
-      edges {
-        cursor
-        node {
-          ...OpportunityFields
-          slots {
-            ...OpportunitySlotFields
-          }
-          place {
-            ...PlaceFields
-          }
-        }
-      }
-    }
-    featured: opportunities(filter: $featuredFilter, first: 5) {
-      pageInfo {
-        startCursor
-        endCursor
-        hasNextPage
-        hasPreviousPage
-      }
-      totalCount
-      edges {
-        cursor
-        node {
-          ...OpportunityFields
-          slots {
-            ...OpportunitySlotFields
-          }
-          place {
-            ...PlaceFields
-          }
-        }
-      }
-    }
-    similar: opportunities(filter: $similarFilter, first: 3) {
-      pageInfo {
-        startCursor
-        endCursor
-        hasNextPage
-        hasPreviousPage
-      }
-      totalCount
-      edges {
-        cursor
-        node {
-          ...OpportunityFields
-          slots {
-            ...OpportunitySlotFields
-          }
-          place {
-            ...PlaceFields
-          }
-        }
-      }
-    }
-    all: opportunities(filter: $allFilter, first: $first, cursor: $cursor) {
       pageInfo {
         startCursor
         endCursor
@@ -5607,10 +5361,7 @@ export const GetOpportunitiesDocument = gql`
  * @example
  * const { data, loading, error } = useGetOpportunitiesQuery({
  *   variables: {
- *      upcomingFilter: // value for 'upcomingFilter'
- *      featuredFilter: // value for 'featuredFilter'
- *      allFilter: // value for 'allFilter'
- *      similarFilter: // value for 'similarFilter'
+ *      filter: // value for 'filter'
  *      first: // value for 'first'
  *      cursor: // value for 'cursor'
  *   },

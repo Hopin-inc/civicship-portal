@@ -1,15 +1,15 @@
 "use client";
 
-import { useActivityDetails } from "@/hooks/features/activity/useActivityDetails";
-import ActivityDetailsHeader from "@/components/features/activity/ActivityDetailsHeader";
-import ActivityDetailsContent from "@/components/features/activity/ActivityDetailsContent";
-import ActivityDetailsFooter from "@/components/features/activity/ActivityDetailsFooter";
+import { useActivityDetails } from "@/app/activities/[id]/hooks/useActivityDetails";
+import ActivityDetailsHeader from "@/app/activities/[id]/components/ActivityDetailsHeader";
+import ActivityDetailsContent from "@/app/activities/[id]/components/ActivityDetailsContent";
+import ActivityDetailsFooter from "@/app/activities/[id]/components/ActivityDetailsFooter";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useEffect, useMemo } from "react";
-import { useLoading } from "@/hooks/core/useLoading";
-import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
-import { useHierarchicalNavigation } from "@/hooks/core/useHierarchicalNavigation";
-import ActivityNavigationButtons from "@/components/features/activity/ActivityNavigationButtons";
+import { useLoading } from "@/hooks/useLoading";
+import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
+import ActivityNavigationButtons from "@/app/activities/[id]/components/ActivityNavigationButtons";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface ActivityPageProps {
   params: {

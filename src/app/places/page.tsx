@@ -2,10 +2,10 @@
 
 import { useMemo } from "react";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { usePlaces } from "@/hooks/features/place/usePlaces";
-import PlaceMapView from "@/components/features/places/PlaceMapView";
-import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
-import { PlaceListPage } from "@/components/features/places/list/PlaceListSheet";
+import { usePlaces } from "@/app/places/hooks/usePlaces";
+import PlaceMapView from "@/app/places/components/map/PlaceMapView";
+import { PlaceListPage } from "@/app/places/components/list/PlaceListSheet";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function PlacesPage() {
   const headerConfig = useMemo(

@@ -1,12 +1,12 @@
 "use client";
 
-import { useSearch, PREFECTURES } from "@/hooks/features/search/useSearch";
-import { SearchHeader } from "@/components/features/search/SearchHeader";
-import { SearchTabs } from "@/components/features/search/SearchTabs";
-import { SearchForm } from "@/components/features/search/SearchForm";
-import { SearchFilters } from "@/components/features/search/SearchFilters";
-import { SearchFooter } from "@/components/features/search/SearchFooter";
-import { FilterSheets } from "@/components/features/search/FilterSheets";
+import { useSearch, PREFECTURES } from "@/app/search/hooks/useSearch";
+import { SearchHeader } from "@/app/search/components/SearchHeader";
+import { SearchTabs } from "@/app/search/components/SearchTabs";
+import { SearchForm } from "@/app/search/components/SearchForm";
+import { SearchFilters } from "@/app/search/components/SearchFilters";
+import { SearchFooter } from "@/app/search/components/SearchFooter";
+import { FilterSheets } from "@/app/search/components/FilterSheets";
 
 export default function SearchPage() {
   const {
