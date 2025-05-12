@@ -5,11 +5,10 @@ import { CookiesProvider } from "next-client-cookies/server";
 import ApolloProvider from "@/components/providers/ApolloProvider";
 import { Toaster } from "@/components/ui/sonner";
 import LoadingProvider from "@/components/providers/LoadingProvider";
-import Header from "@/components/layout/Header";
 import { LiffProvider } from "@/contexts/LiffContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import HeaderProvider from "@/components/providers/HeaderProvider";
-import BottomBar from "@/components/layout/BottomBar";
+import MainContent from "@/components/layout/MainContent";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -32,11 +31,7 @@ const RootLayout = ({
               <AuthProvider>
                 <HeaderProvider>
                   <LoadingProvider>
-                    <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full">
-                      <Header />
-                      <main className="w-full flex-grow pt-16 pb-16 overflow-y-auto">{children}</main>
-                      <BottomBar className="fixed bottom-0 left-0 right-0 z-50 max-w-mobile-l mx-auto w-full" />
-                    </div>
+                    <MainContent>{children}</MainContent>
                     <Toaster richColors className="mx-8" />
                   </LoadingProvider>
                 </HeaderProvider>
@@ -48,5 +43,7 @@ const RootLayout = ({
     </html>
   );
 };
+
+
 
 export default RootLayout;

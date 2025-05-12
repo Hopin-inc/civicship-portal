@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import LoginModal from "@/components/features/login/LoginModal";
-import { LoadingIndicator } from "@/components/shared/LoadingIndicator";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useTicketClaim } from "@/hooks/features/ticket/useTicketClaim";
 import TicketReceiveContent from "@/components/features/ticket/TicketReceiveContent";

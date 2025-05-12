@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { useWallet } from '@/hooks/features/wallet/useWallet';
-import { LoadingIndicator } from '@/components/shared/LoadingIndicator';
+import LoadingIndicator from '@/components/shared/LoadingIndicator';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
 import { WalletCard } from '@/components/features/wallet/WalletCard';

@@ -1,66 +1,41 @@
-'use client';
+"use client";
 
-import React from 'react';
-import dynamic from 'next/dynamic';
-import { Membership } from '@/hooks/features/place/usePlaces';
-import PlaceToggleButton from './shared/PlaceToggleButton';
-import { PlaceList } from './list/PlaceList';
-import PlaceCardsSheet from './shared/PlaceCardsSheet';
+import React from "react";
+import dynamic from "next/dynamic";
+import PlaceToggleButton from "./shared/PlaceToggleButton";
+import PlaceCardsSheet from "./shared/PlaceCardsSheet";
+import { BaseCardInfo } from "@/types/place";
 
-const MapComponent = dynamic(
-  () => import('./map/MapComponent').then((mod) => mod.default),
-  { ssr: false }
-);
+const MapComponent = dynamic(() => import("./map/MapComponent"), {
+  ssr: false,
+  loading: () => <></>,
+});
 
 interface PlaceMapViewProps {
-  memberships: Membership[];
   selectedPlaceId: string | null;
   onPlaceSelect: (placeId: string) => void;
-  onClose: () => void;
   toggleMode: () => void;
-  places: Array<{
-    placeId: string;
-    title: string;
-    address: string;
-    participantCount: number;
-    description: string;
-    image: string;
-    bio?: string;
-    userId: string;
-    activeOpportunityCount?: number;
-  }>;
+  places: BaseCardInfo[];
 }
 
 const PlaceMapView: React.FC<PlaceMapViewProps> = ({
-  memberships,
   selectedPlaceId,
   onPlaceSelect,
-  onClose,
   toggleMode,
-  places
+  places,
 }) => {
   return (
     <div className="relative h-full w-full">
-      <MapComponent 
-        memberships={memberships} 
+      <MapComponent
+        places={places}
         selectedPlaceId={selectedPlaceId}
         onPlaceSelect={onPlaceSelect}
       />
-      {!selectedPlaceId && (
-        <>
-          <PlaceToggleButton isMapMode={true} onClick={toggleMode} />
-          <PlaceList 
-            memberships={memberships} 
-            isMapMode={true} 
-            selectedPlaceId={selectedPlaceId}
-          />
-        </>
-      )}
+      {!selectedPlaceId && <PlaceToggleButton isMapMode={true} onClick={toggleMode} />}
       {selectedPlaceId && (
         <PlaceCardsSheet
           places={places}
           selectedPlaceId={selectedPlaceId}
-          onClose={onClose}
           onPlaceSelect={onPlaceSelect}
         />
       )}

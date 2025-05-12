@@ -1,6 +1,5 @@
-
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { Button } from "@/components/ui/button";
 import { ActivitySlot, ActivitySlotGroup } from "@/types/opportunitySlot";
 import { formatTimeRange } from "@/utils/date";
 
@@ -13,15 +12,13 @@ interface TimeSlotListProps {
 export const TimeSlotList: React.FC<TimeSlotListProps> = ({
   dateSections,
   isSlotAvailable,
-  onSelectSlot
+  onSelectSlot,
 }) => {
   return (
     <div className="space-y-8">
       {dateSections.map((section, sectionIndex) => (
         <div key={sectionIndex}>
-          <h3 className="text-lg font-bold mb-4">
-            {section.dateLabel}
-          </h3>
+          <h3 className="text-lg font-bold mb-4">{section.dateLabel}</h3>
           <div className="space-y-2">
             {section.slots.map((slot: ActivitySlot, slotIndex: number) => {
               const remainingCapacity = slot.remainingCapacity || 0;
@@ -35,15 +32,21 @@ export const TimeSlotList: React.FC<TimeSlotListProps> = ({
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={`text-lg font-bold ${isFull ? "text-muted-foreground/50" : ""}`}>
+                      <p
+                        className={`text-lg font-bold ${isFull ? "text-muted-foreground/50" : ""}`}
+                      >
                         {formatTimeRange(slot.startsAt, slot.endsAt)}
                       </p>
-                      <p className={`text-md font-bold ${isFull ? "text-muted-foreground/50" : ""}`}>
-                        {slot.feeRequired.toLocaleString()}円/人
+                      <p
+                        className={`text-md font-bold ${isFull ? "text-muted-foreground/50" : ""}`}
+                      >
+                        {slot.feeRequired?.toLocaleString()}円/人
                       </p>
                     </div>
                     {isFull ? (
-                      <div className="text-muted-foreground/50 bg-muted px-8 py-3 rounded-full">満員</div>
+                      <div className="text-muted-foreground/50 bg-muted px-8 py-3 rounded-full">
+                        満員
+                      </div>
                     ) : (
                       <div className="flex flex-col items-end gap-1">
                         {remainingCapacity <= 3 && remainingCapacity > 0 && (

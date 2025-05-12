@@ -1,20 +1,13 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { ArticleWithAuthor } from "@/types/article";
 
 interface PlaceFeaturedArticleProps {
-  article: {
-    id: string;
-    title: string;
-    description?: string;
-    thumbnail?: string;
-    url: string;
-    publishedAt?: string;
-    type?: string;
-  } | null;
+  article: ArticleWithAuthor | null;
 }
 
 const PlaceFeaturedArticle: React.FC<PlaceFeaturedArticleProps> = ({ article }) => {
@@ -23,7 +16,7 @@ const PlaceFeaturedArticle: React.FC<PlaceFeaturedArticleProps> = ({ article }) 
   return (
     <div className="px-4 mb-8">
       <h2 className="text-xl font-bold mb-4">関連記事</h2>
-      <Link href={article.url} className="block">
+      <Link href={article.id} className="block">
         <div className="bg-background rounded-xl border hover:shadow-md transition-shadow duration-200">
           <div className="relative w-full h-[200px]">
             {article.thumbnail ? (
@@ -41,9 +34,9 @@ const PlaceFeaturedArticle: React.FC<PlaceFeaturedArticleProps> = ({ article }) 
           </div>
           <div className="p-6">
             <div className="flex items-center mb-2">
-              {article.type && (
+              {article.category && (
                 <span className="bg-primary-foreground text-primary text-xs font-medium px-2 py-0.5 rounded-full mr-2">
-                  {article.type}
+                  {article.category}
                 </span>
               )}
               {article.publishedAt && (
@@ -53,15 +46,13 @@ const PlaceFeaturedArticle: React.FC<PlaceFeaturedArticleProps> = ({ article }) 
               )}
             </div>
             <h3 className="text-xl font-bold mb-2 line-clamp-2">{article.title}</h3>
-            {article.description && (
+            {article.introduction && (
               <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
-                {article.description}
+                {article.introduction}
               </p>
             )}
             <div className="flex justify-end">
-              <Button variant="secondary" size="sm">
-                記事を読む
-              </Button>
+              <Button>記事を読む</Button>
             </div>
           </div>
         </div>

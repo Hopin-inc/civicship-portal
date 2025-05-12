@@ -1,17 +1,18 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { AlertCircle } from 'lucide-react';
-import { SimilarActivitiesList } from './SimilarActivitiesList';
-import ActivityScheduleCard from './ActivityScheduleCard';
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { AlertCircle } from "lucide-react";
+import { SimilarActivitiesList } from "./SimilarActivitiesList";
+import ActivityScheduleCard from "./ActivityScheduleCard";
 import { ActivityCard, ActivityDetail } from "@/types/opportunity";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
   availableTickets: number;
   availableDates: Array<{
+    id: string;
     startsAt: string;
     endsAt: string;
     participants: number;
@@ -26,7 +27,7 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
   availableTickets,
   availableDates,
   similarActivities,
-  communityId = '',
+  communityId = "",
 }) => {
   return (
     <>
@@ -56,19 +57,12 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
               </div>
             </div>
             {opportunity.host.interview && (
-              <Link
-                href={`/articles/${opportunity.host.interview.id}`}
-                className="block"
-              >
+              <Link href={`/articles/${opportunity.host.interview.id}`} className="block">
                 <div className="bg-background rounded-xl border hover:shadow-md transition-shadow duration-200">
                   <div className="relative w-full h-[200px]">
                     <Image
-                      src={
-                        opportunity.host.interview.thumbnail ?? "/placeholder.png"
-                      }
-                      alt={
-                        opportunity.host.interview.title || "案内者の記事"
-                      }
+                      src={opportunity.host.interview.thumbnail ?? "/placeholder.png"}
+                      alt={opportunity.host.interview.title || "案内者の記事"}
                       fill
                       className="object-cover rounded-t-xl"
                     />
@@ -91,19 +85,19 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
       {/* 集合場所 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-6">集合場所</h2>
-          {opportunity.place?.latitude && opportunity.place?.longitude && (
-            <div className="relative w-full h-[300px] rounded-lg overflow-hidden">
-              <iframe
-                src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(opportunity.place.address)}`}
-                width="100%"
-                height="100%"
-                className="border-0"
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </div>
-          )}
+        {opportunity.place?.latitude && opportunity.place?.longitude && (
+          <div className="relative w-full h-[300px] rounded-lg overflow-hidden">
+            <iframe
+              src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(opportunity.place.address)}`}
+              width="100%"
+              height="100%"
+              className="border-0"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        )}
       </section>
 
       {/* 開催日 */}
@@ -115,6 +109,7 @@ const ActivityDetailsContent: React.FC<ActivityDetailsContentProps> = ({
             {availableDates.map((schedule, index) => (
               <div key={index} className="flex-shrink-0 first:ml-0">
                 <ActivityScheduleCard
+                  id={schedule.id}
                   startsAt={schedule.startsAt}
                   endsAt={schedule.endsAt}
                   participants={schedule.participants}

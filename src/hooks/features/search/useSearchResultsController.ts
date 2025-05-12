@@ -3,21 +3,20 @@
 import { useEffect, useMemo } from 'react';
 import { useHeader } from '@/components/providers/HeaderProvider';
 import { useLoading } from '@/hooks/core/useLoading';
-import { 
-  GqlOpportunityCategory as OpportunityCategory, 
-  GqlPublishStatus as PublishStatus, 
+import {
+  GqlOpportunityCategory as OpportunityCategory,
+  GqlPublishStatus as PublishStatus,
   GqlOpportunityFilterInput as OpportunityFilterInput
 } from '@/types/graphql';
-import { OpportunityCardProps } from '@/components/features/opportunity/OpportunityCard';
 import { useSearchResultsQuery } from './useSearchResultsQuery';
-import { 
-  mapNodeToCardProps, 
-  transformRecommendedOpportunities, 
+import {
+  transformRecommendedOpportunities,
   groupOpportunitiesByDate,
   SearchParams
 } from '@/presenters/search';
 import { ErrorWithMessage, formatError } from '../wallet/useWalletController';
 import { toast } from 'sonner';
+import { ActivityCard } from "@/types/opportunity";
 
 /**
  * Controller hook for managing search results
@@ -25,8 +24,8 @@ import { toast } from 'sonner';
  */
 export const useSearchResultsController = (searchParams: SearchParams = {}): {
   opportunities: any;
-  recommendedOpportunities: OpportunityCardProps[];
-  groupedOpportunities: { [key: string]: OpportunityCardProps[] };
+  recommendedOpportunities: ActivityCard[];
+  groupedOpportunities: { [key: string]: ActivityCard[] };
   loading: boolean;
   error: ErrorWithMessage | null;
   hasResults: boolean;
@@ -97,7 +96,7 @@ export const useSearchResultsController = (searchParams: SearchParams = {}): {
         location: searchParams.location,
         from: searchParams.from,
         to: searchParams.to,
-        guests: searchParams.guests,
+        guests: searchParams.guests !== undefined ? parseInt(searchParams.guests) : undefined,
       },
       showLogo: false,
       showBackButton: true,
@@ -121,7 +120,7 @@ export const useSearchResultsController = (searchParams: SearchParams = {}): {
   const recommendedOpportunities = useMemo(() => {
     return transformRecommendedOpportunities(opportunities);
   }, [opportunities]);
-  
+
   const groupedOpportunities = useMemo(() => {
     return groupOpportunitiesByDate(opportunities);
   }, [opportunities]);

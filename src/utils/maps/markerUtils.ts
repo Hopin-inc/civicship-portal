@@ -1,5 +1,4 @@
-import { Geo, MarkerData, PlaceData } from "../../types/place";
-import { ContentType } from "../../types";
+import { BasePin, BaseCardInfo } from "../../types/place";
 
 /**
  * デフォルトの画像URL（CORS対応のサービスを使用）
@@ -238,36 +237,11 @@ export const createPlaceFromLocation = (
 };
 
 /**
- * メンバーシップデータからマーカーとプレースデータを作成する関数
+ * 拠点データからマーカーとプレースデータを作成する関数
  */
-export const processMapData = (memberships: any[]): {
-  markers: MarkerData[];
-  places: PlaceData[];
+export const processMapData = (places: BaseCardInfo[]): {
+  markers: BasePin[];
+  places: BasePin[];
 } => {
-  const allMarkers: MarkerData[] = [];
-  const allPlaces: PlaceData[] = [];
-
-  memberships.forEach(({ node }) => {
-    const activeOpportunityCount = node.user.opportunitiesCreatedByMe?.edges
-      .filter((edge: any) => edge.node.publishStatus === 'PUBLIC')
-      .length || 0;
-
-    node.participationView.participated.geo.forEach((location: Geo) => {
-      const marker = createMarkerFromLocation(location, node, 'participated');
-      if (marker) {
-        allMarkers.push(marker);
-        allPlaces.push(createPlaceFromLocation(location, node, 'participated', activeOpportunityCount));
-      }
-    });
-
-    node.participationView.hosted.geo.forEach((location: Geo) => {
-      const marker = createMarkerFromLocation(location, node, 'hosted');
-      if (marker) {
-        allMarkers.push(marker);
-        allPlaces.push(createPlaceFromLocation(location, node, 'hosted', activeOpportunityCount));
-      }
-    });
-  });
-
-  return { markers: allMarkers, places: allPlaces };
+  return { markers: places, places };
 };

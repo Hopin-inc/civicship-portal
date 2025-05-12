@@ -1,6 +1,6 @@
 "use client";
 
-import { useReservationConfirm } from "@/hooks";
+import { ReservationParams, useReservationConfirm } from "@/hooks";
 import { useSearchParams } from "next/navigation";
 import React, { useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -14,12 +14,15 @@ import { ReservationContentGate } from "@/app/reservation/contentGate";
 
 export default function ConfirmPage() {
   const searchParams = useSearchParams();
-  const params = useMemo(() => ({
-    id: searchParams.get("id") ?? "",
-    starts_at: searchParams.get("starts_at") ?? "",
-    guests: searchParams.get("guests") ?? "",
-    community_id: searchParams.get("community_id") ?? ""
-  }), [searchParams]);
+  const params: ReservationParams = useMemo(
+    () => ({
+      id: searchParams.get("id") ?? "",
+      starts_at: searchParams.get("starts_at") ?? "",
+      guests: searchParams.get("guests") ?? "",
+      community_id: searchParams.get("community_id") ?? "",
+    }),
+    [searchParams],
+  );
 
   const result = useReservationConfirm(params);
 
@@ -29,7 +32,7 @@ export default function ConfirmPage() {
       error={result.error}
       nullChecks={[
         { label: "予約情報", value: result.opportunity },
-        { label: "スロット情報", value: result.selectedSlot?.node },
+        { label: "スロット情報", value: result.selectedSlot },
         { label: "開始日時", value: result.startDateTime },
         { label: "終了日時", value: result.endDateTime },
       ]}
@@ -41,10 +44,7 @@ export default function ConfirmPage() {
           onClose={() => result.setIsLoginModalOpen(false)}
         />
 
-        <OpportunityInfo
-          opportunity={result.opportunity}
-          pricePerPerson={result.pricePerPerson}
-        />
+        <OpportunityInfo opportunity={result.opportunity} pricePerPerson={result.pricePerPerson} />
 
         <div className="px-4">
           <ReservationDetailsCard
@@ -82,6 +82,5 @@ export default function ConfirmPage() {
         </div>
       </main>
     </ReservationContentGate>
-
   );
 }

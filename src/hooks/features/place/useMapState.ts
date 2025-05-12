@@ -1,12 +1,12 @@
 'use client';
 
 import { useReducer, useCallback, useEffect } from 'react';
-import { MarkerData, PlaceData, MapComponentProps } from '@/types/place';
+import { BasePin, BaseCardInfo } from '@/types/place';
 import { processMapData } from '@/utils/maps/markerUtils';
 
 interface MapState {
-  markers: MarkerData[];
-  places: PlaceData[];
+  markers: BasePin[];
+  places: BasePin[];
   center: google.maps.LatLngLiteral;
   map: google.maps.Map | null;
   isLoaded: boolean;
@@ -14,7 +14,7 @@ interface MapState {
 }
 
 type MapAction =
-  | { type: 'SET_MARKERS'; payload: { markers: MarkerData[]; places: PlaceData[] } }
+  | { type: 'SET_MARKERS'; payload: { markers: BasePin[]; places: BasePin[] } }
   | { type: 'SET_CENTER'; payload: google.maps.LatLngLiteral }
   | { type: 'SET_MAP'; payload: google.maps.Map | null }
   | { type: 'SET_LOADED'; payload: boolean }
@@ -65,23 +65,29 @@ const mapReducer = (state: MapState, action: MapAction): MapState => {
   }
 };
 
+interface MapComponentProps {
+  places: BaseCardInfo[];
+  selectedPlaceId: string | null;
+  onPlaceSelect: (placeId: string) => void;
+}
+
 export const useMapState = (props: MapComponentProps) => {
-  const { memberships, selectedPlaceId } = props;
+  const { places, selectedPlaceId } = props;
   const [state, dispatch] = useReducer(mapReducer, initialState);
 
   useEffect(() => {
     try {
-      const { markers, places } = processMapData(memberships);
-      dispatch({ type: 'SET_MARKERS', payload: { markers, places } });
+      console.log('useMapState - places:', places);
+      dispatch({ type: 'SET_MARKERS', payload: { markers: places, places } });
     } catch (error) {
       console.error('Error processing map data:', error);
       dispatch({ type: 'SET_ERROR', payload: 'マップデータの処理中にエラーが発生しました' });
     }
-  }, [memberships]);
+  }, [places]);
 
   useEffect(() => {
     if (state.map && selectedPlaceId) {
-      const selectedMarker = state.markers.find(marker => marker.placeId === selectedPlaceId);
+      const selectedMarker = state.markers.find(marker => marker.id === selectedPlaceId);
       if (selectedMarker) {
         const sheetHeight = window.innerHeight * 0.45;
         
@@ -89,8 +95,8 @@ export const useMapState = (props: MapComponentProps) => {
         const mapHeight = mapDiv.clientHeight;
         
         const markerLatLng = new google.maps.LatLng(
-          selectedMarker.position.lat,
-          selectedMarker.position.lng
+          selectedMarker.latitude,
+          selectedMarker.longitude
         );
         
         state.map.setZoom(17);
@@ -104,8 +110,8 @@ export const useMapState = (props: MapComponentProps) => {
           const latOffset = latSpan * offsetRatio;
           
           const newCenter = new google.maps.LatLng(
-            selectedMarker.position.lat - latOffset,
-            selectedMarker.position.lng
+            selectedMarker.latitude - latOffset,
+            selectedMarker.longitude
           );
           
           state.map.panTo(newCenter);

@@ -1,20 +1,16 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { MarkerData } from '@/types/place';
-import { createCustomMarkerIcon, defaultImageUrl, drawCircleWithImage } from '@/utils/maps/markerUtils';
-import { Marker } from '@react-google-maps/api';
+import React, { useState, useEffect } from "react";
+import { defaultImageUrl, drawCircleWithImage } from "@/utils/maps/markerUtils";
+import { Marker } from "@react-google-maps/api";
+import { BasePin } from "@/types/place";
 
 interface CustomMarkerProps {
-  data: MarkerData;
+  data: BasePin;
   onClick: () => void;
   isSelected: boolean;
 }
 
-/**
- * Custom marker component for Google Maps
- * Uses the Marker component from @react-google-maps/api with a custom icon
- */
 const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }) => {
   const [icon, setIcon] = useState<google.maps.Icon | null>(null);
   const [currentSize, setCurrentSize] = useState<number>(56);
@@ -28,7 +24,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
   }, [isSelected, currentSize]);
 
   useEffect(() => {
-    const loadIcon = async () => {
+    (async () => {
       const displaySize = currentSize;
       const scale = 2;
       const canvas = document.createElement("canvas");
@@ -54,11 +50,11 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         const smallY = centerY + mainRadius * 0.5;
 
         const mainImg = document.createElement("img");
-        mainImg.src = data.placeImage || defaultImageUrl;
+        mainImg.src = data.image || defaultImageUrl;
         await drawCircleWithImage(context, mainImg, centerX, centerY, mainRadius, true);
 
         const userImg = document.createElement("img");
-        userImg.src = data.userImage || defaultImageUrl;
+        userImg.src = data.host.image || defaultImageUrl;
         await drawCircleWithImage(context, userImg, smallX, smallY, smallRadius, false);
 
         setIcon({
@@ -82,20 +78,18 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
           anchor: new google.maps.Point(displaySize / 2, displaySize / 2),
         });
       }
-    };
-
-    loadIcon();
-  }, [currentSize, data.placeImage, data.userImage]);
+    })();
+  }, [currentSize, data.image, data.host.image]);
 
   if (!icon) return null;
 
   return (
     <Marker
-      position={data.position}
+      position={{ lat: data.latitude, lng: data.longitude }}
       icon={icon}
       onClick={onClick}
       zIndex={isSelected ? 2 : 1}
-      title={data.name}
+      title={data.host.name}
     />
   );
 };
