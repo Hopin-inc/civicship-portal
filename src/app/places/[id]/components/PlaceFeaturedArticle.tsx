@@ -4,10 +4,10 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleWithAuthor } from "@/app/articles/data/type";
 
 interface PlaceFeaturedArticleProps {
-  article: ArticleWithAuthor | null;
+  article: TArticleWithAuthor | null;
 }
 
 const PlaceFeaturedArticle: React.FC<PlaceFeaturedArticleProps> = ({ article }) => {

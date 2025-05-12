@@ -4,11 +4,11 @@ import Image from "next/image";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import CategoryBadge from "../../components/CategoryBadge";
-import { ArticleCard } from "@/app/articles/data/type";
+import { TArticleCard } from "@/app/articles/data/type";
 
 interface ArticleRecommendationsProps {
   title: string;
-  articles: ArticleCard[];
+  articles: TArticleCard[];
 }
 
 export const ArticleRecommendations: React.FC<ArticleRecommendationsProps> = ({
@@ -30,7 +30,7 @@ export const ArticleRecommendations: React.FC<ArticleRecommendationsProps> = ({
 };
 
 interface ArticleRecommendationCardProps {
-  article: ArticleCard;
+  article: TArticleCard;
 }
 
 const ArticleRecommendationCard: React.FC<ArticleRecommendationCardProps> = ({ article }) => {

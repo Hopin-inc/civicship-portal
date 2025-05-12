@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import { ArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleCard, TArticleWithAuthor } from "@/app/articles/data/type";
 import ArticleCard from "@/app/articles/components/Card";
 
 interface ArticleListProps {
-  articles: ArticleWithAuthor[];
+  articles: TArticleWithAuthor[];
 }
 
 export const ArticleList: React.FC<ArticleListProps> = ({ articles }) => {

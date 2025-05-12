@@ -1,6 +1,6 @@
 import { GqlOpportunityCategory, GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 import { CommunityId } from "@/types";
-import { ArticleCard } from "@/app/articles/data/type";
+import { TArticleCard } from "@/app/articles/data/type";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 
 // ---------------------------------------------
@@ -70,7 +70,7 @@ export type OpportunityHost = {
   image: string | null;
   bio: string;
 
-  interview?: ArticleCard;
+  interview?: TArticleCard;
 };
 
 // ---------------------------------------------

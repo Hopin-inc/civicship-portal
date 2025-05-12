@@ -7,12 +7,12 @@ import { useEffect, useState } from "react";
 import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import CategoryBadge from "../../components/CategoryBadge";
 import { ArticleRecommendations } from "./ArticleRecommendations";
-import { ArticleCard, ArticleDetail } from "@/app/articles/data/type";
+import { TArticleCard, TArticleDetail } from "@/app/articles/data/type";
 
 type ArticleDetailProps = {
-  article: ArticleDetail;
-  recommendedArticles?: ArticleCard[];
-  relatedArticles?: ArticleCard[];
+  article: TArticleDetail;
+  recommendedArticles?: TArticleCard[];
+  relatedArticles?: TArticleCard[];
 };
 
 export const ArticleDetailUI = ({

@@ -1,7 +1,7 @@
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { OpportunityPlace, OpportunityHost, ActivityCard } from "@/app/activities/data/type";
 import { ParticipationStatus, ParticipationStatusReason } from "@/types/participationStatus";
-import { ArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleWithAuthor } from "@/app/articles/data/type";
 
 export type ParticipationInfo = PublicParticipationInfo & Partial<PrivateParticipationInfo>;
 
@@ -36,7 +36,7 @@ export type QuestField = {
 };
 
 export type ParticipationOptionalInfo = {
-  interview?: ArticleWithAuthor;
+  interview?: TArticleWithAuthor;
   relatedOpportunity?: ActivityCard[];
   isCancelable?: boolean;
   cancelDue?: string;
@@ -61,15 +61,6 @@ export type ParticipationOpportunity = {
   title: string;
   images: string[];
   host: OpportunityHost;
-};
-
-export type ParticipationImage = {
-  id: string;
-  url: string;
-  caption: string | null;
-  participationId: string;
-  createdAt: string;
-  updatedAt: string;
 };
 
 export type Participation = {

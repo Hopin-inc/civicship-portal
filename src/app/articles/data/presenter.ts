@@ -1,18 +1,18 @@
 "use client";
 
 import { GqlArticle, GqlArticleCategory, GqlArticleEdge, GqlUser, Maybe } from "@/types/graphql";
-import { ArticleCard, ArticleDetail, ArticleRelatedUser, ArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleCard, TArticleDetail, TArticleRelatedUser, TArticleWithAuthor } from "@/app/articles/data/type";
 
 export const presenterArticleCards = (
   edges?: (GqlArticleEdge | null | undefined)[],
-): ArticleCard[] => {
+): TArticleCard[] => {
   return (edges ?? [])
     .map((edge) => edge?.node)
     .filter((node): node is GqlArticle => !!node)
     .map(presenterArticleCard);
 };
 
-export const presenterArticleCard = (node?: GqlArticle): ArticleCard => ({
+export const presenterArticleCard = (node?: GqlArticle): TArticleCard => ({
   id: node?.id || "",
   category: node?.category || GqlArticleCategory.Interview,
   title: node?.title || "",
@@ -23,14 +23,14 @@ export const presenterArticleCard = (node?: GqlArticle): ArticleCard => ({
 
 export const presenterArticleWithAuthorList = (
   edges?: (GqlArticleEdge | null | undefined)[],
-): ArticleWithAuthor[] => {
+): TArticleWithAuthor[] => {
   return (edges ?? [])
     .map((edge) => edge?.node)
     .filter((node): node is GqlArticle => !!node)
     .map(presenterArticleWithAuthor);
 };
 
-export const presenterArticleWithAuthor = (node?: GqlArticle): ArticleWithAuthor => ({
+export const presenterArticleWithAuthor = (node?: GqlArticle): TArticleWithAuthor => ({
   ...presenterArticleCard(node),
   author: {
     name: node?.authors?.[0]?.name || "",
@@ -38,7 +38,7 @@ export const presenterArticleWithAuthor = (node?: GqlArticle): ArticleWithAuthor
   },
 });
 
-export const presenterArticleDetail = (article: GqlArticle): ArticleDetail => {
+export const presenterArticleDetail = (article: GqlArticle): TArticleDetail => {
   return {
     id: article.id,
     title: article.title,
@@ -57,7 +57,7 @@ export const presenterArticleDetail = (article: GqlArticle): ArticleDetail => {
   };
 };
 
-function presenterUser(host?: Maybe<GqlUser> | undefined): ArticleRelatedUser {
+function presenterUser(host?: Maybe<GqlUser> | undefined): TArticleRelatedUser {
   return {
     id: host?.id || "",
     name: host?.name || "",

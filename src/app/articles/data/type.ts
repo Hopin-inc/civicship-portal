@@ -1,7 +1,7 @@
 import { GqlArticleCategory } from "@/types/graphql";
 import { OpportunityCard } from "@/app/activities/data/type";
 
-export type ArticleCard = {
+export type TArticleCard = {
   id: string;
   title: string;
   category: GqlArticleCategory;
@@ -12,28 +12,28 @@ export type ArticleCard = {
   publishedAt: string;
 };
 
-export type ArticleDetail = ArticleCard & {
+export type TArticleDetail = TArticleCard & {
   body: string;
 
-  authors: ArticleRelatedUser[];
-  relatedUsers: ArticleRelatedUser[];
+  authors: TArticleRelatedUser[];
+  relatedUsers: TArticleRelatedUser[];
 
   hostedOpportunitiesByAuthors: OpportunityCard[];
-  relatedArticles: ArticleCard[];
+  relatedArticles: TArticleCard[];
 };
 
-export type ArticleRelatedUser = {
+export type TArticleRelatedUser = {
   id: string;
   name: string;
   image: string;
   bio: string;
 };
 
-type AuthorIcon = {
+export type TAuthorIcon = {
   name: string;
   image: string | null;
 };
 
-export type ArticleWithAuthor = ArticleCard & {
-  author: AuthorIcon;
+export type TArticleWithAuthor = TArticleCard & {
+  author: TAuthorIcon;
 };

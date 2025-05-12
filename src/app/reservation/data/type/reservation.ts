@@ -1,7 +1,7 @@
 import { GqlReservationStatus, GqlOpportunityCategory } from "@/types/graphql";
 import { CommunityId } from "@/types";
 import { OpportunityPlace, OpportunityHost, OpportunityCard } from "@/app/activities/data/type";
-import { ArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleWithAuthor } from "@/app/articles/data/type";
 
 // ---------------------------------------------
 // 📌 カテゴリ
@@ -54,7 +54,7 @@ export type QuestField = {
 // ---------------------------------------------
 
 export type ReservationOptionalInfo = {
-  interview?: ArticleWithAuthor;
+  interview?: TArticleWithAuthor;
   relatedOpportunity?: OpportunityCard[];
   isCancelable?: boolean;
   cancelDue?: string;

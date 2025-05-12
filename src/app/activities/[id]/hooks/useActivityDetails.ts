@@ -44,7 +44,6 @@ export const useActivityDetails = (id: string): UseActivityDetailsResult => {
   }, [data?.opportunity]);
 
   const cityCode = data?.opportunity?.place?.city?.code ?? "";
-
   const { similarOpportunities, loading: similarLoading } = useSimilarOpportunitiesQuery({
     opportunityId: id,
     cityCode,

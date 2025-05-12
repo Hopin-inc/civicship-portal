@@ -3,12 +3,12 @@
 import { useEffect, useMemo } from "react";
 import { useArticleQuery } from './useArticleQuery';
 import { presenterArticleCard, presenterArticleDetail } from '@/app/articles/data/presenter';
-import type { ArticleDetail, ArticleCard } from "@/app/articles/data/type";
+import type { TArticleDetail, TArticleCard } from "@/app/articles/data/type";
 import { toast } from 'sonner';
 
 interface UseArticleResult {
-  article: ArticleDetail | null;
-  recommendedArticles: ArticleCard[];
+  article: TArticleDetail | null;
+  recommendedArticles: TArticleCard[];
   loading: boolean;
   error: Error | null;
 }

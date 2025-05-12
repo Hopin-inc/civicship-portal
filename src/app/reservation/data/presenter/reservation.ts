@@ -9,7 +9,7 @@ import {
 } from "@/types/graphql";
 import { RequiredUtility, OpportunityCard } from "@/app/activities/data/type";
 import { ReservationDetail, ActivityField, QuestField } from "@/app/reservation/data/type/reservation";
-import { ArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleWithAuthor } from "@/app/articles/data/type";
 import { presenterPlace } from "@/app/places/data/presenter/place";
 import { presenterOpportunityHost } from "@/app/activities/data/presenter";
 
@@ -37,7 +37,7 @@ export const getEmergencyContactPhone = (reservation: GqlReservation): string | 
 
 export const presenterReservationDetail = (
   reservation: GqlReservation,
-  interview?: ArticleWithAuthor,
+  interview?: TArticleWithAuthor,
   relatedOpportunities: OpportunityCard[] = [],
 ): ReservationDetail => {
   const slot = reservation.opportunitySlot;

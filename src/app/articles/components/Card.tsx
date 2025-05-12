@@ -5,12 +5,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { ArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleWithAuthor } from "@/app/articles/data/type";
 import { Card, CardContent } from "@/components/ui/card";
 import CategoryBadge from "@/app/articles/components/CategoryBadge";
 
 interface ArticleCardProps {
-  article: ArticleWithAuthor;
+  article: TArticleWithAuthor;
   showCategory?: boolean;
 }
 

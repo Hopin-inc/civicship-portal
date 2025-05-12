@@ -5,12 +5,12 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useLoading } from "@/hooks/useLoading";
 import { GqlSortDirection as SortDirection, useGetArticlesQuery } from "@/types/graphql";
 import { presenterArticleWithAuthorList, } from "@/app/articles/data/presenter";
-import {  ArticleWithAuthor } from "@/app/articles/data/type";
+import {  TArticleWithAuthor } from "@/app/articles/data/type";
 
 export const ARTICLES_PER_PAGE = 10;
 
 interface UseArticlesResult {
-  articles: ArticleWithAuthor[];
+  articles: TArticleWithAuthor[];
   loading: boolean;
   initialLoading: boolean;
   error: Error | null;
