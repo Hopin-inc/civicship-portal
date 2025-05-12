@@ -6,7 +6,7 @@ import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
-import { auth, signInWithLiffToken, startPhoneNumberVerification, verifyPhoneCode, isPhoneVerified, getVerifiedPhoneNumber, phoneVerificationState } from "@/lib/firebase";
+import { auth, signInWithLiffToken, startPhoneNumberVerification, verifyPhoneCode, isPhoneVerified as checkPhoneVerified, getVerifiedPhoneNumber, phoneVerificationState } from "@/lib/firebase";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
 import { useLiff } from "./LiffContext";
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user: {
           id: fetchedUser.id,
           name: fetchedUser.name,
-          memberships: fetchedUser.memberships || []
+          memberships: fetchedUser.memberships || [] as any
         }
       });
     }
@@ -133,7 +133,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsExplicitLogin(true);
       await liffLogin();
       
-      setIsPhoneVerified(isPhoneVerified());
+      const phoneVerified = checkPhoneVerified();
+      setIsPhoneVerified(phoneVerified);
     } catch (error) {
       console.error("LIFF login failed:", error);
       toast.error("LINEログインに失敗しました");
@@ -185,7 +186,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             user: {
               id: fetchedUser.id,
               name: fetchedUser.name,
-              memberships: fetchedUser.memberships || []
+              memberships: fetchedUser.memberships || [] as any
             }
           });
 
