@@ -9,7 +9,6 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   PhoneAuthProvider,
-  UserCredential,
 } from "@firebase/auth";
 
 export { PhoneAuthProvider };
@@ -91,10 +90,10 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
       recaptchaVerifier.clear();
       recaptchaVerifier = null;
     }
-    
+
     const tempAuth = getAuth(app);
-    
-    recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+
+    recaptchaVerifier = new RecaptchaVerifier(tempAuth, 'recaptcha-container', {
       size: 'normal',
       callback: () => {
         console.log('reCAPTCHA solved!');
@@ -106,15 +105,15 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
           recaptchaVerifier = null;
         }
       }
-    }, tempAuth);
-    
+    });
+
     await recaptchaVerifier.render();
-    
+
     const confirmationResult = await signInWithPhoneNumber(tempAuth, phoneNumber, recaptchaVerifier);
-    
+
     phoneVerificationState.phoneNumber = phoneNumber;
     phoneVerificationState.verificationId = confirmationResult.verificationId;
-    
+
     return confirmationResult.verificationId;
   } catch (error) {
     console.error("Phone verification failed:", error);
@@ -125,15 +124,15 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
 export const verifyPhoneCode = async (verificationId: string, code: string): Promise<boolean> => {
   try {
     const tempAuth = getAuth(app);
-    
+
     const credential = PhoneAuthProvider.credential(verificationId, code);
-    
+
     const tempUser = await signInWithPhoneNumber(tempAuth, phoneVerificationState.phoneNumber || '', recaptchaVerifier!);
-    
+
     phoneVerificationState.verified = true;
-    
+
     await tempAuth.signOut();
-    
+
     return true;
   } catch (error) {
     console.error("Code verification failed:", error);
