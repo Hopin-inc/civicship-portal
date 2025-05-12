@@ -39,7 +39,7 @@ type FormValues = z.infer<typeof FormSchema>;
 
 export function SignUpForm() {
   const router = useRouter();
-  const { createUser, isLinkedWithPhone } = useAuth();
+  const { createUser, isPhoneVerified } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormValues>({
@@ -60,7 +60,7 @@ export function SignUpForm() {
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     try {
-      if (!isLinkedWithPhone) {
+      if (!isPhoneVerified) {
         toast.error("電話番号認証が完了していません");
         router.push("/phone-verification");
         return;

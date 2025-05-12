@@ -9,13 +9,10 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   PhoneAuthProvider,
-  linkWithCredential,
-  signInWithCredential,
   UserCredential,
-  fetchSignInMethodsForEmail as firebaseFetchSignInMethodsForEmail,
 } from "@firebase/auth";
 
-export { PhoneAuthProvider, signInWithCredential };
+export { PhoneAuthProvider };
 import { LIFFLoginResponse } from "@/types/line";
 
 export const app = initializeApp({
@@ -27,13 +24,17 @@ export const app = initializeApp({
 export const auth = getAuth(app);
 auth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
 
-const phoneApp = initializeApp({
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-}, 'phoneAuth'); // Use a different name to avoid conflicts
+type PhoneVerificationState = {
+  phoneNumber: string | null;
+  verificationId: string | null;
+  verified: boolean;
+};
 
-export const phoneAuth = getAuth(phoneApp);
+export const phoneVerificationState: PhoneVerificationState = {
+  phoneNumber: null,
+  verificationId: null,
+  verified: false,
+};
 
 const providers = {
   line: new OAuthProvider("oidc.line"),
@@ -91,6 +92,8 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
       recaptchaVerifier = null;
     }
     
+    const tempAuth = getAuth(app);
+    
     recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
       size: 'normal',
       callback: () => {
@@ -103,11 +106,15 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
           recaptchaVerifier = null;
         }
       }
-    }, phoneAuth); // Use the separate auth instance for phone
+    }, tempAuth);
     
     await recaptchaVerifier.render();
     
-    const confirmationResult = await signInWithPhoneNumber(phoneAuth, phoneNumber, recaptchaVerifier);
+    const confirmationResult = await signInWithPhoneNumber(tempAuth, phoneNumber, recaptchaVerifier);
+    
+    phoneVerificationState.phoneNumber = phoneNumber;
+    phoneVerificationState.verificationId = confirmationResult.verificationId;
+    
     return confirmationResult.verificationId;
   } catch (error) {
     console.error("Phone verification failed:", error);
@@ -115,25 +122,29 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
   }
 };
 
-export const verifyPhoneCode = async (verificationId: string, code: string): Promise<UserCredential> => {
+export const verifyPhoneCode = async (verificationId: string, code: string): Promise<boolean> => {
   try {
+    const tempAuth = getAuth(app);
+    
     const credential = PhoneAuthProvider.credential(verificationId, code);
-    return signInWithCredential(phoneAuth, credential);
+    
+    const tempUser = await signInWithPhoneNumber(tempAuth, phoneVerificationState.phoneNumber || '', recaptchaVerifier!);
+    
+    phoneVerificationState.verified = true;
+    
+    await tempAuth.signOut();
+    
+    return true;
   } catch (error) {
     console.error("Code verification failed:", error);
-    throw error;
+    return false;
   }
 };
 
-export const linkPhoneCredential = async (verificationId: string, code: string): Promise<UserCredential> => {
-  if (!auth.currentUser) {
-    throw new Error("No user is signed in");
-  }
-  
-  const credential = PhoneAuthProvider.credential(verificationId, code);
-  return linkWithCredential(auth.currentUser, credential);
+export const isPhoneVerified = (): boolean => {
+  return phoneVerificationState.verified;
 };
 
-export const fetchSignInMethodsForEmail = async (email: string): Promise<string[]> => {
-  return firebaseFetchSignInMethodsForEmail(auth, email);
+export const getVerifiedPhoneNumber = (): string | null => {
+  return phoneVerificationState.verified ? phoneVerificationState.phoneNumber : null;
 };
