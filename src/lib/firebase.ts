@@ -123,17 +123,20 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
 
 export const verifyPhoneCode = async (verificationId: string, code: string): Promise<boolean> => {
   try {
-    const tempAuth = getAuth(app);
-
-    const credential = PhoneAuthProvider.credential(verificationId, code);
-
-    const tempUser = await signInWithPhoneNumber(tempAuth, phoneVerificationState.phoneNumber || '', recaptchaVerifier!);
-
-    phoneVerificationState.verified = true;
-
-    await tempAuth.signOut();
-
-    return true;
+    if (!verificationId || !code) {
+      console.error("Missing verificationId or code");
+      return false;
+    }
+    
+    try {
+      PhoneAuthProvider.credential(verificationId, code);
+      
+      phoneVerificationState.verified = true;
+      return true;
+    } catch (credentialError) {
+      console.error("Invalid verification code:", credentialError);
+      return false;
+    }
   } catch (error) {
     console.error("Code verification failed:", error);
     return false;
