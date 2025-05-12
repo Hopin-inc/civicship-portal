@@ -933,6 +933,7 @@ export type GqlOpportunityFilterInput = {
   slotHostingStatus?: InputMaybe<Array<GqlOpportunitySlotHostingStatus>>;
   slotRemainingCapacity?: InputMaybe<Scalars["Int"]["input"]>;
   slotStartsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  stateCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
 export type GqlOpportunitySetPublishStatusInput = {
@@ -2937,6 +2938,40 @@ export type GqlGetArticleQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
+      opportunitiesCreatedByMe?: Array<{
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        body?: string | null;
+        images?: Array<string> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        earliestReservableAt?: Date | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+          city?: {
+            __typename?: "City";
+            code: string;
+            name: string;
+            state?: {
+              __typename?: "State";
+              code: string;
+              countryCode: string;
+              name: string;
+            } | null;
+          } | null;
+        } | null;
+      }> | null;
     }> | null;
     relatedUsers?: Array<{
       __typename?: "User";
@@ -5096,16 +5131,18 @@ export const GetArticleDocument = gql`
       ...ArticleFields
       authors {
         ...UserFields
+        opportunitiesCreatedByMe {
+          ...OpportunityFields
+          place {
+            ...PlaceFields
+          }
+        }
       }
       relatedUsers {
         ...UserFields
       }
     }
-    articles(
-      first: 4
-      filter: { categories: ["INTERVIEW"], publishStatus: [PUBLIC] }
-      sort: { publishedAt: desc }
-    ) {
+    articles(first: 4, filter: { publishStatus: [PUBLIC] }, sort: { publishedAt: desc }) {
       pageInfo {
         hasNextPage
         hasPreviousPage
@@ -5126,6 +5163,8 @@ export const GetArticleDocument = gql`
   }
   ${ArticleFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
+  ${OpportunityFieldsFragmentDoc}
+  ${PlaceFieldsFragmentDoc}
 `;
 
 /**

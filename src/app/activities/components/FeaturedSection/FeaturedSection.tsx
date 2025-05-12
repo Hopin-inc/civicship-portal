@@ -71,6 +71,7 @@ function OpportunityImageSlider({ images, title }: { images: string[]; title: st
       {slideImages.map((img, i) => {
         const isActive = i === index;
         const isPrevious = i === prevIndex;
+
         return (
           <Image
             key={i}
@@ -84,12 +85,13 @@ function OpportunityImageSlider({ images, title }: { images: string[]; title: st
           />
         );
       })}
-      <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 flex gap-2">
+
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1 z-10">
         {slideImages.map((_, i) => (
           <div
             key={i}
-            className={`h-2 w-2 rounded-full transition-colors duration-300 ${
-              i === index ? "bg-white" : "bg-white/30"
+            className={`h-1 rounded-sm transition-all duration-300 ${
+              i === index ? "w-8 bg-white" : "w-4 bg-white/40"
             }`}
           />
         ))}

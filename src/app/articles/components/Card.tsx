@@ -30,9 +30,11 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory }) => {
         )}
         <CardContent>
           <h3 className="text-xl font-bold mb-2">{article.title}</h3>
-          <div className="text-muted-foreground text-sm mb-2">
-            公開: {format(new Date(article.publishedAt), "yyyy年M月d日", { locale: ja })}
-          </div>
+          {article.publishedAt && !isNaN(new Date(article.publishedAt).getTime()) && (
+            <div className="text-muted-foreground text-sm mb-2">
+              公開: {format(new Date(article.publishedAt), "yyyy年M月d日", { locale: ja })}
+            </div>
+          )}
           <p className="text-foreground text-sm line-clamp-3">{article.introduction}</p>
           { "author" in article && article.author && (
             <div className="flex items-center mt-4">

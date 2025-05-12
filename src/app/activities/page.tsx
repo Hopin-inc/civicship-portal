@@ -37,6 +37,10 @@ export default function ActivitiesPage() {
   const isSectionLoading = loading && !isInitialLoading;
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
     setIsLoading(isInitialLoading);
   }, [isInitialLoading, setIsLoading]);
 
@@ -55,11 +59,6 @@ export default function ActivitiesPage() {
         opportunities={featuredCards}
         isInitialLoading={isInitialLoading}
       />
-      {/*<ActivitiesCarouselSection*/}
-      {/*  title="特集"*/}
-      {/*  opportunities={featuredCards}*/}
-      {/*  isInitialLoading={isInitialLoading}*/}
-      {/*/>*/}
       <ActivitiesCarouselSection
         title="もうすぐ開催予定"
         opportunities={upcomingCards}

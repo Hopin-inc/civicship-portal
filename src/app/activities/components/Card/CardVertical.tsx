@@ -5,8 +5,7 @@ import { Card } from "@/components/ui/card";
 import { ActivityCard } from "@/app/activities/data/type";
 
 export default function OpportunityCardVertical({ opportunity }: { opportunity: ActivityCard }) {
-  const { id, title, feeRequired, location, images, communityId, hasReservableTicket } =
-    opportunity;
+  const { id, title, feeRequired, location, images, hasReservableTicket } = opportunity;
 
   return (
     <Link href={`/activities/${id}`} className="relative w-[164px] flex-shrink-0">

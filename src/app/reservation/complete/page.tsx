@@ -1,6 +1,6 @@
 "use client";
 
-import { SimilarActivitiesList } from "@/app/activities/[id]/components/SimilarActivitiesList";
+import { SameStateActivities } from "@/app/activities/[id]/components/SimilarActivitiesList";
 import { CompletionHeader } from "@/app/reservation/components/CompletionHeader";
 import { ActivitySummary } from "@/app/reservation/components/ActivitySummary";
 import { ReservationDetails } from "@/app/reservation/components/ReservationDetails";
@@ -52,7 +52,8 @@ function ReservationCompletionUI({
       />
 
       <div className="w-full mt-8 mb-16">
-        <SimilarActivitiesList
+        <SameStateActivities
+          header={"おすすめの体験"}
           opportunities={similarOpportunities}
           currentOpportunityId={opportunity.id}
         />

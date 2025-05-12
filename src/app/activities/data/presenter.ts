@@ -77,7 +77,7 @@ export function presenterOpportunityHost(
     name: host?.name || "",
     image: host?.image || "",
     bio: host?.bio || "",
-    interview: presenterArticleCard(interview),
+    interview: presenterArticleCard(host?.articlesAboutMe?.[0] || interview),
   };
 }
 
@@ -95,6 +95,7 @@ function presenterActivitySlot(
         capacity: slot?.capacity ?? 0,
         remainingCapacity: slot?.remainingCapacity ?? 0,
         feeRequired: feeRequired ?? null,
+        applicantCount: null,
       }),
     ) ?? []
   );

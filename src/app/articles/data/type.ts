@@ -1,5 +1,5 @@
 import { GqlArticleCategory } from "@/types/graphql";
-import { OpportunityCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/app/activities/data/type";
 
 export type TArticleCard = {
   id: string;
@@ -18,7 +18,7 @@ export type TArticleDetail = TArticleCard & {
   authors: TArticleRelatedUser[];
   relatedUsers: TArticleRelatedUser[];
 
-  hostedOpportunitiesByAuthors: OpportunityCard[];
+  hostedOpportunitiesByAuthors: ActivityCard[];
   relatedArticles: TArticleCard[];
 };
 

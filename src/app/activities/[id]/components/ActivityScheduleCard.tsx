@@ -5,32 +5,21 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
+import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 
 interface ActivityScheduleCardProps {
-  id: string;
-  startsAt: string;
-  endsAt: string;
-  participants: number;
-  price: number;
+  slot: ActivitySlot;
   opportunityId: string;
   communityId: string;
-  reservableTickets?: number;
-  availableTickets?: number;
 }
 
 const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
-  id,
-  startsAt,
-  endsAt,
-  participants,
-  price,
+  slot,
   opportunityId,
   communityId,
-  reservableTickets,
-  availableTickets,
 }) => {
-  const startDate = new Date(startsAt);
-  const endDate = new Date(endsAt);
+  const startDate = new Date(slot.startsAt);
+  const endDate = new Date(slot.endsAt);
 
   return (
     <div className="bg-background rounded-xl border px-10 py-8 w-[280px] h-[316px] flex flex-col">
@@ -42,14 +31,14 @@ const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
         <p className="text-md text-muted-foreground mb-4">
           {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
         </p>
-        <p className="text-md text-muted-foreground mb-4">参加予定 {participants}人</p>
+        <p className="text-md text-muted-foreground mb-4">参加予定 {slot.applicantCount}人</p>
         <div className="space-y-2">
-          <p className="text-lg font-bold">¥{price.toLocaleString()}</p>
+          <p className="text-lg font-bold">¥{slot.feeRequired?.toLocaleString()}</p>
         </div>
       </div>
       <div className="flex justify-center">
         <Link
-          href={`/reservation/confirm?id=${opportunityId}&community_id=${communityId}&slot_id=${id}&guests=${participants}`}
+          href={`/reservation/confirm?id=${opportunityId}&community_id=${communityId}&slot_id=${slot.id}&guests=${slot.applicantCount}`}
         >
           <Button variant="primary" size="selection">
             選択

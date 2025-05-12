@@ -1,65 +1,36 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { COMMUNITY_ID } from "@/utils";
-import { useLoading } from "@/hooks/useLoading";
+import { useEffect } from "react";
 import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
-import { useAvailableDatesQuery } from "@/app/activities/[id]/hooks/useAvailableDatesQuery";
-import { useSimilarOpportunitiesQuery } from "@/app/activities/[id]/hooks/useSimilarOpportunitiesQuery";
+import { useSortedSlotsByStartsAt } from "@/app/activities/[id]/hooks/useAvailableDates";
 import { ActivityCard, ActivityDetail } from "@/app/activities/data/type";
-import { GqlOpportunity, useGetOpportunityQuery } from "@/types/graphql";
-import { presenterActivityCard, presenterActivityDetail } from "@/app/activities/data/presenter";
+import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
+import { useSameStateActivities } from "@/app/activities/[id]/hooks/useSimilarActivities";
+import { useLoading } from "@/hooks/useLoading";
+import { useAuth } from "@/contexts/AuthContext";
+import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 
 interface UseActivityDetailsResult {
   opportunity: ActivityDetail | null;
-  similarActivities: ActivityCard[];
+  sameStateActivities: ActivityCard[];
   availableTickets: number;
-  availableDates: {
-    id: string;
-    startsAt: string;
-    endsAt: string;
-    participants: number;
-    price: number;
-  }[];
-  loading: boolean;
+  sortedSlots: ActivitySlot[];
+  isLoading: boolean;
   initialLoading: boolean;
   error: Error | null;
 }
 
 export const useActivityDetails = (id: string): UseActivityDetailsResult => {
+  const { user } = useAuth();
   const { setIsLoading } = useLoading();
 
-  const { data, loading, error } = useGetOpportunityQuery({
-    variables: {
-      id,
-      permission: { communityId: COMMUNITY_ID },
-    },
-    skip: !id,
-    fetchPolicy: "network-only",
-    errorPolicy: "all",
-  });
+  const { data, opportunity, loading: loadingOpportunity, error } = useOpportunityDetail(id);
+  const { sameStateActivities, loading: loadingSimilar } = useSameStateActivities(id, data?.opportunity?.place?.city?.state?.code ?? "");
+  const availableTickets = useAvailableTickets(opportunity, user?.id);
+  const sortedSlots = useSortedSlotsByStartsAt(opportunity?.slots);
 
-  const opportunity: ActivityDetail | null = useMemo(() => {
-    return data?.opportunity ? presenterActivityDetail(data.opportunity) : null;
-  }, [data?.opportunity]);
-
-  const cityCode = data?.opportunity?.place?.city?.code ?? "";
-  const { similarOpportunities, loading: similarLoading } = useSimilarOpportunitiesQuery({
-    opportunityId: id,
-    cityCode,
-  });
-
-  const similarActivities: ActivityCard[] = useMemo(() => {
-    return (similarOpportunities ?? [])
-      .filter((node): node is GqlOpportunity => !!node)
-      .map(presenterActivityCard);
-  }, [similarOpportunities]);
-
-  const availableTickets = useAvailableTickets(opportunity, undefined);
-  const { availableDates } = useAvailableDatesQuery(opportunity?.slots);
-
-  const isLoading = loading || similarLoading;
-  const initialLoading = isLoading && !data?.opportunity && !error;
+  const isLoading = loadingOpportunity || loadingSimilar;
+  const initialLoading = isLoading && !opportunity && !error;
 
   useEffect(() => {
     setIsLoading(isLoading);
@@ -67,11 +38,11 @@ export const useActivityDetails = (id: string): UseActivityDetailsResult => {
 
   return {
     opportunity,
-    similarActivities,
+    sameStateActivities,
     availableTickets,
-    availableDates,
-    loading: isLoading,
+    sortedSlots,
+    isLoading,
     initialLoading,
-    error: error || null,
+    error: error ?? null,
   };
 };

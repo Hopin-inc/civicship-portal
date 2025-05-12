@@ -1,7 +1,13 @@
 "use client";
 
 import { GqlArticle, GqlArticleCategory, GqlArticleEdge, GqlUser, Maybe } from "@/types/graphql";
-import { TArticleCard, TArticleDetail, TArticleRelatedUser, TArticleWithAuthor } from "@/app/articles/data/type";
+import {
+  TArticleCard,
+  TArticleDetail,
+  TArticleRelatedUser,
+  TArticleWithAuthor,
+} from "@/app/articles/data/type";
+import { presenterActivityCard } from "@/app/activities/data/presenter";
 
 export const presenterArticleCards = (
   edges?: (GqlArticleEdge | null | undefined)[],
@@ -52,7 +58,10 @@ export const presenterArticleDetail = (article: GqlArticle): TArticleDetail => {
     authors: article.authors?.map(presenterUser) || [],
     relatedUsers: article.relatedUsers?.map(presenterUser) || [],
 
-    hostedOpportunitiesByAuthors: [],
+    hostedOpportunitiesByAuthors:
+      article.authors?.flatMap(
+        (author) => author.opportunitiesCreatedByMe?.map(presenterActivityCard) ?? [],
+      ) ?? [],
     relatedArticles: [],
   };
 };

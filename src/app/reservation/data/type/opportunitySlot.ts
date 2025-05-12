@@ -19,6 +19,8 @@ type OpportunitySlot = {
   capacity: number;
   remainingCapacity: number;
 
+  applicantCount: number | null;
+
   startsAt: string;
   endsAt: string;
 };

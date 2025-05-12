@@ -23,7 +23,7 @@ interface ActivityPageProps {
 export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
   const { id } = params;
 
-  const { opportunity, similarActivities, availableTickets, availableDates, loading, error } =
+  const { opportunity, sameStateActivities, availableTickets, sortedSlots, isLoading, error } =
     useActivityDetails(id);
 
   const { setIsLoading } = useLoading();
@@ -38,8 +38,8 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
   useHeaderConfig(headerConfig);
 
   useEffect(() => {
-    setIsLoading(loading);
-  }, [loading, setIsLoading]);
+    setIsLoading(isLoading);
+  }, [isLoading, setIsLoading]);
 
   if (error && !opportunity) {
     return <ErrorState message={`Error: ${error.message}`} />;
@@ -50,10 +50,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
 
   return (
     <>
-      <ActivityNavigationButtons 
-        title={opportunity.title} 
-        onBack={navigateBack} 
-      />
+      <ActivityNavigationButtons title={opportunity.title} onBack={navigateBack} />
 
       <main className="min-h-screen pb-24">
         <div className="max-w-7xl mx-auto px-4">
@@ -61,8 +58,8 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
           <ActivityDetailsContent
             opportunity={opportunity}
             availableTickets={availableTickets}
-            availableDates={availableDates}
-            similarActivities={similarActivities}
+            availableDates={sortedSlots}
+            sameStateActivities={sameStateActivities}
             communityId={searchParams.community_id}
           />
         </div>
