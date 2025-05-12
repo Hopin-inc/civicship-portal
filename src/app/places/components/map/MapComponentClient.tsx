@@ -33,8 +33,6 @@ export const MapComponentClient = ({
     onPlaceSelect,
   });
 
-  console.log("MapComponent - markers:", markers);
-
   if (!isLoaded) {
     return <></>;
   }
@@ -47,6 +45,8 @@ export const MapComponentClient = ({
       onLoad={onLoad}
       onUnmount={onUnmount}
       options={{
+        gestureHandling: "greedy",
+        scrollwheel: true,
         zoomControl: true,
         mapTypeControl: false,
         streetViewControl: false,

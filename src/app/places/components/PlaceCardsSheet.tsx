@@ -1,11 +1,12 @@
 "use client";
 
-import { FC, useRef, useEffect } from "react";
+import React, { FC, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { BaseCardInfo } from "@/app/places/data/type";
+import { Card, CardContent, CardDescription, CardFooter, CardTitle } from "@/components/ui/card";
 
 interface PlaceCardsSheetProps {
   places: BaseCardInfo[];
@@ -13,19 +14,19 @@ interface PlaceCardsSheetProps {
   onPlaceSelect: (placeId: string) => void;
 }
 
+interface PlaceCardProps {
+  place: BaseCardInfo;
+  selected: boolean;
+  onClick: () => void;
+}
+
 const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, onPlaceSelect }) => {
   const router = useRouter();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<number | null>(null);
+  useAutoScrollToSelectedCard(scrollContainerRef, selectedPlaceId);
 
-  useEffect(() => {
-    if (!selectedPlaceId || !scrollContainerRef.current) return;
-
-    const selectedCard = scrollContainerRef.current.querySelector<HTMLElement>(
-      `[data-place-id="${selectedPlaceId}"]`,
-    );
-    selectedCard?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-  }, [selectedPlaceId]);
+  if (!places.length) return null;
 
   const handleScroll = () => {
     const container = scrollContainerRef.current;
@@ -36,38 +37,7 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
     }
 
     scrollTimeoutRef.current = window.setTimeout(() => {
-      const containerRect = container.getBoundingClientRect();
-      const containerCenter = containerRect.left + containerRect.width / 2;
-
-      let closestCard: HTMLElement | null = null;
-      let minDistance = Infinity;
-
-      const cards = Array.from(container.querySelectorAll("[data-place-id]")) as HTMLElement[];
-
-      for (const card of cards) {
-        const rect = card.getBoundingClientRect();
-        const center = rect.left + rect.width / 2;
-        const dist = Math.abs(center - containerCenter);
-
-        if (dist < minDistance) {
-          minDistance = dist;
-          closestCard = card;
-        }
-      }
-
-      const selectedCard = container.querySelector(
-        `[data-place-id="${selectedPlaceId}"]`,
-      ) as HTMLElement | null;
-      selectedCard?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center",
-      });
-
-      const placeId = closestCard?.dataset?.placeId;
-      if (placeId && placeId !== selectedPlaceId) {
-        onPlaceSelect(placeId);
-      }
+      scrollToNearestCard(container, selectedPlaceId, onPlaceSelect);
     }, 150);
   };
 
@@ -75,8 +45,6 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
     onPlaceSelect(placeId);
     router.push(`/places/${placeId}?userId=${userId}`);
   };
-
-  if (places.length === 0) return null;
 
   return (
     <motion.div
@@ -93,65 +61,112 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
       >
         <div className="flex gap-4 pb-2 px-2">
           {places.map((place) => (
-            <motion.div
+            <PlaceCard
               key={place.id}
-              data-place-id={place.id}
-              className={`flex-none w-[345px] bg-background rounded-2xl shadow-lg transform transition-transform duration-200 snap-center ${
-                selectedPlaceId === place.id ? "scale-[1.02]" : "scale-100"
-              }`}
+              place={place}
+              selected={place.id === selectedPlaceId}
               onClick={() => handlePlaceClick(place.id, place.host.id)}
-            >
-              <div className="relative h-40 rounded-t-2xl overflow-hidden">
-                <Image
-                  src={place.image}
-                  alt={place.headline}
-                  className="object-cover"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 345px"
-                />
-              </div>
-
-              <div className="p-4 flex flex-col min-h-[200px]">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground truncate max-w-[180px]">
-                    📍{place.address}
-                  </div>
-                  <div className="flex items-center gap-1 text-sm text-gray-700">
-                    👥{place.participantCount}人
-                  </div>
-                </div>
-
-                <h2 className="text-lg font-bold mb-2 line-clamp-2">{place.headline}</h2>
-                <p className="text-gray-600 text-sm line-clamp-2 mb-4">{place.bio}</p>
-
-                <div className="flex items-center justify-between mt-auto pt-2">
-                  <div>
-                    {place.publicOpportunityCount > 0 && (
-                      <span className="text-gray-700 text-sm">
-                        <strong>{place.publicOpportunityCount}件</strong>の関わり方を募集中
-                      </span>
-                    )}
-                  </div>
-                  <Button>もっと見る</Button>
-                </div>
-              </div>
-            </motion.div>
+            />
           ))}
         </div>
       </div>
-
-      <style jsx global>{`
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </motion.div>
   );
+};
+
+const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, onClick }) => (
+  <Card
+    data-place-id={place.id}
+    onClick={onClick}
+    className={`flex-none w-[345px] snap-center transform transition-transform duration-200 ${
+      selected ? "scale-[1.02]" : "scale-100"
+    }`}
+  >
+    <div className="relative h-40 rounded-t-lg overflow-hidden">
+      <Image
+        src={place.image}
+        alt={place.headline}
+        className="object-cover"
+        fill
+        sizes="(max-width: 768px) 100vw, 345px"
+      />
+    </div>
+
+    <CardContent className="flex flex-col min-h-[200px] p-4">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm text-muted-foreground truncate max-w-[180px]">
+          📍{place.address}
+        </span>
+        <span className="text-sm text-gray-700">👥{place.participantCount}人</span>
+      </div>
+
+      <CardTitle className="text-lg line-clamp-2">{place.headline}</CardTitle>
+      <CardDescription className="line-clamp-2 mb-4">{place.bio}</CardDescription>
+
+      <CardFooter className="flex justify-between mt-auto pt-2 p-0">
+        {place.publicOpportunityCount > 0 && (
+          <span className="text-sm text-gray-700">
+            <strong>{place.publicOpportunityCount}件</strong>の関わり方を募集中
+          </span>
+        )}
+        <Button>もっと見る</Button>
+      </CardFooter>
+    </CardContent>
+  </Card>
+);
+
+const useAutoScrollToSelectedCard = (
+  containerRef: React.RefObject<HTMLElement>,
+  selectedId: string | null,
+) => {
+  useEffect(() => {
+    if (!selectedId || !containerRef.current) return;
+
+    const selectedCard = containerRef.current.querySelector<HTMLElement>(
+      `[data-place-id="${selectedId}"]`,
+    );
+    selectedCard?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+  }, [selectedId]);
+};
+
+const scrollToNearestCard = (
+  container: HTMLElement,
+  selectedPlaceId: string | null,
+  onPlaceSelect: (placeId: string) => void,
+) => {
+  const containerRect = container.getBoundingClientRect();
+  const containerCenter = containerRect.left + containerRect.width / 2;
+
+  let closestCard: HTMLElement | null = null;
+  let minDistance = Infinity;
+
+  const cards = Array.from(container.querySelectorAll("[data-place-id]")) as HTMLElement[];
+
+  for (const card of cards) {
+    const rect = card.getBoundingClientRect();
+    const center = rect.left + rect.width / 2;
+    const dist = Math.abs(center - containerCenter);
+
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestCard = card;
+    }
+  }
+
+  const selectedCard = container.querySelector(
+    `[data-place-id="${selectedPlaceId}"]`,
+  ) as HTMLElement | null;
+
+  selectedCard?.scrollIntoView({
+    behavior: "smooth",
+    block: "nearest",
+    inline: "center",
+  });
+
+  const placeId = closestCard?.dataset?.placeId;
+  if (placeId && placeId !== selectedPlaceId) {
+    onPlaceSelect(placeId);
+  }
 };
 
 export default PlaceCardsSheet;

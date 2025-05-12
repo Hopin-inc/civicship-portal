@@ -31,6 +31,8 @@ export const presenterOpportunitySlot = (
     capacity: slot.capacity ?? 0,
     remainingCapacity: slot.remainingCapacity ?? 0,
 
+    applicantCount: null,
+
     startsAt: new Date(slot.startsAt).toISOString(),
     endsAt: new Date(slot.endsAt).toISOString(),
   };
