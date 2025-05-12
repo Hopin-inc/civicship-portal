@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { MapPin, Ticket } from 'lucide-react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { ActivityDetail } from "@/types/opportunity";
 
 interface ActivityDetailsHeaderProps {
@@ -10,19 +11,104 @@ interface ActivityDetailsHeaderProps {
   availableTickets: number;
 }
 
-const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({ 
-  opportunity, 
-  availableTickets 
+const AUTO_PLAY_INTERVAL = 5000;
+
+const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
+  opportunity,
+  availableTickets
 }) => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: 'start',
+  });
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const images = opportunity.images?.length
+    ? opportunity.images
+    : ["/placeholder.png", "/placeholder.png", "/placeholder.png"];
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    emblaApi.on('select', onSelect);
+    onSelect();
+
+    const autoplayInterval = setInterval(() => {
+      emblaApi.scrollNext();
+    }, AUTO_PLAY_INTERVAL);
+
+    return () => {
+      emblaApi.off('select', onSelect);
+      clearInterval(autoplayInterval);
+    };
+  }, [emblaApi, onSelect]);
+
+  const handleLeftClick = (e: React.MouseEvent) => {
+    const { clientX } = e;
+    const containerWidth = (e.currentTarget as HTMLElement).clientWidth;
+
+    if (clientX < containerWidth * 0.3) {
+      emblaApi?.scrollPrev();
+    }
+  };
+
+  const handleRightClick = (e: React.MouseEvent) => {
+    const { clientX } = e;
+    const containerWidth = (e.currentTarget as HTMLElement).clientWidth;
+
+    if (clientX > containerWidth * 0.7) {
+      emblaApi?.scrollNext();
+    }
+  };
+
   return (
     <div className="relative w-full bg-background rounded-b-3xl shadow-md pb-6 max-w-mobile-l mx-auto">
-      <div className="relative w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden mb-8">
-        <Image
-          src={opportunity.images?.[0] || "/placeholder.png"}
-          alt={opportunity.title}
-          fill
-          className="object-cover"
-        />
+      <div className="relative w-full h-[480px] rounded-xl overflow-hidden mb-8">
+        <div
+          className="embla h-full relative"
+          ref={emblaRef}
+          onClick={(e) => {
+            handleLeftClick(e);
+            handleRightClick(e);
+          }}
+        >
+          <div className="embla__container h-full">
+            {images.map((image, index) => (
+              <div key={index} className="embla__slide relative h-full w-full flex-[0_0_100%]">
+                <Image
+                  src={image}
+                  alt={`${opportunity.title} - 画像 ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* 左右のクリック領域 */}
+          <div className="absolute left-0 top-0 h-full w-[30%] cursor-w-resize z-[1] hover:bg-gradient-to-r hover:from-black/10 hover:to-transparent" />
+          <div className="absolute right-0 top-0 h-full w-[30%] cursor-e-resize z-[1] hover:bg-gradient-to-l hover:from-black/10 hover:to-transparent" />
+        </div>
+
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1 z-10">
+          {images.map((_, index) => (
+            <div
+              key={index}
+              className={`h-1 rounded-sm transition-all duration-300 ${
+                index === selectedIndex
+                  ? 'w-8 bg-white'
+                  : 'w-4 bg-white/40'
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="mb-8">
