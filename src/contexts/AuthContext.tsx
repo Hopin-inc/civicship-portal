@@ -1,12 +1,20 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { GqlUser, GqlCurrentPrefecture, useCurrentUserQuery, useUserSignUpMutation } from '@/types/graphql';
+import { GqlUser, GqlCurrentPrefecture, useCurrentUserQuery, useUserSignUpMutation } from "@/types/graphql";
 import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
-import { auth, signInWithLiffToken } from "@/lib/firebase";
+import {
+  auth,
+  signInWithLiffToken,
+  startPhoneNumberVerification,
+  verifyPhoneCode,
+  isPhoneVerified as checkPhoneVerified,
+  getVerifiedPhoneNumber,
+  phoneVerificationState,
+} from "@/lib/firebase";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
 import { useLiff } from "./LiffContext";
@@ -24,7 +32,17 @@ type AuthContextType = UserInfo & {
   logout: () => Promise<void>;
   loginWithLiff: () => Promise<void>;
   isAuthenticating: boolean;
-  createUser: (name: string, currentPrefecture: GqlCurrentPrefecture) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
+  createUser: (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
+
+  phoneNumber: string | null;
+  phoneAuth: {
+    isVerifying: boolean;
+    verificationId: string | null;
+    phoneUid: string | null;
+    startPhoneVerification: (phoneNumber: string) => Promise<boolean>;
+    verifyPhoneCode: (code: string) => Promise<boolean>;
+  };
+  isPhoneVerified: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,6 +63,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isExplicitLogin, setIsExplicitLogin] = useState(false);
 
+  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
+  const [verificationId, setVerificationId] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+
   const login = useCallback((userInfo: UserInfo | null) => {
     setUid(userInfo?.uid ?? null);
     setUser(userInfo?.user ?? null);
@@ -58,13 +81,64 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user: {
           id: fetchedUser.id,
           name: fetchedUser.name,
-          memberships: fetchedUser.memberships || []
-        }
+          memberships: fetchedUser.memberships || [] as any,
+        },
       });
     }
   }, [currentUserData, uid, login]);
 
   const [userSignUpMutation] = useUserSignUpMutation();
+
+  const startPhoneVerification = async (phoneNumber: string): Promise<boolean> => {
+    setIsVerifying(true);
+    try {
+      const verId = await startPhoneNumberVerification(phoneNumber);
+      setVerificationId(verId);
+      setPhoneNumber(phoneNumber);
+      return true;
+    } catch (error) {
+      console.error("Failed to start phone verification:", error);
+      toast.error("電話番号認証の開始に失敗しました");
+      return false;
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const verifyPhoneCodeLocal = async (code: string): Promise<boolean> => {
+    if (!verificationId) {
+      toast.error("認証IDがありません。もう一度電話番号を入力してください");
+      return false;
+    }
+
+    setIsVerifying(true);
+    try {
+      const success = await verifyPhoneCode(verificationId, code);
+
+      if (success) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        if (phoneVerificationState.phoneUid) {
+          setIsPhoneVerified(true);
+          toast.success("電話番号認証が完了しました");
+          router.push("/sign-up");
+          return true;
+        } else {
+          toast.error("電話番号認証IDが取得できませんでした");
+          return false;
+        }
+      } else {
+        toast.error("認証コードの検証に失敗しました");
+        return false;
+      }
+    } catch (error) {
+      console.error("Failed to verify phone code:", error);
+      toast.error("認証コードの検証に失敗しました");
+      return false;
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   const loginWithLiff = async () => {
     if (!liff) {
@@ -74,6 +148,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setIsExplicitLogin(true);
       await liffLogin();
+
+      const phoneVerified = checkPhoneVerified();
+      setIsPhoneVerified(phoneVerified);
     } catch (error) {
       console.error("LIFF login failed:", error);
       toast.error("LINEログインに失敗しました");
@@ -125,8 +202,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             user: {
               id: fetchedUser.id,
               name: fetchedUser.name,
-              memberships: fetchedUser.memberships || []
-            }
+              memberships: fetchedUser.memberships || [] as any,
+            },
           });
 
           if (isExplicitLogin) {
@@ -138,7 +215,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             router.push(next);
           }
         } else {
-          router.push("/sign-up");
+          if (isPhoneVerified || checkPhoneVerified()) {
+            router.push("/sign-up");
+          } else {
+            router.push("/sign-up/phone-verification");
+          }
         }
       } else {
         login(null);
@@ -174,14 +255,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const createUser = async (name: string, currentPrefecture: GqlCurrentPrefecture): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
+  const createUser = async (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
     try {
       const { data } = await userSignUpMutation({
         variables: {
           input: {
             name,
             currentPrefecture: currentPrefecture as any, // Type cast to resolve compatibility issue
-            communityId: COMMUNITY_ID
+            communityId: COMMUNITY_ID,
+            phoneUid: phoneUid || undefined,
           },
         },
       });
@@ -194,16 +276,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{
+    <AuthContext.Provider value={ {
       uid,
       user,
       login,
       logout,
       loginWithLiff,
       isAuthenticating,
-      createUser
-    }}>
-      {children}
+      createUser,
+
+      phoneNumber,
+      phoneAuth: {
+        isVerifying,
+        verificationId,
+        phoneUid: phoneVerificationState.phoneUid,
+        startPhoneVerification,
+        verifyPhoneCode: verifyPhoneCodeLocal,
+      },
+      isPhoneVerified,
+    } }>
+      { children }
     </AuthContext.Provider>
   );
 };

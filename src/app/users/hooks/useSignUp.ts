@@ -32,7 +32,7 @@ export const prefectureOptions = [
  */
 export const useSignUp = () => {
   const router = useRouter();
-  const { createUser } = useAuth();
+  const { createUser, phoneAuth } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignUp = async (values: SignUpFormValues) => {
@@ -43,7 +43,9 @@ export const useSignUp = () => {
 
     setIsLoading(true);
     try {
-      const user = await createUser(values.name, values.prefecture);
+      const phoneUid = phoneAuth.phoneUid || undefined;
+      
+      const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
         toast.success('アカウントが作成されました');
         router.push('/');

@@ -2048,6 +2048,7 @@ export type GqlUserSignUpInput = {
   image?: InputMaybe<GqlImageInput>;
   name: Scalars["String"]["input"];
   slug?: InputMaybe<Scalars["String"]["input"]>;
+  phoneUid?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type GqlUserSortInput = {
