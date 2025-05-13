@@ -1,12 +1,20 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { GqlUser, GqlCurrentPrefecture, useCurrentUserQuery, useUserSignUpMutation } from '@/types/graphql';
+import { GqlUser, GqlCurrentPrefecture, useCurrentUserQuery, useUserSignUpMutation } from "@/types/graphql";
 import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
-import { auth, signInWithLiffToken, startPhoneNumberVerification, verifyPhoneCode, isPhoneVerified as checkPhoneVerified, getVerifiedPhoneNumber, phoneVerificationState } from "@/lib/firebase";
+import {
+  auth,
+  signInWithLiffToken,
+  startPhoneNumberVerification,
+  verifyPhoneCode,
+  isPhoneVerified as checkPhoneVerified,
+  getVerifiedPhoneNumber,
+  phoneVerificationState,
+} from "@/lib/firebase";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
 import { useLiff } from "./LiffContext";
@@ -24,8 +32,8 @@ type AuthContextType = UserInfo & {
   logout: () => Promise<void>;
   loginWithLiff: () => Promise<void>;
   isAuthenticating: boolean;
-  createUser: (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
-  
+  createUser: (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
+
   phoneNumber: string | null;
   phoneAuth: {
     isVerifying: boolean;
@@ -54,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserInfo["user"]>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isExplicitLogin, setIsExplicitLogin] = useState(false);
-  
+
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
   const [verificationId, setVerificationId] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -73,8 +81,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user: {
           id: fetchedUser.id,
           name: fetchedUser.name,
-          memberships: fetchedUser.memberships || [] as any
-        }
+          memberships: fetchedUser.memberships || [] as any,
+        },
       });
     }
   }, [currentUserData, uid, login]);
@@ -96,20 +104,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsVerifying(false);
     }
   };
-  
+
   const verifyPhoneCodeLocal = async (code: string): Promise<boolean> => {
     if (!verificationId) {
       toast.error("認証IDがありません。もう一度電話番号を入力してください");
       return false;
     }
-    
+
     setIsVerifying(true);
     try {
       const success = await verifyPhoneCode(verificationId, code);
-      
+
       if (success) {
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
         if (phoneVerificationState.phoneUid) {
           setIsPhoneVerified(true);
           toast.success("電話番号認証が完了しました");
@@ -140,7 +148,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setIsExplicitLogin(true);
       await liffLogin();
-      
+
       const phoneVerified = checkPhoneVerified();
       setIsPhoneVerified(phoneVerified);
     } catch (error) {
@@ -194,8 +202,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             user: {
               id: fetchedUser.id,
               name: fetchedUser.name,
-              memberships: fetchedUser.memberships || [] as any
-            }
+              memberships: fetchedUser.memberships || [] as any,
+            },
           });
 
           if (isExplicitLogin) {
@@ -247,7 +255,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const createUser = async (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
+  const createUser = async (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
     try {
       const { data } = await userSignUpMutation({
         variables: {
@@ -255,7 +263,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             name,
             currentPrefecture: currentPrefecture as any, // Type cast to resolve compatibility issue
             communityId: COMMUNITY_ID,
-            phoneUid: phoneUid || undefined
+            phoneUid: phoneUid || undefined,
           },
         },
       });
@@ -268,7 +276,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{
+    <AuthContext.Provider value={ {
       uid,
       user,
       login,
@@ -276,7 +284,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       loginWithLiff,
       isAuthenticating,
       createUser,
-      
+
       phoneNumber,
       phoneAuth: {
         isVerifying,
@@ -285,9 +293,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         startPhoneVerification,
         verifyPhoneCode: verifyPhoneCodeLocal,
       },
-      isPhoneVerified
-    }}>
-      {children}
+      isPhoneVerified,
+    } }>
+      { children }
     </AuthContext.Provider>
   );
 };
