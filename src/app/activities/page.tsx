@@ -30,10 +30,9 @@ export default function ActivitiesPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { opportunities, loading, error, loadMoreRef } =
-    useActivities();
+  const { opportunities, loading, error, loadMoreRef } = useActivities();
 
-  const isInitialLoading = loading && !opportunities?.edges?.length
+  const isInitialLoading = loading && !opportunities?.edges?.length;
   const isSectionLoading = loading && !isInitialLoading;
 
   useEffect(() => {
@@ -47,14 +46,10 @@ export default function ActivitiesPage() {
   if (error) return <ErrorState message={`Error: ${error.message}`} />;
 
   const activityCards = mapOpportunityCards(opportunities.edges);
-  const {
-    upcomingCards,
-    featuredCards,
-    listCards
-  } = sliceActivitiesBySection(activityCards);
+  const { upcomingCards, featuredCards, listCards } = sliceActivitiesBySection(activityCards);
 
   return (
-    <div className="min-h-screen pb-16">
+    <div className="min-h-screen">
       <ActivitiesFeaturedSection
         opportunities={featuredCards}
         isInitialLoading={isInitialLoading}
