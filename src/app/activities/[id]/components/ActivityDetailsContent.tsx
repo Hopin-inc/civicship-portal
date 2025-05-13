@@ -58,7 +58,7 @@ const ActivityBodySection = ({ body }: { body: string }) => {
   const hasMoreLines = lines.length > INITIAL_DISPLAY_LINES;
 
   return (
-    <section className="py-6 mt-0">
+    <section className="pt-6 pb-8 mt-0">
       <h2 className="text-display-md text-foreground mb-4">体験できること</h2>
       <div className="relative">
         <p
@@ -70,7 +70,12 @@ const ActivityBodySection = ({ body }: { body: string }) => {
           <div className="absolute bottom-0 left-0 w-full">
             <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
             <div className="relative flex justify-center pt-8">
-              <Button variant="tertiary" size="sm" onClick={() => setExpanded(true)} className="bg-white px-6">
+              <Button
+                variant="tertiary"
+                size="sm"
+                onClick={() => setExpanded(true)}
+                className="bg-white px-6"
+              >
                 <span className="text-label-sm font-bold">もっと見る</span>
               </Button>
             </div>
@@ -123,8 +128,8 @@ const PlaceSection = ({ place }: { place: OpportunityPlace }) => {
       : `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(place.address)}`;
 
   return (
-    <section className="mb-12">
-      <h2 className="text-2xl font-bold mb-6">集合場所</h2>
+    <section className="pt-6 pb-8 mt-0">
+      <h2 className="text-display-md text-foreground mb-4">集合場所</h2>
       <div className="relative w-full h-[300px] rounded-lg overflow-hidden">
         <iframe
           src={mapUrl}
@@ -137,6 +142,7 @@ const PlaceSection = ({ place }: { place: OpportunityPlace }) => {
           referrerPolicy="no-referrer-when-downgrade"
         />
       </div>
+      {place?.description && <p className="text-body-sm text-foreground mt-4">{place.description}</p>}
     </section>
   );
 };
