@@ -86,7 +86,8 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
   if (!host) return null;
 
   return (
-    <section className="mb-12">
+    <section className="py-6 mt-0 bg-background-hover -mx-4 px-4">
+      <h2 className="text-display-md text-foreground mb-4">案内人</h2>
       <div className="rounded-xl flex flex-col gap-6">
         <div className="flex items-center gap-4">
           <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
@@ -98,10 +99,10 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
             />
           </div>
           <div>
-            <h3 className="text-lg font-bold mb-1">
-              <span className="text-xl">{host.name}</span>さん
+            <h3 className="text-title-sm font-bold mb-1 text-caption">
+              <span className="text-display-sm mr-1 text-foreground">{host.name}</span>さん
             </h3>
-            <p className="text-gray-600">が案内します</p>
+            {host.bio && <p className="text-body-sm text-caption line-clamp-2">{host.bio}</p>}
           </div>
         </div>
         {host.interview && <ArticleCard article={host.interview} />}
