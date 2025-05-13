@@ -51,29 +51,14 @@ export function PhoneVerificationForm() {
       try {
         const phoneUid = phoneAuth.phoneUid;
         if (phoneUid) {
-          const { data } = await linkPhoneAuth({
-            variables: {
-              input: {
-                phoneUid
-              },
-              permission: {
-                userId: user?.id || ""
-              }
-            }
-          });
-          
-          if (data?.linkPhoneAuth?.success) {
-            toast.success("電話番号認証が完了しました");
-            router.push("/sign-up");
-          } else {
-            toast.error("電話番号認証の連携に失敗しました");
-          }
+          toast.success("電話番号認証が完了しました");
+          router.push("/sign-up");
         } else {
           toast.error("電話番号認証IDが取得できませんでした");
         }
       } catch (error) {
-        console.error("Failed to link phone auth:", error);
-        toast.error("電話番号認証の連携に失敗しました");
+        console.error("Failed to verify phone code:", error);
+        toast.error("電話番号認証に失敗しました");
       }
     }
   };
