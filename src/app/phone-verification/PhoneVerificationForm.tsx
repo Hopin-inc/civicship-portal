@@ -46,23 +46,7 @@ export function PhoneVerificationForm() {
   
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await phoneAuth.verifyPhoneCode(verificationCode);
-    if (success) {
-      try {
-        setTimeout(() => {
-          const phoneUid = phoneAuth.phoneUid;
-          if (phoneUid) {
-            toast.success("電話番号認証が完了しました");
-            router.push("/sign-up");
-          } else {
-            toast.error("電話番号認証IDが取得できませんでした");
-          }
-        }, 500); // 500ms delay to ensure phoneUid is set
-      } catch (error) {
-        console.error("Failed to verify phone code:", error);
-        toast.error("電話番号認証に失敗しました");
-      }
-    }
+    await phoneAuth.verifyPhoneCode(verificationCode);
   };
 
   const formatPhoneNumber = (phone: string): string => {

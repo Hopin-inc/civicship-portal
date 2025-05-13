@@ -108,9 +108,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const success = await verifyPhoneCode(verificationId, code);
       
       if (success) {
-        setIsPhoneVerified(true);
-        toast.success("電話番号認証が完了しました");
-        return true;
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        if (phoneVerificationState.phoneUid) {
+          setIsPhoneVerified(true);
+          toast.success("電話番号認証が完了しました");
+          router.push("/sign-up");
+          return true;
+        } else {
+          toast.error("電話番号認証IDが取得できませんでした");
+          return false;
+        }
       } else {
         toast.error("認証コードの検証に失敗しました");
         return false;
