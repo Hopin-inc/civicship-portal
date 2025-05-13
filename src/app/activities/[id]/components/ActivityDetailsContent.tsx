@@ -179,16 +179,16 @@ const ScheduleSection = ({
 );
 
 const NoticeSection = ({ requiredApproval }: { requiredApproval?: boolean }) => (
-  <section className="mb-12">
-    <h2 className="text-2xl font-bold mb-6">注意事項</h2>
-    <ul className="space-y-4">
-      <li className="flex items-start gap-2">
-        <AlertCircle className="h-5 w-5 text-gray-500 flex-shrink-0 mt-1" />
+  <section className="pt-6 pb-8 mt-0 bg-background-hover -mx-4 px-4">
+    <h2 className="text-display-md text-foreground mb-4">注意事項</h2>
+    <ul className="space-y-4 text-body-sm text-caption">
+      <li className="flex items-start gap-2 ml-0">
+        <AlertCircle className="h-5 w-5 text-gray-500 flex-shrink-0" />
         <span>参加には事前予約が必要です</span>
       </li>
       {requiredApproval && (
-        <li className="flex items-start gap-2">
-          <AlertCircle className="h-5 w-5 text-gray-500 flex-shrink-0 mt-1" />
+        <li className="flex items-start gap-2 ml-0">
+          <AlertCircle className="h-5 w-5 text-gray-500 flex-shrink-0" />
           <span>参加には承認が必要です</span>
         </li>
       )}
