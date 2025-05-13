@@ -156,9 +156,8 @@ const ScheduleSection = ({
   opportunityId: string;
   communityId: string;
 }) => (
-  <section className="mb-12">
-    <h2 className="text-2xl font-bold mb-6">開催日</h2>
-    <p className="text-gray-600 mb-4">申込可能な時間枠の数：{slots.length}</p>
+  <section className="pt-6 pb-8 mt-0">
+    <h2 className="text-display-md text-foreground mb-4">開催日</h2>
     <div className="relative">
       <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
         {slots.map((slot, index) => (
@@ -171,6 +170,10 @@ const ScheduleSection = ({
           </div>
         ))}
       </div>
+      {/* #TODO: ボタンクリックの挙動 */}
+      <Button variant="secondary" size="md" className="w-full">
+        参加できる日程を探す
+      </Button>
     </div>
   </section>
 );
