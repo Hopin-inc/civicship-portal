@@ -39,7 +39,7 @@ type FormValues = z.infer<typeof FormSchema>;
 
 export function SignUpForm() {
   const router = useRouter();
-  const { createUser, isPhoneVerified } = useAuth();
+  const { createUser, isPhoneVerified, phoneAuth } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormValues>({
@@ -66,7 +66,9 @@ export function SignUpForm() {
         return;
       }
       
-      const user = await createUser(values.name, values.prefecture);
+      const phoneUid = phoneAuth.phoneUid;
+      
+      const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
         router.push("/");
       }

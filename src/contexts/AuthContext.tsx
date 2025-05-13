@@ -235,14 +235,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const createUser = async (name: string, currentPrefecture: GqlCurrentPrefecture): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
+  const createUser = async (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
     try {
       const { data } = await userSignUpMutation({
         variables: {
           input: {
             name,
             currentPrefecture: currentPrefecture as any, // Type cast to resolve compatibility issue
-            communityId: COMMUNITY_ID
+            communityId: COMMUNITY_ID,
+            phoneUid: phoneUid || undefined
           },
         },
       });
