@@ -9,6 +9,7 @@ import CategoryBadge from "../../components/CategoryBadge";
 import { ArticleRecommendations } from "./ArticleRecommendations";
 import { TArticleCard, TArticleDetail } from "@/app/articles/data/type";
 import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
+import { Calendar } from "lucide-react";
 
 type ArticleDetailProps = {
   article: TArticleDetail;
@@ -17,7 +18,7 @@ type ArticleDetailProps = {
 
 const ArticleDetail = ({ article, recommendedArticles }: ArticleDetailProps) => {
   return (
-    <div className="max-w-[375px] mx-auto pt-10 pb-32 px-2">
+    <div className="max-w-[375px] mx-auto pb-32 px-2">
       <ArticleHeader
         title={article.title}
         thumbnail={article.thumbnail}
@@ -47,20 +48,21 @@ const ArticleHeader = ({
     <div className="bg-background relative rounded-[8px]">
       <div className="relative w-full h-[210px]">
         <Image src={thumbnail || "/placeholder.svg"} alt={title} fill className="object-cover" />
-        <div className="absolute top-4 left-4">
-          <CategoryBadge category={category} />
-        </div>
       </div>
 
-      <div className="relative -mt-8 bg-background rounded-2xl shadow-md mx-4">
-        <div className="px-4 pt-6 pb-4">
-          <h1 className="text-2xl font-bold mb-4">{title}</h1>
-          <div className="text-muted-foreground text-sm">
-            公開: {format(new Date(publishedAt), "yyyy年M月d日", { locale: ja })}
+      <div className="relative -mt-8 bg-background rounded-t-2xl">
+        <div className="p-6">
+          <div className="mb-2">
+            <CategoryBadge category={category} />
+          </div>
+          <h1 className="text-display-lg mb-2">{title}</h1>
+          <div className="flex gap-2 text-caption items-center">
+            <Calendar className="w-4 h-4" />
+            <div className="text-caption text-body-sm">
+              {format(new Date(publishedAt), "yyyy/M/d", { locale: ja })}
+            </div>
           </div>
         </div>
-
-        <div className="h-px bg-muted" />
       </div>
     </div>
   );
