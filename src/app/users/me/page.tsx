@@ -1,14 +1,13 @@
-'use client';
+"use client";
 
 import { useEffect, useRef } from "react";
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { UserProfileSection } from '@/components/features/user/UserProfileSection';
-import LoadingIndicator from '@/components/shared/LoadingIndicator';
-import { ErrorState } from '@/components/shared/ErrorState';
-import { UserPortfolioList } from "@/components/features/user/UserPortfolioList";
-import { useUserProfile } from "@/hooks";
-import loading from "@/components/layout/Loading";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { UserProfileSection } from "@/app/users/components/UserProfileSection";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { UserPortfolioList } from "@/app/users/components/UserPortfolioList";
+import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
@@ -18,11 +17,11 @@ export default function MyProfilePage() {
 
   useEffect(() => {
     if (!currentUser) {
-      router.push('/login?next=/users/me');
+      router.push("/login?next=/users/me");
     }
   }, [currentUser, router]);
 
-  const { userData, isLoading, error} = useUserProfile(currentUser?.id ?? "");
+  const { userData, isLoading, error } = useUserProfile(currentUser?.id ?? "");
 
   if (isLoading) {
     return (
@@ -35,9 +34,7 @@ export default function MyProfilePage() {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-6">
-        <ErrorState message={
-          error.message || "ユーザー情報の取得に失敗しました"
-        } />
+        <ErrorState message={error.message || "ユーザー情報の取得に失敗しました"} />
       </div>
     );
   }

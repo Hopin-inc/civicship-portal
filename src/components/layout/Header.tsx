@@ -6,14 +6,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import LoginModal from "@/components/features/login/LoginModal";
+import LoginModal from "@/app/login/components/LoginModal";
 import { useHeader } from "@/components/providers/HeaderProvider";
-import { useHierarchicalNavigation } from "@/hooks/core/useHierarchicalNavigation";
+import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { cn } from "@/lib/utils";
-import SearchBox from "../features/search/SearchBox";
+import SearchBox from "../../app/search/components/SearchBox";
 
 interface HeaderProps {
-  className?: string
+  className?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({ className }) => {
@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     return null;
   }
 
-  const shouldShowBackButton = config.showBackButton && pathname !== '/';
+  const shouldShowBackButton = config.showBackButton && pathname !== "/";
 
   return (
     <header
@@ -36,12 +36,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       )}
     >
       {shouldShowBackButton && (
-        <Button
-          onClick={navigateBack}
-          variant="icon-only"
-          size="sm"
-          aria-label="戻る"
-        >
+        <Button onClick={navigateBack} variant="icon-only" size="sm" aria-label="戻る">
           <ChevronLeft className="h-6 w-6" />
         </Button>
       )}

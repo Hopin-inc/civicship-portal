@@ -1,10 +1,10 @@
 "use client";
 
-import { SimilarActivitiesList } from "@/components/features/activity/SimilarActivitiesList";
-import { CompletionHeader } from "@/components/features/reservation/CompletionHeader";
-import { ActivitySummary } from "@/components/features/reservation/ActivitySummary";
-import { ReservationDetails } from "@/components/features/reservation/ReservationDetails";
-import { useReservationComplete } from "@/hooks/features/reservation/useReservationComplete";
+import { SameStateActivities } from "@/app/activities/[id]/components/SimilarActivitiesList";
+import { CompletionHeader } from "@/app/reservation/components/CompletionHeader";
+import { ActivitySummary } from "@/app/reservation/components/ActivitySummary";
+import { ReservationDetails } from "@/app/reservation/components/ReservationDetails";
+import { useReservationComplete } from "@/app/reservation/hooks/useReservationComplete";
 import React from "react";
 import { ReservationContentGate } from "@/app/reservation/contentGate";
 
@@ -26,13 +26,15 @@ export default function CompletePage() {
 }
 
 function ReservationCompletionUI({
-   opportunity,
-   similarOpportunities,
-   // opportunitiesCreatedByHost,
-   dateTimeInfo,
- }: ReturnType<typeof useReservationComplete>) {
+  opportunity,
+  similarOpportunities,
+  // opportunitiesCreatedByHost,
+  dateTimeInfo,
+}: ReturnType<typeof useReservationComplete>) {
   if (!opportunity || !dateTimeInfo) {
-    throw new Error("ReservationCompletionUI should only be rendered when opportunity and dateTimeInfo are present");
+    throw new Error(
+      "ReservationCompletionUI should only be rendered when opportunity and dateTimeInfo are present",
+    );
   }
   return (
     <main className="flex flex-col items-center px-4 pb-8">
@@ -50,7 +52,8 @@ function ReservationCompletionUI({
       />
 
       <div className="w-full mt-8 mb-16">
-        <SimilarActivitiesList
+        <SameStateActivities
+          header={"おすすめの体験"}
           opportunities={similarOpportunities}
           currentOpportunityId={opportunity.id}
         />

@@ -2,11 +2,11 @@
 
 import { useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { UserProfileSection } from "@/components/features/user/UserProfileSection";
+import { UserProfileSection } from "@/app/users/components/UserProfileSection";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { UserPortfolioList } from "@/components/features/user/UserPortfolioList";
-import { useUserProfile } from "@/hooks";
+import { UserPortfolioList } from "@/app/users/components/UserPortfolioList";
+import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 
 export default function UserPage({ params }: { params: { id: string } }) {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
@@ -14,7 +14,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
   const { user: currentUser } = useAuth();
   const isOwner = currentUser?.id === params.id;
 
-  const { userData, isLoading, error} = useUserProfile(params.id);
+  const { userData, isLoading, error } = useUserProfile(params.id);
 
   if (isLoading) {
     return (
@@ -27,9 +27,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-6">
-        <ErrorState message={
-          error.message || "ユーザー情報の取得に失敗しました"
-        } />
+        <ErrorState message={error.message || "ユーザー情報の取得に失敗しました"} />
       </div>
     );
   }
@@ -57,9 +55,9 @@ export default function UserPage({ params }: { params: { id: string } }) {
         isOwner={isOwner}
         portfolios={userData.portfolios}
         isLoadingMore={false} // ← 常に false で OK
-        hasMore={false}       // ← 常に false で OK
+        hasMore={false} // ← 常に false で OK
         lastPortfolioRef={lastPortfolioRef}
-        isSysAdmin={false}    // ← 管理者権限に応じて true に
+        isSysAdmin={false} // ← 管理者権限に応じて true に
         activeOpportunities={userData.currentlyHiringOpportunities}
       />
     </div>

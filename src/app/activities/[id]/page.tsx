@@ -1,16 +1,15 @@
 "use client";
 
-import { useActivityDetails } from "@/hooks/features/activity/useActivityDetails";
-import ActivityDetailsHeader from "@/components/features/activity/ActivityDetailsHeader";
-import ActivityDetailsContent from "@/components/features/activity/ActivityDetailsContent";
-import ActivityDetailsFooter from "@/components/features/activity/ActivityDetailsFooter";
+import { useActivityDetails } from "@/app/activities/[id]/hooks/useActivityDetails";
+import ActivityDetailsHeader from "@/app/activities/[id]/components/ActivityDetailsHeader";
+import ActivityDetailsContent from "@/app/activities/[id]/components/ActivityDetailsContent";
+import ActivityDetailsFooter from "@/app/activities/[id]/components/ActivityDetailsFooter";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useEffect, useMemo } from "react";
-import { useLoading } from "@/hooks/core/useLoading";
-import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
-import { useHierarchicalNavigation } from "@/hooks/core/useHierarchicalNavigation";
-import { ChevronLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useLoading } from "@/hooks/useLoading";
+import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
+import ActivityNavigationButtons from "@/app/activities/[id]/components/ActivityNavigationButtons";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface ActivityPageProps {
   params: {
@@ -24,7 +23,7 @@ interface ActivityPageProps {
 export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
   const { id } = params;
 
-  const { opportunity, similarActivities, availableTickets, availableDates, loading, error } =
+  const { opportunity, sameStateActivities, availableTickets, sortedSlots, isLoading, error } =
     useActivityDetails(id);
 
   const { setIsLoading } = useLoading();
@@ -39,8 +38,8 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
   useHeaderConfig(headerConfig);
 
   useEffect(() => {
-    setIsLoading(loading);
-  }, [loading, setIsLoading]);
+    setIsLoading(isLoading);
+  }, [isLoading, setIsLoading]);
 
   if (error && !opportunity) {
     return <ErrorState message={`Error: ${error.message}`} />;
@@ -51,17 +50,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
 
   return (
     <>
-      <div className="fixed top-4 left-4 z-50">
-        <Button
-          onClick={navigateBack}
-          variant="secondary"
-          size="icon"
-          className="rounded-full shadow-md"
-          aria-label="戻る"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
-      </div>
+      <ActivityNavigationButtons title={opportunity.title} onBack={navigateBack} />
 
       <main className="min-h-screen pb-24">
         <div className="max-w-7xl mx-auto px-4">
@@ -69,8 +58,8 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
           <ActivityDetailsContent
             opportunity={opportunity}
             availableTickets={availableTickets}
-            availableDates={availableDates}
-            similarActivities={similarActivities}
+            availableDates={sortedSlots}
+            sameStateActivities={sameStateActivities}
             communityId={searchParams.community_id}
           />
         </div>

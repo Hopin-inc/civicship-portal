@@ -1,24 +1,27 @@
-'use client';
+"use client";
 
-import React, { useMemo } from 'react';
-import { useWallet } from '@/hooks/features/wallet/useWallet';
-import LoadingIndicator from '@/components/shared/LoadingIndicator';
-import { ErrorState } from '@/components/shared/ErrorState';
-import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
-import { WalletCard } from '@/components/features/wallet/WalletCard';
-import { WalletHistoryButton } from '@/components/features/wallet/WalletHistoryButton';
-import { WalletInfoSection } from '@/components/features/wallet/WalletInfoSection';
-import { WalletActionButton } from '@/components/features/wallet/WalletActionButton';
-import { WalletUsageSection } from '@/components/features/wallet/WalletUsageSection';
+import React, { useMemo } from "react";
+import { useWallet } from "@/app/wallets/hooks/useWallet";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { ErrorState } from "@/components/shared/ErrorState";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { WalletCard } from "@/app/wallets/components/WalletCard";
+import { WalletHistoryButton } from "@/app/wallets/components/WalletHistoryButton";
+import { WalletInfoSection } from "@/app/wallets/components/WalletInfoSection";
+import { WalletActionButton } from "@/app/wallets/components/WalletActionButton";
+import { WalletUsageSection } from "@/app/wallets/components/WalletUsageSection";
 
 export default function WalletsPage() {
   const { userAsset, isLoading, error } = useWallet();
-  
-  const headerConfig = useMemo(() => ({
-    title: '保有ポイント',
-    showBackButton: true,
-    showLogo: false,
-  }), []);
+
+  const headerConfig = useMemo(
+    () => ({
+      title: "保有ポイント",
+      showBackButton: true,
+      showLogo: false,
+    }),
+    [],
+  );
   useHeaderConfig(headerConfig);
 
   if (isLoading) {
@@ -40,14 +43,14 @@ export default function WalletsPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background px-4 py-6">
       <WalletCard currentPoint={userAsset.points.currentPoint} isLoading={isLoading} />
-      <WalletHistoryButton walletId={userAsset.points.walletId}/>
+      <WalletHistoryButton walletId={userAsset.points.walletId} />
       <WalletInfoSection />
       <WalletActionButton> 投稿してみる </WalletActionButton>
-      <WalletUsageSection 
+      <WalletUsageSection
         title="ポイントを使う"
         message="ポイントを使ってサービスを利用できるようになったら、LINEからお伝えします💪"
       />
-      <WalletUsageSection 
+      <WalletUsageSection
         title="ポイントをもらう"
         message="ポイントをもらえるお手伝いに参加できるようになったら、LINEからお伝えします💪"
       />
