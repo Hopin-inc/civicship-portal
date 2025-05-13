@@ -13,6 +13,7 @@ import {
 } from "@/app/activities/data/type";
 import ArticleCard from "@/app/articles/components/Card";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { Button } from "@/components/ui/button";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
@@ -58,36 +59,25 @@ const ActivityBodySection = ({ body }: { body: string }) => {
 
   return (
     <section className="py-6 mt-0">
-      <h2 className="text-2xl font-bold mb-4">体験できること</h2>
+      <h2 className="text-display-md text-foreground mb-4">体験できること</h2>
       <div className="relative">
-        <p className={`text-foreground whitespace-pre-wrap transition-all duration-300 ${!expanded && hasMoreLines ? `line-clamp-${INITIAL_DISPLAY_LINES}` : ''}`}>
+        <p
+          className={`text-body-md text-foreground whitespace-pre-wrap transition-all duration-300 ${!expanded && hasMoreLines ? `line-clamp-${INITIAL_DISPLAY_LINES}` : ""}`}
+        >
           {body}
         </p>
-        {hasMoreLines && (
-          expanded ? (
-            <div className="flex justify-center mt-4">
-              <button
-                onClick={() => setExpanded(false)}
-                className="text-primary font-medium bg-background px-6 py-2 rounded-full shadow-sm hover:shadow transition-all duration-200"
-              >
-                閉じる
-              </button>
+        {hasMoreLines && !expanded && (
+          <div className="absolute bottom-0 left-0 w-full">
+            <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+            <div className="relative flex justify-center pt-8">
+              <Button variant="tertiary" size="sm" onClick={() => setExpanded(true)} className="bg-white px-6">
+                <span className="text-label-sm font-bold">もっと見る</span>
+              </Button>
             </div>
-          ) : (
-            <div className="absolute bottom-0 left-0 w-full">
-              <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
-              <div className="relative flex justify-center pt-8">
-                <button
-                  onClick={() => setExpanded(true)}
-                  className="text-primary font-medium bg-background px-6 py-2 rounded-full shadow-sm hover:shadow transition-all duration-200"
-                >
-                  もっと見る
-                </button>
-              </div>
-            </div>
-          )
+          </div>
         )}
       </div>
+      {/* #TODO: 体験画像のギャラリー表示 */}
     </section>
   );
 };
