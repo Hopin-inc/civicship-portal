@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState} from "react";
 import Image from "next/image";
 import { AlertCircle } from "lucide-react";
 import { SameStateActivities } from "./SimilarActivitiesList";
@@ -49,12 +49,48 @@ const ActivityDetailsContent = ({
   );
 };
 
-const ActivityBodySection = ({ body }: { body: string }) => (
-  <section className="py-6 mt-0">
-    <h2 className="text-2xl font-bold mb-4">体験できること</h2>
-    <p className="text-foreground whitespace-pre-wrap">{body}</p>
-  </section>
-);
+const INITIAL_DISPLAY_LINES = 6;
+
+const ActivityBodySection = ({ body }: { body: string }) => {
+  const [expanded, setExpanded] = useState(false);
+  const lines = body.split('\n');
+  const hasMoreLines = lines.length > INITIAL_DISPLAY_LINES;
+
+  return (
+    <section className="py-6 mt-0">
+      <h2 className="text-2xl font-bold mb-4">体験できること</h2>
+      <div className="relative">
+        <p className={`text-foreground whitespace-pre-wrap transition-all duration-300 ${!expanded && hasMoreLines ? `line-clamp-${INITIAL_DISPLAY_LINES}` : ''}`}>
+          {body}
+        </p>
+        {hasMoreLines && (
+          expanded ? (
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => setExpanded(false)}
+                className="text-primary font-medium bg-background px-6 py-2 rounded-full shadow-sm hover:shadow transition-all duration-200"
+              >
+                閉じる
+              </button>
+            </div>
+          ) : (
+            <div className="absolute bottom-0 left-0 w-full">
+              <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+              <div className="relative flex justify-center pt-8">
+                <button
+                  onClick={() => setExpanded(true)}
+                  className="text-primary font-medium bg-background px-6 py-2 rounded-full shadow-sm hover:shadow transition-all duration-200"
+                >
+                  もっと見る
+                </button>
+              </div>
+            </div>
+          )
+        )}
+      </div>
+    </section>
+  );
+};
 
 const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
   if (!host) return null;
