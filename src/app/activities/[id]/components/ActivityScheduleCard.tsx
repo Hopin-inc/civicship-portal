@@ -44,7 +44,7 @@ const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
         <Link
           href={`/reservation/confirm?id=${opportunityId}&community_id=${communityId}&slot_id=${slot.id}&guests=${slot.applicantCount}`}
         >
-          <Button variant="primary" size="md">
+          <Button variant="primary" size="md" className="px-6">
             この日程を選択
           </Button>
         </Link>
