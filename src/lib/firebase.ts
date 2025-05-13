@@ -99,12 +99,12 @@ export const clearRecaptcha = () => {
       recaptchaVerifier.clear();
       recaptchaVerifier = null;
     }
-    
+
     if (recaptchaContainerElement) {
       if (document.getElementById('recaptcha-container')) {
         const iframes = recaptchaContainerElement.querySelectorAll('iframe');
         iframes.forEach(iframe => iframe.remove());
-        
+
         const divs = recaptchaContainerElement.querySelectorAll('div[id^="rc-"]');
         divs.forEach(div => div.remove());
       }
@@ -118,14 +118,14 @@ export const clearRecaptcha = () => {
 export const startPhoneNumberVerification = async (phoneNumber: string): Promise<string> => {
   try {
     clearRecaptcha();
-    
+
     recaptchaContainerElement = document.getElementById('recaptcha-container');
     if (!recaptchaContainerElement) {
       throw new Error("reCAPTCHA container element not found");
     }
-    
+
     recaptchaVerifier = new RecaptchaVerifier(phoneAuth, 'recaptcha-container', {
-      size: 'normal',
+      size: 'invisible',
       callback: () => {
         console.log('reCAPTCHA solved!');
       },
@@ -152,48 +152,48 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
 export const verifyPhoneCode = async (verificationId: string, code: string): Promise<boolean> => {
   try {
     console.log("Starting phone verification with code, using phoneAuth instance (no tenant)");
-    
+
     if (!verificationId || !code) {
       console.error("Missing verificationId or code");
       return false;
     }
-    
+
     try {
       const credential = PhoneAuthProvider.credential(verificationId, code);
       console.log("Successfully created phone credential");
-      
+
       try {
         console.log("Signing in with credential to get user ID");
         const userCredential = await signInWithCredential(phoneAuth, credential);
         console.log("Phone sign-in successful with credential");
-        
+
         if (userCredential.user) {
           phoneVerificationState.phoneUid = userCredential.user.uid;
           console.log("Stored phone UID:", phoneVerificationState.phoneUid);
         } else {
           console.error("No user returned from signInWithCredential");
         }
-        
+
         await phoneAuth.signOut();
         console.log("Signed out of phone auth");
       } catch (signInError) {
         console.warn("Could not sign in with phone credential:", signInError);
-        
+
         try {
           console.log("Attempting fallback with signInWithPhoneNumber");
           const result = await signInWithPhoneNumber(phoneAuth, phoneVerificationState.phoneNumber || '', recaptchaVerifier!);
-          
+
           if (phoneAuth.currentUser) {
             phoneVerificationState.phoneUid = phoneAuth.currentUser.uid;
             console.log("Stored phone UID from fallback:", phoneVerificationState.phoneUid);
           }
-          
+
           await phoneAuth.signOut();
         } catch (fallbackError) {
           console.error("Fallback also failed:", fallbackError);
         }
       }
-      
+
       phoneVerificationState.verified = true;
       console.log("Phone verification state set to verified:", phoneVerificationState);
       return true;
