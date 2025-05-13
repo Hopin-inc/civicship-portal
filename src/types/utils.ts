@@ -7,4 +7,5 @@ export type AppImage = {
 export type Participant = {
   id: string;
   image: string | null;
+  name: string;
 }

@@ -1,140 +1,38 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { useParticipation } from "@/hooks/features/participation/useParticipation";
-import { useParticipationImageUpload } from "@/hooks/features/participation/useParticipationImageUpload";
-import { GqlParticipationStatus } from '@/types/graphql';
-import { useHeaderConfig } from "@/hooks/core/useHeaderConfig";
-import { useParticipationState } from "@/hooks/features/participation/useParticipationState";
-import { calculateCancellationDeadline } from "@/presenters/participation";
+import { useMemo } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { ParticipationStatusNotification } from "@/components/features/participation/ParticipationStatusNotification";
-import { NotificationMessage } from "@/components/features/participation/NotificationMessage";
-import { ParticipationHeader } from "@/components/features/participation/ParticipationHeader";
-import { ParticipationDetails } from "@/components/features/participation/ParticipationDetails";
-import { ParticipationImageGallery } from "@/components/features/participation/ParticipationImageGallery";
-import { ParticipationActions } from "@/components/features/participation/ParticipationActions";
+import { useParticipationPage } from "@/app/participations/[id]/hooks/useParticipationPage";
+import { ParticipationContent } from "@/app/participations/[id]/components/ParticipationContext";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface ParticipationProps {
-  params: {
-    id: string;
-  };
+  params: { id: string };
 }
 
 export default function ParticipationPage({ params }: ParticipationProps) {
-  const { participation, opportunity, loading, error, refetch } = useParticipation(params.id);
-  
-  const headerConfig = useMemo(() => ({
-    title: opportunity?.title ? `${opportunity.title} - 予約詳細` : "予約詳細",
-    showBackButton: true,
-    showLogo: false,
-    showSearchForm: false,
-  }), [opportunity?.title]);
+  const { participation, opportunity, loading, error, ...rest } = useParticipationPage(params.id);
+
+  const headerConfig = useMemo(
+    () => ({
+      title: opportunity?.title ? `${opportunity.title} - 予約詳細` : "予約詳細",
+      showBackButton: true,
+      showLogo: false,
+      showSearchForm: false,
+    }),
+    [opportunity?.title],
+  );
   useHeaderConfig(headerConfig);
-  
-  const {
-    currentStatus,
-    uploadSuccess,
-    uploadError,
-    isAddPhotosModalOpen,
-    handleUploadSuccess,
-    handleUploadError,
-    togglePhotosModal,
-  } = useParticipationState({
-    participation,
-    onUploadSuccess: refetch,
-  });
 
-  const { uploadImages, isUploading } = useParticipationImageUpload({
-    participationId: params.id,
-    onSuccess: handleUploadSuccess,
-    onError: handleUploadError,
-  });
-
-  const handleAddPhotos = async (images: File[], comment: string) => {
-    try {
-      await uploadImages(images, comment);
-    } catch (error) {
-      console.error("Error uploading photos:", error);
-    }
-  };
-
-  if (loading) {
-    return <LoadingIndicator message="参加情報を読み込み中..." />;
-  }
-
+  if (loading) return <LoadingIndicator message="参加情報を読み込み中..." />;
   if (error || !opportunity || !participation) {
     return <ErrorState message="参加情報の読み込みに失敗しました。" />;
   }
 
-  const participationSlot = participation.node.reservation?.opportunitySlot;
-  const startTime = participationSlot?.startsAt ? new Date(participationSlot.startsAt) : new Date();
-  const endTime = participationSlot?.endsAt ? new Date(participationSlot.endsAt) : new Date();
-  const participantCount = participation.node.reservation?.participations?.length || 0;
-  
-  const cancellationDeadline = calculateCancellationDeadline(startTime);
-  
-  const isCancellable = false;
-
   return (
     <div className="max-w-2xl mx-auto p-4 pb-[120px]">
-      {/* Success message */}
-      {uploadSuccess && (
-        <NotificationMessage
-          type="success"
-          title="写真が正常にアップロードされました"
-        />
-      )}
-
-      {/* Error message */}
-      {uploadError && (
-        <NotificationMessage
-          type="error"
-          title="写真のアップロードに失敗しました"
-          message={uploadError}
-        />
-      )}
-
-      {/* Status notification */}
-      {currentStatus && (
-        <ParticipationStatusNotification
-          status={currentStatus.status}
-          statusText={currentStatus.statusText}
-          statusSubText={currentStatus.statusSubText}
-          statusClass={currentStatus.statusClass}
-        />
-      )}
-      
-      {/* Header section */}
-      <ParticipationHeader opportunity={opportunity} />
-      
-      {/* Details section */}
-      <ParticipationDetails
-        opportunity={opportunity}
-        participation={participation}
-        startTime={startTime}
-        endTime={endTime}
-        participantCount={participantCount}
-      />
-      
-      {/* Image gallery section */}
-      {participation?.node?.images && participation.node.images.length > 0 && (
-        <ParticipationImageGallery
-          images={participation.node.images}
-          onViewAllImages={() => console.log(`残りの画像枚数: ${Math.max(0, participation.node.images?.length ?? 0 - 3)}枚`)}
-        />
-      )}
-      
-      {/* Actions section */}
-      <ParticipationActions
-        opportunity={opportunity}
-        participation={participation}
-        cancellationDeadline={cancellationDeadline}
-        isCancellable={isCancellable}
-        isUploading={isUploading}
-        onAddPhotos={handleAddPhotos}
-      />
+      <ParticipationContent opportunity={opportunity} participation={participation} {...rest} />
     </div>
   );
 }

@@ -9,64 +9,37 @@ export const SEARCH_OPPORTUNITIES = gql`
       filter: $filter
       first: $first
     ) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
       edges {
+        cursor
         node {
-          id
-          title
-          description
-          category
-          capacity
+          ...OpportunityFields
           community {
-            id
-            name
-            image
+           ...CommunityFields
           }
-          pointsToEarn
-          feeRequired
-          requireApproval
-          publishStatus
-          images
-          createdAt
-          updatedAt
           place {
-            id
-            name
-            address
-            latitude
-            longitude
-            city {
-              name
-              state {
-                name
-              }
-            }
+            ...PlaceFields
           }
           slots {
-            id
-            startsAt
-            endsAt
-            remainingCapacity
+            ...OpportunitySlotFields
             reservations {
-              status
+              ...ReservationFields
               participations {
-                id
-                status
-                images
+                ...ParticipationFields
                 user {
-                  id
-                  name
-                  image
+                  ...UserFields
                 }
               }
             }
           }
         }
       }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      totalCount
     }
   }
 `; 

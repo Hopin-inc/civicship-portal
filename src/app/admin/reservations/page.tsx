@@ -1,7 +1,7 @@
 "use client";
 
-import { useHeaderConfig } from "@/hooks/core";
 import { useMemo } from "react";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function ReservationsPage() {
   const headerConfig = useMemo(() => ({

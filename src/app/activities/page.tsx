@@ -1,60 +1,75 @@
-'use client'
+"use client";
 
-import { useEffect, useMemo } from 'react'
-import { useLoading } from '@/hooks/core/useLoading'
-import { useActivities } from '@/hooks/features/activity/useActivities'
-import { useHeaderConfig } from '@/hooks/core/useHeaderConfig'
-import ActivitiesFeaturedSection from '@/components/features/activity/ActivitiesFeaturedSection'
-import ActivitiesUpcomingSection from '@/components/features/activity/ActivitiesUpcomingSection'
-import ActivitiesAllSection from '@/components/features/activity/ActivitiesAllSection'
-import { ErrorState } from "@/components/shared/ErrorState"
+import { useEffect, useMemo } from "react";
+import { useLoading } from "@/hooks/useLoading";
+import { useActivities } from "@/app/activities/hooks/useActivities";
+import ActivitiesFeaturedSection from "@/app/activities/components/FeaturedSection/FeaturedSection";
+import ActivitiesListSection from "@/app/activities/components/ListSection/ListSection";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { GqlOpportunity, GqlOpportunityEdge } from "@/types/graphql";
-import { presenterActivityCard } from "@/presenters/opportunity";
-import { ActivityCard } from "@/types/opportunity";
+import { ActivityCard } from "@/app/activities/data/type";
+import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
+import { presenterActivityCard, sliceActivitiesBySection } from "@/app/activities/data/presenter";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
   edges
-    .map(edge => edge.node)
+    .map((edge) => edge.node)
     .filter((node): node is GqlOpportunity => !!node)
     .map(presenterActivityCard);
 
 export default function ActivitiesPage() {
-  const { setIsLoading } = useLoading()
+  const { setIsLoading } = useLoading();
 
-  const headerConfig = useMemo(() => ({
-    showLogo: true,
-    showSearchForm: true
-  }), [])
+  const headerConfig = useMemo(
+    () => ({
+      showLogo: true,
+      showSearchForm: true,
+    }),
+    [],
+  );
   useHeaderConfig(headerConfig);
 
-  const {
-    upcomingActivities,
-    featuredActivities,
-    allActivities,
-    loading,
-    error,
-    loadMoreRef
-  } = useActivities()
+  const { opportunities, loading, error, loadMoreRef } =
+    useActivities();
+
+  const isInitialLoading = loading && !opportunities?.edges?.length
+  const isSectionLoading = loading && !isInitialLoading;
 
   useEffect(() => {
-    setIsLoading(loading && !upcomingActivities?.edges?.length)
-  }, [loading, upcomingActivities, setIsLoading])
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
-  if (error) return <ErrorState message={`Error: ${error.message}`} />
+  useEffect(() => {
+    setIsLoading(isInitialLoading);
+  }, [isInitialLoading, setIsLoading]);
 
-  const featuredCards = mapOpportunityCards(featuredActivities.edges);
-  const upcomingCards = mapOpportunityCards(upcomingActivities.edges);
-  const allCards = mapOpportunityCards(allActivities.edges);
+  if (error) return <ErrorState message={`Error: ${error.message}`} />;
+
+  const activityCards = mapOpportunityCards(opportunities.edges);
+  const {
+    upcomingCards,
+    featuredCards,
+    listCards
+  } = sliceActivitiesBySection(activityCards);
 
   return (
     <div className="min-h-screen pb-16">
-      <ActivitiesFeaturedSection opportunities={featuredCards} />
-      <ActivitiesUpcomingSection opportunities={upcomingCards} />
-      <ActivitiesAllSection
-        opportunities={allCards}
+      <ActivitiesFeaturedSection
+        opportunities={featuredCards}
+        isInitialLoading={isInitialLoading}
+      />
+      <ActivitiesCarouselSection
+        title="もうすぐ開催予定"
+        opportunities={upcomingCards}
+        isInitialLoading={isInitialLoading}
+      />
+      <ActivitiesListSection
+        opportunities={listCards}
         loadMoreRef={loadMoreRef}
-        isLoading={loading}
+        isInitialLoading={isInitialLoading}
+        isSectionLoading={isSectionLoading}
       />
     </div>
-  )
+  );
 }

@@ -1,34 +1,27 @@
-'use client';
+"use client";
 
-import { useMemo } from 'react';
-import { ErrorState } from '@/components/shared/ErrorState';
-import { ArticleList } from '@/components/features/article/ArticleList';
-import { ArticleLoadingIndicator } from '@/components/features/article/ArticleLoadingIndicator';
-import { useArticles } from '@/hooks/features/article/useArticles';
-import { useHeaderConfig } from '@/hooks/core/useHeaderConfig';
+import { useMemo } from "react";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { ArticleList } from "@/app/articles/components/ArticleList";
+import { useArticles } from "@/app/articles/hooks/useArticles";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function ArticlesPage() {
-  const headerConfig = useMemo(() => ({
-    title: "記事一覧",
-    showBackButton: true,
-    showLogo: false,
-  }), []);
+  const headerConfig = useMemo(
+    () => ({
+      title: "記事一覧",
+      showBackButton: true,
+      showLogo: false,
+    }),
+    [],
+  );
   useHeaderConfig(headerConfig);
 
-  const {
-    articles,
-    loading,
-    initialLoading,
-    error,
-    loadMoreRef,
-    hasMore,
-  } = useArticles();
+  const { articles, loading, initialLoading, error, loadMoreRef, hasMore } = useArticles();
 
   if (initialLoading) {
-    return (
-      <LoadingIndicator/>
-    );
+    return <LoadingIndicator />;
   }
 
   if (error) {
@@ -41,7 +34,7 @@ export default function ArticlesPage() {
       <ArticleList articles={articles} />
       {hasMore && (
         <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
-          {loading && <ArticleLoadingIndicator size="small" />}
+          {loading && <LoadingIndicator />}
         </div>
       )}
     </div>
