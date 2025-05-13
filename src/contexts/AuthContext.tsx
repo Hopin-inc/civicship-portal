@@ -218,7 +218,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (isPhoneVerified || checkPhoneVerified()) {
             router.push("/sign-up");
           } else {
-            router.push("/phone-verification");
+            router.push("/sign-up/phone-verification");
           }
         }
       } else {
