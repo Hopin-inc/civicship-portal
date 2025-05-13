@@ -23,7 +23,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory }) => {
                 <CategoryBadge category={article.category} />
               </div>
             )}
-            <Image src={article.thumbnail} alt={article.title} fill className="object-cover" />
+            <Image src={article.thumbnail} alt={article.title} fill className="object-cover rounded-t-lg" />
           </div>
         )}
         {/* #NOTE: CardContent の padding では上部がなく、かつ余白も大きかったので、他 component への影響を踏まえて、自前で設定 */}
