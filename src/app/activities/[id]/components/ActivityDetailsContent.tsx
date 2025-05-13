@@ -50,7 +50,7 @@ const ActivityDetailsContent = ({
 };
 
 const ActivityBodySection = ({ body }: { body: string }) => (
-  <section className="mb-12">
+  <section className="py-6 mt-0">
     <h2 className="text-2xl font-bold mb-4">体験できること</h2>
     <p className="text-foreground whitespace-pre-wrap">{body}</p>
   </section>

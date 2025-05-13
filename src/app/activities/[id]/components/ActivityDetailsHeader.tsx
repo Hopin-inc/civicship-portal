@@ -68,8 +68,8 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
   };
 
   return (
-    <div className="relative w-full bg-background rounded-b-3xl shadow-md pb-6 max-w-mobile-l mx-auto">
-      <div className="relative h-[480px] overflow-hidden mb-8 mx-[-1rem] sm:mx-[-1.5rem] md:mx-[-2rem]">
+    <div className="relative w-full bg-background pb-6 max-w-mobile-l mx-auto">
+      <div className="relative h-[480px] overflow-hidden mb-6 mx-[-1rem] sm:mx-[-1.5rem] md:mx-[-2rem]">
         <div
           className="embla h-full relative"
           ref={emblaRef}
@@ -109,20 +109,24 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
         </div>
       </div>
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">{opportunity.title}</h1>
+      <div className="">
+        <h1 className="text-display-lg mb-4">{opportunity.title}</h1>
         <div className="flex flex-wrap gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-start gap-2">
             <MapPin className="h-5 w-5 text-muted-foreground" />
-            <span>{opportunity.place?.name || "場所未定"}</span>
+            <div className="flex flex-col -mt-1">
+              <span className="text-body-md">{opportunity.place?.name || "場所未定"}</span>
+              <span className="text-body-sm text-caption">{opportunity.place?.address}</span>
+            </div>
           </div>
         </div>
       </div>
 
       {opportunity.reservableTickets.length > 0 && availableTickets > 0 && (
-        <div className="flex items-center gap-2 bg-[#EEF0FF] rounded-lg px-4 py-3">
-          <Ticket className="w-5 h-5 text-[#4361EE]" />
-          <p className="text-[#4361EE] font-medium">利用できるチケット {availableTickets}枚</p>
+        <div className="flex items-center gap-2 bg-[#EEF0FF] rounded-lg px-4 py-3 mt-4">
+          <Ticket className="w-5 h-5 text-primary" />
+          <p className="text-primary text-label-md">利用できるチケット</p>
+          <p className="text-primary text-label-md font-bold">{availableTickets}枚</p>
         </div>
       )}
     </div>
