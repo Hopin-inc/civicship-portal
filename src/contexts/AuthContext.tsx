@@ -24,7 +24,7 @@ type AuthContextType = UserInfo & {
   logout: () => Promise<void>;
   loginWithLiff: () => Promise<void>;
   isAuthenticating: boolean;
-  createUser: (name: string, currentPrefecture: GqlCurrentPrefecture) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
+  createUser: (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
   
   phoneNumber: string | null;
   phoneAuth: {
