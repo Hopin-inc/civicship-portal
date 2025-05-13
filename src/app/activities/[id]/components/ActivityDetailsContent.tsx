@@ -42,7 +42,7 @@ const ActivityDetailsContent = ({
       />
       <NoticeSection requiredApproval={opportunity.requiredApproval} />
       <SameStateActivities
-        header={"近くの体験"}
+        header={"近くでおすすめの体験"}
         opportunities={sameStateActivities}
         currentOpportunityId={opportunity.id}
       />
