@@ -11,6 +11,7 @@ export const USER_SIGN_UP = gql(`
   }
 `);
 
+
 export const LINK_PHONE_AUTH = gql(`
   mutation linkPhoneAuth($input: LinkPhoneAuthInput!, $permission: CheckIsSelfPermissionInput!) {
     linkPhoneAuth(input: $input, permission: $permission) {
