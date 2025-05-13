@@ -86,9 +86,9 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
   if (!host) return null;
 
   return (
-    <section className="py-6 mt-0 bg-background-hover -mx-4 px-4">
+    <section className="pt-6 pb-8 mt-0 bg-background-hover -mx-4 px-4">
       <h2 className="text-display-md text-foreground mb-4">案内人</h2>
-      <div className="rounded-xl flex flex-col gap-6">
+      <div className="rounded-xl flex flex-col gap-4">
         <div className="flex items-center gap-4">
           <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
             <Image
