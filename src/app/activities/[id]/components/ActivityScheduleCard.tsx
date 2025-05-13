@@ -35,7 +35,7 @@ const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            <p className="text-body-md font-bold">¥{slot.feeRequired?.toLocaleString()}</p>
+            <p className="text-body-md font-bold">{slot.feeRequired?.toLocaleString()}円</p>
             <p className="text-body-sm ml-1 text-caption">/ 人</p>
           </div>
         </div>
