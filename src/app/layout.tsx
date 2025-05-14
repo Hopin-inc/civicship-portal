@@ -9,6 +9,7 @@ import { LiffProvider } from "@/contexts/LiffContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
+import AnalyticsProvider from "@/components/providers/VireAnalytics";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -64,8 +65,10 @@ const RootLayout = ({
               <AuthProvider>
                 <HeaderProvider>
                   <LoadingProvider>
-                    <MainContent>{children}</MainContent>
-                    <Toaster richColors className="mx-8" />
+                    <AnalyticsProvider>
+                      <MainContent>{children}</MainContent>
+                      <Toaster richColors className="mx-8" />
+                    </AnalyticsProvider>
                   </LoadingProvider>
                 </HeaderProvider>
               </AuthProvider>
