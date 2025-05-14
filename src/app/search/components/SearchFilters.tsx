@@ -1,112 +1,109 @@
+"use client";
+
 import React from "react";
-import { MapPin, Calendar as CalendarIcon, Users, Tags, ChevronRight } from "lucide-react";
-import { SearchFilterType, Prefecture } from "@/app/search/hooks/useSearch";
+import { useFormContext } from "react-hook-form";
+import { MapPin, Calendar as CalendarIcon, Users, Tags } from "lucide-react";
+import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { DateRange } from "react-day-picker";
-import { Button } from "@/components/ui/button";
+import { FormItem, FormField, FormControl } from "@/components/ui/form";
+import FilterButton from "@/app/search/components/Button";
 
 interface SearchFiltersProps {
+  onFilterClick: (filter: SearchFilterType) => void;
+  formatDateRange: (range: DateRange | undefined) => string;
+  prefectureLabels: Record<string, string>;
   location: string;
   dateRange: DateRange | undefined;
   guests: number;
   useTicket: boolean;
-  onFilterClick: (filter: SearchFilterType) => void;
-  formatDateRange: (range: DateRange | undefined) => string;
-  prefectures: Prefecture[];
 }
 
-/**
- * Component for displaying search filters
- */
-export const SearchFilters: React.FC<SearchFiltersProps> = ({
+const SearchFilters: React.FC<SearchFiltersProps> = ({
+  onFilterClick,
+  formatDateRange,
+  prefectureLabels,
   location,
   dateRange,
   guests,
   useTicket,
-  onFilterClick,
-  formatDateRange,
-  prefectures,
 }) => {
+  const { control } = useFormContext();
+
   return (
     <div className="bg-background rounded-2xl shadow-sm border border-input divide-y divide-input">
-      <Button
-        onClick={() => onFilterClick("location")}
-        variant="tertiary"
-        className="w-full px-4 py-4 flex items-center justify-between"
-      >
-        <div className="flex items-center space-x-4">
-          <MapPin className="h-6 w-6 text-muted-foreground" />
-          <span
-            className={`text-base ${location ? "text-foreground font-medium" : "text-muted-foreground"}`}
-          >
-            場所
-          </span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-base">
-            {location ? prefectures.find((p) => p.id === location)?.name : "場所を指定"}
-          </span>
-          <ChevronRight className="h-5 w-5 text-gray-400" />
-        </div>
-      </Button>
+      <FormField
+        control={control}
+        name="location"
+        render={() => (
+          <FormItem>
+            <FormControl>
+              <FilterButton
+                icon={<MapPin className="h-6 w-6 text-muted-foreground" />}
+                label="場所"
+                value={location ? (prefectureLabels[location] ?? "不明な場所") : "場所を指定"}
+                active={!!location}
+                onClick={() => onFilterClick("location")}
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
 
-      <Button
-        onClick={() => onFilterClick("date")}
-        variant="tertiary"
-        className="w-full px-4 py-4 flex items-center justify-between"
-      >
-        <div className="flex items-center space-x-4">
-          <CalendarIcon className="h-6 w-6 text-gray-400" />
-          <span
-            className={`text-base ${dateRange?.from ? "text-gray-900 font-medium" : "text-gray-400"}`}
-          >
-            日付
-          </span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-base">
-            {dateRange?.from ? formatDateRange(dateRange) : "日付を追加"}
-          </span>
-          <ChevronRight className="h-5 w-5 text-gray-400" />
-        </div>
-      </Button>
+      <FormField
+        control={control}
+        name="dateRange"
+        render={() => (
+          <FormItem>
+            <FormControl>
+              <FilterButton
+                icon={<CalendarIcon className="h-6 w-6 text-muted-foreground" />}
+                label="日付"
+                value={dateRange?.from ? formatDateRange(dateRange) : "日付を追加"}
+                active={!!dateRange?.from}
+                onClick={() => onFilterClick("date")}
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
 
-      <Button
-        onClick={() => onFilterClick("guests")}
-        variant="tertiary"
-        className="w-full px-4 py-4 flex items-center justify-between"
-      >
-        <div className="flex items-center space-x-4">
-          <Users className="h-6 w-6 text-gray-400" />
-          <span
-            className={`text-base ${guests > 0 ? "text-gray-900 font-medium" : "text-gray-400"}`}
-          >
-            人数
-          </span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-base">{guests > 0 ? `${guests}人` : "人数を指定"}</span>
-          <ChevronRight className="h-5 w-5 text-gray-400" />
-        </div>
-      </Button>
+      <FormField
+        control={control}
+        name="guests"
+        render={() => (
+          <FormItem>
+            <FormControl>
+              <FilterButton
+                icon={<Users className="h-6 w-6 text-muted-foreground" />}
+                label="人数"
+                value={guests > 0 ? `${guests}人` : "人数を指定"}
+                active={guests > 0}
+                onClick={() => onFilterClick("guests")}
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
 
-      <Button
-        onClick={() => onFilterClick("other")}
-        variant="tertiary"
-        className="w-full px-4 py-4 flex items-center justify-between"
-      >
-        <div className="flex flex-col space-y-1">
-          <div className="flex items-center space-x-4">
-            <Tags className="h-6 w-6 text-gray-400" />
-            <span
-              className={`text-base ${useTicket ? "text-gray-900 font-medium" : "text-gray-400"}`}
-            >
-              その他の条件
-            </span>
-          </div>
-          {useTicket && <div className="pl-10 text-base">チケットで支払える</div>}
-        </div>
-        <ChevronRight className="h-5 w-5 text-gray-400" />
-      </Button>
+      <FormField
+        control={control}
+        name="useTicket"
+        render={() => (
+          <FormItem>
+            <FormControl>
+              <FilterButton
+                icon={<Tags className="h-6 w-6 text-muted-foreground" />}
+                label="その他の条件"
+                value={useTicket ? "チケットで支払える" : ""}
+                active={useTicket}
+                onClick={() => onFilterClick("other")}
+              >
+                {useTicket && <div className="pl-10 text-base">チケットで支払える</div>}
+              </FilterButton>
+            </FormControl>
+          </FormItem>
+        )}
+      />
     </div>
   );
 };

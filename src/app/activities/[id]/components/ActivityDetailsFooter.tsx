@@ -17,17 +17,19 @@ const ActivityDetailsFooter: React.FC<ActivityDetailsFooterProps> = ({
     <footer className="fixed bottom-0 left-0 right-0 bg-background border-t">
       <div className="max-w-lg mx-auto px-4 h-16 flex items-center justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">1人あたり</p>
-          <p className="text-xl font-bold">¥{price.toLocaleString()}</p>
+          <p className="text-body-sm text-muted-foreground">1人あたり</p>
+          <p className="text-bodylg font-bold">{price.toLocaleString()}円〜</p>
         </div>
         <Link
           href={`/reservation/select-date?id=${opportunityId}`}
         >
+          {/* #TODO: 日付選択画面への接続 */}
           <Button
             variant="primary"
-            className="px-8 py-3 rounded-lg font-medium"
+            size="md"
+            className="px-6"
           >
-            予約する
+            日付を選択
           </Button>
         </Link>
       </div>

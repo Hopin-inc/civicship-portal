@@ -1,7 +1,13 @@
-'use client';
+"use client";
 
 import { GqlCurrentPrefecture, GqlPortfolio, GqlUser } from "@/types/graphql";
-import { AppPortfolio, AppUser, AppUserSelf, GeneralUserProfile, ManagerProfile } from "@/app/users/data/type";
+import {
+  AppPortfolio,
+  AppUser,
+  AppUserSelf,
+  GeneralUserProfile,
+  ManagerProfile,
+} from "@/app/users/data/type";
 import { presenterUserAsset } from "@/app/wallets/data/presenter";
 import { Participant } from "@/types/utils";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
@@ -26,7 +32,9 @@ export const presenterManagerProfile = (gqlUser: GqlUser): ManagerProfile => {
   return {
     ...presenterAppUser(gqlUser),
     asset: presenterUserAsset(gqlUser.wallets?.[0]),
-    currentlyHiringOpportunities: (gqlUser.opportunitiesCreatedByMe ?? []).map(presenterActivityCard),
+    currentlyHiringOpportunities: (gqlUser.opportunitiesCreatedByMe ?? []).map(
+      presenterActivityCard,
+    ),
   };
 };
 
@@ -65,13 +73,13 @@ export const presentParticipant = (gqlParticipant: GqlUser): Participant => {
 };
 
 export const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
-  [GqlCurrentPrefecture.Kagawa]: '香川県',
-  [GqlCurrentPrefecture.Tokushima]: '徳島県',
-  [GqlCurrentPrefecture.Kochi]: '高知県',
-  [GqlCurrentPrefecture.Ehime]: '愛媛県',
-  [GqlCurrentPrefecture.OutsideShikoku]: '四国以外',
-  [GqlCurrentPrefecture.Unknown]: '不明',
-} as const;
+  [GqlCurrentPrefecture.Kagawa]: "香川県",
+  [GqlCurrentPrefecture.Tokushima]: "徳島県",
+  [GqlCurrentPrefecture.Kochi]: "高知県",
+  [GqlCurrentPrefecture.Ehime]: "愛媛県",
+  [GqlCurrentPrefecture.OutsideShikoku]: "四国以外",
+  [GqlCurrentPrefecture.Unknown]: "不明",
+};
 
 export const prefectureOptions = [
   GqlCurrentPrefecture.Kagawa,

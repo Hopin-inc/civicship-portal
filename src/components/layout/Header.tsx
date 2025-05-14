@@ -10,7 +10,7 @@ import LoginModal from "@/app/login/components/LoginModal";
 import { useHeader } from "@/components/providers/HeaderProvider";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { cn } from "@/lib/utils";
-import SearchBox from "../../app/search/components/SearchBox";
+import SearchBox from "@/app/search/components/SearchBox";
 
 interface HeaderProps {
   className?: string;

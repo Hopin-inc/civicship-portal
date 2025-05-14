@@ -3,7 +3,7 @@
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { GqlOpportunityEdge, GqlOpportunity as GraphQLOpportunity } from "@/types/graphql";
+import { GqlOpportunity as GraphQLOpportunity, GqlOpportunityEdge } from "@/types/graphql";
 import { ActivityCard } from "@/app/activities/data/type";
 
 export interface SearchParams {

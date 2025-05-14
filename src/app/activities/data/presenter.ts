@@ -9,11 +9,7 @@ import {
   GqlUser,
   Maybe,
 } from "@/types/graphql";
-import {
-  ActivityCard,
-  ActivityDetail,
-  OpportunityHost,
-} from "@/app/activities/data/type";
+import { ActivityCard, ActivityDetail, OpportunityHost } from "@/app/activities/data/type";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter/place";
@@ -45,7 +41,6 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
 
   return {
     communityId: data.community?.id || "",
-
     id: data.id,
     title: data.title,
     description: data.description || "",
@@ -102,14 +97,13 @@ function presenterActivitySlot(
 }
 
 export const sliceActivitiesBySection = (
-  activityCards: ActivityCard[]
+  activityCards: ActivityCard[],
 ): {
   upcomingCards: ActivityCard[];
   featuredCards: ActivityCard[];
   listCards: ActivityCard[];
 } => {
-  const safe = <T>(cards: (T | undefined)[]): T[] =>
-    cards.filter((c): c is T => !!c);
+  const safe = <T>(cards: (T | undefined)[]): T[] => cards.filter((c): c is T => !!c);
 
   const N = activityCards.length;
 
@@ -124,17 +118,13 @@ export const sliceActivitiesBySection = (
     const featuredCards = safe([featuredHead]);
 
     const upcomingCards = safe(
-      activityCards
-        .slice(1, 1 + maxUpcoming)
-        .map((card, i) => {
-          usedIndices.add(i + 1);
-          return card;
-        })
+      activityCards.slice(1, 1 + maxUpcoming).map((card, i) => {
+        usedIndices.add(i + 1);
+        return card;
+      }),
     );
 
-    const listCards = safe(
-      activityCards.filter((_, idx) => !usedIndices.has(idx))
-    );
+    const listCards = safe(activityCards.filter((_, idx) => !usedIndices.has(idx)));
 
     return { upcomingCards, featuredCards, listCards };
   }
@@ -152,5 +142,3 @@ export const sliceActivitiesBySection = (
 
   return { upcomingCards, featuredCards, listCards };
 };
-
-

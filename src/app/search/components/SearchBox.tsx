@@ -1,59 +1,61 @@
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
-import { Search, Calendar, Users } from 'lucide-react'
-import { format } from 'date-fns'
-import { ja } from 'date-fns/locale'
-import { Button } from '@/components/ui/button'
+import { useRouter } from "next/navigation";
+import { Search, Calendar, Users } from "lucide-react";
+import { format } from "date-fns";
+import { ja } from "date-fns/locale";
+import { Button } from "@/components/ui/button";
 
 interface SearchFormProps {
-  location?: string
-  from?: string
-  to?: string
-  guests?: string
+  location?: string;
+  from?: string;
+  to?: string;
+  guests?: string;
 }
 
-const SearchForm = ({ location, from, to, guests }: SearchFormProps) => {
-  const router = useRouter()
+const PREFECTURE_LABELS: Record<string, string> = {
+  KAGAWA: "香川県",
+  TOKUSHIMA: "徳島県",
+  KOUCHI: "高知県",
+  EHIME: "愛媛県",
+};
+const DEFAULT_LABEL = "場所を選択";
 
-  const getLocationText = () => {
-    if (!location) return ''
-    const prefMap: { [key: string]: string } = {
-      kagawa: '香川県',
-      tokushima: '徳島県',
-      kochi: '高知県',
-      ehime: '愛媛県',
-    }
-    return `${prefMap[location] || '場所を選択'}の体験`
-  }
+const SearchBox = ({ location, from, to, guests }: SearchFormProps) => {
+  const router = useRouter();
+
+  const getLocationText = (location?: string): string => {
+    const label = PREFECTURE_LABELS[location ?? ""] ?? DEFAULT_LABEL;
+    return `${label}の体験`;
+  };
 
   const formatDateRange = () => {
-    const fromDate = from ? new Date(from) : null
-    const toDate = to ? new Date(to) : null
-    
-    if (!fromDate) return '日付未定'
+    const fromDate = from ? new Date(from) : null;
+    const toDate = to ? new Date(to) : null;
+
+    if (!fromDate) return "日付未定";
     if (!toDate) {
-      return format(fromDate, 'M/d', { locale: ja })
+      return format(fromDate, "M/d", { locale: ja });
     }
-    return `${format(fromDate, 'M/d', { locale: ja })}〜${format(toDate, 'M/d', { locale: ja })}`
-  }
+    return `${format(fromDate, "M/d", { locale: ja })}〜${format(toDate, "M/d", { locale: ja })}`;
+  };
 
   const getGuestsText = () => {
-    if (!guests) return '人数未定'
-    return `${guests}人`
-  }
+    if (!guests) return "人数未定";
+    return `${guests}人`;
+  };
 
   const handleClick = () => {
-    const params = new URLSearchParams()
-    if (location) params.set('location', location)
-    if (from) params.set('from', from)
-    if (to) params.set('to', to)
-    if (guests) params.set('guests', guests)
-    
-    router.push(`/search${params.toString() ? `?${params.toString()}` : ''}`)
-  }
+    const params = new URLSearchParams();
+    if (location) params.set("location", location);
+    if (from) params.set("from", from);
+    if (to) params.set("to", to);
+    if (guests) params.set("guests", guests);
 
-  const hasAnyCondition = location || from || to || guests
+    router.push(`/search${params.toString() ? `?${params.toString()}` : ""}`);
+  };
+
+  const hasAnyCondition = location || from || to || guests;
 
   return (
     <Button
@@ -85,7 +87,7 @@ const SearchForm = ({ location, from, to, guests }: SearchFormProps) => {
         </div>
       )}
     </Button>
-  )
-}
+  );
+};
 
-export default SearchForm
+export default SearchBox;
