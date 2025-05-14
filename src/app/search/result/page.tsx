@@ -25,7 +25,7 @@ export default function SearchResultPage({ searchParams = {} }: SearchResultPage
     useSearchResults(searchParams);
   return (
     <div className="min-h-screen">
-      <main className="pt-20 px-4 pb-24">
+      <main className="px-6 pb-6">
         {loading ? (
           <LoadingIndicator />
         ) : error ? (
@@ -37,7 +37,7 @@ export default function SearchResultPage({ searchParams = {} }: SearchResultPage
           Object.keys(groupedOpportunities).length === 0 ? (
           <EmptySearchResults searchQuery={searchParams.q} />
         ) : (
-          <div className="space-y-12">
+          <div>
             <ActivitiesCarouselSection
               title={"おすすめの体験"}
               opportunities={recommendedOpportunities}

@@ -7,12 +7,12 @@ import { useEffect, useState } from "react";
 import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import CategoryBadge from "../../components/CategoryBadge";
 import { ArticleRecommendations } from "./ArticleRecommendations";
-import { TArticleCard, TArticleDetail } from "@/app/articles/data/type";
+import { TArticleDetail, TArticleWithAuthor } from "@/app/articles/data/type";
 import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
 
 type ArticleDetailProps = {
   article: TArticleDetail;
-  recommendedArticles?: TArticleCard[];
+  recommendedArticles?: TArticleWithAuthor[];
 };
 
 const ArticleDetail = ({ article, recommendedArticles }: ArticleDetailProps) => {

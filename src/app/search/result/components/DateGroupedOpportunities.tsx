@@ -20,13 +20,13 @@ export const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> =
   );
 
   return (
-    <section className="mt-8">
-      <h2 className="text-xl font-bold mb-4">日付別の体験</h2>
+    <section>
       {sortedEntries.map(([dateKey, opportunities]) => (
         <ActivitiesCarouselSection
           key={dateKey}
-          title={format(new Date(dateKey), "M月d日（E）", { locale: ja })}
+          title={format(new Date(dateKey), "M/d(E)", { locale: ja })}
           opportunities={opportunities}
+          isSearchResult={true}
         />
       ))}
     </section>
