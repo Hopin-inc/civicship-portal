@@ -10,12 +10,13 @@ export const usePlaces = () => {
   const { data, loading, error } = useGetMembershipListQuery({
     variables: {
       filter: {
-        status: "JOINED",
-        role: "MANAGER",
+        //TODO 今後の拡張性で追加予定
+        // status: "JOINED",
+        // role: "MANAGER",
       },
     },
   });
-  
+
   const { setIsLoading } = useLoading();
   const router = useRouter();
   const searchParams = useSearchParams();
