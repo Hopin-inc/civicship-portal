@@ -3,11 +3,11 @@
 import React from "react";
 import { useSearchResults } from "@/app/search/hooks/useSearchResults";
 import { SearchResultHeader } from "@/app/search/components/SearchResultHeader";
-import { RecommendedOpportunities } from "@/app/search/components/RecommendedOpportunities";
 import { DateGroupedOpportunities } from "@/app/search/components/DateGroupedOpportunities";
 import { EmptySearchResults } from "@/app/search/components/EmptySearchResults";
 import { ErrorState } from "@/components/shared/ErrorState";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
 
 interface SearchResultPageProps {
   searchParams?: {
@@ -45,7 +45,10 @@ export default function Page({ searchParams = {} }: SearchResultPageProps) {
           <EmptySearchResults searchQuery={searchParams.q} />
         ) : (
           <div className="space-y-12">
-            <RecommendedOpportunities opportunities={recommendedOpportunities} />
+            <ActivitiesCarouselSection
+              title={"おすすめの体験"}
+              opportunities={recommendedOpportunities}
+            />
             <DateGroupedOpportunities groupedOpportunities={groupedOpportunities} />
           </div>
         )}
