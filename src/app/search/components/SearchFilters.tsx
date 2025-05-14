@@ -6,7 +6,7 @@ import { MapPin, Calendar as CalendarIcon, Users, Tags } from "lucide-react";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { DateRange } from "react-day-picker";
 import { FormItem, FormField, FormControl } from "@/components/ui/form";
-import FilterButton from "@/app/search/components/Filter/Button";
+import FilterButton from "@/app/search/components/Button";
 
 interface SearchFiltersProps {
   onFilterClick: (filter: SearchFilterType) => void;

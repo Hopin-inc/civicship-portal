@@ -5,14 +5,15 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { buildSearchParams, formatDateRange } from "@/app/search/data/presenter";
-import { SearchTabs, SearchTabType } from "@/app/search/components/Filter/Tabs";
+import { SearchTabs, SearchTabType } from "@/app/search/components/Tabs";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { prefectureLabels } from "@/app/users/data/presenter";
 import { DateRange } from "react-day-picker";
 import { useSearchForm } from "@/app/search/hooks/useSearchForm";
-import SearchForm from "@/app/search/components/Filter/SearchForm";
-import SearchFilters from "@/app/search/components/Filter/SearchFilters";
-import SearchFooter from "@/app/search/components/Filter/Footer";
+import SearchForm from "@/app/search/components/SearchForm";
+import SearchFilters from "@/app/search/components/SearchFilters";
+import SearchFooter from "@/app/search/components/Footer";
+import SearchFilterSheets from "@/app/search/components/SearchFilterSheet";
 
 export default function SearchPage() {
   const headerConfig = useMemo(
@@ -75,7 +76,23 @@ function SearchPageContent({
   prefectureLabels: Record<string, string>;
   router: ReturnType<typeof useRouter>;
 }) {
-  const { location, dateRange, guests, useTicket, getValues, handleClear } = useSearchForm();
+  const {
+    location,
+    dateRange,
+    guests,
+    useTicket,
+    getValues,
+    setValue,
+    handleClear,
+    baseClearActiveFilter,
+  } = useSearchForm();
+
+  const clearActiveFilter = () => {
+    if (activeForm) {
+      baseClearActiveFilter(activeForm);
+    }
+    setActiveForm(null);
+  };
 
   const handleSearch = () => {
     const values = getValues();
@@ -101,6 +118,21 @@ function SearchPageContent({
         dateRange={dateRange}
         guests={guests}
         useTicket={useTicket}
+      />
+      <SearchFilterSheets
+        activeForm={activeForm}
+        setActiveForm={setActiveForm}
+        location={location}
+        setLocation={(val) => setValue("location", val)}
+        dateRange={dateRange}
+        setDateRange={(val) => setValue("dateRange", val)}
+        guests={guests}
+        setGuests={(val) => setValue("guests", val)}
+        useTicket={useTicket}
+        setUseTicket={(val) => setValue("useTicket", val)}
+        clearActiveFilter={clearActiveFilter}
+        getSheetHeight={() => "90vh"}
+        prefectures={Object.entries(prefectureLabels).map(([id, name]) => ({ id, name }))}
       />
       <SearchFooter onClear={handleClear} onSearch={handleSearch} />
     </>

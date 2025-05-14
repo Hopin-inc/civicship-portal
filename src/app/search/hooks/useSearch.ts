@@ -2,7 +2,7 @@ import { useFormContext } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { buildSearchParams, formatDateRange } from "@/app/search/data/presenter";
 import { useState } from "react";
-import { SearchTabType } from "@/app/search/components/Filter/Tabs";
+import { SearchTabType } from "@/app/search/components/Tabs";
 
 export type SearchFilterType = "location" | "date" | "guests" | "other" | null;
 

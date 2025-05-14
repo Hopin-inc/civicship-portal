@@ -22,18 +22,21 @@ const FilterButton: React.FC<FilterButtonProps> = ({
   <Button
     onClick={onClick}
     variant="tertiary"
-    className="w-full px-4 py-4 flex items-center justify-between"
+    className="w-full px-4 py-4 flex items-center justify-between text-left"
   >
-    <div className="flex flex-col space-y-1">
+    <div className="flex flex-col space-y-0.5 flex-1">
       <div className="flex items-center space-x-4">
         {icon}
+        <span className="text-sm text-muted-foreground">{label}</span>
+      </div>
+      <div className="pl-10">
         <span
           className={`text-base ${active ? "text-foreground font-medium" : "text-muted-foreground"}`}
         >
-          {label}
+          {value}
         </span>
+        {children}
       </div>
-      {children}
     </div>
     <ChevronRight className="h-5 w-5 text-gray-400" />
   </Button>

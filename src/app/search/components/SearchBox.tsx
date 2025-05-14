@@ -13,18 +13,20 @@ interface SearchFormProps {
   guests?: string;
 }
 
+const PREFECTURE_LABELS: Record<string, string> = {
+  KAGAWA: "香川県",
+  TOKUSHIMA: "徳島県",
+  KOUCHI: "高知県",
+  EHIME: "愛媛県",
+};
+const DEFAULT_LABEL = "場所を選択";
+
 const SearchBox = ({ location, from, to, guests }: SearchFormProps) => {
   const router = useRouter();
 
-  const getLocationText = () => {
-    if (!location) return "";
-    const prefMap: { [key: string]: string } = {
-      kagawa: "香川県",
-      tokushima: "徳島県",
-      kochi: "高知県",
-      ehime: "愛媛県",
-    };
-    return `${prefMap[location] || "場所を選択"}の体験`;
+  const getLocationText = (location?: string): string => {
+    const label = PREFECTURE_LABELS[location ?? ""] ?? DEFAULT_LABEL;
+    return `${label}の体験`;
   };
 
   const formatDateRange = () => {
