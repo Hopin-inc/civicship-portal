@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import { useSearchResults } from "@/app/search/hooks/useSearchResults";
-import { SearchResultHeader } from "@/app/search/components/SearchResultHeader";
-import { DateGroupedOpportunities } from "@/app/search/components/DateGroupedOpportunities";
-import { EmptySearchResults } from "@/app/search/components/EmptySearchResults";
+import { useSearchResults } from "@/app/search/result/hooks/useSearchResults";
+import { DateGroupedOpportunities } from "@/app/search/result/components/DateGroupedOpportunities";
+import { EmptySearchResults } from "@/app/search/result/components/EmptySearchResults";
 import { ErrorState } from "@/components/shared/ErrorState";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
@@ -21,18 +20,12 @@ interface SearchResultPageProps {
   };
 }
 
-/**
- * Search results page component
- */
-export default function Page({ searchParams = {} }: SearchResultPageProps) {
+export default function SearchResultPage({ searchParams = {} }: SearchResultPageProps) {
   const { recommendedOpportunities, groupedOpportunities, loading, error } =
     useSearchResults(searchParams);
-
   return (
     <div className="min-h-screen">
-      <SearchResultHeader />
-
-      <main className="pt-20 px-4 pb-24">
+      <main className="px-6 pb-6">
         {loading ? (
           <LoadingIndicator />
         ) : error ? (
@@ -44,7 +37,7 @@ export default function Page({ searchParams = {} }: SearchResultPageProps) {
           Object.keys(groupedOpportunities).length === 0 ? (
           <EmptySearchResults searchQuery={searchParams.q} />
         ) : (
-          <div className="space-y-12">
+          <div>
             <ActivitiesCarouselSection
               title={"おすすめの体験"}
               opportunities={recommendedOpportunities}

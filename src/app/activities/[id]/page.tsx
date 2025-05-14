@@ -52,7 +52,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
     <>
       <ActivityNavigationButtons title={opportunity.title} onBack={navigateBack} />
 
-      <main className="min-h-screen pb-24">
+      <main className="min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
           <ActivityDetailsHeader opportunity={opportunity} availableTickets={availableTickets} />
           <ActivityDetailsContent

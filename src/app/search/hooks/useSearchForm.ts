@@ -15,11 +15,11 @@ export function useSearchForm() {
   const handleClear = () => {
     setValue("location", "");
     setValue("dateRange", undefined);
-    setValue("guests", 0);
+    setValue("guests", 1);
     setValue("useTicket", false);
   };
 
-  const clearActiveFilter = (activeForm: SearchFilterType) => {
+  const baseClearActiveFilter = (activeForm: SearchFilterType) => {
     switch (activeForm) {
       case "location":
         setValue("location", "");
@@ -42,7 +42,7 @@ export function useSearchForm() {
     guests,
     useTicket,
     handleClear,
-    clearActiveFilter,
+    baseClearActiveFilter,
     getValues,
     setValue,
   };

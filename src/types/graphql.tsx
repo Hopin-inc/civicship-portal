@@ -354,6 +354,7 @@ export type GqlIdentity = {
 export const GqlIdentityPlatform = {
   Facebook: "FACEBOOK",
   Line: "LINE",
+  Phone: "PHONE",
 } as const;
 
 export type GqlIdentityPlatform = (typeof GqlIdentityPlatform)[keyof typeof GqlIdentityPlatform];
@@ -361,6 +362,16 @@ export type GqlImageInput = {
   alt?: InputMaybe<Scalars["String"]["input"]>;
   caption?: InputMaybe<Scalars["String"]["input"]>;
   file: Scalars["Upload"]["input"];
+};
+
+export type GqlLinkPhoneAuthInput = {
+  phoneUid: Scalars["String"]["input"];
+};
+
+export type GqlLinkPhoneAuthPayload = {
+  __typename?: "LinkPhoneAuthPayload";
+  success: Scalars["Boolean"]["output"];
+  user?: Maybe<GqlUser>;
 };
 
 export type GqlMembership = {
@@ -538,6 +549,7 @@ export type GqlMutation = {
   communityUpdateProfile?: Maybe<GqlCommunityUpdateProfilePayload>;
   evaluationFail?: Maybe<GqlEvaluationCreatePayload>;
   evaluationPass?: Maybe<GqlEvaluationCreatePayload>;
+  linkPhoneAuth?: Maybe<GqlLinkPhoneAuthPayload>;
   membershipAcceptMyInvitation?: Maybe<GqlMembershipSetInvitationStatusPayload>;
   membershipAssignManager?: Maybe<GqlMembershipSetRolePayload>;
   membershipAssignMember?: Maybe<GqlMembershipSetRolePayload>;
@@ -604,6 +616,11 @@ export type GqlMutationEvaluationFailArgs = {
 export type GqlMutationEvaluationPassArgs = {
   input: GqlEvaluationCreateInput;
   permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationLinkPhoneAuthArgs = {
+  input: GqlLinkPhoneAuthInput;
+  permission: GqlCheckIsSelfPermissionInput;
 };
 
 export type GqlMutationMembershipAcceptMyInvitationArgs = {
@@ -924,6 +941,8 @@ export type GqlOpportunityFilterInput = {
   cityCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   communityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   createdByUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  isReservableWithTicket?: InputMaybe<Scalars["Boolean"]["input"]>;
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
   not?: InputMaybe<GqlOpportunityFilterInput>;
   or?: InputMaybe<Array<GqlOpportunityFilterInput>>;
   placeIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
@@ -2047,8 +2066,8 @@ export type GqlUserSignUpInput = {
   currentPrefecture: GqlCurrentPrefecture;
   image?: InputMaybe<GqlImageInput>;
   name: Scalars["String"]["input"];
-  slug?: InputMaybe<Scalars["String"]["input"]>;
   phoneUid?: InputMaybe<Scalars["String"]["input"]>;
+  slug?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type GqlUserSortInput = {
@@ -2267,6 +2286,20 @@ export type GqlUserSignUpMutation = {
   __typename?: "Mutation";
   userSignUp?: {
     __typename?: "CurrentUserPayload";
+    user?: { __typename?: "User"; id: string; name: string } | null;
+  } | null;
+};
+
+export type GqlLinkPhoneAuthMutationVariables = Exact<{
+  input: GqlLinkPhoneAuthInput;
+  permission: GqlCheckIsSelfPermissionInput;
+}>;
+
+export type GqlLinkPhoneAuthMutation = {
+  __typename?: "Mutation";
+  linkPhoneAuth?: {
+    __typename?: "LinkPhoneAuthPayload";
+    success: boolean;
     user?: { __typename?: "User"; id: string; name: string } | null;
   } | null;
 };
@@ -4293,6 +4326,58 @@ export type UserSignUpMutationResult = Apollo.MutationResult<GqlUserSignUpMutati
 export type UserSignUpMutationOptions = Apollo.BaseMutationOptions<
   GqlUserSignUpMutation,
   GqlUserSignUpMutationVariables
+>;
+export const LinkPhoneAuthDocument = gql`
+  mutation linkPhoneAuth($input: LinkPhoneAuthInput!, $permission: CheckIsSelfPermissionInput!) {
+    linkPhoneAuth(input: $input, permission: $permission) {
+      success
+      user {
+        id
+        name
+      }
+    }
+  }
+`;
+export type GqlLinkPhoneAuthMutationFn = Apollo.MutationFunction<
+  GqlLinkPhoneAuthMutation,
+  GqlLinkPhoneAuthMutationVariables
+>;
+
+/**
+ * __useLinkPhoneAuthMutation__
+ *
+ * To run a mutation, you first call `useLinkPhoneAuthMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLinkPhoneAuthMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [linkPhoneAuthMutation, { data, loading, error }] = useLinkPhoneAuthMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useLinkPhoneAuthMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlLinkPhoneAuthMutation,
+    GqlLinkPhoneAuthMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlLinkPhoneAuthMutation, GqlLinkPhoneAuthMutationVariables>(
+    LinkPhoneAuthDocument,
+    options,
+  );
+}
+export type LinkPhoneAuthMutationHookResult = ReturnType<typeof useLinkPhoneAuthMutation>;
+export type LinkPhoneAuthMutationResult = Apollo.MutationResult<GqlLinkPhoneAuthMutation>;
+export type LinkPhoneAuthMutationOptions = Apollo.BaseMutationOptions<
+  GqlLinkPhoneAuthMutation,
+  GqlLinkPhoneAuthMutationVariables
 >;
 export const CurrentUserDocument = gql`
   query currentUser {
