@@ -27,7 +27,7 @@ export const presenterBaseCard = (memberships: GqlMembership[]): BaseCardInfo[] 
   memberships.forEach((membership) => {
     const user = membership.user;
     if (!user) return;
-
+    const relatedArticles = (user.articlesAboutMe || []).map(presenterArticleWithAuthor);
     const host = presenterOpportunityHost(user);
     const hosted = membership.participationView?.hosted;
 
@@ -41,8 +41,8 @@ export const presenterBaseCard = (memberships: GqlMembership[]): BaseCardInfo[] 
         ...pin,
         name: location.placeName,
         address: location.address,
-        headline: membership.headline || "",
-        bio: membership.bio || "",
+        headline: relatedArticles[0].title || "",
+        bio: relatedArticles[0].introduction || "",
         publicOpportunityCount: membership.hostOpportunityCount ?? 0,
         participantCount: hosted.totalParticipantCount ?? 0,
         communityId: membership.community?.id || "",

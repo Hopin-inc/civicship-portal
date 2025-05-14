@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { BaseCardInfo } from "@/app/places/data/type";
 import React from "react";
 import { Map } from "lucide-react";
+import PlaceToggleButton from "@/app/places/components/PlaceToggleButton";
 
 interface PlaceListSheetProps {
   places: BaseCardInfo[];
@@ -40,13 +41,7 @@ export const PlaceListPage: React.FC<PlaceListSheetProps> = ({
             />
           ))}
       </div>
-
-      <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50">
-        <Button onClick={onMapClick} variant="secondary">
-          <span>地図</span>
-          <Map className="w-6 h-6" />
-        </Button>
-      </div>
+      {!selectedPlaceId && <PlaceToggleButton isMapMode={true} onClick={onMapClick} />}
     </div>
   );
 };
