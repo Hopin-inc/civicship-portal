@@ -41,6 +41,13 @@ export const metadata: Metadata = {
     locale: "ja_JP",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "NEO四国88祭",
+    description:
+      "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。心が躍るさまざまな体験を通じて、新しい自分に出会う旅へ。",
+    images: ["/images/ogp.png"],
+  },
 };
 
 const RootLayout = ({
