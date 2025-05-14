@@ -22,26 +22,30 @@ const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
   const endDate = new Date(slot.endsAt);
 
   return (
-    <div className="bg-background rounded-xl border px-10 py-8 w-[280px] h-[316px] flex flex-col">
+    <div className="bg-background rounded-xl border px-6 py-6 w-[280px] flex flex-col">
       <div className="flex-1">
-        <h3 className="text-lg font-bold mb-1">
+        <h3 className="text-title-md font-bold mb-1">
           {format(startDate, "M月d日", { locale: ja })}
-          <span className="text-lg">（{format(startDate, "E", { locale: ja })}）</span>
+          <span className="text-label-sm text-caption">
+            （{format(startDate, "E", { locale: ja })}）
+          </span>
         </h3>
-        <p className="text-md text-muted-foreground mb-4">
+        <p className="text-body-md text-foreground mb-4">
           {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
         </p>
-        <p className="text-md text-muted-foreground mb-4">参加予定 {slot.applicantCount}人</p>
         <div className="space-y-2">
-          <p className="text-lg font-bold">¥{slot.feeRequired?.toLocaleString()}</p>
+          <div className="flex items-baseline">
+            <p className="text-body-md font-bold">{slot.feeRequired?.toLocaleString()}円</p>
+            <p className="text-body-sm ml-1 text-caption">/ 人</p>
+          </div>
         </div>
       </div>
-      <div className="flex justify-center">
+      <div className="flex justify-center mt-6">
         <Link
           href={`/reservation/confirm?id=${opportunityId}&community_id=${communityId}&slot_id=${slot.id}&guests=${slot.applicantCount}`}
         >
-          <Button variant="primary" size="selection">
-            選択
+          <Button variant="primary" size="md" className="px-6">
+            この日程を選択
           </Button>
         </Link>
       </div>
