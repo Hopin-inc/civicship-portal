@@ -87,10 +87,7 @@ const PortfolioCard = ({
 
   return (
     <Link href={linkHref} className="block w-full">
-      <div
-        ref={isLast ? lastRef : undefined}
-        className="rounded-lg overflow-hidden bg-card hover:opacity-90 transition-opacity"
-      >
+      <div ref={isLast ? lastRef : undefined} className="rounded-lg overflow-hidden">
         <div className="relative w-full aspect-[164/205]">
           <Image
             src={portfolio.image ?? "/placeholder-image.png"}
@@ -110,28 +107,25 @@ const PortfolioCard = ({
             <div className="absolute bottom-2 left-2 right-2 z-10">
               <div className="flex items-center justify-between">
                 <ParticipantsList participants={portfolio.participants} size="md" />
-                {portfolio.participants.length > 3 && (
-                  <span className="text-xs text-white bg-black/50 px-2 py-1 rounded-full">
-                    +{Math.max(0, portfolio.participants.length - 3)}
-                  </span>
-                )}
               </div>
             </div>
           )}
         </div>
-        <div className="p-3 space-y-2">
-          <h3 className="font-bold text-sm sm:text-base line-clamp-2">{portfolio.title}</h3>
+        <div className="py-3 space-y-2">
+          <h3 className="text-title-sm line-clamp-2">{portfolio.title}</h3>
           <div className="space-y-1">
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Calendar className="w-3 h-3" />
+            <div className="flex items-center gap-1 text-body-sm text-caption">
+              <Calendar className="w-4 h-4" />
               <span>
                 {portfolio.date}
-                {portfolio.source === "OPPORTUNITY" && " 予定"}
+                <span className="bg-ring pl-1 pr-2 py-0.5 rounded-lg ml-1">
+                  {portfolio.source === "OPPORTUNITY" && " 予定"}
+                </span>
               </span>
             </div>
             {portfolio.location && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <MapPin className="w-3 h-3" />
+              <div className="flex items-center gap-1 text-body-sm text-caption">
+                <MapPin className="w-4 h-4" />
                 <span>{portfolio.location}</span>
               </div>
             )}
@@ -221,7 +215,13 @@ const dummyPortfolios: AppPortfolio[] = [
     image: "/images/activities/activity-placeholder-1.jpg",
     date: "2025-05-15",
     location: "四国",
-    participants: [],
+    participants: [
+      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
+    ],
   },
   {
     id: "2",
@@ -232,8 +232,48 @@ const dummyPortfolios: AppPortfolio[] = [
     image: "/images/activities/activity-placeholder-2.jpg",
     date: "2025-05-15",
     location: "四国",
-    participants: [],
+    participants: [
+      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
+    ],
   },
+  {
+    id: "3",
+    source: "OPPORTUNITY",
+    category: "QUEST",
+    reservationStatus: "CANCELED",
+    title: "体験のタイトル",
+    image: "/images/activities/activity-placeholder-2.jpg",
+    date: "2025-05-15",
+    location: "四国",
+    participants: [
+      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
+    ],
+  },
+  {
+    id: "4",
+    source: "OPPORTUNITY",
+    category: "EVENT",
+    reservationStatus: "REJECTED",
+    title: "体験のタイトル",
+    image: "/images/activities/activity-placeholder-2.jpg",
+    date: "2025-05-15",
+    location: "四国",
+    participants: [
+      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
+    ],
+  }
 ];
 const enableDummyPortfolios = dummyPortfolios.length > 0;
 
