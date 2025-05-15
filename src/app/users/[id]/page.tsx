@@ -41,7 +41,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-3xl">
+    <div className="container mx-auto py-6 max-w-3xl">
       <UserProfileSection
         userId={params.id}
         isLoading={isLoading}

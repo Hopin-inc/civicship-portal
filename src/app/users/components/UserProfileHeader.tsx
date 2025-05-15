@@ -32,7 +32,7 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   socialUrl
 }) => {
   return (
-    <div className="relative bg-white rounded-3xl shadow-sm p-6 max-w-mobile-l mx-auto w-full">
+    <div className="relative bg-white rounded-3xl shadow-sm max-w-mobile-l mx-auto w-full">
       <div className="flex flex-col items-center">
         {/* Profile Image */}
         <div className="flex items-center w-full mb-4">
