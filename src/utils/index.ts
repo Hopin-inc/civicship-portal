@@ -2,6 +2,9 @@ import dayjs from "dayjs";
 
 export const COMMUNITY_ID = "neo88";
 
+export const PLACEHOLDER_IMAGE =
+  "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/placeholder.jpg";
+
 type Name = {
   lastName: string;
   middleName?: string | null;

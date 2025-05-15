@@ -3,11 +3,10 @@ import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { ActivityCard } from "@/app/activities/data/type";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 export default function OpportunityCardVertical({ opportunity }: { opportunity: ActivityCard }) {
   const { id, title, feeRequired, location, images, hasReservableTicket } = opportunity;
-
-  const dummy = "dsdscdscdsvcdsvdsvdfsvdfsvsdfvsdvsdvsdvdsvds";
 
   return (
     <Link href={`/activities/${id}`} className="relative w-[164px] flex-shrink-0">
@@ -18,11 +17,13 @@ export default function OpportunityCardVertical({ opportunity }: { opportunity: 
           </div>
         )}
         <Image
-          src={images?.[0] || "https://images.unsplash.com/photo-1578662996442-48f60103fc96"}
+          src={images?.[0] || PLACEHOLDER_IMAGE}
           alt={title}
           width={400}
           height={400}
           sizes="164px"
+          placeholder={`blur`}
+          blurDataURL={PLACEHOLDER_IMAGE}
           loading="lazy"
           className="h-full w-full object-cover"
         />

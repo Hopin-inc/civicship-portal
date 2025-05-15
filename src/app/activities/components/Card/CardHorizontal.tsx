@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
 import React from "react";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 export function OpportunityCardHorizontal({ opportunity }: { opportunity: ActivityCard }) {
   return (
@@ -14,12 +15,11 @@ export function OpportunityCardHorizontal({ opportunity }: { opportunity: Activi
         <div className="flex overflow-hidden rounded-xl bg-background shadow-lg">
           <div className="relative h-[108px] w-[88px] flex-shrink-0">
             <Image
-              src={
-                opportunity.images?.[0] ??
-                "https://images.unsplash.com/photo-1578662996442-48f60103fc96"
-              }
+              src={opportunity.images?.[0] ?? PLACEHOLDER_IMAGE}
               alt={opportunity.title}
               fill
+              placeholder={`blur`}
+              blurDataURL={PLACEHOLDER_IMAGE}
               className="object-cover rounded-lg"
             />
           </div>

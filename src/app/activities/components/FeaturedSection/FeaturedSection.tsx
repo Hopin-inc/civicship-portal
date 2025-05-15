@@ -6,6 +6,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
 import { OpportunityCardHorizontal } from "@/app/activities/components/Card/CardHorizontal";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface FeaturedSectionProps {
   opportunities: ActivityCard[];
@@ -110,17 +111,18 @@ function OpportunityImageSlider({
       {slideImages.map((img, i) => {
         const isActive = i === index;
         const isPrevious = i === prevIndex;
-        console.log(images);
 
         return (
           <Image
             key={i}
-            src={img ?? "https://images.unsplash.com/photo-1578662996442-48f60103fc96"}
+            src={img ?? PLACEHOLDER_IMAGE}
             alt={`${title} - ${i + 1}`}
             fill
             sizes="(max-width: 480px) 100vw, 480px"
             loading={i === 0 ? "eager" : "lazy"}
             priority={i === 0}
+            placeholder={`blur`}
+            blurDataURL={PLACEHOLDER_IMAGE}
             className={`object-cover transition-opacity duration-1000 ease-in-out ${
               isActive ? "opacity-100" : isPrevious ? "opacity-0" : "hidden"
             }`}
