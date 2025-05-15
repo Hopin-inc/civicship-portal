@@ -1,4 +1,4 @@
-import { History, Calendar, MapPin } from "lucide-react";
+import { Calendar, MapPin, Ellipsis } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import EmptyState from "@/components/shared/EmptyState";
@@ -8,6 +8,7 @@ import OpportunityCardVertical from "@/app/activities/components/Card/CardVertic
 import { ActivityCard } from "@/app/activities/data/type";
 import { AppPortfolio } from "@/app/users/data/type";
 import { GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   userId: string;
@@ -325,7 +326,14 @@ export const UserPortfolioList = ({
       {isSysAdmin && <ActiveOpportunities opportunities={activeOpportunities} />}
 
       <div className="space-y-4">
-        <h2 className="text-display-sm font-semibold text-foreground py-4">これまでの関わり</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-display-sm font-semibold text-foreground py-4">これまでの関わり</h2>
+          {isOwner && (
+            <Button variant="icon-only" size="sm" className="w-8 h-8 p-0">
+              <Ellipsis className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
         {showEmptyState ? (
           <EmptyState {...emptyStateProps} />
         ) : (
