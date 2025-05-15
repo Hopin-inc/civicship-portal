@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Participant } from "@/types/utils";
 
-const MAX_DISPLAY_PARTICIPANTS = 3;
+const MAX_DISPLAY_PARTICIPANTS = 4;
 
 interface ParticipantsListProps {
   participants: Participant[];
@@ -21,7 +21,7 @@ export const ParticipantsList = ({ participants, size = 'sm' }: ParticipantsList
     <div className="flex items-center">
       <div className="flex -space-x-2">
         {displayParticipants.map((participant, index) => (
-          <div 
+          <div
             key={`${participant.id}-${index}`}
             className={`${avatarSize} relative ${index === MAX_DISPLAY_PARTICIPANTS - 1 && remainingCount > 0 ? 'relative' : ''}`}
           >
@@ -41,4 +41,4 @@ export const ParticipantsList = ({ participants, size = 'sm' }: ParticipantsList
       </div>
     </div>
   );
-}; 
+};
