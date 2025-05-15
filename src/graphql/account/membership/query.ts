@@ -1,9 +1,4 @@
 import { gql } from "@apollo/client";
-import { HOSTED_GEO_FRAGMENT, MEMBERSHIP_FRAGMENT } from "@/graphql/account/membership/fragment";
-import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
-import { OPPORTUNITY_FRAGMENT } from "@/graphql/experience/opportunity/fragment";
-import { ARTICLE_FRAGMENT } from "@/graphql/content/article/fragment";
-import { COMMUNITY_FRAGMENT } from "@/graphql/account/community/fragment";
 
 export const GET_SINGLE_MEMBERSHIP = gql`
   query GetSingleMembership($communityId: ID!, $userId: ID!) {
@@ -31,12 +26,6 @@ export const GET_SINGLE_MEMBERSHIP = gql`
       }
     }
   }
-  ${MEMBERSHIP_FRAGMENT}
-  ${HOSTED_GEO_FRAGMENT}
-  ${USER_FRAGMENT}
-  ${ARTICLE_FRAGMENT}
-  ${OPPORTUNITY_FRAGMENT}
-  ${COMMUNITY_FRAGMENT}
 `;
 
 export const GET_MEMBERSHIP_LIST = gql`
@@ -45,6 +34,7 @@ export const GET_MEMBERSHIP_LIST = gql`
     $cursor: MembershipCursorInput
     $filter: MembershipFilterInput
     $sort: MembershipSortInput
+    $IsCard: Boolean! = false
   ) {
     memberships(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
       pageInfo {
@@ -63,23 +53,20 @@ export const GET_MEMBERSHIP_LIST = gql`
               ...HostedGeoFields
             }
           }
-          hostOpportunityCount
+          hostOpportunityCount @include(if: $IsCard)
           user {
-            ...UserFields
-            articlesAboutMe {
+            id
+            image
+            ...UserFields @include(if: $IsCard)
+            articlesAboutMe @include(if: $IsCard) {
               ...ArticleFields
             }
           }
-          community {
+          community @include(if: $IsCard) {
             ...CommunityFields
           }
         }
       }
     }
   }
-  ${MEMBERSHIP_FRAGMENT}
-  ${HOSTED_GEO_FRAGMENT}
-  ${USER_FRAGMENT}
-  ${OPPORTUNITY_FRAGMENT}
-  ${COMMUNITY_FRAGMENT}
 `;

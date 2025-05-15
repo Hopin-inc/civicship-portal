@@ -118,7 +118,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, onClick }) => (
             <strong>{place.publicOpportunityCount}件</strong>の関わり方を募集中
           </span>
         )}
-        <Button size="sm" variant={"primary"}>
+        <Button size="sm" variant="primary" onClick={onClick}>
           もっと見る
         </Button>
       </CardFooter>

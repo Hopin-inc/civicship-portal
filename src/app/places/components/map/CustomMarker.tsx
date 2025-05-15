@@ -84,7 +84,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         const smallY = centerY + mainRadius * 0.5;
 
         const mainImg = new Image();
-        mainImg.src = data.image || PLACEHOLDER_IMAGE;
+        mainImg.src = data.image;
         await drawCircleWithImage(context, mainImg, centerX, centerY, mainRadius, true);
 
         const userImg = new Image();

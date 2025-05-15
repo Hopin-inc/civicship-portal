@@ -2438,6 +2438,7 @@ export type GqlGetMembershipListQueryVariables = Exact<{
   cursor?: InputMaybe<GqlMembershipCursorInput>;
   filter?: InputMaybe<GqlMembershipFilterInput>;
   sort?: InputMaybe<GqlMembershipSortInput>;
+  IsCard?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetMembershipListQuery = {
@@ -2482,8 +2483,8 @@ export type GqlGetMembershipListQuery = {
         user?: {
           __typename?: "User";
           id: string;
-          name: string;
           image?: string | null;
+          name: string;
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           urlFacebook?: string | null;
@@ -4575,6 +4576,7 @@ export const GetMembershipListDocument = gql`
     $cursor: MembershipCursorInput
     $filter: MembershipFilterInput
     $sort: MembershipSortInput
+    $IsCard: Boolean! = false
   ) {
     memberships(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
       pageInfo {
@@ -4593,14 +4595,16 @@ export const GetMembershipListDocument = gql`
               ...HostedGeoFields
             }
           }
-          hostOpportunityCount
+          hostOpportunityCount @include(if: $IsCard)
           user {
-            ...UserFields
-            articlesAboutMe {
+            id
+            image
+            ...UserFields @include(if: $IsCard)
+            articlesAboutMe @include(if: $IsCard) {
               ...ArticleFields
             }
           }
-          community {
+          community @include(if: $IsCard) {
             ...CommunityFields
           }
         }
@@ -4630,6 +4634,7 @@ export const GetMembershipListDocument = gql`
  *      cursor: // value for 'cursor'
  *      filter: // value for 'filter'
  *      sort: // value for 'sort'
+ *      IsCard: // value for 'IsCard'
  *   },
  * });
  */

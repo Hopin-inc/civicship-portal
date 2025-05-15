@@ -1,21 +1,21 @@
 import React from "react";
-import { BaseCardInfo } from "@/app/places/data/type";
+import { BasePin } from "@/app/places/data/type";
 import { MapComponentClient } from "./MapComponentClient";
 
 interface MapComponentProps {
-  places: BaseCardInfo[];
+  placePins: BasePin[];
   selectedPlaceId: string | null;
   onPlaceSelect: (placeId: string) => void;
 }
 
 export default function MapComponent({
-  places,
+  placePins,
   selectedPlaceId,
   onPlaceSelect,
 }: MapComponentProps) {
   return (
     <MapComponentClient
-      places={places}
+      placePins={placePins}
       selectedPlaceId={selectedPlaceId}
       onPlaceSelect={onPlaceSelect}
     />

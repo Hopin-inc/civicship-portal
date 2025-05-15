@@ -1,9 +1,9 @@
+"use client";
+
 import PlaceCard from "@/app/places/components/list/PlaceCard";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { BaseCardInfo } from "@/app/places/data/type";
 import React from "react";
-import { Map } from "lucide-react";
 import PlaceToggleButton from "@/app/places/components/PlaceToggleButton";
 
 interface PlaceListSheetProps {
