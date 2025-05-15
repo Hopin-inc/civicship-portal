@@ -15,6 +15,7 @@ export const usePlaces = () => {
         // role: "MANAGER",
       },
     },
+    nextFetchPolicy: "cache-first",
   });
 
   const { setIsLoading } = useLoading();

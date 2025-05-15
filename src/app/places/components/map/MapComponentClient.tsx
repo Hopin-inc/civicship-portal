@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import CustomMarker from "@/app/places/components/map/CustomMarker";
@@ -25,6 +23,8 @@ export const MapComponentClient = ({
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    language: "ja",
+    region: "JP",
   });
 
   const { markers, center, map, onLoad, onUnmount } = useMapState({

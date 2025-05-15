@@ -88,7 +88,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, onClick }) => (
   >
     <div className="relative h-32 rounded-t-lg overflow-hidden">
       <Image
-        src={PLACEHOLDER_IMAGE}
+        src={place.image ?? PLACEHOLDER_IMAGE}
         alt={place.headline}
         className="object-cover"
         fill
@@ -97,7 +97,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, onClick }) => (
         sizes="(max-width: 768px) 100vw, 320px"
       />
     </div>
-    <CardContent className="flex flex-col min-h-[200px] p-4">
+    <CardContent className="flex flex-col min-h-[160px] px-4 py-3">
       <div className="flex items-center justify-between mb-1">
         <div className="mt-1 flex items-center text-muted-foreground text-body-sm">
           <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
@@ -110,9 +110,9 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, onClick }) => (
       </div>
 
       <CardTitle className="text-md line-clamp-1">{place.headline}</CardTitle>
-      <CardDescription className="line-clamp-2">{place.bio}</CardDescription>
+      <CardDescription className="line-clamp-2 mb-2">{place.bio}</CardDescription>
 
-      <CardFooter className="flex justify-between mt-auto pt-0 p-0">
+      <CardFooter className="flex justify-between mt-2 p-0">
         {place.publicOpportunityCount > 0 && (
           <span className="text-label-sm text-gray-700">
             <strong>{place.publicOpportunityCount}件</strong>の関わり方を募集中

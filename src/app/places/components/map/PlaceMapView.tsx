@@ -36,7 +36,7 @@ const PlaceMapView: React.FC<PlaceMapViewProps> = ({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed bottom-8 left-0 right-0 z-50 mx-4"
+            className="fixed bottom-[80px] left-0 right-0 z-50 mx-4"
           >
             <PlaceCardsSheet
               places={places}
@@ -51,7 +51,7 @@ const PlaceMapView: React.FC<PlaceMapViewProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-8 right-4 z-50"
+            className="fixed bottom-[80px] right-4 z-50"
           >
             <PlaceToggleButton isMapMode={true} onClick={toggleMode} />
           </motion.div>

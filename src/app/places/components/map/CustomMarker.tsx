@@ -17,6 +17,42 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
   const [currentSize, setCurrentSize] = useState<number>(56);
 
   useEffect(() => {
+    const drawPlaceholderIcon = async () => {
+      const displaySize = 56;
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      canvas.width = displaySize * 2;
+      canvas.height = displaySize * 2;
+      ctx.scale(2, 2);
+
+      const img = new Image();
+      img.src = PLACEHOLDER_IMAGE;
+      await img.decode();
+
+      await drawCircleWithImage(
+        ctx,
+        img,
+        displaySize / 2,
+        displaySize / 2,
+        displaySize / 2 - 2,
+        true,
+      );
+
+      const icon: google.maps.Icon = {
+        url: canvas.toDataURL("image/png"),
+        scaledSize: new google.maps.Size(displaySize, displaySize),
+        anchor: new google.maps.Point(displaySize / 2, displaySize / 2),
+      };
+
+      setIcon(icon);
+    };
+
+    void drawPlaceholderIcon();
+  }, []);
+
+  useEffect(() => {
     if (isSelected && currentSize !== 80) {
       setCurrentSize(80);
     } else if (!isSelected && currentSize !== 56) {
@@ -37,9 +73,6 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
 
       canvas.width = canvasWidth;
       canvas.height = canvasHeight;
-      canvas.style.width = `${displaySize}px`;
-      canvas.style.height = `${displaySize}px`;
-
       context.scale(scale, scale);
 
       try {
@@ -50,34 +83,23 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         const smallX = centerX + mainRadius * 0.5;
         const smallY = centerY + mainRadius * 0.5;
 
-        const mainImg = document.createElement("img");
+        const mainImg = new Image();
         mainImg.src = data.image || PLACEHOLDER_IMAGE;
         await drawCircleWithImage(context, mainImg, centerX, centerY, mainRadius, true);
 
-        const userImg = document.createElement("img");
+        const userImg = new Image();
         userImg.src = data.host.image || PLACEHOLDER_IMAGE;
         await drawCircleWithImage(context, userImg, smallX, smallY, smallRadius, false);
 
-        setIcon({
+        const markerIcon: google.maps.Icon = {
           url: canvas.toDataURL("image/png", 1.0),
           scaledSize: new google.maps.Size(displaySize, displaySize),
           anchor: new google.maps.Point(displaySize / 2, displaySize / 2),
-        });
+        };
+
+        setIcon(markerIcon);
       } catch (error) {
         console.warn("Failed to create marker icon:", error);
-        context.beginPath();
-        context.arc(displaySize / 2, displaySize / 2, displaySize / 2 - 4, 0, 2 * Math.PI);
-        context.fillStyle = "#F0F0F0";
-        context.fill();
-        context.strokeStyle = "#E0E0E0";
-        context.lineWidth = 2;
-        context.stroke();
-
-        setIcon({
-          url: canvas.toDataURL("image/png", 1.0),
-          scaledSize: new google.maps.Size(displaySize, displaySize),
-          anchor: new google.maps.Point(displaySize / 2, displaySize / 2),
-        });
       }
     })();
   }, [currentSize, data.image, data.host.image]);
