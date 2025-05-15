@@ -45,6 +45,23 @@ const getCategoryLabel = (
   return undefined;
 };
 
+const getStatusStyles = (reservationStatus?: GqlReservationStatus | null): string => {
+  if (!reservationStatus) return "bg-primary-foreground text-primary";
+
+  switch (reservationStatus) {
+    case GqlReservationStatus.Applied:
+      return "bg-yellow-100 text-yellow-700";
+    case GqlReservationStatus.Accepted:
+      return "bg-primary-foreground text-primary";
+    case GqlReservationStatus.Rejected:
+      return "bg-destructive text-destructive-foreground";
+    case GqlReservationStatus.Canceled:
+      return "bg-muted text-muted-foreground";
+    default:
+      return "bg-muted text-muted-foreground";
+  }
+};
+
 const ActiveOpportunities = ({ opportunities }: ActiveOpportunitiesProps) => {
   if (!opportunities.length) return null;
 
@@ -96,9 +113,11 @@ const PortfolioCard = ({
             className="object-cover"
             sizes="(min-width: 640px) 50vw, 100vw"
           />
-          {portfolio.source === "OPPORTUNITY" && portfolio.reservationStatus && (
+          {portfolio.source === "OPPORTUNITY" && portfolio.reservationStatus &&
+            // 予約確定かつ過去の場合はラベルを表示しない
+            !(portfolio.reservationStatus === GqlReservationStatus.Accepted && new Date(portfolio.date) < new Date()) && (
             <div className="absolute top-2 left-2 z-10">
-              <div className="px-2 py-1 text-xs sm:text-sm rounded-full font-bold bg-muted text-foreground">
+              <div className={`px-2 py-1 text-label-sm rounded-full font-bold ${getStatusStyles(portfolio.reservationStatus)}`}>
                 {getCategoryLabel(portfolio.source, portfolio.reservationStatus)}
               </div>
             </div>
