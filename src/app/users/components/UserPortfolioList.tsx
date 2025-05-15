@@ -239,7 +239,7 @@ const PhotoGallery = () => {
   );
 };
 
-
+// NOTE: 開発確認用のフラグ。ユーザーページ関連の修正が落ち着いたら削除する。
 const enableDummyPortfolios = true;
 
 export const UserPortfolioList = ({
