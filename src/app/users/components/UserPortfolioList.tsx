@@ -209,6 +209,34 @@ const PhotoGallery = () => {
     </div>
   );
 };
+
+// #NOTE: スタイル確認用に作成、後ほど削除する
+const dummyPortfolios: AppPortfolio[] = [
+  {
+    id: "1",
+    source: "OPPORTUNITY",
+    category: "EVENT",
+    reservationStatus: "ACCEPTED",
+    title: "体験のタイトル",
+    image: "/images/activities/activity-placeholder-1.jpg",
+    date: "2025-05-15",
+    location: "四国",
+    participants: [],
+  },
+  {
+    id: "2",
+    source: "OPPORTUNITY",
+    category: "QUEST",
+    reservationStatus: "APPLIED",
+    title: "体験のタイトル",
+    image: "/images/activities/activity-placeholder-2.jpg",
+    date: "2025-05-15",
+    location: "四国",
+    participants: [],
+  },
+];
+const enableDummyPortfolios = dummyPortfolios.length > 0;
+
 export const UserPortfolioList = ({
   isSysAdmin,
   activeOpportunities = [],
@@ -218,7 +246,7 @@ export const UserPortfolioList = ({
   hasMore,
   lastPortfolioRef,
 }: Props) => {
-  const showEmptyState = portfolios.length === 0;
+  const showEmptyState = enableDummyPortfolios ? false : portfolios.length === 0;
 
   const emptyStateProps = {
     title: "四国にふれよう",
@@ -241,9 +269,9 @@ export const UserPortfolioList = ({
           <EmptyState {...emptyStateProps} />
         ) : (
           <PortfolioGrid
-            portfolios={portfolios}
-            isLoadingMore={isLoadingMore}
-            hasMore={hasMore}
+            portfolios={enableDummyPortfolios ? dummyPortfolios : portfolios}
+            isLoadingMore={enableDummyPortfolios ? false : isLoadingMore}
+            hasMore={enableDummyPortfolios ? false : hasMore}
             lastPortfolioRef={lastPortfolioRef}
           />
         )}
