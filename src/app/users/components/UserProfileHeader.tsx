@@ -118,7 +118,7 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   );
 };
 
-const useReadMore = (maxLines = 6) => {
+const useReadMore = ({ text, maxLines = 6 }: { text: string; maxLines?: number }) => {
   const [expanded, setExpanded] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
   const [showReadMore, setShowReadMore] = useState(false);
@@ -130,7 +130,8 @@ const useReadMore = (maxLines = 6) => {
       const lines = Math.floor(height / lineHeight);
       setShowReadMore(lines > maxLines);
     }
-  }, [maxLines]);
+    // text が更新された際にも再判定したいので、deps に入れている
+  }, [maxLines, text, textRef]);
 
   const toggleExpanded = () => setExpanded(true);
 
@@ -145,7 +146,7 @@ const useReadMore = (maxLines = 6) => {
 };
 
 const BioSection = ({ bio }: { bio: string }) => {
-  const { textRef, expanded, showReadMore, toggleExpanded, getTextClassName } = useReadMore(6);
+  const { textRef, expanded, showReadMore, toggleExpanded, getTextClassName } = useReadMore({ text: bio, maxLines: 6 });
 
   return (
     <div className="mb-4 relative">
