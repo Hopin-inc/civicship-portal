@@ -113,7 +113,10 @@ const PortfolioCard = ({
 
   return (
     <Link href={linkHref} className="block w-full">
-      <div ref={isLast ? lastRef : undefined} className="rounded-lg overflow-hidden">
+      <div
+        ref={isLast ? lastRef : undefined}
+        className="rounded-lg overflow-hidden hover:opacity-90 transition-opacity"
+      >
         <div className="relative w-full aspect-[164/205]">
           <Image
             src={portfolio.image ?? "/placeholder-image.png"}
@@ -154,10 +157,9 @@ const PortfolioCard = ({
               <Calendar className="w-4 h-4" />
               <span>
                 {portfolio.date}
-                {portfolio.source === "OPPORTUNITY" &&
-                  !isPast && (
-                    <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">予定</span>
-                  )}
+                {portfolio.source === "OPPORTUNITY" && !isPast && (
+                  <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">予定</span>
+                )}
               </span>
             </div>
             {portfolio.location && (
