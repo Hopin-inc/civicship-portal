@@ -12,7 +12,7 @@ export const ParticipantsList = ({ participants, size = 'sm' }: ParticipantsList
   const uniqueParticipants = Array.from(
     new Map(participants.map(p => [p.id, p])).values()
   );
-  const remainingCount = uniqueParticipants.length - MAX_DISPLAY_PARTICIPANTS;
+  const remainingCount = uniqueParticipants.length - MAX_DISPLAY_PARTICIPANTS + 1;
   const displayParticipants = uniqueParticipants.slice(0, MAX_DISPLAY_PARTICIPANTS);
 
   const avatarSize = size === 'sm' ? 'w-6 h-6' : 'w-8 h-8';

@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Ellipsis, Plus, Clock, FileText } from "lucide-react";
+import { Calendar, MapPin, Ellipsis, Plus, Clock, FileText, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import EmptyState from "@/components/shared/EmptyState";
@@ -102,6 +102,8 @@ const PortfolioCard = ({
   isLast: boolean;
   lastRef: RefObject<HTMLDivElement>;
 }) => {
+  const isPast = new Date(portfolio.date) < new Date();
+
   const linkHref =
     portfolio.source === "ARTICLE"
       ? `/articles/${portfolio.id}`
@@ -120,11 +122,19 @@ const PortfolioCard = ({
             className="object-cover"
             sizes="(min-width: 640px) 50vw, 100vw"
           />
-          {portfolio.source === "OPPORTUNITY" && portfolio.reservationStatus &&
-            // 予約確定かつ過去の場合はラベルを表示しない
-            !(portfolio.reservationStatus === GqlReservationStatus.Accepted && new Date(portfolio.date) < new Date()) && (
+          {portfolio.source === "OPPORTUNITY" &&
+          portfolio?.reservationStatus === GqlReservationStatus.Accepted &&
+          isPast ? (
             <div className="absolute top-2 left-2 z-10">
-              <div className={`px-2 py-1 text-label-sm rounded-full font-bold ${getStatusStyles(portfolio.reservationStatus)}`}>
+              <div className="bg-primary-foreground rounded-full w-6 h-6 flex items-center justify-center">
+                <ShieldCheck className="w-4 h-4 text-primary" />
+              </div>
+            </div>
+          ) : (
+            <div className="absolute top-2 left-2 z-10">
+              <div
+                className={`px-2 py-1 text-label-sm rounded-full font-bold ${getStatusStyles(portfolio.reservationStatus)}`}
+              >
                 {getCategoryLabel(portfolio.source, portfolio.reservationStatus)}
               </div>
             </div>
@@ -144,11 +154,10 @@ const PortfolioCard = ({
               <Calendar className="w-4 h-4" />
               <span>
                 {portfolio.date}
-                {portfolio.source === "OPPORTUNITY" && portfolio.date > new Date().toISOString() && (
-<span className="bg-ring pl-1 pr-2 py-0.5 rounded-lg ml-1">
-                    予定
-                  </span>
-                )}
+                {portfolio.source === "OPPORTUNITY" &&
+                  !isPast && (
+                    <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">予定</span>
+                  )}
               </span>
             </div>
             {portfolio.location && (
@@ -232,78 +241,8 @@ const PhotoGallery = () => {
   );
 };
 
-// #NOTE: スタイル確認用に作成、後ほど削除する
-const dummyPortfolios: AppPortfolio[] = [
-  {
-    id: "1",
-    source: "OPPORTUNITY",
-    category: "EVENT",
-    reservationStatus: "ACCEPTED",
-    title: "体験のタイトル",
-    image: "/images/activities/activity-placeholder-1.jpg",
-    date: "2025-05-15",
-    location: "四国",
-    participants: [
-      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
-    ],
-  },
-  {
-    id: "2",
-    source: "OPPORTUNITY",
-    category: "QUEST",
-    reservationStatus: "APPLIED",
-    title: "体験のタイトル",
-    image: "/images/activities/activity-placeholder-2.jpg",
-    date: "2025-05-15",
-    location: "四国",
-    participants: [
-      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
-    ],
-  },
-  {
-    id: "3",
-    source: "OPPORTUNITY",
-    category: "QUEST",
-    reservationStatus: "CANCELED",
-    title: "体験のタイトル",
-    image: "/images/activities/activity-placeholder-2.jpg",
-    date: "2025-05-15",
-    location: "四国",
-    participants: [
-      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
-    ],
-  },
-  {
-    id: "4",
-    source: "OPPORTUNITY",
-    category: "EVENT",
-    reservationStatus: "REJECTED",
-    title: "体験のタイトル",
-    image: "/images/activities/activity-placeholder-2.jpg",
-    date: "2025-05-15",
-    location: "四国",
-    participants: [
-      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
-    ],
-  }
-];
-const enableDummyPortfolios = dummyPortfolios.length > 0;
+
+const enableDummyPortfolios = true;
 
 export const UserPortfolioList = ({
   isSysAdmin,
@@ -373,3 +312,88 @@ export const UserPortfolioList = ({
     </section>
   );
 };
+
+
+// #NOTE: スタイル確認用に作成、後ほど削除する
+const dummyPortfolios: AppPortfolio[] = [
+  {
+    id: "1",
+    source: "OPPORTUNITY",
+    category: "EVENT",
+    reservationStatus: "ACCEPTED",
+    title: "体験のタイトル",
+    image: "/images/activities/activity-placeholder-1.jpg",
+    date: "2025-05-15",
+    location: "四国",
+    participants: [
+      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
+    ],
+  },
+  {
+    id: "2",
+    source: "OPPORTUNITY",
+    category: "QUEST",
+    reservationStatus: "APPLIED",
+    title: "体験のタイトル",
+    image: "/images/activities/activity-placeholder-2.jpg",
+    date: "2025-05-25",
+    location: "四国",
+    participants: [
+      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
+    ],
+  },
+  {
+    id: "9",
+    source: "OPPORTUNITY",
+    category: "QUEST",
+    reservationStatus: "ACCEPTED",
+    title: "体験のタイトル",
+    image: "/images/activities/activity-placeholder-2.jpg",
+    date: "2025-05-25",
+    location: "四国",
+    participants: [
+      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
+    ],
+  },
+  {
+    id: "3",
+    source: "OPPORTUNITY",
+    category: "QUEST",
+    reservationStatus: "CANCELED",
+    title: "体験のタイトル",
+    image: "/images/activities/activity-placeholder-2.jpg",
+    date: "2025-05-15",
+    location: "四国",
+    participants: [
+      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
+    ],
+  },
+  {
+    id: "4",
+    source: "OPPORTUNITY",
+    category: "EVENT",
+    reservationStatus: "REJECTED",
+    title: "体験のタイトル",
+    image: "/images/activities/activity-placeholder-2.jpg",
+    date: "2025-05-25",
+    location: "四国",
+    participants: [
+      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
+    ],
+  },
+];
