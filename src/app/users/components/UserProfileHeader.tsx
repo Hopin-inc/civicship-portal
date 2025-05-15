@@ -15,6 +15,11 @@ interface UserProfileHeaderProps {
   bio: string;
   currentPrefecture?: GqlCurrentPrefecture | null;
   isOwner: boolean;
+  socialUrl: {
+    x: string | null;
+    instagram: string | null;
+    facebook: string | null;
+  }
 }
 
 export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
@@ -23,7 +28,8 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   image,
   bio,
   currentPrefecture,
-  isOwner
+  isOwner,
+  socialUrl
 }) => {
   return (
     <div className="relative bg-white rounded-3xl shadow-sm p-6 max-w-mobile-l mx-auto w-full">
@@ -62,29 +68,42 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
 
           {/* #TODO: SNS アカウントの取得結果に基づく描画に切り替える*/}
           <div className="flex items-center justify-center gap-2 ml-auto mb-4">
-            <Button
-              variant="icon-only"
-              size="icon"
-              disabled
-              className="rounded-full border border-input w-10 h-10 flex items-center justify-center"
-            >
-              <Facebook className="w-4 h-4 text-foreground" />
-            </Button>
-            <Button
-              variant="icon-only"
-              size="icon"
-              disabled
-              className="rounded-full border border-input w-10 h-10 flex items-center justify-center"
-            >
-              <Instagram className="w-4 h-4 text-foreground" />
-            </Button>
-            <Button
-              variant="icon-only"
-              size="icon"
-              className="rounded-full border border-input w-10 h-10 flex items-center justify-center"
-            >
-              <Twitter className="w-4 h-4 text-foreground" />
-            </Button>
+            {socialUrl?.facebook && (
+              <a href={socialUrl.facebook} target="_blank" rel="noopener noreferrer">
+                <Button
+                  variant="icon-only"
+                  size="icon"
+                  className="rounded-full border border-input w-10 h-10 flex items-center justify-center"
+                >
+                  <Facebook className="w-4 h-4 text-foreground" />
+                </Button>
+              </a>
+            )}
+
+            {socialUrl?.instagram && (
+              <a href={socialUrl.instagram} target="_blank" rel="noopener noreferrer">
+                <Button
+                  variant="icon-only"
+                  size="icon"
+                  className="rounded-full border border-input w-10 h-10 flex items-center justify-center"
+                >
+                  <Instagram className="w-4 h-4 text-foreground" />
+                </Button>
+              </a>
+            )}
+
+            {socialUrl?.x && (
+              <a href={socialUrl.x} target="_blank" rel="noopener noreferrer">
+                <Button
+                  variant="icon-only"
+                  size="icon"
+                  className="rounded-full border border-input w-10 h-10 flex items-center justify-center"
+                >
+                  <Twitter className="w-4 h-4 text-foreground" />
+                </Button>
+              </a>
+            )}
+
           </div>
         </div>
 
