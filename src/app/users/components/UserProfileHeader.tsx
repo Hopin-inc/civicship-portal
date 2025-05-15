@@ -31,6 +31,10 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   isOwner,
   socialUrl
 }) => {
+
+  const socialButtonClasses =
+    "rounded-full border border-input w-10 h-10 flex items-center justify-center";
+
   return (
     <div className="relative bg-white rounded-3xl shadow-sm max-w-mobile-l mx-auto w-full">
       <div className="flex flex-col items-center">
@@ -72,7 +76,7 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
                 <Button
                   variant="icon-only"
                   size="icon"
-                  className="rounded-full border border-input w-10 h-10 flex items-center justify-center"
+                  className={socialButtonClasses}
                 >
                   <Facebook className="w-4 h-4 text-foreground" />
                 </Button>
@@ -84,7 +88,7 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
                 <Button
                   variant="icon-only"
                   size="icon"
-                  className="rounded-full border border-input w-10 h-10 flex items-center justify-center"
+                  className={socialButtonClasses}
                 >
                   <Instagram className="w-4 h-4 text-foreground" />
                 </Button>
@@ -96,7 +100,7 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
                 <Button
                   variant="icon-only"
                   size="icon"
-                  className="rounded-full border border-input w-10 h-10 flex items-center justify-center"
+                  className={socialButtonClasses}
                 >
                   <Twitter className="w-4 h-4 text-foreground" />
                 </Button>
