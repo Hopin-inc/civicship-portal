@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { prefectureLabels } from '@/app/users/data/presenter';
 import { GqlCurrentPrefecture } from '@/types/graphql';
+import { Facebook, Home, Instagram, Twitter } from 'lucide-react';
 
 interface UserProfileHeaderProps {
   id: string;
@@ -25,42 +26,68 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   isOwner
 }) => {
   return (
-    <div className="relative bg-background rounded-b-3xl shadow-md pb-6 max-w-mobile-l mx-auto w-full">
-      <div className="flex flex-col items-center md:flex-row md:items-start gap-6">
-        <div className="relative w-24 h-24 rounded-full overflow-hidden">
-          <Image
-            src={image || '/placeholder-profile.jpg'}
-            alt={name}
-            fill
-            className="object-cover"
-            priority
-          />
+    <div className="relative bg-white rounded-3xl shadow-sm p-6 max-w-mobile-l mx-auto w-full">
+      <div className="flex flex-col items-center">
+        {/* Profile Image */}
+        <div className="flex items-center w-full mb-4">
+          <div className="relative w-24 h-24 rounded-full overflow-hidden">
+            <Image
+              src={image || "/placeholder.png"}
+              alt={name}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+          {isOwner && (
+            <Link href="/users/me/edit" className="ml-auto">
+              <Button variant="secondary" size="md" className="px-6">
+                編集
+              </Button>
+            </Link>
+          )}
         </div>
-        
-        <div className="flex-1">
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
-            <h1 className="text-2xl font-bold">{name}</h1>
-            {isOwner && (
-              <Link href="/users/me/edit">
-                <Button variant="secondary" size="sm">
-                  編集
-                </Button>
-              </Link>
+
+        <div className="flex items-start w-full">
+          <div>
+            <h1 className="text-title-lg mb-2">{name}</h1>
+
+            {currentPrefecture && (
+              <div className="flex items-center justify-center text-label-md text-caption mb-3">
+                <Home className="w-4 h-4 mr-1" />
+                <span>{prefectureLabels[currentPrefecture] || "不明"}</span>
+              </div>
             )}
           </div>
-          
-          {currentPrefecture && (
-            <div className="text-sm text-muted-foreground mb-2">
-              {prefectureLabels[currentPrefecture] || '不明'}
-            </div>
-          )}
-          
-          {bio && (
-            <div className="mt-2 text-foreground whitespace-pre-line">
-              {bio}
-            </div>
-          )}
+
+          <div className="flex items-center justify-center gap-2 ml-auto mb-4">
+            <Button
+              variant="icon-only"
+              size="icon"
+              disabled
+              className="rounded-full border border-input w-10 h-10 flex items-center justify-center"
+            >
+              <Facebook className="w-4 h-4 text-foreground" />
+            </Button>
+            <Button
+              variant="icon-only"
+              size="icon"
+              disabled
+              className="rounded-full border border-input w-10 h-10 flex items-center justify-center"
+            >
+              <Instagram className="w-4 h-4 text-foreground" />
+            </Button>
+            <Button
+              variant="icon-only"
+              size="icon"
+              className="rounded-full border border-input w-10 h-10 flex items-center justify-center"
+            >
+              <Twitter className="w-4 h-4 text-foreground" />
+            </Button>
+          </div>
         </div>
+
+        {bio && <div className="text-body-md text-foreground whitespace-pre-line mb-4">{bio}</div>}
       </div>
     </div>
   );
