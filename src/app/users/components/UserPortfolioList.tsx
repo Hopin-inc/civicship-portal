@@ -209,7 +209,6 @@ const PhotoGallery = () => {
 
   return (
     <div className="flex flex-row gap-2 mt-4 w-72 h-64">
-      {/* 左側の大きな画像 (2/3幅) */}
       <div className="w-3/5 h-full relative">
         <div className="w-full h-full rounded-lg overflow-hidden">
           <img
@@ -220,7 +219,6 @@ const PhotoGallery = () => {
         </div>
       </div>
 
-      {/* 右側の2枚の画像を縦に並べる (1/3幅) */}
       <div className="w-2/5 h-full flex flex-col gap-2">
         <div className="h-1/2 rounded-lg overflow-hidden">
           <img
