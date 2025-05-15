@@ -16,11 +16,28 @@ export default function ActivitiesFeaturedSection({
   opportunities,
   isInitialLoading = false,
 }: FeaturedSectionProps) {
-  const [emblaRef] = useEmblaCarousel({
+  const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "center",
     containScroll: "trimSnaps",
   });
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const onSelect = () => {
+      setSelectedIndex(emblaApi.selectedScrollSnap());
+    };
+
+    emblaApi.on("select", onSelect);
+    onSelect(); // 初期化時にも呼ぶ
+
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi]);
 
   if (isInitialLoading) return <FeaturedSectionSkeleton />;
   if (opportunities.length === 0) return null;
@@ -37,12 +54,16 @@ export default function ActivitiesFeaturedSection({
 
       <div className="embla h-full" ref={emblaRef}>
         <div className="embla__container h-full">
-          {opportunities.map((opportunity) => (
+          {opportunities.map((opportunity, i) => (
             <div
               key={opportunity.id}
               className="embla__slide relative h-full w-full flex-[0_0_100%]"
             >
-              <OpportunityImageSlider images={opportunity.images ?? []} title={opportunity.title} />
+              <OpportunityImageSlider
+                images={opportunity.images ?? []}
+                title={opportunity.title}
+                isVisible={i === selectedIndex}
+              />
               <OpportunityCardHorizontal opportunity={opportunity} />
             </div>
           ))}
@@ -52,25 +73,44 @@ export default function ActivitiesFeaturedSection({
   );
 }
 
-function OpportunityImageSlider({ images, title }: { images: string[]; title: string }) {
+function OpportunityImageSlider({
+  images,
+  title,
+  isVisible,
+}: {
+  images: string[];
+  title: string;
+  isVisible: boolean;
+}) {
   const [index, setIndex] = useState(0);
   const [prevIndex, setPrevIndex] = useState<number | null>(null);
 
   const slideImages = images.length > 0 ? images : [undefined];
 
   useEffect(() => {
+    if (!isVisible) return;
+
     const interval = setInterval(() => {
       setPrevIndex(index);
       setIndex((prev) => (prev + 1) % slideImages.length);
     }, 2000);
+
     return () => clearInterval(interval);
-  }, [index, slideImages.length]);
+  }, [index, slideImages.length, isVisible]);
+
+  useEffect(() => {
+    if (!isVisible) {
+      setIndex(0);
+      setPrevIndex(null);
+    }
+  }, [isVisible]);
 
   return (
     <div className="absolute inset-0 z-0">
       {slideImages.map((img, i) => {
         const isActive = i === index;
         const isPrevious = i === prevIndex;
+        console.log(images);
 
         return (
           <Image
@@ -78,10 +118,12 @@ function OpportunityImageSlider({ images, title }: { images: string[]; title: st
             src={img ?? "https://images.unsplash.com/photo-1578662996442-48f60103fc96"}
             alt={`${title} - ${i + 1}`}
             fill
+            sizes="(max-width: 480px) 100vw, 480px"
+            loading={i === 0 ? "eager" : "lazy"}
+            priority={i === 0}
             className={`object-cover transition-opacity duration-1000 ease-in-out ${
               isActive ? "opacity-100" : isPrevious ? "opacity-0" : "hidden"
             }`}
-            priority={i === 0}
           />
         );
       })}

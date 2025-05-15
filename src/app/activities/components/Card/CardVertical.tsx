@@ -20,6 +20,8 @@ export default function OpportunityCardVertical({ opportunity }: { opportunity: 
           alt={title}
           width={400}
           height={400}
+          sizes="164px"
+          loading="lazy"
           className="h-full w-full object-cover"
         />
       </Card>
