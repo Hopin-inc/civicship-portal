@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback, CSSProperties } from 'react';
 
 interface UseReadMoreProps {
   text: string;
@@ -12,24 +12,46 @@ export const useReadMore = ({ text, maxLines = 6 }: UseReadMoreProps) => {
   const textRef = useRef<HTMLDivElement>(null);
   const [showReadMore, setShowReadMore] = useState(false);
 
+  const calculateLines = useCallback(() => {
+    if (!textRef.current) return 0;
+
+    const style = window.getComputedStyle(textRef.current);
+    const lineHeight = parseInt(style.lineHeight) || parseInt(style.fontSize) * 1.5;
+    const height = textRef.current.scrollHeight;
+    return Math.floor(height / lineHeight);
+  }, []);
+
   useEffect(() => {
-    if (textRef.current) {
-      const lineHeight = parseInt(window.getComputedStyle(textRef.current).lineHeight);
-      const height = textRef.current.clientHeight;
-      const lines = Math.floor(height / lineHeight);
+    const lines = calculateLines();
+    setShowReadMore(lines > maxLines);
+
+    const handleResize = () => {
+      const lines = calculateLines();
       setShowReadMore(lines > maxLines);
-    }
-    // text が更新された際にも再判定したいので、deps に入れている
-  }, [maxLines, text, textRef]);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [calculateLines, maxLines, text]);
 
   const toggleExpanded = () => setExpanded(true);
+
+  const getTextStyle = (): CSSProperties => {
+    if (expanded || !showReadMore) return {};
+
+    return {
+      display: '-webkit-box',
+      WebkitLineClamp: maxLines,
+      WebkitBoxOrient: 'vertical',
+      overflow: 'hidden'
+    } as CSSProperties;
+  };
 
   return {
     textRef,
     expanded,
     showReadMore,
     toggleExpanded,
-    getTextClassName: (baseClassName: string) =>
-      `${baseClassName} transition-all duration-300 ${!expanded && showReadMore ? `line-clamp-${maxLines}` : ''}`
+    getTextStyle,
   };
 };

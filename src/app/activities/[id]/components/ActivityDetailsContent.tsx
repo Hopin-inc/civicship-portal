@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect, useCallback, CSSProperties } from "react";
 import Image from "next/image";
 import { AlertCircle } from "lucide-react";
 import { SameStateActivities } from "./SimilarActivitiesList";
@@ -54,7 +54,10 @@ const ActivityDetailsContent = ({
 const INITIAL_DISPLAY_LINES = 6;
 
 const ActivityBodySection = ({ body }: { body: string }) => {
-  const { textRef, expanded, showReadMore, toggleExpanded, getTextClassName } = useReadMore({ text: body, maxLines: INITIAL_DISPLAY_LINES });
+  const { textRef, expanded, showReadMore, toggleExpanded, getTextStyle } = useReadMore({
+    text: body,
+    maxLines: INITIAL_DISPLAY_LINES
+  });
 
   return (
     <section className="pt-6 pb-8 mt-0">
@@ -62,7 +65,8 @@ const ActivityBodySection = ({ body }: { body: string }) => {
       <div className="relative">
         <p
           ref={textRef}
-          className={getTextClassName("text-body-md text-foreground whitespace-pre-wrap")}
+          className="text-body-md text-foreground whitespace-pre-wrap transition-all duration-300"
+          style={getTextStyle()}
         >
           {body}
         </p>
