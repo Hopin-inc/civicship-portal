@@ -27,12 +27,12 @@ export function OpportunityCardHorizontal({ opportunity }: { opportunity: Activi
             <h2 className="text-title-md text-foreground line-clamp-1">{opportunity.title}</h2>
             <p className="mt-1 text-body-sm text-muted-foreground">
               {opportunity.feeRequired
-                ? `1人当たり${opportunity.feeRequired.toLocaleString()}円から`
+                ? `1人あたり${opportunity.feeRequired.toLocaleString()}円から`
                 : "要問い合わせ"}
             </p>
             <div className="mt-1 flex items-center text-muted-foreground text-body-sm">
-              <MapPin className="mr-1 h-4 w-4" />
-              <span>{opportunity.location}</span>
+              <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
+              <span className="line-clamp-1 break-words">{opportunity.location}</span>
             </div>
           </div>
         </div>

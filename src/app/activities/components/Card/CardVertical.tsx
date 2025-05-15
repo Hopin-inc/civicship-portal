@@ -7,6 +7,8 @@ import { ActivityCard } from "@/app/activities/data/type";
 export default function OpportunityCardVertical({ opportunity }: { opportunity: ActivityCard }) {
   const { id, title, feeRequired, location, images, hasReservableTicket } = opportunity;
 
+  const dummy = "dsdscdscdsvcdsvdsvdfsvdfsvsdfvsdvsdvsdvdsvds";
+
   return (
     <Link href={`/activities/${id}`} className="relative w-[164px] flex-shrink-0">
       <Card className="w-[164px] h-[205px] overflow-hidden relative">
@@ -32,8 +34,8 @@ export default function OpportunityCardVertical({ opportunity }: { opportunity: 
             {feeRequired ? `1人あたり${feeRequired.toLocaleString()}円から` : "要問い合わせ"}
           </p>
           <div className="flex items-center text-body-sm text-muted-foreground mt-1">
-            <MapPin className="mr-1 h-4 w-4" />
-            {location}
+            <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
+            <span className="line-clamp-1 break-words">{location}</span>
           </div>
         </div>
       </div>
