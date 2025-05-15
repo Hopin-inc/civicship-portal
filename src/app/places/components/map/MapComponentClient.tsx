@@ -4,6 +4,7 @@ import CustomMarker from "@/app/places/components/map/CustomMarker";
 import { useMapState } from "@/app/places/hooks/useMapState";
 import { BasePin } from "@/app/places/data/type";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { usePreloadImages } from "@/hooks/usePreloadImages";
 
 const containerStyle = {
   width: "100%",
@@ -27,6 +28,15 @@ export const MapComponentClient = ({
     language: "ja",
     region: "JP",
   });
+
+  const allImageUrls = Array.from(
+    new Set(
+      [...placePins.map((pin) => pin.image), ...placePins.map((pin) => pin.host?.image)].filter(
+        (url): url is string => url != null,
+      ),
+    ),
+  );
+  usePreloadImages(allImageUrls);
 
   const { markers, center, onLoad, onUnmount } = useMapState({
     placePins,

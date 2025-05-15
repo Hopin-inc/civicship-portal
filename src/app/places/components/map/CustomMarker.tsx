@@ -17,42 +17,6 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
   const [currentSize, setCurrentSize] = useState<number>(56);
 
   useEffect(() => {
-    const drawPlaceholderIcon = async () => {
-      const displaySize = 56;
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-
-      canvas.width = displaySize * 2;
-      canvas.height = displaySize * 2;
-      ctx.scale(2, 2);
-
-      const img = new Image();
-      img.src = PLACEHOLDER_IMAGE;
-      await img.decode();
-
-      await drawCircleWithImage(
-        ctx,
-        img,
-        displaySize / 2,
-        displaySize / 2,
-        displaySize / 2 - 2,
-        true,
-      );
-
-      const icon: google.maps.Icon = {
-        url: canvas.toDataURL("image/png"),
-        scaledSize: new google.maps.Size(displaySize, displaySize),
-        anchor: new google.maps.Point(displaySize / 2, displaySize / 2),
-      };
-
-      setIcon(icon);
-    };
-
-    void drawPlaceholderIcon();
-  }, []);
-
-  useEffect(() => {
     if (isSelected && currentSize !== 80) {
       setCurrentSize(80);
     } else if (!isSelected && currentSize !== 56) {
