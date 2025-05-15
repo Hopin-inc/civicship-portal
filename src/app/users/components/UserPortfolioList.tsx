@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Ellipsis } from "lucide-react";
+import { Calendar, MapPin, Ellipsis, Plus, Clock, FileText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import EmptyState from "@/components/shared/EmptyState";
@@ -9,6 +9,12 @@ import { ActivityCard } from "@/app/activities/data/type";
 import { AppPortfolio } from "@/app/users/data/type";
 import { GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Props = {
   userId: string;
@@ -329,9 +335,28 @@ export const UserPortfolioList = ({
         <div className="flex items-center justify-between">
           <h2 className="text-display-sm font-semibold text-foreground py-4">これまでの関わり</h2>
           {isOwner && (
-            <Button variant="icon-only" size="sm" className="w-8 h-8 p-0">
-              <Ellipsis className="w-4 h-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="icon-only" size="sm" className="w-8 h-8 p-0">
+                  <Ellipsis className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              {/* #TODO: 導線接続 */}
+              <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuItem>
+                  <Plus className="mr-2 h-5 w-5 text-primary" />
+                  <span className="text-primary text-label-md">関わりを追加</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Clock className="mr-2 h-5 w-5" />
+                  <span className="text-label-md">過去の予約</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <FileText className="mr-2 h-5 w-5" />
+                  <span className="text-label-md">参加証明を発行</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
         {showEmptyState ? (
