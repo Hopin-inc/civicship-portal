@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -107,8 +107,66 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           </div>
         </div>
 
-        {bio && <div className="text-body-md text-foreground whitespace-pre-line mb-4">{bio}</div>}
+        {bio && (
+          <BioSection bio={bio} />
+        )}
       </div>
+    </div>
+  );
+};
+
+const useReadMore = (maxLines = 6) => {
+  const [expanded, setExpanded] = useState(false);
+  const textRef = useRef<HTMLDivElement>(null);
+  const [showReadMore, setShowReadMore] = useState(false);
+
+  useEffect(() => {
+    if (textRef.current) {
+      const lineHeight = parseInt(window.getComputedStyle(textRef.current).lineHeight);
+      const height = textRef.current.clientHeight;
+      const lines = Math.floor(height / lineHeight);
+      setShowReadMore(lines > maxLines);
+    }
+  }, [maxLines]);
+
+  const toggleExpanded = () => setExpanded(true);
+
+  return {
+    textRef,
+    expanded,
+    showReadMore,
+    toggleExpanded,
+    getTextClassName: (baseClassName: string) =>
+      `${baseClassName} transition-all duration-300 ${!expanded && showReadMore ? `line-clamp-${maxLines}` : ''}`
+  };
+};
+
+const BioSection = ({ bio }: { bio: string }) => {
+  const { textRef, expanded, showReadMore, toggleExpanded, getTextClassName } = useReadMore(6);
+
+  return (
+    <div className="mb-4 relative">
+      <div
+        ref={textRef}
+        className={getTextClassName("text-body-md text-foreground whitespace-pre-line")}
+      >
+        {bio}
+      </div>
+      {showReadMore && !expanded && (
+        <div className="absolute bottom-0 left-0 w-full">
+          <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+          <div className="relative flex justify-center pt-8">
+            <Button
+              variant="tertiary"
+              size="sm"
+              onClick={toggleExpanded}
+              className="bg-white px-6"
+            >
+              <span className="text-label-sm font-bold">もっと見る</span>
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
