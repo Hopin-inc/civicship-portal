@@ -51,10 +51,10 @@ export default function EmptyState({
         </div>
       )}
 
-      <h2 className="text-2xl font-bold mb-3">{title}</h2>
-      <div className="text-muted-foreground mb-8">
+      <h2 className="text-display-md mb-1">{title}</h2>
+      <div className="text-muted-foreground mb-4">
         {typeof description === 'string' ? (
-          <p className="whitespace-pre-line">{description}</p>
+          <p className="whitespace-pre-line text-body-md">{description}</p>
         ) : (
           description
         )}
@@ -64,7 +64,7 @@ export default function EmptyState({
         <Button
           variant="primary"
           size="lg"
-          className="w-full max-w-[400px] text-base font-bold"
+          className="px-16"
           onClick={onAction}
         >
           {actionLabel}

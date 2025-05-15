@@ -172,6 +172,43 @@ export const PortfolioGrid = ({
   );
 };
 
+
+const PhotoGallery = () => {
+  const images = ["/images/activities/activity-placeholder-1.jpg", "/images/activities/activity-placeholder-2.jpg", "/images/activities/activity-placeholder-3.jpg"];
+
+  return (
+    <div className="flex flex-row gap-2 mt-4 w-72 h-64">
+      {/* 左側の大きな画像 (2/3幅) */}
+      <div className="w-3/5 h-full relative">
+        <div className="w-full h-full rounded-lg overflow-hidden">
+          <img
+            src={images[0]}
+            alt={"体験のイメージ画像1"}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+
+      {/* 右側の2枚の画像を縦に並べる (1/3幅) */}
+      <div className="w-2/5 h-full flex flex-col gap-2">
+        <div className="h-1/2 rounded-lg overflow-hidden">
+          <img
+            src={images[1]}
+            alt="体験のイメージ画像2"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="h-1/2 rounded-lg overflow-hidden">
+          <img
+            src={images[2]}
+            alt="体験のイメージ画像3"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
 export const UserPortfolioList = ({
   isSysAdmin,
   activeOpportunities = [],
@@ -184,14 +221,14 @@ export const UserPortfolioList = ({
   const showEmptyState = portfolios.length === 0;
 
   const emptyStateProps = {
-    title: "まだ活動がありません",
+    title: "四国にふれよう",
     description: isOwner
-      ? "地域の活動に参加して、タイムラインを作りましょう"
-      : "地域の活動に参加すると、タイムラインが作成されます",
+      ? "四国の素敵な88人との\n関わりを探してみましょう"
+      : "体験に参加すると、タイムラインが作成されます",
     actionLabel: isOwner ? "関わりを探す" : undefined,
     onAction: isOwner ? () => (window.location.href = "/") : undefined,
     hideActionButton: !isOwner,
-    icon: <History className="w-8 h-8 text-muted-foreground font-thin" />,
+    icon: <PhotoGallery />,
   };
 
   return (
@@ -199,7 +236,7 @@ export const UserPortfolioList = ({
       {isSysAdmin && <ActiveOpportunities opportunities={activeOpportunities} />}
 
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-foreground py-4">これまでの関わり</h2>
+        <h2 className="text-display-sm font-semibold text-foreground py-4">これまでの関わり</h2>
         {showEmptyState ? (
           <EmptyState {...emptyStateProps} />
         ) : (
