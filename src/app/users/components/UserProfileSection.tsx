@@ -34,7 +34,7 @@ export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <div className="max-w-4xl mx-auto px-4">
       <UserProfileHeader
         id={userId}
         name={profile.name}
@@ -42,6 +42,11 @@ export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
         bio={profile.bio ?? ""}
         currentPrefecture={profile.currentPrefecture}
         isOwner={isOwner}
+        socialUrl={{
+          x: profile.urlX || null,
+          instagram: profile.urlInstagram || null,
+          facebook: profile.urlFacebook || null,
+        }}
       />
 
       {isOwner && (
