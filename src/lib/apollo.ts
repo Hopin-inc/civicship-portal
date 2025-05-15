@@ -33,13 +33,36 @@ const requestLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors)
-    graphQLErrors.map(({ message, locations, path }) =>
-      console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`),
-    );
+const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
+  if (graphQLErrors) {
+    for (const error of graphQLErrors) {
+      console.log(`[GraphQL error]: Message: ${error.message}, Location: ${error.locations}, Path: ${error.path}`);
+      
+      if (
+        error.message.includes("Authentication required") ||
+        error.message.includes("Invalid token") ||
+        error.message.includes("Token expired") ||
+        error.message.includes("Unauthorized")
+      ) {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth:token-expired', {
+            detail: { source: 'graphql', message: error.message }
+          }));
+        }
+      }
+    }
+  }
+  
   if (networkError) {
     console.log(`[Network error]: ${networkError}`);
+    
+    if ('statusCode' in networkError && networkError.statusCode === 401) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:token-expired', {
+          detail: { source: 'network', status: 401 }
+        }));
+      }
+    }
   }
 });
 

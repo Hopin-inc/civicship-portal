@@ -186,6 +186,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [liffAccessToken, isLiffLoggedIn, uid]);
 
   useEffect(() => {
+    const handleTokenExpired = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      console.log("Token expired event detected:", customEvent.detail);
+      
+      toast.error(
+        "認証の有効期限が切れました。再認証が必要です。",
+        {
+          action: {
+            label: "再認証",
+            onClick: () => router.push("/sign-up/phone-verification")
+          },
+          duration: 10000, // 10 seconds
+        }
+      );
+      
+      // router.push("/sign-up/phone-verification");
+    };
+    
+    window.addEventListener('auth:token-expired', handleTokenExpired);
+    
+    return () => {
+      window.removeEventListener('auth:token-expired', handleTokenExpired);
+    };
+  }, [router]);
+
+  useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user: AuthUser | null) => {
       ready.resolve();
 
