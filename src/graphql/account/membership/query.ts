@@ -66,6 +66,9 @@ export const GET_MEMBERSHIP_LIST = gql`
           hostOpportunityCount
           user {
             ...UserFields
+            articlesAboutMe {
+              ...ArticleFields
+            }
           }
           community {
             ...CommunityFields

@@ -2489,6 +2489,17 @@ export type GqlGetMembershipListQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          articlesAboutMe?: Array<{
+            __typename?: "Article";
+            id: string;
+            title: string;
+            body?: string | null;
+            introduction: string;
+            thumbnail?: any | null;
+            category: GqlArticleCategory;
+            publishStatus: GqlPublishStatus;
+            publishedAt?: Date | null;
+          }> | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -4585,6 +4596,9 @@ export const GetMembershipListDocument = gql`
           hostOpportunityCount
           user {
             ...UserFields
+            articlesAboutMe {
+              ...ArticleFields
+            }
           }
           community {
             ...CommunityFields
@@ -4596,6 +4610,7 @@ export const GetMembershipListDocument = gql`
   ${MembershipFieldsFragmentDoc}
   ${HostedGeoFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
+  ${ArticleFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
 
