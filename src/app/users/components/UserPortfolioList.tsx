@@ -195,7 +195,7 @@ export const UserPortfolioList = ({
   };
 
   return (
-    <section className="space-y-8 pb-20">
+    <section className="py-6">
       {isSysAdmin && <ActiveOpportunities opportunities={activeOpportunities} />}
 
       <div className="space-y-4">

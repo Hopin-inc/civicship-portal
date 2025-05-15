@@ -34,7 +34,7 @@ export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4">
+    <div className="max-w-4xl mx-auto">
       <UserProfileHeader
         id={userId}
         name={profile.name}
