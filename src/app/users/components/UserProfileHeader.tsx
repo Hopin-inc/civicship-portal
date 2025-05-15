@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { prefectureLabels } from '@/app/users/data/presenter';
 import { GqlCurrentPrefecture } from '@/types/graphql';
 import { Facebook, Home, Instagram, Twitter } from 'lucide-react';
+import { useReadMore } from '@/hooks/useReadMore';
 
 interface UserProfileHeaderProps {
   id: string;
@@ -116,33 +117,6 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
       </div>
     </div>
   );
-};
-
-const useReadMore = ({ text, maxLines = 6 }: { text: string; maxLines?: number }) => {
-  const [expanded, setExpanded] = useState(false);
-  const textRef = useRef<HTMLDivElement>(null);
-  const [showReadMore, setShowReadMore] = useState(false);
-
-  useEffect(() => {
-    if (textRef.current) {
-      const lineHeight = parseInt(window.getComputedStyle(textRef.current).lineHeight);
-      const height = textRef.current.clientHeight;
-      const lines = Math.floor(height / lineHeight);
-      setShowReadMore(lines > maxLines);
-    }
-    // text が更新された際にも再判定したいので、deps に入れている
-  }, [maxLines, text, textRef]);
-
-  const toggleExpanded = () => setExpanded(true);
-
-  return {
-    textRef,
-    expanded,
-    showReadMore,
-    toggleExpanded,
-    getTextClassName: (baseClassName: string) =>
-      `${baseClassName} transition-all duration-300 ${!expanded && showReadMore ? `line-clamp-${maxLines}` : ''}`
-  };
 };
 
 const BioSection = ({ bio }: { bio: string }) => {
