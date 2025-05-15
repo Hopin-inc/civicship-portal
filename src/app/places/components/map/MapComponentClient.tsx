@@ -1,10 +1,10 @@
-"use client";
-
 import React from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import CustomMarker from "@/app/places/components/map/CustomMarker";
 import { useMapState } from "@/app/places/hooks/useMapState";
-import { BasePin, BaseCardInfo } from "@/app/places/data/type";
+import { BasePin } from "@/app/places/data/type";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { usePreloadImages } from "@/app/places/hooks/usePreloadImages";
 
 const containerStyle = {
   width: "100%",
@@ -12,29 +12,39 @@ const containerStyle = {
 };
 
 interface MapComponentClientProps {
-  places: BaseCardInfo[];
+  placePins: BasePin[];
   selectedPlaceId: string | null;
   onPlaceSelect: (placeId: string) => void;
 }
 
 export const MapComponentClient = ({
-  places,
+  placePins,
   selectedPlaceId,
   onPlaceSelect,
 }: MapComponentClientProps) => {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    language: "ja",
+    region: "JP",
   });
 
-  const { markers, center, map, onLoad, onUnmount } = useMapState({
-    places,
+  const allImageUrls = Array.from(
+    new Set(
+      [...placePins.map((pin) => pin.image), ...placePins.map((pin) => pin.host?.image)].filter(
+        (url): url is string => url != null,
+      ),
+    ),
+  );
+
+  const { markers, center, onLoad, onUnmount } = useMapState({
+    placePins,
     selectedPlaceId,
-    onPlaceSelect,
   });
 
-  if (!isLoaded) {
-    return <></>;
+  const imagesReady = usePreloadImages(allImageUrls);
+  if (!isLoaded || !imagesReady) {
+    return <LoadingIndicator fullScreen={true} />;
   }
 
   return (
@@ -53,14 +63,15 @@ export const MapComponentClient = ({
         fullscreenControl: false,
       }}
     >
-      {markers.map((marker: BasePin) => (
-        <CustomMarker
-          key={marker.id}
-          data={marker}
-          onClick={() => onPlaceSelect?.(marker.id)}
-          isSelected={marker.id === selectedPlaceId}
-        />
-      ))}
+      {isLoaded &&
+        markers.map((marker: BasePin) => (
+          <CustomMarker
+            key={marker.id}
+            data={marker}
+            onClick={() => onPlaceSelect?.(marker.id)}
+            isSelected={marker.id === selectedPlaceId}
+          />
+        ))}
     </GoogleMap>
   );
 };

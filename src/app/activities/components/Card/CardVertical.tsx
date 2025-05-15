@@ -3,6 +3,7 @@ import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { ActivityCard } from "@/app/activities/data/type";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 export default function OpportunityCardVertical({ opportunity }: { opportunity: ActivityCard }) {
   const { id, title, feeRequired, location, images, hasReservableTicket } = opportunity;
@@ -16,10 +17,14 @@ export default function OpportunityCardVertical({ opportunity }: { opportunity: 
           </div>
         )}
         <Image
-          src={images?.[0] || "https://images.unsplash.com/photo-1578662996442-48f60103fc96"}
+          src={images?.[0] || PLACEHOLDER_IMAGE}
           alt={title}
           width={400}
           height={400}
+          sizes="164px"
+          placeholder={`blur`}
+          blurDataURL={PLACEHOLDER_IMAGE}
+          loading="lazy"
           className="h-full w-full object-cover"
         />
       </Card>
@@ -30,8 +35,8 @@ export default function OpportunityCardVertical({ opportunity }: { opportunity: 
             {feeRequired ? `1人あたり${feeRequired.toLocaleString()}円から` : "要問い合わせ"}
           </p>
           <div className="flex items-center text-body-sm text-muted-foreground mt-1">
-            <MapPin className="mr-1 h-4 w-4" />
-            {location}
+            <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
+            <span className="line-clamp-1 break-words">{location}</span>
           </div>
         </div>
       </div>

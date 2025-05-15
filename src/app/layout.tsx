@@ -9,6 +9,8 @@ import { LiffProvider } from "@/contexts/LiffContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
+import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
+import React from "react";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -32,7 +34,7 @@ export const metadata: Metadata = {
     siteName: "NEO四国88祭",
     images: [
       {
-        url: "/images/ogp.png",
+        url: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
         width: 1200,
         height: 630,
         alt: "NEO四国88祭",
@@ -40,13 +42,6 @@ export const metadata: Metadata = {
     ],
     locale: "ja_JP",
     type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "NEO四国88祭",
-    description:
-      "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。心が躍るさまざまな体験を通じて、新しい自分に出会う旅へ。",
-    images: ["/images/ogp.png"],
   },
 };
 
@@ -64,8 +59,10 @@ const RootLayout = ({
               <AuthProvider>
                 <HeaderProvider>
                   <LoadingProvider>
+                    {/*<AnalyticsProvider>*/}
                     <MainContent>{children}</MainContent>
                     <Toaster richColors className="mx-8" />
+                    {/*</AnalyticsProvider>*/}
                   </LoadingProvider>
                 </HeaderProvider>
               </AuthProvider>

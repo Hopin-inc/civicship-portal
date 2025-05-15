@@ -8,8 +8,43 @@ import { presenterArticleWithAuthor } from "@/app/articles/data/presenter";
 import { OpportunityHost } from "@/app/activities/data/type";
 import { BaseCardInfo, BaseDetail, BasePin } from "@/app/places/data/type";
 import { presenterActivityCard, presenterOpportunityHost } from "@/app/activities/data/presenter";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
-export const presenterBasePin = (
+export const presenterBasePins = (memberships: GqlMembership[]): BasePin[] => {
+  const pins: BasePin[] = [];
+  const seen = new Set<string>();
+
+  for (const membership of memberships) {
+    const hosted = membership.participationView?.hosted;
+    const hostUser = membership.user;
+    if (!hosted || !hostUser) continue;
+
+    for (const location of hosted.geo ?? []) {
+      const placeId = location?.placeId;
+      if (!placeId || seen.has(placeId) || location.latitude == null || location.longitude == null)
+        continue;
+
+      seen.add(placeId);
+
+      pins.push({
+        id: placeId,
+        image: location.placeImage ?? PLACEHOLDER_IMAGE,
+        host: {
+          id: hostUser.id,
+          name: hostUser.name,
+          image: hostUser.image ?? PLACEHOLDER_IMAGE,
+          bio: hostUser.bio ?? "",
+        },
+        latitude: Number(location.latitude),
+        longitude: Number(location.longitude),
+      });
+    }
+  }
+
+  return pins;
+};
+
+const presenterBasePin = (
   location: GqlMembershipParticipationLocation,
   host: OpportunityHost,
 ): BasePin => ({
@@ -41,8 +76,8 @@ export const presenterBaseCard = (memberships: GqlMembership[]): BaseCardInfo[] 
         ...pin,
         name: location.placeName,
         address: location.address,
-        headline: relatedArticles[0].title || "",
-        bio: relatedArticles[0].introduction || "",
+        headline: relatedArticles?.[0]?.title || "",
+        bio: relatedArticles?.[0]?.introduction || "",
         publicOpportunityCount: membership.hostOpportunityCount ?? 0,
         participantCount: hosted.totalParticipantCount ?? 0,
         communityId: membership.community?.id || "",

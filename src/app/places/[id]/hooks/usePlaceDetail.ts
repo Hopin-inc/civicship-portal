@@ -1,6 +1,6 @@
-import { usePlaceMembership } from "@/app/places/hooks/usePlaceMembership";
+import { usePlaceMembership } from "@/app/places/[id]/hooks/usePlaceMembership";
 import { useLoading } from "@/hooks/useLoading";
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { BaseDetail } from "@/app/places/data/type";
 import { COMMUNITY_ID } from "@/utils";
 import { presenterBaseDetail } from "@/app/places/data/presenter/membership";
