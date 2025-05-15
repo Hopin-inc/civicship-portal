@@ -66,7 +66,6 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
             )}
           </div>
 
-          {/* #TODO: SNS アカウントの取得結果に基づく描画に切り替える*/}
           <div className="flex items-center justify-center gap-2 ml-auto mb-4">
             {socialUrl?.facebook && (
               <a href={socialUrl.facebook} target="_blank" rel="noopener noreferrer">
