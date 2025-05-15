@@ -12,21 +12,27 @@ interface CustomMarkerProps {
   isSelected: boolean;
 }
 
+const markerIconCache = new Map<string, google.maps.Icon>();
+
+const loadImage = (src: string): Promise<HTMLImageElement> =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+
 const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }) => {
   const [icon, setIcon] = useState<google.maps.Icon | null>(null);
-  const [currentSize, setCurrentSize] = useState<number>(56);
-
-  useEffect(() => {
-    if (isSelected && currentSize !== 80) {
-      setCurrentSize(80);
-    } else if (!isSelected && currentSize !== 56) {
-      setCurrentSize(56);
-    }
-  }, [isSelected, currentSize]);
+  const displaySize = isSelected ? 80 : 56;
 
   useEffect(() => {
     (async () => {
-      const displaySize = currentSize;
+      if (markerIconCache.has(data.id)) {
+        setIcon(markerIconCache.get(data.id)!);
+        return;
+      }
+
       const scale = 2;
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
@@ -47,12 +53,10 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         const smallX = centerX + mainRadius * 0.5;
         const smallY = centerY + mainRadius * 0.5;
 
-        const mainImg = new Image();
-        mainImg.src = data.image;
+        const mainImg = await loadImage(data.image);
         await drawCircleWithImage(context, mainImg, centerX, centerY, mainRadius, true);
 
-        const userImg = new Image();
-        userImg.src = data.host.image || PLACEHOLDER_IMAGE;
+        const userImg = await loadImage(data.host.image || PLACEHOLDER_IMAGE);
         await drawCircleWithImage(context, userImg, smallX, smallY, smallRadius, false);
 
         const markerIcon: google.maps.Icon = {
@@ -61,12 +65,13 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
           anchor: new google.maps.Point(displaySize / 2, displaySize / 2),
         };
 
+        markerIconCache.set(data.id, markerIcon);
         setIcon(markerIcon);
       } catch (error) {
         console.warn("Failed to create marker icon:", error);
       }
     })();
-  }, [currentSize, data.image, data.host.image]);
+  }, [data.id, data.image, data.host.image, displaySize]);
 
   if (!icon) return null;
 
