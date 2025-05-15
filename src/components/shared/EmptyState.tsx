@@ -50,16 +50,20 @@ export default function EmptyState({
           <AsymmetricImageGrid images={images} className="h-full" />
         </div>
       )}
-      
+
       <h2 className="text-2xl font-bold mb-3">{title}</h2>
       <div className="text-muted-foreground mb-8">
-        {typeof description === 'string' ? <p>{description}</p> : description}
+        {typeof description === 'string' ? (
+          <p className="whitespace-pre-line">{description}</p>
+        ) : (
+          description
+        )}
       </div>
-      
+
       {!hideActionButton && (
-        <Button 
+        <Button
           variant="primary"
-          size="lg" 
+          size="lg"
           className="w-full max-w-[400px] text-base font-bold"
           onClick={onAction}
         >
@@ -68,4 +72,4 @@ export default function EmptyState({
       )}
     </div>
   );
-}  
+}
