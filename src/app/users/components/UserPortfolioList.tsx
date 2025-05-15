@@ -118,9 +118,11 @@ const PortfolioCard = ({
               <Calendar className="w-4 h-4" />
               <span>
                 {portfolio.date}
-                <span className="bg-ring pl-1 pr-2 py-0.5 rounded-lg ml-1">
-                  {portfolio.source === "OPPORTUNITY" && " 予定"}
-                </span>
+                {portfolio.source === "OPPORTUNITY" && portfolio.date > new Date().toISOString() && (
+<span className="bg-ring pl-1 pr-2 py-0.5 rounded-lg ml-1">
+                    予定
+                  </span>
+                )}
               </span>
             </div>
             {portfolio.location && (
