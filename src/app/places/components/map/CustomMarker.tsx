@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { defaultImageUrl, drawCircleWithImage } from "@/utils/maps/markerUtils";
+import { drawCircleWithImage } from "@/utils/maps/markerUtils";
 import { Marker } from "@react-google-maps/api";
 import { BasePin } from "@/app/places/data/type";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface CustomMarkerProps {
   data: BasePin;
@@ -50,11 +51,11 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         const smallY = centerY + mainRadius * 0.5;
 
         const mainImg = document.createElement("img");
-        mainImg.src = data.image || defaultImageUrl;
+        mainImg.src = data.image || PLACEHOLDER_IMAGE;
         await drawCircleWithImage(context, mainImg, centerX, centerY, mainRadius, true);
 
         const userImg = document.createElement("img");
-        userImg.src = data.host.image || defaultImageUrl;
+        userImg.src = data.host.image || PLACEHOLDER_IMAGE;
         await drawCircleWithImage(context, userImg, smallX, smallY, smallRadius, false);
 
         setIcon({
