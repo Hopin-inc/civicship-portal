@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import { AlertCircle } from "lucide-react";
 import { SameStateActivities } from "./SimilarActivitiesList";
@@ -14,6 +14,7 @@ import {
 import ArticleCard from "@/app/articles/components/Card";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Button } from "@/components/ui/button";
+import { useReadMore } from "@/hooks/useReadMore";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
@@ -53,38 +54,34 @@ const ActivityDetailsContent = ({
 const INITIAL_DISPLAY_LINES = 6;
 
 const ActivityBodySection = ({ body }: { body: string }) => {
-  const [expanded, setExpanded] = useState(false);
-  const lines = body.split("\n");
-  const hasMoreLines = lines.length > INITIAL_DISPLAY_LINES;
+  const { textRef, expanded, showReadMore, toggleExpanded, getTextClassName } = useReadMore({ text: body, maxLines: INITIAL_DISPLAY_LINES });
 
   return (
     <section className="pt-6 pb-8 mt-0">
       <h2 className="text-display-md text-foreground mb-4">体験できること</h2>
-      <div>
-        <p className="text-body-md text-foreground whitespace-pre-wrap">{body}</p>
+      <div className="relative">
+        <p
+          ref={textRef}
+          className={getTextClassName("text-body-md text-foreground whitespace-pre-wrap")}
+        >
+          {body}
+        </p>
+        {showReadMore && !expanded && (
+          <div className="absolute bottom-0 left-0 w-full">
+            <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+            <div className="relative flex justify-center pt-8">
+              <Button
+                variant="tertiary"
+                size="sm"
+                onClick={toggleExpanded}
+                className="bg-white px-6"
+              >
+                <span className="text-label-sm font-bold">もっと見る</span>
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
-      {/*<div className="relative">*/}
-      {/*  <p*/}
-      {/*    className={`text-body-md text-foreground whitespace-pre-wrap transition-all duration-300 ${!expanded && hasMoreLines ? `line-clamp-${INITIAL_DISPLAY_LINES}` : ""}`}*/}
-      {/*  >*/}
-      {/*    {body}*/}
-      {/*  </p>*/}
-      {/*  {hasMoreLines && !expanded && (*/}
-      {/*    <div className="absolute bottom-0 left-0 w-full">*/}
-      {/*      <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>*/}
-      {/*      <div className="relative flex justify-center pt-8">*/}
-      {/*        <Button*/}
-      {/*          variant="tertiary"*/}
-      {/*          size="sm"*/}
-      {/*          onClick={() => setExpanded(true)}*/}
-      {/*          className="bg-white px-6"*/}
-      {/*        >*/}
-      {/*          <span className="text-label-sm font-bold">もっと見る</span>*/}
-      {/*        </Button>*/}
-      {/*      </div>*/}
-      {/*    </div>*/}
-      {/*  )}*/}
-      {/*</div>*/}
       {/* #TODO: 体験画像のギャラリー表示 */}
     </section>
   );
