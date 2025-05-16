@@ -52,6 +52,11 @@ export default function ConfirmPage() {
   } = useReservationActions({ opportunity, selectedSlot, wallets, user, ticketCounter });
 
   const router = useRouter();
+  
+  const handleCloseLoginModal = useCallback(() => {
+    setIsLoginModalOpen(false);
+  }, [setIsLoginModalOpen]);
+  
   const handleConfirm = useCallback(() => {
     if (!opportunity || !handleReservation) return;
     return createReservationHandler(opportunity, handleReservation, router)();
@@ -69,7 +74,7 @@ export default function ConfirmPage() {
       >
         <main className="pb-8 min-h-screen">
           <Toaster />
-          <LoginModal isOpen={isLoginModalOpen} onClose={useCallback(() => setIsLoginModalOpen(false), [])} />
+          <LoginModal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal} />
 
           <OpportunityInfo opportunity={opportunity} />
 
