@@ -17,7 +17,7 @@ import { useReservationParams } from "@/app/reservation/confirm/hooks/useReserva
 import { createReservationHandler } from "@/app/reservation/confirm/hooks/useReservationHandler";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 
 export default function ConfirmPage() {
   const { user } = useAuth();
@@ -52,7 +52,7 @@ export default function ConfirmPage() {
   } = useReservationActions({ opportunity, selectedSlot, wallets, user, ticketCounter });
 
   const router = useRouter();
-  const handleConfirm = useMemo(
+  const handleConfirm = useCallback(
     () => createReservationHandler(opportunity, handleReservation, router),
     [opportunity, handleReservation, router],
   );
