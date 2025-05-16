@@ -1,12 +1,11 @@
-
 import React from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { prefectureLabels, prefectureOptions } from '@/app/users/data/presenter';
 import { GqlCurrentPrefecture } from '@/types/graphql';
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface UserProfileEditProps {
   profileImage: string | null;
@@ -100,35 +99,19 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
               住んでいるところ
               <span className="text-primary text-sm ml-1">必須</span>
             </Label>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              {prefectureOptions.map((prefecture) => (
-                <Button
-                  key={prefecture}
-                  type="button"
-                  onClick={() => setLocation(prefecture)}
-                  variant={location === prefecture ? "primary" : "tertiary"}
-                  className={`px-4 py-2 rounded-2xl border-2 ${
-                    location === prefecture
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'border-input hover:border-input/80 hover:bg-muted'
-                  }`}
-                >
-                  {prefectureLabels[prefecture]}
-                </Button>
-              ))}
-            </div>
-            <Button
-              type="button"
-              onClick={() => setLocation(GqlCurrentPrefecture.OutsideShikoku)}
-              variant={location === GqlCurrentPrefecture.OutsideShikoku ? "primary" : "tertiary"}
-              className={`w-full px-4 py-2 rounded-2xl border-2 ${
-                location === GqlCurrentPrefecture.OutsideShikoku
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'border-input hover:border-input/80 hover:bg-muted'
-              }`}
-            >
-              {prefectureLabels[GqlCurrentPrefecture.OutsideShikoku]}
-            </Button>
+            <ToggleGroup onValueChange={ (val) => setLocation(val as GqlCurrentPrefecture) } type="single"
+                         variant="outline" className="gap-2">
+              <ToggleGroupItem value={ GqlCurrentPrefecture.Kagawa }
+                               className="flex-1">香川県</ToggleGroupItem>
+              <ToggleGroupItem value={ GqlCurrentPrefecture.Tokushima }
+                               className="flex-1">徳島県</ToggleGroupItem>
+              <ToggleGroupItem value={ GqlCurrentPrefecture.Ehime }
+                               className="flex-1">愛媛県</ToggleGroupItem>
+              <ToggleGroupItem value={ GqlCurrentPrefecture.Kochi }
+                               className="flex-1">高知県</ToggleGroupItem>
+              <ToggleGroupItem value={ GqlCurrentPrefecture.OutsideShikoku }
+                               className="basis-full">四国以外</ToggleGroupItem>
+            </ToggleGroup>
           </div>
 
           <div className="mb-8">
