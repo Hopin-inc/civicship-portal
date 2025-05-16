@@ -1,15 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 export const useReservationUIState = () => {
   const [useTickets, setUseTickets] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
+  const memoizedSetUseTickets = useCallback((value: boolean) => {
+    setUseTickets(value);
+  }, []);
+
+  const memoizedSetIsLoginModalOpen = useCallback((value: boolean) => {
+    setIsLoginModalOpen(value);
+  }, []);
+
   return {
     useTickets,
-    setUseTickets,
+    setUseTickets: memoizedSetUseTickets,
     isLoginModalOpen,
-    setIsLoginModalOpen,
+    setIsLoginModalOpen: memoizedSetIsLoginModalOpen,
   };
 };
