@@ -108,7 +108,7 @@ function SearchPageContent({
   };
 
   return (
-    <>
+    <div className="space-y-6">
       <SearchForm />
       <SearchFilters
         onFilterClick={setActiveForm}
@@ -135,6 +135,6 @@ function SearchPageContent({
         prefectures={Object.entries(prefectureLabels).map(([id, name]) => ({ id, name }))}
       />
       <SearchFooter onClear={handleClear} onSearch={handleSearch} />
-    </>
+    </div>
   );
 }
