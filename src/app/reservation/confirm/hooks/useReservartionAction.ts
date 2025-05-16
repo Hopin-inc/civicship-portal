@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
 import type { GqlUser, GqlWallet } from "@/types/graphql";
 import { useCreateReservationMutation } from "@/types/graphql";
@@ -73,8 +73,8 @@ export const useReservationSubmission = ({
     createReservation,
   ]);
 
-  return {
+  return useMemo(() => ({
     submit,
     creatingReservation,
-  };
+  }), [submit, creatingReservation]);
 };
