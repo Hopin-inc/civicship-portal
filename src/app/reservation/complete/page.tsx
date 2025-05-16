@@ -4,7 +4,7 @@ import { SameStateActivities } from "@/app/activities/[id]/components/SimilarAct
 import { CompletionHeader } from "@/app/reservation/components/CompletionHeader";
 import { ActivitySummary } from "@/app/reservation/components/ActivitySummary";
 import { ReservationDetails } from "@/app/reservation/components/ReservationDetails";
-import { useReservationComplete } from "@/app/reservation/hooks/useReservationComplete";
+import { useReservationComplete } from "@/app/reservation/complete/hooks/useReservationComplete";
 import React from "react";
 import { ReservationContentGate } from "@/app/reservation/contentGate";
 

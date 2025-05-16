@@ -12,3 +12,5 @@ export function useTicketCounter(maxTickets: number) {
     decrement,
   };
 }
+
+export type UseTicketCounterReturn = ReturnType<typeof useTicketCounter>;

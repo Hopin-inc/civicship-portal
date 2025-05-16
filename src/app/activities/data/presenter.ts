@@ -90,7 +90,7 @@ function presenterActivitySlot(
         capacity: slot?.capacity ?? 0,
         remainingCapacity: slot?.remainingCapacity ?? 0,
         feeRequired: feeRequired ?? null,
-        applicantCount: null,
+        applicantCount: 1,
       }),
     ) ?? []
   );

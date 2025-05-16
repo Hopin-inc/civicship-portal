@@ -22,15 +22,51 @@ const loadImage = (src: string): Promise<HTMLImageElement> =>
     img.src = src;
   });
 
+const createPlaceholderIcon = async (size: number): Promise<google.maps.Icon> => {
+  const scale = 2;
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  const canvasSize = size * scale;
+
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
+
+  if (!context) throw new Error("Failed to get canvas context");
+  context.scale(scale, scale);
+
+  const centerX = size / 2;
+  const centerY = size / 2;
+  const radius = size / 2 - 2;
+
+  const placeholderImage = await loadImage(PLACEHOLDER_IMAGE);
+  await drawCircleWithImage(context, placeholderImage, centerX, centerY, radius, true);
+
+  return {
+    url: canvas.toDataURL("image/png"),
+    scaledSize: new google.maps.Size(size, size),
+    anchor: new google.maps.Point(size / 2, size / 2),
+  };
+};
+
 const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }) => {
   const [icon, setIcon] = useState<google.maps.Icon | null>(null);
   const displaySize = isSelected ? 80 : 56;
 
   useEffect(() => {
+    let isMounted = true;
+
     (async () => {
       if (markerIconCache.has(data.id)) {
-        setIcon(markerIconCache.get(data.id)!);
+        isMounted && setIcon(markerIconCache.get(data.id)!);
         return;
+      }
+
+      // 一旦プレースホルダーを先に表示
+      try {
+        const placeholder = await createPlaceholderIcon(displaySize);
+        isMounted && setIcon(placeholder);
+      } catch (error) {
+        console.warn("Failed to create placeholder icon:", error);
       }
 
       const scale = 2;
@@ -66,11 +102,15 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         };
 
         markerIconCache.set(data.id, markerIcon);
-        setIcon(markerIcon);
+        isMounted && setIcon(markerIcon);
       } catch (error) {
         console.warn("Failed to create marker icon:", error);
       }
     })();
+
+    return () => {
+      isMounted = false;
+    };
   }, [data.id, data.image, data.host.image, displaySize]);
 
   if (!icon) return null;

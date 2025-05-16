@@ -3155,6 +3155,12 @@ export type GqlGetOpportunitiesQuery = {
         feeRequired?: number | null;
         pointsToEarn?: number | null;
         earliestReservableAt?: Date | null;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
+        } | null;
         slots?: Array<{
           __typename?: "OpportunitySlot";
           id: string;
@@ -5479,6 +5485,9 @@ export const GetOpportunitiesDocument = gql`
         cursor
         node {
           ...OpportunityFields
+          community {
+            ...CommunityFields
+          }
           slots {
             ...OpportunitySlotFields
           }
@@ -5490,6 +5499,7 @@ export const GetOpportunitiesDocument = gql`
     }
   }
   ${OpportunityFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
   ${OpportunitySlotFieldsFragmentDoc}
   ${PlaceFieldsFragmentDoc}
 `;

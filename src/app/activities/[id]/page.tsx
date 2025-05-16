@@ -5,11 +5,11 @@ import ActivityDetailsHeader from "@/app/activities/[id]/components/ActivityDeta
 import ActivityDetailsContent from "@/app/activities/[id]/components/ActivityDetailsContent";
 import ActivityDetailsFooter from "@/app/activities/[id]/components/ActivityDetailsFooter";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { useEffect, useMemo } from "react";
-import { useLoading } from "@/hooks/useLoading";
+import { useMemo } from "react";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import ActivityNavigationButtons from "@/app/activities/[id]/components/ActivityNavigationButtons";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 interface ActivityPageProps {
   params: {
@@ -25,8 +25,6 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
 
   const { opportunity, sameStateActivities, availableTickets, sortedSlots, isLoading, error } =
     useActivityDetails(id);
-
-  const { setIsLoading } = useLoading();
   const { navigateBack } = useHierarchicalNavigation();
 
   const headerConfig = useMemo(
@@ -37,10 +35,6 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
   );
   useHeaderConfig(headerConfig);
 
-  useEffect(() => {
-    setIsLoading(isLoading);
-  }, [isLoading, setIsLoading]);
-
   if (error && !opportunity) {
     return <ErrorState message={`Error: ${error.message}`} />;
   }
@@ -50,6 +44,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
 
   return (
     <>
+      {isLoading && <LoadingIndicator fullScreen />}
       <ActivityNavigationButtons title={opportunity.title} onBack={navigateBack} />
 
       <main className="min-h-screen">
@@ -64,7 +59,11 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
           />
         </div>
       </main>
-      <ActivityDetailsFooter opportunityId={opportunity.id} price={opportunity.feeRequired || 0} />
+      <ActivityDetailsFooter
+        opportunityId={opportunity.id}
+        price={opportunity.feeRequired || 0}
+        communityId={searchParams.community_id}
+      />
     </>
   );
 }
