@@ -46,10 +46,10 @@ export default function ConfirmPage() {
   const memoizedDecrement = useCallback(ticketCounter.decrement, [ticketCounter.decrement]);
   
   const memoizedTicketCounter = useMemo(() => ({
-    ...ticketCounter,
+    count: ticketCounter.count,
     increment: memoizedIncrement,
     decrement: memoizedDecrement
-  }), [ticketCounter, memoizedIncrement, memoizedDecrement]);
+  }), [ticketCounter.count, memoizedIncrement, memoizedDecrement]);
 
   const {
     isLoginModalOpen,
