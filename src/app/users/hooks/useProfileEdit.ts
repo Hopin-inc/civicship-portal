@@ -25,6 +25,7 @@ export const useProfileEdit = () => {
     urlFacebook: '',
     urlInstagram: '',
     urlX: '',
+    phone: '',
   });
 
   const { data, loading: userLoading, error: userError } = useGetUserFlexibleQuery({
@@ -121,6 +122,7 @@ export const useProfileEdit = () => {
       instagram: profile.urlInstagram ?? '',
       twitter: profile.urlX ?? '',
     },
+    phone: profile.phone,
     userLoading,
     error: formattedError,
     updating,
