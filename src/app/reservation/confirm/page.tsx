@@ -68,7 +68,7 @@ export default function ConfirmPage() {
       >
         <main className="pb-8 min-h-screen">
           <Toaster />
-          <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+          <LoginModal isOpen={isLoginModalOpen} onClose={useCallback(() => setIsLoginModalOpen(false), [setIsLoginModalOpen])} />
 
           <OpportunityInfo opportunity={opportunity} />
 
