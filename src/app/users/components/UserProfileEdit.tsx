@@ -42,118 +42,114 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
   handleSave
 }) => {
   return (
-    <div className="min-h-screen bg-background">
-      <main className="py-6 px-4 pb-24 max-w-md mx-auto">
-        <form onSubmit={handleSave}>
-          <div className="mb-8">
-            <Label className="block mb-2">
-              プロフィール画像
-              <span className="text-primary text-sm ml-1">必須</span>
-            </Label>
-            <div className="flex items-center gap-3">
-              <div className="w-24 h-24 rounded-full overflow-hidden bg-muted">
-                {profileImage ? (
-                  <Image
-                    src={`data:image/jpeg;base64,${profileImage}`}
-                    alt="Profile"
-                    width={96}
-                    height={96}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-muted" />
-                )}
-              </div>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => document.getElementById('profile-image-input')?.click()}
-                className="h-10"
-              >
-                画像を選択
-              </Button>
-              <input
-                id="profile-image-input"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageSelect}
+    <form onSubmit={handleSave}>
+      <div className="mb-8">
+        <Label className="block mb-2">
+          プロフィール画像
+          <span className="text-primary text-sm ml-1">必須</span>
+        </Label>
+        <div className="flex items-center gap-3">
+          <div className="w-24 h-24 rounded-full overflow-hidden bg-muted">
+            {profileImage ? (
+              <Image
+                src={`data:image/jpeg;base64,${profileImage}`}
+                alt="Profile"
+                width={96}
+                height={96}
+                className="w-full h-full object-cover"
               />
-            </div>
+            ) : (
+              <div className="w-full h-full bg-muted" />
+            )}
           </div>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => document.getElementById('profile-image-input')?.click()}
+            className="h-10"
+          >
+            画像を選択
+          </Button>
+          <input
+            id="profile-image-input"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageSelect}
+          />
+        </div>
+      </div>
 
-          <div className="mb-8">
-            <Label className="block mb-2">
-              表示名
-              <span className="text-primary text-sm ml-1">必須</span>
-            </Label>
-            <Input
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="山田太郎"
-              required
-            />
-          </div>
+      <div className="mb-8">
+        <Label className="block mb-2">
+          表示名
+          <span className="text-primary text-sm ml-1">必須</span>
+        </Label>
+        <Input
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          placeholder="山田太郎"
+          required
+        />
+      </div>
 
-          <div className="mb-8">
-            <Label className="block mb-2">
-              住んでいるところ
-              <span className="text-primary text-sm ml-1">必須</span>
-            </Label>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              {prefectureOptions.map((prefecture) => (
-                <Button
-                  key={prefecture}
-                  type="button"
-                  onClick={() => setLocation(prefecture)}
-                  variant={location === prefecture ? "primary" : "tertiary"}
-                  className={`px-4 py-2 rounded-2xl border-2 ${
-                    location === prefecture
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'border-input hover:border-input/80 hover:bg-muted'
-                  }`}
-                >
-                  {prefectureLabels[prefecture]}
-                </Button>
-              ))}
-            </div>
+      <div className="mb-8">
+        <Label className="block mb-2">
+          住んでいるところ
+          <span className="text-primary text-sm ml-1">必須</span>
+        </Label>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          {prefectureOptions.map((prefecture) => (
             <Button
+              key={prefecture}
               type="button"
-              onClick={() => setLocation(GqlCurrentPrefecture.OutsideShikoku)}
-              variant={location === GqlCurrentPrefecture.OutsideShikoku ? "primary" : "tertiary"}
-              className={`w-full px-4 py-2 rounded-2xl border-2 ${
-                location === GqlCurrentPrefecture.OutsideShikoku
+              onClick={() => setLocation(prefecture)}
+              variant={location === prefecture ? "primary" : "tertiary"}
+              className={`px-4 py-2 rounded-2xl border-2 ${
+                location === prefecture
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'border-input hover:border-input/80 hover:bg-muted'
               }`}
             >
-              {prefectureLabels[GqlCurrentPrefecture.OutsideShikoku]}
+              {prefectureLabels[prefecture]}
             </Button>
-          </div>
+          ))}
+        </div>
+        <Button
+          type="button"
+          onClick={() => setLocation(GqlCurrentPrefecture.OutsideShikoku)}
+          variant={location === GqlCurrentPrefecture.OutsideShikoku ? "primary" : "tertiary"}
+          className={`w-full px-4 py-2 rounded-2xl border-2 ${
+            location === GqlCurrentPrefecture.OutsideShikoku
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-input hover:border-input/80 hover:bg-muted'
+          }`}
+        >
+          {prefectureLabels[GqlCurrentPrefecture.OutsideShikoku]}
+        </Button>
+      </div>
 
-          <div className="mb-8">
-            <Label className="block mb-2">自己紹介</Label>
-            <Textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder="自己紹介を入力しましょう"
-              className="min-h-[120px]"
-            />
-          </div>
+      <div className="mb-8">
+        <Label className="block mb-2">自己紹介</Label>
+        <Textarea
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          placeholder="自己紹介を入力しましょう"
+          className="min-h-[120px]"
+        />
+      </div>
 
-          <div className="w-[345px] mx-auto mb-8">
-            <Button
-              type="submit"
-              variant="primary"
-              className="w-full h-[56px]"
-              disabled={updating}
-            >
-              {updating ? '保存中...' : '保存'}
-            </Button>
-          </div>
-        </form>
-      </main>
-    </div>
+      <div className="w-[345px] mx-auto mb-8">
+        <Button
+          type="submit"
+          variant="primary"
+          className="w-full h-[56px]"
+          disabled={updating}
+        >
+          {updating ? '保存中...' : '保存'}
+        </Button>
+      </div>
+    </form>
   );
 };
 

@@ -47,7 +47,7 @@ export default function ProfileEditPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="px-4 pb-24 max-w-md mx-auto">
+      <main className="px-6 py-6 pb-24 max-w-md mx-auto">
         <UserProfileEdit
           profileImage={profileImage}
           displayName={displayName}
