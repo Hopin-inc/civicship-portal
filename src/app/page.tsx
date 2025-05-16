@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
 import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
-// import { useAnalyticsUserBinding } from "@/lib/analytics";
+import { useAnalyticsUserBinding } from "@/lib/analytics";
 
 export default function HomePage() {
   const router = useRouter();
 
-  // useAnalyticsUserBinding();
+  useAnalyticsUserBinding();
 
   useEffect(() => {
     router.push("/activities");
