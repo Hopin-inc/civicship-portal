@@ -41,6 +41,15 @@ export default function ConfirmPage() {
   } = useReservationConfirm({ opportunityId, slotId, userId: user?.id });
 
   const ticketCounter = useTicketCounter(availableTickets);
+  
+  const memoizedIncrement = useCallback(ticketCounter.increment, [ticketCounter.increment]);
+  const memoizedDecrement = useCallback(ticketCounter.decrement, [ticketCounter.decrement]);
+  
+  const memoizedTicketCounter = useMemo(() => ({
+    ...ticketCounter,
+    increment: memoizedIncrement,
+    decrement: memoizedDecrement
+  }), [ticketCounter, memoizedIncrement, memoizedDecrement]);
 
   const {
     isLoginModalOpen,
@@ -49,7 +58,7 @@ export default function ConfirmPage() {
     setUseTickets,
     handleReservation,
     creatingReservation,
-  } = useReservationActions({ opportunity, selectedSlot, wallets, user, ticketCounter });
+  } = useReservationActions({ opportunity, selectedSlot, wallets, user, ticketCounter: memoizedTicketCounter });
 
   const router = useRouter();
   
@@ -91,8 +100,8 @@ export default function ConfirmPage() {
 
             <PaymentSection
               ticketCount={ticketCounter.count}
-              onIncrement={ticketCounter.increment}
-              onDecrement={ticketCounter.decrement}
+              onIncrement={memoizedIncrement}
+              onDecrement={memoizedDecrement}
               maxTickets={availableTickets}
               pricePerPerson={opportunity?.feeRequired ?? 0}
               participantCount={participantCount}
