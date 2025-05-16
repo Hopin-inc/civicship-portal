@@ -80,16 +80,13 @@ const setSafeUserAttributes = (rawProps: Record<string, any>) => {
  * イベント送信：ユーザー属性 + params をすべて送信
  */
 const safeLogEvent = (name: string, params?: Record<string, any>): void => {
+  console.log("[Analytics] → send event:", name, params); // ← 追加
   if (!analytics) {
     console.warn(`[Analytics] not initialized: skip event '${name}'`);
     return;
   }
-
-  const enrichedParams = {
-    ...currentUserAttributes,
-    ...params,
-  };
-
+  const enrichedParams = { ...currentUserAttributes, ...params };
+  console.log("[Analytics] → enriched params:", enrichedParams); // ← 追加
   logEvent(analytics, name, enrichedParams);
 };
 
