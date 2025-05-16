@@ -189,11 +189,15 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
         </div>
       </div>
 
-      <div>
-        <Label className="mb-2 block">電話番号</Label>
-        <span className="text-body-lg mb-2 block">{phone}</span>
-        <p className='text-body-sm text-caption'>電話番号は、予約時の緊急連絡先として案内人に共有されます。一般には公開されません。</p>
-      </div>
+      {phone && (
+        <div>
+          <Label className="mb-2 block">電話番号</Label>
+          <span className="text-body-lg mb-2 block">{phone}</span>
+          <p className="text-body-sm text-caption">
+            電話番号は、予約時の緊急連絡先として案内人に共有されます。一般には公開されません。
+          </p>
+        </div>
+      )}
 
       <div className="w-[345px] mx-auto">
         <Button type="submit" variant="primary" className="w-full h-[56px]" disabled={updating}>
