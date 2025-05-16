@@ -1,10 +1,10 @@
 "use client";
 
-import PlaceCard from "@/app/places/components/list/PlaceCard";
 import { useRouter } from "next/navigation";
 import { BaseCardInfo } from "@/app/places/data/type";
 import React from "react";
-import PlaceToggleButton from "@/app/places/components/PlaceToggleButton";
+import PlaceToggleButton from "@/app/places/components/ToggleButton";
+import PlaceCard from "@/app/places/components/Card";
 
 interface PlaceListSheetProps {
   places: BaseCardInfo[];
@@ -24,24 +24,20 @@ export const PlaceListPage: React.FC<PlaceListSheetProps> = ({
   };
 
   return (
-    <div className="min-h-screen w-full px-6 pt-16 pb-24 max-w-lg mx-auto">
+    <div className="min-h-screen w-full px-6 pt-6 pb-6 max-w-lg mx-auto">
       <div className="grid gap-4">
         {places
           .filter((place) => !selectedPlaceId || place.id === selectedPlaceId)
           .map((place) => (
             <PlaceCard
               key={place.id}
-              placeId={place.id}
-              placeName={place.name}
-              placeImage={place.image}
-              participantCount={place.participantCount}
-              bio={place.bio}
-              activeOpportunityCount={place.publicOpportunityCount}
+              place={place}
+              selected={place.id === selectedPlaceId}
               onClick={() => handlePlaceClick(place.id, place.host.id)}
             />
           ))}
       </div>
-      {!selectedPlaceId && <PlaceToggleButton isMapMode={true} onClick={onMapClick} />}
+      {!selectedPlaceId && <PlaceToggleButton isMapMode={false} onClick={onMapClick} />}
     </div>
   );
 };

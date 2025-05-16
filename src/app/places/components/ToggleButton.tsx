@@ -16,12 +16,12 @@ const PlaceToggleButton: React.FC<PlaceToggleButtonProps> = ({ isMapMode, onClic
         {isMapMode ? (
           <>
             <List className="h-5 w-5" />
-            一覧で見る
+            一覧
           </>
         ) : (
           <>
             <MapPin className="h-5 w-5" />
-            地図で見る
+            地図
           </>
         )}
       </Button>
