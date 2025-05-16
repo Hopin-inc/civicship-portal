@@ -171,7 +171,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsPhoneVerified(phoneVerified);
     } catch (error) {
       console.error("LIFF login failed:", error);
-      toast.error("LINEログインに失敗しました");
+      
+      let errorMessage = "LINEログインに失敗しました";
+      
+      if (error instanceof Error) {
+        if (error.message.includes("network")) {
+          errorMessage = "ネットワーク接続に問題が発生しました。インターネット接続を確認してください。";
+        } else if (error.message.includes("expired")) {
+          errorMessage = "セッションの有効期限が切れました。再度お試しください。";
+        } else if (error.message.includes("access denied") || error.message.includes("cancelled")) {
+          errorMessage = "ログイン処理がキャンセルされました。";
+        }
+      }
+      
+      toast.error(errorMessage);
       setIsExplicitLogin(false);
     }
   };
@@ -182,11 +195,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const success = await signInWithLiffToken(accessToken);
       if (!success) {
-        toast.error("認証に失敗しました");
+        return false;
       }
-      return success;
+      return true;
     } catch (error) {
-      toast.error("認証に失敗しました");
+      console.error("Unexpected error during LIFF token authentication:", error);
+      toast.error("予期せぬエラーが発生しました。もう一度お試しください。");
       return false;
     } finally {
       setIsAuthenticating(false);
@@ -218,14 +232,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           duration: 10000, // 10 seconds
         }
       );
+    };
+    
+    const handleAuthError = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { errorType, errorMessage } = customEvent.detail;
       
-      // router.push("/sign-up/phone-verification");
+      console.log("Auth error event detected:", customEvent.detail);
+      
+      toast.error(
+        errorMessage,
+        {
+          action: errorType === 'network' ? {
+            label: "再試行",
+            onClick: () => window.location.reload()
+          } : (errorType === 'expired' || errorType === 'auth' || errorType === 'reauth') ? {
+            label: "再認証",
+            onClick: () => router.push("/login")
+          } : undefined,
+          duration: 10000, // 10 seconds
+        }
+      );
     };
     
     window.addEventListener('auth:token-expired', handleTokenExpired);
+    window.addEventListener('auth:error', handleAuthError);
+    window.addEventListener('auth:token-refresh-failed', handleAuthError);
     
     return () => {
       window.removeEventListener('auth:token-expired', handleTokenExpired);
+      window.removeEventListener('auth:error', handleAuthError);
+      window.removeEventListener('auth:token-refresh-failed', handleAuthError);
     };
   }, [router]);
 

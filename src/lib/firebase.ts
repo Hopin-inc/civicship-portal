@@ -11,6 +11,8 @@ import {
   signInWithPhoneNumber,
   PhoneAuthProvider,
 } from "@firebase/auth";
+import { retry } from "retry";
+import type { FirebaseError } from "@firebase/util";
 
 export { PhoneAuthProvider };
 import { LIFFLoginResponse } from "@/types/line";
@@ -70,30 +72,121 @@ export const signInWithFacebook = async () => {
   return signIn("facebook");
 };
 
-export const signInWithLiffToken = async (accessToken: string): Promise<boolean> => {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ accessToken }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`LIFF authentication failed: ${response.status}`);
+const categorizeFirebaseError = (error: any): { type: string; message: string; retryable: boolean } => {
+  if (error?.code) {
+    const code = error.code as string;
+    
+    if (code === 'auth/network-request-failed') {
+      return { 
+        type: 'network', 
+        message: 'ネットワーク接続に問題が発生しました。インターネット接続を確認してください。', 
+        retryable: true 
+      };
     }
-
-    const { customToken, profile }: LIFFLoginResponse = await response.json();
-
-    const { user } = await signInWithCustomToken(auth, customToken);
-    await updateProfile(user, {
-      displayName: profile.displayName,
-      photoURL: profile.pictureUrl,
-    });
-    return true;
-  } catch (error) {
-    console.error("Authentication with LIFF token failed:", error);
-    return false;
+    
+    if (code === 'auth/user-token-expired' || code === 'auth/id-token-expired') {
+      return { 
+        type: 'expired', 
+        message: '認証の有効期限が切れました。再認証が必要です。', 
+        retryable: false 
+      };
+    }
+    
+    if (code === 'auth/invalid-credential' || code === 'auth/user-disabled') {
+      return { 
+        type: 'auth', 
+        message: '認証情報が無効です。再ログインしてください。', 
+        retryable: false 
+      };
+    }
+    
+    if (code === 'auth/requires-recent-login') {
+      return { 
+        type: 'reauth', 
+        message: 'セキュリティのため再認証が必要です。', 
+        retryable: false 
+      };
+    }
   }
+  
+  if (error?.message?.includes('LIFF authentication failed')) {
+    return { 
+      type: 'api', 
+      message: 'LINE認証サービスとの通信に失敗しました。', 
+      retryable: true 
+    };
+  }
+  
+  return { 
+    type: 'unknown', 
+    message: '認証中に予期せぬエラーが発生しました。', 
+    retryable: false 
+  };
+};
+
+export const signInWithLiffToken = async (accessToken: string): Promise<boolean> => {
+  const operation = retry.operation({
+    retries: 3,
+    factor: 2,
+    minTimeout: 1000,
+    maxTimeout: 10000,
+    randomize: true,
+  });
+
+  return new Promise((resolve) => {
+    operation.attempt(async (currentAttempt) => {
+      try {
+        console.log(`Attempting LIFF authentication (attempt ${currentAttempt})`);
+        
+        const response = await fetch(`${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ accessToken }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`LIFF authentication failed: ${response.status}`);
+        }
+
+        const { customToken, profile }: LIFFLoginResponse = await response.json();
+
+        const { user } = await signInWithCustomToken(auth, customToken);
+        await updateProfile(user, {
+          displayName: profile.displayName,
+          photoURL: profile.pictureUrl,
+        });
+        
+        console.log('LIFF authentication successful');
+        resolve(true);
+      } catch (error) {
+        const categorizedError = categorizeFirebaseError(error);
+        
+        console.error(`LIFF authentication error (attempt ${currentAttempt}):`, {
+          type: categorizedError.type,
+          message: categorizedError.message,
+          error,
+          retryable: categorizedError.retryable
+        });
+
+        if (!categorizedError.retryable || !operation.retry(error as Error)) {
+          console.error('LIFF authentication failed after all retries');
+          
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('auth:error', {
+              detail: { 
+                source: 'liff',
+                errorType: categorizedError.type,
+                errorMessage: categorizedError.message,
+                originalError: error
+              }
+            }));
+          }
+          
+          resolve(false);
+        }
+      }
+    });
+  });
 };
 
 let recaptchaVerifier: RecaptchaVerifier | null = null;
@@ -243,4 +336,89 @@ export const isPhoneVerified = (): boolean => {
 
 export const getVerifiedPhoneNumber = (): string | null => {
   return phoneVerificationState.verified ? phoneVerificationState.phoneNumber : null;
+};
+
+export const refreshAuthToken = async (user: any): Promise<string | null> => {
+  const operation = retry.operation({
+    retries: 3,
+    factor: 2,
+    minTimeout: 1000,
+    maxTimeout: 10000,
+    randomize: true,
+  });
+
+  return new Promise((resolve) => {
+    operation.attempt(async (currentAttempt) => {
+      try {
+        console.log(`Attempting to refresh auth token (attempt ${currentAttempt})`);
+        
+        const idToken = await user.getIdToken(true);
+        console.log('Token refresh successful');
+        
+        resolve(idToken);
+      } catch (error) {
+        const categorizedError = categorizeFirebaseError(error);
+        
+        console.error(`Token refresh error (attempt ${currentAttempt}):`, {
+          type: categorizedError.type,
+          message: categorizedError.message,
+          error,
+          retryable: categorizedError.retryable
+        });
+
+        if (!categorizedError.retryable || !operation.retry(error as Error)) {
+          console.error('Token refresh failed after all retries');
+          
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('auth:token-refresh-failed', {
+              detail: { 
+                source: 'token-refresh',
+                errorType: categorizedError.type,
+                errorMessage: categorizedError.message,
+                originalError: error
+              }
+            }));
+          }
+          
+          resolve(null);
+        }
+      }
+    });
+  });
+};
+
+/**
+ * Attempts to refresh the authentication token with proper error handling and retry mechanism
+ * @returns The new ID token if successful, or null if failed
+ */
+export const refreshIdToken = async (): Promise<string | null> => {
+  try {
+    if (!auth.currentUser) {
+      console.warn('Cannot refresh token: No authenticated user');
+      return null;
+    }
+    
+    return await refreshAuthToken(auth.currentUser);
+  } catch (error) {
+    console.error('Failed to refresh ID token:', error);
+    return null;
+  }
+};
+
+/**
+ * Attempts to refresh the phone authentication token with proper error handling and retry mechanism
+ * @returns The new phone ID token if successful, or null if failed
+ */
+export const refreshPhoneIdToken = async (): Promise<string | null> => {
+  try {
+    if (!phoneAuth.currentUser) {
+      console.warn('Cannot refresh phone token: No authenticated user');
+      return null;
+    }
+    
+    return await refreshAuthToken(phoneAuth.currentUser);
+  } catch (error) {
+    console.error('Failed to refresh phone ID token:', error);
+    return null;
+  }
 };
