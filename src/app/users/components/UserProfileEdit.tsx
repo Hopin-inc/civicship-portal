@@ -44,9 +44,9 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
   return (
     <form onSubmit={handleSave}>
       <div className="mb-8">
-        <Label className="block mb-2">
+        <Label className="mb-2 flex items-center gap-x-2">
           プロフィール画像
-          <span className="text-primary text-sm ml-1">必須</span>
+          <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">必須</span>
         </Label>
         <div className="flex items-center gap-3">
           <div className="w-24 h-24 rounded-full overflow-hidden bg-muted">
@@ -81,9 +81,9 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
       </div>
 
       <div className="mb-8">
-        <Label className="block mb-2">
+        <Label className="mb-2 flex items-center gap-x-2">
           表示名
-          <span className="text-primary text-sm ml-1">必須</span>
+          <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">必須</span>
         </Label>
         <Input
           value={displayName}
@@ -94,9 +94,9 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
       </div>
 
       <div className="mb-8">
-        <Label className="block mb-2">
+        <Label className="mb-2 flex items-center gap-x-2">
           住んでいるところ
-          <span className="text-primary text-sm ml-1">必須</span>
+          <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">必須</span>
         </Label>
         <div className="grid grid-cols-2 gap-4 mb-4">
           {prefectureOptions.map((prefecture) => (
