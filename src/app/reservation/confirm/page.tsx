@@ -54,7 +54,7 @@ export default function ConfirmPage() {
   const router = useRouter();
   const handleConfirm = useCallback(() => {
     return createReservationHandler(opportunity, handleReservation, router)();
-  }, [opportunity, handleReservation, router, createReservationHandler]);
+  }, [opportunity, handleReservation, router]);
 
   return (
     <>
