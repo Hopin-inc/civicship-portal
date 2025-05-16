@@ -46,8 +46,6 @@ const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
     userId: searchParams.userId || "",
   });
 
-  console.log(detail);
-
   const [selectedImageIndex, setSelectedImageIndex] = useState(currentImageIndex);
 
   if (error) return <ErrorState message={error.message} />;

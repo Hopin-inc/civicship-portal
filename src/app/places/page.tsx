@@ -1,7 +1,7 @@
 "use client";
 
 import { ErrorState } from "@/components/shared/ErrorState";
-import { PlaceListPage } from "@/app/places/components/list/PlaceListSheet";
+import { PlaceListPage } from "@/app/places/components/list/ListPage";
 import PlaceMapView from "@/app/places/components/map/PlaceMapView";
 import usePlaceQueryParams from "@/app/places/hooks/usePlaceQueryParams";
 import usePlacePins from "@/app/places/hooks/usePlacePins";

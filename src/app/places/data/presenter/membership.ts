@@ -37,6 +37,7 @@ export const presenterBasePins = (memberships: GqlMembership[]): BasePin[] => {
         },
         latitude: Number(location.latitude),
         longitude: Number(location.longitude),
+        address: location.address ?? "",
       });
     }
   }
@@ -53,6 +54,7 @@ const presenterBasePin = (
   host,
   latitude: Number(location.latitude),
   longitude: Number(location.longitude),
+  address: location.address ?? "",
 });
 
 export const presenterBaseCard = (memberships: GqlMembership[]): BaseCardInfo[] => {
