@@ -6,6 +6,7 @@ import type { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import type { GqlUser, GqlWallet } from "@/types/graphql";
 import { useReservationSubmission } from "./useReservartionAction";
 import { UseTicketCounterReturn } from "./useTicketCounter";
+import { useMemo } from "react";
 
 export const useReservationActions = ({
   opportunity,
@@ -32,12 +33,19 @@ export const useReservationActions = ({
     useTickets,
   });
 
-  return {
+  return useMemo(() => ({
     useTickets,
     setUseTickets,
     isLoginModalOpen,
     setIsLoginModalOpen,
     handleReservation: submit,
     creatingReservation,
-  };
+  }), [
+    useTickets,
+    setUseTickets,
+    isLoginModalOpen,
+    setIsLoginModalOpen,
+    submit,
+    creatingReservation
+  ]);
 };
