@@ -1,27 +1,39 @@
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
-  signInWithCustomToken,
-  signInWithCredential,
-  updateProfile,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
   PhoneAuthProvider,
+  RecaptchaVerifier,
+  signInWithCredential,
+  signInWithCustomToken,
+  signInWithPhoneNumber,
+  updateProfile,
 } from "@firebase/auth";
+import { LIFFLoginResponse } from "@/types/line";
+// import { Analytics, getAnalytics, isSupported } from "@firebase/analytics";
 import retry from "retry";
 
 export { PhoneAuthProvider };
-import { LIFFLoginResponse } from "@/types/line";
 
 const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 auth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
+
+// let analytics: Analytics;
+// if (typeof window !== "undefined") {
+//   isSupported().then((supported) => {
+//     if (supported) {
+//       analytics = getAnalytics(app);
+//     }
+//   });
+// }
+// export { analytics };
 
 export const phoneApp = initializeApp(firebaseConfig, "phone-auth-app");
 export const phoneAuth = getAuth(phoneApp);
@@ -175,12 +187,12 @@ export const clearRecaptcha = () => {
     }
 
     if (recaptchaContainerElement) {
-      if (document.getElementById('recaptcha-container')) {
-        const iframes = recaptchaContainerElement.querySelectorAll('iframe');
-        iframes.forEach(iframe => iframe.remove());
+      if (document.getElementById("recaptcha-container")) {
+        const iframes = recaptchaContainerElement.querySelectorAll("iframe");
+        iframes.forEach((iframe) => iframe.remove());
 
         const divs = recaptchaContainerElement.querySelectorAll('div[id^="rc-"]');
-        divs.forEach(div => div.remove());
+        divs.forEach((div) => div.remove());
       }
       recaptchaContainerElement = null;
     }
@@ -193,25 +205,29 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
   try {
     clearRecaptcha();
 
-    recaptchaContainerElement = document.getElementById('recaptcha-container');
+    recaptchaContainerElement = document.getElementById("recaptcha-container");
     if (!recaptchaContainerElement) {
       throw new Error("reCAPTCHA container element not found");
     }
 
-    recaptchaVerifier = new RecaptchaVerifier(phoneAuth, 'recaptcha-container', {
-      size: 'invisible',
+    recaptchaVerifier = new RecaptchaVerifier(phoneAuth, "recaptcha-container", {
+      size: "invisible",
       callback: () => {
-        console.log('reCAPTCHA solved!');
+        console.log("reCAPTCHA solved!");
       },
-      'expired-callback': () => {
-        console.log('reCAPTCHA expired');
+      "expired-callback": () => {
+        console.log("reCAPTCHA expired");
         clearRecaptcha();
-      }
+      },
     });
 
     await recaptchaVerifier.render();
 
-    const confirmationResult = await signInWithPhoneNumber(phoneAuth, phoneNumber, recaptchaVerifier);
+    const confirmationResult = await signInWithPhoneNumber(
+      phoneAuth,
+      phoneNumber,
+      recaptchaVerifier,
+    );
 
     phoneVerificationState.phoneNumber = phoneNumber;
     phoneVerificationState.verificationId = confirmationResult.verificationId;
@@ -267,7 +283,11 @@ export const verifyPhoneCode = async (verificationId: string, code: string): Pro
 
         try {
           console.log("Attempting fallback with signInWithPhoneNumber");
-          const result = await signInWithPhoneNumber(phoneAuth, phoneVerificationState.phoneNumber || '', recaptchaVerifier!);
+          const result = await signInWithPhoneNumber(
+            phoneAuth,
+            phoneVerificationState.phoneNumber || "",
+            recaptchaVerifier!,
+          );
 
           if (phoneAuth.currentUser) {
             phoneVerificationState.phoneUid = phoneAuth.currentUser.uid;

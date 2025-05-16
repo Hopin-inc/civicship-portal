@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
-import { useSortedSlotsByStartsAt } from "@/app/activities/[id]/hooks/useAvailableDates";
+import { useSortedSlotsByStartsAt } from "@/app/activities/[id]/hooks/useSortedSlotsByStartsAt";
 import { ActivityCard, ActivityDetail } from "@/app/activities/data/type";
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
 import { useSameStateActivities } from "@/app/activities/[id]/hooks/useSimilarActivities";
@@ -25,7 +25,10 @@ export const useActivityDetails = (id: string): UseActivityDetailsResult => {
   const { setIsLoading } = useLoading();
 
   const { data, opportunity, loading: loadingOpportunity, error } = useOpportunityDetail(id);
-  const { sameStateActivities, loading: loadingSimilar } = useSameStateActivities(id, data?.opportunity?.place?.city?.state?.code ?? "");
+  const { sameStateActivities, loading: loadingSimilar } = useSameStateActivities(
+    id,
+    data?.opportunity?.place?.city?.state?.code ?? "",
+  );
   const availableTickets = useAvailableTickets(opportunity, user?.id);
   const sortedSlots = useSortedSlotsByStartsAt(opportunity?.slots);
 

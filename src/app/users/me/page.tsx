@@ -48,7 +48,7 @@ export default function MyProfilePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-3xl">
+    <div className="container mx-auto px-6 py-6 max-w-3xl">
       <UserProfileSection
         userId={currentUser?.id ?? ""}
         isLoading={isLoading}

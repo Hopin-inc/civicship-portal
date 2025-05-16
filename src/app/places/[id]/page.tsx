@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, useState, useMemo } from "react";
-import { usePlaceDetail } from "@/app/places/hooks/usePlaceDetail";
+import { usePlaceDetail } from "@/app/places/[id]/hooks/usePlaceDetail";
 import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
 import PlaceImageSlider from "@/app/places/[id]/components/PlaceImageSlider";
 import PlaceHeader from "@/app/places/[id]/components/PlaceHeader";
@@ -45,8 +45,6 @@ const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
     placeId: params.id,
     userId: searchParams.userId || "",
   });
-
-  console.log(detail);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(currentImageIndex);
 

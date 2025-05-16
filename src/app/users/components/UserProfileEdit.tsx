@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Facebook, Instagram, Twitter } from 'lucide-react';
 import { GqlCurrentPrefecture } from '@/types/graphql';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
@@ -17,6 +18,7 @@ interface UserProfileEditProps {
     instagram: string;
     twitter: string;
   };
+  phone: string | undefined;
   updating: boolean;
   setDisplayName: (name: string) => void;
   setLocation: (location: GqlCurrentPrefecture) => void;
@@ -31,73 +33,78 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
   displayName,
   location,
   bio,
-  // socialLinks,
+  socialLinks,
+  phone,
   updating,
   setDisplayName,
   setLocation,
   setBio,
-  // setSocialLinks,
+  setSocialLinks,
   handleImageSelect,
   handleSave
 }) => {
   return (
-    <div className="min-h-screen bg-background">
-      <main className="py-6 px-4 pb-24 max-w-md mx-auto">
-        <form onSubmit={handleSave}>
-          <div className="mb-8">
-            <Label className="block mb-2">
-              プロフィール画像
-              <span className="text-primary text-sm ml-1">必須</span>
-            </Label>
-            <div className="flex items-center gap-3">
-              <div className="w-24 h-24 rounded-full overflow-hidden bg-muted">
-                {profileImage ? (
-                  <Image
-                    src={`data:image/jpeg;base64,${profileImage}`}
-                    alt="Profile"
-                    width={96}
-                    height={96}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-muted" />
-                )}
-              </div>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => document.getElementById('profile-image-input')?.click()}
-                className="h-10"
-              >
-                画像を選択
-              </Button>
-              <input
-                id="profile-image-input"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageSelect}
+    <form onSubmit={handleSave} className="space-y-8">
+      <div>
+        <Label className="mb-2 flex items-center gap-x-2">
+          プロフィール画像
+          <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">
+            必須
+          </span>
+        </Label>
+        <div className="flex items-center gap-3">
+          <div className="w-24 h-24 rounded-full overflow-hidden bg-muted">
+            {profileImage ? (
+              <Image
+                src={`data:image/jpeg;base64,${profileImage}`}
+                alt="Profile"
+                width={96}
+                height={96}
+                className="w-full h-full object-cover"
               />
-            </div>
+            ) : (
+              <div className="w-full h-full bg-muted" />
+            )}
           </div>
+          <Button
+            type="button"
+            variant="tertiary"
+            onClick={() => document.getElementById("profile-image-input")?.click()}
+            className="h-10"
+          >
+            画像を選択
+          </Button>
+          <input
+            id="profile-image-input"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageSelect}
+          />
+        </div>
+      </div>
 
-          <div className="mb-8">
-            <Label className="block mb-2">
-              表示名
-              <span className="text-primary text-sm ml-1">必須</span>
-            </Label>
-            <Input
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="山田太郎"
-              required
-            />
-          </div>
+      <div>
+        <Label className="mb-2 flex items-center gap-x-2">
+          表示名
+          <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">
+            必須
+          </span>
+        </Label>
+        <Input
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          placeholder="山田太郎"
+          required
+        />
+      </div>
 
-          <div className="mb-8">
-            <Label className="block mb-2">
+          <div>
+            <Label className="mb-2 flex items-center gap-x-2">
               住んでいるところ
-              <span className="text-primary text-sm ml-1">必須</span>
+              <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">
+                必須
+              </span>
             </Label>
             <ToggleGroup onValueChange={ (val) => setLocation(val as GqlCurrentPrefecture) } type="single"
                          variant="outline" className="gap-2">
@@ -114,29 +121,73 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
             </ToggleGroup>
           </div>
 
-          <div className="mb-8">
-            <Label className="block mb-2">自己紹介</Label>
-            <Textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder="自己紹介を入力しましょう"
-              className="min-h-[120px]"
+      <div>
+        <Label className="block mb-2">自己紹介</Label>
+        <Textarea
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          placeholder="自己紹介を入力しましょう"
+          className="min-h-[120px]"
+        />
+      </div>
+
+      <div>
+        <Label className="mb-2 block">SNSリンク</Label>
+        <div className="space-y-3">
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <Facebook className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <Input
+              value={socialLinks.facebook}
+              onChange={(e) => setSocialLinks({ ...socialLinks, facebook: e.target.value })}
+              placeholder="https://facebook.com/..."
+              className="pl-9"
             />
           </div>
 
-          <div className="w-[345px] mx-auto mb-8">
-            <Button
-              type="submit"
-              variant="primary"
-              className="w-full h-[56px]"
-              disabled={updating}
-            >
-              {updating ? '保存中...' : '保存'}
-            </Button>
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <Instagram className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <Input
+              value={socialLinks.instagram}
+              onChange={(e) => setSocialLinks({ ...socialLinks, instagram: e.target.value })}
+              placeholder="https://instagram.com/..."
+              className="pl-9"
+            />
           </div>
-        </form>
-      </main>
-    </div>
+
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <Twitter className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <Input
+              value={socialLinks.twitter}
+              onChange={(e) => setSocialLinks({ ...socialLinks, twitter: e.target.value })}
+              placeholder="https://x.com/..."
+              className="pl-9"
+            />
+          </div>
+        </div>
+      </div>
+
+      {phone && (
+        <div>
+          <Label className="mb-2 block">電話番号</Label>
+          <span className="text-body-lg mb-2 block">{phone}</span>
+          <p className="text-body-sm text-caption">
+            電話番号は、予約時の緊急連絡先として案内人に共有されます。一般には公開されません。
+          </p>
+        </div>
+      )}
+
+      <div className="w-[345px] mx-auto">
+        <Button type="submit" variant="primary" className="w-full h-[56px]" disabled={updating}>
+          {updating ? "保存中..." : "保存"}
+        </Button>
+      </div>
+    </form>
   );
 };
 

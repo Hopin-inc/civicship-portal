@@ -1,34 +1,39 @@
 "use client";
 
-import { useMemo } from "react";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { usePlaces } from "@/app/places/hooks/usePlaces";
+import { PlaceListPage } from "@/app/places/components/list/ListPage";
 import PlaceMapView from "@/app/places/components/map/PlaceMapView";
-import { PlaceListPage } from "@/app/places/components/list/PlaceListSheet";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
+import usePlaceQueryParams from "@/app/places/hooks/usePlaceQueryParams";
+import usePlacePins from "@/app/places/hooks/usePlacePins";
+import usePlaceCards from "@/app/places/hooks/usePlaceCards";
 
 export default function PlacesPage() {
-  const headerConfig = useMemo(
-    () => ({
-      showLogo: true,
-    }),
-    [],
-  );
-  useHeaderConfig(headerConfig);
+  const { selectedPlaceId, mode, handlePlaceSelect, handleClose, toggleMode } =
+    usePlaceQueryParams();
 
-  const { places, selectedPlaceId, mode, error, handlePlaceSelect, toggleMode } = usePlaces();
+  const { placePins, loading: pinsLoading, error: pinsError } = usePlacePins();
+  const { baseCards, loading: cardsLoading, error: cardsError } = usePlaceCards();
+
+  const loading = mode === "map" ? pinsLoading : cardsLoading;
+  const error = mode === "map" ? pinsError : cardsError;
+
   if (error) return <ErrorState message={error.message} />;
 
   return (
     <div className="h-screen w-full">
       {mode === "list" ? (
-        <PlaceListPage places={places} selectedPlaceId={selectedPlaceId} onMapClick={toggleMode} />
+        <PlaceListPage
+          places={baseCards}
+          selectedPlaceId={selectedPlaceId}
+          onMapClick={toggleMode}
+        />
       ) : (
         <PlaceMapView
           selectedPlaceId={selectedPlaceId}
           onPlaceSelect={handlePlaceSelect}
           toggleMode={toggleMode}
-          places={places}
+          placePins={placePins}
+          places={baseCards}
         />
       )}
     </div>

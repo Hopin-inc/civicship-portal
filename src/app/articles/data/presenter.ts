@@ -22,7 +22,8 @@ export const presenterArticleCard = (node?: GqlArticle): TArticleCard => ({
   id: node?.id || "",
   category: node?.category || GqlArticleCategory.Interview,
   title: node?.title || "",
-  introduction: node?.introduction || "",
+  // TODO FEでintroが入ったら修正
+  introduction: node?.body || "",
   thumbnail: node?.thumbnail || null,
   publishedAt: node?.publishedAt ? new Date(node.publishedAt).toISOString() : "",
 });
@@ -49,7 +50,8 @@ export const presenterArticleDetail = (article: GqlArticle): TArticleDetail => {
     id: article.id,
     title: article.title,
     category: article.category,
-    introduction: article.introduction || "",
+    // TODO FEでintroが入ったら修正
+    introduction: article.body || "",
     body: article.body || "",
 
     thumbnail: typeof article.thumbnail === "string" ? article.thumbnail : "",
