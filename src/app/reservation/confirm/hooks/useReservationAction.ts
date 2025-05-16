@@ -4,8 +4,8 @@ import { useReservationUIState } from "./useReservationUIState";
 import type { ActivityDetail } from "@/app/activities/data/type";
 import type { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import type { GqlUser, GqlWallet } from "@/types/graphql";
-import { useReservationSubmission } from "@/app/reservation/confirm/hooks/useReservartionAction";
-import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
+import { useReservationSubmission } from "./useReservartionAction";
+import { UseTicketCounterReturn } from "./useTicketCounter";
 
 export const useReservationActions = ({
   opportunity,

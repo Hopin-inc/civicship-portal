@@ -1,6 +1,6 @@
 
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 
@@ -28,11 +28,11 @@ export const PaymentSection: React.FC<PaymentSectionProps> = ({
   useTickets,
   setUseTickets
 }) => {
-  const handleUseTicketsChange = (value: boolean) => {
+  const handleUseTicketsChange = useCallback((value: boolean) => {
     if (maxTickets > 0) {
       setUseTickets(value);
     }
-  };
+  }, [maxTickets, setUseTickets]);
 
   return (
     <div className="rounded-lg p-4 mb-6">
