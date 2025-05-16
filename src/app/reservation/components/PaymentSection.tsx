@@ -1,6 +1,6 @@
 
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 
@@ -28,11 +28,17 @@ export const PaymentSection: React.FC<PaymentSectionProps> = ({
   useTickets,
   setUseTickets
 }) => {
+  const switchRef = useRef(null);
+  
+  const stableSetUseTickets = useCallback((value: boolean) => {
+    setUseTickets(value);
+  }, [setUseTickets]);
+  
   const handleUseTicketsChange = useCallback((value: boolean) => {
     if (maxTickets > 0) {
-      setUseTickets(value);
+      stableSetUseTickets(value);
     }
-  }, [maxTickets, setUseTickets]);
+  }, [maxTickets, stableSetUseTickets]);
 
   return (
     <div className="rounded-lg p-4 mb-6">
@@ -41,7 +47,9 @@ export const PaymentSection: React.FC<PaymentSectionProps> = ({
       <div className="rounded-2xl border border-input p-4 mb-6">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-4">
+            {/* Use a stable ref and handler for the Switch component */}
             <Switch 
+              ref={switchRef}
               checked={useTickets} 
               onCheckedChange={handleUseTicketsChange}
               disabled={maxTickets === 0}
