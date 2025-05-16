@@ -25,11 +25,11 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({ selectedTab, onTabChange
       }}
       className="mb-6"
     >
-      <TabsList className="w-full grid grid-cols-2">
-        <TabsTrigger value="activity" className="text-xl">
+      <TabsList>
+        <TabsTrigger value="activity">
           体験
         </TabsTrigger>
-        <TabsTrigger value="quest" className="text-xl">
+        <TabsTrigger value="quest">
           お手伝い
         </TabsTrigger>
       </TabsList>

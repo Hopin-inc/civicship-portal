@@ -43,7 +43,7 @@ export default function SearchPage() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-auto">
-        <div className="container px-4 py-6">
+        <div className="container px-4 py-2">
           <SearchTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />
           <FormProvider {...methods}>
             <SearchPageContent
