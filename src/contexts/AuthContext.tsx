@@ -119,6 +119,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         await new Promise(resolve => setTimeout(resolve, 500));
 
         if (phoneVerificationState.phoneUid) {
+          if (phoneVerificationState.authToken) {
+            cookies.set("phone_auth_token", phoneVerificationState.authToken);
+          }
+          if (phoneVerificationState.refreshToken) {
+            cookies.set("phone_refresh_token", phoneVerificationState.refreshToken);
+          }
+          
+          console.log("Phone verification successful with tokens:", {
+            phoneUid: phoneVerificationState.phoneUid,
+            authToken: phoneVerificationState.authToken ? "present" : "missing",
+            refreshToken: phoneVerificationState.refreshToken ? "present" : "missing",
+            tokenExpiresAt: phoneVerificationState.tokenExpiresAt
+          });
+          
           setIsPhoneVerified(true);
           toast.success("電話番号認証が完了しました");
           router.push("/sign-up");
@@ -219,6 +233,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const next = searchParams.get("next");
         const idToken = await user.getIdToken();
         cookies.set("access_token", idToken);
+        
+        if (user.refreshToken) {
+          cookies.set("refresh_token", user.refreshToken);
+          console.log("LINE refresh token stored in cookies");
+        }
+        
+        try {
+          const tokenResult = await user.getIdTokenResult();
+          if (tokenResult.expirationTime) {
+            cookies.set("token_expires_at", tokenResult.expirationTime);
+            console.log("Token expiration time stored:", tokenResult.expirationTime);
+          }
+        } catch (error) {
+          console.error("Failed to get token expiration time:", error);
+        }
 
         const { data } = await refetch();
         const fetchedUser = data.currentUser?.user ?? null;
@@ -250,6 +279,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         login(null);
         cookies.remove("access_token");
+        cookies.remove("refresh_token");
+        cookies.remove("token_expires_at");
+        cookies.remove("phone_auth_token");
+        cookies.remove("phone_refresh_token");
       }
     });
 
@@ -283,16 +316,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const createUser = async (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
     try {
+      const effectivePhoneUid = phoneUid || phoneVerificationState.phoneUid || undefined;
+      
+      console.log("Creating user with phone UID:", effectivePhoneUid);
+      
       const { data } = await userSignUpMutation({
         variables: {
           input: {
             name,
             currentPrefecture: currentPrefecture as any, // Type cast to resolve compatibility issue
             communityId: COMMUNITY_ID,
-            phoneUid: phoneUid || undefined,
+            phoneUid: effectivePhoneUid,
           },
         },
       });
+      
       return data?.userSignUp?.user ?? null;
     } catch (error) {
       console.error("Failed to create user:", error);

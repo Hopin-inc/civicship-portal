@@ -34,6 +34,9 @@ type PhoneVerificationState = {
   verificationId: string | null;
   verified: boolean;
   phoneUid: string | null;
+  authToken: string | null;
+  refreshToken: string | null;
+  tokenExpiresAt: Date | null;
 };
 
 export const phoneVerificationState: PhoneVerificationState = {
@@ -41,6 +44,9 @@ export const phoneVerificationState: PhoneVerificationState = {
   verificationId: null,
   verified: false,
   phoneUid: null,
+  authToken: null,
+  refreshToken: null,
+  tokenExpiresAt: null,
 };
 
 const providers = {
@@ -170,6 +176,18 @@ export const verifyPhoneCode = async (verificationId: string, code: string): Pro
         if (userCredential.user) {
           phoneVerificationState.phoneUid = userCredential.user.uid;
           console.log("Stored phone UID:", phoneVerificationState.phoneUid);
+          
+          const idToken = await userCredential.user.getIdToken();
+          const refreshToken = userCredential.user.refreshToken;
+          
+          phoneVerificationState.authToken = idToken;
+          phoneVerificationState.refreshToken = refreshToken;
+          
+          const tokenResult = await userCredential.user.getIdTokenResult();
+          const expirationTime = new Date(tokenResult.expirationTime);
+          phoneVerificationState.tokenExpiresAt = expirationTime;
+          
+          console.log("Extracted phone auth tokens successfully");
         } else {
           console.error("No user returned from signInWithCredential");
         }
@@ -186,6 +204,18 @@ export const verifyPhoneCode = async (verificationId: string, code: string): Pro
           if (phoneAuth.currentUser) {
             phoneVerificationState.phoneUid = phoneAuth.currentUser.uid;
             console.log("Stored phone UID from fallback:", phoneVerificationState.phoneUid);
+            
+            const idToken = await phoneAuth.currentUser.getIdToken();
+            const refreshToken = phoneAuth.currentUser.refreshToken;
+            
+            phoneVerificationState.authToken = idToken;
+            phoneVerificationState.refreshToken = refreshToken;
+            
+            const tokenResult = await phoneAuth.currentUser.getIdTokenResult();
+            const expirationTime = new Date(tokenResult.expirationTime);
+            phoneVerificationState.tokenExpiresAt = expirationTime;
+            
+            console.log("Extracted phone auth tokens successfully (fallback)");
           }
 
           await phoneAuth.signOut();
