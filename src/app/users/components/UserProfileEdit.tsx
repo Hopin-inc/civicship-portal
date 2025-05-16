@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Facebook, Instagram, Twitter } from 'lucide-react';
 import { prefectureLabels, prefectureOptions } from '@/app/users/data/presenter';
 import { GqlCurrentPrefecture } from '@/types/graphql';
 
@@ -32,18 +33,18 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
   displayName,
   location,
   bio,
-  // socialLinks,
+  socialLinks,
   updating,
   setDisplayName,
   setLocation,
   setBio,
-  // setSocialLinks,
+  setSocialLinks,
   handleImageSelect,
   handleSave
 }) => {
   return (
-    <form onSubmit={handleSave}>
-      <div className="mb-8">
+    <form onSubmit={handleSave} className="space-y-8">
+      <div>
         <Label className="mb-2 flex items-center gap-x-2">
           プロフィール画像
           <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">必須</span>
@@ -80,7 +81,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
         </div>
       </div>
 
-      <div className="mb-8">
+      <div>
         <Label className="mb-2 flex items-center gap-x-2">
           表示名
           <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">必須</span>
@@ -93,12 +94,12 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
         />
       </div>
 
-      <div className="mb-8">
+      <div>
         <Label className="mb-2 flex items-center gap-x-2">
           住んでいるところ
           <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">必須</span>
         </Label>
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-4 gap-4 mb-4">
           {prefectureOptions.map((prefecture) => (
             <Button
               key={prefecture}
@@ -129,7 +130,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
         </Button>
       </div>
 
-      <div className="mb-8">
+      <div>
         <Label className="block mb-2">自己紹介</Label>
         <Textarea
           value={bio}
@@ -139,7 +140,48 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
         />
       </div>
 
-      <div className="w-[345px] mx-auto mb-8">
+      <div>
+        <Label className='mb-2 block'>SNSリンク</Label>
+        <div className="space-y-3">
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <Facebook className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <Input
+              value={socialLinks.facebook}
+              onChange={(e) => setSocialLinks({...socialLinks, facebook: e.target.value})}
+              placeholder="https://facebook.com/..."
+              className="pl-9"
+            />
+          </div>
+
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <Instagram className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <Input
+              value={socialLinks.instagram}
+              onChange={(e) => setSocialLinks({...socialLinks, instagram: e.target.value})}
+              placeholder="https://instagram.com/..."
+              className="pl-9"
+            />
+          </div>
+
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <Twitter className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <Input
+              value={socialLinks.twitter}
+              onChange={(e) => setSocialLinks({...socialLinks, twitter: e.target.value})}
+              placeholder="https://x.com/..."
+              className="pl-9"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="w-[345px] mx-auto">
         <Button
           type="submit"
           variant="primary"
