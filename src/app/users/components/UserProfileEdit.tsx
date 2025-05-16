@@ -19,6 +19,7 @@ interface UserProfileEditProps {
     instagram: string;
     twitter: string;
   };
+  phone: string | undefined;
   updating: boolean;
   setDisplayName: (name: string) => void;
   setLocation: (location: GqlCurrentPrefecture) => void;
@@ -34,6 +35,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
   location,
   bio,
   socialLinks,
+  phone,
   updating,
   setDisplayName,
   setLocation,
@@ -47,7 +49,9 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
       <div>
         <Label className="mb-2 flex items-center gap-x-2">
           プロフィール画像
-          <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">必須</span>
+          <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">
+            必須
+          </span>
         </Label>
         <div className="flex items-center gap-3">
           <div className="w-24 h-24 rounded-full overflow-hidden bg-muted">
@@ -66,7 +70,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
           <Button
             type="button"
             variant="secondary"
-            onClick={() => document.getElementById('profile-image-input')?.click()}
+            onClick={() => document.getElementById("profile-image-input")?.click()}
             className="h-10"
           >
             画像を選択
@@ -84,7 +88,9 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
       <div>
         <Label className="mb-2 flex items-center gap-x-2">
           表示名
-          <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">必須</span>
+          <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">
+            必須
+          </span>
         </Label>
         <Input
           value={displayName}
@@ -97,7 +103,9 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
       <div>
         <Label className="mb-2 flex items-center gap-x-2">
           住んでいるところ
-          <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">必須</span>
+          <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">
+            必須
+          </span>
         </Label>
         <div className="grid grid-cols-4 gap-4 mb-4">
           {prefectureOptions.map((prefecture) => (
@@ -108,8 +116,8 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
               variant={location === prefecture ? "primary" : "tertiary"}
               className={`px-4 py-2 rounded-2xl border-2 ${
                 location === prefecture
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'border-input hover:border-input/80 hover:bg-muted'
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "border-input hover:border-input/80 hover:bg-muted"
               }`}
             >
               {prefectureLabels[prefecture]}
@@ -122,8 +130,8 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
           variant={location === GqlCurrentPrefecture.OutsideShikoku ? "primary" : "tertiary"}
           className={`w-full px-4 py-2 rounded-2xl border-2 ${
             location === GqlCurrentPrefecture.OutsideShikoku
-              ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-input hover:border-input/80 hover:bg-muted'
+              ? "bg-primary text-primary-foreground border-primary"
+              : "border-input hover:border-input/80 hover:bg-muted"
           }`}
         >
           {prefectureLabels[GqlCurrentPrefecture.OutsideShikoku]}
@@ -141,7 +149,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
       </div>
 
       <div>
-        <Label className='mb-2 block'>SNSリンク</Label>
+        <Label className="mb-2 block">SNSリンク</Label>
         <div className="space-y-3">
           <div className="relative">
             <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -149,7 +157,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
             </div>
             <Input
               value={socialLinks.facebook}
-              onChange={(e) => setSocialLinks({...socialLinks, facebook: e.target.value})}
+              onChange={(e) => setSocialLinks({ ...socialLinks, facebook: e.target.value })}
               placeholder="https://facebook.com/..."
               className="pl-9"
             />
@@ -161,7 +169,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
             </div>
             <Input
               value={socialLinks.instagram}
-              onChange={(e) => setSocialLinks({...socialLinks, instagram: e.target.value})}
+              onChange={(e) => setSocialLinks({ ...socialLinks, instagram: e.target.value })}
               placeholder="https://instagram.com/..."
               className="pl-9"
             />
@@ -173,7 +181,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
             </div>
             <Input
               value={socialLinks.twitter}
-              onChange={(e) => setSocialLinks({...socialLinks, twitter: e.target.value})}
+              onChange={(e) => setSocialLinks({ ...socialLinks, twitter: e.target.value })}
               placeholder="https://x.com/..."
               className="pl-9"
             />
@@ -181,14 +189,15 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
         </div>
       </div>
 
+      <div>
+        <Label className="mb-2 block">電話番号</Label>
+        <span className="text-body-lg mb-2 block">{phone}</span>
+        <p className='text-body-sm text-caption'>電話番号は、予約時の緊急連絡先として案内人に共有されます。一般には公開されません。</p>
+      </div>
+
       <div className="w-[345px] mx-auto">
-        <Button
-          type="submit"
-          variant="primary"
-          className="w-full h-[56px]"
-          disabled={updating}
-        >
-          {updating ? '保存中...' : '保存'}
+        <Button type="submit" variant="primary" className="w-full h-[56px]" disabled={updating}>
+          {updating ? "保存中..." : "保存"}
         </Button>
       </div>
     </form>

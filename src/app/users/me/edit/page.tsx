@@ -26,6 +26,7 @@ export default function ProfileEditPage() {
     location,
     bio,
     socialLinks,
+    phone,
     userLoading,
     error,
     updating,
@@ -61,6 +62,7 @@ export default function ProfileEditPage() {
           setSocialLinks={setSocialLinks}
           handleImageSelect={handleImageSelect}
           handleSave={handleSave}
+          phone={phone}
         />
       </main>
     </div>
