@@ -4,7 +4,7 @@ import { useReservationUIState } from "./useReservationUIState";
 import type { ActivityDetail } from "@/app/activities/data/type";
 import type { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import type { GqlUser, GqlWallet } from "@/types/graphql";
-import { useReservationSubmission } from "./useReservartionAction"; // Note: Filename typo might be causing circular imports
+import { useReservationSubmission } from "./useReservationSubmission";
 import { UseTicketCounterReturn } from "./useTicketCounter";
 import { useMemo } from "react";
 
