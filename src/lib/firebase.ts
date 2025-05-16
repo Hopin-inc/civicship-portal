@@ -12,7 +12,7 @@ import {
   updateProfile,
 } from "@firebase/auth";
 import { LIFFLoginResponse } from "@/types/line";
-// import { Analytics, getAnalytics, isSupported } from "@firebase/analytics";
+import { Analytics, getAnalytics, isSupported } from "@firebase/analytics";
 
 export { PhoneAuthProvider };
 
@@ -27,15 +27,15 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 auth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
 
-// let analytics: Analytics;
-// if (typeof window !== "undefined") {
-//   isSupported().then((supported) => {
-//     if (supported) {
-//       analytics = getAnalytics(app);
-//     }
-//   });
-// }
-// export { analytics };
+let analytics: Analytics;
+if (typeof window !== "undefined") {
+  isSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  });
+}
+export { analytics };
 
 export const phoneApp = initializeApp(firebaseConfig, "phone-auth-app");
 export const phoneAuth = getAuth(phoneApp);
