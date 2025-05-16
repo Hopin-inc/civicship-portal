@@ -359,6 +359,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const createUser = async (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
     try {
       const effectivePhoneUid = phoneUid || phoneVerificationState.phoneUid || undefined;
+      const phoneNumber = getVerifiedPhoneNumber();
       
       console.log("Creating user with phone UID:", effectivePhoneUid);
       
@@ -369,6 +370,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             currentPrefecture: currentPrefecture as any, // Type cast to resolve compatibility issue
             communityId: COMMUNITY_ID,
             phoneUid: effectivePhoneUid,
+            phoneNumber: phoneNumber,
           },
         },
       });
