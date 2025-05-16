@@ -69,7 +69,7 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
           </div>
           <Button
             type="button"
-            variant="secondary"
+            variant="tertiary"
             onClick={() => document.getElementById("profile-image-input")?.click()}
             className="h-10"
           >
