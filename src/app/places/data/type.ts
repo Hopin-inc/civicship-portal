@@ -1,5 +1,5 @@
 import { AppImage, Participant } from "@/types/utils";
-import { ActivityCard, OpportunityCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/app/activities/data/type";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 
 export type BasePin = {
@@ -9,6 +9,7 @@ export type BasePin = {
 
   latitude: number;
   longitude: number;
+  address: string;
 };
 
 export type BaseHost = {
