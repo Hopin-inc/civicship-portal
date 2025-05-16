@@ -27,6 +27,7 @@ const requestLink = new ApolloLink((operation, forward) => {
   const tokenExpiresAt = cookies.find((e) => e.startsWith("token_expires_at"))?.split("=").pop();
   const phoneAuthToken = cookies.find((e) => e.startsWith("phone_auth_token"))?.split("=").pop();
   const phoneRefreshToken = cookies.find((e) => e.startsWith("phone_refresh_token"))?.split("=").pop();
+  const phoneTokenExpiresAt = cookies.find((e) => e.startsWith("phone_token_expires_at"))?.split("=").pop();
   
   operation.setContext(({ headers = {} }) => ({
     headers: {
@@ -37,6 +38,7 @@ const requestLink = new ApolloLink((operation, forward) => {
       "X-Token-Expires-At": tokenExpiresAt || "",
       "X-Phone-Auth-Token": phoneAuthToken || "",
       "X-Phone-Refresh-Token": phoneRefreshToken || "",
+      "X-Phone-Token-Expires-At": phoneTokenExpiresAt || "",
     },
   }));
   return forward(operation);

@@ -125,6 +125,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (phoneVerificationState.refreshToken) {
             cookies.set("phone_refresh_token", phoneVerificationState.refreshToken);
           }
+          if (phoneVerificationState.tokenExpiresAt) {
+            const timestamp = Math.floor(phoneVerificationState.tokenExpiresAt.getTime() / 1000);
+            cookies.set("phone_token_expires_at", timestamp.toString());
+          }
           
           console.log("Phone verification successful with tokens:", {
             phoneUid: phoneVerificationState.phoneUid,
@@ -242,8 +246,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const tokenResult = await user.getIdTokenResult();
           if (tokenResult.expirationTime) {
-            cookies.set("token_expires_at", tokenResult.expirationTime);
-            console.log("Token expiration time stored:", tokenResult.expirationTime);
+            const expiryTimestamp = Math.floor(new Date(tokenResult.expirationTime).getTime() / 1000);
+            cookies.set("token_expires_at", expiryTimestamp.toString());
+            console.log("Token expiration time stored:", expiryTimestamp);
           }
         } catch (error) {
           console.error("Failed to get token expiration time:", error);
