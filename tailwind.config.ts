@@ -112,7 +112,7 @@ const config = {
           { lineHeight: "var(--line-height-md)", fontWeight: "400" },
         ],
         "body-md": [
-          "var(--font-size-mg)",
+          "var(--font-size-md)",
           { lineHeight: "var(--line-height-md)", fontWeight: "400" },
         ],
         "body-sm": [
@@ -128,7 +128,7 @@ const config = {
           { lineHeight: "var(--line-height-xs)", fontWeight: "500" },
         ],
         "label-md": [
-          "var(--font-size-mg)",
+          "var(--font-size-md)",
           { lineHeight: "var(--line-height-xs)", fontWeight: "500" },
         ],
         "label-sm": [

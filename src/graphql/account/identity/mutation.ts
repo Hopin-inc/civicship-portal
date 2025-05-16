@@ -11,7 +11,14 @@ export const USER_SIGN_UP = gql(`
   }
 `);
 
-
+export const STORE_PHONE_AUTH_TOKEN = gql(`
+  mutation storePhoneAuthToken($input: StorePhoneAuthTokenInput!) {
+    storePhoneAuthToken(input: $input) {
+      success
+      expiresAt
+    }
+  }
+`);
 
 export const LINK_PHONE_AUTH = gql(`
   mutation linkPhoneAuth($input: LinkPhoneAuthInput!, $permission: CheckIsSelfPermissionInput!) {
