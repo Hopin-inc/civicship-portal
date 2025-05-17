@@ -9,7 +9,7 @@ export function OpportunityCardHorizontal({ opportunity }: { opportunity: Activi
   return (
     <Link
       href={`/activities/${opportunity.id}?community_id=${opportunity.communityId}`}
-      className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/60 via-black/40 to-transparent px-6 pb-8 pt-16"
+      className="block"
     >
       <div className="mx-auto max-w-md">
         <div className="flex overflow-hidden rounded-xl bg-background shadow-lg">
