@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useGetOpportunityQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
 import { presenterActivityDetail } from "@/app/activities/data/presenter";
@@ -30,7 +30,6 @@ export const useReservationConfirm = ({
     skip: !opportunityId,
     fetchPolicy: "network-only",
     errorPolicy: "all",
-    onError: (err) => console.error("Opportunity query error:", err),
   });
 
   const opportunity: ActivityDetail | null = useMemo(() => {
@@ -51,11 +50,12 @@ export const useReservationConfirm = ({
 
   // --- 統合された状態管理 ---
   const loading = oppLoading || walletLoading;
-  const error = oppError ?? walletError ?? null;
+  const hasError = Boolean(oppError || walletError); // ← serialize-safe
 
-  const refetch = async () => {
-    await Promise.all([oppRefetch(), walletRefetch()]);
-  };
+  useEffect(() => {
+    if (oppError) console.error("Opportunity query error:", oppError);
+    if (walletError) console.error("Slot/Wallet error:", walletError);
+  }, [oppError, walletError]);
 
   return {
     opportunity,
@@ -65,7 +65,10 @@ export const useReservationConfirm = ({
     wallets,
     availableTickets,
     loading,
-    error,
-    refetch,
+    hasError, // ← serialize-safe
+    triggerRefetch: () => {
+      void oppRefetch();
+      void walletRefetch();
+    },
   };
 };
