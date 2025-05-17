@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { AlertCircle } from "lucide-react";
-import { SameStateActivities } from "./SimilarActivitiesList";
+import SameStateActivities from "./SimilarActivitiesList";
 import ActivityScheduleCard from "./ActivityScheduleCard";
 import {
   ActivityCard,
@@ -16,7 +16,7 @@ import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Button } from "@/components/ui/button";
 import { useReadMore } from "@/hooks/useReadMore";
 import Link from "next/link";
-import { IconWrapper } from "@/components/shared/IconWrapper";
+import IconWrapper from "@/components/shared/IconWrapper";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;

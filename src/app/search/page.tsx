@@ -5,7 +5,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
-import { SearchTabs, SearchTabType } from "@/app/search/components/Tabs";
+import SearchTabs, { SearchTabType } from "@/app/search/components/Tabs";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { visiblePrefectureLabels } from "@/app/users/data/presenter";
 import { DateRange } from "react-day-picker";

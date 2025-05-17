@@ -3,7 +3,7 @@
 import React from "react";
 import { Info } from "lucide-react";
 
-export const WalletInfoSection: React.FC = () => {
+const WalletInfoSection: React.FC = () => {
   return (
     <div className="bg-muted rounded-2xl p-4 mb-6">
       <h2 className="text-lg font-bold mb-4">ポイントとは</h2>

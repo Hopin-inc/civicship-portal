@@ -8,7 +8,7 @@ interface TransactionItemProps {
   transaction: AppTransaction;
 }
 
-export const TransactionItem: React.FC<TransactionItemProps> = ({
+const TransactionItem: React.FC<TransactionItemProps> = ({
   transaction
 }) => {
   const isPositive = transaction.transferPoints > 0;

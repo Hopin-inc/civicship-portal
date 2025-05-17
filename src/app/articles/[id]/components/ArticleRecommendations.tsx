@@ -9,7 +9,7 @@ interface ArticleRecommendationsProps {
   articles: TArticleWithAuthor[];
 }
 
-export const ArticleRecommendations: React.FC<ArticleRecommendationsProps> = ({
+const ArticleRecommendations: React.FC<ArticleRecommendationsProps> = ({
   title,
   articles,
 }) => {

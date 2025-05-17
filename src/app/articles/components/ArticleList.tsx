@@ -8,7 +8,7 @@ interface ArticleListProps {
   articles: TArticleWithAuthor[];
 }
 
-export const ArticleList: React.FC<ArticleListProps> = ({ articles }) => {
+const ArticleList: React.FC<ArticleListProps> = ({ articles }) => {
   if (articles.length === 0) {
     return (
       <div className="text-center py-8">

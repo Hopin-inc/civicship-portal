@@ -4,7 +4,7 @@ import React from "react";
 import { Calendar, MapPin, Users } from "lucide-react";
 import { formatDateTime } from "@/utils/date";
 import { ja } from "date-fns/locale";
-import { IconWrapper } from "@/components/shared/IconWrapper";
+import IconWrapper from "@/components/shared/IconWrapper";
 
 interface ReservationDetailsCardProps {
   startDateTime: Date | null;
@@ -19,7 +19,7 @@ interface ReservationDetailsCardProps {
 /**
  * Component to display reservation details
  */
-export const ReservationDetailsCard: React.FC<ReservationDetailsCardProps> = ({
+const ReservationDetailsCard: React.FC<ReservationDetailsCardProps> = ({
   startDateTime,
   endDateTime,
   participantCount,

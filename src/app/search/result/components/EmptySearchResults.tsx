@@ -9,7 +9,7 @@ interface EmptySearchResultsProps {
   searchQuery?: string;
 }
 
-export const EmptySearchResults: React.FC<EmptySearchResultsProps> = ({ searchQuery }) => {
+const EmptySearchResults: React.FC<EmptySearchResultsProps> = ({ searchQuery }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="text-center space-y-6">

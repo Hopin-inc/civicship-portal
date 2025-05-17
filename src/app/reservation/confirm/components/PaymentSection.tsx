@@ -12,7 +12,7 @@ interface PaymentSectionProps {
   setUseTickets: (value: boolean) => void;
 }
 
-export const PaymentSection: React.FC<PaymentSectionProps> = memo(
+const PaymentSection: React.FC<PaymentSectionProps> = memo(
   ({
     ticketCount,
     onIncrement,

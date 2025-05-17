@@ -12,7 +12,7 @@ interface StatusProps {
   statusClass: string;
 }
 
-export const ParticipationStatusNotification: React.FC<StatusProps> = ({
+const ParticipationStatusNotification: React.FC<StatusProps> = ({
   status,
   statusText,
   statusSubText,

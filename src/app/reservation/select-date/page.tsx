@@ -1,8 +1,8 @@
 "use client";
 
-import { DateSelectionForm } from "@/app/reservation/select-date/components/DateSelectionForm";
-import { GuestSelectionForm } from "@/app/reservation/select-date/components/GuestSelectionForm";
-import { SelectionSheet } from "@/app/reservation/select-date/components/SelectionSheet";
+import DateSelectionForm from "@/app/reservation/select-date/components/DateSelectionForm";
+import GuestSelectionForm from "@/app/reservation/select-date/components/GuestSelectionForm";
+import SelectionSheet from "@/app/reservation/select-date/components/SelectionSheet";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { HeaderConfig } from "@/contexts/HeaderContext";
