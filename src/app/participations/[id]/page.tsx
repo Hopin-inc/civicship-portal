@@ -37,6 +37,7 @@ export default function ParticipationPage({ params }: ParticipationProps) {
     cancellationDeadline,
     loading,
     error,
+    refetch,
   } = useParticipationPage(params.id);
 
   const isCancellable = new Date() < cancellationDeadline;
@@ -51,7 +52,7 @@ export default function ParticipationPage({ params }: ParticipationProps) {
     const result = await handleCancel(reservationId);
     if (result.success) {
       toast.success("キャンセルしました");
-      // TODO: 必要ならリダイレクトやrefetch
+      refetch();
     } else {
       toast.error(`キャンセル失敗: ${result.error}`);
     }

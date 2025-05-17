@@ -18,10 +18,13 @@ interface UseParticipationPageResult {
   endTime: Date;
   participantCount: number;
   cancellationDeadline: Date;
+  refetch: () => void;
 }
 
-export const useParticipationPage = (id: string): UseParticipationPageResult => {
-  const { participation, opportunity, loading, error } = useParticipation(id);
+export const useParticipationPage = (
+  id: string,
+): UseParticipationPageResult & { refetch: () => void } => {
+  const { participation, opportunity, loading, error, refetch } = useParticipation(id); // ✅ refetch を取得
 
   const { currentStatus } = useParticipationState({ participation });
 
@@ -51,5 +54,6 @@ export const useParticipationPage = (id: string): UseParticipationPageResult => 
     endTime,
     participantCount,
     cancellationDeadline,
+    refetch,
   };
 };
