@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useEffect, useRef } from "react";
 import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
 import type { GqlUser, GqlWallet } from "@/types/graphql";
 import { useCreateReservationMutation } from "@/types/graphql";
@@ -27,7 +27,31 @@ export const useReservationSubmission = ({
 }) => {
   const [createReservation, { loading: creatingReservation }] = useCreateReservationMutation();
 
-  const submit = useCallback(async (): Promise<Result> => {
+  const latestParamsRef = useRef({
+    opportunity,
+    selectedSlot,
+    wallets,
+    user,
+    ticketCounter,
+    useTickets,
+  });
+
+  // 更新は副作用で明示的に行う
+  useEffect(() => {
+    latestParamsRef.current = {
+      opportunity,
+      selectedSlot,
+      wallets,
+      user,
+      ticketCounter,
+      useTickets,
+    };
+  }, [opportunity, selectedSlot, wallets, user, ticketCounter, useTickets]);
+
+  const submit = useRef<() => Promise<Result>>(async () => {
+    const { opportunity, selectedSlot, wallets, user, ticketCounter, useTickets } =
+      latestParamsRef.current;
+
     if (!user) return { success: false, error: "NOT_AUTHENTICATED" };
     if (!selectedSlot || !opportunity) return { success: false, error: "MISSING_DATA" };
 
@@ -63,18 +87,10 @@ export const useReservationSubmission = ({
       console.error("Reservation error:", e);
       return { success: false, error: "UNKNOWN_ERROR" };
     }
-  }, [
-    user,
-    opportunity,
-    selectedSlot,
-    ticketCounter.count,
-    wallets,
-    useTickets,
-    createReservation,
-  ]);
+  });
 
-  return useMemo(() => ({
-    submit,
+  return {
+    submit: submit.current,
     creatingReservation,
-  }), [submit, creatingReservation]);
+  };
 };

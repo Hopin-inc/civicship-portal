@@ -12,21 +12,26 @@ import { useReservationConfirm } from "@/app/reservation/hooks/useReservationCon
 import { useAuth } from "@/contexts/AuthContext";
 import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCounter";
 import { useReservationActions } from "@/app/reservation/confirm/hooks/useReservationAction";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
 import { useRouter } from "next/navigation";
-import { useMemo, useCallback } from "react";
-import { createReservationHandler } from "@/app/reservation/confirm/hooks/useReservationHandler";
+import { HeaderConfig } from "@/contexts/HeaderContext";
+import { useMemo } from "react";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function ConfirmPage() {
-  const { user } = useAuth();
-  const { opportunityId, slotId, participantCount } = useReservationParams();
+  const headerConfig: HeaderConfig = useMemo(
+    () => ({
+      title: "申込内容の確認",
+      showLogo: false,
+      showBackButton: true,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
 
-  useHeaderConfig({
-    title: "申し込み内容の確認",
-    showBackButton: true,
-    showLogo: false,
-  });
+  const { user } = useAuth();
+  const router = useRouter();
+  const { opportunityId, slotId, participantCount, communityId } = useReservationParams();
 
   const {
     opportunity,
@@ -41,47 +46,33 @@ export default function ConfirmPage() {
 
   const ticketCounter = useTicketCounter(availableTickets);
 
-  const memoizedTicketCounter = useMemo(
-    () => ({
-      count: ticketCounter.count,
-      increment: ticketCounter.increment,
-      decrement: ticketCounter.decrement,
-    }),
-    [ticketCounter.count, ticketCounter.increment, ticketCounter.decrement],
-  );
-
   const {
-    isLoginModalOpen,
-    setIsLoginModalOpen,
     useTickets,
     setUseTickets,
+    isLoginModalOpen,
+    setIsLoginModalOpen,
     handleReservation,
     creatingReservation,
-  } = useReservationActions({
-    opportunity,
-    selectedSlot,
-    wallets,
-    user,
-    ticketCounter: memoizedTicketCounter,
-  });
-
-  const router = useRouter();
-
-  const handleCloseLoginModal = useCallback(() => {
-    setIsLoginModalOpen(false);
-  }, [setIsLoginModalOpen]);
+  } = useReservationActions({ opportunity, selectedSlot, wallets, user, ticketCounter });
 
   const handleConfirm = async () => {
-    if (!opportunity || !handleReservation) return;
-
     const result = await handleReservation();
 
-    if (!result.success && result.error === "NOT_AUTHENTICATED") {
-      setIsLoginModalOpen(true);
+    if (!result.success) {
+      if (result.error === "NOT_AUTHENTICATED") {
+        setIsLoginModalOpen(true);
+      } else {
+        console.error("Reservation failed:", result.error);
+      }
       return;
     }
 
-    await createReservationHandler(opportunity, handleReservation, router)();
+    const query = new URLSearchParams({
+      id: opportunityId,
+      community_id: communityId ?? "",
+      reservation_id: result.reservationId,
+    });
+    router.push(`/reservation/complete?${query.toString()}`);
   };
 
   return (
@@ -96,8 +87,7 @@ export default function ConfirmPage() {
       >
         <main className="pb-8 min-h-screen">
           <Toaster />
-          <LoginModal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal} />
-
+          <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
           <OpportunityInfo opportunity={opportunity} />
 
           <div className="px-4">
@@ -110,7 +100,6 @@ export default function ConfirmPage() {
                 address: opportunity?.place?.address || "",
               }}
             />
-
             <PaymentSection
               ticketCount={ticketCounter.count}
               onIncrement={ticketCounter.increment}
@@ -121,9 +110,7 @@ export default function ConfirmPage() {
               useTickets={useTickets}
               setUseTickets={setUseTickets}
             />
-
-            <NotesSection requireApproval={opportunity?.requiredApproval} />
-
+            <NotesSection requireApproval={opportunity?.requiredApproval} />{" "}
             <Button
               onClick={handleConfirm}
               disabled={
