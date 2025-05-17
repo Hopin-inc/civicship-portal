@@ -13,7 +13,7 @@ const SearchFooter: React.FC<SearchFooterProps> = ({ onClear, onSearch }) => {
         <Button
           onClick={onClear}
           variant="link"
-          className="text-label-md !text-foreground underline"
+          className="text-label-md !text-foreground underline px-0"
         >
           条件をクリア
         </Button>
