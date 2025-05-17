@@ -1383,6 +1383,8 @@ export type GqlQuery = {
   states: Array<GqlState>;
   ticket?: Maybe<GqlTicket>;
   ticketClaimLink?: Maybe<GqlTicketClaimLink>;
+  ticketIssuer?: Maybe<GqlTicketIssuer>;
+  ticketIssuers: GqlTicketIssuersConnection;
   ticketStatusHistories: GqlTicketStatusHistoriesConnection;
   ticketStatusHistory?: Maybe<GqlTicketStatusHistory>;
   tickets: GqlTicketsConnection;
@@ -1545,6 +1547,17 @@ export type GqlQueryTicketArgs = {
 
 export type GqlQueryTicketClaimLinkArgs = {
   id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryTicketIssuerArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryTicketIssuersArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlTicketIssuerFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlTicketIssuerSortInput>;
 };
 
 export type GqlQueryTicketStatusHistoriesArgs = {
@@ -1836,6 +1849,27 @@ export type GqlTicketIssuer = {
   qtyToBeIssued: Scalars["Int"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
   utility?: Maybe<GqlUtility>;
+};
+
+export type GqlTicketIssuerEdge = GqlEdge & {
+  __typename?: "TicketIssuerEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlTicketIssuer>;
+};
+
+export type GqlTicketIssuerFilterInput = {
+  ownerId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type GqlTicketIssuerSortInput = {
+  createdAt?: InputMaybe<GqlSortDirection>;
+};
+
+export type GqlTicketIssuersConnection = {
+  __typename?: "TicketIssuersConnection";
+  edges?: Maybe<Array<Maybe<GqlTicketIssuerEdge>>>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type GqlTicketPurchaseInput = {
@@ -3910,6 +3944,26 @@ export type GqlTicketClaimLinkQuery = {
       owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
     } | null;
   } | null;
+};
+
+export type GqlGetTicketIssuersQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetTicketIssuersQuery = {
+  __typename?: "Query";
+  ticketIssuers: {
+    __typename?: "TicketIssuersConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "TicketIssuerEdge";
+      node?: {
+        __typename?: "TicketIssuer";
+        id: string;
+        qtyToBeIssued: number;
+        createdAt?: Date | null;
+        owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+      } | null;
+    } | null> | null;
+  };
 };
 
 export type GqlUtilityFieldsFragment = {
@@ -6831,6 +6885,86 @@ export type TicketClaimLinkSuspenseQueryHookResult = ReturnType<
 export type TicketClaimLinkQueryResult = Apollo.QueryResult<
   GqlTicketClaimLinkQuery,
   GqlTicketClaimLinkQueryVariables
+>;
+export const GetTicketIssuersDocument = gql`
+  query GetTicketIssuers {
+    ticketIssuers {
+      edges {
+        node {
+          id
+          qtyToBeIssued
+          createdAt
+          owner {
+            id
+            name
+            image
+          }
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetTicketIssuersQuery__
+ *
+ * To run a query within a React component, call `useGetTicketIssuersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTicketIssuersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTicketIssuersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetTicketIssuersQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetTicketIssuersQuery,
+    GqlGetTicketIssuersQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetTicketIssuersQuery, GqlGetTicketIssuersQueryVariables>(
+    GetTicketIssuersDocument,
+    options,
+  );
+}
+export function useGetTicketIssuersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetTicketIssuersQuery,
+    GqlGetTicketIssuersQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetTicketIssuersQuery, GqlGetTicketIssuersQueryVariables>(
+    GetTicketIssuersDocument,
+    options,
+  );
+}
+export function useGetTicketIssuersSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetTicketIssuersQuery, GqlGetTicketIssuersQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetTicketIssuersQuery, GqlGetTicketIssuersQueryVariables>(
+    GetTicketIssuersDocument,
+    options,
+  );
+}
+export type GetTicketIssuersQueryHookResult = ReturnType<typeof useGetTicketIssuersQuery>;
+export type GetTicketIssuersLazyQueryHookResult = ReturnType<typeof useGetTicketIssuersLazyQuery>;
+export type GetTicketIssuersSuspenseQueryHookResult = ReturnType<
+  typeof useGetTicketIssuersSuspenseQuery
+>;
+export type GetTicketIssuersQueryResult = Apollo.QueryResult<
+  GqlGetTicketIssuersQuery,
+  GqlGetTicketIssuersQueryVariables
 >;
 export const GetUtilitiesDocument = gql`
   query GetUtilities {
