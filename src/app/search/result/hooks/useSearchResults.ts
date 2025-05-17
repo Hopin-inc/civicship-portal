@@ -86,7 +86,6 @@ export const useSearchResults = (
   const { updateConfig } = useHeader();
 
   const filter = useMemo(() => buildFilter(searchParams), [searchParams]);
-  console.log(filter);
 
   const {
     data,
