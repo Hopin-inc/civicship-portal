@@ -70,7 +70,7 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
               setLocation(pref.id);
             }}
             variant="tertiary"
-            className={`py-3 rounded-xl ${
+            className={`py-3 rounded-xl text-label-md ${
               location === pref.id
                 ? "border-2 border-primary text-primary bg-primary/5 font-bold"
                 : "border border-input text-foreground font-medium"
