@@ -6,15 +6,31 @@ import { ErrorState } from "@/components/shared/ErrorState";
 import { useParticipationPage } from "@/app/participations/[id]/hooks/useParticipationPage";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { ParticipationStatusNotification } from "@/app/participations/[id]/components/ParticipationStatusNotification";
-import { ParticipationHeader } from "@/app/participations/[id]/components/ParticipationHeader";
 import { ParticipationDetails } from "@/app/participations/[id]/components/ParticipationDetails";
 import ParticipationActions from "@/app/participations/[id]/components/ParticipationActions";
 import { useCancelReservation } from "@/app/participations/[id]/hooks/useCancelReservation";
 import { toast } from "sonner";
+import { GqlReservationStatus } from "@/types/graphql";
+import { OpportunityCardHorizontal } from "@/app/activities/components/Card/CardHorizontal";
 
 interface ParticipationProps {
   params: { id: string };
 }
+
+export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
+
+const mapReservationStatusToUIStatus = (status: GqlReservationStatus): ParticipationUIStatus => {
+  switch (status) {
+    case GqlReservationStatus.Accepted:
+      return "confirmed";
+    case GqlReservationStatus.Rejected:
+    case GqlReservationStatus.Canceled:
+      return "cancelled";
+    case GqlReservationStatus.Applied:
+    default:
+      return "pending";
+  }
+};
 
 export default function ParticipationPage({ params }: ParticipationProps) {
   const headerConfig = useMemo(
@@ -31,17 +47,14 @@ export default function ParticipationPage({ params }: ParticipationProps) {
     participation,
     opportunity,
     currentStatus,
-    startTime,
-    endTime,
-    participantCount,
     cancellationDeadline,
     loading,
     error,
     refetch,
   } = useParticipationPage(params.id);
 
-  const isCancellable = new Date() < cancellationDeadline;
-  const reservationId = participation?.node?.reservation?.id;
+  const isCancellable = cancellationDeadline ? new Date() < cancellationDeadline : false;
+  const reservationId = participation?.reservation?.id;
   const { handleCancel } = useCancelReservation();
 
   const onCancel = async () => {
@@ -67,28 +80,16 @@ export default function ParticipationPage({ params }: ParticipationProps) {
     <div className="max-w-2xl mx-auto p-4 pb-[120px]">
       {currentStatus && (
         <ParticipationStatusNotification
-          status={
-            currentStatus.status === "confirmed"
-              ? "confirmed"
-              : currentStatus.status === "cancelled"
-                ? "cancelled"
-                : "pending"
-          }
+          status={mapReservationStatusToUIStatus(currentStatus.status)}
           statusText={currentStatus.statusText}
           statusSubText={currentStatus.statusSubText}
           statusClass={currentStatus.statusClass}
         />
       )}
 
-      <ParticipationHeader opportunity={opportunity} />
+      <OpportunityCardHorizontal opportunity={opportunity} />
 
-      <ParticipationDetails
-        opportunity={opportunity}
-        participation={participation}
-        startTime={startTime}
-        endTime={endTime}
-        participantCount={participantCount}
-      />
+      <ParticipationDetails opportunity={opportunity} participation={participation} />
 
       <ParticipationActions
         cancellationDeadline={cancellationDeadline}

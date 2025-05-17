@@ -1,51 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getStatusInfo } from "@/app/participations/[id]/data/presenter";
-import type { Participation } from "@/app/participations/[id]/data/type";
-import { useParticipationImageUploadState } from "@/app/participations/[id]/hooks/useParticipationImageUploadState";
+import type { ParticipationDetail } from "@/app/participations/[id]/data/type";
 import { ReservationStatus } from "@/types/participationStatus";
 
 interface UseParticipationStateProps {
-  participation?: Participation;
-  onUploadSuccess?: () => void;
+  participation: ParticipationDetail | null;
 }
 
-export const useParticipationState = ({
-  participation,
-  onUploadSuccess,
-}: UseParticipationStateProps) => {
+export const useParticipationState = ({ participation }: UseParticipationStateProps) => {
   const [currentStatus, setCurrentStatus] = useState<ReservationStatus | null>(null);
-  const {
-    uploadSuccess,
-    uploadError,
-    isAddPhotosModalOpen,
-    handleUploadSuccess,
-    handleUploadError,
-    togglePhotosModal,
-  } = useParticipationImageUploadState();
 
   useEffect(() => {
-    if (participation?.node.status) {
-      const statusInfo = getStatusInfo(participation.node.status, participation.node.reason);
+    if (participation?.reservation?.status) {
+      const statusInfo = getStatusInfo(participation.reservation.status);
       setCurrentStatus(statusInfo);
     }
-  }, [participation?.node.status, participation?.node.reason]);
-
-  const handleUploadSuccessWrapper = () => {
-    handleUploadSuccess();
-    if (onUploadSuccess) {
-      onUploadSuccess();
-    }
-  };
+  }, [participation?.reservation?.status]);
 
   return {
     currentStatus,
-    uploadSuccess,
-    uploadError,
-    isAddPhotosModalOpen,
-    handleUploadSuccess: handleUploadSuccessWrapper,
-    handleUploadError,
-    togglePhotosModal,
   };
 };
