@@ -31,12 +31,12 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, onClick }) => (
     </div>
     <CardContent className="flex flex-col min-h-[160px] px-4 py-3">
       {/*//TODO 適切に1行に収めるか、name, addressで2行にした方が良い？ユーザーがどの地域なのか分からない問題を解消したい*/}
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between mb-2">
         <div className="mt-1 flex items-center text-foreground text-body-xs">
           <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
           <div className="flex-1 max-w-[80%] flex overflow-hidden">
-            <span className="truncate font-bold">{place.name}</span>
-            <span className="truncate text-muted-foreground">{`（${place.address}）`}</span>
+            <span className="font-bold text-body-xs">{place.name}</span>
+            <span className="truncate text-muted-foreground text-body-xs w-full mr-2">{`（${place.address}）`}</span>
           </div>
         </div>
         <div className="mt-1 flex items-center text-muted-foreground text-label-xs">
@@ -45,8 +45,8 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, onClick }) => (
         </div>
       </div>
 
-      <CardTitle className="text-title-sm line-clamp-1">{place.headline}</CardTitle>
-      <CardDescription className="line-clamp-2 mb-2">{place.bio}</CardDescription>
+      <CardTitle className="text-title-sm line-clamp-1 mb-1">{place.headline}</CardTitle>
+      <CardDescription className="line-clamp-2 mb-2 text-body-xs">{place.bio}</CardDescription>
 
       <CardFooter className="flex justify-between mt-2 p-0 mb-2">
         {place.publicOpportunityCount > 0 && (
