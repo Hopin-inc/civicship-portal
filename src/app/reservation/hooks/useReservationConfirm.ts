@@ -1,6 +1,7 @@
+"use client";
+
 import { useSlotAndTicketInfo } from "@/app/reservation/confirm/hooks/useSlotAndTicket";
 import { useOpportunityData } from "@/app/reservation/confirm/hooks/useOpportunity";
-import { useMemo } from "react";
 
 export const useReservationConfirm = ({
   opportunityId,
@@ -9,13 +10,14 @@ export const useReservationConfirm = ({
 }: {
   opportunityId: string;
   slotId: string;
-  userId: string | undefined;
+  userId?: string;
 }) => {
   const { opportunity, loading: oppLoading, error: oppError } = useOpportunityData(opportunityId);
-  const { wallets, selectedSlot, availableTickets, startDateTime, endDateTime, walletLoading } =
-    useSlotAndTicketInfo(opportunity, userId ?? undefined, slotId);
 
-  return useMemo(() => ({
+  const { wallets, selectedSlot, availableTickets, startDateTime, endDateTime, walletLoading } =
+    useSlotAndTicketInfo(opportunity, userId, slotId);
+
+  return {
     opportunity,
     selectedSlot,
     startDateTime,
@@ -24,15 +26,5 @@ export const useReservationConfirm = ({
     availableTickets,
     loading: oppLoading || walletLoading,
     error: oppError,
-  }), [
-    opportunity,
-    selectedSlot,
-    startDateTime,
-    endDateTime,
-    wallets,
-    availableTickets,
-    oppLoading,
-    walletLoading,
-    oppError
-  ]);
+  };
 };
