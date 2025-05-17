@@ -7,7 +7,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
 import { SearchTabs, SearchTabType } from "@/app/search/components/Tabs";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
-import { prefectureLabels } from "@/app/users/data/presenter";
+import { visiblePrefectureLabels } from "@/app/users/data/presenter";
 import { DateRange } from "react-day-picker";
 import { useSearchForm } from "@/app/search/hooks/useSearchForm";
 import SearchForm from "@/app/search/components/SearchForm";
@@ -51,7 +51,7 @@ export default function SearchPage() {
               setActiveForm={setActiveForm}
               selectedTab={selectedTab}
               formatDateRange={formatDateRange}
-              prefectureLabels={prefectureLabels}
+              prefectureLabels={visiblePrefectureLabels}
               router={router}
             />
           </FormProvider>
