@@ -39,7 +39,7 @@ export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
       <UserProfileHeader
         id={userId}
         name={profile.name}
-        image={profile.image}
+        image={profile.image || PLACEHOLDER_IMAGE}
         bio={profile.bio ?? ""}
         currentPrefecture={profile.currentPrefecture}
         isOwner={isOwner}
