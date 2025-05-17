@@ -9,7 +9,7 @@ import {
   GqlOpportunityCategory as OpportunityCategory,
   GqlOpportunityFilterInput as OpportunityFilterInput,
   GqlPublishStatus as PublishStatus,
-  useSearchOpportunitiesQuery,
+  useGetOpportunitiesQuery,
 } from "@/types/graphql";
 import { groupOpportunitiesByDate, SearchParams } from "@/app/search/data/presenter";
 import { toast } from "sonner";
@@ -18,8 +18,6 @@ import { presenterActivityCards } from "@/app/activities/data/presenter";
 import { IPrefectureCodeMap } from "@/app/search/data/type";
 
 function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
-  console.log(searchParams);
-
   const filter: OpportunityFilterInput = {
     publishStatus: [PublishStatus.Public],
   };
@@ -34,16 +32,27 @@ function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
   if (location && IPrefectureCodeMap[location]) {
     filter.cityCodes = [IPrefectureCodeMap[location]];
   }
-  if (searchParams.from) {
-    const fromDate = new Date(searchParams.from);
-    fromDate.setUTCHours(0, 0, 0, 0);
-    filter.slotStartsAt = fromDate;
-  }
 
-  if (searchParams.to) {
-    const toDate = new Date(searchParams.to);
-    toDate.setUTCHours(23, 59, 59, 999);
-    filter.slotEndsAt = toDate;
+  if (searchParams.from || searchParams.to) {
+    const slotDateRange: Record<string, Date> = {};
+
+    if (searchParams.from) {
+      const [year, month, day] = searchParams.from.split("-").map(Number);
+      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+        slotDateRange.gte = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+      }
+    }
+
+    if (searchParams.to) {
+      const [year, month, day] = searchParams.to.split("-").map(Number);
+      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+        slotDateRange.lte = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
+      }
+    }
+
+    if (Object.keys(slotDateRange).length > 0) {
+      filter.slotDateRange = slotDateRange;
+    }
   }
 
   if (searchParams.guests) {
@@ -78,14 +87,16 @@ export const useSearchResults = (
   const { setIsLoading } = useLoading();
 
   const filter = useMemo(() => buildFilter(searchParams), [searchParams]);
+  console.log(filter);
 
   const {
     data,
     loading: queryLoading,
     error,
-  } = useSearchOpportunitiesQuery({
+  } = useGetOpportunitiesQuery({
     variables: { filter, first: 20 },
     fetchPolicy: "network-only",
+    nextFetchPolicy: "network-only",
   });
 
   useEffect(() => {
@@ -127,8 +138,12 @@ export const useSearchResults = (
   );
 
   const groupedOpportunities = useMemo(
-    () => groupOpportunitiesByDate(opportunities),
-    [opportunities],
+    () =>
+      groupOpportunitiesByDate(opportunities, {
+        gte: filter.slotDateRange?.gte,
+        lte: filter.slotDateRange?.lte,
+      }),
+    [opportunities, filter.slotDateRange],
   );
 
   const hasResults = recommendedOpportunities.length > 0;

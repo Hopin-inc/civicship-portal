@@ -22,25 +22,33 @@ export const formatDateRange = (range: DateRange | undefined): string => {
   return `${format(range.from, "M/d", { locale: ja })} - ${format(range.to, "M/d", { locale: ja })}`;
 };
 
-export const buildSearchParams = (
-  searchQuery: string,
+export function buildSearchResultParams(
+  q: string,
   location: string,
   dateRange: DateRange | undefined,
   guests: number,
   useTicket: boolean,
-  selectedTab: string,
-): URLSearchParams => {
+  type: "activity" | "quest",
+): URLSearchParams {
   const params = new URLSearchParams();
-  if (searchQuery) params.set("q", searchQuery);
+
+  if (q) params.set("q", q);
   if (location) params.set("location", location);
-  if (dateRange?.from) params.set("from", dateRange.from.toISOString());
-  if (dateRange?.to) params.set("to", dateRange.to.toISOString());
+  if (dateRange?.from) {
+    const fromStr = dateRange.from.toLocaleDateString("sv-SE");
+    params.set("from", fromStr);
+  }
+  if (dateRange?.to) {
+    const toStr = dateRange.to.toLocaleDateString("sv-SE");
+    params.set("to", toStr);
+  }
+
   if (guests > 0) params.set("guests", guests.toString());
   if (useTicket) params.set("ticket", "true");
-  params.set("type", selectedTab);
+  if (type) params.set("type", type);
 
   return params;
-};
+}
 
 export const mapNodeToCardProps = (node: GraphQLOpportunity): ActivityCard => ({
   id: node.id,
@@ -53,20 +61,28 @@ export const mapNodeToCardProps = (node: GraphQLOpportunity): ActivityCard => ({
   hasReservableTicket: node.isReservableWithTicket || false,
 });
 
-export const groupOpportunitiesByDate = (opportunities: {
-  edges: GqlOpportunityEdge[];
-}): { [key: string]: ActivityCard[] } => {
-  return opportunities.edges.reduce(
-    (acc: { [key: string]: ActivityCard[] }, edge: GqlOpportunityEdge) => {
-      if (!edge?.node?.slots?.[0]?.startsAt) return acc;
+export const groupOpportunitiesByDate = (
+  opportunities: { edges: GqlOpportunityEdge[] },
+  dateRange?: { gte?: Date; lte?: Date },
+): { [key: string]: ActivityCard[] } => {
+  return opportunities.edges.reduce((acc: { [key: string]: ActivityCard[] }, edge) => {
+    const node = edge?.node;
+    if (!node || !node.slots || node.slots.length === 0) return acc;
 
-      const dateKey = format(new Date(edge.node.slots[0].startsAt), "yyyy-MM-dd");
-      if (!acc[dateKey]) {
-        acc[dateKey] = [];
-      }
-      acc[dateKey].push(mapNodeToCardProps(edge.node));
-      return acc;
-    },
-    {},
-  );
+    const matchedSlot = node.slots.find((slot) => {
+      const start = new Date(slot.startsAt);
+      if (dateRange?.gte && start < dateRange.gte) return false;
+      return !(dateRange?.lte && start > dateRange.lte);
+    });
+
+    if (!matchedSlot) return acc;
+
+    const dateKey = format(new Date(matchedSlot.startsAt), "yyyy-MM-dd");
+
+    if (!acc[dateKey]) {
+      acc[dateKey] = [];
+    }
+    acc[dateKey].push(mapNodeToCardProps(node));
+    return acc;
+  }, {});
 };

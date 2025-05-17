@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { buildSearchParams, formatDateRange } from "@/app/search/data/presenter";
+import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
 import { SearchTabs, SearchTabType } from "@/app/search/components/Tabs";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { prefectureLabels } from "@/app/users/data/presenter";
@@ -96,7 +96,7 @@ function SearchPageContent({
 
   const handleSearch = () => {
     const values = getValues();
-    const params = buildSearchParams(
+    const params = buildSearchResultParams(
       values.searchQuery,
       values.location,
       values.dateRange,
