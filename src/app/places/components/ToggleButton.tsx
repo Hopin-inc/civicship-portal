@@ -11,7 +11,7 @@ interface PlaceToggleButtonProps {
 
 const PlaceToggleButton: React.FC<PlaceToggleButtonProps> = ({ isMapMode, onClick }) => {
   return (
-    <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50">
+    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50">
       <Button onClick={onClick} variant={"secondary"} size={"md"}>
         {isMapMode ? (
           <>
