@@ -7,6 +7,7 @@ import PlaceFeaturedArticle from "@/app/places/[id]/components/PlaceFeaturedArti
 import { ErrorState } from "@/components/shared/ErrorState";
 import { ImagesCarousel } from "@/components/ui/images-carousel";
 import { PlaceOverview } from "./components/PlaceOverview";
+import { PlaceAddress } from "./components/PlaceAddress";
 
 interface PlaceDetailProps {
   params: {
@@ -33,11 +34,9 @@ const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
   return (
     <div className="min-h-screen bg-background overflow-auto">
       <div className="pb-6">
-        <ImagesCarousel
-          images={detail.images}
-          title={detail.name}
-        />
+        <ImagesCarousel images={detail.images} title={detail.name} />
         <PlaceOverview detail={detail} />
+        <PlaceAddress detail={detail} />
         <PlaceOpportunities opportunities={detail.currentlyHiringOpportunities} />
         <PlaceFeaturedArticle article={detail.relatedArticles?.[0]} />
       </div>
