@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   next@14.2.5:
-    hash: f09c6427d64cb02d9c7d76c28148c609cd444a77ddb8ea78677e7ebcb9506415
+    hash: qnyw5ngn2vwyfhkv5z253crcym
     path: patches/next@14.2.5.patch
 
 importers:
@@ -18,10 +18,10 @@ importers:
         version: 3.11.4(@types/react@18.3.3)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@apollo/experimental-nextjs-app-support':
         specifier: ^0.11.2
-        version: 0.11.2(@apollo/client@3.11.4(@types/react@18.3.3)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@14.2.5(patch_hash=f09c6427d64cb02d9c7d76c28148c609cd444a77ddb8ea78677e7ebcb9506415)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))(react@18.3.1)
+        version: 0.11.2(@apollo/client@3.11.4(@types/react@18.3.3)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@14.2.5(patch_hash=qnyw5ngn2vwyfhkv5z253crcym)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))(react@18.3.1)
       '@as-integrations/next':
         specifier: ^3.1.0
-        version: 3.1.0(@apollo/server@4.11.0(graphql@16.9.0))(next@14.2.5(patch_hash=f09c6427d64cb02d9c7d76c28148c609cd444a77ddb8ea78677e7ebcb9506415)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))
+        version: 3.1.0(@apollo/server@4.11.0(graphql@16.9.0))(next@14.2.5(patch_hash=qnyw5ngn2vwyfhkv5z253crcym)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))
       '@firebase/analytics':
         specifier: ^0.10.15
         version: 0.10.15(@firebase/app@0.10.9)
@@ -123,10 +123,10 @@ importers:
         version: 4.0.8
       next:
         specifier: 14.2.5
-        version: 14.2.5(patch_hash=f09c6427d64cb02d9c7d76c28148c609cd444a77ddb8ea78677e7ebcb9506415)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8)
+        version: 14.2.5(patch_hash=qnyw5ngn2vwyfhkv5z253crcym)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8)
       next-client-cookies:
         specifier: ^1.1.1
-        version: 1.1.1(next@14.2.5(patch_hash=f09c6427d64cb02d9c7d76c28148c609cd444a77ddb8ea78677e7ebcb9506415)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))(react@18.3.1)
+        version: 1.1.1(next@14.2.5(patch_hash=qnyw5ngn2vwyfhkv5z253crcym)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))(react@18.3.1)
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -170,8 +170,8 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.9)
       undici:
-        specifier: ^7.2.0
-        version: 7.4.0
+        specifier: ^7.5.0
+        version: 7.5.0
       unified:
         specifier: ^11.0.5
         version: 11.0.5
@@ -2929,11 +2929,11 @@ packages:
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
 
-  '@types/express-serve-static-core@4.19.5':
-    resolution: {integrity: sha512-y6W03tvrACO72aijJ5uF02FRq5cgDR9lUxddQ8vyF+GvmjJQqbzDcJngEjURc+ZsG31VI3hODNZJ2URj86pzmg==}
+  '@types/express-serve-static-core@4.19.6':
+    resolution: {integrity: sha512-N4LZ2xG7DatVqhCZzOGb1Yi5lMbXSZcmdLDe9EzSndPV2HpWYWzRbaerl2n27irrm94EPpprqa8KpskPT085+A==}
 
-  '@types/express@4.17.21':
-    resolution: {integrity: sha512-ejlPM315qwLpaQlQDTjPdsUFSc6ZsP4AN6AlWnogPjQ7CVi7PYF3YVz+CY3jE2pwYf7E/7HlDAN0rV2GxTG0HQ==}
+  '@types/express@4.17.22':
+    resolution: {integrity: sha512-eZUmSnhRX9YRSkplpz0N+k6NljUUn5l3EWZIKZvYzhvMphEuNiyyy1viH/ejgt66JWgALwC/gtSUAeQKtSwW/w==}
 
   '@types/google.maps@3.58.1':
     resolution: {integrity: sha512-X9QTSvGJ0nCfMzYOnaVs/k6/4L+7F5uCS+4iUmkLEls6J9S/Phv+m/i3mDeyc49ZBgwab3EFO1HEoBY7k98EGQ==}
@@ -2965,8 +2965,8 @@ packages:
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
-  '@types/node-fetch@2.6.11':
-    resolution: {integrity: sha512-24xFj9R5+rfQJLRyM56qh+wnVSYhyXC2tkoBndtY0U+vubqNsYXGjufB2nn8Q6gt0LrARwL6UBtMCSVCwl4B1g==}
+  '@types/node-fetch@2.6.12':
+    resolution: {integrity: sha512-8nneRWKCg3rMtF69nLQJnOYUcbafYeFSjqkw3jCRLsqkWFlHaoQrr5mXmofFGOx3DKn7UfmBMyov8ySvLRVldA==}
 
   '@types/node@18.19.44':
     resolution: {integrity: sha512-ZsbGerYg72WMXUIE9fYxtvfzLEuq6q8mKERdWFnqTmOvudMxnz+CBNRoOwJ2kNpFOncrKjT1hZwxjlFgQ9qvQA==}
@@ -2974,14 +2974,14 @@ packages:
   '@types/node@20.14.15':
     resolution: {integrity: sha512-Fz1xDMCF/B00/tYSVMlmK7hVeLh7jE5f3B7X1/hmV0MJBwE27KlS7EvD/Yp+z1lm8mVhwV5w+n8jOZG8AfTlKw==}
 
-  '@types/node@20.17.23':
-    resolution: {integrity: sha512-8PCGZ1ZJbEZuYNTMqywO+Sj4vSKjSjT6Ua+6RFOYlEvIvKQABPtrNkoVSLSKDb4obYcMhspVKmsw8Cm10NFRUg==}
+  '@types/node@20.17.47':
+    resolution: {integrity: sha512-3dLX0Upo1v7RvUimvxLeXqwrfyKxUINk0EAM83swP2mlSUcwV73sZy8XhNz8bcZ3VbsfQyC/y6jRdL5tgCNpDQ==}
 
   '@types/prop-types@15.7.12':
     resolution: {integrity: sha512-5zvhXYtRNRluoE/jAp4GVsSduVUzNWKkOZrCDBWYtE7biZywwdC2AcEzg+cSMLFRfVgeAFqpfNabiPjxFddV1Q==}
 
-  '@types/qs@6.9.18':
-    resolution: {integrity: sha512-kK7dgTYDyGqS+e2Q4aK9X3D7q234CIZ1Bv0q/7Z5IwRDoADNU81xXJK/YVyLbLTZCoIwUoDoffFeF+p/eIklAA==}
+  '@types/qs@6.14.0':
+    resolution: {integrity: sha512-eOunJqu0K1923aExK6y8p6fsihYEn/BYuQ4g0CxAAgFc4b/ZLN4CrsRZ55srTdqoiLzU2B2evC+apEIxprEzkQ==}
 
   '@types/range-parser@1.2.7':
     resolution: {integrity: sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==}
@@ -4926,6 +4926,10 @@ packages:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
     engines: {node: '>= 0.6'}
 
+  negotiator@0.6.4:
+    resolution: {integrity: sha512-myRT3DiWPHqho5PrJaIRyaMv2kgYf0mUVgBNOYMuCH5Ki1yEiQaf/ZJuQ62nvpc44wL5WDbTX7yGJi1Neevw8w==}
+    engines: {node: '>= 0.6'}
+
   next-client-cookies@1.1.1:
     resolution: {integrity: sha512-7/wiTI5RPJcP7c1zh5a9XNkvChihtattUG9dHMvfijtvzgEQXotr6E3AHYD1aXyVqGiZA95y/cWlcEI5EJ31tw==}
     peerDependencies:
@@ -5898,8 +5902,8 @@ packages:
     resolution: {integrity: sha512-72RFADWFqKmUb2hmmvNODKL3p9hcB6Gt2DOQMis1SEBaV6a4MH8soBvzg+95CYhCKPFedut2JY9bMfrDl9D23g==}
     engines: {node: '>=14.0'}
 
-  undici@7.4.0:
-    resolution: {integrity: sha512-PUQM3/es3noM24oUn10u3kNNap0AbxESOmnssmW+dOi9yGwlUSi5nTNYl3bNbTkWOF8YZDkx2tCmj9OtQ3iGGw==}
+  undici@7.5.0:
+    resolution: {integrity: sha512-NFQG741e8mJ0fLQk90xKxFdaSM7z4+IQpAgsFI36bCDY9Z2+aXXZjVy2uUksMouWfMI9+w5ejOq5zYYTBCQJDQ==}
     engines: {node: '>=20.18.1'}
 
   unicode-canonical-property-names-ecmascript@2.0.1:
@@ -6203,11 +6207,11 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
-  '@apollo/experimental-nextjs-app-support@0.11.2(@apollo/client@3.11.4(@types/react@18.3.3)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@14.2.5(patch_hash=f09c6427d64cb02d9c7d76c28148c609cd444a77ddb8ea78677e7ebcb9506415)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))(react@18.3.1)':
+  '@apollo/experimental-nextjs-app-support@0.11.2(@apollo/client@3.11.4(@types/react@18.3.3)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@14.2.5(patch_hash=qnyw5ngn2vwyfhkv5z253crcym)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))(react@18.3.1)':
     dependencies:
       '@apollo/client': 3.11.4(@types/react@18.3.3)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@apollo/client-react-streaming': 0.11.2(@apollo/client@3.11.4(@types/react@18.3.3)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
-      next: 14.2.5(patch_hash=f09c6427d64cb02d9c7d76c28148c609cd444a77ddb8ea78677e7ebcb9506415)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8)
+      next: 14.2.5(patch_hash=qnyw5ngn2vwyfhkv5z253crcym)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8)
       react: 18.3.1
 
   '@apollo/protobufjs@1.2.7':
@@ -6246,16 +6250,16 @@ snapshots:
       '@apollo/utils.usagereporting': 2.1.0(graphql@16.9.0)
       '@apollo/utils.withrequired': 2.0.1
       '@graphql-tools/schema': 9.0.19(graphql@16.9.0)
-      '@types/express': 4.17.21
-      '@types/express-serve-static-core': 4.19.5
-      '@types/node-fetch': 2.6.11
+      '@types/express': 4.17.22
+      '@types/express-serve-static-core': 4.19.6
+      '@types/node-fetch': 2.6.12
       async-retry: 1.3.3
       cors: 2.8.5
       express: 4.21.2
       graphql: 16.9.0
       loglevel: 1.9.2
       lru-cache: 7.18.3
-      negotiator: 0.6.3
+      negotiator: 0.6.4
       node-abort-controller: 3.1.1
       node-fetch: 2.7.0
       uuid: 9.0.1
@@ -6347,10 +6351,10 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@as-integrations/next@3.1.0(@apollo/server@4.11.0(graphql@16.9.0))(next@14.2.5(patch_hash=f09c6427d64cb02d9c7d76c28148c609cd444a77ddb8ea78677e7ebcb9506415)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))':
+  '@as-integrations/next@3.1.0(@apollo/server@4.11.0(graphql@16.9.0))(next@14.2.5(patch_hash=qnyw5ngn2vwyfhkv5z253crcym)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))':
     dependencies:
       '@apollo/server': 4.11.0(graphql@16.9.0)
-      next: 14.2.5(patch_hash=f09c6427d64cb02d9c7d76c28148c609cd444a77ddb8ea78677e7ebcb9506415)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8)
+      next: 14.2.5(patch_hash=qnyw5ngn2vwyfhkv5z253crcym)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8)
 
   '@babel/code-frame@7.24.7':
     dependencies:
@@ -9765,18 +9769,18 @@ snapshots:
     dependencies:
       '@types/ms': 2.1.0
 
-  '@types/express-serve-static-core@4.19.5':
+  '@types/express-serve-static-core@4.19.6':
     dependencies:
-      '@types/node': 20.17.23
-      '@types/qs': 6.9.18
+      '@types/node': 20.17.47
+      '@types/qs': 6.14.0
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
 
-  '@types/express@4.17.21':
+  '@types/express@4.17.22':
     dependencies:
       '@types/body-parser': 1.19.5
-      '@types/express-serve-static-core': 4.19.5
-      '@types/qs': 6.9.18
+      '@types/express-serve-static-core': 4.19.6
+      '@types/qs': 6.14.0
       '@types/serve-static': 1.15.7
 
   '@types/google.maps@3.58.1': {}
@@ -9805,9 +9809,9 @@ snapshots:
 
   '@types/ms@2.1.0': {}
 
-  '@types/node-fetch@2.6.11':
+  '@types/node-fetch@2.6.12':
     dependencies:
-      '@types/node': 20.17.23
+      '@types/node': 20.17.47
       form-data: 4.0.2
 
   '@types/node@18.19.44':
@@ -9818,13 +9822,13 @@ snapshots:
     dependencies:
       undici-types: 5.26.5
 
-  '@types/node@20.17.23':
+  '@types/node@20.17.47':
     dependencies:
       undici-types: 6.19.8
 
   '@types/prop-types@15.7.12': {}
 
-  '@types/qs@6.9.18': {}
+  '@types/qs@6.14.0': {}
 
   '@types/range-parser@1.2.7': {}
 
@@ -9842,12 +9846,12 @@ snapshots:
   '@types/send@0.17.4':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 20.17.23
+      '@types/node': 20.17.47
 
   '@types/serve-static@1.15.7':
     dependencies:
       '@types/http-errors': 2.0.4
-      '@types/node': 20.17.23
+      '@types/node': 20.17.47
       '@types/send': 0.17.4
 
   '@types/unist@3.0.3': {}
@@ -12283,10 +12287,12 @@ snapshots:
 
   negotiator@0.6.3: {}
 
-  next-client-cookies@1.1.1(next@14.2.5(patch_hash=f09c6427d64cb02d9c7d76c28148c609cd444a77ddb8ea78677e7ebcb9506415)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))(react@18.3.1):
+  negotiator@0.6.4: {}
+
+  next-client-cookies@1.1.1(next@14.2.5(patch_hash=qnyw5ngn2vwyfhkv5z253crcym)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8))(react@18.3.1):
     dependencies:
       js-cookie: 3.0.5
-      next: 14.2.5(patch_hash=f09c6427d64cb02d9c7d76c28148c609cd444a77ddb8ea78677e7ebcb9506415)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8)
+      next: 14.2.5(patch_hash=qnyw5ngn2vwyfhkv5z253crcym)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8)
       react: 18.3.1
 
   next-themes@0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
@@ -12294,7 +12300,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  next@14.2.5(patch_hash=f09c6427d64cb02d9c7d76c28148c609cd444a77ddb8ea78677e7ebcb9506415)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8):
+  next@14.2.5(patch_hash=qnyw5ngn2vwyfhkv5z253crcym)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.8):
     dependencies:
       '@next/env': 14.2.5
       '@swc/helpers': 0.5.5
@@ -13359,7 +13365,7 @@ snapshots:
     dependencies:
       '@fastify/busboy': 2.1.1
 
-  undici@7.4.0: {}
+  undici@7.5.0: {}
 
   unicode-canonical-property-names-ecmascript@2.0.1: {}
 
