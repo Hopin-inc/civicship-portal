@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo } from "react";
 import { useHeader } from "@/components/providers/HeaderProvider";
-import { useLoading } from "@/hooks/useLoading";
 import {
   GqlCurrentPrefecture,
   GqlOpportunitiesConnection,
@@ -82,9 +81,9 @@ export const useSearchResults = (
   loading: boolean;
   error: Error | null;
   hasResults: boolean;
+  refetch: () => void;
 } => {
   const { updateConfig } = useHeader();
-  const { setIsLoading } = useLoading();
 
   const filter = useMemo(() => buildFilter(searchParams), [searchParams]);
   console.log(filter);
@@ -93,15 +92,12 @@ export const useSearchResults = (
     data,
     loading: queryLoading,
     error,
+    refetch,
   } = useGetOpportunitiesQuery({
     variables: { filter, first: 20 },
     fetchPolicy: "network-only",
     nextFetchPolicy: "network-only",
   });
-
-  useEffect(() => {
-    setIsLoading(queryLoading && !data);
-  }, [queryLoading, data, setIsLoading]);
 
   useEffect(() => {
     updateConfig({
@@ -162,6 +158,7 @@ export const useSearchResults = (
     loading: queryLoading,
     error: error ?? null,
     hasResults,
+    refetch,
   };
 };
 

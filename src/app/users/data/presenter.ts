@@ -88,6 +88,12 @@ export const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
   [GqlCurrentPrefecture.Unknown]: "不明",
 };
 
+export const visiblePrefectureLabels = Object.fromEntries(
+  Object.entries(prefectureLabels).filter(
+    ([key]) => key !== GqlCurrentPrefecture.OutsideShikoku && key !== GqlCurrentPrefecture.Unknown,
+  ),
+) as Record<GqlCurrentPrefecture, string>;
+
 export const prefectureOptions = [
   GqlCurrentPrefecture.Kagawa,
   GqlCurrentPrefecture.Tokushima,
