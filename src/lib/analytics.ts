@@ -1,9 +1,12 @@
-import { analytics } from "./firebase";
 import { logEvent, setUserProperties } from "firebase/analytics";
-import { setUserId } from "@firebase/analytics";
+import { getAnalytics, setUserId } from "@firebase/analytics";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { useParams, usePathname } from "next/navigation";
+import { app } from "@/lib/firebase";
+
+const analytics = typeof window !== "undefined" ? getAnalytics(app) : undefined;
+export { analytics };
 
 // 内部保持：ユーザー属性 + 環境情報（初期値は空）
 let currentUserAttributes: Record<string, string> = {};
