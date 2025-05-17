@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfileSection } from "@/app/users/components/UserProfileSection";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
 import { UserPortfolioList } from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
+import ErrorState from "@/components/shared/ErrorState";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
@@ -15,7 +15,11 @@ export default function MyProfilePage() {
   const router = useRouter();
   const { user: currentUser, isAuthenticating } = useAuth();
 
-  const { userData, isLoading, error } = useUserProfile(currentUser?.id);
+  const { userData, isLoading, error, refetch } = useUserProfile(currentUser?.id);
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   // 認証完了後、未ログイン状態ならリダイレクト
   useEffect(() => {
@@ -26,11 +30,7 @@ export default function MyProfilePage() {
 
   // 認証中の間はローディング
   if (isAuthenticating) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <LoadingIndicator fullScreen={true} />
-      </div>
-    );
+    return <LoadingIndicator />;
   }
 
   // 未ログインで useEffect によりリダイレクト中
@@ -39,27 +39,15 @@ export default function MyProfilePage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <LoadingIndicator fullScreen={true} />
-      </div>
-    );
+    return <LoadingIndicator />;
   }
 
   if (error) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <ErrorState message={error.message || "ユーザー情報の取得に失敗しました"} />
-      </div>
-    );
+    return <ErrorState title={"マイページを読み込めませんでした"} refetchRef={refetchRef} />;
   }
 
   if (!userData) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <ErrorState message="ユーザーが見つかりませんでした" />
-      </div>
-    );
+    return notFound();
   }
 
   return (

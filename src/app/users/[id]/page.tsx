@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProfileSection } from "@/app/users/components/UserProfileSection";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
 import { UserPortfolioList } from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
+import { notFound } from "next/navigation";
+import ErrorState from "@/components/shared/ErrorState";
 
 export default function UserPage({ params }: { params: { id: string } }) {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
@@ -14,30 +15,22 @@ export default function UserPage({ params }: { params: { id: string } }) {
   const { user: currentUser } = useAuth();
   const isOwner = currentUser?.id === params.id;
 
-  const { userData, isLoading, error } = useUserProfile(params.id);
+  const { userData, isLoading, error, refetch } = useUserProfile(params.id);
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <LoadingIndicator />
-      </div>
-    );
+    return <LoadingIndicator />;
   }
 
   if (error) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <ErrorState message={error.message || "ユーザー情報の取得に失敗しました"} />
-      </div>
-    );
+    return <ErrorState title={"参加者ページを読み込めませんでした"} refetchRef={refetchRef} />;
   }
 
   if (!userData) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <ErrorState message="ユーザーが見つかりませんでした" />
-      </div>
-    );
+    return notFound();
   }
 
   return (

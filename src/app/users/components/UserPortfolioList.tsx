@@ -1,7 +1,7 @@
 import { Calendar, MapPin, Ellipsis, Plus, Clock, FileText, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import EmptyState from "@/components/shared/EmptyState";
+import EmptyStateWithSearch from "@/components/shared/EmptyStateWithSearch";
 import { RefObject } from "react";
 import { ParticipantsList } from "@/components/shared/ParticipantsList";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
@@ -293,7 +293,7 @@ export const UserPortfolioList = ({
           )}
         </div>
         {showEmptyState ? (
-          <EmptyState {...emptyStateProps} />
+          <EmptyStateWithSearch {...emptyStateProps} />
         ) : (
           <PortfolioGrid
             portfolios={enableDummyPortfolios ? dummyPortfolios : portfolios}
