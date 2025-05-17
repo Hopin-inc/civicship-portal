@@ -1,7 +1,7 @@
 import { useGetReservationQuery } from "@/types/graphql";
 
 export const useReservationComplete = (reservationId: string | null) => {
-  const { data, loading, error } = useGetReservationQuery({
+  const { data, loading, error, refetch } = useGetReservationQuery({
     variables: { id: reservationId! },
     skip: !reservationId,
     fetchPolicy: "network-only",
@@ -18,5 +18,6 @@ export const useReservationComplete = (reservationId: string | null) => {
     gqlOpportunitySlot,
     loading,
     error,
+    refetch,
   };
 };
