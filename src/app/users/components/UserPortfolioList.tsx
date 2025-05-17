@@ -160,9 +160,12 @@ const PortfolioCard = ({
               <Calendar className="w-4 h-4" />
               <span>
                 {portfolio.date}
-                {portfolio.source === "OPPORTUNITY" && !isPast && (
-                  <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">予定</span>
-                )}
+                {portfolio.source === "OPPORTUNITY" &&
+                  !isPast &&
+                  portfolio.reservationStatus !== GqlReservationStatus.Canceled &&
+                  portfolio.reservationStatus !== GqlReservationStatus.Rejected && (
+                    <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">予定</span>
+                  )}
               </span>
             </div>
             {portfolio.location && (
