@@ -7,6 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { DateRange } from "react-day-picker";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { IPrefecture } from "@/app/search/data/type";
@@ -43,19 +44,17 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
   prefectures,
 }) => {
   const renderFooterButtons = () => (
-    <div className="absolute bottom-0 left-0 right-0 bg-background p-4">
-      <div className="flex justify-between items-center">
-        <Button
-          onClick={clearActiveFilter}
-          variant="link"
-          className="text-muted-foreground text-sm"
-        >
-          選択を解除
-        </Button>
-        <Button onClick={() => setActiveForm(null)} variant="primary" className="px-8 py-3">
-          決定
-        </Button>
-      </div>
+    <div className="absolute bottom-0 left-0 right-0 z-50 bg-background max-w-mobile-l w-full h-16 flex items-center justify-between mx-auto">
+      <Button
+        onClick={clearActiveFilter}
+        variant="link"
+        className="text-label-md px-0 underline !text-foreground"
+      >
+        選択を解除
+      </Button>
+      <Button onClick={() => setActiveForm(null)} variant="primary" className="px-8 py-3">
+        決定
+      </Button>
     </div>
   );
 
@@ -71,9 +70,11 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
             onClick={() => {
               setLocation(pref.id);
             }}
-            variant={location === pref.id ? "primary" : "tertiary"}
-            className={`py-3 ${
-              location === pref.id ? "text-primary bg-primary-foreground" : "text-foreground"
+            variant="tertiary"
+            className={`py-3 rounded-xl text-label-md ${
+              location === pref.id
+                ? "border-2 border-primary text-primary bg-primary/5 font-bold"
+                : "border border-input text-foreground font-medium"
             }`}
           >
             {pref.name}
@@ -143,15 +144,12 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
         <SheetTitle>その他の条件</SheetTitle>
       </SheetHeader>
       <div className="space-y-4">
-        <Label className="flex items-center space-x-2">
-          <Input
-            type="checkbox"
-            checked={useTicket}
-            onChange={(e) => setUseTicket(e.target.checked)}
-            className="h-5 w-5"
-          />
-          <span className="text-gray-700">チケットで支払える</span>
-        </Label>
+        <div className="flex items-center gap-x-2">
+          <Switch id="use-ticket" checked={useTicket} onCheckedChange={setUseTicket} />
+          <Label htmlFor="use-ticket" className="text-label-md">
+            チケットを使って参加する
+          </Label>
+        </div>
       </div>
       {renderFooterButtons()}
     </div>
@@ -176,9 +174,12 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
     <Sheet open={activeForm !== null} onOpenChange={(open) => !open && setActiveForm(null)}>
       <SheetContent
         side="bottom"
-        className={`${getSheetHeight()} rounded-t-3xl overflow-auto max-w-md mx-auto`}
+        className={`${getSheetHeight()} rounded-t-3xl overflow-auto max-w-md mx-auto pt-2 px-6`}
         onPointerDownOutside={() => setActiveForm(null)}
       >
+        <div className="flex justify-center mb-3">
+          <div className="w-10 h-1 bg-muted-foreground/30 rounded-full"></div>
+        </div>
         {renderSheetContent()}
       </SheetContent>
     </Sheet>

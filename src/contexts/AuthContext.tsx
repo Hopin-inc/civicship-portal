@@ -129,14 +129,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const timestamp = Math.floor(phoneVerificationState.tokenExpiresAt.getTime() / 1000);
             cookies.set("phone_token_expires_at", timestamp.toString());
           }
-          
+
           console.log("Phone verification successful with tokens:", {
             phoneUid: phoneVerificationState.phoneUid,
             authToken: phoneVerificationState.authToken ? "present" : "missing",
             refreshToken: phoneVerificationState.refreshToken ? "present" : "missing",
             tokenExpiresAt: phoneVerificationState.tokenExpiresAt
           });
-          
+
           setIsPhoneVerified(true);
           toast.success("電話番号認証が完了しました");
           router.push("/sign-up");
@@ -171,9 +171,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsPhoneVerified(phoneVerified);
     } catch (error) {
       console.error("LIFF login failed:", error);
-      
+
       let errorMessage = "LINEログインに失敗しました";
-      
+
       if (error instanceof Error) {
         if (error.message.includes("network")) {
           errorMessage = "ネットワーク接続に問題が発生しました。インターネット接続を確認してください。";
@@ -183,7 +183,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           errorMessage = "ログイン処理がキャンセルされました。";
         }
       }
-      
+
       toast.error(errorMessage);
       setIsExplicitLogin(false);
     }
@@ -221,7 +221,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const handleTokenExpired = (event: Event) => {
       const customEvent = event as CustomEvent;
       console.log("Token expired event detected:", customEvent.detail);
-      
+
       toast.error(
         "認証の有効期限が切れました。再認証が必要です。",
         {
@@ -233,13 +233,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       );
     };
-    
+
     const handleAuthError = (event: Event) => {
       const customEvent = event as CustomEvent;
       const { errorType, errorMessage } = customEvent.detail;
-      
+
       console.log("Auth error event detected:", customEvent.detail);
-      
+
       toast.error(
         errorMessage,
         {
@@ -254,11 +254,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       );
     };
-    
+
     window.addEventListener('auth:token-expired', handleTokenExpired);
     window.addEventListener('auth:error', handleAuthError);
     window.addEventListener('auth:token-refresh-failed', handleAuthError);
-    
+
     return () => {
       window.removeEventListener('auth:token-expired', handleTokenExpired);
       window.removeEventListener('auth:error', handleAuthError);
@@ -274,12 +274,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const next = searchParams.get("next");
         const idToken = await user.getIdToken();
         cookies.set("access_token", idToken);
-        
+
         if (user.refreshToken) {
           cookies.set("refresh_token", user.refreshToken);
           console.log("LINE refresh token stored in cookies");
         }
-        
+
         try {
           const tokenResult = await user.getIdTokenResult();
           if (tokenResult.expirationTime) {
@@ -360,9 +360,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const effectivePhoneUid = phoneUid || phoneVerificationState.phoneUid || undefined;
       const phoneNumber = getVerifiedPhoneNumber();
-      
       console.log("Creating user with phone UID:", effectivePhoneUid);
-      
+      if (!phoneNumber) {
+        throw new Error("No verified phone number found.");
+      }
+
       const { data } = await userSignUpMutation({
         variables: {
           input: {
@@ -370,11 +372,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             currentPrefecture: currentPrefecture as any, // Type cast to resolve compatibility issue
             communityId: COMMUNITY_ID,
             phoneUid: effectivePhoneUid,
-            phoneNumber: phoneNumber,
+            phoneNumber,
           },
         },
       });
-      
+
       return data?.userSignUp?.user ?? null;
     } catch (error) {
       console.error("Failed to create user:", error);
