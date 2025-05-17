@@ -1,22 +1,45 @@
 "use client";
 
-import { useMemo } from "react";
-import { useQuery } from "@apollo/client";
+import { useMemo, useState } from "react";
+import { useQuery, useMutation } from "@apollo/client";
+import { useRouter } from "next/navigation";
 import { GET_TICKET_ISSUERS } from "@/graphql/reward/ticketIssuer/query";
+import { TICKET_CLAIM } from "@/graphql/reward/ticket/mutation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { toast } from "sonner";
 
 export default function TicketsPage() {
   const headerConfig = useMemo(() => ({
     hideHeader: true,
   }), []);
   useHeaderConfig(headerConfig);
+  const router = useRouter();
+  const [isIssuing, setIsIssuing] = useState(false);
 
   const { data, loading, error } = useQuery(GET_TICKET_ISSUERS);
+
+  const [claimTicket, { loading: claimLoading }] = useMutation(TICKET_CLAIM, {
+    onCompleted: (data) => {
+      setIsIssuing(false);
+      if (data?.ticketClaim?.tickets?.[0]?.id) {
+        router.push(`/admin/tickets/${data.ticketClaim.tickets[0].id}`);
+      }
+    },
+    onError: (error) => {
+      setIsIssuing(false);
+      toast.error(`チケット発行に失敗しました: ${error.message}`);
+    }
+  });
+
+  const handleIssueTicket = async (ticketClaimLinkId: string) => {
+    setIsIssuing(true);
+    await claimTicket({ variables: { input: { ticketClaimLinkId } } });
+  };
 
   if (loading) {
     return (
@@ -34,16 +57,24 @@ export default function TicketsPage() {
     );
   }
 
-  const tickets = data?.ticketIssuers?.edges?.map(edge => edge.node) || [];
+  const tickets = data?.ticketIssuers?.edges?.map((edge: any) => edge.node) || [];
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">チケット一覧</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">チケット一覧</h1>
+        <Button 
+          onClick={() => tickets.length > 0 && handleIssueTicket(tickets[0]?.id)} 
+          disabled={isIssuing || claimLoading || tickets.length === 0}
+        >
+          {isIssuing || claimLoading ? "処理中..." : "チケット発行"}
+        </Button>
+      </div>
       <div className="space-y-4">
         {tickets.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">チケットが見つかりません</p>
         ) : (
-          tickets.map((ticket) => (
+          tickets.map((ticket: any) => (
             <Link key={ticket.id} href={`/admin/tickets/${ticket.id}`}>
               <CardWrapper className="p-4 cursor-pointer">
                 <div className="flex justify-between items-center">
