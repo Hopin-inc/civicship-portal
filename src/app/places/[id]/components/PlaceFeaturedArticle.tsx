@@ -14,8 +14,8 @@ const PlaceFeaturedArticle: React.FC<PlaceFeaturedArticleProps> = ({ article }) 
   if (!article) return null;
 
   return (
-    <div className="px-4 mb-8">
-      <h2 className="text-xl font-bold mb-4">関連記事</h2>
+    <div className="px-4 pt-6 pb-8 max-w-mobile-l mx-auto space-y-4">
+      <h2 className="text-display-sm mb-4">関連記事</h2>
       <Link href={article.id} className="block">
         <div className="bg-background rounded-xl border hover:shadow-md transition-shadow duration-200">
           <div className="relative w-full h-[200px]">

@@ -14,17 +14,17 @@ const PlaceOpportunities: React.FC<PlaceOpportunitiesProps> = ({ opportunities }
   if (!opportunities.length) return null;
 
   return (
-    <div className="px-4 space-y-4 mb-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+    <div className="px-4 pt-6 pb-8 max-w-mobile-l mx-auto space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-display-sm font-semibold text-foreground flex items-center gap-2">
           募集中の関わり
-          <span className="bg-primary-foreground text-primary text-xs font-medium px-2 py-0.5 rounded-full">
+          <span className="bg-primary text-primary-foreground text-xs font-medium px-2 py-0.5 rounded-full">
             {opportunities.length}
           </span>
         </h2>
       </div>
       <div className="relative">
-        <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+        <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
           <div className="flex gap-4">
             {opportunities.map((opportunity) => (
               <div

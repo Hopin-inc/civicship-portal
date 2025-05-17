@@ -23,7 +23,7 @@ export const PlaceAddress = ({ detail }: { detail: BaseDetail }) => {
   };
 
   return (
-    <div className="px-4 pt-2 pb-4 max-w-mobile-l mx-auto space-y-4">
+    <div className="px-4 pt-6 pb-8 max-w-mobile-l mx-auto space-y-4">
       <h3 className="text-display-sm">主な拠点</h3>
       <div>
         <p className="text-body-md font-bold">{detail.name}</p>
