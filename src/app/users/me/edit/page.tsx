@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { useProfileEdit } from "@/app/users/hooks/useProfileEdit";
 import { UserProfileEdit } from "@/app/users/components/UserProfileEdit";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import ErrorState from "@/components/shared/ErrorState";
+import useProfileEdit from "@/app/users/me/edit/hooks/useProfileEdit";
 
 export default function ProfileEditPage() {
   const headerConfig = useMemo(
@@ -19,7 +18,6 @@ export default function ProfileEditPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const router = useRouter();
   const {
     profileImage,
     displayName,
@@ -43,7 +41,7 @@ export default function ProfileEditPage() {
   }
 
   if (error) {
-    return <ErrorState message="プロフィールの取得に失敗しました" />;
+    return <ErrorState title="プロフィールを読み込めませんでした" />;
   }
 
   return (

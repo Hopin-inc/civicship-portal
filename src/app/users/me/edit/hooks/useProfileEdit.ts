@@ -1,35 +1,44 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, FormEvent, ChangeEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   GqlCurrentPrefecture,
   useGetUserFlexibleQuery,
   useUpdateMyProfileMutation,
 } from "@/types/graphql";
-import { GeneralUserProfile } from '@/app/users/data/type';
+import { GeneralUserProfile } from "@/app/users/data/type";
 import { prefectureLabels, presenterUserProfile } from "@/app/users/data/presenter";
 
-export const useProfileEdit = () => {
+const useProfileEdit = () => {
   const router = useRouter();
   const { user } = useAuth();
   const userId = user?.id;
 
   const [profile, setProfile] = useState<GeneralUserProfile>({
-    name: '',
+    name: "",
     image: null,
-    bio: '',
+    bio: "",
     currentPrefecture: undefined,
-    urlFacebook: '',
-    urlInstagram: '',
-    urlX: '',
-    phone: '',
+    urlFacebook: "",
+    urlInstagram: "",
+    urlX: "",
+    phone: "",
   });
 
-  const { data, loading: userLoading, error: userError } = useGetUserFlexibleQuery({
-    variables: { id: userId ?? '', withOpportunities: false, withPortfolios: false, withWallets: false },
+  const {
+    data,
+    loading: userLoading,
+    error: userError,
+  } = useGetUserFlexibleQuery({
+    variables: {
+      id: userId ?? "",
+      withOpportunities: false,
+      withPortfolios: false,
+      withWallets: false,
+    },
     skip: !userId,
   });
 
@@ -58,7 +67,7 @@ export const useProfileEdit = () => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result as string;
-      const base64 = base64String.split(',')[1];
+      const base64 = base64String.split(",")[1];
       setProfile((prev) => ({ ...prev, image: base64 }));
     };
     reader.readAsDataURL(file);
@@ -67,7 +76,7 @@ export const useProfileEdit = () => {
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
     if (!profile.currentPrefecture) {
-      toast.error('居住地を選択してください');
+      toast.error("居住地を選択してください");
       return;
     }
 
@@ -77,37 +86,39 @@ export const useProfileEdit = () => {
           input: {
             name: profile.name,
             image: profile.image ? { file: profile.image } : undefined,
-            bio: profile.bio ?? '',
+            bio: profile.bio ?? "",
             currentPrefecture: profile.currentPrefecture,
-            urlFacebook: profile.urlFacebook ?? '',
-            urlInstagram: profile.urlInstagram ?? '',
-            urlX: profile.urlX ?? '',
-            slug: profile.name.toLowerCase().replace(/\s+/g, '-'),
+            urlFacebook: profile.urlFacebook ?? "",
+            urlInstagram: profile.urlInstagram ?? "",
+            urlX: profile.urlX ?? "",
+            slug: profile.name.toLowerCase().replace(/\s+/g, "-"),
           },
           permission: {
-            userId: userId ?? '',
+            userId: userId ?? "",
           },
         },
       });
-      toast.success('プロフィールを更新しました');
+      toast.success("プロフィールを更新しました");
       router.push(`/users/${userId}`);
     } catch (err) {
-      console.error('Failed to update profile:', err);
-      toast.error('プロフィールの更新に失敗しました');
+      console.error("Failed to update profile:", err);
+      toast.error("プロフィールの更新に失敗しました");
     }
   };
 
-  const prefectureOptions = useMemo(() => (
-    Object.entries(prefectureLabels).map(([key, label]) => ({
-      value: key as GqlCurrentPrefecture,
-      label,
-    }))
-  ), []);
+  const prefectureOptions = useMemo(
+    () =>
+      Object.entries(prefectureLabels).map(([key, label]) => ({
+        value: key as GqlCurrentPrefecture,
+        label,
+      })),
+    [],
+  );
 
   const formattedError = useMemo(() => {
     if (userError) {
-      console.error('Error fetching user profile:', userError);
-      toast.error('プロフィールの取得に失敗しました');
+      console.error("Error fetching user profile:", userError);
+      toast.error("プロフィールの取得に失敗しました");
     }
     return null;
   }, [userError]);
@@ -116,11 +127,11 @@ export const useProfileEdit = () => {
     profileImage: profile.image,
     displayName: profile.name,
     location: profile.currentPrefecture,
-    bio: profile.bio ?? '',
+    bio: profile.bio ?? "",
     socialLinks: {
-      facebook: profile.urlFacebook ?? '',
-      instagram: profile.urlInstagram ?? '',
-      twitter: profile.urlX ?? '',
+      facebook: profile.urlFacebook ?? "",
+      instagram: profile.urlInstagram ?? "",
+      twitter: profile.urlX ?? "",
     },
     phone: profile.phone,
     userLoading,
@@ -128,7 +139,8 @@ export const useProfileEdit = () => {
     updating,
     prefectureOptions,
     setDisplayName: (name: string) => setProfile((prev) => ({ ...prev, name })),
-    setLocation: (location: GqlCurrentPrefecture | undefined) => setProfile((prev) => ({ ...prev, currentPrefecture: location })),
+    setLocation: (location: GqlCurrentPrefecture | undefined) =>
+      setProfile((prev) => ({ ...prev, currentPrefecture: location })),
     setBio: (bio: string) => setProfile((prev) => ({ ...prev, bio })),
     setSocialLinks,
     handleImageSelect,
