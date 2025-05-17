@@ -112,7 +112,7 @@ export default function ConfirmPage() {
               useTickets={useTickets}
               setUseTickets={setUseTickets}
             />
-            <NotesSection requireApproval={opportunity?.requiredApproval} />{" "}
+            <NotesSection />
             <Button
               onClick={handleConfirm}
               disabled={
