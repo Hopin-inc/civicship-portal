@@ -54,8 +54,6 @@ export default function MyProfilePage() {
     <div className="container mx-auto px-6 py-6 max-w-3xl">
       <UserProfileSection
         userId={currentUser?.id ?? ""}
-        isLoading={isLoading}
-        error={error}
         profile={userData.profile}
         userAsset={userData.asset}
         isOwner={true}

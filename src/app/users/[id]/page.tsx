@@ -37,8 +37,6 @@ export default function UserPage({ params }: { params: { id: string } }) {
     <div className="container mx-auto py-6 max-w-3xl">
       <UserProfileSection
         userId={params.id}
-        isLoading={isLoading}
-        error={error}
         profile={userData.profile}
         userAsset={userData.asset}
         isOwner={isOwner}
