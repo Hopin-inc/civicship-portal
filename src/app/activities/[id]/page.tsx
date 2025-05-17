@@ -6,10 +6,9 @@ import ActivityDetailsContent from "@/app/activities/[id]/components/ActivityDet
 import ActivityDetailsFooter from "@/app/activities/[id]/components/ActivityDetailsFooter";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useMemo } from "react";
-import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
-import ActivityNavigationButtons from "@/app/activities/[id]/components/ActivityNavigationButtons";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { NavigationButtons } from "@/components/shared/NavigationButtons";
 
 interface ActivityPageProps {
   params: {
@@ -25,7 +24,6 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
 
   const { opportunity, sameStateActivities, availableTickets, sortedSlots, isLoading, error } =
     useActivityDetails(id);
-  const { navigateBack } = useHierarchicalNavigation();
 
   const headerConfig = useMemo(
     () => ({
@@ -46,7 +44,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
     <>
       {isLoading && <LoadingIndicator fullScreen />}
       <div className="relative max-w-mobile-l mx-auto w-full">
-        <ActivityNavigationButtons title={opportunity.title} onBack={navigateBack} />
+        <NavigationButtons title={opportunity.title} />
       </div>
 
       <main className="min-h-screen">
