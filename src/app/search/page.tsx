@@ -5,8 +5,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
-import { SearchTabs, SearchTabType } from "@/app/search/components/Tabs";
-import { SearchFilterType } from "@/app/search/hooks/useSearch";
+// import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { visiblePrefectureLabels } from "@/app/users/data/presenter";
 import { DateRange } from "react-day-picker";
 import { useSearchForm } from "@/app/search/hooks/useSearchForm";
@@ -14,6 +13,7 @@ import SearchForm from "@/app/search/components/SearchForm";
 import SearchFilters from "@/app/search/components/SearchFilters";
 import SearchFooter from "@/app/search/components/Footer";
 import SearchFilterSheets from "@/app/search/components/SearchFilterSheet";
+import { SearchFilterType } from "@/app/search/hooks/useSearch";
 
 export default function SearchPage() {
   const headerConfig = useMemo(
@@ -37,19 +37,19 @@ export default function SearchPage() {
   });
 
   const router = useRouter();
-  const [selectedTab, setSelectedTab] = useState<SearchTabType>("activity");
+  // const [selectedTab, setSelectedTab] = useState<SearchTabType>("activity");
   const [activeForm, setActiveForm] = useState<SearchFilterType>(null);
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-auto">
         <div className="container px-4 py-2">
-          <SearchTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />
+          {/*<SearchTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />*/}
           <FormProvider {...methods}>
             <SearchPageContent
               activeForm={activeForm}
               setActiveForm={setActiveForm}
-              selectedTab={selectedTab}
+              // selectedTab={selectedTab}
               formatDateRange={formatDateRange}
               prefectureLabels={visiblePrefectureLabels}
               router={router}
@@ -64,14 +64,14 @@ export default function SearchPage() {
 function SearchPageContent({
   activeForm,
   setActiveForm,
-  selectedTab,
+  // selectedTab,
   formatDateRange,
   prefectureLabels,
   router,
 }: {
   activeForm: SearchFilterType;
   setActiveForm: (f: SearchFilterType) => void;
-  selectedTab: SearchTabType;
+  // selectedTab: SearchTabType;
   formatDateRange: (r: DateRange | undefined) => string;
   prefectureLabels: Record<string, string>;
   router: ReturnType<typeof useRouter>;
@@ -102,13 +102,14 @@ function SearchPageContent({
       values.dateRange,
       values.guests,
       values.useTicket,
-      selectedTab,
+      "activity",
+      // selectedTab,
     );
     router.push(`/search/result?${params.toString()}`);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-4">
       <SearchForm />
       <SearchFilters
         onFilterClick={setActiveForm}
