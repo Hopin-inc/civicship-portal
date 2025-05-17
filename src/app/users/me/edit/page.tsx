@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useProfileEdit } from "@/app/users/hooks/useProfileEdit";
+import useProfileEdit from "@/app/users/me/edit/hooks/useProfileEdit";
 import UserProfileEdit from "@/app/users/components/UserProfileEdit";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useGetParticipationQuery } from "@/types/graphql";
 import {
   calculateCancellationDeadline,
@@ -20,15 +20,20 @@ interface UseParticipationPageResult {
   cancellationDeadline: Date | null;
   loading: boolean;
   error: ApolloError | undefined;
-  refetch: () => void;
+  hasError: boolean; // ← serialize-safe
 }
 
-export const useParticipationPage = (id: string): UseParticipationPageResult => {
+const useParticipationPage = (id: string): UseParticipationPageResult => {
   const { data, loading, error, refetch } = useGetParticipationQuery({
     variables: { id },
     skip: !id,
     fetchPolicy: "network-only",
   });
+
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   const rawParticipation = data?.participation;
   const rawOpportunity = rawParticipation?.reservation?.opportunitySlot?.opportunity;
@@ -44,6 +49,12 @@ export const useParticipationPage = (id: string): UseParticipationPageResult => 
     return calculateCancellationDeadline(startsAt);
   }, [startsAt]);
 
+  useEffect(() => {
+    if (error) {
+      console.error("Participation query error:", error);
+    }
+  }, [error]);
+
   return {
     participation,
     opportunity,
@@ -51,6 +62,8 @@ export const useParticipationPage = (id: string): UseParticipationPageResult => 
     cancellationDeadline,
     loading,
     error,
-    refetch,
+    hasError: Boolean(error), // ← serialize-safe
   };
 };
+
+export default useParticipationPage;
