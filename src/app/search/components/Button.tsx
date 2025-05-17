@@ -11,6 +11,7 @@ interface FilterButtonProps {
   onClick: () => void;
   children?: React.ReactNode;
   verticalLayout?: boolean;
+  className?: string;
 }
 
 const FilterButton: React.FC<FilterButtonProps> = ({
@@ -21,11 +22,12 @@ const FilterButton: React.FC<FilterButtonProps> = ({
   onClick,
   children,
   verticalLayout = false,
+  className,
 }) => (
   <Button
     onClick={onClick}
     variant="tertiary"
-    className="w-full px-4 py-3 flex items-center justify-between text-left bg-background rounded-none border-x-0 border-t-0 hover:bg-background/80 h-auto"
+    className={cn("w-full px-4 py-3 flex items-center justify-between text-left bg-background rounded-none border-b hover:bg-background/80 h-auto", className)}
   >
     <div className={cn("flex", {
       "items-start": verticalLayout,

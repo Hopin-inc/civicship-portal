@@ -31,7 +31,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   const { control } = useFormContext();
 
   return (
-    <div className="bg-background rounded-xl border border-input overflow-hidden">
+    <div className="bg-background rounded-xl overflow-hidden">
       <FormField
         control={control}
         name="location"
@@ -44,6 +44,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
                 value={location ? (prefectureLabels[location] ?? "不明な場所") : "場所を指定"}
                 active={!!location}
                 onClick={() => onFilterClick("location")}
+                className="rounded-t-xl border-b-0"
               />
             </FormControl>
           </FormItem>
@@ -62,6 +63,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
                 value={dateRange?.from ? formatDateRange(dateRange) : "日付を追加"}
                 active={!!dateRange?.from}
                 onClick={() => onFilterClick("date")}
+                className="border-b-0"
               />
             </FormControl>
           </FormItem>
@@ -80,18 +82,17 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
                 value={guests > 0 ? `${guests}人` : "人数を指定"}
                 active={guests > 0}
                 onClick={() => onFilterClick("guests")}
+                className="border-b-0"
               />
             </FormControl>
           </FormItem>
         )}
       />
-
-
-        <FormField
-          control={control}
-          name="useTicket"
-          render={() => (
-            <FormItem>
+      <FormField
+        control={control}
+        name="useTicket"
+        render={() => (
+          <FormItem>
             <FormControl>
               <FilterButton
                 icon={<Tags className="h-4 w-4" />}
@@ -100,6 +101,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
                 active={useTicket}
                 onClick={() => onFilterClick("other")}
                 verticalLayout={true}
+                className="rounded-b-xl"
               >
                 {useTicket && "チケットで支払える"}
               </FilterButton>
