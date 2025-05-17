@@ -21,6 +21,10 @@ export function OpportunityCardHorizontal({ opportunity }: { opportunity: Activi
               placeholder={`blur`}
               blurDataURL={PLACEHOLDER_IMAGE}
               className="object-cover rounded-lg"
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                img.src = PLACEHOLDER_IMAGE;
+              }}
             />
           </div>
           <div className="flex-1 px-4 py-3">

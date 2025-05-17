@@ -25,6 +25,10 @@ export const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity })
                 placeholder={"blur"}
                 blurDataURL={PLACEHOLDER_IMAGE}
                 className="object-cover"
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.src = PLACEHOLDER_IMAGE;
+                }}
               />
             </div>
             <span className="text-xl">{opportunity?.host?.name ?? "案内人"}</span>

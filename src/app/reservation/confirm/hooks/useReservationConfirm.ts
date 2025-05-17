@@ -1,11 +1,9 @@
-"use client";
-
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useGetOpportunityQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
+import { ActivityDetail } from "@/app/activities/data/type";
 import { presenterActivityDetail } from "@/app/activities/data/presenter";
 import { useSlotAndTicketInfo } from "@/app/reservation/confirm/hooks/useSlotAndTicket";
-import type { ActivityDetail } from "@/app/activities/data/type";
 
 export const useReservationConfirm = ({
   opportunityId,
@@ -16,7 +14,7 @@ export const useReservationConfirm = ({
   slotId: string;
   userId?: string;
 }) => {
-  // --- Opportunity クエリ ---
+  // クエリの取得
   const {
     data,
     loading: oppLoading,
@@ -30,14 +28,12 @@ export const useReservationConfirm = ({
     skip: !opportunityId,
     fetchPolicy: "network-only",
     errorPolicy: "all",
-    onError: (err) => console.error("Opportunity query error:", err),
   });
 
   const opportunity: ActivityDetail | null = useMemo(() => {
     return data?.opportunity ? presenterActivityDetail(data.opportunity) : null;
   }, [data]);
 
-  // --- Slot, Wallet, Ticket 情報取得 ---
   const {
     wallets,
     selectedSlot,
@@ -49,13 +45,13 @@ export const useReservationConfirm = ({
     walletRefetch,
   } = useSlotAndTicketInfo(opportunity, userId, slotId);
 
-  // --- 統合された状態管理 ---
   const loading = oppLoading || walletLoading;
-  const error = oppError ?? walletError ?? null;
+  const hasError = Boolean(oppError || walletError);
 
-  const refetch = async () => {
-    await Promise.all([oppRefetch(), walletRefetch()]);
-  };
+  useEffect(() => {
+    if (oppError) console.error("Opportunity query error:", oppError);
+    if (walletError) console.error("Slot/Wallet error:", walletError);
+  }, [oppError, walletError]);
 
   return {
     opportunity,
@@ -65,7 +61,10 @@ export const useReservationConfirm = ({
     wallets,
     availableTickets,
     loading,
-    error,
-    refetch,
+    hasError, // ← serialize-safe
+    triggerRefetch: () => {
+      void oppRefetch();
+      void walletRefetch();
+    },
   };
 };

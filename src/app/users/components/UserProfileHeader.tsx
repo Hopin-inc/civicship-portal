@@ -50,6 +50,10 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
               blurDataURL={PLACEHOLDER_IMAGE}
               className="object-cover"
               priority
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                img.src = PLACEHOLDER_IMAGE;
+              }}
             />
           </div>
           {isOwner && (

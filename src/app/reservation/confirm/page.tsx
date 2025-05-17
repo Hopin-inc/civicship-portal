@@ -43,14 +43,14 @@ export default function ConfirmPage() {
     endDateTime,
     availableTickets,
     loading,
-    error,
-    refetch,
+    hasError,
+    triggerRefetch,
   } = useReservationConfirm({ opportunityId, slotId, userId: user?.id });
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
-    refetchRef.current = refetch;
-  }, [refetch]);
+    refetchRef.current = triggerRefetch;
+  }, [triggerRefetch]);
 
   const ticketCounter = useTicketCounter(availableTickets);
 
@@ -58,7 +58,8 @@ export default function ConfirmPage() {
   const { handleReservation, creatingReservation } = useReservationCommand();
 
   if (loading) return <LoadingIndicator />;
-  if (error) return <ErrorState title="予約情報を読み込めませんでした" refetchRef={refetchRef} />;
+  if (hasError)
+    return <ErrorState title="予約情報を読み込めませんでした" refetchRef={refetchRef} />;
   if (!opportunity) return notFound();
 
   const handleConfirm = async () => {

@@ -127,6 +127,10 @@ const PortfolioCard = ({
             placeholder={"blur"}
             blurDataURL={PLACEHOLDER_IMAGE}
             sizes="(min-width: 640px) 50vw, 100vw"
+            onError={(e) => {
+              const img = e.target as HTMLImageElement;
+              img.src = PLACEHOLDER_IMAGE;
+            }}
           />
           {portfolio.source === "OPPORTUNITY" &&
           portfolio?.reservationStatus === GqlReservationStatus.Accepted &&

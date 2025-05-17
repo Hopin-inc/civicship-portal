@@ -27,6 +27,10 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, onClick }) => (
         placeholder={`blur`}
         blurDataURL={PLACEHOLDER_IMAGE}
         sizes="(max-width: 768px) 100vw, 320px"
+        onError={(e) => {
+          const img = e.target as HTMLImageElement;
+          img.src = PLACEHOLDER_IMAGE;
+        }}
       />
     </div>
     <CardContent className="flex flex-col min-h-[160px] px-4 py-3">

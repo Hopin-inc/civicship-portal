@@ -61,7 +61,13 @@ export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
                 alt="Profile"
                 width={96}
                 height={96}
+                placeholder={"blur"}
+                blurDataURL={PLACEHOLDER_IMAGE}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.src = PLACEHOLDER_IMAGE;
+                }}
               />
             ) : (
               <div className="w-full h-full bg-muted" />
