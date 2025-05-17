@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
+import ErrorState from "@/components/shared/ErrorState";
 import { useParticipationPage } from "@/app/participations/[id]/hooks/useParticipationPage";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { ParticipationStatusNotification } from "@/app/participations/[id]/components/ParticipationStatusNotification";
@@ -53,27 +53,32 @@ export default function ParticipationPage({ params }: ParticipationProps) {
     refetch,
   } = useParticipationPage(params.id);
 
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
+
   const isCancellable = cancellationDeadline ? new Date() < cancellationDeadline : false;
   const reservationId = participation?.reservation?.id;
   const { handleCancel } = useCancelReservation();
 
   const onCancel = async () => {
     if (!reservationId) {
-      toast.error("予約IDが見つかりません");
+      toast.error("予約情報が見つかりません");
       return;
     }
     const result = await handleCancel(reservationId);
     if (result.success) {
-      toast.success("キャンセルしました");
+      toast.success("予約をキャンセルしました");
       refetch();
     } else {
-      toast.error(`キャンセル失敗: ${result.error}`);
+      toast.error(`予約のキャンセルが失敗しました`);
     }
   };
 
-  if (loading) return <LoadingIndicator message="参加情報を読み込み中..." />;
-  if (error || !opportunity || !participation) {
-    return <ErrorState message="参加情報の読み込みに失敗しました。" />;
+  if (loading) return <LoadingIndicator />;
+  if (error || !reservationId || !opportunity || !participation) {
+    return <ErrorState title="予約ページを読み込めませんでした" refetchRef={refetchRef} />;
   }
 
   return (
