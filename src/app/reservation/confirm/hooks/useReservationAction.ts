@@ -4,9 +4,9 @@ import { useReservationUIState } from "./useReservationUIState";
 import type { ActivityDetail } from "@/app/activities/data/type";
 import type { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import type { GqlUser, GqlWallet } from "@/types/graphql";
-import { useReservationSubmission } from "./useReservationSubmission";
-import { UseTicketCounterReturn } from "./useTicketCounter";
 import { useMemo } from "react";
+import { useReservationSubmission } from "@/app/reservation/confirm/hooks/useReservationSubmission";
+import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
 
 export const useReservationActions = ({
   opportunity,
@@ -33,19 +33,15 @@ export const useReservationActions = ({
     useTickets,
   });
 
-  return useMemo(() => ({
-    useTickets,
-    setUseTickets,
-    isLoginModalOpen,
-    setIsLoginModalOpen,
-    handleReservation: submit,
-    creatingReservation,
-  }), [
-    useTickets,
-    setUseTickets,
-    isLoginModalOpen,
-    setIsLoginModalOpen,
-    submit,
-    creatingReservation
-  ]);
+  return useMemo(
+    () => ({
+      useTickets,
+      setUseTickets,
+      isLoginModalOpen,
+      setIsLoginModalOpen,
+      handleReservation: submit,
+      creatingReservation,
+    }),
+    [useTickets, setUseTickets, isLoginModalOpen, setIsLoginModalOpen, submit, creatingReservation],
+  );
 };

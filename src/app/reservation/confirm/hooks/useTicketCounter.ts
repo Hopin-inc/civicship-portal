@@ -1,21 +1,14 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 
 export function useTicketCounter(maxTickets: number) {
   const [count, setCount] = useState(1);
 
-  const setCountMemoized = useCallback((value: number) => {
-    setCount(value);
-  }, []);
-
   const increment = useCallback(
-    () => setCountMemoized(Math.min(count + 1, maxTickets)),
-    [count, maxTickets, setCountMemoized]
+    () => setCount((prev) => Math.min(prev + 1, maxTickets)),
+    [maxTickets],
   );
-  
-  const decrement = useCallback(
-    () => setCountMemoized(Math.max(count - 1, 1)),
-    [count, setCountMemoized]
-  );
+
+  const decrement = useCallback(() => setCount((prev) => Math.max(prev - 1, 1)), []);
 
   return {
     count,

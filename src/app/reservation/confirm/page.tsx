@@ -14,10 +14,9 @@ import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCount
 import { useReservationActions } from "@/app/reservation/confirm/hooks/useReservationAction";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
-import { createReservationHandler } from "@/app/reservation/confirm/hooks/useReservationHandler";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useRouter } from "next/navigation";
 import { useMemo, useCallback } from "react";
+import { createReservationHandler } from "@/app/reservation/confirm/hooks/useReservationHandler";
 
 export default function ConfirmPage() {
   const { user } = useAuth();
@@ -41,15 +40,15 @@ export default function ConfirmPage() {
   } = useReservationConfirm({ opportunityId, slotId, userId: user?.id });
 
   const ticketCounter = useTicketCounter(availableTickets);
-  
-  const memoizedIncrement = useCallback(ticketCounter.increment, [ticketCounter.increment]);
-  const memoizedDecrement = useCallback(ticketCounter.decrement, [ticketCounter.decrement]);
-  
-  const memoizedTicketCounter = useMemo(() => ({
-    count: ticketCounter.count,
-    increment: memoizedIncrement,
-    decrement: memoizedDecrement
-  }), [ticketCounter.count, memoizedIncrement, memoizedDecrement]);
+
+  const memoizedTicketCounter = useMemo(
+    () => ({
+      count: ticketCounter.count,
+      increment: ticketCounter.increment,
+      decrement: ticketCounter.decrement,
+    }),
+    [ticketCounter.count, ticketCounter.increment, ticketCounter.decrement],
+  );
 
   const {
     isLoginModalOpen,
@@ -58,18 +57,32 @@ export default function ConfirmPage() {
     setUseTickets,
     handleReservation,
     creatingReservation,
-  } = useReservationActions({ opportunity, selectedSlot, wallets, user, ticketCounter: memoizedTicketCounter });
+  } = useReservationActions({
+    opportunity,
+    selectedSlot,
+    wallets,
+    user,
+    ticketCounter: memoizedTicketCounter,
+  });
 
   const router = useRouter();
-  
+
   const handleCloseLoginModal = useCallback(() => {
     setIsLoginModalOpen(false);
   }, [setIsLoginModalOpen]);
-  
-  const handleConfirm = useCallback(() => {
+
+  const handleConfirm = async () => {
     if (!opportunity || !handleReservation) return;
-    return createReservationHandler(opportunity, handleReservation, router)();
-  }, [opportunity, handleReservation, router]);
+
+    const result = await handleReservation();
+
+    if (!result.success && result.error === "NOT_AUTHENTICATED") {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    await createReservationHandler(opportunity, handleReservation, router)();
+  };
 
   return (
     <>
@@ -100,8 +113,8 @@ export default function ConfirmPage() {
 
             <PaymentSection
               ticketCount={ticketCounter.count}
-              onIncrement={memoizedIncrement}
-              onDecrement={memoizedDecrement}
+              onIncrement={ticketCounter.increment}
+              onDecrement={ticketCounter.decrement}
               maxTickets={availableTickets}
               pricePerPerson={opportunity?.feeRequired ?? 0}
               participantCount={participantCount}
