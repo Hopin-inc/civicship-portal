@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { GqlRole } from "@/types/graphql";
 
 export default function AdminLayout({
   children,
@@ -15,12 +16,14 @@ export default function AdminLayout({
 
   useEffect(() => {
     if (!loading && currentUser) {
-      if (!currentUser.memberships || currentUser.memberships.length === 0) {
+      const targetMembership = currentUser.memberships?.find(m => m.community?.id === "neo88");
+      const isCommunityManager = targetMembership && (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
+      if (!isCommunityManager) {
         router.push("/");
         toast.warning("管理者権限がありません");
       }
     }
-  }, [currentUser, loading, router]);
+  }, [currentUser, router]);
 
   if (loading || !currentUser) {
     return null;
