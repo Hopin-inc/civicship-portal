@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { ActivityDetail } from "@/app/activities/data/type";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface OpportunityInfoProps {
   opportunity: ActivityDetail | null;
@@ -18,21 +19,25 @@ export const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity })
           <div className="flex items-center gap-3">
             <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
               <Image
-                src={opportunity?.host?.image ?? "/placeholder-avatar.png"}
-                alt={opportunity?.host?.name ?? "ホスト"}
+                src={opportunity?.host?.image ?? PLACEHOLDER_IMAGE}
+                alt={opportunity?.host?.name ?? "案内人"}
                 fill
+                placeholder={"blur"}
+                blurDataURL={PLACEHOLDER_IMAGE}
                 className="object-cover"
               />
             </div>
-            <span className="text-xl">{opportunity?.host?.name ?? "ホスト"}</span>
+            <span className="text-xl">{opportunity?.host?.name ?? "案内人"}</span>
           </div>
         </div>
 
         <div className="relative w-[108px] h-[108px] rounded-lg overflow-hidden flex-shrink-0">
           <Image
-            src={opportunity?.images?.[0] || "/placeholder.png"}
+            src={opportunity?.images?.[0] || PLACEHOLDER_IMAGE}
             alt={opportunity?.title ?? ""}
             fill
+            placeholder={"blur"}
+            blurDataURL={PLACEHOLDER_IMAGE}
             className="object-cover"
           />
         </div>
