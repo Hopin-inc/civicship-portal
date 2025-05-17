@@ -13,20 +13,35 @@ export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, isAuthenticating } = useAuth();
 
+  const { userData, isLoading, error } = useUserProfile(currentUser?.id);
+
+  // 認証完了後、未ログイン状態ならリダイレクト
   useEffect(() => {
-    if (!currentUser) {
+    if (!isAuthenticating && !currentUser) {
       router.push("/login?next=/users/me");
     }
-  }, [currentUser, router]);
+  }, [currentUser, isAuthenticating, router]);
 
-  const { userData, isLoading, error } = useUserProfile(currentUser?.id ?? "");
+  // 認証中の間はローディング
+  if (isAuthenticating) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <LoadingIndicator fullScreen={true} />
+      </div>
+    );
+  }
+
+  // 未ログインで useEffect によりリダイレクト中
+  if (!currentUser) {
+    return null;
+  }
 
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-6">
-        <LoadingIndicator />
+        <LoadingIndicator fullScreen={true} />
       </div>
     );
   }

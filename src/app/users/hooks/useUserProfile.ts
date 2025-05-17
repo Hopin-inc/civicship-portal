@@ -4,12 +4,13 @@ import { useEffect, useMemo } from "react";
 import { useGetUserFlexibleQuery } from "@/types/graphql";
 import { useLoading } from "@/hooks/useLoading";
 import { presenterManagerProfile } from "@/app/users/data/presenter";
-export const useUserProfile = (userId: string) => {
+
+export const useUserProfile = (userId?: string) => {
   const { setIsLoading } = useLoading();
 
   const result = useGetUserFlexibleQuery({
     variables: {
-      id: userId,
+      id: userId ?? "", // 空文字でもOK
       withPortfolios: true,
       withOpportunities: true,
       withWallets: true,
