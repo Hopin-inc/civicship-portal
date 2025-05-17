@@ -12,3 +12,16 @@ export const CREATE_RESERVATION_MUTATION = gql`
     }
   }
 `;
+
+export const ACCEPT_RESERVATION_MUTATION = gql`
+  mutation ReservationAccept($id: ID!) {
+    reservationAccept(id: $id) {
+      ... on ReservationAcceptSuccess {
+        reservation {
+          id
+          status
+        }
+      }
+    }
+  }
+`;

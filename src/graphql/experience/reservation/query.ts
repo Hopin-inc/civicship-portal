@@ -13,6 +13,15 @@ export const GET_RESERVATIONS = gql`
       edges {
         node {
           id
+          status
+          createdAt
+          opportunitySlot {
+            id
+            opportunity {
+              id
+              title
+            }
+          }
         }
       }
       totalCount
