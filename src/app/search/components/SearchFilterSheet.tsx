@@ -7,6 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { DateRange } from "react-day-picker";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { IPrefecture } from "@/app/search/data/type";
@@ -143,15 +144,12 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
         <SheetTitle>その他の条件</SheetTitle>
       </SheetHeader>
       <div className="space-y-4">
-        <Label className="flex items-center space-x-2">
-          <Input
-            type="checkbox"
-            checked={useTicket}
-            onChange={(e) => setUseTicket(e.target.checked)}
-            className="h-5 w-5"
-          />
-          <span className="text-gray-700">チケットで支払える</span>
-        </Label>
+        <div className="flex items-center gap-x-2">
+          <Switch id="use-ticket" checked={useTicket} onCheckedChange={setUseTicket} />
+          <Label htmlFor="use-ticket" className="text-label-md">
+            チケットを使って参加する
+          </Label>
+        </div>
       </div>
       {renderFooterButtons()}
     </div>
