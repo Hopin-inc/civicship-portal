@@ -1,6 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { buildSearchParams, formatDateRange } from "@/app/search/data/presenter";
+import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
 import { useState } from "react";
 import { SearchTabType } from "@/app/search/components/Tabs";
 
@@ -23,7 +23,7 @@ export const useSearch = () => {
 
   const handleSearch = () => {
     const values = getValues(); // RHFの値を取得
-    const params = buildSearchParams(
+    const params = buildSearchResultParams(
       values.searchQuery,
       values.location,
       values.dateRange,
