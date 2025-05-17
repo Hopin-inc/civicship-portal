@@ -5,7 +5,7 @@ import { useTransactionHistory } from "@/app/wallets/[id]/hooks/useTransactionHi
 import { useAuth } from "@/contexts/AuthContext";
 import { useHeader } from "@/components/providers/HeaderProvider";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { TransactionItem } from "@/app/wallets/[id]/components/TransactionItem";
+import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
 import ErrorState from "@/components/shared/ErrorState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import EmptyState from "@/components/shared/EmptyState";

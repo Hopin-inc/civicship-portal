@@ -1,9 +1,11 @@
+"use client";
+
 import { useEffect, useMemo } from "react";
 import { useGetOpportunityQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
-import { ActivityDetail } from "@/app/activities/data/type";
 import { presenterActivityDetail } from "@/app/activities/data/presenter";
 import { useSlotAndTicketInfo } from "@/app/reservation/confirm/hooks/useSlotAndTicket";
+import type { ActivityDetail } from "@/app/activities/data/type";
 
 export const useReservationConfirm = ({
   opportunityId,
@@ -28,6 +30,7 @@ export const useReservationConfirm = ({
     skip: !opportunityId,
     fetchPolicy: "network-only",
     errorPolicy: "all",
+    onError: (err) => console.error("Opportunity query error:", err),
   });
 
   const opportunity: ActivityDetail | null = useMemo(() => {

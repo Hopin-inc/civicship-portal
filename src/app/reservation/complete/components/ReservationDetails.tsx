@@ -12,7 +12,7 @@ interface ReservationDetailsProps {
   pricePerPerson: number;
 }
 
-export const ReservationDetails: React.FC<ReservationDetailsProps> = ({
+const ReservationDetails: React.FC<ReservationDetailsProps> = ({
   formattedDate,
   startTime,
   endTime,

@@ -1,6 +1,8 @@
+"use client";
+
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
+import AsymmetricImageGrid from "@/components/ui/asymmetric-image-grid";
 
 const emptyImages = [
   {

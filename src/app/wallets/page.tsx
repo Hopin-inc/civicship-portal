@@ -4,10 +4,10 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { useWallet } from "@/app/wallets/hooks/useWallet";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { WalletCard } from "@/app/wallets/components/WalletCard";
-import { WalletHistoryButton } from "@/app/wallets/components/WalletHistoryButton";
-import { WalletInfoSection } from "@/app/wallets/components/WalletInfoSection";
-import { WalletUsageSection } from "@/app/wallets/components/WalletUsageSection";
+import WalletCard from "@/app/wallets/components/WalletCard";
+import WalletHistoryButton from "@/app/wallets/components/WalletHistoryButton";
+import WalletInfoSection from "@/app/wallets/components/WalletInfoSection";
+import WalletUsageSection from "@/app/wallets/components/WalletUsageSection";
 import ErrorState from "@/components/shared/ErrorState";
 
 export default function WalletsPage() {

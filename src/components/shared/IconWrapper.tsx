@@ -10,7 +10,7 @@ interface IconWrapperProps {
 /**
  * Wrapper component for icons with consistent styling
  */
-export const IconWrapper: React.FC<IconWrapperProps> = ({ 
+const IconWrapper: React.FC<IconWrapperProps> = ({ 
   children, 
   color = 'default' 
 }) => {

@@ -1,13 +1,13 @@
 "use client";
 
-import { SameStateActivities } from "@/app/activities/[id]/components/SimilarActivitiesList";
-import { CompletionHeader } from "@/app/reservation/complete/components/CompletionHeader";
-import { ReservationDetails } from "@/app/reservation/complete/components/ReservationDetails";
+import SameStateActivities from "@/app/activities/[id]/components/SimilarActivitiesList";
+import CompletionHeader from "@/app/reservation/complete/components/CompletionHeader";
+import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
 import React, { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useSearchParams } from "next/navigation";
 import { HeaderConfig } from "@/contexts/HeaderContext";
-import { OpportunityCardHorizontal } from "@/app/activities/components/Card/CardHorizontal";
+import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";

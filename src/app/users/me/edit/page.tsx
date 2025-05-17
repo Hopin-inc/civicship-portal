@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { UserProfileEdit } from "@/app/users/components/UserProfileEdit";
+import { useRouter } from "next/navigation";
+import { useProfileEdit } from "@/app/users/hooks/useProfileEdit";
+import UserProfileEdit from "@/app/users/components/UserProfileEdit";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
 import ErrorState from "@/components/shared/ErrorState";
-import useProfileEdit from "@/app/users/me/edit/hooks/useProfileEdit";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function ProfileEditPage() {
   const headerConfig = useMemo(

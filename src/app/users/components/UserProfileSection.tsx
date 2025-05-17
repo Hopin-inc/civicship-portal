@@ -1,8 +1,10 @@
 "use client";
 
 import React from "react";
-import { UserProfileHeader } from "./UserProfileHeader";
-import { UserTicketsAndPoints } from "./UserTicketsAndPoints";
+import UserProfileHeader from "./UserProfileHeader";
+import UserTicketsAndPoints from "./UserTicketsAndPoints";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import ErrorState from "@/components/shared/ErrorState";
 import { GeneralUserProfile } from "@/app/users/data/type";
 import { UserAsset } from "@/app/wallets/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
@@ -14,7 +16,7 @@ interface UserProfileSectionProps {
   isOwner: boolean;
 }
 
-export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
+const UserProfileSection: React.FC<UserProfileSectionProps> = ({
   userId,
   profile,
   userAsset,

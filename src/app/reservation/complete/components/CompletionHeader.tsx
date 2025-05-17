@@ -6,7 +6,7 @@ import { CheckCircle } from 'lucide-react';
 /**
  * Header component for the reservation completion page
  */
-export const CompletionHeader: React.FC = () => {
+const CompletionHeader: React.FC = () => {
   return (
     <div className="flex flex-col items-center py-12 max-w-mobile-l mx-auto w-full">
       <div className="flex items-center justify-center">

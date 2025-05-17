@@ -4,12 +4,12 @@ import { FC, useEffect, useRef } from "react";
 import { usePlaceDetail } from "@/app/places/[id]/hooks/usePlaceDetail";
 import PlaceOpportunities from "@/app/places/[id]/components/PlaceOpportunities";
 import PlaceFeaturedArticle from "@/app/places/[id]/components/PlaceFeaturedArticle";
-import { ImagesCarousel } from "@/components/ui/images-carousel";
-import { PlaceOverview } from "./components/PlaceOverview";
-import { PlaceAddress } from "./components/PlaceAddress";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { NavigationButtons } from "@/components/shared/NavigationButtons";
 import ErrorState from "@/components/shared/ErrorState";
+import ImagesCarousel from "@/components/ui/images-carousel";
+import PlaceOverview from "./components/PlaceOverview";
+import PlaceAddress from "./components/PlaceAddress";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import NavigationButtons from "@/components/shared/NavigationButtons";
 import { notFound } from "next/navigation";
 
 interface PlaceDetailProps {

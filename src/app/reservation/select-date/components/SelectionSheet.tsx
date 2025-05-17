@@ -18,7 +18,7 @@ interface SelectionSheetProps {
 /**
  * Sheet component for date and guest selection
  */
-export const SelectionSheet: React.FC<SelectionSheetProps> = ({
+const SelectionSheet: React.FC<SelectionSheetProps> = ({
   isOpen,
   onClose,
   activeForm,

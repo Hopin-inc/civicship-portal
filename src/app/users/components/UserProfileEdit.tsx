@@ -1,11 +1,13 @@
-import React, { useState } from "react";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Facebook, Instagram, Twitter } from "lucide-react";
-import { GqlCurrentPrefecture } from "@/types/graphql";
+"use client";
+
+import React, { useState } from 'react';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Facebook, Instagram, Twitter } from 'lucide-react';
+import { GqlCurrentPrefecture } from '@/types/graphql';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
@@ -29,7 +31,7 @@ interface UserProfileEditProps {
   handleSave: (e: React.FormEvent) => void;
 }
 
-export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
+const UserProfileEdit: React.FC<UserProfileEditProps> = ({
   profileImage,
   displayName,
   location,

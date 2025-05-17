@@ -5,13 +5,13 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import { useParticipationPage } from "@/app/participations/[id]/hooks/useParticipationPage";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { ParticipationStatusNotification } from "@/app/participations/[id]/components/ParticipationStatusNotification";
-import { ParticipationDetails } from "@/app/participations/[id]/components/ParticipationDetails";
+import ParticipationStatusNotification from "@/app/participations/[id]/components/ParticipationStatusNotification";
+import ParticipationDetails from "@/app/participations/[id]/components/ParticipationDetails";
 import ParticipationActions from "@/app/participations/[id]/components/ParticipationActions";
 import { useCancelReservation } from "@/app/participations/[id]/hooks/useCancelReservation";
 import { toast } from "sonner";
 import { GqlReservationStatus } from "@/types/graphql";
-import { OpportunityCardHorizontal } from "@/app/activities/components/Card/CardHorizontal";
+import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 
 interface ParticipationProps {
   params: { id: string };

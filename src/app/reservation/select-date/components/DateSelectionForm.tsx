@@ -8,7 +8,7 @@ interface DateSelectionFormProps {
   onOpenDateForm: () => void;
 }
 
-export const DateSelectionForm: React.FC<DateSelectionFormProps> = ({
+const DateSelectionForm: React.FC<DateSelectionFormProps> = ({
   selectedDate,
   onOpenDateForm
 }) => {

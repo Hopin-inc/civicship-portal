@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 /**
  * Header component for the search results page
  */
-export const SearchResultHeader: React.FC = () => {
+const SearchResultHeader: React.FC = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b max-w-mobile-l mx-auto w-full h-14 flex items-center px-4">
       <Link href="/search" className="absolute left-4">

@@ -12,7 +12,7 @@ interface PlaceOverviewProps {
   detail: BaseDetail;
 }
 
-export const PlaceOverview = ({ detail }: PlaceOverviewProps) => {
+const PlaceOverview = ({ detail }: PlaceOverviewProps) => {
 
   return (
     <div className="px-4 pt-2 pb-4 max-w-mobile-l mx-auto space-y-4">
@@ -31,6 +31,8 @@ export const PlaceOverview = ({ detail }: PlaceOverviewProps) => {
     </div>
   );
 };
+
+export default PlaceOverview;
 
 const PlaceDescription = ({ bio }: { bio: string }) => {
   const { textRef, expanded, showReadMore, toggleExpanded, getTextStyle } = useReadMore({

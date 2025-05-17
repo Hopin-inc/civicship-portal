@@ -5,7 +5,7 @@ import { ActivityCard } from "@/app/activities/data/type";
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
-import { OpportunityCardHorizontal } from "@/app/activities/components/Card/CardHorizontal";
+import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface FeaturedSectionProps {

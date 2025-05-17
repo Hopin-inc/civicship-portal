@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Participant } from "@/types/utils";
 import { PLACEHOLDER_IMAGE } from "@/utils";
@@ -53,3 +55,5 @@ export const ParticipantsList = ({ participants, size = "sm" }: ParticipantsList
     </div>
   );
 };
+
+export default ParticipantsList;

@@ -5,7 +5,8 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
-// import { SearchFilterType } from "@/app/search/hooks/useSearch";
+// import SearchTabs, { SearchTabType } from "@/app/search/components/Tabs";
+import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { visiblePrefectureLabels } from "@/app/users/data/presenter";
 import { DateRange } from "react-day-picker";
 import { useSearchForm } from "@/app/search/hooks/useSearchForm";
@@ -13,7 +14,6 @@ import SearchForm from "@/app/search/components/SearchForm";
 import SearchFilters from "@/app/search/components/SearchFilters";
 import SearchFooter from "@/app/search/components/Footer";
 import SearchFilterSheets from "@/app/search/components/SearchFilterSheet";
-import { SearchFilterType } from "@/app/search/hooks/useSearch";
 
 export default function SearchPage() {
   const headerConfig = useMemo(

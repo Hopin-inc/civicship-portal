@@ -9,7 +9,7 @@ interface OpportunityInfoProps {
   opportunity: ActivityDetail | null;
 }
 
-export const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity }) => {
+const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity }) => {
   return (
     <div className="px-4 mt-8 mb-8">
       <div className="flex justify-between items-start gap-4">

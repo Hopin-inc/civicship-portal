@@ -6,7 +6,7 @@ import { ja } from "date-fns/locale";
 import { useEffect, useState } from "react";
 import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import CategoryBadge from "../../components/CategoryBadge";
-import { ArticleRecommendations } from "./ArticleRecommendations";
+import ArticleRecommendations from "./ArticleRecommendations";
 import { TArticleDetail, TArticleWithAuthor } from "@/app/articles/data/type";
 import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
 

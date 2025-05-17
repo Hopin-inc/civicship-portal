@@ -7,7 +7,7 @@ interface GuestSelectionFormProps {
   onOpenGuestForm: () => void;
 }
 
-export const GuestSelectionForm: React.FC<GuestSelectionFormProps> = ({
+const GuestSelectionForm: React.FC<GuestSelectionFormProps> = ({
   selectedGuests,
   onOpenGuestForm
 }) => {
