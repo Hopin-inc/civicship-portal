@@ -1,84 +1,71 @@
-"use client";
-
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { GqlUser, GqlWallet } from "@/types/graphql";
-import { useCreateReservationMutation } from "@/types/graphql";
+import { useCallback } from "react";
+import { GqlUser, GqlWallet, useCreateReservationMutation } from "@/types/graphql";
 import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
-import type { ActivityDetail } from "@/app/activities/data/type";
-import type { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
-import type { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
+import { ActivityDetail } from "@/app/activities/data/type";
+import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
 
 type Result = { success: true; reservationId: string } | { success: false; error: string };
 
-export const useReservationActions = ({
-  opportunity,
-  selectedSlot,
-  wallets,
-  user,
-  ticketCounter,
-}: {
+interface ReservationParams {
   opportunity: ActivityDetail | null;
   selectedSlot: ActivitySlot | null;
   wallets: GqlWallet[] | null;
   user: Pick<GqlUser, "id"> | null;
   ticketCounter: UseTicketCounterReturn;
-}) => {
-  const [useTickets, setUseTickets] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  useTickets: boolean;
+}
 
+export const useReservationCommand = () => {
   const [createReservation, { loading }] = useCreateReservationMutation();
 
-  const latest = useRef({ opportunity, selectedSlot, wallets, user, ticketCounter });
-  useEffect(() => {
-    latest.current = { opportunity, selectedSlot, wallets, user, ticketCounter };
-  }, [opportunity, selectedSlot, wallets, user, ticketCounter]);
+  const handleReservation = useCallback(
+    async ({
+      opportunity,
+      selectedSlot,
+      wallets,
+      user,
+      ticketCounter,
+      useTickets,
+    }: ReservationParams): Promise<Result> => {
+      if (loading) return { success: false, error: "IN_PROGRESS" };
+      if (!user) return { success: false, error: "NOT_AUTHENTICATED" };
+      if (!opportunity || !selectedSlot) return { success: false, error: "MISSING_DATA" };
 
-  const handleReservation = useCallback(async (): Promise<Result> => {
-    const { opportunity, selectedSlot, wallets, user, ticketCounter } = latest.current;
+      const count = ticketCounter.count;
+      const ticketIds = useTickets ? getTicketIds(wallets, opportunity.requiredTicket, count) : [];
 
-    if (loading) {
-      return { success: false, error: "IN_PROGRESS" };
-    }
-    if (!user) {
-      return { success: false, error: "NOT_AUTHENTICATED" };
-    }
-    if (!opportunity || !selectedSlot) {
-      return { success: false, error: "MISSING_DATA" };
-    }
+      if (useTickets && ticketIds.length < count) {
+        return { success: false, error: "NOT_ENOUGH_TICKETS" };
+      }
 
-    const count = ticketCounter.count;
-    const ticketIds = useTickets ? getTicketIds(wallets, opportunity.requiredTicket, count) : [];
-    if (useTickets && ticketIds.length < count) {
-      return { success: false, error: "NOT_ENOUGH_TICKETS" };
-    }
+      try {
+        const res = await createReservation({
+          variables: {
+            input: {
+              opportunitySlotId: selectedSlot.id,
+              totalParticipantCount: count,
+              paymentMethod: useTickets ? "TICKET" : "FEE",
+              ticketIdsIfNeed: useTickets ? ticketIds : undefined,
+            },
+          },
+        });
 
-    const res = await createReservation({
-      variables: {
-        input: {
-          opportunitySlotId: selectedSlot.id,
-          totalParticipantCount: count,
-          paymentMethod: useTickets ? "TICKET" : "FEE",
-          ticketIdsIfNeed: useTickets ? ticketIds : undefined,
-        },
-      },
-    });
+        const reservation = res.data?.reservationCreate?.reservation;
+        if (reservation) return { success: true, reservationId: reservation.id };
 
-    const reservation = res.data?.reservationCreate?.reservation;
-    if (reservation) {
-      return { success: true, reservationId: reservation.id };
-    }
-
-    const rawCode = res.errors?.[0]?.extensions?.code;
-    const errCode = typeof rawCode === "string" ? rawCode : "UNKNOWN_ERROR";
-
-    return { success: false, error: errCode };
-  }, [createReservation, loading, useTickets]);
+        const rawCode = res.errors?.[0]?.extensions?.code;
+        const errCode = typeof rawCode === "string" ? rawCode : "UNKNOWN_ERROR";
+        return { success: false, error: errCode };
+      } catch (e) {
+        console.error("Reservation mutation failed", e);
+        return { success: false, error: "NETWORK_ERROR" };
+      }
+    },
+    [createReservation, loading],
+  );
 
   return {
-    useTickets,
-    setUseTickets,
-    isLoginModalOpen,
-    setIsLoginModalOpen,
     handleReservation,
     creatingReservation: loading,
   };
