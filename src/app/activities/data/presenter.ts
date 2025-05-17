@@ -6,6 +6,7 @@ import {
   GqlOpportunityCategory,
   GqlOpportunityEdge,
   GqlOpportunitySlot,
+  GqlReservation,
   GqlUser,
   Maybe,
 } from "@/types/graphql";
@@ -95,6 +96,38 @@ function presenterActivitySlot(
     ) ?? []
   );
 }
+
+export const presenterReservationDateTimeInfo = (
+  opportunitySlot: GqlOpportunitySlot,
+  opportunity: GqlOpportunity,
+  reservation: GqlReservation,
+) => {
+  const startDate = new Date(opportunitySlot.startsAt);
+  const endDate = new Date(opportunitySlot.endsAt);
+
+  const participantCount = reservation.participations?.length || 0;
+
+  return {
+    formattedDate: startDate.toLocaleDateString("ja-JP", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "long",
+    }),
+    startTime: startDate.toLocaleTimeString("ja-JP", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }),
+    endTime: endDate.toLocaleTimeString("ja-JP", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }),
+    participantCount,
+    totalPrice: (opportunity.feeRequired || 0) * participantCount,
+  };
+};
 
 export const sliceActivitiesBySection = (
   activityCards: ActivityCard[],

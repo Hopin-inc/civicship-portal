@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { COMMUNITY_ID } from "@/utils";
-import { useGetOpportunitiesQuery, GqlOpportunity } from "@/types/graphql";
+import { GqlOpportunity, useGetOpportunitiesQuery } from "@/types/graphql";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
 import { ActivityCard } from "@/app/activities/data/type";
 
@@ -14,7 +14,7 @@ interface useSameStateActivitiesResult {
 
 export const useSameStateActivities = (
   opportunityId: string,
-  stateCode: string
+  stateCode: string,
 ): useSameStateActivitiesResult => {
   const { data, loading, error } = useGetOpportunitiesQuery({
     variables: {
@@ -24,6 +24,7 @@ export const useSameStateActivities = (
       },
     },
     skip: !opportunityId,
+    nextFetchPolicy: "cache-and-network",
     fetchPolicy: "cache-first",
   });
 
