@@ -54,7 +54,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, onClick }) => (
             <strong>{place.publicOpportunityCount}件</strong>の関わり方を募集中
           </span>
         )}
-        <Button onClick={onClick}>もっと見る</Button>
+        <Button variant="tertiary" onClick={onClick}>もっと見る</Button>
       </CardFooter>
     </CardContent>
   </Card>
