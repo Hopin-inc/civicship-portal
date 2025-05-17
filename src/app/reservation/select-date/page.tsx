@@ -3,14 +3,17 @@
 import { DateSelectionForm } from "@/app/reservation/select-date/components/DateSelectionForm";
 import { GuestSelectionForm } from "@/app/reservation/select-date/components/GuestSelectionForm";
 import { SelectionSheet } from "@/app/reservation/select-date/components/SelectionSheet";
-import React, { useMemo, useState } from "react";
-import { ReservationContentGate } from "@/app/reservation/contentGate";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { HeaderConfig } from "@/contexts/HeaderContext";
 import { useReservationDateLoader } from "@/app/reservation/select-date/hooks/useOpportunitySlotQuery";
 import { useReservationDateHandler } from "@/app/reservation/select-date/hooks/useReservationDateHandler";
 import { filterSlotGroupsBySelectedDate } from "@/app/reservation/data/presenter/opportunitySlot";
 import TimeSlotList from "@/app/reservation/select-date/components/TimeSlotList";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import ErrorState from "@/components/shared/ErrorState";
+import { notFound } from "next/navigation";
+import EmptyState from "@/components/shared/EmptyState";
 
 export default function SelectDatePage({
   searchParams,
@@ -27,10 +30,19 @@ export default function SelectDatePage({
   );
   useHeaderConfig(headerConfig);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const { id, community_id } = searchParams;
-  const { opportunity, groupedSlots, loading, error } = useReservationDateLoader({
+  const { opportunity, groupedSlots, loading, error, refetch } = useReservationDateLoader({
     opportunityId: id,
   });
+
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedGuests, setSelectedGuests] = useState<number>(1);
@@ -48,41 +60,43 @@ export default function SelectDatePage({
     setSelectedDate,
   });
 
+  if (loading) return <LoadingIndicator />;
+  if (error)
+    return <ErrorState title="日付選択ページを読み込めませんでした" refetchRef={refetchRef} />;
+  if (!opportunity) return notFound();
+  if (groupedSlots.length === 0) {
+    return <EmptyState title="予約枠" />;
+  }
+
   return (
-    <ReservationContentGate
-      loading={loading}
-      error={error}
-      nullChecks={[{ label: "予約情報", value: opportunity }]}
-    >
-      <main className="pt-16 px-4 pb-24">
-        <div className="space-y-4 mb-8">
-          <DateSelectionForm
-            selectedDate={selectedDate}
-            onOpenDateForm={() => setActiveForm("date")}
-          />
-          <GuestSelectionForm
-            selectedGuests={selectedGuests}
-            onOpenGuestForm={() => setActiveForm("guests")}
-          />
-        </div>
-
-        <TimeSlotList
-          dateSections={filteredDateSections}
-          isSlotAvailable={isSlotAvailable}
-          onSelectSlot={handleReservation}
-        />
-
-        <SelectionSheet
-          isOpen={activeForm !== null}
-          onClose={() => setActiveForm(null)}
-          activeForm={activeForm}
+    <main className="pt-16 px-4 pb-24">
+      <div className="space-y-4 mb-8">
+        <DateSelectionForm
           selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-          selectedGuests={selectedGuests}
-          setSelectedGuests={setSelectedGuests}
-          dateSections={groupedSlots}
+          onOpenDateForm={() => setActiveForm("date")}
         />
-      </main>
-    </ReservationContentGate>
+        <GuestSelectionForm
+          selectedGuests={selectedGuests}
+          onOpenGuestForm={() => setActiveForm("guests")}
+        />
+      </div>
+
+      <TimeSlotList
+        dateSections={filteredDateSections}
+        isSlotAvailable={isSlotAvailable}
+        onSelectSlot={handleReservation}
+      />
+
+      <SelectionSheet
+        isOpen={activeForm !== null}
+        onClose={() => setActiveForm(null)}
+        activeForm={activeForm}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        selectedGuests={selectedGuests}
+        setSelectedGuests={setSelectedGuests}
+        dateSections={groupedSlots}
+      />
+    </main>
   );
 }
