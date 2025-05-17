@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useGetTransactionsQuery } from "@/types/graphql";
@@ -10,15 +10,16 @@ export interface UseTransactionHistoryResult {
   transactions: AppTransaction[];
   isLoading: boolean;
   error: Error | null;
+  refetch: () => void;
 }
 
 export const useTransactionHistory = (
   userId: string,
-  walletId: string
+  walletId: string,
 ): UseTransactionHistoryResult => {
   const [transactions, setTransactions] = useState<AppTransaction[]>([]);
 
-  const { data, loading, error } = useGetTransactionsQuery({
+  const { data, loading, error, refetch } = useGetTransactionsQuery({
     variables: { filter: { fromUserId: userId, toUserId: userId } },
     skip: !userId,
   });
@@ -38,8 +39,8 @@ export const useTransactionHistory = (
 
   const formattedError = useMemo(() => {
     if (error) {
-      console.error('Error fetching transaction history:', error);
-      toast.error('取引履歴の取得に失敗しました');
+      console.error("Error fetching transaction history:", error);
+      toast.error("取引履歴の取得に失敗しました");
       return error;
     }
     return null;
@@ -49,6 +50,7 @@ export const useTransactionHistory = (
     transactions,
     isLoading: loading,
     error: formattedError,
+    refetch,
   };
 };
 

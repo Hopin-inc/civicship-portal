@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Info } from 'lucide-react';
+import React from "react";
+import { Info } from "lucide-react";
 
 export const WalletInfoSection: React.FC = () => {
   return (
@@ -11,10 +11,6 @@ export const WalletInfoSection: React.FC = () => {
         <li className="flex gap-3">
           <Info className="w-5 h-5 text-primary flex-shrink-0" />
           <p className="text-base">NEO88に関わる支払いで使えるようになるポイントです。</p>
-        </li>
-        <li className="flex gap-3">
-          <Info className="w-5 h-5 text-primary flex-shrink-0" />
-          <p className="text-base">現時点では、体験に参加したり、当日の様子を投稿することでポイントを獲得できます。</p>
         </li>
       </ul>
     </div>
