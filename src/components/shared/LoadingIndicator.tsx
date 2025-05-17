@@ -11,7 +11,7 @@ interface LoadingIndicatorProps {
 const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
   message = "読み込み中",
   className = "",
-  fullScreen = false,
+  fullScreen = true,
 }) => {
   const Spinner = (
     <div className="flex justify-center items-center">
