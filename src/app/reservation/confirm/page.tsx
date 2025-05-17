@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Toaster } from "@/components/ui/sonner";
 import LoginModal from "@/app/login/components/LoginModal";
 import { OpportunityInfo } from "@/app/reservation/components/OpportunityInfo";
 import { ReservationDetailsCard } from "@/app/reservation/components/ReservationDetailsCard";
@@ -17,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { HeaderConfig } from "@/contexts/HeaderContext";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { toast } from "sonner";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -62,10 +62,13 @@ export default function ConfirmPage() {
       if (result.error === "NOT_AUTHENTICATED") {
         setIsLoginModalOpen(true);
       } else {
+        toast.error(`申し込みに失敗しました: ${result.error}`);
         console.error("Reservation failed:", result.error);
       }
       return;
     }
+
+    toast.success("申し込みが完了しました");
 
     const query = new URLSearchParams({
       id: opportunityId,
@@ -86,7 +89,6 @@ export default function ConfirmPage() {
         ]}
       >
         <main className="pb-8 min-h-screen">
-          <Toaster />
           <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
           <OpportunityInfo opportunity={opportunity} />
 
