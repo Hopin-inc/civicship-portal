@@ -85,3 +85,21 @@ jobs:
         service: ${{ env.APPLICATION_NAME }}
         image: ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest
         region: ${{ env.GCP_REGION }}
+
+    - name: Create Git tag
+      run: |
+        # Install tzdata to use Japan timezone
+        sudo apt-get update && sudo apt-get install -y tzdata
+        sudo ln -fs /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+        sudo dpkg-reconfigure -f noninteractive tzdata
+        
+        # Generate timestamp in yyyymmddhhmmss format
+        TAG_NAME=$(date +"%Y%m%d%H%M%S")
+        
+        # Configure Git user info (required inside GitHub Actions)
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        
+        # Create and push tag
+        git tag $TAG_NAME
+        git push origin $TAG_NAME
