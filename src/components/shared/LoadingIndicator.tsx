@@ -6,7 +6,7 @@ interface LoadingIndicatorProps {
   fullScreen?: boolean;
 }
 
-const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ fullScreen = false }) => {
+const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ fullScreen = true }) => {
   const Spinner = (
     <div className="flex justify-center items-center">
       <div className="animate-spin h-8 w-8 bg-blue-300 rounded-xl"></div>
