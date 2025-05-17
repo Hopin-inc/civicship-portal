@@ -1,11 +1,12 @@
 "use client";
 
-import { FC, useState } from "react";
+import { FC } from "react";
 import { usePlaceDetail } from "@/app/places/[id]/hooks/usePlaceDetail";
 import PlaceOpportunities from "@/app/places/[id]/components/PlaceOpportunities";
 import PlaceFeaturedArticle from "@/app/places/[id]/components/PlaceFeaturedArticle";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { ImagesCarousel } from "@/components/ui/images-carousel";
+import { PlaceOverview } from "./components/PlaceOverview";
 
 interface PlaceDetailProps {
   params: {
@@ -20,15 +21,7 @@ const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
 
   const {
     detail,
-    // loading,
     error,
-    // currentImageIndex,
-    imagesForSlider,
-    // imagesForGrid,
-    // remainingCount,
-    // nextImage,
-    // prevImage,
-    // hasImages,
   } = usePlaceDetail({
     placeId: params.id,
     userId: searchParams.userId || "",
@@ -41,9 +34,10 @@ const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
     <div className="min-h-screen bg-background overflow-auto">
       <div className="pb-6">
         <ImagesCarousel
-          images={imagesForSlider.map((image) => image.url)}
+          images={detail.images}
           title={detail.name}
         />
+        <PlaceOverview detail={detail} />
         <PlaceOpportunities opportunities={detail.currentlyHiringOpportunities} />
         <PlaceFeaturedArticle article={detail.relatedArticles?.[0]} />
       </div>
