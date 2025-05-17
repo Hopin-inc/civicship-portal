@@ -576,6 +576,7 @@ export type GqlMutation = {
   reservationCreate?: Maybe<GqlReservationCreatePayload>;
   reservationJoin?: Maybe<GqlReservationSetStatusPayload>;
   reservationReject?: Maybe<GqlReservationSetStatusPayload>;
+  storePhoneAuthToken?: Maybe<GqlStorePhoneAuthTokenPayload>;
   ticketClaim?: Maybe<GqlTicketClaimPayload>;
   ticketIssue?: Maybe<GqlTicketIssuePayload>;
   ticketPurchase?: Maybe<GqlTicketPurchasePayload>;
@@ -748,6 +749,10 @@ export type GqlMutationReservationJoinArgs = {
 export type GqlMutationReservationRejectArgs = {
   id: Scalars["ID"]["input"];
   permission: GqlCheckOpportunityPermissionInput;
+};
+
+export type GqlMutationStorePhoneAuthTokenArgs = {
+  input: GqlStorePhoneAuthTokenInput;
 };
 
 export type GqlMutationTicketClaimArgs = {
@@ -1742,6 +1747,19 @@ export type GqlState = {
   name: Scalars["String"]["output"];
 };
 
+export type GqlStorePhoneAuthTokenInput = {
+  authToken: Scalars["String"]["input"];
+  expiresIn: Scalars["Int"]["input"];
+  phoneUid: Scalars["String"]["input"];
+  refreshToken: Scalars["String"]["input"];
+};
+
+export type GqlStorePhoneAuthTokenPayload = {
+  __typename?: "StorePhoneAuthTokenPayload";
+  expiresAt?: Maybe<Scalars["Datetime"]["output"]>;
+  success: Scalars["Boolean"]["output"];
+};
+
 export const GqlSysRole = {
   SysAdmin: "SYS_ADMIN",
   User: "USER",
@@ -2066,6 +2084,7 @@ export type GqlUserSignUpInput = {
   currentPrefecture: GqlCurrentPrefecture;
   image?: InputMaybe<GqlImageInput>;
   name: Scalars["String"]["input"];
+  phoneNumber?: InputMaybe<Scalars["String"]["input"]>;
   phoneUid?: InputMaybe<Scalars["String"]["input"]>;
   slug?: InputMaybe<Scalars["String"]["input"]>;
 };
@@ -2287,6 +2306,19 @@ export type GqlUserSignUpMutation = {
   userSignUp?: {
     __typename?: "CurrentUserPayload";
     user?: { __typename?: "User"; id: string; name: string } | null;
+  } | null;
+};
+
+export type GqlStorePhoneAuthTokenMutationVariables = Exact<{
+  input: GqlStorePhoneAuthTokenInput;
+}>;
+
+export type GqlStorePhoneAuthTokenMutation = {
+  __typename?: "Mutation";
+  storePhoneAuthToken?: {
+    __typename?: "StorePhoneAuthTokenPayload";
+    success: boolean;
+    expiresAt?: Date | null;
   } | null;
 };
 
@@ -4338,6 +4370,57 @@ export type UserSignUpMutationResult = Apollo.MutationResult<GqlUserSignUpMutati
 export type UserSignUpMutationOptions = Apollo.BaseMutationOptions<
   GqlUserSignUpMutation,
   GqlUserSignUpMutationVariables
+>;
+export const StorePhoneAuthTokenDocument = gql`
+  mutation storePhoneAuthToken($input: StorePhoneAuthTokenInput!) {
+    storePhoneAuthToken(input: $input) {
+      success
+      expiresAt
+    }
+  }
+`;
+export type GqlStorePhoneAuthTokenMutationFn = Apollo.MutationFunction<
+  GqlStorePhoneAuthTokenMutation,
+  GqlStorePhoneAuthTokenMutationVariables
+>;
+
+/**
+ * __useStorePhoneAuthTokenMutation__
+ *
+ * To run a mutation, you first call `useStorePhoneAuthTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStorePhoneAuthTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [storePhoneAuthTokenMutation, { data, loading, error }] = useStorePhoneAuthTokenMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useStorePhoneAuthTokenMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlStorePhoneAuthTokenMutation,
+    GqlStorePhoneAuthTokenMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlStorePhoneAuthTokenMutation,
+    GqlStorePhoneAuthTokenMutationVariables
+  >(StorePhoneAuthTokenDocument, options);
+}
+export type StorePhoneAuthTokenMutationHookResult = ReturnType<
+  typeof useStorePhoneAuthTokenMutation
+>;
+export type StorePhoneAuthTokenMutationResult =
+  Apollo.MutationResult<GqlStorePhoneAuthTokenMutation>;
+export type StorePhoneAuthTokenMutationOptions = Apollo.BaseMutationOptions<
+  GqlStorePhoneAuthTokenMutation,
+  GqlStorePhoneAuthTokenMutationVariables
 >;
 export const LinkPhoneAuthDocument = gql`
   mutation linkPhoneAuth($input: LinkPhoneAuthInput!, $permission: CheckIsSelfPermissionInput!) {
