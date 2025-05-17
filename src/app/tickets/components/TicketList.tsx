@@ -1,3 +1,5 @@
+"use client";
+
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Ticket as TicketIcon } from 'lucide-react';

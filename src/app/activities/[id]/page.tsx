@@ -7,7 +7,7 @@ import ActivityDetailsFooter from "@/app/activities/[id]/components/ActivityDeta
 import { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { NavigationButtons } from "@/components/shared/NavigationButtons";
+import NavigationButtons from "@/components/shared/NavigationButtons";
 import { notFound } from "next/navigation";
 import ErrorState from "@/components/shared/ErrorState";
 

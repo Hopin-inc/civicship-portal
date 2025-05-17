@@ -2,7 +2,7 @@
 
 import React from "react";
 import { AlertCircle } from "lucide-react";
-import { IconWrapper } from "@/components/shared/IconWrapper";
+import IconWrapper from "@/components/shared/IconWrapper";
 
 export const NotesSection = () => {
   return (

@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Participant } from "@/types/utils";
 
@@ -8,7 +10,7 @@ interface ParticipantsListProps {
   size?: 'sm' | 'md';
 }
 
-export const ParticipantsList = ({ participants, size = 'sm' }: ParticipantsListProps) => {
+const ParticipantsList = ({ participants, size = 'sm' }: ParticipantsListProps) => {
   const uniqueParticipants = Array.from(
     new Map(participants.map(p => [p.id, p])).values()
   );
@@ -49,3 +51,5 @@ export const ParticipantsList = ({ participants, size = 'sm' }: ParticipantsList
     </div>
   );
 };
+
+export default ParticipantsList;

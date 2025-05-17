@@ -1,3 +1,5 @@
+"use client";
+
 import { ActivityCard } from "@/app/activities/data/type";
 import Link from "next/link";
 import Image from "next/image";
@@ -5,7 +7,7 @@ import { MapPin } from "lucide-react";
 import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
-export function OpportunityCardHorizontal({ opportunity }: { opportunity: ActivityCard }) {
+function OpportunityCardHorizontal({ opportunity }: { opportunity: ActivityCard }) {
   return (
     <Link
       href={`/activities/${opportunity.id}?community_id=${opportunity.communityId}`}
@@ -40,3 +42,5 @@ export function OpportunityCardHorizontal({ opportunity }: { opportunity: Activi
     </Link>
   );
 }
+
+export default OpportunityCardHorizontal;

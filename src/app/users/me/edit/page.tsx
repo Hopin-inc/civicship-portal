@@ -3,9 +3,9 @@
 import React, { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useProfileEdit } from "@/app/users/hooks/useProfileEdit";
-import { UserProfileEdit } from "@/app/users/components/UserProfileEdit";
+import UserProfileEdit from "@/app/users/components/UserProfileEdit";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
+import ErrorState from "@/components/shared/ErrorState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function ProfileEditPage() {
@@ -43,7 +43,7 @@ export default function ProfileEditPage() {
   }
 
   if (error) {
-    return <ErrorState message="プロフィールの取得に失敗しました" />;
+    return <ErrorState title="プロフィールの取得に失敗しました" />;
   }
 
   return (

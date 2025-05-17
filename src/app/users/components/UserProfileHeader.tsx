@@ -24,7 +24,7 @@ interface UserProfileHeaderProps {
   };
 }
 
-export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
+const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   id,
   name,
   image,

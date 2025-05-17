@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -28,7 +30,7 @@ interface UserProfileEditProps {
   handleSave: (e: React.FormEvent) => void;
 }
 
-export const UserProfileEdit: React.FC<UserProfileEditProps> = ({
+const UserProfileEdit: React.FC<UserProfileEditProps> = ({
   profileImage,
   displayName,
   location,

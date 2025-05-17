@@ -2,9 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { UserProfileSection } from "@/app/users/components/UserProfileSection";
+import UserProfileSection from "@/app/users/components/UserProfileSection";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { UserPortfolioList } from "@/app/users/components/UserPortfolioList";
+import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import { notFound } from "next/navigation";
 import ErrorState from "@/components/shared/ErrorState";
