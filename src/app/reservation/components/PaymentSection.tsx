@@ -1,8 +1,6 @@
 
-
-import React, { useCallback, useRef, useEffect } from 'react';
+import React, { useCallback, memo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 
 interface PaymentSectionProps {
   ticketCount: number;
@@ -17,8 +15,9 @@ interface PaymentSectionProps {
 
 /**
  * Component for payment options and ticket selection
+ * Completely reimplemented to avoid using Switch component
  */
-export const PaymentSection: React.FC<PaymentSectionProps> = ({
+export const PaymentSection: React.FC<PaymentSectionProps> = memo(({
   ticketCount,
   onIncrement,
   onDecrement,
@@ -28,11 +27,11 @@ export const PaymentSection: React.FC<PaymentSectionProps> = ({
   useTickets,
   setUseTickets
 }) => {
-  const handleUseTicketsChange = useCallback((value: boolean) => {
+  const toggleUseTickets = useCallback(() => {
     if (maxTickets > 0) {
-      setUseTickets(value);
+      setUseTickets(!useTickets);
     }
-  }, [maxTickets, setUseTickets]);
+  }, [maxTickets, setUseTickets, useTickets]);
 
   return (
     <div className="rounded-lg p-4 mb-6">
@@ -41,13 +40,15 @@ export const PaymentSection: React.FC<PaymentSectionProps> = ({
       <div className="rounded-2xl border border-input p-4 mb-6">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-4">
-            {/* Simplified Switch component without ref */}
-            <Switch 
-              checked={useTickets} 
-              onCheckedChange={handleUseTicketsChange}
+            {/* Replace Switch with a simple button */}
+            <Button
+              onClick={toggleUseTickets}
+              variant={useTickets ? "primary" : "tertiary"}
               disabled={maxTickets === 0}
-              className="scale-125 data-[state=checked]:bg-[#4361EE] data-[state=checked]:hover:bg-[#4361EE]"
-            />
+              className="min-w-[24px] h-[24px] p-0 rounded-full"
+            >
+              {useTickets ? "✓" : " "}
+            </Button>
             <div className="flex flex-col">
               <span className="text-lg">チケットを利用する</span>
               <p className="text-muted-foreground">保有しているチケット: {maxTickets}枚</p>
@@ -113,6 +114,8 @@ export const PaymentSection: React.FC<PaymentSectionProps> = ({
       </div>
     </div>
   );
-};
+});
+
+PaymentSection.displayName = 'PaymentSection';
 
 export default PaymentSection;
