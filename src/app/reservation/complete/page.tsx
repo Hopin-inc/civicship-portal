@@ -1,8 +1,8 @@
 "use client";
 
 import { SameStateActivities } from "@/app/activities/[id]/components/SimilarActivitiesList";
-import { CompletionHeader } from "@/app/reservation/components/CompletionHeader";
-import { ReservationDetails } from "@/app/reservation/components/ReservationDetails";
+import { CompletionHeader } from "@/app/reservation/complete/components/CompletionHeader";
+import { ReservationDetails } from "@/app/reservation/complete/components/ReservationDetails";
 import { useReservationComplete } from "@/app/reservation/complete/hooks/useReservationComplete";
 import React, { useMemo } from "react";
 import { ReservationContentGate } from "@/app/reservation/contentGate";

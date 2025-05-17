@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Calendar, MapPin, Users } from 'lucide-react';
-import { formatDateTime } from '@/utils/date';
-import { ja } from 'date-fns/locale';
-import { IconWrapper } from './IconWrapper';
+import React from "react";
+import { Calendar, MapPin, Users } from "lucide-react";
+import { formatDateTime } from "@/utils/date";
+import { ja } from "date-fns/locale";
+import { IconWrapper } from "@/components/shared/IconWrapper";
 
 interface ReservationDetailsCardProps {
   startDateTime: Date | null;
@@ -23,10 +23,10 @@ export const ReservationDetailsCard: React.FC<ReservationDetailsCardProps> = ({
   startDateTime,
   endDateTime,
   participantCount,
-  location = { name: '高松市役所', address: '香川県高松市番町1丁目8-15' }
+  location = { name: "高松市役所", address: "香川県高松市番町1丁目8-15" },
 }) => {
   if (!startDateTime || !endDateTime) return null;
-  
+
   return (
     <div className="bg-muted rounded-lg p-6 mb-6 space-y-6">
       <div className="flex items-center gap-3">
@@ -38,8 +38,7 @@ export const ReservationDetailsCard: React.FC<ReservationDetailsCardProps> = ({
             {formatDateTime(startDateTime, "yyyy年M月d日（E）", { locale: ja })}
           </span>
           <span className="text-base text-muted-foreground">
-            {formatDateTime(startDateTime, "HH:mm")}-
-            {formatDateTime(endDateTime, "HH:mm")}
+            {formatDateTime(startDateTime, "HH:mm")}-{formatDateTime(endDateTime, "HH:mm")}
           </span>
         </div>
       </div>

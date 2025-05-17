@@ -1,8 +1,8 @@
 "use client";
 
-import { DateSelectionForm } from "@/app/reservation/components/DateSelectionForm";
-import { GuestSelectionForm } from "@/app/reservation/components/GuestSelectionForm";
-import { SelectionSheet } from "@/app/reservation/components/SelectionSheet";
+import { DateSelectionForm } from "@/app/reservation/select-date/components/DateSelectionForm";
+import { GuestSelectionForm } from "@/app/reservation/select-date/components/GuestSelectionForm";
+import { SelectionSheet } from "@/app/reservation/select-date/components/SelectionSheet";
 import React, { useMemo, useState } from "react";
 import { ReservationContentGate } from "@/app/reservation/contentGate";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -10,7 +10,7 @@ import { HeaderConfig } from "@/contexts/HeaderContext";
 import { useReservationDateLoader } from "@/app/reservation/select-date/hooks/useOpportunitySlotQuery";
 import { useReservationDateHandler } from "@/app/reservation/select-date/hooks/useReservationDateHandler";
 import { filterSlotGroupsBySelectedDate } from "@/app/reservation/data/presenter/opportunitySlot";
-import TimeSlotList from "@/app/reservation/components/TimeSlotList";
+import TimeSlotList from "@/app/reservation/select-date/components/TimeSlotList";
 
 export default function SelectDatePage({
   searchParams,

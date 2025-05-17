@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import LoginModal from "@/app/login/components/LoginModal";
-import { OpportunityInfo } from "@/app/reservation/components/OpportunityInfo";
-import { ReservationDetailsCard } from "@/app/reservation/components/ReservationDetailsCard";
-import { PaymentSection } from "@/app/reservation/components/PaymentSection";
-import { NotesSection } from "@/app/reservation/components/NotesSection";
+import { OpportunityInfo } from "@/app/reservation/confirm/components/OpportunityInfo";
+import { ReservationDetailsCard } from "@/app/reservation/confirm/components/ReservationDetailsCard";
+import { PaymentSection } from "@/app/reservation/confirm/components/PaymentSection";
+import { NotesSection } from "@/app/reservation/confirm/components/NotesSection";
 import { ReservationContentGate } from "@/app/reservation/contentGate";
 import { useReservationConfirm } from "@/app/reservation/hooks/useReservationConfirm";
 import { useAuth } from "@/contexts/AuthContext";

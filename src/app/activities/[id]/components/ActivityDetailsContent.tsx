@@ -16,7 +16,7 @@ import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Button } from "@/components/ui/button";
 import { useReadMore } from "@/hooks/useReadMore";
 import Link from "next/link";
-import { IconWrapper } from "@/app/reservation/components/IconWrapper";
+import { IconWrapper } from "@/components/shared/IconWrapper";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
