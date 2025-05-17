@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 type Props = {
   userId: string;
@@ -119,10 +120,12 @@ const PortfolioCard = ({
       >
         <div className="relative w-full aspect-[164/205]">
           <Image
-            src={portfolio.image ?? "/placeholder-image.png"}
+            src={portfolio.image ?? PLACEHOLDER_IMAGE}
             alt={portfolio.title}
             fill
             className="object-cover"
+            placeholder={"blur"}
+            blurDataURL={PLACEHOLDER_IMAGE}
             sizes="(min-width: 640px) 50vw, 100vw"
           />
           {portfolio.source === "OPPORTUNITY" &&
@@ -205,36 +208,27 @@ export const PortfolioGrid = ({
   );
 };
 
-
 const PhotoGallery = () => {
-  const images = ["/images/activities/activity-placeholder-1.jpg", "/images/activities/activity-placeholder-2.jpg", "/images/activities/activity-placeholder-3.jpg"];
+  const images = [
+    "/images/activities/activity-placeholder-1.jpg",
+    "/images/activities/activity-placeholder-2.jpg",
+    "/images/activities/activity-placeholder-3.jpg",
+  ];
 
   return (
     <div className="flex flex-row gap-2 mt-4 w-72 h-64">
       <div className="w-3/5 h-full relative">
         <div className="w-full h-full rounded-lg overflow-hidden">
-          <img
-            src={images[0]}
-            alt={"体験のイメージ画像1"}
-            className="w-full h-full object-cover"
-          />
+          <img src={images[0]} alt={"体験のイメージ画像1"} className="w-full h-full object-cover" />
         </div>
       </div>
 
       <div className="w-2/5 h-full flex flex-col gap-2">
         <div className="h-1/2 rounded-lg overflow-hidden">
-          <img
-            src={images[1]}
-            alt="体験のイメージ画像2"
-            className="w-full h-full object-cover"
-          />
+          <img src={images[1]} alt="体験のイメージ画像2" className="w-full h-full object-cover" />
         </div>
         <div className="h-1/2 rounded-lg overflow-hidden">
-          <img
-            src={images[2]}
-            alt="体験のイメージ画像3"
-            className="w-full h-full object-cover"
-          />
+          <img src={images[2]} alt="体験のイメージ画像3" className="w-full h-full object-cover" />
         </div>
       </div>
     </div>
@@ -312,7 +306,6 @@ export const UserPortfolioList = ({
     </section>
   );
 };
-
 
 // #NOTE: スタイル確認用に作成、後ほど削除する
 const dummyPortfolios: AppPortfolio[] = [

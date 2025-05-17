@@ -1,34 +1,43 @@
+"use client";
 
-import React from 'react';
-import type { Opportunity, Participation } from '@/app/participations/[id]/data/type';
-import { ParticipationActionsClient } from './ParticipationActionsClient';
+import React from "react";
+import { format } from "date-fns";
+import { ja } from "date-fns/locale";
+import { Button } from "@/components/ui/button";
 
 interface ParticipationActionsProps {
-  opportunity: Opportunity;
-  participation: Participation;
   cancellationDeadline: Date;
   isCancellable: boolean;
-  isUploading: boolean;
-  onAddPhotos: (images: File[], comment: string) => void;
+  onCancel?: () => void;
 }
 
-export const ParticipationActions: React.FC<ParticipationActionsProps> = ({
-  opportunity,
-  participation,
+const ParticipationActions: React.FC<ParticipationActionsProps> = ({
   cancellationDeadline,
   isCancellable,
-  isUploading,
-  onAddPhotos,
+  onCancel,
 }) => {
   return (
-    <ParticipationActionsClient
-      opportunity={opportunity}
-      participation={participation}
-      cancellationDeadline={cancellationDeadline}
-      isCancellable={isCancellable}
-      isUploading={isUploading}
-      onAddPhotos={onAddPhotos}
-    />
+    <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
+      <div className="max-w-lg mx-auto px-4 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col text-muted-foreground min-w-fit">
+            <span className="text-sm">キャンセル期限:</span>
+            <span className="text-sm font-bold">
+              {format(cancellationDeadline, "M/d(E)", { locale: ja })}
+            </span>
+          </div>
+          {isCancellable ? (
+            <Button variant="destructive" className="shrink-0" onClick={onCancel}>
+              予約をキャンセル
+            </Button>
+          ) : (
+            <Button variant="tertiary" className="shrink-0 text-gray-400" disabled>
+              キャンセル不可
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

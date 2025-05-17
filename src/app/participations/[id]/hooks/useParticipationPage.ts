@@ -3,11 +3,10 @@
 import { useMemo } from "react";
 import { useParticipation } from "@/app/participations/[id]/hooks/useParticipation";
 import { useParticipationState } from "@/app/participations/[id]/hooks/useParticipationState";
-import { useParticipationImageUpload } from "@/app/participations/[id]/hooks/useParticipationImageUpload";
 import { calculateCancellationDeadline } from "@/app/participations/[id]/data/presenter";
-import { Participation, Opportunity } from "@/app/participations/[id]/data/type";
-import { ReservationStatus } from "@/types/participationStatus";
-import { ApolloError } from "@apollo/client";
+import type { Opportunity, Participation } from "@/app/participations/[id]/data/type";
+import type { ReservationStatus } from "@/types/participationStatus";
+import type { ApolloError } from "@apollo/client";
 
 interface UseParticipationPageResult {
   participation?: Participation;
@@ -15,53 +14,22 @@ interface UseParticipationPageResult {
   loading: boolean;
   error: ApolloError | undefined;
   currentStatus: ReservationStatus | null;
-  uploadSuccess: boolean;
-  uploadError: string | null;
-  isUploading: boolean;
-  handleAddPhotos: (images: File[], comment: string) => Promise<void>;
   startTime: Date;
   endTime: Date;
   participantCount: number;
   cancellationDeadline: Date;
+  refetch: () => void;
 }
 
-export const useParticipationPage = (id: string): UseParticipationPageResult => {
-  const { participation, opportunity, loading, error, refetch } = useParticipation(id);
+export const useParticipationPage = (
+  id: string,
+): UseParticipationPageResult & { refetch: () => void } => {
+  const { participation, opportunity, loading, error, refetch } = useParticipation(id); // ✅ refetch を取得
 
-  const {
-    currentStatus,
-    uploadSuccess,
-    uploadError,
-    isAddPhotosModalOpen,
-    handleUploadSuccess,
-    handleUploadError,
-    togglePhotosModal,
-  } = useParticipationState({ participation, onUploadSuccess: refetch });
-
-  const handleErrorAdapter = (error: Error): void => {
-    handleUploadError(error.message);
-  };
-
-  const { uploadImages, isUploading } = useParticipationImageUpload({
-    participationId: id,
-    onSuccess: handleUploadSuccess,
-    onError: handleErrorAdapter,
-  });
-
-  const handleAddPhotos = async (images: File[], comment: string): Promise<void> => {
-    try {
-      await uploadImages(images, comment);
-    } catch (error) {
-      console.error("Error uploading photos:", error);
-      if (error instanceof Error) {
-        handleUploadError(error.message);
-      } else {
-        handleUploadError("画像のアップロードに失敗しました");
-      }
-    }
-  };
+  const { currentStatus } = useParticipationState({ participation });
 
   const participationSlot = participation?.node?.reservation?.opportunitySlot;
+
   const startTime = useMemo(() => {
     return participationSlot?.startsAt ? new Date(participationSlot.startsAt) : new Date();
   }, [participationSlot?.startsAt]);
@@ -82,13 +50,10 @@ export const useParticipationPage = (id: string): UseParticipationPageResult => 
     loading,
     error,
     currentStatus,
-    uploadSuccess,
-    uploadError,
-    isUploading,
-    handleAddPhotos,
     startTime,
     endTime,
     participantCount,
     cancellationDeadline,
+    refetch,
   };
 };

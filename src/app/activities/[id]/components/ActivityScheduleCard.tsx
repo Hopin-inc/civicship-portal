@@ -61,11 +61,17 @@ const renderFullSlotCard = (slot: ActivitySlot) => {
 const renderAvailableSlotCard = (
   slot: ActivitySlot,
   opportunityId: string,
-  communityId: string
+  communityId: string,
 ) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
-  const href = `/reservation/confirm?id=${opportunityId}&community_id=${communityId}&slot_id=${slot.id}&guests=${slot.applicantCount}`;
+  const query = new URLSearchParams({
+    id: opportunityId,
+    community_id: communityId,
+    slot_id: slot.id,
+    guests: String(slot.applicantCount),
+  });
+  const href = `/reservation/confirm?${query.toString()}`;
 
   return (
     <div className="bg-background rounded-xl border px-6 py-6 w-[280px] flex flex-col">
@@ -81,9 +87,7 @@ const renderAvailableSlotCard = (
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            <p className="text-body-md font-bold">
-              {slot.feeRequired?.toLocaleString()}円
-            </p>
+            <p className="text-body-md font-bold">{slot.feeRequired?.toLocaleString()}円</p>
             <p className="text-body-sm ml-1 text-caption">/ 人</p>
           </div>
         </div>

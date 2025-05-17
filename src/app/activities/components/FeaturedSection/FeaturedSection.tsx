@@ -65,7 +65,9 @@ export default function ActivitiesFeaturedSection({
                 title={opportunity.title}
                 isVisible={i === selectedIndex}
               />
-              <OpportunityCardHorizontal opportunity={opportunity} />
+              <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/60 via-black/40 to-transparent px-6 pb-8 pt-16">
+                <OpportunityCardHorizontal opportunity={opportunity} />
+              </div>
             </div>
           ))}
         </div>

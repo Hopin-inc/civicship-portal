@@ -5,6 +5,7 @@ import { useHeader } from "@/components/providers/HeaderProvider";
 import Header from "@/components/layout/Header";
 import BottomBar from "@/components/layout/BottomBar";
 import AdminBottomBar from "@/components/layout/AdminBottomBar";
+// import { useAnalyticsUserBinding, useAutoPageView } from "@/lib/analytics";
 
 interface MainContentProps {
   children: React.ReactNode;
@@ -13,11 +14,16 @@ interface MainContentProps {
 const MainContent: React.FC<MainContentProps> = ({ children }) => {
   const { config } = useHeader();
   const showHeader = !config?.hideHeader;
-  
+
+  // useAnalyticsUserBinding();
+  // useAutoPageView();
+
   return (
     <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full">
       <Header />
-      <main className={`w-full flex-grow ${showHeader ? 'pt-16' : ''} pb-16 overflow-y-auto`}>{children}</main>
+      <main className={`w-full flex-grow ${showHeader ? "pt-16" : ""} pb-16 overflow-y-auto`}>
+        {children}
+      </main>
       <BottomBar className="fixed bottom-0 left-0 right-0 z-50 max-w-mobile-l mx-auto w-full" />
       <AdminBottomBar className="fixed bottom-0 left-0 right-0 z-50 max-w-mobile-l mx-auto w-full" />
     </div>

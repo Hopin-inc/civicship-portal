@@ -42,7 +42,13 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       )}
       {config.showLogo && (
         <Link href="/" className="flex items-center space-x-2">
-          <Image src="/images/neo88-logo.jpg" alt="NEO88" width={88} height={80} />
+          <Image
+            src="/images/neo88-logo.jpg"
+            alt="NEO88"
+            width={88}
+            height={72}
+            className="h-[28px] w-auto"
+          />
         </Link>
       )}
       {config.showSearchForm && (

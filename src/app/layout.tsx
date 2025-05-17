@@ -9,7 +9,6 @@ import { LiffProvider } from "@/contexts/LiffContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
-// import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import React from "react";
 
 const font = Inter({ subsets: ["latin"] });
@@ -59,10 +58,8 @@ const RootLayout = ({
               <AuthProvider>
                 <HeaderProvider>
                   <LoadingProvider>
-                    {/*<AnalyticsProvider>*/}
                     <MainContent>{children}</MainContent>
                     <Toaster richColors className="mx-8" />
-                    {/*</AnalyticsProvider>*/}
                   </LoadingProvider>
                 </HeaderProvider>
               </AuthProvider>

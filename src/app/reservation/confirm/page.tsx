@@ -1,7 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import React, { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import LoginModal from "@/app/login/components/LoginModal";
@@ -10,80 +8,120 @@ import { ReservationDetailsCard } from "@/app/reservation/components/Reservation
 import { PaymentSection } from "@/app/reservation/components/PaymentSection";
 import { NotesSection } from "@/app/reservation/components/NotesSection";
 import { ReservationContentGate } from "@/app/reservation/contentGate";
-import {
-  ReservationParams,
-  useReservationConfirm,
-} from "@/app/reservation/hooks/useReservationConfirm";
+import { useReservationConfirm } from "@/app/reservation/hooks/useReservationConfirm";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCounter";
+import { useReservationActions } from "@/app/reservation/confirm/hooks/useReservationAction";
+import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
+import { useRouter } from "next/navigation";
+import { HeaderConfig } from "@/contexts/HeaderContext";
+import { useMemo } from "react";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function ConfirmPage() {
-  const searchParams = useSearchParams();
-  const params: ReservationParams = useMemo(
+  const headerConfig: HeaderConfig = useMemo(
     () => ({
-      id: searchParams.get("id") ?? "",
-      starts_at: searchParams.get("starts_at") ?? "",
-      guests: searchParams.get("guests") ?? "",
-      community_id: searchParams.get("community_id") ?? "",
+      title: "申込内容の確認",
+      showLogo: false,
+      showBackButton: true,
     }),
-    [searchParams],
+    [],
   );
+  useHeaderConfig(headerConfig);
 
-  const result = useReservationConfirm(params);
+  const { user } = useAuth();
+  const router = useRouter();
+  const { opportunityId, slotId, participantCount, communityId } = useReservationParams();
+
+  const {
+    opportunity,
+    selectedSlot,
+    wallets,
+    startDateTime,
+    endDateTime,
+    availableTickets,
+    loading,
+    error,
+  } = useReservationConfirm({ opportunityId, slotId, userId: user?.id });
+
+  const ticketCounter = useTicketCounter(availableTickets);
+
+  const {
+    useTickets,
+    setUseTickets,
+    isLoginModalOpen,
+    setIsLoginModalOpen,
+    handleReservation,
+    creatingReservation,
+  } = useReservationActions({ opportunity, selectedSlot, wallets, user, ticketCounter });
+
+  const handleConfirm = async () => {
+    const result = await handleReservation();
+
+    if (!result.success) {
+      if (result.error === "NOT_AUTHENTICATED") {
+        setIsLoginModalOpen(true);
+      } else {
+        console.error("Reservation failed:", result.error);
+      }
+      return;
+    }
+
+    const query = new URLSearchParams({
+      id: opportunityId,
+      community_id: communityId ?? "",
+      reservation_id: result.reservationId,
+    });
+    router.push(`/reservation/complete?${query.toString()}`);
+  };
 
   return (
-    <ReservationContentGate
-      loading={result.loading}
-      error={result.error}
-      nullChecks={[
-        { label: "予約情報", value: result.opportunity },
-        { label: "スロット情報", value: result.selectedSlot },
-        { label: "開始日時", value: result.startDateTime },
-        { label: "終了日時", value: result.endDateTime },
-      ]}
-    >
-      <main className="pb-8 min-h-screen">
-        <Toaster />
-        <LoginModal
-          isOpen={result.isLoginModalOpen}
-          onClose={() => result.setIsLoginModalOpen(false)}
-        />
+    <>
+      <ReservationContentGate
+        loading={loading}
+        error={error}
+        nullChecks={[
+          { label: "予約情報", value: opportunity },
+          { label: "スロット情報", value: selectedSlot },
+        ]}
+      >
+        <main className="pb-8 min-h-screen">
+          <Toaster />
+          <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+          <OpportunityInfo opportunity={opportunity} />
 
-        <OpportunityInfo opportunity={result.opportunity} />
-
-        <div className="px-4">
-          <ReservationDetailsCard
-            startDateTime={result.startDateTime}
-            endDateTime={result.endDateTime}
-            participantCount={result.participantCount}
-            location={{
-              name: result.opportunity?.place?.name || "",
-              address: result.opportunity?.place?.address || "",
-            }}
-          />
-
-          <PaymentSection
-            ticketCount={result.ticketCount}
-            onIncrement={result.incrementTicket}
-            onDecrement={result.decrementTicket}
-            maxTickets={result.availableTickets}
-            pricePerPerson={result.pricePerPerson}
-            participantCount={result.participantCount}
-            useTickets={result.useTickets}
-            setUseTickets={result.setUseTickets}
-          />
-
-          <NotesSection requireApproval={result.opportunity?.requiredApproval} />
-
-          <Button
-            onClick={result.handleConfirmReservation}
-            disabled={
-              result.creatingReservation ||
-              (result.useTickets && result.ticketCount > result.availableTickets)
-            }
-          >
-            {result.creatingReservation ? "処理中..." : "申し込みを確定"}
-          </Button>
-        </div>
-      </main>
-    </ReservationContentGate>
+          <div className="px-4">
+            <ReservationDetailsCard
+              startDateTime={startDateTime}
+              endDateTime={endDateTime}
+              participantCount={participantCount}
+              location={{
+                name: opportunity?.place?.name || "",
+                address: opportunity?.place?.address || "",
+              }}
+            />
+            <PaymentSection
+              ticketCount={ticketCounter.count}
+              onIncrement={ticketCounter.increment}
+              onDecrement={ticketCounter.decrement}
+              maxTickets={availableTickets}
+              pricePerPerson={opportunity?.feeRequired ?? 0}
+              participantCount={participantCount}
+              useTickets={useTickets}
+              setUseTickets={setUseTickets}
+            />
+            <NotesSection requireApproval={opportunity?.requiredApproval} />{" "}
+            <Button
+              onClick={handleConfirm}
+              disabled={
+                creatingReservation || (useTickets && ticketCounter.count > availableTickets)
+              }
+            >
+              {creatingReservation ? "処理中..." : "申し込みを確定"}
+            </Button>
+          </div>
+        </main>
+      </ReservationContentGate>
+    </>
   );
 }

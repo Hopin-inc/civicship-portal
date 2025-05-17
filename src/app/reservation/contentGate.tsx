@@ -9,8 +9,13 @@ export type ContentGateProps = {
   nullChecks?: { label: string; value: unknown }[];
 };
 
-export function ReservationContentGate({ loading, error, children, nullChecks = [] }: ContentGateProps) {
-  if (loading) return <LoadingIndicator />;
+export function ReservationContentGate({
+  loading,
+  error,
+  children,
+  nullChecks = [],
+}: ContentGateProps) {
+  if (loading) return <LoadingIndicator fullScreen={true} />;
   if (error) return <ErrorState message={error.message} />;
 
   const failedCheck = nullChecks.find((check) => check.value == null || check.value === false);

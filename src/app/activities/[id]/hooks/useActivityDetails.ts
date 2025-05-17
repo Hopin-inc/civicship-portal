@@ -5,7 +5,7 @@ import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
 import { useSortedSlotsByStartsAt } from "@/app/activities/[id]/hooks/useSortedSlotsByStartsAt";
 import { ActivityCard, ActivityDetail } from "@/app/activities/data/type";
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
-import { useSameStateActivities } from "@/app/activities/[id]/hooks/useSimilarActivities";
+import { useSameStateActivities } from "@/app/activities/[id]/hooks/useSameStateActivities";
 import { useLoading } from "@/hooks/useLoading";
 import { useAuth } from "@/contexts/AuthContext";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
