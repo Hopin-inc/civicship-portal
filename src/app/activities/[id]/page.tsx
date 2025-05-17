@@ -45,7 +45,9 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
   return (
     <>
       {isLoading && <LoadingIndicator fullScreen />}
-      <ActivityNavigationButtons title={opportunity.title} onBack={navigateBack} />
+      <div className="relative max-w-mobile-l mx-auto w-full">
+        <ActivityNavigationButtons title={opportunity.title} onBack={navigateBack} />
+      </div>
 
       <main className="min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
