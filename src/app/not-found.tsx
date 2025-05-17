@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Home, SearchX } from "lucide-react";
 import React from "react";
 
-export default function NotFound() {
+interface NotFoundProps {
+  titleTarget?: string;
+}
+
+export default function NotFound({ titleTarget = "ページ" }: NotFoundProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="text-center space-y-6">
@@ -14,12 +18,13 @@ export default function NotFound() {
         </div>
 
         <h1 className="text-3xl font-bold">
-          お探しのページが
+          お探しの{titleTarget}が
           <br />
           見つかりませんでした
         </h1>
+
         <p className="text-left text-body-sm text-muted-foreground px-[40px]">
-          指定されたページ（URL）が見つかりません。
+          指定された{titleTarget}（URL）が見つかりません。
           <br />
           下にあるボタンからページをご覧ください。
         </p>

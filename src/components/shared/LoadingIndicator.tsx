@@ -3,16 +3,10 @@
 import React from "react";
 
 interface LoadingIndicatorProps {
-  message?: string;
-  className?: string;
   fullScreen?: boolean;
 }
 
-const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
-  message = "読み込み中",
-  className = "",
-  fullScreen = true,
-}) => {
+const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ fullScreen = false }) => {
   const Spinner = (
     <div className="flex justify-center items-center">
       <div className="animate-spin h-8 w-8 bg-blue-300 rounded-xl"></div>
@@ -27,7 +21,7 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     );
   }
 
-  return <div className={className}>{Spinner}</div>;
+  return <div>{Spinner}</div>;
 };
 
 export default LoadingIndicator;
