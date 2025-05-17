@@ -1,19 +1,22 @@
-'use client';
+"use client";
 
 import { useGetParticipationQuery } from "@/types/graphql";
-import { transformOpportunity, transformParticipation } from '@/app/participations/[id]/data/presenter';
+import { presenterParticipation } from "@/app/participations/[id]/data/presenter";
+import { presenterActivityCard } from "@/app/activities/data/presenter";
 
 export const useParticipation = (id: string) => {
-  const { data, loading, error, refetch } = useGetParticipationQuery(
-    {
-      variables: { id },
-      skip: !id,
-      fetchPolicy: 'network-only',
-    }
-  )
-  const opportunityData = data?.participation?.reservation?.opportunitySlot?.opportunity;
-  const formattedOpportunity = transformOpportunity(opportunityData);
-  const formattedParticipation = transformParticipation(data?.participation);
+  const { data, loading, error, refetch } = useGetParticipationQuery({
+    variables: { id },
+    skip: !id,
+    fetchPolicy: "network-only",
+  });
+
+  const rawParticipation = data?.participation;
+  const rawOpportunity = rawParticipation?.reservation?.opportunitySlot?.opportunity;
+
+  const formattedParticipation = rawParticipation ? presenterParticipation(rawParticipation) : null;
+
+  const formattedOpportunity = rawOpportunity ? presenterActivityCard(rawOpportunity) : null;
 
   return {
     participation: formattedParticipation,

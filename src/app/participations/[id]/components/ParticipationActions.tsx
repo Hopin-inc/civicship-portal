@@ -6,7 +6,7 @@ import { ja } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 
 interface ParticipationActionsProps {
-  cancellationDeadline: Date;
+  cancellationDeadline: Date | null;
   isCancellable: boolean;
   onCancel?: () => void;
 }
@@ -23,7 +23,9 @@ const ParticipationActions: React.FC<ParticipationActionsProps> = ({
           <div className="flex flex-col text-muted-foreground min-w-fit">
             <span className="text-sm">キャンセル期限:</span>
             <span className="text-sm font-bold">
-              {format(cancellationDeadline, "M/d(E)", { locale: ja })}
+              {cancellationDeadline
+                ? format(cancellationDeadline, "M/d(E)", { locale: ja })
+                : "未定"}
             </span>
           </div>
           {isCancellable ? (
