@@ -2,40 +2,57 @@
 
 import { DateSelectionForm } from "@/app/reservation/components/DateSelectionForm";
 import { GuestSelectionForm } from "@/app/reservation/components/GuestSelectionForm";
-import { TimeSlotList } from "@/app/reservation/components/TimeSlotList";
 import { SelectionSheet } from "@/app/reservation/components/SelectionSheet";
-import { useReservationDateSelection } from "@/app/reservation/hooks/useReservationDateSelection";
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { ReservationContentGate } from "@/app/reservation/contentGate";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { HeaderConfig } from "@/contexts/HeaderContext";
+import { useReservationDateLoader } from "@/app/reservation/select-date/hooks/useOpportunitySlotQuery";
+import { useReservationDateHandler } from "@/app/reservation/select-date/hooks/useReservationDateHandler";
+import { filterSlotGroupsBySelectedDate } from "@/app/reservation/data/presenter/opportunitySlot";
+import TimeSlotList from "@/app/reservation/components/TimeSlotList";
 
 export default function SelectDatePage({
   searchParams,
 }: {
   searchParams: { id: string; community_id: string };
 }) {
-  const selection = useReservationDateSelection({
-    opportunityId: searchParams.id,
-    communityId: searchParams.community_id,
+  const headerConfig: HeaderConfig = useMemo(
+    () => ({
+      title: "日付をえらぶ",
+      showLogo: false,
+      showBackButton: true,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
+
+  const { id, community_id } = searchParams;
+  const { opportunity, groupedSlots, loading, error } = useReservationDateLoader({
+    opportunityId: id,
   });
 
-  const {
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedGuests, setSelectedGuests] = useState<number>(1);
+  const [activeForm, setActiveForm] = useState<"date" | "guests" | null>(null);
+  const filteredDateSections = useMemo(
+    () => filterSlotGroupsBySelectedDate(groupedSlots, selectedDate ? [selectedDate] : []),
+    [groupedSlots, selectedDate],
+  );
+
+  const { handleReservation, isSlotAvailable } = useReservationDateHandler({
+    opportunityId: id,
+    communityId: community_id,
     selectedDate,
-    setSelectedDate,
     selectedGuests,
-    setSelectedGuests,
-    activeForm,
-    setActiveForm,
-    dateSections,
-    filteredDateSections,
-    handleReservation,
-    isSlotAvailable,
-  } = selection;
+    setSelectedDate,
+  });
 
   return (
     <ReservationContentGate
-      loading={selection.loading}
-      error={selection.error}
-      nullChecks={[{ label: "予約情報", value: selection.opportunity }]}
+      loading={loading}
+      error={error}
+      nullChecks={[{ label: "予約情報", value: opportunity }]}
     >
       <main className="pt-16 px-4 pb-24">
         <div className="space-y-4 mb-8">
@@ -63,7 +80,7 @@ export default function SelectDatePage({
           setSelectedDate={setSelectedDate}
           selectedGuests={selectedGuests}
           setSelectedGuests={setSelectedGuests}
-          dateSections={dateSections}
+          dateSections={groupedSlots}
         />
       </main>
     </ReservationContentGate>

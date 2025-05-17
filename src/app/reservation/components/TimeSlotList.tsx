@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 import { formatTimeRange } from "@/utils/date";
@@ -9,18 +9,23 @@ interface TimeSlotListProps {
   onSelectSlot: (slot: ActivitySlot) => void;
 }
 
-export const TimeSlotList: React.FC<TimeSlotListProps> = ({
+const TimeSlotList: React.FC<TimeSlotListProps> = ({
   dateSections,
   isSlotAvailable,
   onSelectSlot,
 }) => {
+  const handleSelectSlot = useCallback(
+    (slot: ActivitySlot) => () => onSelectSlot(slot),
+    [onSelectSlot],
+  );
+
   return (
     <div className="space-y-8">
       {dateSections.map((section, sectionIndex) => (
         <div key={sectionIndex}>
           <h3 className="text-lg font-bold mb-4">{section.dateLabel}</h3>
           <div className="space-y-2">
-            {section.slots.map((slot: ActivitySlot, slotIndex: number) => {
+            {section.slots.map((slot, slotIndex) => {
               const remainingCapacity = slot.remainingCapacity || 0;
               const isFull = remainingCapacity === 0;
               const isAvailable = isSlotAvailable(slot);
@@ -57,7 +62,7 @@ export const TimeSlotList: React.FC<TimeSlotListProps> = ({
                         <Button
                           variant="primary"
                           className="rounded-full px-8 py-3"
-                          onClick={() => onSelectSlot(slot)}
+                          onClick={handleSelectSlot(slot)} // ✅ 安定した関数
                           disabled={!isAvailable}
                         >
                           選択

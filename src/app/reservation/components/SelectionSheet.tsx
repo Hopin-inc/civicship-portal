@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -30,13 +30,35 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
 }) => {
   if (!activeForm) return null;
 
-  const handleClearSelection = () => {
+  const handleClearSelection = useCallback(() => {
     if (activeForm === 'date') {
       setSelectedDate(null);
     } else {
       setSelectedGuests(1);
     }
-  };
+  }, [activeForm, setSelectedDate, setSelectedGuests]);
+
+  const handleSelectDate = useCallback(
+    (dateLabel: string) => () => setSelectedDate(dateLabel),
+    [setSelectedDate]
+  );
+
+  const handleDecreaseGuests = useCallback(
+    () => setSelectedGuests(Math.max(1, selectedGuests - 1)),
+    [selectedGuests, setSelectedGuests]
+  );
+
+  const handleIncreaseGuests = useCallback(
+    () => setSelectedGuests(selectedGuests + 1),
+    [selectedGuests, setSelectedGuests]
+  );
+
+  const handleSheetOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) onClose();
+    },
+    [onClose]
+  );
 
   const renderFooterButtons = () => (
     <div className="max-w-md mx-auto fixed bottom-0 left-0 right-0 bg-background p-4 border-t">
@@ -63,7 +85,7 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
         {dateSections.map((section, index) => (
           <Button
             key={index}
-            onClick={() => setSelectedDate(`${section.dateLabel}`)}
+            onClick={handleSelectDate(`${section.dateLabel}`)}
             variant={selectedDate === `${section.dateLabel}` ? "primary" : "tertiary"}
           >
             {section.dateLabel}
@@ -76,7 +98,7 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
   const renderGuestSelection = () => (
     <div className="flex items-center justify-center space-x-8 py-4">
       <Button
-        onClick={() => setSelectedGuests(Math.max(1, selectedGuests - 1))}
+        onClick={handleDecreaseGuests}
         variant="tertiary"
         size="icon"
         className="p-2"
@@ -85,7 +107,7 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
       </Button>
       <span className="text-2xl font-medium w-8 text-center">{selectedGuests}</span>
       <Button
-        onClick={() => setSelectedGuests(selectedGuests + 1)}
+        onClick={handleIncreaseGuests}
         variant="tertiary"
         size="icon"
         className="p-2"
@@ -96,7 +118,7 @@ export const SelectionSheet: React.FC<SelectionSheetProps> = ({
   );
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Sheet open={isOpen} onOpenChange={handleSheetOpenChange}>
       <SheetContent
         side="bottom"
         className="h-[300px] rounded-t-3xl overflow-hidden max-w-md mx-auto"

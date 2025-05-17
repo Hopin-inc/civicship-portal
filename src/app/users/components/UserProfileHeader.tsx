@@ -120,13 +120,14 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
 };
 
 const BioSection = ({ bio }: { bio: string }) => {
-  const { textRef, expanded, showReadMore, toggleExpanded, getTextClassName } = useReadMore({ text: bio, maxLines: 6 });
+  const { textRef, expanded, showReadMore, toggleExpanded, getTextStyle } = useReadMore({ text: bio, maxLines: 6 });
 
   return (
     <div className="mb-4 relative">
       <div
         ref={textRef}
-        className={getTextClassName("text-body-md text-foreground whitespace-pre-line")}
+        className="text-body-md text-foreground whitespace-pre-line transition-all duration-300"
+        style={getTextStyle()}
       >
         {bio}
       </div>

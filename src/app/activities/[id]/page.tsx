@@ -5,11 +5,10 @@ import ActivityDetailsHeader from "@/app/activities/[id]/components/ActivityDeta
 import ActivityDetailsContent from "@/app/activities/[id]/components/ActivityDetailsContent";
 import ActivityDetailsFooter from "@/app/activities/[id]/components/ActivityDetailsFooter";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { useEffect, useMemo } from "react";
-import { useLoading } from "@/hooks/useLoading";
-import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
-import ActivityNavigationButtons from "@/app/activities/[id]/components/ActivityNavigationButtons";
+import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { NavigationButtons } from "@/components/shared/NavigationButtons";
 
 interface ActivityPageProps {
   params: {
@@ -26,9 +25,6 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
   const { opportunity, sameStateActivities, availableTickets, sortedSlots, isLoading, error } =
     useActivityDetails(id);
 
-  const { setIsLoading } = useLoading();
-  const { navigateBack } = useHierarchicalNavigation();
-
   const headerConfig = useMemo(
     () => ({
       hideHeader: true,
@@ -36,10 +32,6 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
     [],
   );
   useHeaderConfig(headerConfig);
-
-  useEffect(() => {
-    setIsLoading(isLoading);
-  }, [isLoading, setIsLoading]);
 
   if (error && !opportunity) {
     return <ErrorState message={`Error: ${error.message}`} />;
@@ -50,7 +42,10 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
 
   return (
     <>
-      <ActivityNavigationButtons title={opportunity.title} onBack={navigateBack} />
+      {isLoading && <LoadingIndicator fullScreen />}
+      <div className="relative max-w-mobile-l mx-auto w-full">
+        <NavigationButtons title={opportunity.title} />
+      </div>
 
       <main className="min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
@@ -64,7 +59,11 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
           />
         </div>
       </main>
-      <ActivityDetailsFooter opportunityId={opportunity.id} price={opportunity.feeRequired || 0} />
+      <ActivityDetailsFooter
+        opportunityId={opportunity.id}
+        price={opportunity.feeRequired || 0}
+        communityId={searchParams.community_id}
+      />
     </>
   );
 }

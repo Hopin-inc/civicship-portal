@@ -248,6 +248,13 @@ export type GqlCurrentUserPayload = {
   user?: Maybe<GqlUser>;
 };
 
+export type GqlDateTimeRangeFilter = {
+  gt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  gte?: InputMaybe<Scalars["Datetime"]["input"]>;
+  lt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  lte?: InputMaybe<Scalars["Datetime"]["input"]>;
+};
+
 export type GqlEdge = {
   cursor: Scalars["String"]["output"];
 };
@@ -576,6 +583,7 @@ export type GqlMutation = {
   reservationCreate?: Maybe<GqlReservationCreatePayload>;
   reservationJoin?: Maybe<GqlReservationSetStatusPayload>;
   reservationReject?: Maybe<GqlReservationSetStatusPayload>;
+  storePhoneAuthToken?: Maybe<GqlStorePhoneAuthTokenPayload>;
   ticketClaim?: Maybe<GqlTicketClaimPayload>;
   ticketIssue?: Maybe<GqlTicketIssuePayload>;
   ticketPurchase?: Maybe<GqlTicketPurchasePayload>;
@@ -748,6 +756,10 @@ export type GqlMutationReservationJoinArgs = {
 export type GqlMutationReservationRejectArgs = {
   id: Scalars["ID"]["input"];
   permission: GqlCheckOpportunityPermissionInput;
+};
+
+export type GqlMutationStorePhoneAuthTokenArgs = {
+  input: GqlStorePhoneAuthTokenInput;
 };
 
 export type GqlMutationTicketClaimArgs = {
@@ -948,10 +960,9 @@ export type GqlOpportunityFilterInput = {
   placeIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   publishStatus?: InputMaybe<Array<GqlPublishStatus>>;
   requiredUtilityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  slotEndsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  slotDateRange?: InputMaybe<GqlDateTimeRangeFilter>;
   slotHostingStatus?: InputMaybe<Array<GqlOpportunitySlotHostingStatus>>;
   slotRemainingCapacity?: InputMaybe<Scalars["Int"]["input"]>;
-  slotStartsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   stateCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
@@ -1378,6 +1389,8 @@ export type GqlQuery = {
   states: Array<GqlState>;
   ticket?: Maybe<GqlTicket>;
   ticketClaimLink?: Maybe<GqlTicketClaimLink>;
+  ticketIssuer?: Maybe<GqlTicketIssuer>;
+  ticketIssuers: GqlTicketIssuersConnection;
   ticketStatusHistories: GqlTicketStatusHistoriesConnection;
   ticketStatusHistory?: Maybe<GqlTicketStatusHistory>;
   tickets: GqlTicketsConnection;
@@ -1540,6 +1553,17 @@ export type GqlQueryTicketArgs = {
 
 export type GqlQueryTicketClaimLinkArgs = {
   id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryTicketIssuerArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryTicketIssuersArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlTicketIssuerFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlTicketIssuerSortInput>;
 };
 
 export type GqlQueryTicketStatusHistoriesArgs = {
@@ -1742,6 +1766,19 @@ export type GqlState = {
   name: Scalars["String"]["output"];
 };
 
+export type GqlStorePhoneAuthTokenInput = {
+  authToken: Scalars["String"]["input"];
+  expiresIn: Scalars["Int"]["input"];
+  phoneUid: Scalars["String"]["input"];
+  refreshToken: Scalars["String"]["input"];
+};
+
+export type GqlStorePhoneAuthTokenPayload = {
+  __typename?: "StorePhoneAuthTokenPayload";
+  expiresAt?: Maybe<Scalars["Datetime"]["output"]>;
+  success: Scalars["Boolean"]["output"];
+};
+
 export const GqlSysRole = {
   SysAdmin: "SYS_ADMIN",
   User: "USER",
@@ -1818,6 +1855,27 @@ export type GqlTicketIssuer = {
   qtyToBeIssued: Scalars["Int"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
   utility?: Maybe<GqlUtility>;
+};
+
+export type GqlTicketIssuerEdge = GqlEdge & {
+  __typename?: "TicketIssuerEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlTicketIssuer>;
+};
+
+export type GqlTicketIssuerFilterInput = {
+  ownerId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type GqlTicketIssuerSortInput = {
+  createdAt?: InputMaybe<GqlSortDirection>;
+};
+
+export type GqlTicketIssuersConnection = {
+  __typename?: "TicketIssuersConnection";
+  edges?: Maybe<Array<Maybe<GqlTicketIssuerEdge>>>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type GqlTicketPurchaseInput = {
@@ -2066,6 +2124,7 @@ export type GqlUserSignUpInput = {
   currentPrefecture: GqlCurrentPrefecture;
   image?: InputMaybe<GqlImageInput>;
   name: Scalars["String"]["input"];
+  phoneNumber?: InputMaybe<Scalars["String"]["input"]>;
   phoneUid?: InputMaybe<Scalars["String"]["input"]>;
   slug?: InputMaybe<Scalars["String"]["input"]>;
 };
@@ -2287,6 +2346,19 @@ export type GqlUserSignUpMutation = {
   userSignUp?: {
     __typename?: "CurrentUserPayload";
     user?: { __typename?: "User"; id: string; name: string } | null;
+  } | null;
+};
+
+export type GqlStorePhoneAuthTokenMutationVariables = Exact<{
+  input: GqlStorePhoneAuthTokenInput;
+}>;
+
+export type GqlStorePhoneAuthTokenMutation = {
+  __typename?: "Mutation";
+  storePhoneAuthToken?: {
+    __typename?: "StorePhoneAuthTokenPayload";
+    success: boolean;
+    expiresAt?: Date | null;
   } | null;
 };
 
@@ -3155,6 +3227,12 @@ export type GqlGetOpportunitiesQuery = {
         feeRequired?: number | null;
         pointsToEarn?: number | null;
         earliestReservableAt?: Date | null;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
+        } | null;
         slots?: Array<{
           __typename?: "OpportunitySlot";
           id: string;
@@ -3656,6 +3734,20 @@ export type GqlCreateReservationMutation = {
   __typename?: "Mutation";
   reservationCreate?: {
     __typename?: "ReservationCreateSuccess";
+    reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
+  } | null;
+};
+
+export type GqlCancelReservationMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlReservationCancelInput;
+  permission: GqlCheckIsSelfPermissionInput;
+}>;
+
+export type GqlCancelReservationMutation = {
+  __typename?: "Mutation";
+  reservationCancel?: {
+    __typename?: "ReservationSetStatusSuccess";
     reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
   } | null;
 };
@@ -4338,6 +4430,57 @@ export type UserSignUpMutationResult = Apollo.MutationResult<GqlUserSignUpMutati
 export type UserSignUpMutationOptions = Apollo.BaseMutationOptions<
   GqlUserSignUpMutation,
   GqlUserSignUpMutationVariables
+>;
+export const StorePhoneAuthTokenDocument = gql`
+  mutation storePhoneAuthToken($input: StorePhoneAuthTokenInput!) {
+    storePhoneAuthToken(input: $input) {
+      success
+      expiresAt
+    }
+  }
+`;
+export type GqlStorePhoneAuthTokenMutationFn = Apollo.MutationFunction<
+  GqlStorePhoneAuthTokenMutation,
+  GqlStorePhoneAuthTokenMutationVariables
+>;
+
+/**
+ * __useStorePhoneAuthTokenMutation__
+ *
+ * To run a mutation, you first call `useStorePhoneAuthTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStorePhoneAuthTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [storePhoneAuthTokenMutation, { data, loading, error }] = useStorePhoneAuthTokenMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useStorePhoneAuthTokenMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlStorePhoneAuthTokenMutation,
+    GqlStorePhoneAuthTokenMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlStorePhoneAuthTokenMutation,
+    GqlStorePhoneAuthTokenMutationVariables
+  >(StorePhoneAuthTokenDocument, options);
+}
+export type StorePhoneAuthTokenMutationHookResult = ReturnType<
+  typeof useStorePhoneAuthTokenMutation
+>;
+export type StorePhoneAuthTokenMutationResult =
+  Apollo.MutationResult<GqlStorePhoneAuthTokenMutation>;
+export type StorePhoneAuthTokenMutationOptions = Apollo.BaseMutationOptions<
+  GqlStorePhoneAuthTokenMutation,
+  GqlStorePhoneAuthTokenMutationVariables
 >;
 export const LinkPhoneAuthDocument = gql`
   mutation linkPhoneAuth($input: LinkPhoneAuthInput!, $permission: CheckIsSelfPermissionInput!) {
@@ -5479,6 +5622,9 @@ export const GetOpportunitiesDocument = gql`
         cursor
         node {
           ...OpportunityFields
+          community {
+            ...CommunityFields
+          }
           slots {
             ...OpportunitySlotFields
           }
@@ -5490,6 +5636,7 @@ export const GetOpportunitiesDocument = gql`
     }
   }
   ${OpportunityFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
   ${OpportunitySlotFieldsFragmentDoc}
   ${PlaceFieldsFragmentDoc}
 `;
@@ -6145,12 +6292,12 @@ export const CreateReservationDocument = gql`
     reservationCreate(input: $input) {
       ... on ReservationCreateSuccess {
         reservation {
-          id
-          status
+          ...ReservationFields
         }
       }
     }
   }
+  ${ReservationFieldsFragmentDoc}
 `;
 export type GqlCreateReservationMutationFn = Apollo.MutationFunction<
   GqlCreateReservationMutation,
@@ -6191,6 +6338,64 @@ export type CreateReservationMutationResult = Apollo.MutationResult<GqlCreateRes
 export type CreateReservationMutationOptions = Apollo.BaseMutationOptions<
   GqlCreateReservationMutation,
   GqlCreateReservationMutationVariables
+>;
+export const CancelReservationDocument = gql`
+  mutation CancelReservation(
+    $id: ID!
+    $input: ReservationCancelInput!
+    $permission: CheckIsSelfPermissionInput!
+  ) {
+    reservationCancel(id: $id, input: $input, permission: $permission) {
+      ... on ReservationSetStatusSuccess {
+        reservation {
+          ...ReservationFields
+        }
+      }
+    }
+  }
+  ${ReservationFieldsFragmentDoc}
+`;
+export type GqlCancelReservationMutationFn = Apollo.MutationFunction<
+  GqlCancelReservationMutation,
+  GqlCancelReservationMutationVariables
+>;
+
+/**
+ * __useCancelReservationMutation__
+ *
+ * To run a mutation, you first call `useCancelReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCancelReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cancelReservationMutation, { data, loading, error }] = useCancelReservationMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useCancelReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlCancelReservationMutation,
+    GqlCancelReservationMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlCancelReservationMutation, GqlCancelReservationMutationVariables>(
+    CancelReservationDocument,
+    options,
+  );
+}
+export type CancelReservationMutationHookResult = ReturnType<typeof useCancelReservationMutation>;
+export type CancelReservationMutationResult = Apollo.MutationResult<GqlCancelReservationMutation>;
+export type CancelReservationMutationOptions = Apollo.BaseMutationOptions<
+  GqlCancelReservationMutation,
+  GqlCancelReservationMutationVariables
 >;
 export const GetReservationsDocument = gql`
   query GetReservations {

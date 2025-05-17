@@ -1,18 +1,16 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { GqlUser, GqlWallet } from "@/types/graphql";
 import { useCreateReservationMutation } from "@/types/graphql";
+import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
 import type { ActivityDetail } from "@/app/activities/data/type";
 import type { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
-import type { GqlUser, GqlWallet } from "@/types/graphql";
-import { useTicketCounter } from "./useTicketCounter";
+import type { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
 
-type UseTicketCounterReturn = ReturnType<typeof useTicketCounter>;
+type Result = { success: true; reservationId: string } | { success: false; error: string };
 
-export function useReservationActions({
+export const useReservationActions = ({
   opportunity,
   selectedSlot,
   wallets,
@@ -24,81 +22,64 @@ export function useReservationActions({
   wallets: GqlWallet[] | null;
   user: Pick<GqlUser, "id"> | null;
   ticketCounter: UseTicketCounterReturn;
-}) {
-  const router = useRouter();
+}) => {
   const [useTickets, setUseTickets] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  const [createReservation, { loading: creatingReservation }] = useCreateReservationMutation();
+  const [createReservation, { loading }] = useCreateReservationMutation();
 
-  const handleConfirmReservation = useCallback(async () => {
+  const latest = useRef({ opportunity, selectedSlot, wallets, user, ticketCounter });
+  useEffect(() => {
+    latest.current = { opportunity, selectedSlot, wallets, user, ticketCounter };
+  }, [opportunity, selectedSlot, wallets, user, ticketCounter]);
+
+  const handleReservation = useCallback(async (): Promise<Result> => {
+    const { opportunity, selectedSlot, wallets, user, ticketCounter } = latest.current;
+
+    if (loading) {
+      return { success: false, error: "IN_PROGRESS" };
+    }
     if (!user) {
-      setIsLoginModalOpen(true);
-      return;
+      return { success: false, error: "NOT_AUTHENTICATED" };
+    }
+    if (!opportunity || !selectedSlot) {
+      return { success: false, error: "MISSING_DATA" };
     }
 
-    if (!selectedSlot || !opportunity) {
-      toast.error("必要な情報が不足しています");
-      return;
+    const count = ticketCounter.count;
+    const ticketIds = useTickets ? getTicketIds(wallets, opportunity.requiredTicket, count) : [];
+    if (useTickets && ticketIds.length < count) {
+      return { success: false, error: "NOT_ENOUGH_TICKETS" };
     }
 
-    const participantCount = ticketCounter.count;
-
-    const ticketIds = useTickets
-      ? getTicketIds(wallets, opportunity.requiredTicket, participantCount)
-      : [];
-
-    if (useTickets && ticketIds.length < participantCount) {
-      toast.error("必要なチケットが不足しています");
-      return;
-    }
-
-    try {
-      const result = await createReservation({
-        variables: {
-          input: {
-            opportunitySlotId: selectedSlot.id,
-            totalParticipantCount: participantCount,
-            paymentMethod: useTickets ? "TICKET" : "FEE",
-            ticketIdsIfNeed: useTickets ? ticketIds : undefined,
-          },
+    const res = await createReservation({
+      variables: {
+        input: {
+          opportunitySlotId: selectedSlot.id,
+          totalParticipantCount: count,
+          paymentMethod: useTickets ? "TICKET" : "FEE",
+          ticketIdsIfNeed: useTickets ? ticketIds : undefined,
         },
-      });
+      },
+    });
 
-      result.errors?.forEach((error) => {
-        console.error("GraphQL error:", error.message);
-      });
-
-      const reservation = result.data?.reservationCreate?.reservation;
-      if (reservation) {
-        toast.success("予約が完了しました");
-        router.push(
-          `/reservation/complete?opportunity_id=${opportunity.id}&reservation_id=${reservation.id}`,
-        );
-      }
-    } catch (err) {
-      console.error("Reservation error:", err);
-      toast.error(
-        err instanceof Error ? err.message : "予約に失敗しました。もう一度お試しください。",
-      );
+    const reservation = res.data?.reservationCreate?.reservation;
+    if (reservation) {
+      return { success: true, reservationId: reservation.id };
     }
-  }, [
-    user,
-    opportunity,
-    selectedSlot,
-    ticketCounter.count,
-    wallets,
-    useTickets,
-    createReservation,
-    router,
-  ]);
+
+    const rawCode = res.errors?.[0]?.extensions?.code;
+    const errCode = typeof rawCode === "string" ? rawCode : "UNKNOWN_ERROR";
+
+    return { success: false, error: errCode };
+  }, [createReservation, loading, useTickets]);
 
   return {
     useTickets,
     setUseTickets,
     isLoginModalOpen,
     setIsLoginModalOpen,
-    handleConfirmReservation,
-    creatingReservation,
+    handleReservation,
+    creatingReservation: loading,
   };
-}
+};

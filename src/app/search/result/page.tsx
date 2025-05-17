@@ -23,11 +23,12 @@ interface SearchResultPageProps {
 export default function SearchResultPage({ searchParams = {} }: SearchResultPageProps) {
   const { recommendedOpportunities, groupedOpportunities, loading, error } =
     useSearchResults(searchParams);
+
   return (
     <div className="min-h-screen">
       <main className="px-6 pb-6">
         {loading ? (
-          <LoadingIndicator />
+          <LoadingIndicator fullScreen={true} />
         ) : error ? (
           <ErrorState
             title="検索エラー"

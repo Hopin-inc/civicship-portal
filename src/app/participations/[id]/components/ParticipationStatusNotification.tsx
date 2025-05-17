@@ -1,10 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 import { AlertCircle, Check } from "lucide-react";
+import { GqlReservationStatus } from "@/types/graphql";
+import { ParticipationUIStatus } from "@/app/participations/[id]/page";
 
 interface StatusProps {
-  status: "pending" | "confirmed" | "cancelled";
+  status: ParticipationUIStatus;
   statusText: string;
   statusSubText?: string;
   statusClass: string;

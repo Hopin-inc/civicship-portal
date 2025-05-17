@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import PlaceToggleButton from "../PlaceToggleButton";
-import PlaceCardsSheet from "../PlaceCardsSheet";
+import PlaceToggleButton from "../ToggleButton";
+import PlaceCardsSheet from "./PlaceCardsSheet";
 import MapComponent from "./MapComponent";
 import { AnimatePresence, motion } from "framer-motion";
 import { BaseCardInfo, BasePin } from "@/app/places/data/type";
@@ -38,13 +38,15 @@ const PlaceMapView: React.FC<PlaceMapViewProps> = ({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed bottom-[80px] left-0 right-0 z-50 mx-4"
+            className="fixed bottom-[80px] inset-x-0 z-50 flex justify-center px-4"
           >
-            <PlaceCardsSheet
-              places={places}
-              selectedPlaceId={selectedPlaceId}
-              onPlaceSelect={onPlaceSelect}
-            />
+            <div className="relative w-full max-w-lg overflow-hidden mx-auto">
+              <PlaceCardsSheet
+                places={places}
+                selectedPlaceId={selectedPlaceId}
+                onPlaceSelect={onPlaceSelect}
+              />
+            </div>
           </motion.div>
         ) : (
           <motion.div

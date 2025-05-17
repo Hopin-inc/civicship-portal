@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { buildSearchParams, formatDateRange } from "@/app/search/data/presenter";
+import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
 import { SearchTabs, SearchTabType } from "@/app/search/components/Tabs";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { prefectureLabels } from "@/app/users/data/presenter";
@@ -43,7 +43,7 @@ export default function SearchPage() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-auto">
-        <div className="container px-4 py-6">
+        <div className="container px-4 py-2">
           <SearchTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />
           <FormProvider {...methods}>
             <SearchPageContent
@@ -96,7 +96,7 @@ function SearchPageContent({
 
   const handleSearch = () => {
     const values = getValues();
-    const params = buildSearchParams(
+    const params = buildSearchResultParams(
       values.searchQuery,
       values.location,
       values.dateRange,
@@ -108,7 +108,7 @@ function SearchPageContent({
   };
 
   return (
-    <>
+    <div className="space-y-6">
       <SearchForm />
       <SearchFilters
         onFilterClick={setActiveForm}
@@ -135,6 +135,6 @@ function SearchPageContent({
         prefectures={Object.entries(prefectureLabels).map(([id, name]) => ({ id, name }))}
       />
       <SearchFooter onClear={handleClear} onSearch={handleSearch} />
-    </>
+    </div>
   );
 }

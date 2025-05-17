@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect, useCallback, CSSProperties } from "react";
 import Image from "next/image";
 import { AlertCircle } from "lucide-react";
 import { SameStateActivities } from "./SimilarActivitiesList";
@@ -15,6 +15,7 @@ import ArticleCard from "@/app/articles/components/Card";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Button } from "@/components/ui/button";
 import { useReadMore } from "@/hooks/useReadMore";
+import Link from "next/link";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
@@ -54,7 +55,10 @@ const ActivityDetailsContent = ({
 const INITIAL_DISPLAY_LINES = 6;
 
 const ActivityBodySection = ({ body }: { body: string }) => {
-  const { textRef, expanded, showReadMore, toggleExpanded, getTextClassName } = useReadMore({ text: body, maxLines: INITIAL_DISPLAY_LINES });
+  const { textRef, expanded, showReadMore, toggleExpanded, getTextStyle } = useReadMore({
+    text: body,
+    maxLines: INITIAL_DISPLAY_LINES,
+  });
 
   return (
     <section className="pt-6 pb-8 mt-0">
@@ -62,7 +66,8 @@ const ActivityBodySection = ({ body }: { body: string }) => {
       <div className="relative">
         <p
           ref={textRef}
-          className={getTextClassName("text-body-md text-foreground whitespace-pre-wrap")}
+          className="text-body-md text-foreground whitespace-pre-wrap transition-all duration-300"
+          style={getTextStyle()}
         >
           {body}
         </p>
@@ -157,28 +162,36 @@ const ScheduleSection = ({
   slots: ActivitySlot[];
   opportunityId: string;
   communityId: string;
-}) => (
-  <section className="pt-6 pb-8 mt-0">
-    <h2 className="text-display-md text-foreground mb-4">開催日</h2>
-    <div className="relative">
-      <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
-        {slots.map((slot, index) => (
-          <div key={index} className="flex-shrink-0 first:ml-0">
-            <ActivityScheduleCard
-              slot={slot}
-              opportunityId={opportunityId}
-              communityId={communityId}
-            />
-          </div>
-        ))}
+}) => {
+  const query = new URLSearchParams({
+    id: opportunityId,
+    community_id: communityId ?? "",
+  });
+
+  return (
+    <section className="pt-6 pb-8 mt-0">
+      <h2 className="text-display-md text-foreground mb-4">開催日</h2>
+      <div className="relative">
+        <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
+          {slots.map((slot, index) => (
+            <div key={index} className="flex-shrink-0 first:ml-0">
+              <ActivityScheduleCard
+                slot={slot}
+                opportunityId={opportunityId}
+                communityId={communityId}
+              />
+            </div>
+          ))}
+        </div>
+        <Link href={`/reservation/select-date?${query.toString()}`}>
+          <Button variant="secondary" size="md" className="w-full">
+            参加できる日程を探す
+          </Button>
+        </Link>
       </div>
-      {/* #TODO: ボタンクリックの挙動 */}
-      <Button variant="secondary" size="md" className="w-full">
-        参加できる日程を探す
-      </Button>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 const NoticeSection = ({ requiredApproval }: { requiredApproval?: boolean }) => (
   <section className="pt-6 pb-8 mt-0 bg-background-hover -mx-4 px-4">

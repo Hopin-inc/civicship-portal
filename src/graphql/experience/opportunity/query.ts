@@ -9,11 +9,7 @@ import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
 import { ARTICLE_FRAGMENT } from "@/graphql/content/article/fragment";
 
 export const GET_OPPORTUNITIES = gql`
-  query GetOpportunities(
-    $filter: OpportunityFilterInput
-    $first: Int
-    $cursor: String
-  ) {
+  query GetOpportunities($filter: OpportunityFilterInput, $first: Int, $cursor: String) {
     opportunities(
       filter: $filter
       sort: { earliestSlotStartsAt: desc }
@@ -31,6 +27,9 @@ export const GET_OPPORTUNITIES = gql`
         cursor
         node {
           ...OpportunityFields
+          community {
+            ...CommunityFields
+          }
           slots {
             ...OpportunitySlotFields
           }
@@ -41,20 +40,17 @@ export const GET_OPPORTUNITIES = gql`
       }
     }
   }
-  ${OPPORTUNITY_FRAGMENT}
-  ${SLOT_FRAGMENT}
-  ${PLACE_FRAGMENT}
 `;
 
 export const GET_OPPORTUNITY = gql`
   query GetOpportunity($id: ID!, $permission: CheckCommunityPermissionInput!) {
     opportunity(id: $id, permission: $permission) {
       ...OpportunityFields
-      
+
       community {
         ...CommunityFields
       }
-      
+
       place {
         ...PlaceFields
       }
@@ -104,4 +100,4 @@ export const GET_OPPORTUNITY = gql`
   ${PARTICIPATION_FRAGMENT}
   ${USER_FRAGMENT}
   ${ARTICLE_FRAGMENT}
-`; 
+`;

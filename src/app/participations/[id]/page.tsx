@@ -4,26 +4,72 @@ import { useMemo } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useParticipationPage } from "@/app/participations/[id]/hooks/useParticipationPage";
-import { ParticipationContent } from "@/app/participations/[id]/components/ParticipationContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { ParticipationStatusNotification } from "@/app/participations/[id]/components/ParticipationStatusNotification";
+import { ParticipationDetails } from "@/app/participations/[id]/components/ParticipationDetails";
+import ParticipationActions from "@/app/participations/[id]/components/ParticipationActions";
+import { useCancelReservation } from "@/app/participations/[id]/hooks/useCancelReservation";
+import { toast } from "sonner";
+import { GqlReservationStatus } from "@/types/graphql";
+import { OpportunityCardHorizontal } from "@/app/activities/components/Card/CardHorizontal";
 
 interface ParticipationProps {
   params: { id: string };
 }
 
-export default function ParticipationPage({ params }: ParticipationProps) {
-  const { participation, opportunity, loading, error, ...rest } = useParticipationPage(params.id);
+export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
+const mapReservationStatusToUIStatus = (status: GqlReservationStatus): ParticipationUIStatus => {
+  switch (status) {
+    case GqlReservationStatus.Accepted:
+      return "confirmed";
+    case GqlReservationStatus.Rejected:
+    case GqlReservationStatus.Canceled:
+      return "cancelled";
+    case GqlReservationStatus.Applied:
+    default:
+      return "pending";
+  }
+};
+
+export default function ParticipationPage({ params }: ParticipationProps) {
   const headerConfig = useMemo(
     () => ({
-      title: opportunity?.title ? `${opportunity.title} - 予約詳細` : "予約詳細",
+      title: "予約詳細",
       showBackButton: true,
       showLogo: false,
-      showSearchForm: false,
     }),
-    [opportunity?.title],
+    [],
   );
   useHeaderConfig(headerConfig);
+
+  const {
+    participation,
+    opportunity,
+    currentStatus,
+    cancellationDeadline,
+    loading,
+    error,
+    refetch,
+  } = useParticipationPage(params.id);
+
+  const isCancellable = cancellationDeadline ? new Date() < cancellationDeadline : false;
+  const reservationId = participation?.reservation?.id;
+  const { handleCancel } = useCancelReservation();
+
+  const onCancel = async () => {
+    if (!reservationId) {
+      toast.error("予約IDが見つかりません");
+      return;
+    }
+    const result = await handleCancel(reservationId);
+    if (result.success) {
+      toast.success("キャンセルしました");
+      refetch();
+    } else {
+      toast.error(`キャンセル失敗: ${result.error}`);
+    }
+  };
 
   if (loading) return <LoadingIndicator message="参加情報を読み込み中..." />;
   if (error || !opportunity || !participation) {
@@ -32,7 +78,24 @@ export default function ParticipationPage({ params }: ParticipationProps) {
 
   return (
     <div className="max-w-2xl mx-auto p-4 pb-[120px]">
-      <ParticipationContent opportunity={opportunity} participation={participation} {...rest} />
+      {currentStatus && (
+        <ParticipationStatusNotification
+          status={mapReservationStatusToUIStatus(currentStatus.status)}
+          statusText={currentStatus.statusText}
+          statusSubText={currentStatus.statusSubText}
+          statusClass={currentStatus.statusClass}
+        />
+      )}
+
+      <OpportunityCardHorizontal opportunity={opportunity} />
+
+      <ParticipationDetails opportunity={opportunity} participation={participation} />
+
+      <ParticipationActions
+        cancellationDeadline={cancellationDeadline}
+        isCancellable={isCancellable}
+        onCancel={onCancel}
+      />
     </div>
   );
 }

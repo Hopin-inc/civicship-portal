@@ -1,9 +1,12 @@
-import { analytics } from "./firebase";
 import { logEvent, setUserProperties } from "firebase/analytics";
-import { setUserId } from "@firebase/analytics";
+import { getAnalytics, setUserId } from "@firebase/analytics";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
+import { app } from "@/lib/firebase";
+
+const analytics = typeof window !== "undefined" ? getAnalytics(app) : undefined;
+export { analytics };
 
 // 内部保持：ユーザー属性 + 環境情報（初期値は空）
 let currentUserAttributes: Record<string, string> = {};
@@ -32,10 +35,22 @@ export function useAnalyticsUserBinding() {
 
 export const useAutoPageView = () => {
   const pathname = usePathname();
+  const paramsObj = useParams(); // { activityId, placeId, … }
+
+  // ❶ stringify を外に出す
+  const paramsJson = JSON.stringify(paramsObj);
 
   useEffect(() => {
-    logPageView();
-  }, [pathname]);
+    // ❷ 必要ならパースしてオブジェクトに戻す
+    const dynamicParams = JSON.parse(paramsJson);
+
+    logPageView({
+      path: pathname,
+      title: document.title,
+      ...dynamicParams, // activityId, placeId, ticketId, userId など
+    });
+    // ❸ deps はシンプルな変数参照だけにする
+  }, [pathname, paramsJson]);
 };
 
 const getDefaultClientAttributes = (): Record<string, string> => {
@@ -80,24 +95,29 @@ const setSafeUserAttributes = (rawProps: Record<string, any>) => {
  * イベント送信：ユーザー属性 + params をすべて送信
  */
 const safeLogEvent = (name: string, params?: Record<string, any>): void => {
+  console.log("[Analytics] → send event:", name, params); // ← 追加
   if (!analytics) {
     console.warn(`[Analytics] not initialized: skip event '${name}'`);
     return;
   }
-
-  const enrichedParams = {
-    ...currentUserAttributes,
-    ...params,
-  };
-
+  const enrichedParams = { ...currentUserAttributes, ...params };
+  console.log("[Analytics] → enriched params:", enrichedParams); // ← 追加
   logEvent(analytics, name, enrichedParams);
 };
 
 // ------------------- 代表的イベント -------------------
 
-const logPageView = (options: { path?: string; title?: string } = {}): void => {
+type LogPageViewOptions = {
+  path?: string;
+  title?: string;
+  [param: string]: string | undefined;
+};
+
+export const logPageView = (options: LogPageViewOptions = {}) => {
+  const { path, title, ...restParams } = options;
   safeLogEvent("page_view", {
-    page_location: options.path || window.location.href,
-    page_title: options.title || document.title,
+    page_location: path || window.location.href,
+    page_title: title || document.title,
+    ...restParams,
   });
 };
