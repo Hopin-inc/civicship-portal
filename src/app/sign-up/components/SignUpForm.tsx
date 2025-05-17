@@ -14,24 +14,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { GqlCurrentPrefecture } from '@/types/graphql';
+import { GqlCurrentPrefecture } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { toast } from "sonner";
-
-const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
-  [GqlCurrentPrefecture.Kagawa]: '香川県',
-  [GqlCurrentPrefecture.Tokushima]: '徳島県',
-  [GqlCurrentPrefecture.Kochi]: '高知県',
-  [GqlCurrentPrefecture.Ehime]: '愛媛県',
-  [GqlCurrentPrefecture.OutsideShikoku]: '四国以外',
-  [GqlCurrentPrefecture.Unknown]: '不明',
-} as const;
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const FormSchema = z.object({
   name: z.string({ required_error: "名前を入力してください。" }),
   prefecture: z.nativeEnum(GqlCurrentPrefecture, {
-    required_error: "居住地を選択してください。"
+    required_error: "居住地を選択してください。",
   }),
 });
 
@@ -50,13 +42,6 @@ export function SignUpForm() {
     },
   });
 
-  const prefectures = [
-    GqlCurrentPrefecture.Kagawa,
-    GqlCurrentPrefecture.Tokushima,
-    GqlCurrentPrefecture.Kochi,
-    GqlCurrentPrefecture.Ehime,
-  ];
-
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     try {
@@ -65,9 +50,9 @@ export function SignUpForm() {
         router.push("/phone-verification");
         return;
       }
-      
+
       const phoneUid = phoneAuth.phoneUid;
-      
+
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
         router.push("/");
@@ -80,80 +65,62 @@ export function SignUpForm() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 space-y-8">
+    <div className="w-full max-w-md mx-auto space-y-8">
       <div className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">アカウント情報の登録</h1>
       </div>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <Form { ...form }>
+        <form onSubmit={ form.handleSubmit(onSubmit) } className="space-y-8">
           <FormField
-            control={form.control}
+            control={ form.control }
             name="name"
-            render={({ field }) => (
+            render={ ({ field }) => (
               <FormItem className="space-y-3">
                 <FormLabel className="text-base">表示名</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="名前を入力"
-                    {...field}
+                    { ...field }
                     className="h-12"
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
-            )}
+            ) }
           />
 
           <FormField
-            control={form.control}
+            control={ form.control }
             name="prefecture"
-            render={({ field }) => (
+            render={ ({ field }) => (
               <FormItem className="space-y-3">
                 <FormLabel className="text-base">住んでいるところ</FormLabel>
                 <FormControl>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      {prefectures.map((prefecture) => (
-                        <Button
-                          key={prefecture}
-                          type="button"
-                          variant="secondary"
-                          className={`h-12 rounded-2xl border-2 ${
-                            field.value === prefecture
-                              ? 'bg-primary text-primary-foreground border-primary'
-                              : 'border-input hover:border-input/80 hover:bg-muted'
-                          }`}
-                          onClick={() => field.onChange(prefecture)}
-                        >
-                          {prefectureLabels[prefecture]}
-                        </Button>
-                      ))}
-                    </div>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      className={`w-full h-12 rounded-2xl border-2 ${
-                        field.value === GqlCurrentPrefecture.OutsideShikoku
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'border-input hover:border-input/80 hover:bg-muted'
-                      }`}
-                      onClick={() => field.onChange(GqlCurrentPrefecture.OutsideShikoku)}
-                    >
-                      {prefectureLabels[GqlCurrentPrefecture.OutsideShikoku]}
-                    </Button>
-                  </div>
+                  <ToggleGroup onValueChange={ (val) => field.onChange(val as GqlCurrentPrefecture) } type="single"
+                               variant="outline" className="gap-2">
+                    <ToggleGroupItem value={ GqlCurrentPrefecture.Kagawa }
+                                     className="flex-1">香川県</ToggleGroupItem>
+                    <ToggleGroupItem value={ GqlCurrentPrefecture.Tokushima }
+                                     className="flex-1">徳島県</ToggleGroupItem>
+                    <ToggleGroupItem value={ GqlCurrentPrefecture.Ehime }
+                                     className="flex-1">愛媛県</ToggleGroupItem>
+                    <ToggleGroupItem value={ GqlCurrentPrefecture.Kochi }
+                                     className="flex-1">高知県</ToggleGroupItem>
+                    <ToggleGroupItem value={ GqlCurrentPrefecture.OutsideShikoku }
+                                     className="basis-full">四国以外</ToggleGroupItem>
+                  </ToggleGroup>
                 </FormControl>
                 <FormMessage />
               </FormItem>
-            )}
+            ) }
           />
 
           <Button
             type="submit"
             className="w-full h-12 text-base"
-            disabled={isLoading}
+            disabled={ isLoading }
           >
-            {isLoading ? "作成中..." : "アカウントを作成"}
+            { isLoading ? "作成中..." : "アカウントを作成" }
           </Button>
         </form>
       </Form>

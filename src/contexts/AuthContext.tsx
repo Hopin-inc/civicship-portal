@@ -119,6 +119,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         await new Promise(resolve => setTimeout(resolve, 500));
 
         if (phoneVerificationState.phoneUid) {
+          if (phoneVerificationState.authToken) {
+            cookies.set("phone_auth_token", phoneVerificationState.authToken);
+          }
+          if (phoneVerificationState.refreshToken) {
+            cookies.set("phone_refresh_token", phoneVerificationState.refreshToken);
+          }
+          if (phoneVerificationState.tokenExpiresAt) {
+            const timestamp = Math.floor(phoneVerificationState.tokenExpiresAt.getTime() / 1000);
+            cookies.set("phone_token_expires_at", timestamp.toString());
+          }
+          
+          console.log("Phone verification successful with tokens:", {
+            phoneUid: phoneVerificationState.phoneUid,
+            authToken: phoneVerificationState.authToken ? "present" : "missing",
+            refreshToken: phoneVerificationState.refreshToken ? "present" : "missing",
+            tokenExpiresAt: phoneVerificationState.tokenExpiresAt
+          });
+          
           setIsPhoneVerified(true);
           toast.success("電話番号認証が完了しました");
           router.push("/sign-up");
@@ -153,7 +171,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsPhoneVerified(phoneVerified);
     } catch (error) {
       console.error("LIFF login failed:", error);
-      toast.error("LINEログインに失敗しました");
+      
+      let errorMessage = "LINEログインに失敗しました";
+      
+      if (error instanceof Error) {
+        if (error.message.includes("network")) {
+          errorMessage = "ネットワーク接続に問題が発生しました。インターネット接続を確認してください。";
+        } else if (error.message.includes("expired")) {
+          errorMessage = "セッションの有効期限が切れました。再度お試しください。";
+        } else if (error.message.includes("access denied") || error.message.includes("cancelled")) {
+          errorMessage = "ログイン処理がキャンセルされました。";
+        }
+      }
+      
+      toast.error(errorMessage);
       setIsExplicitLogin(false);
     }
   };
@@ -164,11 +195,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const success = await signInWithLiffToken(accessToken);
       if (!success) {
-        toast.error("認証に失敗しました");
+        return false;
       }
-      return success;
+      return true;
     } catch (error) {
-      toast.error("認証に失敗しました");
+      console.error("Unexpected error during LIFF token authentication:", error);
+      toast.error("予期せぬエラーが発生しました。もう一度お試しください。");
       return false;
     } finally {
       setIsAuthenticating(false);
@@ -186,6 +218,55 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [liffAccessToken, isLiffLoggedIn, uid]);
 
   useEffect(() => {
+    const handleTokenExpired = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      console.log("Token expired event detected:", customEvent.detail);
+      
+      toast.error(
+        "認証の有効期限が切れました。再認証が必要です。",
+        {
+          action: {
+            label: "再認証",
+            onClick: () => router.push("/sign-up/phone-verification")
+          },
+          duration: 10000, // 10 seconds
+        }
+      );
+    };
+    
+    const handleAuthError = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { errorType, errorMessage } = customEvent.detail;
+      
+      console.log("Auth error event detected:", customEvent.detail);
+      
+      toast.error(
+        errorMessage,
+        {
+          action: errorType === 'network' ? {
+            label: "再試行",
+            onClick: () => window.location.reload()
+          } : (errorType === 'expired' || errorType === 'auth' || errorType === 'reauth') ? {
+            label: "再認証",
+            onClick: () => router.push("/login")
+          } : undefined,
+          duration: 10000, // 10 seconds
+        }
+      );
+    };
+    
+    window.addEventListener('auth:token-expired', handleTokenExpired);
+    window.addEventListener('auth:error', handleAuthError);
+    window.addEventListener('auth:token-refresh-failed', handleAuthError);
+    
+    return () => {
+      window.removeEventListener('auth:token-expired', handleTokenExpired);
+      window.removeEventListener('auth:error', handleAuthError);
+      window.removeEventListener('auth:token-refresh-failed', handleAuthError);
+    };
+  }, [router]);
+
+  useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user: AuthUser | null) => {
       ready.resolve();
 
@@ -193,6 +274,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const next = searchParams.get("next");
         const idToken = await user.getIdToken();
         cookies.set("access_token", idToken);
+        
+        if (user.refreshToken) {
+          cookies.set("refresh_token", user.refreshToken);
+          console.log("LINE refresh token stored in cookies");
+        }
+        
+        try {
+          const tokenResult = await user.getIdTokenResult();
+          if (tokenResult.expirationTime) {
+            const expiryTimestamp = Math.floor(new Date(tokenResult.expirationTime).getTime() / 1000);
+            cookies.set("token_expires_at", expiryTimestamp.toString());
+            console.log("Token expiration time stored:", expiryTimestamp);
+          }
+        } catch (error) {
+          console.error("Failed to get token expiration time:", error);
+        }
 
         const { data } = await refetch();
         const fetchedUser = data.currentUser?.user ?? null;
@@ -224,6 +321,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         login(null);
         cookies.remove("access_token");
+        cookies.remove("refresh_token");
+        cookies.remove("token_expires_at");
+        cookies.remove("phone_auth_token");
+        cookies.remove("phone_refresh_token");
       }
     });
 
@@ -257,16 +358,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const createUser = async (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
     try {
+      const effectivePhoneUid = phoneUid || phoneVerificationState.phoneUid || undefined;
+      const phoneNumber = getVerifiedPhoneNumber();
+      
+      console.log("Creating user with phone UID:", effectivePhoneUid);
+      
       const { data } = await userSignUpMutation({
         variables: {
           input: {
             name,
             currentPrefecture: currentPrefecture as any, // Type cast to resolve compatibility issue
             communityId: COMMUNITY_ID,
-            phoneUid: phoneUid || undefined,
+            phoneUid: effectivePhoneUid,
+            phoneNumber: phoneNumber,
           },
         },
       });
+      
       return data?.userSignUp?.user ?? null;
     } catch (error) {
       console.error("Failed to create user:", error);

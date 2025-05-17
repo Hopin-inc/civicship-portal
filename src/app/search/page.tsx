@@ -43,7 +43,7 @@ export default function SearchPage() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-auto">
-        <div className="container px-4 py-6">
+        <div className="container px-4 py-2">
           <SearchTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />
           <FormProvider {...methods}>
             <SearchPageContent
@@ -108,7 +108,7 @@ function SearchPageContent({
   };
 
   return (
-    <>
+    <div className="space-y-6">
       <SearchForm />
       <SearchFilters
         onFilterClick={setActiveForm}
@@ -135,6 +135,6 @@ function SearchPageContent({
         prefectures={Object.entries(prefectureLabels).map(([id, name]) => ({ id, name }))}
       />
       <SearchFooter onClear={handleClear} onSearch={handleSearch} />
-    </>
+    </div>
   );
 }
