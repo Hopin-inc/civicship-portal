@@ -3732,6 +3732,20 @@ export type GqlCreateReservationMutation = {
   } | null;
 };
 
+export type GqlCancelReservationMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlReservationCancelInput;
+  permission: GqlCheckIsSelfPermissionInput;
+}>;
+
+export type GqlCancelReservationMutation = {
+  __typename?: "Mutation";
+  reservationCancel?: {
+    __typename?: "ReservationSetStatusSuccess";
+    reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
+  } | null;
+};
+
 export type GqlGetReservationsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GqlGetReservationsQuery = {
@@ -6272,12 +6286,12 @@ export const CreateReservationDocument = gql`
     reservationCreate(input: $input) {
       ... on ReservationCreateSuccess {
         reservation {
-          id
-          status
+          ...ReservationFields
         }
       }
     }
   }
+  ${ReservationFieldsFragmentDoc}
 `;
 export type GqlCreateReservationMutationFn = Apollo.MutationFunction<
   GqlCreateReservationMutation,
@@ -6318,6 +6332,64 @@ export type CreateReservationMutationResult = Apollo.MutationResult<GqlCreateRes
 export type CreateReservationMutationOptions = Apollo.BaseMutationOptions<
   GqlCreateReservationMutation,
   GqlCreateReservationMutationVariables
+>;
+export const CancelReservationDocument = gql`
+  mutation CancelReservation(
+    $id: ID!
+    $input: ReservationCancelInput!
+    $permission: CheckIsSelfPermissionInput!
+  ) {
+    reservationCancel(id: $id, input: $input, permission: $permission) {
+      ... on ReservationSetStatusSuccess {
+        reservation {
+          ...ReservationFields
+        }
+      }
+    }
+  }
+  ${ReservationFieldsFragmentDoc}
+`;
+export type GqlCancelReservationMutationFn = Apollo.MutationFunction<
+  GqlCancelReservationMutation,
+  GqlCancelReservationMutationVariables
+>;
+
+/**
+ * __useCancelReservationMutation__
+ *
+ * To run a mutation, you first call `useCancelReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCancelReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cancelReservationMutation, { data, loading, error }] = useCancelReservationMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useCancelReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlCancelReservationMutation,
+    GqlCancelReservationMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlCancelReservationMutation, GqlCancelReservationMutationVariables>(
+    CancelReservationDocument,
+    options,
+  );
+}
+export type CancelReservationMutationHookResult = ReturnType<typeof useCancelReservationMutation>;
+export type CancelReservationMutationResult = Apollo.MutationResult<GqlCancelReservationMutation>;
+export type CancelReservationMutationOptions = Apollo.BaseMutationOptions<
+  GqlCancelReservationMutation,
+  GqlCancelReservationMutationVariables
 >;
 export const GetReservationsDocument = gql`
   query GetReservations {
