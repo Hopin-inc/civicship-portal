@@ -83,14 +83,37 @@ const signInWithFirebase = async (
 ) => {
   const { user } = await signInWithCustomToken(auth, customToken);
 
-  // pictureUrlがundefinedの場合にデフォルト画像URLを設定
-  const profilePictureUrl = profile.pictureUrl || "https://example.com/default-profile-pic.png"; // デフォルトURL
+  try {
+    // pictureUrlがundefinedの場合にデフォルト画像URLを設定
+    const profilePictureUrl = profile.pictureUrl || "https://example.com/default-profile-pic.png"; // デフォルトURL
 
-  await updateProfile(user, {
-    displayName: profile.displayName,
-    photoURL: profilePictureUrl,
-  });
-
+    await updateProfile(user, {
+      displayName: profile.displayName,
+      photoURL: profilePictureUrl,
+    });
+    
+    console.log("LIFF authentication with profile update successful");
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("quota-exceeded")) {
+      console.warn("Profile update failed due to quota exceeded, but authentication successful");
+      
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("auth:warning", {
+            detail: {
+              source: "firebase",
+              warningType: "quota-exceeded",
+              warningMessage: "プロファイル更新の制限に達しました。プロファイル情報は更新されていません。",
+              originalError: error,
+            },
+          }),
+        );
+      }
+    } else {
+      throw error;
+    }
+  }
+  
   console.log("LIFF authentication successful");
 };
 
