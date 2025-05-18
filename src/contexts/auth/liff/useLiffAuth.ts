@@ -6,7 +6,7 @@ import { isPhoneVerified as checkPhoneVerified } from "@/contexts/auth/phone/uti
 /**
  * LIFF authentication hook for handling LINE login
  */
-export const useLiffAuth = (liff: any, liffLogin: () => Promise<void>) => {
+export const useLiffAuth = (liff: any, liffLogin: () => void | Promise<void>) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isExplicitLogin, setIsExplicitLogin] = useState(false);
 

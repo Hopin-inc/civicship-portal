@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useCookies } from "next-client-cookies";
 import { toast } from "sonner";
-import { auth } from "@/lib/firebase/firebase";
+import { auth, phoneVerificationState } from "@/lib/firebase/firebase";
 import { GqlCurrentPrefecture, GqlUser } from "@/types/graphql";
 import { Required } from "utility-types";
 import { COMMUNITY_ID } from "@/utils";
 import { removeCookies } from "@/contexts/auth/cookie";
-import { phoneVerificationState } from "@/lib/firebase/firebase";
 import { getVerifiedPhoneNumber } from "@/contexts/auth/phone/utils";
 
 /**

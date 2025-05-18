@@ -8,19 +8,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
 import {
   auth,
-  phoneAuth,
   phoneVerificationState,
 } from "@/lib/firebase/firebase";
-import signInWithLiffToken from "@/contexts/auth/liff/signIn";
-import startPhoneNumberVerification from "@/contexts/auth/phone/startPhoneNumberVerticication";
-import verifyPhoneCode from "@/contexts/auth/phone/verifyPhoneCode";
-import { isPhoneVerified as checkPhoneVerified, getVerifiedPhoneNumber } from "@/contexts/auth/phone/utils";
-import { refreshIdToken, refreshPhoneIdToken } from "@/contexts/auth/refreshToken/refreshToken";
+import { isPhoneVerified as checkPhoneVerified } from "@/contexts/auth/phone/utils";
 import { setCookies, removeCookies } from "@/contexts/auth/cookie";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
 import { useLiff } from "./LiffContext";
 import { COMMUNITY_ID } from "@/utils";
+import usePhoneAuth from "@/contexts/auth/phone/usePhoneAuth";
+import useLiffAuth from "@/contexts/auth/liff/useLiffAuth";
+import useUserManagement from "@/contexts/auth/user/useUserManagement";
 
 type UserInfo = {
   uid: string | null;
@@ -62,13 +60,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [ready] = useState(() => deferred());
   const [uid, setUid] = useState<UserInfo["uid"]>(null);
   const [user, setUser] = useState<UserInfo["user"]>(null);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const [isExplicitLogin, setIsExplicitLogin] = useState(false);
+  
+  const [userSignUpMutation] = useUserSignUpMutation();
 
-  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
-  const [verificationId, setVerificationId] = useState<string | null>(null);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const {
+    phoneNumber,
+    isVerifying,
+    verificationId,
+    isPhoneVerified,
+    phoneUid,
+    startPhoneVerification,
+    verifyPhoneCode: verifyPhoneCodeLocal,
+    setIsPhoneVerified
+  } = usePhoneAuth();
+
+  const {
+    isAuthenticating: isLiffAuthenticating,
+    isExplicitLogin,
+    loginWithLiff,
+    handleAuthenticateWithLiffToken,
+    setIsExplicitLogin
+  } = useLiffAuth(liff, liffLogin);
+
+  const {
+    createUser,
+    logout,
+    isAuthenticating: isUserAuthenticating
+  } = useUserManagement(userSignUpMutation, setUser, setUid, liffLogout);
+
+  const isAuthenticating = isLiffAuthenticating || isUserAuthenticating;
 
   const login = useCallback((userInfo: UserInfo | null) => {
     setUid(userInfo?.uid ?? null);
@@ -89,123 +109,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [currentUserData, uid, login]);
 
-  const [userSignUpMutation] = useUserSignUpMutation();
-
-  const startPhoneVerification = async (phoneNumber: string): Promise<boolean> => {
-    setIsVerifying(true);
-    try {
-      const verId = await startPhoneNumberVerification(phoneNumber, null, null);
-      setVerificationId(verId);
-      setPhoneNumber(phoneNumber);
-      return true;
-    } catch (error) {
-      console.error("Failed to start phone verification:", error);
-      toast.error("電話番号認証の開始に失敗しました");
-      return false;
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
-  const verifyPhoneCodeLocal = async (code: string): Promise<boolean> => {
-    if (!verificationId) {
-      toast.error("認証IDがありません。もう一度電話番号を入力してください");
-      return false;
-    }
-
-    setIsVerifying(true);
-    try {
-      const success = await verifyPhoneCode(verificationId, code, null);
-
-      if (success) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        if (phoneVerificationState.phoneUid) {
-          setCookies(
-            cookies,
-            phoneVerificationState.authToken,
-            phoneVerificationState.refreshToken,
-            phoneVerificationState.tokenExpiresAt,
-            "phone"
-          );
-
-          console.log("Phone verification successful with tokens:", {
-            phoneUid: phoneVerificationState.phoneUid,
-            authToken: phoneVerificationState.authToken ? "present" : "missing",
-            refreshToken: phoneVerificationState.refreshToken ? "present" : "missing",
-            tokenExpiresAt: phoneVerificationState.tokenExpiresAt
-          });
-
-          setIsPhoneVerified(true);
-          toast.success("電話番号認証が完了しました");
-          router.push("/sign-up");
-          return true;
-        } else {
-          toast.error("電話番号認証IDが取得できませんでした");
-          return false;
-        }
-      } else {
-        toast.error("認証コードの検証に失敗しました");
-        return false;
-      }
-    } catch (error) {
-      console.error("Failed to verify phone code:", error);
-      toast.error("認証コードの検証に失敗しました");
-      return false;
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
-  const loginWithLiff = async () => {
-    if (!liff) {
-      return;
-    }
-
-    try {
-      setIsExplicitLogin(true);
-      await liffLogin();
-
-      const phoneVerified = checkPhoneVerified();
-      setIsPhoneVerified(phoneVerified);
-    } catch (error) {
-      console.error("LIFF login failed:", error);
-
-      let errorMessage = "LINEログインに失敗しました";
-
-      if (error instanceof Error) {
-        if (error.message.includes("network")) {
-          errorMessage = "ネットワーク接続に問題が発生しました。インターネット接続を確認してください。";
-        } else if (error.message.includes("expired")) {
-          errorMessage = "セッションの有効期限が切れました。再度お試しください。";
-        } else if (error.message.includes("access denied") || error.message.includes("cancelled")) {
-          errorMessage = "ログイン処理がキャンセルされました。";
-        }
-      }
-
-      toast.error(errorMessage);
-      setIsExplicitLogin(false);
-    }
-  };
-
-  const handleAuthenticateWithLiffToken = async (accessToken: string): Promise<boolean> => {
-    setIsAuthenticating(true);
-
-    try {
-      const success = await signInWithLiffToken(accessToken);
-      if (!success) {
-        return false;
-      }
-      return true;
-    } catch (error) {
-      console.error("Unexpected error during LIFF token authentication:", error);
-      toast.error("予期せぬエラーが発生しました。もう一度お試しください。");
-      return false;
-    } finally {
-      setIsAuthenticating(false);
-    }
-  };
-
   useEffect(() => {
     const attemptAuthWithLiffToken = async () => {
       if (liffAccessToken && isLiffLoggedIn && !uid) {
@@ -214,7 +117,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     attemptAuthWithLiffToken();
-  }, [liffAccessToken, isLiffLoggedIn, uid]);
+  }, [liffAccessToken, isLiffLoggedIn, uid, handleAuthenticateWithLiffToken]);
 
   useEffect(() => {
     const handleTokenExpired = (event: Event) => {
@@ -329,64 +232,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [ready, cookies, refetch, router, searchParams, login, isExplicitLogin]);
-
-  const logout = async () => {
-    setIsAuthenticating(true);
-
-    try {
-      await auth.signOut();
-
-      liffLogout();
-
-      const response = await fetch("/api/logout", { method: "POST" });
-      if (!response.ok) {
-        console.warn("Backend logout failed:", response.status);
-      }
-
-      removeCookies(cookies);
-      removeCookies(cookies, "phone");
-
-      setUser(null);
-      setUid(null);
-
-      toast.success("ログアウトしました");
-    } catch (error) {
-      console.error("Logout failed:", error);
-      toast.error("ログアウトに失敗しました");
-    } finally {
-      setIsAuthenticating(false);
-    }
-  };
-
-  const createUser = async (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
-    try {
-      const effectivePhoneUid = phoneUid || phoneVerificationState.phoneUid || undefined;
-      const phoneNumber = getVerifiedPhoneNumber();
-      console.log("Creating user with phone UID:", effectivePhoneUid);
-      if (!phoneNumber) {
-        throw new Error("No verified phone number found.");
-      }
-
-      const { data } = await userSignUpMutation({
-        variables: {
-          input: {
-            name,
-            currentPrefecture: currentPrefecture as any, // Type cast to resolve compatibility issue
-            communityId: COMMUNITY_ID,
-            phoneUid: effectivePhoneUid,
-            phoneNumber,
-          },
-        },
-      });
-
-      return data?.userSignUp?.user ?? null;
-    } catch (error) {
-      console.error("Failed to create user:", error);
-      toast.error("ユーザー作成に失敗しました");
-      return null;
-    }
-  };
+  }, [ready, cookies, refetch, router, searchParams, login, isExplicitLogin, isPhoneVerified, setIsExplicitLogin]);
 
   return (
     <AuthContext.Provider value={ {
@@ -402,7 +248,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       phoneAuth: {
         isVerifying,
         verificationId,
-        phoneUid: phoneVerificationState.phoneUid,
+        phoneUid,
         startPhoneVerification,
         verifyPhoneCode: verifyPhoneCodeLocal,
       },
