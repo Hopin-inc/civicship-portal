@@ -1,9 +1,11 @@
+"use client";
+
 import { Calendar, MapPin, Ellipsis, Plus, Clock, FileText, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import EmptyState from "@/components/shared/EmptyState";
+import EmptyStateWithSearch from "@/components/shared/EmptyStateWithSearch";
 import { RefObject } from "react";
-import { ParticipantsList } from "@/components/shared/ParticipantsList";
+import ParticipantsList from "@/components/shared/ParticipantsList";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
 import { ActivityCard } from "@/app/activities/data/type";
 import { AppPortfolio } from "@/app/users/data/type";
@@ -127,6 +129,10 @@ const PortfolioCard = ({
             placeholder={"blur"}
             blurDataURL={PLACEHOLDER_IMAGE}
             sizes="(min-width: 640px) 50vw, 100vw"
+            onError={(e) => {
+              const img = e.target as HTMLImageElement;
+              img.src = PLACEHOLDER_IMAGE;
+            }}
           />
           {portfolio.source === "OPPORTUNITY" &&
           portfolio?.reservationStatus === GqlReservationStatus.Accepted &&
@@ -160,9 +166,12 @@ const PortfolioCard = ({
               <Calendar className="w-4 h-4" />
               <span>
                 {portfolio.date}
-                {portfolio.source === "OPPORTUNITY" && !isPast && (
-                  <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">予定</span>
-                )}
+                {portfolio.source === "OPPORTUNITY" &&
+                  !isPast &&
+                  portfolio.reservationStatus !== GqlReservationStatus.Canceled &&
+                  portfolio.reservationStatus !== GqlReservationStatus.Rejected && (
+                    <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">予定</span>
+                  )}
               </span>
             </div>
             {portfolio.location && (
@@ -178,7 +187,7 @@ const PortfolioCard = ({
   );
 };
 
-export const PortfolioGrid = ({
+const PortfolioGrid = ({
   portfolios,
   isLoadingMore,
   hasMore,
@@ -238,7 +247,7 @@ const PhotoGallery = () => {
 // NOTE: 開発確認用のフラグ。ユーザーページ関連の修正が落ち着いたら削除する。
 const enableDummyPortfolios = false;
 
-export const UserPortfolioList = ({
+const UserPortfolioList = ({
   isSysAdmin,
   activeOpportunities = [],
   isOwner,
@@ -293,7 +302,7 @@ export const UserPortfolioList = ({
           )}
         </div>
         {showEmptyState ? (
-          <EmptyState {...emptyStateProps} />
+          <EmptyStateWithSearch {...emptyStateProps} />
         ) : (
           <PortfolioGrid
             portfolios={enableDummyPortfolios ? dummyPortfolios : portfolios}
@@ -306,6 +315,8 @@ export const UserPortfolioList = ({
     </section>
   );
 };
+
+export default UserPortfolioList;
 
 // #NOTE: スタイル確認用に作成、後ほど削除する
 const dummyPortfolios: AppPortfolio[] = [

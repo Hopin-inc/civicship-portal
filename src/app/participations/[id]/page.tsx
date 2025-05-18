@@ -1,17 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { useParticipationPage } from "@/app/participations/[id]/hooks/useParticipationPage";
+import ErrorState from "@/components/shared/ErrorState";
+import useParticipationPage from "@/app/participations/[id]/hooks/useParticipationPage";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { ParticipationStatusNotification } from "@/app/participations/[id]/components/ParticipationStatusNotification";
-import { ParticipationDetails } from "@/app/participations/[id]/components/ParticipationDetails";
+import ParticipationStatusNotification from "@/app/participations/[id]/components/ParticipationStatusNotification";
+import ParticipationDetails from "@/app/participations/[id]/components/ParticipationDetails";
 import ParticipationActions from "@/app/participations/[id]/components/ParticipationActions";
 import { useCancelReservation } from "@/app/participations/[id]/hooks/useCancelReservation";
 import { toast } from "sonner";
 import { GqlReservationStatus } from "@/types/graphql";
-import { OpportunityCardHorizontal } from "@/app/activities/components/Card/CardHorizontal";
+import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 
 interface ParticipationProps {
   params: { id: string };
@@ -50,8 +50,13 @@ export default function ParticipationPage({ params }: ParticipationProps) {
     cancellationDeadline,
     loading,
     error,
-    refetch,
+    hasError,
   } = useParticipationPage(params.id);
+
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   const isCancellable = cancellationDeadline ? new Date() < cancellationDeadline : false;
   const reservationId = participation?.reservation?.id;
@@ -59,21 +64,23 @@ export default function ParticipationPage({ params }: ParticipationProps) {
 
   const onCancel = async () => {
     if (!reservationId) {
-      toast.error("予約IDが見つかりません");
+      toast.error("予約情報が見つかりません");
       return;
     }
     const result = await handleCancel(reservationId);
     if (result.success) {
-      toast.success("キャンセルしました");
-      refetch();
+      toast.success("予約をキャンセルしました");
+      if (refetchRef.current) {
+        refetchRef.current();
+      }
     } else {
-      toast.error(`キャンセル失敗: ${result.error}`);
+      toast.error(`予約のキャンセルが失敗しました`);
     }
   };
 
-  if (loading) return <LoadingIndicator message="参加情報を読み込み中..." />;
-  if (error || !opportunity || !participation) {
-    return <ErrorState message="参加情報の読み込みに失敗しました。" />;
+  if (loading) return <LoadingIndicator />;
+  if (hasError || !reservationId || !opportunity || !participation) {
+    return <ErrorState title="予約ページを読み込めませんでした" refetchRef={refetchRef} />;
   }
 
   return (

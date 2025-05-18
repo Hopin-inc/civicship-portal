@@ -9,7 +9,7 @@ interface NavigationButtonsProps {
   title: string;
 }
 
-export const NavigationButtons: React.FC<NavigationButtonsProps> = ({ title }) => {
+const NavigationButtons: React.FC<NavigationButtonsProps> = ({ title }) => {
   const { navigateBack } = useHierarchicalNavigation();
 
   const handleShare = () => {
@@ -44,3 +44,5 @@ export const NavigationButtons: React.FC<NavigationButtonsProps> = ({ title }) =
     </>
   );
 };
+
+export default NavigationButtons;

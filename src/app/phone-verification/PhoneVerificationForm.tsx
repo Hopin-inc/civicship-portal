@@ -17,33 +17,33 @@ export function PhoneVerificationForm() {
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [linkPhoneAuth] = useMutation(LINK_PHONE_AUTH);
-  
+
   useEffect(() => {
     if (recaptchaContainerRef.current) {
       setIsRecaptchaReady(true);
     }
-    
+
     return () => {
-      import('@/lib/firebase').then(({ clearRecaptcha }) => {
+      import("@/lib/firebase").then(({ clearRecaptcha }) => {
         clearRecaptcha();
       });
     };
   }, []);
-  
+
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isRecaptchaReady) {
       toast.error("reCAPTCHAの読み込みが完了していません。ページを再読み込みしてください。");
       return;
     }
-    
+
     const formattedPhone = formatPhoneNumber(phoneNumber);
     const success = await phoneAuth.startPhoneVerification(formattedPhone);
     if (success) {
       setStep("code");
     }
   };
-  
+
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await phoneAuth.verifyPhoneCode(verificationCode);
@@ -51,18 +51,18 @@ export function PhoneVerificationForm() {
 
   const formatPhoneNumber = (phone: string): string => {
     const cleaned = phone.replace(/[-\s]/g, "");
-    
+
     if (cleaned.startsWith("0")) {
       return "+81" + cleaned.substring(1);
     }
-    
+
     if (cleaned.startsWith("+")) {
       return cleaned;
     }
-    
+
     return "+81" + cleaned;
   };
-  
+
   return (
     <div className="w-full max-w-md mx-auto p-6 space-y-8">
       <div className="space-y-2">
@@ -70,22 +70,24 @@ export function PhoneVerificationForm() {
           {step === "phone" ? "電話番号を入力" : "認証コードを入力"}
         </h1>
         <p className="text-sm text-muted-foreground">
-          {step === "phone" 
-            ? "電話番号認証のため、あなたの電話番号を入力してください。SMSで認証コードが送信されます。" 
+          {step === "phone"
+            ? "電話番号認証のため、あなたの電話番号を入力してください。SMSで認証コードが送信されます。"
             : "電話番号に送信された6桁の認証コードを入力してください。"}
         </p>
       </div>
-      
+
       {step === "phone" ? (
         <form onSubmit={handlePhoneSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="phone" className="text-sm font-medium">電話番号</label>
+            <label htmlFor="phone" className="text-sm font-medium">
+              電話番号
+            </label>
             <input
               id="phone"
               type="tel"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="090-1234-5678"
+              placeholder="09012345678"
               className="w-full h-12 px-3 border rounded-md"
               required
             />
@@ -102,7 +104,9 @@ export function PhoneVerificationForm() {
       ) : (
         <form onSubmit={handleCodeSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="code" className="text-sm font-medium">認証コード</label>
+            <label htmlFor="code" className="text-sm font-medium">
+              認証コード
+            </label>
             <input
               id="code"
               type="text"

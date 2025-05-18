@@ -1,39 +1,56 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { AlertCircle } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { AlertCircle, Home, RefreshCcw } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface ErrorStateProps {
-  message?: string;
   title?: string;
-  actionText?: string;
-  actionHref?: string;
+  refetchRef?: React.MutableRefObject<(() => void) | null>;
 }
 
-export const ErrorState: React.FC<ErrorStateProps> = ({ 
-  message = 'エラーが発生しました',
-  title = 'エラーが発生しました',
-  actionText,
-  actionHref
+const ErrorState: React.FC<ErrorStateProps> = ({
+  title = "ページを読み込めませんでした",
+  refetchRef,
 }) => {
+  const handleRetry = () => {
+    if (refetchRef?.current) {
+      refetchRef.current();
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-xl">
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex flex-col items-center text-center">
-        <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-        <h2 className="text-xl font-bold text-red-700 mb-2">{title}</h2>
-        <p className="text-red-600">{message}</p>
-        {actionText && actionHref && (
-          <Link href={actionHref}>
-            <Button 
-              variant="destructive"
-              className="mt-4"
-            >
-              {actionText}
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <div className="text-center space-y-6">
+        <div className="bg-muted rounded-full p-4 mx-auto w-fit">
+          <AlertCircle className="h-10 w-10 text-muted-foreground" />
+        </div>
+
+        <h1 className="text-3xl font-bold">{title}</h1>
+        <p className="text-left text-body-sm text-muted-foreground px-[40px]">
+          以下のボタンから再読み込みをお試しください。
+          <br />
+          <br />
+          再試行しても改善しない場合は、時間をおいて再度アクセスするか、
+          トップページにお戻りください。
+        </p>
+
+        <div className="w-full px-[40px] space-y-3">
+          {refetchRef?.current && (
+            <Button className="w-full flex justify-center" onClick={handleRetry} variant="primary">
+              <RefreshCcw className="mr-2 h-4 w-4" />
+              再試行する
+            </Button>
+          )}
+
+          <Link href="/" passHref>
+            <Button className="w-full flex justify-center" variant="secondary">
+              <Home className="mr-2 h-4 w-4" />
+              トップページに戻る
             </Button>
           </Link>
-        )}
+        </div>
       </div>
     </div>
   );

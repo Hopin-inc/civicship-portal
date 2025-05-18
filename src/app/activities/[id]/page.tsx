@@ -4,11 +4,12 @@ import { useActivityDetails } from "@/app/activities/[id]/hooks/useActivityDetai
 import ActivityDetailsHeader from "@/app/activities/[id]/components/ActivityDetailsHeader";
 import ActivityDetailsContent from "@/app/activities/[id]/components/ActivityDetailsContent";
 import ActivityDetailsFooter from "@/app/activities/[id]/components/ActivityDetailsFooter";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { NavigationButtons } from "@/components/shared/NavigationButtons";
+import NavigationButtons from "@/components/shared/NavigationButtons";
+import { notFound } from "next/navigation";
+import ErrorState from "@/components/shared/ErrorState";
 
 interface ActivityPageProps {
   params: {
@@ -20,11 +21,6 @@ interface ActivityPageProps {
 }
 
 export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
-  const { id } = params;
-
-  const { opportunity, sameStateActivities, availableTickets, sortedSlots, isLoading, error } =
-    useActivityDetails(id);
-
   const headerConfig = useMemo(
     () => ({
       hideHeader: true,
@@ -33,16 +29,38 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
   );
   useHeaderConfig(headerConfig);
 
-  if (error && !opportunity) {
-    return <ErrorState message={`Error: ${error.message}`} />;
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const { id } = params;
+  const {
+    opportunity,
+    sameStateActivities,
+    availableTickets,
+    sortedSlots,
+    isLoading,
+    error,
+    refetch,
+  } = useActivityDetails(id);
+
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
+
+  if (isLoading) return <LoadingIndicator />;
+
+  if (error) {
+    return <ErrorState title="募集ページを読み込めませんでした" refetchRef={refetchRef} />;
   }
+
   if (!opportunity) {
-    return <ErrorState message="No opportunity found" />;
+    return notFound();
   }
 
   return (
     <>
-      {isLoading && <LoadingIndicator fullScreen />}
       <div className="relative max-w-mobile-l mx-auto w-full">
         <NavigationButtons title={opportunity.title} />
       </div>

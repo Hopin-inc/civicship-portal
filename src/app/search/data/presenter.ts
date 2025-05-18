@@ -34,20 +34,18 @@ export function buildSearchResultParams(
 
   if (q) params.set("q", q);
   if (location) params.set("location", location);
-  if (dateRange?.from) {
-    const fromStr = dateRange.from.toLocaleDateString("sv-SE");
-    params.set("from", fromStr);
-  }
-  if (dateRange?.to) {
-    const toStr = dateRange.to.toLocaleDateString("sv-SE");
-    params.set("to", toStr);
-  }
-
+  if (dateRange?.from) params.set("from", formatDateToJST(dateRange.from));
+  if (dateRange?.to) params.set("to", formatDateToJST(dateRange.to));
   if (guests > 0) params.set("guests", guests.toString());
-  if (useTicket) params.set("ticket", "true");
-  if (type) params.set("type", type);
+  if (useTicket) params.set("ticket", "1");
+  params.set("type", type);
 
   return params;
+}
+
+function formatDateToJST(date: Date): string {
+  const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+  return jst.toISOString().slice(0, 10);
 }
 
 export const mapNodeToCardProps = (node: GraphQLOpportunity): ActivityCard => ({

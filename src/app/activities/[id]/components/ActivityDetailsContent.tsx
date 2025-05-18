@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback, CSSProperties } from "react";
+import React from "react";
 import Image from "next/image";
 import { AlertCircle } from "lucide-react";
-import { SameStateActivities } from "./SimilarActivitiesList";
+import SameStateActivities from "./SimilarActivitiesList";
 import ActivityScheduleCard from "./ActivityScheduleCard";
 import {
   ActivityCard,
@@ -16,6 +16,7 @@ import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Button } from "@/components/ui/button";
 import { useReadMore } from "@/hooks/useReadMore";
 import Link from "next/link";
+import IconWrapper from "@/components/shared/IconWrapper";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
@@ -42,7 +43,7 @@ const ActivityDetailsContent = ({
         opportunityId={opportunity.id}
         communityId={communityId}
       />
-      <NoticeSection requiredApproval={opportunity.requiredApproval} />
+      <NoticeSection />
       <SameStateActivities
         header={"近くでおすすめの体験"}
         opportunities={sameStateActivities}
@@ -193,22 +194,40 @@ const ScheduleSection = ({
   );
 };
 
-const NoticeSection = ({ requiredApproval }: { requiredApproval?: boolean }) => (
-  <section className="pt-6 pb-8 mt-0 bg-background-hover -mx-4 px-4">
-    <h2 className="text-display-md text-foreground mb-4">注意事項</h2>
-    <ul className="space-y-4 text-body-sm text-caption">
-      <li className="flex items-start gap-2 ml-0">
-        <AlertCircle className="h-5 w-5 text-gray-500 flex-shrink-0" />
-        <span>参加には事前予約が必要です</span>
-      </li>
-      {requiredApproval && (
-        <li className="flex items-start gap-2 ml-0">
-          <AlertCircle className="h-5 w-5 text-gray-500 flex-shrink-0" />
-          <span>参加には承認が必要です</span>
-        </li>
-      )}
-    </ul>
-  </section>
-);
+const NoticeSection: React.FC = () => {
+  return (
+    <section className="pt-6 pb-8 mt-0 bg-background-hover -mx-4 px-4">
+      <h2 className="text-display-md text-foreground mb-4">注意事項</h2>
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <IconWrapper color="warning">
+            <AlertCircle size={20} strokeWidth={2.5} />
+          </IconWrapper>
+          <p className="text-body-md flex-1 font-bold">ホストによる確認後に、予約が確定します。</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <IconWrapper color="warning">
+            <AlertCircle size={20} strokeWidth={2.5} />
+          </IconWrapper>
+          <p className="text-body-md flex-1">
+            実施確定または中止のどちらの場合でも、公式LINEから14日前までにご連絡します。
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <IconWrapper color="warning">
+            <AlertCircle size={20} strokeWidth={2.5} />
+          </IconWrapper>
+          <p className="text-body-md flex-1">当日は現金をご用意下さい。</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <IconWrapper color="warning">
+            <AlertCircle size={20} strokeWidth={2.5} />
+          </IconWrapper>
+          <p className="text-body-md flex-1">キャンセルは開催日の7日前まで可能です。</p>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 export default ActivityDetailsContent;

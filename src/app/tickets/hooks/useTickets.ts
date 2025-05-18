@@ -9,12 +9,13 @@ export interface UseTicketsResult {
   tickets: Ticket[];
   loading: boolean;
   error: any;
+  refetch: () => void;
 }
 
 export const useTickets = (): UseTicketsResult => {
   const { user } = useAuth();
 
-  const { data, loading, error } = useGetUserWalletQuery({
+  const { data, loading, error, refetch } = useGetUserWalletQuery({
     variables: { id: user?.id ?? "" },
     skip: !user?.id,
   });
@@ -25,5 +26,6 @@ export const useTickets = (): UseTicketsResult => {
     tickets,
     loading,
     error,
+    refetch,
   };
 };

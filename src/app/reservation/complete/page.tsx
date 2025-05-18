@@ -1,20 +1,16 @@
 "use client";
 
-import { SameStateActivities } from "@/app/activities/[id]/components/SimilarActivitiesList";
-import { CompletionHeader } from "@/app/reservation/components/CompletionHeader";
-import { ReservationDetails } from "@/app/reservation/components/ReservationDetails";
-import { useReservationComplete } from "@/app/reservation/complete/hooks/useReservationComplete";
-import React, { useMemo } from "react";
-import { ReservationContentGate } from "@/app/reservation/contentGate";
+import SameStateActivities from "@/app/activities/[id]/components/SimilarActivitiesList";
+import CompletionHeader from "@/app/reservation/complete/components/CompletionHeader";
+import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
+import React, { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useSearchParams } from "next/navigation";
-import {
-  presenterActivityCard,
-  presenterReservationDateTimeInfo,
-} from "@/app/activities/data/presenter";
-import { useSameStateActivities } from "@/app/activities/[id]/hooks/useSameStateActivities";
 import { HeaderConfig } from "@/contexts/HeaderContext";
-import { OpportunityCardHorizontal } from "@/app/activities/components/Card/CardHorizontal";
+import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
+import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import ErrorState from "@/components/shared/ErrorState";
 
 export default function CompletePage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -30,65 +26,41 @@ export default function CompletePage() {
   const opportunityId = searchParams.get("id");
   const reservationId = searchParams.get("reservation_id");
 
-  const {
-    reservation,
-    gqlOpportunity,
-    gqlOpportunitySlot,
-    loading: reservationLoading,
-    error: reservationError,
-  } = useReservationComplete(reservationId);
+  const { reservation, opportunity, dateTimeInfo, sameStateActivities, loading, error, refetch } =
+    useCompletePageViewModel(opportunityId, reservationId);
 
-  const opportunity = useMemo(() => {
-    return gqlOpportunity ? presenterActivityCard(gqlOpportunity) : null;
-  }, [gqlOpportunity]);
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
-  const dateTimeInfo = useMemo(() => {
-    if (!reservation || !gqlOpportunity || !gqlOpportunitySlot) return null;
-    return presenterReservationDateTimeInfo(gqlOpportunitySlot, gqlOpportunity, reservation);
-  }, [reservation, gqlOpportunity, gqlOpportunitySlot]);
-
-  const stateCode = gqlOpportunity?.place?.city?.state?.code ?? "";
-  const {
-    sameStateActivities,
-    loading: sameStateLoading,
-    error: sameStateError,
-  } = useSameStateActivities(opportunityId ?? "", stateCode);
-
-  const isLoading = reservationLoading || sameStateLoading;
-  const error = reservationError ?? sameStateError ?? null;
+  if (loading) return <LoadingIndicator fullScreen />;
+  if (error || !reservation || !opportunity || !dateTimeInfo)
+    return <ErrorState title="申込完了ページを読み込めませんでした" refetchRef={refetchRef} />;
 
   return (
-    <ReservationContentGate
-      loading={isLoading}
-      error={error}
-      nullChecks={[
-        { label: "予約情報", value: opportunity },
-        { label: "日付情報", value: dateTimeInfo },
-      ]}
-    >
-      <main className="flex flex-col items-center px-4 pb-8">
-        <CompletionHeader />
-        {opportunity && <OpportunityCardHorizontal opportunity={opportunity} />}
-        {dateTimeInfo && opportunity && (
-          <ReservationDetails
-            formattedDate={dateTimeInfo.formattedDate}
-            startTime={dateTimeInfo.startTime}
-            endTime={dateTimeInfo.endTime}
-            participantCount={dateTimeInfo.participantCount}
-            totalPrice={dateTimeInfo.totalPrice}
-            pricePerPerson={opportunity.feeRequired ?? 0}
+    <main className="flex flex-col items-center px-4 pb-8">
+      <CompletionHeader />
+      {opportunity && <OpportunityCardHorizontal opportunity={opportunity} />}
+      {dateTimeInfo && opportunity && (
+        <ReservationDetails
+          formattedDate={dateTimeInfo.formattedDate}
+          startTime={dateTimeInfo.startTime}
+          endTime={dateTimeInfo.endTime}
+          participantCount={dateTimeInfo.participantCount}
+          totalPrice={dateTimeInfo.totalPrice}
+          pricePerPerson={opportunity.feeRequired ?? 0}
+        />
+      )}
+      {opportunityId && (
+        <div className="w-full mt-8 mb-16">
+          <SameStateActivities
+            header="おすすめの体験"
+            opportunities={sameStateActivities}
+            currentOpportunityId={opportunityId}
           />
-        )}
-        {opportunityId && (
-          <div className="w-full mt-8 mb-16">
-            <SameStateActivities
-              header="おすすめの体験"
-              opportunities={sameStateActivities}
-              currentOpportunityId={opportunityId}
-            />
-          </div>
-        )}
-      </main>
-    </ReservationContentGate>
+        </div>
+      )}
+    </main>
   );
 }
