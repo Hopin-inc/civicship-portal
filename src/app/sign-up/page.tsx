@@ -24,7 +24,7 @@ export default function SignUpPage() {
 
     if (user) {
       console.log("Sign-up page: User already exists, redirecting to dashboard");
-      router.push("/dashboard");
+      router.push("/");
     }
   }, [uid, user, isPhoneVerified, isLineAuthenticated, router]);
 
