@@ -1022,6 +1022,7 @@ export type GqlOpportunitySlot = {
   capacity?: Maybe<Scalars["Int"]["output"]>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   endsAt: Scalars["Datetime"]["output"];
+  evaluationProgress?: Maybe<GqlSlotEvaluationProgress>;
   hostingStatus: GqlOpportunitySlotHostingStatus;
   id: Scalars["ID"]["output"];
   opportunity?: Maybe<GqlOpportunity>;
@@ -1826,6 +1827,12 @@ export const GqlRole = {
 } as const;
 
 export type GqlRole = (typeof GqlRole)[keyof typeof GqlRole];
+export type GqlSlotEvaluationProgress = {
+  __typename?: "SlotEvaluationProgress";
+  totalEvaluated?: Maybe<Scalars["Int"]["output"]>;
+  validParticipations?: Maybe<Scalars["Int"]["output"]>;
+};
+
 export type GqlSlotNotScheduledError = {
   __typename?: "SlotNotScheduledError";
   message: Scalars["String"]["output"];

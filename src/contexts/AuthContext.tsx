@@ -150,6 +150,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [liffAuthFailed, setLiffAuthFailed] = useState(false);
 
   useEffect(() => {
+    // 失敗済みトークンなら何もしない
+    if (
+      liffAccessToken &&
+      typeof window !== "undefined" &&
+      localStorage.getItem(`failedLiffToken:${liffAccessToken}`)
+    ) {
+      console.warn("This LIFF accessToken has already failed. Skipping effect.");
+      return;
+    }
     const attemptAuthWithLiffToken = async () => {
       if (liffAccessToken && isLiffLoggedIn && !uid && !liffAuthFailed && !authState.error) {
         console.log("Attempting to authenticate with LIFF token");

@@ -85,25 +85,28 @@ const signInWithFirebase = async (
 
   try {
     // pictureUrlがundefinedの場合にデフォルト画像URLを設定
-    const profilePictureUrl = profile.pictureUrl || "https://example.com/default-profile-pic.png"; // デフォルトURL
+    const profilePictureUrl =
+      profile.pictureUrl ||
+      "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/placeholder.jpg";
 
     await updateProfile(user, {
       displayName: profile.displayName,
       photoURL: profilePictureUrl,
     });
-    
+
     console.log("LIFF authentication with profile update successful");
   } catch (error) {
     if (error instanceof Error && error.message.includes("quota-exceeded")) {
       console.warn("Profile update failed due to quota exceeded, but authentication successful");
-      
+
       if (typeof window !== "undefined") {
         window.dispatchEvent(
           new CustomEvent("auth:warning", {
             detail: {
               source: "firebase",
               warningType: "quota-exceeded",
-              warningMessage: "プロファイル更新の制限に達しました。プロファイル情報は更新されていません。",
+              warningMessage:
+                "プロファイル更新の制限に達しました。プロファイル情報は更新されていません。",
               originalError: error,
             },
           }),
@@ -113,12 +116,20 @@ const signInWithFirebase = async (
       throw error;
     }
   }
-  
+
   console.log("LIFF authentication successful");
 };
 
 // LIFFトークンでサインインするメイン関数
 const signInWithLiffToken = async (accessToken: string): Promise<boolean> => {
+  // 失敗済みトークンのチェック
+  if (typeof window !== "undefined") {
+    if (localStorage.getItem(`failedLiffToken:${accessToken}`)) {
+      console.warn("This LIFF accessToken has already failed. Skipping authentication.");
+      return false;
+    }
+  }
+
   const operation = createRetryOperation();
 
   return new Promise((resolve) => {
@@ -139,10 +150,27 @@ const signInWithLiffToken = async (accessToken: string): Promise<boolean> => {
           pictureUrl: profile.pictureUrl, // ここでpictureUrlをそのまま渡す
         });
 
+        // 認証成功時に失敗トークンをlocalStorageから削除
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.removeItem(`failedLiffToken:${accessToken}`);
+          } catch (e) {
+            console.warn("Failed to remove failed LIFF token from localStorage", e);
+          }
+        }
+
         resolve(true);
       } catch (error) {
         // エラーハンドリングとリトライ処理
         if (!handleLiffLoginError(error, currentAttempt, operation)) {
+          // 失敗トークンをlocalStorageに記録
+          if (typeof window !== "undefined") {
+            try {
+              localStorage.setItem(`failedLiffToken:${accessToken}`, "1");
+            } catch (e) {
+              console.warn("Failed to write failed LIFF token to localStorage", e);
+            }
+          }
           resolve(false);
         }
       }

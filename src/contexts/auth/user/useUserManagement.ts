@@ -11,7 +11,7 @@ import { getVerifiedPhoneNumber } from "@/contexts/auth/phone/utils";
 /**
  * User management hook for handling user creation and logout
  */
-export const useUserManagement = (
+const useUserManagement = (
   userSignUpMutation: any,
   setUser: (user: any) => void,
   setUid: (uid: string | null) => void,

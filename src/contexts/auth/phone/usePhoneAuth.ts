@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCookies } from "next-client-cookies";
 import { toast } from "sonner";
@@ -6,15 +6,14 @@ import { phoneVerificationState } from "@/lib/firebase/firebase";
 import startPhoneNumberVerification from "@/contexts/auth/phone/startPhoneNumberVerticication";
 import verifyPhoneCode from "@/contexts/auth/phone/verifyPhoneCode";
 import { setCookies } from "@/contexts/auth/cookie";
-import { isPhoneVerified as checkPhoneVerified } from "@/contexts/auth/phone/utils";
 
 /**
  * Phone authentication hook for handling phone number verification
  */
-export const usePhoneAuth = () => {
+const usePhoneAuth = () => {
   const router = useRouter();
   const cookies = useCookies();
-  
+
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
   const [verificationId, setVerificationId] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -24,7 +23,7 @@ export const usePhoneAuth = () => {
     if (isPhoneVerified !== phoneVerificationState.verified) {
       console.log("Initializing phone verification state from global state:", {
         local: isPhoneVerified,
-        global: phoneVerificationState.verified
+        global: phoneVerificationState.verified,
       });
       setIsPhoneVerified(phoneVerificationState.verified);
     }
@@ -33,14 +32,17 @@ export const usePhoneAuth = () => {
   /**
    * Start phone verification process with the given phone number
    */
-  const startPhoneVerification = async (phoneNumber: string, uid: string | null = null): Promise<boolean> => {
+  const startPhoneVerification = async (
+    phoneNumber: string,
+    uid: string | null = null,
+  ): Promise<boolean> => {
     if (!uid) {
       toast.error("LINEログインが必要です");
       toast.info("電話番号認証の前にLINEログインを完了してください");
       router.push("/login"); // Redirect to login page
       return false;
     }
-    
+
     setIsVerifying(true);
     try {
       const verId = await startPhoneNumberVerification(phoneNumber, null, null);
@@ -49,16 +51,19 @@ export const usePhoneAuth = () => {
       return true;
     } catch (error) {
       console.error("Failed to start phone verification:", error);
-      
+
       if (error instanceof Error) {
         if (error.message.includes("network")) {
-          toast.error("ネットワーク接続に問題が発生しました。インターネット接続を確認してください。", {
-            action: {
-              label: "再試行",
-              onClick: () => window.location.reload()
+          toast.error(
+            "ネットワーク接続に問題が発生しました。インターネット接続を確認してください。",
+            {
+              action: {
+                label: "再試行",
+                onClick: () => window.location.reload(),
+              },
+              duration: 10000,
             },
-            duration: 10000
-          });
+          );
         } else if (error.message.includes("too-many-requests")) {
           toast.error("リクエストが多すぎます。しばらく待ってから再度お試しください。");
         } else if (error.message.includes("captcha")) {
@@ -69,7 +74,7 @@ export const usePhoneAuth = () => {
       } else {
         toast.error("電話番号認証の開始に失敗しました");
       }
-      
+
       return false;
     } finally {
       setIsVerifying(false);
@@ -90,7 +95,7 @@ export const usePhoneAuth = () => {
       const success = await verifyPhoneCode(verificationId, code, null);
 
       if (success) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         if (phoneVerificationState.phoneUid) {
           setCookies(
@@ -98,7 +103,7 @@ export const usePhoneAuth = () => {
             phoneVerificationState.authToken,
             phoneVerificationState.refreshToken,
             phoneVerificationState.tokenExpiresAt,
-            "phone"
+            "phone",
           );
 
           console.log("Phone verification successful with tokens:", {
@@ -106,30 +111,30 @@ export const usePhoneAuth = () => {
             authToken: phoneVerificationState.authToken ? "present" : "missing",
             refreshToken: phoneVerificationState.refreshToken ? "present" : "missing",
             tokenExpiresAt: phoneVerificationState.tokenExpiresAt,
-            verified: phoneVerificationState.verified
+            verified: phoneVerificationState.verified,
           });
 
           if (!phoneVerificationState.verified) {
             phoneVerificationState.verified = true;
             console.log("Updated global verification state to true");
           }
-          
+
           setIsPhoneVerified(true);
-          
+
           toast.success("電話番号認証が完了しました");
-          
+
           setTimeout(() => {
             router.push("/sign-up");
           }, 100);
-          
+
           return true;
         } else {
           toast.error("電話番号認証IDが取得できませんでした", {
             action: {
               label: "再試行",
-              onClick: () => window.location.reload()
+              onClick: () => window.location.reload(),
             },
-            duration: 10000
+            duration: 10000,
           });
           return false;
         }
@@ -137,31 +142,34 @@ export const usePhoneAuth = () => {
         toast.error("認証コードの検証に失敗しました", {
           action: {
             label: "再入力",
-            onClick: () => document.getElementById("verification-code")?.focus()
+            onClick: () => document.getElementById("verification-code")?.focus(),
           },
-          duration: 10000
+          duration: 10000,
         });
         return false;
       }
     } catch (error) {
       console.error("Failed to verify phone code:", error);
-      
+
       if (error instanceof Error) {
         if (error.message.includes("network")) {
-          toast.error("ネットワーク接続に問題が発生しました。インターネット接続を確認してください。", {
-            action: {
-              label: "再試行",
-              onClick: () => window.location.reload()
+          toast.error(
+            "ネットワーク接続に問題が発生しました。インターネット接続を確認してください。",
+            {
+              action: {
+                label: "再試行",
+                onClick: () => window.location.reload(),
+              },
+              duration: 10000,
             },
-            duration: 10000
-          });
+          );
         } else if (error.message.includes("code-expired")) {
           toast.error("認証コードの有効期限が切れました。新しいコードを取得してください。", {
             action: {
               label: "再送信",
-              onClick: () => router.push("/sign-up/phone-verification")
+              onClick: () => router.push("/sign-up/phone-verification"),
             },
-            duration: 10000
+            duration: 10000,
           });
         } else if (error.message.includes("invalid-verification-code")) {
           toast.error("無効な認証コードです。正しいコードを入力してください。");
@@ -171,7 +179,7 @@ export const usePhoneAuth = () => {
       } else {
         toast.error("認証コードの検証に失敗しました");
       }
-      
+
       return false;
     } finally {
       setIsVerifying(false);
