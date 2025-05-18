@@ -8,7 +8,7 @@ type WalletHistoryButtonProps = {
   walletId: string;
 };
 
-export const WalletHistoryButton: React.FC<WalletHistoryButtonProps> = ({ walletId }) => {
+const WalletHistoryButton: React.FC<WalletHistoryButtonProps> = ({ walletId }) => {
   const router = useRouter();
 
   const handleHistoryClick = () => {

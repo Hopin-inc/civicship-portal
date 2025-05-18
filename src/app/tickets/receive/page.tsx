@@ -5,15 +5,17 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import LoginModal from "@/app/login/components/LoginModal";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { useTicketClaim } from "@/app/tickets/hooks/useTicketClaim";
-import TicketReceiveContent from "@/app/tickets/components/TicketReceiveContent";
+import { useTicketClaim } from "@/app/tickets/receive/hooks/useTicketClaim";
+import TicketReceiveContent from "@/app/tickets/receive/components/TicketReceiveContent";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import ErrorState from "@/components/shared/ErrorState";
+import { toast } from "sonner";
 
 export default function TicketReceivePage() {
   const searchParams = useSearchParams();
   const ticketClaimLinkId = searchParams.get("token");
   if (!ticketClaimLinkId) {
+    toast.error("URLが無効か、既に使用されています。");
     throw new Error("URLが無効か、既に使用されています。");
   }
 
@@ -33,16 +35,20 @@ export default function TicketReceivePage() {
   const { claimLinkData, hasIssued, isClaimLoading, claimTicket, viewLoading, viewError } =
     useTicketClaim(ticketClaimLinkId);
 
+  if (!ticketClaimLinkId) {
+    return <ErrorState title="このチケット受け取りリンクは無効か、すでに使用済みです" />;
+  }
+
   if (viewLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <LoadingIndicator fullScreen={true} />
-      </div>
-    );
+    return <LoadingIndicator />;
+  }
+
+  if (!claimLinkData) {
+    return <ErrorState title="このリンクは無効か、チケット情報が確認できませんでした" />;
   }
 
   if (viewError) {
-    return <ErrorState message={`エラーが発生しました: ${viewError.message}`} />;
+    return <ErrorState title="チケットを読み込めませんでした" />;
   }
 
   return (

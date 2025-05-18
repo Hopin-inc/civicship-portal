@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useHeader } from "@/components/providers/HeaderProvider";
-import { useLoading } from "@/hooks/useLoading";
 import {
   GqlCurrentPrefecture,
   GqlOpportunitiesConnection,
@@ -16,6 +14,79 @@ import { toast } from "sonner";
 import { ActivityCard } from "@/app/activities/data/type";
 import { presenterActivityCards } from "@/app/activities/data/presenter";
 import { IPrefectureCodeMap } from "@/app/search/data/type";
+
+export const useSearchResults = (
+  searchParams: SearchParams = {},
+): {
+  opportunities: GqlOpportunitiesConnection;
+  recommendedOpportunities: ActivityCard[];
+  groupedOpportunities: { [key: string]: ActivityCard[] };
+  loading: boolean;
+  error: Error | null;
+  hasResults: boolean;
+  refetch: () => void;
+} => {
+  const filter = useMemo(() => buildFilter(searchParams), [searchParams]);
+
+  const {
+    data,
+    loading: queryLoading,
+    error,
+    refetch,
+  } = useGetOpportunitiesQuery({
+    variables: { filter, first: 20 },
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "network-only",
+  });
+
+  const opportunities = useMemo(
+    () =>
+      data?.opportunities || {
+        edges: [],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
+        },
+        totalCount: 0,
+      },
+    [data],
+  );
+
+  const recommendedOpportunities = useMemo(
+    () => presenterActivityCards(opportunities.edges),
+    [opportunities],
+  );
+
+  const groupedOpportunities = useMemo(
+    () =>
+      groupOpportunitiesByDate(opportunities, {
+        gte: filter.slotDateRange?.gte,
+        lte: filter.slotDateRange?.lte,
+      }),
+    [opportunities, filter.slotDateRange],
+  );
+
+  const hasResults = recommendedOpportunities.length > 0;
+
+  useEffect(() => {
+    if (error) {
+      console.error("Error fetching search results:", error);
+      toast.error("検索結果の取得に失敗しました");
+    }
+  }, [error]);
+
+  return {
+    opportunities,
+    recommendedOpportunities,
+    groupedOpportunities,
+    loading: queryLoading,
+    error: error ?? null,
+    hasResults,
+    refetch,
+  };
+};
 
 function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
   const filter: OpportunityFilterInput = {
@@ -72,97 +143,5 @@ function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
 
   return filter;
 }
-
-export const useSearchResults = (
-  searchParams: SearchParams = {},
-): {
-  opportunities: GqlOpportunitiesConnection;
-  recommendedOpportunities: ActivityCard[];
-  groupedOpportunities: { [key: string]: ActivityCard[] };
-  loading: boolean;
-  error: Error | null;
-  hasResults: boolean;
-} => {
-  const { updateConfig } = useHeader();
-  const { setIsLoading } = useLoading();
-
-  const filter = useMemo(() => buildFilter(searchParams), [searchParams]);
-  console.log(filter);
-
-  const {
-    data,
-    loading: queryLoading,
-    error,
-  } = useGetOpportunitiesQuery({
-    variables: { filter, first: 20 },
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "network-only",
-  });
-
-  useEffect(() => {
-    setIsLoading(queryLoading && !data);
-  }, [queryLoading, data, setIsLoading]);
-
-  useEffect(() => {
-    updateConfig({
-      showSearchForm: true,
-      searchParams: {
-        location: searchParams.location,
-        from: searchParams.from,
-        to: searchParams.to,
-        guests: searchParams.guests ? parseInt(searchParams.guests) : undefined,
-      },
-      showLogo: false,
-      showBackButton: true,
-    });
-  }, [searchParams, updateConfig]);
-
-  const opportunities = useMemo(
-    () =>
-      data?.opportunities || {
-        edges: [],
-        pageInfo: {
-          hasNextPage: false,
-          hasPreviousPage: false,
-          startCursor: null,
-          endCursor: null,
-        },
-        totalCount: 0,
-      },
-    [data],
-  );
-
-  const recommendedOpportunities = useMemo(
-    () => presenterActivityCards(opportunities.edges),
-    [opportunities],
-  );
-
-  const groupedOpportunities = useMemo(
-    () =>
-      groupOpportunitiesByDate(opportunities, {
-        gte: filter.slotDateRange?.gte,
-        lte: filter.slotDateRange?.lte,
-      }),
-    [opportunities, filter.slotDateRange],
-  );
-
-  const hasResults = recommendedOpportunities.length > 0;
-
-  useEffect(() => {
-    if (error) {
-      console.error("Error fetching search results:", error);
-      toast.error("検索結果の取得に失敗しました");
-    }
-  }, [error]);
-
-  return {
-    opportunities,
-    recommendedOpportunities,
-    groupedOpportunities,
-    loading: queryLoading,
-    error: error ?? null,
-    hasResults,
-  };
-};
 
 export default useSearchResults;

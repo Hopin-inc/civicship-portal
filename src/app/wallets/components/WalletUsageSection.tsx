@@ -8,7 +8,7 @@ interface WalletUsageSectionProps {
   message: string;
 }
 
-export const WalletUsageSection: React.FC<WalletUsageSectionProps> = ({
+const WalletUsageSection: React.FC<WalletUsageSectionProps> = ({
   title,
   message
 }) => {

@@ -1,14 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../../contexts/AuthContext";
 import { toast } from "sonner";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot
-} from "../../../components/ui/input-otp";
+import { useAuth } from "@/contexts/AuthContext";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 export function PhoneVerificationForm() {
   const { phoneAuth, uid, user } = useAuth();
@@ -25,7 +21,8 @@ export function PhoneVerificationForm() {
     }
 
     return () => {
-      import('../../../lib/firebase').then(({ clearRecaptcha }) => {
+      import("@/contexts/auth/reCAPTCHA/clearRecaptcha").then((module) => {
+        const clearRecaptcha = module.default;
         clearRecaptcha();
       });
     };
@@ -84,7 +81,9 @@ export function PhoneVerificationForm() {
       {step === "phone" ? (
         <form onSubmit={handlePhoneSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="phone" className="text-sm font-medium">電話番号</label>
+            <label htmlFor="phone" className="text-sm font-medium">
+              電話番号
+            </label>
             <input
               id="phone"
               type="tel"
@@ -107,13 +106,11 @@ export function PhoneVerificationForm() {
       ) : (
         <form onSubmit={handleCodeSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="code" className="text-sm font-medium">認証コード</label>
+            <label htmlFor="code" className="text-sm font-medium">
+              認証コード
+            </label>
             <div className="flex justify-center py-4">
-              <InputOTP
-                maxLength={6}
-                value={verificationCode}
-                onChange={handleOTPChange}
-              >
+              <InputOTP maxLength={6} value={verificationCode} onChange={handleOTPChange}>
                 <InputOTPGroup>
                   {Array.from({ length: 6 }).map((_, index) => (
                     <InputOTPSlot key={index} index={index} />

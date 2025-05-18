@@ -12,11 +12,7 @@ interface PlaceListSheetProps {
   onMapClick: () => void;
 }
 
-export const PlaceListPage: React.FC<PlaceListSheetProps> = ({
-  places,
-  selectedPlaceId,
-  onMapClick,
-}) => {
+const PlaceListPage: React.FC<PlaceListSheetProps> = ({ places, selectedPlaceId, onMapClick }) => {
   const router = useRouter();
 
   const handlePlaceClick = (placeId: string, userId: string) => {
@@ -41,3 +37,5 @@ export const PlaceListPage: React.FC<PlaceListSheetProps> = ({
     </div>
   );
 };
+
+export default PlaceListPage;

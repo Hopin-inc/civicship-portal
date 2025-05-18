@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
 
 interface HeaderProps {
-  className?: string
+  className?: string;
 }
 
 const BottomBar: React.FC<HeaderProps> = ({ className }) => {
@@ -27,12 +27,12 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   }
 
   const getLinkStyle = (...paths: string[]) => {
-    const isActive = matchPaths(pathname, ...paths)
+    const isActive = matchPaths(pathname, ...paths);
     return `flex flex-col items-center ${isActive ? "text-primary" : "text-muted-foreground"} hover:text-primary`;
   };
 
   return (
-    <nav className={cn(className, "w-full bg-background border-t border-input py-2 z-50")}>
+    <nav className={cn(className, "w-full bg-background border-t border-input py-4 z-50")}>
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
           <Link

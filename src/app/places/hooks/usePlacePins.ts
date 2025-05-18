@@ -5,7 +5,7 @@ import { presenterBasePins } from "@/app/places/data/presenter/membership";
 import { useMemo } from "react";
 
 export default function usePlacePins() {
-  const { data, loading, error, fetchMore } = useGetMembershipListQuery({
+  const { data, loading, error, fetchMore, refetch } = useGetMembershipListQuery({
     variables: {
       filter: {},
       IsCard: false,
@@ -64,5 +64,6 @@ export default function usePlacePins() {
     loading,
     error: error ?? null,
     // loadMoreRef,
+    refetch,
   };
 }

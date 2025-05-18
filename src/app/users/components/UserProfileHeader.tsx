@@ -1,13 +1,14 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { prefectureLabels } from '@/app/users/data/presenter';
-import { GqlCurrentPrefecture } from '@/types/graphql';
-import { Facebook, Home, Instagram, Twitter } from 'lucide-react';
-import { useReadMore } from '@/hooks/useReadMore';
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { prefectureLabels } from "@/app/users/data/presenter";
+import { GqlCurrentPrefecture } from "@/types/graphql";
+import { Facebook, Home, Instagram, Twitter } from "lucide-react";
+import { useReadMore } from "@/hooks/useReadMore";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface UserProfileHeaderProps {
   id: string;
@@ -20,34 +21,39 @@ interface UserProfileHeaderProps {
     x: string | null;
     instagram: string | null;
     facebook: string | null;
-  }
+  };
 }
 
-export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
+const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   id,
   name,
   image,
   bio,
   currentPrefecture,
   isOwner,
-  socialUrl
+  socialUrl,
 }) => {
-
   const socialButtonClasses =
     "rounded-full border border-input w-10 h-10 flex items-center justify-center";
 
   return (
-    <div className="relative bg-white rounded-3xl shadow-sm max-w-mobile-l mx-auto w-full">
+    <div className="relative max-w-mobile-l mx-auto w-full">
       <div className="flex flex-col items-center">
         {/* Profile Image */}
         <div className="flex items-center w-full mb-4">
           <div className="relative w-24 h-24 rounded-full overflow-hidden">
             <Image
-              src={image || "/placeholder.png"}
+              src={image || PLACEHOLDER_IMAGE}
               alt={name}
               fill
+              placeholder={"blur"}
+              blurDataURL={PLACEHOLDER_IMAGE}
               className="object-cover"
               priority
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                img.src = PLACEHOLDER_IMAGE;
+              }}
             />
           </div>
           {isOwner && (
@@ -74,11 +80,7 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           <div className="flex items-center justify-center gap-2 ml-auto mb-4">
             {socialUrl?.facebook && (
               <a href={socialUrl.facebook} target="_blank" rel="noopener noreferrer">
-                <Button
-                  variant="icon-only"
-                  size="icon"
-                  className={socialButtonClasses}
-                >
+                <Button variant="icon-only" size="icon" className={socialButtonClasses}>
                   <Facebook className="w-4 h-4 text-foreground" />
                 </Button>
               </a>
@@ -86,11 +88,7 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
 
             {socialUrl?.instagram && (
               <a href={socialUrl.instagram} target="_blank" rel="noopener noreferrer">
-                <Button
-                  variant="icon-only"
-                  size="icon"
-                  className={socialButtonClasses}
-                >
+                <Button variant="icon-only" size="icon" className={socialButtonClasses}>
                   <Instagram className="w-4 h-4 text-foreground" />
                 </Button>
               </a>
@@ -98,29 +96,25 @@ export const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
 
             {socialUrl?.x && (
               <a href={socialUrl.x} target="_blank" rel="noopener noreferrer">
-                <Button
-                  variant="icon-only"
-                  size="icon"
-                  className={socialButtonClasses}
-                >
+                <Button variant="icon-only" size="icon" className={socialButtonClasses}>
                   <Twitter className="w-4 h-4 text-foreground" />
                 </Button>
               </a>
             )}
-
           </div>
         </div>
 
-        {bio && (
-          <BioSection bio={bio} />
-        )}
+        {bio && <BioSection bio={bio} />}
       </div>
     </div>
   );
 };
 
 const BioSection = ({ bio }: { bio: string }) => {
-  const { textRef, expanded, showReadMore, toggleExpanded, getTextStyle } = useReadMore({ text: bio, maxLines: 6 });
+  const { textRef, expanded, showReadMore, toggleExpanded, getTextStyle } = useReadMore({
+    text: bio,
+    maxLines: 6,
+  });
 
   return (
     <div className="mb-4 relative">
@@ -135,12 +129,7 @@ const BioSection = ({ bio }: { bio: string }) => {
         <div className="absolute bottom-0 left-0 w-full">
           <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
           <div className="relative flex justify-center pt-8">
-            <Button
-              variant="tertiary"
-              size="sm"
-              onClick={toggleExpanded}
-              className="bg-white px-6"
-            >
+            <Button variant="tertiary" size="sm" onClick={toggleExpanded} className="bg-white px-6">
               <span className="text-label-sm font-bold">もっと見る</span>
             </Button>
           </div>

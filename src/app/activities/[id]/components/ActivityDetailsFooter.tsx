@@ -22,13 +22,13 @@ const ActivityDetailsFooter: React.FC<ActivityDetailsFooterProps> = ({
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 bg-background border-t z-50">
-      <div className="max-w-mobile-l mx-auto px-4 h-16 flex items-center justify-between w-full">
+      <div className="max-w-mobile-l mx-auto px-4 h-20 flex items-center justify-between w-full">
         <div>
           <p className="text-body-sm text-muted-foreground">1人あたり</p>
           <p className="text-bodylg font-bold">{price.toLocaleString()}円〜</p>
         </div>
         <Link href={`/reservation/select-date?${query.toString()}`}>
-          <Button variant="primary" size="md" className="px-6">
+          <Button variant="primary" size="lg" className="px-8">
             日付を選択
           </Button>
         </Link>

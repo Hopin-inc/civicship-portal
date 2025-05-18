@@ -10,7 +10,7 @@ interface DateGroupedOpportunitiesProps {
   groupedOpportunities: Record<string, ActivityCard[]>;
 }
 
-export const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({
+const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({
   groupedOpportunities,
 }) => {
   if (Object.keys(groupedOpportunities).length === 0) return null;

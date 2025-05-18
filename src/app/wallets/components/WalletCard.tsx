@@ -8,7 +8,7 @@ interface WalletCardProps {
   isLoading: boolean;
 }
 
-export const WalletCard: React.FC<WalletCardProps> = ({
+const WalletCard: React.FC<WalletCardProps> = ({
   currentPoint,
   isLoading
 }) => {

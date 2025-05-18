@@ -9,7 +9,7 @@ interface UserTicketsAndPointsProps {
   pointCount: number;
 }
 
-export const UserTicketsAndPoints: React.FC<UserTicketsAndPointsProps> = ({
+const UserTicketsAndPoints: React.FC<UserTicketsAndPointsProps> = ({
   ticketCount,
   pointCount
 }) => {

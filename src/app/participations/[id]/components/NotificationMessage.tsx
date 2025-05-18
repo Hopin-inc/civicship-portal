@@ -11,7 +11,7 @@ interface NotificationMessageProps {
   message?: string;
 }
 
-export const NotificationMessage: React.FC<NotificationMessageProps> = ({
+const NotificationMessage: React.FC<NotificationMessageProps> = ({
   type,
   title,
   message,

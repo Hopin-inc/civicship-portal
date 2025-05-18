@@ -1,21 +1,18 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { useParticipationPage } from "@/app/participations/[id]/hooks/useParticipationPage";
+import ErrorState from "@/components/shared/ErrorState";
+import useParticipationPage from "@/app/participations/[id]/hooks/useParticipationPage";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { ParticipationStatusNotification } from "@/app/participations/[id]/components/ParticipationStatusNotification";
-import { ParticipationDetails } from "@/app/participations/[id]/components/ParticipationDetails";
+import ParticipationStatusNotification from "@/app/participations/[id]/components/ParticipationStatusNotification";
+import ParticipationDetails from "@/app/participations/[id]/components/ParticipationDetails";
 import ParticipationActions from "@/app/participations/[id]/components/ParticipationActions";
 import { useCancelReservation } from "@/app/participations/[id]/hooks/useCancelReservation";
 import { toast } from "sonner";
 import { GqlReservationStatus } from "@/types/graphql";
-import { OpportunityCardHorizontal } from "@/app/activities/components/Card/CardHorizontal";
-
-interface ParticipationProps {
-  params: { id: string };
-}
+import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
+import { useParams } from "next/navigation";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
@@ -32,7 +29,7 @@ const mapReservationStatusToUIStatus = (status: GqlReservationStatus): Participa
   }
 };
 
-export default function ParticipationPage({ params }: ParticipationProps) {
+export default function ParticipationPage() {
   const headerConfig = useMemo(
     () => ({
       title: "予約詳細",
@@ -43,15 +40,22 @@ export default function ParticipationPage({ params }: ParticipationProps) {
   );
   useHeaderConfig(headerConfig);
 
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const {
     participation,
     opportunity,
     currentStatus,
     cancellationDeadline,
     loading,
-    error,
+    hasError,
     refetch,
-  } = useParticipationPage(params.id);
+  } = useParticipationPage(id ?? "");
+
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   const isCancellable = cancellationDeadline ? new Date() < cancellationDeadline : false;
   const reservationId = participation?.reservation?.id;
@@ -59,21 +63,27 @@ export default function ParticipationPage({ params }: ParticipationProps) {
 
   const onCancel = async () => {
     if (!reservationId) {
-      toast.error("予約IDが見つかりません");
+      toast.error("予約情報が見つかりません");
       return;
     }
     const result = await handleCancel(reservationId);
     if (result.success) {
-      toast.success("キャンセルしました");
-      refetch();
-    } else {
-      toast.error(`キャンセル失敗: ${result.error}`);
+      toast.success("予約がキャンセルされました。");
+      if (refetchRef.current) {
+        refetchRef.current();
+      }
+    }else if (result.typename === "ReservationCancellationTimeoutError") {
+      toast.error("予約のキャンセルは24時間前まで可能です。");
+    }
+    else {
+      toast.error(`予約のキャンセルに失敗しました。`);
+      console.error("Cancel reservation failed:", result.error);
     }
   };
 
-  if (loading) return <LoadingIndicator message="参加情報を読み込み中..." />;
-  if (error || !opportunity || !participation) {
-    return <ErrorState message="参加情報の読み込みに失敗しました。" />;
+  if (loading) return <LoadingIndicator />;
+  if (hasError || !reservationId || !opportunity || !participation) {
+    return <ErrorState title="Could not load reservation page" refetchRef={refetchRef} />;
   }
 
   return (

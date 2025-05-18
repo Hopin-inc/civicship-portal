@@ -1,75 +1,43 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { AsymmetricImageGrid } from '@/components/ui/asymmetric-image-grid';
+"use client";
 
-const emptyImages = [
-  {
-    url: '/images/tickets/empty-1.jpg',
-    alt: '体験の様子1'
-  },
-  {
-    url: '/images/tickets/empty-2.jpg',
-    alt: '体験の様子2'
-  },
-  {
-    url: '/images/tickets/empty-3.jpg',
-    alt: '体験の様子3'
-  }
-];
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Home, Inbox } from "lucide-react";
+import React from "react";
 
 interface EmptyStateProps {
   title?: string;
-  description?: string | React.ReactNode;
-  actionLabel?: string;
-  onAction?: () => void;
-  hideActionButton?: boolean;
-  icon?: React.ReactNode;
-  images?: Array<{ url: string; alt: string }>;
+  message?: string;
 }
 
 export default function EmptyState({
-  title = "チケットはありません",
-  description = (
-    <>
-      四国の素敵な88人と関わって<br />
-      チケットをもらおう
-    </>
-  ),
-  actionLabel = "関わりをみつける",
-  onAction = () => window.location.href = "/",
-  hideActionButton = false,
-  icon,
-  images = emptyImages
+  title = "ページ",
+  message = `現在${title}は準備中です。しばらくしてからご確認ください。`,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center text-center mt-8">
-      {icon ? (
-        <div className="mb-6">{icon}</div>
-      ) : (
-        <div className="w-[224px] h-[220px] mb-8">
-          <AsymmetricImageGrid images={images} className="h-full" />
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <div className="text-center space-y-6">
+        <div className="bg-muted rounded-full p-4 mx-auto w-fit">
+          <Inbox className="h-10 w-10 text-muted-foreground" />
         </div>
-      )}
 
-      <h2 className="text-display-md mb-1">{title}</h2>
-      <div className="text-muted-foreground mb-4">
-        {typeof description === 'string' ? (
-          <p className="whitespace-pre-line text-body-md">{description}</p>
-        ) : (
-          description
-        )}
+        <h1 className="text-3xl font-bold">
+          お探しの{title}は
+          <br />
+          まだありません
+        </h1>
+
+        <p className="text-left text-body-sm text-muted-foreground px-[40px]">{message}</p>
+
+        <div className="w-full px-[40px]">
+          <Link href="/" passHref>
+            <Button className="w-full flex justify-center">
+              <Home className="mr-2 h-4 w-4" />
+              トップページに戻る
+            </Button>
+          </Link>
+        </div>
       </div>
-
-      {!hideActionButton && (
-        <Button
-          variant="primary"
-          size="lg"
-          className="px-16"
-          onClick={onAction}
-        >
-          {actionLabel}
-        </Button>
-      )}
     </div>
   );
 }

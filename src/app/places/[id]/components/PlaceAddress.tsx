@@ -1,7 +1,7 @@
 "use client";
 import { BaseDetail } from "@/app/places/data/type";
 
-export const PlaceAddress = ({ detail }: { detail: BaseDetail }) => {
+const PlaceAddress = ({ detail }: { detail: BaseDetail }) => {
   const mapUrl = detail.latitude && detail.longitude
     ? `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${detail.latitude},${detail.longitude}`
     : `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(detail.address)}`;
@@ -28,3 +28,5 @@ export const PlaceAddress = ({ detail }: { detail: BaseDetail }) => {
     </div>
   );
 };
+
+export default PlaceAddress;

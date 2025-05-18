@@ -13,7 +13,7 @@ interface UseReservationDateLoaderProps {
 }
 
 export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLoaderProps) => {
-  const { data, loading, error } = useGetOpportunitySlotsQuery({
+  const { data, loading, error, refetch } = useGetOpportunitySlotsQuery({
     variables: {
       filter: {
         opportunityId,
@@ -45,5 +45,6 @@ export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLo
     groupedSlots,
     loading,
     error: error ?? null,
+    refetch,
   };
 };

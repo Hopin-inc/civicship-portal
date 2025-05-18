@@ -5,7 +5,7 @@ import { useGetMembershipListQuery } from "@/types/graphql";
 import { presenterBaseCard } from "@/app/places/data/presenter/membership";
 
 export default function usePlaceCards() {
-  const { data, loading, error } = useGetMembershipListQuery({
+  const { data, loading, error, refetch } = useGetMembershipListQuery({
     variables: {
       filter: {},
       first: 50,
@@ -27,5 +27,6 @@ export default function usePlaceCards() {
     baseCards,
     loading,
     error: error ?? null,
+    refetch,
   };
 }

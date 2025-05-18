@@ -62,6 +62,7 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
               place={place}
               selected={place.id === selectedPlaceId}
               onClick={() => handlePlaceClick(place.id, place.host.id)}
+              buttonVariant={place.id === selectedPlaceId ? "primary" : "tertiary"}
             />
           </div>
         ))}

@@ -1,8 +1,11 @@
+"use client";
+
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Ticket as TicketIcon } from 'lucide-react';
 import { Ticket } from '@/app/tickets/data/type';
 import React from "react";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface TicketListProps {
   tickets: Ticket[];
@@ -26,10 +29,16 @@ export default function TicketList({ tickets }: TicketListProps) {
             <div className="flex items-center gap-3">
               <div className="relative w-12 h-12 rounded-full overflow-hidden">
                 <Image
-                  src={ticket.hostImage ?? "/images/tickets/empty-1.jpg"}
+                  src={ticket.hostImage ?? PLACEHOLDER_IMAGE}
                   alt={ticket.hostName}
                   fill
+                  placeholder={`blur`}
+                  blurDataURL={PLACEHOLDER_IMAGE}
                   className="object-cover"
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    img.src = PLACEHOLDER_IMAGE;
+                  }}
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -41,9 +50,7 @@ export default function TicketList({ tickets }: TicketListProps) {
               関わりを見つける
             </Button>
           </div>
-          <p className="mt-4 text-foreground">
-            {ticket.hostName}さんからの招待
-          </p>
+          <p className="mt-4 text-foreground">{ticket.hostName}さんからの招待</p>
         </div>
       ))}
     </div>
