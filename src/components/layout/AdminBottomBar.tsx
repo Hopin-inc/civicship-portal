@@ -34,8 +34,15 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
             <FileText size={24} />
             <span className="text-xs mt-1">応募</span>
           </Link>
-          <Link 
-            href="/admin/tickets" 
+          <Link
+            href="/admin/slots"
+            className={getLinkStyle("/admin/slots", "/admin/slots/*")}
+          >
+            <FileText size={24} />
+            <span className="text-xs mt-1">出欠管理</span>
+          </Link>
+          <Link
+            href="/admin/tickets"
             className={getLinkStyle("/admin/tickets", "/admin/tickets/*")}
           >
             <Ticket size={24} />

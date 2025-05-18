@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_OPPORTUNITY_SLOTS } from "@/graphql/experience/opportunitySlot/query";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -10,7 +10,6 @@ import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { format } from "date-fns";
-import React from "react";
 
 export default function SlotsPage() {
   const headerConfig = useMemo(() => ({
@@ -18,13 +17,14 @@ export default function SlotsPage() {
   }), []);
   useHeaderConfig(headerConfig);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = new Date();
 
   const { data, loading, error } = useQuery(GET_OPPORTUNITY_SLOTS, {
     variables: {
       filter: {
-        startsAtLte: today.toISOString(),
+        dateRange: {
+          lte: now.toISOString(),
+        },
       },
     },
   });
