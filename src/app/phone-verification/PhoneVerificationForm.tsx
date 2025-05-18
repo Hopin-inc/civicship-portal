@@ -52,16 +52,21 @@ export function PhoneVerificationForm() {
   const formatPhoneNumber = (phone: string): string => {
     const cleaned = phone.replace(/[-\s]/g, "");
 
-    if (cleaned.startsWith("0")) {
-      return "+81" + cleaned.substring(1);
+    const halfWidthPhone = cleaned.replace(/[０-９]/g, (char) =>
+      String.fromCharCode(char.charCodeAt(0) - 0xfee0)
+    );
+
+    if (halfWidthPhone.startsWith("0")) {
+      return "+81" + halfWidthPhone.substring(1);
     }
 
-    if (cleaned.startsWith("+")) {
-      return cleaned;
+    if (halfWidthPhone.startsWith("+")) {
+      return halfWidthPhone;
     }
 
-    return "+81" + cleaned;
+    return "+81" + halfWidthPhone;
   };
+
 
   return (
     <div className="w-full max-w-md mx-auto p-6 space-y-8">
