@@ -12,14 +12,10 @@ import { filterSlotGroupsBySelectedDate } from "@/app/reservation/data/presenter
 import TimeSlotList from "@/app/reservation/select-date/components/TimeSlotList";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
-import { notFound } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import EmptyState from "@/components/shared/EmptyState";
 
-export default function SelectDatePage({
-  searchParams,
-}: {
-  searchParams: { id: string; community_id: string };
-}) {
+export default function SelectDatePage() {
   const headerConfig: HeaderConfig = useMemo(
     () => ({
       title: "日付をえらぶ",
@@ -34,9 +30,12 @@ export default function SelectDatePage({
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const { id, community_id } = searchParams;
+  const searchParams = useSearchParams();
+  const opportunityId = searchParams.get("id");
+  const communityId = searchParams.get("community_id");
+
   const { opportunity, groupedSlots, loading, error, refetch } = useReservationDateLoader({
-    opportunityId: id,
+    opportunityId: opportunityId ?? "",
   });
 
   const refetchRef = useRef<(() => void) | null>(null);
@@ -47,14 +46,15 @@ export default function SelectDatePage({
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedGuests, setSelectedGuests] = useState<number>(1);
   const [activeForm, setActiveForm] = useState<"date" | "guests" | null>(null);
+
   const filteredDateSections = useMemo(
     () => filterSlotGroupsBySelectedDate(groupedSlots, selectedDate ? [selectedDate] : []),
     [groupedSlots, selectedDate],
   );
 
   const { handleReservation, isSlotAvailable } = useReservationDateHandler({
-    opportunityId: id,
-    communityId: community_id,
+    opportunityId: opportunityId ?? "",
+    communityId: communityId ?? "",
     selectedDate,
     selectedGuests,
     setSelectedDate,

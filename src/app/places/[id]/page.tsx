@@ -10,21 +10,18 @@ import PlaceOverview from "./components/PlaceOverview";
 import PlaceAddress from "./components/PlaceAddress";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
-import { notFound } from "next/navigation";
+import { notFound, useParams, useSearchParams } from "next/navigation";
 
-interface PlaceDetailProps {
-  params: {
-    id: string;
-  };
-  searchParams: {
-    userId?: string;
-  };
-}
+const PlaceDetail: FC = () => {
+  const params = useParams();
+  const searchParams = useSearchParams();
 
-const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const userId = searchParams.get("userId") ?? "";
+
   const { loading, detail, error, refetch } = usePlaceDetail({
-    placeId: params.id,
-    userId: searchParams.userId || "",
+    placeId: id ?? "",
+    userId,
   });
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {

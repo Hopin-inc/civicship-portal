@@ -7,22 +7,24 @@ import EmptySearchResults from "@/app/search/result/components/EmptySearchResult
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
 import ErrorState from "@/components/shared/ErrorState";
+import { useSearchParams } from "next/navigation";
 
-interface SearchResultPageProps {
-  searchParams?: {
-    location?: string;
-    from?: string;
-    to?: string;
-    guests?: string;
-    type?: "activity" | "quest";
-    ticket?: string;
-    q?: string;
+export default function SearchResultPage() {
+  const searchParams = useSearchParams();
+
+  const queryParams = {
+    location: searchParams.get("location") ?? undefined,
+    from: searchParams.get("from") ?? undefined,
+    to: searchParams.get("to") ?? undefined,
+    guests: searchParams.get("guests") ?? undefined,
+    type: searchParams.get("type") as "activity" | "quest" | undefined,
+    ticket: searchParams.get("ticket") ?? undefined,
+    q: searchParams.get("q") ?? undefined,
   };
-}
 
-export default function SearchResultPage({ searchParams = {} }: SearchResultPageProps) {
   const { recommendedOpportunities, groupedOpportunities, loading, error, refetch } =
-    useSearchResults(searchParams);
+    useSearchResults(queryParams);
+
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
@@ -40,7 +42,7 @@ export default function SearchResultPage({ searchParams = {} }: SearchResultPage
     recommendedOpportunities.length === 0 && Object.keys(groupedOpportunities).length === 0;
 
   if (isEmpty) {
-    return <EmptySearchResults searchQuery={searchParams.q} />;
+    return <EmptySearchResults searchQuery={queryParams.q} />;
   }
 
   return (

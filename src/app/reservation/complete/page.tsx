@@ -28,7 +28,6 @@ export default function CompletePage() {
 
   const { reservation, opportunity, dateTimeInfo, sameStateActivities, loading, error, refetch } =
     useCompletePageViewModel(opportunityId, reservationId);
-
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;

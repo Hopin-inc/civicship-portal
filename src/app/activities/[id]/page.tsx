@@ -8,19 +8,10 @@ import { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
-import { notFound } from "next/navigation";
+import { notFound, useParams, useSearchParams } from "next/navigation";
 import ErrorState from "@/components/shared/ErrorState";
 
-interface ActivityPageProps {
-  params: {
-    id: string;
-  };
-  searchParams: {
-    community_id?: string;
-  };
-}
-
-export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
+export default function ActivityPage() {
   const headerConfig = useMemo(
     () => ({
       hideHeader: true,
@@ -33,7 +24,11 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const { id } = params;
+  const params = useParams();
+  const searchParams = useSearchParams();
+
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const communityId = searchParams.get("community_id") ?? "";
   const {
     opportunity,
     sameStateActivities,
@@ -42,7 +37,7 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
     isLoading,
     error,
     refetch,
-  } = useActivityDetails(id);
+  } = useActivityDetails(id ?? "");
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -73,14 +68,14 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             availableTickets={availableTickets}
             availableDates={sortedSlots}
             sameStateActivities={sameStateActivities}
-            communityId={searchParams.community_id}
+            communityId={communityId}
           />
         </div>
       </main>
       <ActivityDetailsFooter
         opportunityId={opportunity.id}
         price={opportunity.feeRequired || 0}
-        communityId={searchParams.community_id}
+        communityId={communityId}
       />
     </>
   );

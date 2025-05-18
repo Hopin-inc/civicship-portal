@@ -4,7 +4,7 @@ import React from "react";
 import { AlertCircle } from "lucide-react";
 import IconWrapper from "@/components/shared/IconWrapper";
 
-export const NotesSection = () => {
+const NotesSection = () => {
   return (
     <div className="rounded-lg p-4 mb-6">
       <h3 className="text-2xl font-bold mb-6">注意事項</h3>
