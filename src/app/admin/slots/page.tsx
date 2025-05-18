@@ -17,7 +17,7 @@ export default function SlotsPage() {
   }), []);
   useHeaderConfig(headerConfig);
 
-  const now = new Date();
+  const now = useMemo(() => new Date(), []);
 
   const { data, loading, error } = useQuery(GET_OPPORTUNITY_SLOTS, {
     variables: {
