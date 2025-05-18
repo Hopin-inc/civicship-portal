@@ -20,6 +20,13 @@ export default function ReservationsPage() {
     tabParam && ["all", "pending", "processed"].includes(tabParam) ? tabParam : "all"
   );
   
+  useEffect(() => {
+    const newTab = tabParam && ["all", "pending", "processed"].includes(tabParam) ? tabParam : "all";
+    if (activeTab !== newTab) {
+      setActiveTab(newTab);
+    }
+  }, [tabParam, activeTab]);
+  
   const headerConfig = useMemo(() => ({
     hideHeader: true,
   }), []);
