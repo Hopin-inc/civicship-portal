@@ -52,6 +52,9 @@ export const CANCEL_RESERVATION = gql`
           ...ReservationFields
         }
       }
+      ... on ReservationCancellationTimeoutError {
+        message
+      }
     }
   }
 `;
