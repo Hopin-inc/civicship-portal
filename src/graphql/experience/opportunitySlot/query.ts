@@ -60,7 +60,7 @@ export const GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS = gql`
         }
       }
       reservations {
-        participations(cursor: $cursor, first: $first) {
+        participations {
           id
           status
           user {
@@ -82,4 +82,4 @@ export const GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS = gql`
   }
   ${SLOT_FRAGMENT}
   ${OPPORTUNITY_FRAGMENT}
-`;     
+`;
