@@ -281,7 +281,9 @@ const UserPortfolioList = ({
           />
         )}
         <div className="flex items-center justify-between">
-          <h2 className="text-display-sm font-semibold text-foreground py-4">これまでの関わり</h2>
+          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
+            これまでの関わり
+          </h2>
           {isOwner && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
