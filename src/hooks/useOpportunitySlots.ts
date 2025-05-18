@@ -1,7 +1,7 @@
-import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useQuery } from "@apollo/client";
 import { useRef, useMemo } from 'react';
-import { GET_OPPORTUNITY_SLOTS } from "../graphql/experience/opportunitySlot/query";
+import { GET_OPPORTUNITY_SLOTS } from "@/graphql/experience/opportunitySlot/query";
 
 export interface UseOpportunitySlotsResult {
   slots: any[];
@@ -12,8 +12,8 @@ export interface UseOpportunitySlotsResult {
   isLoadingMore: boolean;
 }
 
-export const useOpportunitySlots = () => {
-  const now = useMemo(() => new Date(), []);
+export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
+  const now = useMemo(() => new Date(2025, 5, 30), []);
   const isLoadingMore = useRef(false);
 
   const {
@@ -39,7 +39,7 @@ export const useOpportunitySlots = () => {
 
   const handleFetchMore = async () => {
     if (!hasNextPage || isLoadingMore.current) return;
-    
+
     isLoadingMore.current = true;
     try {
       await fetchMore({

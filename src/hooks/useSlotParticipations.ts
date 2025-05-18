@@ -1,7 +1,7 @@
-import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useQuery } from "@apollo/client";
 import { useRef } from 'react';
-import { GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS } from "../graphql/experience/opportunitySlot/query";
+import { GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS } from "@/graphql/experience/opportunitySlot/query";
 
 export interface UseSlotParticipationsResult {
   slot: any;
@@ -13,7 +13,7 @@ export interface UseSlotParticipationsResult {
   isLoadingMore: boolean;
 }
 
-export const useSlotParticipations = (slotId: string) => {
+export const useSlotParticipations = (slotId: string): UseSlotParticipationsResult => {
   const isLoadingMore = useRef(false);
 
   const {
@@ -28,14 +28,14 @@ export const useSlotParticipations = (slotId: string) => {
     },
   });
 
-  const slot = data?.opportunitySlot || {};
-  const allParticipations = slot.reservations?.flatMap((reservation: any) => reservation.participations || []) || [];
+  const slot = data?.opportunitySlot ?? {};
+  const allParticipations = slot.reservations?.flatMap((reservation: any) => reservation.participations ?? []) ?? [];
   const endCursor = slot.pageInfo?.endCursor;
   const hasNextPage = slot.pageInfo?.hasNextPage ?? false;
 
   const handleFetchMore = async () => {
     if (!hasNextPage || isLoadingMore.current) return;
-    
+
     isLoadingMore.current = true;
     try {
       await fetchMore({
@@ -58,7 +58,7 @@ export const useSlotParticipations = (slotId: string) => {
                 ...prevReservation,
                 participations: [
                   ...prevReservation.participations,
-                  ...(newReservation?.participations || []),
+                  ...(newReservation?.participations ?? []),
                 ],
               };
             }),
