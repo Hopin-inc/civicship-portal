@@ -37,6 +37,11 @@ export type GqlAlreadyJoinedError = {
   message: Scalars["String"]["output"];
 };
 
+export type GqlAlreadyUsedClaimLinkError = {
+  __typename?: "AlreadyUsedClaimLinkError";
+  message: Scalars["String"]["output"];
+};
+
 export type GqlArticle = {
   __typename?: "Article";
   authors?: Maybe<Array<GqlUser>>;
@@ -149,6 +154,11 @@ export type GqlCity = {
   code: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
   state?: Maybe<GqlState>;
+};
+
+export type GqlClaimLinkExpiredError = {
+  __typename?: "ClaimLinkExpiredError";
+  message: Scalars["String"]["output"];
 };
 
 export const GqlClaimLinkStatus = {
@@ -279,34 +289,6 @@ export type GqlEdge = {
   cursor: Scalars["String"]["output"];
 };
 
-export const GqlErrorCode = {
-  AlreadyJoined: "ALREADY_JOINED",
-  AlreadyUsedClaimLink: "ALREADY_USED_CLAIM_LINK",
-  ClaimLinkExpired: "CLAIM_LINK_EXPIRED",
-  Forbidden: "FORBIDDEN",
-  InsuperableBalance: "INSUPERABLE_BALANCE",
-  InternalServerError: "INTERNAL_SERVER_ERROR",
-  InvalidEvaluationStatus: "INVALID_EVALUATION_STATUS",
-  InvalidPlaceInput: "INVALID_PLACE_INPUT",
-  InvalidPublishStatus: "INVALID_PUBLISH_STATUS",
-  InvalidTransferMethod: "INVALID_TRANSFER_METHOD",
-  MissingTicketIds: "MISSING_TICKET_IDS",
-  MissingWalletInformation: "MISSING_WALLET_INFORMATION",
-  NotFound: "NOT_FOUND",
-  PersonalRecordOnlyDeletable: "PERSONAL_RECORD_ONLY_DELETABLE",
-  RateLimit: "RATE_LIMIT",
-  ReservationCancellationTimeout: "RESERVATION_CANCELLATION_TIMEOUT",
-  ReservationFull: "RESERVATION_FULL",
-  ReservationNotAccepted: "RESERVATION_NOT_ACCEPTED",
-  SlotNotScheduled: "SLOT_NOT_SCHEDULED",
-  TicketParticipantMismatch: "TICKET_PARTICIPANT_MISMATCH",
-  Unauthenticated: "UNAUTHENTICATED",
-  UnsupportedTransactionReason: "UNSUPPORTED_TRANSACTION_REASON",
-  UserIdNotFound: "USER_ID_NOT_FOUND",
-  ValidationError: "VALIDATION_ERROR",
-} as const;
-
-export type GqlErrorCode = (typeof GqlErrorCode)[keyof typeof GqlErrorCode];
 export type GqlEvaluation = {
   __typename?: "Evaluation";
   comment?: Maybe<Scalars["String"]["output"]>;
@@ -1916,7 +1898,10 @@ export type GqlTicketClaimLink = {
   tickets?: Maybe<Array<GqlTicket>>;
 };
 
-export type GqlTicketClaimPayload = GqlTicketClaimSuccess;
+export type GqlTicketClaimPayload =
+  | GqlAlreadyUsedClaimLinkError
+  | GqlClaimLinkExpiredError
+  | GqlTicketClaimSuccess;
 
 export type GqlTicketClaimSuccess = {
   __typename?: "TicketClaimSuccess";
@@ -4027,10 +4012,11 @@ export type GqlTicketClaimMutationVariables = Exact<{
 
 export type GqlTicketClaimMutation = {
   __typename?: "Mutation";
-  ticketClaim?: {
-    __typename?: "TicketClaimSuccess";
-    tickets: Array<{ __typename?: "Ticket"; id: string }>;
-  } | null;
+  ticketClaim?:
+    | { __typename?: "AlreadyUsedClaimLinkError"; message: string }
+    | { __typename?: "ClaimLinkExpiredError"; message: string }
+    | { __typename?: "TicketClaimSuccess"; tickets: Array<{ __typename?: "Ticket"; id: string }> }
+    | null;
 };
 
 export type GqlGetTicketsQueryVariables = Exact<{ [key: string]: never }>;
@@ -6792,6 +6778,12 @@ export const TicketClaimDocument = gql`
         tickets {
           id
         }
+      }
+      ... on AlreadyUsedClaimLinkError {
+        message
+      }
+      ... on ClaimLinkExpiredError {
+        message
       }
     }
   }
