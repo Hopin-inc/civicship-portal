@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -11,11 +12,32 @@ import { useReservations } from "@/hooks/useReservations";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ReservationsPage() {
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  
+  const [activeTab, setActiveTab] = useState<string>(
+    tabParam && ["all", "pending", "processed"].includes(tabParam) ? tabParam : "all"
+  );
+  
   const headerConfig = useMemo(() => ({
     hideHeader: true,
   }), []);
   useHeaderConfig(headerConfig);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    
+    const params = new URLSearchParams(searchParams.toString());
+    
+    if (value === "all") {
+      params.delete("tab"); // Remove tab parameter for default tab
+    } else {
+      params.set("tab", value);
+    }
+    
+    router.push(`/admin/reservations?${params.toString()}`);
+  };
 
   const statusFilter = useMemo(() => {
     if (activeTab === "pending") return "APPLIED";
@@ -45,7 +67,7 @@ export default function ReservationsPage() {
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">応募一覧</h1>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-4">
         <TabsList className="mb-2">
           <TabsTrigger value="all">すべて</TabsTrigger>
           <TabsTrigger value="pending">未対応</TabsTrigger>
