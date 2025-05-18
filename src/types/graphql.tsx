@@ -32,6 +32,12 @@ export type GqlAccumulatedPointView = {
   walletId?: Maybe<Scalars["String"]["output"]>;
 };
 
+export type GqlAlreadyJoinedError = {
+  __typename?: "AlreadyJoinedError";
+  code: GqlErrorCode;
+  message: Scalars["String"]["output"];
+};
+
 export type GqlArticle = {
   __typename?: "Article";
   authors?: Maybe<Array<GqlUser>>;
@@ -116,6 +122,16 @@ export const GqlAuthZRules = {
 } as const;
 
 export type GqlAuthZRules = (typeof GqlAuthZRules)[keyof typeof GqlAuthZRules];
+export type GqlAuthenticationError = {
+  __typename?: "AuthenticationError";
+  message: Scalars["String"]["output"];
+};
+
+export type GqlAuthorizationError = {
+  __typename?: "AuthorizationError";
+  message: Scalars["String"]["output"];
+};
+
 export type GqlCheckCommunityPermissionInput = {
   communityId: Scalars["ID"]["input"];
 };
@@ -248,6 +264,11 @@ export type GqlCurrentUserPayload = {
   user?: Maybe<GqlUser>;
 };
 
+export type GqlDatabaseError = {
+  __typename?: "DatabaseError";
+  message: Scalars["String"]["output"];
+};
+
 export type GqlDateTimeRangeFilter = {
   gt?: InputMaybe<Scalars["Datetime"]["input"]>;
   gte?: InputMaybe<Scalars["Datetime"]["input"]>;
@@ -259,6 +280,34 @@ export type GqlEdge = {
   cursor: Scalars["String"]["output"];
 };
 
+export const GqlErrorCode = {
+  AlreadyJoined: "ALREADY_JOINED",
+  AlreadyUsedClaimLink: "ALREADY_USED_CLAIM_LINK",
+  ClaimLinkExpired: "CLAIM_LINK_EXPIRED",
+  Forbidden: "FORBIDDEN",
+  InsuperableBalance: "INSUPERABLE_BALANCE",
+  InternalServerError: "INTERNAL_SERVER_ERROR",
+  InvalidEvaluationStatus: "INVALID_EVALUATION_STATUS",
+  InvalidPlaceInput: "INVALID_PLACE_INPUT",
+  InvalidPublishStatus: "INVALID_PUBLISH_STATUS",
+  InvalidTransferMethod: "INVALID_TRANSFER_METHOD",
+  MissingTicketIds: "MISSING_TICKET_IDS",
+  MissingWalletInformation: "MISSING_WALLET_INFORMATION",
+  NotFound: "NOT_FOUND",
+  PersonalRecordOnlyDeletable: "PERSONAL_RECORD_ONLY_DELETABLE",
+  RateLimit: "RATE_LIMIT",
+  ReservationCancellationTimeout: "RESERVATION_CANCELLATION_TIMEOUT",
+  ReservationFull: "RESERVATION_FULL",
+  ReservationNotAccepted: "RESERVATION_NOT_ACCEPTED",
+  SlotNotScheduled: "SLOT_NOT_SCHEDULED",
+  TicketParticipantMismatch: "TICKET_PARTICIPANT_MISMATCH",
+  Unauthenticated: "UNAUTHENTICATED",
+  UnsupportedTransactionReason: "UNSUPPORTED_TRANSACTION_REASON",
+  UserIdNotFound: "USER_ID_NOT_FOUND",
+  ValidationError: "VALIDATION_ERROR",
+} as const;
+
+export type GqlErrorCode = (typeof GqlErrorCode)[keyof typeof GqlErrorCode];
 export type GqlEvaluation = {
   __typename?: "Evaluation";
   comment?: Maybe<Scalars["String"]["output"]>;
@@ -547,6 +596,12 @@ export type GqlMembershipsConnection = {
   edges?: Maybe<Array<Maybe<GqlMembershipEdge>>>;
   pageInfo: GqlPageInfo;
   totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlMissingTicketIdsError = {
+  __typename?: "MissingTicketIdsError";
+  code: GqlErrorCode;
+  message: Scalars["String"]["output"];
 };
 
 export type GqlMutation = {
@@ -863,6 +918,12 @@ export type GqlNestedPlacesBulkUpdateInput = {
   disconnect?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
+export type GqlNoAvailableParticipationSlotsError = {
+  __typename?: "NoAvailableParticipationSlotsError";
+  code: GqlErrorCode;
+  message: Scalars["String"]["output"];
+};
+
 export type GqlOpportunitiesConnection = {
   __typename?: "OpportunitiesConnection";
   edges: Array<GqlOpportunityEdge>;
@@ -1003,6 +1064,7 @@ export type GqlOpportunitySlotEdge = GqlEdge & {
 };
 
 export type GqlOpportunitySlotFilterInput = {
+  dateRange?: InputMaybe<GqlDateTimeRangeFilter>;
   hostingStatus?: InputMaybe<GqlOpportunitySlotHostingStatus>;
   opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
 };
@@ -1629,6 +1691,11 @@ export type GqlQueryWalletsArgs = {
   sort?: InputMaybe<GqlWalletSortInput>;
 };
 
+export type GqlRateLimitError = {
+  __typename?: "RateLimitError";
+  message: Scalars["String"]["output"];
+};
+
 export type GqlReservation = {
   __typename?: "Reservation";
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
@@ -1641,9 +1708,21 @@ export type GqlReservation = {
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
 };
 
+export type GqlReservationAdvanceBookingRequiredError = {
+  __typename?: "ReservationAdvanceBookingRequiredError";
+  code: GqlErrorCode;
+  message: Scalars["String"]["output"];
+};
+
 export type GqlReservationCancelInput = {
   paymentMethod: GqlReservationPaymentMethod;
   ticketIdsIfExists?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+};
+
+export type GqlReservationCancellationTimeoutError = {
+  __typename?: "ReservationCancellationTimeoutError";
+  code: GqlErrorCode;
+  message: Scalars["String"]["output"];
 };
 
 export type GqlReservationCreateInput = {
@@ -1654,7 +1733,14 @@ export type GqlReservationCreateInput = {
   totalParticipantCount: Scalars["Int"]["input"];
 };
 
-export type GqlReservationCreatePayload = GqlReservationCreateSuccess;
+export type GqlReservationCreatePayload =
+  | GqlMissingTicketIdsError
+  | GqlReservationAdvanceBookingRequiredError
+  | GqlReservationCreateSuccess
+  | GqlReservationFullError
+  | GqlReservationNotAcceptedError
+  | GqlSlotNotScheduledError
+  | GqlTicketParticipantMismatchError;
 
 export type GqlReservationCreateSuccess = {
   __typename?: "ReservationCreateSuccess";
@@ -1672,6 +1758,14 @@ export type GqlReservationFilterInput = {
   opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
   opportunitySlotId?: InputMaybe<Scalars["ID"]["input"]>;
   status?: InputMaybe<GqlReservationStatus>;
+};
+
+export type GqlReservationFullError = {
+  __typename?: "ReservationFullError";
+  capacity: Scalars["Int"]["output"];
+  code: GqlErrorCode;
+  message: Scalars["String"]["output"];
+  requested: Scalars["Int"]["output"];
 };
 
 export type GqlReservationHistoriesConnection = {
@@ -1706,6 +1800,12 @@ export type GqlReservationHistorySortInput = {
   createdAt?: InputMaybe<GqlSortDirection>;
 };
 
+export type GqlReservationNotAcceptedError = {
+  __typename?: "ReservationNotAcceptedError";
+  code: GqlErrorCode;
+  message: Scalars["String"]["output"];
+};
+
 export const GqlReservationPaymentMethod = {
   Fee: "FEE",
   Ticket: "TICKET",
@@ -1713,7 +1813,11 @@ export const GqlReservationPaymentMethod = {
 
 export type GqlReservationPaymentMethod =
   (typeof GqlReservationPaymentMethod)[keyof typeof GqlReservationPaymentMethod];
-export type GqlReservationSetStatusPayload = GqlReservationSetStatusSuccess;
+export type GqlReservationSetStatusPayload =
+  | GqlAlreadyJoinedError
+  | GqlNoAvailableParticipationSlotsError
+  | GqlReservationCancellationTimeoutError
+  | GqlReservationSetStatusSuccess;
 
 export type GqlReservationSetStatusSuccess = {
   __typename?: "ReservationSetStatusSuccess";
@@ -1747,6 +1851,12 @@ export const GqlRole = {
 } as const;
 
 export type GqlRole = (typeof GqlRole)[keyof typeof GqlRole];
+export type GqlSlotNotScheduledError = {
+  __typename?: "SlotNotScheduledError";
+  code: GqlErrorCode;
+  message: Scalars["String"]["output"];
+};
+
 export const GqlSortDirection = {
   Asc: "asc",
   Desc: "desc",
@@ -1876,6 +1986,14 @@ export type GqlTicketIssuersConnection = {
   edges?: Maybe<Array<Maybe<GqlTicketIssuerEdge>>>;
   pageInfo: GqlPageInfo;
   totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlTicketParticipantMismatchError = {
+  __typename?: "TicketParticipantMismatchError";
+  code: GqlErrorCode;
+  message: Scalars["String"]["output"];
+  participantCount: Scalars["Int"]["output"];
+  ticketCount: Scalars["Int"]["output"];
 };
 
 export type GqlTicketPurchaseInput = {
@@ -2248,6 +2366,11 @@ export type GqlUtilityUpdateInfoPayload = GqlUtilityUpdateInfoSuccess;
 export type GqlUtilityUpdateInfoSuccess = {
   __typename?: "UtilityUpdateInfoSuccess";
   utility: GqlUtility;
+};
+
+export type GqlValidationError = {
+  __typename?: "ValidationError";
+  message: Scalars["String"]["output"];
 };
 
 export const GqlValueType = {
@@ -3732,10 +3855,30 @@ export type GqlCreateReservationMutationVariables = Exact<{
 
 export type GqlCreateReservationMutation = {
   __typename?: "Mutation";
-  reservationCreate?: {
-    __typename?: "ReservationCreateSuccess";
-    reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
-  } | null;
+  reservationCreate?:
+    | { __typename: "MissingTicketIdsError"; code: GqlErrorCode; message: string }
+    | { __typename: "ReservationAdvanceBookingRequiredError"; code: GqlErrorCode; message: string }
+    | {
+        __typename?: "ReservationCreateSuccess";
+        reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
+      }
+    | {
+        __typename: "ReservationFullError";
+        code: GqlErrorCode;
+        message: string;
+        capacity: number;
+        requested: number;
+      }
+    | { __typename: "ReservationNotAcceptedError"; code: GqlErrorCode; message: string }
+    | { __typename: "SlotNotScheduledError"; code: GqlErrorCode; message: string }
+    | {
+        __typename: "TicketParticipantMismatchError";
+        code: GqlErrorCode;
+        message: string;
+        ticketCount: number;
+        participantCount: number;
+      }
+    | null;
 };
 
 export type GqlCancelReservationMutationVariables = Exact<{
@@ -3746,10 +3889,15 @@ export type GqlCancelReservationMutationVariables = Exact<{
 
 export type GqlCancelReservationMutation = {
   __typename?: "Mutation";
-  reservationCancel?: {
-    __typename?: "ReservationSetStatusSuccess";
-    reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
-  } | null;
+  reservationCancel?:
+    | { __typename?: "AlreadyJoinedError" }
+    | { __typename?: "NoAvailableParticipationSlotsError" }
+    | { __typename?: "ReservationCancellationTimeoutError" }
+    | {
+        __typename?: "ReservationSetStatusSuccess";
+        reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
+      }
+    | null;
 };
 
 export type GqlGetReservationsQueryVariables = Exact<{ [key: string]: never }>;
@@ -6294,6 +6442,40 @@ export const CreateReservationDocument = gql`
         reservation {
           ...ReservationFields
         }
+      }
+      ... on ReservationFullError {
+        __typename
+        code
+        message
+        capacity
+        requested
+      }
+      ... on ReservationAdvanceBookingRequiredError {
+        __typename
+        code
+        message
+      }
+      ... on ReservationNotAcceptedError {
+        __typename
+        code
+        message
+      }
+      ... on SlotNotScheduledError {
+        __typename
+        code
+        message
+      }
+      ... on MissingTicketIdsError {
+        __typename
+        code
+        message
+      }
+      ... on TicketParticipantMismatchError {
+        __typename
+        code
+        message
+        ticketCount
+        participantCount
       }
     }
   }

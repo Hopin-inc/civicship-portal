@@ -16,7 +16,6 @@ export const useReservationConfirm = ({
   slotId: string;
   userId?: string;
 }) => {
-  // クエリの取得
   const {
     data,
     loading: oppLoading,
@@ -30,7 +29,6 @@ export const useReservationConfirm = ({
     skip: !opportunityId,
     fetchPolicy: "network-only",
     errorPolicy: "all",
-    onError: (err) => console.error("Opportunity query error:", err),
   });
 
   const opportunity: ActivityDetail | null = useMemo(() => {

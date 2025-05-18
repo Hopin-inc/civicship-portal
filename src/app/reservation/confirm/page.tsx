@@ -73,16 +73,37 @@ export default function ConfirmPage() {
     });
 
     if (!result.success) {
-      if (result.error === "NOT_AUTHENTICATED") {
+      if (!user) {
         ui.setIsLoginModalOpen(true);
       } else {
-        toast.error(`申し込みに失敗しました`);
+        switch (result.typename) {
+          case "ReservationFullError":
+            toast.error("予約枠が満員です。別の日時をお試しください。");
+            break;
+          case "ReservationAdvanceBookingRequiredError":
+            toast.error("開始日から7日以上前に申し込みが必要です。");
+            break;
+          case "ReservationNotAcceptedError":
+            toast.error("予約が承認されていません。");
+            break;
+          case "SlotNotScheduledError":
+            toast.error("予約枠は開催を予定されていません。");
+            break;
+          case "TicketParticipantMismatchError":
+            toast.error(`チケット数と参加者数が一致しません。`);
+            break;
+          case "MissingTicketIdsError":
+            toast.error("チケットが指定されていません。");
+            break;
+          default:
+            toast.error(`申し込みに失敗しました。: ${result.error}`);
+        }
         console.error("Reservation failed:", result.error);
       }
       return;
     }
 
-    toast.success("申し込みが完了しました");
+    toast.success("申し込みが完了しました。");
 
     const query = new URLSearchParams({
       id: opportunityId,

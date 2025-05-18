@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 export const CREATE_RESERVATION = gql`
   mutation CreateReservation($input: ReservationCreateInput!) {
@@ -7,6 +7,40 @@ export const CREATE_RESERVATION = gql`
         reservation {
           ...ReservationFields
         }
+      }
+      ... on ReservationFullError {
+        __typename
+        code
+        message
+        capacity
+        requested
+      }
+      ... on ReservationAdvanceBookingRequiredError {
+        __typename
+        code
+        message
+      }
+      ... on ReservationNotAcceptedError {
+        __typename
+        code
+        message
+      }
+      ... on SlotNotScheduledError {
+        __typename
+        code
+        message
+      }
+      ... on MissingTicketIdsError {
+        __typename
+        code
+        message
+      }
+      ... on TicketParticipantMismatchError {
+        __typename
+        code
+        message
+        ticketCount
+        participantCount
       }
     }
   }
