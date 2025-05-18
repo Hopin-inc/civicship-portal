@@ -14,7 +14,11 @@ interface AdminBottomBarProps {
 const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
   const pathname = usePathname();
 
-  if (!pathname.startsWith("/admin")) {
+  if (
+    !pathname.startsWith("/admin") ||
+    pathname.startsWith("/admin/reservations/") ||
+    pathname.startsWith("/admin/slots/")
+  ) {
     return null;
   }
 

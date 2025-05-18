@@ -16,6 +16,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
 
   // Hide BottomBar on search and reservation pages except complete page
   if (
+    pathname.startsWith("/admin") ||
     pathname === "/search" ||
     (pathname.startsWith("/reservation") && !pathname.includes("/complete")) ||
     pathname.startsWith("/activities/") ||
