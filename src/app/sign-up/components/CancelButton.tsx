@@ -2,10 +2,10 @@
 
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { auth } from "@/lib/firebase";
+import { auth } from "@/lib/firebase/firebase";
 import { useCookies } from "next-client-cookies";
 import { useRouter } from "next/navigation";
-import { MouseEventHandler } from "react";
+import React, { MouseEventHandler } from "react";
 
 const CancelButton: React.FC = () => {
   const router = useRouter();
