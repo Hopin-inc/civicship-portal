@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCookies } from "next-client-cookies";
 import { toast } from "sonner";
@@ -6,6 +6,7 @@ import { phoneVerificationState } from "@/lib/firebase/firebase";
 import startPhoneNumberVerification from "@/contexts/auth/phone/startPhoneNumberVerticication";
 import verifyPhoneCode from "@/contexts/auth/phone/verifyPhoneCode";
 import { setCookies } from "@/contexts/auth/cookie";
+import { isPhoneVerified as checkPhoneVerified } from "@/contexts/auth/phone/utils";
 
 /**
  * Phone authentication hook for handling phone number verification
@@ -17,7 +18,17 @@ export const usePhoneAuth = () => {
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
   const [verificationId, setVerificationId] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const [isPhoneVerified, setIsPhoneVerified] = useState(phoneVerificationState.verified);
+
+  useEffect(() => {
+    if (isPhoneVerified !== phoneVerificationState.verified) {
+      console.log("Initializing phone verification state from global state:", {
+        local: isPhoneVerified,
+        global: phoneVerificationState.verified
+      });
+      setIsPhoneVerified(phoneVerificationState.verified);
+    }
+  }, []);
 
   /**
    * Start phone verification process with the given phone number
@@ -38,7 +49,27 @@ export const usePhoneAuth = () => {
       return true;
     } catch (error) {
       console.error("Failed to start phone verification:", error);
-      toast.error("電話番号認証の開始に失敗しました");
+      
+      if (error instanceof Error) {
+        if (error.message.includes("network")) {
+          toast.error("ネットワーク接続に問題が発生しました。インターネット接続を確認してください。", {
+            action: {
+              label: "再試行",
+              onClick: () => window.location.reload()
+            },
+            duration: 10000
+          });
+        } else if (error.message.includes("too-many-requests")) {
+          toast.error("リクエストが多すぎます。しばらく待ってから再度お試しください。");
+        } else if (error.message.includes("captcha")) {
+          toast.error("reCAPTCHA検証に失敗しました。再度お試しください。");
+        } else {
+          toast.error("電話番号認証の開始に失敗しました");
+        }
+      } else {
+        toast.error("電話番号認証の開始に失敗しました");
+      }
+      
       return false;
     } finally {
       setIsVerifying(false);
@@ -74,35 +105,88 @@ export const usePhoneAuth = () => {
             phoneUid: phoneVerificationState.phoneUid,
             authToken: phoneVerificationState.authToken ? "present" : "missing",
             refreshToken: phoneVerificationState.refreshToken ? "present" : "missing",
-            tokenExpiresAt: phoneVerificationState.tokenExpiresAt
+            tokenExpiresAt: phoneVerificationState.tokenExpiresAt,
+            verified: phoneVerificationState.verified
           });
 
+          if (!phoneVerificationState.verified) {
+            phoneVerificationState.verified = true;
+            console.log("Updated global verification state to true");
+          }
+          
           setIsPhoneVerified(true);
+          
           toast.success("電話番号認証が完了しました");
-          router.push("/sign-up");
+          
+          setTimeout(() => {
+            router.push("/sign-up");
+          }, 100);
+          
           return true;
         } else {
-          toast.error("電話番号認証IDが取得できませんでした");
+          toast.error("電話番号認証IDが取得できませんでした", {
+            action: {
+              label: "再試行",
+              onClick: () => window.location.reload()
+            },
+            duration: 10000
+          });
           return false;
         }
       } else {
-        toast.error("認証コードの検証に失敗しました");
+        toast.error("認証コードの検証に失敗しました", {
+          action: {
+            label: "再入力",
+            onClick: () => document.getElementById("verification-code")?.focus()
+          },
+          duration: 10000
+        });
         return false;
       }
     } catch (error) {
       console.error("Failed to verify phone code:", error);
-      toast.error("認証コードの検証に失敗しました");
+      
+      if (error instanceof Error) {
+        if (error.message.includes("network")) {
+          toast.error("ネットワーク接続に問題が発生しました。インターネット接続を確認してください。", {
+            action: {
+              label: "再試行",
+              onClick: () => window.location.reload()
+            },
+            duration: 10000
+          });
+        } else if (error.message.includes("code-expired")) {
+          toast.error("認証コードの有効期限が切れました。新しいコードを取得してください。", {
+            action: {
+              label: "再送信",
+              onClick: () => router.push("/sign-up/phone-verification")
+            },
+            duration: 10000
+          });
+        } else if (error.message.includes("invalid-verification-code")) {
+          toast.error("無効な認証コードです。正しいコードを入力してください。");
+        } else {
+          toast.error("認証コードの検証に失敗しました");
+        }
+      } else {
+        toast.error("認証コードの検証に失敗しました");
+      }
+      
       return false;
     } finally {
       setIsVerifying(false);
     }
   };
 
+  const getIsPhoneVerified = (): boolean => {
+    return isPhoneVerified;
+  };
+
   return {
     phoneNumber,
     isVerifying,
     verificationId,
-    isPhoneVerified,
+    isPhoneVerified: getIsPhoneVerified(),
     phoneUid: phoneVerificationState.phoneUid,
     startPhoneVerification,
     verifyPhoneCode: verifyPhoneCodeLocal,

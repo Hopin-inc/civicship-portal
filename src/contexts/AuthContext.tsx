@@ -20,6 +20,13 @@ import usePhoneAuth from "@/contexts/auth/phone/usePhoneAuth";
 import useLiffAuth from "@/contexts/auth/liff/useLiffAuth";
 import useUserManagement from "@/contexts/auth/user/useUserManagement";
 
+type AuthState = {
+  phoneVerified: boolean;
+  lineAuthenticated: boolean;
+  loading: boolean;
+  error: string | null;
+};
+
 type UserInfo = {
   uid: string | null;
   user: Required<Partial<GqlUser>, "id" | "name"> & {
@@ -43,6 +50,8 @@ type AuthContextType = UserInfo & {
     verifyPhoneCode: (code: string) => Promise<boolean>;
   };
   isPhoneVerified: boolean;
+  isLineAuthenticated: boolean;
+  authState: AuthState;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,6 +69,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [ready] = useState(() => deferred());
   const [uid, setUid] = useState<UserInfo["uid"]>(null);
   const [user, setUser] = useState<UserInfo["user"]>(null);
+  
+  const [authState, setAuthState] = useState<AuthState>({
+    phoneVerified: phoneVerificationState.verified,
+    lineAuthenticated: false,
+    loading: false,
+    error: null
+  });
   
   const [userSignUpMutation] = useUserSignUpMutation();
 
@@ -90,10 +106,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const isAuthenticating = isLiffAuthenticating || isUserAuthenticating;
 
+  const updateAuthState = useCallback((updates: Partial<AuthState>) => {
+    setAuthState(prevState => ({
+      ...prevState,
+      ...updates
+    }));
+    
+    if (updates.phoneVerified !== undefined && 
+        phoneVerificationState.verified !== updates.phoneVerified) {
+      console.log("Updating global phone verification state:", updates.phoneVerified);
+      phoneVerificationState.verified = updates.phoneVerified;
+      
+      if (setIsPhoneVerified && isPhoneVerified !== updates.phoneVerified) {
+        setIsPhoneVerified(updates.phoneVerified);
+      }
+    }
+  }, [isPhoneVerified, setIsPhoneVerified]);
+
   const login = useCallback((userInfo: UserInfo | null) => {
     setUid(userInfo?.uid ?? null);
     setUser(userInfo?.user ?? null);
-  }, []);
+    
+    updateAuthState({ 
+      lineAuthenticated: !!userInfo?.uid,
+      loading: false
+    });
+  }, [updateAuthState]);
 
   useEffect(() => {
     if (currentUserData?.currentUser?.user && uid) {
@@ -112,12 +150,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const attemptAuthWithLiffToken = async () => {
       if (liffAccessToken && isLiffLoggedIn && !uid) {
-        await handleAuthenticateWithLiffToken(liffAccessToken);
+        updateAuthState({ loading: true });
+        try {
+          await handleAuthenticateWithLiffToken(liffAccessToken);
+          updateAuthState({ 
+            lineAuthenticated: true,
+            loading: false,
+            error: null
+          });
+        } catch (error) {
+          console.error("LIFF authentication failed:", error);
+          updateAuthState({ 
+            loading: false,
+            error: "LINE認証に失敗しました"
+          });
+        }
       }
     };
 
     attemptAuthWithLiffToken();
-  }, [liffAccessToken, isLiffLoggedIn, uid, handleAuthenticateWithLiffToken]);
+  }, [liffAccessToken, isLiffLoggedIn, uid, handleAuthenticateWithLiffToken, updateAuthState]);
 
   useEffect(() => {
     const handleTokenExpired = (event: Event) => {
@@ -169,10 +221,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [router]);
 
   useEffect(() => {
+    const syncAuthStates = () => {
+      if (phoneVerificationState.verified !== authState.phoneVerified) {
+        console.log("Synchronizing phone verification state:", {
+          global: phoneVerificationState.verified,
+          central: authState.phoneVerified
+        });
+        updateAuthState({ phoneVerified: phoneVerificationState.verified });
+      }
+      
+      const isLineAuthenticated = !!uid;
+      if (isLineAuthenticated !== authState.lineAuthenticated) {
+        console.log("Synchronizing LINE authentication state:", {
+          current: isLineAuthenticated,
+          central: authState.lineAuthenticated
+        });
+        updateAuthState({ lineAuthenticated: isLineAuthenticated });
+      }
+    };
+    
+    syncAuthStates();
+    
+    const intervalId = setInterval(syncAuthStates, 500);
+    
+    return () => clearInterval(intervalId);
+  }, [uid, authState.phoneVerified, authState.lineAuthenticated, updateAuthState]);
+
+  useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user: AuthUser | null) => {
       ready.resolve();
 
       if (user) {
+        updateAuthState({ loading: true });
         const next = searchParams.get("next");
         const idToken = await user.getIdToken();
         
@@ -186,53 +266,130 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           );
           
           console.log("LINE tokens stored in cookies");
+          updateAuthState({ lineAuthenticated: true });
         } catch (error) {
           console.error("Failed to get token expiration time:", error);
           cookies.set("access_token", idToken);
           if (user.refreshToken) {
             cookies.set("refresh_token", user.refreshToken);
           }
+          
+          updateAuthState({ lineAuthenticated: true });
         }
 
-        const { data } = await refetch();
-        const fetchedUser = data.currentUser?.user ?? null;
-        if (fetchedUser) {
-          login({
-            uid: user.uid,
-            user: {
-              id: fetchedUser.id,
-              name: fetchedUser.name,
-              memberships: fetchedUser.memberships || [] as any,
-            },
-          });
+        try {
+          const { data } = await refetch();
+          const fetchedUser = data.currentUser?.user ?? null;
+          if (fetchedUser) {
+            login({
+              uid: user.uid,
+              user: {
+                id: fetchedUser.id,
+                name: fetchedUser.name,
+                memberships: fetchedUser.memberships || [] as any,
+              },
+            });
 
-          if (isExplicitLogin) {
-            toast.success("ログインしました！");
-            setIsExplicitLogin(false); // フラグをリセットして再表示を防止
-          }
+            if (isExplicitLogin) {
+              toast.success("ログインしました！");
+              setIsExplicitLogin(false); // フラグをリセットして再表示を防止
+            }
 
-          if (next) {
-            router.push(next);
-          }
-        } else {
-          if (isPhoneVerified || checkPhoneVerified()) {
-            router.push("/sign-up");
+            if (next) {
+              router.push(next);
+            }
           } else {
-            router.push("/sign-up/phone-verification");
+            if (authState.phoneVerified) {
+              router.push("/sign-up");
+            } else {
+              router.push("/sign-up/phone-verification");
+            }
           }
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
+          updateAuthState({ 
+            loading: false,
+            error: "ユーザー情報の取得に失敗しました"
+          });
+          
+          toast.error("ユーザー情報の取得に失敗しました", {
+            action: {
+              label: "再試行",
+              onClick: () => window.location.reload()
+            },
+            duration: 10000
+          });
+        } finally {
+          updateAuthState({ loading: false });
         }
       } else {
         login(null);
-        cookies.remove("access_token");
-        cookies.remove("refresh_token");
-        cookies.remove("token_expires_at");
-        cookies.remove("phone_auth_token");
-        cookies.remove("phone_refresh_token");
+        removeCookies(cookies);
+        removeCookies(cookies, "phone");
+        updateAuthState({
+          phoneVerified: false,
+          lineAuthenticated: false,
+          loading: false,
+          error: null
+        });
       }
     });
 
     return () => unsubscribe();
-  }, [ready, cookies, refetch, router, searchParams, login, isExplicitLogin, isPhoneVerified, setIsExplicitLogin]);
+  }, [ready, cookies, refetch, router, searchParams, login, isExplicitLogin, authState.phoneVerified, setIsExplicitLogin, updateAuthState]);
+
+  const verifyPhoneCode = async (code: string): Promise<boolean> => {
+    updateAuthState({ loading: true });
+    try {
+      const success = await verifyPhoneCodeLocal(code);
+      if (success) {
+        updateAuthState({ 
+          phoneVerified: true,
+          loading: false,
+          error: null
+        });
+        return true;
+      } else {
+        updateAuthState({ 
+          loading: false,
+          error: "認証コードの検証に失敗しました"
+        });
+        return false;
+      }
+    } catch (error) {
+      console.error("Phone verification failed:", error);
+      updateAuthState({ 
+        loading: false,
+        error: "認証コードの検証中にエラーが発生しました"
+      });
+      return false;
+    }
+  };
+  
+  const loginWithLiffWrapper = async (): Promise<void> => {
+    updateAuthState({ loading: true });
+    try {
+      await loginWithLiff();
+      if (liffAccessToken && isLiffLoggedIn) {
+        updateAuthState({ 
+          lineAuthenticated: true,
+          loading: false,
+          error: null
+        });
+      } else {
+        updateAuthState({ 
+          loading: false,
+          error: "LINE認証に失敗しました"
+        });
+      }
+    } catch (error) {
+      console.error("LIFF login failed:", error);
+      updateAuthState({ 
+        loading: false,
+        error: "LINE認証に失敗しました"
+      });
+    }
+  };
 
   return (
     <AuthContext.Provider value={ {
@@ -240,8 +397,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       user,
       login,
       logout,
-      loginWithLiff,
-      isAuthenticating,
+      loginWithLiff: loginWithLiffWrapper,
+      isAuthenticating: isAuthenticating || authState.loading,
       createUser: (name, currentPrefecture, phoneUid) => createUser(name, currentPrefecture, phoneUid, uid),
 
       phoneNumber,
@@ -250,9 +407,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         verificationId,
         phoneUid,
         startPhoneVerification,
-        verifyPhoneCode: verifyPhoneCodeLocal,
+        verifyPhoneCode,
       },
-      isPhoneVerified,
+      isPhoneVerified: authState.phoneVerified,
+      isLineAuthenticated: authState.lineAuthenticated,
+      authState,
     } }>
       { children }
     </AuthContext.Provider>

@@ -4,27 +4,29 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { SignUpForm } from "@/app/sign-up/components/SignUpForm";
-import { isPhoneVerified } from "@/contexts/auth/phone/utils";
 
 export default function SignUpPage() {
-  const { uid, user } = useAuth();
+  const { uid, user, isPhoneVerified, isLineAuthenticated } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!uid) {
+    if (!isLineAuthenticated) {
+      console.log("Sign-up page: User not authenticated with LINE, redirecting to login");
       router.push("/login");
       return;
     }
 
-    if (!isPhoneVerified()) {
+    if (!isPhoneVerified) {
+      console.log("Sign-up page: Phone not verified, redirecting to phone verification");
       router.push("/sign-up/phone-verification");
       return;
     }
 
     if (user) {
+      console.log("Sign-up page: User already exists, redirecting to dashboard");
       router.push("/dashboard");
     }
-  }, [uid, user, router]);
+  }, [uid, user, isPhoneVerified, isLineAuthenticated, router]);
 
   return (
     <main className="min-h-screen p-8">
