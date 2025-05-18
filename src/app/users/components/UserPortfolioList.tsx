@@ -9,7 +9,7 @@ import ParticipantsList from "@/components/shared/ParticipantsList";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
 import { ActivityCard } from "@/app/activities/data/type";
 import { AppPortfolio } from "@/app/users/data/type";
-import { GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
+import { GqlPortfolioSource, GqlReservationStatus, GqlOpportunityCategory } from "@/types/graphql";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -76,13 +76,13 @@ const ActiveOpportunities = ({ opportunities }: ActiveOpportunitiesProps) => {
   if (!opportunities.length) return null;
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-        現在募集中の関わり
-        <span className="bg-primary-foreground text-primary text-xs font-medium px-2 py-0.5 rounded-full">
+    <div>
+      <div className="flex items-center gap-x-2">
+        <h2 className="text-display-sm font-semibold text-foreground py-4">現在募集中の関わり</h2>
+        <span className="bg-primary text-primary-foreground text-xs font-medium px-2 py-0.5 rounded-full">
           {opportunities.length}
         </span>
-      </h2>
+      </div>
       <div className="relative">
         <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
           <div className="flex gap-4">
@@ -246,6 +246,7 @@ const PhotoGallery = () => {
 
 // NOTE: 開発確認用のフラグ。ユーザーページ関連の修正が落ち着いたら削除する。
 const enableDummyPortfolios = false;
+const enableDummyActiveOpportunities = false;
 
 const UserPortfolioList = ({
   isSysAdmin,
@@ -270,12 +271,19 @@ const UserPortfolioList = ({
   };
 
   return (
-    <section className="py-6">
-      {isSysAdmin && <ActiveOpportunities opportunities={activeOpportunities} />}
-
+    <section className="py-6 mt-0">
       <div className="space-y-4">
+        {isSysAdmin && (
+          <ActiveOpportunities
+            opportunities={
+              enableDummyActiveOpportunities ? dummyActivityCards : activeOpportunities
+            }
+          />
+        )}
         <div className="flex items-center justify-between">
-          <h2 className="text-display-sm font-semibold text-foreground py-4">これまでの関わり</h2>
+          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
+            これまでの関わり
+          </h2>
           {isOwner && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -401,3 +409,15 @@ const dummyPortfolios: AppPortfolio[] = [
     ],
   },
 ];
+
+const dummyActivityCards: ActivityCard[] = dummyPortfolios.map((portfolio) => ({
+  id: portfolio.id,
+  category:
+    portfolio.category === "EVENT" ? GqlOpportunityCategory.Event : GqlOpportunityCategory.Quest,
+  title: portfolio.title,
+  images: [portfolio.image || PLACEHOLDER_IMAGE],
+  location: portfolio.location || "",
+  hasReservableTicket: true,
+  feeRequired: 200,
+  communityId: "neo-88",
+}));
