@@ -123,12 +123,12 @@ export default function ReservationDetailPage({ params }: { params: { id: string
           <h2 className="font-semibold text-lg mb-2">予約者</h2>
           <div className="flex items-center space-x-3">
             <Avatar>
-              <AvatarImage src={ reservation.user?.image || "" } />
-              <AvatarFallback>{ reservation.user?.name?.[0] || "U" }</AvatarFallback>
+              <AvatarImage src={ reservation.createdByUser?.image || "" } />
+              <AvatarFallback>{ reservation.createdByUser?.name?.[0] || "U" }</AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium">{ reservation.user?.name || "未設定" }</p>
-              <p className="text-sm text-muted-foreground">{ reservation.user?.currentPrefecture || "不明" }</p>
+              <p className="font-medium">{ reservation.createdByUser?.name || "未設定" }</p>
+              <p className="text-sm text-muted-foreground">{ reservation.createdByUser?.currentPrefecture || "不明" }</p>
             </div>
           </div>
         </div>
@@ -152,7 +152,7 @@ export default function ReservationDetailPage({ params }: { params: { id: string
             <p><span
               className="font-medium">参加費:</span> { opportunity?.feeRequired || 0 } × { participantCount } = { participationFee }円
             </p>
-            <p><span className="font-medium">緊急連絡先:</span> { reservation.user?.phoneNumber || "未設定" }</p>
+            <p><span className="font-medium">緊急連絡先:</span> { reservation.createdByUser?.phoneNumber || "未設定" }</p>
           </div>
         </div>
       </CardWrapper>
