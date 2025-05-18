@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useMutation } from "@apollo/client";
 import { LINK_PHONE_AUTH } from "@/graphql/account/identity/mutation";
+import { normalizePhoneNumber } from "@/contexts/auth/phone/utils";
 
 export function PhoneVerificationForm() {
   const { phoneAuth, uid, user } = useAuth();
@@ -37,7 +38,7 @@ export function PhoneVerificationForm() {
       return;
     }
 
-    const formattedPhone = formatPhoneNumber(phoneNumber);
+    const formattedPhone = normalizePhoneNumber(phoneNumber);
     const success = await phoneAuth.startPhoneVerification(formattedPhone);
     if (success) {
       setStep("code");
@@ -49,19 +50,6 @@ export function PhoneVerificationForm() {
     await phoneAuth.verifyPhoneCode(verificationCode);
   };
 
-  const formatPhoneNumber = (phone: string): string => {
-    const cleaned = phone.replace(/[-\s]/g, "");
-
-    if (cleaned.startsWith("0")) {
-      return "+81" + cleaned.substring(1);
-    }
-
-    if (cleaned.startsWith("+")) {
-      return cleaned;
-    }
-
-    return "+81" + cleaned;
-  };
 
   return (
     <div className="w-full max-w-md mx-auto p-6 space-y-8">

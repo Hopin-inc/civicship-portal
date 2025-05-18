@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { normalizePhoneNumber } from "@/contexts/auth/phone/utils";
 
 export function PhoneVerificationForm() {
   const { phoneAuth, uid, user } = useAuth();
@@ -35,7 +36,7 @@ export function PhoneVerificationForm() {
       return;
     }
 
-    const formattedPhone = formatPhoneNumber(phoneNumber);
+    const formattedPhone = normalizePhoneNumber(phoneNumber);
     const success = await phoneAuth.startPhoneVerification(formattedPhone);
     if (success) {
       setStep("code");
@@ -47,19 +48,6 @@ export function PhoneVerificationForm() {
     await phoneAuth.verifyPhoneCode(verificationCode);
   };
 
-  const formatPhoneNumber = (phone: string): string => {
-    const cleaned = phone.replace(/[-\s]/g, "");
-
-    if (cleaned.startsWith("0")) {
-      return "+81" + cleaned.substring(1);
-    }
-
-    if (cleaned.startsWith("+")) {
-      return cleaned;
-    }
-
-    return "+81" + cleaned;
-  };
 
   const handleOTPChange = (value: string) => {
     setVerificationCode(value);

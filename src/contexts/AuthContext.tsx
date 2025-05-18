@@ -8,13 +8,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
 import {
   auth,
-  signInWithLiffToken,
-  startPhoneNumberVerification,
-  verifyPhoneCode,
-  isPhoneVerified as checkPhoneVerified,
-  getVerifiedPhoneNumber,
+  phoneAuth,
   phoneVerificationState,
-} from "@/lib/firebase";
+} from "@/lib/firebase/firebase";
+import signInWithLiffToken from "@/contexts/auth/liff/signIn";
+import startPhoneNumberVerification from "@/contexts/auth/phone/startPhoneNumberVerticication";
+import verifyPhoneCode from "@/contexts/auth/phone/verifyPhoneCode";
+import { isPhoneVerified as checkPhoneVerified, getVerifiedPhoneNumber } from "@/contexts/auth/phone/utils";
+import { refreshIdToken, refreshPhoneIdToken } from "@/contexts/auth/refreshToken/refreshToken";
+import { setCookies, removeCookies } from "@/contexts/auth/cookie";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
 import { useLiff } from "./LiffContext";
@@ -92,7 +94,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const startPhoneVerification = async (phoneNumber: string): Promise<boolean> => {
     setIsVerifying(true);
     try {
-      const verId = await startPhoneNumberVerification(phoneNumber);
+      const verId = await startPhoneNumberVerification(phoneNumber, null, null);
       setVerificationId(verId);
       setPhoneNumber(phoneNumber);
       return true;
@@ -113,22 +115,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     setIsVerifying(true);
     try {
-      const success = await verifyPhoneCode(verificationId, code);
+      const success = await verifyPhoneCode(verificationId, code, null);
 
       if (success) {
         await new Promise(resolve => setTimeout(resolve, 500));
 
         if (phoneVerificationState.phoneUid) {
-          if (phoneVerificationState.authToken) {
-            cookies.set("phone_auth_token", phoneVerificationState.authToken);
-          }
-          if (phoneVerificationState.refreshToken) {
-            cookies.set("phone_refresh_token", phoneVerificationState.refreshToken);
-          }
-          if (phoneVerificationState.tokenExpiresAt) {
-            const timestamp = Math.floor(phoneVerificationState.tokenExpiresAt.getTime() / 1000);
-            cookies.set("phone_token_expires_at", timestamp.toString());
-          }
+          setCookies(
+            cookies,
+            phoneVerificationState.authToken,
+            phoneVerificationState.refreshToken,
+            phoneVerificationState.tokenExpiresAt,
+            "phone"
+          );
 
           console.log("Phone verification successful with tokens:", {
             phoneUid: phoneVerificationState.phoneUid,
@@ -273,22 +272,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (user) {
         const next = searchParams.get("next");
         const idToken = await user.getIdToken();
-        cookies.set("access_token", idToken);
-
-        if (user.refreshToken) {
-          cookies.set("refresh_token", user.refreshToken);
-          console.log("LINE refresh token stored in cookies");
-        }
-
+        
         try {
           const tokenResult = await user.getIdTokenResult();
-          if (tokenResult.expirationTime) {
-            const expiryTimestamp = Math.floor(new Date(tokenResult.expirationTime).getTime() / 1000);
-            cookies.set("token_expires_at", expiryTimestamp.toString());
-            console.log("Token expiration time stored:", expiryTimestamp);
-          }
+          setCookies(
+            cookies,
+            idToken,
+            user.refreshToken,
+            new Date(tokenResult.expirationTime)
+          );
+          
+          console.log("LINE tokens stored in cookies");
         } catch (error) {
           console.error("Failed to get token expiration time:", error);
+          cookies.set("access_token", idToken);
+          if (user.refreshToken) {
+            cookies.set("refresh_token", user.refreshToken);
+          }
         }
 
         const { data } = await refetch();
@@ -343,6 +343,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (!response.ok) {
         console.warn("Backend logout failed:", response.status);
       }
+
+      removeCookies(cookies);
+      removeCookies(cookies, "phone");
 
       setUser(null);
       setUid(null);
