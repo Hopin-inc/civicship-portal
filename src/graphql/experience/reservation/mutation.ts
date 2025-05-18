@@ -10,34 +10,28 @@ export const CREATE_RESERVATION = gql`
       }
       ... on ReservationFullError {
         __typename
-        code
         message
         capacity
         requested
       }
       ... on ReservationAdvanceBookingRequiredError {
         __typename
-        code
         message
       }
       ... on ReservationNotAcceptedError {
         __typename
-        code
         message
       }
       ... on SlotNotScheduledError {
         __typename
-        code
         message
       }
       ... on MissingTicketIdsError {
         __typename
-        code
         message
       }
       ... on TicketParticipantMismatchError {
         __typename
-        code
         message
         ticketCount
         participantCount

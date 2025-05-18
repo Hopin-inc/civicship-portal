@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { GqlErrorCode, GqlUser, GqlWallet, useCreateReservationMutation } from "@/types/graphql";
+import {  GqlUser, GqlWallet, useCreateReservationMutation } from "@/types/graphql";
 import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
 import { ActivityDetail } from "@/app/activities/data/type";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
@@ -7,7 +7,7 @@ import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicke
 
 type Result =
   | { success: true; reservationId: string; typename: string }
-  | { success: false; error: string; code?: GqlErrorCode; typename?: string };
+  | { success: false; error: string;  typename?: string };
 
 interface ReservationParams {
   opportunity: ActivityDetail | null;
@@ -57,17 +57,17 @@ export const useReservationCommand = () => {
         if (data?.__typename === "ReservationCreateSuccess") {
           return { success: true, reservationId: data.reservation.id, typename: "ReservationCreateSuccess" };
         } else if (data?.__typename === "ReservationFullError") {
-          return { success: false, error: `Full Error: Capacity ${data.capacity}, Requested ${data.requested}`, code: data.code, typename: "ReservationFullError" };
+          return { success: false, error: `Full Error: Capacity ${data.capacity}, Requested ${data.requested}`, typename: "ReservationFullError" };
         } else if (data?.__typename === "ReservationAdvanceBookingRequiredError") {
-          return { success: false, error: "Advance booking required.", code: data.code, typename: "ReservationAdvanceBookingRequiredError" };
+          return { success: false, error: "Advance booking required.", typename: "ReservationAdvanceBookingRequiredError" };
         } else if (data?.__typename === "ReservationNotAcceptedError") {
-          return { success: false, error: "Reservation not accepted.", code: data.code, typename: "ReservationNotAcceptedError" };
+          return { success: false, error: "Reservation not accepted.", typename: "ReservationNotAcceptedError" };
         } else if (data?.__typename === "SlotNotScheduledError") {
-          return { success: false, error: "Slot not scheduled.", code: data.code, typename: "SlotNotScheduledError" };
+          return { success: false, error: "Slot not scheduled.", typename: "SlotNotScheduledError" };
         } else if (data?.__typename === "MissingTicketIdsError") {
-          return { success: false, error: "Missing ticket IDs.", code: data.code, typename: "MissingTicketIdsError" };
+          return { success: false, error: "Missing ticket IDs.", typename: "MissingTicketIdsError" };
         } else if (data?.__typename === "TicketParticipantMismatchError") {
-          return { success: false, error: `Ticket mismatch: ${data.ticketCount} tickets, ${data.participantCount} participants`, code: data.code, typename: "TicketParticipantMismatchError" };
+          return { success: false, error: `Ticket mismatch: ${data.ticketCount} tickets, ${data.participantCount} participants`, typename: "TicketParticipantMismatchError" };
         } else {
           return { success: false, error: "Unknown error.", typename: "UnknownError" };
         }

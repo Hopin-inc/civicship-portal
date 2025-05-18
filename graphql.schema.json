@@ -1,12 +1,10 @@
 {
   "__schema": {
     "queryType": {
-      "name": "Query",
-      "kind": "OBJECT"
+      "name": "Query"
     },
     "mutationType": {
-      "name": "Mutation",
-      "kind": "OBJECT"
+      "name": "Mutation"
     },
     "subscriptionType": null,
     "types": [
@@ -56,22 +54,6 @@
         "description": null,
         "isOneOf": null,
         "fields": [
-          {
-            "name": "code",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ErrorCode",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "message",
             "description": null,
@@ -4865,22 +4847,6 @@
         "isOneOf": null,
         "fields": [
           {
-            "name": "code",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ErrorCode",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "message",
             "description": null,
             "args": [],
@@ -7331,22 +7297,6 @@
         "description": null,
         "isOneOf": null,
         "fields": [
-          {
-            "name": "code",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ErrorCode",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "message",
             "description": null,
@@ -14037,22 +13987,6 @@
         "isOneOf": null,
         "fields": [
           {
-            "name": "code",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ErrorCode",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "message",
             "description": null,
             "args": [],
@@ -14128,22 +14062,6 @@
         "description": null,
         "isOneOf": null,
         "fields": [
-          {
-            "name": "code",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ErrorCode",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "message",
             "description": null,
@@ -14470,22 +14388,6 @@
             "deprecationReason": null
           },
           {
-            "name": "code",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ErrorCode",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "message",
             "description": null,
             "args": [],
@@ -14800,22 +14702,6 @@
         "isOneOf": null,
         "fields": [
           {
-            "name": "code",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ErrorCode",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "message",
             "description": null,
             "args": [],
@@ -15097,22 +14983,6 @@
         "description": null,
         "isOneOf": null,
         "fields": [
-          {
-            "name": "code",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ErrorCode",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "message",
             "description": null,
@@ -16178,22 +16048,6 @@
         "description": null,
         "isOneOf": null,
         "fields": [
-          {
-            "name": "code",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ErrorCode",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "message",
             "description": null,
@@ -20909,7 +20763,11 @@
         "name": "authz",
         "description": null,
         "isRepeatable": false,
-        "locations": ["FIELD_DEFINITION", "INTERFACE", "OBJECT"],
+        "locations": [
+          "FIELD_DEFINITION",
+          "INTERFACE",
+          "OBJECT"
+        ],
         "args": [
           {
             "name": "compositeRules",
@@ -20990,7 +20848,11 @@
         "name": "include",
         "description": "Directs the executor to include this field or fragment only when the `if` argument is true.",
         "isRepeatable": false,
-        "locations": ["FIELD", "FRAGMENT_SPREAD", "INLINE_FRAGMENT"],
+        "locations": [
+          "FIELD",
+          "FRAGMENT_SPREAD",
+          "INLINE_FRAGMENT"
+        ],
         "args": [
           {
             "name": "if",
@@ -21014,14 +20876,18 @@
         "name": "oneOf",
         "description": "Indicates exactly one field must be supplied and this field must not be `null`.",
         "isRepeatable": false,
-        "locations": ["INPUT_OBJECT"],
+        "locations": [
+          "INPUT_OBJECT"
+        ],
         "args": []
       },
       {
         "name": "requireRole",
         "description": null,
         "isRepeatable": false,
-        "locations": ["FIELD_DEFINITION"],
+        "locations": [
+          "FIELD_DEFINITION"
+        ],
         "args": [
           {
             "name": "role",
@@ -21045,7 +20911,11 @@
         "name": "skip",
         "description": "Directs the executor to skip this field or fragment when the `if` argument is true.",
         "isRepeatable": false,
-        "locations": ["FIELD", "FRAGMENT_SPREAD", "INLINE_FRAGMENT"],
+        "locations": [
+          "FIELD",
+          "FRAGMENT_SPREAD",
+          "INLINE_FRAGMENT"
+        ],
         "args": [
           {
             "name": "if",
@@ -21069,7 +20939,9 @@
         "name": "specifiedBy",
         "description": "Exposes a URL that specifies the behavior of this scalar.",
         "isRepeatable": false,
-        "locations": ["SCALAR"],
+        "locations": [
+          "SCALAR"
+        ],
         "args": [
           {
             "name": "url",
