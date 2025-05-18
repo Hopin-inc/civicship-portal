@@ -18,7 +18,7 @@ import SearchFilterSheets from "@/app/search/components/SearchFilterSheet";
 export default function SearchPage() {
   const headerConfig = useMemo(
     () => ({
-      title: "体験・お手伝いを検索",
+      title: "体験を検索",
       showBackButton: true,
       showLogo: false,
     }),
@@ -37,19 +37,22 @@ export default function SearchPage() {
   });
 
   const router = useRouter();
-  const [selectedTab, setSelectedTab] = useState<SearchTabType>("activity");
+  // NOTE: お手伝いの検索は今はないので、コメントアウトしている
+  // const [selectedTab, setSelectedTab] = useState<SearchTabType>("activity");
   const [activeForm, setActiveForm] = useState<SearchFilterType>(null);
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-auto">
-        <div className="container px-4 py-2">
-          <SearchTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />
+        <div className="container px-4 pb-2 pt-8">
+        {/* <div className="container px-4 py-2"> */}
+          {/* <SearchTabs selectedTab={selectedTab} onTabChange={setSelectedTab} /> */}
           <FormProvider {...methods}>
             <SearchPageContent
               activeForm={activeForm}
               setActiveForm={setActiveForm}
-              selectedTab={selectedTab}
+              // selectedTab={selectedTab}
+              selectedTab="activity"
               formatDateRange={formatDateRange}
               prefectureLabels={prefectureLabels}
               router={router}
