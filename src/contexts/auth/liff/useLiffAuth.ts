@@ -48,10 +48,60 @@ const useLiffAuth = (liff: any, liffLogin: () => void | Promise<void>) => {
     setIsAuthenticating(true);
 
     try {
-      return await signInWithLiffToken(accessToken);
+      const success = await signInWithLiffToken(accessToken);
+      
+      if (!success) {
+        console.log("LIFF token authentication failed without throwing an error");
+        toast.error("LINE認証に失敗しました。もう一度お試しください。", {
+          action: {
+            label: "再試行",
+            onClick: () => window.location.reload()
+          },
+          duration: 10000
+        });
+      }
+      
+      return success;
     } catch (error) {
       console.error("Unexpected error during LIFF token authentication:", error);
-      toast.error("予期せぬエラーが発生しました。もう一度お試しください。");
+      
+      let errorMessage = "認証中に予期せぬエラーが発生しました。もう一度お試しください。";
+      let errorType = "unknown";
+      
+      if (error instanceof Error) {
+        if (error.message.includes("network")) {
+          errorMessage = "ネットワーク接続に問題が発生しました。インターネット接続を確認してください。";
+          errorType = "network";
+        } else if (error.message.includes("expired")) {
+          errorMessage = "認証の有効期限が切れました。再度お試しください。";
+          errorType = "expired";
+        } else if (error.message.includes("auth") || error.message.includes("token")) {
+          errorMessage = "認証に失敗しました。再度LINEログインを行ってください。";
+          errorType = "auth";
+        }
+      }
+      
+      toast.error(errorMessage, {
+        action: {
+          label: "再試行",
+          onClick: () => window.location.reload()
+        },
+        duration: 10000
+      });
+      
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("auth:error", {
+            detail: {
+              source: "liff",
+              errorType,
+              errorMessage,
+              originalError: error,
+            },
+          }),
+        );
+      }
+      
       return false;
     } finally {
       setIsAuthenticating(false);

@@ -147,19 +147,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [currentUserData, uid, login]);
 
+  const [liffAuthFailed, setLiffAuthFailed] = useState(false);
+
   useEffect(() => {
     const attemptAuthWithLiffToken = async () => {
-      if (liffAccessToken && isLiffLoggedIn && !uid) {
+      if (liffAccessToken && isLiffLoggedIn && !uid && !liffAuthFailed && !authState.error) {
+        console.log("Attempting to authenticate with LIFF token");
         updateAuthState({ loading: true });
         try {
-          await handleAuthenticateWithLiffToken(liffAccessToken);
-          updateAuthState({ 
-            lineAuthenticated: true,
-            loading: false,
-            error: null
-          });
+          const success = await handleAuthenticateWithLiffToken(liffAccessToken);
+          if (success) {
+            console.log("LIFF authentication successful");
+            updateAuthState({ 
+              lineAuthenticated: true,
+              loading: false,
+              error: null
+            });
+            setLiffAuthFailed(false);
+          } else {
+            console.log("LIFF authentication failed but no error thrown");
+            setLiffAuthFailed(true);
+            updateAuthState({ 
+              loading: false,
+              error: "LINE認証に失敗しました"
+            });
+          }
         } catch (error) {
-          console.error("LIFF authentication failed:", error);
+          console.error("LIFF authentication failed with error:", error);
+          setLiffAuthFailed(true);
           updateAuthState({ 
             loading: false,
             error: "LINE認証に失敗しました"
@@ -169,7 +184,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     attemptAuthWithLiffToken();
-  }, [liffAccessToken, isLiffLoggedIn, uid, handleAuthenticateWithLiffToken, updateAuthState]);
+  }, [liffAccessToken, isLiffLoggedIn, uid, handleAuthenticateWithLiffToken, updateAuthState, liffAuthFailed, authState.error]);
 
   useEffect(() => {
     const handleTokenExpired = (event: Event) => {
