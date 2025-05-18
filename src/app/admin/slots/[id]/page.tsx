@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useQuery, useMutation } from "@apollo/client";
-import { GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS } from "@/graphql/experience/opportunitySlot/query";
+import { useMutation } from "@apollo/client";
 import { EVALUATION_PASS, EVALUATION_FAIL } from "@/graphql/experience/evaluation/mutation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";
@@ -14,6 +13,7 @@ import { format } from "date-fns";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import React from "react";
+import { useSlotParticipations } from "@/hooks/useSlotParticipations";
 
 export default function SlotDetailPage({ params }: { params: { id: string } }) {
   const headerConfig = useMemo(() => ({
@@ -23,14 +23,19 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
   }), []);
   useHeaderConfig(headerConfig);
 
-  const { data, loading, error, refetch } = useQuery(GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS, {
-    variables: { id: params.id },
-  });
+  const { 
+    slot, 
+    participations, 
+    loading, 
+    error, 
+    loadMoreRef, 
+    hasMore, 
+    isLoadingMore 
+  } = useSlotParticipations(params.id);
 
   const [evaluationPass, { loading: passLoading }] = useMutation(EVALUATION_PASS, {
     onCompleted: () => {
       toast.success("参加を確認しました");
-      refetch();
     },
     onError: (error) => {
       toast.error(`参加確認に失敗しました: ${error.message}`);
@@ -40,7 +45,6 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
   const [evaluationFail, { loading: failLoading }] = useMutation(EVALUATION_FAIL, {
     onCompleted: () => {
       toast.success("不参加を記録しました");
-      refetch();
     },
     onError: (error) => {
       toast.error(`不参加記録に失敗しました: ${error.message}`);
@@ -49,7 +53,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
 
   const handleAttendanceChange = async (participationId: string, value: string) => {
     const input = { participationId };
-    const permission = { communityId: data?.opportunitySlot?.opportunity?.community?.id || "neo88" };
+    const permission = { communityId: slot?.opportunity?.community?.id || "neo88" };
 
     try {
       if (value === "PASSED") {
@@ -61,7 +65,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
     }
   };
 
-  if (loading) {
+  if (loading && participations.length === 0) {
     return (
       <div className="p-4 pt-16 flex justify-center items-center h-screen">
         <LoadingIndicator />
@@ -77,7 +81,6 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
     );
   }
 
-  const slot = data?.opportunitySlot;
   if (!slot) {
     return (
       <div className="p-4 pt-16">
@@ -85,8 +88,6 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
       </div>
     );
   }
-
-  const participations = slot.participations || [];
 
   return (
     <div className="p-4 pt-16">
@@ -109,7 +110,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-3">
                   <Avatar>
-                    <AvatarImage src={participation.user?.profileImageUrl || ""} />
+                    <AvatarImage src={participation.user?.image || ""} />
                     <AvatarFallback>{participation.user?.name?.[0] || "U"}</AvatarFallback>
                   </Avatar>
                   <div>
@@ -117,8 +118,8 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
                     <p className="text-sm text-muted-foreground">ID: {participation.user?.id}</p>
                   </div>
                 </div>
-                <ToggleGroup 
-                  type="single" 
+                <ToggleGroup
+                  type="single"
                   value={participation.evaluation?.status || "PENDING"}
                   onValueChange={(value) => {
                     if (value) handleAttendanceChange(participation.id, value);
@@ -135,6 +136,13 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
               </div>
             </CardWrapper>
           ))}
+          
+          {/* Infinite scroll loading ref */}
+          <div ref={loadMoreRef} className="py-4 flex justify-center">
+            {hasMore && (
+              isLoadingMore ? <LoadingIndicator /> : <p className="text-sm text-muted-foreground">スクロールして続きを読み込む</p>
+            )}
+          </div>
         </div>
       )}
     </div>

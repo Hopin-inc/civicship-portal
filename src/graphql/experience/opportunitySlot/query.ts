@@ -49,14 +49,18 @@ export const GET_OPPORTUNITY_SLOT = gql`
 `;
 
 export const GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS = gql`
-  query GetOpportunitySlotWithParticipations($id: ID!) {
+  query GetOpportunitySlotWithParticipations($id: ID!, $cursor: String, $first: Int) {
     opportunitySlot(id: $id) {
       ...OpportunitySlotFields
       opportunity {
         ...OpportunityFields
+        community {
+          id
+          name
+        }
       }
       reservations {
-        participations {
+        participations(cursor: $cursor, first: $first) {
           id
           status
           user {
@@ -70,8 +74,12 @@ export const GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS = gql`
           }
         }
       }
+      pageInfo @client {
+        hasNextPage
+        endCursor
+      }
     }
   }
   ${SLOT_FRAGMENT}
   ${OPPORTUNITY_FRAGMENT}
-`;  
+`;     
