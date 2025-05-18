@@ -22,7 +22,14 @@ export const usePhoneAuth = () => {
   /**
    * Start phone verification process with the given phone number
    */
-  const startPhoneVerification = async (phoneNumber: string): Promise<boolean> => {
+  const startPhoneVerification = async (phoneNumber: string, uid: string | null = null): Promise<boolean> => {
+    if (!uid) {
+      toast.error("LINEログインが必要です");
+      toast.info("電話番号認証の前にLINEログインを完了してください");
+      router.push("/login"); // Redirect to login page
+      return false;
+    }
+    
     setIsVerifying(true);
     try {
       const verId = await startPhoneNumberVerification(phoneNumber, null, null);

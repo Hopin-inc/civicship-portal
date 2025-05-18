@@ -32,14 +32,14 @@ type AuthContextType = UserInfo & {
   logout: () => Promise<void>;
   loginWithLiff: () => Promise<void>;
   isAuthenticating: boolean;
-  createUser: (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
+  createUser: (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null, uid?: string | null) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
 
   phoneNumber: string | null;
   phoneAuth: {
     isVerifying: boolean;
     verificationId: string | null;
     phoneUid: string | null;
-    startPhoneVerification: (phoneNumber: string) => Promise<boolean>;
+    startPhoneVerification: (phoneNumber: string, uid?: string | null) => Promise<boolean>;
     verifyPhoneCode: (code: string) => Promise<boolean>;
   };
   isPhoneVerified: boolean;
@@ -242,7 +242,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       logout,
       loginWithLiff,
       isAuthenticating,
-      createUser,
+      createUser: (name, currentPrefecture, phoneUid) => createUser(name, currentPrefecture, phoneUid, uid),
 
       phoneNumber,
       phoneAuth: {

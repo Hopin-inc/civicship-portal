@@ -39,7 +39,7 @@ export function PhoneVerificationForm() {
     }
 
     const formattedPhone = normalizePhoneNumber(phoneNumber);
-    const success = await phoneAuth.startPhoneVerification(formattedPhone);
+    const success = await phoneAuth.startPhoneVerification(formattedPhone, uid);
     if (success) {
       setStep("code");
     }

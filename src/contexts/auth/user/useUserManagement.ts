@@ -26,12 +26,20 @@ export const useUserManagement = (
   const createUser = async (
     name: string,
     currentPrefecture: GqlCurrentPrefecture,
-    phoneUid?: string | null
+    phoneUid?: string | null,
+    uid?: string | null
   ): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
     try {
+      if (!uid) {
+        toast.error("LINEログインが必要です");
+        toast.info("ユーザー登録の前にLINEログインを完了してください");
+        return null;
+      }
+
       const effectivePhoneUid = phoneUid || phoneVerificationState.phoneUid || undefined;
       const phoneNumber = getVerifiedPhoneNumber();
       console.log("Creating user with phone UID:", effectivePhoneUid);
+      
       if (!phoneNumber) {
         throw new Error("No verified phone number found.");
       }
@@ -51,7 +59,13 @@ export const useUserManagement = (
       return data?.userSignUp?.user ?? null;
     } catch (error) {
       console.error("Failed to create user:", error);
-      toast.error("ユーザー作成に失敗しました");
+      
+      if (error instanceof Error && error.message.includes("Authentication required")) {
+        toast.error("認証が不足しています。再度LINEログインを行ってください");
+      } else {
+        toast.error("ユーザー作成に失敗しました");
+      }
+      
       return null;
     }
   };
