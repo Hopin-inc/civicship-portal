@@ -37,16 +37,16 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
         <div className="flex justify-around items-center">
           <Link
             href="/activities"
-            className={getLinkStyle("/activities", "/activities/*", "/search/*")}
+            className={cn(getLinkStyle("/activities", "/activities/*", "/search/*"), "flex-grow")}
           >
             <Search size={24} />
             <span className="text-xs mt-1">見つける</span>
           </Link>
-          <Link href="/places" className={getLinkStyle("/places", "/places/*")}>
+          <Link href="/places" className={cn(getLinkStyle("/places", "/places/*"), "flex-grow")}>
             <Globe size={24} />
             <span className="text-xs mt-1">拠点</span>
           </Link>
-          <Link href="/users/me" className={getLinkStyle("/users/me", "/users/me/*")}>
+          <Link href="/users/me" className={cn(getLinkStyle("/users/me", "/users/me/*"), "flex-grow")}>
             <User size={24} />
             <span className="text-xs mt-1">マイページ</span>
           </Link>
