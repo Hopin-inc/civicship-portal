@@ -5,11 +5,14 @@ import { useArticle } from "@/app/articles/hooks/useArticle";
 import { useEffect, useMemo, useRef } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import ErrorState from "@/components/shared/ErrorState";
 
-export default function ArticlePage({ params }: { params: { id: string } }) {
-  const { article, recommendedArticles, isLoading, error, refetch } = useArticle(params.id);
+export default function ArticlePage() {
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+
+  const { article, recommendedArticles, isLoading, error, refetch } = useArticle(id ?? "");
 
   const headerConfig = useMemo(
     () => ({

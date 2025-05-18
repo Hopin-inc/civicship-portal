@@ -12,10 +12,7 @@ import { useCancelReservation } from "@/app/participations/[id]/hooks/useCancelR
 import { toast } from "sonner";
 import { GqlReservationStatus } from "@/types/graphql";
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
-
-interface ParticipationProps {
-  params: { id: string };
-}
+import { useParams } from "next/navigation";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
@@ -32,7 +29,7 @@ const mapReservationStatusToUIStatus = (status: GqlReservationStatus): Participa
   }
 };
 
-export default function ParticipationPage({ params }: ParticipationProps) {
+export default function ParticipationPage() {
   const headerConfig = useMemo(
     () => ({
       title: "予約詳細",
@@ -43,15 +40,17 @@ export default function ParticipationPage({ params }: ParticipationProps) {
   );
   useHeaderConfig(headerConfig);
 
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const {
     participation,
     opportunity,
     currentStatus,
     cancellationDeadline,
     loading,
-    error,
     hasError,
-  } = useParticipationPage(params.id);
+    refetch,
+  } = useParticipationPage(id ?? "");
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {

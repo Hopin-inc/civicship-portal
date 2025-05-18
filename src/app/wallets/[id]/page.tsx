@@ -9,14 +9,9 @@ import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
 import ErrorState from "@/components/shared/ErrorState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import EmptyState from "@/components/shared/EmptyState";
+import { useParams } from "next/navigation";
 
-type WalletPageProps = {
-  params: {
-    id: string;
-  };
-};
-
-export default function WalletPage({ params }: WalletPageProps) {
+export default function WalletPage() {
   const headerConfig = useMemo(
     () => ({
       title: "ポイント履歴",
@@ -27,12 +22,15 @@ export default function WalletPage({ params }: WalletPageProps) {
   );
   useHeaderConfig(headerConfig);
 
-  const walletId = params.id;
+  const params = useParams();
+  const walletId = Array.isArray(params.id) ? params.id[0] : params.id;
+
   const { user } = useAuth();
   const { transactions, isLoading, error, refetch } = useTransactionHistory(
     user?.id ?? "",
-    walletId,
+    walletId ?? "",
   );
+
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;

@@ -27,7 +27,7 @@ const ErrorState: React.FC<ErrorStateProps> = ({
           <AlertCircle className="h-10 w-10 text-muted-foreground" />
         </div>
 
-        <h1 className="text-3xl font-bold">{title}</h1>
+        <h1 className="text-display-sm font-bold">{title}</h1>
         <p className="text-left text-body-sm text-muted-foreground px-[40px]">
           以下のボタンから再読み込みをお試しください。
           <br />
@@ -36,16 +36,16 @@ const ErrorState: React.FC<ErrorStateProps> = ({
           トップページにお戻りください。
         </p>
 
-        <div className="w-full px-[40px] space-y-3">
+        <div className="w-full px-[40px]">
           {refetchRef?.current && (
             <Button className="w-full flex justify-center" onClick={handleRetry} variant="primary">
               <RefreshCcw className="mr-2 h-4 w-4" />
-              再試行する
+              再度読み込み
             </Button>
           )}
-
+          <div className="h-3" />
           <Link href="/" passHref>
-            <Button className="w-full flex justify-center" variant="secondary">
+            <Button className="w-full flex justify-center" size={"sm"} variant="text">
               <Home className="mr-2 h-4 w-4" />
               トップページに戻る
             </Button>
