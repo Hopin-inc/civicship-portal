@@ -30,7 +30,7 @@ function OpportunityCardHorizontal({ opportunity }: { opportunity: ActivityCard 
             />
           </div>
           <div className="flex-1 px-4 py-3">
-            <h2 className="text-title-md text-foreground line-clamp-1">{opportunity.title}</h2>
+            <h2 className="text-title-sm text-foreground line-clamp-1">{opportunity.title}</h2>
             <p className="mt-1 text-body-sm text-muted-foreground">
               {opportunity.feeRequired
                 ? `1人あたり${opportunity.feeRequired.toLocaleString()}円から`
