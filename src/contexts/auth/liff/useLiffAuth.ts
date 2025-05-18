@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import signInWithLiffToken from "@/contexts/auth/liff/signIn";
+import signInWithLiffToken from "./signIn";
 
 /**
  * LIFF authentication hook for handling LINE login

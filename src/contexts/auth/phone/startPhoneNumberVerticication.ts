@@ -1,6 +1,6 @@
 import { RecaptchaVerifier, signInWithPhoneNumber } from "@firebase/auth";
 import { phoneAuth } from "@/lib/firebase/firebase";
-import clearRecaptcha from "@/contexts/auth/reCAPTCHA/clearRecaptcha";
+import clearRecaptcha from "./reCAPTCHA/clearRecaptcha";
 
 // 1. reCAPTCHAの初期化
 const initializeRecaptcha = (

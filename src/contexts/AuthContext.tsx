@@ -7,14 +7,14 @@ import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
 import { auth } from "@/lib/firebase/firebase";
-import { setCookies, removeCookies } from "@/contexts/auth/cookie";
+import { setCookies, removeCookies } from "@/contexts/auth/shared/cookie";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
 import { useLiff } from "./LiffContext";
 import { COMMUNITY_ID } from "@/utils";
 import usePhoneAuth from "@/contexts/auth/phone/usePhoneAuth";
 import useLiffAuth from "@/contexts/auth/liff/useLiffAuth";
-import useUserManagement from "@/contexts/auth/user/useUserManagement";
+import useUserManagement from "@/contexts/auth/shared/user/useUserManagement";
 
 type AuthState = {
   phoneVerified: boolean;
