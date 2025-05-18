@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -8,14 +8,22 @@ import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useReservations } from "@/hooks/useReservations";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ReservationsPage() {
+  const [activeTab, setActiveTab] = useState<string>("all");
   const headerConfig = useMemo(() => ({
     hideHeader: true,
   }), []);
   useHeaderConfig(headerConfig);
 
-  const { reservations, loading, error, loadMoreRef, hasMore, isLoadingMore } = useReservations();
+  const statusFilter = useMemo(() => {
+    if (activeTab === "pending") return "APPLIED";
+    if (activeTab === "processed") return "NOT_APPLIED";
+    return null;
+  }, [activeTab]);
+
+  const { reservations, loading, error, loadMoreRef, hasMore, isLoadingMore } = useReservations(statusFilter);
 
   if (loading && reservations.length === 0) {
     return (
@@ -36,6 +44,15 @@ export default function ReservationsPage() {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">応募一覧</h1>
+      
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
+        <TabsList className="mb-2">
+          <TabsTrigger value="all">すべて</TabsTrigger>
+          <TabsTrigger value="pending">未対応</TabsTrigger>
+          <TabsTrigger value="processed">対応済み</TabsTrigger>
+        </TabsList>
+      </Tabs>
+      
       <div className="space-y-4">
         {reservations.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">応募が見つかりません</p>

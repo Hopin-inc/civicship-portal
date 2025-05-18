@@ -1,6 +1,6 @@
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { useQuery } from "@apollo/client";
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { GET_RESERVATIONS } from "../graphql/experience/reservation/query";
 
 export interface UseReservationsResult {
@@ -12,8 +12,20 @@ export interface UseReservationsResult {
   isLoadingMore: boolean;
 }
 
-export const useReservations = () => {
+export const useReservations = (statusFilter?: string | null) => {
   const isLoadingMore = useRef(false);
+
+  const filterVariables = useMemo(() => {
+    if (!statusFilter) return {};
+
+    if (statusFilter === 'APPLIED') {
+      return { status: 'APPLIED' };
+    } else if (statusFilter === 'NOT_APPLIED') {
+      return { status_not: 'APPLIED' };
+    }
+    
+    return {};
+  }, [statusFilter]);
 
   const {
     data,
@@ -22,6 +34,7 @@ export const useReservations = () => {
     fetchMore,
   } = useQuery(GET_RESERVATIONS, {
     variables: {
+      filter: filterVariables,
       first: 10,
     },
   });
@@ -38,6 +51,7 @@ export const useReservations = () => {
     try {
       await fetchMore({
         variables: {
+          filter: filterVariables,
           cursor: endCursor,
           first: 10,
         },
