@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useMutation } from "@apollo/client";
 import { LINK_PHONE_AUTH } from "@/graphql/account/identity/mutation";
-import { getVerifiedPhoneNumber } from "@/lib/firebase";
 
 export function PhoneVerificationForm() {
   const { phoneAuth, uid, user } = useAuth();
@@ -24,7 +23,8 @@ export function PhoneVerificationForm() {
     }
 
     return () => {
-      import("@/lib/firebase").then(({ clearRecaptcha }) => {
+      import("@/contexts/auth/reCAPTCHA/clearRecaptcha").then((module) => {
+        const clearRecaptcha = module.default;
         clearRecaptcha();
       });
     };
