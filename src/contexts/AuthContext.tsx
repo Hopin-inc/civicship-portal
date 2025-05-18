@@ -223,17 +223,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       );
     };
+    
+    const handleAuthWarning = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { warningType, warningMessage } = customEvent.detail;
+
+      console.log("Auth warning event detected:", customEvent.detail);
+
+      toast.warning(
+        warningMessage,
+        {
+          duration: 8000, // 8 seconds
+        }
+      );
+      
+      if (warningType === 'quota-exceeded') {
+        console.log("Quota exceeded warning, but continuing authentication flow");
+        updateAuthState({ 
+          lineAuthenticated: true,
+          loading: false,
+          error: null
+        });
+      }
+    };
 
     window.addEventListener('auth:token-expired', handleTokenExpired);
     window.addEventListener('auth:error', handleAuthError);
     window.addEventListener('auth:token-refresh-failed', handleAuthError);
+    window.addEventListener('auth:warning', handleAuthWarning);
 
     return () => {
       window.removeEventListener('auth:token-expired', handleTokenExpired);
       window.removeEventListener('auth:error', handleAuthError);
       window.removeEventListener('auth:token-refresh-failed', handleAuthError);
+      window.removeEventListener('auth:warning', handleAuthWarning);
     };
-  }, [router]);
+  }, [router, updateAuthState]);
 
   useEffect(() => {
     
