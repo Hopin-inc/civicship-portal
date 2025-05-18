@@ -3,7 +3,7 @@ import { getAnalytics, setUserId } from "@firebase/analytics";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { useParams, usePathname } from "next/navigation";
-import { app } from "@/lib/firebase";
+import { app } from "@/lib/firebase/firebase";
 
 const analytics = typeof window !== "undefined" ? getAnalytics(app) : undefined;
 export { analytics };
