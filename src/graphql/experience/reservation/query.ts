@@ -39,7 +39,7 @@ export const GET_RESERVATION = gql`
   query GetReservation($id: ID!) {
     reservation(id: $id) {
       ...ReservationFields
-      user {
+      createdByUser {
         ...UserFields
       }
       opportunitySlot {
