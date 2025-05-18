@@ -221,31 +221,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [router]);
 
   useEffect(() => {
-    const syncAuthStates = () => {
-      if (phoneVerificationState.verified !== authState.phoneVerified) {
-        console.log("Synchronizing phone verification state:", {
-          global: phoneVerificationState.verified,
-          central: authState.phoneVerified
-        });
-        updateAuthState({ phoneVerified: phoneVerificationState.verified });
-      }
-      
-      const isLineAuthenticated = !!uid;
-      if (isLineAuthenticated !== authState.lineAuthenticated) {
-        console.log("Synchronizing LINE authentication state:", {
-          current: isLineAuthenticated,
-          central: authState.lineAuthenticated
-        });
-        updateAuthState({ lineAuthenticated: isLineAuthenticated });
-      }
-    };
     
-    syncAuthStates();
+    if (phoneVerificationState.verified !== authState.phoneVerified) {
+      console.log("Synchronizing phone verification state:", {
+        global: phoneVerificationState.verified,
+        central: authState.phoneVerified
+      });
+      updateAuthState({ phoneVerified: phoneVerificationState.verified });
+    }
     
-    const intervalId = setInterval(syncAuthStates, 500);
-    
-    return () => clearInterval(intervalId);
-  }, [uid, authState.phoneVerified, authState.lineAuthenticated, updateAuthState]);
+    const isLineAuthenticated = !!uid;
+    if (isLineAuthenticated !== authState.lineAuthenticated) {
+      console.log("Synchronizing LINE authentication state:", {
+        current: isLineAuthenticated,
+        central: authState.lineAuthenticated
+      });
+      updateAuthState({ lineAuthenticated: isLineAuthenticated });
+    }
+  }, [uid, authState.phoneVerified, authState.lineAuthenticated, updateAuthState, phoneVerificationState.verified]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user: AuthUser | null) => {
@@ -299,11 +292,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               router.push(next);
             }
           } else {
-            if (authState.phoneVerified) {
-              router.push("/sign-up");
-            } else {
-              router.push("/sign-up/phone-verification");
-            }
+            console.log("User authenticated but no user record found");
+            
+            updateAuthState({ 
+              lineAuthenticated: true,
+              loading: false
+            });
           }
         } catch (error) {
           console.error("Failed to fetch user data:", error);
