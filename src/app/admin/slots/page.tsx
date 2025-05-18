@@ -22,7 +22,7 @@ export default function SlotsPage() {
   const { data, loading, error } = useQuery(GET_OPPORTUNITY_SLOTS, {
     variables: {
       filter: {
-        slotDateRange: {
+        dateRange: {
           lte: now.toISOString(),
         },
       },
