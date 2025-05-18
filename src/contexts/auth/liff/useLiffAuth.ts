@@ -36,7 +36,9 @@ const useLiffAuth = (liff: any, liffLogin: () => void | Promise<void>) => {
         }
       }
 
-      toast.error(errorMessage);
+      toast.error(errorMessage, {
+        id: `liff-login-error-${errorMessage.substring(0, 10)}`
+      });
       setIsExplicitLogin(false);
     }
   };
@@ -45,6 +47,12 @@ const useLiffAuth = (liff: any, liffLogin: () => void | Promise<void>) => {
    * Authenticate with LIFF token
    */
   const handleAuthenticateWithLiffToken = async (accessToken: string): Promise<boolean> => {
+    const failedTokenKey = `failed_liff_token:${accessToken}`;
+    if (typeof window !== "undefined" && localStorage.getItem(failedTokenKey)) {
+      console.log("Skipping authentication with previously failed token");
+      return false;
+    }
+    
     setIsAuthenticating(true);
 
     try {
@@ -52,12 +60,17 @@ const useLiffAuth = (liff: any, liffLogin: () => void | Promise<void>) => {
       
       if (!success) {
         console.log("LIFF token authentication failed without throwing an error");
+        if (typeof window !== "undefined") {
+          localStorage.setItem(failedTokenKey, Date.now().toString());
+        }
+        
         toast.error("LINE認証に失敗しました。もう一度お試しください。", {
           action: {
             label: "再試行",
             onClick: () => window.location.reload()
           },
-          duration: 10000
+          duration: 10000,
+          id: "liff-auth-failed" // Add unique ID to prevent duplicate toasts
         });
       }
       
@@ -81,12 +94,17 @@ const useLiffAuth = (liff: any, liffLogin: () => void | Promise<void>) => {
         }
       }
       
+      if (typeof window !== "undefined") {
+        localStorage.setItem(failedTokenKey, Date.now().toString());
+      }
+      
       toast.error(errorMessage, {
         action: {
           label: "再試行",
           onClick: () => window.location.reload()
         },
-        duration: 10000
+        duration: 10000,
+        id: `liff-auth-error-${errorType}` // Add unique ID to prevent duplicate toasts
       });
       
       if (typeof window !== "undefined") {

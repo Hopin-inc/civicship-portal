@@ -86,13 +86,20 @@ const signInWithFirebase = async (
   try {
     // pictureUrlがundefinedの場合にデフォルト画像URLを設定
     const profilePictureUrl = profile.pictureUrl || "https://example.com/default-profile-pic.png"; // デフォルトURL
-
-    await updateProfile(user, {
-      displayName: profile.displayName,
-      photoURL: profilePictureUrl,
-    });
     
-    console.log("LIFF authentication with profile update successful");
+    const needsUpdate = user.displayName !== profile.displayName || 
+                        user.photoURL !== profilePictureUrl;
+    
+    if (needsUpdate) {
+      console.log("Updating user profile with new information");
+      await updateProfile(user, {
+        displayName: profile.displayName,
+        photoURL: profilePictureUrl,
+      });
+      console.log("LIFF authentication with profile update successful");
+    } else {
+      console.log("Profile unchanged, skipping updateProfile call");
+    }
   } catch (error) {
     if (error instanceof Error && error.message.includes("quota-exceeded")) {
       console.warn("Profile update failed due to quota exceeded, but authentication successful");

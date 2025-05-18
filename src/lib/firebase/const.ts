@@ -35,6 +35,14 @@ const categorizeFirebaseError = (
         retryable: false,
       };
     }
+    
+    if (code === "auth/quota-exceeded") {
+      return {
+        type: "quota-exceeded",
+        message: "プロファイル更新の制限に達しました。プロファイル情報は更新されていません。",
+        retryable: false,
+      };
+    }
   }
 
   if (error?.message?.includes("LIFF authentication failed")) {

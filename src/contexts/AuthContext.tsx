@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { GqlUser, GqlCurrentPrefecture, useCurrentUserQuery, useUserSignUpMutation } from "@/types/graphql";
 import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
@@ -149,42 +149,62 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [liffAuthFailed, setLiffAuthFailed] = useState(false);
 
-  useEffect(() => {
-    const attemptAuthWithLiffToken = async () => {
-      if (liffAccessToken && isLiffLoggedIn && !uid && !liffAuthFailed && !authState.error) {
-        console.log("Attempting to authenticate with LIFF token");
-        updateAuthState({ loading: true });
-        try {
-          const success = await handleAuthenticateWithLiffToken(liffAccessToken);
-          if (success) {
-            console.log("LIFF authentication successful");
-            updateAuthState({ 
-              lineAuthenticated: true,
-              loading: false,
-              error: null
-            });
-            setLiffAuthFailed(false);
-          } else {
-            console.log("LIFF authentication failed but no error thrown");
-            setLiffAuthFailed(true);
-            updateAuthState({ 
-              loading: false,
-              error: "LINE認証に失敗しました"
-            });
-          }
-        } catch (error) {
-          console.error("LIFF authentication failed with error:", error);
+  const prevLiffAccessToken = useRef<string | null>(null);
+
+  const attemptAuthWithLiffToken = useCallback(async () => {
+    if (liffAccessToken && 
+        isLiffLoggedIn && 
+        !uid && 
+        !liffAuthFailed && 
+        !authState.error) {
+      
+      const failedTokenKey = `failed_liff_token:${liffAccessToken}`;
+      if (typeof window !== "undefined" && localStorage.getItem(failedTokenKey)) {
+        console.log("Skipping authentication with previously failed token (from localStorage)");
+        return;
+      }
+      
+      if (liffAccessToken === prevLiffAccessToken.current) {
+        console.log("Skipping authentication with already attempted token");
+        return;
+      }
+      
+      prevLiffAccessToken.current = liffAccessToken;
+      
+      console.log("Attempting to authenticate with LIFF token");
+      updateAuthState({ loading: true });
+      try {
+        const success = await handleAuthenticateWithLiffToken(liffAccessToken);
+        if (success) {
+          console.log("LIFF authentication successful");
+          updateAuthState({ 
+            lineAuthenticated: true,
+            loading: false,
+            error: null
+          });
+          setLiffAuthFailed(false);
+        } else {
+          console.log("LIFF authentication failed but no error thrown");
           setLiffAuthFailed(true);
           updateAuthState({ 
             loading: false,
             error: "LINE認証に失敗しました"
           });
         }
+      } catch (error) {
+        console.error("LIFF authentication failed with error:", error);
+        setLiffAuthFailed(true);
+        updateAuthState({ 
+          loading: false,
+          error: "LINE認証に失敗しました"
+        });
       }
-    };
+    }
+  }, [liffAccessToken, isLiffLoggedIn, uid, liffAuthFailed, authState.error, handleAuthenticateWithLiffToken, updateAuthState]);
 
+  useEffect(() => {
     attemptAuthWithLiffToken();
-  }, [liffAccessToken, isLiffLoggedIn, uid, handleAuthenticateWithLiffToken, updateAuthState, liffAuthFailed, authState.error]);
+  }, [attemptAuthWithLiffToken]);
 
   useEffect(() => {
     const handleTokenExpired = (event: Event) => {
@@ -199,6 +219,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             onClick: () => router.push("/sign-up/phone-verification")
           },
           duration: 10000, // 10 seconds
+          id: "auth-token-expired" // Add unique ID
         }
       );
     };
@@ -220,6 +241,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             onClick: () => router.push("/login")
           } : undefined,
           duration: 10000, // 10 seconds
+          id: `auth-error-${errorType}` // Add unique ID based on error type
         }
       );
     };
@@ -234,16 +256,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         warningMessage,
         {
           duration: 8000, // 8 seconds
+          id: `auth-warning-${warningType}` // Add unique ID to prevent duplicate toasts
         }
       );
       
       if (warningType === 'quota-exceeded') {
         console.log("Quota exceeded warning, but continuing authentication flow");
-        updateAuthState({ 
-          lineAuthenticated: true,
-          loading: false,
-          error: null
-        });
+        if (!authState.lineAuthenticated) {
+          updateAuthState({ 
+            lineAuthenticated: true,
+            loading: false,
+            error: null
+          });
+        }
       }
     };
 
@@ -324,7 +349,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             });
 
             if (isExplicitLogin) {
-              toast.success("ログインしました！");
+              toast.success("ログインしました！", {
+                id: "login-success"
+              });
               setIsExplicitLogin(false); // フラグをリセットして再表示を防止
             }
 
@@ -351,7 +378,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               label: "再試行",
               onClick: () => window.location.reload()
             },
-            duration: 10000
+            duration: 10000,
+            id: "user-fetch-error"
           });
         } finally {
           updateAuthState({ loading: false });
