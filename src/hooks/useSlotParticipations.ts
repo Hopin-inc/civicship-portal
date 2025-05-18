@@ -1,7 +1,7 @@
-import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { useQuery } from "@apollo/client";
 import { useRef } from 'react';
-import { GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS } from "@/graphql/experience/opportunitySlot/query";
+import { GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS } from "../graphql/experience/opportunitySlot/query";
 
 export interface UseSlotParticipationsResult {
   slot: any;
@@ -29,7 +29,7 @@ export const useSlotParticipations = (slotId: string) => {
   });
 
   const slot = data?.opportunitySlot || {};
-  const allParticipations = slot.reservations?.flatMap(reservation => reservation.participations || []) || [];
+  const allParticipations = slot.reservations?.flatMap((reservation: any) => reservation.participations || []) || [];
   const endCursor = slot.pageInfo?.endCursor;
   const hasNextPage = slot.pageInfo?.hasNextPage ?? false;
 
@@ -52,7 +52,7 @@ export const useSlotParticipations = (slotId: string) => {
 
           const newOpportunitySlot = {
             ...prev.opportunitySlot,
-            reservations: prev.opportunitySlot.reservations.map((prevReservation, index) => {
+            reservations: prev.opportunitySlot.reservations.map((prevReservation: any, index: number) => {
               const newReservation = fetchMoreResult.opportunitySlot.reservations[index];
               return {
                 ...prevReservation,
