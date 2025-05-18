@@ -15,7 +15,8 @@ import { toast } from "sonner";
 
 export default function TicketsPage() {
   const headerConfig = useMemo(() => ({
-    hideHeader: true,
+    title: "チケット発行",
+    showLogo: false,
   }), []);
   useHeaderConfig(headerConfig);
   const router = useRouter();
@@ -63,8 +64,8 @@ export default function TicketsPage() {
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">チケット一覧</h1>
-        <Button 
-          onClick={() => tickets.length > 0 && handleIssueTicket(tickets[0]?.id)} 
+        <Button
+          onClick={() => tickets.length > 0 && handleIssueTicket(tickets[0]?.id)}
           disabled={isIssuing || claimLoading || tickets.length === 0}
         >
           {isIssuing || claimLoading ? "処理中..." : "チケット発行"}

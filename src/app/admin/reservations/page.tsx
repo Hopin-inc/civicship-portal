@@ -15,34 +15,35 @@ export default function ReservationsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
-  
+
   const [activeTab, setActiveTab] = useState<string>(
     tabParam && ["all", "pending", "processed"].includes(tabParam) ? tabParam : "all"
   );
-  
+
   useEffect(() => {
     const newTab = tabParam && ["all", "pending", "processed"].includes(tabParam) ? tabParam : "all";
     if (activeTab !== newTab) {
       setActiveTab(newTab);
     }
   }, [tabParam, activeTab]);
-  
+
   const headerConfig = useMemo(() => ({
-    hideHeader: true,
+    title: "応募管理",
+    showLogo: false,
   }), []);
   useHeaderConfig(headerConfig);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    
+
     const params = new URLSearchParams(searchParams.toString());
-    
+
     if (value === "all") {
       params.delete("tab"); // Remove tab parameter for default tab
     } else {
       params.set("tab", value);
     }
-    
+
     router.push(`/admin/reservations?${params.toString()}`);
   };
 
@@ -73,7 +74,7 @@ export default function ReservationsPage() {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">応募一覧</h1>
-      
+
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-4">
         <TabsList className="mb-2">
           <TabsTrigger value="all">すべて</TabsTrigger>
@@ -81,7 +82,7 @@ export default function ReservationsPage() {
           <TabsTrigger value="processed">対応済み</TabsTrigger>
         </TabsList>
       </Tabs>
-      
+
       <div className="space-y-4">
         {reservations.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">応募が見つかりません</p>
@@ -105,7 +106,7 @@ export default function ReservationsPage() {
                 </CardWrapper>
               </Link>
             ))}
-            
+
             {/* Infinite scroll loading ref */}
             <div ref={loadMoreRef} className="py-4 flex justify-center">
               {hasMore && (

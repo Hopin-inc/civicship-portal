@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { useMutation } from "@apollo/client";
 import { EVALUATION_PASS, EVALUATION_FAIL } from "@/graphql/experience/evaluation/mutation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { Button } from "@/components/ui/button";
 import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
@@ -12,25 +11,25 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import React from "react";
 import { useSlotParticipations } from "@/hooks/useSlotParticipations";
 
 export default function SlotDetailPage({ params }: { params: { id: string } }) {
   const headerConfig = useMemo(() => ({
     title: `開催日程詳細`,
+    showLogo: false,
     showBackButton: true,
     backTo: "/admin/slots",
   }), []);
   useHeaderConfig(headerConfig);
 
-  const { 
-    slot, 
-    participations, 
-    loading, 
-    error, 
-    loadMoreRef, 
-    hasMore, 
-    isLoadingMore 
+  const {
+    slot,
+    participations,
+    loading,
+    error,
+    loadMoreRef,
+    hasMore,
+    isLoadingMore
   } = useSlotParticipations(params.id);
 
   const [evaluationPass, { loading: passLoading }] = useMutation(EVALUATION_PASS, {
@@ -120,7 +119,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
                 </div>
                 <ToggleGroup
                   type="single"
-                  value={participation.evaluation?.status || "PENDING"}
+                  value={participation.evaluation?.status ?? "PENDING"}
                   onValueChange={(value) => {
                     if (value) handleAttendanceChange(participation.id, value);
                   }}
@@ -136,7 +135,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
               </div>
             </CardWrapper>
           ))}
-          
+
           {/* Infinite scroll loading ref */}
           <div ref={loadMoreRef} className="py-4 flex justify-center">
             {hasMore && (

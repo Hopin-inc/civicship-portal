@@ -12,7 +12,8 @@ import { useOpportunitySlots } from "@/hooks/useOpportunitySlots";
 
 export default function SlotsPage() {
   const headerConfig = useMemo(() => ({
-    hideHeader: true,
+    title: "出欠管理",
+    showLogo: false,
   }), []);
   useHeaderConfig(headerConfig);
 
@@ -61,7 +62,7 @@ export default function SlotsPage() {
                 </CardWrapper>
               </Link>
             ))}
-            
+
             {/* Infinite scroll loading ref */}
             <div ref={loadMoreRef} className="py-4 flex justify-center">
               {hasMore && (
