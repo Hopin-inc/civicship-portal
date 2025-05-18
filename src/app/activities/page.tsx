@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { useLoading } from "@/hooks/useLoading";
+import { useEffect, useMemo, useRef } from "react";
 import { useActivities } from "@/app/activities/hooks/useActivities";
 import ActivitiesFeaturedSection from "@/app/activities/components/FeaturedSection/FeaturedSection";
 import ActivitiesListSection from "@/app/activities/components/ListSection/ListSection";
-import { ErrorState } from "@/components/shared/ErrorState";
+import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
 import { GqlOpportunity, GqlOpportunityEdge } from "@/types/graphql";
 import { ActivityCard } from "@/app/activities/data/type";
-import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
 import { presenterActivityCard, sliceActivitiesBySection } from "@/app/activities/data/presenter";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import EmptyState from "@/components/shared/EmptyState";
+import ErrorState from "@/components/shared/ErrorState";
 
 const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
   edges
@@ -19,8 +20,6 @@ const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
     .map(presenterActivityCard);
 
 export default function ActivitiesPage() {
-  const { setIsLoading } = useLoading();
-
   const headerConfig = useMemo(
     () => ({
       showLogo: true,
@@ -30,40 +29,45 @@ export default function ActivitiesPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { opportunities, loading, error, loadMoreRef } = useActivities();
+  const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
 
-  const isInitialLoading = loading && !opportunities?.edges?.length;
-  const isSectionLoading = loading && !isInitialLoading;
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  useEffect(() => {
-    setIsLoading(isInitialLoading);
-  }, [isInitialLoading, setIsLoading]);
+  if (loading) {
+    return <LoadingIndicator />;
+  }
 
-  if (error) return <ErrorState message={`Error: ${error.message}`} />;
+  if (error) {
+    return <ErrorState title="募集一覧を読み込めませんでした" refetchRef={refetchRef} />;
+  }
+
+  if (!loading && !opportunities?.edges?.length) {
+    return <EmptyState title={"募集"} />;
+  }
 
   const activityCards = mapOpportunityCards(opportunities.edges);
   const { upcomingCards, featuredCards, listCards } = sliceActivitiesBySection(activityCards);
 
   return (
     <div className="min-h-screen">
-      <ActivitiesFeaturedSection
-        opportunities={featuredCards}
-        isInitialLoading={isInitialLoading}
-      />
+      <ActivitiesFeaturedSection opportunities={featuredCards} isInitialLoading={false} />
       <ActivitiesCarouselSection
         title="もうすぐ開催予定"
         opportunities={upcomingCards}
-        isInitialLoading={isInitialLoading}
+        isInitialLoading={false}
       />
       <ActivitiesListSection
         opportunities={listCards}
         loadMoreRef={loadMoreRef}
-        isInitialLoading={isInitialLoading}
-        isSectionLoading={isSectionLoading}
+        isInitialLoading={false}
+        isSectionLoading={loading}
       />
     </div>
   );

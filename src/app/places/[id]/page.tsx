@@ -1,39 +1,36 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useEffect, useRef } from "react";
 import { usePlaceDetail } from "@/app/places/[id]/hooks/usePlaceDetail";
 import PlaceOpportunities from "@/app/places/[id]/components/PlaceOpportunities";
 import PlaceFeaturedArticle from "@/app/places/[id]/components/PlaceFeaturedArticle";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { ImagesCarousel } from "@/components/ui/images-carousel";
-import { PlaceOverview } from "./components/PlaceOverview";
-import { PlaceAddress } from "./components/PlaceAddress";
+import ErrorState from "@/components/shared/ErrorState";
+import ImagesCarousel from "@/components/ui/images-carousel";
+import PlaceOverview from "./components/PlaceOverview";
+import PlaceAddress from "./components/PlaceAddress";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { NavigationButtons } from "@/components/shared/NavigationButtons";
+import NavigationButtons from "@/components/shared/NavigationButtons";
+import { notFound, useParams, useSearchParams } from "next/navigation";
 
-interface PlaceDetailProps {
-  params: {
-    id: string;
-  };
-  searchParams: {
-    userId?: string;
-  };
-}
+const PlaceDetail: FC = () => {
+  const params = useParams();
+  const searchParams = useSearchParams();
 
-const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const userId = searchParams.get("userId") ?? "";
 
-  const {
-    loading,
-    detail,
-    error,
-  } = usePlaceDetail({
-    placeId: params.id,
-    userId: searchParams.userId || "",
+  const { loading, detail, error, refetch } = usePlaceDetail({
+    placeId: id ?? "",
+    userId,
   });
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
-  if (loading) return <LoadingIndicator fullScreen />;
-  if (error) return <ErrorState message={error.message} />;
-  if (!detail) return <ErrorState message="Place not found" />;
+  if (loading) return <LoadingIndicator />;
+  if (error) return <ErrorState title="拠点を読み込めませんでした" refetchRef={refetchRef} />;
+  if (!detail) return notFound();
 
   return (
     <>

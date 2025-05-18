@@ -1,51 +1,58 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useSearchResults } from "@/app/search/result/hooks/useSearchResults";
-import { DateGroupedOpportunities } from "@/app/search/result/components/DateGroupedOpportunities";
-import { EmptySearchResults } from "@/app/search/result/components/EmptySearchResults";
-import { ErrorState } from "@/components/shared/ErrorState";
+import DateGroupedOpportunities from "@/app/search/result/components/DateGroupedOpportunities";
+import EmptySearchResults from "@/app/search/result/components/EmptySearchResults";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
+import ErrorState from "@/components/shared/ErrorState";
+import { useSearchParams } from "next/navigation";
 
-interface SearchResultPageProps {
-  searchParams?: {
-    location?: string;
-    from?: string;
-    to?: string;
-    guests?: string;
-    type?: "activity" | "quest";
-    ticket?: string;
-    q?: string;
+export default function SearchResultPage() {
+  const searchParams = useSearchParams();
+
+  const queryParams = {
+    location: searchParams.get("location") ?? undefined,
+    from: searchParams.get("from") ?? undefined,
+    to: searchParams.get("to") ?? undefined,
+    guests: searchParams.get("guests") ?? undefined,
+    type: searchParams.get("type") as "activity" | "quest" | undefined,
+    ticket: searchParams.get("ticket") ?? undefined,
+    q: searchParams.get("q") ?? undefined,
   };
-}
 
-export default function SearchResultPage({ searchParams = {} }: SearchResultPageProps) {
-  const { recommendedOpportunities, groupedOpportunities, loading, error } =
-    useSearchResults(searchParams);
+  const { recommendedOpportunities, groupedOpportunities, loading, error, refetch } =
+    useSearchResults(queryParams);
+
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
+
+  if (loading) {
+    return <LoadingIndicator />;
+  }
+
+  if (error) {
+    return <ErrorState title="検索結果を読み込めませんでした" refetchRef={refetchRef} />;
+  }
+
+  const isEmpty =
+    recommendedOpportunities.length === 0 && Object.keys(groupedOpportunities).length === 0;
+
+  if (isEmpty) {
+    return <EmptySearchResults searchQuery={queryParams.q} />;
+  }
 
   return (
     <div className="min-h-screen">
-      <main className="px-6 pb-6">
-        {loading ? (
-          <LoadingIndicator fullScreen={true} />
-        ) : error ? (
-          <ErrorState
-            title="検索エラー"
-            message="検索結果の取得中にエラーが発生しました。もう一度お試しください。"
-          />
-        ) : recommendedOpportunities.length === 0 &&
-          Object.keys(groupedOpportunities).length === 0 ? (
-          <EmptySearchResults searchQuery={searchParams.q} />
-        ) : (
-          <div>
-            <ActivitiesCarouselSection
-              title={"おすすめの体験"}
-              opportunities={recommendedOpportunities}
-            />
-            <DateGroupedOpportunities groupedOpportunities={groupedOpportunities} />
-          </div>
-        )}
+      <main>
+        <ActivitiesCarouselSection
+          title="おすすめの体験"
+          opportunities={recommendedOpportunities}
+        />
+        <DateGroupedOpportunities groupedOpportunities={groupedOpportunities} />
       </main>
     </div>
   );

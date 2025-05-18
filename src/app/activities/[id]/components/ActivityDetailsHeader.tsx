@@ -3,7 +3,7 @@
 import React from "react";
 import { ChevronRight, MapPin, Ticket } from "lucide-react";
 import { ActivityDetail } from "@/app/activities/data/type";
-import { ImagesCarousel } from "@/components/ui/images-carousel";
+import ImagesCarousel from "@/components/ui/images-carousel";
 
 interface ActivityDetailsHeaderProps {
   opportunity: ActivityDetail;

@@ -6,17 +6,8 @@ import { GqlOpportunity, useGetOpportunitiesQuery } from "@/types/graphql";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
 import { ActivityCard } from "@/app/activities/data/type";
 
-interface useSameStateActivitiesResult {
-  sameStateActivities: ActivityCard[];
-  loading: boolean;
-  error: any;
-}
-
-export const useSameStateActivities = (
-  opportunityId: string,
-  stateCode: string,
-): useSameStateActivitiesResult => {
-  const { data, loading, error } = useGetOpportunitiesQuery({
+export const useSameStateActivities = (opportunityId: string, stateCode: string) => {
+  const { data, loading, error, refetch } = useGetOpportunitiesQuery({
     variables: {
       filter: {
         communityIds: [COMMUNITY_ID],
@@ -39,5 +30,6 @@ export const useSameStateActivities = (
     sameStateActivities,
     loading,
     error,
+    refetch,
   };
 };

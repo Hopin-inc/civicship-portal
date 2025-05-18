@@ -1,10 +1,12 @@
+"use client";
+
 import useEmblaCarousel from "embla-carousel-react";
 import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 
 const AUTO_PLAY_INTERVAL = 5000;
 
-export const ImagesCarousel = ({ images, title }: { images: string[]; title: string }) => {
+const ImagesCarousel = ({ images, title }: { images: string[]; title: string }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "start",
@@ -88,3 +90,5 @@ export const ImagesCarousel = ({ images, title }: { images: string[]; title: str
     </div>
   );
 };
+
+export default ImagesCarousel;

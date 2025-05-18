@@ -12,7 +12,7 @@ interface ParticipationDetailsProps {
   participation: ParticipationDetail;
 }
 
-export const ParticipationDetails: React.FC<ParticipationDetailsProps> = ({
+const ParticipationDetails: React.FC<ParticipationDetailsProps> = ({
   opportunity,
   participation,
 }) => {

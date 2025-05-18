@@ -44,7 +44,7 @@ const createPlaceholderIcon = async (size: number): Promise<google.maps.Icon> =>
   return {
     url: canvas.toDataURL("image/png"),
     scaledSize: new google.maps.Size(size, size),
-    anchor: new google.maps.Point(size / 2, size / 2),
+    anchor: new google.maps.Point(size / 2, size / 2 + 10),
   };
 };
 
@@ -98,7 +98,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         const markerIcon: google.maps.Icon = {
           url: canvas.toDataURL("image/png", 1.0),
           scaledSize: new google.maps.Size(displaySize, displaySize),
-          anchor: new google.maps.Point(displaySize / 2, displaySize / 2),
+          anchor: new google.maps.Point(displaySize / 2, displaySize / 2 + (isSelected ? 30 : 0)),
         };
 
         markerIconCache.set(data.id, markerIcon);

@@ -1,39 +1,27 @@
 "use client";
 
 import React from "react";
-import { UserProfileHeader } from "./UserProfileHeader";
-import { UserTicketsAndPoints } from "./UserTicketsAndPoints";
+import UserProfileHeader from "./UserProfileHeader";
+import UserTicketsAndPoints from "./UserTicketsAndPoints";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
+import ErrorState from "@/components/shared/ErrorState";
 import { GeneralUserProfile } from "@/app/users/data/type";
 import { UserAsset } from "@/app/wallets/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface UserProfileSectionProps {
   userId: string;
-  isLoading: boolean;
-  error: any;
   profile: GeneralUserProfile;
   userAsset: UserAsset;
   isOwner: boolean;
 }
 
-export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
+const UserProfileSection: React.FC<UserProfileSectionProps> = ({
   userId,
-  isLoading,
-  error,
   profile,
   userAsset,
   isOwner,
 }) => {
-  if (isLoading) {
-    return <LoadingIndicator />;
-  }
-
-  if (error || !profile) {
-    return <ErrorState message="ユーザー情報の取得に失敗しました" />;
-  }
-
   return (
     <div className="max-w-4xl mx-auto">
       <UserProfileHeader

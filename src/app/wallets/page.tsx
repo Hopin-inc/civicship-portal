@@ -1,19 +1,16 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useWallet } from "@/app/wallets/hooks/useWallet";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { WalletCard } from "@/app/wallets/components/WalletCard";
-import { WalletHistoryButton } from "@/app/wallets/components/WalletHistoryButton";
-import { WalletInfoSection } from "@/app/wallets/components/WalletInfoSection";
-import { WalletActionButton } from "@/app/wallets/components/WalletActionButton";
-import { WalletUsageSection } from "@/app/wallets/components/WalletUsageSection";
+import WalletCard from "@/app/wallets/components/WalletCard";
+import WalletHistoryButton from "@/app/wallets/components/WalletHistoryButton";
+import WalletInfoSection from "@/app/wallets/components/WalletInfoSection";
+import WalletUsageSection from "@/app/wallets/components/WalletUsageSection";
+import ErrorState from "@/components/shared/ErrorState";
 
 export default function WalletsPage() {
-  const { userAsset, isLoading, error } = useWallet();
-
   const headerConfig = useMemo(
     () => ({
       title: "保有ポイント",
@@ -24,20 +21,18 @@ export default function WalletsPage() {
   );
   useHeaderConfig(headerConfig);
 
+  const { userAsset, isLoading, error, refetch } = useWallet();
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
+
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingIndicator />
-      </div>
-    );
+    return <LoadingIndicator />;
   }
 
   if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <ErrorState message="ウォレット情報の取得に失敗しました" />
-      </div>
-    );
+    return <ErrorState title="保有ポイントを読み込めませんでした" refetchRef={refetchRef} />;
   }
 
   return (
@@ -45,7 +40,6 @@ export default function WalletsPage() {
       <WalletCard currentPoint={userAsset.points.currentPoint} isLoading={isLoading} />
       <WalletHistoryButton walletId={userAsset.points.walletId} />
       <WalletInfoSection />
-      <WalletActionButton> 投稿してみる </WalletActionButton>
       <WalletUsageSection
         title="ポイントを使う"
         message="ポイントを使ってサービスを利用できるようになったら、LINEからお伝えします💪"

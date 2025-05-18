@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
-import React from 'react';
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import React from "react";
 import {
   GqlOpportunitiesConnection,
   GqlOpportunityCategory,
@@ -14,6 +14,7 @@ export interface UseActivitiesResult {
   loading: boolean;
   error: any;
   loadMoreRef: React.RefObject<HTMLDivElement>;
+  refetch: () => void;
 }
 
 const fallbackConnection: GqlOpportunitiesConnection = {
@@ -28,12 +29,7 @@ const fallbackConnection: GqlOpportunitiesConnection = {
 };
 
 export const useActivities = (): UseActivitiesResult => {
-  const {
-    data,
-    loading,
-    error,
-    fetchMore,
-  } = useGetOpportunitiesQuery({
+  const { data, loading, error, fetchMore, refetch } = useGetOpportunitiesQuery({
     variables: {
       filter: {
         category: GqlOpportunityCategory.Activity,
@@ -41,8 +37,8 @@ export const useActivities = (): UseActivitiesResult => {
       },
       first: 20,
     },
-    fetchPolicy: 'cache-and-network',
-    nextFetchPolicy: 'cache-first',
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
   });
 
   const opportunities = data?.opportunities ?? fallbackConnection;
@@ -70,10 +66,7 @@ export const useActivities = (): UseActivitiesResult => {
           ...prev,
           opportunities: {
             ...prev.opportunities,
-            edges: [
-              ...prev.opportunities.edges,
-              ...fetchMoreResult.opportunities.edges,
-            ],
+            edges: [...prev.opportunities.edges, ...fetchMoreResult.opportunities.edges],
             pageInfo: fetchMoreResult.opportunities.pageInfo,
           },
         };
@@ -92,5 +85,6 @@ export const useActivities = (): UseActivitiesResult => {
     loading,
     error,
     loadMoreRef,
+    refetch,
   };
 };

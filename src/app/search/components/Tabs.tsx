@@ -1,3 +1,4 @@
+/*
 "use client";
 
 import React from "react";
@@ -14,7 +15,7 @@ const isSearchTabType = (value: string): value is SearchTabType => {
   return value === "activity" || value === "quest";
 };
 
-export const SearchTabs: React.FC<SearchTabsProps> = ({ selectedTab, onTabChange }) => {
+const SearchTabs: React.FC<SearchTabsProps> = ({ selectedTab, onTabChange }) => {
   return (
     <Tabs
       value={selectedTab}
@@ -38,3 +39,4 @@ export const SearchTabs: React.FC<SearchTabsProps> = ({ selectedTab, onTabChange
 };
 
 export default SearchTabs;
+*/

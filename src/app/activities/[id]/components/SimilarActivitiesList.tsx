@@ -10,7 +10,7 @@ interface SameStateActivitiesProps {
   currentOpportunityId: string;
 }
 
-export const SameStateActivities: React.FC<SameStateActivitiesProps> = ({
+const SameStateActivities: React.FC<SameStateActivitiesProps> = ({
   header,
   opportunities,
   currentOpportunityId,
@@ -30,3 +30,5 @@ export const SameStateActivities: React.FC<SameStateActivitiesProps> = ({
     </section>
   );
 };
+
+export default SameStateActivities;
