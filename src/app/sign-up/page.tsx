@@ -12,8 +12,8 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (user) {
-      console.log("Sign-up page: User already exists, redirecting to dashboard");
-      router.push("/dashboard");
+      console.log("Sign-up page: User already exists, redirecting to home");
+      router.push("/");
       return;
     }
 

@@ -15,7 +15,7 @@ export const useUserManagement = (
   userSignUpMutation: any,
   setUser: (user: any) => void,
   setUid: (uid: string | null) => void,
-  liffLogout: () => void
+  liffLogout: () => void,
 ) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const cookies = useCookies();
@@ -27,7 +27,7 @@ export const useUserManagement = (
     name: string,
     currentPrefecture: GqlCurrentPrefecture,
     phoneUid?: string | null,
-    uid?: string | null
+    uid?: string | null,
   ): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
     try {
       if (!uid) {
@@ -39,7 +39,7 @@ export const useUserManagement = (
       const effectivePhoneUid = phoneUid || phoneVerificationState.phoneUid || undefined;
       const phoneNumber = getVerifiedPhoneNumber();
       console.log("Creating user with phone UID:", effectivePhoneUid);
-      
+
       if (!phoneNumber) {
         throw new Error("No verified phone number found.");
       }
@@ -48,7 +48,7 @@ export const useUserManagement = (
         variables: {
           input: {
             name,
-            currentPrefecture: currentPrefecture as any, // Type cast to resolve compatibility issue
+            currentPrefecture: currentPrefecture as any,
             communityId: COMMUNITY_ID,
             phoneUid: effectivePhoneUid,
             phoneNumber,
@@ -59,13 +59,13 @@ export const useUserManagement = (
       return data?.userSignUp?.user ?? null;
     } catch (error) {
       console.error("Failed to create user:", error);
-      
+
       if (error instanceof Error && error.message.includes("Authentication required")) {
         toast.error("認証が不足しています。再度LINEログインを行ってください");
       } else {
         toast.error("ユーザー作成に失敗しました");
       }
-      
+
       return null;
     }
   };
