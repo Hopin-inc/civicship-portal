@@ -8,8 +8,8 @@ import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
 import { ARTICLE_FRAGMENT } from "@/graphql/content/article/fragment";
 
 export const GET_RESERVATIONS = gql`
-  query GetReservations {
-    reservations {
+  query GetReservations($cursor: String, $first: Int) {
+    reservations(cursor: $cursor, first: $first) {
       edges {
         node {
           id
@@ -23,6 +23,12 @@ export const GET_RESERVATIONS = gql`
             }
           }
         }
+      }
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
       }
       totalCount
     }
