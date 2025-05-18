@@ -6,11 +6,7 @@ import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
-import {
-  auth,
-  phoneVerificationState,
-} from "@/lib/firebase/firebase";
-import { isPhoneVerified as checkPhoneVerified } from "@/contexts/auth/phone/utils";
+import { auth } from "@/lib/firebase/firebase";
 import { setCookies, removeCookies } from "@/contexts/auth/cookie";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
@@ -71,7 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserInfo["user"]>(null);
   
   const [authState, setAuthState] = useState<AuthState>({
-    phoneVerified: phoneVerificationState.verified,
+    phoneVerified: false,
     lineAuthenticated: false,
     loading: false,
     error: null
@@ -113,13 +109,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }));
     
     if (updates.phoneVerified !== undefined && 
-        phoneVerificationState.verified !== updates.phoneVerified) {
-      console.log("Updating global phone verification state:", updates.phoneVerified);
-      phoneVerificationState.verified = updates.phoneVerified;
-      
-      if (setIsPhoneVerified && isPhoneVerified !== updates.phoneVerified) {
-        setIsPhoneVerified(updates.phoneVerified);
-      }
+        isPhoneVerified !== updates.phoneVerified && 
+        setIsPhoneVerified) {
+      console.log("Updating phone verification state:", updates.phoneVerified);
+      setIsPhoneVerified(updates.phoneVerified);
     }
   }, [isPhoneVerified, setIsPhoneVerified]);
 
@@ -286,15 +279,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [router, updateAuthState]);
 
   useEffect(() => {
-    
-    if (phoneVerificationState.verified !== authState.phoneVerified) {
-      console.log("Synchronizing phone verification state:", {
-        global: phoneVerificationState.verified,
-        central: authState.phoneVerified
-      });
-      updateAuthState({ phoneVerified: phoneVerificationState.verified });
-    }
-    
     const isLineAuthenticated = !!uid;
     if (isLineAuthenticated !== authState.lineAuthenticated) {
       console.log("Synchronizing LINE authentication state:", {
@@ -303,7 +287,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       updateAuthState({ lineAuthenticated: isLineAuthenticated });
     }
-  }, [uid, authState.phoneVerified, authState.lineAuthenticated, updateAuthState, phoneVerificationState.verified]);
+  }, [uid, authState.lineAuthenticated, updateAuthState]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user: AuthUser | null) => {

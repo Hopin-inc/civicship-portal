@@ -1,11 +1,12 @@
-import { phoneVerificationState } from "@/lib/firebase/firebase";
 
 const isPhoneVerified = (): boolean => {
-  return phoneVerificationState.verified;
+  console.warn("isPhoneVerified() is deprecated. Use useAuth().isPhoneVerified instead.");
+  return false;
 };
 
 const getVerifiedPhoneNumber = (): string | null => {
-  return phoneVerificationState.verified ? phoneVerificationState.phoneNumber : null;
+  console.warn("getVerifiedPhoneNumber() is deprecated. Use useAuth().phoneNumber instead.");
+  return null;
 };
 
 const normalizePhoneNumber = (phone: string): string => {

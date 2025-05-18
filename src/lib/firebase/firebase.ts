@@ -16,24 +16,4 @@ const phoneApp = initializeApp(firebaseConfig, "phone-auth-app");
 const phoneAuth = getAuth(phoneApp);
 phoneAuth.tenantId = null;
 
-type PhoneVerificationState = {
-  phoneNumber: string | null;
-  verificationId: string | null;
-  verified: boolean;
-  phoneUid: string | null;
-  authToken: string | null;
-  refreshToken: string | null;
-  tokenExpiresAt: Date | null;
-};
-
-const phoneVerificationState: PhoneVerificationState = {
-  phoneNumber: null,
-  verificationId: null,
-  verified: false,
-  phoneUid: null,
-  authToken: null,
-  refreshToken: null,
-  tokenExpiresAt: null,
-};
-
-export { app, auth, phoneAuth, phoneApp, phoneVerificationState, PhoneAuthProvider };
+export { app, auth, phoneAuth, phoneApp, PhoneAuthProvider };

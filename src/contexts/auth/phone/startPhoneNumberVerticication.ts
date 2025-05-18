@@ -1,5 +1,5 @@
 import { RecaptchaVerifier, signInWithPhoneNumber } from "@firebase/auth";
-import { phoneAuth, phoneVerificationState } from "@/lib/firebase/firebase";
+import { phoneAuth } from "@/lib/firebase/firebase";
 import clearRecaptcha from "@/contexts/auth/reCAPTCHA/clearRecaptcha";
 
 // 1. reCAPTCHAの初期化
@@ -57,10 +57,6 @@ const startPhoneNumberVerification = async (
       phoneNumber,
       recaptchaVerifier,
     );
-
-    // 成功時に状態を更新
-    phoneVerificationState.phoneNumber = phoneNumber;
-    phoneVerificationState.verificationId = confirmationResult.verificationId;
 
     console.log("Phone number verification started successfully");
     return confirmationResult.verificationId;
