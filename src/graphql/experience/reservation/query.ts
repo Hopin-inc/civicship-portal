@@ -15,12 +15,22 @@ export const GET_RESERVATIONS = gql`
           id
           status
           createdAt
+          createdByUser {
+            id
+            name
+            image
+          }
           opportunitySlot {
             id
+            startsAt
+            endsAt
             opportunity {
               id
               title
             }
+          }
+          participations {
+            id
           }
         }
       }

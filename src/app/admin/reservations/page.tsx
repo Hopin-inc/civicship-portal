@@ -10,6 +10,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useReservations } from "@/hooks/useReservations";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function ReservationsPage() {
   const router = useRouter();
@@ -91,17 +92,39 @@ export default function ReservationsPage() {
             {reservations.map((reservation: any) => (
               <Link key={reservation.id} href={`/admin/reservations/${reservation.id}`}>
                 <CardWrapper className="p-4 cursor-pointer">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h2 className="font-semibold">応募 #{reservation.id}</h2>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(reservation.createdAt).toLocaleDateString('ja-JP')}
-                      </p>
-                      <p className="text-sm mt-1 px-2 py-0.5 bg-secondary inline-block rounded-full">
+                  <div className="flex flex-col space-y-3">
+                    <div className="flex justify-between items-center">
+                      {/* 予約者情報 */}
+                      <div className="flex items-center space-x-3">
+                        <Avatar>
+                          <AvatarImage src={reservation.createdByUser?.image || ""} />
+                          <AvatarFallback>{reservation.createdByUser?.name?.[0] || "U"}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{reservation.createdByUser?.name || "未設定"}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(reservation.createdAt).toLocaleDateString('ja-JP')}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-sm px-2 py-0.5 bg-secondary inline-block rounded-full">
                         {reservation.status}
                       </p>
                     </div>
-                    <Button variant="secondary" size="sm">詳細</Button>
+                    
+                    {/* 予約情報 */}
+                    <div className="text-sm space-y-1">
+                      <p><span className="font-medium">機会:</span> {reservation.opportunitySlot?.opportunity?.title}</p>
+                      <p><span className="font-medium">予約した日程:</span> {
+                        reservation.opportunitySlot?.startsAt && 
+                        `${new Date(reservation.opportunitySlot.startsAt).toLocaleDateString('ja-JP')} ${new Date(reservation.opportunitySlot.startsAt).toLocaleTimeString('ja-JP', {hour: '2-digit', minute:'2-digit'})} 〜 ${new Date(reservation.opportunitySlot.endsAt).toLocaleTimeString('ja-JP', {hour: '2-digit', minute:'2-digit'})}`
+                      }</p>
+                      <p><span className="font-medium">参加人数:</span> {reservation.participations?.length || 0}名</p>
+                    </div>
+                    
+                    <div className="flex justify-end">
+                      <Button variant="secondary" size="sm">詳細</Button>
+                    </div>
                   </div>
                 </CardWrapper>
               </Link>
