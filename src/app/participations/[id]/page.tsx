@@ -68,18 +68,22 @@ export default function ParticipationPage() {
     }
     const result = await handleCancel(reservationId);
     if (result.success) {
-      toast.success("予約をキャンセルしました");
+      toast.success("予約がキャンセルされました。");
       if (refetchRef.current) {
         refetchRef.current();
       }
-    } else {
-      toast.error(`予約のキャンセルが失敗しました`);
+    }else if (result.typename === "ReservationCancellationTimeoutError") {
+      toast.error("予約のキャンセルは24時間前まで可能です。");
+    }
+    else {
+      toast.error(`予約のキャンセルに失敗しました。`);
+      console.error("Cancel reservation failed:", result.error);
     }
   };
 
   if (loading) return <LoadingIndicator />;
   if (hasError || !reservationId || !opportunity || !participation) {
-    return <ErrorState title="予約ページを読み込めませんでした" refetchRef={refetchRef} />;
+    return <ErrorState title="Could not load reservation page" refetchRef={refetchRef} />;
   }
 
   return (
