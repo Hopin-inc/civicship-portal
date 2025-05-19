@@ -19,6 +19,7 @@ import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReserv
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
+import { ParticipationAge } from "./components/ParticipationAge";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -119,7 +120,7 @@ export default function ConfirmPage() {
         <LoginModal isOpen={ui.isLoginModalOpen} onClose={() => ui.setIsLoginModalOpen(false)} />
         <OpportunityInfo opportunity={opportunity} />
 
-        <div className="px-4">
+        <div className="px-6">
           <ReservationDetailsCard
             startDateTime={startDateTime}
             endDateTime={endDateTime}
@@ -129,18 +130,26 @@ export default function ConfirmPage() {
               address: opportunity?.place?.address || "",
             }}
           />
-          <PaymentSection
-            ticketCount={ticketCounter.count}
-            onIncrement={ticketCounter.increment}
-            onDecrement={ticketCounter.decrement}
-            maxTickets={availableTickets}
-            pricePerPerson={opportunity?.feeRequired ?? 0}
-            participantCount={participantCount}
-            useTickets={ui.useTickets}
-            setUseTickets={ui.setUseTickets}
-          />
-          <NotesSection />
+        </div>
+        <div className="h-2 bg-border" />
+        <ParticipationAge />
+        <div className="h-2 bg-border" />
+        <PaymentSection
+          ticketCount={ticketCounter.count}
+          onIncrement={ticketCounter.increment}
+          onDecrement={ticketCounter.decrement}
+          maxTickets={availableTickets}
+          pricePerPerson={opportunity?.feeRequired ?? 0}
+          participantCount={participantCount}
+          useTickets={ui.useTickets}
+          setUseTickets={ui.setUseTickets}
+        />
+        <div className="h-2 bg-border" />
+        <NotesSection />
+        <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border max-w-mobile-l w-full h-20 flex items-center px-4 py-4 justify-between mx-auto">
           <Button
+            size="lg"
+            className="mx-auto px-20"
             onClick={handleConfirm}
             disabled={
               creatingReservation || (ui.useTickets && ticketCounter.count > availableTickets)
@@ -148,7 +157,7 @@ export default function ConfirmPage() {
           >
             {creatingReservation ? "申込処理中..." : "申し込みを確定"}
           </Button>
-        </div>
+        </footer>
       </main>
     </>
   );
