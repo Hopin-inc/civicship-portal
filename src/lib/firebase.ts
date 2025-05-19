@@ -10,6 +10,7 @@ import {
 } from "@firebase/auth";
 import { LIFFLoginResponse } from "@/types/line";
 import retry from "retry";
+import { isRunningInLiff } from "@/utils/liff";
 
 export { PhoneAuthProvider };
 
@@ -207,7 +208,7 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
     }
 
     recaptchaVerifier = new RecaptchaVerifier(phoneAuth, "recaptcha-container", {
-      size: "invisible",
+      size: isRunningInLiff() ? "normal" : "invisible",
       callback: () => {
         console.log("reCAPTCHA solved!");
       },
