@@ -139,7 +139,7 @@ export default function ParticipationPage() {
           cancellationDeadline={cancellationDeadline}
           isCancellable={isCancellable}
           onCancel={onCancel}
-          isAfterParticipation={false}
+          isAfterParticipation={isAfterParticipation}
         />
       )}
     </div>
