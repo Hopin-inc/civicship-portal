@@ -61,20 +61,22 @@ const SelectionSheet: React.FC<SelectionSheetProps> = ({
   if (!activeForm) return null;
 
   const renderFooterButtons = () => (
-    <div className="max-w-md mx-auto fixed bottom-0 left-0 right-0 bg-background p-4 border-t">
-      <div className="flex justify-between items-center">
-        <Button onClick={handleClearSelection} variant="link">
-          選択を解除
-        </Button>
-        <Button onClick={onClose} variant="primary">
-          決定
-        </Button>
-      </div>
+    <div className="bg-background max-w-mobile-l w-full h-16 flex items-center justify-between mx-auto pt-3">
+      <Button
+        onClick={handleClearSelection}
+        variant="link"
+        className="text-label-md px-0 underline !text-foreground"
+      >
+        選択を解除
+      </Button>
+      <Button onClick={onClose} variant="primary" className="px-8 py-3">
+        決定
+      </Button>
     </div>
   );
 
   const renderDateSelection = () => (
-    <div className="flex-1 overflow-auto pb-24">
+    <div className="flex-1 overflow-auto h-auto pb-0 mb-0">
       <div className="space-y-2">
         {dateSections.map((section, index) => (
           <Button
@@ -105,18 +107,15 @@ const SelectionSheet: React.FC<SelectionSheetProps> = ({
     <Sheet open={isOpen} onOpenChange={handleSheetOpenChange}>
       <SheetContent
         side="bottom"
-        className="h-[300px] rounded-t-3xl overflow-hidden max-w-md mx-auto"
+        className="90-vh rounded-t-3xl overflow-auto max-w-md mx-auto pt-2 px-6"
         onPointerDownOutside={onClose}
       >
+        <div className="flex justify-center mb-3">
+          <div className="w-10 h-1 bg-muted-foreground/30 rounded-full"></div>
+        </div>
         <div className="h-full flex flex-col">
           <SheetHeader className="text-left pb-6">
-            <SheetTitle>
-              <div className="flex items-center">
-                <span className="text-lg font-bold">
-                  {activeForm === "date" ? "日付を選択" : "人数を選択"}
-                </span>
-              </div>
-            </SheetTitle>
+            <SheetTitle>{activeForm === "date" ? "日付を選択" : "人数を選択"}</SheetTitle>
           </SheetHeader>
 
           {activeForm === "date" ? renderDateSelection() : renderGuestSelection()}
