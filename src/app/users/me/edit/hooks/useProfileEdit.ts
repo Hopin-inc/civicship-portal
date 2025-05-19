@@ -93,7 +93,8 @@ const useProfileEdit = () => {
         variables: {
           input: {
             name: profile.name,
-            image: profile.image instanceof File ? { file: profile.image } : undefined,
+            image: profile.image instanceof File && profile.image.size > 0 && profile.image.name ? 
+              { file: profile.image } : undefined,
             bio: profile.bio ?? "",
             currentPrefecture: profile.currentPrefecture,
             urlFacebook: profile.urlFacebook ?? "",
