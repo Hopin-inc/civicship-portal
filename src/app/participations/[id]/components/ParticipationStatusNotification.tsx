@@ -19,7 +19,7 @@ const ParticipationStatusNotification: React.FC<StatusProps> = ({
   statusClass,
 }) => {
   return (
-    <div className={`p-3 rounded-xl border-[1px] ${statusClass} mb-6`}>
+    <div className={`p-3 rounded-xl border-[1px] ${statusClass} my-6`}>
       <div className="flex items-start gap-2">
         {status === "confirmed" ? (
           <Check className="w-5 h-5 mt-[3px] text-green-600" />
