@@ -8,11 +8,12 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import ParticipationStatusNotification from "@/app/participations/[id]/components/ParticipationStatusNotification";
 import ParticipationDetails from "@/app/participations/[id]/components/ParticipationDetails";
 import ParticipationActions from "@/app/participations/[id]/components/ParticipationActions";
-import { useCancelReservation } from "@/app/participations/[id]/hooks/useCancelReservation";
 import { toast } from "sonner";
 import { GqlReservationStatus } from "@/types/graphql";
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { useParams } from "next/navigation";
+import { errorMessages } from "@/utils/errorMessage";
+import useCancelReservation from "@/app/participations/[id]/hooks/useCancelReservation";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
@@ -72,12 +73,9 @@ export default function ParticipationPage() {
       if (refetchRef.current) {
         refetchRef.current();
       }
-    }else if (result.typename === "ReservationCancellationTimeoutError") {
-      toast.error("予約のキャンセルは24時間前まで可能です。");
-    }
-    else {
-      toast.error(`予約のキャンセルに失敗しました。`);
-      console.error("Cancel reservation failed:", result.error);
+    } else {
+      const message = errorMessages[result.code] ?? "予期しないエラーが発生しました。";
+      toast.error(message);
     }
   };
 
