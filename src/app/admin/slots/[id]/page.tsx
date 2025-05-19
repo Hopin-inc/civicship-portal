@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import { EVALUATION_PASS, EVALUATION_FAIL } from "@/graphql/experience/evaluation/mutation";
+import { BATCH_EVALUATE_PARTICIPATIONS } from "@/graphql/experience/evaluation/batchMutation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { CardWrapper } from "@/components/ui/card-wrapper";
+import { Card, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import { toast } from "sonner";
@@ -23,6 +26,10 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
     backTo: "/admin/slots",
   }), []);
   useHeaderConfig(headerConfig);
+
+  const [attendanceData, setAttendanceData] = useState<Record<string, string>>({});
+  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const {
     slot,
@@ -51,19 +58,71 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
       toast.error(`不参加記録に失敗しました: ${error.message}`);
     },
   });
+  
+  const [batchEvaluate, { loading: batchLoading }] = useMutation(BATCH_EVALUATE_PARTICIPATIONS, {
+    onCompleted: () => {
+      toast.success("出欠情報を保存しました");
+      setIsSaved(true);
+      setIsSaving(false);
+    },
+    onError: (error) => {
+      toast.error(`出欠情報の保存に失敗しました: ${error.message}`);
+      setIsSaving(false);
+    },
+  });
+  
+  useEffect(() => {
+    if (participations.length > 0) {
+      const initialAttendance: Record<string, string> = {};
+      participations.forEach((participation: any) => {
+        if (participation.evaluation?.status) {
+          initialAttendance[participation.id] = participation.evaluation.status;
+        } else {
+          initialAttendance[participation.id] = "PENDING";
+        }
+      });
+      setAttendanceData(initialAttendance);
+    }
+  }, [participations]);
 
-  const handleAttendanceChange = async (participationId: string, value: string) => {
-    const input = { participationId };
-    const permission = { communityId: slot?.opportunity?.community?.id || "neo88" };
+  const handleAttendanceSelection = (participationId: string, value: string) => {
+    if (isSaved) return; // 保存済みの場合は編集不可
+    setAttendanceData(prev => ({ ...prev, [participationId]: value }));
+  };
+
+  const handleSaveAllAttendance = async () => {
+    const isAllSelected = participations.every((participation: any) => 
+      attendanceData[participation.id] && attendanceData[participation.id] !== "PENDING"
+    );
+    
+    if (!isAllSelected) {
+      toast.error("すべての参加者の出欠を選択してください");
+      return;
+    }
+
+    setIsSaving(true);
+    
+    const evaluations = participations.map((participation: any) => ({
+      participationId: participation.id,
+      status: attendanceData[participation.id]
+    }));
 
     try {
-      if (value === "PASSED") {
-        await evaluationPass({ variables: { input, permission } });
-      } else if (value === "FAILED") {
-        await evaluationFail({ variables: { input, permission } });
-      }
+      await batchEvaluate({
+        variables: {
+          input: { evaluations },
+          permission: { communityId: slot?.opportunity?.community?.id || "neo88" }
+        }
+      });
     } catch (e) {
+      setIsSaving(false);
     }
+  };
+
+  const handleAttendanceChange = async (participationId: string, value: string) => {
+    if (isSaved) return;
+    
+    handleAttendanceSelection(participationId, value);
   };
 
   if (loading && participations.length === 0) {
@@ -121,11 +180,11 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
                 </div>
                 <ToggleGroup
                   type="single"
-                  value={participation.evaluation?.status ?? "PENDING"}
+                  value={attendanceData[participation.id] || "PENDING"}
                   onValueChange={(value) => {
                     if (value) handleAttendanceChange(participation.id, value);
                   }}
-                  disabled={passLoading || failLoading}
+                  disabled={isSaved || isSaving || passLoading || failLoading}
                 >
                   <ToggleGroupItem value="PASSED" aria-label="参加">
                     参加
@@ -144,6 +203,32 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
               isLoadingMore ? <LoadingIndicator /> : <p className="text-sm text-muted-foreground">スクロールして続きを読み込む</p>
             )}
           </div>
+
+          {/* 保存ボタン */}
+          {participations.length > 0 && !isSaved && (
+            <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
+              <CardFooter className="p-4">
+                <Button
+                  className="w-full"
+                  onClick={handleSaveAllAttendance}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "保存中..." : "出欠を保存する"}
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
+
+          {/* 保存済みの場合に表示するメッセージ */}
+          {participations.length > 0 && isSaved && (
+            <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
+              <CardFooter className="p-4 flex justify-center">
+                <p className="text-muted-foreground">
+                  出欠情報は保存済みです
+                </p>
+              </CardFooter>
+            </Card>
+          )}
         </div>
       )}
     </div>
