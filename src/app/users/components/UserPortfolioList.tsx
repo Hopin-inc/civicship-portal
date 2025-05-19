@@ -1,13 +1,15 @@
+"use client";
+
 import { Calendar, MapPin, Ellipsis, Plus, Clock, FileText, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import EmptyState from "@/components/shared/EmptyState";
+import EmptyStateWithSearch from "@/components/shared/EmptyStateWithSearch";
 import { RefObject } from "react";
-import { ParticipantsList } from "@/components/shared/ParticipantsList";
+import ParticipantsList from "@/components/shared/ParticipantsList";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
 import { ActivityCard } from "@/app/activities/data/type";
 import { AppPortfolio } from "@/app/users/data/type";
-import { GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
+import { GqlPortfolioSource, GqlReservationStatus, GqlOpportunityCategory } from "@/types/graphql";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,6 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 type Props = {
   userId: string;
@@ -73,13 +76,13 @@ const ActiveOpportunities = ({ opportunities }: ActiveOpportunitiesProps) => {
   if (!opportunities.length) return null;
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-        現在募集中の関わり
-        <span className="bg-primary-foreground text-primary text-xs font-medium px-2 py-0.5 rounded-full">
+    <div>
+      <div className="flex items-center gap-x-2">
+        <h2 className="text-display-sm font-semibold text-foreground py-4">現在募集中の関わり</h2>
+        <span className="bg-primary text-primary-foreground text-xs font-medium px-2 py-0.5 rounded-full">
           {opportunities.length}
         </span>
-      </h2>
+      </div>
       <div className="relative">
         <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
           <div className="flex gap-4">
@@ -119,11 +122,17 @@ const PortfolioCard = ({
       >
         <div className="relative w-full aspect-[164/205]">
           <Image
-            src={portfolio.image ?? "/placeholder-image.png"}
+            src={portfolio.image ?? PLACEHOLDER_IMAGE}
             alt={portfolio.title}
             fill
             className="object-cover"
+            placeholder={"blur"}
+            blurDataURL={PLACEHOLDER_IMAGE}
             sizes="(min-width: 640px) 50vw, 100vw"
+            onError={(e) => {
+              const img = e.target as HTMLImageElement;
+              img.src = PLACEHOLDER_IMAGE;
+            }}
           />
           {portfolio.source === "OPPORTUNITY" &&
           portfolio?.reservationStatus === GqlReservationStatus.Accepted &&
@@ -157,9 +166,12 @@ const PortfolioCard = ({
               <Calendar className="w-4 h-4" />
               <span>
                 {portfolio.date}
-                {portfolio.source === "OPPORTUNITY" && !isPast && (
-                  <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">予定</span>
-                )}
+                {portfolio.source === "OPPORTUNITY" &&
+                  !isPast &&
+                  portfolio.reservationStatus !== GqlReservationStatus.Canceled &&
+                  portfolio.reservationStatus !== GqlReservationStatus.Rejected && (
+                    <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">予定</span>
+                  )}
               </span>
             </div>
             {portfolio.location && (
@@ -175,7 +187,7 @@ const PortfolioCard = ({
   );
 };
 
-export const PortfolioGrid = ({
+const PortfolioGrid = ({
   portfolios,
   isLoadingMore,
   hasMore,
@@ -205,36 +217,27 @@ export const PortfolioGrid = ({
   );
 };
 
-
 const PhotoGallery = () => {
-  const images = ["/images/activities/activity-placeholder-1.jpg", "/images/activities/activity-placeholder-2.jpg", "/images/activities/activity-placeholder-3.jpg"];
+  const images = [
+    "/images/activities/activity-placeholder-1.jpg",
+    "/images/activities/activity-placeholder-2.jpg",
+    "/images/activities/activity-placeholder-3.jpg",
+  ];
 
   return (
     <div className="flex flex-row gap-2 mt-4 w-72 h-64">
       <div className="w-3/5 h-full relative">
         <div className="w-full h-full rounded-lg overflow-hidden">
-          <img
-            src={images[0]}
-            alt={"体験のイメージ画像1"}
-            className="w-full h-full object-cover"
-          />
+          <img src={images[0]} alt={"体験のイメージ画像1"} className="w-full h-full object-cover" />
         </div>
       </div>
 
       <div className="w-2/5 h-full flex flex-col gap-2">
         <div className="h-1/2 rounded-lg overflow-hidden">
-          <img
-            src={images[1]}
-            alt="体験のイメージ画像2"
-            className="w-full h-full object-cover"
-          />
+          <img src={images[1]} alt="体験のイメージ画像2" className="w-full h-full object-cover" />
         </div>
         <div className="h-1/2 rounded-lg overflow-hidden">
-          <img
-            src={images[2]}
-            alt="体験のイメージ画像3"
-            className="w-full h-full object-cover"
-          />
+          <img src={images[2]} alt="体験のイメージ画像3" className="w-full h-full object-cover" />
         </div>
       </div>
     </div>
@@ -243,8 +246,9 @@ const PhotoGallery = () => {
 
 // NOTE: 開発確認用のフラグ。ユーザーページ関連の修正が落ち着いたら削除する。
 const enableDummyPortfolios = false;
+const enableDummyActiveOpportunities = false;
 
-export const UserPortfolioList = ({
+const UserPortfolioList = ({
   isSysAdmin,
   activeOpportunities = [],
   isOwner,
@@ -267,12 +271,19 @@ export const UserPortfolioList = ({
   };
 
   return (
-    <section className="py-6">
-      {isSysAdmin && <ActiveOpportunities opportunities={activeOpportunities} />}
-
+    <section className="py-6 mt-0">
       <div className="space-y-4">
+        {isSysAdmin && (
+          <ActiveOpportunities
+            opportunities={
+              enableDummyActiveOpportunities ? dummyActivityCards : activeOpportunities
+            }
+          />
+        )}
         <div className="flex items-center justify-between">
-          <h2 className="text-display-sm font-semibold text-foreground py-4">これまでの関わり</h2>
+          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
+            これまでの関わり
+          </h2>
           {isOwner && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -299,7 +310,7 @@ export const UserPortfolioList = ({
           )}
         </div>
         {showEmptyState ? (
-          <EmptyState {...emptyStateProps} />
+          <EmptyStateWithSearch {...emptyStateProps} />
         ) : (
           <PortfolioGrid
             portfolios={enableDummyPortfolios ? dummyPortfolios : portfolios}
@@ -313,6 +324,7 @@ export const UserPortfolioList = ({
   );
 };
 
+export default UserPortfolioList;
 
 // #NOTE: スタイル確認用に作成、後ほど削除する
 const dummyPortfolios: AppPortfolio[] = [
@@ -397,3 +409,15 @@ const dummyPortfolios: AppPortfolio[] = [
     ],
   },
 ];
+
+const dummyActivityCards: ActivityCard[] = dummyPortfolios.map((portfolio) => ({
+  id: portfolio.id,
+  category:
+    portfolio.category === "EVENT" ? GqlOpportunityCategory.Event : GqlOpportunityCategory.Quest,
+  title: portfolio.title,
+  images: [portfolio.image || PLACEHOLDER_IMAGE],
+  location: portfolio.location || "",
+  hasReservableTicket: true,
+  feeRequired: 200,
+  communityId: "neo-88",
+}));

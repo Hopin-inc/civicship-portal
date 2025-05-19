@@ -9,12 +9,13 @@ import { toast } from "sonner";
 interface UseArticleResult {
   article: TArticleDetail | null;
   recommendedArticles: TArticleWithAuthor[];
-  loading: boolean;
+  isLoading: boolean;
   error: Error | null;
+  refetch: () => void;
 }
 
 export const useArticle = (id: string): UseArticleResult => {
-  const { data, loading, error } = useArticleQuery(id);
+  const { data, loading, error, refetch } = useArticleQuery(id);
 
   const article = useMemo(() => {
     return data?.article ? presenterArticleDetail(data.article) : null;
@@ -39,7 +40,8 @@ export const useArticle = (id: string): UseArticleResult => {
   return {
     article,
     recommendedArticles,
-    loading,
+    isLoading: loading,
     error: error || null,
+    refetch,
   };
 };

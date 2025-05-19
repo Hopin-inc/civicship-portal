@@ -1,64 +1,100 @@
 "use client";
 
-import { SameStateActivities } from "@/app/activities/[id]/components/SimilarActivitiesList";
-import { CompletionHeader } from "@/app/reservation/components/CompletionHeader";
-import { ActivitySummary } from "@/app/reservation/components/ActivitySummary";
-import { ReservationDetails } from "@/app/reservation/components/ReservationDetails";
-import { useReservationComplete } from "@/app/reservation/hooks/useReservationComplete";
-import React from "react";
-import { ReservationContentGate } from "@/app/reservation/contentGate";
+import SameStateActivities from "@/app/activities/[id]/components/SimilarActivitiesList";
+import CompletionHeader from "@/app/reservation/complete/components/CompletionHeader";
+import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
+import React, { useEffect, useMemo, useRef } from "react";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { useSearchParams } from "next/navigation";
+import { HeaderConfig } from "@/contexts/HeaderContext";
+import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
+import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import ErrorState from "@/components/shared/ErrorState";
+import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
+import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
+import ArticleCard from "@/app/articles/components/Card";
+import { useArticles } from "@/app/articles/hooks/useArticles";
 
 export default function CompletePage() {
-  const result = useReservationComplete();
-
-  return (
-    <ReservationContentGate
-      loading={result.isLoading}
-      error={result.error}
-      nullChecks={[
-        { label: "予約情報", value: result.opportunity },
-        { label: "日付情報", value: result.dateTimeInfo },
-      ]}
-    >
-      <ReservationCompletionUI {...result} />
-    </ReservationContentGate>
+  const headerConfig: HeaderConfig = useMemo(
+    () => ({
+      showLogo: true,
+      showBackButton: false,
+    }),
+    [],
   );
-}
+  useHeaderConfig(headerConfig);
 
-function ReservationCompletionUI({
-  opportunity,
-  similarOpportunities,
-  // opportunitiesCreatedByHost,
-  dateTimeInfo,
-}: ReturnType<typeof useReservationComplete>) {
-  if (!opportunity || !dateTimeInfo) {
-    throw new Error(
-      "ReservationCompletionUI should only be rendered when opportunity and dateTimeInfo are present",
-    );
-  }
+  const searchParams = useSearchParams();
+  const opportunityId = searchParams.get("id");
+  const reservationId = searchParams.get("reservation_id");
+
+  const { reservation, opportunity, dateTimeInfo, sameStateActivities, loading, error, refetch } =
+    useCompletePageViewModel(opportunityId, reservationId);
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
+
+  // #NOTE: query でまとめて取得したいが、一時的対応
+  const { opportunity: oppotunityDetail } = useOpportunityDetail(opportunityId ?? "");
+
+  // 記事データを取得*(同じく query でまとめて取得したいが、一時的対応
+  const { articles, loading: articlesLoading } = useArticles();
+  // 最新の記事を取得（存在する場合）
+  const latestArticle = useMemo(() => (articles.length > 0 ? articles[0] : null), [articles]);
+
+  if (loading) return <LoadingIndicator fullScreen />;
+  if (error || !reservation || !opportunity || !dateTimeInfo)
+    return <ErrorState title="申込完了ページを読み込めませんでした" refetchRef={refetchRef} />;
+
   return (
-    <main className="flex flex-col items-center px-4 pb-8">
+    <main className="flex flex-col items-center">
       <CompletionHeader />
-
-      <ActivitySummary opportunity={opportunity} />
-
-      <ReservationDetails
-        formattedDate={dateTimeInfo.formattedDate}
-        startTime={dateTimeInfo.startTime}
-        endTime={dateTimeInfo.endTime}
-        participantCount={dateTimeInfo.participantCount}
-        totalPrice={dateTimeInfo.totalPrice}
-        pricePerPerson={opportunity.feeRequired || 0}
-      />
-
-      <div className="w-full mt-8 mb-16">
-        <SameStateActivities
-          header={"おすすめの体験"}
-          opportunities={similarOpportunities}
-          currentOpportunityId={opportunity.id}
-        />
-        {/*<RecentActivitiesTimeline opportunities={opportunitiesCreatedByHost} />*/}
-      </div>
+      {oppotunityDetail && <OpportunityInfo opportunity={oppotunityDetail} />}
+      {dateTimeInfo && opportunity && (
+        <div className="px-6 w-full">
+          <ReservationDetails
+            formattedDate={dateTimeInfo.formattedDate}
+            startTime={dateTimeInfo.startTime}
+            endTime={dateTimeInfo.endTime}
+            participantCount={dateTimeInfo.participantCount}
+            totalPrice={dateTimeInfo.totalPrice}
+            pricePerPerson={opportunity.feeRequired ?? 0}
+            location={oppotunityDetail?.place}
+          />
+        </div>
+      )}
+      {articlesLoading || latestArticle ? (
+        <>
+          <div className="h-2 bg-border -mx-6 w-full" />
+          <div className="px-6 w-full pt-6 pb-8 max-w-mobile-l mx-auto space-y-4">
+            <h2 className="text-display-md mb-4">依頼人の想い</h2>
+            {articlesLoading ? (
+              <div className="py-4">
+                <LoadingIndicator />
+              </div>
+            ) : latestArticle ? (
+              <ArticleCard article={latestArticle} showUser />
+            ) : (
+              <p className="text-body-md text-caption">関連記事はありません</p>
+            )}
+          </div>
+        </>
+      ) : null}
+      {opportunityId && sameStateActivities.length > 0 && (
+        <>
+          <div className="h-2 bg-border -mx-6 w-full" />
+          <div className="px-6 w-full">
+            <SameStateActivities
+              header="近くでおすすめの関わり"
+              opportunities={sameStateActivities}
+              currentOpportunityId={opportunityId}
+            />
+          </div>
+        </>
+      )}
     </main>
   );
 }

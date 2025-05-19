@@ -1,63 +1,56 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useParams, notFound } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { UserProfileSection } from "@/app/users/components/UserProfileSection";
+import UserProfileSection from "@/app/users/components/UserProfileSection";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { UserPortfolioList } from "@/app/users/components/UserPortfolioList";
+import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
+import ErrorState from "@/components/shared/ErrorState";
 
-export default function UserPage({ params }: { params: { id: string } }) {
+export default function UserPage() {
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
-
   const { user: currentUser } = useAuth();
-  const isOwner = currentUser?.id === params.id;
+  const isOwner = currentUser?.id === id;
 
-  const { userData, isLoading, error } = useUserProfile(params.id);
+  const { userData, isLoading, error, refetch } = useUserProfile(id ?? "");
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <LoadingIndicator />
-      </div>
-    );
+    return <LoadingIndicator />;
   }
 
   if (error) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <ErrorState message={error.message || "ユーザー情報の取得に失敗しました"} />
-      </div>
-    );
+    return <ErrorState title={"参加者ページを読み込めませんでした"} refetchRef={refetchRef} />;
   }
 
-  if (!userData) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <ErrorState message="ユーザーが見つかりませんでした" />
-      </div>
-    );
+  if (!userData || !id) {
+    return notFound();
   }
 
   return (
     <div className="container mx-auto py-6 max-w-3xl">
       <UserProfileSection
-        userId={params.id}
-        isLoading={isLoading}
-        error={error}
+        userId={id}
         profile={userData.profile}
         userAsset={userData.asset}
         isOwner={isOwner}
       />
       <UserPortfolioList
-        userId={params.id}
+        userId={id}
         isOwner={isOwner}
         portfolios={userData.portfolios}
-        isLoadingMore={false} // ← 常に false で OK
-        hasMore={false} // ← 常に false で OK
+        isLoadingMore={false}
+        hasMore={false}
         lastPortfolioRef={lastPortfolioRef}
-        isSysAdmin={false} // ← 管理者権限に応じて true に
+        isSysAdmin={false}
         activeOpportunities={userData.currentlyHiringOpportunities}
       />
     </div>

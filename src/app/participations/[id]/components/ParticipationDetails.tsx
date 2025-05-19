@@ -1,27 +1,22 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Calendar, MapPin, Users, Banknote } from "lucide-react";
-import type { Opportunity, Participation } from '@/app/participations/[id]/data/type';
+import type { ParticipationDetail } from "@/app/participations/[id]/data/type";
+import { ActivityCard } from "@/app/activities/data/type";
 
 interface ParticipationDetailsProps {
-  opportunity: Opportunity;
-  participation: Participation;
-  startTime: Date;
-  endTime: Date;
-  participantCount: number;
+  opportunity: ActivityCard;
+  participation: ParticipationDetail;
 }
 
-export const ParticipationDetails: React.FC<ParticipationDetailsProps> = ({
+const ParticipationDetails: React.FC<ParticipationDetailsProps> = ({
   opportunity,
   participation,
-  startTime,
-  endTime,
-  participantCount,
 }) => {
-  const duration = `${format(startTime, "HH:mm")}〜${format(endTime, "HH:mm")}`;
+  const duration = `${format(participation.slot.startsAt, "HH:mm")}〜${format(participation.slot.endsAt, "HH:mm")}`;
 
   return (
     <div className="p-2 my-6">
@@ -29,7 +24,7 @@ export const ParticipationDetails: React.FC<ParticipationDetailsProps> = ({
         <div className="flex items-start gap-2">
           <Calendar className="w-5 h-5 text-primary flex-shrink-0" />
           <div>
-            <p>{format(startTime, "yyyy年M月d日(E)", { locale: ja })}</p>
+            <p>{format(participation.slot.startsAt, "yyyy年M月d日(E)", { locale: ja })}</p>
             <p>{duration}</p>
           </div>
         </div>
@@ -37,14 +32,14 @@ export const ParticipationDetails: React.FC<ParticipationDetailsProps> = ({
         <div className="flex items-start gap-2">
           <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0" />
           <div>
-            <p>{opportunity.location?.name || opportunity.place?.name}</p>
-            <p className="text-sm text-muted-foreground">{opportunity.location?.address || opportunity.place?.address}</p>
+            <p>{participation.place.name || ""}</p>
+            <p className="text-sm text-muted-foreground">{participation.place.address || ""}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-blue-600 flex-shrink-0" />
-          <p>{participantCount}人</p>
+          <p>{participation.participantsCount}人</p>
         </div>
 
         {opportunity.feeRequired !== undefined && (

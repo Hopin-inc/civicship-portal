@@ -2,17 +2,17 @@
 
 import ArticleDetail from "@/app/articles/[id]/components/ArticleDetail";
 import { useArticle } from "@/app/articles/hooks/useArticle";
-import { useEffect, useMemo } from "react";
-import { useLoading } from "@/hooks/useLoading";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { useEffect, useMemo, useRef } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { notFound, useParams } from "next/navigation";
+import ErrorState from "@/components/shared/ErrorState";
 
-export default function ArticlePage({ params }: { params: { id: string } }) {
-  const { article, recommendedArticles, loading, error } = useArticle(params.id);
-  const { setIsLoading } = useLoading();
+export default function ArticlePage() {
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
-  const initialLoading = loading && !article;
+  const { article, recommendedArticles, isLoading, error, refetch } = useArticle(id ?? "");
 
   const headerConfig = useMemo(
     () => ({
@@ -23,18 +23,20 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
   );
   useHeaderConfig(headerConfig);
 
+  const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
-    setIsLoading(initialLoading);
-  }, [initialLoading, setIsLoading]);
+    refetchRef.current = refetch;
+  }, [refetch]);
 
-  if (initialLoading) {
-    return <LoadingIndicator fullScreen />;
+  if (isLoading) {
+    return <LoadingIndicator />;
   }
   if (error) {
-    return <ErrorState message={error.message} />;
+    return <ErrorState title="記事を読み込めませんでした" refetchRef={refetchRef} />;
   }
+
   if (!article) {
-    return <ErrorState message="記事が見つかりませんでした" title="Not Found" />;
+    return notFound();
   }
 
   return <ArticleDetail article={article} recommendedArticles={recommendedArticles} />;

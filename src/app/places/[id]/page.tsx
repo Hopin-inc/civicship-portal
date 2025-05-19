@@ -1,92 +1,50 @@
 "use client";
 
-import { FC, useState, useMemo } from "react";
+import { FC, useEffect, useRef } from "react";
 import { usePlaceDetail } from "@/app/places/[id]/hooks/usePlaceDetail";
-import { AsymmetricImageGrid } from "@/components/ui/asymmetric-image-grid";
-import PlaceImageSlider from "@/app/places/[id]/components/PlaceImageSlider";
-import PlaceHeader from "@/app/places/[id]/components/PlaceHeader";
 import PlaceOpportunities from "@/app/places/[id]/components/PlaceOpportunities";
 import PlaceFeaturedArticle from "@/app/places/[id]/components/PlaceFeaturedArticle";
-import { ErrorState } from "@/components/shared/ErrorState";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
+import ErrorState from "@/components/shared/ErrorState";
+import ImagesCarousel from "@/components/ui/images-carousel";
+import PlaceOverview from "./components/PlaceOverview";
+import PlaceAddress from "./components/PlaceAddress";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import NavigationButtons from "@/components/shared/NavigationButtons";
+import { notFound, useParams, useSearchParams } from "next/navigation";
 
-interface PlaceDetailProps {
-  params: {
-    id: string;
-  };
-  searchParams: {
-    userId?: string;
-  };
-}
+const PlaceDetail: FC = () => {
+  const params = useParams();
+  const searchParams = useSearchParams();
 
-const PlaceDetail: FC<PlaceDetailProps> = ({ params, searchParams }) => {
-  const headerConfig = useMemo(
-    () => ({
-      title: "拠点詳細",
-      showBackButton: true,
-      showLogo: false,
-    }),
-    [],
-  );
-  useHeaderConfig(headerConfig);
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const userId = searchParams.get("userId") ?? "";
 
-  const {
-    detail,
-    loading,
-    error,
-    currentImageIndex,
-    imagesForSlider,
-    imagesForGrid,
-    remainingCount,
-    nextImage,
-    prevImage,
-    hasImages,
-  } = usePlaceDetail({
-    placeId: params.id,
-    userId: searchParams.userId || "",
+  const { loading, detail, error, refetch } = usePlaceDetail({
+    placeId: id ?? "",
+    userId,
   });
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
-  const [selectedImageIndex, setSelectedImageIndex] = useState(currentImageIndex);
-
-  if (error) return <ErrorState message={error.message} />;
-  if (!detail) return <ErrorState message="Place not found" />;
+  if (loading) return <LoadingIndicator />;
+  if (error) return <ErrorState title="拠点を読み込めませんでした" refetchRef={refetchRef} />;
+  if (!detail) return notFound();
 
   return (
-    <div className="min-h-screen bg-background overflow-auto">
-      <div className="pb-6">
-        <PlaceImageSlider
-          images={imagesForSlider}
-          currentIndex={selectedImageIndex}
-          onNext={nextImage}
-          onPrev={prevImage}
-          onSelectIndex={setSelectedImageIndex}
-        />
-
-        <PlaceHeader
-          address={detail.address}
-          participantCount={detail.participantCount}
-          name={detail.name}
-          headline={detail.headline}
-          bio={detail.bio}
-        />
-
-        {hasImages && (
-          <section className="mb-12 px-4">
-            <div className="max-w-3xl">
-              <div className="space-y-4">
-                <AsymmetricImageGrid
-                  images={imagesForGrid}
-                  remainingCount={remainingCount > 0 ? remainingCount : undefined}
-                />
-              </div>
-            </div>
-          </section>
-        )}
-
+    <>
+      <div className="relative max-w-mobile-l mx-auto w-full z-10">
+        <NavigationButtons title={detail.name} />
+      </div>
+      <div className="min-h-screen">
+        <ImagesCarousel images={detail.images} title={detail.name} />
+        <PlaceOverview detail={detail} />
+        <PlaceAddress detail={detail} />
         <PlaceOpportunities opportunities={detail.currentlyHiringOpportunities} />
         <PlaceFeaturedArticle article={detail.relatedArticles?.[0]} />
       </div>
-    </div>
+    </>
   );
 };
 

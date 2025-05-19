@@ -32,7 +32,8 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     <header
       className={cn(
         className,
-        "fixed top-0 left-0 right-0 z-50 bg-background border-b border-border max-w-mobile-l mx-auto w-full h-16 flex items-center px-4",
+        "fixed top-0 left-0 right-0 z-50 bg-background border-b border-border max-w-mobile-l mx-auto w-full flex items-center px-4 transition-all duration-200",
+        config.showSearchForm ? "h-20" : "h-16",
       )}
     >
       {shouldShowBackButton && (
@@ -42,7 +43,13 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       )}
       {config.showLogo && (
         <Link href="/admin" className="flex items-center space-x-2">
-          <Image src="/images/neo88-logo.jpg" alt="NEO88" width={88} height={80} />
+          <Image
+            src="/images/neo88-logo.jpg"
+            alt="NEO88"
+            width={88}
+            height={72}
+            className="h-[28px] w-auto"
+          />
         </Link>
       )}
       {config.showSearchForm && (

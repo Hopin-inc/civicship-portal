@@ -32,6 +32,16 @@ export type GqlAccumulatedPointView = {
   walletId?: Maybe<Scalars["String"]["output"]>;
 };
 
+export type GqlAlreadyJoinedError = {
+  __typename?: "AlreadyJoinedError";
+  message: Scalars["String"]["output"];
+};
+
+export type GqlAlreadyUsedClaimLinkError = {
+  __typename?: "AlreadyUsedClaimLinkError";
+  message: Scalars["String"]["output"];
+};
+
 export type GqlArticle = {
   __typename?: "Article";
   authors?: Maybe<Array<GqlUser>>;
@@ -116,6 +126,16 @@ export const GqlAuthZRules = {
 } as const;
 
 export type GqlAuthZRules = (typeof GqlAuthZRules)[keyof typeof GqlAuthZRules];
+export type GqlAuthenticationError = {
+  __typename?: "AuthenticationError";
+  message: Scalars["String"]["output"];
+};
+
+export type GqlAuthorizationError = {
+  __typename?: "AuthorizationError";
+  message: Scalars["String"]["output"];
+};
+
 export type GqlCheckCommunityPermissionInput = {
   communityId: Scalars["ID"]["input"];
 };
@@ -134,6 +154,11 @@ export type GqlCity = {
   code: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
   state?: Maybe<GqlState>;
+};
+
+export type GqlClaimLinkExpiredError = {
+  __typename?: "ClaimLinkExpiredError";
+  message: Scalars["String"]["output"];
 };
 
 export const GqlClaimLinkStatus = {
@@ -246,6 +271,11 @@ export type GqlCurrentPrefecture = (typeof GqlCurrentPrefecture)[keyof typeof Gq
 export type GqlCurrentUserPayload = {
   __typename?: "CurrentUserPayload";
   user?: Maybe<GqlUser>;
+};
+
+export type GqlDatabaseError = {
+  __typename?: "DatabaseError";
+  message: Scalars["String"]["output"];
 };
 
 export type GqlDateTimeRangeFilter = {
@@ -547,6 +577,11 @@ export type GqlMembershipsConnection = {
   edges?: Maybe<Array<Maybe<GqlMembershipEdge>>>;
   pageInfo: GqlPageInfo;
   totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlMissingTicketIdsError = {
+  __typename?: "MissingTicketIdsError";
+  message: Scalars["String"]["output"];
 };
 
 export type GqlMutation = {
@@ -861,6 +896,11 @@ export type GqlNestedPlacesBulkConnectOrCreateInput = {
 export type GqlNestedPlacesBulkUpdateInput = {
   connectOrCreate?: InputMaybe<Array<GqlNestedPlaceConnectOrCreateInput>>;
   disconnect?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+};
+
+export type GqlNoAvailableParticipationSlotsError = {
+  __typename?: "NoAvailableParticipationSlotsError";
+  message: Scalars["String"]["output"];
 };
 
 export type GqlOpportunitiesConnection = {
@@ -1630,6 +1670,11 @@ export type GqlQueryWalletsArgs = {
   sort?: InputMaybe<GqlWalletSortInput>;
 };
 
+export type GqlRateLimitError = {
+  __typename?: "RateLimitError";
+  message: Scalars["String"]["output"];
+};
+
 export type GqlReservation = {
   __typename?: "Reservation";
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
@@ -1642,9 +1687,19 @@ export type GqlReservation = {
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
 };
 
+export type GqlReservationAdvanceBookingRequiredError = {
+  __typename?: "ReservationAdvanceBookingRequiredError";
+  message: Scalars["String"]["output"];
+};
+
 export type GqlReservationCancelInput = {
   paymentMethod: GqlReservationPaymentMethod;
   ticketIdsIfExists?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+};
+
+export type GqlReservationCancellationTimeoutError = {
+  __typename?: "ReservationCancellationTimeoutError";
+  message: Scalars["String"]["output"];
 };
 
 export type GqlReservationCreateInput = {
@@ -1655,7 +1710,14 @@ export type GqlReservationCreateInput = {
   totalParticipantCount: Scalars["Int"]["input"];
 };
 
-export type GqlReservationCreatePayload = GqlReservationCreateSuccess;
+export type GqlReservationCreatePayload =
+  | GqlMissingTicketIdsError
+  | GqlReservationAdvanceBookingRequiredError
+  | GqlReservationCreateSuccess
+  | GqlReservationFullError
+  | GqlReservationNotAcceptedError
+  | GqlSlotNotScheduledError
+  | GqlTicketParticipantMismatchError;
 
 export type GqlReservationCreateSuccess = {
   __typename?: "ReservationCreateSuccess";
@@ -1673,6 +1735,13 @@ export type GqlReservationFilterInput = {
   opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
   opportunitySlotId?: InputMaybe<Scalars["ID"]["input"]>;
   status?: InputMaybe<GqlReservationStatus>;
+};
+
+export type GqlReservationFullError = {
+  __typename?: "ReservationFullError";
+  capacity: Scalars["Int"]["output"];
+  message: Scalars["String"]["output"];
+  requested: Scalars["Int"]["output"];
 };
 
 export type GqlReservationHistoriesConnection = {
@@ -1707,6 +1776,11 @@ export type GqlReservationHistorySortInput = {
   createdAt?: InputMaybe<GqlSortDirection>;
 };
 
+export type GqlReservationNotAcceptedError = {
+  __typename?: "ReservationNotAcceptedError";
+  message: Scalars["String"]["output"];
+};
+
 export const GqlReservationPaymentMethod = {
   Fee: "FEE",
   Ticket: "TICKET",
@@ -1714,7 +1788,11 @@ export const GqlReservationPaymentMethod = {
 
 export type GqlReservationPaymentMethod =
   (typeof GqlReservationPaymentMethod)[keyof typeof GqlReservationPaymentMethod];
-export type GqlReservationSetStatusPayload = GqlReservationSetStatusSuccess;
+export type GqlReservationSetStatusPayload =
+  | GqlAlreadyJoinedError
+  | GqlNoAvailableParticipationSlotsError
+  | GqlReservationCancellationTimeoutError
+  | GqlReservationSetStatusSuccess;
 
 export type GqlReservationSetStatusSuccess = {
   __typename?: "ReservationSetStatusSuccess";
@@ -1748,6 +1826,11 @@ export const GqlRole = {
 } as const;
 
 export type GqlRole = (typeof GqlRole)[keyof typeof GqlRole];
+export type GqlSlotNotScheduledError = {
+  __typename?: "SlotNotScheduledError";
+  message: Scalars["String"]["output"];
+};
+
 export const GqlSortDirection = {
   Asc: "asc",
   Desc: "desc",
@@ -1815,7 +1898,10 @@ export type GqlTicketClaimLink = {
   tickets?: Maybe<Array<GqlTicket>>;
 };
 
-export type GqlTicketClaimPayload = GqlTicketClaimSuccess;
+export type GqlTicketClaimPayload =
+  | GqlAlreadyUsedClaimLinkError
+  | GqlClaimLinkExpiredError
+  | GqlTicketClaimSuccess;
 
 export type GqlTicketClaimSuccess = {
   __typename?: "TicketClaimSuccess";
@@ -1877,6 +1963,13 @@ export type GqlTicketIssuersConnection = {
   edges?: Maybe<Array<Maybe<GqlTicketIssuerEdge>>>;
   pageInfo: GqlPageInfo;
   totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlTicketParticipantMismatchError = {
+  __typename?: "TicketParticipantMismatchError";
+  message: Scalars["String"]["output"];
+  participantCount: Scalars["Int"]["output"];
+  ticketCount: Scalars["Int"]["output"];
 };
 
 export type GqlTicketPurchaseInput = {
@@ -2249,6 +2342,11 @@ export type GqlUtilityUpdateInfoPayload = GqlUtilityUpdateInfoSuccess;
 export type GqlUtilityUpdateInfoSuccess = {
   __typename?: "UtilityUpdateInfoSuccess";
   utility: GqlUtility;
+};
+
+export type GqlValidationError = {
+  __typename?: "ValidationError";
+  message: Scalars["String"]["output"];
 };
 
 export const GqlValueType = {
@@ -3154,50 +3252,6 @@ export type GqlEvaluationFieldsFragment = {
   issuedAt?: Date | null;
 };
 
-export type GqlEvaluationPassMutationVariables = Exact<{
-  input: GqlEvaluationCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-}>;
-
-export type GqlEvaluationPassMutation = {
-  __typename?: "Mutation";
-  evaluationPass?: {
-    __typename?: "EvaluationCreateSuccess";
-    evaluation: {
-      __typename?: "Evaluation";
-      id: string;
-      comment?: string | null;
-      credentialUrl?: string | null;
-      status: GqlEvaluationStatus;
-      createdAt?: Date | null;
-      updatedAt?: Date | null;
-      issuedAt?: Date | null;
-    };
-  } | null;
-};
-
-export type GqlEvaluationFailMutationVariables = Exact<{
-  input: GqlEvaluationCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-}>;
-
-export type GqlEvaluationFailMutation = {
-  __typename?: "Mutation";
-  evaluationFail?: {
-    __typename?: "EvaluationCreateSuccess";
-    evaluation: {
-      __typename?: "Evaluation";
-      id: string;
-      comment?: string | null;
-      credentialUrl?: string | null;
-      status: GqlEvaluationStatus;
-      createdAt?: Date | null;
-      updatedAt?: Date | null;
-      issuedAt?: Date | null;
-    };
-  } | null;
-};
-
 export type GqlGetEvaluationsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GqlGetEvaluationsQuery = {
@@ -3272,6 +3326,12 @@ export type GqlGetOpportunitiesQuery = {
         feeRequired?: number | null;
         pointsToEarn?: number | null;
         earliestReservableAt?: Date | null;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
+        } | null;
         slots?: Array<{
           __typename?: "OpportunitySlot";
           id: string;
@@ -3624,48 +3684,6 @@ export type GqlGetOpportunitySlotQuery = {
   opportunitySlot?: { __typename?: "OpportunitySlot"; id: string } | null;
 };
 
-export type GqlGetOpportunitySlotWithParticipationsQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type GqlGetOpportunitySlotWithParticipationsQuery = {
-  __typename?: "Query";
-  opportunitySlot?: {
-    __typename?: "OpportunitySlot";
-    id: string;
-    hostingStatus: GqlOpportunitySlotHostingStatus;
-    startsAt: Date;
-    endsAt: Date;
-    capacity?: number | null;
-    remainingCapacity?: number | null;
-    opportunity?: {
-      __typename?: "Opportunity";
-      id: string;
-      title: string;
-      description: string;
-      body?: string | null;
-      images?: Array<string> | null;
-      category: GqlOpportunityCategory;
-      publishStatus: GqlPublishStatus;
-      isReservableWithTicket?: boolean | null;
-      requireApproval: boolean;
-      feeRequired?: number | null;
-      pointsToEarn?: number | null;
-      earliestReservableAt?: Date | null;
-    } | null;
-    reservations?: Array<{
-      __typename?: "Reservation";
-      participations?: Array<{
-        __typename?: "Participation";
-        id: string;
-        status: GqlParticipationStatus;
-        user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
-        evaluation?: { __typename?: "Evaluation"; id: string; status: GqlEvaluationStatus } | null;
-      }> | null;
-    }> | null;
-  } | null;
-};
-
 export type GqlParticipationFieldsFragment = {
   __typename?: "Participation";
   id: string;
@@ -3813,23 +3831,42 @@ export type GqlCreateReservationMutationVariables = Exact<{
 
 export type GqlCreateReservationMutation = {
   __typename?: "Mutation";
-  reservationCreate?: {
-    __typename?: "ReservationCreateSuccess";
-    reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
-  } | null;
+  reservationCreate?:
+    | { __typename: "MissingTicketIdsError"; message: string }
+    | { __typename: "ReservationAdvanceBookingRequiredError"; message: string }
+    | {
+        __typename?: "ReservationCreateSuccess";
+        reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
+      }
+    | { __typename: "ReservationFullError"; message: string; capacity: number; requested: number }
+    | { __typename: "ReservationNotAcceptedError"; message: string }
+    | { __typename: "SlotNotScheduledError"; message: string }
+    | {
+        __typename: "TicketParticipantMismatchError";
+        message: string;
+        ticketCount: number;
+        participantCount: number;
+      }
+    | null;
 };
 
-export type GqlReservationAcceptMutationVariables = Exact<{
+export type GqlCancelReservationMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
-  permission: GqlCheckOpportunityPermissionInput;
+  input: GqlReservationCancelInput;
+  permission: GqlCheckIsSelfPermissionInput;
 }>;
 
-export type GqlReservationAcceptMutation = {
+export type GqlCancelReservationMutation = {
   __typename?: "Mutation";
-  reservationAccept?: {
-    __typename?: "ReservationSetStatusSuccess";
-    reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
-  } | null;
+  reservationCancel?:
+    | { __typename?: "AlreadyJoinedError" }
+    | { __typename?: "NoAvailableParticipationSlotsError" }
+    | { __typename?: "ReservationCancellationTimeoutError"; message: string }
+    | {
+        __typename?: "ReservationSetStatusSuccess";
+        reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
+      }
+    | null;
 };
 
 export type GqlGetReservationsQueryVariables = Exact<{ [key: string]: never }>;
@@ -3841,17 +3878,7 @@ export type GqlGetReservationsQuery = {
     totalCount: number;
     edges: Array<{
       __typename?: "ReservationEdge";
-      node?: {
-        __typename?: "Reservation";
-        id: string;
-        status: GqlReservationStatus;
-        createdAt?: Date | null;
-        opportunitySlot?: {
-          __typename?: "OpportunitySlot";
-          id: string;
-          opportunity?: { __typename?: "Opportunity"; id: string; title: string } | null;
-        } | null;
-      } | null;
+      node?: { __typename?: "Reservation"; id: string } | null;
     }>;
   };
 };
@@ -3985,10 +4012,11 @@ export type GqlTicketClaimMutationVariables = Exact<{
 
 export type GqlTicketClaimMutation = {
   __typename?: "Mutation";
-  ticketClaim?: {
-    __typename?: "TicketClaimSuccess";
-    tickets: Array<{ __typename?: "Ticket"; id: string }>;
-  } | null;
+  ticketClaim?:
+    | { __typename?: "AlreadyUsedClaimLinkError"; message: string }
+    | { __typename?: "ClaimLinkExpiredError"; message: string }
+    | { __typename?: "TicketClaimSuccess"; tickets: Array<{ __typename?: "Ticket"; id: string }> }
+    | null;
 };
 
 export type GqlGetTicketsQueryVariables = Exact<{ [key: string]: never }>;
@@ -4037,26 +4065,6 @@ export type GqlTicketClaimLinkQuery = {
       owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
     } | null;
   } | null;
-};
-
-export type GqlGetTicketIssuersQueryVariables = Exact<{ [key: string]: never }>;
-
-export type GqlGetTicketIssuersQuery = {
-  __typename?: "Query";
-  ticketIssuers: {
-    __typename?: "TicketIssuersConnection";
-    totalCount: number;
-    edges?: Array<{
-      __typename?: "TicketIssuerEdge";
-      node?: {
-        __typename?: "TicketIssuer";
-        id: string;
-        qtyToBeIssued: number;
-        createdAt?: Date | null;
-        owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
-      } | null;
-    } | null> | null;
-  };
 };
 
 export type GqlUtilityFieldsFragment = {
@@ -5581,118 +5589,6 @@ export type GetArticleQueryResult = Apollo.QueryResult<
   GqlGetArticleQuery,
   GqlGetArticleQueryVariables
 >;
-export const EvaluationPassDocument = gql`
-  mutation EvaluationPass(
-    $input: EvaluationCreateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    evaluationPass(input: $input, permission: $permission) {
-      ... on EvaluationCreateSuccess {
-        evaluation {
-          ...EvaluationFields
-        }
-      }
-    }
-  }
-  ${EvaluationFieldsFragmentDoc}
-`;
-export type GqlEvaluationPassMutationFn = Apollo.MutationFunction<
-  GqlEvaluationPassMutation,
-  GqlEvaluationPassMutationVariables
->;
-
-/**
- * __useEvaluationPassMutation__
- *
- * To run a mutation, you first call `useEvaluationPassMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useEvaluationPassMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [evaluationPassMutation, { data, loading, error }] = useEvaluationPassMutation({
- *   variables: {
- *      input: // value for 'input'
- *      permission: // value for 'permission'
- *   },
- * });
- */
-export function useEvaluationPassMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    GqlEvaluationPassMutation,
-    GqlEvaluationPassMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<GqlEvaluationPassMutation, GqlEvaluationPassMutationVariables>(
-    EvaluationPassDocument,
-    options,
-  );
-}
-export type EvaluationPassMutationHookResult = ReturnType<typeof useEvaluationPassMutation>;
-export type EvaluationPassMutationResult = Apollo.MutationResult<GqlEvaluationPassMutation>;
-export type EvaluationPassMutationOptions = Apollo.BaseMutationOptions<
-  GqlEvaluationPassMutation,
-  GqlEvaluationPassMutationVariables
->;
-export const EvaluationFailDocument = gql`
-  mutation EvaluationFail(
-    $input: EvaluationCreateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    evaluationFail(input: $input, permission: $permission) {
-      ... on EvaluationCreateSuccess {
-        evaluation {
-          ...EvaluationFields
-        }
-      }
-    }
-  }
-  ${EvaluationFieldsFragmentDoc}
-`;
-export type GqlEvaluationFailMutationFn = Apollo.MutationFunction<
-  GqlEvaluationFailMutation,
-  GqlEvaluationFailMutationVariables
->;
-
-/**
- * __useEvaluationFailMutation__
- *
- * To run a mutation, you first call `useEvaluationFailMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useEvaluationFailMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [evaluationFailMutation, { data, loading, error }] = useEvaluationFailMutation({
- *   variables: {
- *      input: // value for 'input'
- *      permission: // value for 'permission'
- *   },
- * });
- */
-export function useEvaluationFailMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    GqlEvaluationFailMutation,
-    GqlEvaluationFailMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<GqlEvaluationFailMutation, GqlEvaluationFailMutationVariables>(
-    EvaluationFailDocument,
-    options,
-  );
-}
-export type EvaluationFailMutationHookResult = ReturnType<typeof useEvaluationFailMutation>;
-export type EvaluationFailMutationResult = Apollo.MutationResult<GqlEvaluationFailMutation>;
-export type EvaluationFailMutationOptions = Apollo.BaseMutationOptions<
-  GqlEvaluationFailMutation,
-  GqlEvaluationFailMutationVariables
->;
 export const GetEvaluationsDocument = gql`
   query GetEvaluations {
     evaluations {
@@ -5844,6 +5740,9 @@ export const GetOpportunitiesDocument = gql`
         cursor
         node {
           ...OpportunityFields
+          community {
+            ...CommunityFields
+          }
           slots {
             ...OpportunitySlotFields
           }
@@ -5855,6 +5754,7 @@ export const GetOpportunitiesDocument = gql`
     }
   }
   ${OpportunityFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
   ${OpportunitySlotFieldsFragmentDoc}
   ${PlaceFieldsFragmentDoc}
 `;
@@ -6322,106 +6222,6 @@ export type GetOpportunitySlotQueryResult = Apollo.QueryResult<
   GqlGetOpportunitySlotQuery,
   GqlGetOpportunitySlotQueryVariables
 >;
-export const GetOpportunitySlotWithParticipationsDocument = gql`
-  query GetOpportunitySlotWithParticipations($id: ID!) {
-    opportunitySlot(id: $id) {
-      ...OpportunitySlotFields
-      opportunity {
-        ...OpportunityFields
-      }
-      reservations {
-        participations {
-          id
-          status
-          user {
-            id
-            name
-            image
-          }
-          evaluation {
-            id
-            status
-          }
-        }
-      }
-    }
-  }
-  ${OpportunitySlotFieldsFragmentDoc}
-  ${OpportunityFieldsFragmentDoc}
-`;
-
-/**
- * __useGetOpportunitySlotWithParticipationsQuery__
- *
- * To run a query within a React component, call `useGetOpportunitySlotWithParticipationsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetOpportunitySlotWithParticipationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetOpportunitySlotWithParticipationsQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useGetOpportunitySlotWithParticipationsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GqlGetOpportunitySlotWithParticipationsQuery,
-    GqlGetOpportunitySlotWithParticipationsQueryVariables
-  > &
-    (
-      | { variables: GqlGetOpportunitySlotWithParticipationsQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    ),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GqlGetOpportunitySlotWithParticipationsQuery,
-    GqlGetOpportunitySlotWithParticipationsQueryVariables
-  >(GetOpportunitySlotWithParticipationsDocument, options);
-}
-export function useGetOpportunitySlotWithParticipationsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetOpportunitySlotWithParticipationsQuery,
-    GqlGetOpportunitySlotWithParticipationsQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GqlGetOpportunitySlotWithParticipationsQuery,
-    GqlGetOpportunitySlotWithParticipationsQueryVariables
-  >(GetOpportunitySlotWithParticipationsDocument, options);
-}
-export function useGetOpportunitySlotWithParticipationsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GqlGetOpportunitySlotWithParticipationsQuery,
-        GqlGetOpportunitySlotWithParticipationsQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GqlGetOpportunitySlotWithParticipationsQuery,
-    GqlGetOpportunitySlotWithParticipationsQueryVariables
-  >(GetOpportunitySlotWithParticipationsDocument, options);
-}
-export type GetOpportunitySlotWithParticipationsQueryHookResult = ReturnType<
-  typeof useGetOpportunitySlotWithParticipationsQuery
->;
-export type GetOpportunitySlotWithParticipationsLazyQueryHookResult = ReturnType<
-  typeof useGetOpportunitySlotWithParticipationsLazyQuery
->;
-export type GetOpportunitySlotWithParticipationsSuspenseQueryHookResult = ReturnType<
-  typeof useGetOpportunitySlotWithParticipationsSuspenseQuery
->;
-export type GetOpportunitySlotWithParticipationsQueryResult = Apollo.QueryResult<
-  GqlGetOpportunitySlotWithParticipationsQuery,
-  GqlGetOpportunitySlotWithParticipationsQueryVariables
->;
 export const GetParticipationsDocument = gql`
   query GetParticipations {
     participations {
@@ -6610,12 +6410,40 @@ export const CreateReservationDocument = gql`
     reservationCreate(input: $input) {
       ... on ReservationCreateSuccess {
         reservation {
-          id
-          status
+          ...ReservationFields
         }
+      }
+      ... on ReservationFullError {
+        __typename
+        message
+        capacity
+        requested
+      }
+      ... on ReservationAdvanceBookingRequiredError {
+        __typename
+        message
+      }
+      ... on ReservationNotAcceptedError {
+        __typename
+        message
+      }
+      ... on SlotNotScheduledError {
+        __typename
+        message
+      }
+      ... on MissingTicketIdsError {
+        __typename
+        message
+      }
+      ... on TicketParticipantMismatchError {
+        __typename
+        message
+        ticketCount
+        participantCount
       }
     }
   }
+  ${ReservationFieldsFragmentDoc}
 `;
 export type GqlCreateReservationMutationFn = Apollo.MutationFunction<
   GqlCreateReservationMutation,
@@ -6657,58 +6485,66 @@ export type CreateReservationMutationOptions = Apollo.BaseMutationOptions<
   GqlCreateReservationMutation,
   GqlCreateReservationMutationVariables
 >;
-export const ReservationAcceptDocument = gql`
-  mutation ReservationAccept($id: ID!, $permission: CheckOpportunityPermissionInput!) {
-    reservationAccept(id: $id, permission: $permission) {
+export const CancelReservationDocument = gql`
+  mutation CancelReservation(
+    $id: ID!
+    $input: ReservationCancelInput!
+    $permission: CheckIsSelfPermissionInput!
+  ) {
+    reservationCancel(id: $id, input: $input, permission: $permission) {
       ... on ReservationSetStatusSuccess {
         reservation {
-          id
-          status
+          ...ReservationFields
         }
+      }
+      ... on ReservationCancellationTimeoutError {
+        message
       }
     }
   }
+  ${ReservationFieldsFragmentDoc}
 `;
-export type GqlReservationAcceptMutationFn = Apollo.MutationFunction<
-  GqlReservationAcceptMutation,
-  GqlReservationAcceptMutationVariables
+export type GqlCancelReservationMutationFn = Apollo.MutationFunction<
+  GqlCancelReservationMutation,
+  GqlCancelReservationMutationVariables
 >;
 
 /**
- * __useReservationAcceptMutation__
+ * __useCancelReservationMutation__
  *
- * To run a mutation, you first call `useReservationAcceptMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useReservationAcceptMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useCancelReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCancelReservationMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [reservationAcceptMutation, { data, loading, error }] = useReservationAcceptMutation({
+ * const [cancelReservationMutation, { data, loading, error }] = useCancelReservationMutation({
  *   variables: {
  *      id: // value for 'id'
+ *      input: // value for 'input'
  *      permission: // value for 'permission'
  *   },
  * });
  */
-export function useReservationAcceptMutation(
+export function useCancelReservationMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    GqlReservationAcceptMutation,
-    GqlReservationAcceptMutationVariables
+    GqlCancelReservationMutation,
+    GqlCancelReservationMutationVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<GqlReservationAcceptMutation, GqlReservationAcceptMutationVariables>(
-    ReservationAcceptDocument,
+  return Apollo.useMutation<GqlCancelReservationMutation, GqlCancelReservationMutationVariables>(
+    CancelReservationDocument,
     options,
   );
 }
-export type ReservationAcceptMutationHookResult = ReturnType<typeof useReservationAcceptMutation>;
-export type ReservationAcceptMutationResult = Apollo.MutationResult<GqlReservationAcceptMutation>;
-export type ReservationAcceptMutationOptions = Apollo.BaseMutationOptions<
-  GqlReservationAcceptMutation,
-  GqlReservationAcceptMutationVariables
+export type CancelReservationMutationHookResult = ReturnType<typeof useCancelReservationMutation>;
+export type CancelReservationMutationResult = Apollo.MutationResult<GqlCancelReservationMutation>;
+export type CancelReservationMutationOptions = Apollo.BaseMutationOptions<
+  GqlCancelReservationMutation,
+  GqlCancelReservationMutationVariables
 >;
 export const GetReservationsDocument = gql`
   query GetReservations {
@@ -6716,15 +6552,6 @@ export const GetReservationsDocument = gql`
       edges {
         node {
           id
-          status
-          createdAt
-          opportunitySlot {
-            id
-            opportunity {
-              id
-              title
-            }
-          }
         }
       }
       totalCount
@@ -6951,6 +6778,12 @@ export const TicketClaimDocument = gql`
         tickets {
           id
         }
+      }
+      ... on AlreadyUsedClaimLinkError {
+        message
+      }
+      ... on ClaimLinkExpiredError {
+        message
       }
     }
   }
@@ -7190,86 +7023,6 @@ export type TicketClaimLinkSuspenseQueryHookResult = ReturnType<
 export type TicketClaimLinkQueryResult = Apollo.QueryResult<
   GqlTicketClaimLinkQuery,
   GqlTicketClaimLinkQueryVariables
->;
-export const GetTicketIssuersDocument = gql`
-  query GetTicketIssuers {
-    ticketIssuers {
-      edges {
-        node {
-          id
-          qtyToBeIssued
-          createdAt
-          owner {
-            id
-            name
-            image
-          }
-        }
-      }
-      totalCount
-    }
-  }
-`;
-
-/**
- * __useGetTicketIssuersQuery__
- *
- * To run a query within a React component, call `useGetTicketIssuersQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetTicketIssuersQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetTicketIssuersQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetTicketIssuersQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GqlGetTicketIssuersQuery,
-    GqlGetTicketIssuersQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetTicketIssuersQuery, GqlGetTicketIssuersQueryVariables>(
-    GetTicketIssuersDocument,
-    options,
-  );
-}
-export function useGetTicketIssuersLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetTicketIssuersQuery,
-    GqlGetTicketIssuersQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetTicketIssuersQuery, GqlGetTicketIssuersQueryVariables>(
-    GetTicketIssuersDocument,
-    options,
-  );
-}
-export function useGetTicketIssuersSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlGetTicketIssuersQuery, GqlGetTicketIssuersQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlGetTicketIssuersQuery, GqlGetTicketIssuersQueryVariables>(
-    GetTicketIssuersDocument,
-    options,
-  );
-}
-export type GetTicketIssuersQueryHookResult = ReturnType<typeof useGetTicketIssuersQuery>;
-export type GetTicketIssuersLazyQueryHookResult = ReturnType<typeof useGetTicketIssuersLazyQuery>;
-export type GetTicketIssuersSuspenseQueryHookResult = ReturnType<
-  typeof useGetTicketIssuersSuspenseQuery
->;
-export type GetTicketIssuersQueryResult = Apollo.QueryResult<
-  GqlGetTicketIssuersQuery,
-  GqlGetTicketIssuersQueryVariables
 >;
 export const GetUtilitiesDocument = gql`
   query GetUtilities {

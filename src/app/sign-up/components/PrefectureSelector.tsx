@@ -12,7 +12,7 @@ interface PrefectureSelectorProps {
 /**
  * Component for selecting prefecture in the sign-up form
  */
-export const PrefectureSelector: React.FC<PrefectureSelectorProps> = ({
+const PrefectureSelector: React.FC<PrefectureSelectorProps> = ({
   value,
   onChange,
   error,

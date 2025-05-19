@@ -1,5 +1,9 @@
-import { GqlOpportunityCategory } from "@/types/graphql";
-import { OpportunityPlace, OpportunityHost, ActivityCard } from "@/app/activities/data/type";
+import {
+  GqlOpportunityCategory,
+  GqlOpportunitySlotHostingStatus,
+  GqlReservationStatus,
+} from "@/types/graphql";
+import { ActivityCard, OpportunityHost, OpportunityPlace } from "@/app/activities/data/type";
 import { ParticipationStatus, ParticipationStatusReason } from "@/types/participationStatus";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 
@@ -12,11 +16,12 @@ type PublicParticipationInfo = {
   reason: ParticipationStatusReason;
 
   opportunity: ParticipationOpportunity;
+  slot: ParticipationSlot;
+  reservation: ParticipationReservation;
 
   images: string[];
   totalImageCount: number;
 
-  date: string;
   participantsCount: number;
   place: OpportunityPlace;
 };
@@ -61,6 +66,18 @@ export type ParticipationOpportunity = {
   title: string;
   images: string[];
   host: OpportunityHost;
+};
+
+export type ParticipationSlot = {
+  id: string;
+  status: GqlOpportunitySlotHostingStatus;
+  startsAt: Date;
+  endsAt: Date;
+};
+
+export type ParticipationReservation = {
+  id: string;
+  status: GqlReservationStatus;
 };
 
 export type Participation = {

@@ -1,94 +1,63 @@
 "use client";
 
-import { useMemo } from "react";
-import { useParticipation } from "@/app/participations/[id]/hooks/useParticipation";
+import { useEffect, useMemo } from "react";
+import { useGetParticipationQuery } from "@/types/graphql";
+import {
+  calculateCancellationDeadline,
+  presenterParticipation,
+} from "@/app/participations/[id]/data/presenter";
+import { presenterActivityCard } from "@/app/activities/data/presenter";
 import { useParticipationState } from "@/app/participations/[id]/hooks/useParticipationState";
-import { useParticipationImageUpload } from "@/app/participations/[id]/hooks/useParticipationImageUpload";
-import { calculateCancellationDeadline } from "@/app/participations/[id]/data/presenter";
-import { Participation, Opportunity } from "@/app/participations/[id]/data/type";
-import { ReservationStatus } from "@/types/participationStatus";
-import { ApolloError } from "@apollo/client";
+import type { ParticipationDetail } from "@/app/participations/[id]/data/type";
+import type { ReservationStatus } from "@/types/participationStatus";
+import type { ActivityCard } from "@/app/activities/data/type";
 
 interface UseParticipationPageResult {
-  participation?: Participation;
-  opportunity?: Opportunity;
-  loading: boolean;
-  error: ApolloError | undefined;
+  participation: ParticipationDetail | null;
+  opportunity: ActivityCard | null;
   currentStatus: ReservationStatus | null;
-  uploadSuccess: boolean;
-  uploadError: string | null;
-  isUploading: boolean;
-  handleAddPhotos: (images: File[], comment: string) => Promise<void>;
-  startTime: Date;
-  endTime: Date;
-  participantCount: number;
-  cancellationDeadline: Date;
+  cancellationDeadline: Date | null;
+  loading: boolean;
+  hasError: boolean;
+  refetch: () => void;
 }
 
-export const useParticipationPage = (id: string): UseParticipationPageResult => {
-  const { participation, opportunity, loading, error, refetch } = useParticipation(id);
-
-  const {
-    currentStatus,
-    uploadSuccess,
-    uploadError,
-    isAddPhotosModalOpen,
-    handleUploadSuccess,
-    handleUploadError,
-    togglePhotosModal,
-  } = useParticipationState({ participation, onUploadSuccess: refetch });
-
-  const handleErrorAdapter = (error: Error): void => {
-    handleUploadError(error.message);
-  };
-
-  const { uploadImages, isUploading } = useParticipationImageUpload({
-    participationId: id,
-    onSuccess: handleUploadSuccess,
-    onError: handleErrorAdapter,
+const useParticipationPage = (id: string): UseParticipationPageResult => {
+  const { data, loading, error, refetch } = useGetParticipationQuery({
+    variables: { id: id },
+    skip: !id,
+    fetchPolicy: "network-only",
   });
 
-  const handleAddPhotos = async (images: File[], comment: string): Promise<void> => {
-    try {
-      await uploadImages(images, comment);
-    } catch (error) {
-      console.error("Error uploading photos:", error);
-      if (error instanceof Error) {
-        handleUploadError(error.message);
-      } else {
-        handleUploadError("画像のアップロードに失敗しました");
-      }
-    }
-  };
+  const rawParticipation = data?.participation;
+  const rawOpportunity = rawParticipation?.reservation?.opportunitySlot?.opportunity;
 
-  const participationSlot = participation?.node?.reservation?.opportunitySlot;
-  const startTime = useMemo(() => {
-    return participationSlot?.startsAt ? new Date(participationSlot.startsAt) : new Date();
-  }, [participationSlot?.startsAt]);
+  const participation = rawParticipation ? presenterParticipation(rawParticipation) : null;
+  const opportunity = rawOpportunity ? presenterActivityCard(rawOpportunity) : null;
 
-  const endTime = useMemo(() => {
-    return participationSlot?.endsAt ? new Date(participationSlot.endsAt) : new Date();
-  }, [participationSlot?.endsAt]);
+  const { currentStatus } = useParticipationState({ participation });
 
-  const participantCount = participation?.node?.reservation?.participations?.length || 0;
+  const { startsAt } = participation?.slot ?? {};
 
   const cancellationDeadline = useMemo(() => {
-    return calculateCancellationDeadline(startTime);
-  }, [startTime]);
+    return calculateCancellationDeadline(startsAt);
+  }, [startsAt]);
+
+  useEffect(() => {
+    if (error) {
+      console.error("Participation query error:", error);
+    }
+  }, [error]);
 
   return {
     participation,
     opportunity,
-    loading,
-    error,
     currentStatus,
-    uploadSuccess,
-    uploadError,
-    isUploading,
-    handleAddPhotos,
-    startTime,
-    endTime,
-    participantCount,
     cancellationDeadline,
+    loading,
+    hasError: Boolean(error),
+    refetch,
   };
 };
+
+export default useParticipationPage;

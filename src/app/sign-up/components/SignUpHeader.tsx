@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 /**
  * Header component for the sign-up page with cancel functionality
  */
-export const SignUpHeader: React.FC = () => {
+const SignUpHeader: React.FC = () => {
   const router = useRouter();
   const cookies = useCookies();
 

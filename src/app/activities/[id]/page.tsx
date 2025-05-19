@@ -4,31 +4,14 @@ import { useActivityDetails } from "@/app/activities/[id]/hooks/useActivityDetai
 import ActivityDetailsHeader from "@/app/activities/[id]/components/ActivityDetailsHeader";
 import ActivityDetailsContent from "@/app/activities/[id]/components/ActivityDetailsContent";
 import ActivityDetailsFooter from "@/app/activities/[id]/components/ActivityDetailsFooter";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { useEffect, useMemo } from "react";
-import { useLoading } from "@/hooks/useLoading";
-import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
-import ActivityNavigationButtons from "@/app/activities/[id]/components/ActivityNavigationButtons";
+import { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import NavigationButtons from "@/components/shared/NavigationButtons";
+import { notFound, useParams, useSearchParams } from "next/navigation";
+import ErrorState from "@/components/shared/ErrorState";
 
-interface ActivityPageProps {
-  params: {
-    id: string;
-  };
-  searchParams: {
-    community_id?: string;
-  };
-}
-
-export default function ActivityPage({ params, searchParams }: ActivityPageProps) {
-  const { id } = params;
-
-  const { opportunity, sameStateActivities, availableTickets, sortedSlots, isLoading, error } =
-    useActivityDetails(id);
-
-  const { setIsLoading } = useLoading();
-  const { navigateBack } = useHierarchicalNavigation();
-
+export default function ActivityPage() {
   const headerConfig = useMemo(
     () => ({
       hideHeader: true,
@@ -38,19 +21,44 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
   useHeaderConfig(headerConfig);
 
   useEffect(() => {
-    setIsLoading(isLoading);
-  }, [isLoading, setIsLoading]);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
-  if (error && !opportunity) {
-    return <ErrorState message={`Error: ${error.message}`} />;
+  const params = useParams();
+  const searchParams = useSearchParams();
+
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const communityId = searchParams.get("community_id") ?? "";
+  const {
+    opportunity,
+    sameStateActivities,
+    availableTickets,
+    sortedSlots,
+    isLoading,
+    error,
+    refetch,
+  } = useActivityDetails(id ?? "");
+
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
+
+  if (isLoading) return <LoadingIndicator />;
+
+  if (error) {
+    return <ErrorState title="募集ページを読み込めませんでした" refetchRef={refetchRef} />;
   }
+
   if (!opportunity) {
-    return <ErrorState message="No opportunity found" />;
+    return notFound();
   }
 
   return (
     <>
-      <ActivityNavigationButtons title={opportunity.title} onBack={navigateBack} />
+      <div className="relative max-w-mobile-l mx-auto w-full">
+        <NavigationButtons title={opportunity.title} />
+      </div>
 
       <main className="min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
@@ -60,11 +68,15 @@ export default function ActivityPage({ params, searchParams }: ActivityPageProps
             availableTickets={availableTickets}
             availableDates={sortedSlots}
             sameStateActivities={sameStateActivities}
-            communityId={searchParams.community_id}
+            communityId={communityId}
           />
         </div>
       </main>
-      <ActivityDetailsFooter opportunityId={opportunity.id} price={opportunity.feeRequired || 0} />
+      <ActivityDetailsFooter
+        opportunityId={opportunity.id}
+        price={opportunity.feeRequired || 0}
+        communityId={communityId}
+      />
     </>
   );
 }

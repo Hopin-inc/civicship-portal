@@ -11,6 +11,7 @@ import {
 import { presenterUserAsset } from "@/app/wallets/data/presenter";
 import { Participant } from "@/types/utils";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 export const presenterAppUser = (gqlUser: GqlUser): AppUser => {
   return {
@@ -41,7 +42,7 @@ export const presenterManagerProfile = (gqlUser: GqlUser): ManagerProfile => {
 export const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
   return {
     name: gqlUser.name,
-    image: gqlUser.image ?? null,
+    image: gqlUser.image ?? PLACEHOLDER_IMAGE,
     bio: gqlUser.bio ?? null,
     currentPrefecture: gqlUser.currentPrefecture ?? undefined,
     urlFacebook: gqlUser.urlFacebook ?? null,
@@ -51,14 +52,20 @@ export const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
 };
 
 export const presenterPortfolio = (gqlPortfolio: GqlPortfolio): AppPortfolio => {
+  const dateObj = new Date(gqlPortfolio.date);
+
   return {
     id: gqlPortfolio.id,
     source: gqlPortfolio.source,
     category: gqlPortfolio.category,
     reservationStatus: gqlPortfolio.reservationStatus ?? null,
     title: gqlPortfolio.title,
-    image: gqlPortfolio.thumbnailUrl ?? null,
-    date: new Date(gqlPortfolio.date).toISOString() ?? null,
+    image: gqlPortfolio.thumbnailUrl ?? PLACEHOLDER_IMAGE,
+    date: dateObj.toLocaleDateString("ja-JP", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
     location: gqlPortfolio.place?.name ?? null,
     participants: (gqlPortfolio.participants ?? []).map(presentParticipant),
   };
@@ -67,7 +74,7 @@ export const presenterPortfolio = (gqlPortfolio: GqlPortfolio): AppPortfolio => 
 export const presentParticipant = (gqlParticipant: GqlUser): Participant => {
   return {
     id: gqlParticipant.id,
-    image: gqlParticipant.image ?? null,
+    image: gqlParticipant.image ?? PLACEHOLDER_IMAGE,
     name: gqlParticipant.name,
   };
 };
@@ -80,6 +87,12 @@ export const prefectureLabels: Record<GqlCurrentPrefecture, string> = {
   [GqlCurrentPrefecture.OutsideShikoku]: "四国以外",
   [GqlCurrentPrefecture.Unknown]: "不明",
 };
+
+export const visiblePrefectureLabels = Object.fromEntries(
+  Object.entries(prefectureLabels).filter(
+    ([key]) => key !== GqlCurrentPrefecture.OutsideShikoku && key !== GqlCurrentPrefecture.Unknown,
+  ),
+) as Record<GqlCurrentPrefecture, string>;
 
 export const prefectureOptions = [
   GqlCurrentPrefecture.Kagawa,

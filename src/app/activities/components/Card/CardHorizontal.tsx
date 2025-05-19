@@ -1,3 +1,5 @@
+"use client";
+
 import { ActivityCard } from "@/app/activities/data/type";
 import Link from "next/link";
 import Image from "next/image";
@@ -5,11 +7,11 @@ import { MapPin } from "lucide-react";
 import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
-export function OpportunityCardHorizontal({ opportunity }: { opportunity: ActivityCard }) {
+function OpportunityCardHorizontal({ opportunity }: { opportunity: ActivityCard }) {
   return (
     <Link
-      href={`/activities/${opportunity.id}`}
-      className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/60 via-black/40 to-transparent px-6 pb-8 pt-16"
+      href={`/activities/${opportunity.id}?community_id=${opportunity.communityId}`}
+      className="block"
     >
       <div className="mx-auto max-w-md">
         <div className="flex overflow-hidden rounded-xl bg-background shadow-lg">
@@ -21,10 +23,14 @@ export function OpportunityCardHorizontal({ opportunity }: { opportunity: Activi
               placeholder={`blur`}
               blurDataURL={PLACEHOLDER_IMAGE}
               className="object-cover rounded-lg"
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                img.src = PLACEHOLDER_IMAGE;
+              }}
             />
           </div>
           <div className="flex-1 px-4 py-3">
-            <h2 className="text-title-md text-foreground line-clamp-1">{opportunity.title}</h2>
+            <h2 className="text-title-sm text-foreground line-clamp-1">{opportunity.title}</h2>
             <p className="mt-1 text-body-sm text-muted-foreground">
               {opportunity.feeRequired
                 ? `1人あたり${opportunity.feeRequired.toLocaleString()}円から`
@@ -40,3 +46,5 @@ export function OpportunityCardHorizontal({ opportunity }: { opportunity: Activi
     </Link>
   );
 }
+
+export default OpportunityCardHorizontal;

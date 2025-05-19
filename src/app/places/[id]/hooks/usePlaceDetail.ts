@@ -1,9 +1,24 @@
-import { usePlaceMembership } from "@/app/places/[id]/hooks/usePlaceMembership";
+"use client";
+
+import { useEffect, useMemo } from "react";
 import { useLoading } from "@/hooks/useLoading";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { BaseDetail } from "@/app/places/data/type";
+import { useGetSingleMembershipQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
 import { presenterBaseDetail } from "@/app/places/data/presenter/membership";
+import { presenterArticleWithAuthor } from "@/app/articles/data/presenter";
+import { presenterActivityCard } from "@/app/activities/data/presenter";
+import type { BaseDetail } from "@/app/places/data/type";
+import type { ActivityCard } from "@/app/activities/data/type";
+import { TArticleWithAuthor } from "@/app/articles/data/type";
+
+export interface UsePlaceDetailResult {
+  detail: BaseDetail | null;
+  opportunities: ActivityCard[];
+  featuredArticle: TArticleWithAuthor | null;
+  loading: boolean;
+  error: Error | null;
+  refetch: () => void;
+}
 
 export const usePlaceDetail = ({
   placeId,
@@ -12,66 +27,38 @@ export const usePlaceDetail = ({
   placeId: string;
   userId: string;
 }): UsePlaceDetailResult => {
-  const { membership, loading, error } = usePlaceMembership(COMMUNITY_ID, userId);
+  const { data, loading, error, refetch } = useGetSingleMembershipQuery({
+    variables: { communityId: COMMUNITY_ID, userId },
+  });
+
   const { setIsLoading } = useLoading();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     setIsLoading(loading);
   }, [loading, setIsLoading]);
 
+  const membership = data?.membership;
+  const user = membership?.user;
+
   const detail = useMemo(() => {
     return membership ? presenterBaseDetail(membership, placeId) : null;
   }, [membership, placeId]);
 
-  const imagesForSlider = useMemo(
-    () =>
-      detail?.images.map((url) => ({
-        url,
-        alt: detail.name,
-      })) || [],
-    [detail],
-  );
+  const opportunities = useMemo(() => {
+    return user?.opportunitiesCreatedByMe?.map(presenterActivityCard) || [];
+  }, [user]);
 
-  const nextImage = useCallback(() => {
-    if (imagesForSlider.length > 0) {
-      setCurrentImageIndex((prev) => (prev + 1) % imagesForSlider.length);
-    }
-  }, [imagesForSlider.length]);
-
-  const prevImage = useCallback(() => {
-    if (imagesForSlider.length > 0) {
-      setCurrentImageIndex((prev) => (prev - 1 + imagesForSlider.length) % imagesForSlider.length);
-    }
-  }, [imagesForSlider.length]);
-
-  const imagesForGrid = imagesForSlider.slice(0, 3);
-  const remainingCount = Math.max(0, imagesForSlider.length - 3);
-  const hasImages = imagesForSlider.length > 0;
+  const featuredArticle = useMemo(() => {
+    const article = user?.articlesAboutMe?.[0];
+    return article ? presenterArticleWithAuthor(article) : null;
+  }, [user]);
 
   return {
     detail,
+    opportunities,
+    featuredArticle,
     loading,
-    error: error || null,
-    currentImageIndex,
-    imagesForSlider,
-    imagesForGrid,
-    remainingCount,
-    nextImage,
-    prevImage,
-    hasImages,
+    error: error ?? null,
+    refetch,
   };
 };
-
-interface UsePlaceDetailResult {
-  detail: BaseDetail | null;
-  loading: boolean;
-  error: Error | null;
-  currentImageIndex: number;
-  imagesForSlider: Array<{ url: string; alt: string }>;
-  imagesForGrid: Array<{ url: string; alt: string }>;
-  remainingCount: number;
-  nextImage: () => void;
-  prevImage: () => void;
-  hasImages: boolean;
-}

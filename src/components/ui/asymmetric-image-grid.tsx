@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { memo } from "react";
 
@@ -12,7 +14,7 @@ type AsymmetricImageGridProps = {
   remainingCount?: number;
 };
 
-export const AsymmetricImageGrid = memo(
+const AsymmetricImageGrid = memo(
   ({ images, className = "", remainingCount }: AsymmetricImageGridProps) => {
     if (images.length === 0) return null;
 
@@ -62,3 +64,5 @@ export const AsymmetricImageGrid = memo(
 );
 
 AsymmetricImageGrid.displayName = "AsymmetricImageGrid";
+
+export default AsymmetricImageGrid;

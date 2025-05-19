@@ -8,6 +8,7 @@ import {
   TArticleWithAuthor,
 } from "@/app/articles/data/type";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
+import markdownToTxt from 'markdown-to-txt';
 
 export const presenterArticleCards = (
   edges?: (GqlArticleEdge | null | undefined)[],
@@ -23,7 +24,7 @@ export const presenterArticleCard = (node?: GqlArticle): TArticleCard => ({
   category: node?.category || GqlArticleCategory.Interview,
   title: node?.title || "",
   // TODO FEでintroが入ったら修正
-  introduction: node?.body || "",
+  introduction: node?.body ? markdownToTxt(node.body) : "",
   thumbnail: node?.thumbnail || null,
   publishedAt: node?.publishedAt ? new Date(node.publishedAt).toISOString() : "",
 });

@@ -7,7 +7,7 @@ import { presenterActivityDetail } from "@/app/activities/data/presenter";
 import { ActivityDetail } from "@/app/activities/data/type";
 
 export const useOpportunityDetail = (id: string) => {
-  const { data, loading, error } = useGetOpportunityQuery({
+  const { data, loading, error, refetch } = useGetOpportunityQuery({
     variables: {
       id,
       permission: { communityId: COMMUNITY_ID },
@@ -26,5 +26,6 @@ export const useOpportunityDetail = (id: string) => {
     opportunity,
     loading,
     error,
+    refetch,
   };
 };

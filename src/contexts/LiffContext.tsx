@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import liff from '@line/liff';
+import { setIsInLiffBrowser } from '@/utils/liff';
 
 type LiffProfile = {
   userId: string;
@@ -70,6 +71,7 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
       setIsLiffInitialized(true);
       
       setIsInLiff(liff.isInClient());
+      setIsInLiffBrowser(liff.isInClient());
       setIsLiffLoggedIn(liff.isLoggedIn());
       
       if (liff.isLoggedIn()) {

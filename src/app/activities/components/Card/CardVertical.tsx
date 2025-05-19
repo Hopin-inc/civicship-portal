@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { MapPin } from "lucide-react";
 import Link from "next/link";
@@ -6,10 +8,14 @@ import { ActivityCard } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 export default function OpportunityCardVertical({ opportunity }: { opportunity: ActivityCard }) {
-  const { id, title, feeRequired, location, images, hasReservableTicket } = opportunity;
+  const { id, title, feeRequired, location, images, hasReservableTicket, communityId } =
+    opportunity;
 
   return (
-    <Link href={`/activities/${id}`} className="relative w-[164px] flex-shrink-0">
+    <Link
+      href={`/activities/${id}?community_id=${communityId}`}
+      className="relative w-[164px] flex-shrink-0"
+    >
       <Card className="w-[164px] h-[205px] overflow-hidden relative">
         {hasReservableTicket && (
           <div className="absolute top-2 left-2 bg-primary-foreground text-primary px-2.5 py-1 rounded-xl text-label-xs font-bold z-10">
@@ -26,6 +32,10 @@ export default function OpportunityCardVertical({ opportunity }: { opportunity: 
           blurDataURL={PLACEHOLDER_IMAGE}
           loading="lazy"
           className="h-full w-full object-cover"
+          onError={(e) => {
+            const img = e.target as HTMLImageElement;
+            img.src = PLACEHOLDER_IMAGE;
+          }}
         />
       </Card>
       <div className="mt-3">
