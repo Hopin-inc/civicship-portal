@@ -26,7 +26,7 @@ const sendUserSignUpRequest = async (
     variables: {
       input: {
         name,
-        currentPrefecture: currentPrefecture as any, // Type cast to resolve compatibility issue
+        currentPrefecture: currentPrefecture,
         communityId: COMMUNITY_ID,
         phoneUid: effectivePhoneUid,
         phoneNumber,
