@@ -5,7 +5,7 @@ import { auth } from "@/lib/firebase/firebase";
 import { GqlCurrentPrefecture, GqlUser } from "@/types/graphql";
 import { Required } from "utility-types";
 import { COMMUNITY_ID } from "@/utils";
-import { removeCookies } from "@/contexts/auth/cookie";
+import { removeCookies } from "../cookie";
 
 /**
  * User management hook for handling user creation and logout

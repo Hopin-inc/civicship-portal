@@ -1,5 +1,5 @@
 import { auth, phoneAuth } from "@/lib/firebase/firebase";
-import refreshAuthToken from "@/contexts/auth/refreshToken/index";
+import refreshAuthToken from "./index";
 
 const refreshIdToken = async (): Promise<string | null> => {
   try {

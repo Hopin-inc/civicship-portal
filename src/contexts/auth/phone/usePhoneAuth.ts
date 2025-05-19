@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCookies } from "next-client-cookies";
 import { toast } from "sonner";
-import startPhoneNumberVerification from "@/contexts/auth/phone/startPhoneNumberVerticication";
-import verifyPhoneCode, { PhoneVerificationResult } from "@/contexts/auth/phone/verifyPhoneCode";
-import { setCookies } from "@/contexts/auth/cookie";
-import { normalizePhoneNumber } from "@/contexts/auth/phone/utils";
+import startPhoneNumberVerification from "./startPhoneNumberVerticication";
+import verifyPhoneCode, { PhoneVerificationResult } from "./verifyPhoneCode";
+import { setCookies } from "@/contexts/auth/shared/cookie";
+import { normalizePhoneNumber } from "./utils";
 
 /**
  * Phone authentication hook for handling phone number verification

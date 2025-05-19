@@ -24,7 +24,7 @@ export function PhoneVerificationForm() {
     }
 
     return () => {
-      import("@/contexts/auth/reCAPTCHA/clearRecaptcha").then((module) => {
+      import("@/contexts/auth/phone/reCAPTCHA/clearRecaptcha").then((module) => {
         const clearRecaptcha = module.default;
         clearRecaptcha();
       });
