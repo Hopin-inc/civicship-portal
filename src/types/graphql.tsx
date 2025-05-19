@@ -1038,6 +1038,7 @@ export type GqlOpportunitySlotEdge = GqlEdge & {
 };
 
 export type GqlOpportunitySlotFilterInput = {
+  dateRange?: InputMaybe<GqlDateTimeRangeFilter>;
   hostingStatus?: InputMaybe<GqlOpportunitySlotHostingStatus>;
   opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
 };
@@ -2496,6 +2497,7 @@ export type GqlGetSingleMembershipQuery = {
       image?: string | null;
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
+      phoneNumber?: string | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -2595,6 +2597,7 @@ export type GqlGetMembershipListQuery = {
           name: string;
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -2628,6 +2631,7 @@ export type GqlUserFieldsFragment = {
   image?: string | null;
   bio?: string | null;
   currentPrefecture?: GqlCurrentPrefecture | null;
+  phoneNumber?: string | null;
   urlFacebook?: string | null;
   urlInstagram?: string | null;
   urlX?: string | null;
@@ -2663,6 +2667,7 @@ export type GqlUserPortfolioFieldsFragment = {
     image?: string | null;
     bio?: string | null;
     currentPrefecture?: GqlCurrentPrefecture | null;
+    phoneNumber?: string | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -2709,6 +2714,7 @@ export type GqlGetUserFlexibleQuery = {
     image?: string | null;
     bio?: string | null;
     currentPrefecture?: GqlCurrentPrefecture | null;
+    phoneNumber?: string | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -2742,6 +2748,7 @@ export type GqlGetUserFlexibleQuery = {
         image?: string | null;
         bio?: string | null;
         currentPrefecture?: GqlCurrentPrefecture | null;
+        phoneNumber?: string | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -2810,6 +2817,7 @@ export type GqlGetUserWalletQuery = {
     image?: string | null;
     bio?: string | null;
     currentPrefecture?: GqlCurrentPrefecture | null;
+    phoneNumber?: string | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -2835,6 +2843,7 @@ export type GqlGetUserWalletQuery = {
             image?: string | null;
             bio?: string | null;
             currentPrefecture?: GqlCurrentPrefecture | null;
+            phoneNumber?: string | null;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -2852,6 +2861,7 @@ export type GqlGetUserWalletQuery = {
             image?: string | null;
             bio?: string | null;
             currentPrefecture?: GqlCurrentPrefecture | null;
+            phoneNumber?: string | null;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -2929,6 +2939,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               image?: string | null;
               bio?: string | null;
               currentPrefecture?: GqlCurrentPrefecture | null;
+              phoneNumber?: string | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -2946,6 +2957,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               image?: string | null;
               bio?: string | null;
               currentPrefecture?: GqlCurrentPrefecture | null;
+              phoneNumber?: string | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -3056,6 +3068,7 @@ export type GqlGetArticlesQuery = {
           image?: string | null;
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -3089,6 +3102,7 @@ export type GqlGetArticleQuery = {
       image?: string | null;
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
+      phoneNumber?: string | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3134,6 +3148,7 @@ export type GqlGetArticleQuery = {
       image?: string | null;
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
+      phoneNumber?: string | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3169,6 +3184,7 @@ export type GqlGetArticleQuery = {
           image?: string | null;
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -3187,6 +3203,50 @@ export type GqlEvaluationFieldsFragment = {
   createdAt?: Date | null;
   updatedAt?: Date | null;
   issuedAt?: Date | null;
+};
+
+export type GqlEvaluationPassMutationVariables = Exact<{
+  input: GqlEvaluationCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlEvaluationPassMutation = {
+  __typename?: "Mutation";
+  evaluationPass?: {
+    __typename?: "EvaluationCreateSuccess";
+    evaluation: {
+      __typename?: "Evaluation";
+      id: string;
+      comment?: string | null;
+      credentialUrl?: string | null;
+      status: GqlEvaluationStatus;
+      createdAt?: Date | null;
+      updatedAt?: Date | null;
+      issuedAt?: Date | null;
+    };
+  } | null;
+};
+
+export type GqlEvaluationFailMutationVariables = Exact<{
+  input: GqlEvaluationCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlEvaluationFailMutation = {
+  __typename?: "Mutation";
+  evaluationFail?: {
+    __typename?: "EvaluationCreateSuccess";
+    evaluation: {
+      __typename?: "Evaluation";
+      id: string;
+      comment?: string | null;
+      credentialUrl?: string | null;
+      status: GqlEvaluationStatus;
+      createdAt?: Date | null;
+      updatedAt?: Date | null;
+      issuedAt?: Date | null;
+    };
+  } | null;
 };
 
 export type GqlGetEvaluationsQueryVariables = Exact<{ [key: string]: never }>;
@@ -3370,6 +3430,7 @@ export type GqlGetOpportunityQuery = {
             image?: string | null;
             bio?: string | null;
             currentPrefecture?: GqlCurrentPrefecture | null;
+            phoneNumber?: string | null;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -3384,6 +3445,7 @@ export type GqlGetOpportunityQuery = {
       image?: string | null;
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
+      phoneNumber?: string | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3445,6 +3507,7 @@ export type GqlGetOpportunityQuery = {
                 image?: string | null;
                 bio?: string | null;
                 currentPrefecture?: GqlCurrentPrefecture | null;
+                phoneNumber?: string | null;
                 urlFacebook?: string | null;
                 urlInstagram?: string | null;
                 urlX?: string | null;
@@ -3543,6 +3606,7 @@ export type GqlSearchOpportunitiesQuery = {
                 image?: string | null;
                 bio?: string | null;
                 currentPrefecture?: GqlCurrentPrefecture | null;
+                phoneNumber?: string | null;
                 urlFacebook?: string | null;
                 urlInstagram?: string | null;
                 urlX?: string | null;
@@ -3565,8 +3629,32 @@ export type GqlOpportunitySlotFieldsFragment = {
   remainingCapacity?: number | null;
 };
 
+export type GqlOpportunitySlotSetHostingStatusMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlOpportunitySlotSetHostingStatusInput;
+  permission: GqlCheckOpportunityPermissionInput;
+}>;
+
+export type GqlOpportunitySlotSetHostingStatusMutation = {
+  __typename?: "Mutation";
+  opportunitySlotSetHostingStatus?: {
+    __typename?: "OpportunitySlotSetHostingStatusSuccess";
+    slot: {
+      __typename?: "OpportunitySlot";
+      id: string;
+      hostingStatus: GqlOpportunitySlotHostingStatus;
+      startsAt: Date;
+      endsAt: Date;
+      capacity?: number | null;
+      remainingCapacity?: number | null;
+    };
+  } | null;
+};
+
 export type GqlGetOpportunitySlotsQueryVariables = Exact<{
   filter?: InputMaybe<GqlOpportunitySlotFilterInput>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
 export type GqlGetOpportunitySlotsQuery = {
@@ -3607,6 +3695,18 @@ export type GqlGetOpportunitySlotsQuery = {
           pointsToEarn?: number | null;
           earliestReservableAt?: Date | null;
         } | null;
+        reservations?: Array<{
+          __typename?: "Reservation";
+          participations?: Array<{
+            __typename?: "Participation";
+            id: string;
+            evaluation?: {
+              __typename?: "Evaluation";
+              id: string;
+              status: GqlEvaluationStatus;
+            } | null;
+          }> | null;
+        }> | null;
       } | null;
     } | null> | null;
   };
@@ -3619,6 +3719,49 @@ export type GqlGetOpportunitySlotQueryVariables = Exact<{
 export type GqlGetOpportunitySlotQuery = {
   __typename?: "Query";
   opportunitySlot?: { __typename?: "OpportunitySlot"; id: string } | null;
+};
+
+export type GqlGetOpportunitySlotWithParticipationsQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetOpportunitySlotWithParticipationsQuery = {
+  __typename?: "Query";
+  opportunitySlot?: {
+    __typename?: "OpportunitySlot";
+    id: string;
+    hostingStatus: GqlOpportunitySlotHostingStatus;
+    startsAt: Date;
+    endsAt: Date;
+    capacity?: number | null;
+    remainingCapacity?: number | null;
+    opportunity?: {
+      __typename?: "Opportunity";
+      id: string;
+      title: string;
+      description: string;
+      body?: string | null;
+      images?: Array<string> | null;
+      category: GqlOpportunityCategory;
+      publishStatus: GqlPublishStatus;
+      isReservableWithTicket?: boolean | null;
+      requireApproval: boolean;
+      feeRequired?: number | null;
+      pointsToEarn?: number | null;
+      earliestReservableAt?: Date | null;
+      community?: { __typename?: "Community"; id: string; name?: string | null } | null;
+    } | null;
+    reservations?: Array<{
+      __typename?: "Reservation";
+      participations?: Array<{
+        __typename?: "Participation";
+        id: string;
+        status: GqlParticipationStatus;
+        user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+        evaluation?: { __typename?: "Evaluation"; id: string; status: GqlEvaluationStatus } | null;
+      }> | null;
+    }> | null;
+  } | null;
 };
 
 export type GqlParticipationFieldsFragment = {
@@ -3698,6 +3841,7 @@ export type GqlGetParticipationQuery = {
             image?: string | null;
             bio?: string | null;
             currentPrefecture?: GqlCurrentPrefecture | null;
+            phoneNumber?: string | null;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -3737,6 +3881,7 @@ export type GqlGetParticipationQuery = {
         image?: string | null;
         bio?: string | null;
         currentPrefecture?: GqlCurrentPrefecture | null;
+        phoneNumber?: string | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -3749,6 +3894,7 @@ export type GqlGetParticipationQuery = {
       image?: string | null;
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
+      phoneNumber?: string | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3788,7 +3934,24 @@ export type GqlCancelReservationMutation = {
   } | null;
 };
 
-export type GqlGetReservationsQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlReservationAcceptMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  permission: GqlCheckOpportunityPermissionInput;
+}>;
+
+export type GqlReservationAcceptMutation = {
+  __typename?: "Mutation";
+  reservationAccept?: {
+    __typename?: "ReservationSetStatusSuccess";
+    reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
+  } | null;
+};
+
+export type GqlGetReservationsQueryVariables = Exact<{
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  filter?: InputMaybe<GqlReservationFilterInput>;
+}>;
 
 export type GqlGetReservationsQuery = {
   __typename?: "Query";
@@ -3797,8 +3960,34 @@ export type GqlGetReservationsQuery = {
     totalCount: number;
     edges: Array<{
       __typename?: "ReservationEdge";
-      node?: { __typename?: "Reservation"; id: string } | null;
+      node?: {
+        __typename?: "Reservation";
+        id: string;
+        status: GqlReservationStatus;
+        createdAt?: Date | null;
+        createdByUser?: {
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+        } | null;
+        opportunitySlot?: {
+          __typename?: "OpportunitySlot";
+          id: string;
+          startsAt: Date;
+          endsAt: Date;
+          opportunity?: { __typename?: "Opportunity"; id: string; title: string } | null;
+        } | null;
+        participations?: Array<{ __typename?: "Participation"; id: string }> | null;
+      } | null;
     }>;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
   };
 };
 
@@ -3812,6 +4001,18 @@ export type GqlGetReservationQuery = {
     __typename?: "Reservation";
     id: string;
     status: GqlReservationStatus;
+    createdByUser?: {
+      __typename?: "User";
+      phoneNumber?: string | null;
+      id: string;
+      name: string;
+      image?: string | null;
+      bio?: string | null;
+      currentPrefecture?: GqlCurrentPrefecture | null;
+      urlFacebook?: string | null;
+      urlInstagram?: string | null;
+      urlX?: string | null;
+    } | null;
     opportunitySlot?: {
       __typename?: "OpportunitySlot";
       id: string;
@@ -3834,6 +4035,13 @@ export type GqlGetReservationQuery = {
         feeRequired?: number | null;
         pointsToEarn?: number | null;
         earliestReservableAt?: Date | null;
+        slots?: Array<{
+          __typename?: "OpportunitySlot";
+          id: string;
+          startsAt: Date;
+          hostingStatus: GqlOpportunitySlotHostingStatus;
+        }> | null;
+        community?: { __typename?: "Community"; id: string; name?: string | null } | null;
         createdByUser?: {
           __typename?: "User";
           id: string;
@@ -3841,20 +4049,10 @@ export type GqlGetReservationQuery = {
           image?: string | null;
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
-          articlesAboutMe?: Array<{
-            __typename?: "Article";
-            id: string;
-            title: string;
-            body?: string | null;
-            introduction: string;
-            thumbnail?: any | null;
-            category: GqlArticleCategory;
-            publishStatus: GqlPublishStatus;
-            publishedAt?: Date | null;
-          }> | null;
         } | null;
         place?: {
           __typename?: "Place";
@@ -3985,6 +4183,26 @@ export type GqlTicketClaimLinkQuery = {
   } | null;
 };
 
+export type GqlGetTicketIssuersQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetTicketIssuersQuery = {
+  __typename?: "Query";
+  ticketIssuers: {
+    __typename?: "TicketIssuersConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "TicketIssuerEdge";
+      node?: {
+        __typename?: "TicketIssuer";
+        id: string;
+        qtyToBeIssued: number;
+        createdAt?: Date | null;
+        owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
 export type GqlUtilityFieldsFragment = {
   __typename?: "Utility";
   id: string;
@@ -4055,6 +4273,7 @@ export type GqlGetTransactionsQuery = {
             image?: string | null;
             bio?: string | null;
             currentPrefecture?: GqlCurrentPrefecture | null;
+            phoneNumber?: string | null;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -4072,6 +4291,7 @@ export type GqlGetTransactionsQuery = {
             image?: string | null;
             bio?: string | null;
             currentPrefecture?: GqlCurrentPrefecture | null;
+            phoneNumber?: string | null;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -4154,6 +4374,7 @@ export const UserFieldsFragmentDoc = gql`
     image
     bio
     currentPrefecture
+    phoneNumber
     urlFacebook
     urlInstagram
     urlX
@@ -5507,6 +5728,118 @@ export type GetArticleQueryResult = Apollo.QueryResult<
   GqlGetArticleQuery,
   GqlGetArticleQueryVariables
 >;
+export const EvaluationPassDocument = gql`
+  mutation EvaluationPass(
+    $input: EvaluationCreateInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    evaluationPass(input: $input, permission: $permission) {
+      ... on EvaluationCreateSuccess {
+        evaluation {
+          ...EvaluationFields
+        }
+      }
+    }
+  }
+  ${EvaluationFieldsFragmentDoc}
+`;
+export type GqlEvaluationPassMutationFn = Apollo.MutationFunction<
+  GqlEvaluationPassMutation,
+  GqlEvaluationPassMutationVariables
+>;
+
+/**
+ * __useEvaluationPassMutation__
+ *
+ * To run a mutation, you first call `useEvaluationPassMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEvaluationPassMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [evaluationPassMutation, { data, loading, error }] = useEvaluationPassMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useEvaluationPassMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlEvaluationPassMutation,
+    GqlEvaluationPassMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlEvaluationPassMutation, GqlEvaluationPassMutationVariables>(
+    EvaluationPassDocument,
+    options,
+  );
+}
+export type EvaluationPassMutationHookResult = ReturnType<typeof useEvaluationPassMutation>;
+export type EvaluationPassMutationResult = Apollo.MutationResult<GqlEvaluationPassMutation>;
+export type EvaluationPassMutationOptions = Apollo.BaseMutationOptions<
+  GqlEvaluationPassMutation,
+  GqlEvaluationPassMutationVariables
+>;
+export const EvaluationFailDocument = gql`
+  mutation EvaluationFail(
+    $input: EvaluationCreateInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    evaluationFail(input: $input, permission: $permission) {
+      ... on EvaluationCreateSuccess {
+        evaluation {
+          ...EvaluationFields
+        }
+      }
+    }
+  }
+  ${EvaluationFieldsFragmentDoc}
+`;
+export type GqlEvaluationFailMutationFn = Apollo.MutationFunction<
+  GqlEvaluationFailMutation,
+  GqlEvaluationFailMutationVariables
+>;
+
+/**
+ * __useEvaluationFailMutation__
+ *
+ * To run a mutation, you first call `useEvaluationFailMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEvaluationFailMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [evaluationFailMutation, { data, loading, error }] = useEvaluationFailMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useEvaluationFailMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlEvaluationFailMutation,
+    GqlEvaluationFailMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlEvaluationFailMutation, GqlEvaluationFailMutationVariables>(
+    EvaluationFailDocument,
+    options,
+  );
+}
+export type EvaluationFailMutationHookResult = ReturnType<typeof useEvaluationFailMutation>;
+export type EvaluationFailMutationResult = Apollo.MutationResult<GqlEvaluationFailMutation>;
+export type EvaluationFailMutationOptions = Apollo.BaseMutationOptions<
+  GqlEvaluationFailMutation,
+  GqlEvaluationFailMutationVariables
+>;
 export const GetEvaluationsDocument = gql`
   query GetEvaluations {
     evaluations {
@@ -5970,9 +6303,70 @@ export type SearchOpportunitiesQueryResult = Apollo.QueryResult<
   GqlSearchOpportunitiesQuery,
   GqlSearchOpportunitiesQueryVariables
 >;
+export const OpportunitySlotSetHostingStatusDocument = gql`
+  mutation OpportunitySlotSetHostingStatus(
+    $id: ID!
+    $input: OpportunitySlotSetHostingStatusInput!
+    $permission: CheckOpportunityPermissionInput!
+  ) {
+    opportunitySlotSetHostingStatus(id: $id, input: $input, permission: $permission) {
+      ... on OpportunitySlotSetHostingStatusSuccess {
+        slot {
+          ...OpportunitySlotFields
+        }
+      }
+    }
+  }
+  ${OpportunitySlotFieldsFragmentDoc}
+`;
+export type GqlOpportunitySlotSetHostingStatusMutationFn = Apollo.MutationFunction<
+  GqlOpportunitySlotSetHostingStatusMutation,
+  GqlOpportunitySlotSetHostingStatusMutationVariables
+>;
+
+/**
+ * __useOpportunitySlotSetHostingStatusMutation__
+ *
+ * To run a mutation, you first call `useOpportunitySlotSetHostingStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useOpportunitySlotSetHostingStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [opportunitySlotSetHostingStatusMutation, { data, loading, error }] = useOpportunitySlotSetHostingStatusMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useOpportunitySlotSetHostingStatusMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlOpportunitySlotSetHostingStatusMutation,
+    GqlOpportunitySlotSetHostingStatusMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlOpportunitySlotSetHostingStatusMutation,
+    GqlOpportunitySlotSetHostingStatusMutationVariables
+  >(OpportunitySlotSetHostingStatusDocument, options);
+}
+export type OpportunitySlotSetHostingStatusMutationHookResult = ReturnType<
+  typeof useOpportunitySlotSetHostingStatusMutation
+>;
+export type OpportunitySlotSetHostingStatusMutationResult =
+  Apollo.MutationResult<GqlOpportunitySlotSetHostingStatusMutation>;
+export type OpportunitySlotSetHostingStatusMutationOptions = Apollo.BaseMutationOptions<
+  GqlOpportunitySlotSetHostingStatusMutation,
+  GqlOpportunitySlotSetHostingStatusMutationVariables
+>;
 export const GetOpportunitySlotsDocument = gql`
-  query GetOpportunitySlots($filter: OpportunitySlotFilterInput) {
-    opportunitySlots(filter: $filter, sort: { startsAt: desc }) {
+  query GetOpportunitySlots($filter: OpportunitySlotFilterInput, $cursor: String, $first: Int) {
+    opportunitySlots(filter: $filter, sort: { startsAt: desc }, cursor: $cursor, first: $first) {
       pageInfo {
         startCursor
         endCursor
@@ -5991,6 +6385,15 @@ export const GetOpportunitySlotsDocument = gql`
           remainingCapacity
           opportunity {
             ...OpportunityFields
+          }
+          reservations {
+            participations {
+              id
+              evaluation {
+                id
+                status
+              }
+            }
           }
         }
       }
@@ -6012,6 +6415,8 @@ export const GetOpportunitySlotsDocument = gql`
  * const { data, loading, error } = useGetOpportunitySlotsQuery({
  *   variables: {
  *      filter: // value for 'filter'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
  *   },
  * });
  */
@@ -6139,6 +6544,110 @@ export type GetOpportunitySlotSuspenseQueryHookResult = ReturnType<
 export type GetOpportunitySlotQueryResult = Apollo.QueryResult<
   GqlGetOpportunitySlotQuery,
   GqlGetOpportunitySlotQueryVariables
+>;
+export const GetOpportunitySlotWithParticipationsDocument = gql`
+  query GetOpportunitySlotWithParticipations($id: ID!) {
+    opportunitySlot(id: $id) {
+      ...OpportunitySlotFields
+      opportunity {
+        ...OpportunityFields
+        community {
+          id
+          name
+        }
+      }
+      reservations {
+        participations {
+          id
+          status
+          user {
+            id
+            name
+            image
+          }
+          evaluation {
+            id
+            status
+          }
+        }
+      }
+    }
+  }
+  ${OpportunitySlotFieldsFragmentDoc}
+  ${OpportunityFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetOpportunitySlotWithParticipationsQuery__
+ *
+ * To run a query within a React component, call `useGetOpportunitySlotWithParticipationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOpportunitySlotWithParticipationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOpportunitySlotWithParticipationsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetOpportunitySlotWithParticipationsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetOpportunitySlotWithParticipationsQuery,
+    GqlGetOpportunitySlotWithParticipationsQueryVariables
+  > &
+    (
+      | { variables: GqlGetOpportunitySlotWithParticipationsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetOpportunitySlotWithParticipationsQuery,
+    GqlGetOpportunitySlotWithParticipationsQueryVariables
+  >(GetOpportunitySlotWithParticipationsDocument, options);
+}
+export function useGetOpportunitySlotWithParticipationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetOpportunitySlotWithParticipationsQuery,
+    GqlGetOpportunitySlotWithParticipationsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetOpportunitySlotWithParticipationsQuery,
+    GqlGetOpportunitySlotWithParticipationsQueryVariables
+  >(GetOpportunitySlotWithParticipationsDocument, options);
+}
+export function useGetOpportunitySlotWithParticipationsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetOpportunitySlotWithParticipationsQuery,
+        GqlGetOpportunitySlotWithParticipationsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetOpportunitySlotWithParticipationsQuery,
+    GqlGetOpportunitySlotWithParticipationsQueryVariables
+  >(GetOpportunitySlotWithParticipationsDocument, options);
+}
+export type GetOpportunitySlotWithParticipationsQueryHookResult = ReturnType<
+  typeof useGetOpportunitySlotWithParticipationsQuery
+>;
+export type GetOpportunitySlotWithParticipationsLazyQueryHookResult = ReturnType<
+  typeof useGetOpportunitySlotWithParticipationsLazyQuery
+>;
+export type GetOpportunitySlotWithParticipationsSuspenseQueryHookResult = ReturnType<
+  typeof useGetOpportunitySlotWithParticipationsSuspenseQuery
+>;
+export type GetOpportunitySlotWithParticipationsQueryResult = Apollo.QueryResult<
+  GqlGetOpportunitySlotWithParticipationsQuery,
+  GqlGetOpportunitySlotWithParticipationsQueryVariables
 >;
 export const GetParticipationsDocument = gql`
   query GetParticipations {
@@ -6433,13 +6942,91 @@ export type CancelReservationMutationOptions = Apollo.BaseMutationOptions<
   GqlCancelReservationMutation,
   GqlCancelReservationMutationVariables
 >;
+export const ReservationAcceptDocument = gql`
+  mutation ReservationAccept($id: ID!, $permission: CheckOpportunityPermissionInput!) {
+    reservationAccept(id: $id, permission: $permission) {
+      ... on ReservationSetStatusSuccess {
+        reservation {
+          id
+          status
+        }
+      }
+    }
+  }
+`;
+export type GqlReservationAcceptMutationFn = Apollo.MutationFunction<
+  GqlReservationAcceptMutation,
+  GqlReservationAcceptMutationVariables
+>;
+
+/**
+ * __useReservationAcceptMutation__
+ *
+ * To run a mutation, you first call `useReservationAcceptMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReservationAcceptMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [reservationAcceptMutation, { data, loading, error }] = useReservationAcceptMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useReservationAcceptMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlReservationAcceptMutation,
+    GqlReservationAcceptMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlReservationAcceptMutation, GqlReservationAcceptMutationVariables>(
+    ReservationAcceptDocument,
+    options,
+  );
+}
+export type ReservationAcceptMutationHookResult = ReturnType<typeof useReservationAcceptMutation>;
+export type ReservationAcceptMutationResult = Apollo.MutationResult<GqlReservationAcceptMutation>;
+export type ReservationAcceptMutationOptions = Apollo.BaseMutationOptions<
+  GqlReservationAcceptMutation,
+  GqlReservationAcceptMutationVariables
+>;
 export const GetReservationsDocument = gql`
-  query GetReservations {
-    reservations {
+  query GetReservations($cursor: String, $first: Int, $filter: ReservationFilterInput) {
+    reservations(cursor: $cursor, first: $first, filter: $filter) {
       edges {
         node {
           id
+          status
+          createdAt
+          createdByUser {
+            id
+            name
+            image
+          }
+          opportunitySlot {
+            id
+            startsAt
+            endsAt
+            opportunity {
+              id
+              title
+            }
+          }
+          participations {
+            id
+          }
         }
+      }
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
       }
       totalCount
     }
@@ -6458,6 +7045,9 @@ export const GetReservationsDocument = gql`
  * @example
  * const { data, loading, error } = useGetReservationsQuery({
  *   variables: {
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
+ *      filter: // value for 'filter'
  *   },
  * });
  */
@@ -6507,15 +7097,25 @@ export const GetReservationDocument = gql`
   query GetReservation($id: ID!) {
     reservation(id: $id) {
       ...ReservationFields
+      createdByUser {
+        ...UserFields
+        phoneNumber
+      }
       opportunitySlot {
         ...OpportunitySlotFields
         opportunity {
           ...OpportunityFields
+          slots {
+            id
+            startsAt
+            hostingStatus
+          }
+          community {
+            id
+            name
+          }
           createdByUser {
             ...UserFields
-            articlesAboutMe {
-              ...ArticleFields
-            }
           }
           place {
             ...PlaceFields
@@ -6524,14 +7124,14 @@ export const GetReservationDocument = gql`
       }
       participations {
         ...ParticipationFields
+        id
       }
     }
   }
   ${ReservationFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
   ${OpportunitySlotFieldsFragmentDoc}
   ${OpportunityFieldsFragmentDoc}
-  ${UserFieldsFragmentDoc}
-  ${ArticleFieldsFragmentDoc}
   ${PlaceFieldsFragmentDoc}
   ${ParticipationFieldsFragmentDoc}
 `;
@@ -6904,6 +7504,86 @@ export type TicketClaimLinkSuspenseQueryHookResult = ReturnType<
 export type TicketClaimLinkQueryResult = Apollo.QueryResult<
   GqlTicketClaimLinkQuery,
   GqlTicketClaimLinkQueryVariables
+>;
+export const GetTicketIssuersDocument = gql`
+  query GetTicketIssuers {
+    ticketIssuers {
+      edges {
+        node {
+          id
+          qtyToBeIssued
+          createdAt
+          owner {
+            id
+            name
+            image
+          }
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetTicketIssuersQuery__
+ *
+ * To run a query within a React component, call `useGetTicketIssuersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTicketIssuersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTicketIssuersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetTicketIssuersQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetTicketIssuersQuery,
+    GqlGetTicketIssuersQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetTicketIssuersQuery, GqlGetTicketIssuersQueryVariables>(
+    GetTicketIssuersDocument,
+    options,
+  );
+}
+export function useGetTicketIssuersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetTicketIssuersQuery,
+    GqlGetTicketIssuersQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetTicketIssuersQuery, GqlGetTicketIssuersQueryVariables>(
+    GetTicketIssuersDocument,
+    options,
+  );
+}
+export function useGetTicketIssuersSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetTicketIssuersQuery, GqlGetTicketIssuersQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetTicketIssuersQuery, GqlGetTicketIssuersQueryVariables>(
+    GetTicketIssuersDocument,
+    options,
+  );
+}
+export type GetTicketIssuersQueryHookResult = ReturnType<typeof useGetTicketIssuersQuery>;
+export type GetTicketIssuersLazyQueryHookResult = ReturnType<typeof useGetTicketIssuersLazyQuery>;
+export type GetTicketIssuersSuspenseQueryHookResult = ReturnType<
+  typeof useGetTicketIssuersSuspenseQuery
+>;
+export type GetTicketIssuersQueryResult = Apollo.QueryResult<
+  GqlGetTicketIssuersQuery,
+  GqlGetTicketIssuersQueryVariables
 >;
 export const GetUtilitiesDocument = gql`
   query GetUtilities {
