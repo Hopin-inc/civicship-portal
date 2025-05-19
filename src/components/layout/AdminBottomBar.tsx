@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, Ticket } from "lucide-react";
+import { Book, Check, Ticket } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,11 @@ interface AdminBottomBarProps {
 const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
   const pathname = usePathname();
 
-  if (!pathname.startsWith("/admin")) {
+  if (
+    !pathname.startsWith("/admin") ||
+    pathname.startsWith("/admin/reservations/") ||
+    pathname.startsWith("/admin/slots/")
+  ) {
     return null;
   }
 
@@ -29,18 +33,25 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
         <div className="flex justify-around items-center">
           <Link
             href="/admin/reservations"
-            className={getLinkStyle("/admin/reservations", "/admin/reservations/*")}
+            className={cn(getLinkStyle("/admin/reservations", "/admin/reservations/*"), "flex-grow")}
           >
-            <FileText size={24} />
+            <Book size={24} />
             <span className="text-xs mt-1">応募</span>
           </Link>
-          <Link 
-            href="/admin/tickets" 
-            className={getLinkStyle("/admin/tickets", "/admin/tickets/*")}
+          <Link
+            href="/admin/slots"
+            className={cn(getLinkStyle("/admin/slots", "/admin/slots/*"), "flex-grow")}
           >
-            <Ticket size={24} />
-            <span className="text-xs mt-1">チケット</span>
+            <Check size={24} />
+            <span className="text-xs mt-1">出欠</span>
           </Link>
+          {/*<Link*/}
+          {/*  href="/admin/tickets"*/}
+          {/*  className={cn(getLinkStyle("/admin/tickets", "/admin/tickets/*"), "flex-grow")}*/}
+          {/*>*/}
+          {/*  <Ticket size={24} />*/}
+          {/*  <span className="text-xs mt-1">チケット</span>*/}
+          {/*</Link>*/}
         </div>
       </div>
     </nav>
