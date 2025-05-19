@@ -21,7 +21,7 @@ const useSearchResultHeader = (searchParams: SearchParams) => {
           location: searchParams.location,
           from: searchParams.from,
           to: searchParams.to,
-          guests: searchParams.guests ? parseInt(searchParams.guests) : undefined,
+          guests: searchParams.guests && !isNaN(parseInt(searchParams.guests, 10)) ? parseInt(searchParams.guests, 10) : undefined,
         },
         showLogo: false,
         showBackButton: true,
