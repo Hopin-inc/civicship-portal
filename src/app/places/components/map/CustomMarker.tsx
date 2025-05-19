@@ -98,7 +98,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         const markerIcon: google.maps.Icon = {
           url: canvas.toDataURL("image/png", 1.0),
           scaledSize: new google.maps.Size(displaySize, displaySize),
-          anchor: new google.maps.Point(displaySize / 2, displaySize / 2 + (isSelected ? 30 : 0)),
+          anchor: new google.maps.Point(displaySize / 2, displaySize / 2 + (isSelected ? 65 : 0)),
         };
 
         markerIconCache.set(data.id, markerIcon);
