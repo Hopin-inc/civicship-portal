@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
+import ErrorState from "@/components/shared/ErrorState";
 import { format } from "date-fns";
 import { useOpportunitySlots } from "@/hooks/useOpportunitySlots";
 import { Badge } from "@/components/ui/badge";
@@ -59,7 +59,7 @@ export default function SlotsPage() {
   if (error) {
     return (
       <div className="p-4">
-        <ErrorState message="開催日程の取得に失敗しました" />
+        <ErrorState title="開催日程の取得に失敗しました" />
       </div>
     );
   }

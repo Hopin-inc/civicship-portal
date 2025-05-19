@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
+import ErrorState from "@/components/shared/ErrorState";
 import { toast } from "sonner";
 
 export default function TicketsPage() {
@@ -53,7 +53,7 @@ export default function TicketsPage() {
   if (error) {
     return (
       <div className="p-4">
-        <ErrorState message="チケット情報の取得に失敗しました" />
+        <ErrorState title="チケット情報の取得に失敗しました" />
       </div>
     );
   }

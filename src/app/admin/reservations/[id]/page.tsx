@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { CardWrapper } from "@/components/ui/card-wrapper";
 import { Card, CardFooter } from "@/components/ui/card";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
+import ErrorState from "@/components/shared/ErrorState";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import dayjs from "dayjs";
@@ -61,6 +61,7 @@ export default function ReservationDetailPage({ params }: { params: { id: string
         variables: {
           id: params.id,
           permission: {
+            opportunityId: data?.reservation?.opportunitySlot?.opportunity?.id,
             communityId: data?.reservation?.opportunitySlot?.opportunity?.community?.id || "neo88",
           },
         },
@@ -97,7 +98,7 @@ export default function ReservationDetailPage({ params }: { params: { id: string
   if (error) {
     return (
       <div className="p-4 pt-16">
-        <ErrorState message="予約情報の取得に失敗しました" />
+        <ErrorState title="予約情報の取得に失敗しました" />
       </div>
     );
   }
@@ -106,7 +107,7 @@ export default function ReservationDetailPage({ params }: { params: { id: string
   if (!reservation) {
     return (
       <div className="p-4 pt-16">
-        <ErrorState message="予約が見つかりません" />
+        <ErrorState title="予約が見つかりません" />
       </div>
     );
   }

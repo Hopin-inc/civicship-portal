@@ -6,7 +6,7 @@ import { EVALUATION_PASS, EVALUATION_FAIL } from "@/graphql/experience/evaluatio
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
+import ErrorState from "@/components/shared/ErrorState";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -75,7 +75,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
   if (error) {
     return (
       <div className="p-4 pt-16">
-        <ErrorState message="開催日程の取得に失敗しました" />
+        <ErrorState title="開催日程の取得に失敗しました" />
       </div>
     );
   }
@@ -83,7 +83,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
   if (!slot) {
     return (
       <div className="p-4 pt-16">
-        <ErrorState message="開催日程が見つかりません" />
+        <ErrorState title="開催日程が見つかりません" />
       </div>
     );
   }

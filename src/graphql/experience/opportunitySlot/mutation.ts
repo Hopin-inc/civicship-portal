@@ -4,15 +4,15 @@ import { SLOT_FRAGMENT } from "./fragment";
 export const OPPORTUNITY_SLOT_SET_HOSTING_STATUS = gql`
   mutation OpportunitySlotSetHostingStatus(
     $id: ID!,
-    $input: GqlOpportunitySlotSetHostingStatusInput!,
-    $permission: GqlCheckOpportunityPermissionInput!
+    $input: OpportunitySlotSetHostingStatusInput!,
+    $permission: CheckOpportunityPermissionInput!
   ) {
     opportunitySlotSetHostingStatus(
       id: $id,
       input: $input,
       permission: $permission
     ) {
-      ... on GqlOpportunitySlotSetHostingStatusSuccess {
+      ... on OpportunitySlotSetHostingStatusSuccess {
         slot {
           ...OpportunitySlotFields
         }

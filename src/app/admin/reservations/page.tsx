@@ -6,7 +6,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import Link from "next/link";
 import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
+import ErrorState from "@/components/shared/ErrorState";
 import { useReservations } from "@/hooks/useReservations";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -69,7 +69,7 @@ export default function ReservationsPage() {
   if (error) {
     return (
       <div className="p-4">
-        <ErrorState message="応募情報の取得に失敗しました" />
+        <ErrorState title="応募情報の取得に失敗しました" />
       </div>
     );
   }
