@@ -9,11 +9,13 @@ dayjs.extend(relativeTime);
 export const COMMUNITY_ID = "neo88";
 // export const PLACEHOLDER_IMAGE =
 //   "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/placeholder.jpg";
+export const DEFAULT_OGP =
+  "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg";
 
 const YEAR_FMT = "YYYY年";
 const MONTH_DATE_FMT = "M月D日(ddd)";
 const TIME_FMT = "H:mm";
-const FULL_FMT = `${ YEAR_FMT }${ MONTH_DATE_FMT } ${ TIME_FMT }`;
+const FULL_FMT = `${YEAR_FMT}${MONTH_DATE_FMT} ${TIME_FMT}`;
 
 export const PLACEHOLDER_IMAGE = "/images/placeholder.jpg";
 
@@ -26,7 +28,7 @@ type Name = {
 export const displayName = <T extends Name>(args?: T | null, altText: string = "未登録") => {
   if (args) {
     const { lastName, firstName } = args;
-    return `${ lastName } ${ firstName }`;
+    return `${lastName} ${firstName}`;
   }
   return altText;
 };
@@ -40,11 +42,11 @@ export const displayDuration = (start: Date | string, end?: Date | string) => {
   const dEnd = dayjs(end);
   if (!end) return displayDatetime(start, FULL_FMT);
   if (dStart.isSame(dEnd, "date")) {
-    return `${ dStart.format(FULL_FMT) }〜${ dEnd.format(TIME_FMT) }`;
-  } else　if (dStart.isSame(dEnd, "year")) {
-    return `${ dStart.format(FULL_FMT) } 〜 ${ dEnd.format(`${ MONTH_DATE_FMT } ${ TIME_FMT }`) }`;
+    return `${dStart.format(FULL_FMT)}〜${dEnd.format(TIME_FMT)}`;
+  } else if (dStart.isSame(dEnd, "year")) {
+    return `${dStart.format(FULL_FMT)} 〜 ${dEnd.format(`${MONTH_DATE_FMT} ${TIME_FMT}`)}`;
   } else {
-    return `${ dStart.format(FULL_FMT) } 〜 ${ dEnd.format(FULL_FMT) }`;
+    return `${dStart.format(FULL_FMT)} 〜 ${dEnd.format(FULL_FMT)}`;
   }
 };
 
@@ -54,7 +56,10 @@ export const displayRelativeTime = (date: Date | string) => {
 
 export const displayPhoneNumber = (phoneNumber: string) => {
   const phoneUtil = PhoneNumberUtil.getInstance();
-  return phoneUtil.formatOutOfCountryCallingNumber(phoneUtil.parseAndKeepRawInput(phoneNumber, "JP"), "JP");
+  return phoneUtil.formatOutOfCountryCallingNumber(
+    phoneUtil.parseAndKeepRawInput(phoneNumber, "JP"),
+    "JP",
+  );
 };
 
 export const wait = async (seconds: number) => {
