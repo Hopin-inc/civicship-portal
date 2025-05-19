@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useMutation } from "@apollo/client";
 import { EVALUATION_PASS, EVALUATION_FAIL } from "@/graphql/experience/evaluation/mutation";
 import { EVALUATION_BULK_CREATE } from "@/graphql/experience/evaluation/batchMutation";
@@ -71,17 +71,29 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
     },
   });
   
+  const processedParticipationIds = useRef<Set<string>>(new Set());
+  
   useEffect(() => {
     if (participations.length > 0) {
       const initialAttendance: Record<string, string> = {};
+      let hasNewParticipations = false;
+      
       participations.forEach((participation: any) => {
-        if (participation.evaluation?.status) {
-          initialAttendance[participation.id] = participation.evaluation.status;
-        } else {
-          initialAttendance[participation.id] = "PENDING";
+        if (!processedParticipationIds.current.has(participation.id)) {
+          processedParticipationIds.current.add(participation.id);
+          hasNewParticipations = true;
+          
+          if (participation.evaluation?.status) {
+            initialAttendance[participation.id] = participation.evaluation.status;
+          } else {
+            initialAttendance[participation.id] = "PENDING";
+          }
         }
       });
-      setAttendanceData(initialAttendance);
+      
+      if (hasNewParticipations) {
+        setAttendanceData(prev => ({...prev, ...initialAttendance}));
+      }
     }
   }, [participations]);
 
