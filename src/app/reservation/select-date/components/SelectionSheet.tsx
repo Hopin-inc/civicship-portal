@@ -134,9 +134,9 @@ const SelectionSheet: React.FC<SelectionSheetProps> = ({
               </div>
             </SheetTitle>
           </SheetHeader>
-          
+
           {activeForm === 'date' ? renderDateSelection() : renderGuestSelection()}
-          
+
           {renderFooterButtons()}
         </div>
       </SheetContent>
