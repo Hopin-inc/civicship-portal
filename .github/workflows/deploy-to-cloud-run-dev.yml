@@ -4,6 +4,7 @@ on:
   push:
     branches:
        - develop
+       - fix/recaptcha # TODO: Remove this after debug
 
 jobs:
   deploy:
