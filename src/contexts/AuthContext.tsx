@@ -1,20 +1,24 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
-import { GqlUser, GqlCurrentPrefecture, useCurrentUserQuery, useUserSignUpMutation } from "@/types/graphql";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  GqlCurrentPrefecture,
+  GqlUser,
+  useCurrentUserQuery,
+  useUserSignUpMutation,
+} from "@/types/graphql";
 import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCookies } from "next-client-cookies";
 import { auth } from "@/lib/firebase/firebase";
-import { setCookies, removeCookies } from "@/contexts/auth/cookie";
+import { removeCookies, setCookies } from "@/contexts/auth/cookie";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
 import { useLiff } from "./LiffContext";
-import { COMMUNITY_ID } from "@/utils";
 import usePhoneAuth from "@/contexts/auth/phone/usePhoneAuth";
-import useLiffAuth from "@/contexts/auth/liff/useLiffAuth";
 import useUserManagement from "@/contexts/auth/user/useUserManagement";
+import signInWithLiffToken from "@/contexts/auth/liff/signInWithLiffToken";
 
 type AuthState = {
   phoneVerified: boolean;
@@ -25,9 +29,11 @@ type AuthState = {
 
 type UserInfo = {
   uid: string | null;
-  user: Required<Partial<GqlUser>, "id" | "name"> & {
-    memberships?: any[];
-  } | null;
+  user:
+    | (Required<Partial<GqlUser>, "id" | "name"> & {
+        memberships?: any[];
+      })
+    | null;
 };
 
 type AuthContextType = UserInfo & {
@@ -35,7 +41,12 @@ type AuthContextType = UserInfo & {
   logout: () => Promise<void>;
   loginWithLiff: () => Promise<void>;
   isAuthenticating: boolean;
-  createUser: (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null, uid?: string | null) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
+  createUser: (
+    name: string,
+    currentPrefecture: GqlCurrentPrefecture,
+    phoneUid?: string | null,
+    uid?: string | null,
+  ) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
 
   phoneNumber: string | null;
   phoneAuth: {
@@ -58,21 +69,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const cookies = useCookies();
   const { liff, isLiffLoggedIn, liffAccessToken, liffLogin, liffLogout } = useLiff();
 
-  const { data: currentUserData, loading: queryLoading, refetch } = useCurrentUserQuery({
+  const {
+    data: currentUserData,
+    loading: queryLoading,
+    refetch,
+  } = useCurrentUserQuery({
     fetchPolicy: "no-cache",
   });
 
   const [ready] = useState(() => deferred());
   const [uid, setUid] = useState<UserInfo["uid"]>(null);
   const [user, setUser] = useState<UserInfo["user"]>(null);
-  
+
   const [authState, setAuthState] = useState<AuthState>({
     phoneVerified: false,
     lineAuthenticated: false,
     loading: false,
-    error: null
+    error: null,
   });
-  
+
   const [userSignUpMutation] = useUserSignUpMutation();
 
   const {
@@ -83,7 +98,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     phoneUid,
     startPhoneVerification,
     verifyPhoneCode: verifyPhoneCodeLocal,
-    setIsPhoneVerified
+    setIsPhoneVerified,
   } = usePhoneAuth();
 
   const {
@@ -91,40 +106,48 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isExplicitLogin,
     loginWithLiff,
     handleAuthenticateWithLiffToken,
-    setIsExplicitLogin
-  } = useLiffAuth(liff, liffLogin);
+    setIsExplicitLogin,
+  } = signInWithLiffToken(liff, liffLogin);
 
   const {
     createUser,
     logout,
-    isAuthenticating: isUserAuthenticating
+    isAuthenticating: isUserAuthenticating,
   } = useUserManagement(userSignUpMutation, setUser, setUid, liffLogout);
 
   const isAuthenticating = isLiffAuthenticating || isUserAuthenticating;
 
-  const updateAuthState = useCallback((updates: Partial<AuthState>) => {
-    setAuthState(prevState => ({
-      ...prevState,
-      ...updates
-    }));
-    
-    if (updates.phoneVerified !== undefined && 
-        isPhoneVerified !== updates.phoneVerified && 
-        setIsPhoneVerified) {
-      console.log("Updating phone verification state:", updates.phoneVerified);
-      setIsPhoneVerified(updates.phoneVerified);
-    }
-  }, [isPhoneVerified, setIsPhoneVerified]);
+  const updateAuthState = useCallback(
+    (updates: Partial<AuthState>) => {
+      setAuthState((prevState) => ({
+        ...prevState,
+        ...updates,
+      }));
 
-  const login = useCallback((userInfo: UserInfo | null) => {
-    setUid(userInfo?.uid ?? null);
-    setUser(userInfo?.user ?? null);
-    
-    updateAuthState({ 
-      lineAuthenticated: !!userInfo?.uid,
-      loading: false
-    });
-  }, [updateAuthState]);
+      if (
+        updates.phoneVerified !== undefined &&
+        isPhoneVerified !== updates.phoneVerified &&
+        setIsPhoneVerified
+      ) {
+        console.log("Updating phone verification state:", updates.phoneVerified);
+        setIsPhoneVerified(updates.phoneVerified);
+      }
+    },
+    [isPhoneVerified, setIsPhoneVerified],
+  );
+
+  const login = useCallback(
+    (userInfo: UserInfo | null) => {
+      setUid(userInfo?.uid ?? null);
+      setUser(userInfo?.user ?? null);
+
+      updateAuthState({
+        lineAuthenticated: !!userInfo?.uid,
+        loading: false,
+      });
+    },
+    [updateAuthState],
+  );
 
   useEffect(() => {
     if (currentUserData?.currentUser?.user && uid) {
@@ -134,7 +157,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user: {
           id: fetchedUser.id,
           name: fetchedUser.name,
-          memberships: fetchedUser.memberships || [] as any,
+          memberships: fetchedUser.memberships || ([] as any),
         },
       });
     }
@@ -145,55 +168,58 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const prevLiffAccessToken = useRef<string | null>(null);
 
   const attemptAuthWithLiffToken = useCallback(async () => {
-    if (liffAccessToken && 
-        isLiffLoggedIn && 
-        !uid && 
-        !liffAuthFailed && 
-        !authState.error) {
-      
+    if (liffAccessToken && isLiffLoggedIn && !uid && !liffAuthFailed && !authState.error) {
       const failedTokenKey = `failed_liff_token:${liffAccessToken}`;
       if (typeof window !== "undefined" && localStorage.getItem(failedTokenKey)) {
         console.log("Skipping authentication with previously failed token (from localStorage)");
         return;
       }
-      
+
       if (liffAccessToken === prevLiffAccessToken.current) {
         console.log("Skipping authentication with already attempted token");
         return;
       }
-      
+
       prevLiffAccessToken.current = liffAccessToken;
-      
+
       console.log("Attempting to authenticate with LIFF token");
       updateAuthState({ loading: true });
       try {
         const success = await handleAuthenticateWithLiffToken(liffAccessToken);
         if (success) {
           console.log("LIFF authentication successful");
-          updateAuthState({ 
+          updateAuthState({
             lineAuthenticated: true,
             loading: false,
-            error: null
+            error: null,
           });
           setLiffAuthFailed(false);
         } else {
           console.log("LIFF authentication failed but no error thrown");
           setLiffAuthFailed(true);
-          updateAuthState({ 
+          updateAuthState({
             loading: false,
-            error: "LINE認証に失敗しました"
+            error: "LINE認証に失敗しました",
           });
         }
       } catch (error) {
         console.error("LIFF authentication failed with error:", error);
         setLiffAuthFailed(true);
-        updateAuthState({ 
+        updateAuthState({
           loading: false,
-          error: "LINE認証に失敗しました"
+          error: "LINE認証に失敗しました",
         });
       }
     }
-  }, [liffAccessToken, isLiffLoggedIn, uid, liffAuthFailed, authState.error, handleAuthenticateWithLiffToken, updateAuthState]);
+  }, [
+    liffAccessToken,
+    isLiffLoggedIn,
+    uid,
+    liffAuthFailed,
+    authState.error,
+    handleAuthenticateWithLiffToken,
+    updateAuthState,
+  ]);
 
   useEffect(() => {
     attemptAuthWithLiffToken();
@@ -204,17 +230,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const customEvent = event as CustomEvent;
       console.log("Token expired event detected:", customEvent.detail);
 
-      toast.error(
-        "認証の有効期限が切れました。再認証が必要です。",
-        {
-          action: {
-            label: "再認証",
-            onClick: () => router.push("/sign-up/phone-verification")
-          },
-          duration: 10000, // 10 seconds
-          id: "auth-token-expired" // Add unique ID
-        }
-      );
+      toast.error("認証の有効期限が切れました。再認証が必要です。", {
+        action: {
+          label: "再認証",
+          onClick: () => router.push("/sign-up/phone-verification"),
+        },
+        duration: 10000, // 10 seconds
+        id: "auth-token-expired", // Add unique ID
+      });
     };
 
     const handleAuthError = (event: Event) => {
@@ -223,58 +246,57 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       console.log("Auth error event detected:", customEvent.detail);
 
-      toast.error(
-        errorMessage,
-        {
-          action: errorType === 'network' ? {
-            label: "再試行",
-            onClick: () => window.location.reload()
-          } : (errorType === 'expired' || errorType === 'auth' || errorType === 'reauth') ? {
-            label: "再認証",
-            onClick: () => router.push("/login")
-          } : undefined,
-          duration: 10000, // 10 seconds
-          id: `auth-error-${errorType}` // Add unique ID based on error type
-        }
-      );
+      toast.error(errorMessage, {
+        action:
+          errorType === "network"
+            ? {
+                label: "再試行",
+                onClick: () => window.location.reload(),
+              }
+            : errorType === "expired" || errorType === "auth" || errorType === "reauth"
+              ? {
+                  label: "再認証",
+                  onClick: () => router.push("/login"),
+                }
+              : undefined,
+        duration: 10000, // 10 seconds
+        id: `auth-error-${errorType}`, // Add unique ID based on error type
+      });
     };
-    
+
     const handleAuthWarning = (event: Event) => {
       const customEvent = event as CustomEvent;
       const { warningType, warningMessage } = customEvent.detail;
 
       console.log("Auth warning event detected:", customEvent.detail);
 
-      toast.warning(
-        warningMessage,
-        {
-          duration: 8000, // 8 seconds
-          id: `auth-warning-${warningType}` // Add unique ID to prevent duplicate toasts
-        }
-      );
-      
-      if (warningType === 'quota-exceeded') {
+      toast.warning(warningMessage, {
+        duration: 8000, // 8 seconds
+        id: `auth-warning-${warningType}`, // Add unique ID to prevent duplicate toasts
+      });
+
+      if (warningType === "quota-exceeded") {
         console.log("Quota exceeded warning, but continuing authentication flow");
         if (!authState.lineAuthenticated) {
-          updateAuthState({ 
+          updateAuthState({
             lineAuthenticated: true,
             loading: false,
-            error: null
+            error: null,
           });
         }
       }
     };
 
-    window.addEventListener('auth:token-expired', handleTokenExpired);
-    window.addEventListener('auth:error', handleAuthError);
-    window.addEventListener('auth:token-refresh-failed', handleAuthError);
-    window.addEventListener('auth:warning', handleAuthWarning);
+    window.addEventListener("auth:token-expired", handleTokenExpired);
+    window.addEventListener("auth:error", handleAuthError);
+    window.addEventListener("auth:token-refresh-failed", handleAuthError);
+    window.addEventListener("auth:warning", handleAuthWarning);
 
     return () => {
-      window.removeEventListener('auth:token-expired', handleTokenExpired);
-      window.removeEventListener('auth:error', handleAuthError);
-      window.removeEventListener('auth:token-refresh-failed', handleAuthError);
-      window.removeEventListener('auth:warning', handleAuthWarning);
+      window.removeEventListener("auth:token-expired", handleTokenExpired);
+      window.removeEventListener("auth:error", handleAuthError);
+      window.removeEventListener("auth:token-refresh-failed", handleAuthError);
+      window.removeEventListener("auth:warning", handleAuthWarning);
     };
   }, [router, updateAuthState]);
 
@@ -283,7 +305,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (isLineAuthenticated !== authState.lineAuthenticated) {
       console.log("Synchronizing LINE authentication state:", {
         current: isLineAuthenticated,
-        central: authState.lineAuthenticated
+        central: authState.lineAuthenticated,
       });
       updateAuthState({ lineAuthenticated: isLineAuthenticated });
     }
@@ -297,16 +319,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         updateAuthState({ loading: true });
         const next = searchParams.get("next");
         const idToken = await user.getIdToken();
-        
+
         try {
           const tokenResult = await user.getIdTokenResult();
-          setCookies(
-            cookies,
-            idToken,
-            user.refreshToken,
-            new Date(tokenResult.expirationTime)
-          );
-          
+          setCookies(cookies, idToken, user.refreshToken, new Date(tokenResult.expirationTime));
+
           console.log("LINE tokens stored in cookies");
           updateAuthState({ lineAuthenticated: true });
         } catch (error) {
@@ -315,7 +332,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (user.refreshToken) {
             cookies.set("refresh_token", user.refreshToken);
           }
-          
+
           updateAuthState({ lineAuthenticated: true });
         }
 
@@ -328,13 +345,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               user: {
                 id: fetchedUser.id,
                 name: fetchedUser.name,
-                memberships: fetchedUser.memberships || [] as any,
+                memberships: fetchedUser.memberships || ([] as any),
               },
             });
 
             if (isExplicitLogin) {
               toast.success("ログインしました！", {
-                id: "login-success"
+                id: "login-success",
               });
               setIsExplicitLogin(false); // フラグをリセットして再表示を防止
             }
@@ -344,26 +361,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
           } else {
             console.log("User authenticated but no user record found");
-            
-            updateAuthState({ 
+
+            updateAuthState({
               lineAuthenticated: true,
-              loading: false
+              loading: false,
             });
           }
         } catch (error) {
           console.error("Failed to fetch user data:", error);
-          updateAuthState({ 
+          updateAuthState({
             loading: false,
-            error: "ユーザー情報の取得に失敗しました"
+            error: "ユーザー情報の取得に失敗しました",
           });
-          
+
           toast.error("ユーザー情報の取得に失敗しました", {
             action: {
               label: "再試行",
-              onClick: () => window.location.reload()
+              onClick: () => window.location.reload(),
             },
             duration: 10000,
-            id: "user-fetch-error"
+            id: "user-fetch-error",
           });
         } finally {
           updateAuthState({ loading: false });
@@ -376,90 +393,104 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           phoneVerified: false,
           lineAuthenticated: false,
           loading: false,
-          error: null
+          error: null,
         });
       }
     });
 
     return () => unsubscribe();
-  }, [ready, cookies, refetch, router, searchParams, login, isExplicitLogin, authState.phoneVerified, setIsExplicitLogin, updateAuthState]);
+  }, [
+    ready,
+    cookies,
+    refetch,
+    router,
+    searchParams,
+    login,
+    isExplicitLogin,
+    authState.phoneVerified,
+    setIsExplicitLogin,
+    updateAuthState,
+  ]);
 
   const verifyPhoneCode = async (code: string): Promise<boolean> => {
     updateAuthState({ loading: true });
     try {
       const success = await verifyPhoneCodeLocal(code);
       if (success) {
-        updateAuthState({ 
+        updateAuthState({
           phoneVerified: true,
           loading: false,
-          error: null
+          error: null,
         });
         return true;
       } else {
-        updateAuthState({ 
+        updateAuthState({
           loading: false,
-          error: "認証コードの検証に失敗しました"
+          error: "認証コードの検証に失敗しました",
         });
         return false;
       }
     } catch (error) {
       console.error("Phone verification failed:", error);
-      updateAuthState({ 
+      updateAuthState({
         loading: false,
-        error: "認証コードの検証中にエラーが発生しました"
+        error: "認証コードの検証中にエラーが発生しました",
       });
       return false;
     }
   };
-  
+
   const loginWithLiffWrapper = async (): Promise<void> => {
     updateAuthState({ loading: true });
     try {
       await loginWithLiff();
       if (liffAccessToken && isLiffLoggedIn) {
-        updateAuthState({ 
+        updateAuthState({
           lineAuthenticated: true,
           loading: false,
-          error: null
+          error: null,
         });
       } else {
-        updateAuthState({ 
+        updateAuthState({
           loading: false,
-          error: "LINE認証に失敗しました"
+          error: "LINE認証に失敗しました",
         });
       }
     } catch (error) {
       console.error("LIFF login failed:", error);
-      updateAuthState({ 
+      updateAuthState({
         loading: false,
-        error: "LINE認証に失敗しました"
+        error: "LINE認証に失敗しました",
       });
     }
   };
 
   return (
-    <AuthContext.Provider value={ {
-      uid,
-      user,
-      login,
-      logout,
-      loginWithLiff: loginWithLiffWrapper,
-      isAuthenticating: isAuthenticating || authState.loading,
-      createUser: (name, currentPrefecture, phoneUid) => createUser(name, currentPrefecture, phoneUid, uid),
+    <AuthContext.Provider
+      value={{
+        uid,
+        user,
+        login,
+        logout,
+        loginWithLiff: loginWithLiffWrapper,
+        isAuthenticating: isAuthenticating || authState.loading,
+        createUser: (name, currentPrefecture, phoneUid) =>
+          createUser(name, currentPrefecture, phoneUid, uid),
 
-      phoneNumber,
-      phoneAuth: {
-        isVerifying,
-        verificationId,
-        phoneUid,
-        startPhoneVerification,
-        verifyPhoneCode,
-      },
-      isPhoneVerified: authState.phoneVerified,
-      isLineAuthenticated: authState.lineAuthenticated,
-      authState,
-    } }>
-      { children }
+        phoneNumber,
+        phoneAuth: {
+          isVerifying,
+          verificationId,
+          phoneUid,
+          startPhoneVerification,
+          verifyPhoneCode,
+        },
+        isPhoneVerified: authState.phoneVerified,
+        isLineAuthenticated: authState.lineAuthenticated,
+        authState,
+      }}
+    >
+      {children}
     </AuthContext.Provider>
   );
 };
