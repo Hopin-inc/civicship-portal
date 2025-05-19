@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const TICKET_CLAIM = gql`
   mutation ticketClaim($input: TicketClaimInput!) {
@@ -7,12 +7,6 @@ export const TICKET_CLAIM = gql`
         tickets {
           id
         }
-      }
-      ... on AlreadyUsedClaimLinkError {
-        message
-      }
-      ... on ClaimLinkExpiredError {
-        message
       }
     }
   }

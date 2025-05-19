@@ -16,10 +16,11 @@ import { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { toast } from "sonner";
 import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
-import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import { ParticipationAge } from "./components/ParticipationAge";
+import { errorMessages } from "@/utils/errorMessage";
+import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -77,29 +78,9 @@ export default function ConfirmPage() {
       if (!user) {
         ui.setIsLoginModalOpen(true);
       } else {
-        switch (result.typename) {
-          case "ReservationFullError":
-            toast.error("予約枠が満員です。別の日時をお試しください。");
-            break;
-          case "ReservationAdvanceBookingRequiredError":
-            toast.error("開始日から7日以上前に申し込みが必要です。");
-            break;
-          case "ReservationNotAcceptedError":
-            toast.error("予約が承認されていません。");
-            break;
-          case "SlotNotScheduledError":
-            toast.error("予約枠は開催を予定されていません。");
-            break;
-          case "TicketParticipantMismatchError":
-            toast.error(`チケット数と参加者数が一致しません。`);
-            break;
-          case "MissingTicketIdsError":
-            toast.error("チケットが指定されていません。");
-            break;
-          default:
-            toast.error(`申し込みに失敗しました。: ${result.error}`);
-        }
-        console.error("Reservation failed:", result.error);
+        const message = errorMessages[result.code] ?? "予期しないエラーが発生しました。";
+        toast.error(message);
+        console.error("Reservation failed:", result.code);
       }
       return;
     }
