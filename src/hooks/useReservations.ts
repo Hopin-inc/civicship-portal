@@ -20,7 +20,7 @@ export const useReservations = (statusFilter?: string | null) => {
 
   const filterVariables = useMemo<GqlReservationFilterInput>(() => {
     const filter: any = {
-      createdByUserId: user?.id,
+      opportunityOwnerId: user?.id
     };
 
     if (!statusFilter) return filter;
