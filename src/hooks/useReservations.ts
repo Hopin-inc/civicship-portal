@@ -2,6 +2,7 @@ import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import { useQuery } from "@apollo/client";
 import { useRef, useMemo } from 'react';
 import { GET_RESERVATIONS } from "../graphql/experience/reservation/query";
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface UseReservationsResult {
   reservations: any[];
@@ -14,18 +15,23 @@ export interface UseReservationsResult {
 
 export const useReservations = (statusFilter?: string | null) => {
   const isLoadingMore = useRef(false);
+  const { user } = useAuth();
 
   const filterVariables = useMemo(() => {
-    if (!statusFilter) return {};
+    const filter: any = {
+      createdByUserId: user?.id
+    };
+
+    if (!statusFilter) return filter;
 
     if (statusFilter === 'APPLIED') {
-      return { status: 'APPLIED' };
+      filter.status = 'APPLIED';
     } else if (statusFilter === 'NOT_APPLIED') {
-      return { status_not: 'APPLIED' };
+      filter.status_not = 'APPLIED';
     }
     
-    return {};
-  }, [statusFilter]);
+    return filter;
+  }, [statusFilter, user?.id]);
 
   const {
     data,
