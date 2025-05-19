@@ -21,8 +21,10 @@ import { GqlCurrentPrefecture } from "@/types/graphql";
 import { ReservationStatus } from "@/app/admin/reservations/components/ReservationStatus";
 import Link from "next/link";
 import Image from "next/image";
+import { use } from "react";
 
 export default function ReservationDetailPage({ params }: { params: { id: string } }) {
+  const { id } = use(params);
   const headerConfig = useMemo(() => ({
     title: `予約詳細`,
     showBackButton: true,
@@ -32,7 +34,7 @@ export default function ReservationDetailPage({ params }: { params: { id: string
   useHeaderConfig(headerConfig);
 
   const { data, loading, error, refetch } = useQuery(GET_RESERVATION, {
-    variables: { id: params.id },
+    variables: { id },
   });
 
   const [acceptReservation, { loading: acceptLoading }] = useMutation(ACCEPT_RESERVATION_MUTATION, {
@@ -59,7 +61,7 @@ export default function ReservationDetailPage({ params }: { params: { id: string
     try {
       await acceptReservation({
         variables: {
-          id: params.id,
+          id,
           permission: {
             opportunityId: data?.reservation?.opportunitySlot?.opportunity?.id,
             communityId: data?.reservation?.opportunitySlot?.opportunity?.community?.id || "neo88",
@@ -143,7 +145,7 @@ export default function ReservationDetailPage({ params }: { params: { id: string
 
       <div>
         <h2 className="text-title-md mb-3">予約情報</h2>
-        <Link href={ `/opportunities/${ params.id }` } target="_blank">
+        <Link href={ `/opportunities/${ id }` } target="_blank">
           <CardWrapper clickable className="overflow-hidden flex items-center h-24">
             <Image src={opportunity?.images[0]} alt={opportunity?.title} width="96" height="96"/>
             <div className="flex flex-col flex-grow p-4">

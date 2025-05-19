@@ -12,8 +12,10 @@ import { format } from "date-fns";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useSlotParticipations } from "@/hooks/useSlotParticipations";
+import { use } from "react";
 
 export default function SlotDetailPage({ params }: { params: { id: string } }) {
+  const { id } = use(params);
   const headerConfig = useMemo(() => ({
     title: `開催日程詳細`,
     showLogo: false,
@@ -30,7 +32,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
     loadMoreRef,
     hasMore,
     isLoadingMore
-  } = useSlotParticipations(params.id);
+  } = useSlotParticipations(id);
 
   const [evaluationPass, { loading: passLoading }] = useMutation(EVALUATION_PASS, {
     onCompleted: () => {
