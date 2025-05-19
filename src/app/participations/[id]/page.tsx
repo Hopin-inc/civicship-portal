@@ -101,7 +101,7 @@ export default function ParticipationPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      {currentStatus && (
+      {!isAfterParticipation && currentStatus && (
         <div className="px-6">
           <ParticipationStatusNotification
             status={mapReservationStatusToUIStatus(currentStatus.status)}
@@ -133,15 +133,16 @@ export default function ParticipationPage() {
           汚れてもOKな服装でお越しください。当日は12:50に現地集合です。遅れる場合は090-xxxx-xxxxまでご連絡をお願いします。
         </p>
       </div>
-      {currentStatus && (
-        <ParticipationActions
-          status={mapReservationStatusToUIStatus(currentStatus.status)}
-          cancellationDeadline={cancellationDeadline}
-          isCancellable={isCancellable}
-          onCancel={onCancel}
-          isAfterParticipation={isAfterParticipation}
-        />
-      )}
+      {currentStatus &&
+        currentStatus?.status !== "REJECTED" &&
+        currentStatus?.status !== "CANCELED" && (
+          <ParticipationActions
+            cancellationDeadline={cancellationDeadline}
+            isCancellable={isCancellable}
+            onCancel={onCancel}
+            isAfterParticipation={isAfterParticipation}
+          />
+        )}
     </div>
   );
 }

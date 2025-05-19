@@ -8,7 +8,6 @@ import { ParticipationUIStatus } from "@/app/participations/[id]/page";
 import { ImagePlus } from "lucide-react";
 
 interface ParticipationActionsProps {
-  status: ParticipationUIStatus;
   cancellationDeadline: Date | null;
   isCancellable: boolean;
   isAfterParticipation: boolean;
@@ -16,16 +15,11 @@ interface ParticipationActionsProps {
 }
 
 const ParticipationActions: React.FC<ParticipationActionsProps> = ({
-  status,
   cancellationDeadline,
   isCancellable,
   isAfterParticipation,
   onCancel,
 }) => {
-  if (status === "cancelled") {
-    return null;
-  }
-
   const renderMessage = () => {
     if (isAfterParticipation) {
       return (
