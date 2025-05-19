@@ -3,7 +3,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import { EVALUATION_PASS, EVALUATION_FAIL } from "@/graphql/experience/evaluation/mutation";
-import { BATCH_EVALUATE_PARTICIPATIONS } from "@/graphql/experience/evaluation/batchMutation";
+import { EVALUATION_BULK_CREATE } from "@/graphql/experience/evaluation/batchMutation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { CardWrapper } from "@/components/ui/card-wrapper";
 import { Card, CardFooter } from "@/components/ui/card";
@@ -59,7 +59,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
     },
   });
   
-  const [batchEvaluate, { loading: batchLoading }] = useMutation(BATCH_EVALUATE_PARTICIPATIONS, {
+  const [batchEvaluate, { loading: batchLoading }] = useMutation(EVALUATION_BULK_CREATE, {
     onCompleted: () => {
       toast.success("出欠情報を保存しました");
       setIsSaved(true);

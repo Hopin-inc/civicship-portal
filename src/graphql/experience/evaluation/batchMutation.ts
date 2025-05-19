@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 import { EVALUATION_FRAGMENT } from "./fragment";
 
-export const BATCH_EVALUATE_PARTICIPATIONS = gql`
-  mutation BatchEvaluateParticipations(
-    $input: BatchEvaluationInput!, 
+export const EVALUATION_BULK_CREATE = gql`
+  mutation EvaluationBulkCreate(
+    $input: EvaluationBulkCreateInput!, 
     $permission: CheckCommunityPermissionInput!
   ) {
-    batchEvaluateParticipations(input: $input, permission: $permission) {
-      ... on BatchEvaluationSuccess {
+    evaluationBulkCreate(input: $input, permission: $permission) {
+      ... on EvaluationBulkCreateSuccess {
         evaluations {
           ...EvaluationFields
         }
