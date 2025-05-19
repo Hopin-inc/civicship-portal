@@ -59,7 +59,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory, showUs
                   />
                 </div>
                 <div>
-                  <p className="text-body-md font-bold">{article.author?.name}田中 太郎</p>
+                  <p className="text-body-md font-bold">{article.author?.name}</p>
                 </div>
               </div>
               <div className="flex items-center gap-x-1">
