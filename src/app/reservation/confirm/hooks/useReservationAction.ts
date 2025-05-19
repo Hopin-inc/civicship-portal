@@ -1,13 +1,12 @@
 import { useCallback } from "react";
-import {  GqlUser, GqlWallet, useCreateReservationMutation } from "@/types/graphql";
+import { GqlErrorCode, GqlUser, GqlWallet, useCreateReservationMutation } from "@/types/graphql";
 import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
 import { ActivityDetail } from "@/app/activities/data/type";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
+import { ApolloError } from "@apollo/client";
 
-type Result =
-  | { success: true; reservationId: string; typename: string }
-  | { success: false; error: string;  typename?: string };
+type Result = { success: true; reservationId: string } | { success: false; code: GqlErrorCode };
 
 interface ReservationParams {
   opportunity: ActivityDetail | null;
@@ -23,22 +22,23 @@ export const useReservationCommand = () => {
 
   const handleReservation = useCallback(
     async ({
-             opportunity,
-             selectedSlot,
-             wallets,
-             user,
-             ticketCounter,
-             useTickets,
-           }: ReservationParams): Promise<Result> => {
-      if (loading) return { success: false, error: "Reservation is already in progress." };
-      if (!user) return { success: false, error: "User is not authenticated." };
-      if (!opportunity || !selectedSlot) return { success: false, error: "Missing opportunity or slot data." };
+      opportunity,
+      selectedSlot,
+      wallets,
+      user,
+      ticketCounter,
+      useTickets,
+    }: ReservationParams): Promise<Result> => {
+      if (loading) return { success: false, code: GqlErrorCode.Unknown };
+      if (!user) return { success: false, code: GqlErrorCode.Unauthenticated };
+      if (!opportunity || !selectedSlot)
+        return { success: false, code: GqlErrorCode.ValidationError };
 
       const count = ticketCounter.count;
       const ticketIds = useTickets ? getTicketIds(wallets, opportunity.requiredTicket, count) : [];
 
       if (useTickets && ticketIds.length < count) {
-        return { success: false, error: "Not enough tickets available." };
+        return { success: false, code: GqlErrorCode.TicketParticipantMismatch };
       }
 
       try {
@@ -55,25 +55,25 @@ export const useReservationCommand = () => {
 
         const data = res.data?.reservationCreate;
         if (data?.__typename === "ReservationCreateSuccess") {
-          return { success: true, reservationId: data.reservation.id, typename: "ReservationCreateSuccess" };
-        } else if (data?.__typename === "ReservationFullError") {
-          return { success: false, error: `Full Error: Capacity ${data.capacity}, Requested ${data.requested}`, typename: "ReservationFullError" };
-        } else if (data?.__typename === "ReservationAdvanceBookingRequiredError") {
-          return { success: false, error: "Advance booking required.", typename: "ReservationAdvanceBookingRequiredError" };
-        } else if (data?.__typename === "ReservationNotAcceptedError") {
-          return { success: false, error: "Reservation not accepted.", typename: "ReservationNotAcceptedError" };
-        } else if (data?.__typename === "SlotNotScheduledError") {
-          return { success: false, error: "Slot not scheduled.", typename: "SlotNotScheduledError" };
-        } else if (data?.__typename === "MissingTicketIdsError") {
-          return { success: false, error: "Missing ticket IDs.", typename: "MissingTicketIdsError" };
-        } else if (data?.__typename === "TicketParticipantMismatchError") {
-          return { success: false, error: `Ticket mismatch: ${data.ticketCount} tickets, ${data.participantCount} participants`, typename: "TicketParticipantMismatchError" };
+          return {
+            success: true,
+            reservationId: data.reservation.id,
+          };
         } else {
-          return { success: false, error: "Unknown error.", typename: "UnknownError" };
+          return { success: false, code: GqlErrorCode.Unknown };
         }
       } catch (e) {
+        if (e instanceof ApolloError) {
+          const gqlError = e.graphQLErrors[0];
+          const code = gqlError.extensions?.code as GqlErrorCode | undefined;
+
+          return {
+            success: false,
+            code: code ?? GqlErrorCode.Unknown,
+          };
+        }
         console.error("Reservation mutation failed", e);
-        return { success: false, error: "Network error occurred.", typename: "NetworkError" };
+        return { success: false, code: GqlErrorCode.Unknown };
       }
     },
     [createReservation, loading],
