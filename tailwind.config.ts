@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-import type plugin from "tailwindcss/plugin";
 
 const config = {
   darkMode: ["class"],
@@ -9,6 +8,7 @@ const config = {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
   ],
+  safelist: [{ pattern: /^border-/ }, { pattern: /^bg-/ }, { pattern: /^text-/ }],
   prefix: "",
   theme: {
     container: {
@@ -49,6 +49,11 @@ const config = {
           foreground: "hsl(var(--destructive-foreground))",
           hover: "hsl(var(--destructive-hover))",
         },
+        danger: {
+          DEFAULT: "hsl(var(--danger))",
+          foreground: "hsl(var(--danger-foreground))",
+          hover: "hsl(var(--danger-hover))",
+        },
         warning: {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
@@ -77,6 +82,28 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        status: {
+          pending: {
+            DEFAULT: "hsl(var(--status-pending))",
+            foreground: "hsl(var(--white))",
+          },
+          approved: {
+            DEFAULT: "hsl(var(--status-approved))",
+            foreground: "hsl(var(--white))",
+          },
+          rejected: {
+            DEFAULT: "hsl(var(--rejected-pending))",
+            foreground: "hsl(var(--white))",
+          },
+          completed: {
+            DEFAULT: "hsl(var(--status-completed))",
+            foreground: "hsl(var(--white))",
+          },
+          cancelled: {
+            DEFAULT: "hsl(var(--status-cancelled))",
+            foreground: "hsl(var(--white))",
+          },
+        }
       },
       fontSize: {
         "display-xl": [
