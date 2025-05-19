@@ -5,7 +5,7 @@ import { useHeader } from "@/components/providers/HeaderProvider";
 import Header from "@/components/layout/Header";
 import BottomBar from "@/components/layout/BottomBar";
 import AdminBottomBar from "@/components/layout/AdminBottomBar";
-// import { useAnalyticsUserBinding, useAutoPageView } from "@/lib/analytics";
+import { useAnalyticsUserBinding, useAutoPageView } from "@/lib/analytics";
 
 interface MainContentProps {
   children: React.ReactNode;
@@ -15,8 +15,8 @@ const MainContent: React.FC<MainContentProps> = ({ children }) => {
   const { config } = useHeader();
   const showHeader = !config?.hideHeader;
 
-  // useAnalyticsUserBinding();
-  // useAutoPageView();
+  useAnalyticsUserBinding();
+  useAutoPageView();
 
   return (
     <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full">
