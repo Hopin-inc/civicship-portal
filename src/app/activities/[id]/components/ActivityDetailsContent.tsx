@@ -210,7 +210,7 @@ const NoticeSection: React.FC = () => {
             <AlertCircle size={20} strokeWidth={2.5} />
           </IconWrapper>
           <p className="text-body-md flex-1">
-            実施確定または中止のどちらの場合でも、公式LINEから14日前までにご連絡します。
+            実施確定または中止のどちらの場合でも、公式LINEからご連絡します。
           </p>
         </div>
         <div className="flex items-center gap-3">
