@@ -37,7 +37,7 @@ const ActivitiesCarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
       )}
       <div className="mt-4 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
         {opportunities.map((opportunity) => (
-          <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} />
+          <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} isCarousel />
         ))}
       </div>
     </section>
