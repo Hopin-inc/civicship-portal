@@ -11,10 +11,10 @@ interface OpportunityInfoProps {
 
 const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity }) => {
   return (
-    <div className="px-4 mt-8 mb-8">
+    <div className="mx-6 my-8">
       <div className="flex justify-between items-start gap-4">
         <div>
-          <h1 className="title-lg font-bold leading-tight mb-4">{opportunity?.title ?? ""}</h1>
+          <h1 className="text-title-lg font-bold leading-tight mb-4">{opportunity?.title ?? ""}</h1>
 
           <div className="flex items-center gap-3">
             <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
@@ -31,7 +31,7 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity }) => {
                 }}
               />
             </div>
-            <span className="text-xl">{opportunity?.host?.name ?? "案内人"}</span>
+            <span className="text-label-md">{opportunity?.host?.name ?? "案内人"}</span>
           </div>
         </div>
 
