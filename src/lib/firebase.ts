@@ -210,10 +210,8 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
     recaptchaVerifier = new RecaptchaVerifier(phoneAuth, "recaptcha-container", {
       size: isRunningInLiff() ? "normal" : "invisible",
       callback: () => {
-        console.log("reCAPTCHA solved!");
       },
       "expired-callback": () => {
-        console.log("reCAPTCHA expired");
         clearRecaptcha();
       },
     });

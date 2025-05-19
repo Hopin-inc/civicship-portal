@@ -8,12 +8,37 @@ import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
 import { ARTICLE_FRAGMENT } from "@/graphql/content/article/fragment";
 
 export const GET_RESERVATIONS = gql`
-  query GetReservations {
-    reservations {
+  query GetReservations($cursor: String, $first: Int, $filter: ReservationFilterInput) {
+    reservations(cursor: $cursor, first: $first, filter: $filter) {
       edges {
         node {
           id
+          status
+          createdAt
+          createdByUser {
+            id
+            name
+            image
+          }
+          opportunitySlot {
+            id
+            startsAt
+            endsAt
+            opportunity {
+              id
+              title
+            }
+          }
+          participations {
+            id
+          }
         }
+      }
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
       }
       totalCount
     }
@@ -24,15 +49,25 @@ export const GET_RESERVATION = gql`
   query GetReservation($id: ID!) {
     reservation(id: $id) {
       ...ReservationFields
+      createdByUser {
+        ...UserFields
+        phoneNumber,
+      }
       opportunitySlot {
         ...OpportunitySlotFields
         opportunity {
           ...OpportunityFields
+          slots {
+            id
+            startsAt
+            hostingStatus
+          }
+          community {
+            id
+            name
+          }
           createdByUser {
             ...UserFields
-            articlesAboutMe {
-              ...ArticleFields
-            }
           }
           place {
             ...PlaceFields
@@ -41,6 +76,7 @@ export const GET_RESERVATION = gql`
       }
       participations {
         ...ParticipationFields
+        id
       }
     }
   }
@@ -49,6 +85,5 @@ export const GET_RESERVATION = gql`
   ${OPPORTUNITY_FRAGMENT}
   ${PLACE_FRAGMENT}
   ${USER_FRAGMENT}
-  ${ARTICLE_FRAGMENT}
   ${PARTICIPATION_FRAGMENT}
 `;

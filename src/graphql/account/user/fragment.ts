@@ -7,6 +7,7 @@ export const USER_FRAGMENT = gql`
     image
     bio
     currentPrefecture
+    phoneNumber
 
     urlFacebook
     urlInstagram

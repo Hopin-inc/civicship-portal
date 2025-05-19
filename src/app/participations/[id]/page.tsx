@@ -8,11 +8,16 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import ParticipationStatusNotification from "@/app/participations/[id]/components/ParticipationStatusNotification";
 import ParticipationDetails from "@/app/participations/[id]/components/ParticipationDetails";
 import ParticipationActions from "@/app/participations/[id]/components/ParticipationActions";
-import { useCancelReservation } from "@/app/participations/[id]/hooks/useCancelReservation";
 import { toast } from "sonner";
 import { GqlReservationStatus } from "@/types/graphql";
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { useParams } from "next/navigation";
+import { errorMessages } from "@/utils/errorMessage";
+import useCancelReservation from "@/app/participations/[id]/hooks/useCancelReservation";
+import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
+import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
+import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
+import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
@@ -32,7 +37,7 @@ const mapReservationStatusToUIStatus = (status: GqlReservationStatus): Participa
 export default function ParticipationPage() {
   const headerConfig = useMemo(
     () => ({
-      title: "予約詳細",
+      title: "予約の確認",
       showBackButton: true,
       showLogo: false,
     }),
@@ -51,6 +56,12 @@ export default function ParticipationPage() {
     hasError,
     refetch,
   } = useParticipationPage(id ?? "");
+
+  // #NOTE: コンポーネントに必要な情報を取得するために、useCompletePageViewModel と useOpportunityDetail を使用しているがリクエストが重複するので、まとめたい
+  const { dateTimeInfo } = useCompletePageViewModel(id ?? "", participation?.reservation?.id ?? "");
+  const { opportunity: oppotunityDetail, loading: opportunityLoading } = useOpportunityDetail(
+    opportunity?.id ?? "",
+  );
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -72,40 +83,77 @@ export default function ParticipationPage() {
       if (refetchRef.current) {
         refetchRef.current();
       }
-    }else if (result.typename === "ReservationCancellationTimeoutError") {
-      toast.error("予約のキャンセルは24時間前まで可能です。");
-    }
-    else {
-      toast.error(`予約のキャンセルに失敗しました。`);
-      console.error("Cancel reservation failed:", result.error);
+    } else {
+      const message = errorMessages[result.code] ?? "予期しないエラーが発生しました。";
+      toast.error(message);
     }
   };
 
-  if (loading) return <LoadingIndicator />;
+  const isAfterParticipation = useMemo(() => {
+    if (currentStatus?.status !== GqlReservationStatus.Accepted) {
+      return false;
+    }
+    const relevantDateString = dateTimeInfo?.endTime ?? dateTimeInfo?.startTime;
+    if (!relevantDateString) {
+      return false;
+    }
+    const eventDate = new Date(relevantDateString);
+    if (isNaN(eventDate.getTime())) {
+      console.warn("Invalid date string for participation check:", relevantDateString);
+      return false;
+    }
+    return new Date() > eventDate;
+  }, [currentStatus, dateTimeInfo]);
+
+  if (loading || opportunityLoading) return <LoadingIndicator />;
   if (hasError || !reservationId || !opportunity || !participation) {
     return <ErrorState title="Could not load reservation page" refetchRef={refetchRef} />;
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4 pb-[120px]">
-      {currentStatus && (
-        <ParticipationStatusNotification
-          status={mapReservationStatusToUIStatus(currentStatus.status)}
-          statusText={currentStatus.statusText}
-          statusSubText={currentStatus.statusSubText}
-          statusClass={currentStatus.statusClass}
-        />
+    <div className="max-w-2xl mx-auto">
+      {!isAfterParticipation && currentStatus && (
+        <div className="px-6">
+          <ParticipationStatusNotification
+            status={mapReservationStatusToUIStatus(currentStatus.status)}
+            statusText={currentStatus.statusText}
+            statusSubText={currentStatus.statusSubText}
+            statusClass={currentStatus.statusClass}
+          />
+        </div>
       )}
-
-      <OpportunityCardHorizontal opportunity={opportunity} />
-
-      <ParticipationDetails opportunity={opportunity} participation={participation} />
-
-      <ParticipationActions
-        cancellationDeadline={cancellationDeadline}
-        isCancellable={isCancellable}
-        onCancel={onCancel}
-      />
+      <OpportunityInfo opportunity={oppotunityDetail} />
+      {dateTimeInfo && oppotunityDetail && (
+        <div className="px-6 mb-10 mt-8">
+          <h2 className="text-label-md font-bold mb-4">予約詳細</h2>
+          <ReservationDetails
+            formattedDate={dateTimeInfo.formattedDate}
+            startTime={dateTimeInfo.startTime}
+            endTime={dateTimeInfo.endTime}
+            participantCount={dateTimeInfo.participantCount}
+            totalPrice={dateTimeInfo.totalPrice}
+            pricePerPerson={oppotunityDetail.feeRequired ?? 0}
+            location={oppotunityDetail.place}
+          />
+        </div>
+      )}
+      <div className="px-6">
+        <h2 className="text-label-md font-bold mb-4">メッセージ</h2>
+        {/* #TODO: メッセージの表示を動的にする */}
+        <p className="whitespace-pre-line text-body-md">
+          汚れてもOKな服装でお越しください。当日は12:50に現地集合です。遅れる場合は090-xxxx-xxxxまでご連絡をお願いします。
+        </p>
+      </div>
+      {currentStatus &&
+        currentStatus?.status !== "REJECTED" &&
+        currentStatus?.status !== "CANCELED" && (
+          <ParticipationActions
+            cancellationDeadline={cancellationDeadline}
+            isCancellable={isCancellable}
+            onCancel={onCancel}
+            isAfterParticipation={isAfterParticipation}
+          />
+        )}
     </div>
   );
 }

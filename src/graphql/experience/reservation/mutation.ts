@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const CREATE_RESERVATION = gql`
   mutation CreateReservation($input: ReservationCreateInput!) {
@@ -7,34 +7,6 @@ export const CREATE_RESERVATION = gql`
         reservation {
           ...ReservationFields
         }
-      }
-      ... on ReservationFullError {
-        __typename
-        message
-        capacity
-        requested
-      }
-      ... on ReservationAdvanceBookingRequiredError {
-        __typename
-        message
-      }
-      ... on ReservationNotAcceptedError {
-        __typename
-        message
-      }
-      ... on SlotNotScheduledError {
-        __typename
-        message
-      }
-      ... on MissingTicketIdsError {
-        __typename
-        message
-      }
-      ... on TicketParticipantMismatchError {
-        __typename
-        message
-        ticketCount
-        participantCount
       }
     }
   }
@@ -52,8 +24,18 @@ export const CANCEL_RESERVATION = gql`
           ...ReservationFields
         }
       }
-      ... on ReservationCancellationTimeoutError {
-        message
+    }
+  }
+`;
+
+export const ACCEPT_RESERVATION_MUTATION = gql`
+  mutation ReservationAccept($id: ID!, $permission: CheckOpportunityPermissionInput!) {
+    reservationAccept(id: $id, permission: $permission) {
+      ... on ReservationSetStatusSuccess {
+        reservation {
+          id
+          status
+        }
       }
     }
   }

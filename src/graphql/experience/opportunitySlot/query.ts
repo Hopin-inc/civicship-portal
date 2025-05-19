@@ -1,13 +1,18 @@
 import { gql } from '@apollo/client';
 import { OPPORTUNITY_FRAGMENT } from "@/graphql/experience/opportunity/fragment";
+import { SLOT_FRAGMENT } from "@/graphql/experience/opportunitySlot/fragment";
 
 export const GET_OPPORTUNITY_SLOTS = gql`
   query GetOpportunitySlots (
     $filter: OpportunitySlotFilterInput
+    $cursor: String
+    $first: Int
   ){
     opportunitySlots(
       filter: $filter,
       sort: {startsAt: desc},
+      cursor: $cursor,
+      first: $first
     ) {
       pageInfo {
         startCursor
@@ -28,6 +33,15 @@ export const GET_OPPORTUNITY_SLOTS = gql`
           opportunity {
             ...OpportunityFields
           }
+          reservations {
+            participations {
+              id
+              evaluation {
+                id
+                status
+              }
+            }
+          }
         }
       }
     }
@@ -41,4 +55,36 @@ export const GET_OPPORTUNITY_SLOT = gql`
       id
     }
   }
-`; 
+`;
+
+export const GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS = gql`
+  query GetOpportunitySlotWithParticipations($id: ID!) {
+    opportunitySlot(id: $id) {
+      ...OpportunitySlotFields
+      opportunity {
+        ...OpportunityFields
+        community {
+          id
+          name
+        }
+      }
+      reservations {
+        participations {
+          id
+          status
+          user {
+            id
+            name
+            image
+          }
+          evaluation {
+            id
+            status
+          }
+        }
+      }
+    }
+  }
+  ${SLOT_FRAGMENT}
+  ${OPPORTUNITY_FRAGMENT}
+`;
