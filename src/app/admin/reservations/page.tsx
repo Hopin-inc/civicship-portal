@@ -91,7 +91,7 @@ export default function ReservationsPage() {
           <>
             { reservations.map((reservation: any) => (
               <Link key={ reservation.id } href={ `/admin/reservations/${ reservation.id }` }>
-                <CardWrapper className="p-4 cursor-pointer">
+                <CardWrapper className="p-4 cursor-pointer" clickable>
                   <div className="flex flex-col space-y-3">
                     <div className="flex items-center gap-3">
                       <Avatar>

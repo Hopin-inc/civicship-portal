@@ -1,7 +1,8 @@
-import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { useQuery } from "@apollo/client";
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo } from "react";
 import { GET_RESERVATIONS } from "../graphql/experience/reservation/query";
+import { GqlReservationFilterInput } from "@/types/graphql";
 
 export interface UseReservationsResult {
   reservations: any[];
@@ -15,15 +16,13 @@ export interface UseReservationsResult {
 export const useReservations = (statusFilter?: string | null) => {
   const isLoadingMore = useRef(false);
 
-  const filterVariables = useMemo(() => {
+  const filterVariables = useMemo<GqlReservationFilterInput>(() => {
     if (!statusFilter) return {};
 
-    if (statusFilter === 'APPLIED') {
-      return { status: 'APPLIED' };
-    } else if (statusFilter === 'NOT_APPLIED') {
-      return { status_not: 'APPLIED' };
+    if (statusFilter === "APPLIED") {
+      return { status: "APPLIED" };
     }
-    
+
     return {};
   }, [statusFilter]);
 
@@ -46,7 +45,7 @@ export const useReservations = (statusFilter?: string | null) => {
 
   const handleFetchMore = async () => {
     if (!hasNextPage || isLoadingMore.current) return;
-    
+
     isLoadingMore.current = true;
     try {
       await fetchMore({
@@ -76,7 +75,7 @@ export const useReservations = (statusFilter?: string | null) => {
       });
     } catch (error) {
       isLoadingMore.current = false;
-      console.error('Error fetching more reservations:', error);
+      console.error("Error fetching more reservations:", error);
     }
   };
 

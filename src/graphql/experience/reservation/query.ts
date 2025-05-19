@@ -51,11 +51,10 @@ export const GET_RESERVATION = gql`
       ...ReservationFields
       createdByUser {
         ...UserFields
+        phoneNumber,
       }
       opportunitySlot {
         ...OpportunitySlotFields
-        startsAt
-        endsAt
         opportunity {
           ...OpportunityFields
           slots {

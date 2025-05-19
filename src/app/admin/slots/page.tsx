@@ -32,8 +32,8 @@ export default function SlotsPage() {
       if (reservation.participations && reservation.participations.length > 0) {
         reservation.participations.forEach((participation: any) => {
           totalParticipations++;
-          if (participation.evaluation && 
-              (participation.evaluation.status === "PASSED" || 
+          if (participation.evaluation &&
+              (participation.evaluation.status === "PASSED" ||
                participation.evaluation.status === "FAILED")) {
             evaluatedParticipations++;
           }
@@ -41,8 +41,8 @@ export default function SlotsPage() {
       }
     });
 
-    const progress = totalParticipations > 0 
-      ? Math.round((evaluatedParticipations / totalParticipations) * 100) 
+    const progress = totalParticipations > 0
+      ? Math.round((evaluatedParticipations / totalParticipations) * 100)
       : 0;
 
     return { total: totalParticipations, evaluated: evaluatedParticipations, progress };
@@ -66,7 +66,6 @@ export default function SlotsPage() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">開催日程一覧</h1>
       <div className="space-y-4">
         {slots.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">開催日程が見つかりません</p>
@@ -85,24 +84,24 @@ export default function SlotsPage() {
                             {format(new Date(slot.startsAt || slot.startAt), 'yyyy/MM/dd HH:mm')} 〜 {format(new Date(slot.endsAt || slot.endAt), 'HH:mm')}
                           </p>
                         </div>
-                        <Badge variant={slot.hostingStatus === "COMPLETED" ? "success" : 
-                                        slot.hostingStatus === "CANCELLED" ? "destructive" : 
+                        <Badge variant={slot.hostingStatus === "COMPLETED" ? "success" :
+                                        slot.hostingStatus === "CANCELLED" ? "destructive" :
                                         "secondary"}>
                           {slot.hostingStatus}
                         </Badge>
                       </div>
-                      
+
                       <div className="text-sm space-y-1">
                         <p>
                           <span className="font-medium">定員:</span> {slot.capacity}名
                           ({slot.capacity - slot.remainingCapacity}/{slot.capacity})
                         </p>
                         <p>
-                          <span className="font-medium">出欠管理:</span> {evaluationProgress.evaluated}/{evaluationProgress.total}名 
+                          <span className="font-medium">出欠管理:</span> {evaluationProgress.evaluated}/{evaluationProgress.total}名
                           ({evaluationProgress.progress}%)
                         </p>
                       </div>
-                      
+
                       <div className="flex justify-end">
                         <Button variant="secondary" size="sm">詳細</Button>
                       </div>
