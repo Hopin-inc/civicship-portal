@@ -103,6 +103,9 @@ importers:
       framer-motion:
         specifier: ^12.5.0
         version: 12.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      google-libphonenumber:
+        specifier: ^3.2.40
+        version: 3.2.40
       graphql:
         specifier: ^16.9.0
         version: 16.9.0
@@ -206,6 +209,9 @@ importers:
       '@svgr/webpack':
         specifier: ^8.1.0
         version: 8.1.0(typescript@5.5.4)
+      '@types/google-libphonenumber':
+        specifier: ^7.4.30
+        version: 7.4.30
       '@types/micromatch':
         specifier: ^4.0.9
         version: 4.0.9
@@ -2913,6 +2919,9 @@ packages:
   '@types/express@4.17.21':
     resolution: {integrity: sha512-ejlPM315qwLpaQlQDTjPdsUFSc6ZsP4AN6AlWnogPjQ7CVi7PYF3YVz+CY3jE2pwYf7E/7HlDAN0rV2GxTG0HQ==}
 
+  '@types/google-libphonenumber@7.4.30':
+    resolution: {integrity: sha512-Td1X1ayRxePEm6/jPHUBs2tT6TzW1lrVB6ZX7ViPGellyzO/0xMNi+wx5nH6jEitjznq276VGIqjK5qAju0XVw==}
+
   '@types/google.maps@3.58.1':
     resolution: {integrity: sha512-X9QTSvGJ0nCfMzYOnaVs/k6/4L+7F5uCS+4iUmkLEls6J9S/Phv+m/i3mDeyc49ZBgwab3EFO1HEoBY7k98EGQ==}
 
@@ -4136,6 +4145,10 @@ packages:
   globby@11.1.0:
     resolution: {integrity: sha512-jhIXaOzy1sb8IyocaruWSn1TjmnBVs8Ayhcy83rmxNJ8q2uWKCAj3CnJY+KpGSXCueAPc0i05kVvVKtP1t9S3g==}
     engines: {node: '>=10'}
+
+  google-libphonenumber@3.2.40:
+    resolution: {integrity: sha512-bzGxX/vfggcV80LVcibki+JvR91x6zHpBpovDXSfmZUGn6uLzhbYXsWll2a80EG6qTmvf8lt7KZZ/pkMml8ckw==}
+    engines: {node: '>=0.10'}
 
   gopd@1.0.1:
     resolution: {integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==}
@@ -9735,6 +9748,8 @@ snapshots:
       '@types/qs': 6.9.18
       '@types/serve-static': 1.15.7
 
+  '@types/google-libphonenumber@7.4.30': {}
+
   '@types/google.maps@3.58.1': {}
 
   '@types/hast@3.0.4':
@@ -11341,6 +11356,8 @@ snapshots:
       ignore: 5.3.2
       merge2: 1.4.1
       slash: 3.0.0
+
+  google-libphonenumber@3.2.40: {}
 
   gopd@1.0.1:
     dependencies:
