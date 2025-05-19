@@ -90,9 +90,21 @@ export default function ParticipationPage() {
     }
   };
 
-  const isAfterParticipation =
-    currentStatus?.status === "ACCEPTED" &&
-    new Date() > new Date(dateTimeInfo?.startTime ?? dateTimeInfo?.endTime ?? "");
+  const isAfterParticipation = useMemo(() => {
+    if (currentStatus?.status !== GqlReservationStatus.Accepted) {
+      return false;
+    }
+    const relevantDateString = dateTimeInfo?.endTime ?? dateTimeInfo?.startTime;
+    if (!relevantDateString) {
+      return false;
+    }
+    const eventDate = new Date(relevantDateString);
+    if (isNaN(eventDate.getTime())) {
+      console.warn("Invalid date string for participation check:", relevantDateString);
+      return false;
+    }
+    return new Date() > eventDate;
+  }, [currentStatus, dateTimeInfo]);
 
   if (loading || opportunityLoading) return <LoadingIndicator />;
   if (hasError || !reservationId || !opportunity || !participation) {
