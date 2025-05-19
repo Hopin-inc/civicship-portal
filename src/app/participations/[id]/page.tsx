@@ -90,6 +90,10 @@ export default function ParticipationPage() {
     }
   };
 
+  const isAfterParticipation =
+    currentStatus?.status === "ACCEPTED" &&
+    new Date() > new Date(dateTimeInfo?.startTime ?? dateTimeInfo?.endTime ?? "");
+
   if (loading || opportunityLoading) return <LoadingIndicator />;
   if (hasError || !reservationId || !opportunity || !participation) {
     return <ErrorState title="Could not load reservation page" refetchRef={refetchRef} />;
@@ -128,11 +132,15 @@ export default function ParticipationPage() {
           汚れてもOKな服装でお越しください。当日は12:50に現地集合です。遅れる場合は090-xxxx-xxxxまでご連絡をお願いします。
         </p>
       </div>
-      <ParticipationActions
-        cancellationDeadline={cancellationDeadline}
-        isCancellable={isCancellable}
-        onCancel={onCancel}
-      />
+      {currentStatus && (
+        <ParticipationActions
+          status={mapReservationStatusToUIStatus(currentStatus.status)}
+          cancellationDeadline={cancellationDeadline}
+          isCancellable={isCancellable}
+          onCancel={onCancel}
+          isAfterParticipation={false}
+        />
+      )}
     </div>
   );
 }
