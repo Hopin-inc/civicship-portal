@@ -77,7 +77,7 @@ const SelectionSheet: React.FC<SelectionSheetProps> = ({
 
   const renderDateSelection = () => (
     <div className="flex-1 overflow-auto h-auto pb-0 mb-0">
-      <div className="space-y-2">
+      <div className="flex flex-wrap gap-x-2 gap-y-2 mb-2">
         {dateSections.map((section, index) => (
           <Button
             key={index}
@@ -107,7 +107,7 @@ const SelectionSheet: React.FC<SelectionSheetProps> = ({
     <Sheet open={isOpen} onOpenChange={handleSheetOpenChange}>
       <SheetContent
         side="bottom"
-        className="90-vh rounded-t-3xl overflow-auto max-w-md mx-auto pt-2 px-6"
+        className="rounded-t-3xl overflow-auto max-w-md mx-auto pt-2 px-6"
         onPointerDownOutside={onClose}
       >
         <div className="flex justify-center mb-3">
