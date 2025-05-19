@@ -1,13 +1,13 @@
-import React, { useCallback } from 'react';
-import { Minus, Plus } from 'lucide-react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
+import React, { useCallback } from "react";
+import { Minus, Plus } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 
 interface SelectionSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  activeForm: 'date' | 'guests' | null;
+  activeForm: "date" | "guests" | null;
   selectedDate: string | null;
   setSelectedDate: (date: string | null) => void;
   selectedGuests: number;
@@ -26,12 +26,10 @@ const SelectionSheet: React.FC<SelectionSheetProps> = ({
   setSelectedDate,
   selectedGuests,
   setSelectedGuests,
-  dateSections
+  dateSections,
 }) => {
-  if (!activeForm) return null;
-
   const handleClearSelection = useCallback(() => {
-    if (activeForm === 'date') {
+    if (activeForm === "date") {
       setSelectedDate(null);
     } else {
       setSelectedGuests(1);
@@ -40,39 +38,35 @@ const SelectionSheet: React.FC<SelectionSheetProps> = ({
 
   const handleSelectDate = useCallback(
     (dateLabel: string) => () => setSelectedDate(dateLabel),
-    [setSelectedDate]
+    [setSelectedDate],
   );
 
   const handleDecreaseGuests = useCallback(
     () => setSelectedGuests(Math.max(1, selectedGuests - 1)),
-    [selectedGuests, setSelectedGuests]
+    [selectedGuests, setSelectedGuests],
   );
 
   const handleIncreaseGuests = useCallback(
     () => setSelectedGuests(selectedGuests + 1),
-    [selectedGuests, setSelectedGuests]
+    [selectedGuests, setSelectedGuests],
   );
 
   const handleSheetOpenChange = useCallback(
     (open: boolean) => {
       if (!open) onClose();
     },
-    [onClose]
+    [onClose],
   );
+
+  if (!activeForm) return null;
 
   const renderFooterButtons = () => (
     <div className="max-w-md mx-auto fixed bottom-0 left-0 right-0 bg-background p-4 border-t">
       <div className="flex justify-between items-center">
-        <Button
-          onClick={handleClearSelection}
-          variant="link"
-        >
+        <Button onClick={handleClearSelection} variant="link">
           選択を解除
         </Button>
-        <Button
-          onClick={onClose}
-          variant="primary"
-        >
+        <Button onClick={onClose} variant="primary">
           決定
         </Button>
       </div>
@@ -97,21 +91,11 @@ const SelectionSheet: React.FC<SelectionSheetProps> = ({
 
   const renderGuestSelection = () => (
     <div className="flex items-center justify-center space-x-8 py-4">
-      <Button
-        onClick={handleDecreaseGuests}
-        variant="tertiary"
-        size="icon"
-        className="p-2"
-      >
+      <Button onClick={handleDecreaseGuests} variant="tertiary" size="icon" className="p-2">
         <Minus className="h-6 w-6 text-muted-foreground" />
       </Button>
       <span className="text-2xl font-medium w-8 text-center">{selectedGuests}</span>
-      <Button
-        onClick={handleIncreaseGuests}
-        variant="tertiary"
-        size="icon"
-        className="p-2"
-      >
+      <Button onClick={handleIncreaseGuests} variant="tertiary" size="icon" className="p-2">
         <Plus className="h-6 w-6 text-gray-400" />
       </Button>
     </div>
@@ -129,13 +113,13 @@ const SelectionSheet: React.FC<SelectionSheetProps> = ({
             <SheetTitle>
               <div className="flex items-center">
                 <span className="text-lg font-bold">
-                  {activeForm === 'date' ? '日付を選択' : '人数を選択'}
+                  {activeForm === "date" ? "日付を選択" : "人数を選択"}
                 </span>
               </div>
             </SheetTitle>
           </SheetHeader>
 
-          {activeForm === 'date' ? renderDateSelection() : renderGuestSelection()}
+          {activeForm === "date" ? renderDateSelection() : renderGuestSelection()}
 
           {renderFooterButtons()}
         </div>
