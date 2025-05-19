@@ -158,7 +158,9 @@ export default function ReservationDetailPage({ params }: { params: { id: string
       </CardWrapper>
 
       {/* Footer with conditional buttons */ }
-      { reservation.status === "APPLIED" && (
+      { reservation.status === "APPLIED" && 
+        reservation.opportunitySlot?.hostingStatus !== "CANCELLED" && 
+        reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
         <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
           <CardFooter className="p-4">
             <Button
@@ -172,7 +174,9 @@ export default function ReservationDetailPage({ params }: { params: { id: string
         </Card>
       ) }
 
-      { reservation.status === "ACCEPTED" && !isWithin7Days && (
+      { reservation.status === "ACCEPTED" && !isWithin7Days && 
+        reservation.opportunitySlot?.hostingStatus !== "CANCELLED" && 
+        reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
         <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
           <CardFooter className="p-4">
             <Button
@@ -187,7 +191,9 @@ export default function ReservationDetailPage({ params }: { params: { id: string
         </Card>
       ) }
 
-      { reservation.status === "ACCEPTED" && isWithin7Days && (
+      { reservation.status === "ACCEPTED" && isWithin7Days && 
+        reservation.opportunitySlot?.hostingStatus !== "CANCELLED" && 
+        reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
         <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
           <CardFooter className="p-4">
             <Button variant="destructive" disabled className="w-full">
