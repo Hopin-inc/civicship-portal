@@ -14,13 +14,20 @@ import { ErrorState } from "@/components/shared/ErrorState";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import dayjs from "dayjs";
+import { displayDuration, displayPhoneNumber } from "@/utils";
+import { CalendarIcon, JapaneseYen, MapPin, Phone, User } from "lucide-react";
+import { prefectureLabels } from "@/app/users/data/presenter";
+import { GqlCurrentPrefecture } from "@/types/graphql";
+import { ReservationStatus } from "@/app/admin/reservations/components/ReservationStatus";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function ReservationDetailPage({ params }: { params: { id: string } }) {
   const headerConfig = useMemo(() => ({
     title: `予約詳細`,
     showBackButton: true,
+    showLogo: false,
     backTo: "/admin/reservations",
-    hideBottomBar: true, // Hide the BottomBar
   }), []);
   useHeaderConfig(headerConfig);
 
@@ -114,94 +121,104 @@ export default function ReservationDetailPage({ params }: { params: { id: string
   )?.length || 0;
 
   return (
-    <div className="p-4 pt-16 pb-24">
-      <CardWrapper className="p-4 mb-4">
-        <h1 className="text-xl font-bold mb-4">予約詳細</h1>
+    <div className="p-6">
+      <div className="mb-8">
+        <h2 className="text-title-md mb-3">予約者</h2>
+        <div className="flex items-center gap-3">
+          <Avatar>
+            <AvatarImage src={ reservation.createdByUser?.image || "" } />
+            <AvatarFallback>{ reservation.createdByUser?.name?.[0] || "U" }</AvatarFallback>
+          </Avatar>
+          <div className="flex-grow flex flex-col justify-center gap-1">
+            <p className="text-label-md">{ reservation.createdByUser?.name || "未設定" }</p>
+            <p className="inline-flex items-center gap-1 text-muted-foreground text-label-sm">
+              <MapPin size="16" />
+              { reservation.createdByUser?.currentPrefecture ? prefectureLabels[reservation.createdByUser?.currentPrefecture as GqlCurrentPrefecture] : "不明" }
+            </p>
+          </div>
+          <ReservationStatus status={ reservation.status } />
+        </div>
+      </div>
 
-        {/* 予約者情報 */ }
-        <div className="mb-6">
-          <h2 className="font-semibold text-lg mb-2">予約者</h2>
-          <div className="flex items-center space-x-3">
-            <Avatar>
-              <AvatarImage src={ reservation.createdByUser?.image || "" } />
-              <AvatarFallback>{ reservation.createdByUser?.name?.[0] || "U" }</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-medium">{ reservation.createdByUser?.name || "未設定" }</p>
-              <p className="text-sm text-muted-foreground">{ reservation.createdByUser?.currentPrefecture || "不明" }</p>
+      <div>
+        <h2 className="text-title-md mb-3">予約情報</h2>
+        <Link href={ `/opportunities/${ params.id }` } target="_blank">
+          <CardWrapper clickable className="overflow-hidden flex items-center h-24">
+            <Image src={opportunity?.images[0]} alt={opportunity?.title} width="96" height="96"/>
+            <div className="flex flex-col flex-grow p-4">
+              <p className="text-body-md">{ opportunity?.title }</p>
+              <p className="text-body-sm text-muted-foreground">今後{ futureSlotsCount }日程で開催予定</p>
             </div>
-          </div>
+          </CardWrapper>
+        </Link>
+        <div className="flex flex-col flex-wrap text-body-sm gap-2 mt-4">
+          <p className="inline-flex items-center gap-2 text-body-md">
+            <CalendarIcon size="24" />
+            { reservation.opportunitySlot?.startsAt && displayDuration(reservation.opportunitySlot.startsAt, reservation.opportunitySlot.endsAt) }
+          </p>
+          <p className="inline-flex items-center gap-2 text-body-md">
+            <User size="24" />
+            { reservation.participations?.length ?? 0 }名
+          </p>
+          <p className="inline-flex items-center gap-2 text-body-md">
+            <JapaneseYen size="24" />
+            { participationFee.toLocaleString() }円
+            <span className="text-label-sm text-muted-foreground">
+              ({ opportunity?.feeRequired?.toLocaleString() ?? 0 }円×{ participantCount.toLocaleString() }人)
+            </span>
+          </p>
+          <p className="inline-flex items-center gap-2 text-body-md">
+            <Phone size="24" />
+            { reservation.createdByUser?.phoneNumber ? displayPhoneNumber(reservation.createdByUser?.phoneNumber) : "未設定" }
+          </p>
         </div>
-
-        {/* 予約ステータス */ }
-        <div className="mb-6">
-          <h2 className="font-semibold text-lg mb-2">予約ステータス</h2>
-          <p className="px-3 py-1 bg-secondary inline-block rounded-full">{ reservation.status }</p>
-        </div>
-
-        {/* 予約情報 */ }
-        <div>
-          <h2 className="font-semibold text-lg mb-2">予約情報</h2>
-          <div className="space-y-2">
-            <p><span className="font-medium">機会:</span> { opportunity?.title }</p>
-            <p><span className="font-medium">機会の日程:</span> 今後 { futureSlotsCount } 件</p>
-            <p><span
-              className="font-medium">予約した日程:</span> { dayjs(reservation.opportunitySlot?.startsAt).format("YYYY/MM/DD HH:mm") } 〜 { dayjs(reservation.opportunitySlot?.endsAt).format("HH:mm") }
-            </p>
-            <p><span className="font-medium">参加人数:</span> { participantCount }名</p>
-            <p><span
-              className="font-medium">参加費:</span> { opportunity?.feeRequired || 0 } × { participantCount } = { participationFee }円
-            </p>
-            <p><span className="font-medium">緊急連絡先:</span> { reservation.createdByUser?.phoneNumber || "未設定" }</p>
-          </div>
-        </div>
-      </CardWrapper>
+      </div>
 
       {/* Footer with conditional buttons */ }
-      { reservation.status === "APPLIED" && 
-        reservation.opportunitySlot?.hostingStatus !== "CANCELLED" && 
+      { reservation.status === "APPLIED" &&
+        reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
         reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
-        <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
-          <CardFooter className="p-4">
-            <Button
-              className="w-full"
-              onClick={ handleAccept }
-              disabled={ acceptLoading }
-            >
-              { acceptLoading ? "処理中..." : "承認する" }
-            </Button>
-          </CardFooter>
-        </Card>
-      ) }
+          <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
+            <CardFooter className="p-4">
+              <Button
+                className="w-full"
+                onClick={ handleAccept }
+                disabled={ acceptLoading }
+              >
+                { acceptLoading ? "処理中..." : "承認する" }
+              </Button>
+            </CardFooter>
+          </Card>
+        ) }
 
-      { reservation.status === "ACCEPTED" && !isWithin7Days && 
-        reservation.opportunitySlot?.hostingStatus !== "CANCELLED" && 
+      { reservation.status === "ACCEPTED" && !isWithin7Days &&
+        reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
         reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
-        <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
-          <CardFooter className="p-4">
-            <Button
-              className="w-full"
-              onClick={ handleCancel }
-              disabled={ cancelLoading }
-              variant="destructive"
-            >
-              { cancelLoading ? "処理中..." : "開催中止" }
-            </Button>
-          </CardFooter>
-        </Card>
-      ) }
+          <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
+            <CardFooter className="p-4">
+              <Button
+                className="w-full"
+                onClick={ handleCancel }
+                disabled={ cancelLoading }
+                variant="destructive"
+              >
+                { cancelLoading ? "処理中..." : "開催中止" }
+              </Button>
+            </CardFooter>
+          </Card>
+        ) }
 
-      { reservation.status === "ACCEPTED" && isWithin7Days && 
-        reservation.opportunitySlot?.hostingStatus !== "CANCELLED" && 
+      { reservation.status === "ACCEPTED" && isWithin7Days &&
+        reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
         reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
-        <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
-          <CardFooter className="p-4">
-            <Button variant="destructive" disabled className="w-full">
-              中止不可
-            </Button>
-          </CardFooter>
-        </Card>
-      ) }
+          <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
+            <CardFooter className="p-4">
+              <Button variant="destructive" disabled className="w-full">
+                中止不可
+              </Button>
+            </CardFooter>
+          </Card>
+        ) }
     </div>
   );
 }
