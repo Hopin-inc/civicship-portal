@@ -18,7 +18,7 @@ import EmptyState from "@/components/shared/EmptyState";
 export default function SelectDatePage() {
   const headerConfig: HeaderConfig = useMemo(
     () => ({
-      title: "日付をえらぶ",
+      title: "日付を選ぶ",
       showLogo: false,
       showBackButton: true,
     }),
@@ -69,8 +69,8 @@ export default function SelectDatePage() {
   }
 
   return (
-    <main className="pt-16 px-4 pb-24">
-      <div className="space-y-4 mb-8">
+    <main className="px-6">
+      <div className="space-y-4 py-6">
         <DateSelectionForm
           selectedDate={selectedDate}
           onOpenDateForm={() => setActiveForm("date")}
@@ -80,12 +80,15 @@ export default function SelectDatePage() {
           onOpenGuestForm={() => setActiveForm("guests")}
         />
       </div>
+      <div className="h-2 bg-border -mx-6"></div>
 
-      <TimeSlotList
-        dateSections={filteredDateSections}
-        isSlotAvailable={isSlotAvailable}
-        onSelectSlot={handleReservation}
-      />
+      <div className="py-6">
+        <TimeSlotList
+          dateSections={filteredDateSections}
+          isSlotAvailable={isSlotAvailable}
+          onSelectSlot={handleReservation}
+        />
+      </div>
 
       <SelectionSheet
         isOpen={activeForm !== null}
