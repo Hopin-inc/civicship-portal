@@ -25,7 +25,7 @@ const ActivitiesCarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
   const [month, day, weekday] = match ? match.slice(1) : [];
 
   return (
-    <section className="px-6">
+    <section className="px-6 pr-0">
       {isSearchResult ? (
         <h2 className="flex items-baseline gap-1">
           <span className="text-md text-gray-500">{month}/</span>
@@ -37,7 +37,7 @@ const ActivitiesCarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
       )}
       <div className="mt-4 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
         {opportunities.map((opportunity) => (
-          <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} />
+          <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} isCarousel />
         ))}
       </div>
     </section>

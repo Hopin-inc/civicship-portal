@@ -7,16 +7,24 @@ import { Card } from "@/components/ui/card";
 import { ActivityCard } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
-export default function OpportunityCardVertical({ opportunity }: { opportunity: ActivityCard }) {
+interface OpportunityCardVerticalProps {
+  opportunity: ActivityCard;
+  isCarousel?: boolean;
+}
+
+export default function OpportunityCardVertical({
+  opportunity,
+  isCarousel = false,
+}: OpportunityCardVerticalProps) {
   const { id, title, feeRequired, location, images, hasReservableTicket, communityId } =
     opportunity;
 
   return (
     <Link
       href={`/activities/${id}?community_id=${communityId}`}
-      className="relative w-[164px] flex-shrink-0"
+      className={`relative w-full flex-shrink-0 ${isCarousel ? "max-w-[150px] sm:max-w-[164px]" : ""}`}
     >
-      <Card className="w-[164px] h-[205px] overflow-hidden relative">
+      <Card className="w-full h-[205px] overflow-hidden relative">
         {hasReservableTicket && (
           <div className="absolute top-2 left-2 bg-primary-foreground text-primary px-2.5 py-1 rounded-xl text-label-xs font-bold z-10">
             チケット利用可
