@@ -32,6 +32,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState<boolean>(false);
+  const [allEvaluated, setAllEvaluated] = useState<boolean>(false);
 
   const {
     slot,
@@ -79,6 +80,8 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
     if (participations.length > 0) {
       const initialAttendance: Record<string, string> = {};
       let hasNewParticipations = false;
+      let allEvaluatedStatus = true;
+      let hasAnyEvaluation = false;
       
       participations.forEach((participation: any) => {
         if (!processedParticipationIds.current.has(participation.id)) {
@@ -87,14 +90,26 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
           
           if (participation.evaluation?.status) {
             initialAttendance[participation.id] = participation.evaluation.status;
+            hasAnyEvaluation = true;
+            
+            if (participation.evaluation.status === "PENDING") {
+              allEvaluatedStatus = false;
+            }
           } else {
             initialAttendance[participation.id] = "PENDING";
+            allEvaluatedStatus = false;
           }
         }
       });
       
       if (hasNewParticipations) {
         setAttendanceData(prev => ({...prev, ...initialAttendance}));
+        
+        if (hasAnyEvaluation && allEvaluatedStatus) {
+          setIsSaved(true);
+        }
+        
+        setAllEvaluated(allEvaluatedStatus);
       }
     }
   }, [participations]);
@@ -203,7 +218,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
                   onValueChange={(value) => {
                     if (value) handleAttendanceChange(participation.id, value);
                   }}
-                  disabled={isSaved || isSaving || passLoading || failLoading}
+                  disabled={isSaved || isSaving || passLoading || failLoading || participation.evaluation?.status === "PASSED" || participation.evaluation?.status === "FAILED"}
                 >
                   <ToggleGroupItem value="PASSED" aria-label="参加">
                     参加
@@ -230,9 +245,9 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
                 <Button
                   className="w-full"
                   onClick={handleOpenConfirmDialog}
-                  disabled={isSaving}
+                  disabled={isSaving || allEvaluated}
                 >
-                  {isSaving ? "保存中..." : "出欠を保存する"}
+                  {isSaving ? "保存中..." : allEvaluated ? "すべての出欠が確定済み" : "出欠を保存する"}
                 </Button>
               </CardFooter>
             </Card>
