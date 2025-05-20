@@ -21,26 +21,35 @@ const httpLink = createHttpLink({
 });
 
 const requestLink = new ApolloLink((operation, forward) => {
-  const cookies = document.cookie.split("; ");
-  const accessToken = cookies.find((e) => e.startsWith("access_token"))?.split("=").pop();
-  const refreshToken = cookies.find((e) => e.startsWith("refresh_token"))?.split("=").pop();
-  const tokenExpiresAt = cookies.find((e) => e.startsWith("token_expires_at"))?.split("=").pop();
-  const phoneAuthToken = cookies.find((e) => e.startsWith("phone_auth_token"))?.split("=").pop();
-  const phoneRefreshToken = cookies.find((e) => e.startsWith("phone_refresh_token"))?.split("=").pop();
-  const phoneTokenExpiresAt = cookies.find((e) => e.startsWith("phone_token_expires_at"))?.split("=").pop();
-  
-  operation.setContext(({ headers = {} }) => ({
-    headers: {
-      ...headers,
-      Authorization: accessToken ? `Bearer ${accessToken}` : "",
-      "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-      "X-Refresh-Token": refreshToken || "",
-      "X-Token-Expires-At": tokenExpiresAt || "",
-      "X-Phone-Auth-Token": phoneAuthToken || "",
-      "X-Phone-Refresh-Token": phoneRefreshToken || "",
-      "X-Phone-Token-Expires-At": phoneTokenExpiresAt || "",
-    },
-  }));
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    const cookies = document.cookie.split("; ");
+    const accessToken = cookies.find((e) => e.startsWith("access_token"))?.split("=").pop();
+    const refreshToken = cookies.find((e) => e.startsWith("refresh_token"))?.split("=").pop();
+    const tokenExpiresAt = cookies.find((e) => e.startsWith("token_expires_at"))?.split("=").pop();
+    const phoneAuthToken = cookies.find((e) => e.startsWith("phone_auth_token"))?.split("=").pop();
+    const phoneRefreshToken = cookies.find((e) => e.startsWith("phone_refresh_token"))?.split("=").pop();
+    const phoneTokenExpiresAt = cookies.find((e) => e.startsWith("phone_token_expires_at"))?.split("=").pop();
+    
+    operation.setContext(({ headers = {} }) => ({
+      headers: {
+        ...headers,
+        Authorization: accessToken ? `Bearer ${accessToken}` : "",
+        "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+        "X-Refresh-Token": refreshToken || "",
+        "X-Token-Expires-At": tokenExpiresAt || "",
+        "X-Phone-Auth-Token": phoneAuthToken || "",
+        "X-Phone-Refresh-Token": phoneRefreshToken || "",
+        "X-Phone-Token-Expires-At": phoneTokenExpiresAt || "",
+      },
+    }));
+  } else {
+    operation.setContext(({ headers = {} }) => ({
+      headers: {
+        ...headers,
+        "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+      },
+    }));
+  }
   return forward(operation);
 });
 

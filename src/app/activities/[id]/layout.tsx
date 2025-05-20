@@ -9,11 +9,12 @@ import {
 import { apolloClient } from "@/lib/apollo";
 import { fallbackMetadata } from "@/lib/metadata/notFound";
 
-export const generateMetadata = async (
-  input: Promise<{ params: { id: string } }>,
-): Promise<Metadata> => {
+export const generateMetadata = async ({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> => {
   //TODO COMMUNITY_IDを動的にかえる
-  const { params } = await input;
   const id = params.id;
   const res = await fetchOpportunity(id, COMMUNITY_ID);
 
