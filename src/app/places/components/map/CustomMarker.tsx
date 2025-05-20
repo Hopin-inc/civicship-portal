@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { drawCircleWithImage } from "@/utils/maps/markerUtils";
 import { Marker } from "@react-google-maps/api";
 import { IPlacePin } from "@/app/places/data/type";
@@ -52,6 +52,9 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
   const [icon, setIcon] = useState<google.maps.Icon | null>(null);
   const displaySize = isSelected ? 80 : 56;
 
+  // ✅ 安定した依存値にする（nullを避ける）
+  const hostImage = useMemo(() => data.host.image ?? PLACEHOLDER_IMAGE, [data.host.image]);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -61,7 +64,6 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         return;
       }
 
-      // 一旦プレースホルダーを先に表示
       try {
         const placeholder = await createPlaceholderIcon(displaySize);
         isMounted && setIcon(placeholder);
@@ -74,11 +76,8 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
       const context = canvas.getContext("2d");
       if (!context) return;
 
-      const canvasWidth = displaySize * scale;
-      const canvasHeight = displaySize * scale;
-
-      canvas.width = canvasWidth;
-      canvas.height = canvasHeight;
+      canvas.width = displaySize * scale;
+      canvas.height = displaySize * scale;
       context.scale(scale, scale);
 
       try {
@@ -92,7 +91,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         const mainImg = await loadImage(data.image);
         await drawCircleWithImage(context, mainImg, centerX, centerY, mainRadius, true);
 
-        const userImg = await loadImage(data.host.image || PLACEHOLDER_IMAGE);
+        const userImg = await loadImage(hostImage);
         await drawCircleWithImage(context, userImg, smallX, smallY, smallRadius, false);
 
         const markerIcon: google.maps.Icon = {
@@ -111,7 +110,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
     return () => {
       isMounted = false;
     };
-  }, [data.id, data.image, data.host.image, displaySize]);
+  }, [data.id, data.image, hostImage, displaySize, isSelected]); // ✅ サイズ一定な依存配列
 
   if (!icon) return null;
 
