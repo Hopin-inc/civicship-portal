@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, { use, useMemo, useState, useEffect, useRef } from "react";
 import { useMutation } from "@apollo/client";
 import { EVALUATION_PASS, EVALUATION_FAIL } from "@/graphql/experience/evaluation/mutation";
 import { EVALUATION_BULK_CREATE } from "@/graphql/experience/evaluation/batchMutation";
@@ -15,8 +15,8 @@ import { format } from "date-fns";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useSlotParticipations } from "@/hooks/useSlotParticipations";
-import { use } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 export default function SlotDetailPage({ params }: { params: { id: string } }) {
   const { id } = use(params);
@@ -41,7 +41,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
     error,
     loadMoreRef,
     hasMore,
-    isLoadingMore
+    isLoadingMore,
   } = useSlotParticipations(id);
 
   const [evaluationPass, { loading: passLoading }] = useMutation(EVALUATION_PASS, {
@@ -49,7 +49,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
       toast.success("参加を確認しました");
     },
     onError: (error) => {
-      toast.error(`参加確認に失敗しました: ${error.message}`);
+      toast.error(`参加確認に失敗しました: ${ error.message }`);
     },
   });
 
@@ -58,10 +58,10 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
       toast.success("不参加を記録しました");
     },
     onError: (error) => {
-      toast.error(`不参加記録に失敗しました: ${error.message}`);
+      toast.error(`不参加記録に失敗しました: ${ error.message }`);
     },
   });
-  
+
   const [batchEvaluate, { loading: batchLoading }] = useMutation(EVALUATION_BULK_CREATE, {
     onCompleted: () => {
       toast.success("出欠情報を保存しました");
@@ -69,29 +69,29 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
       setIsSaving(false);
     },
     onError: (error) => {
-      toast.error(`出欠情報の保存に失敗しました: ${error.message}`);
+      toast.error(`出欠情報の保存に失敗しました: ${ error.message }`);
       setIsSaving(false);
     },
   });
-  
+
   const processedParticipationIds = useRef<Set<string>>(new Set());
-  
+
   useEffect(() => {
     if (participations.length > 0) {
       const initialAttendance: Record<string, string> = {};
       let hasNewParticipations = false;
       let allEvaluatedStatus = true;
       let hasAnyEvaluation = false;
-      
+
       participations.forEach((participation: any) => {
         if (!processedParticipationIds.current.has(participation.id)) {
           processedParticipationIds.current.add(participation.id);
           hasNewParticipations = true;
-          
+
           if (participation.evaluation?.status) {
             initialAttendance[participation.id] = participation.evaluation.status;
             hasAnyEvaluation = true;
-            
+
             if (participation.evaluation.status === "PENDING") {
               allEvaluatedStatus = false;
             }
@@ -101,14 +101,14 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
           }
         }
       });
-      
+
       if (hasNewParticipations) {
-        setAttendanceData(prev => ({...prev, ...initialAttendance}));
-        
+        setAttendanceData(prev => ({ ...prev, ...initialAttendance }));
+
         if (hasAnyEvaluation && allEvaluatedStatus) {
           setIsSaved(true);
         }
-        
+
         setAllEvaluated(allEvaluatedStatus);
       }
     }
@@ -120,10 +120,10 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
   };
 
   const handleOpenConfirmDialog = () => {
-    const isAllSelected = participations.every((participation: any) => 
-      attendanceData[participation.id] && attendanceData[participation.id] !== "PENDING"
+    const isAllSelected = participations.every((participation: any) =>
+      attendanceData[participation.id] && attendanceData[participation.id] !== "PENDING",
     );
-    
+
     if (!isAllSelected) {
       toast.error("すべての参加者の出欠を選択してください");
       return;
@@ -135,18 +135,18 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
   const handleSaveAllAttendance = async () => {
     setIsSaving(true);
     setIsConfirmDialogOpen(false);
-    
+
     const evaluations = participations.map((participation: any) => ({
       participationId: participation.id,
-      status: attendanceData[participation.id]
+      status: attendanceData[participation.id],
     }));
 
     try {
       await batchEvaluate({
         variables: {
           input: { evaluations },
-          permission: { communityId: slot?.opportunity?.community?.id || "neo88" }
-        }
+          permission: { communityId: slot?.opportunity?.community?.id || "neo88" },
+        },
       });
     } catch (e) {
       setIsSaving(false);
@@ -155,7 +155,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
 
   const handleAttendanceChange = async (participationId: string, value: string) => {
     if (isSaved) return;
-    
+
     handleAttendanceSelection(participationId, value);
   };
 
@@ -186,84 +186,77 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
   return (
     <div className="p-4 pt-16">
       <CardWrapper className="p-4 mb-4">
-        <h1 className="text-xl font-bold mb-2">{slot.opportunity?.title || '無題のイベント'}</h1>
+        <h1 className="text-xl font-bold mb-2">{ slot.opportunity?.title || "無題のイベント" }</h1>
         <div className="space-y-2">
-          <p><span className="font-medium">開催日時:</span> {format(new Date(slot.startsAt || slot.startAt), 'yyyy/MM/dd HH:mm')} 〜 {format(new Date(slot.endsAt || slot.endAt), 'HH:mm')}</p>
-          <p><span className="font-medium">定員:</span> {slot.capacity}名</p>
-          <p><span className="font-medium">ステータス:</span> {slot.hostingStatus}</p>
+          <p><span
+            className="font-medium">開催日時:</span> { format(new Date(slot.startsAt || slot.startAt), "yyyy/MM/dd HH:mm") } 〜 { format(new Date(slot.endsAt || slot.endAt), "HH:mm") }
+          </p>
+          <p><span className="font-medium">定員:</span> { slot.capacity }名</p>
+          <p><span className="font-medium">ステータス:</span> { slot.hostingStatus }</p>
         </div>
       </CardWrapper>
 
       <h2 className="text-lg font-bold mb-2">参加者一覧</h2>
-      {participations.length === 0 ? (
+      { participations.length === 0 ? (
         <p className="text-center text-muted-foreground py-8">参加者が見つかりません</p>
       ) : (
-        <div>
-          {participations.map((participation: any, index: number) => (
-            <CardWrapper 
-              key={participation.id} 
-              className={`p-4 ${
-                index === 0 
-                  ? 'rounded-t-xl' 
-                  : index === participations.length - 1 
-                    ? 'rounded-b-xl border-t-0' 
-                    : 'rounded-none border-t-0'
-              }`}
-            >
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <Avatar>
-                    <AvatarImage src={participation.user?.image || ""} />
-                    <AvatarFallback>{participation.user?.name?.[0] || "U"}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium">{participation.user?.name || "未設定"}</p>
-                    <p className="text-sm text-muted-foreground">ID: {participation.user?.id}</p>
-                  </div>
+        <div className="rounded-xl border overflow-hidden">
+          { participations.map((participation: any, index: number) => (
+            <CardWrapper key={ participation.id }
+                         className={ cn("p-4 rounded-none border-0 flex justify-between items-center", (index !== participations.length - (hasMore ? 2 : 1)) && "border-b") }>
+              <div className="flex items-center space-x-3">
+                <Avatar>
+                  <AvatarImage src={ participation.user?.image || "" } />
+                  <AvatarFallback>{ participation.user?.name?.[0] || "U" }</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-medium">{ participation.user?.name || "未設定" }</p>
+                  <p className="text-sm text-muted-foreground">ID: { participation.user?.id }</p>
                 </div>
-                <ToggleGroup
-                  type="single"
-                  value={attendanceData[participation.id] || "PENDING"}
-                  onValueChange={(value) => {
-                    if (value) handleAttendanceChange(participation.id, value);
-                  }}
-                  disabled={isSaved || isSaving || passLoading || failLoading || participation.evaluation?.status === "PASSED" || participation.evaluation?.status === "FAILED"}
-                >
-                  <ToggleGroupItem value="PASSED" aria-label="参加">
-                    参加
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="FAILED" variant="destructive" aria-label="不参加">
-                    不参加
-                  </ToggleGroupItem>
-                </ToggleGroup>
               </div>
+              <ToggleGroup
+                type="single"
+                value={ attendanceData[participation.id] || "PENDING" }
+                onValueChange={ (value) => {
+                  if (value) handleAttendanceChange(participation.id, value);
+                } }
+                disabled={ isSaved || isSaving || passLoading || failLoading || participation.evaluation?.status === "PASSED" || participation.evaluation?.status === "FAILED" }
+              >
+                <ToggleGroupItem value="PASSED" aria-label="参加">
+                  参加
+                </ToggleGroupItem>
+                <ToggleGroupItem value="FAILED" color="danger" aria-label="不参加">
+                  不参加
+                </ToggleGroupItem>
+              </ToggleGroup>
             </CardWrapper>
-          ))}
+          )) }
 
-          {/* Infinite scroll loading ref */}
-          <div ref={loadMoreRef} className="py-4 flex justify-center">
-            {hasMore && (
-              isLoadingMore ? <LoadingIndicator /> : <p className="text-sm text-muted-foreground">スクロールして続きを読み込む</p>
-            )}
-          </div>
+          { hasMore && (
+            <div ref={ loadMoreRef } className="py-4 flex justify-center">
+              { isLoadingMore
+                ? <LoadingIndicator />
+                : <p className="text-sm text-muted-foreground">スクロールして続きを読み込む</p> }
+            </div>
+          ) }
 
-          {/* 保存ボタン */}
-          {participations.length > 0 && !isSaved && (
+          {/* 保存ボタン */ }
+          { participations.length > 0 && !isSaved && (
             <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
               <CardFooter className="p-4">
                 <Button
                   className="w-full"
-                  onClick={handleOpenConfirmDialog}
-                  disabled={isSaving || allEvaluated}
+                  onClick={ handleOpenConfirmDialog }
+                  disabled={ isSaving || allEvaluated }
                 >
-                  {isSaving ? "保存中..." : allEvaluated ? "すべての出欠が確定済み" : "出欠を保存する"}
+                  { isSaving ? "保存中..." : allEvaluated ? "すべての出欠が確定済み" : "出欠を保存する" }
                 </Button>
               </CardFooter>
             </Card>
-          )}
+          ) }
 
-          {/* 保存済みの場合に表示するメッセージ */}
-          {participations.length > 0 && isSaved && (
+          {/* 保存済みの場合に表示するメッセージ */ }
+          { participations.length > 0 && isSaved && (
             <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
               <CardFooter className="p-4 flex justify-center">
                 <p className="text-muted-foreground">
@@ -271,10 +264,10 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
                 </p>
               </CardFooter>
             </Card>
-          )}
+          ) }
 
-          {/* 確認ダイアログ */}
-          <Sheet open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+          {/* 確認ダイアログ */ }
+          <Sheet open={ isConfirmDialogOpen } onOpenChange={ setIsConfirmDialogOpen }>
             <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto pt-6 px-6">
               <SheetHeader className="text-left pb-6">
                 <SheetTitle>出欠情報を保存しますか？</SheetTitle>
@@ -284,15 +277,15 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
               </p>
               <SheetFooter className="flex flex-col space-y-2 sm:space-y-0">
                 <Button
-                  onClick={handleSaveAllAttendance}
-                  disabled={isSaving}
+                  onClick={ handleSaveAllAttendance }
+                  disabled={ isSaving }
                   className="w-full"
                 >
-                  {isSaving ? "保存中..." : "保存する"}
+                  { isSaving ? "保存中..." : "保存する" }
                 </Button>
                 <Button
-                  onClick={() => setIsConfirmDialogOpen(false)}
-                  variant="outline"
+                  onClick={ () => setIsConfirmDialogOpen(false) }
+                  variant="text"
                   className="w-full"
                 >
                   キャンセル
@@ -301,7 +294,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
             </SheetContent>
           </Sheet>
         </div>
-      )}
+      ) }
     </div>
   );
 }
