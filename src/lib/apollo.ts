@@ -20,9 +20,11 @@ const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
   credentials: "same-origin",
   headers: {
-    "Apollo-Require-Preflight": "true",
+    "apollo-require-preflight": "true",
+    "Content-Type": "application/json",
   },
   formDataAppendFile: true,
+  includeExtensions: true,
 });
 
 const requestLink = new ApolloLink((operation, forward) => {
@@ -44,7 +46,7 @@ const requestLink = new ApolloLink((operation, forward) => {
       "X-Phone-Auth-Token": phoneAuthToken || "",
       "X-Phone-Refresh-Token": phoneRefreshToken || "",
       "X-Phone-Token-Expires-At": phoneTokenExpiresAt || "",
-      "apollo-require-preflight": "true", // CSRF保護のためのヘッダーを追加
+      // "apollo-require-preflight"ヘッダーはcreateUploadLinkで設定済み
     },
   }));
   return forward(operation);
