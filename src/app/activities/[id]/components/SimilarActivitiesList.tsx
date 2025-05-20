@@ -24,7 +24,7 @@ const SameStateActivities: React.FC<SameStateActivitiesProps> = ({
       <h2 className="text-display-md text-foreground mb-4">{header}</h2>
       <div className="mt-6 flex gap-4 overflow-x-auto pb-8 scrollbar-hide">
         {opportunities.map((opportunity) => (
-          <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} />
+          <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} isCarousel/>
         ))}
       </div>
     </section>
