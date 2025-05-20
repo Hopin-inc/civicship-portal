@@ -44,7 +44,7 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
 
   const handlePlaceClick = (placeId: string, userId: string) => {
     onPlaceSelect(placeId);
-    router.push(`/places/${placeId}?user_id=${userId}`);
+    router.push(`/places/${placeId}`);
   };
 
   if (!places.length) return null;
