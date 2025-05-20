@@ -20,11 +20,8 @@ const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
   credentials: "same-origin",
   headers: {
-    "apollo-require-preflight": "true",
-    "Content-Type": "application/json",
+    "Apollo-Require-Preflight": "true",
   },
-  formDataAppendFile: true,
-  includeExtensions: true,
 });
 
 const requestLink = new ApolloLink((operation, forward) => {
