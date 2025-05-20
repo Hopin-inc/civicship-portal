@@ -16,6 +16,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useSlotParticipations } from "@/hooks/useSlotParticipations";
 import { use } from "react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 
 export default function SlotDetailPage({ params }: { params: { id: string } }) {
   const { id } = use(params);
@@ -30,6 +31,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
   const [attendanceData, setAttendanceData] = useState<Record<string, string>>({});
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState<boolean>(false);
 
   const {
     slot,
@@ -102,7 +104,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
     setAttendanceData(prev => ({ ...prev, [participationId]: value }));
   };
 
-  const handleSaveAllAttendance = async () => {
+  const handleOpenConfirmDialog = () => {
     const isAllSelected = participations.every((participation: any) => 
       attendanceData[participation.id] && attendanceData[participation.id] !== "PENDING"
     );
@@ -112,7 +114,12 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
       return;
     }
 
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleSaveAllAttendance = async () => {
     setIsSaving(true);
+    setIsConfirmDialogOpen(false);
     
     const evaluations = participations.map((participation: any) => ({
       participationId: participation.id,
@@ -222,7 +229,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
               <CardFooter className="p-4">
                 <Button
                   className="w-full"
-                  onClick={handleSaveAllAttendance}
+                  onClick={handleOpenConfirmDialog}
                   disabled={isSaving}
                 >
                   {isSaving ? "保存中..." : "出欠を保存する"}
@@ -241,6 +248,34 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
               </CardFooter>
             </Card>
           )}
+
+          {/* 確認ダイアログ */}
+          <Sheet open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+            <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto pt-6 px-6">
+              <SheetHeader className="text-left pb-6">
+                <SheetTitle>出欠情報を保存しますか？</SheetTitle>
+              </SheetHeader>
+              <p className="text-muted-foreground mb-6">
+                保存後は編集できなくなります。本当に保存しますか？
+              </p>
+              <SheetFooter className="flex flex-col space-y-2 sm:space-y-0">
+                <Button
+                  onClick={handleSaveAllAttendance}
+                  disabled={isSaving}
+                  className="w-full"
+                >
+                  {isSaving ? "保存中..." : "保存する"}
+                </Button>
+                <Button
+                  onClick={() => setIsConfirmDialogOpen(false)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  キャンセル
+                </Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
         </div>
       )}
     </div>
