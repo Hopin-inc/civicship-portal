@@ -232,7 +232,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
                   <ToggleGroupItem value="PASSED" aria-label="参加">
                     参加
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="FAILED" aria-label="不参加">
+                  <ToggleGroupItem value="FAILED" variant="destructive" aria-label="不参加">
                     不参加
                   </ToggleGroupItem>
                 </ToggleGroup>
