@@ -17,6 +17,7 @@ export const generateMetadata = async ({
   //TODO COMMUNITY_IDを動的にかえる
   const id = params.id;
   const res = await fetchOpportunity(id, COMMUNITY_ID);
+  console.log("[generateMetadata]", params, res);
 
   if (!res) return fallbackMetadata;
 

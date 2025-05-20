@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { DEFAULT_OGP } from "@/utils";
 
 export const fallbackMetadata: Metadata = {
   title: "お探しのページは見つかりません",
@@ -9,7 +8,7 @@ export const fallbackMetadata: Metadata = {
     description: "この機会は存在しないか、削除された可能性があります。",
     images: [
       {
-        url: DEFAULT_OGP,
+        url: "DEFAULT_OGP",
         width: 1200,
         height: 630,
         alt: "Not Found",
