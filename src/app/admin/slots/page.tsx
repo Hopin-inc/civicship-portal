@@ -80,11 +80,20 @@ export default function SlotsPage() {
                       {/* Header with title and status badge */}
                       <div className="flex items-center justify-between">
                         <h2 className="font-semibold">{slot.opportunity?.title || '無題のイベント'}</h2>
-                        <Badge variant={slot.hostingStatus === "COMPLETED" ? "success" :
-                                        slot.hostingStatus === "CANCELLED" ? "destructive" :
-                                        "secondary"}>
-                          {slot.hostingStatus}
-                        </Badge>
+                        <div className="flex gap-2">
+                          {slot.isFullyEvaluated && (
+                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                              出欠入力済み
+                            </Badge>
+                          )}
+                          <Badge variant={slot.hostingStatus === "COMPLETED" ? "success" :
+                                          slot.hostingStatus === "CANCELLED" ? "destructive" :
+                                          "secondary"}>
+                            {slot.hostingStatus === "COMPLETED" ? "完了" :
+                             slot.hostingStatus === "CANCELLED" ? "中止" :
+                             "予定"}
+                          </Badge>
+                        </div>
                       </div>
 
                       {/* Slot information with icons */}

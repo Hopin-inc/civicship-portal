@@ -202,6 +202,16 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
           </p>
         </div>
       </div>
+      
+      {/* Add participant count information */}
+      <div className="text-sm mb-4">
+        <p>参加者: {slot.numParticipants || 0}名</p>
+        <p>出欠評価済み: {slot.numEvaluated || 0}名 
+           ({slot.numParticipants ? 
+             Math.round((slot.numEvaluated / slot.numParticipants) * 100) : 
+             0}%)
+        </p>
+      </div>
 
       <h2 className="text-lg font-bold mb-2">参加者一覧</h2>
       { participations.length === 0 ? (

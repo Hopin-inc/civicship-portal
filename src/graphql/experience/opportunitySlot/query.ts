@@ -30,6 +30,9 @@ export const GET_OPPORTUNITY_SLOTS = gql`
           endsAt
           capacity
           remainingCapacity
+          isFullyEvaluated
+          numParticipants
+          numEvaluated
           opportunity {
             ...OpportunityFields
           }
@@ -61,6 +64,9 @@ export const GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS = gql`
   query GetOpportunitySlotWithParticipations($id: ID!) {
     opportunitySlot(id: $id) {
       ...OpportunitySlotFields
+      isFullyEvaluated
+      numParticipants
+      numEvaluated
       opportunity {
         ...OpportunityFields
         community {
