@@ -72,7 +72,7 @@ export const presenterPlaceDetail = (place: GqlPlace): IPlaceDetail => {
   const user = opportunity?.createdByUser;
 
   const pin = presenterPlacePin(place);
-  const opportunities = user?.opportunitiesCreatedByMe ?? [];
+  const opportunities = place.opportunities ?? [];
   const publicOpportunities = opportunities.filter(
     (o) => o.publishStatus === GqlPublishStatus.Public,
   );
