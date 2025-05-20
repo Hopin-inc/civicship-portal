@@ -20,6 +20,7 @@ const useProfileEdit = () => {
   const [profile, setProfile] = useState<GeneralUserProfile>({
     name: "",
     image: null,
+    imagePreviewUrl: null,
     bio: "",
     currentPrefecture: undefined,
     urlFacebook: "",
@@ -64,14 +65,21 @@ const useProfileEdit = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
-      const base64 = base64String.split(",")[1];
-      setProfile((prev) => ({ ...prev, image: base64 }));
-    };
-    reader.readAsDataURL(file);
+    const imageUrl = URL.createObjectURL(file);
+    setProfile((prev) => ({
+      ...prev,
+      image: file,
+      imagePreviewUrl: imageUrl
+    }));
   };
+
+  useEffect(() => {
+    return () => {
+      if (profile.imagePreviewUrl && profile.imagePreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(profile.imagePreviewUrl);
+      }
+    };
+  }, [profile.imagePreviewUrl]);
 
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
@@ -85,7 +93,8 @@ const useProfileEdit = () => {
         variables: {
           input: {
             name: profile.name,
-            image: profile.image ? { file: profile.image } : undefined,
+            image: profile.image instanceof File && profile.image.size > 0 ?
+              { file: profile.image } : undefined,
             bio: profile.bio ?? "",
             currentPrefecture: profile.currentPrefecture,
             urlFacebook: profile.urlFacebook ?? "",
@@ -124,7 +133,7 @@ const useProfileEdit = () => {
   }, [userError]);
 
   return {
-    profileImage: profile.image,
+    profileImage: profile.imagePreviewUrl || (data?.user?.image || null),
     displayName: profile.name,
     location: profile.currentPrefecture,
     bio: profile.bio ?? "",

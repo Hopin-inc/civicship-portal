@@ -3,8 +3,6 @@
 import React from "react";
 import UserProfileHeader from "./UserProfileHeader";
 import UserTicketsAndPoints from "./UserTicketsAndPoints";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
 import { GeneralUserProfile } from "@/app/users/data/type";
 import { UserAsset } from "@/app/wallets/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
@@ -27,7 +25,7 @@ const UserProfileSection: React.FC<UserProfileSectionProps> = ({
       <UserProfileHeader
         id={userId}
         name={profile.name}
-        image={profile.image || PLACEHOLDER_IMAGE}
+        image={profile.imagePreviewUrl || PLACEHOLDER_IMAGE}
         bio={profile.bio ?? ""}
         currentPrefecture={profile.currentPrefecture}
         isOwner={isOwner}
