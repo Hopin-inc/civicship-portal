@@ -6,7 +6,6 @@ import { useParams, usePathname } from "next/navigation";
 import { app } from "@/lib/firebase";
 
 const analytics = typeof window !== "undefined" ? getAnalytics(app) : undefined;
-export { analytics };
 
 // 内部保持：ユーザー属性 + 環境情報（初期値は空）
 let currentUserAttributes: Record<string, string> = {};
@@ -95,7 +94,7 @@ const setSafeUserAttributes = (rawProps: Record<string, any>) => {
  * イベント送信：ユーザー属性 + params をすべて送信
  */
 const safeLogEvent = (name: string, params?: Record<string, any>): void => {
-  const isDev = process.env.NODE_ENV === 'development';
+  const isDev = process.env.NODE_ENV === "development";
   if (isDev) {
     console.log("[Analytics] → send event:", name, params);
   }

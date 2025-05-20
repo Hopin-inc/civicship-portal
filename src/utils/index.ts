@@ -9,8 +9,6 @@ dayjs.extend(relativeTime);
 export const COMMUNITY_ID = "neo88";
 // export const PLACEHOLDER_IMAGE =
 //   "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/placeholder.jpg";
-export const DEFAULT_OGP =
-  "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg";
 
 const YEAR_FMT = "YYYY年";
 const MONTH_DATE_FMT = "M月D日(ddd)";

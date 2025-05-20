@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { COMMUNITY_ID, DEFAULT_OGP } from "@/utils";
+import { COMMUNITY_ID } from "@/utils";
 import {
   GetArticleDocument,
   GqlArticle,
@@ -7,14 +7,13 @@ import {
   GqlGetArticleQueryVariables,
 } from "@/types/graphql";
 import { apolloClient } from "@/lib/apollo";
-import { fallbackMetadata } from "@/lib/metadata";
+import { fallbackMetadata } from "@/lib/metadata/notFound";
 
-export const generateMetadata = async ({
-  params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> => {
+export const generateMetadata = async (
+  input: Promise<{ params: { id: string } }>,
+): Promise<Metadata> => {
   //TODO COMMUNITY_IDを動的にかえる
+  const { params } = await input;
   const id = params.id;
   const res = await fetchArticle(id, COMMUNITY_ID);
 
@@ -28,7 +27,7 @@ export const generateMetadata = async ({
       description: res.introduction ?? res.body,
       images: [
         {
-          url: res.thumbnail ?? DEFAULT_OGP,
+          url: res.thumbnail ?? "",
           width: 1200,
           height: 630,
           alt: res.title,
