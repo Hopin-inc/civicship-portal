@@ -40,6 +40,7 @@ const requestLink = new ApolloLink((operation, forward) => {
       "X-Phone-Auth-Token": phoneAuthToken || "",
       "X-Phone-Refresh-Token": phoneRefreshToken || "",
       "X-Phone-Token-Expires-At": phoneTokenExpiresAt || "",
+      "apollo-require-preflight": "true", // CSRF保護のためのヘッダーを追加
     },
   }));
   return forward(operation);
