@@ -64,7 +64,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
         {place.bio}
       </CardDescription>
 
-      <CardFooter className="flex justify-between mt-2 p-0 mb-2">
+      <CardFooter className="flex justify-between mt-1 p-0 mb-1">
         {place.publicOpportunityCount > 0 && (
           <span className="text-body-xs text-caption">
             <strong className="text-foreground mr-0.5">{place.publicOpportunityCount}件</strong>

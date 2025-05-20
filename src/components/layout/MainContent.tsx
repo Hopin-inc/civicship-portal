@@ -5,7 +5,6 @@ import { useHeader } from "@/components/providers/HeaderProvider";
 import Header from "@/components/layout/Header";
 import BottomBar from "@/components/layout/BottomBar";
 import AdminBottomBar from "@/components/layout/AdminBottomBar";
-// import { useAnalyticsUserBinding, useAutoPageView } from "@/lib/analytics";
 
 interface MainContentProps {
   children: React.ReactNode;

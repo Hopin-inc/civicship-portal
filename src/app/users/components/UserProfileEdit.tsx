@@ -116,6 +116,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
           </span>
         </Label>
         <ToggleGroup
+          value={location}
           onValueChange={(val) => setLocation(val as GqlCurrentPrefecture)}
           type="single"
           variant="outline"

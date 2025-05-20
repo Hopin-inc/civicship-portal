@@ -6,7 +6,7 @@ import { VIEW_TICKET_CLAIM } from "@/graphql/reward/ticketClaimLink/query";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
+import ErrorState from "@/components/shared/ErrorState";
 import dynamic from "next/dynamic";
 
 const QRCode = dynamic(() => import("react-qr-code"), { ssr: false });
@@ -34,7 +34,7 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
   if (error) {
     return (
       <div className="p-4 pt-16">
-        <ErrorState message="チケット情報の取得に失敗しました" />
+        <ErrorState title="チケット情報の取得に失敗しました" />
       </div>
     );
   }
@@ -43,12 +43,12 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
   if (!ticketClaimLink) {
     return (
       <div className="p-4 pt-16">
-        <ErrorState message="チケットが見つかりません" />
+        <ErrorState title="チケットが見つかりません" />
       </div>
     );
   }
 
-  const qrUrl = typeof window !== 'undefined' 
+  const qrUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/tickets/receive?id=${params.id}`
     : '';
 
@@ -56,14 +56,14 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
     <div className="p-4 pt-16">
       <CardWrapper className="p-4 mb-4">
         <h1 className="text-xl font-bold mb-4">チケットQRコード</h1>
-        
+
         <div className="flex flex-col items-center mb-4">
           <div className="bg-white p-4 rounded-lg mb-2">
             {qrUrl && <QRCode value={qrUrl} size={200} />}
           </div>
           <p className="text-sm text-center text-muted-foreground">{qrUrl}</p>
         </div>
-        
+
         <div className="space-y-2 mt-4">
           <p><span className="font-medium">ステータス:</span> {ticketClaimLink.status}</p>
           <p><span className="font-medium">発行枚数:</span> {ticketClaimLink.qty}</p>

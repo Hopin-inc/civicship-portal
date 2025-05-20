@@ -33,7 +33,8 @@ export type GeneralUserProfile = PublicUserProfile & Partial<PrivateUserProfile>
 
 export type PublicUserProfile = {
   name: string;
-  image: string | null;
+  image: string | File | null;
+  imagePreviewUrl?: string | null;
   bio: string | null;
   currentPrefecture?: GqlCurrentPrefecture;
 

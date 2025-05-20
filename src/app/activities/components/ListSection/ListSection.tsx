@@ -24,7 +24,7 @@ const ActivitiesListSection: React.FC<ActivitiesAllSectionProps> = ({
   return (
     <section className="mt-6 px-6">
       <h2 className="text-display-md">すべての体験</h2>
-      <div className="mt-6 flex flex-wrap gap-4 pb-8">
+      <div className="mt-6 grid grid-cols-2 gap-4 pb-8">
         {opportunities.map((opportunity) => (
           <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} />
         ))}

@@ -42,7 +42,8 @@ export const presenterManagerProfile = (gqlUser: GqlUser): ManagerProfile => {
 export const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
   return {
     name: gqlUser.name,
-    image: gqlUser.image ?? PLACEHOLDER_IMAGE,
+    image: null, // File object is not available from server data
+    imagePreviewUrl: gqlUser.image ?? PLACEHOLDER_IMAGE,
     bio: gqlUser.bio ?? null,
     currentPrefecture: gqlUser.currentPrefecture ?? undefined,
     urlFacebook: gqlUser.urlFacebook ?? null,
