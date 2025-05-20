@@ -23,7 +23,7 @@ const PlaceOpportunities: React.FC<PlaceOpportunitiesProps> = ({ opportunities }
       </div>
       <div className="flex gap-4 overflow-x-auto scrollbar-hide">
         {opportunities.map((opportunity) => (
-          <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} />
+          <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} isCarousel />
         ))}
       </div>
     </div>
