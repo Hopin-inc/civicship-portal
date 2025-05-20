@@ -11,20 +11,20 @@ import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import { toast } from "sonner";
-import { format } from "date-fns";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useSlotParticipations } from "@/hooks/useSlotParticipations";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
-import { MapPin } from "lucide-react";
+import { CalendarIcon, MapPin, User } from "lucide-react";
 import { prefectureLabels } from "@/app/users/data/presenter";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { cn } from "@/lib/utils";
+import { displayDuration } from "@/utils";
 
 export default function SlotDetailPage({ params }: { params: { id: string } }) {
   const { id } = use(params);
   const headerConfig = useMemo(() => ({
-    title: `開催日程詳細`,
+    title: `出欠入力`,
     showLogo: false,
     showBackButton: true,
     backTo: "/admin/slots",
@@ -187,17 +187,21 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="p-4 pt-16">
-      <CardWrapper className="p-4 mb-4">
+    <div className="p-4">
+      <div className="mb-6">
         <h1 className="text-xl font-bold mb-2">{ slot.opportunity?.title || "無題のイベント" }</h1>
-        <div className="space-y-2">
-          <p><span
-            className="font-medium">開催日時:</span> { format(new Date(slot.startsAt || slot.startAt), "yyyy/MM/dd HH:mm") } 〜 { format(new Date(slot.endsAt || slot.endAt), "HH:mm") }
+        <div className="flex flex-col flex-wrap text-body-sm gap-2 mt-4">
+          <p className="inline-flex items-center gap-2 text-body-md">
+            <CalendarIcon size="24" />
+            { slot.startsAt && displayDuration(slot.startsAt, slot.endsAt) }
           </p>
-          <p><span className="font-medium">定員:</span> { slot.capacity }名</p>
-          <p><span className="font-medium">ステータス:</span> { slot.hostingStatus }</p>
+          <p className="inline-flex items-center gap-2 text-body-md">
+            <User size="24" />
+            予約 { slot.capacity - slot.remainingCapacity }名
+            <span className="text-caption">/ 定員 { slot.capacity }名</span>
+          </p>
         </div>
-      </CardWrapper>
+      </div>
 
       <h2 className="text-lg font-bold mb-2">参加者一覧</h2>
       { participations.length === 0 ? (
@@ -213,12 +217,12 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
                   <AvatarFallback>{ participation.user?.name?.[0] || "U" }</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{participation.user?.name || "未設定"}</p>
+                  <p className="font-medium">{ participation.user?.name || "未設定" }</p>
                   <p className="inline-flex items-center gap-1 text-sm text-muted-foreground">
                     <MapPin size="16" />
-                    {participation.user?.currentPrefecture
+                    { participation.user?.currentPrefecture
                       ? prefectureLabels[participation.user.currentPrefecture as GqlCurrentPrefecture]
-                      : "不明"}
+                      : "不明" }
                   </p>
                 </div>
               </div>
@@ -250,7 +254,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
 
           {/* 保存ボタン */ }
           { participations.length > 0 && !isSaved && (
-            <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
+            <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto bg-white border-0 border-t rounded-none">
               <CardFooter className="p-4">
                 <Button
                   className="w-full"
@@ -265,10 +269,10 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
 
           {/* 保存済みの場合に表示するメッセージ */ }
           { participations.length > 0 && isSaved && (
-            <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
+            <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto bg-white border-0 border-t rounded-none">
               <CardFooter className="p-4 flex justify-center">
                 <p className="text-muted-foreground">
-                  出欠情報は保存済みです
+                  出欠情報は確定済みです
                 </p>
               </CardFooter>
             </Card>
