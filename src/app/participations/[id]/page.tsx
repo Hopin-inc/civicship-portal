@@ -6,11 +6,9 @@ import ErrorState from "@/components/shared/ErrorState";
 import useParticipationPage from "@/app/participations/[id]/hooks/useParticipationPage";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import ParticipationStatusNotification from "@/app/participations/[id]/components/ParticipationStatusNotification";
-import ParticipationDetails from "@/app/participations/[id]/components/ParticipationDetails";
 import ParticipationActions from "@/app/participations/[id]/components/ParticipationActions";
 import { toast } from "sonner";
 import { GqlReservationStatus } from "@/types/graphql";
-import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { useParams } from "next/navigation";
 import { errorMessages } from "@/utils/errorMessage";
 import useCancelReservation from "@/app/participations/[id]/hooks/useCancelReservation";
@@ -59,7 +57,7 @@ export default function ParticipationPage() {
 
   // #NOTE: コンポーネントに必要な情報を取得するために、useCompletePageViewModel と useOpportunityDetail を使用しているがリクエストが重複するので、まとめたい
   const { dateTimeInfo } = useCompletePageViewModel(id ?? "", participation?.reservation?.id ?? "");
-  const { opportunity: oppotunityDetail, loading: opportunityLoading } = useOpportunityDetail(
+  const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityDetail(
     opportunity?.id ?? "",
   );
 
@@ -122,8 +120,8 @@ export default function ParticipationPage() {
           />
         </div>
       )}
-      <OpportunityInfo opportunity={oppotunityDetail} />
-      {dateTimeInfo && oppotunityDetail && (
+      <OpportunityInfo opportunity={opportunityDetail} />
+      {dateTimeInfo && opportunityDetail && (
         <div className="px-6 mb-10 mt-8">
           <h2 className="text-label-md font-bold mb-4">予約詳細</h2>
           <ReservationDetails
@@ -132,18 +130,18 @@ export default function ParticipationPage() {
             endTime={dateTimeInfo.endTime}
             participantCount={dateTimeInfo.participantCount}
             totalPrice={dateTimeInfo.totalPrice}
-            pricePerPerson={oppotunityDetail.feeRequired ?? 0}
-            location={oppotunityDetail.place}
+            pricePerPerson={opportunityDetail.feeRequired ?? 0}
+            location={opportunityDetail.place}
           />
         </div>
       )}
-      <div className="px-6">
-        <h2 className="text-label-md font-bold mb-4">メッセージ</h2>
-        {/* #TODO: メッセージの表示を動的にする */}
-        <p className="whitespace-pre-line text-body-md">
-          汚れてもOKな服装でお越しください。当日は12:50に現地集合です。遅れる場合は090-xxxx-xxxxまでご連絡をお願いします。
-        </p>
-      </div>
+      {/*<div className="px-6">*/}
+      {/*  <h2 className="text-label-md font-bold mb-4">メッセージ</h2>*/}
+      {/*  /!* #TODO: メッセージの表示を動的にする *!/*/}
+      {/*  <p className="whitespace-pre-line text-body-md">*/}
+      {/*    汚れてもOKな服装でお越しください。当日は12:50に現地集合です。遅れる場合は090-xxxx-xxxxまでご連絡をお願いします。*/}
+      {/*  </p>*/}
+      {/*</div>*/}
       {currentStatus &&
         currentStatus?.status !== "REJECTED" &&
         currentStatus?.status !== "CANCELED" && (
