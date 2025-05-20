@@ -58,14 +58,19 @@ export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
             return prev;
           }
 
+          const existingSlotIds = new Set(
+            prev.opportunitySlots.edges.map((edge: any) => edge.node.id)
+          );
+          
+          const newEdges = fetchMoreResult.opportunitySlots.edges.filter(
+            (edge: any) => !existingSlotIds.has(edge.node.id)
+          );
+
           return {
             ...prev,
             opportunitySlots: {
               ...prev.opportunitySlots,
-              edges: [
-                ...prev.opportunitySlots.edges,
-                ...fetchMoreResult.opportunitySlots.edges,
-              ],
+              edges: [...prev.opportunitySlots.edges, ...newEdges],
               pageInfo: fetchMoreResult.opportunitySlots.pageInfo,
             },
           };
