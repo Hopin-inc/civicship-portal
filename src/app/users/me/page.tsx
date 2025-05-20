@@ -11,45 +11,51 @@ import ErrorState from "@/components/shared/ErrorState";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
-
   const router = useRouter();
-  const { user: currentUser, isAuthenticating } = useAuth();
 
+  const { user: currentUser, isAuthenticating } = useAuth();
   const { userData, isLoading, error, refetch } = useUserProfile(currentUser?.id);
+
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  // 認証完了後、未ログイン状態ならリダイレクト
+  // リダイレクト済みフラグで多重 push を防止
+  const hasRedirectedRef = useRef(false);
   useEffect(() => {
-    if (!isAuthenticating && !currentUser) {
+    if (!isAuthenticating && !currentUser && !hasRedirectedRef.current) {
+      hasRedirectedRef.current = true;
       router.push("/login?next=/users/me");
     }
   }, [currentUser, isAuthenticating, router]);
 
-  // 認証中の間はローディング
-  if (isAuthenticating) {
+  // 認証中 or リダイレクト待ち → ローディング表示
+  if (isAuthenticating || (!currentUser && !hasRedirectedRef.current)) {
     return <LoadingIndicator />;
   }
 
-  // 未ログインで useEffect によりリダイレクト中
+  // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
   if (!currentUser) {
     return null;
   }
 
+  // データ取得中
   if (isLoading) {
     return <LoadingIndicator />;
   }
 
+  // エラー
   if (error) {
     return <ErrorState title={"マイページを読み込めませんでした"} refetchRef={refetchRef} />;
   }
 
+  // データがない → notFound()
   if (!userData) {
     return notFound();
   }
 
+  // 正常表示
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">
       <UserProfileSection
