@@ -50,3 +50,7 @@
 //
 //   return data.membership ?? null;
 // }
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}

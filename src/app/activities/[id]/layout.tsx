@@ -16,7 +16,6 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  //TODO COMMUNITY_IDを動的にかえる
   const id = params.id;
   const res = await fetchOpportunity(id, COMMUNITY_ID);
 

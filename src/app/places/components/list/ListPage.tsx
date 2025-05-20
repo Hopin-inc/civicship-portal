@@ -16,7 +16,7 @@ const PlaceListPage: React.FC<PlaceListSheetProps> = ({ places, selectedPlaceId,
   const router = useRouter();
 
   const handlePlaceClick = (placeId: string, userId: string) => {
-    router.push(`/places/${placeId}?userId=${userId}`);
+    router.push(`/places/${placeId}?user_id=${userId}`);
   };
 
   return (
