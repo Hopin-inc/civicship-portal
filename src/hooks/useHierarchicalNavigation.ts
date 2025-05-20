@@ -154,8 +154,15 @@ export const useHierarchicalNavigation = () => {
   );
 
   const navigateBack = useCallback(() => {
-    const parentPath = getParentPath();
-    router.push(parentPath);
+    // Check if there's a history to go back to
+    if (window.history.length > 1) {
+      // Use the browser's history API to go back
+      window.history.back();
+    } else {
+      // Fall back to the parent path if there's no history
+      const parentPath = getParentPath();
+      router.push(parentPath);
+    }
   }, [getParentPath, router]);
 
   return {
