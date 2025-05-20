@@ -76,6 +76,7 @@ export const GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS = gql`
             id
             name
             image
+            currentPrefecture
           }
           evaluation {
             id

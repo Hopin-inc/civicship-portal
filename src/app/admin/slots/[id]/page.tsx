@@ -16,6 +16,9 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useSlotParticipations } from "@/hooks/useSlotParticipations";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
+import { MapPin } from "lucide-react";
+import { prefectureLabels } from "@/app/users/data/presenter";
+import { GqlCurrentPrefecture } from "@/types/graphql";
 import { cn } from "@/lib/utils";
 
 export default function SlotDetailPage({ params }: { params: { id: string } }) {
@@ -210,8 +213,13 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
                   <AvatarFallback>{ participation.user?.name?.[0] || "U" }</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{ participation.user?.name || "未設定" }</p>
-                  <p className="text-sm text-muted-foreground">ID: { participation.user?.id }</p>
+                  <p className="font-medium">{participation.user?.name || "未設定"}</p>
+                  <p className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                    <MapPin size="16" />
+                    {participation.user?.currentPrefecture
+                      ? prefectureLabels[participation.user.currentPrefecture as GqlCurrentPrefecture]
+                      : "不明"}
+                  </p>
                 </div>
               </div>
               <ToggleGroup
