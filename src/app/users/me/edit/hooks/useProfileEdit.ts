@@ -66,10 +66,10 @@ const useProfileEdit = () => {
     if (!file) return;
 
     const imageUrl = URL.createObjectURL(file);
-    setProfile((prev) => ({ 
-      ...prev, 
+    setProfile((prev) => ({
+      ...prev,
       image: file,
-      imagePreviewUrl: imageUrl 
+      imagePreviewUrl: imageUrl
     }));
   };
 
@@ -93,7 +93,7 @@ const useProfileEdit = () => {
         variables: {
           input: {
             name: profile.name,
-            image: profile.image instanceof File && profile.image.size > 0 && profile.image.name ? 
+            image: profile.image instanceof File && profile.image.size > 0 ?
               { file: profile.image } : undefined,
             bio: profile.bio ?? "",
             currentPrefecture: profile.currentPrefecture,

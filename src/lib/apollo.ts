@@ -9,13 +9,14 @@ import {
 import { onError } from "@apollo/client/link/error";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { __DEV__ } from "@apollo/client/utilities/globals";
+import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
 if (__DEV__) {
   loadDevMessages();
   loadErrorMessages();
 }
 
-const httpLink = createHttpLink({
+const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
   credentials: "same-origin",
 });
@@ -28,7 +29,7 @@ const requestLink = new ApolloLink((operation, forward) => {
   const phoneAuthToken = cookies.find((e) => e.startsWith("phone_auth_token"))?.split("=").pop();
   const phoneRefreshToken = cookies.find((e) => e.startsWith("phone_refresh_token"))?.split("=").pop();
   const phoneTokenExpiresAt = cookies.find((e) => e.startsWith("phone_token_expires_at"))?.split("=").pop();
-  
+
   operation.setContext(({ headers = {} }) => ({
     headers: {
       ...headers,
@@ -48,7 +49,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
   if (graphQLErrors) {
     for (const error of graphQLErrors) {
       console.log(`[GraphQL error]: Message: ${error.message}, Location: ${error.locations}, Path: ${error.path}`);
-      
+
       if (
         error.message.includes("Authentication required") ||
         error.message.includes("Invalid token") ||
@@ -63,10 +64,10 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
       }
     }
   }
-  
+
   if (networkError) {
     console.log(`[Network error]: ${networkError}`);
-    
+
     if ('statusCode' in networkError && networkError.statusCode === 401) {
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('auth:token-expired', {
