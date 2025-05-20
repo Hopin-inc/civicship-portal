@@ -8,12 +8,13 @@ import {
 } from "@/types/graphql";
 import { apolloClient } from "@/lib/apollo";
 import { fallbackMetadata } from "@/lib/metadata/notFound";
+import React from "react";
 
-export const generateMetadata = async ({
-  params,
-}: {
+type Props = {
   params: { id: string };
-}): Promise<Metadata> => {
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   //TODO COMMUNITY_IDを動的にかえる
   const id = params.id;
   const res = await fetchArticle(id, COMMUNITY_ID);
@@ -36,7 +37,7 @@ export const generateMetadata = async ({
       ],
     },
   };
-};
+}
 
 async function fetchArticle(id: string, communityId: string): Promise<GqlArticle | null> {
   const { data } = await apolloClient.query<GqlGetArticleQuery, GqlGetArticleQueryVariables>({
@@ -45,4 +46,8 @@ async function fetchArticle(id: string, communityId: string): Promise<GqlArticle
   });
 
   return data.article ?? null;
+}
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }
