@@ -493,8 +493,8 @@ export type GqlMembershipParticipationLocation = {
   latitude: Scalars["Decimal"]["output"];
   longitude: Scalars["Decimal"]["output"];
   placeId: Scalars["ID"]["output"];
-  placeImage: Scalars["String"]["output"];
-  placeName: Scalars["String"]["output"];
+  placeImage?: Maybe<Scalars["String"]["output"]>;
+  placeName?: Maybe<Scalars["String"]["output"]>;
 };
 
 export type GqlMembershipParticipationView = {
@@ -2452,8 +2452,8 @@ export type GqlHostedGeoFieldsFragment = {
   geo: Array<{
     __typename?: "MembershipParticipationLocation";
     placeId: string;
-    placeName: string;
-    placeImage: string;
+    placeName?: string | null;
+    placeImage?: string | null;
     latitude: any;
     longitude: any;
     address: string;
@@ -2482,8 +2482,8 @@ export type GqlGetSingleMembershipQuery = {
         geo: Array<{
           __typename?: "MembershipParticipationLocation";
           placeId: string;
-          placeName: string;
-          placeImage: string;
+          placeName?: string | null;
+          placeImage?: string | null;
           latitude: any;
           longitude: any;
           address: string;
@@ -2582,8 +2582,8 @@ export type GqlGetMembershipListQuery = {
             geo: Array<{
               __typename?: "MembershipParticipationLocation";
               placeId: string;
-              placeName: string;
-              placeImage: string;
+              placeName?: string | null;
+              placeImage?: string | null;
               latitude: any;
               longitude: any;
               address: string;

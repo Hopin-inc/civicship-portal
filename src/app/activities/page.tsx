@@ -13,12 +13,6 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
 
-const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
-  edges
-    .map((edge) => edge.node)
-    .filter((node): node is GqlOpportunity => !!node)
-    .map(presenterActivityCard);
-
 export default function ActivitiesPage() {
   const headerConfig = useMemo(
     () => ({
@@ -72,3 +66,9 @@ export default function ActivitiesPage() {
     </div>
   );
 }
+
+const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
+  edges
+    .map((edge) => edge.node)
+    .filter((node): node is GqlOpportunity => !!node)
+    .map(presenterActivityCard);
