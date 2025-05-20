@@ -1,11 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
-import { useGetMembershipListQuery } from "@/types/graphql";
-import { presenterBaseCard } from "@/app/places/data/presenter/membership";
+import { GqlPlaceEdge, useGetPlacesQuery } from "@/types/graphql";
+import { presenterPlaceCard } from "@/app/places/data/presenter";
 
 export default function usePlaceCards() {
-  const { data, loading, error, refetch } = useGetMembershipListQuery({
+  const { data, loading, error, refetch } = useGetPlacesQuery({
     variables: {
       filter: {},
       first: 50,
@@ -15,15 +15,12 @@ export default function usePlaceCards() {
     nextFetchPolicy: "cache-first",
   });
 
-  const memberships = useMemo(
-    () => data?.memberships?.edges?.flatMap((edge) => (edge?.node ? [edge.node] : [])) ?? [],
-    [data?.memberships?.edges],
+  const placeEdges: GqlPlaceEdge[] = (data?.places?.edges ?? []).filter(
+    (e): e is GqlPlaceEdge => e != null && e.node != null,
   );
-
-  const baseCards = useMemo(() => presenterBaseCard(memberships), [memberships]);
+  const baseCards = useMemo(() => presenterPlaceCard(placeEdges), [placeEdges]);
 
   return {
-    memberships,
     baseCards,
     loading,
     error: error ?? null,

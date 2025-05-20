@@ -2,12 +2,12 @@
 
 import React, { FC, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BaseCardInfo } from "@/app/places/data/type";
+import { IPlaceCard } from "@/app/places/data/type";
 import useEmblaCarousel from "embla-carousel-react";
 import PlaceCard from "@/app/places/components/Card";
 
 interface PlaceCardsSheetProps {
-  places: BaseCardInfo[];
+  places: IPlaceCard[];
   selectedPlaceId: string | null;
   onPlaceSelect: (placeId: string) => void;
 }

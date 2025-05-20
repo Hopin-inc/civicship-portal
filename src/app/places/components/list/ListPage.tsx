@@ -1,13 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { BaseCardInfo } from "@/app/places/data/type";
 import React from "react";
 import PlaceToggleButton from "@/app/places/components/ToggleButton";
 import PlaceCard from "@/app/places/components/Card";
+import { IPlaceCard } from "@/app/places/data/type";
 
 interface PlaceListSheetProps {
-  places: BaseCardInfo[];
+  places: IPlaceCard[];
   selectedPlaceId?: string | null;
   onMapClick: () => void;
 }
