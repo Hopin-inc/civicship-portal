@@ -242,7 +242,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
                 onValueChange={ (value) => {
                   if (value) handleAttendanceChange(participation.id, value);
                 } }
-                disabled={ isSaved || isSaving || passLoading || failLoading || participation.evaluation?.status === "PASSED" || participation.evaluation?.status === "FAILED" }
+                disabled={ isSaved || isSaving || passLoading || failLoading || participation.evaluation !== null && participation.evaluation !== undefined }
               >
                 <ToggleGroupItem value="PASSED" aria-label="参加">
                   参加
