@@ -13,7 +13,7 @@ export interface UseOpportunitySlotsResult {
 }
 
 export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
-  const now = useMemo(() => new Date(2025, 5, 30), []);
+  const now = useMemo(() => new Date(), []);
   const isLoadingMore = useRef(false);
 
   const {
