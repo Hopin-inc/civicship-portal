@@ -13,7 +13,16 @@ const DEFAULT_ICONS: Metadata["icons"] = {
   ],
 };
 
-const DEFAULT_OGP: Metadata["openGraph"] = {
+const DEFAULT_OPEN_GRAPH_IMAGE = [
+  {
+    url: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
+    width: 1200,
+    height: 630,
+    alt: DEFAULT_TITLE,
+  },
+];
+
+const DEFAULT_OPEN_GRAPH: Metadata["openGraph"] = {
   title: DEFAULT_TITLE,
   description: DEFAULT_DESCRIPTION,
   url: "https://www.neo88.app",
@@ -30,4 +39,10 @@ const DEFAULT_OGP: Metadata["openGraph"] = {
   type: "website",
 };
 
-export { DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_ICONS, DEFAULT_OGP };
+export {
+  DEFAULT_TITLE,
+  DEFAULT_DESCRIPTION,
+  DEFAULT_ICONS,
+  DEFAULT_OPEN_GRAPH_IMAGE,
+  DEFAULT_OPEN_GRAPH,
+};

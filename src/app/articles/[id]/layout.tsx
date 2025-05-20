@@ -9,6 +9,7 @@ import {
 import { apolloClient } from "@/lib/apollo";
 import { fallbackMetadata } from "@/lib/metadata/notFound";
 import React from "react";
+import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
 
 type Props = {
   params: { id: string };
@@ -25,16 +26,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: res.title,
     description: res.introduction ?? res.body,
     openGraph: {
+      type: "article",
       title: res.title,
       description: res.introduction ?? res.body,
-      images: [
-        {
-          url: res.thumbnail ?? "",
-          width: 1200,
-          height: 630,
-          alt: res.title,
-        },
-      ],
+      images: res.thumbnail
+        ? [
+            {
+              url: res.thumbnail,
+              width: 1200,
+              height: 630,
+              alt: res.title,
+            },
+          ]
+        : DEFAULT_OPEN_GRAPH_IMAGE,
     },
   };
 }
