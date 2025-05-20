@@ -18,7 +18,7 @@ import {
   QuestField,
 } from "@/app/participations/[id]/data/type";
 import { ReservationStatus } from "@/types/participationStatus";
-import { presenterPlace } from "@/app/places/data/presenter/place";
+import { presenterPlace } from "@/app/places/data/presenter";
 import { presenterOpportunityHost } from "@/app/activities/data/presenter";
 
 export const presenterParticipation = (raw: GqlParticipation): ParticipationDetail => {
