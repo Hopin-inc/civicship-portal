@@ -101,7 +101,7 @@ function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
 
   const location = searchParams.location as GqlCurrentPrefecture;
   if (location && IPrefectureCodeMap[location]) {
-    filter.cityCodes = [IPrefectureCodeMap[location]];
+    filter.stateCodes = [IPrefectureCodeMap[location]];
   }
 
   if (searchParams.from || searchParams.to) {
