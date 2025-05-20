@@ -198,9 +198,18 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
       {participations.length === 0 ? (
         <p className="text-center text-muted-foreground py-8">参加者が見つかりません</p>
       ) : (
-        <div className="space-y-4">
-          {participations.map((participation: any) => (
-            <CardWrapper key={participation.id} className="p-4">
+        <div>
+          {participations.map((participation: any, index: number) => (
+            <CardWrapper 
+              key={participation.id} 
+              className={`p-4 ${
+                index === 0 
+                  ? 'rounded-t-xl' 
+                  : index === participations.length - 1 
+                    ? 'rounded-b-xl border-t-0' 
+                    : 'rounded-none border-t-0'
+              }`}
+            >
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-3">
                   <Avatar>
