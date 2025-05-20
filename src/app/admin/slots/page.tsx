@@ -3,13 +3,13 @@
 import React, { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import { format } from "date-fns";
 import { useOpportunitySlots } from "@/hooks/useOpportunitySlots";
 import { Badge } from "@/components/ui/badge";
+import { Bookmark, CalendarIcon, Users, BarChart } from "lucide-react";
 
 export default function SlotsPage() {
   const headerConfig = useMemo(() => ({
@@ -75,15 +75,11 @@ export default function SlotsPage() {
               const evaluationProgress = getEvaluationProgress(slot);
               return (
                 <Link key={slot.id} href={`/admin/slots/${slot.id}`}>
-                  <CardWrapper className="p-4 cursor-pointer">
+                  <CardWrapper className="p-4 cursor-pointer" clickable>
                     <div className="flex flex-col space-y-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h2 className="font-semibold">{slot.opportunity?.title || '無題のイベント'}</h2>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(slot.startsAt || slot.startAt), 'yyyy/MM/dd HH:mm')} 〜 {format(new Date(slot.endsAt || slot.endAt), 'HH:mm')}
-                          </p>
-                        </div>
+                      {/* Header with title and status badge */}
+                      <div className="flex items-center justify-between">
+                        <h2 className="font-semibold">{slot.opportunity?.title || '無題のイベント'}</h2>
                         <Badge variant={slot.hostingStatus === "COMPLETED" ? "success" :
                                         slot.hostingStatus === "CANCELLED" ? "destructive" :
                                         "secondary"}>
@@ -91,19 +87,28 @@ export default function SlotsPage() {
                         </Badge>
                       </div>
 
-                      <div className="text-sm space-y-1">
-                        <p>
-                          <span className="font-medium">定員:</span> {slot.capacity}名
-                          ({slot.capacity - slot.remainingCapacity}/{slot.capacity})
+                      {/* Slot information with icons */}
+                      <div className="flex flex-col flex-wrap text-body-sm gap-1">
+                        <p className="inline-flex items-center gap-1">
+                          <Bookmark size="16" />
+                          {slot.opportunity?.title || '無題のイベント'}
                         </p>
-                        <p>
-                          <span className="font-medium">出欠管理:</span> {evaluationProgress.evaluated}/{evaluationProgress.total}名
-                          ({evaluationProgress.progress}%)
+                        <p className="inline-flex items-center gap-1">
+                          <CalendarIcon size="16" />
+                          {format(new Date(slot.startsAt || slot.startAt), 'yyyy/MM/dd HH:mm')} 〜 {format(new Date(slot.endsAt || slot.endAt), 'HH:mm')}
                         </p>
-                      </div>
-
-                      <div className="flex justify-end">
-                        <Button variant="secondary" size="sm">詳細</Button>
+                        <div className="flex flex-wrap text-body-sm gap-x-4 gap-y-1">
+                          <p className="inline-flex items-center gap-1">
+                            <Users size="16" />
+                            定員: {slot.capacity}名
+                            ({slot.capacity - slot.remainingCapacity}/{slot.capacity})
+                          </p>
+                          <p className="inline-flex items-center gap-1">
+                            <BarChart size="16" />
+                            出欠管理: {evaluationProgress.evaluated}/{evaluationProgress.total}名
+                            ({evaluationProgress.progress}%)
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </CardWrapper>
