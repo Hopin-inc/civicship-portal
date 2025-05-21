@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { IPlaceCard } from "@/app/places/data/type";
 import useEmblaCarousel from "embla-carousel-react";
@@ -21,6 +21,23 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  // 選択されたカードのインデックスを取得
+  const initialSelectedIndex = useMemo(() => {
+    if (!selectedPlaceId) return 0;
+    const index = places.findIndex((place) => place.id === selectedPlaceId);
+    return index >= 0 ? index : 0;
+  }, [places, selectedPlaceId]);
+
+  // 初期化時に選択されたカードにスクロール
+  useEffect(() => {
+    if (!emblaApi || !selectedPlaceId) return;
+
+    const index = places.findIndex((place) => place.id === selectedPlaceId);
+    if (index >= 0) {
+      emblaApi.scrollTo(index, false); // アニメーションなしで即座にスクロール
+    }
+  }, [emblaApi, places, selectedPlaceId]);
 
   useEffect(() => {
     if (!emblaApi) return;
