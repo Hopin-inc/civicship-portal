@@ -2,13 +2,42 @@ import { BasePin, BaseCardInfo } from "@/app/places/data/type";
 
 export const defaultImageUrl = "https://via.placeholder.com/200";
 
+// 影の設定を行う共通関数
+const setShadow = (ctx: CanvasRenderingContext2D, enabled: boolean = true) => {
+  if (enabled) {
+    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 2;
+  } else {
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+  }
+};
+
+// 円を描画する共通関数
+const drawCircle = (
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  radius: number,
+  color: string,
+) => {
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
+  ctx.fillStyle = color;
+  ctx.fill();
+};
+
 export const drawCircleWithImage = async (
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
   cx: number,
   cy: number,
   radius: number,
-  isMainImage: boolean
+  isMainImage: boolean,
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     const loadImage = (src: string) => {
@@ -18,22 +47,14 @@ export const drawCircleWithImage = async (
 
     img.onload = () => {
       try {
-        const gradient = ctx.createRadialGradient(
-          cx,
-          cy,
-          radius - 2,
-          cx,
-          cy,
-          radius + 2
-        );
-        gradient.addColorStop(0, "#FFFFFF");
-        gradient.addColorStop(1, "#EEEEEE");
+        // 影付きの白い外枠を描画
+        setShadow(ctx, true);
+        drawCircle(ctx, cx, cy, radius + 4, "#FFFFFF");
 
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius + 2, 0, 2 * Math.PI);
-        ctx.fillStyle = gradient;
-        ctx.fill();
+        // 影をクリア
+        setShadow(ctx, false);
 
+        // 画像を描画
         ctx.save();
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
@@ -63,7 +84,7 @@ export const drawCircleWithImage = async (
           cx - imgSize / 2,
           cy - imgSize / 2,
           imgSize,
-          imgSize
+          imgSize,
         );
 
         ctx.restore();
@@ -78,10 +99,15 @@ export const drawCircleWithImage = async (
         loadImage(defaultImageUrl);
       } else {
         try {
-          ctx.beginPath();
-          ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
-          ctx.fillStyle = isMainImage ? "#F0F0F0" : "#E0E0E0";
-          ctx.fill();
+          // 影付きの白い外枠を描画
+          setShadow(ctx, true);
+          drawCircle(ctx, cx, cy, radius + 4, "#FFFFFF");
+
+          // 影をクリア
+          setShadow(ctx, false);
+
+          // プレースホルダー円を描画
+          drawCircle(ctx, cx, cy, radius, isMainImage ? "#F0F0F0" : "#E0E0E0");
           resolve();
         } catch (error) {
           reject(error);
@@ -93,7 +119,9 @@ export const drawCircleWithImage = async (
   });
 };
 
-export const processMapData = (places: BaseCardInfo[]): {
+export const processMapData = (
+  places: BaseCardInfo[],
+): {
   markers: BasePin[];
   places: BasePin[];
 } => {
