@@ -82,7 +82,7 @@ export default function ReservationDetailPage({ params }: { params: { id: string
         variables: {
           id: data?.reservation?.opportunitySlot?.id,
           input: {
-            hostingStatus: "CANCELLED",
+            status: "CANCELLED",
           },
           permission: {
             opportunityId: data?.reservation?.opportunitySlot?.opportunity?.id,
