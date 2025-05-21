@@ -52,7 +52,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory, showUs
               <div className="flex items-center gap-x-1">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                   <Image
-                    src={article.author?.image || "/placeholder.png"}
+                    src={article.author?.image || PLACEHOLDER_IMAGE}
                     alt={article.author?.name || "作者"}
                     fill
                     className="object-cover"

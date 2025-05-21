@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useReadMore } from "@/hooks/useReadMore";
 import Link from "next/link";
 import IconWrapper from "@/components/shared/IconWrapper";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
@@ -103,7 +104,7 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
         <div className="flex items-center gap-4">
           <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
             <Image
-              src={host.image || "/placeholder.png"}
+              src={host.image || PLACEHOLDER_IMAGE}
               alt={host.name || "案内者"}
               fill
               className="object-cover"
