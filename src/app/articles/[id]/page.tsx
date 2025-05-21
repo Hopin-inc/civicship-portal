@@ -16,8 +16,9 @@ export default function ArticlePage() {
 
   const headerConfig = useMemo(
     () => ({
-      title: article?.title,
-      hideHeader: true,
+      title: `${article?.authors?.[0]?.name}さんの記事`,
+      showLogo: false,
+      showBackButton: true,
     }),
     [article],
   );
