@@ -29,15 +29,13 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
     return index >= 0 ? index : 0;
   }, [places, selectedPlaceId]);
 
-  // 初期化時に選択されたカードにスクロール
   useEffect(() => {
-    if (!emblaApi || !selectedPlaceId) return;
+    if (!emblaApi) return;
 
-    const index = places.findIndex((place) => place.id === selectedPlaceId);
-    if (index >= 0) {
-      emblaApi.scrollTo(index, false); // アニメーションなしで即座にスクロール
+    if (initialSelectedIndex >= 0) {
+      emblaApi.scrollTo(initialSelectedIndex, false);
     }
-  }, [emblaApi, places, selectedPlaceId]);
+  }, [emblaApi, initialSelectedIndex]);
 
   useEffect(() => {
     if (!emblaApi) return;
