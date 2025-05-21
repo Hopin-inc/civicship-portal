@@ -1,13 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { BaseCardInfo } from "@/app/places/data/type";
 import React from "react";
 import PlaceToggleButton from "@/app/places/components/ToggleButton";
 import PlaceCard from "@/app/places/components/Card";
+import { IPlaceCard } from "@/app/places/data/type";
 
 interface PlaceListSheetProps {
-  places: BaseCardInfo[];
+  places: IPlaceCard[];
   selectedPlaceId?: string | null;
   onMapClick: () => void;
 }
@@ -15,8 +15,8 @@ interface PlaceListSheetProps {
 const PlaceListPage: React.FC<PlaceListSheetProps> = ({ places, selectedPlaceId, onMapClick }) => {
   const router = useRouter();
 
-  const handlePlaceClick = (placeId: string, userId: string) => {
-    router.push(`/places/${placeId}?user_id=${userId}`);
+  const handlePlaceClick = (placeId: string) => {
+    router.push(`/places/${placeId}`);
   };
 
   return (
@@ -29,7 +29,7 @@ const PlaceListPage: React.FC<PlaceListSheetProps> = ({ places, selectedPlaceId,
               key={place.id}
               place={place}
               selected={place.id === selectedPlaceId}
-              onClick={() => handlePlaceClick(place.id, place.host.id)}
+              onClick={() => handlePlaceClick(place.id)}
             />
           ))}
       </div>

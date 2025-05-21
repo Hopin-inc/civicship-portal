@@ -2,33 +2,20 @@
 
 import { useEffect, useMemo } from "react";
 import { useLoading } from "@/hooks/useLoading";
-import { useGetSingleMembershipQuery } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/utils";
-import { presenterBaseDetail } from "@/app/places/data/presenter/membership";
-import { presenterArticleWithAuthor } from "@/app/articles/data/presenter";
-import { presenterActivityCard } from "@/app/activities/data/presenter";
-import type { BaseDetail } from "@/app/places/data/type";
-import type { ActivityCard } from "@/app/activities/data/type";
-import { TArticleWithAuthor } from "@/app/articles/data/type";
+import { useGetPlaceQuery } from "@/types/graphql";
+import { IPlaceDetail } from "@/app/places/data/type";
+import { presenterPlaceDetail } from "@/app/places/data/presenter";
 
 export interface UsePlaceDetailResult {
-  detail: BaseDetail | null;
-  opportunities: ActivityCard[];
-  featuredArticle: TArticleWithAuthor | null;
+  place: IPlaceDetail | null;
   loading: boolean;
   error: Error | null;
   refetch: () => void;
 }
 
-export const usePlaceDetail = ({
-  placeId,
-  userId,
-}: {
-  placeId: string;
-  userId: string;
-}): UsePlaceDetailResult => {
-  const { data, loading, error, refetch } = useGetSingleMembershipQuery({
-    variables: { communityId: COMMUNITY_ID, userId },
+export const usePlaceDetail = (placeId: string): UsePlaceDetailResult => {
+  const { data, loading, error, refetch } = useGetPlaceQuery({
+    variables: { id: placeId },
   });
 
   const { setIsLoading } = useLoading();
@@ -37,26 +24,13 @@ export const usePlaceDetail = ({
     setIsLoading(loading);
   }, [loading, setIsLoading]);
 
-  const membership = data?.membership;
-  const user = membership?.user;
-
-  const detail = useMemo(() => {
-    return membership ? presenterBaseDetail(membership, placeId) : null;
-  }, [membership, placeId]);
-
-  const opportunities = useMemo(() => {
-    return user?.opportunitiesCreatedByMe?.map(presenterActivityCard) || [];
-  }, [user]);
-
-  const featuredArticle = useMemo(() => {
-    const article = user?.articlesAboutMe?.[0];
-    return article ? presenterArticleWithAuthor(article) : null;
-  }, [user]);
+  const place = useMemo(() => {
+    const place = data?.place;
+    return place ? presenterPlaceDetail(place) : null;
+  }, [data]);
 
   return {
-    detail,
-    opportunities,
-    featuredArticle,
+    place,
     loading,
     error: error ?? null,
     refetch,

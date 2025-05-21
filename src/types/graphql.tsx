@@ -1273,10 +1273,12 @@ export type GqlParticipationsConnection = {
 
 export type GqlPlace = {
   __typename?: "Place";
+  accumulatedParticipants?: Maybe<Scalars["Int"]["output"]>;
   address: Scalars["String"]["output"];
   city?: Maybe<GqlCity>;
   community?: Maybe<GqlCommunity>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  currentPublicOpportunityCount?: Maybe<Scalars["Int"]["output"]>;
   googlePlaceId?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
@@ -4102,18 +4104,145 @@ export type GqlPlaceFieldsFragment = {
   } | null;
 };
 
-export type GqlGetPlacesQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetPlacesQueryVariables = Exact<{
+  filter?: InputMaybe<GqlPlaceFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  sort?: InputMaybe<GqlPlaceSortInput>;
+  IsCard?: Scalars["Boolean"]["input"];
+}>;
 
 export type GqlGetPlacesQuery = {
   __typename?: "Query";
   places: {
     __typename?: "PlacesConnection";
     totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
     edges?: Array<{
       __typename?: "PlaceEdge";
-      node?: { __typename?: "Place"; id: string; name: string } | null;
+      cursor: string;
+      node?: {
+        __typename?: "Place";
+        accumulatedParticipants?: number | null;
+        currentPublicOpportunityCount?: number | null;
+        id: string;
+        name: string;
+        address: string;
+        latitude: any;
+        longitude: any;
+        opportunities?: Array<{
+          __typename?: "Opportunity";
+          id: string;
+          images?: Array<string> | null;
+          createdByUser?: {
+            __typename?: "User";
+            image?: string | null;
+            articlesAboutMe?: Array<{
+              __typename?: "Article";
+              title: string;
+              introduction: string;
+              thumbnail?: any | null;
+            }> | null;
+          } | null;
+        }> | null;
+        city?: {
+          __typename?: "City";
+          code: string;
+          name: string;
+          state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
+        } | null;
+      } | null;
     } | null> | null;
   };
+};
+
+export type GqlGetPlaceQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetPlaceQuery = {
+  __typename?: "Query";
+  place?: {
+    __typename?: "Place";
+    id: string;
+    name: string;
+    address: string;
+    latitude: any;
+    longitude: any;
+    opportunities?: Array<{
+      __typename?: "Opportunity";
+      id: string;
+      title: string;
+      description: string;
+      body?: string | null;
+      images?: Array<string> | null;
+      category: GqlOpportunityCategory;
+      publishStatus: GqlPublishStatus;
+      isReservableWithTicket?: boolean | null;
+      requireApproval: boolean;
+      feeRequired?: number | null;
+      pointsToEarn?: number | null;
+      earliestReservableAt?: Date | null;
+      createdByUser?: {
+        __typename?: "User";
+        id: string;
+        name: string;
+        image?: string | null;
+        bio?: string | null;
+        currentPrefecture?: GqlCurrentPrefecture | null;
+        phoneNumber?: string | null;
+        urlFacebook?: string | null;
+        urlInstagram?: string | null;
+        urlX?: string | null;
+        articlesAboutMe?: Array<{
+          __typename?: "Article";
+          id: string;
+          title: string;
+          body?: string | null;
+          introduction: string;
+          thumbnail?: any | null;
+          category: GqlArticleCategory;
+          publishStatus: GqlPublishStatus;
+          publishedAt?: Date | null;
+        }> | null;
+      } | null;
+      articles?: Array<{
+        __typename?: "Article";
+        id: string;
+        title: string;
+        body?: string | null;
+        introduction: string;
+        thumbnail?: any | null;
+        category: GqlArticleCategory;
+        publishStatus: GqlPublishStatus;
+        publishedAt?: Date | null;
+        authors?: Array<{
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
+          urlFacebook?: string | null;
+          urlInstagram?: string | null;
+          urlX?: string | null;
+        }> | null;
+      }> | null;
+    }> | null;
+    city?: {
+      __typename?: "City";
+      code: string;
+      name: string;
+      state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
+    } | null;
+  } | null;
 };
 
 export type GqlTicketFieldsFragment = {
@@ -7196,17 +7325,44 @@ export type GetReservationQueryResult = Apollo.QueryResult<
   GqlGetReservationQueryVariables
 >;
 export const GetPlacesDocument = gql`
-  query GetPlaces {
-    places {
-      edges {
-        node {
-          id
-          name
-        }
+  query GetPlaces(
+    $filter: PlaceFilterInput
+    $first: Int
+    $cursor: String
+    $sort: PlaceSortInput
+    $IsCard: Boolean! = false
+  ) {
+    places(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
       }
       totalCount
+      edges {
+        cursor
+        node {
+          ...PlaceFields
+          accumulatedParticipants @include(if: $IsCard)
+          currentPublicOpportunityCount @include(if: $IsCard)
+          opportunities {
+            id
+            images
+            createdByUser {
+              image
+              articlesAboutMe @include(if: $IsCard) {
+                title
+                introduction
+                thumbnail
+              }
+            }
+          }
+        }
+      }
     }
   }
+  ${PlaceFieldsFragmentDoc}
 `;
 
 /**
@@ -7221,6 +7377,11 @@ export const GetPlacesDocument = gql`
  * @example
  * const { data, loading, error } = useGetPlacesQuery({
  *   variables: {
+ *      filter: // value for 'filter'
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
+ *      sort: // value for 'sort'
+ *      IsCard: // value for 'IsCard'
  *   },
  * });
  */
@@ -7258,6 +7419,81 @@ export type GetPlacesQueryResult = Apollo.QueryResult<
   GqlGetPlacesQuery,
   GqlGetPlacesQueryVariables
 >;
+export const GetPlaceDocument = gql`
+  query GetPlace($id: ID!) {
+    place(id: $id) {
+      ...PlaceFields
+      opportunities {
+        ...OpportunityFields
+        createdByUser {
+          ...UserFields
+          articlesAboutMe {
+            ...ArticleFields
+          }
+        }
+        articles {
+          ...ArticleFields
+          authors {
+            ...UserFields
+          }
+        }
+      }
+    }
+  }
+  ${PlaceFieldsFragmentDoc}
+  ${OpportunityFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+  ${ArticleFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetPlaceQuery__
+ *
+ * To run a query within a React component, call `useGetPlaceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPlaceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPlaceQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetPlaceQuery(
+  baseOptions: Apollo.QueryHookOptions<GqlGetPlaceQuery, GqlGetPlaceQueryVariables> &
+    ({ variables: GqlGetPlaceQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetPlaceQuery, GqlGetPlaceQueryVariables>(GetPlaceDocument, options);
+}
+export function useGetPlaceLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetPlaceQuery, GqlGetPlaceQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetPlaceQuery, GqlGetPlaceQueryVariables>(
+    GetPlaceDocument,
+    options,
+  );
+}
+export function useGetPlaceSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetPlaceQuery, GqlGetPlaceQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetPlaceQuery, GqlGetPlaceQueryVariables>(
+    GetPlaceDocument,
+    options,
+  );
+}
+export type GetPlaceQueryHookResult = ReturnType<typeof useGetPlaceQuery>;
+export type GetPlaceLazyQueryHookResult = ReturnType<typeof useGetPlaceLazyQuery>;
+export type GetPlaceSuspenseQueryHookResult = ReturnType<typeof useGetPlaceSuspenseQuery>;
+export type GetPlaceQueryResult = Apollo.QueryResult<GqlGetPlaceQuery, GqlGetPlaceQueryVariables>;
 export const TicketClaimDocument = gql`
   mutation ticketClaim($input: TicketClaimInput!) {
     ticketClaim(input: $input) {
