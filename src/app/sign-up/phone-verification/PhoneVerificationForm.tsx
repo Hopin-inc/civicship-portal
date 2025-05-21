@@ -4,11 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../contexts/AuthContext";
 import { toast } from "sonner";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot
-} from "../../../components/ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../../components/ui/input-otp";
 
 export function PhoneVerificationForm() {
   const { phoneAuth, uid, user } = useAuth();
@@ -25,7 +21,7 @@ export function PhoneVerificationForm() {
     }
 
     return () => {
-      import('../../../lib/firebase').then(({ clearRecaptcha }) => {
+      import("../../../lib/firebase").then(({ clearRecaptcha }) => {
         clearRecaptcha();
       });
     };
@@ -72,19 +68,22 @@ export function PhoneVerificationForm() {
     <div className="w-full max-w-md mx-auto space-y-8">
       <div className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">
-          {step === "phone" ? "電話番号を入力" : "認証コードを入力"}
+          {step === "phone" && "電話番号を入力"}
+          {step === "code" && "認証コードを入力"}
         </h1>
         <p className="text-sm text-muted-foreground">
-          {step === "phone"
-            ? "電話番号認証のため、あなたの電話番号を入力してください。SMSで認証コードが送信されます。"
-            : "電話番号に送信された6桁の認証コードを入力してください。"}
+          {step === "phone" &&
+            "電話番号認証のため、あなたの電話番号を入力してください。SMSで認証コードが送信されます。"}
+          {step === "code" && "電話番号に送信された6桁の認証コードを入力してください。"}
         </p>
       </div>
 
-      {step === "phone" ? (
+      {step === "phone" && (
         <form onSubmit={handlePhoneSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="phone" className="text-sm font-medium">電話番号</label>
+            <label htmlFor="phone" className="text-sm font-medium">
+              電話番号
+            </label>
             <input
               id="phone"
               type="tel"
@@ -104,16 +103,15 @@ export function PhoneVerificationForm() {
             {phoneAuth.isVerifying ? "送信中..." : "認証コードを送信"}
           </button>
         </form>
-      ) : (
+      )}
+      {step === "code" && (
         <form onSubmit={handleCodeSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="code" className="text-sm font-medium">認証コード</label>
+            <label htmlFor="code" className="text-sm font-medium">
+              認証コード
+            </label>
             <div className="flex justify-center py-4">
-              <InputOTP
-                maxLength={6}
-                value={verificationCode}
-                onChange={handleOTPChange}
-              >
+              <InputOTP maxLength={6} value={verificationCode} onChange={handleOTPChange}>
                 <InputOTPGroup>
                   {Array.from({ length: 6 }).map((_, index) => (
                     <InputOTPSlot key={index} index={index} />
