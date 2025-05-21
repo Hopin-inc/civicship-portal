@@ -4,10 +4,10 @@ import Image from "next/image";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BaseCardInfo } from "@/app/places/data/type";
+import { IPlaceCard } from "@/app/places/data/type";
 
 interface PlaceCardProps {
-  place: BaseCardInfo;
+  place: IPlaceCard;
   selected: boolean;
   onClick: () => void;
   buttonVariant?: "primary" | "tertiary";
