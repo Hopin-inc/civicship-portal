@@ -8,7 +8,7 @@ import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import CategoryBadge from "../../components/CategoryBadge";
 import ArticleRecommendations from "./ArticleRecommendations";
 import { TArticleDetail, TArticleWithAuthor } from "@/app/articles/data/type";
-import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
+import { ActivitiesCarouselSection } from "./ActivitiesCarouselSection";
 import { Calendar } from "lucide-react";
 
 type ArticleDetailProps = {
@@ -32,7 +32,7 @@ const ArticleDetail = ({ article, recommendedArticles }: ArticleDetailProps) => 
         opportunities={article.hostedOpportunitiesByAuthors}
       />
       {recommendedArticles && recommendedArticles.length > 0 && (
-        <ArticleRecommendations title="おすすめの記事" articles={recommendedArticles} />
+        <ArticleRecommendations title="関連する記事" articles={recommendedArticles} />
       )}
     </div>
   );

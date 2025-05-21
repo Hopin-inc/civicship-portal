@@ -9,21 +9,18 @@ interface ArticleRecommendationsProps {
   articles: TArticleWithAuthor[];
 }
 
-const ArticleRecommendations: React.FC<ArticleRecommendationsProps> = ({
-  title,
-  articles,
-}) => {
+const ArticleRecommendations: React.FC<ArticleRecommendationsProps> = ({ title, articles }) => {
   if (articles.length === 0) return null;
 
   return (
-    <div className="mt-12">
-      <h2 className="text-2xl font-bold mb-6">{title}</h2>
+    <section className="px-4 pt-6 mt-0">
+      <h2 className="text-display-md mb-4">{title}</h2>
       <div className="grid grid-cols-1 gap-6">
         {articles.map((article) => (
-          <ArticleCard key={article.id} article={article} showCategory />
+          <ArticleCard key={article.id} article={article} showUser />
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 
