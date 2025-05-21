@@ -1,8 +1,11 @@
 "use client";
 
 import { GqlPlaceEdge, useGetPlacesQuery } from "@/types/graphql";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { presenterPlacePins } from "@/app/places/data/presenter";
+import { getCoordinatesFromAddress } from "@/utils/maps/geocoding";
+import { IPlacePin } from "@/app/places/data/type";
+import { useJsApiLoader } from "@react-google-maps/api";
 
 export default function usePlacePins() {
   const { data, loading, error, fetchMore, refetch } = useGetPlacesQuery({
@@ -11,53 +14,78 @@ export default function usePlacePins() {
     nextFetchPolicy: "cache-first",
   });
 
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    language: "ja",
+    region: "JP",
+  });
+
   const placeEdges: GqlPlaceEdge[] = (data?.places?.edges ?? []).filter(
     (e): e is GqlPlaceEdge => e != null && e.node != null,
   );
-  const placePins = useMemo(() => presenterPlacePins(placeEdges), [placeEdges]);
 
-  // const pageInfo = data?.memberships?.pageInfo;
-  // const endCursor = pageInfo?.endCursor;
-  // const hasNextPage = pageInfo?.hasNextPage ?? false;
+  const basePlacePins = useMemo(() => presenterPlacePins(placeEdges), [placeEdges]);
 
-  /*const handleFetchMore = async () => {
-    if (!hasNextPage) return;
+  const prevPinIdsRef = useRef<string[]>([]);
 
-    await fetchMore({
-      variables: {
-        cursor: { after: endCursor },
-        first: 10,
-        IsCard: false,
-      },
-      updateQuery: (prev, { fetchMoreResult }) => {
-        if (!fetchMoreResult || !fetchMoreResult.memberships) return prev;
+  const [geocodedPlacePins, setGeocodedPlacePins] = useState<IPlacePin[]>([]);
+  const [isGeocoding, setIsGeocoding] = useState(false);
 
-        return {
-          ...prev,
-          memberships: {
-            ...fetchMoreResult.memberships,
-            edges: [
-              ...(prev.memberships?.edges ?? []),
-              ...(fetchMoreResult.memberships?.edges ?? []),
-            ],
-            pageInfo: fetchMoreResult.memberships.pageInfo,
-          },
-        };
-      },
-    });
-  };*/
+  const pinsChanged = useMemo(() => {
+    const currentPinIds = basePlacePins
+      .map((pin) => pin.id)
+      .sort()
+      .join(",");
+    const prevPinIds = prevPinIdsRef.current.sort().join(",");
+    return currentPinIds !== prevPinIds;
+  }, [basePlacePins]);
 
-  // const loadMoreRef = useInfiniteScroll({
-  //   hasMore: hasNextPage,
-  //   isLoading: loading,
-  //   onLoadMore: handleFetchMore,
-  // });
+  // 住所から緯度経度を取得して更新する
+  // #NOTE: strapi に保存された緯度経度は若干位置がずれるため、住所から位置情報を再取得して表示するため
+  useEffect(() => {
+    if (!isLoaded || !basePlacePins.length || isGeocoding || !pinsChanged) return;
+
+    const geocodePins = async () => {
+      setIsGeocoding(true);
+
+      // 現在のピンIDを保存
+      prevPinIdsRef.current = basePlacePins.map((pin) => pin.id);
+
+      const updatedPins = await Promise.all(
+        basePlacePins.map(async (pin) => {
+          if (!pin.address) return pin;
+
+          const coordinates = await getCoordinatesFromAddress(pin.address);
+
+          if (coordinates) {
+            return {
+              ...pin,
+              latitude: coordinates.lat,
+              longitude: coordinates.lng,
+            };
+          }
+
+          return pin;
+        }),
+      );
+
+      setGeocodedPlacePins(updatedPins);
+      setIsGeocoding(false);
+    };
+
+    geocodePins();
+  }, [basePlacePins, isLoaded, isGeocoding, pinsChanged]);
+
+  const placePins = useMemo(
+    () => (geocodedPlacePins.length > 0 ? geocodedPlacePins : basePlacePins),
+    [geocodedPlacePins, basePlacePins],
+  );
 
   return {
     placePins,
-    loading,
+    loading: loading || isGeocoding,
     error: error ?? null,
-    // loadMoreRef,
     refetch,
   };
 }

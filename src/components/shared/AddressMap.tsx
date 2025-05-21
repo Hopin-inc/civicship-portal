@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { getCoordinatesFromAddress } from "@/utils/maps/geocoding";
 
 interface AddressMapProps {
   address: string;
@@ -56,7 +57,7 @@ export default function AddressMap({
     region: "JP",
   });
 
-  // 地図がロードされたときに住所からジオコーディングを実行
+  // 地図がロードされたときの処理
   const onLoad = useCallback(
     (map: google.maps.Map) => {
       setMap(map);
@@ -64,24 +65,32 @@ export default function AddressMap({
       if (onMapLoad) {
         onMapLoad(map);
       }
-
-      const geocoder = new google.maps.Geocoder();
-      geocoder.geocode({ address }, (results, status) => {
-        if (status === "OK" && results && results[0]) {
-          const location = results[0].geometry.location;
-          setMarkerPosition(location);
-          map.setCenter(location);
-          map.setZoom(zoom);
-
-          // 位置が見つかった時のコールバックを実行
-          if (onLocationFound) {
-            onLocationFound(location);
-          }
-        }
-      });
     },
-    [address, zoom, onMapLoad, onLocationFound],
+    [onMapLoad],
   );
+
+  // 住所から位置情報を取得して地図を更新する
+  useEffect(() => {
+    if (!isLoaded || !map || !address) return;
+
+    const geocodeAddress = async () => {
+      const coordinates = await getCoordinatesFromAddress(address);
+
+      if (coordinates) {
+        const location = new google.maps.LatLng(coordinates.lat, coordinates.lng);
+        setMarkerPosition(location);
+        map.setCenter(location);
+        map.setZoom(zoom);
+
+        // 位置が見つかった時のコールバックを実行
+        if (onLocationFound) {
+          onLocationFound(location);
+        }
+      }
+    };
+
+    geocodeAddress();
+  }, [address, map, isLoaded, zoom, onLocationFound]);
 
   const onUnmount = useCallback(() => {
     setMap(null);
