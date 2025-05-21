@@ -25,7 +25,7 @@ const ActivitiesCarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
   const [month, day, weekday] = match ? match.slice(1) : [];
 
   return (
-    <section className="pl-4 pr-0 mt-0 pt-6">
+    <section className="px-6 pr-0">
       {isSearchResult ? (
         <h2 className="flex items-baseline gap-1">
           <span className="text-md text-gray-500">{month}/</span>
