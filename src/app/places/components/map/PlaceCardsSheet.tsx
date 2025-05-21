@@ -42,11 +42,6 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
     };
   }, [emblaApi, places, selectedPlaceId, onPlaceSelect]);
 
-  const handlePlaceClick = (placeId: string, userId: string) => {
-    onPlaceSelect(placeId);
-    router.push(`/places/${placeId}`);
-  };
-
   if (!places.length) return null;
 
   return (
@@ -61,7 +56,6 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
             <PlaceCard
               place={place}
               selected={place.id === selectedPlaceId}
-              onClick={() => handlePlaceClick(place.id, place.host.id)}
               buttonVariant={place.id === selectedPlaceId ? "primary" : "tertiary"}
             />
           </div>
