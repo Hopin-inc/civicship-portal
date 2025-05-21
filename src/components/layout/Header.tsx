@@ -11,6 +11,7 @@ import { useHeader } from "@/components/providers/HeaderProvider";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { cn } from "@/lib/utils";
 import SearchBox from "@/app/search/components/SearchBox";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   className?: string;
@@ -21,6 +22,16 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const { navigateBack } = useHierarchicalNavigation();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const pathname = usePathname();
+
+  const router = useRouter();
+
+  const handleBackButton = () => {
+    if (config?.backTo) {
+      router.push(config.backTo);
+    } else {
+      navigateBack();
+    }
+  };
 
   if (config.hideHeader) {
     return null;
@@ -37,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       )}
     >
       {shouldShowBackButton && (
-        <Button onClick={navigateBack} variant="icon-only" size="sm" aria-label="戻る">
+        <Button onClick={handleBackButton} variant="icon-only" size="sm" aria-label="戻る">
           <ChevronLeft className="h-6 w-6" />
         </Button>
       )}

@@ -20,7 +20,7 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles }) => {
   return (
     <div className="grid grid-cols-1 gap-6">
       {articles.map((article) => (
-        <ArticleCard key={article.id} article={article} />
+        <ArticleCard key={article.id} article={article} showUser />
       ))}
     </div>
   );
