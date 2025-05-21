@@ -87,7 +87,7 @@ const ActiveOpportunities = ({ opportunities }: ActiveOpportunitiesProps) => {
         <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
           <div className="flex gap-4">
             {opportunities.map((opportunity) => (
-              <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} />
+              <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} isCarousel />
             ))}
           </div>
         </div>
