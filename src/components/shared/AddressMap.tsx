@@ -48,14 +48,8 @@ function useAddressGeocoding(
 
       setIsGeocoding(true);
 
-      // 緯度経度が指定されている場合はフォールバックとして使用
-      const fallbackCoordinates =
-        fallbackLat !== undefined && fallbackLng !== undefined
-          ? { lat: fallbackLat, lng: fallbackLng }
-          : undefined;
-
       try {
-        const coordinates = await getCoordinatesFromAddress(address, fallbackCoordinates);
+        const coordinates = await getCoordinatesFromAddress(address);
 
         if (coordinates) {
           const newLocation = new google.maps.LatLng(coordinates.lat, coordinates.lng);
@@ -73,15 +67,41 @@ function useAddressGeocoding(
           return newLocation;
         }
 
-        return null;
+        // 住所からの取得に失敗した場合、フォールバックの座標を使用
+        return useFallbackCoordinates(map, zoom);
       } catch (error) {
         console.error("Error geocoding address:", error);
-        return null;
+
+        // エラー発生時もフォールバックの座標を使用
+        return useFallbackCoordinates(map, zoom);
       } finally {
         setIsGeocoding(false);
       }
     },
     [address, fallbackLat, fallbackLng, onSuccess],
+  );
+
+  const useFallbackCoordinates = useCallback(
+    (map?: google.maps.Map | null, zoom?: number) => {
+      if (fallbackLat === undefined || fallbackLng === undefined) {
+        return null;
+      }
+
+      const fallbackLocation = new google.maps.LatLng(fallbackLat, fallbackLng);
+      setLocation(fallbackLocation);
+
+      if (map) {
+        map.setCenter(fallbackLocation);
+        if (zoom !== undefined) map.setZoom(zoom);
+      }
+
+      if (onSuccess) {
+        onSuccess(fallbackLocation);
+      }
+
+      return fallbackLocation;
+    },
+    [fallbackLat, fallbackLng, onSuccess],
   );
 
   return {

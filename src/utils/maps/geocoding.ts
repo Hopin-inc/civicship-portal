@@ -9,12 +9,10 @@ const geocodeCache: Record<string, google.maps.LatLngLiteral> = {};
 /**
  * 住所から緯度経度を取得する
  * @param address 住所
- * @param fallbackCoordinates 住所からの取得に失敗した場合に使用する緯度経度
- * @returns Promise<{lat: number, lng: number} | null> 緯度経度の情報、取得できなかった場合はnullまたはfallbackCoordinates
+ * @returns Promise<{lat: number, lng: number} | null> 緯度経度の情報、取得できなかった場合はnull
  */
 export const getCoordinatesFromAddress = async (
   address: string,
-  fallbackCoordinates?: { lat: number; lng: number },
 ): Promise<google.maps.LatLngLiteral | null> => {
   if (geocodeCache[address]) {
     return geocodeCache[address];
@@ -23,7 +21,7 @@ export const getCoordinatesFromAddress = async (
   // Google Maps APIが読み込まれていない場合はfallbackまたはnullを返す
   if (!window.google || !window.google.maps) {
     console.error("Google Maps API is not loaded");
-    return fallbackCoordinates || null;
+    return null;
   }
 
   const geocoder = new google.maps.Geocoder();
@@ -40,7 +38,7 @@ export const getCoordinatesFromAddress = async (
       });
     });
 
-    if (!result) return fallbackCoordinates || null;
+    if (!result) return null;
 
     const location = result[0].geometry.location;
     const coordinates = {
@@ -53,7 +51,7 @@ export const getCoordinatesFromAddress = async (
     return coordinates;
   } catch (error) {
     console.error("Error geocoding address:", error);
-    return fallbackCoordinates || null;
+    return null;
   }
 };
 
