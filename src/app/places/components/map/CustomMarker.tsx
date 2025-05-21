@@ -22,17 +22,44 @@ const loadImage = (src: string): Promise<HTMLImageElement> =>
     img.src = src;
   });
 
-const createPlaceholderIcon = async (size: number): Promise<google.maps.Icon> => {
+const setupCanvas = (size: number, includeShadowPadding: boolean = false) => {
   const scale = 2;
+  const shadowPadding = includeShadowPadding ? 24 : 0;
+  const totalSize = size + shadowPadding;
+
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
-  const canvasSize = size * scale;
-
-  canvas.width = canvasSize;
-  canvas.height = canvasSize;
 
   if (!context) throw new Error("Failed to get canvas context");
+
+  canvas.width = totalSize * scale;
+  canvas.height = totalSize * scale;
+
   context.scale(scale, scale);
+
+  if (includeShadowPadding) {
+    context.translate(shadowPadding / 2, shadowPadding / 2);
+  }
+
+  return { canvas, context, totalSize, shadowPadding };
+};
+
+const createIconObject = (
+  canvas: HTMLCanvasElement,
+  size: number,
+  shadowPadding: number,
+  anchorYOffset: number = 0,
+): google.maps.Icon => {
+  const totalSize = size + shadowPadding;
+  return {
+    url: canvas.toDataURL("image/png", 1.0),
+    scaledSize: new google.maps.Size(totalSize, totalSize),
+    anchor: new google.maps.Point(totalSize / 2, totalSize / 2 + anchorYOffset),
+  };
+};
+
+const createPlaceholderIcon = async (size: number): Promise<google.maps.Icon> => {
+  const { canvas, context, totalSize } = setupCanvas(size);
 
   const centerX = size / 2;
   const centerY = size / 2;
@@ -41,11 +68,7 @@ const createPlaceholderIcon = async (size: number): Promise<google.maps.Icon> =>
   const placeholderImage = await loadImage(PLACEHOLDER_IMAGE);
   await drawCircleWithImage(context, placeholderImage, centerX, centerY, radius, true);
 
-  return {
-    url: canvas.toDataURL("image/png"),
-    scaledSize: new google.maps.Size(size, size),
-    anchor: new google.maps.Point(size / 2, size / 2 + 10),
-  };
+  return createIconObject(canvas, size, 0, 10);
 };
 
 const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }) => {
@@ -71,14 +94,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         console.warn("Failed to create placeholder icon:", error);
       }
 
-      const scale = 2;
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
-      if (!context) return;
-
-      canvas.width = displaySize * scale;
-      canvas.height = displaySize * scale;
-      context.scale(scale, scale);
+      const { canvas, context, totalSize, shadowPadding } = setupCanvas(displaySize, true);
 
       try {
         const centerX = displaySize / 2;
@@ -94,11 +110,12 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         const userImg = await loadImage(hostImage);
         await drawCircleWithImage(context, userImg, smallX, smallY, smallRadius, false);
 
-        const markerIcon: google.maps.Icon = {
-          url: canvas.toDataURL("image/png", 1.0),
-          scaledSize: new google.maps.Size(displaySize, displaySize),
-          anchor: new google.maps.Point(displaySize / 2, displaySize / 2 + (isSelected ? 110 : 0)),
-        };
+        const markerIcon = createIconObject(
+          canvas,
+          displaySize,
+          shadowPadding,
+          isSelected ? 110 : 0,
+        );
 
         markerIconCache.set(data.id, markerIcon);
         isMounted && setIcon(markerIcon);
@@ -110,7 +127,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
     return () => {
       isMounted = false;
     };
-  }, [data.id, data.image, hostImage, displaySize, isSelected]); // ✅ サイズ一定な依存配列
+  }, [data.id, data.image, hostImage, displaySize, isSelected]);
 
   if (!icon) return null;
 
