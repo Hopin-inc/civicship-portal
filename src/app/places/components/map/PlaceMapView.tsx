@@ -38,7 +38,7 @@ const PlaceMapView: React.FC<PlaceMapViewProps> = ({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed bottom-[210px] inset-x-0 left-0 right-0 z-50 max-w-[444px] w-full h-16 flex items-center px-4 justify-between mx-auto"
+            className="fixed bottom-[32px] inset-x-0 left-0 right-0 z-50 w-full flex items-center px-4 justify-center mx-auto"
           >
             <div className="relative w-full max-w-lg overflow-hidden mx-auto">
               <PlaceCardsSheet

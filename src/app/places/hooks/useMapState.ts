@@ -88,7 +88,7 @@ const panToSelectedMarker = (
   const mapHeight = mapDiv.clientHeight;
 
   // マップの高さに対するオフセット比率を計算
-  const offsetRatio = (sheetHeight * 0.3) / mapHeight;
+  const offsetRatio = (sheetHeight * 0.25) / mapHeight;
   const bounds = map.getBounds();
   const markerLatLng = new google.maps.LatLng(marker.latitude, marker.longitude);
 

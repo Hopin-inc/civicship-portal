@@ -64,7 +64,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, buttonVariant = 
           </CardDescription>
         )}
 
-        <CardFooter className="flex justify-between mt-1 p-0 mb-1">
+        <CardFooter className="flex justify-between mt-2 p-0 mb-1">
           {place.publicOpportunityCount > 0 ? (
             <span className="text-body-xs text-caption">
               <strong className="text-foreground mr-0.5">{place.publicOpportunityCount}件</strong>
@@ -74,7 +74,9 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, buttonVariant = 
             // レイアウト保持のために render
             <span className="text-body-xs text-caption"></span>
           )}
-          <Button variant={buttonVariant}>もっと見る</Button>
+          <Button variant={buttonVariant} size={"sm"}>
+            もっと見る
+          </Button>
         </CardFooter>
       </CardContent>
     </Card>
