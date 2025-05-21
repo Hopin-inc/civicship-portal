@@ -1,7 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { GqlUser, GqlCurrentPrefecture, useCurrentUserQuery, useUserSignUpMutation } from "@/types/graphql";
+import {
+  GqlUser,
+  GqlCurrentPrefecture,
+  useCurrentUserQuery,
+  useUserSignUpMutation,
+} from "@/types/graphql";
 import { User as AuthUser } from "@firebase/auth";
 import { Required } from "utility-types";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,9 +27,11 @@ import { COMMUNITY_ID } from "@/utils";
 
 type UserInfo = {
   uid: string | null;
-  user: Required<Partial<GqlUser>, "id" | "name"> & {
-    memberships?: any[];
-  } | null;
+  user:
+    | (Required<Partial<GqlUser>, "id" | "name"> & {
+        memberships?: any[];
+      })
+    | null;
 };
 
 type AuthContextType = UserInfo & {
@@ -32,7 +39,11 @@ type AuthContextType = UserInfo & {
   logout: () => Promise<void>;
   loginWithLiff: () => Promise<void>;
   isAuthenticating: boolean;
-  createUser: (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
+  createUser: (
+    name: string,
+    currentPrefecture: GqlCurrentPrefecture,
+    phoneUid?: string | null,
+  ) => Promise<Required<Partial<GqlUser>, "id" | "name"> | null>;
 
   phoneNumber: string | null;
   phoneAuth: {
@@ -53,7 +64,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const cookies = useCookies();
   const { liff, isLiffLoggedIn, liffAccessToken, liffLogin, liffLogout } = useLiff();
 
-  const { data: currentUserData, loading: queryLoading, refetch } = useCurrentUserQuery({
+  const {
+    data: currentUserData,
+    loading: queryLoading,
+    refetch,
+  } = useCurrentUserQuery({
     fetchPolicy: "no-cache",
   });
 
@@ -81,7 +96,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user: {
           id: fetchedUser.id,
           name: fetchedUser.name,
-          memberships: fetchedUser.memberships || [] as any,
+          memberships: fetchedUser.memberships || ([] as any),
         },
       });
     }
@@ -116,7 +131,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const success = await verifyPhoneCode(verificationId, code);
 
       if (success) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         if (phoneVerificationState.phoneUid) {
           if (phoneVerificationState.authToken) {
@@ -134,7 +149,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             phoneUid: phoneVerificationState.phoneUid,
             authToken: phoneVerificationState.authToken ? "present" : "missing",
             refreshToken: phoneVerificationState.refreshToken ? "present" : "missing",
-            tokenExpiresAt: phoneVerificationState.tokenExpiresAt
+            tokenExpiresAt: phoneVerificationState.tokenExpiresAt,
           });
 
           setIsPhoneVerified(true);
@@ -176,7 +191,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error instanceof Error) {
         if (error.message.includes("network")) {
-          errorMessage = "ネットワーク接続に問題が発生しました。インターネット接続を確認してください。";
+          errorMessage =
+            "ネットワーク接続に問題が発生しました。インターネット接続を確認してください。";
         } else if (error.message.includes("expired")) {
           errorMessage = "セッションの有効期限が切れました。再度お試しください。";
         } else if (error.message.includes("access denied") || error.message.includes("cancelled")) {
@@ -222,16 +238,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const customEvent = event as CustomEvent;
       console.log("Token expired event detected:", customEvent.detail);
 
-      toast.error(
-        "認証の有効期限が切れました。再認証が必要です。",
-        {
-          action: {
-            label: "再認証",
-            onClick: () => router.push("/sign-up/phone-verification")
-          },
-          duration: 10000, // 10 seconds
-        }
-      );
+      toast.error("認証の有効期限が切れました。再認証が必要です。", {
+        action: {
+          label: "再認証",
+          onClick: () => router.push("/sign-up/phone-verification"),
+        },
+        duration: 10000, // 10 seconds
+      });
     };
 
     const handleAuthError = (event: Event) => {
@@ -240,29 +253,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       console.log("Auth error event detected:", customEvent.detail);
 
-      toast.error(
-        errorMessage,
-        {
-          action: errorType === 'network' ? {
-            label: "再試行",
-            onClick: () => window.location.reload()
-          } : (errorType === 'expired' || errorType === 'auth' || errorType === 'reauth') ? {
-            label: "再認証",
-            onClick: () => router.push("/login")
-          } : undefined,
-          duration: 10000, // 10 seconds
-        }
-      );
+      toast.error(errorMessage, {
+        action:
+          errorType === "network"
+            ? {
+                label: "再試行",
+                onClick: () => window.location.reload(),
+              }
+            : errorType === "expired" || errorType === "auth" || errorType === "reauth"
+              ? {
+                  label: "再認証",
+                  onClick: () => router.push("/login"),
+                }
+              : undefined,
+        duration: 10000, // 10 seconds
+      });
     };
 
-    window.addEventListener('auth:token-expired', handleTokenExpired);
-    window.addEventListener('auth:error', handleAuthError);
-    window.addEventListener('auth:token-refresh-failed', handleAuthError);
+    window.addEventListener("auth:token-expired", handleTokenExpired);
+    window.addEventListener("auth:error", handleAuthError);
+    window.addEventListener("auth:token-refresh-failed", handleAuthError);
 
     return () => {
-      window.removeEventListener('auth:token-expired', handleTokenExpired);
-      window.removeEventListener('auth:error', handleAuthError);
-      window.removeEventListener('auth:token-refresh-failed', handleAuthError);
+      window.removeEventListener("auth:token-expired", handleTokenExpired);
+      window.removeEventListener("auth:error", handleAuthError);
+      window.removeEventListener("auth:token-refresh-failed", handleAuthError);
     };
   }, [router]);
 
@@ -283,7 +298,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const tokenResult = await user.getIdTokenResult();
           if (tokenResult.expirationTime) {
-            const expiryTimestamp = Math.floor(new Date(tokenResult.expirationTime).getTime() / 1000);
+            const expiryTimestamp = Math.floor(
+              new Date(tokenResult.expirationTime).getTime() / 1000,
+            );
             cookies.set("token_expires_at", expiryTimestamp.toString());
             console.log("Token expiration time stored:", expiryTimestamp);
           }
@@ -299,7 +316,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             user: {
               id: fetchedUser.id,
               name: fetchedUser.name,
-              memberships: fetchedUser.memberships || [] as any,
+              memberships: fetchedUser.memberships || ([] as any),
             },
           });
 
@@ -356,7 +373,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const createUser = async (name: string, currentPrefecture: GqlCurrentPrefecture, phoneUid?: string | null): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
+  const createUser = async (
+    name: string,
+    currentPrefecture: GqlCurrentPrefecture,
+    phoneUid?: string | null,
+  ): Promise<Required<Partial<GqlUser>, "id" | "name"> | null> => {
     try {
       const effectivePhoneUid = phoneUid || phoneVerificationState.phoneUid || undefined;
       const phoneNumber = getVerifiedPhoneNumber();
@@ -386,26 +407,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={ {
-      uid,
-      user,
-      login,
-      logout,
-      loginWithLiff,
-      isAuthenticating,
-      createUser,
+    <AuthContext.Provider
+      value={{
+        uid,
+        user,
+        login,
+        logout,
+        loginWithLiff,
+        isAuthenticating,
+        createUser,
 
-      phoneNumber,
-      phoneAuth: {
-        isVerifying,
-        verificationId,
-        phoneUid: phoneVerificationState.phoneUid,
-        startPhoneVerification,
-        verifyPhoneCode: verifyPhoneCodeLocal,
-      },
-      isPhoneVerified,
-    } }>
-      { children }
+        phoneNumber,
+        phoneAuth: {
+          isVerifying,
+          verificationId,
+          phoneUid: phoneVerificationState.phoneUid,
+          startPhoneVerification,
+          verifyPhoneCode: verifyPhoneCodeLocal,
+        },
+        isPhoneVerified,
+      }}
+    >
+      {children}
     </AuthContext.Provider>
   );
 };
