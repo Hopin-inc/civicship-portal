@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useReadMore } from "@/hooks/useReadMore";
 import Link from "next/link";
 import IconWrapper from "@/components/shared/IconWrapper";
+import AddressMap from "@/components/shared/AddressMap";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface ActivityDetailsContentProps {
@@ -124,34 +125,17 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
 };
 
 const PlaceSection = ({ place }: { place: OpportunityPlace }) => {
-  if (!place?.latitude || !place?.longitude) return null;
-
-  const lat = place.latitude;
-  const lng = place.longitude;
-
-  const mapUrl =
-    lat && lng
-      ? `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${lat},${lng}`
-      : `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(place.address)}`;
-
   return (
     <section className="pt-6 pb-8 mt-0">
       <h2 className="text-display-md text-foreground mb-4">集合場所</h2>
-      <div className="relative w-full h-[300px] rounded-lg overflow-hidden">
-        <iframe
-          src={mapUrl}
-          width="100%"
-          height="100%"
-          className="border-0"
-          allowFullScreen
-          loading="lazy"
-          lang={"JP"}
-          referrerPolicy="no-referrer-when-downgrade"
-        />
+      <div>
+        <p className="text-body-md font-bold">{place.name}</p>
+        <p className="text-body-sm text-caption mb-2">{place.address}</p>
+        <AddressMap address={place.address} markerTitle={place.name || "集合場所"} height={300} />
+        {place?.description && (
+          <p className="text-body-sm text-caption mt-4">{place.description}</p>
+        )}
       </div>
-      {place?.description && (
-        <p className="text-body-sm text-foreground mt-4">{place.description}</p>
-      )}
     </section>
   );
 };
