@@ -39,7 +39,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
         }}
       />
     </div>
-    <CardContent className="flex flex-col min-h-[160px] px-4 py-3">
+    <CardContent className="flex flex-col px-4 py-3">
       {/*//TODO 適切に1行に収めるか、name, addressで2行にした方が良い？ユーザーがどの地域なのか分からない問題を解消したい*/}
       <div className="flex items-center justify-between mb-2">
         <div className="mt-1 flex items-start text-foreground text-body-xs max-w-[75%]">
@@ -59,17 +59,24 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
         </div>
       </div>
 
-      <CardTitle className="text-title-sm line-clamp-1 mb-1">{place.headline}</CardTitle>
-      <CardDescription className="line-clamp-2 mb-2 text-body-xs text-caption">
-        {place.bio}
-      </CardDescription>
+      {place.headline && (
+        <CardTitle className="text-title-sm line-clamp-1 mb-1">{place.headline}</CardTitle>
+      )}
+      {place.bio && (
+        <CardDescription className="line-clamp-2 mb-2 text-body-xs text-caption">
+          {place.bio}
+        </CardDescription>
+      )}
 
       <CardFooter className="flex justify-between mt-1 p-0 mb-1">
-        {place.publicOpportunityCount > 0 && (
+        {place.publicOpportunityCount > 0 ? (
           <span className="text-body-xs text-caption">
             <strong className="text-foreground mr-0.5">{place.publicOpportunityCount}件</strong>
             の関わり方を募集中
           </span>
+        ) : (
+          // レイアウト保持のために render
+          <span className="text-body-xs text-caption"></span>
         )}
         <Button variant={buttonVariant} onClick={onClick}>
           もっと見る

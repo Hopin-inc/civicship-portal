@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Calendar, MapPin, Users, Clock, CalendarX } from "lucide-react";
 import SameStateActivities from "./SimilarActivitiesList";
 import ActivityScheduleCard from "./ActivityScheduleCard";
 import {
@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useReadMore } from "@/hooks/useReadMore";
 import Link from "next/link";
 import IconWrapper from "@/components/shared/IconWrapper";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
@@ -103,7 +104,7 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
         <div className="flex items-center gap-4">
           <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
             <Image
-              src={host.image || "/placeholder.png"}
+              src={host.image || PLACEHOLDER_IMAGE}
               alt={host.name || "案内者"}
               fill
               className="object-cover"
@@ -169,26 +170,42 @@ const ScheduleSection = ({
     community_id: communityId ?? "",
   });
 
+  const hasSchedule = slots.length > 0;
+
   return (
     <section className="pt-6 pb-8 mt-0">
       <h2 className="text-display-md text-foreground mb-4">開催日</h2>
       <div className="relative">
-        <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
-          {slots.map((slot, index) => (
-            <div key={index} className="flex-shrink-0 first:ml-0">
-              <ActivityScheduleCard
-                slot={slot}
-                opportunityId={opportunityId}
-                communityId={communityId}
-              />
+        {hasSchedule ? (
+          <>
+            <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
+              {slots.map((slot, index) => (
+                <div key={index} className="flex-shrink-0 first:ml-0">
+                  <ActivityScheduleCard
+                    slot={slot}
+                    opportunityId={opportunityId}
+                    communityId={communityId}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <Link href={`/reservation/select-date?${query.toString()}`}>
-          <Button variant="secondary" size="md" className="w-full">
-            参加できる日程を探す
-          </Button>
-        </Link>
+            <Link href={`/reservation/select-date?${query.toString()}`}>
+              <Button variant="secondary" size="md" className="w-full">
+                参加できる日程を探す
+              </Button>
+            </Link>
+          </>
+        ) : (
+          <div className="text-center py-8 px-4 bg-card rounded-lg border border-muted/20 flex flex-col items-center">
+            <CalendarX className="h-12 w-12 text-muted-foreground/50 mb-3" />
+            <p className="text-body-lg font-medium text-foreground">
+              現在予定されている日程はありません
+            </p>
+            <p className="text-body-sm text-caption mt-2 max-w-xs">
+              日程はまだ登録されていません。後日再度確認するか、主催者にお問い合わせください。
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );

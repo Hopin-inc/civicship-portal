@@ -7,6 +7,7 @@ import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunity
 import { useSameStateActivities } from "@/app/activities/[id]/hooks/useSameStateActivities";
 import { useAuth } from "@/contexts/AuthContext";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { useFilterFutureSlots } from "./useFilterFutureSlots";
 
 interface UseActivityDetailsResult {
   opportunity: ActivityDetail | null;
@@ -38,7 +39,8 @@ export const useActivityDetails = (id: string): UseActivityDetailsResult => {
   } = useSameStateActivities(id, stateCode ?? "");
 
   const availableTickets = useAvailableTickets(opportunity, user?.id);
-  const sortedSlots = useSortedSlotsByStartsAt(opportunity?.slots);
+  const futureSlots = useFilterFutureSlots(opportunity?.slots);
+  const sortedSlots = useSortedSlotsByStartsAt(futureSlots);
 
   const isLoading = loadingOpportunity || loadingSameState;
   const error = errorOpportunity || errorSameState;

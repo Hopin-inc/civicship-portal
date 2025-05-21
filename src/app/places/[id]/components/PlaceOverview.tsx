@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Users } from "lucide-react";
 import { useReadMore } from "@/hooks/useReadMore";
 import { IPlaceDetail } from "@/app/places/data/type";
+import { cn } from "@/lib/utils";
 
 const INITIAL_DISPLAY_LINES = 6;
 
@@ -14,7 +15,11 @@ interface PlaceOverviewProps {
 
 const PlaceOverview = ({ detail }: PlaceOverviewProps) => {
   return (
-    <div className="px-4 pt-2 pb-4 max-w-mobile-l mx-auto space-y-4">
+    <div
+      className={cn("px-4 pt-2 max-w-mobile-l mx-auto space-y-4", {
+        "pb-4": detail.headline || detail.bio,
+      })}
+    >
       <div className="flex flex-wrap gap-4 justify-between">
         <div className="flex items-center gap-1 text-body-sm gap-x-1">
           <MapPin className="h-5 w-5" />
@@ -30,7 +35,6 @@ const PlaceOverview = ({ detail }: PlaceOverviewProps) => {
     </div>
   );
 };
-
 export default PlaceOverview;
 
 const PlaceDescription = ({ bio }: { bio: string }) => {
