@@ -27,12 +27,12 @@ const DEFAULT_CENTER = {
 
 const DEFAULT_ZOOM = 17;
 
-function useAddressGeocoding(
+const useAddressGeocoding = (
   address: string | undefined,
   fallbackLat?: number,
   fallbackLng?: number,
   onSuccess?: (location: google.maps.LatLng) => void,
-) {
+) => {
   const [location, setLocation] = useState<google.maps.LatLng | null>(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const geocodeRequestRef = useRef<AbortController | null>(null);
@@ -68,12 +68,12 @@ function useAddressGeocoding(
         }
 
         // 住所からの取得に失敗した場合、フォールバックの座標を使用
-        return useFallbackCoordinates(map, zoom);
+        return setFallbackLocation(map, zoom);
       } catch (error) {
         console.error("Error geocoding address:", error);
 
         // エラー発生時もフォールバックの座標を使用
-        return useFallbackCoordinates(map, zoom);
+        return setFallbackLocation(map, zoom);
       } finally {
         setIsGeocoding(false);
       }
@@ -81,7 +81,7 @@ function useAddressGeocoding(
     [address, fallbackLat, fallbackLng, onSuccess],
   );
 
-  const useFallbackCoordinates = useCallback(
+  const setFallbackLocation = useCallback(
     (map?: google.maps.Map | null, zoom?: number) => {
       if (fallbackLat === undefined || fallbackLng === undefined) {
         return null;
@@ -109,7 +109,7 @@ function useAddressGeocoding(
     isGeocoding,
     geocodeAddress,
   };
-}
+};
 
 /**
  * 住所から位置を特定してマップとマーカーを表示するコンポーネント
