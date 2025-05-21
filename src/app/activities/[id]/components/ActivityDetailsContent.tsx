@@ -36,7 +36,7 @@ const ActivityDetailsContent = ({
 }: ActivityDetailsContentProps) => {
   return (
     <>
-      <ActivityBodySection body={opportunity.body} />
+      <ActivityBodySection body={opportunity.description + "\n\n" + opportunity.body} />
       <HostInfoSection host={opportunity.host} />
       <PlaceSection place={opportunity.place} />
       <ScheduleSection
