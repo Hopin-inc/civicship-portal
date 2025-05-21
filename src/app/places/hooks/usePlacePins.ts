@@ -56,7 +56,10 @@ export default function usePlacePins() {
         basePlacePins.map(async (pin) => {
           if (!pin.address) return pin;
 
-          const coordinates = await getCoordinatesFromAddress(pin.address);
+          const fallbackCoordinates =
+            pin.latitude && pin.longitude ? { lat: pin.latitude, lng: pin.longitude } : undefined;
+
+          const coordinates = await getCoordinatesFromAddress(pin.address, fallbackCoordinates);
 
           if (coordinates) {
             return {

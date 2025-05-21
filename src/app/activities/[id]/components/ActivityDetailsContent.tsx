@@ -131,7 +131,13 @@ const PlaceSection = ({ place }: { place: OpportunityPlace }) => {
       <div>
         <p className="text-body-md font-bold">{place.name}</p>
         <p className="text-body-sm text-caption mb-2">{place.address}</p>
-        <AddressMap address={place.address} markerTitle={place.name || "集合場所"} height={300} />
+        <AddressMap
+          address={place.address}
+          markerTitle={place.name || "集合場所"}
+          height={300}
+          latitude={place.latitude}
+          longitude={place.longitude}
+        />
         {place?.description && (
           <p className="text-body-sm text-caption mt-4">{place.description}</p>
         )}

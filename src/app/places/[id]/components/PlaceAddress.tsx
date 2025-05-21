@@ -9,7 +9,7 @@ const PlaceAddress = ({ detail }: { detail: IPlaceDetail }) => {
       <div>
         <p className="text-body-md font-bold">{detail.name}</p>
         <p className="text-body-sm text-caption mb-2">{detail.address}</p>
-        <AddressMap address={detail.address} markerTitle={detail.name} height={250} />
+        <AddressMap address={detail.address} markerTitle={detail.name} height={250} latitude={detail.latitude} longitude={detail.longitude} />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useRef } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { getCoordinatesFromAddress } from "@/utils/maps/geocoding";
@@ -16,6 +16,8 @@ interface AddressMapProps {
   markerOptions?: Omit<google.maps.MarkerOptions, "position" | "map">;
   onMapLoad?: (map: google.maps.Map) => void;
   onLocationFound?: (location: google.maps.LatLng) => void;
+  latitude?: number; // 緯度（フォールバック用）
+  longitude?: number; //経度（フォールバック用）
 }
 
 const DEFAULT_CENTER = {
@@ -24,6 +26,70 @@ const DEFAULT_CENTER = {
 };
 
 const DEFAULT_ZOOM = 17;
+
+function useAddressGeocoding(
+  address: string | undefined,
+  fallbackLat?: number,
+  fallbackLng?: number,
+  onSuccess?: (location: google.maps.LatLng) => void,
+) {
+  const [location, setLocation] = useState<google.maps.LatLng | null>(null);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const geocodeRequestRef = useRef<AbortController | null>(null);
+
+  const geocodeAddress = useCallback(
+    async (map?: google.maps.Map | null, zoom?: number) => {
+      if (!address) return null;
+
+      // 前回のリクエストがあればキャンセル
+      if (geocodeRequestRef.current) {
+        geocodeRequestRef.current.abort();
+      }
+
+      setIsGeocoding(true);
+
+      // 緯度経度が指定されている場合はフォールバックとして使用
+      const fallbackCoordinates =
+        fallbackLat !== undefined && fallbackLng !== undefined
+          ? { lat: fallbackLat, lng: fallbackLng }
+          : undefined;
+
+      try {
+        const coordinates = await getCoordinatesFromAddress(address, fallbackCoordinates);
+
+        if (coordinates) {
+          const newLocation = new google.maps.LatLng(coordinates.lat, coordinates.lng);
+          setLocation(newLocation);
+
+          if (map) {
+            map.setCenter(newLocation);
+            if (zoom !== undefined) map.setZoom(zoom);
+          }
+
+          if (onSuccess) {
+            onSuccess(newLocation);
+          }
+
+          return newLocation;
+        }
+
+        return null;
+      } catch (error) {
+        console.error("Error geocoding address:", error);
+        return null;
+      } finally {
+        setIsGeocoding(false);
+      }
+    },
+    [address, fallbackLat, fallbackLng, onSuccess],
+  );
+
+  return {
+    location,
+    isGeocoding,
+    geocodeAddress,
+  };
+}
 
 /**
  * 住所から位置を特定してマップとマーカーを表示するコンポーネント
@@ -40,9 +106,17 @@ export default function AddressMap({
   markerOptions,
   onMapLoad,
   onLocationFound,
+  latitude,
+  longitude,
 }: AddressMapProps) {
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [markerPosition, setMarkerPosition] = useState<google.maps.LatLng | null>(null);
+
+  const { location: markerPosition, geocodeAddress } = useAddressGeocoding(
+    address,
+    latitude,
+    longitude,
+    onLocationFound,
+  );
 
   const containerStyle = {
     width: typeof width === "number" ? `${width}px` : width,
@@ -59,42 +133,21 @@ export default function AddressMap({
 
   // 地図がロードされたときの処理
   const onLoad = useCallback(
-    (map: google.maps.Map) => {
-      setMap(map);
+    (mapInstance: google.maps.Map) => {
+      setMap(mapInstance);
+
+      // マップがロードされたら住所の位置情報を取得
+      geocodeAddress(mapInstance, zoom);
 
       if (onMapLoad) {
-        onMapLoad(map);
+        onMapLoad(mapInstance);
       }
     },
-    [onMapLoad],
+    [onMapLoad, geocodeAddress, zoom],
   );
-
-  // 住所から位置情報を取得して地図を更新する
-  useEffect(() => {
-    if (!isLoaded || !map || !address) return;
-
-    const geocodeAddress = async () => {
-      const coordinates = await getCoordinatesFromAddress(address);
-
-      if (coordinates) {
-        const location = new google.maps.LatLng(coordinates.lat, coordinates.lng);
-        setMarkerPosition(location);
-        map.setCenter(location);
-        map.setZoom(zoom);
-
-        // 位置が見つかった時のコールバックを実行
-        if (onLocationFound) {
-          onLocationFound(location);
-        }
-      }
-    };
-
-    geocodeAddress();
-  }, [address, map, isLoaded, zoom, onLocationFound]);
 
   const onUnmount = useCallback(() => {
     setMap(null);
-    setMarkerPosition(null);
   }, []);
 
   if (!isLoaded) {
