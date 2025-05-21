@@ -4,13 +4,13 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin, Users } from "lucide-react";
 import { useReadMore } from "@/hooks/useReadMore";
-import { BaseDetail } from "@/app/places/data/type";
+import { IPlaceDetail } from "@/app/places/data/type";
 import { cn } from "@/lib/utils";
 
 const INITIAL_DISPLAY_LINES = 6;
 
 interface PlaceOverviewProps {
-  detail: BaseDetail;
+  detail: IPlaceDetail;
 }
 
 const PlaceOverview = ({ detail }: PlaceOverviewProps) => {

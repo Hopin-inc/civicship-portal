@@ -4,7 +4,7 @@ import CustomMarker from "@/app/places/components/map/CustomMarker";
 import { useMapState } from "@/app/places/hooks/useMapState";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { usePreloadImages } from "@/app/places/hooks/usePreloadImages";
-import { BasePin } from "@/app/places/data/type";
+import { IPlacePin } from "@/app/places/data/type";
 
 const containerStyle = {
   width: "100%",
@@ -12,7 +12,7 @@ const containerStyle = {
 };
 
 interface MapComponentProps {
-  placePins: BasePin[];
+  placePins: IPlacePin[];
   selectedPlaceId: string | null;
   onPlaceSelect: (placeId: string) => void;
 }
@@ -61,7 +61,7 @@ export default function MapComponent({
         zoomControl: true,
       }}
     >
-      {markers.map((marker: BasePin) => (
+      {markers.map((marker: IPlacePin) => (
         <CustomMarker
           key={marker.id}
           data={marker}

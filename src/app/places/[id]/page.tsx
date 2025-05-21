@@ -17,12 +17,8 @@ const PlaceDetail: FC = () => {
   const searchParams = useSearchParams();
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
-  const userId = searchParams.get("user_id") ?? "";
 
-  const { loading, detail, error, refetch } = usePlaceDetail({
-    placeId: id ?? "",
-    userId,
-  });
+  const { loading, place, error, refetch } = usePlaceDetail(id ?? "");
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
@@ -30,19 +26,19 @@ const PlaceDetail: FC = () => {
 
   if (loading) return <LoadingIndicator />;
   if (error) return <ErrorState title="拠点を読み込めませんでした" refetchRef={refetchRef} />;
-  if (!detail) return notFound();
+  if (!place) return notFound();
 
   return (
     <>
       <div className="relative max-w-mobile-l mx-auto w-full z-10">
-        <NavigationButtons title={detail.name} />
+        <NavigationButtons title={place.name} />
       </div>
       <div className="min-h-screen">
-        <ImagesCarousel images={detail.images} title={detail.name} />
-        <PlaceOverview detail={detail} />
-        <PlaceAddress detail={detail} />
-        <PlaceOpportunities opportunities={detail.currentlyHiringOpportunities} />
-        <PlaceFeaturedArticle article={detail.relatedArticles?.[0]} />
+        <ImagesCarousel images={place.images} title={place.name} />
+        <PlaceOverview detail={place} />
+        <PlaceAddress detail={place} />
+        <PlaceOpportunities opportunities={place.currentlyHiringOpportunities} />
+        <PlaceFeaturedArticle article={place.relatedArticles?.[0]} />
       </div>
     </>
   );

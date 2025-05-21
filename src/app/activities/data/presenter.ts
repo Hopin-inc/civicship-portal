@@ -13,7 +13,7 @@ import {
 import { ActivityCard, ActivityDetail, OpportunityHost } from "@/app/activities/data/type";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
-import { presenterPlace } from "@/app/places/data/presenter/place";
+import { presenterPlace } from "@/app/places/data/presenter";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,

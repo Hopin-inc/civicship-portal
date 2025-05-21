@@ -1,25 +1,20 @@
 "use client";
 
-import { useGetMembershipListQuery } from "@/types/graphql";
-import { presenterBasePins } from "@/app/places/data/presenter/membership";
+import { GqlPlaceEdge, useGetPlacesQuery } from "@/types/graphql";
 import { useMemo } from "react";
+import { presenterPlacePins } from "@/app/places/data/presenter";
 
 export default function usePlacePins() {
-  const { data, loading, error, fetchMore, refetch } = useGetMembershipListQuery({
-    variables: {
-      filter: {},
-      IsCard: false,
-    },
+  const { data, loading, error, fetchMore, refetch } = useGetPlacesQuery({
+    variables: { first: 100 },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
 
-  const memberships = useMemo(
-    () => data?.memberships?.edges?.flatMap((edge) => (edge?.node ? [edge.node] : [])) ?? [],
-    [data?.memberships?.edges],
+  const placeEdges: GqlPlaceEdge[] = (data?.places?.edges ?? []).filter(
+    (e): e is GqlPlaceEdge => e != null && e.node != null,
   );
-
-  const placePins = useMemo(() => presenterBasePins(memberships), [memberships]);
+  const placePins = useMemo(() => presenterPlacePins(placeEdges), [placeEdges]);
 
   // const pageInfo = data?.memberships?.pageInfo;
   // const endCursor = pageInfo?.endCursor;
@@ -60,7 +55,6 @@ export default function usePlacePins() {
 
   return {
     placePins,
-    memberships,
     loading,
     error: error ?? null,
     // loadMoreRef,

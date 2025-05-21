@@ -3,11 +3,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { drawCircleWithImage } from "@/utils/maps/markerUtils";
 import { Marker } from "@react-google-maps/api";
-import { BasePin } from "@/app/places/data/type";
+import { IPlacePin } from "@/app/places/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface CustomMarkerProps {
-  data: BasePin;
+  data: IPlacePin;
   onClick: () => void;
   isSelected: boolean;
 }
