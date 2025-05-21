@@ -12,7 +12,7 @@ const categoryLabels: Record<GqlArticleCategory, string> = {
 
 const CategoryBadge: React.FC<CategoryBadgeProps> = ({ category }) => {
   return (
-    <div className="inline-block bg-[#4361EE] text-white px-4 py-1 rounded-md text-sm font-medium">
+    <div className="inline-block bg-primary text-primary-foreground px-4 py-1 rounded-xl text-label-sm font-bold">
       {categoryLabels[category]}
     </div>
   );
