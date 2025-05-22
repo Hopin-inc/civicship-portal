@@ -6,7 +6,9 @@ import {
   GqlOpportunitiesConnection,
   GqlOpportunityCategory as OpportunityCategory,
   GqlOpportunityFilterInput as OpportunityFilterInput,
+  GqlOpportunitySlotHostingStatus,
   GqlPublishStatus as PublishStatus,
+  GqlSortDirection,
   useGetOpportunitiesQuery,
 } from "@/types/graphql";
 import { groupOpportunitiesByDate, SearchParams } from "@/app/search/data/presenter";
@@ -34,7 +36,12 @@ export const useSearchResults = (
     error,
     refetch,
   } = useGetOpportunitiesQuery({
-    variables: { filter, first: 20 },
+    variables: {
+      filter,
+      first: 20,
+      slotFilter: { hostingStatus: GqlOpportunitySlotHostingStatus.Scheduled },
+      slotSort: { startsAt: GqlSortDirection.Asc },
+    },
     fetchPolicy: "network-only",
     nextFetchPolicy: "network-only",
   });
