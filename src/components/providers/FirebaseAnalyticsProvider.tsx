@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { app } from "@/lib/firebase";
 import { getAnalytics } from "firebase/analytics";
 
-const FirebaseAnalyticsProvider = () => {
+const FirebaseAnalyticsProvider = ({ children }: React.PropsWithChildren) => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -16,7 +16,7 @@ const FirebaseAnalyticsProvider = () => {
     }
   }, []);
 
-  return null;
+  return children;
 };
 
 export default FirebaseAnalyticsProvider;

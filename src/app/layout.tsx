@@ -37,21 +37,22 @@ const RootLayout = ({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </head>
       <body className={font.className}>
-        <FirebaseAnalyticsProvider />
-        <CookiesProvider>
-          <ApolloProvider>
-            <LiffProvider>
-              <AuthProvider>
-                <HeaderProvider>
-                  <LoadingProvider>
-                    <MainContent>{children}</MainContent>
-                    <Toaster richColors className="mx-8" />
-                  </LoadingProvider>
-                </HeaderProvider>
-              </AuthProvider>
-            </LiffProvider>
-          </ApolloProvider>
-        </CookiesProvider>
+        <FirebaseAnalyticsProvider>
+          <CookiesProvider>
+            <ApolloProvider>
+              <LiffProvider>
+                <AuthProvider>
+                  <HeaderProvider>
+                    <LoadingProvider>
+                      <MainContent>{children}</MainContent>
+                      <Toaster richColors className="mx-8" />
+                    </LoadingProvider>
+                  </HeaderProvider>
+                </AuthProvider>
+              </LiffProvider>
+            </ApolloProvider>
+          </CookiesProvider>
+        </FirebaseAnalyticsProvider>
       </body>
     </html>
   );
