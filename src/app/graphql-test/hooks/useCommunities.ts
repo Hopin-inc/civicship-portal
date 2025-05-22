@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useApolloClient } from "@apollo/client";
 import { GET_COMMUNITIES } from "@/graphql/account/community/query";
+import { testApolloClient } from "../lib/apollo";
 
 interface Community {
   id: string;
@@ -10,7 +10,6 @@ interface Community {
 }
 
 export const useCommunities = () => {
-  const client = useApolloClient();
   const [communities, setCommunities] = useState<Community[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -20,7 +19,7 @@ export const useCommunities = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const { data } = await client.query({
+        const { data } = await testApolloClient.query({
           query: GET_COMMUNITIES,
           fetchPolicy: "network-only",
         });
@@ -33,6 +32,7 @@ export const useCommunities = () => {
           setCommunities(communityList);
         }
       } catch (err) {
+        console.error("Error fetching communities:", err);
         setError(err instanceof Error ? err : new Error("Failed to fetch communities"));
       } finally {
         setIsLoading(false);
@@ -40,7 +40,7 @@ export const useCommunities = () => {
     };
 
     fetchCommunities();
-  }, [client]);
+  }, []);
 
   return {
     communities,

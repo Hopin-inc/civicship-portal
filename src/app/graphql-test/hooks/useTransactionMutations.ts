@@ -1,7 +1,7 @@
 "use client";
 
-import { useApolloClient } from "@apollo/client";
 import { ISSUE_POINT, GRANT_POINT, DONATE_POINT } from "@/graphql/transaction/mutation";
+import { testApolloClient } from "../lib/apollo";
 
 interface IssuePointInput {
   communityId: string;
@@ -25,14 +25,12 @@ interface DonatePointInput {
 }
 
 export const useTransactionMutations = () => {
-  const client = useApolloClient();
-
   const issuePoint = async (input: IssuePointInput) => {
     if (!input.communityId || !input.userId) {
       throw new Error("Community ID and User ID are required");
     }
 
-    const { data } = await client.mutate({
+    const { data } = await testApolloClient.mutate({
       mutation: ISSUE_POINT,
       variables: {
         input: {
@@ -53,7 +51,7 @@ export const useTransactionMutations = () => {
       throw new Error("Community ID and User ID are required");
     }
 
-    const { data } = await client.mutate({
+    const { data } = await testApolloClient.mutate({
       mutation: GRANT_POINT,
       variables: {
         input: {
@@ -74,7 +72,7 @@ export const useTransactionMutations = () => {
       throw new Error("Community ID and Target User ID are required");
     }
 
-    const { data } = await client.mutate({
+    const { data } = await testApolloClient.mutate({
       mutation: DONATE_POINT,
       variables: {
         input: {

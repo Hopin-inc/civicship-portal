@@ -1,7 +1,7 @@
 "use client";
 
-import { useApolloClient } from "@apollo/client";
 import { GET_TRANSACTIONS, GET_TRANSACTION } from "@/graphql/transaction/query";
+import { testApolloClient } from "../lib/apollo";
 
 interface TransactionFilterInput {
   userId?: string;
@@ -10,10 +10,8 @@ interface TransactionFilterInput {
 }
 
 export const useTransactionQueries = () => {
-  const client = useApolloClient();
-
   const getTransactions = async (filter: TransactionFilterInput = {}) => {
-    const { data } = await client.query({
+    const { data } = await testApolloClient.query({
       query: GET_TRANSACTIONS,
       variables: { filter },
       fetchPolicy: "network-only",
@@ -27,7 +25,7 @@ export const useTransactionQueries = () => {
       throw new Error("Transaction ID is required");
     }
 
-    const { data } = await client.query({
+    const { data } = await testApolloClient.query({
       query: GET_TRANSACTION,
       variables: { id },
       fetchPolicy: "network-only",

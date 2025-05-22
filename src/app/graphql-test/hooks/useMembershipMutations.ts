@@ -1,7 +1,7 @@
 "use client";
 
-import { useApolloClient } from "@apollo/client";
 import { ASSIGN_OWNER, ASSIGN_MANAGER, ASSIGN_MEMBER } from "@/graphql/account/membership/mutation";
+import { testApolloClient } from "../lib/apollo";
 
 interface MembershipSetRoleInput {
   userId: string;
@@ -9,14 +9,12 @@ interface MembershipSetRoleInput {
 }
 
 export const useMembershipMutations = () => {
-  const client = useApolloClient();
-
   const assignOwner = async (input: MembershipSetRoleInput) => {
     if (!input.communityId || !input.userId) {
       throw new Error("Community ID and User ID are required");
     }
 
-    const { data } = await client.mutate({
+    const { data } = await testApolloClient.mutate({
       mutation: ASSIGN_OWNER,
       variables: {
         input,
@@ -32,7 +30,7 @@ export const useMembershipMutations = () => {
       throw new Error("Community ID and User ID are required");
     }
 
-    const { data } = await client.mutate({
+    const { data } = await testApolloClient.mutate({
       mutation: ASSIGN_MANAGER,
       variables: {
         input,
@@ -48,7 +46,7 @@ export const useMembershipMutations = () => {
       throw new Error("Community ID and User ID are required");
     }
 
-    const { data } = await client.mutate({
+    const { data } = await testApolloClient.mutate({
       mutation: ASSIGN_MEMBER,
       variables: {
         input,

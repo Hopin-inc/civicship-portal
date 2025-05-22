@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useApolloClient } from "@apollo/client";
 import { GET_MEMBERSHIP_LIST } from "@/graphql/account/membership/query";
+import { testApolloClient } from "../lib/apollo";
 
 interface User {
   id: string;
@@ -10,7 +10,6 @@ interface User {
 }
 
 export const useUsersByCommunity = (communityId: string) => {
-  const client = useApolloClient();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -25,7 +24,7 @@ export const useUsersByCommunity = (communityId: string) => {
       setIsLoading(true);
       setError(null);
       try {
-        const { data } = await client.query({
+        const { data } = await testApolloClient.query({
           query: GET_MEMBERSHIP_LIST,
           variables: { 
             first: 50,
@@ -45,6 +44,7 @@ export const useUsersByCommunity = (communityId: string) => {
           setUsers(userList);
         }
       } catch (err) {
+        console.error("Error fetching users by community:", err);
         setError(err instanceof Error ? err : new Error("Failed to fetch users"));
       } finally {
         setIsLoading(false);
@@ -52,7 +52,7 @@ export const useUsersByCommunity = (communityId: string) => {
     };
 
     fetchUsers();
-  }, [client, communityId]);
+  }, [communityId]);
 
   return {
     users,
