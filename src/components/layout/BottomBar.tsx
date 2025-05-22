@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Search, Globe, User } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
@@ -13,6 +13,8 @@ interface HeaderProps {
 
 const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const placeId = searchParams.get("placeId");
 
   // Hide BottomBar on search and reservation pages except complete page
   if (
@@ -21,8 +23,8 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     (pathname.startsWith("/reservation") && !pathname.includes("/complete")) ||
     pathname.startsWith("/activities/") ||
     pathname.startsWith("/participations/") ||
-    pathname === "/users/me/edit"
-    // || pathname.startsWith('/places')
+    pathname === "/users/me/edit" ||
+    (pathname.startsWith("/places") && placeId)
   ) {
     return null;
   }
@@ -47,7 +49,10 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
             <Globe size={24} />
             <span className="text-xs mt-1">拠点</span>
           </Link>
-          <Link href="/users/me" className={cn(getLinkStyle("/users/me", "/users/me/*"), "flex-grow")}>
+          <Link
+            href="/users/me"
+            className={cn(getLinkStyle("/users/me", "/users/me/*"), "flex-grow")}
+          >
             <User size={24} />
             <span className="text-xs mt-1">マイページ</span>
           </Link>

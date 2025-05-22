@@ -8,7 +8,8 @@ import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import CategoryBadge from "../../components/CategoryBadge";
 import ArticleRecommendations from "./ArticleRecommendations";
 import { TArticleDetail, TArticleWithAuthor } from "@/app/articles/data/type";
-import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
+import { ActivitiesCarouselSection } from "./ActivitiesCarouselSection";
+import { Calendar } from "lucide-react";
 
 type ArticleDetailProps = {
   article: TArticleDetail;
@@ -17,7 +18,7 @@ type ArticleDetailProps = {
 
 const ArticleDetail = ({ article, recommendedArticles }: ArticleDetailProps) => {
   return (
-    <div className="max-w-[375px] mx-auto pt-10 pb-32 px-2">
+    <div className="max-w-[375px] mx-auto pb-32">
       <ArticleHeader
         title={article.title}
         thumbnail={article.thumbnail}
@@ -31,7 +32,7 @@ const ArticleDetail = ({ article, recommendedArticles }: ArticleDetailProps) => 
         opportunities={article.hostedOpportunitiesByAuthors}
       />
       {recommendedArticles && recommendedArticles.length > 0 && (
-        <ArticleRecommendations title="おすすめの記事" articles={recommendedArticles} />
+        <ArticleRecommendations title="関連する記事" articles={recommendedArticles} />
       )}
     </div>
   );
@@ -47,19 +48,19 @@ const ArticleHeader = ({
     <div className="bg-background relative rounded-[8px]">
       <div className="relative w-full h-[210px]">
         <Image src={thumbnail || "/placeholder.svg"} alt={title} fill className="object-cover" />
-        <div className="absolute top-4 left-4">
-          <CategoryBadge category={category} />
-        </div>
       </div>
 
-      <div className="relative -mt-8 bg-background rounded-2xl shadow-md mx-4">
-        <div className="px-4 pt-6 pb-4">
-          <h1 className="text-2xl font-bold mb-4">{title}</h1>
-          <div className="text-muted-foreground text-sm">
-            公開: {format(new Date(publishedAt), "yyyy年M月d日", { locale: ja })}
+      <div className="relative -mt-8 bg-background rounded-2xl">
+        <div className="px-4 pt-6 pb-4 space-y-2">
+          <div className="flex items-center gap-x-1">
+            <CategoryBadge category={category} />
+          </div>
+          <h1 className="text-display-lg">{title}</h1>
+          <div className="text-caption flex items-center gap-x-1">
+            <Calendar className="h-4 w-4 flex-shrink-0" />
+            <span>{format(new Date(publishedAt), "yyyy/M/d", { locale: ja })}</span>
           </div>
         </div>
-
         <div className="h-px bg-muted" />
       </div>
     </div>
@@ -101,7 +102,6 @@ const ArticleBody = ({ markdown }: { markdown: string }) => {
       />
     </article>
   );
-
 };
 
 export default ArticleDetail;

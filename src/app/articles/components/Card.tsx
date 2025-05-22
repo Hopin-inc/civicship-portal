@@ -25,7 +25,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory, showUs
         {article.thumbnail && (
           <div className="relative w-full h-48">
             {showCategory && (
-              <div className="absolute top-4 left-4 z-10">
+              <div className="absolute top-2 left-3 z-10">
                 <CategoryBadge category={article.category} />
               </div>
             )}
@@ -52,14 +52,14 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory, showUs
               <div className="flex items-center gap-x-1">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                   <Image
-                    src={article.author?.image || "/placeholder.png"}
+                    src={article.author?.image || PLACEHOLDER_IMAGE}
                     alt={article.author?.name || "作者"}
                     fill
                     className="object-cover"
                   />
                 </div>
                 <div>
-                  <p className="text-body-md font-bold">{article.author?.name}</p>
+                  <p className="text-body-md font-bold ml-1">{article.author?.name}</p>
                 </div>
               </div>
               <div className="flex items-center gap-x-1">

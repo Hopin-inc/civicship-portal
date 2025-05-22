@@ -2,24 +2,24 @@ import { AppImage, Participant } from "@/types/utils";
 import { ActivityCard } from "@/app/activities/data/type";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 
-export type BasePin = {
+export type IPlacePin = {
   id: string;
   image: string; // 拠点の代表画像（例：施設写真）
-  host: BaseHost;
+  host: IPlaceHost;
 
   latitude: number;
   longitude: number;
   address: string;
 };
 
-export type BaseHost = {
+export type IPlaceHost = {
   id: string;
   name: string;
   image: string | null;
   bio: string;
 };
 
-export type BaseCardInfo = BasePin & {
+export type IPlaceCard = IPlacePin & {
   name: string; // 拠点名
   address: string;
   headline: string; // 強調キャッチコピー（短文）
@@ -31,28 +31,28 @@ export type BaseCardInfo = BasePin & {
   communityId: string;
 };
 
-export type BaseDetail = BaseCardInfo & {
+export type IPlaceDetail = IPlaceCard & {
   images: string[];
   totalImageCount: number;
 
   currentlyHiringOpportunities: ActivityCard[];
   relatedArticles: TArticleWithAuthor[];
-  // pastHistories: BaseHistoryGrouped;
+  // pastHistories: PlaceHistoryGrouped;
 };
 
-// export type BaseHistoryGrouped = HistoryYearGroup[];
+// export type PlaceHistoryGrouped = HistoryYearGroup[];
 
-export type HistoryYearGroup = {
+export type IHistoryYearGroup = {
   year: string;
-  months: HistoryMonthGroup[];
+  months: IHistoryMonthGroup[];
 };
 
-export type HistoryMonthGroup = {
+export type IHistoryMonthGroup = {
   month: string;
-  entries: BaseHistoryEntry[];
+  entries: IPlaceHistoryEntry[];
 };
 
-export type BaseHistoryEntry = {
+export type IPlaceHistoryEntry = {
   id: string;
   date: string;
   title: string;

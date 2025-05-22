@@ -1,16 +1,20 @@
 "use client";
 
 import {
+  GqlOpportunityCategory,
+  GqlReservation,
   GqlTicket,
   GqlWallet,
-  GqlReservation,
-  GqlOpportunityCategory,
   Maybe,
 } from "@/types/graphql";
-import { RequiredUtility, OpportunityCard } from "@/app/activities/data/type";
-import { ReservationDetail, ActivityField, QuestField } from "@/app/reservation/data/type/reservation";
+import { OpportunityCard, RequiredUtility } from "@/app/activities/data/type";
+import {
+  ActivityField,
+  QuestField,
+  ReservationDetail,
+} from "@/app/reservation/data/type/reservation";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
-import { presenterPlace } from "@/app/places/data/presenter/place";
+import { presenterPlace } from "@/app/places/data/presenter";
 import { presenterOpportunityHost } from "@/app/activities/data/presenter";
 
 export const getTicketIds = (

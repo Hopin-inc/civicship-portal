@@ -1,12 +1,23 @@
 import { logEvent, setUserProperties } from "firebase/analytics";
 import { getAnalytics, setUserId } from "@firebase/analytics";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
-import { useParams, usePathname } from "next/navigation";
+import { useEffect, useMemo } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import { app } from "@/lib/firebase";
 
-const analytics = typeof window !== "undefined" ? getAnalytics(app) : undefined;
-export { analytics };
+let analyticsInstance: ReturnType<typeof getAnalytics> | undefined;
+
+export const getSafeAnalytics = () => {
+  if (typeof window === "undefined") return undefined;
+  if (typeof window.gtag !== "function") {
+    console.warn("[Analytics] gtag not ready");
+    return undefined;
+  }
+  if (!analyticsInstance) {
+    analyticsInstance = getAnalytics(app);
+  }
+  return analyticsInstance;
+};
 
 // 内部保持：ユーザー属性 + 環境情報（初期値は空）
 let currentUserAttributes: Record<string, string> = {};
@@ -15,16 +26,15 @@ export function useAnalyticsUserBinding() {
   const { user, uid, isPhoneVerified, isAuthenticating } = useAuth();
 
   useEffect(() => {
+    const analytics = getSafeAnalytics();
     if (isAuthenticating || !analytics) return;
 
-    // 認証済みユーザーには user_id を明示
     if (user?.id) {
       setUserId(analytics, user.id);
     }
 
-    // 認証済み・未認証問わず属性は送る（GA4に紐づく）
     setSafeUserAttributes({
-      user_id: user?.id ?? "guest", // または undefined を避けるなら "anonymous"
+      user_id: user?.id ?? "guest",
       firebase_uid: uid ?? "",
       name: user?.name ?? "",
       phone_verified: isPhoneVerified ? "true" : "false",
@@ -35,22 +45,27 @@ export function useAnalyticsUserBinding() {
 
 export const useAutoPageView = () => {
   const pathname = usePathname();
-  const paramsObj = useParams(); // { activityId, placeId, … }
+  const searchParams = useSearchParams();
 
-  // ❶ stringify を外に出す
-  const paramsJson = JSON.stringify(paramsObj);
+  const { normalizedPath, entityId, queryParams } = useMemo(() => {
+    return normalizeUrlForLogging(pathname, searchParams);
+  }, [pathname, searchParams]);
+
+  const paramsJson = useMemo(() => {
+    return JSON.stringify({
+      ...(entityId ? { entityId } : {}),
+      ...queryParams,
+    });
+  }, [entityId, queryParams]);
 
   useEffect(() => {
-    // ❷ 必要ならパースしてオブジェクトに戻す
-    const dynamicParams = JSON.parse(paramsJson);
-
+    const parsedParams = JSON.parse(paramsJson);
     logPageView({
-      path: pathname,
+      path: normalizedPath,
       title: document.title,
-      ...dynamicParams, // activityId, placeId, ticketId, userId など
+      ...parsedParams,
     });
-    // ❸ deps はシンプルな変数参照だけにする
-  }, [pathname, paramsJson]);
+  }, [normalizedPath, paramsJson]);
 };
 
 const getDefaultClientAttributes = (): Record<string, string> => {
@@ -65,9 +80,6 @@ const getDefaultClientAttributes = (): Record<string, string> => {
   };
 };
 
-/**
- * ユーザー属性を設定し、以降のイベントに自動付加されるようにする
- */
 const setSafeUserAttributes = (rawProps: Record<string, any>) => {
   const cleanedProps: Record<string, string> = {};
 
@@ -77,36 +89,38 @@ const setSafeUserAttributes = (rawProps: Record<string, any>) => {
     }
   }
 
-  // デフォルトのクライアント属性をマージ
   const defaultAttrs = getDefaultClientAttributes();
   const merged = { ...cleanedProps, ...defaultAttrs };
   currentUserAttributes = merged;
+
+  const analytics = getSafeAnalytics(); // ← ここで取得
 
   if (!analytics) {
     console.warn("[Analytics] not initialized: skip setUserProperties");
     return;
   }
 
-  // Firebase 側のユーザープロパティにも反映（25個制限に注意）
   setUserProperties(analytics, merged);
 };
 
-/**
- * イベント送信：ユーザー属性 + params をすべて送信
- */
 const safeLogEvent = (name: string, params?: Record<string, any>): void => {
-  const isDev = process.env.NODE_ENV === 'development';
+  const isDev = process.env.NODE_ENV !== "production";
   if (isDev) {
     console.log("[Analytics] → send event:", name, params);
   }
+
+  const analytics = getSafeAnalytics(); // ← ここでも取得
+
   if (!analytics) {
     console.warn(`[Analytics] not initialized: skip event '${name}'`);
     return;
   }
+
   const enrichedParams = { ...currentUserAttributes, ...params };
   if (isDev) {
     console.log("[Analytics] → enriched params:", enrichedParams);
   }
+
   logEvent(analytics, name, enrichedParams);
 };
 
@@ -125,4 +139,35 @@ export const logPageView = (options: LogPageViewOptions = {}) => {
     page_title: title || document.title,
     ...restParams,
   });
+};
+
+type NormalizedUrlResult = {
+  normalizedPath: string;
+  entityId?: string;
+  queryParams: Record<string, string>;
+};
+
+const cuidRegex = /^c[a-z0-9]{20,}$/;
+
+const normalizeUrlForLogging = (
+  pathname: string,
+  searchParams: URLSearchParams,
+): NormalizedUrlResult => {
+  const segments = pathname.split("/").filter(Boolean);
+
+  // 正規化されたパス（CUIDを [id] に変換）
+  const normalizedSegments = segments.map((seg) => (cuidRegex.test(seg) ? "[id]" : seg));
+  const normalizedPath = "/" + normalizedSegments.join("/");
+
+  // entityId: 最後のセグメントが CUID なら
+  const lastSegment = segments.at(-1);
+  const entityId = lastSegment && cuidRegex.test(lastSegment) ? lastSegment : undefined;
+
+  // queryParams: SearchParams からすべて取得（undefinedは除外）
+  const queryParams: Record<string, string> = {};
+  for (const [key, value] of searchParams.entries()) {
+    if (value) queryParams[key] = value;
+  }
+
+  return { normalizedPath, entityId, queryParams };
 };

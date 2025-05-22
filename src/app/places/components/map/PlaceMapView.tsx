@@ -5,14 +5,14 @@ import PlaceToggleButton from "../ToggleButton";
 import PlaceCardsSheet from "./PlaceCardsSheet";
 import MapComponent from "./MapComponent";
 import { AnimatePresence, motion } from "framer-motion";
-import { BaseCardInfo, BasePin } from "@/app/places/data/type";
+import { IPlaceCard, IPlacePin } from "@/app/places/data/type";
 
 interface PlaceMapViewProps {
   selectedPlaceId: string | null;
   onPlaceSelect: (placeId: string) => void;
   toggleMode: () => void;
-  placePins: BasePin[];
-  places: BaseCardInfo[];
+  placePins: IPlacePin[];
+  places: IPlaceCard[];
 }
 
 const PlaceMapView: React.FC<PlaceMapViewProps> = ({
@@ -38,7 +38,7 @@ const PlaceMapView: React.FC<PlaceMapViewProps> = ({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed bottom-[80px] inset-x-0 z-50 flex justify-center px-4"
+            className="fixed bottom-[32px] inset-x-0 left-0 right-0 z-50 w-full flex items-center px-4 justify-center mx-auto"
           >
             <div className="relative w-full max-w-lg overflow-hidden mx-auto">
               <PlaceCardsSheet
