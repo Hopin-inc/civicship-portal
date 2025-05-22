@@ -24,12 +24,19 @@ export default function ActivitiesFeaturedSection({
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [imageSliderApi, setImageSliderApi] = useState<any>(null);
 
   useEffect(() => {
     if (!emblaApi) return;
 
     const onSelect = () => {
-      setSelectedIndex(emblaApi.selectedScrollSnap());
+      const index = emblaApi.selectedScrollSnap();
+      setSelectedIndex(index);
+
+      // Synchronize image slider with main carousel
+      if (imageSliderApi) {
+        imageSliderApi.scrollTo(index);
+      }
     };
 
     emblaApi.on("select", onSelect);
@@ -38,7 +45,7 @@ export default function ActivitiesFeaturedSection({
     return () => {
       emblaApi.off("select", onSelect);
     };
-  }, [emblaApi]);
+  }, [emblaApi, imageSliderApi]);
 
   const handleImageSlideChange = useCallback(
     (index: number) => {
@@ -74,6 +81,7 @@ export default function ActivitiesFeaturedSection({
         title={opportunities[selectedIndex]?.title || ""}
         isVisible={true}
         onSlideChange={handleImageSlideChange}
+        onApiChange={setImageSliderApi}
       />
 
       <div className="embla h-full" ref={emblaRef}>
@@ -99,11 +107,13 @@ function OpportunityImageSlider({
   title,
   isVisible,
   onSlideChange,
+  onApiChange,
 }: {
   images: string[];
   title: string;
   isVisible: boolean;
   onSlideChange?: (index: number) => void;
+  onApiChange?: (api: any) => void;
 }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
@@ -111,6 +121,13 @@ function OpportunityImageSlider({
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  // Provide the embla API to parent component
+  useEffect(() => {
+    if (emblaApi && onApiChange) {
+      onApiChange(emblaApi);
+    }
+  }, [emblaApi, onApiChange]);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
