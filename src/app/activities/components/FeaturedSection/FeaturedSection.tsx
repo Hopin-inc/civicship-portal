@@ -21,6 +21,8 @@ export default function ActivitiesFeaturedSection({
     loop: true,
     align: "center",
     containScroll: "trimSnaps",
+    dragFree: false,
+    slidesToScroll: 1,
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -63,7 +65,7 @@ export default function ActivitiesFeaturedSection({
     if (opportunity.images && opportunity.images.length > 1) {
       return opportunity.images[1];
     }
-    return `/images/activities/featured/image-${(i % 5) + 1}.png`;
+    return PLACEHOLDER_IMAGE;
   });
 
   return (
@@ -118,6 +120,9 @@ function OpportunityImageSlider({
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "start",
+    dragFree: false,
+    speed: 20,
+    slidesToScroll: 1,
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
