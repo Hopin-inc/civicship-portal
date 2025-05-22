@@ -43,19 +43,19 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     <header
       className={cn(
         className,
-        "fixed top-0 left-0 right-0 z-50 bg-background border-b border-border max-w-mobile-l mx-auto w-full flex items-center px-4 transition-all duration-200",
+        "fixed top-0 left-0 right-0 z-50 bg-background border-b border-border max-w-mobile-l mx-auto w-full flex items-center px-6 transition-all duration-200",
         config.showSearchForm ? "h-20" : "h-16",
       )}
     >
       {shouldShowBackButton && (
         <Button onClick={handleBackButton} variant="icon-only" size="sm" aria-label="戻る">
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-6 w-6 text-caption" />
         </Button>
       )}
       {config.showLogo && (
         <Link href="/" className="flex items-center space-x-2">
           <Image
-            src="/images/neo88-logo.jpg"
+            src="/images/neo88-logo-square.jpg"
             alt="NEO88"
             width={88}
             height={72}
@@ -74,8 +74,8 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         </div>
       )}
       {config.title && !config.showSearchForm && (
-        <div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col content-center justify-center -z-10">
-          <h1 className="text-center text-title-md truncate">{config.title}</h1>
+        <div className="flex flex-col content-center justify-center w-full">
+          <h1 className="text-center text-title-md truncate max-w-[80%]">{config.title}</h1>
         </div>
       )}
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
