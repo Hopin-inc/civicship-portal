@@ -3,8 +3,17 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue 
+} from "@/components/ui/select";
 import { useMembershipQueries } from "../hooks/useMembershipQueries";
 import { useMembershipMutations } from "../hooks/useMembershipMutations";
+import { useUsers } from "../hooks/useUsers";
+import { useCommunities } from "../hooks/useCommunities";
 import ResultDisplay from "./ResultDisplay";
 
 export default function MembershipTestSection() {
@@ -14,6 +23,8 @@ export default function MembershipTestSection() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  const { users, isLoading: usersLoading } = useUsers();
+  const { communities, isLoading: communitiesLoading } = useCommunities();
   const { getSingleMembership, getMembershipList } = useMembershipQueries();
   const { assignOwner, assignManager, assignMember } = useMembershipMutations();
 
@@ -98,20 +109,44 @@ export default function MembershipTestSection() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Community ID</label>
-            <Input
+            <label className="block text-sm font-medium mb-1">Community</label>
+            <Select
               value={communityId}
-              onChange={(e) => setCommunityId(e.target.value)}
-              placeholder="Enter community ID"
-            />
+              onValueChange={setCommunityId}
+              disabled={communitiesLoading || isLoading}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a community" />
+              </SelectTrigger>
+              <SelectContent>
+                {communities.map((community) => (
+                  <SelectItem key={community.id} value={community.id}>
+                    {community.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {communitiesLoading && <p className="text-sm text-muted-foreground mt-1">Loading communities...</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">User ID</label>
-            <Input
+            <label className="block text-sm font-medium mb-1">User</label>
+            <Select
               value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              placeholder="Enter user ID"
-            />
+              onValueChange={setUserId}
+              disabled={usersLoading || isLoading}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a user" />
+              </SelectTrigger>
+              <SelectContent>
+                {users.map((user) => (
+                  <SelectItem key={user.id} value={user.id}>
+                    {user.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {usersLoading && <p className="text-sm text-muted-foreground mt-1">Loading users...</p>}
           </div>
         </div>
         
