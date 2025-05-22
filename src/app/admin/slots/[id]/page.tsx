@@ -1,8 +1,7 @@
 "use client";
 
-import React, { use, useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useMutation } from "@apollo/client";
-import { EVALUATION_PASS, EVALUATION_FAIL } from "@/graphql/experience/evaluation/mutation";
 import { EVALUATION_BULK_CREATE } from "@/graphql/experience/evaluation/batchMutation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { CardWrapper } from "@/components/ui/card-wrapper";
@@ -20,9 +19,11 @@ import { prefectureLabels } from "@/app/users/data/presenter";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { cn } from "@/lib/utils";
 import { displayDuration } from "@/utils";
+import { useParams } from "next/navigation";
 
-export default function SlotDetailPage({ params }: { params: { id: string } }) {
-  const { id } = use(params);
+export default function SlotDetailPage() {
+  const params = useParams();
+  const id = (Array.isArray(params.id) ? params.id[0] : params.id) ?? "";
   const headerConfig = useMemo(() => ({
     title: `出欠入力`,
     showLogo: false,
@@ -46,24 +47,6 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
     hasMore,
     isLoadingMore,
   } = useSlotParticipations(id);
-
-  const [evaluationPass, { loading: passLoading }] = useMutation(EVALUATION_PASS, {
-    onCompleted: () => {
-      toast.success("参加を確認しました");
-    },
-    onError: (error) => {
-      toast.error(`参加確認に失敗しました: ${ error.message }`);
-    },
-  });
-
-  const [evaluationFail, { loading: failLoading }] = useMutation(EVALUATION_FAIL, {
-    onCompleted: () => {
-      toast.success("不参加を記録しました");
-    },
-    onError: (error) => {
-      toast.error(`不参加記録に失敗しました: ${ error.message }`);
-    },
-  });
 
   const [batchEvaluate, { loading: batchLoading }] = useMutation(EVALUATION_BULK_CREATE, {
     onCompleted: () => {
@@ -197,20 +180,10 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
           </p>
           <p className="inline-flex items-center gap-2 text-body-md">
             <User size="24" />
-            予約 { slot.capacity - slot.remainingCapacity }名
+            予約 { slot.numParticipants }名
             <span className="text-caption">/ 定員 { slot.capacity }名</span>
           </p>
         </div>
-      </div>
-      
-      {/* Add participant count information */}
-      <div className="text-sm mb-4">
-        <p>参加者: {slot.numParticipants || 0}名</p>
-        <p>出欠評価済み: {slot.numEvaluated || 0}名 
-           ({slot.numParticipants ? 
-             Math.round((slot.numEvaluated / slot.numParticipants) * 100) : 
-             0}%)
-        </p>
       </div>
 
       <h2 className="text-lg font-bold mb-2">参加者一覧</h2>
@@ -242,7 +215,7 @@ export default function SlotDetailPage({ params }: { params: { id: string } }) {
                 onValueChange={ (value) => {
                   if (value) handleAttendanceChange(participation.id, value);
                 } }
-                disabled={ isSaved || isSaving || passLoading || failLoading || participation.evaluation !== null && participation.evaluation !== undefined }
+                disabled={ isSaved || isSaving || batchLoading || participation.evaluation !== null && participation.evaluation !== undefined }
               >
                 <ToggleGroupItem value="PASSED" aria-label="参加">
                   参加

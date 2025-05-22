@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useMemo } from "react";
+import { useMemo } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_RESERVATION } from "@/graphql/experience/reservation/query";
 import { ACCEPT_RESERVATION_MUTATION } from "@/graphql/experience/reservation/mutation";
@@ -17,13 +17,15 @@ import dayjs from "dayjs";
 import { displayDuration, displayPhoneNumber } from "@/utils";
 import { CalendarIcon, JapaneseYen, MapPin, Phone, User } from "lucide-react";
 import { prefectureLabels } from "@/app/users/data/presenter";
-import { GqlCurrentPrefecture } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlOpportunityCategory } from "@/types/graphql";
 import { ReservationStatus } from "@/app/admin/reservations/components/ReservationStatus";
 import Link from "next/link";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 
-export default function ReservationDetailPage({ params }: { params: { id: string } }) {
-  const { id } = use(params);
+export default function ReservationDetailPage() {
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const headerConfig = useMemo(
     () => ({
       title: `予約詳細`,
@@ -45,7 +47,7 @@ export default function ReservationDetailPage({ params }: { params: { id: string
       refetch();
     },
     onError: (error) => {
-      toast.error(`承認に失敗しました: ${error.message}`);
+      toast.error(`承認に失敗しました: ${ error.message }`);
     },
   });
 
@@ -57,7 +59,7 @@ export default function ReservationDetailPage({ params }: { params: { id: string
         refetch();
       },
       onError: (error) => {
-        toast.error(`中止に失敗しました: ${error.message}`);
+        toast.error(`中止に失敗しました: ${ error.message }`);
       },
     },
   );
@@ -73,7 +75,8 @@ export default function ReservationDetailPage({ params }: { params: { id: string
           },
         },
       });
-    } catch (e) {}
+    } catch (e) {
+    }
   };
 
   const handleCancel = async () => {
@@ -90,7 +93,8 @@ export default function ReservationDetailPage({ params }: { params: { id: string
           },
         },
       });
-    } catch (e) {}
+    } catch (e) {
+    }
   };
 
   if (loading) {
@@ -127,6 +131,9 @@ export default function ReservationDetailPage({ params }: { params: { id: string
     opportunity?.slots?.filter(
       (slot: any) => dayjs(slot.startsAt).isAfter(dayjs()) && slot.hostingStatus !== "CANCELLED",
     )?.length || 0;
+  const opportunityPagePath = opportunity.category === GqlOpportunityCategory.Activity ? `/activities/${ opportunity.id }`
+    : opportunity.category === GqlOpportunityCategory.Quest ? `/quests/${ opportunity.id }`
+      : "/";
 
   return (
     <div className="p-6">
@@ -134,33 +141,33 @@ export default function ReservationDetailPage({ params }: { params: { id: string
         <h2 className="text-title-md mb-3">予約者</h2>
         <div className="flex items-center gap-3">
           <Avatar>
-            <AvatarImage src={reservation.createdByUser?.image || ""} />
-            <AvatarFallback>{reservation.createdByUser?.name?.[0] || "U"}</AvatarFallback>
+            <AvatarImage src={ reservation.createdByUser?.image || "" } />
+            <AvatarFallback>{ reservation.createdByUser?.name?.[0] || "U" }</AvatarFallback>
           </Avatar>
           <div className="flex-grow flex flex-col justify-center gap-1">
-            <p className="text-label-md">{reservation.createdByUser?.name || "未設定"}</p>
+            <p className="text-label-md">{ reservation.createdByUser?.name || "未設定" }</p>
             <p className="inline-flex items-center gap-1 text-muted-foreground text-label-sm">
               <MapPin size="16" />
-              {reservation.createdByUser?.currentPrefecture
+              { reservation.createdByUser?.currentPrefecture
                 ? prefectureLabels[
-                    reservation.createdByUser?.currentPrefecture as GqlCurrentPrefecture
+                  reservation.createdByUser?.currentPrefecture as GqlCurrentPrefecture
                   ]
-                : "不明"}
+                : "不明" }
             </p>
           </div>
-          <ReservationStatus status={reservation.status} />
+          <ReservationStatus status={ reservation.status } />
         </div>
       </div>
 
       <div>
         <h2 className="text-title-md mb-3">予約情報</h2>
-        <Link href={`/opportunities/${id}`} target="_blank">
+        <Link href={ opportunityPagePath } target="_blank">
           <CardWrapper clickable className="overflow-hidden flex items-center h-24">
-            <Image src={opportunity?.images[0]} alt={opportunity?.title} width="96" height="96" />
+            <Image src={ opportunity?.images[0] } alt={ opportunity?.title } width="96" height="96" />
             <div className="flex flex-col flex-grow p-4">
-              <p className="text-body-md">{opportunity?.title}</p>
+              <p className="text-body-md">{ opportunity?.title }</p>
               <p className="text-body-sm text-muted-foreground">
-                今後{futureSlotsCount}日程で開催予定
+                今後{ futureSlotsCount }日程で開催予定
               </p>
             </div>
           </CardWrapper>
@@ -168,47 +175,47 @@ export default function ReservationDetailPage({ params }: { params: { id: string
         <div className="flex flex-col flex-wrap text-body-sm gap-2 mt-4">
           <p className="inline-flex items-center gap-2 text-body-md">
             <CalendarIcon size="24" />
-            {reservation.opportunitySlot?.startsAt &&
+            { reservation.opportunitySlot?.startsAt &&
               displayDuration(
                 reservation.opportunitySlot.startsAt,
                 reservation.opportunitySlot.endsAt,
-              )}
+              ) }
           </p>
           <p className="inline-flex items-center gap-2 text-body-md">
             <User size="24" />
-            {reservation.participations?.length ?? 0}名
+            { reservation.participations?.length ?? 0 }名
           </p>
           <p className="inline-flex items-center gap-2 text-body-md">
             <JapaneseYen size="24" />
-            {participationFee.toLocaleString()}円
+            { participationFee.toLocaleString() }円
             <span className="text-label-sm text-muted-foreground">
-              ({opportunity?.feeRequired?.toLocaleString() ?? 0}円×
-              {participantCount.toLocaleString()}人)
+              ({ opportunity?.feeRequired?.toLocaleString() ?? 0 }円×
+              { participantCount.toLocaleString() }人)
             </span>
           </p>
           <p className="inline-flex items-center gap-2 text-body-md">
             <Phone size="24" />
-            {reservation.createdByUser?.phoneNumber
+            { reservation.createdByUser?.phoneNumber
               ? displayPhoneNumber(reservation.createdByUser?.phoneNumber)
-              : "未設定"}
+              : "未設定" }
           </p>
         </div>
       </div>
 
-      {/* Footer with conditional buttons */}
-      {reservation.status === "APPLIED" &&
+      {/* Footer with conditional buttons */ }
+      { reservation.status === "APPLIED" &&
         reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
         reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
           <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
             <CardFooter className="p-4">
-              <Button className="w-full" onClick={handleAccept} disabled={acceptLoading}>
-                {acceptLoading ? "処理中..." : "承認する"}
+              <Button className="w-full" onClick={ handleAccept } disabled={ acceptLoading }>
+                { acceptLoading ? "処理中..." : "承認する" }
               </Button>
             </CardFooter>
           </Card>
-        )}
+        ) }
 
-      {reservation.status === "ACCEPTED" &&
+      { reservation.status === "ACCEPTED" &&
         !isWithin7Days &&
         reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
         reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
@@ -216,17 +223,17 @@ export default function ReservationDetailPage({ params }: { params: { id: string
             <CardFooter className="p-4">
               <Button
                 className="w-full"
-                onClick={handleCancel}
-                disabled={cancelLoading}
+                onClick={ handleCancel }
+                disabled={ cancelLoading }
                 variant="destructive"
               >
-                {cancelLoading ? "処理中..." : "開催中止"}
+                { cancelLoading ? "処理中..." : "開催中止" }
               </Button>
             </CardFooter>
           </Card>
-        )}
+        ) }
 
-      {reservation.status === "ACCEPTED" &&
+      { reservation.status === "ACCEPTED" &&
         isWithin7Days &&
         reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
         reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
@@ -237,7 +244,7 @@ export default function ReservationDetailPage({ params }: { params: { id: string
               </Button>
             </CardFooter>
           </Card>
-        )}
+        ) }
     </div>
   );
 }
