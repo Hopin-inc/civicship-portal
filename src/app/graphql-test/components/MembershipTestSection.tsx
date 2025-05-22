@@ -151,6 +151,7 @@ export default function MembershipTestSection() {
               </SelectContent>
             </Select>
             {usersLoading && <p className="text-sm text-muted-foreground mt-1">Loading users...</p>}
+            {!communityId && <p className="text-sm text-muted-foreground mt-1">Select a community first</p>}
           </div>
         </div>
         
