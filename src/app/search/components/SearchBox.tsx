@@ -19,13 +19,13 @@ const PREFECTURE_LABELS: Record<string, string> = {
   KOUCHI: "高知県",
   EHIME: "愛媛県",
 };
-const DEFAULT_LABEL = "場所を選択";
+const DEFAULT_LABEL = "四国";
 
 const SearchBox = ({ location, from, to, guests }: SearchFormProps) => {
   const router = useRouter();
 
-  const getLocationText = (location?: string): string => {
-    const label = PREFECTURE_LABELS[location ?? ""] ?? DEFAULT_LABEL;
+  const getLocationText = (location: string | undefined): string => {
+    const label = location ? PREFECTURE_LABELS[location] || DEFAULT_LABEL : DEFAULT_LABEL;
     return `${label}の体験`;
   };
 
@@ -72,16 +72,16 @@ const SearchBox = ({ location, from, to, guests }: SearchFormProps) => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center w-full h-full">
-          <span className="text-sm font-medium text-foreground">{getLocationText()}</span>
+          <span className="text-sm font-medium text-foreground">{getLocationText(location)}</span>
           <div className="flex items-center gap-1.5">
             <div className="flex items-center gap-1.5">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">{formatDateRange()}</span>
+              <span className="text-xs text-muted-foreground font-medium">{formatDateRange()}</span>
             </div>
             <span className="text-xs text-muted-foreground mx-1">・</span>
             <div className="flex items-center gap-1.5">
               <Users className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">{getGuestsText()}</span>
+              <span className="text-xs text-muted-foreground font-medium">{getGuestsText()}</span>
             </div>
           </div>
         </div>
