@@ -43,7 +43,7 @@ const NextImageMarker: React.FC<NextImageMarkerProps> = ({
         url: mainImage,
         scaledSize: new google.maps.Size(displaySize, displaySize),
         origin: new google.maps.Point(0, 0),
-        anchor: new google.maps.Point(displaySize / 2, displaySize / 2 + (isSelected ? 10 : 0)),
+        anchor: new google.maps.Point(displaySize / 2, displaySize / 2 + (isSelected ? 110 : 0)),
       };
 
       markerIconCache.set(cacheKey, markerIcon);

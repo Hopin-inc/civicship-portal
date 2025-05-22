@@ -26,7 +26,9 @@ const CircleImage: React.FC<CircleImageProps> = ({
   smallImage,
   smallImageAlt,
 }) => {
-  const smallImageSize = size * 0.4;
+  const mainRadius = size / 2 - 2;
+  const smallRadius = mainRadius * 0.4;
+  const smallImageSize = smallRadius * 2;
   
   return (
     <div
@@ -55,13 +57,14 @@ const CircleImage: React.FC<CircleImageProps> = ({
           style={{ 
             width: smallImageSize, 
             height: smallImageSize,
-            right: size * 0.1,
-            bottom: size * 0.1
+            position: 'absolute',
+            left: `calc(50% + ${mainRadius * 0.5 - smallRadius}px)`,
+            top: `calc(50% + ${mainRadius * 0.5 - smallRadius}px)`
           }}
         >
           <Image
             src={smallImage || PLACEHOLDER_IMAGE}
-            alt={smallImageAlt || "Small image"}
+            alt={smallImageAlt || "Host"}
             fill
             sizes={`${smallImageSize}px`}
             className={styles.circleImage}
