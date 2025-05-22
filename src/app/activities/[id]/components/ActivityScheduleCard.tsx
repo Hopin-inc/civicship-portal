@@ -74,32 +74,32 @@ const renderAvailableSlotCard = (
   const href = `/reservation/confirm?${query.toString()}`;
 
   return (
-    <div className="bg-background rounded-xl border px-6 py-6 w-[280px] flex flex-col">
-      <div className="flex-1">
-        <h3 className="text-title-md font-bold mb-1">
-          {format(startDate, "M月d日", { locale: ja })}
-          <span className="text-label-sm text-caption">
-            （{format(startDate, "E", { locale: ja })}）
-          </span>
-        </h3>
-        <p className="text-body-md text-foreground mb-4">
-          {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
-        </p>
-        <div className="space-y-2">
-          <div className="flex items-baseline">
-            <p className="text-body-md font-bold">{slot.feeRequired?.toLocaleString()}円</p>
-            <p className="text-body-sm ml-1 text-caption">/ 人</p>
+    <Link href={href}>
+      <div className="bg-background rounded-xl border px-6 py-6 w-[280px] flex flex-col">
+        <div className="flex-1">
+          <h3 className="text-title-md font-bold mb-1">
+            {format(startDate, "M月d日", { locale: ja })}
+            <span className="text-label-sm text-caption">
+              （{format(startDate, "E", { locale: ja })}）
+            </span>
+          </h3>
+          <p className="text-body-md text-foreground mb-4">
+            {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
+          </p>
+          <div className="space-y-2">
+            <div className="flex items-baseline">
+              <p className="text-body-md text-caption">{slot.feeRequired?.toLocaleString()}円</p>
+              <p className="text-body-sm ml-1 text-caption">/ 人</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="flex justify-center mt-6">
-        <Link href={href}>
+        <div className="flex justify-center mt-6">
           <Button variant="primary" size="md" className="px-6">
             この日程を選択
           </Button>
-        </Link>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

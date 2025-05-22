@@ -81,10 +81,13 @@ const panToSelectedMarker = (
   const marker = markers.find((m) => m.id === selectedPlaceId);
   if (!marker) return;
 
+  // カードシートの高さを考慮して、マーカーが画面の上半分に表示されるように調整
+  // これにより、マーカーとカードの両方が同時に見えるようになる
   const sheetHeight = window.innerHeight * 0.45;
   const mapDiv = map.getDiv();
   const mapHeight = mapDiv.clientHeight;
 
+  // マップの高さに対するオフセット比率を計算
   const offsetRatio = (sheetHeight * 0.25) / mapHeight;
   const bounds = map.getBounds();
   const markerLatLng = new google.maps.LatLng(marker.latitude, marker.longitude);
@@ -95,6 +98,7 @@ const panToSelectedMarker = (
     const latSpan = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
     const latOffset = latSpan * offsetRatio;
 
+    // マーカーの位置から少し上にずらした新しい中心位置を設定
     const newCenter = new google.maps.LatLng(marker.latitude - latOffset, marker.longitude);
     map.panTo(newCenter);
   }

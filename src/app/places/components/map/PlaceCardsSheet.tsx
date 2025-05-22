@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { IPlaceCard } from "@/app/places/data/type";
 import useEmblaCarousel from "embla-carousel-react";
@@ -22,6 +22,21 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  // 選択されたカードのインデックスを取得
+  const initialSelectedIndex = useMemo(() => {
+    if (!selectedPlaceId) return 0;
+    const index = places.findIndex((place) => place.id === selectedPlaceId);
+    return index >= 0 ? index : 0;
+  }, [places, selectedPlaceId]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    if (initialSelectedIndex >= 0) {
+      emblaApi.scrollTo(initialSelectedIndex, false);
+    }
+  }, [emblaApi, initialSelectedIndex]);
+
   useEffect(() => {
     if (!emblaApi) return;
 
@@ -42,11 +57,6 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
     };
   }, [emblaApi, places, selectedPlaceId, onPlaceSelect]);
 
-  const handlePlaceClick = (placeId: string, userId: string) => {
-    onPlaceSelect(placeId);
-    router.push(`/places/${placeId}`);
-  };
-
   if (!places.length) return null;
 
   return (
@@ -61,7 +71,6 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
             <PlaceCard
               place={place}
               selected={place.id === selectedPlaceId}
-              onClick={() => handlePlaceClick(place.id, place.host.id)}
               buttonVariant={place.id === selectedPlaceId ? "primary" : "tertiary"}
             />
           </div>

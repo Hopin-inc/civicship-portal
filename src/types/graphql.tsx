@@ -3294,6 +3294,8 @@ export type GqlGetOpportunitiesQueryVariables = Exact<{
   filter?: InputMaybe<GqlOpportunityFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
+  slotFilter?: InputMaybe<GqlOpportunitySlotFilterInput>;
+  slotSort?: InputMaybe<GqlOpportunitySlotSortInput>;
 }>;
 
 export type GqlGetOpportunitiesQuery = {
@@ -3523,8 +3525,10 @@ export type GqlGetOpportunityQuery = {
 };
 
 export type GqlSearchOpportunitiesQueryVariables = Exact<{
-  filter?: InputMaybe<GqlOpportunityFilterInput>;
+  opportunityFilter?: InputMaybe<GqlOpportunityFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
+  slotFilter?: InputMaybe<GqlOpportunitySlotFilterInput>;
+  slotSort?: InputMaybe<GqlOpportunitySlotSortInput>;
 }>;
 
 export type GqlSearchOpportunitiesQuery = {
@@ -6102,7 +6106,13 @@ export type GetEvaluationQueryResult = Apollo.QueryResult<
   GqlGetEvaluationQueryVariables
 >;
 export const GetOpportunitiesDocument = gql`
-  query GetOpportunities($filter: OpportunityFilterInput, $first: Int, $cursor: String) {
+  query GetOpportunities(
+    $filter: OpportunityFilterInput
+    $first: Int
+    $cursor: String
+    $slotFilter: OpportunitySlotFilterInput
+    $slotSort: OpportunitySlotSortInput
+  ) {
     opportunities(
       filter: $filter
       sort: { earliestSlotStartsAt: desc }
@@ -6123,7 +6133,7 @@ export const GetOpportunitiesDocument = gql`
           community {
             ...CommunityFields
           }
-          slots {
+          slots(filter: $slotFilter, sort: $slotSort) {
             ...OpportunitySlotFields
           }
           place {
@@ -6154,6 +6164,8 @@ export const GetOpportunitiesDocument = gql`
  *      filter: // value for 'filter'
  *      first: // value for 'first'
  *      cursor: // value for 'cursor'
+ *      slotFilter: // value for 'slotFilter'
+ *      slotSort: // value for 'slotSort'
  *   },
  * });
  */
@@ -6321,8 +6333,13 @@ export type GetOpportunityQueryResult = Apollo.QueryResult<
   GqlGetOpportunityQueryVariables
 >;
 export const SearchOpportunitiesDocument = gql`
-  query SearchOpportunities($filter: OpportunityFilterInput, $first: Int) {
-    opportunities(filter: $filter, first: $first) {
+  query SearchOpportunities(
+    $opportunityFilter: OpportunityFilterInput
+    $first: Int
+    $slotFilter: OpportunitySlotFilterInput
+    $slotSort: OpportunitySlotSortInput
+  ) {
+    opportunities(filter: $opportunityFilter, first: $first) {
       pageInfo {
         startCursor
         endCursor
@@ -6340,7 +6357,7 @@ export const SearchOpportunitiesDocument = gql`
           place {
             ...PlaceFields
           }
-          slots {
+          slots(filter: $slotFilter, sort: $slotSort) {
             ...OpportunitySlotFields
             reservations {
               ...ReservationFields
@@ -6377,8 +6394,10 @@ export const SearchOpportunitiesDocument = gql`
  * @example
  * const { data, loading, error } = useSearchOpportunitiesQuery({
  *   variables: {
- *      filter: // value for 'filter'
+ *      opportunityFilter: // value for 'opportunityFilter'
  *      first: // value for 'first'
+ *      slotFilter: // value for 'slotFilter'
+ *      slotSort: // value for 'slotSort'
  *   },
  * });
  */
