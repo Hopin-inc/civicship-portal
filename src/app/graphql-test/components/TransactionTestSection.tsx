@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/select";
 import { useTransactionQueries } from "../hooks/useTransactionQueries";
 import { useTransactionMutations } from "../hooks/useTransactionMutations";
-import { useUsers } from "../hooks/useUsers";
 import { useCommunities } from "../hooks/useCommunities";
+import { useUsersByCommunity } from "../hooks/useUsersByCommunity";
 import ResultDisplay from "./ResultDisplay";
 
 export default function TransactionTestSection() {
@@ -26,10 +26,14 @@ export default function TransactionTestSection() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const { users, isLoading: usersLoading } = useUsers();
   const { communities, isLoading: communitiesLoading } = useCommunities();
+  const { users, isLoading: usersLoading } = useUsersByCommunity(communityId);
   const { getTransactions, getTransaction } = useTransactionQueries();
   const { issuePoint, grantPoint, donatePoint } = useTransactionMutations();
+  
+  useEffect(() => {
+    setUserId("");
+  }, [communityId]);
 
   const handleGetTransactions = async () => {
     setIsLoading(true);
@@ -122,10 +126,10 @@ export default function TransactionTestSection() {
             <Select
               value={userId}
               onValueChange={setUserId}
-              disabled={usersLoading || isLoading}
+              disabled={usersLoading || isLoading || !communityId}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a user" />
+                <SelectValue placeholder={communityId ? "Select a user" : "Select a community first"} />
               </SelectTrigger>
               <SelectContent>
                 {users.map((user) => (

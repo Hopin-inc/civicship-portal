@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/select";
 import { useMembershipQueries } from "../hooks/useMembershipQueries";
 import { useMembershipMutations } from "../hooks/useMembershipMutations";
-import { useUsers } from "../hooks/useUsers";
 import { useCommunities } from "../hooks/useCommunities";
+import { useUsersByCommunity } from "../hooks/useUsersByCommunity";
 import ResultDisplay from "./ResultDisplay";
 
 export default function MembershipTestSection() {
@@ -23,10 +23,14 @@ export default function MembershipTestSection() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const { users, isLoading: usersLoading } = useUsers();
   const { communities, isLoading: communitiesLoading } = useCommunities();
+  const { users, isLoading: usersLoading } = useUsersByCommunity(communityId);
   const { getSingleMembership, getMembershipList } = useMembershipQueries();
   const { assignOwner, assignManager, assignMember } = useMembershipMutations();
+  
+  useEffect(() => {
+    setUserId("");
+  }, [communityId]);
 
   const handleGetSingleMembership = async () => {
     setIsLoading(true);
@@ -133,10 +137,10 @@ export default function MembershipTestSection() {
             <Select
               value={userId}
               onValueChange={setUserId}
-              disabled={usersLoading || isLoading}
+              disabled={usersLoading || isLoading || !communityId}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a user" />
+                <SelectValue placeholder={communityId ? "Select a user" : "Select a community first"} />
               </SelectTrigger>
               <SelectContent>
                 {users.map((user) => (
