@@ -1696,6 +1696,7 @@ export type GqlQueryWalletsArgs = {
 
 export type GqlReservation = {
   __typename?: "Reservation";
+  comment?: Maybe<Scalars["String"]["output"]>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   createdByUser?: Maybe<GqlUser>;
   histories?: Maybe<Array<GqlReservationHistory>>;
@@ -1712,6 +1713,7 @@ export type GqlReservationCancelInput = {
 };
 
 export type GqlReservationCreateInput = {
+  comment?: InputMaybe<Scalars["String"]["input"]>;
   opportunitySlotId: Scalars["ID"]["input"];
   otherUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   paymentMethod: GqlReservationPaymentMethod;
@@ -2487,6 +2489,66 @@ export type GqlHostedGeoFieldsFragment = {
     longitude: any;
     address: string;
   }>;
+};
+
+export type GqlAssignOwnerMutationVariables = Exact<{
+  input: GqlMembershipSetRoleInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlAssignOwnerMutation = {
+  __typename?: "Mutation";
+  membershipAssignOwner?: {
+    __typename?: "MembershipSetRoleSuccess";
+    membership: {
+      __typename?: "Membership";
+      headline?: string | null;
+      bio?: string | null;
+      role: GqlRole;
+      status: GqlMembershipStatus;
+      reason: GqlMembershipStatusReason;
+    };
+  } | null;
+};
+
+export type GqlAssignManagerMutationVariables = Exact<{
+  input: GqlMembershipSetRoleInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlAssignManagerMutation = {
+  __typename?: "Mutation";
+  membershipAssignManager?: {
+    __typename?: "MembershipSetRoleSuccess";
+    membership: {
+      __typename?: "Membership";
+      headline?: string | null;
+      bio?: string | null;
+      role: GqlRole;
+      status: GqlMembershipStatus;
+      reason: GqlMembershipStatusReason;
+    };
+  } | null;
+};
+
+export type GqlAssignMemberMutationVariables = Exact<{
+  input: GqlMembershipSetRoleInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlAssignMemberMutation = {
+  __typename?: "Mutation";
+  membershipAssignMember?: {
+    __typename?: "MembershipSetRoleSuccess";
+    membership: {
+      __typename?: "Membership";
+      headline?: string | null;
+      bio?: string | null;
+      role: GqlRole;
+      status: GqlMembershipStatus;
+      reason: GqlMembershipStatusReason;
+    };
+  } | null;
 };
 
 export type GqlGetSingleMembershipQueryVariables = Exact<{
@@ -4329,6 +4391,66 @@ export type GqlTransactionFieldsFragment = {
   createdAt?: Date | null;
 };
 
+export type GqlPointIssueMutationVariables = Exact<{
+  input: GqlTransactionIssueCommunityPointInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlPointIssueMutation = {
+  __typename?: "Mutation";
+  transactionIssueCommunityPoint?: {
+    __typename?: "TransactionIssueCommunityPointSuccess";
+    transaction: {
+      __typename?: "Transaction";
+      id: string;
+      reason: GqlTransactionReason;
+      fromPointChange?: number | null;
+      toPointChange?: number | null;
+      createdAt?: Date | null;
+    };
+  } | null;
+};
+
+export type GqlPointGrantMutationVariables = Exact<{
+  input: GqlTransactionGrantCommunityPointInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlPointGrantMutation = {
+  __typename?: "Mutation";
+  transactionGrantCommunityPoint?: {
+    __typename?: "TransactionGrantCommunityPointSuccess";
+    transaction: {
+      __typename?: "Transaction";
+      id: string;
+      reason: GqlTransactionReason;
+      fromPointChange?: number | null;
+      toPointChange?: number | null;
+      createdAt?: Date | null;
+    };
+  } | null;
+};
+
+export type GqlPointDonateMutationVariables = Exact<{
+  input: GqlTransactionDonateSelfPointInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlPointDonateMutation = {
+  __typename?: "Mutation";
+  transactionDonateSelfPoint?: {
+    __typename?: "TransactionDonateSelfPointSuccess";
+    transaction: {
+      __typename?: "Transaction";
+      id: string;
+      reason: GqlTransactionReason;
+      fromPointChange?: number | null;
+      toPointChange?: number | null;
+      createdAt?: Date | null;
+    };
+  } | null;
+};
+
 export type GqlGetTransactionsQueryVariables = Exact<{
   filter?: InputMaybe<GqlTransactionFilterInput>;
 }>;
@@ -4960,6 +5082,171 @@ export type CurrentUserSuspenseQueryHookResult = ReturnType<typeof useCurrentUse
 export type CurrentUserQueryResult = Apollo.QueryResult<
   GqlCurrentUserQuery,
   GqlCurrentUserQueryVariables
+>;
+export const AssignOwnerDocument = gql`
+  mutation assignOwner(
+    $input: MembershipSetRoleInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    membershipAssignOwner(input: $input, permission: $permission) {
+      ... on MembershipSetRoleSuccess {
+        membership {
+          ...MembershipFields
+        }
+      }
+    }
+  }
+  ${MembershipFieldsFragmentDoc}
+`;
+export type GqlAssignOwnerMutationFn = Apollo.MutationFunction<
+  GqlAssignOwnerMutation,
+  GqlAssignOwnerMutationVariables
+>;
+
+/**
+ * __useAssignOwnerMutation__
+ *
+ * To run a mutation, you first call `useAssignOwnerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignOwnerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignOwnerMutation, { data, loading, error }] = useAssignOwnerMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useAssignOwnerMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlAssignOwnerMutation, GqlAssignOwnerMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlAssignOwnerMutation, GqlAssignOwnerMutationVariables>(
+    AssignOwnerDocument,
+    options,
+  );
+}
+export type AssignOwnerMutationHookResult = ReturnType<typeof useAssignOwnerMutation>;
+export type AssignOwnerMutationResult = Apollo.MutationResult<GqlAssignOwnerMutation>;
+export type AssignOwnerMutationOptions = Apollo.BaseMutationOptions<
+  GqlAssignOwnerMutation,
+  GqlAssignOwnerMutationVariables
+>;
+export const AssignManagerDocument = gql`
+  mutation assignManager(
+    $input: MembershipSetRoleInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    membershipAssignManager(input: $input, permission: $permission) {
+      ... on MembershipSetRoleSuccess {
+        membership {
+          ...MembershipFields
+        }
+      }
+    }
+  }
+  ${MembershipFieldsFragmentDoc}
+`;
+export type GqlAssignManagerMutationFn = Apollo.MutationFunction<
+  GqlAssignManagerMutation,
+  GqlAssignManagerMutationVariables
+>;
+
+/**
+ * __useAssignManagerMutation__
+ *
+ * To run a mutation, you first call `useAssignManagerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignManagerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignManagerMutation, { data, loading, error }] = useAssignManagerMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useAssignManagerMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlAssignManagerMutation,
+    GqlAssignManagerMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlAssignManagerMutation, GqlAssignManagerMutationVariables>(
+    AssignManagerDocument,
+    options,
+  );
+}
+export type AssignManagerMutationHookResult = ReturnType<typeof useAssignManagerMutation>;
+export type AssignManagerMutationResult = Apollo.MutationResult<GqlAssignManagerMutation>;
+export type AssignManagerMutationOptions = Apollo.BaseMutationOptions<
+  GqlAssignManagerMutation,
+  GqlAssignManagerMutationVariables
+>;
+export const AssignMemberDocument = gql`
+  mutation assignMember(
+    $input: MembershipSetRoleInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    membershipAssignMember(input: $input, permission: $permission) {
+      ... on MembershipSetRoleSuccess {
+        membership {
+          ...MembershipFields
+        }
+      }
+    }
+  }
+  ${MembershipFieldsFragmentDoc}
+`;
+export type GqlAssignMemberMutationFn = Apollo.MutationFunction<
+  GqlAssignMemberMutation,
+  GqlAssignMemberMutationVariables
+>;
+
+/**
+ * __useAssignMemberMutation__
+ *
+ * To run a mutation, you first call `useAssignMemberMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignMemberMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignMemberMutation, { data, loading, error }] = useAssignMemberMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useAssignMemberMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlAssignMemberMutation,
+    GqlAssignMemberMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlAssignMemberMutation, GqlAssignMemberMutationVariables>(
+    AssignMemberDocument,
+    options,
+  );
+}
+export type AssignMemberMutationHookResult = ReturnType<typeof useAssignMemberMutation>;
+export type AssignMemberMutationResult = Apollo.MutationResult<GqlAssignMemberMutation>;
+export type AssignMemberMutationOptions = Apollo.BaseMutationOptions<
+  GqlAssignMemberMutation,
+  GqlAssignMemberMutationVariables
 >;
 export const GetSingleMembershipDocument = gql`
   query GetSingleMembership($communityId: ID!, $userId: ID!) {
@@ -7812,6 +8099,165 @@ export type GetUtilitiesSuspenseQueryHookResult = ReturnType<typeof useGetUtilit
 export type GetUtilitiesQueryResult = Apollo.QueryResult<
   GqlGetUtilitiesQuery,
   GqlGetUtilitiesQueryVariables
+>;
+export const PointIssueDocument = gql`
+  mutation pointIssue(
+    $input: TransactionIssueCommunityPointInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    transactionIssueCommunityPoint(input: $input, permission: $permission) {
+      ... on TransactionIssueCommunityPointSuccess {
+        transaction {
+          ...TransactionFields
+        }
+      }
+    }
+  }
+  ${TransactionFieldsFragmentDoc}
+`;
+export type GqlPointIssueMutationFn = Apollo.MutationFunction<
+  GqlPointIssueMutation,
+  GqlPointIssueMutationVariables
+>;
+
+/**
+ * __usePointIssueMutation__
+ *
+ * To run a mutation, you first call `usePointIssueMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePointIssueMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [pointIssueMutation, { data, loading, error }] = usePointIssueMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function usePointIssueMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlPointIssueMutation, GqlPointIssueMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlPointIssueMutation, GqlPointIssueMutationVariables>(
+    PointIssueDocument,
+    options,
+  );
+}
+export type PointIssueMutationHookResult = ReturnType<typeof usePointIssueMutation>;
+export type PointIssueMutationResult = Apollo.MutationResult<GqlPointIssueMutation>;
+export type PointIssueMutationOptions = Apollo.BaseMutationOptions<
+  GqlPointIssueMutation,
+  GqlPointIssueMutationVariables
+>;
+export const PointGrantDocument = gql`
+  mutation pointGrant(
+    $input: TransactionGrantCommunityPointInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    transactionGrantCommunityPoint(input: $input, permission: $permission) {
+      ... on TransactionGrantCommunityPointSuccess {
+        transaction {
+          ...TransactionFields
+        }
+      }
+    }
+  }
+  ${TransactionFieldsFragmentDoc}
+`;
+export type GqlPointGrantMutationFn = Apollo.MutationFunction<
+  GqlPointGrantMutation,
+  GqlPointGrantMutationVariables
+>;
+
+/**
+ * __usePointGrantMutation__
+ *
+ * To run a mutation, you first call `usePointGrantMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePointGrantMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [pointGrantMutation, { data, loading, error }] = usePointGrantMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function usePointGrantMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlPointGrantMutation, GqlPointGrantMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlPointGrantMutation, GqlPointGrantMutationVariables>(
+    PointGrantDocument,
+    options,
+  );
+}
+export type PointGrantMutationHookResult = ReturnType<typeof usePointGrantMutation>;
+export type PointGrantMutationResult = Apollo.MutationResult<GqlPointGrantMutation>;
+export type PointGrantMutationOptions = Apollo.BaseMutationOptions<
+  GqlPointGrantMutation,
+  GqlPointGrantMutationVariables
+>;
+export const PointDonateDocument = gql`
+  mutation pointDonate(
+    $input: TransactionDonateSelfPointInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    transactionDonateSelfPoint(input: $input, permission: $permission) {
+      ... on TransactionDonateSelfPointSuccess {
+        transaction {
+          ...TransactionFields
+        }
+      }
+    }
+  }
+  ${TransactionFieldsFragmentDoc}
+`;
+export type GqlPointDonateMutationFn = Apollo.MutationFunction<
+  GqlPointDonateMutation,
+  GqlPointDonateMutationVariables
+>;
+
+/**
+ * __usePointDonateMutation__
+ *
+ * To run a mutation, you first call `usePointDonateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePointDonateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [pointDonateMutation, { data, loading, error }] = usePointDonateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function usePointDonateMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlPointDonateMutation, GqlPointDonateMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlPointDonateMutation, GqlPointDonateMutationVariables>(
+    PointDonateDocument,
+    options,
+  );
+}
+export type PointDonateMutationHookResult = ReturnType<typeof usePointDonateMutation>;
+export type PointDonateMutationResult = Apollo.MutationResult<GqlPointDonateMutation>;
+export type PointDonateMutationOptions = Apollo.BaseMutationOptions<
+  GqlPointDonateMutation,
+  GqlPointDonateMutationVariables
 >;
 export const GetTransactionsDocument = gql`
   query getTransactions($filter: TransactionFilterInput) {
