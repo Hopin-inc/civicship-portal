@@ -52,9 +52,12 @@ export default function ActivitiesFeaturedSection({
   if (isInitialLoading) return <FeaturedSectionSkeleton />;
   if (opportunities.length === 0) return null;
 
-  const featuredImages = opportunities.map(
-    (_, i) => `/images/activities/featured/image-${(i % 5) + 1}.png`,
-  );
+  const featuredImages = opportunities.map((opportunity, i) => {
+    if (opportunity.images && opportunity.images.length > 1) {
+      return opportunity.images[1];
+    }
+    return `/images/activities/featured/image-${(i % 5) + 1}.png`;
+  });
 
   return (
     <section className="relative h-[70vh] w-full overflow-hidden [&]:mt-0 mb-12">
