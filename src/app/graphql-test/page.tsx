@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import MembershipTestSection from "./components/MembershipTestSection";
 import TransactionTestSection from "./components/TransactionTestSection";
@@ -9,11 +9,13 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 export default function GraphQLTestPage() {
   const [activeTab, setActiveTab] = useState<"membership" | "transaction">("membership");
   
-  useHeaderConfig({
+  const headerConfig = useMemo(() => ({
     title: "GraphQL Test Environment",
     showBackButton: true,
     showLogo: false,
-  });
+  }), []);
+  
+  useHeaderConfig(headerConfig);
 
   return (
     <div className="flex flex-col min-h-screen bg-background p-4">
