@@ -14,7 +14,15 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    unoptimized: false,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        pathname: '/prod-civicship-storage-public/**',
+      },
+    ],
+    domains: ['storage.googleapis.com'],
   },
   experimental: {
     webpackBuildWorker: true,

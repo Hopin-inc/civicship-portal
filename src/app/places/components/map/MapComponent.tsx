@@ -1,6 +1,6 @@
 import React from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-import CustomMarker from "@/app/places/components/map/CustomMarker";
+import NextImageMarker from "@/app/places/components/map/NextImageMarker";
 import { useMapState } from "@/app/places/hooks/useMapState";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { usePreloadImages } from "@/app/places/hooks/usePreloadImages";
@@ -64,7 +64,7 @@ export default function MapComponent({
       }}
     >
       {markers.map((marker: IPlacePin) => (
-        <CustomMarker
+        <NextImageMarker
           key={marker.id}
           data={marker}
           onClick={() => onPlaceSelect(marker.id)}
