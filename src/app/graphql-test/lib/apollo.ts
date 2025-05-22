@@ -10,7 +10,7 @@ import { onError } from "@apollo/client/link/error";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
 const httpLink = createUploadLink({
-  uri: "http://localhost:8000/graphql", // Use the same port as the app
+  uri: process.env.NEXT_PUBLIC_API_ENDPOINT || "https://localhost:3000/graphql", // Use the environment variable
   credentials: "same-origin",
   headers: {
     "Apollo-Require-Preflight": "true",
