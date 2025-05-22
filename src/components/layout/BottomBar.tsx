@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
+import { useScrollDirection } from "@/hooks/useScrollDirection";
 
 interface HeaderProps {
   className?: string;
@@ -13,8 +14,8 @@ interface HeaderProps {
 
 const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const pathname = usePathname();
+  const { isVisible } = useScrollDirection({ threshold: 20 });
 
-  // Hide BottomBar on search and reservation pages except complete page
   if (
     pathname.startsWith("/admin") ||
     pathname === "/search" ||
@@ -33,7 +34,13 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   };
 
   return (
-    <nav className={cn(className, "w-full bg-background border-t border-input py-4 z-50")}>
+    <nav
+      className={cn(
+        className,
+        "fixed bottom-0 left-0 w-full bg-background border-t border-input py-4 z-50 transition-transform duration-300",
+        !isVisible && "transform translate-y-full",
+      )}
+    >
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
           <Link
@@ -47,7 +54,10 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
             <Globe size={24} />
             <span className="text-xs mt-1">拠点</span>
           </Link>
-          <Link href="/users/me" className={cn(getLinkStyle("/users/me", "/users/me/*"), "flex-grow")}>
+          <Link
+            href="/users/me"
+            className={cn(getLinkStyle("/users/me", "/users/me/*"), "flex-grow")}
+          >
             <User size={24} />
             <span className="text-xs mt-1">マイページ</span>
           </Link>
