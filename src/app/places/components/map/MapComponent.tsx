@@ -61,7 +61,6 @@ export default function MapComponent({
         disableDefaultUI: true,
         scrollwheel: true,
         zoomControl: true,
-        zoom: INITIAL_ZOOM_LEVEL,
       }}
     >
       {markers.map((marker: IPlacePin) => (
