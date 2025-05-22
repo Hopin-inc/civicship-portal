@@ -19,7 +19,7 @@ export const presenterPlacePins = (edges: GqlPlaceEdge[]): IPlacePin[] => {
     .filter((node): node is GqlPlace => !!node && node.latitude != null && node.longitude != null)
     .map((node) => ({
       id: node.id,
-      image: node.opportunities?.[0].images?.[0] ?? PLACEHOLDER_IMAGE,
+      image: node.opportunities?.length && node.opportunities?.[0].images && node.opportunities?.[0].images?.[0] ? node.opportunities?.[0].images?.[0] : PLACEHOLDER_IMAGE,
       host: extractFirstHostFromPlace(node.opportunities?.[0]?.createdByUser),
       latitude: Number(node.latitude),
       longitude: Number(node.longitude),
@@ -30,7 +30,7 @@ export const presenterPlacePins = (edges: GqlPlaceEdge[]): IPlacePin[] => {
 export const presenterPlacePin = (node: GqlPlace): IPlacePin => {
   return {
     id: node.id,
-    image: node.opportunities?.[0].images?.[0] ?? PLACEHOLDER_IMAGE,
+    image: node.opportunities?.length && node.opportunities?.[0].images && node.opportunities?.[0].images?.[0] ? node.opportunities?.[0].images?.[0] : PLACEHOLDER_IMAGE,
     host: extractFirstHostFromPlace(node.opportunities?.[0]?.createdByUser),
     latitude: Number(node.latitude),
     longitude: Number(node.longitude),
