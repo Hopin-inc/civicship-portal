@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useReducer } from "react";
 import { BasePin } from "@/app/places/data/type";
 
+const INITIAL_CENTER_COORDINATE = { lat: 33.0, lng: 133.5 };
+
 /* --------------------------------------------
  * Reducer + 型定義
  * ------------------------------------------ */
@@ -26,7 +28,7 @@ type MapAction =
 const initialState: MapState = {
   markers: [],
   places: [],
-  center: { lat: 33.75, lng: 133.5 },
+  center: INITIAL_CENTER_COORDINATE,
   map: null,
   isLoaded: false,
   error: null,

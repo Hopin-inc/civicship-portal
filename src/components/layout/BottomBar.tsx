@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
+import { useScrollDirection } from "@/hooks/useScrollDirection";
 
 interface HeaderProps {
   className?: string;
@@ -16,7 +17,8 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const searchParams = useSearchParams();
   const placeId = searchParams.get("placeId");
 
-  // Hide BottomBar on search and reservation pages except complete page
+  const { isVisible } = useScrollDirection({ threshold: 20 });
+
   if (
     pathname.startsWith("/admin") ||
     pathname === "/search" ||
@@ -35,7 +37,13 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   };
 
   return (
-    <nav className={cn(className, "w-full bg-background border-t border-input py-4 z-50")}>
+    <nav
+      className={cn(
+        className,
+        "fixed bottom-0 left-0 w-full bg-background border-t border-input py-4 z-50 transition-transform duration-300",
+        !isVisible && "transform translate-y-full",
+      )}
+    >
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
           <Link

@@ -2,6 +2,7 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useQuery } from "@apollo/client";
 import { useRef, useMemo } from 'react';
 import { GET_OPPORTUNITY_SLOTS } from "@/graphql/experience/opportunitySlot/query";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface UseOpportunitySlotsResult {
   slots: any[];
@@ -36,6 +37,7 @@ export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
   const slots = opportunitySlots.edges?.map((edge: any) => edge.node) || [];
   const endCursor = opportunitySlots.pageInfo?.endCursor;
   const hasNextPage = opportunitySlots.pageInfo?.hasNextPage ?? false;
+  const { user } = useAuth();
 
   const handleFetchMore = async () => {
     if (!hasNextPage || isLoadingMore.current) return;
@@ -48,6 +50,7 @@ export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
             dateRange: {
               lte: now.toISOString(),
             },
+            ownerId: user?.id,
           },
           cursor: endCursor,
           first: 10,
@@ -61,7 +64,7 @@ export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
           const existingSlotIds = new Set(
             prev.opportunitySlots.edges.map((edge: any) => edge.node.id)
           );
-          
+
           const newEdges = fetchMoreResult.opportunitySlots.edges.filter(
             (edge: any) => !existingSlotIds.has(edge.node.id)
           );

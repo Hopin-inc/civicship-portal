@@ -73,7 +73,7 @@ const createPlaceholderIcon = async (size: number): Promise<google.maps.Icon> =>
 
 const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }) => {
   const [icon, setIcon] = useState<google.maps.Icon | null>(null);
-  const displaySize = isSelected ? 80 : 56;
+  const displaySize = isSelected ? 70 : 48;
 
   // ✅ 安定した依存値にする（nullを避ける）
   const hostImage = useMemo(() => data.host.image ?? PLACEHOLDER_IMAGE, [data.host.image]);

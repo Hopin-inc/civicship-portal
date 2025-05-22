@@ -11,6 +11,8 @@ const containerStyle = {
   height: "100%",
 };
 
+const INITIAL_ZOOM_LEVEL = 8.0;
+
 interface MapComponentProps {
   placePins: IPlacePin[];
   selectedPlaceId: string | null;
@@ -51,7 +53,7 @@ export default function MapComponent({
     <GoogleMap
       mapContainerStyle={containerStyle}
       center={center}
-      zoom={9}
+      zoom={INITIAL_ZOOM_LEVEL}
       onLoad={onLoad}
       onUnmount={onUnmount}
       options={{

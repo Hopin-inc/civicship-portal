@@ -61,14 +61,14 @@ const SearchBox = ({ location, from, to, guests }: SearchFormProps) => {
     <Button
       onClick={handleClick}
       variant="tertiary"
-      className="flex flex-col w-full max-w-xl bg-muted rounded-full h-12 px-4 text-left hover:bg-muted transition-colors relative"
+      className="flex flex-col w-full max-w-xl rounded-full h-12 px-4 text-left hover:bg-muted transition-colors relative"
     >
       <div className="absolute left-4 top-1/2 -translate-y-1/2">
         <Search className="h-6 w-6 text-muted-foreground" />
       </div>
       {!hasAnyCondition ? (
         <div className="flex items-center justify-center w-full h-full">
-          <span className="text-sm text-muted-foreground">タップして検索する</span>
+          <span className="text-body-sm text-caption font-medium">タップして検索する</span>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center w-full h-full">

@@ -21,15 +21,24 @@ export default function ActivitiesFeaturedSection({
     loop: true,
     align: "center",
     containScroll: "trimSnaps",
+    dragFree: false,
+    slidesToScroll: 1,
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [imageSliderApi, setImageSliderApi] = useState<any>(null);
 
   useEffect(() => {
     if (!emblaApi) return;
 
     const onSelect = () => {
-      setSelectedIndex(emblaApi.selectedScrollSnap());
+      const index = emblaApi.selectedScrollSnap();
+      setSelectedIndex(index);
+
+      // Synchronize image slider with main carousel
+      if (imageSliderApi) {
+        imageSliderApi.scrollTo(index);
+      }
     };
 
     emblaApi.on("select", onSelect);
@@ -38,7 +47,7 @@ export default function ActivitiesFeaturedSection({
     return () => {
       emblaApi.off("select", onSelect);
     };
-  }, [emblaApi]);
+  }, [emblaApi, imageSliderApi]);
 
   const handleImageSlideChange = useCallback(
     (index: number) => {
@@ -52,13 +61,16 @@ export default function ActivitiesFeaturedSection({
   if (isInitialLoading) return <FeaturedSectionSkeleton />;
   if (opportunities.length === 0) return null;
 
-  const featuredImages = opportunities.map(
-    (_, i) => `/images/activities/featured/image-${(i % 5) + 1}.png`,
-  );
+  const featuredImages = opportunities.map((opportunity, i) => {
+    if (opportunity.images && opportunity.images.length > 1) {
+      return opportunity.images[1];
+    }
+    return PLACEHOLDER_IMAGE;
+  });
 
   return (
     <section className="relative h-[70vh] w-full overflow-hidden [&]:mt-0 mb-12">
-      <div className="absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/60 to-transparent pt-16 pb-10 px-8 text-white">
+      <div className="absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/60 to-transparent pt-16 pb-10 px-6 text-white">
         <h1 className="text-4xl font-bold leading-tight">
           四国にふれる
           <br />
@@ -71,6 +83,7 @@ export default function ActivitiesFeaturedSection({
         title={opportunities[selectedIndex]?.title || ""}
         isVisible={true}
         onSlideChange={handleImageSlideChange}
+        onApiChange={setImageSliderApi}
       />
 
       <div className="embla h-full" ref={emblaRef}>
@@ -96,18 +109,30 @@ function OpportunityImageSlider({
   title,
   isVisible,
   onSlideChange,
+  onApiChange,
 }: {
   images: string[];
   title: string;
   isVisible: boolean;
   onSlideChange?: (index: number) => void;
+  onApiChange?: (api: any) => void;
 }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "start",
+    dragFree: false,
+    speed: 20,
+    slidesToScroll: 1,
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  // Provide the embla API to parent component
+  useEffect(() => {
+    if (emblaApi && onApiChange) {
+      onApiChange(emblaApi);
+    }
+  }, [emblaApi, onApiChange]);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
