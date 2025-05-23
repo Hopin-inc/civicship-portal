@@ -1042,9 +1042,9 @@ export type GqlOpportunitySlot = {
   endsAt: Scalars["Datetime"]["output"];
   hostingStatus: GqlOpportunitySlotHostingStatus;
   id: Scalars["ID"]["output"];
-  isFullyEvaluated: Scalars["Boolean"]["output"];
-  numEvaluated: Scalars["Int"]["output"];
-  numParticipants: Scalars["Int"]["output"];
+  isFullyEvaluated?: Maybe<Scalars["Boolean"]["output"]>;
+  numEvaluated?: Maybe<Scalars["Int"]["output"]>;
+  numParticipants?: Maybe<Scalars["Int"]["output"]>;
   opportunity?: Maybe<GqlOpportunity>;
   remainingCapacity?: Maybe<Scalars["Int"]["output"]>;
   reservations?: Maybe<Array<GqlReservation>>;
@@ -3634,9 +3634,9 @@ export type GqlGetOpportunitySlotsQuery = {
         endsAt: Date;
         capacity?: number | null;
         remainingCapacity?: number | null;
-        isFullyEvaluated: boolean;
-        numParticipants: number;
-        numEvaluated: number;
+        isFullyEvaluated?: boolean | null;
+        numParticipants?: number | null;
+        numEvaluated?: number | null;
         opportunity?: {
           __typename?: "Opportunity";
           id: string;
@@ -3686,9 +3686,9 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
   __typename?: "Query";
   opportunitySlot?: {
     __typename?: "OpportunitySlot";
-    isFullyEvaluated: boolean;
-    numParticipants: number;
-    numEvaluated: number;
+    isFullyEvaluated?: boolean | null;
+    numParticipants?: number | null;
+    numEvaluated?: number | null;
     id: string;
     hostingStatus: GqlOpportunitySlotHostingStatus;
     startsAt: Date;
