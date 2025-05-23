@@ -80,6 +80,7 @@ export default function UserWalletPage() {
           onClick={handleNavigateToGive}
           variant="secondary"
           size="sm"
+          disabled={currentPoint <= 0}
           className="w-[104px] h-[48px] flex items-center gap-1.5"
         >
           <Gift className="w-4 h-4" />

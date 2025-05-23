@@ -88,7 +88,7 @@ export default function WalletPage() {
           <span className="text-base">発行</span>
         </Button>
         <Button
-          disabled={currentUserRole !== GqlRole.Owner}
+          disabled={currentUserRole !== GqlRole.Owner || currentPoint <= 0}
           onClick={handleNavigateToGrant}
           variant="secondary"
           size="sm"
