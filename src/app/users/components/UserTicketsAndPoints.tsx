@@ -1,22 +1,29 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { Ticket as TicketIcon, Star as StarIcon, ChevronRight } from 'lucide-react';
+import React from "react";
+import Link from "next/link";
+import { ChevronRight, Star as StarIcon, Ticket as TicketIcon } from "lucide-react";
 
 interface UserTicketsAndPointsProps {
   ticketCount: number;
   pointCount: number;
 }
 
-const UserTicketsAndPoints: React.FC<UserTicketsAndPointsProps> = ({
-  ticketCount,
-  pointCount
-}) => {
+const UserTicketsAndPoints: React.FC<UserTicketsAndPointsProps> = ({ ticketCount, pointCount }) => {
+  const ticketClass =
+    ticketCount > 0
+      ? "flex items-center gap-2 bg-primary-foreground text-primary rounded-lg px-4 py-3 mt-2 cursor-pointer hover:bg-primary-foreground/80"
+      : "flex items-center gap-2 bg-muted text-caption rounded-lg px-4 py-3 mt-2";
+
+  const pointClass =
+    pointCount > 0
+      ? "flex items-center gap-2 bg-primary-foreground text-primary rounded-lg px-4 py-3 mt-2 cursor-pointer hover:bg-primary-foreground/80"
+      : "flex items-center gap-2 bg-muted text-caption rounded-lg px-4 py-3 mt-2";
+
   return (
     <div className="space-y-2 mt-2">
       <Link href="/tickets">
-        <div className="flex items-center gap-2 bg-primary-foreground text-primary rounded-lg px-4 py-3 mt-2 cursor-pointer hover:bg-primary-foreground/80">
+        <div className={ticketClass}>
           <TicketIcon className="w-5 h-5 mb-0.5" />
           <p className="text-label-md">利用できるチケット</p>
           <p className="text-label-md font-bold">{ticketCount}枚</p>
@@ -24,10 +31,10 @@ const UserTicketsAndPoints: React.FC<UserTicketsAndPointsProps> = ({
         </div>
       </Link>
       <Link href="/wallets">
-        <div className="flex items-center gap-2 bg-muted text-caption rounded-lg px-4 py-3 mt-2 cursor-pointer hover:bg-muted/80">
+        <div className={pointClass}>
           <StarIcon className="w-5 h-5 mb-0.5" />
           <p className="text-label-md">保有ポイント</p>
-          <p className="text-label-md font-bold">{pointCount}pt</p>
+          <p className="text-label-md font-bold">{pointCount.toLocaleString()}pt</p>
           <ChevronRight className="w-4 h-4 ml-auto" />
         </div>
       </Link>
