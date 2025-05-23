@@ -1,11 +1,13 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const GET_TRANSACTIONS = gql`
-  query getTransactions($filter: TransactionFilterInput) {
-    transactions(
-      filter: $filter,
-      sort: { createdAt: desc }
-    ) {
+  query getTransactions(
+    $filter: TransactionFilterInput
+    $sort: TransactionSortInput
+    $first: Int
+    $cursor: String
+  ) {
+    transactions(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
       pageInfo {
         hasNextPage
         hasPreviousPage

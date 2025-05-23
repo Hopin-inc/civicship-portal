@@ -4447,6 +4447,9 @@ export type GqlPointDonateMutation = {
 
 export type GqlGetTransactionsQueryVariables = Exact<{
   filter?: InputMaybe<GqlTransactionFilterInput>;
+  sort?: InputMaybe<GqlTransactionSortInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type GqlGetTransactionsQuery = {
@@ -8396,8 +8399,13 @@ export type PointDonateMutationOptions = Apollo.BaseMutationOptions<
   GqlPointDonateMutationVariables
 >;
 export const GetTransactionsDocument = gql`
-  query getTransactions($filter: TransactionFilterInput) {
-    transactions(filter: $filter, sort: { createdAt: desc }) {
+  query getTransactions(
+    $filter: TransactionFilterInput
+    $sort: TransactionSortInput
+    $first: Int
+    $cursor: String
+  ) {
+    transactions(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
       pageInfo {
         hasNextPage
         hasPreviousPage
@@ -8443,6 +8451,9 @@ export const GetTransactionsDocument = gql`
  * const { data, loading, error } = useGetTransactionsQuery({
  *   variables: {
  *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
  *   },
  * });
  */
