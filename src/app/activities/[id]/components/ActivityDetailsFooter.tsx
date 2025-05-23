@@ -8,12 +8,14 @@ interface ActivityDetailsFooterProps {
   opportunityId: string;
   price: number;
   communityId: string | undefined;
+  disableButton?: boolean;
 }
 
 const ActivityDetailsFooter: React.FC<ActivityDetailsFooterProps> = ({
   opportunityId,
   price,
   communityId,
+  disableButton = false,
 }) => {
   const query = new URLSearchParams({
     id: opportunityId,
@@ -27,11 +29,17 @@ const ActivityDetailsFooter: React.FC<ActivityDetailsFooterProps> = ({
           <p className="text-body-sm text-muted-foreground">1人あたり</p>
           <p className="text-bodylg font-bold">{price.toLocaleString()}円〜</p>
         </div>
-        <Link href={`/reservation/select-date?${query.toString()}`}>
-          <Button variant="primary" size="lg" className="px-8">
+        {disableButton ? (
+          <Button variant="primary" size="lg" className="px-8" disabled>
             日付を選択
           </Button>
-        </Link>
+        ) : (
+          <Link href={`/reservation/select-date?${query.toString()}`}>
+            <Button variant="primary" size="lg" className="px-8">
+              日付を選択
+            </Button>
+          </Link>
+        )}
       </div>
     </footer>
   );
