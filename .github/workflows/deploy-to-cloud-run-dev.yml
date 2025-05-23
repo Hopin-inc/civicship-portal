@@ -4,6 +4,7 @@ on:
   push:
     branches:
        - develop
+       - feature/transfer-points
 
 jobs:
   deploy:
