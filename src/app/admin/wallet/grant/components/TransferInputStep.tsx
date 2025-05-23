@@ -40,7 +40,7 @@ function TransferInputStep({
   const headerConfig: HeaderConfig = useMemo(
     () => ({
       title,
-      showLogo: false,
+      showLogo: true,
       showBackButton: false,
     }),
     [title],
@@ -143,7 +143,7 @@ function TransferInputStep({
       </main>
 
       <footer className="fixed bottom-[120px] left-0 right-0 z-50 bg-background max-w-mobile-l w-full px-4 py-4 mx-auto">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <Button
             onClick={() => amount && amount > 0 && amount <= currentPoint && onSubmit(amount)}
             disabled={!amount || amount <= 0 || amount > currentPoint || isLoading}
