@@ -8,27 +8,46 @@ import { GqlUser } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { HeaderConfig } from "@/contexts/HeaderContext";
-
-const PRESET_AMOUNTS = [100000, 300000, 500000, 1000000];
+import { toast } from "sonner";
 
 interface Props {
   user: GqlUser;
+  currentPoint: number;
   isLoading: boolean;
   onBack: () => void;
   onSubmit: (amount: number) => void;
+  title?: string;
+  recipientLabel?: string;
+  submitLabel?: string;
+  backLabel?: string;
+  presetAmounts?: number[]; // ← 追加
 }
 
-function GrantInputStep({ user, isLoading, onBack, onSubmit }: Props) {
+const DEFAULT_PRESET_AMOUNTS = [100000, 300000, 500000, 1000000];
+
+function TransferInputStep({
+  user,
+  currentPoint,
+  isLoading,
+  onBack,
+  onSubmit,
+  title = "ポイントを支給する",
+  recipientLabel = "支給する相手",
+  submitLabel = "支給",
+  backLabel = "支給先を選び直す",
+  presetAmounts,
+}: Props) {
   const headerConfig: HeaderConfig = useMemo(
     () => ({
-      title: "ポイントを支給する",
+      title,
       showLogo: false,
       showBackButton: false,
-      // backTo: "/admin/wallet/grant",
     }),
-    [],
+    [title],
   );
   useHeaderConfig(headerConfig);
+
+  const amounts = presetAmounts ?? DEFAULT_PRESET_AMOUNTS;
 
   const [amount, setAmount] = useState<number | null>(null);
   const [displayValue, setDisplayValue] = useState<string>("");
@@ -53,17 +72,26 @@ function GrantInputStep({ user, isLoading, onBack, onSubmit }: Props) {
       setAmount(null);
       setDisplayValue("");
     } else {
+      if (num > currentPoint) {
+        toast.error("保有ポイントを超えています");
+        return;
+      }
       setAmount(num);
       setDisplayValue(formatWithComma(raw));
     }
   };
 
   const handlePresetClick = (value: number) => {
+    if (value > currentPoint) {
+      toast.error("保有ポイントを超えています");
+      return;
+    }
     setAmount(value);
     setDisplayValue(formatWithComma(value));
   };
 
-  const formatAsManUnit = (value: number) => `+${value / 10000}万pt`;
+  const formatAsManUnit = (value: number) =>
+    value < 10000 ? `+${value.toLocaleString()}pt` : `+${value / 10000}万pt`;
 
   return (
     <>
@@ -79,7 +107,7 @@ function GrantInputStep({ user, isLoading, onBack, onSubmit }: Props) {
               style={{ aspectRatio: "1 / 1" }}
             />
             <div className="flex flex-col">
-              <span className="text-muted-foreground text-sm">支給する相手</span>
+              <span className="text-muted-foreground text-sm">{recipientLabel}</span>
               <span className="text-base font-medium">{user.name}</span>
             </div>
           </div>
@@ -92,10 +120,13 @@ function GrantInputStep({ user, isLoading, onBack, onSubmit }: Props) {
             inputMode="numeric"
             className="text-5xl text-center py-6 h-20 border-0 border-b-2 border-input focus:outline-none focus:ring-0 shadow-none"
           />
+          <div className="text-sm text-muted-foreground text-center">
+            残高：{currentPoint.toLocaleString()} pt
+          </div>
 
           <div className="w-full">
             <div className="flex gap-x-3 overflow-x-auto scrollbar-none pb-1">
-              {PRESET_AMOUNTS.map((value) => (
+              {amounts.map((value) => (
                 <Button
                   key={value}
                   variant={amount === value ? "primary" : "secondary"}
@@ -114,14 +145,14 @@ function GrantInputStep({ user, isLoading, onBack, onSubmit }: Props) {
       <footer className="fixed bottom-[120px] left-0 right-0 z-50 bg-background max-w-mobile-l w-full px-4 py-4 mx-auto">
         <div className="flex flex-col gap-4">
           <Button
-            onClick={() => amount && amount > 0 && onSubmit(amount)}
-            disabled={!amount || amount <= 0 || isLoading}
+            onClick={() => amount && amount > 0 && amount <= currentPoint && onSubmit(amount)}
+            disabled={!amount || amount <= 0 || amount > currentPoint || isLoading}
             className="w-full"
           >
-            支給
+            {submitLabel}
           </Button>
-          <Button variant="text" size={"sm"} onClick={onBack} className="w-full">
-            支給先を選び直す
+          <Button variant="text" size="sm" onClick={onBack} className="w-full">
+            {backLabel}
           </Button>
         </div>
       </footer>
@@ -129,4 +160,4 @@ function GrantInputStep({ user, isLoading, onBack, onSubmit }: Props) {
   );
 }
 
-export default GrantInputStep;
+export default TransferInputStep;

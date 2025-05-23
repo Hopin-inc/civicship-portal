@@ -6,13 +6,16 @@ import { COMMUNITY_ID } from "@/utils";
 import { GqlUser, useGetMemberWalletsQuery } from "@/types/graphql";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
 import UserSelectStep from "./components/UserSelectStep";
-import GrantInputStep from "./components/GrantInputStep";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
+import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
 
 export default function GrantPointStepperPage() {
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const currentPoint = Number(searchParams.get("currentPoint") ?? "0");
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
     variables: { filter: { communityId: COMMUNITY_ID } },
@@ -94,8 +97,9 @@ export default function GrantPointStepperPage() {
           hasNextPage={data?.wallets?.pageInfo?.hasNextPage}
         />
       ) : (
-        <GrantInputStep
+        <TransferInputStep
           user={selectedUser}
+          currentPoint={currentPoint}
           isLoading={isLoading}
           onBack={() => setSelectedUser(null)}
           onSubmit={handleGrantPoint}

@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { presenterTransaction } from "@/app/wallets/data/presenter";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
 
-export default function TransactionPage() {
+export default function WalletPage() {
   const communityId = COMMUNITY_ID;
   const { user: currentUser } = useAuth();
   const currentUserRole = currentUser?.memberships?.find(
@@ -33,7 +33,8 @@ export default function TransactionPage() {
 
   const router = useRouter();
   const handleNavigateToIssue = () => router.push("/admin/wallet/issue");
-  const handleNavigateToGrant = () => router.push("/admin/wallet/grant");
+  const handleNavigateToGrant = () =>
+    router.push(`/admin/wallet/grant?currentPoint=${currentPoint}`);
 
   const {
     data: walletData,
@@ -98,7 +99,10 @@ export default function TransactionPage() {
         </Button>
       </div>
 
-      <div className="space-y-2">
+      <div className="pt-10">
+        <h2 className="text-display-sm">これまでの交換</h2>
+      </div>
+      <div className="space-y-2 mt-2">
         {connection.edges?.map((edge) => {
           const node = edge?.node;
           if (!node) return null;

@@ -15,16 +15,17 @@ interface Props {
   onSelect: (user: GqlUser) => void;
   onLoadMore?: () => void;
   hasNextPage?: boolean;
+  title?: string; // ← 追加
 }
 
-function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage }: Props) {
+function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title }: Props) {
   const headerConfig = useMemo(
     () => ({
-      title: "支給相手を選ぶ",
+      title: title ?? "支給相手を選ぶ",
       showLogo: false,
       showBackButton: true,
     }),
-    [],
+    [title],
   );
   useHeaderConfig(headerConfig);
 

@@ -1,10 +1,13 @@
 import { ApolloError } from "@apollo/client";
 import {
   GqlErrorCode,
+  GqlMutationTransactionDonateSelfPointArgs,
   GqlMutationTransactionGrantCommunityPointArgs,
   GqlMutationTransactionIssueCommunityPointArgs,
+  GqlPointDonateMutation,
   GqlPointGrantMutation,
   GqlPointIssueMutation,
+  usePointDonateMutation,
   usePointGrantMutation,
   usePointIssueMutation,
 } from "@/types/graphql";
@@ -26,6 +29,7 @@ export const useTransactionMutations = () => {
   // Apollo Hooks
   const [issuePointMutation, { loading: loadingIssue }] = usePointIssueMutation();
   const [grantPointMutation, { loading: loadingGrant }] = usePointGrantMutation();
+  const [donatePointMutation, { loading: loadingDonate }] = usePointDonateMutation();
 
   // -----------------------
   // 明示的に定義: ポイント発行
@@ -86,9 +90,36 @@ export const useTransactionMutations = () => {
     }
   };
 
+  const donatePoint = async (
+    variables: GqlMutationTransactionDonateSelfPointArgs,
+  ): Promise<Result<GqlPointDonateMutation>> => {
+    if (!variables.input?.toUserId || !variables.input?.transferPoints) {
+      return { success: false, code: GqlErrorCode.ValidationError };
+    }
+
+    try {
+      const { data } = await donatePointMutation({ variables });
+
+      if (data != null) {
+        return { success: true, data };
+      } else {
+        return { success: false, code: GqlErrorCode.Unknown };
+      }
+    } catch (e) {
+      if (e instanceof ApolloError) {
+        const gqlError = e.graphQLErrors[0];
+        const code = gqlError?.extensions?.code as GqlErrorCode | undefined;
+        return { success: false, code: code ?? GqlErrorCode.Unknown };
+      }
+      console.error("Donate point mutation failed", e);
+      return { success: false, code: GqlErrorCode.Unknown };
+    }
+  };
+
   return {
     issuePoint,
     grantPoint,
-    isLoading: loadingIssue || loadingGrant,
+    donatePoint,
+    isLoading: loadingIssue || loadingGrant || loadingDonate,
   };
 };
