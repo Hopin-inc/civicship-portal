@@ -98,6 +98,9 @@ export const GET_MEMBER_WALLETS = gql`
           user {
             ...UserFields
           }
+          community {
+            ...CommunityFields
+          }
         }
       }
     }

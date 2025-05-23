@@ -33,7 +33,7 @@ export const GRANT_POINT = gql`
 export const DONATE_POINT = gql`
   mutation pointDonate(
     $input: TransactionDonateSelfPointInput!
-    $permission: CheckCommunityPermissionInput!
+    $permission: CheckIsSelfPermissionInput!
   ) {
     transactionDonateSelfPoint(input: $input, permission: $permission) {
       ... on TransactionDonateSelfPointSuccess {

@@ -847,7 +847,7 @@ export type GqlMutationTicketUseArgs = {
 
 export type GqlMutationTransactionDonateSelfPointArgs = {
   input: GqlTransactionDonateSelfPointInput;
-  permission: GqlCheckCommunityPermissionInput;
+  permission: GqlCheckIsSelfPermissionInput;
 };
 
 export type GqlMutationTransactionGrantCommunityPointArgs = {
@@ -2060,7 +2060,6 @@ export type GqlTransaction = {
 
 export type GqlTransactionDonateSelfPointInput = {
   communityId: Scalars["ID"]["input"];
-  fromWalletId: Scalars["ID"]["input"];
   toUserId: Scalars["ID"]["input"];
   transferPoints: Scalars["Int"]["input"];
 };
@@ -2863,6 +2862,12 @@ export type GqlGetUserWalletQuery = {
             urlInstagram?: string | null;
             urlX?: string | null;
           } | null;
+          community?: {
+            __typename?: "Community";
+            id: string;
+            name?: string | null;
+            image?: string | null;
+          } | null;
           currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
         } | null;
         toWallet?: {
@@ -2880,6 +2885,12 @@ export type GqlGetUserWalletQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+          } | null;
+          community?: {
+            __typename?: "Community";
+            id: string;
+            name?: string | null;
+            image?: string | null;
           } | null;
           currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
         } | null;
@@ -3095,6 +3106,12 @@ export type GqlGetMemberWalletsQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+        } | null;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
         } | null;
         currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
       } | null;
@@ -4427,7 +4444,7 @@ export type GqlPointGrantMutation = {
 
 export type GqlPointDonateMutationVariables = Exact<{
   input: GqlTransactionDonateSelfPointInput;
-  permission: GqlCheckCommunityPermissionInput;
+  permission: GqlCheckIsSelfPermissionInput;
 }>;
 
 export type GqlPointDonateMutation = {
@@ -4490,6 +4507,12 @@ export type GqlGetTransactionsQuery = {
             urlInstagram?: string | null;
             urlX?: string | null;
           } | null;
+          community?: {
+            __typename?: "Community";
+            id: string;
+            name?: string | null;
+            image?: string | null;
+          } | null;
           currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
         } | null;
         toWallet?: {
@@ -4507,6 +4530,12 @@ export type GqlGetTransactionsQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+          } | null;
+          community?: {
+            __typename?: "Community";
+            id: string;
+            name?: string | null;
+            image?: string | null;
           } | null;
           currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
         } | null;
@@ -5607,11 +5636,17 @@ export const GetUserWalletDocument = gql`
             user {
               ...UserFields
             }
+            community {
+              ...CommunityFields
+            }
           }
           toWallet {
             ...WalletFields
             user {
               ...UserFields
+            }
+            community {
+              ...CommunityFields
             }
           }
         }
@@ -5627,6 +5662,7 @@ export const GetUserWalletDocument = gql`
   ${UserFieldsFragmentDoc}
   ${WalletFieldsFragmentDoc}
   ${TransactionFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
   ${TicketFieldsFragmentDoc}
   ${UtilityFieldsFragmentDoc}
 `;
@@ -5993,12 +6029,16 @@ export const GetMemberWalletsDocument = gql`
           user {
             ...UserFields
           }
+          community {
+            ...CommunityFields
+          }
         }
       }
     }
   }
   ${WalletFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
 `;
 
 /**
@@ -8348,7 +8388,7 @@ export type PointGrantMutationOptions = Apollo.BaseMutationOptions<
 export const PointDonateDocument = gql`
   mutation pointDonate(
     $input: TransactionDonateSelfPointInput!
-    $permission: CheckCommunityPermissionInput!
+    $permission: CheckIsSelfPermissionInput!
   ) {
     transactionDonateSelfPoint(input: $input, permission: $permission) {
       ... on TransactionDonateSelfPointSuccess {
@@ -8422,11 +8462,17 @@ export const GetTransactionsDocument = gql`
             user {
               ...UserFields
             }
+            community {
+              ...CommunityFields
+            }
           }
           toWallet {
             ...WalletFields
             user {
               ...UserFields
+            }
+            community {
+              ...CommunityFields
             }
           }
         }
@@ -8436,6 +8482,7 @@ export const GetTransactionsDocument = gql`
   ${TransactionFieldsFragmentDoc}
   ${WalletFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
 `;
 
 /**

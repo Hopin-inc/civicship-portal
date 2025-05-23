@@ -24,11 +24,17 @@ export const GET_TRANSACTIONS = gql`
             user {
               ...UserFields
             }
+            community {
+              ...CommunityFields
+            }
           }
           toWallet {
             ...WalletFields
             user {
               ...UserFields
+            }
+            community {
+              ...CommunityFields
             }
           }
         }
