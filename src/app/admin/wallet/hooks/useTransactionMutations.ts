@@ -1,0 +1,94 @@
+import { ApolloError } from "@apollo/client";
+import {
+  GqlErrorCode,
+  GqlMutationTransactionGrantCommunityPointArgs,
+  GqlMutationTransactionIssueCommunityPointArgs,
+  GqlPointGrantMutation,
+  GqlPointIssueMutation,
+  usePointGrantMutation,
+  usePointIssueMutation,
+} from "@/types/graphql";
+
+interface IssuePointInput {
+  communityId: string;
+  amount: number;
+}
+
+interface GrantPointInput {
+  communityId: string;
+  userId: string;
+  amount: number;
+}
+
+type Result<T> = { success: true; data: T } | { success: false; code: GqlErrorCode };
+
+export const useTransactionMutations = () => {
+  // Apollo Hooks
+  const [issuePointMutation, { loading: loadingIssue }] = usePointIssueMutation();
+  const [grantPointMutation, { loading: loadingGrant }] = usePointGrantMutation();
+
+  // -----------------------
+  // 明示的に定義: ポイント発行
+  // -----------------------
+  const issuePoint = async (
+    variables: GqlMutationTransactionIssueCommunityPointArgs,
+  ): Promise<Result<GqlPointIssueMutation>> => {
+    // 入力バリデーション
+    if (!variables.input?.transferPoints) {
+      return { success: false, code: GqlErrorCode.ValidationError };
+    }
+
+    try {
+      const { data } = await issuePointMutation({ variables });
+
+      if (data != null) {
+        return { success: true, data };
+      } else {
+        return { success: false, code: GqlErrorCode.Unknown };
+      }
+    } catch (e) {
+      if (e instanceof ApolloError) {
+        const gqlError = e.graphQLErrors[0];
+        const code = gqlError?.extensions?.code as GqlErrorCode | undefined;
+        return { success: false, code: code ?? GqlErrorCode.Unknown };
+      }
+      console.error("Issue point mutation failed", e);
+      return { success: false, code: GqlErrorCode.Unknown };
+    }
+  };
+
+  // -----------------------
+  // 明示的に定義: ポイント助成
+  // -----------------------
+  const grantPoint = async (
+    variables: GqlMutationTransactionGrantCommunityPointArgs,
+  ): Promise<Result<GqlPointGrantMutation>> => {
+    if (!variables.input?.toUserId || !variables.input?.transferPoints) {
+      return { success: false, code: GqlErrorCode.ValidationError };
+    }
+
+    try {
+      const { data } = await grantPointMutation({ variables });
+
+      if (data != null) {
+        return { success: true, data };
+      } else {
+        return { success: false, code: GqlErrorCode.Unknown };
+      }
+    } catch (e) {
+      if (e instanceof ApolloError) {
+        const gqlError = e.graphQLErrors[0];
+        const code = gqlError?.extensions?.code as GqlErrorCode | undefined;
+        return { success: false, code: code ?? GqlErrorCode.Unknown };
+      }
+      console.error("Grant point mutation failed", e);
+      return { success: false, code: GqlErrorCode.Unknown };
+    }
+  };
+
+  return {
+    issuePoint,
+    grantPoint,
+    isLoading: loadingIssue || loadingGrant,
+  };
+};
