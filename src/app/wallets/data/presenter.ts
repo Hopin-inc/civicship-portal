@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
 import { GqlTransaction, GqlTransactionReason, GqlWallet, GqlWalletType } from "@/types/graphql";
-import { AppTransaction, AvailableTicket, UserAsset } from "@/app/wallets/data/type";import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { AppTransaction, AvailableTicket, UserAsset } from "@/app/wallets/data/type";
 
 export const presenterUserAsset = (wallet: GqlWallet | undefined | null): UserAsset => {
-  const walletId = wallet?.id ?? '';
+  const walletId = wallet?.id ?? "";
   const currentPoint = wallet?.currentPointView?.currentPoint ?? 0;
 
-  const tickets: AvailableTicket[] = (wallet?.tickets ?? []).map(ticket => ({
+  const tickets: AvailableTicket[] = (wallet?.tickets ?? []).map((ticket) => ({
     id: ticket.id,
   }));
 
@@ -20,17 +20,15 @@ export const presenterUserAsset = (wallet: GqlWallet | undefined | null): UserAs
   };
 };
 
-
 export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('ja-JP').format(amount);
+  return new Intl.NumberFormat("ja-JP").format(amount);
 };
-
 
 export const presenterTransaction = (
   node: GqlTransaction | null | undefined,
   walletId: string,
-): AppTransaction | null  => {
-  if(!node) return null;
+): AppTransaction | null => {
+  if (!node) return null;
   const from = getNameFromWallet(node.fromWallet);
   const to = getNameFromWallet(node.toWallet);
   const rawPoint = node.fromPointChange ?? 0;
@@ -42,8 +40,9 @@ export const presenterTransaction = (
     reason: node.reason,
     from,
     to,
+    source: "",
     transferPoints: signedPoint,
-    transferredAt: node.createdAt ? new Date(node.createdAt).toISOString() : '',
+    transferredAt: node.createdAt ? new Date(node.createdAt).toISOString() : "",
     description: formatTransactionDescription(node.reason, from, to, signedPoint),
   };
 };
@@ -52,56 +51,45 @@ const formatTransactionDescription = (
   reason: GqlTransactionReason,
   fromUserName: string,
   toUserName: string,
-  signedPoints: number
+  signedPoints: number,
 ): string => {
   const isOutgoing = signedPoints < 0;
 
   switch (reason) {
     case GqlTransactionReason.Donation:
-      return isOutgoing
-        ? `${toUserName}さんにプレゼントを贈りました`
-        : `${fromUserName}さんからプレゼントを受け取りました`;
+      return isOutgoing ? `${toUserName}さんに譲渡` : `${fromUserName}さんから譲渡`;
 
     case GqlTransactionReason.Grant:
-      return isOutgoing
-        ? `${toUserName}さんにポイントを付与しました`
-        : `${fromUserName}からポイントを受け取りました`;
+      return isOutgoing ? `${toUserName}さんに支給` : `${fromUserName}からポイント支給`;
 
     case GqlTransactionReason.PointIssued:
-      return `ポイントを発行しました`;
+      return `発行`;
 
     case GqlTransactionReason.PointReward:
-      return isOutgoing
-        ? `${toUserName}さんにポイントを送りました`
-        : `${fromUserName}さんからポイントを獲得しました`;
+      return isOutgoing ? `${toUserName}さんに支払い` : `${fromUserName}さんから支払い`;
 
     case GqlTransactionReason.TicketPurchased:
-      return isOutgoing
-        ? `${toUserName}さんのチケットを購入しました`
-        : `${fromUserName}さんがチケットを購入しました`;
+      return isOutgoing ? `${toUserName}さんに支払い` : `${fromUserName}さんから支払い`;
 
     case GqlTransactionReason.TicketRefunded:
-      return isOutgoing
-        ? `${toUserName}さんのチケットを払い戻さました`
-        : `${fromUserName}さんのチケットを払い戻しました`;
+      return isOutgoing ? `${toUserName}さんから返品` : `${fromUserName}さんに返品`;
 
     case GqlTransactionReason.Onboarding:
-      return `オンボーディングボーナスを受け取りました`;
+      return `初回ボーナス`;
 
     default:
-      return `ポイントが移動しました`;
+      return `ポイント移動`;
   }
 };
 
 const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
-  if (!wallet) return '';
+  if (!wallet) return "";
   switch (wallet.type) {
     case GqlWalletType.Member:
-      return wallet.user?.name ?? '';
+      return wallet.user?.name ?? "";
     case GqlWalletType.Community:
-      return wallet.community?.name ?? '';
+      return wallet.community?.name ?? "";
     default:
-      return '';
+      return "";
   }
 };
-
