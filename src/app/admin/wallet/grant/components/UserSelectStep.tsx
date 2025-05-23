@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import React, { useEffect, useRef } from "react";
 import { GqlUser } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,14 +9,39 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 interface Props {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: number } } }[];
   onSelect: (user: GqlUser) => void;
+  onLoadMore?: () => void;
+  hasNextPage?: boolean;
 }
 
-function UserSelectStep({ members, onSelect }: Props) {
+function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage }: Props) {
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!hasNextPage || !onLoadMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first.isIntersecting) {
+          onLoadMore();
+        }
+      },
+      { threshold: 1 },
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) observer.observe(currentRef);
+
+    return () => {
+      if (currentRef) observer.unobserve(currentRef);
+    };
+  }, [hasNextPage, onLoadMore]);
+
   return (
     <>
       <p className="px-4 text-sm text-muted-foreground">渡す相手を選んでください</p>
       <div className="space-y-3 px-4">
-        {members?.map(({ user, wallet }) => (
+        {members.map(({ user, wallet }) => (
           <Card
             key={user.id}
             onClick={() => onSelect(user)}
@@ -41,6 +67,9 @@ function UserSelectStep({ members, onSelect }: Props) {
             </CardHeader>
           </Card>
         ))}
+
+        {/* 無限スクロールの監視ポイント */}
+        {hasNextPage && <div ref={loadMoreRef} className="h-10" />}
       </div>
     </>
   );

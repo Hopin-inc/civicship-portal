@@ -1,23 +1,28 @@
-"use client";
-
-import { useEffect, useMemo, useState } from "react";
-import { GqlWalletType, useGetTransactionsQuery } from "@/types/graphql";
-import { toast } from "sonner";
-import { AppTransaction } from "@/app/wallets/data/type";
-import { presenterTransaction } from "@/app/wallets/data/presenter";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { COMMUNITY_ID } from "@/utils";
+import { GqlTransactionsConnection, GqlWalletType, useGetTransactionsQuery } from "@/types/graphql";
 
 export interface UseCommunityTransactionsResult {
-  transactions: AppTransaction[];
-  isLoading: boolean;
-  error: Error | null;
+  connection: GqlTransactionsConnection;
+  loading: boolean;
+  error: any;
+  loadMoreRef: React.RefObject<HTMLDivElement>;
   refetch: () => void;
 }
 
-const useCommunityTransactions = (walletId: string): UseCommunityTransactionsResult => {
-  const [transactions, setTransactions] = useState<AppTransaction[]>([]);
+const fallbackConnection: GqlTransactionsConnection = {
+  edges: [],
+  pageInfo: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+    startCursor: null,
+    endCursor: null,
+  },
+  totalCount: 0,
+};
 
-  const { data, loading, error, refetch } = useGetTransactionsQuery({
+const useCommunityTransactions = (): UseCommunityTransactionsResult => {
+  const { data, loading, error, fetchMore, refetch } = useGetTransactionsQuery({
     variables: {
       filter: {
         communityId: COMMUNITY_ID,
@@ -26,36 +31,64 @@ const useCommunityTransactions = (walletId: string): UseCommunityTransactionsRes
           { toWalletType: GqlWalletType.Community },
         ],
       },
+      first: 20,
     },
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
   });
 
-  useEffect(() => {
-    if (!data?.transactions?.edges) return;
+  const connection = data?.transactions ?? fallbackConnection;
+  const endCursor = connection.pageInfo?.endCursor;
+  const hasNextPage = connection.pageInfo?.hasNextPage ?? false;
 
-    const txList: AppTransaction[] = data.transactions.edges
-      .map((edge) => {
-        if (!edge?.node) return null;
-        return presenterTransaction(edge.node, walletId);
-      })
-      .filter((tx): tx is AppTransaction => tx !== null);
+  const handleFetchMore = async () => {
+    if (!hasNextPage) return;
 
-    setTransactions(txList);
-  }, [data, walletId]);
+    await fetchMore({
+      variables: {
+        filter: {
+          communityId: COMMUNITY_ID,
+          or: [
+            { fromWalletType: GqlWalletType.Community },
+            { toWalletType: GqlWalletType.Community },
+          ],
+        },
+        after: endCursor,
+        first: 10,
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult || !prev.transactions) return prev;
 
-  const formattedError = useMemo(() => {
-    if (error) {
-      console.error("Error fetching community transactions:", error);
-      toast.error("コミュニティ取引履歴の取得に失敗しました");
-      return error;
-    }
-    return null;
-  }, [error]);
+        const prevEdges = prev.transactions.edges ?? [];
+        const newEdges = fetchMoreResult.transactions?.edges ?? [];
+
+        // 明示的に重複除去（重要！）
+        const existingIds = new Set(prevEdges.map((e) => e?.node?.id));
+        const dedupedNewEdges = newEdges.filter((e) => e?.node?.id && !existingIds.has(e.node.id));
+
+        return {
+          ...prev,
+          transactions: {
+            ...prev.transactions,
+            edges: [...prevEdges, ...dedupedNewEdges],
+            pageInfo: fetchMoreResult.transactions.pageInfo,
+          },
+        };
+      },
+    });
+  };
+
+  const loadMoreRef = useInfiniteScroll({
+    hasMore: hasNextPage,
+    isLoading: loading,
+    onLoadMore: handleFetchMore,
+  });
 
   return {
-    transactions,
-    isLoading: loading,
-    error: formattedError,
+    connection,
+    loading,
+    error,
+    loadMoreRef,
     refetch,
   };
 };

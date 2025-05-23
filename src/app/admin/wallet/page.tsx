@@ -6,11 +6,13 @@ import { COMMUNITY_ID } from "@/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
-import { useGetCommunityWalletQuery } from "@/types/graphql";
+import { GqlRole, useGetCommunityWalletQuery } from "@/types/graphql";
 import { Coins, Send } from "lucide-react";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
-import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { presenterTransaction } from "@/app/wallets/data/presenter";
+import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
 
 export default function TransactionPage() {
   const communityId = COMMUNITY_ID;
@@ -30,70 +32,82 @@ export default function TransactionPage() {
   useHeaderConfig(headerConfig);
 
   const router = useRouter();
-  const handleNavigateToIssue = () => {
-    router.push("/admin/wallet/issue");
-  };
-
-  const handleNavigateToGrant = () => {
-    router.push("/admin/wallet/grant");
-  };
+  const handleNavigateToIssue = () => router.push("/admin/wallet/issue");
+  const handleNavigateToGrant = () => router.push("/admin/wallet/grant");
 
   const {
     data: walletData,
     loading: loadingWallet,
     refetch: refetchWallet,
   } = useGetCommunityWalletQuery();
+
   const walletId = walletData?.wallets.edges?.[0]?.node?.id ?? "";
   const currentPoint = walletData?.wallets.edges?.[0]?.node?.currentPointView?.currentPoint ?? 0;
 
-  const {
-    transactions,
-    isLoading,
-    // error,
-    refetch: refetchTransactions,
-  } = useCommunityTransactions(walletId);
+  const { connection, loadMoreRef, refetch: refetchTransactions } = useCommunityTransactions();
 
   useEffect(() => {
-    const handleFocus = () => {
-      refetchWallet();
-      refetchTransactions();
+    const handleFocus = async () => {
+      try {
+        await refetchWallet();
+        refetchTransactions();
+      } catch (err) {
+        console.error("Refetch failed on window focus", err);
+      }
     };
-
     window.addEventListener("focus", handleFocus);
-    return () => {
-      window.removeEventListener("focus", handleFocus);
-    };
+    return () => window.removeEventListener("focus", handleFocus);
   }, [refetchWallet, refetchTransactions]);
 
   return (
     <div className="space-y-6 max-w-xl mx-auto mt-8">
-      <WalletCard currentPoint={currentPoint} isLoading={loadingWallet} />
+      <WalletCard
+        currentPoint={currentPoint}
+        isLoading={loadingWallet}
+        onRefetch={async () => {
+          try {
+            await refetchWallet();
+            refetchTransactions();
+            toast.success("ウォレット情報を更新しました");
+          } catch (err) {
+            toast.error("再読み込みに失敗しました");
+          }
+        }}
+      />
+
       <div className="flex justify-center items-center gap-x-3">
         <Button
+          disabled={currentUserRole !== GqlRole.Owner}
           onClick={handleNavigateToIssue}
-          variant="tertiary"
+          variant="secondary"
           size="sm"
-          className="flex items-center gap-1.5 w-[104px] h-[48px]"
+          className="w-[104px] h-[48px] flex items-center gap-1.5"
         >
           <Coins className="w-4 h-4" />
-          <span className="text-base">増やす</span>
+          <span className="text-base">発行</span>
         </Button>
-
         <Button
+          disabled={currentUserRole !== GqlRole.Owner}
           onClick={handleNavigateToGrant}
-          variant="tertiary"
+          variant="secondary"
           size="sm"
-          className="flex items-center gap-1.5 w-[104px] h-[48px]"
+          className="w-[104px] h-[48px] flex items-center gap-1.5"
         >
           <Send className="w-4 h-4" />
-          <span className="text-base">渡す</span>
+          <span className="text-base">支給</span>
         </Button>
       </div>
 
-      <div className="space-y-4">
-        {transactions.map((transaction) => (
-          <TransactionItem key={transaction.id} transaction={transaction} />
-        ))}
+      <div className="space-y-2">
+        {connection.edges?.map((edge) => {
+          const node = edge?.node;
+          if (!node) return null;
+          const transaction = presenterTransaction(node, walletId);
+          if (!transaction) return null;
+          return <TransactionItem key={transaction.id} transaction={transaction} />;
+        })}
+
+        <div ref={loadMoreRef} className="h-10" />
       </div>
     </div>
   );

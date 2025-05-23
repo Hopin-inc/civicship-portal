@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransaction
 import { COMMUNITY_ID } from "@/utils";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 
-const PRESET_AMOUNTS = [1000000, 3000000, 5000000, 10000000];
+const PRESET_AMOUNTS = [1000000, 3000000, 5000000, 10000000, 30000000, 50000000];
 
 export default function IssuePointPage() {
   const communityId = COMMUNITY_ID;
@@ -17,13 +17,20 @@ export default function IssuePointPage() {
 
   const headerConfig = useMemo(
     () => ({
-      title: "ポイントを増やす",
+      title: "ポイント発行",
       showLogo: false,
       showBackButton: true,
     }),
     [],
   );
   useHeaderConfig(headerConfig);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
 
   const [amount, setAmount] = useState<number | null>(null);
   const [displayValue, setDisplayValue] = useState<string>("");
@@ -75,42 +82,46 @@ export default function IssuePointPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen max-w-xl mx-auto pt-8 pb-[96px] space-y-6">
-      <div className="px-4">
-        <Input
-          type="text"
-          placeholder="7,500,000"
-          value={displayValue}
-          onChange={handleInputChange}
-          inputMode="numeric"
-        />
-      </div>
+    <>
+      <main className="pb-24 min-h-screen flex items-center justify-center px-4">
+        <div className="flex flex-col items-center space-y-6 max-w-xl w-full">
+          <Input
+            type="text"
+            placeholder="7,500,000"
+            value={displayValue}
+            onChange={handleInputChange}
+            inputMode="numeric"
+            className="text-5xl text-center py-6 h-20 border-0 border-b-2 border-input focus:outline-none focus:ring-0 shadow-none"
+          />
 
-      <div className="space-y-2 px-4">
-        <div className="flex gap-x-3 overflow-x-auto scrollbar-none pb-1">
-          {PRESET_AMOUNTS.map((value) => (
-            <Button
-              key={value}
-              variant={amount === value ? "primary" : "secondary"}
-              size="sm"
-              onClick={() => handlePresetClick(value)}
-              className="min-w-[100px] flex-shrink-0"
-            >
-              {formatAsManUnit(value)}
-            </Button>
-          ))}
+          <div className="w-full">
+            <div className="flex gap-x-3 overflow-x-auto scrollbar-none pb-1">
+              {PRESET_AMOUNTS.map((value) => (
+                <Button
+                  key={value}
+                  variant={amount === value ? "primary" : "secondary"}
+                  size="sm"
+                  onClick={() => handlePresetClick(value)}
+                  className="min-w-[100px] flex-shrink-0"
+                >
+                  {formatAsManUnit(value)}
+                </Button>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
 
-      <div className="px-4">
+      <footer className="fixed bottom-[120px] left-0 right-0 z-50 bg-background max-w-mobile-l w-full h-20 flex items-center px-4 py-4 justify-center mx-auto">
         <Button
+          size="lg"
+          className="w-full max-w-xl"
           onClick={handleIssuePoint}
           disabled={!amount || amount <= 0}
-          className="w-full h-12 text-base"
         >
           発行
         </Button>
-      </div>
-    </div>
+      </footer>
+    </>
   );
 }

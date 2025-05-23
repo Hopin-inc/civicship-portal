@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/utils";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -9,12 +9,14 @@ import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransaction
 import UserSelectStep from "./components/UserSelectStep";
 import GrantInputStep from "./components/GrantInputStep";
 import { useRouter } from "next/navigation";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import ErrorState from "@/components/shared/ErrorState";
 
 export default function GrantPointStepperPage() {
   const router = useRouter();
   const headerConfig = useMemo(
     () => ({
-      title: "ポイントを渡す",
+      title: "ポイント支給",
       showLogo: false,
       showBackButton: true,
     }),
@@ -22,12 +24,31 @@ export default function GrantPointStepperPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { data, loading, error, refetch } = useGetMemberWalletsQuery({
+  const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
     variables: { filter: { communityId: COMMUNITY_ID } },
     fetchPolicy: "network-only",
   });
 
+  const handleLoadMore = async () => {
+    const pageInfo = data?.wallets?.pageInfo;
+    const endCursor = pageInfo?.endCursor;
+
+    if (pageInfo?.hasNextPage && endCursor) {
+      await fetchMore({
+        variables: {
+          filter: { communityId: COMMUNITY_ID },
+          after: endCursor,
+        },
+      });
+    }
+  };
+
   const { grantPoint } = useTransactionMutations();
+
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -65,10 +86,23 @@ export default function GrantPointStepperPage() {
     wallet: { currentPointView?: { currentPoint: number } };
   }[];
 
+  if (loading) {
+    return <LoadingIndicator />;
+  }
+
+  if (error) {
+    return <ErrorState title="メンバーを読み込めませんでした" refetchRef={refetchRef} />;
+  }
+
   return (
     <div className="max-w-xl mx-auto mt-6 space-y-4">
       {!selectedUser ? (
-        <UserSelectStep members={members} onSelect={setSelectedUser} />
+        <UserSelectStep
+          members={members}
+          onSelect={setSelectedUser}
+          onLoadMore={handleLoadMore}
+          hasNextPage={data?.wallets?.pageInfo?.hasNextPage}
+        />
       ) : (
         <GrantInputStep
           user={selectedUser}
@@ -77,9 +111,6 @@ export default function GrantPointStepperPage() {
           onSubmit={handleGrantPoint}
         />
       )}
-
-      {loading && <p className="text-sm text-muted-foreground text-center">読み込み中...</p>}
-      {error && <p className="text-sm text-red-500 text-center">読み込みに失敗しました</p>}
     </div>
   );
 }
