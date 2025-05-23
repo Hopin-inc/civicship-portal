@@ -1042,9 +1042,9 @@ export type GqlOpportunitySlot = {
   endsAt: Scalars["Datetime"]["output"];
   hostingStatus: GqlOpportunitySlotHostingStatus;
   id: Scalars["ID"]["output"];
-  isFullyEvaluated: Scalars["Boolean"]["output"];
-  numEvaluated: Scalars["Int"]["output"];
-  numParticipants: Scalars["Int"]["output"];
+  isFullyEvaluated?: Maybe<Scalars["Boolean"]["output"]>;
+  numEvaluated?: Maybe<Scalars["Int"]["output"]>;
+  numParticipants?: Maybe<Scalars["Int"]["output"]>;
   opportunity?: Maybe<GqlOpportunity>;
   remainingCapacity?: Maybe<Scalars["Int"]["output"]>;
   reservations?: Maybe<Array<GqlReservation>>;
@@ -1696,7 +1696,6 @@ export type GqlQueryWalletsArgs = {
 
 export type GqlReservation = {
   __typename?: "Reservation";
-  comment?: Maybe<Scalars["String"]["output"]>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   createdByUser?: Maybe<GqlUser>;
   histories?: Maybe<Array<GqlReservationHistory>>;
@@ -1713,7 +1712,6 @@ export type GqlReservationCancelInput = {
 };
 
 export type GqlReservationCreateInput = {
-  comment?: InputMaybe<Scalars["String"]["input"]>;
   opportunitySlotId: Scalars["ID"]["input"];
   otherUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   paymentMethod: GqlReservationPaymentMethod;
@@ -2565,22 +2563,6 @@ export type GqlGetSingleMembershipQuery = {
     role: GqlRole;
     status: GqlMembershipStatus;
     reason: GqlMembershipStatusReason;
-    participationView?: {
-      __typename?: "MembershipParticipationView";
-      hosted: {
-        __typename?: "MembershipHostedMetrics";
-        totalParticipantCount: number;
-        geo: Array<{
-          __typename?: "MembershipParticipationLocation";
-          placeId: string;
-          placeName?: string | null;
-          placeImage?: string | null;
-          latitude: any;
-          longitude: any;
-          address: string;
-        }>;
-      };
-    } | null;
     user?: {
       __typename?: "User";
       id: string;
@@ -2592,38 +2574,6 @@ export type GqlGetSingleMembershipQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
-      articlesAboutMe?: Array<{
-        __typename?: "Article";
-        id: string;
-        title: string;
-        body?: string | null;
-        introduction: string;
-        thumbnail?: any | null;
-        category: GqlArticleCategory;
-        publishStatus: GqlPublishStatus;
-        publishedAt?: Date | null;
-      }> | null;
-      opportunitiesCreatedByMe?: Array<{
-        __typename?: "Opportunity";
-        id: string;
-        title: string;
-        description: string;
-        body?: string | null;
-        images?: Array<string> | null;
-        category: GqlOpportunityCategory;
-        publishStatus: GqlPublishStatus;
-        isReservableWithTicket?: boolean | null;
-        requireApproval: boolean;
-        feeRequired?: number | null;
-        pointsToEarn?: number | null;
-        earliestReservableAt?: Date | null;
-        community?: {
-          __typename?: "Community";
-          id: string;
-          name?: string | null;
-          image?: string | null;
-        } | null;
-      }> | null;
     } | null;
     community?: {
       __typename?: "Community";
@@ -2639,7 +2589,6 @@ export type GqlGetMembershipListQueryVariables = Exact<{
   cursor?: InputMaybe<GqlMembershipCursorInput>;
   filter?: InputMaybe<GqlMembershipFilterInput>;
   sort?: InputMaybe<GqlMembershipSortInput>;
-  IsCard?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetMembershipListQuery = {
@@ -2659,50 +2608,22 @@ export type GqlGetMembershipListQuery = {
       cursor: string;
       node?: {
         __typename?: "Membership";
-        hostOpportunityCount?: number | null;
         headline?: string | null;
         bio?: string | null;
         role: GqlRole;
         status: GqlMembershipStatus;
         reason: GqlMembershipStatusReason;
-        participationView?: {
-          __typename?: "MembershipParticipationView";
-          hosted: {
-            __typename?: "MembershipHostedMetrics";
-            totalParticipantCount: number;
-            geo: Array<{
-              __typename?: "MembershipParticipationLocation";
-              placeId: string;
-              placeName?: string | null;
-              placeImage?: string | null;
-              latitude: any;
-              longitude: any;
-              address: string;
-            }>;
-          };
-        } | null;
         user?: {
           __typename?: "User";
           id: string;
-          image?: string | null;
           name: string;
+          image?: string | null;
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
-          articlesAboutMe?: Array<{
-            __typename?: "Article";
-            id: string;
-            title: string;
-            body?: string | null;
-            introduction: string;
-            thumbnail?: any | null;
-            category: GqlArticleCategory;
-            publishStatus: GqlPublishStatus;
-            publishedAt?: Date | null;
-          }> | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -3696,9 +3617,9 @@ export type GqlGetOpportunitySlotsQuery = {
         endsAt: Date;
         capacity?: number | null;
         remainingCapacity?: number | null;
-        isFullyEvaluated: boolean;
-        numParticipants: number;
-        numEvaluated: number;
+        isFullyEvaluated?: boolean | null;
+        numParticipants?: number | null;
+        numEvaluated?: number | null;
         opportunity?: {
           __typename?: "Opportunity";
           id: string;
@@ -3748,9 +3669,9 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
   __typename?: "Query";
   opportunitySlot?: {
     __typename?: "OpportunitySlot";
-    isFullyEvaluated: boolean;
-    numParticipants: number;
-    numEvaluated: number;
+    isFullyEvaluated?: boolean | null;
+    numParticipants?: number | null;
+    numEvaluated?: number | null;
     id: string;
     hostingStatus: GqlOpportunitySlotHostingStatus;
     startsAt: Date;
@@ -5252,22 +5173,8 @@ export const GetSingleMembershipDocument = gql`
   query GetSingleMembership($communityId: ID!, $userId: ID!) {
     membership(communityId: $communityId, userId: $userId) {
       ...MembershipFields
-      participationView {
-        hosted {
-          ...HostedGeoFields
-        }
-      }
       user {
         ...UserFields
-        articlesAboutMe {
-          ...ArticleFields
-        }
-        opportunitiesCreatedByMe {
-          ...OpportunityFields
-          community {
-            ...CommunityFields
-          }
-        }
       }
       community {
         ...CommunityFields
@@ -5275,10 +5182,7 @@ export const GetSingleMembershipDocument = gql`
     }
   }
   ${MembershipFieldsFragmentDoc}
-  ${HostedGeoFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
-  ${ArticleFieldsFragmentDoc}
-  ${OpportunityFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
 
@@ -5356,7 +5260,6 @@ export const GetMembershipListDocument = gql`
     $cursor: MembershipCursorInput
     $filter: MembershipFilterInput
     $sort: MembershipSortInput
-    $IsCard: Boolean! = false
   ) {
     memberships(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
       pageInfo {
@@ -5370,21 +5273,10 @@ export const GetMembershipListDocument = gql`
         cursor
         node {
           ...MembershipFields
-          participationView {
-            hosted {
-              ...HostedGeoFields
-            }
-          }
-          hostOpportunityCount @include(if: $IsCard)
           user {
-            id
-            image
-            ...UserFields @include(if: $IsCard)
-            articlesAboutMe @include(if: $IsCard) {
-              ...ArticleFields
-            }
+            ...UserFields
           }
-          community @include(if: $IsCard) {
+          community {
             ...CommunityFields
           }
         }
@@ -5392,9 +5284,7 @@ export const GetMembershipListDocument = gql`
     }
   }
   ${MembershipFieldsFragmentDoc}
-  ${HostedGeoFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
-  ${ArticleFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
 
@@ -5414,7 +5304,6 @@ export const GetMembershipListDocument = gql`
  *      cursor: // value for 'cursor'
  *      filter: // value for 'filter'
  *      sort: // value for 'sort'
- *      IsCard: // value for 'IsCard'
  *   },
  * });
  */
