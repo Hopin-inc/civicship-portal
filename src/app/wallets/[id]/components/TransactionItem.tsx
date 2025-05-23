@@ -12,15 +12,17 @@ interface TransactionItemProps {
   image?: string; // ← 追加
 }
 
-const formatDateTime = (isoString: string) => {
+const formatDateTime = (isoString: string | null | undefined): string => {
+  if (!isoString) return "日時不明";
+
   const date = new Date(isoString);
-  return new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+  if (isNaN(date.getTime())) return "日時不明";
+
+  return `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, "0")}月${String(
+    date.getDate(),
+  ).padStart(2, "0")}日 ${String(date.getHours()).padStart(2, "0")}:${String(
+    date.getMinutes(),
+  ).padStart(2, "0")}`;
 };
 
 const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image }) => {
@@ -39,7 +41,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image })
           style={{ aspectRatio: "1 / 1" }}
         />
         <div className="flex flex-col text-left">
-          <span className="text-body-sm">{transaction.description}</span>
+          <span className="text-body-sm truncate max-w-[200px]">{transaction.description}</span>
           <span className="text-label-xs text-muted-foreground">
             {formatDateTime(transaction.transferredAt)}
           </span>

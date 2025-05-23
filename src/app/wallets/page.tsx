@@ -7,7 +7,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Send } from "lucide-react";
+import { Gift } from "lucide-react";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
 import { presenterTransaction } from "@/app/wallets/data/presenter";
 import useUserTransactions from "@/app/wallets/hooks/useUserTransaction";
@@ -82,7 +82,7 @@ export default function UserWalletPage() {
           size="sm"
           className="w-[104px] h-[48px] flex items-center gap-1.5"
         >
-          <Send className="w-4 h-4" />
+          <Gift className="w-4 h-4" />
           <span className="text-base">あげる</span>
         </Button>
       </div>
