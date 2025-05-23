@@ -16,6 +16,11 @@ const settings = [
     description: "ポイントの発行・支給などを行います",
     href: "/admin/wallet",
   },
+  {
+    title: "チケット管理",
+    description: "チケットを発行できます",
+    href: "/admin/tickets",
+  },
 ];
 
 export default function SettingsPage() {
