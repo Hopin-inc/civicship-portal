@@ -80,7 +80,7 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage }: Props) {
                   {user.name}
                 </CardTitle>
                 <CardDescription>
-                  {wallet.currentPointView?.currentPoint?.toLocaleString() ?? 0}pt 保有
+                  {wallet?.currentPointView?.currentPoint?.toLocaleString() ?? 0}pt 保有
                 </CardDescription>
               </div>
             </CardHeader>
