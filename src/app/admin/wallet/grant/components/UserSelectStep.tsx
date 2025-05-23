@@ -65,7 +65,7 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title }: P
           <Card
             key={user.id}
             onClick={() => onSelect(user)}
-            className="cursor-pointer hover:bg-accent transition"
+            className="cursor-pointer hover:bg-background-hover transition"
           >
             <CardHeader className="flex flex-row items-center gap-3 p-4">
               <Image

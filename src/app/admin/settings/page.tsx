@@ -41,7 +41,7 @@ export default function SettingsPage() {
         <Card
           key={item.href}
           onClick={() => router.push(item.href)}
-          className="cursor-pointer hover:bg-accent transition"
+          className="cursor-pointer hover:bg-background-hover transition"
         >
           <CardHeader className={"text-body-sm font-bold"}>
             <CardTitle>{item.title}</CardTitle>
