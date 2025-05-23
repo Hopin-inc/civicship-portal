@@ -1,16 +1,24 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useWallet } from "@/app/wallets/hooks/useWallet";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { useAuth } from "@/contexts/AuthContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
-import WalletHistoryButton from "@/app/wallets/components/WalletHistoryButton";
-import WalletInfoSection from "@/app/wallets/components/WalletInfoSection";
-import WalletUsageSection from "@/app/wallets/components/WalletUsageSection";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { Send } from "lucide-react";
+import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
+import { presenterTransaction } from "@/app/wallets/data/presenter";
+import useUserTransactions from "@/app/wallets/hooks/useUserTransaction";
+import { toast } from "sonner";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 
-export default function WalletsPage() {
+export default function UserWalletPage() {
+  const { user: currentUser } = useAuth();
+  const userId = currentUser?.id;
+
   const headerConfig = useMemo(
     () => ({
       title: "保有ポイント",
@@ -21,33 +29,78 @@ export default function WalletsPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { userAsset, isLoading, error, refetch } = useWallet();
-  const refetchRef = useRef<(() => void) | null>(null);
+  const router = useRouter();
+  const handleNavigateToGive = () => router.push(`/wallets/donate?currentPoint=${currentPoint}`);
+
+  const { userAsset, isLoading, error, refetch: refetchWallet } = useWallet(userId);
+
+  const {
+    connection,
+    loadMoreRef,
+    refetch: refetchTransactions,
+  } = useUserTransactions(userId ?? "");
+
+  const walletId = userAsset.points.walletId;
+  const currentPoint = userAsset.points.currentPoint;
+
   useEffect(() => {
-    refetchRef.current = refetch;
-  }, [refetch]);
+    const handleFocus = async () => {
+      try {
+        await refetchWallet();
+        refetchTransactions();
+      } catch (err) {
+        console.error("Refetch failed on focus", err);
+      }
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [refetchWallet, refetchTransactions]);
 
-  if (isLoading) {
-    return <LoadingIndicator />;
-  }
-
-  if (error) {
-    return <ErrorState title="保有ポイントを読み込めませんでした" refetchRef={refetchRef} />;
-  }
+  if (isLoading) return <LoadingIndicator />;
+  if (error) return <ErrorState title={"ウォレット"} />;
 
   return (
-    <div className="flex flex-col min-h-screen bg-background px-4 py-6">
-      <WalletCard currentPoint={userAsset.points.currentPoint} isLoading={isLoading} />
-      <WalletHistoryButton walletId={userAsset.points.walletId} />
-      <WalletInfoSection />
-      <WalletUsageSection
-        title="ポイントを使う"
-        message="ポイントを使ってサービスを利用できるようになったら、LINEからお伝えします💪"
+    <div className="space-y-6 max-w-xl mx-auto mt-8">
+      <WalletCard
+        currentPoint={currentPoint}
+        isLoading={isLoading}
+        onRefetch={async () => {
+          try {
+            await refetchWallet();
+            refetchTransactions();
+            toast.success("ウォレット情報を更新しました");
+          } catch (err) {
+            toast.error("再読み込みに失敗しました");
+          }
+        }}
       />
-      <WalletUsageSection
-        title="ポイントをもらう"
-        message="ポイントをもらえるお手伝いに参加できるようになったら、LINEからお伝えします💪"
-      />
+
+      <div className="flex justify-center">
+        <Button
+          onClick={handleNavigateToGive}
+          variant="secondary"
+          size="sm"
+          className="w-[104px] h-[48px] flex items-center gap-1.5"
+        >
+          <Send className="w-4 h-4" />
+          <span className="text-base">あげる</span>
+        </Button>
+      </div>
+
+      <div className="pt-10">
+        <h2 className="text-display-sm">これまでの交換</h2>
+      </div>
+      <div className="space-y-2 mt-2">
+        {connection.edges?.map((edge) => {
+          const node = edge?.node;
+          if (!node) return null;
+          const transaction = presenterTransaction(node, walletId);
+          if (!transaction) return null;
+          return <TransactionItem key={transaction.id} transaction={transaction} />;
+        })}
+
+        <div ref={loadMoreRef} className="h-10" />
+      </div>
     </div>
   );
 }

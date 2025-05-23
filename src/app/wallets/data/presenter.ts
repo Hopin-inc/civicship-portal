@@ -60,7 +60,7 @@ const formatTransactionDescription = (
       return isOutgoing ? `${toUserName}さんに譲渡` : `${fromUserName}さんから譲渡`;
 
     case GqlTransactionReason.Grant:
-      return isOutgoing ? `${toUserName}さんに支給` : `${fromUserName}からポイント支給`;
+      return isOutgoing ? `${toUserName}さんに支給` : `${fromUserName}から支給`;
 
     case GqlTransactionReason.PointIssued:
       return `発行`;
@@ -83,6 +83,7 @@ const formatTransactionDescription = (
 };
 
 const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
+  console.log("wallet", wallet);
   if (!wallet) return "";
   switch (wallet.type) {
     case GqlWalletType.Member:
