@@ -8,7 +8,6 @@ import {
   TArticleWithAuthor,
 } from "@/app/articles/data/type";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
-import markdownToTxt from 'markdown-to-txt';
 
 export const presenterArticleCards = (
   edges?: (GqlArticleEdge | null | undefined)[],
@@ -23,8 +22,7 @@ export const presenterArticleCard = (node?: GqlArticle): TArticleCard => ({
   id: node?.id || "",
   category: node?.category || GqlArticleCategory.Interview,
   title: node?.title || "",
-  // TODO FEでintroが入ったら修正
-  introduction: node?.body ? markdownToTxt(node.body) : "",
+  introduction: node?.introduction || "",
   thumbnail: node?.thumbnail || null,
   publishedAt: node?.publishedAt ? new Date(node.publishedAt).toISOString() : "",
 });
@@ -51,10 +49,8 @@ export const presenterArticleDetail = (article: GqlArticle): TArticleDetail => {
     id: article.id,
     title: article.title,
     category: article.category,
-    // TODO FEでintroが入ったら修正
-    introduction: article.body || "",
+    introduction: article.introduction || "",
     body: article.body || "",
-
     thumbnail: typeof article.thumbnail === "string" ? article.thumbnail : "",
     publishedAt: article.publishedAt ? new Date(article.publishedAt).toISOString() : "",
 
