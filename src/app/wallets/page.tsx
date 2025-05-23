@@ -91,13 +91,19 @@ export default function UserWalletPage() {
         <h2 className="text-display-sm">これまでの交換</h2>
       </div>
       <div className="space-y-2 mt-2">
-        {connection.edges?.map((edge) => {
-          const node = edge?.node;
-          if (!node) return null;
-          const transaction = presenterTransaction(node, walletId);
-          if (!transaction) return null;
-          return <TransactionItem key={transaction.id} transaction={transaction} />;
-        })}
+        {connection.edges?.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center pt-6">
+            まだ交換したことがありません
+          </p>
+        ) : (
+          connection.edges?.map((edge) => {
+            const node = edge?.node;
+            if (!node) return null;
+            const transaction = presenterTransaction(node, walletId);
+            if (!transaction) return null;
+            return <TransactionItem key={transaction.id} transaction={transaction} />;
+          })
+        )}
 
         <div ref={loadMoreRef} className="h-10" />
       </div>
