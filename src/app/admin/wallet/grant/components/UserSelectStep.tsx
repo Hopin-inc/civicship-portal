@@ -6,6 +6,9 @@ import { GqlUser } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import SearchForm from "@/app/search/components/SearchForm";
+import { useMemberSearch } from "@/app/admin/wallet/grant/hooks/useMemberSearch";
+import { FormProvider } from "react-hook-form";
 
 interface Props {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: number } } }[];
@@ -26,6 +29,8 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage }: Props) {
   useHeaderConfig(headerConfig);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  const { form, filteredMembers } = useMemberSearch(members); // ← 検索ロジック
 
   useEffect(() => {
     if (!hasNextPage || !onLoadMore) return;
@@ -49,9 +54,13 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage }: Props) {
   }, [hasNextPage, onLoadMore]);
 
   return (
-    <>
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(() => {})} className="px-4">
+        <SearchForm name="searchQuery" />
+      </form>
+
       <div className="space-y-3 px-4">
-        {members.map(({ user, wallet }) => (
+        {filteredMembers.map(({ user, wallet }) => (
           <Card
             key={user.id}
             onClick={() => onSelect(user)}
@@ -71,17 +80,22 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage }: Props) {
                   {user.name}
                 </CardTitle>
                 <CardDescription>
-                  保有pt: {wallet.currentPointView?.currentPoint?.toLocaleString() ?? 0}
+                  {wallet.currentPointView?.currentPoint?.toLocaleString() ?? 0}pt 保有
                 </CardDescription>
               </div>
             </CardHeader>
           </Card>
         ))}
 
-        {/* 無限スクロールの監視ポイント */}
+        {filteredMembers.length === 0 && (
+          <p className="text-sm text-center text-muted-foreground pt-4">
+            一致するメンバーが見つかりません
+          </p>
+        )}
+
         {hasNextPage && <div ref={loadMoreRef} className="h-10" />}
       </div>
-    </>
+    </FormProvider>
   );
 }
 

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { GqlUser } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { HeaderConfig } from "@/contexts/HeaderContext";
 
 const PRESET_AMOUNTS = [100000, 300000, 500000, 1000000];
 
@@ -18,11 +19,12 @@ interface Props {
 }
 
 function GrantInputStep({ user, isLoading, onBack, onSubmit }: Props) {
-  const headerConfig = useMemo(
+  const headerConfig: HeaderConfig = useMemo(
     () => ({
       title: "ポイントを支給する",
       showLogo: false,
-      showBackButton: true,
+      showBackButton: false,
+      // backTo: "/admin/wallet/grant",
     }),
     [],
   );
