@@ -103,14 +103,28 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
       <h2 className="text-display-md text-foreground mb-4">案内人</h2>
       <div className="rounded-xl flex flex-col gap-4">
         <div className="flex items-center gap-4">
-          <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-            <Image
-              src={host.image || PLACEHOLDER_IMAGE}
-              alt={host.name || "案内者"}
-              fill
-              className="object-cover"
-            />
-          </div>
+          {host.id ? (
+            <Link
+              href={`/users/${host.id}`}
+              className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0"
+            >
+              <Image
+                src={host.image || PLACEHOLDER_IMAGE}
+                alt={host.name || "案内者"}
+                fill
+                className="object-cover"
+              />
+            </Link>
+          ) : (
+            <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+              <Image
+                src={host.image || PLACEHOLDER_IMAGE}
+                alt={host.name || "案内者"}
+                fill
+                className="object-cover"
+              />
+            </div>
+          )}
           <div>
             <h3 className="text-title-sm font-bold mb-1 text-caption">
               <span className="text-display-sm mr-1 text-foreground">{host.name}</span>さん
