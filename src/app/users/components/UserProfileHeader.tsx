@@ -70,7 +70,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
             <h1 className="text-title-lg mb-2">{name}</h1>
 
             {currentPrefecture && (
-              <div className="flex items-center justify-center text-label-md text-caption mb-3">
+              <div className="flex items-center text-label-md text-caption mb-3">
                 <Home className="w-4 h-4 mr-1" />
                 <span>{prefectureLabels[currentPrefecture] || "不明"}</span>
               </div>
@@ -120,7 +120,7 @@ const BioSection = ({ bio }: { bio: string }) => {
     <div className="mb-4 relative">
       <div
         ref={textRef}
-        className="text-body-md text-foreground whitespace-pre-line transition-all duration-300"
+        className="text-body-md text-foreground whitespace-pre-line transition-all duration-300 text-left"
         style={getTextStyle()}
       >
         {bio}
