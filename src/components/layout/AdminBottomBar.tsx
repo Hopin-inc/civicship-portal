@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Book, Check, Settings } from "lucide-react";
+import { Book, Check } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -48,13 +48,13 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
             <Check size={24} />
             <span className="text-xs mt-1">出欠</span>
           </Link>
-          <Link
-            href="/admin/settings"
-            className={cn(getLinkStyle("/admin/settings", "/admin/settings/*"), "flex-grow")}
-          >
-            <Settings size={24} />
-            <span className="text-xs mt-1">設定</span>
-          </Link>
+          {/*<Link*/}
+          {/*  href="/admin/settings"*/}
+          {/*  className={cn(getLinkStyle("/admin/settings", "/admin/settings/*"), "flex-grow")}*/}
+          {/*>*/}
+          {/*  <Settings size={24} />*/}
+          {/*  <span className="text-xs mt-1">設定</span>*/}
+          {/*</Link>*/}
           {/*<Link*/}
           {/*  href="/admin/tickets"*/}
           {/*  className={cn(getLinkStyle("/admin/tickets", "/admin/tickets/*"), "flex-grow")}*/}
