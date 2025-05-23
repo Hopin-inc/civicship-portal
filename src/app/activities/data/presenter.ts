@@ -140,6 +140,21 @@ export const sliceActivitiesBySection = (
 
   const N = activityCards.length;
 
+  // Filter activities with images
+  const hasImages = (card: ActivityCard) => card.images && card.images.length > 0;
+
+  // Sort function to put cards with images first
+  const sortByImages = (cards: ActivityCard[]) => {
+    return [...cards].sort((a, b) => {
+      const aHasImages = hasImages(a);
+      const bHasImages = hasImages(b);
+
+      if (aHasImages && !bHasImages) return -1;
+      if (!aHasImages && bHasImages) return 1;
+      return 0;
+    });
+  };
+
   const featuredHead = activityCards[0];
 
   if (N < 10) {
@@ -148,7 +163,8 @@ export const sliceActivitiesBySection = (
     const usedIndices = new Set<number>();
     if (featuredHead) usedIndices.add(0);
 
-    const featuredCards = safe([featuredHead]);
+    // Only include activities with images in featuredCards
+    const featuredCards = safe([featuredHead]).filter(hasImages);
 
     const upcomingCards = safe(
       activityCards.slice(1, 1 + maxUpcoming).map((card, i) => {
@@ -157,21 +173,22 @@ export const sliceActivitiesBySection = (
       }),
     );
 
-    const listCards = safe(activityCards.filter((_, idx) => !usedIndices.has(idx)));
+    // Get remaining cards and sort them - activities with images first
+    const listCards = sortByImages(safe(activityCards.filter((_, idx) => !usedIndices.has(idx))));
 
     return { upcomingCards, featuredCards, listCards };
   }
 
   const featuredTail = activityCards.slice(6, 10);
-  const featuredCards = safe([featuredHead, ...featuredTail]);
+  // Only include activities with images in featuredCards
+  const featuredCards = safe([featuredHead, ...featuredTail]).filter(hasImages);
 
   const upcomingCards = safe(activityCards.slice(1, 6));
 
-  const listCards = safe([
-    ...activityCards.slice(3, 6),
-    ...activityCards.slice(6, 10),
-    ...activityCards.slice(10),
-  ]);
+  // Get all list cards and sort them - activities with images first
+  const listCards = sortByImages(
+    safe([...activityCards.slice(3, 6), ...activityCards.slice(6, 10), ...activityCards.slice(10)]),
+  );
 
   return { upcomingCards, featuredCards, listCards };
 };

@@ -9,6 +9,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
@@ -76,10 +77,14 @@ export function SignUpForm() {
             name="name"
             render={({ field }) => (
               <FormItem className="space-y-3">
-                <FormLabel className="text-base">表示名</FormLabel>
+                {/* #NOTE: 運営メンバーが本名でないと、誰かが誰かを区別できなくなる可能性があるため本名としているが、NEO88における特殊対応 */}
+                <FormLabel className="text-base">本名</FormLabel>
                 <FormControl>
-                  <Input placeholder="名前を入力" {...field} className="h-12" />
+                  <Input placeholder="山田太郎" {...field} className="h-12" />
                 </FormControl>
+                <FormDescription className="text-xs text-muted-foreground">
+                  ※ どなたか分からなくなるため、必ず本名をご入力ください
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

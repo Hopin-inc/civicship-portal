@@ -18,7 +18,6 @@ interface ArticleCardProps {
 }
 
 const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory, showUser }) => {
-  console.debug({ article });
   return (
     <Link href={`/articles/${article.id}`} className="block">
       <Card className="bg-white">

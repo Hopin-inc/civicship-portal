@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Facebook, Instagram, Twitter } from 'lucide-react';
-import { GqlCurrentPrefecture } from '@/types/graphql';
+import React, { useState } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Facebook, Instagram, Twitter } from "lucide-react";
+import { GqlCurrentPrefecture } from "@/types/graphql";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
@@ -94,8 +94,9 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
       </div>
 
       <div>
+        {/* #NOTE: 運営メンバーが本名でないと、誰かが誰かを区別できなくなる可能性があるため本名としているが、NEO88における特殊対応 */}
         <Label className="mb-2 flex items-center gap-x-2">
-          表示名
+          本名
           <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">
             必須
           </span>
@@ -106,6 +107,9 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
           placeholder="山田太郎"
           required
         />
+        <span className="text-xs text-muted-foreground">
+          ※ どなたか分からなくなるため、必ず本名をご入力ください
+        </span>
       </div>
 
       <div>

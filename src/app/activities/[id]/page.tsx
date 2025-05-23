@@ -76,6 +76,7 @@ export default function ActivityPage() {
         opportunityId={opportunity.id}
         price={opportunity.feeRequired || 0}
         communityId={communityId}
+        disableButton={!sortedSlots || sortedSlots.length === 0}
       />
     </>
   );
