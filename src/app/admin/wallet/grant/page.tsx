@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/utils";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { GqlUser, useGetMemberWalletsQuery } from "@/types/graphql";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
 import UserSelectStep from "./components/UserSelectStep";
@@ -14,15 +13,6 @@ import ErrorState from "@/components/shared/ErrorState";
 
 export default function GrantPointStepperPage() {
   const router = useRouter();
-  const headerConfig = useMemo(
-    () => ({
-      title: "ポイント支給",
-      showLogo: false,
-      showBackButton: true,
-    }),
-    [],
-  );
-  useHeaderConfig(headerConfig);
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
     variables: { filter: { communityId: COMMUNITY_ID } },

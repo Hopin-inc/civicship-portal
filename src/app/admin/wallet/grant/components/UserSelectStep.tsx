@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { GqlUser } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface Props {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: number } } }[];
@@ -14,6 +15,16 @@ interface Props {
 }
 
 function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage }: Props) {
+  const headerConfig = useMemo(
+    () => ({
+      title: "支給相手を選ぶ",
+      showLogo: false,
+      showBackButton: true,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
+
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -39,7 +50,6 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage }: Props) {
 
   return (
     <>
-      <p className="px-4 text-sm text-muted-foreground">渡す相手を選んでください</p>
       <div className="space-y-3 px-4">
         {members.map(({ user, wallet }) => (
           <Card
