@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { COMMUNITY_ID } from "@/utils";
-import { GqlRole } from "@/types/graphql";
+import { GqlRole, GqlUser } from "@/types/graphql";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -19,11 +19,13 @@ import { useMembershipQueries } from "@/app/admin/members/hooks/useMembershipQue
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useMembershipCommand } from "@/app/admin/members/hooks/useMembershipMutations";
 import { Button } from "@/components/ui/button";
+import { FormProvider } from "react-hook-form";
+import SearchForm from "@/app/search/components/SearchForm";
+import { useMemberSearch } from "@/app/admin/wallet/grant/hooks/useMemberSearch";
 
 export default function MembersPage() {
   const communityId = COMMUNITY_ID;
   const { user: currentUser } = useAuth();
-
   const currentUserRole = currentUser?.memberships?.find(
     (m) => m.community?.id === communityId,
   )?.role;
@@ -40,6 +42,24 @@ export default function MembersPage() {
 
   const { fetchMembershipList, membershipListData } = useMembershipQueries();
   const { assignOwner, assignManager, assignMember } = useMembershipCommand();
+
+  const members = useMemo(() => {
+    return (
+      membershipListData?.memberships?.edges
+        ?.map((edge) => {
+          const user = edge?.node?.user;
+          const role = edge?.node?.role;
+          return user && role ? { user, role } : null;
+        })
+        .filter((member): member is { user: GqlUser; role: GqlRole } => member !== null) ?? []
+    );
+  }, [membershipListData]);
+
+  const { form, filteredMembers } = useMemberSearch(
+    members
+      .map(({ user }) => (user ? { user } : null))
+      .filter((m): m is { user: GqlUser } => m !== null),
+  );
 
   const [pendingRoleChange, setPendingRoleChange] = useState<{
     userId: string;
@@ -61,43 +81,48 @@ export default function MembersPage() {
 
   const handleMutation = useCallback(
     async (mutate: Function, userId: string) => {
-      setIsLoading(true); // ✅ 開始時にtrue
+      setIsLoading(true);
       try {
         const result = await mutate({ communityId, userId });
         if (!result.success) {
           toast.error(`権限変更に失敗しました（${result.code ?? "UNKNOWN"}）`);
           return;
         }
-        toast.success("ロールを更新しました");
+        toast.success("権限を更新しました");
         window.location.reload();
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "不明なエラーが発生しました");
       } finally {
-        setIsLoading(false); // ✅ 終了時にfalse
+        setIsLoading(false);
       }
     },
     [communityId],
   );
 
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <div className="space-y-4">
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(() => {})} className="px-4 mb-4 pt-6">
+        <SearchForm name="searchQuery" />
+      </form>
+
+      <div className="flex flex-col gap-4 px-4">
         <span className="text-muted-foreground text-label-xs">
           操作を行うには管理者権限が必要です
         </span>
-        {membershipListData?.memberships?.edges?.length === 0 && (
-          <p className="text-sm text-muted-foreground">No members found.</p>
+
+        {filteredMembers.length === 0 && (
+          <p className="text-sm text-muted-foreground">一致するメンバーが見つかりません</p>
         )}
-        {membershipListData?.memberships?.edges?.map((edge) => {
-          const user = edge?.node?.user;
-          const role = edge?.node?.role as GqlRole;
-          if (!user?.id) return null;
+
+        {filteredMembers.map(({ user }) => {
+          const membership = members.find((m) => m?.user.id === user.id);
+          if (!membership) return null;
 
           return (
             <MemberRow
               key={user.id}
               user={user}
-              role={role}
+              role={membership.role}
               currentUserRole={currentUserRole}
               onRoleChange={(newRole) => {
                 if (currentUserRole !== GqlRole.Owner) {
@@ -120,18 +145,18 @@ export default function MembersPage() {
                 <strong className="px-1">{pendingRoleChange.userName}</strong>
                 の権限を
                 <strong className="px-1">{roleLabels[pendingRoleChange.newRole]}</strong>
-                に変更します。
+                に変更しますが、よろしいですか？
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="tertiary" size={"sm"}>
+                <Button variant="tertiary" size="sm">
                   キャンセル
                 </Button>
               </DialogClose>
               <Button
                 variant="primary"
-                size={"sm"}
+                size="sm"
                 onClick={() => {
                   const mutate = roleMutationMap[pendingRoleChange.newRole];
                   if (mutate) void handleMutation(mutate, pendingRoleChange.userId);
@@ -145,6 +170,6 @@ export default function MembersPage() {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+    </FormProvider>
   );
 }
