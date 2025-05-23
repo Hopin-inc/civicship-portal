@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
 import { GqlRole, useGetCommunityWalletQuery } from "@/types/graphql";
-import { Coins, Send } from "lucide-react";
+import { Coins, Gift } from "lucide-react";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -94,7 +94,7 @@ export default function WalletPage() {
           size="sm"
           className="w-[104px] h-[48px] flex items-center gap-1.5"
         >
-          <Send className="w-4 h-4" />
+          <Gift className="w-4 h-4" />
           <span className="text-base">支給</span>
         </Button>
       </div>
