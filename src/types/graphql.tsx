@@ -2079,16 +2079,20 @@ export type GqlTransactionEdge = GqlEdge & {
 };
 
 export type GqlTransactionFilterInput = {
+  and?: InputMaybe<Array<GqlTransactionFilterInput>>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
   fromUserId?: InputMaybe<Scalars["ID"]["input"]>;
   fromWalletId?: InputMaybe<Scalars["ID"]["input"]>;
+  fromWalletType?: InputMaybe<GqlWalletType>;
+  not?: InputMaybe<GqlTransactionFilterInput>;
+  or?: InputMaybe<Array<GqlTransactionFilterInput>>;
   reason?: InputMaybe<GqlTransactionReason>;
   toUserId?: InputMaybe<Scalars["ID"]["input"]>;
   toWalletId?: InputMaybe<Scalars["ID"]["input"]>;
+  toWalletType?: InputMaybe<GqlWalletType>;
 };
 
 export type GqlTransactionGrantCommunityPointInput = {
-  communityId: Scalars["ID"]["input"];
-  fromWalletId: Scalars["ID"]["input"];
   toUserId: Scalars["ID"]["input"];
   transferPoints: Scalars["Int"]["input"];
 };
@@ -2101,7 +2105,6 @@ export type GqlTransactionGrantCommunityPointSuccess = {
 };
 
 export type GqlTransactionIssueCommunityPointInput = {
-  toWalletId: Scalars["ID"]["input"];
   transferPoints: Scalars["Int"]["input"];
 };
 
@@ -3023,6 +3026,76 @@ export type GqlGetWalletsWithTicketQuery = {
             pointsRequired: number;
           } | null;
         }> | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
+export type GqlGetCommunityWalletQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetCommunityWalletQuery = {
+  __typename?: "Query";
+  wallets: {
+    __typename?: "WalletsConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
+    edges?: Array<{
+      __typename?: "WalletEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Wallet";
+        id: string;
+        type: GqlWalletType;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
+export type GqlGetMemberWalletsQueryVariables = Exact<{
+  filter?: InputMaybe<GqlWalletFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type GqlGetMemberWalletsQuery = {
+  __typename?: "Query";
+  wallets: {
+    __typename?: "WalletsConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
+    edges?: Array<{
+      __typename?: "WalletEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Wallet";
+        id: string;
+        type: GqlWalletType;
+        user?: {
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
+          urlFacebook?: string | null;
+          urlInstagram?: string | null;
+          urlX?: string | null;
+        } | null;
         currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
       } | null;
     } | null> | null;
@@ -5813,6 +5886,180 @@ export type GetWalletsWithTicketSuspenseQueryHookResult = ReturnType<
 export type GetWalletsWithTicketQueryResult = Apollo.QueryResult<
   GqlGetWalletsWithTicketQuery,
   GqlGetWalletsWithTicketQueryVariables
+>;
+export const GetCommunityWalletDocument = gql`
+  query GetCommunityWallet {
+    wallets(filter: { type: COMMUNITY }) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          ...WalletFields
+        }
+      }
+    }
+  }
+  ${WalletFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetCommunityWalletQuery__
+ *
+ * To run a query within a React component, call `useGetCommunityWalletQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommunityWalletQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCommunityWalletQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCommunityWalletQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetCommunityWalletQuery,
+    GqlGetCommunityWalletQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetCommunityWalletQuery, GqlGetCommunityWalletQueryVariables>(
+    GetCommunityWalletDocument,
+    options,
+  );
+}
+export function useGetCommunityWalletLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetCommunityWalletQuery,
+    GqlGetCommunityWalletQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetCommunityWalletQuery, GqlGetCommunityWalletQueryVariables>(
+    GetCommunityWalletDocument,
+    options,
+  );
+}
+export function useGetCommunityWalletSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetCommunityWalletQuery,
+        GqlGetCommunityWalletQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetCommunityWalletQuery, GqlGetCommunityWalletQueryVariables>(
+    GetCommunityWalletDocument,
+    options,
+  );
+}
+export type GetCommunityWalletQueryHookResult = ReturnType<typeof useGetCommunityWalletQuery>;
+export type GetCommunityWalletLazyQueryHookResult = ReturnType<
+  typeof useGetCommunityWalletLazyQuery
+>;
+export type GetCommunityWalletSuspenseQueryHookResult = ReturnType<
+  typeof useGetCommunityWalletSuspenseQuery
+>;
+export type GetCommunityWalletQueryResult = Apollo.QueryResult<
+  GqlGetCommunityWalletQuery,
+  GqlGetCommunityWalletQueryVariables
+>;
+export const GetMemberWalletsDocument = gql`
+  query GetMemberWallets($filter: WalletFilterInput, $first: Int, $cursor: String) {
+    wallets(filter: $filter, first: $first, cursor: $cursor) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          ...WalletFields
+          user {
+            ...UserFields
+          }
+        }
+      }
+    }
+  }
+  ${WalletFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetMemberWalletsQuery__
+ *
+ * To run a query within a React component, call `useGetMemberWalletsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMemberWalletsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMemberWalletsQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
+ *   },
+ * });
+ */
+export function useGetMemberWalletsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetMemberWalletsQuery,
+    GqlGetMemberWalletsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetMemberWalletsQuery, GqlGetMemberWalletsQueryVariables>(
+    GetMemberWalletsDocument,
+    options,
+  );
+}
+export function useGetMemberWalletsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetMemberWalletsQuery,
+    GqlGetMemberWalletsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetMemberWalletsQuery, GqlGetMemberWalletsQueryVariables>(
+    GetMemberWalletsDocument,
+    options,
+  );
+}
+export function useGetMemberWalletsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetMemberWalletsQuery, GqlGetMemberWalletsQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetMemberWalletsQuery, GqlGetMemberWalletsQueryVariables>(
+    GetMemberWalletsDocument,
+    options,
+  );
+}
+export type GetMemberWalletsQueryHookResult = ReturnType<typeof useGetMemberWalletsQuery>;
+export type GetMemberWalletsLazyQueryHookResult = ReturnType<typeof useGetMemberWalletsLazyQuery>;
+export type GetMemberWalletsSuspenseQueryHookResult = ReturnType<
+  typeof useGetMemberWalletsSuspenseQuery
+>;
+export type GetMemberWalletsQueryResult = Apollo.QueryResult<
+  GqlGetMemberWalletsQuery,
+  GqlGetMemberWalletsQueryVariables
 >;
 export const GetArticlesDocument = gql`
   query GetArticles(
