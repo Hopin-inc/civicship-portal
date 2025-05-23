@@ -120,7 +120,7 @@ const BioSection = ({ bio }: { bio: string }) => {
     <div className="mb-4 relative">
       <div
         ref={textRef}
-        className="text-body-md text-foreground whitespace-pre-line transition-all duration-300"
+        className="text-body-md text-foreground whitespace-pre-line transition-all duration-300 text-left"
         style={getTextStyle()}
       >
         {bio}
