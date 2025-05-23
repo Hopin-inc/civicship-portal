@@ -70,7 +70,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
             <h1 className="text-title-lg mb-2">{name}</h1>
 
             {currentPrefecture && (
-              <div className="flex items-center justify-center text-label-md text-caption mb-3">
+              <div className="flex items-center text-label-md text-caption mb-3">
                 <Home className="w-4 h-4 mr-1" />
                 <span>{prefectureLabels[currentPrefecture] || "不明"}</span>
               </div>
