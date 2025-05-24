@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Image from 'next/image';
+import React from "react";
+import Image from "next/image";
+import { RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface WalletCardProps {
   currentPoint: number;
   isLoading: boolean;
+  onRefetch?: () => void | Promise<void>;
 }
 
-const WalletCard: React.FC<WalletCardProps> = ({
-  currentPoint,
-  isLoading
-}) => {
+const WalletCard: React.FC<WalletCardProps> = ({ currentPoint, isLoading, onRefetch }) => {
   return (
     <div className="bg-background rounded-[32px] px-12 py-8 shadow-[0_2px_20px_rgba(0,0,0,0.08)] mt-8 mb-8">
       <div className="flex flex-col items-center mb-12">
@@ -19,13 +19,14 @@ const WalletCard: React.FC<WalletCardProps> = ({
         <div className="flex items-center gap-3">
           <div className="flex items-baseline">
             <span className="text-[40px] font-bold leading-none tracking-tight">
-              {isLoading ? '...' : currentPoint.toLocaleString()}
+              {isLoading ? "..." : currentPoint.toLocaleString()}
             </span>
             <span className="text-base ml-0.5">pt</span>
           </div>
         </div>
       </div>
-      <div className="flex justify-start">
+
+      <div className="flex justify-between items-center">
         <Image
           src="/images/neo88-logo.jpg"
           alt="NEO88"
@@ -33,6 +34,17 @@ const WalletCard: React.FC<WalletCardProps> = ({
           height={24}
           className="opacity-60"
         />
+        {onRefetch && (
+          <Button
+            onClick={onRefetch}
+            variant="tertiary"
+            size="sm"
+            className="flex items-center gap-1.5"
+          >
+            <RotateCcw className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm">再読み込み</span>
+          </Button>
+        )}
       </div>
     </div>
   );

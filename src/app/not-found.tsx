@@ -3,13 +3,20 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Home, SearchX } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface NotFoundProps {
   titleTarget?: string;
 }
 
 export default function NotFound({ titleTarget = "ページ" }: NotFoundProps) {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="text-center space-y-6">

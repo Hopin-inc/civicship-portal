@@ -847,7 +847,7 @@ export type GqlMutationTicketUseArgs = {
 
 export type GqlMutationTransactionDonateSelfPointArgs = {
   input: GqlTransactionDonateSelfPointInput;
-  permission: GqlCheckCommunityPermissionInput;
+  permission: GqlCheckIsSelfPermissionInput;
 };
 
 export type GqlMutationTransactionGrantCommunityPointArgs = {
@@ -2060,7 +2060,6 @@ export type GqlTransaction = {
 
 export type GqlTransactionDonateSelfPointInput = {
   communityId: Scalars["ID"]["input"];
-  fromWalletId: Scalars["ID"]["input"];
   toUserId: Scalars["ID"]["input"];
   transferPoints: Scalars["Int"]["input"];
 };
@@ -2079,16 +2078,20 @@ export type GqlTransactionEdge = GqlEdge & {
 };
 
 export type GqlTransactionFilterInput = {
+  and?: InputMaybe<Array<GqlTransactionFilterInput>>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
   fromUserId?: InputMaybe<Scalars["ID"]["input"]>;
   fromWalletId?: InputMaybe<Scalars["ID"]["input"]>;
+  fromWalletType?: InputMaybe<GqlWalletType>;
+  not?: InputMaybe<GqlTransactionFilterInput>;
+  or?: InputMaybe<Array<GqlTransactionFilterInput>>;
   reason?: InputMaybe<GqlTransactionReason>;
   toUserId?: InputMaybe<Scalars["ID"]["input"]>;
   toWalletId?: InputMaybe<Scalars["ID"]["input"]>;
+  toWalletType?: InputMaybe<GqlWalletType>;
 };
 
 export type GqlTransactionGrantCommunityPointInput = {
-  communityId: Scalars["ID"]["input"];
-  fromWalletId: Scalars["ID"]["input"];
   toUserId: Scalars["ID"]["input"];
   transferPoints: Scalars["Int"]["input"];
 };
@@ -2101,7 +2104,6 @@ export type GqlTransactionGrantCommunityPointSuccess = {
 };
 
 export type GqlTransactionIssueCommunityPointInput = {
-  toWalletId: Scalars["ID"]["input"];
   transferPoints: Scalars["Int"]["input"];
 };
 
@@ -2489,6 +2491,66 @@ export type GqlHostedGeoFieldsFragment = {
   }>;
 };
 
+export type GqlAssignOwnerMutationVariables = Exact<{
+  input: GqlMembershipSetRoleInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlAssignOwnerMutation = {
+  __typename?: "Mutation";
+  membershipAssignOwner?: {
+    __typename?: "MembershipSetRoleSuccess";
+    membership: {
+      __typename?: "Membership";
+      headline?: string | null;
+      bio?: string | null;
+      role: GqlRole;
+      status: GqlMembershipStatus;
+      reason: GqlMembershipStatusReason;
+    };
+  } | null;
+};
+
+export type GqlAssignManagerMutationVariables = Exact<{
+  input: GqlMembershipSetRoleInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlAssignManagerMutation = {
+  __typename?: "Mutation";
+  membershipAssignManager?: {
+    __typename?: "MembershipSetRoleSuccess";
+    membership: {
+      __typename?: "Membership";
+      headline?: string | null;
+      bio?: string | null;
+      role: GqlRole;
+      status: GqlMembershipStatus;
+      reason: GqlMembershipStatusReason;
+    };
+  } | null;
+};
+
+export type GqlAssignMemberMutationVariables = Exact<{
+  input: GqlMembershipSetRoleInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlAssignMemberMutation = {
+  __typename?: "Mutation";
+  membershipAssignMember?: {
+    __typename?: "MembershipSetRoleSuccess";
+    membership: {
+      __typename?: "Membership";
+      headline?: string | null;
+      bio?: string | null;
+      role: GqlRole;
+      status: GqlMembershipStatus;
+      reason: GqlMembershipStatusReason;
+    };
+  } | null;
+};
+
 export type GqlGetSingleMembershipQueryVariables = Exact<{
   communityId: Scalars["ID"]["input"];
   userId: Scalars["ID"]["input"];
@@ -2503,22 +2565,6 @@ export type GqlGetSingleMembershipQuery = {
     role: GqlRole;
     status: GqlMembershipStatus;
     reason: GqlMembershipStatusReason;
-    participationView?: {
-      __typename?: "MembershipParticipationView";
-      hosted: {
-        __typename?: "MembershipHostedMetrics";
-        totalParticipantCount: number;
-        geo: Array<{
-          __typename?: "MembershipParticipationLocation";
-          placeId: string;
-          placeName?: string | null;
-          placeImage?: string | null;
-          latitude: any;
-          longitude: any;
-          address: string;
-        }>;
-      };
-    } | null;
     user?: {
       __typename?: "User";
       id: string;
@@ -2530,38 +2576,6 @@ export type GqlGetSingleMembershipQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
-      articlesAboutMe?: Array<{
-        __typename?: "Article";
-        id: string;
-        title: string;
-        body?: string | null;
-        introduction: string;
-        thumbnail?: any | null;
-        category: GqlArticleCategory;
-        publishStatus: GqlPublishStatus;
-        publishedAt?: Date | null;
-      }> | null;
-      opportunitiesCreatedByMe?: Array<{
-        __typename?: "Opportunity";
-        id: string;
-        title: string;
-        description: string;
-        body?: string | null;
-        images?: Array<string> | null;
-        category: GqlOpportunityCategory;
-        publishStatus: GqlPublishStatus;
-        isReservableWithTicket?: boolean | null;
-        requireApproval: boolean;
-        feeRequired?: number | null;
-        pointsToEarn?: number | null;
-        earliestReservableAt?: Date | null;
-        community?: {
-          __typename?: "Community";
-          id: string;
-          name?: string | null;
-          image?: string | null;
-        } | null;
-      }> | null;
     } | null;
     community?: {
       __typename?: "Community";
@@ -2577,7 +2591,6 @@ export type GqlGetMembershipListQueryVariables = Exact<{
   cursor?: InputMaybe<GqlMembershipCursorInput>;
   filter?: InputMaybe<GqlMembershipFilterInput>;
   sort?: InputMaybe<GqlMembershipSortInput>;
-  IsCard?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetMembershipListQuery = {
@@ -2597,50 +2610,22 @@ export type GqlGetMembershipListQuery = {
       cursor: string;
       node?: {
         __typename?: "Membership";
-        hostOpportunityCount?: number | null;
         headline?: string | null;
         bio?: string | null;
         role: GqlRole;
         status: GqlMembershipStatus;
         reason: GqlMembershipStatusReason;
-        participationView?: {
-          __typename?: "MembershipParticipationView";
-          hosted: {
-            __typename?: "MembershipHostedMetrics";
-            totalParticipantCount: number;
-            geo: Array<{
-              __typename?: "MembershipParticipationLocation";
-              placeId: string;
-              placeName?: string | null;
-              placeImage?: string | null;
-              latitude: any;
-              longitude: any;
-              address: string;
-            }>;
-          };
-        } | null;
         user?: {
           __typename?: "User";
           id: string;
-          image?: string | null;
           name: string;
+          image?: string | null;
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
-          articlesAboutMe?: Array<{
-            __typename?: "Article";
-            id: string;
-            title: string;
-            body?: string | null;
-            introduction: string;
-            thumbnail?: any | null;
-            category: GqlArticleCategory;
-            publishStatus: GqlPublishStatus;
-            publishedAt?: Date | null;
-          }> | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -2877,6 +2862,12 @@ export type GqlGetUserWalletQuery = {
             urlInstagram?: string | null;
             urlX?: string | null;
           } | null;
+          community?: {
+            __typename?: "Community";
+            id: string;
+            name?: string | null;
+            image?: string | null;
+          } | null;
           currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
         } | null;
         toWallet?: {
@@ -2894,6 +2885,12 @@ export type GqlGetUserWalletQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+          } | null;
+          community?: {
+            __typename?: "Community";
+            id: string;
+            name?: string | null;
+            image?: string | null;
           } | null;
           currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
         } | null;
@@ -3040,6 +3037,82 @@ export type GqlGetWalletsWithTicketQuery = {
             pointsRequired: number;
           } | null;
         }> | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
+export type GqlGetCommunityWalletQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetCommunityWalletQuery = {
+  __typename?: "Query";
+  wallets: {
+    __typename?: "WalletsConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
+    edges?: Array<{
+      __typename?: "WalletEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Wallet";
+        id: string;
+        type: GqlWalletType;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
+export type GqlGetMemberWalletsQueryVariables = Exact<{
+  filter?: InputMaybe<GqlWalletFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type GqlGetMemberWalletsQuery = {
+  __typename?: "Query";
+  wallets: {
+    __typename?: "WalletsConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
+    edges?: Array<{
+      __typename?: "WalletEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Wallet";
+        id: string;
+        type: GqlWalletType;
+        user?: {
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
+          urlFacebook?: string | null;
+          urlInstagram?: string | null;
+          urlX?: string | null;
+        } | null;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
+        } | null;
         currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
       } | null;
     } | null> | null;
@@ -4329,8 +4402,71 @@ export type GqlTransactionFieldsFragment = {
   createdAt?: Date | null;
 };
 
+export type GqlPointIssueMutationVariables = Exact<{
+  input: GqlTransactionIssueCommunityPointInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlPointIssueMutation = {
+  __typename?: "Mutation";
+  transactionIssueCommunityPoint?: {
+    __typename?: "TransactionIssueCommunityPointSuccess";
+    transaction: {
+      __typename?: "Transaction";
+      id: string;
+      reason: GqlTransactionReason;
+      fromPointChange?: number | null;
+      toPointChange?: number | null;
+      createdAt?: Date | null;
+    };
+  } | null;
+};
+
+export type GqlPointGrantMutationVariables = Exact<{
+  input: GqlTransactionGrantCommunityPointInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlPointGrantMutation = {
+  __typename?: "Mutation";
+  transactionGrantCommunityPoint?: {
+    __typename?: "TransactionGrantCommunityPointSuccess";
+    transaction: {
+      __typename?: "Transaction";
+      id: string;
+      reason: GqlTransactionReason;
+      fromPointChange?: number | null;
+      toPointChange?: number | null;
+      createdAt?: Date | null;
+    };
+  } | null;
+};
+
+export type GqlPointDonateMutationVariables = Exact<{
+  input: GqlTransactionDonateSelfPointInput;
+  permission: GqlCheckIsSelfPermissionInput;
+}>;
+
+export type GqlPointDonateMutation = {
+  __typename?: "Mutation";
+  transactionDonateSelfPoint?: {
+    __typename?: "TransactionDonateSelfPointSuccess";
+    transaction: {
+      __typename?: "Transaction";
+      id: string;
+      reason: GqlTransactionReason;
+      fromPointChange?: number | null;
+      toPointChange?: number | null;
+      createdAt?: Date | null;
+    };
+  } | null;
+};
+
 export type GqlGetTransactionsQueryVariables = Exact<{
   filter?: InputMaybe<GqlTransactionFilterInput>;
+  sort?: InputMaybe<GqlTransactionSortInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type GqlGetTransactionsQuery = {
@@ -4371,6 +4507,12 @@ export type GqlGetTransactionsQuery = {
             urlInstagram?: string | null;
             urlX?: string | null;
           } | null;
+          community?: {
+            __typename?: "Community";
+            id: string;
+            name?: string | null;
+            image?: string | null;
+          } | null;
           currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
         } | null;
         toWallet?: {
@@ -4388,6 +4530,12 @@ export type GqlGetTransactionsQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+          } | null;
+          community?: {
+            __typename?: "Community";
+            id: string;
+            name?: string | null;
+            image?: string | null;
           } | null;
           currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
         } | null;
@@ -4961,26 +5109,177 @@ export type CurrentUserQueryResult = Apollo.QueryResult<
   GqlCurrentUserQuery,
   GqlCurrentUserQueryVariables
 >;
+export const AssignOwnerDocument = gql`
+  mutation assignOwner(
+    $input: MembershipSetRoleInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    membershipAssignOwner(input: $input, permission: $permission) {
+      ... on MembershipSetRoleSuccess {
+        membership {
+          ...MembershipFields
+        }
+      }
+    }
+  }
+  ${MembershipFieldsFragmentDoc}
+`;
+export type GqlAssignOwnerMutationFn = Apollo.MutationFunction<
+  GqlAssignOwnerMutation,
+  GqlAssignOwnerMutationVariables
+>;
+
+/**
+ * __useAssignOwnerMutation__
+ *
+ * To run a mutation, you first call `useAssignOwnerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignOwnerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignOwnerMutation, { data, loading, error }] = useAssignOwnerMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useAssignOwnerMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlAssignOwnerMutation, GqlAssignOwnerMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlAssignOwnerMutation, GqlAssignOwnerMutationVariables>(
+    AssignOwnerDocument,
+    options,
+  );
+}
+export type AssignOwnerMutationHookResult = ReturnType<typeof useAssignOwnerMutation>;
+export type AssignOwnerMutationResult = Apollo.MutationResult<GqlAssignOwnerMutation>;
+export type AssignOwnerMutationOptions = Apollo.BaseMutationOptions<
+  GqlAssignOwnerMutation,
+  GqlAssignOwnerMutationVariables
+>;
+export const AssignManagerDocument = gql`
+  mutation assignManager(
+    $input: MembershipSetRoleInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    membershipAssignManager(input: $input, permission: $permission) {
+      ... on MembershipSetRoleSuccess {
+        membership {
+          ...MembershipFields
+        }
+      }
+    }
+  }
+  ${MembershipFieldsFragmentDoc}
+`;
+export type GqlAssignManagerMutationFn = Apollo.MutationFunction<
+  GqlAssignManagerMutation,
+  GqlAssignManagerMutationVariables
+>;
+
+/**
+ * __useAssignManagerMutation__
+ *
+ * To run a mutation, you first call `useAssignManagerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignManagerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignManagerMutation, { data, loading, error }] = useAssignManagerMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useAssignManagerMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlAssignManagerMutation,
+    GqlAssignManagerMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlAssignManagerMutation, GqlAssignManagerMutationVariables>(
+    AssignManagerDocument,
+    options,
+  );
+}
+export type AssignManagerMutationHookResult = ReturnType<typeof useAssignManagerMutation>;
+export type AssignManagerMutationResult = Apollo.MutationResult<GqlAssignManagerMutation>;
+export type AssignManagerMutationOptions = Apollo.BaseMutationOptions<
+  GqlAssignManagerMutation,
+  GqlAssignManagerMutationVariables
+>;
+export const AssignMemberDocument = gql`
+  mutation assignMember(
+    $input: MembershipSetRoleInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    membershipAssignMember(input: $input, permission: $permission) {
+      ... on MembershipSetRoleSuccess {
+        membership {
+          ...MembershipFields
+        }
+      }
+    }
+  }
+  ${MembershipFieldsFragmentDoc}
+`;
+export type GqlAssignMemberMutationFn = Apollo.MutationFunction<
+  GqlAssignMemberMutation,
+  GqlAssignMemberMutationVariables
+>;
+
+/**
+ * __useAssignMemberMutation__
+ *
+ * To run a mutation, you first call `useAssignMemberMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAssignMemberMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [assignMemberMutation, { data, loading, error }] = useAssignMemberMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useAssignMemberMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlAssignMemberMutation,
+    GqlAssignMemberMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlAssignMemberMutation, GqlAssignMemberMutationVariables>(
+    AssignMemberDocument,
+    options,
+  );
+}
+export type AssignMemberMutationHookResult = ReturnType<typeof useAssignMemberMutation>;
+export type AssignMemberMutationResult = Apollo.MutationResult<GqlAssignMemberMutation>;
+export type AssignMemberMutationOptions = Apollo.BaseMutationOptions<
+  GqlAssignMemberMutation,
+  GqlAssignMemberMutationVariables
+>;
 export const GetSingleMembershipDocument = gql`
   query GetSingleMembership($communityId: ID!, $userId: ID!) {
     membership(communityId: $communityId, userId: $userId) {
       ...MembershipFields
-      participationView {
-        hosted {
-          ...HostedGeoFields
-        }
-      }
       user {
         ...UserFields
-        articlesAboutMe {
-          ...ArticleFields
-        }
-        opportunitiesCreatedByMe {
-          ...OpportunityFields
-          community {
-            ...CommunityFields
-          }
-        }
       }
       community {
         ...CommunityFields
@@ -4988,10 +5287,7 @@ export const GetSingleMembershipDocument = gql`
     }
   }
   ${MembershipFieldsFragmentDoc}
-  ${HostedGeoFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
-  ${ArticleFieldsFragmentDoc}
-  ${OpportunityFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
 
@@ -5069,7 +5365,6 @@ export const GetMembershipListDocument = gql`
     $cursor: MembershipCursorInput
     $filter: MembershipFilterInput
     $sort: MembershipSortInput
-    $IsCard: Boolean! = false
   ) {
     memberships(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
       pageInfo {
@@ -5083,21 +5378,10 @@ export const GetMembershipListDocument = gql`
         cursor
         node {
           ...MembershipFields
-          participationView {
-            hosted {
-              ...HostedGeoFields
-            }
-          }
-          hostOpportunityCount @include(if: $IsCard)
           user {
-            id
-            image
-            ...UserFields @include(if: $IsCard)
-            articlesAboutMe @include(if: $IsCard) {
-              ...ArticleFields
-            }
+            ...UserFields
           }
-          community @include(if: $IsCard) {
+          community {
             ...CommunityFields
           }
         }
@@ -5105,9 +5389,7 @@ export const GetMembershipListDocument = gql`
     }
   }
   ${MembershipFieldsFragmentDoc}
-  ${HostedGeoFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
-  ${ArticleFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
 
@@ -5127,7 +5409,6 @@ export const GetMembershipListDocument = gql`
  *      cursor: // value for 'cursor'
  *      filter: // value for 'filter'
  *      sort: // value for 'sort'
- *      IsCard: // value for 'IsCard'
  *   },
  * });
  */
@@ -5355,11 +5636,17 @@ export const GetUserWalletDocument = gql`
             user {
               ...UserFields
             }
+            community {
+              ...CommunityFields
+            }
           }
           toWallet {
             ...WalletFields
             user {
               ...UserFields
+            }
+            community {
+              ...CommunityFields
             }
           }
         }
@@ -5375,6 +5662,7 @@ export const GetUserWalletDocument = gql`
   ${UserFieldsFragmentDoc}
   ${WalletFieldsFragmentDoc}
   ${TransactionFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
   ${TicketFieldsFragmentDoc}
   ${UtilityFieldsFragmentDoc}
 `;
@@ -5637,6 +5925,184 @@ export type GetWalletsWithTicketSuspenseQueryHookResult = ReturnType<
 export type GetWalletsWithTicketQueryResult = Apollo.QueryResult<
   GqlGetWalletsWithTicketQuery,
   GqlGetWalletsWithTicketQueryVariables
+>;
+export const GetCommunityWalletDocument = gql`
+  query GetCommunityWallet {
+    wallets(filter: { type: COMMUNITY }) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          ...WalletFields
+        }
+      }
+    }
+  }
+  ${WalletFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetCommunityWalletQuery__
+ *
+ * To run a query within a React component, call `useGetCommunityWalletQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommunityWalletQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCommunityWalletQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCommunityWalletQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetCommunityWalletQuery,
+    GqlGetCommunityWalletQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetCommunityWalletQuery, GqlGetCommunityWalletQueryVariables>(
+    GetCommunityWalletDocument,
+    options,
+  );
+}
+export function useGetCommunityWalletLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetCommunityWalletQuery,
+    GqlGetCommunityWalletQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetCommunityWalletQuery, GqlGetCommunityWalletQueryVariables>(
+    GetCommunityWalletDocument,
+    options,
+  );
+}
+export function useGetCommunityWalletSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetCommunityWalletQuery,
+        GqlGetCommunityWalletQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetCommunityWalletQuery, GqlGetCommunityWalletQueryVariables>(
+    GetCommunityWalletDocument,
+    options,
+  );
+}
+export type GetCommunityWalletQueryHookResult = ReturnType<typeof useGetCommunityWalletQuery>;
+export type GetCommunityWalletLazyQueryHookResult = ReturnType<
+  typeof useGetCommunityWalletLazyQuery
+>;
+export type GetCommunityWalletSuspenseQueryHookResult = ReturnType<
+  typeof useGetCommunityWalletSuspenseQuery
+>;
+export type GetCommunityWalletQueryResult = Apollo.QueryResult<
+  GqlGetCommunityWalletQuery,
+  GqlGetCommunityWalletQueryVariables
+>;
+export const GetMemberWalletsDocument = gql`
+  query GetMemberWallets($filter: WalletFilterInput, $first: Int, $cursor: String) {
+    wallets(filter: $filter, first: $first, cursor: $cursor) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          ...WalletFields
+          user {
+            ...UserFields
+          }
+          community {
+            ...CommunityFields
+          }
+        }
+      }
+    }
+  }
+  ${WalletFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetMemberWalletsQuery__
+ *
+ * To run a query within a React component, call `useGetMemberWalletsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMemberWalletsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMemberWalletsQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
+ *   },
+ * });
+ */
+export function useGetMemberWalletsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetMemberWalletsQuery,
+    GqlGetMemberWalletsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetMemberWalletsQuery, GqlGetMemberWalletsQueryVariables>(
+    GetMemberWalletsDocument,
+    options,
+  );
+}
+export function useGetMemberWalletsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetMemberWalletsQuery,
+    GqlGetMemberWalletsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetMemberWalletsQuery, GqlGetMemberWalletsQueryVariables>(
+    GetMemberWalletsDocument,
+    options,
+  );
+}
+export function useGetMemberWalletsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetMemberWalletsQuery, GqlGetMemberWalletsQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetMemberWalletsQuery, GqlGetMemberWalletsQueryVariables>(
+    GetMemberWalletsDocument,
+    options,
+  );
+}
+export type GetMemberWalletsQueryHookResult = ReturnType<typeof useGetMemberWalletsQuery>;
+export type GetMemberWalletsLazyQueryHookResult = ReturnType<typeof useGetMemberWalletsLazyQuery>;
+export type GetMemberWalletsSuspenseQueryHookResult = ReturnType<
+  typeof useGetMemberWalletsSuspenseQuery
+>;
+export type GetMemberWalletsQueryResult = Apollo.QueryResult<
+  GqlGetMemberWalletsQuery,
+  GqlGetMemberWalletsQueryVariables
 >;
 export const GetArticlesDocument = gql`
   query GetArticles(
@@ -7813,9 +8279,173 @@ export type GetUtilitiesQueryResult = Apollo.QueryResult<
   GqlGetUtilitiesQuery,
   GqlGetUtilitiesQueryVariables
 >;
+export const PointIssueDocument = gql`
+  mutation pointIssue(
+    $input: TransactionIssueCommunityPointInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    transactionIssueCommunityPoint(input: $input, permission: $permission) {
+      ... on TransactionIssueCommunityPointSuccess {
+        transaction {
+          ...TransactionFields
+        }
+      }
+    }
+  }
+  ${TransactionFieldsFragmentDoc}
+`;
+export type GqlPointIssueMutationFn = Apollo.MutationFunction<
+  GqlPointIssueMutation,
+  GqlPointIssueMutationVariables
+>;
+
+/**
+ * __usePointIssueMutation__
+ *
+ * To run a mutation, you first call `usePointIssueMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePointIssueMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [pointIssueMutation, { data, loading, error }] = usePointIssueMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function usePointIssueMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlPointIssueMutation, GqlPointIssueMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlPointIssueMutation, GqlPointIssueMutationVariables>(
+    PointIssueDocument,
+    options,
+  );
+}
+export type PointIssueMutationHookResult = ReturnType<typeof usePointIssueMutation>;
+export type PointIssueMutationResult = Apollo.MutationResult<GqlPointIssueMutation>;
+export type PointIssueMutationOptions = Apollo.BaseMutationOptions<
+  GqlPointIssueMutation,
+  GqlPointIssueMutationVariables
+>;
+export const PointGrantDocument = gql`
+  mutation pointGrant(
+    $input: TransactionGrantCommunityPointInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    transactionGrantCommunityPoint(input: $input, permission: $permission) {
+      ... on TransactionGrantCommunityPointSuccess {
+        transaction {
+          ...TransactionFields
+        }
+      }
+    }
+  }
+  ${TransactionFieldsFragmentDoc}
+`;
+export type GqlPointGrantMutationFn = Apollo.MutationFunction<
+  GqlPointGrantMutation,
+  GqlPointGrantMutationVariables
+>;
+
+/**
+ * __usePointGrantMutation__
+ *
+ * To run a mutation, you first call `usePointGrantMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePointGrantMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [pointGrantMutation, { data, loading, error }] = usePointGrantMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function usePointGrantMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlPointGrantMutation, GqlPointGrantMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlPointGrantMutation, GqlPointGrantMutationVariables>(
+    PointGrantDocument,
+    options,
+  );
+}
+export type PointGrantMutationHookResult = ReturnType<typeof usePointGrantMutation>;
+export type PointGrantMutationResult = Apollo.MutationResult<GqlPointGrantMutation>;
+export type PointGrantMutationOptions = Apollo.BaseMutationOptions<
+  GqlPointGrantMutation,
+  GqlPointGrantMutationVariables
+>;
+export const PointDonateDocument = gql`
+  mutation pointDonate(
+    $input: TransactionDonateSelfPointInput!
+    $permission: CheckIsSelfPermissionInput!
+  ) {
+    transactionDonateSelfPoint(input: $input, permission: $permission) {
+      ... on TransactionDonateSelfPointSuccess {
+        transaction {
+          ...TransactionFields
+        }
+      }
+    }
+  }
+  ${TransactionFieldsFragmentDoc}
+`;
+export type GqlPointDonateMutationFn = Apollo.MutationFunction<
+  GqlPointDonateMutation,
+  GqlPointDonateMutationVariables
+>;
+
+/**
+ * __usePointDonateMutation__
+ *
+ * To run a mutation, you first call `usePointDonateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePointDonateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [pointDonateMutation, { data, loading, error }] = usePointDonateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function usePointDonateMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlPointDonateMutation, GqlPointDonateMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlPointDonateMutation, GqlPointDonateMutationVariables>(
+    PointDonateDocument,
+    options,
+  );
+}
+export type PointDonateMutationHookResult = ReturnType<typeof usePointDonateMutation>;
+export type PointDonateMutationResult = Apollo.MutationResult<GqlPointDonateMutation>;
+export type PointDonateMutationOptions = Apollo.BaseMutationOptions<
+  GqlPointDonateMutation,
+  GqlPointDonateMutationVariables
+>;
 export const GetTransactionsDocument = gql`
-  query getTransactions($filter: TransactionFilterInput) {
-    transactions(filter: $filter, sort: { createdAt: desc }) {
+  query getTransactions(
+    $filter: TransactionFilterInput
+    $sort: TransactionSortInput
+    $first: Int
+    $cursor: String
+  ) {
+    transactions(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
       pageInfo {
         hasNextPage
         hasPreviousPage
@@ -7832,11 +8462,17 @@ export const GetTransactionsDocument = gql`
             user {
               ...UserFields
             }
+            community {
+              ...CommunityFields
+            }
           }
           toWallet {
             ...WalletFields
             user {
               ...UserFields
+            }
+            community {
+              ...CommunityFields
             }
           }
         }
@@ -7846,6 +8482,7 @@ export const GetTransactionsDocument = gql`
   ${TransactionFieldsFragmentDoc}
   ${WalletFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
 `;
 
 /**
@@ -7861,6 +8498,9 @@ export const GetTransactionsDocument = gql`
  * const { data, loading, error } = useGetTransactionsQuery({
  *   variables: {
  *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
  *   },
  * });
  */

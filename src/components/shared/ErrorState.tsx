@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { AlertCircle, Home, RefreshCcw } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,13 @@ const ErrorState: React.FC<ErrorStateProps> = ({
       refetchRef.current();
     }
   };
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">

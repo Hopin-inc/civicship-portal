@@ -1,47 +1,51 @@
 "use client";
 
 import React, { useEffect, useMemo } from "react";
-import { useWallet } from "@/app/wallets/hooks/useWallet";
+import { Button } from "@/components/ui/button";
+import { COMMUNITY_ID } from "@/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { Gift } from "lucide-react";
+import { GqlRole, useGetCommunityWalletQuery } from "@/types/graphql";
+import { Coins, Gift } from "lucide-react";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
-import { presenterTransaction } from "@/app/wallets/data/presenter";
-import useUserTransactions from "@/app/wallets/hooks/useUserTransaction";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { presenterTransaction } from "@/app/wallets/data/presenter";
+import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
 
-export default function UserWalletPage() {
+export default function WalletPage() {
+  const communityId = COMMUNITY_ID;
   const { user: currentUser } = useAuth();
-  const userId = currentUser?.id;
+  const currentUserRole = currentUser?.memberships?.find(
+    (m) => m.community?.id === communityId,
+  )?.role;
 
   const headerConfig = useMemo(
     () => ({
-      title: "保有ポイント",
-      showBackButton: true,
+      title: "ウォレット",
       showLogo: false,
+      showBackButton: true,
     }),
     [],
   );
   useHeaderConfig(headerConfig);
 
   const router = useRouter();
-  const handleNavigateToGive = () => router.push(`/wallets/donate?currentPoint=${currentPoint}`);
-
-  const { userAsset, isLoading, error, refetch: refetchWallet } = useWallet(userId);
+  const handleNavigateToIssue = () => router.push("/admin/wallet/issue");
+  const handleNavigateToGrant = () =>
+    router.push(`/admin/wallet/grant?currentPoint=${currentPoint}`);
 
   const {
-    connection,
-    loadMoreRef,
-    refetch: refetchTransactions,
-  } = useUserTransactions(userId ?? "");
+    data: walletData,
+    loading: loadingWallet,
+    refetch: refetchWallet,
+  } = useGetCommunityWalletQuery();
 
-  const walletId = userAsset.points.walletId;
-  const currentPoint = userAsset.points.currentPoint;
+  const walletId = walletData?.wallets.edges?.[0]?.node?.id ?? "";
+  const currentPoint = walletData?.wallets.edges?.[0]?.node?.currentPointView?.currentPoint ?? 0;
+
+  const { connection, loadMoreRef, refetch: refetchTransactions } = useCommunityTransactions();
 
   useEffect(() => {
     const handleFocus = async () => {
@@ -49,21 +53,18 @@ export default function UserWalletPage() {
         await refetchWallet();
         refetchTransactions();
       } catch (err) {
-        console.error("Refetch failed on focus", err);
+        console.error("Refetch failed on window focus", err);
       }
     };
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
   }, [refetchWallet, refetchTransactions]);
 
-  if (isLoading) return <LoadingIndicator />;
-  if (error) return <ErrorState title={"ウォレット"} />;
-
   return (
-    <div className="space-y-6 max-w-xl mx-auto mt-8  px-4">
+    <div className="space-y-6 max-w-xl mx-auto mt-8 px-4">
       <WalletCard
         currentPoint={currentPoint}
-        isLoading={isLoading}
+        isLoading={loadingWallet}
         onRefetch={async () => {
           try {
             await refetchWallet();
@@ -75,16 +76,26 @@ export default function UserWalletPage() {
         }}
       />
 
-      <div className="flex justify-center">
+      <div className="flex justify-center items-center gap-x-3">
         <Button
-          onClick={handleNavigateToGive}
+          disabled={currentUserRole !== GqlRole.Owner}
+          onClick={handleNavigateToIssue}
           variant="secondary"
           size="sm"
-          disabled={currentPoint <= 0}
+          className="w-[104px] h-[48px] flex items-center gap-1.5"
+        >
+          <Coins className="w-4 h-4" />
+          <span className="text-base">発行</span>
+        </Button>
+        <Button
+          disabled={currentUserRole !== GqlRole.Owner || currentPoint <= 0}
+          onClick={handleNavigateToGrant}
+          variant="secondary"
+          size="sm"
           className="w-[104px] h-[48px] flex items-center gap-1.5"
         >
           <Gift className="w-4 h-4" />
-          <span className="text-base">あげる</span>
+          <span className="text-base">支給</span>
         </Button>
       </div>
 

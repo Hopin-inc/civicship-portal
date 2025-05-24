@@ -1,12 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 
 interface LoadingIndicatorProps {
   fullScreen?: boolean;
 }
 
 const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ fullScreen = true }) => {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   const Spinner = (
     <div className="flex justify-center items-center">
       <div className="animate-spin h-8 w-8 bg-blue-300 rounded-xl"></div>
