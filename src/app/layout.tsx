@@ -16,7 +16,7 @@ import {
   DEFAULT_OPEN_GRAPH,
   DEFAULT_TITLE,
 } from "@/lib/metadata/defalut";
-
+import FirebaseAnalyticsProvider from "@/components/providers/FirebaseAnalyticsProvider";
 const font = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -37,20 +37,22 @@ const RootLayout = ({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </head>
       <body className={font.className}>
-        <CookiesProvider>
-          <ApolloProvider>
-            <LiffProvider>
-              <AuthProvider>
-                <HeaderProvider>
-                  <LoadingProvider>
-                    <MainContent>{children}</MainContent>
-                    <Toaster richColors className="mx-8" />
-                  </LoadingProvider>
-                </HeaderProvider>
-              </AuthProvider>
-            </LiffProvider>
-          </ApolloProvider>
-        </CookiesProvider>
+        <FirebaseAnalyticsProvider>
+          <CookiesProvider>
+            <ApolloProvider>
+              <LiffProvider>
+                <AuthProvider>
+                  <HeaderProvider>
+                    <LoadingProvider>
+                      <MainContent>{children}</MainContent>
+                      <Toaster richColors className="mx-8" />
+                    </LoadingProvider>
+                  </HeaderProvider>
+                </AuthProvider>
+              </LiffProvider>
+            </ApolloProvider>
+          </CookiesProvider>
+        </FirebaseAnalyticsProvider>
       </body>
     </html>
   );
