@@ -60,7 +60,7 @@ export default function UserWalletPage() {
   if (error) return <ErrorState title={"ウォレット"} />;
 
   return (
-    <div className="space-y-6 max-w-xl mx-auto mt-8">
+    <div className="space-y-6 max-w-xl mx-auto mt-8  px-4">
       <WalletCard
         currentPoint={currentPoint}
         isLoading={isLoading}
