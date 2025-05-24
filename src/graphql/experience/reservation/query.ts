@@ -7,8 +7,13 @@ import { PLACE_FRAGMENT } from "@/graphql/location/place/fragment";
 import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
 
 export const GET_RESERVATIONS = gql`
-  query GetReservations($cursor: String, $first: Int, $filter: ReservationFilterInput) {
-    reservations(cursor: $cursor, first: $first, filter: $filter) {
+  query GetReservations(
+    $cursor: String
+    $sort: ReservationSortInput
+    $first: Int
+    $filter: ReservationFilterInput
+  ) {
+    reservations(cursor: $cursor, sort: $sort, first: $first, filter: $filter) {
       edges {
         node {
           id

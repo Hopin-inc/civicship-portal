@@ -813,6 +813,7 @@ export type GqlMutationReservationJoinArgs = {
 
 export type GqlMutationReservationRejectArgs = {
   id: Scalars["ID"]["input"];
+  input: GqlReservationRejectInput;
   permission: GqlCheckOpportunityPermissionInput;
 };
 
@@ -1781,6 +1782,10 @@ export const GqlReservationPaymentMethod = {
 
 export type GqlReservationPaymentMethod =
   (typeof GqlReservationPaymentMethod)[keyof typeof GqlReservationPaymentMethod];
+export type GqlReservationRejectInput = {
+  comment?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type GqlReservationSetStatusPayload = GqlReservationSetStatusSuccess;
 
 export type GqlReservationSetStatusSuccess = {
@@ -4004,6 +4009,7 @@ export type GqlReservationAcceptMutation = {
 
 export type GqlGetReservationsQueryVariables = Exact<{
   cursor?: InputMaybe<Scalars["String"]["input"]>;
+  sort?: InputMaybe<GqlReservationSortInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   filter?: InputMaybe<GqlReservationFilterInput>;
 }>;
@@ -7538,8 +7544,13 @@ export type ReservationAcceptMutationOptions = Apollo.BaseMutationOptions<
   GqlReservationAcceptMutationVariables
 >;
 export const GetReservationsDocument = gql`
-  query GetReservations($cursor: String, $first: Int, $filter: ReservationFilterInput) {
-    reservations(cursor: $cursor, first: $first, filter: $filter) {
+  query GetReservations(
+    $cursor: String
+    $sort: ReservationSortInput
+    $first: Int
+    $filter: ReservationFilterInput
+  ) {
+    reservations(cursor: $cursor, sort: $sort, first: $first, filter: $filter) {
       edges {
         node {
           id
@@ -7588,6 +7599,7 @@ export const GetReservationsDocument = gql`
  * const { data, loading, error } = useGetReservationsQuery({
  *   variables: {
  *      cursor: // value for 'cursor'
+ *      sort: // value for 'sort'
  *      first: // value for 'first'
  *      filter: // value for 'filter'
  *   },
