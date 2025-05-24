@@ -6648,7 +6648,7 @@ export const GetOpportunitiesDocument = gql`
   ) {
     opportunities(
       filter: $filter
-      sort: { earliestSlotStartsAt: desc }
+      sort: { earliestSlotStartsAt: asc }
       first: $first
       cursor: $cursor
     ) {
