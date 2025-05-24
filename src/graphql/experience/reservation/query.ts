@@ -53,6 +53,7 @@ export const GET_RESERVATION = gql`
   query GetReservation($id: ID!) {
     reservation(id: $id) {
       ...ReservationFields
+      comment
       createdByUser {
         ...UserFields
         phoneNumber
