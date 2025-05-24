@@ -68,7 +68,7 @@ export default function ParticipationPage() {
 
   const isCancellable = cancellationDeadline ? new Date() < cancellationDeadline : false;
   const reservationId = participation?.reservation?.id;
-  const { handleCancel } = useCancelReservation();
+  const { handleCancel, isCancelling } = useCancelReservation();
 
   const onCancel = async () => {
     if (!reservationId) {
@@ -152,6 +152,7 @@ export default function ParticipationPage() {
             isCancellable={isCancellable}
             onCancel={onCancel}
             isAfterParticipation={isAfterParticipation}
+            isCancelling={isCancelling}
           />
         )}
     </div>

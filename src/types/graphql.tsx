@@ -3738,9 +3738,17 @@ export type GqlGetOpportunitySlotsQuery = {
         } | null;
         reservations?: Array<{
           __typename?: "Reservation";
+          id: string;
+          status: GqlReservationStatus;
+          comment?: string | null;
           participations?: Array<{
             __typename?: "Participation";
             id: string;
+            source?: GqlSource | null;
+            status: GqlParticipationStatus;
+            reason: GqlParticipationStatusReason;
+            images?: Array<string> | null;
+            description?: string | null;
             evaluation?: {
               __typename?: "Evaluation";
               id: string;
@@ -6648,7 +6656,7 @@ export const GetOpportunitiesDocument = gql`
   ) {
     opportunities(
       filter: $filter
-      sort: { earliestSlotStartsAt: desc }
+      sort: { earliestSlotStartsAt: asc }
       first: $first
       cursor: $cursor
     ) {
@@ -6959,8 +6967,9 @@ export const GetOpportunitySlotsDocument = gql`
             ...OpportunityFields
           }
           reservations {
+            ...ReservationFields
             participations {
-              id
+              ...ParticipationFields
               evaluation {
                 id
                 status
@@ -6972,6 +6981,8 @@ export const GetOpportunitySlotsDocument = gql`
     }
   }
   ${OpportunityFieldsFragmentDoc}
+  ${ReservationFieldsFragmentDoc}
+  ${ParticipationFieldsFragmentDoc}
 `;
 
 /**
