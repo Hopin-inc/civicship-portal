@@ -92,7 +92,7 @@ const config = {
             foreground: "hsl(var(--white))",
           },
           rejected: {
-            DEFAULT: "hsl(var(--rejected-pending))",
+            DEFAULT: "hsl(var(--status-rejected))",
             foreground: "hsl(var(--white))",
           },
           completed: {
@@ -103,7 +103,7 @@ const config = {
             DEFAULT: "hsl(var(--status-cancelled))",
             foreground: "hsl(var(--white))",
           },
-        }
+        },
       },
       fontSize: {
         "display-xl": [
@@ -250,7 +250,7 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       maxWidth: {
-        'mobile-l': '425px',
+        "mobile-l": "425px",
       },
     },
   },
