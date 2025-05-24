@@ -10,7 +10,9 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/activities");
+    if (window.location.pathname === "/") {
+      router.push("/activities");
+    }
   }, [router]);
 
   useEffect(() => {
