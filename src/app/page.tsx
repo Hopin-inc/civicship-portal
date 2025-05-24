@@ -21,6 +21,13 @@ export default function HomePage() {
         if (isLiffInitialized) {
           console.log('Root page redirecting to /activities');
           router.push("/activities");
+        } else {
+          const timeoutId = setTimeout(() => {
+            console.log('LIFF initialization timeout - redirecting to /activities anyway');
+            router.push("/activities");
+          }, 3000); // 3 second timeout
+          
+          return () => clearTimeout(timeoutId);
         }
       }
     }
