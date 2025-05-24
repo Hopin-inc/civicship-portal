@@ -5,11 +5,15 @@ import { PARTICIPATION_FRAGMENT } from "@/graphql/experience/participation/fragm
 import { OPPORTUNITY_FRAGMENT } from "@/graphql/experience/opportunity/fragment";
 import { PLACE_FRAGMENT } from "@/graphql/location/place/fragment";
 import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
-import { ARTICLE_FRAGMENT } from "@/graphql/content/article/fragment";
 
 export const GET_RESERVATIONS = gql`
-  query GetReservations($cursor: String, $first: Int, $filter: ReservationFilterInput) {
-    reservations(cursor: $cursor, first: $first, filter: $filter) {
+  query GetReservations(
+    $cursor: String
+    $sort: ReservationSortInput
+    $first: Int
+    $filter: ReservationFilterInput
+  ) {
+    reservations(cursor: $cursor, sort: $sort, first: $first, filter: $filter) {
       edges {
         node {
           id
@@ -49,18 +53,17 @@ export const GET_RESERVATION = gql`
   query GetReservation($id: ID!) {
     reservation(id: $id) {
       ...ReservationFields
+      comment
       createdByUser {
         ...UserFields
-        phoneNumber,
+        phoneNumber
       }
       opportunitySlot {
         ...OpportunitySlotFields
         opportunity {
           ...OpportunityFields
           slots {
-            id
-            startsAt
-            hostingStatus
+            ...OpportunitySlotFields
           }
           community {
             id

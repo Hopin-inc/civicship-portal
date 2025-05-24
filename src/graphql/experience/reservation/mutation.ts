@@ -40,3 +40,21 @@ export const ACCEPT_RESERVATION_MUTATION = gql`
     }
   }
 `;
+
+export const REJECT_RESERVATION = gql`
+  mutation RejectReservation(
+    $id: ID!
+    $input: ReservationRejectInput!
+    $permission: CheckOpportunityPermissionInput!
+  ) {
+    reservationReject(id: $id, input: $input, permission: $permission) {
+      ... on ReservationSetStatusSuccess {
+        reservation {
+          id
+          status
+          comment
+        }
+      }
+    }
+  }
+`;

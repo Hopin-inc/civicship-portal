@@ -132,6 +132,8 @@ export default function ParticipationPage() {
             totalPrice={dateTimeInfo.totalPrice}
             pricePerPerson={opportunityDetail.feeRequired ?? 0}
             location={opportunityDetail.place}
+            phoneNumber={participation.emergencyContactPhone}
+            isReserved={true}
           />
         </div>
       )}

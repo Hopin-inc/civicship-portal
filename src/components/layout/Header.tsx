@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
@@ -11,7 +11,7 @@ import { useHeader } from "@/components/providers/HeaderProvider";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { cn } from "@/lib/utils";
 import SearchBox from "@/app/search/components/SearchBox";
-import { useRouter } from "next/navigation";
+import { isRunningInLiff } from "@/utils/liff";
 
 interface HeaderProps {
   className?: string;
@@ -37,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     return null;
   }
 
-  const shouldShowBackButton = config.showBackButton && pathname !== "/";
+  const shouldShowBackButton = config.showBackButton && pathname !== "/" && !isRunningInLiff();
 
   return (
     <header
@@ -74,8 +74,8 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         </div>
       )}
       {config.title && !config.showSearchForm && (
-        <div className="flex flex-col content-center justify-center w-full">
-          <h1 className="text-center text-title-md truncate max-w-[80%]">{config.title}</h1>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <h1 className="text-title-md truncate max-w-[80vw] text-center">{config.title}</h1>
         </div>
       )}
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />

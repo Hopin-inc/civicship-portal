@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const GET_USER_FLEXIBLE = gql(`
   query GetUserFlexible(
@@ -31,7 +31,7 @@ export const GET_USER_FLEXIBLE = gql(`
   } 
 `);
 
-  export const GET_USER_WALLET = gql(`
+export const GET_USER_WALLET = gql(`
   query GetUserWallet($id: ID!) {
     user(id: $id) {
       ...UserFields
@@ -44,11 +44,17 @@ export const GET_USER_FLEXIBLE = gql(`
             user {
               ...UserFields
             }
+            community {
+              ...CommunityFields
+            }
           }
           toWallet {
             ...WalletFields
             user {
               ...UserFields
+            }
+            community {
+              ...CommunityFields
             }
           }
         }
