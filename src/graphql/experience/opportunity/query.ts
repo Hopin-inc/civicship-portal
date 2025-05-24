@@ -72,6 +72,9 @@ export const GET_OPPORTUNITY = gql`
           }
         }
       }
+      articles {
+        ...ArticleFields
+      }
       createdByUser {
         ...UserFields
         articlesAboutMe {

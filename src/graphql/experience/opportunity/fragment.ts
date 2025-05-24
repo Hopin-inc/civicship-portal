@@ -15,7 +15,7 @@ export const OPPORTUNITY_FRAGMENT = gql`
 
     feeRequired
     pointsToEarn
-    
+
     earliestReservableAt
   }
 `;
