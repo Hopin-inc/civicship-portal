@@ -3491,6 +3491,17 @@ export type GqlGetOpportunityQuery = {
         }> | null;
       }> | null;
     }> | null;
+    articles?: Array<{
+      __typename?: "Article";
+      id: string;
+      title: string;
+      body?: string | null;
+      introduction: string;
+      thumbnail?: any | null;
+      category: GqlArticleCategory;
+      publishStatus: GqlPublishStatus;
+      publishedAt?: Date | null;
+    }> | null;
     createdByUser?: {
       __typename?: "User";
       id: string;
@@ -6254,6 +6265,9 @@ export const GetOpportunityDocument = gql`
             }
           }
         }
+      }
+      articles {
+        ...ArticleFields
       }
       createdByUser {
         ...UserFields
