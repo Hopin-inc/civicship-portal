@@ -50,7 +50,7 @@ export const presenterParticipation = (raw: GqlParticipation): ParticipationDeta
       id: opportunity.id,
       title: opportunity.title,
       images: opportunity.images ?? [],
-      host: presenterOpportunityHost(opportunity.createdByUser),
+      host: presenterOpportunityHost(opportunity.createdByUser, opportunity?.articles?.[0]),
     },
 
     slot: {

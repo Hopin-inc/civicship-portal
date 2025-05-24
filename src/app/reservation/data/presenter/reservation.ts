@@ -64,7 +64,7 @@ export const presenterReservationDetail = (
       id: opportunity.id,
       title: opportunity.title,
       images: opportunity.images || [],
-      host: presenterOpportunityHost(opportunity.createdByUser),
+      host: presenterOpportunityHost(opportunity.createdByUser, opportunity.articles?.[0]),
     },
     images: opportunity.images || [],
     totalImageCount: opportunity.images?.length || 0,
