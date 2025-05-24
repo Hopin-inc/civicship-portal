@@ -33,10 +33,10 @@ export const MemberRow = ({ user, role, currentUserRole, onRoleChange }: Props) 
         className="rounded-full object-cover border"
         style={{ aspectRatio: "1 / 1" }}
       />
-      <div className="flex flex-col">
-        <span className="text-body-sm font-bold truncate max-w-[160px]">{user.name}</span>
+      <div className="flex flex-col max-w-[160px] overflow-hidden">
+        <span className="text-body-sm font-bold truncate">{user.name}</span>
         <span className="text-muted-foreground text-label-xs">
-          {roleLabels[role] ?? "Change role"}
+          {roleLabels[role] ?? "権限を変更"}
         </span>
       </div>
     </div>
@@ -46,7 +46,7 @@ export const MemberRow = ({ user, role, currentUserRole, onRoleChange }: Props) 
         onValueChange={(value) => onRoleChange(value as GqlRole)}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder={roleLabels[role] ?? "Change role"} />
+          <SelectValue placeholder={roleLabels[role] ?? "権限を変更"} />
         </SelectTrigger>
         <SelectContent>
           {Object.entries(roleLabels).map(([val, label]) => (
