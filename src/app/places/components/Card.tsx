@@ -35,38 +35,40 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, buttonVariant = 
           }}
         />
       </div>
-      <CardContent className="flex flex-col px-4 py-3">
+      <CardContent className="flex flex-col px-4 py-3 w-full">
         {/*//TODO 適切に1行に収めるか、name, addressで2行にした方が良い？ユーザーがどの地域なのか分からない問題を解消したい*/}
-        <div className="flex items-center justify-between mb-2">
-          <div className="mt-1 flex items-start text-foreground text-body-xs max-w-[75%]">
+        <div className="flex items-center justify-between mb-2 w-full">
+          <div className="mt-1 flex items-start text-foreground text-body-xs max-w-[75%] overflow-hidden">
             <MapPin className="mr-1 h-4 w-4 flex-shrink-0 mt-0.5" />
-            <div className="flex-1 flex flex-wrap overflow-hidden">
-              <span className="font-bold text-body-xs truncate min-w-0 max-w-[calc(100%-1rem)] mr-2">
+            <div className="flex-1 flex flex-wrap overflow-hidden min-w-0">
+              <span className="font-bold text-body-xs truncate min-w-0 max-w-full mr-2">
                 {place.name}
               </span>
-              <span className="truncate text-caption text-body-xs min-w-0 max-w-[calc(100%-1rem)]">
+              <span className="truncate text-caption text-body-xs min-w-0 max-w-full">
                 {place.address}
               </span>
             </div>
           </div>
-          <div className="mt-1 flex items-center text-caption text-label-xs">
+          <div className="mt-1 flex items-center text-caption text-label-xs flex-shrink-0">
             <Users className="mr-1 h-4 w-4 flex-shrink-0" />
             <span className="line-clamp-1 break-words">{place.participantCount}人</span>
           </div>
         </div>
 
         {place.headline && (
-          <CardTitle className="text-title-sm line-clamp-1 mb-1">{place.headline}</CardTitle>
+          <CardTitle className="text-title-sm line-clamp-1 mb-1 overflow-hidden">
+            {place.headline}
+          </CardTitle>
         )}
         {place.bio && (
-          <CardDescription className="line-clamp-2 mb-2 text-body-xs text-caption">
+          <CardDescription className="line-clamp-2 mb-2 text-body-xs text-caption overflow-hidden">
             {place.bio}
           </CardDescription>
         )}
 
-        <CardFooter className="flex justify-between mt-2 p-0 mb-1">
+        <CardFooter className="flex justify-between mt-2 p-0 mb-1 w-full">
           {place.publicOpportunityCount > 0 ? (
-            <span className="text-body-xs text-caption">
+            <span className="text-body-xs text-caption truncate mr-2">
               <strong className="text-foreground mr-0.5">{place.publicOpportunityCount}件</strong>
               の関わり方を募集中
             </span>
@@ -74,7 +76,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, buttonVariant = 
             // レイアウト保持のために render
             <span className="text-body-xs text-caption"></span>
           )}
-          <Button variant={buttonVariant} size={"sm"}>
+          <Button variant={buttonVariant} size={"sm"} className="flex-shrink-0">
             もっと見る
           </Button>
         </CardFooter>

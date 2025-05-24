@@ -72,6 +72,7 @@ export default function ConfirmPage() {
       user,
       ticketCounter,
       useTickets: ui.useTickets,
+      comment: ui.ageComment ?? undefined,
     });
 
     if (!result.success) {
@@ -113,7 +114,7 @@ export default function ConfirmPage() {
           />
         </div>
         <div className="h-2 bg-border" />
-        <ParticipationAge />
+        <ParticipationAge ageComment={ui.ageComment} setAgeComment={ui.setAgeComment} />
         <div className="h-2 bg-border" />
         <PaymentSection
           ticketCount={ticketCounter.count}

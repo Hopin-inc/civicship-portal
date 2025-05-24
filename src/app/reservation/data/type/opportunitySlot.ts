@@ -3,7 +3,7 @@ import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 export type ActivitySlotGroup = {
   dateLabel: string;
   slots: ActivitySlot[];
-}
+};
 
 export type ActivitySlot = OpportunitySlot & {
   feeRequired: number | null;
@@ -15,9 +15,11 @@ export type QuestSlot = OpportunitySlot & {
 
 type OpportunitySlot = {
   id: string;
-  hostingStatus: GqlOpportunitySlotHostingStatus
+  hostingStatus: GqlOpportunitySlotHostingStatus;
   capacity: number;
   remainingCapacity: number;
+
+  isReservable: boolean;
 
   applicantCount: number | null;
 

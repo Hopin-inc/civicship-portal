@@ -18,8 +18,6 @@ export const useWallet = (userId?: string) => {
     tickets: [],
   });
 
-  const [isLoadingMore] = useState(false);
-
   const { data, loading, error, refetch } = useGetUserWalletQuery({
     variables: targetId ? { id: targetId } : undefined,
     skip: !targetId,
@@ -28,15 +26,14 @@ export const useWallet = (userId?: string) => {
 
   useEffect(() => {
     if (data?.user?.wallets?.[0]) {
-      const asset = presenterUserAsset(data.user.wallets[0]);
-      setUserAsset(asset);
+      const walletData = data.user.wallets[0];
+      setUserAsset(presenterUserAsset(walletData));
     }
   }, [data]);
 
   return {
     userAsset,
-    isLoading: loading || false,
-    isLoadingMore,
+    isLoading: loading,
     error,
     refetch,
   };

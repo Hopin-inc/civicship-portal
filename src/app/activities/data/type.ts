@@ -1,4 +1,4 @@
-import { GqlOpportunityCategory, GqlOpportunitySlotHostingStatus } from "@/types/graphql";
+import { GqlOpportunityCategory } from "@/types/graphql";
 import { CommunityId } from "@/types";
 import { TArticleCard } from "@/app/articles/data/type";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
@@ -50,6 +50,8 @@ export type OpportunityDetail = CommunityId & {
 
   requiredApproval: boolean;
   requiredTicket: RequiredUtility[];
+
+  isReservable: boolean;
 
   description: string;
   body: string;

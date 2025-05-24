@@ -19,7 +19,7 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity }) => {
           <div className="flex items-center gap-3">
             <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
               <Image
-                src={opportunity?.host?.image ?? PLACEHOLDER_IMAGE}
+                src={opportunity?.host?.image ?? PLACEHOLDER_IMAGE ?? null}
                 alt={opportunity?.host?.name ?? "案内人"}
                 fill
                 placeholder={"blur"}
