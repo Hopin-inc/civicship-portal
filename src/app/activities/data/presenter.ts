@@ -73,7 +73,7 @@ export function presenterOpportunityHost(
     name: host?.name || "",
     image: host?.image || "",
     bio: host?.bio || "",
-    interview: presenterArticleCard(host?.articlesAboutMe?.[0] || interview),
+    interview: presenterArticleCard(interview || host?.articlesAboutMe?.[0]),
   };
 }
 
