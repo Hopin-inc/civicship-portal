@@ -26,16 +26,24 @@ export const presenterActivityCards = (
     .map((node) => presenterActivityCard(node));
 };
 
-export const presenterActivityCard = (node: GqlOpportunity): ActivityCard => ({
-  id: node?.id || "",
-  title: node?.title || "",
-  category: node?.category || GqlOpportunityCategory.Activity,
-  feeRequired: node?.feeRequired || 0,
-  location: node?.place?.name || "場所未定",
-  images: node?.images || [],
-  communityId: node?.community?.id || "",
-  hasReservableTicket: node?.isReservableWithTicket || false,
-});
+export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
+  edges
+    .map((edge) => edge.node)
+    .filter((node): node is GqlOpportunity => !!node)
+    .map(presenterActivityCard);
+
+export const presenterActivityCard = (node: GqlOpportunity): ActivityCard => {
+  return {
+    id: node?.id || "",
+    title: node?.title || "",
+    category: node?.category || GqlOpportunityCategory.Activity,
+    feeRequired: node?.feeRequired || 0,
+    location: node?.place?.name || "場所未定",
+    images: node?.images || [],
+    communityId: node?.community?.id || "",
+    hasReservableTicket: node?.isReservableWithTicket || false,
+  };
+};
 
 export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail => {
   const { images, place, slots, articles, createdByUser } = data;
