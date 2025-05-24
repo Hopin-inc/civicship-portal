@@ -81,14 +81,16 @@ export default function ReservationsPage() {
 
   return (
     <>
-      <div className="p-3 rounded-xl border-[1px] border-zinc-300 bg-zinc-50 mt-6">
-        <div className="flex items-start gap-2">
-          <Info className="w-5 h-5 mt-[3px] text-zinc-600" />
-          <div className="flex-1">
-            <p className="font-bold leading-6 text-zinc-800">操作のご案内</p>
-            <p className="text-sm text-zinc-700 mt-1">
-              応募が届くと一覧画面に表示されます。タップすると詳細画面で操作できます。
-            </p>
+      <div className="p-6">
+        <div className="p-3 rounded-xl border-[1px] border-zinc-300 bg-zinc-50 mt-6">
+          <div className="flex items-start gap-2">
+            <Info className="w-5 h-5 mt-[3px] text-zinc-600" />
+            <div className="flex-1">
+              <p className="font-bold leading-6 text-zinc-800">操作のご案内</p>
+              <p className="text-sm text-zinc-700 mt-1">
+                応募が届くと一覧画面に表示されます。タップすると詳細画面で操作できます。
+              </p>
+            </div>
           </div>
         </div>
       </div>

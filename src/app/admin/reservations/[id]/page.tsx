@@ -188,9 +188,10 @@ export default function ReservationDetailPage() {
         ? `/quests/${opportunity.id}`
         : "/";
 
-  const isSlotActive = () =>
-    reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
-    reservation.opportunitySlot?.hostingStatus !== "COMPLETED";
+  const isSlotCancelled = () => reservation.opportunitySlot?.hostingStatus === "CANCELLED";
+  const isSlotCompleted = () => reservation.opportunitySlot?.hostingStatus === "COMPLETED";
+
+  const isSlotActive = () => !isSlotCancelled() && !isSlotCompleted();
   const isApplied = () => reservation.status === "APPLIED" && isSlotActive();
   const isAccepted = () => reservation.status === "ACCEPTED" && isSlotActive();
   const isCanceled = () => reservation.status === "CANCELED";
@@ -203,7 +204,8 @@ export default function ReservationDetailPage() {
     canCancelReservation() ||
     cannotCancelReservation() ||
     isCanceled() ||
-    isRejected();
+    isRejected() ||
+    isSlotCancelled(); // ✅ 追加
 
   const operationNoticeText = isApplied()
     ? "応募内容を確認し、承認またはお断りの操作を行ってください。"
@@ -211,9 +213,11 @@ export default function ReservationDetailPage() {
       ? "応募は参加者によってキャンセルされました。必要な操作はありません。"
       : isRejected()
         ? "応募のお断りが完了しています。必要な操作はありません。"
-        : "開催中止は開催24時間前まで可能です。それ以降は緊急連絡先から直接ご連絡ください。";
+        : isSlotCancelled()
+          ? "この日付はすでに開催中止されています。必要な操作はありません。"
+          : "開催中止は開催24時間前まで可能です。それ以降は緊急連絡先から直接ご連絡ください。";
 
-  const isNeutralNotice = isCanceled() || isRejected();
+  const isNeutralNotice = isCanceled() || isRejected() || isSlotCancelled(); // ✅ 追加
   const noticeBgClass = isNeutralNotice
     ? "bg-zinc-50 border-zinc-300 text-zinc-800"
     : "bg-yellow-50 border-yellow-400 text-yellow-800";
