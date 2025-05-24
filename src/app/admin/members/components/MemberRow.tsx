@@ -34,7 +34,7 @@ export const MemberRow = ({ user, role, currentUserRole, onRoleChange }: Props) 
         style={{ aspectRatio: "1 / 1" }}
       />
       <div className="flex flex-col">
-        <span className="text-body-sm truncate max-w-[160px]">{user.name}</span>
+        <span className="text-body-sm font-bold truncate max-w-[160px]">{user.name}</span>
         <span className="text-muted-foreground text-label-xs">
           {roleLabels[role] ?? "Change role"}
         </span>
