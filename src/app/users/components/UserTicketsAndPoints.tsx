@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ChevronRight, Star as StarIcon, Ticket as TicketIcon } from "lucide-react";
+import { ChevronRight, Ticket as TicketIcon, Wallet } from "lucide-react";
 
 interface UserTicketsAndPointsProps {
   ticketCount: number;
@@ -32,7 +32,7 @@ const UserTicketsAndPoints: React.FC<UserTicketsAndPointsProps> = ({ ticketCount
       </Link>
       <Link href="/wallets">
         <div className={pointClass}>
-          <StarIcon className="w-5 h-5 mb-0.5" />
+          <Wallet className="w-5 h-5 mb-0.5" />
           <p className="text-label-md">保有ポイント</p>
           <p className="text-label-md font-bold">{pointCount.toLocaleString()}pt</p>
           <ChevronRight className="w-4 h-4 ml-auto" />
