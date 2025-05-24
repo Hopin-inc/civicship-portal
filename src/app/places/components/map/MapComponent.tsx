@@ -1,6 +1,6 @@
 import React from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-import CustomMarker from "@/app/places/components/map/CustomMarker";
+import CustomMarker from "./CustomMarker";
 import { useMapState } from "@/app/places/hooks/useMapState";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { usePreloadImages } from "@/app/places/hooks/usePreloadImages";
