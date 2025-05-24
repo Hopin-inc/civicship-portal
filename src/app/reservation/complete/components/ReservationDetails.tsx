@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Calendar, Clock1, Users, JapaneseYen, MapPin, Phone } from "lucide-react";
+import { Calendar, JapaneseYen, MapPin, Phone, Users } from "lucide-react";
 
 interface ReservationDetailsProps {
   formattedDate: string;
@@ -14,6 +14,8 @@ interface ReservationDetailsProps {
     name: string;
     address: string;
   };
+  phoneNumber?: string | null | undefined;
+  isReserved?: boolean;
 }
 
 const ReservationDetails: React.FC<ReservationDetailsProps> = ({
@@ -24,6 +26,8 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
   totalPrice,
   pricePerPerson,
   location = { name: "高松市役所", address: "香川県高松市番町1丁目8-15" },
+  phoneNumber,
+  isReserved = false,
 }) => {
   return (
     <div className="bg-card rounded-lg py-6 px-4 mb-6 space-y-6 w-full">
@@ -58,11 +62,26 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
         </div>
       </div>
       <div className="flex items-center gap-x-2">
-        <Phone size={18} strokeWidth={1.5} className="text-caption w-6 h-6 mt-0.5" />
-        <div className="flex flex-row gap-x-2 items-center">
-          <span className="text-body-md text-primary">090-1234-5678</span>
-          <span className="text-caption text-body-sm">（緊急連絡先）</span>
-        </div>
+        {isReserved ? (
+          phoneNumber ? (
+            <>
+              <Phone size={18} strokeWidth={1.5} className="text-caption w-6 h-6 mt-0.5" />
+              <div className="flex flex-row gap-x-2 items-center">
+                <a
+                  href={`tel:${phoneNumber}`}
+                  className="text-body-md text-primary hover:underline"
+                >
+                  {phoneNumber}
+                </a>
+                <span className="text-caption text-body-sm">（緊急連絡先）</span>
+              </div>
+            </>
+          ) : (
+            <span className="text-body-sm text-caption">
+              緊急時は公式LINEからお問い合わせください。
+            </span>
+          )
+        ) : null}
       </div>
     </div>
   );
