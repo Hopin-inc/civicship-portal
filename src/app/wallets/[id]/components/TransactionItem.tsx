@@ -31,7 +31,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image })
   return (
     <Card className="flex items-center justify-between px-4 py-3">
       {/* 左: アイコンと説明 */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-grow min-w-0">
         <Image
           src={image ?? PLACEHOLDER_IMAGE}
           alt="user"
@@ -40,8 +40,10 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image })
           className="rounded-full object-cover border"
           style={{ aspectRatio: "1 / 1" }}
         />
-        <div className="flex flex-col text-left">
-          <span className="text-body-sm truncate max-w-[200px]">{transaction.description}</span>
+        <div className="flex flex-col text-left min-w-0 flex-1">
+          <span className="text-body-sm truncate whitespace-nowrap overflow-hidden block">
+            {transaction.description}
+          </span>
           <span className="text-label-xs text-muted-foreground">
             {formatDateTime(transaction.transferredAt)}
           </span>
@@ -49,7 +51,9 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image })
       </div>
 
       {/* 右: 金額 */}
-      <div className={`text-label-sm font-bold ${isPositive ? "text-success" : "text-foreground"}`}>
+      <div
+        className={`text-label-sm font-bold shrink-0 ml-4 ${isPositive ? "text-success" : "text-foreground"}`}
+      >
         {isPositive ? "+" : ""}
         {formatCurrency(transaction.transferPoints)} pt
       </div>
