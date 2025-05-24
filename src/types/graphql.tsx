@@ -3498,6 +3498,8 @@ export type GqlGetOpportunitiesQuery = {
 export type GqlGetOpportunityQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   permission: GqlCheckCommunityPermissionInput;
+  slotFilter?: InputMaybe<GqlOpportunitySlotFilterInput>;
+  slotSort?: InputMaybe<GqlOpportunitySlotSortInput>;
 }>;
 
 export type GqlGetOpportunityQuery = {
@@ -6746,7 +6748,12 @@ export type GetOpportunitiesQueryResult = Apollo.QueryResult<
   GqlGetOpportunitiesQueryVariables
 >;
 export const GetOpportunityDocument = gql`
-  query GetOpportunity($id: ID!, $permission: CheckCommunityPermissionInput!) {
+  query GetOpportunity(
+    $id: ID!
+    $permission: CheckCommunityPermissionInput!
+    $slotFilter: OpportunitySlotFilterInput
+    $slotSort: OpportunitySlotSortInput
+  ) {
     opportunity(id: $id, permission: $permission) {
       ...OpportunityFields
       community {
@@ -6755,7 +6762,7 @@ export const GetOpportunityDocument = gql`
       place {
         ...PlaceFields
       }
-      slots {
+      slots(filter: $slotFilter, sort: $slotSort) {
         ...OpportunitySlotFields
         reservations {
           ...ReservationFields
@@ -6817,6 +6824,8 @@ export const GetOpportunityDocument = gql`
  *   variables: {
  *      id: // value for 'id'
  *      permission: // value for 'permission'
+ *      slotFilter: // value for 'slotFilter'
+ *      slotSort: // value for 'slotSort'
  *   },
  * });
  */

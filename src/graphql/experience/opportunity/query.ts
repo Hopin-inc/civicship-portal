@@ -49,7 +49,12 @@ export const GET_OPPORTUNITIES = gql`
 `;
 
 export const GET_OPPORTUNITY = gql`
-  query GetOpportunity($id: ID!, $permission: CheckCommunityPermissionInput!) {
+  query GetOpportunity(
+    $id: ID!
+    $permission: CheckCommunityPermissionInput!
+    $slotFilter: OpportunitySlotFilterInput
+    $slotSort: OpportunitySlotSortInput
+  ) {
     opportunity(id: $id, permission: $permission) {
       ...OpportunityFields
 
@@ -60,7 +65,7 @@ export const GET_OPPORTUNITY = gql`
       place {
         ...PlaceFields
       }
-      slots {
+      slots(filter: $slotFilter, sort: $slotSort) {
         ...OpportunitySlotFields
         reservations {
           ...ReservationFields
