@@ -1,9 +1,9 @@
 import { Input } from "@/components/ui/input";
-import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
 
-export const ParticipationAge: React.FC = () => {
-  const { ageComment, setAgeComment } = useReservationUIState();
-
+export const ParticipationAge: React.FC<{
+  ageComment: string | null;
+  setAgeComment: (v: string | null) => void;
+}> = ({ ageComment, setAgeComment }) => {
   return (
     <div className="px-6 py-6">
       <h2 className="text-display-sm mb-1">参加者の年齢</h2>

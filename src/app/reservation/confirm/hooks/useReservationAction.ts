@@ -51,7 +51,7 @@ export const useReservationCommand = () => {
               totalParticipantCount: count,
               paymentMethod: useTickets ? "TICKET" : "FEE",
               ticketIdsIfNeed: useTickets ? ticketIds : undefined,
-              comment,
+              comment: comment ?? undefined,
             },
           },
         });
