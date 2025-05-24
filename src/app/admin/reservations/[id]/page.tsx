@@ -1,34 +1,56 @@
 "use client";
 
-import { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_RESERVATION } from "@/graphql/experience/reservation/query";
-import { ACCEPT_RESERVATION_MUTATION } from "@/graphql/experience/reservation/mutation";
+import {
+  ACCEPT_RESERVATION_MUTATION,
+  REJECT_RESERVATION,
+} from "@/graphql/experience/reservation/mutation";
 import { OPPORTUNITY_SLOT_SET_HOSTING_STATUS } from "@/graphql/experience/opportunitySlot/mutation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";
 import { CardWrapper } from "@/components/ui/card-wrapper";
-import { Card, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import dayjs from "dayjs";
-import { displayDuration, displayPhoneNumber, PLACEHOLDER_IMAGE } from "@/utils";
-import { CalendarIcon, JapaneseYen, MapPin, NotepadTextDashed, Phone, User } from "lucide-react";
+import { COMMUNITY_ID, displayDuration, displayPhoneNumber, PLACEHOLDER_IMAGE } from "@/utils";
+import {
+  CalendarIcon,
+  Info,
+  JapaneseYen,
+  MapPin,
+  NotepadTextDashed,
+  Phone,
+  User,
+} from "lucide-react";
 import { prefectureLabels } from "@/app/users/data/presenter";
 import { GqlCurrentPrefecture, GqlOpportunityCategory, GqlReservation } from "@/types/graphql";
 import { ReservationStatus } from "@/app/admin/reservations/components/ReservationStatus";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function ReservationDetailPage() {
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const headerConfig = useMemo(
     () => ({
-      title: `予約詳細`,
+      title: `応募詳細`,
       showBackButton: true,
       showLogo: false,
       backTo: "/admin/reservations",
@@ -47,7 +69,7 @@ export default function ReservationDetailPage() {
       refetch();
     },
     onError: (error) => {
-      toast.error(`承認に失敗しました: ${error.message}`);
+      toast.error(`承認に失敗しました`);
     },
   });
 
@@ -59,7 +81,7 @@ export default function ReservationDetailPage() {
         refetch();
       },
       onError: (error) => {
-        toast.error(`中止に失敗しました: ${error.message}`);
+        toast.error(`中止に失敗しました`);
       },
     },
   );
@@ -92,6 +114,36 @@ export default function ReservationDetailPage() {
           },
         },
       });
+    } catch (e) {}
+  };
+
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+  const [rejectComment, setRejectComment] = useState("");
+
+  const [rejectReservation, { loading: rejectLoading }] = useMutation(REJECT_RESERVATION, {
+    onCompleted: () => {
+      toast.success("応募を却下しました");
+      void refetch();
+    },
+    onError: (error) => {
+      toast.error(`却下に失敗しました`);
+    },
+  });
+
+  const handleReject = async () => {
+    try {
+      await rejectReservation({
+        variables: {
+          id,
+          input: { comment: rejectComment },
+          permission: {
+            opportunityId: data?.reservation?.opportunitySlot?.opportunity?.id,
+            communityId: COMMUNITY_ID,
+          },
+        },
+      });
+      setIsRejectDialogOpen(false);
+      setRejectComment("");
     } catch (e) {}
   };
 
@@ -136,17 +188,61 @@ export default function ReservationDetailPage() {
         ? `/quests/${opportunity.id}`
         : "/";
 
+  const isSlotActive = () =>
+    reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
+    reservation.opportunitySlot?.hostingStatus !== "COMPLETED";
+  const isApplied = () => reservation.status === "APPLIED" && isSlotActive();
+  const isAccepted = () => reservation.status === "ACCEPTED" && isSlotActive();
+  const isCanceled = () => reservation.status === "CANCELED";
+  const isRejected = () => reservation.status === "REJECTED";
+  const canCancelReservation = () => isAccepted() && !isWithin1Day;
+  const cannotCancelReservation = () => isAccepted() && isWithin1Day;
+
+  const shouldShowOperationNotice =
+    isApplied() ||
+    canCancelReservation() ||
+    cannotCancelReservation() ||
+    isCanceled() ||
+    isRejected();
+
+  const operationNoticeText = isApplied()
+    ? "応募内容を確認し、承認またはお断りの操作を行ってください。"
+    : isCanceled()
+      ? "応募は参加者によってキャンセルされました。必要な操作はありません。"
+      : isRejected()
+        ? "応募のお断りが完了しています。必要な操作はありません。"
+        : "開催中止は開催24時間前まで可能です。それ以降は緊急連絡先から直接ご連絡ください。";
+
+  const isNeutralNotice = isCanceled() || isRejected();
+  const noticeBgClass = isNeutralNotice
+    ? "bg-zinc-50 border-zinc-300 text-zinc-800"
+    : "bg-yellow-50 border-yellow-400 text-yellow-800";
+  const iconColor = isNeutralNotice ? "text-zinc-600" : "text-yellow-600";
+
   return (
     <div className="p-6">
       <div className="mb-10">
-        <h2 className="text-title-md mb-3">予約者</h2>
+        {shouldShowOperationNotice && (
+          <div className={`p-3 rounded-xl border-[1px] ${noticeBgClass} mb-10`}>
+            <div className="flex items-start gap-2">
+              <Info className={`w-5 h-5 mt-[3px] ${iconColor}`} />
+              <div className="flex-1">
+                <p className="font-bold leading-6">
+                  {/* 色はテキスト全体で反映済み */}操作のご案内
+                </p>
+                <p className="text-sm mt-1">{operationNoticeText}</p>
+              </div>
+            </div>
+          </div>
+        )}
+        <h2 className="text-title-lg mb-3">予約者</h2>
         <div className="flex items-center gap-3">
-          <Avatar>
+          <Avatar className="h-16 w-16">
             <AvatarImage src={reservation.createdByUser?.image || ""} />
             <AvatarFallback>{reservation.createdByUser?.name?.[0] || "U"}</AvatarFallback>
           </Avatar>
           <div className="flex-grow flex flex-col justify-center gap-1">
-            <p className="text-label-md">{reservation.createdByUser?.name || "未設定"}</p>
+            <p className="text-body-md font-bold">{reservation.createdByUser?.name || "未設定"}</p>
             <p className="inline-flex items-center gap-1 text-muted-foreground text-label-sm">
               <MapPin size="16" />
               {reservation.createdByUser?.currentPrefecture
@@ -161,7 +257,7 @@ export default function ReservationDetailPage() {
       </div>
 
       <div>
-        <h2 className="text-title-md mb-3 mt-6">予約情報</h2>
+        <h2 className="text-title-lg mb-3 mt-10">予約情報</h2>
         {/* ▼ CardWrapper部分：ブロックの外に出す */}
         <Link href={opportunityPagePath} target="_blank">
           <CardWrapper clickable className="overflow-hidden flex items-center h-24 mb-6">
@@ -172,7 +268,7 @@ export default function ReservationDetailPage() {
               height="96"
             />
             <div className="flex flex-col flex-grow p-4">
-              <p className="text-body-md">{opportunity?.title}</p>
+              <p className="text-body-md font-bold">{opportunity?.title}</p>
               <p className="text-body-sm text-muted-foreground">
                 今後{futureSlotsCount}日程で開催予定
               </p>
@@ -180,11 +276,10 @@ export default function ReservationDetailPage() {
           </CardWrapper>
         </Link>
 
-        {/* ▼ ReservationDetailsと同じスタイルのブロック */}
-        <div className="px-4 mb-6 mt-6 w-full">
-          <div className="flex flex-col flex-wrap text-body-sm gap-4 mt-6">
+        <Card className="mt-6 mb-6">
+          <CardContent className="flex flex-col flex-wrap text-body-sm gap-4 p-6">
             <p className="inline-flex items-center gap-2 text-body-md">
-              <CalendarIcon size="24" />
+              <CalendarIcon size={24} />
               {reservation.opportunitySlot?.startsAt &&
                 displayDuration(
                   reservation.opportunitySlot.startsAt,
@@ -192,15 +287,15 @@ export default function ReservationDetailPage() {
                 )}
             </p>
             <p className="inline-flex items-center gap-2 text-body-md">
-              <User size="24" />
+              <User size={24} />
               {reservation.participations?.length ?? 0}名
             </p>
             <p className="inline-flex items-center gap-2 text-body-md">
-              <NotepadTextDashed size="24" />
+              <NotepadTextDashed size={24} />
               {reservation.comment ?? "コメントはありません"}
             </p>
             <p className="inline-flex items-center gap-2 text-body-md">
-              <JapaneseYen size="24" />
+              <JapaneseYen size={24} />
               {participationFee.toLocaleString()}円
               <span className="text-label-sm text-muted-foreground">
                 ({opportunity?.feeRequired?.toLocaleString() ?? 0}円×
@@ -208,7 +303,7 @@ export default function ReservationDetailPage() {
               </span>
             </p>
             <p className="inline-flex items-center gap-2 text-body-md">
-              <Phone size="24" />
+              <Phone size={24} />
               {reservation.createdByUser?.phoneNumber ? (
                 <a
                   href={`tel:${reservation.createdByUser.phoneNumber}`}
@@ -220,53 +315,100 @@ export default function ReservationDetailPage() {
                 "未設定"
               )}
             </p>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Footer with conditional buttons */}
-      {reservation.status === "APPLIED" &&
-        reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
-        reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
-          <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
-            <CardFooter className="p-4">
-              <Button className="w-full" onClick={handleAccept} disabled={acceptLoading}>
-                {acceptLoading ? "処理中..." : "承認する"}
-              </Button>
-            </CardFooter>
-          </Card>
-        )}
+      {isApplied() && (
+        <div className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto p-4 mb-6 bg-background border-t-2 border-b-card">
+          <div className="flex flex-col space-y-3">
+            <Button className="w-full" size="lg" onClick={handleAccept} disabled={acceptLoading}>
+              {acceptLoading ? "処理中..." : "承認する"}
+            </Button>
 
-      {reservation.status === "ACCEPTED" &&
-        !isWithin1Day &&
-        reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
-        reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
-          <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
-            <CardFooter className="p-4">
-              <Button
-                className="w-full"
-                onClick={handleCancel}
-                disabled={cancelLoading}
-                variant="destructive"
-              >
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  className="w-full !text-destructive"
+                  size="md"
+                  variant="text"
+                  disabled={rejectLoading}
+                >
+                  {rejectLoading ? "処理中..." : "お断りの連絡を送る"}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-[90vw] max-w-[400px] rounded-sm">
+                <DialogHeader>
+                  <DialogTitle>お断りの連絡</DialogTitle>
+                  <DialogDescription>
+                    コメントは任意です。空欄の場合は、下部に表示されている定型文を使用して送信されます。
+                  </DialogDescription>
+                </DialogHeader>
+                <Textarea
+                  placeholder="今回は日程の都合により申込を辞退させていただきました。またの機会がございましたら、どうぞよろしくお願い致します。"
+                  value={rejectComment}
+                  onChange={(e) => setRejectComment(e.target.value)}
+                  className="min-h-[120px]"
+                />
+                <DialogFooter className="mt-4 gap-2">
+                  <DialogClose asChild>
+                    <Button variant="tertiary">キャンセル</Button>
+                  </DialogClose>
+                  <Button
+                    onClick={handleReject}
+                    variant={"destructive"}
+                    disabled={rejectLoading}
+                    className={"mx-4"}
+                  >
+                    {rejectLoading ? "送信中..." : "送信する"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+      )}
+
+      {canCancelReservation() && (
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto p-4 mb-6 bg-background border-t-2 border-b-card">
+              <Button className="w-full" variant="destructive" disabled={cancelLoading}>
                 {cancelLoading ? "処理中..." : "開催中止"}
               </Button>
-            </CardFooter>
-          </Card>
-        )}
+            </div>
+          </DialogTrigger>
 
-      {reservation.status === "ACCEPTED" &&
-        isWithin1Day &&
-        reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
-        reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
-          <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
-            <CardFooter className="p-4">
-              <Button variant="destructive" disabled className="w-full">
-                中止不可
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>開催を中止しますか？</DialogTitle>
+              <DialogDescription>
+                この操作は取り消せません。参加者には中止の通知が送信されます。
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter className="mt-4">
+              <DialogClose asChild>
+                <Button variant="tertiary">キャンセル</Button>
+              </DialogClose>
+              <Button variant="destructive" onClick={handleCancel} disabled={cancelLoading}>
+                {cancelLoading ? "中止中..." : "中止を確定する"}
               </Button>
-            </CardFooter>
-          </Card>
-        )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {cannotCancelReservation() && (
+        <div className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto p-4 mb-6 bg-background border-t-2 border-b-card">
+          <Button variant="destructive" disabled className="w-full">
+            中止不可
+          </Button>
+          <p className="text-sm text-muted-foreground mt-2 text-center">
+            開催24時間以内のため、緊急連絡先よりご連絡下さい。
+          </p>
+        </div>
+      )}
     </div>
   );
 }
