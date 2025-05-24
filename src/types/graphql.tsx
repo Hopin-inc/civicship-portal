@@ -3543,6 +3543,7 @@ export type GqlGetOpportunityQuery = {
         __typename?: "Reservation";
         id: string;
         status: GqlReservationStatus;
+        comment?: string | null;
         participations?: Array<{
           __typename?: "Participation";
           id: string;
@@ -3620,6 +3621,7 @@ export type GqlGetOpportunityQuery = {
             __typename?: "Reservation";
             id: string;
             status: GqlReservationStatus;
+            comment?: string | null;
             participations?: Array<{
               __typename?: "Participation";
               id: string;
@@ -3847,6 +3849,7 @@ export type GqlGetParticipationQuery = {
       __typename?: "Reservation";
       id: string;
       status: GqlReservationStatus;
+      comment?: string | null;
       opportunitySlot?: {
         __typename?: "OpportunitySlot";
         id: string;
@@ -3947,6 +3950,7 @@ export type GqlReservationFieldsFragment = {
   __typename?: "Reservation";
   id: string;
   status: GqlReservationStatus;
+  comment?: string | null;
 };
 
 export type GqlCreateReservationMutationVariables = Exact<{
@@ -3957,7 +3961,12 @@ export type GqlCreateReservationMutation = {
   __typename?: "Mutation";
   reservationCreate?: {
     __typename?: "ReservationCreateSuccess";
-    reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
+    reservation: {
+      __typename?: "Reservation";
+      id: string;
+      status: GqlReservationStatus;
+      comment?: string | null;
+    };
   } | null;
 };
 
@@ -3971,7 +3980,12 @@ export type GqlCancelReservationMutation = {
   __typename?: "Mutation";
   reservationCancel?: {
     __typename?: "ReservationSetStatusSuccess";
-    reservation: { __typename?: "Reservation"; id: string; status: GqlReservationStatus };
+    reservation: {
+      __typename?: "Reservation";
+      id: string;
+      status: GqlReservationStatus;
+      comment?: string | null;
+    };
   } | null;
 };
 
@@ -4042,6 +4056,7 @@ export type GqlGetReservationQuery = {
     __typename?: "Reservation";
     id: string;
     status: GqlReservationStatus;
+    comment?: string | null;
     createdByUser?: {
       __typename?: "User";
       phoneNumber?: string | null;
@@ -4714,6 +4729,7 @@ export const ReservationFieldsFragmentDoc = gql`
   fragment ReservationFields on Reservation {
     id
     status
+    comment
   }
 `;
 export const TicketFieldsFragmentDoc = gql`
