@@ -1696,6 +1696,7 @@ export type GqlQueryWalletsArgs = {
 
 export type GqlReservation = {
   __typename?: "Reservation";
+  comment?: Maybe<Scalars["String"]["output"]>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   createdByUser?: Maybe<GqlUser>;
   histories?: Maybe<Array<GqlReservationHistory>>;
@@ -1712,6 +1713,7 @@ export type GqlReservationCancelInput = {
 };
 
 export type GqlReservationCreateInput = {
+  comment?: InputMaybe<Scalars["String"]["input"]>;
   opportunitySlotId: Scalars["ID"]["input"];
   otherUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   paymentMethod: GqlReservationPaymentMethod;

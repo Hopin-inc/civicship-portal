@@ -72,6 +72,7 @@ export default function ConfirmPage() {
       user,
       ticketCounter,
       useTickets: ui.useTickets,
+      comment: ui.ageComment ?? undefined,
     });
 
     if (!result.success) {
