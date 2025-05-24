@@ -4094,8 +4094,11 @@ export type GqlGetReservationQuery = {
         slots?: Array<{
           __typename?: "OpportunitySlot";
           id: string;
-          startsAt: Date;
           hostingStatus: GqlOpportunitySlotHostingStatus;
+          startsAt: Date;
+          endsAt: Date;
+          capacity?: number | null;
+          remainingCapacity?: number | null;
         }> | null;
         community?: { __typename?: "Community"; id: string; name?: string | null } | null;
         createdByUser?: {
@@ -7645,9 +7648,7 @@ export const GetReservationDocument = gql`
         opportunity {
           ...OpportunityFields
           slots {
-            id
-            startsAt
-            hostingStatus
+            ...OpportunitySlotFields
           }
           community {
             id
