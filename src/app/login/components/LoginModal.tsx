@@ -49,7 +49,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      <SheetContent side="bottom" className="h-[400px] rounded-t-[20px] px-6">
+      <SheetContent
+        side="bottom"
+        className="h-[400px] rounded-t-[20px] px-6 max-w-mobile-l mx-auto w-full"
+      >
         <div className="flex flex-col items-center pt-8">
           <div className="mb-8">
             <Image src="/images/neo88-logo.jpg" alt="NEO88" width={120} height={40} priority />
@@ -97,6 +100,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             <Image src="/images/line-icon.png" alt="LINE" width={24} height={24} priority />
             {isLoading || isAuthenticating ? "ログイン中..." : "LINEでログイン"}
           </Button>
+          {error && <p className="text-sm text-red-500 mb-4 text-center">{error}</p>}
         </div>
       </SheetContent>
     </Sheet>
