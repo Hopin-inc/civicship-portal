@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import dayjs from "dayjs";
 import { displayDuration, displayPhoneNumber, PLACEHOLDER_IMAGE } from "@/utils";
 import { CalendarIcon, JapaneseYen, MapPin, NotepadTextDashed, Phone, User } from "lucide-react";
+import TappablePhoneNumber from "@/components/shared/TappablePhoneNumber";
 import { prefectureLabels } from "@/app/users/data/presenter";
 import { GqlCurrentPrefecture, GqlOpportunityCategory, GqlReservation } from "@/types/graphql";
 import { ReservationStatus } from "@/app/admin/reservations/components/ReservationStatus";
@@ -206,7 +207,7 @@ export default function ReservationDetailPage() {
           <p className="inline-flex items-center gap-2 text-body-md">
             <Phone size="24" />
             {reservation.createdByUser?.phoneNumber
-              ? displayPhoneNumber(reservation.createdByUser?.phoneNumber)
+              ? <TappablePhoneNumber phoneNumber={reservation.createdByUser.phoneNumber} />
               : "未設定"}
           </p>
         </div>

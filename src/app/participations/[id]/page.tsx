@@ -16,6 +16,7 @@ import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInf
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
 import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
+import TappablePhoneNumber from "@/components/shared/TappablePhoneNumber";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
@@ -135,13 +136,14 @@ export default function ParticipationPage() {
           />
         </div>
       )}
-      {/*<div className="px-6">*/}
-      {/*  <h2 className="text-label-md font-bold mb-4">メッセージ</h2>*/}
-      {/*  /!* #TODO: メッセージの表示を動的にする *!/*/}
-      {/*  <p className="whitespace-pre-line text-body-md">*/}
-      {/*    汚れてもOKな服装でお越しください。当日は12:50に現地集合です。遅れる場合は090-xxxx-xxxxまでご連絡をお願いします。*/}
-      {/*  </p>*/}
-      {/*</div>*/}
+      <div className="px-6">
+        <h2 className="text-label-md font-bold mb-4">メッセージ</h2>
+        {/* #TODO: メッセージの表示を動的にする */}
+        <p className="whitespace-pre-line text-body-md">
+          汚れてもOKな服装でお越しください。当日は12:50に現地集合です。遅れる場合は
+          <TappablePhoneNumber phoneNumber="090-1234-5678" /> までご連絡をお願いします。
+        </p>
+      </div>
       {currentStatus &&
         currentStatus?.status !== "REJECTED" &&
         currentStatus?.status !== "CANCELED" && (
