@@ -124,7 +124,7 @@ export default function ReservationDetailPage() {
   const participantCount = reservation?.participations?.length || 0;
   const participationFee = (opportunity?.feeRequired || 0) * participantCount;
 
-  const isWithin7Days = dayjs(reservation?.opportunitySlot?.startsAt).diff(dayjs(), "day") <= 7;
+  const isWithin1Day = dayjs(reservation.opportunitySlot?.startsAt).diff(dayjs(), "day") < 1;
   const futureSlotsCount =
     opportunity?.slots?.filter(
       (slot: any) => dayjs(slot.startsAt).isAfter(dayjs()) && slot.hostingStatus !== "CANCELLED",
@@ -238,7 +238,7 @@ export default function ReservationDetailPage() {
         )}
 
       {reservation.status === "ACCEPTED" &&
-        !isWithin7Days &&
+        !isWithin1Day &&
         reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
         reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
           <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
@@ -256,7 +256,7 @@ export default function ReservationDetailPage() {
         )}
 
       {reservation.status === "ACCEPTED" &&
-        isWithin7Days &&
+        isWithin1Day &&
         reservation.opportunitySlot?.hostingStatus !== "CANCELLED" &&
         reservation.opportunitySlot?.hostingStatus !== "COMPLETED" && (
           <Card className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto">
