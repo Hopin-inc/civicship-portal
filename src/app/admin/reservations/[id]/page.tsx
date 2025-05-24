@@ -338,33 +338,39 @@ export default function ReservationDetailPage() {
                   variant="text"
                   disabled={rejectLoading}
                 >
-                  {rejectLoading ? "処理中..." : "お断りの連絡を送る"}
+                  {rejectLoading ? "処理中..." : "応募を断る"}
                 </Button>
               </DialogTrigger>
               <DialogContent className="w-[90vw] max-w-[400px] rounded-sm">
                 <DialogHeader>
-                  <DialogTitle>お断りの連絡</DialogTitle>
-                  <DialogDescription>
-                    コメントは任意です。空欄の場合は、下部に表示されている定型文を使用して送信されます。
+                  <DialogTitle className="text-left text-body-sm font-bold pb-2">
+                    応募をお断りますか？
+                  </DialogTitle>
+                  <DialogDescription className="text-left">
+                    コメントは任意です。空欄の場合、下の定型文が送信されます。
                   </DialogDescription>
                 </DialogHeader>
+
                 <Textarea
                   placeholder="今回は日程の都合により申込を辞退させていただきました。またの機会がございましたら、どうぞよろしくお願い致します。"
                   value={rejectComment}
                   onChange={(e) => setRejectComment(e.target.value)}
                   className="min-h-[120px]"
                 />
-                <DialogFooter className="mt-4 gap-2">
+
+                <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-2">
                   <DialogClose asChild>
-                    <Button variant="tertiary">キャンセル</Button>
+                    <Button variant="tertiary" className="w-full py-4">
+                      閉じる
+                    </Button>
                   </DialogClose>
                   <Button
                     onClick={handleReject}
-                    variant={"destructive"}
+                    variant="destructive"
                     disabled={rejectLoading}
-                    className={"mx-4"}
+                    className="w-full py-4"
                   >
-                    {rejectLoading ? "送信中..." : "送信する"}
+                    {rejectLoading ? "送信中..." : "応募を断る"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -383,20 +389,29 @@ export default function ReservationDetailPage() {
             </div>
           </DialogTrigger>
 
-          <DialogContent>
+          <DialogContent className="w-[90vw] max-w-[400px] rounded-sm">
             <DialogHeader>
-              <DialogTitle>開催を中止しますか？</DialogTitle>
-              <DialogDescription>
-                この操作は取り消せません。参加者には中止の通知が送信されます。
+              <DialogTitle className="text-left text-body-sm font-bold pb-2">
+                開催を中止してよろしいですか？
+              </DialogTitle>
+              <DialogDescription className="text-left">
+                中止が確定すると、参加者に通知され、この操作は元に戻せません。
               </DialogDescription>
             </DialogHeader>
 
-            <DialogFooter className="mt-4">
+            <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-2">
               <DialogClose asChild>
-                <Button variant="tertiary">キャンセル</Button>
+                <Button variant="tertiary" className="w-full py-4">
+                  閉じる
+                </Button>
               </DialogClose>
-              <Button variant="destructive" onClick={handleCancel} disabled={cancelLoading}>
-                {cancelLoading ? "中止中..." : "中止を確定する"}
+              <Button
+                variant="destructive"
+                onClick={handleCancel}
+                disabled={cancelLoading}
+                className="w-full py-4"
+              >
+                {cancelLoading ? "中止中..." : "開催を中止する"}
               </Button>
             </DialogFooter>
           </DialogContent>
