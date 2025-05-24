@@ -14,6 +14,7 @@ import { ActivityCard, ActivityDetail, OpportunityHost } from "@/app/activities/
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
+import { addDays, isAfter } from "date-fns";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
@@ -47,6 +48,10 @@ export const presenterActivityCard = (node: GqlOpportunity): ActivityCard => {
 
 export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail => {
   const { images, place, slots, articles, createdByUser } = data;
+  const threshold = addDays(new Date(), 7);
+
+  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired);
+  const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
     communityId: data.community?.id || "",
@@ -62,9 +67,11 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
     requiredTicket: data.requiredUtilities?.map((u) => u) || [],
     feeRequired: data.feeRequired || 0,
 
+    isReservable,
+
     place: presenterPlace(place),
     host: presenterOpportunityHost(createdByUser, articles?.[0]),
-    slots: presenterActivitySlot(slots, data.feeRequired),
+    slots: presenterActivitySlot(slots, threshold, data.feeRequired),
 
     recentOpportunities: [],
     reservableTickets: [],
@@ -87,21 +94,28 @@ export function presenterOpportunityHost(
 
 function presenterActivitySlot(
   slots: Maybe<GqlOpportunitySlot[]> | undefined,
+  threshold: Date,
   feeRequired?: Maybe<number> | undefined,
 ): ActivitySlot[] {
   return (
-    slots?.map(
-      (slot): ActivitySlot => ({
+    slots?.map((slot): ActivitySlot => {
+      const startsAtDate = slot?.startsAt ? new Date(slot.startsAt) : null;
+
+      // 7日以内 → false、8日以降 → true
+      const isReservable = startsAtDate ? isAfter(startsAtDate, threshold) : false;
+
+      return {
         id: slot?.id,
         hostingStatus: slot?.hostingStatus,
-        startsAt: slot?.startsAt ? new Date(slot.startsAt).toISOString() : "",
+        startsAt: startsAtDate?.toISOString() || "",
         endsAt: slot?.endsAt ? new Date(slot.endsAt).toISOString() : "",
         capacity: slot?.capacity ?? 0,
         remainingCapacity: slot?.remainingCapacity ?? 0,
         feeRequired: feeRequired ?? null,
         applicantCount: 1,
-      }),
-    ) ?? []
+        isReservable,
+      };
+    }) ?? []
   );
 }
 

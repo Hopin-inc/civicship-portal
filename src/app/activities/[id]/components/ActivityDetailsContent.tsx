@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { AlertCircle, Calendar, MapPin, Users, Clock, CalendarX } from "lucide-react";
+import { AlertCircle, CalendarX } from "lucide-react";
 import SameStateActivities from "./SimilarActivitiesList";
 import ActivityScheduleCard from "./ActivityScheduleCard";
 import {
@@ -182,6 +182,9 @@ const ScheduleSection = ({
       <div className="relative">
         {hasSchedule ? (
           <>
+            <p className="text-muted-foreground font-bold mb-4 px-1">
+              ※予約は各日程の7日前まで受付中{" "}
+            </p>
             <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
               {slots.map((slot, index) => (
                 <div key={index} className="flex-shrink-0 first:ml-0">
