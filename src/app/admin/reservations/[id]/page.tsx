@@ -14,10 +14,10 @@ import ErrorState from "@/components/shared/ErrorState";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import dayjs from "dayjs";
-import { displayDuration, displayPhoneNumber } from "@/utils";
+import { displayDuration, displayPhoneNumber, PLACEHOLDER_IMAGE } from "@/utils";
 import { CalendarIcon, JapaneseYen, MapPin, NotepadTextDashed, Phone, User } from "lucide-react";
 import { prefectureLabels } from "@/app/users/data/presenter";
-import { GqlCurrentPrefecture, GqlOpportunityCategory } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlOpportunityCategory, GqlReservation } from "@/types/graphql";
 import { ReservationStatus } from "@/app/admin/reservations/components/ReservationStatus";
 import Link from "next/link";
 import Image from "next/image";
@@ -111,7 +111,7 @@ export default function ReservationDetailPage() {
     );
   }
 
-  const reservation = data?.reservation;
+  const reservation: GqlReservation = data?.reservation;
   if (!reservation) {
     return (
       <div className="p-4 pt-16">
@@ -130,9 +130,9 @@ export default function ReservationDetailPage() {
       (slot: any) => dayjs(slot.startsAt).isAfter(dayjs()) && slot.hostingStatus !== "CANCELLED",
     )?.length || 0;
   const opportunityPagePath =
-    opportunity.category === GqlOpportunityCategory.Activity
+    opportunity?.category === GqlOpportunityCategory.Activity
       ? `/activities/${opportunity.id}`
-      : opportunity.category === GqlOpportunityCategory.Quest
+      : opportunity?.category === GqlOpportunityCategory.Quest
         ? `/quests/${opportunity.id}`
         : "/";
 
@@ -164,7 +164,12 @@ export default function ReservationDetailPage() {
         <h2 className="text-title-md mb-3">予約情報</h2>
         <Link href={opportunityPagePath} target="_blank">
           <CardWrapper clickable className="overflow-hidden flex items-center h-24">
-            <Image src={opportunity?.images[0]} alt={opportunity?.title} width="96" height="96" />
+            <Image
+              src={opportunity?.images?.[0] ?? PLACEHOLDER_IMAGE}
+              alt={opportunity?.title ?? "要確認"}
+              width="96"
+              height="96"
+            />
             <div className="flex flex-col flex-grow p-4">
               <p className="text-body-md">{opportunity?.title}</p>
               <p className="text-body-sm text-muted-foreground">
