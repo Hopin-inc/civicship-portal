@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { notFound, useParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import UserProfileSection from "@/app/users/components/UserProfileSection";
