@@ -138,7 +138,7 @@ export default function ReservationDetailPage() {
 
   return (
     <div className="p-6">
-      <div className="mb-8">
+      <div className="mb-10">
         <h2 className="text-title-md mb-3">予約者</h2>
         <div className="flex items-center gap-3">
           <Avatar>
@@ -161,9 +161,10 @@ export default function ReservationDetailPage() {
       </div>
 
       <div>
-        <h2 className="text-title-md mb-3">予約情報</h2>
+        <h2 className="text-title-md mb-3 mt-6">予約情報</h2>
+        {/* ▼ CardWrapper部分：ブロックの外に出す */}
         <Link href={opportunityPagePath} target="_blank">
-          <CardWrapper clickable className="overflow-hidden flex items-center h-24">
+          <CardWrapper clickable className="overflow-hidden flex items-center h-24 mb-6">
             <Image
               src={opportunity?.images?.[0] ?? PLACEHOLDER_IMAGE}
               alt={opportunity?.title ?? "要確認"}
@@ -178,37 +179,48 @@ export default function ReservationDetailPage() {
             </div>
           </CardWrapper>
         </Link>
-        <div className="flex flex-col flex-wrap text-body-sm gap-4 mt-6">
-          <p className="inline-flex items-center gap-2 text-body-md">
-            <CalendarIcon size="24" />
-            {reservation.opportunitySlot?.startsAt &&
-              displayDuration(
-                reservation.opportunitySlot.startsAt,
-                reservation.opportunitySlot.endsAt,
+
+        {/* ▼ ReservationDetailsと同じスタイルのブロック */}
+        <div className="bg-card rounded-lg py-6 px-4 mb-6 mt-6 w-full">
+          <div className="flex flex-col flex-wrap text-body-sm gap-4 mt-6">
+            <p className="inline-flex items-center gap-2 text-body-md">
+              <CalendarIcon size="24" />
+              {reservation.opportunitySlot?.startsAt &&
+                displayDuration(
+                  reservation.opportunitySlot.startsAt,
+                  reservation.opportunitySlot.endsAt,
+                )}
+            </p>
+            <p className="inline-flex items-center gap-2 text-body-md">
+              <User size="24" />
+              {reservation.participations?.length ?? 0}名
+            </p>
+            <p className="inline-flex items-center gap-2 text-body-md">
+              <NotepadTextDashed size="24" />
+              {reservation.comment ?? "コメントはありません"}
+            </p>
+            <p className="inline-flex items-center gap-2 text-body-md">
+              <JapaneseYen size="24" />
+              {participationFee.toLocaleString()}円
+              <span className="text-label-sm text-muted-foreground">
+                ({opportunity?.feeRequired?.toLocaleString() ?? 0}円×
+                {participantCount.toLocaleString()}人)
+              </span>
+            </p>
+            <p className="inline-flex items-center gap-2 text-body-md">
+              <Phone size="24" />
+              {reservation.createdByUser?.phoneNumber ? (
+                <a
+                  href={`tel:${reservation.createdByUser.phoneNumber}`}
+                  className="text-primary hover:underline"
+                >
+                  {displayPhoneNumber(reservation.createdByUser.phoneNumber)}
+                </a>
+              ) : (
+                "未設定"
               )}
-          </p>
-          <p className="inline-flex items-center gap-2 text-body-md">
-            <User size="24" />
-            {reservation.participations?.length ?? 0}名
-          </p>
-          <p className="inline-flex items-center gap-2 text-body-md">
-            <NotepadTextDashed size="24" />
-            {reservation.comment ?? "コメントはありません"}
-          </p>
-          <p className="inline-flex items-center gap-2 text-body-md">
-            <JapaneseYen size="24" />
-            {participationFee.toLocaleString()}円
-            <span className="text-label-sm text-muted-foreground">
-              ({opportunity?.feeRequired?.toLocaleString() ?? 0}円×
-              {participantCount.toLocaleString()}人)
-            </span>
-          </p>
-          <p className="inline-flex items-center gap-2 text-body-md">
-            <Phone size="24" />
-            {reservation.createdByUser?.phoneNumber
-              ? displayPhoneNumber(reservation.createdByUser?.phoneNumber)
-              : "未設定"}
-          </p>
+            </p>
+          </div>
         </div>
       </div>
 
