@@ -4,5 +4,6 @@ export const RESERVATION_FRAGMENT = gql`
   fragment ReservationFields on Reservation {
     id
     status
+    comment
   }
 `;
