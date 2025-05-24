@@ -181,7 +181,7 @@ export default function ReservationDetailPage() {
         </Link>
 
         {/* ▼ ReservationDetailsと同じスタイルのブロック */}
-        <div className="bg-card rounded-lg py-6 px-4 mb-6 mt-6 w-full">
+        <div className="px-4 mb-6 mt-6 w-full">
           <div className="flex flex-col flex-wrap text-body-sm gap-4 mt-6">
             <p className="inline-flex items-center gap-2 text-body-md">
               <CalendarIcon size="24" />
