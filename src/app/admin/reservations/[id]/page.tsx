@@ -292,7 +292,7 @@ export default function ReservationDetailPage() {
             </p>
             <p className="inline-flex items-center gap-2 text-body-md">
               <NotepadTextDashed size={24} />
-              {reservation.comment ?? "コメントはありません"}
+              {reservation.comment?.trim() ? reservation.comment : "コメントはありません"}
             </p>
             <p className="inline-flex items-center gap-2 text-body-md">
               <JapaneseYen size={24} />
