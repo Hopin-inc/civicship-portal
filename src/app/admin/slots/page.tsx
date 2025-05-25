@@ -22,7 +22,6 @@ export default function SlotsPage() {
   useHeaderConfig(headerConfig);
 
   const { slots, loading, error, loadMoreRef, hasMore, isLoadingMore } = useOpportunitySlots();
-  const now = useMemo(() => new Date(), []);
 
   if (loading && slots.length === 0) {
     return (
