@@ -19,9 +19,9 @@ export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
   const { data, loading, error, fetchMore } = useGetOpportunitySlotsQuery({
     variables: {
       filter: {
-        dateRange: {
-          lte: now,
-        },
+        // dateRange: {
+        //   lte: now,
+        // },
       },
       first: 10,
     },
