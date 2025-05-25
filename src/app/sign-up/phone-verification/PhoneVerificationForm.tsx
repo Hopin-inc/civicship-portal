@@ -12,6 +12,7 @@ export function PhoneVerificationForm() {
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -43,7 +44,22 @@ export function PhoneVerificationForm() {
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await phoneAuth.verifyPhoneCode(verificationCode);
+    setIsTransitioning(true);
+    
+    try {
+      const success = await phoneAuth.verifyPhoneCode(verificationCode);
+      if (success) {
+        toast.success("電話番号認証が完了しました");
+        router.push("/sign-up");
+      } else {
+        toast.error("認証コードの検証に失敗しました");
+      }
+    } catch (error) {
+      console.error("Phone verification error:", error);
+      toast.error("認証コードの検証に失敗しました");
+    } finally {
+      setIsTransitioning(false);
+    }
   };
 
   const formatPhoneNumber = (phone: string): string => {
@@ -123,9 +139,9 @@ export function PhoneVerificationForm() {
           <button
             type="submit"
             className="w-full h-12 bg-primary text-white rounded-md"
-            disabled={phoneAuth.isVerifying || verificationCode.length < 6}
+            disabled={phoneAuth.isVerifying || isTransitioning || verificationCode.length < 6}
           >
-            {phoneAuth.isVerifying ? "検証中..." : "コードを検証"}
+            {phoneAuth.isVerifying || isTransitioning ? "検証中..." : "コードを検証"}
           </button>
           <button
             type="button"

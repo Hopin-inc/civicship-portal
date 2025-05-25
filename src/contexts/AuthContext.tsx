@@ -135,7 +135,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const verifyPhoneCodeLocal = async (code: string): Promise<boolean> => {
     if (!verificationId) {
-      toast.error("認証IDがありません。もう一度電話番号を入力してください");
       return false;
     }
 
@@ -166,20 +165,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           });
 
           setIsPhoneVerified(true);
-          toast.success("電話番号認証が完了しました");
-          router.push("/sign-up");
           return true;
         } else {
-          toast.error("電話番号認証IDが取得できませんでした");
           return false;
         }
       } else {
-        toast.error("認証コードの検証に失敗しました");
         return false;
       }
     } catch (error) {
       console.error("Failed to verify phone code:", error);
-      toast.error("認証コードの検証に失敗しました");
       return false;
     } finally {
       setIsVerifying(false);
