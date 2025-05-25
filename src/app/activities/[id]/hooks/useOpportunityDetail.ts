@@ -2,7 +2,11 @@
 
 import { useMemo } from "react";
 import { COMMUNITY_ID } from "@/utils";
-import { useGetOpportunityQuery } from "@/types/graphql";
+import {
+  GqlOpportunitySlotHostingStatus,
+  GqlSortDirection,
+  useGetOpportunityQuery,
+} from "@/types/graphql";
 import { presenterActivityDetail } from "@/app/activities/data/presenter";
 import { ActivityDetail } from "@/app/activities/data/type";
 
@@ -11,6 +15,8 @@ export const useOpportunityDetail = (id: string) => {
     variables: {
       id,
       permission: { communityId: COMMUNITY_ID },
+      slotSort: { startsAt: GqlSortDirection.Asc },
+      slotFilter: { hostingStatus: GqlOpportunitySlotHostingStatus.Scheduled },
     },
     skip: !id,
     fetchPolicy: "network-only",

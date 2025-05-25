@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  GqlGetParticipationQuery,
   GqlOpportunityCategory,
   GqlOpportunitySlotHostingStatus,
   GqlParticipation,
@@ -10,8 +9,6 @@ import {
 } from "@/types/graphql";
 import {
   ActivityField,
-  Opportunity,
-  Participation,
   ParticipationDetail,
   ParticipationInfo,
   ParticipationOptionalInfo,
@@ -20,6 +17,7 @@ import {
 import { ReservationStatus } from "@/types/participationStatus";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { presenterOpportunityHost } from "@/app/activities/data/presenter";
+import { subDays } from "date-fns";
 
 export const presenterParticipation = (raw: GqlParticipation): ParticipationDetail => {
   if (
@@ -52,6 +50,8 @@ export const presenterParticipation = (raw: GqlParticipation): ParticipationDeta
       images: opportunity.images ?? [],
       host: presenterOpportunityHost(opportunity.createdByUser),
     },
+
+    emergencyContactPhone: opportunity?.createdByUser?.phoneNumber ?? "",
 
     slot: {
       id: slot?.id || "",
@@ -194,127 +194,5 @@ export const getStatusInfo = (status: GqlReservationStatus): ReservationStatus |
 
 export const calculateCancellationDeadline = (startTime?: Date): Date | null => {
   if (!startTime) return null;
-  return new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
-};
-
-export const formatImageData = (images: string[]): { url: string; alt: string }[] => {
-  return images.map((url) => ({
-    url,
-    alt: "参加者の写真",
-  }));
-};
-
-type OpportunityData = NonNullable<
-  NonNullable<
-    NonNullable<GqlGetParticipationQuery["participation"]>["reservation"]
-  >["opportunitySlot"]
->["opportunity"];
-
-export const transformOpportunity = (
-  opportunityData: OpportunityData | undefined,
-): Opportunity | undefined => {
-  if (!opportunityData) return undefined;
-
-  return {
-    id: opportunityData.id,
-    title: opportunityData.title,
-    description: opportunityData.description || "",
-    type: opportunityData.category,
-    status:
-      opportunityData.publishStatus === "PUBLIC"
-        ? "open"
-        : opportunityData.publishStatus === "COMMUNITY_INTERNAL"
-          ? "in_progress"
-          : "closed",
-    communityId: opportunityData.community?.id || "",
-    hostId: opportunityData.createdByUser?.id || "",
-    startsAt: new Date(),
-    endsAt: new Date(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    host: {
-      name: opportunityData.createdByUser?.name || "",
-      image: opportunityData.createdByUser?.image || null,
-      title: "",
-      bio: opportunityData.createdByUser?.bio || "",
-    },
-    images: opportunityData.images || [],
-    location: {
-      name: opportunityData.place?.name || "",
-      address: opportunityData.place?.address || "",
-      isOnline: false,
-      lat: opportunityData.place?.latitude || undefined,
-      lng: opportunityData.place?.longitude || undefined,
-    },
-    community: opportunityData.community
-      ? {
-          id: opportunityData.community.id,
-          title: opportunityData.community.name || "",
-          description: "",
-          icon: opportunityData.community.image || "",
-        }
-      : undefined,
-    recommendedFor: [],
-    capacity: 0,
-    pointsForComplete: opportunityData.pointsToEarn || undefined,
-    participants: [],
-    body: opportunityData.body || undefined,
-    createdByUser: opportunityData.createdByUser
-      ? {
-          id: opportunityData.createdByUser.id,
-          name: opportunityData.createdByUser.name || "",
-          image: opportunityData.createdByUser.image || null,
-          articlesAboutMe: [],
-          opportunitiesCreatedByMe: [],
-        }
-      : undefined,
-    place: opportunityData.place
-      ? {
-          name: opportunityData.place.name || "",
-          address: opportunityData.place.address || "",
-          latitude: opportunityData.place.latitude || undefined,
-          longitude: opportunityData.place.longitude || undefined,
-        }
-      : undefined,
-    requireApproval: opportunityData.requireApproval || undefined,
-    pointsRequired: opportunityData.pointsToEarn || undefined,
-    feeRequired: opportunityData.feeRequired || undefined,
-    slots: {
-      edges: [],
-    },
-  };
-};
-
-export const transformParticipation = (
-  participationData: GqlGetParticipationQuery["participation"] | undefined,
-): Participation | undefined => {
-  if (!participationData) return undefined;
-
-  return {
-    node: {
-      id: participationData.id,
-      status: participationData.status,
-      reason: participationData.reason,
-      images: participationData.images ?? [],
-      user: {
-        id: participationData.user?.id ?? "",
-        name: participationData.user?.name ?? "",
-        image: participationData.user?.image ?? null,
-      },
-      reservation:
-        participationData.reservation && participationData.reservation.opportunitySlot
-          ? {
-              id: participationData.reservation.id,
-              opportunitySlot: {
-                id: participationData.reservation.opportunitySlot.id,
-                capacity: participationData.reservation.opportunitySlot.capacity ?? 0,
-                startsAt: participationData.reservation.opportunitySlot.startsAt?.toString() ?? "",
-                endsAt: participationData.reservation.opportunitySlot.endsAt?.toString() ?? "",
-                hostingStatus: participationData.reservation.opportunitySlot.hostingStatus ?? "",
-              },
-              participations: [],
-            }
-          : undefined,
-    },
-  };
+  return subDays(startTime, 7); // ← 7日前
 };

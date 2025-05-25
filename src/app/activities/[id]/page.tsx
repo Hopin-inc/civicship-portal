@@ -76,6 +76,13 @@ export default function ActivityPage() {
         opportunityId={opportunity.id}
         price={opportunity.feeRequired || 0}
         communityId={communityId}
+        disableReason={
+          !sortedSlots || sortedSlots.length === 0
+            ? "noSlots"
+            : !opportunity.isReservable
+              ? "reservationClosed"
+              : undefined
+        }
       />
     </>
   );

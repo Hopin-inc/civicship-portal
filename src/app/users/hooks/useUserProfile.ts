@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { useGetUserFlexibleQuery } from "@/types/graphql";
 import { presenterManagerProfile } from "@/app/users/data/presenter";
+import { presenterActivityCard } from "@/app/activities/data/presenter";
 
 export const useUserProfile = (userId?: string) => {
   const result = useGetUserFlexibleQuery({
@@ -21,8 +22,12 @@ export const useUserProfile = (userId?: string) => {
     return user ? presenterManagerProfile(user) : null;
   }, [result.data]);
 
+  const selfOpportunities =
+    result.data?.user?.opportunitiesCreatedByMe?.map(presenterActivityCard) ?? [];
+
   return {
     userData,
+    selfOpportunities,
     isLoading: result.loading,
     error: result.error,
     refetch: result.refetch,

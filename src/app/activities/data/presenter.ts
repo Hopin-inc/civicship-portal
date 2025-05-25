@@ -14,6 +14,7 @@ import { ActivityCard, ActivityDetail, OpportunityHost } from "@/app/activities/
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
+import { addDays, isAfter } from "date-fns";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
@@ -26,19 +27,31 @@ export const presenterActivityCards = (
     .map((node) => presenterActivityCard(node));
 };
 
-export const presenterActivityCard = (node: GqlOpportunity): ActivityCard => ({
-  id: node?.id || "",
-  title: node?.title || "",
-  category: node?.category || GqlOpportunityCategory.Activity,
-  feeRequired: node?.feeRequired || 0,
-  location: node?.place?.name || "場所未定",
-  images: node?.images || [],
-  communityId: node?.community?.id || "",
-  hasReservableTicket: node?.isReservableWithTicket || false,
-});
+export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
+  edges
+    .map((edge) => edge.node)
+    .filter((node): node is GqlOpportunity => !!node)
+    .map(presenterActivityCard);
+
+export const presenterActivityCard = (node: GqlOpportunity): ActivityCard => {
+  return {
+    id: node?.id || "",
+    title: node?.title || "",
+    category: node?.category || GqlOpportunityCategory.Activity,
+    feeRequired: node?.feeRequired || 0,
+    location: node?.place?.name || "場所未定",
+    images: node?.images || [],
+    communityId: node?.community?.id || "",
+    hasReservableTicket: node?.isReservableWithTicket || false,
+  };
+};
 
 export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail => {
   const { images, place, slots, articles, createdByUser } = data;
+  const threshold = addDays(new Date(), 7);
+
+  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired);
+  const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
     communityId: data.community?.id || "",
@@ -54,9 +67,11 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
     requiredTicket: data.requiredUtilities?.map((u) => u) || [],
     feeRequired: data.feeRequired || 0,
 
+    isReservable,
+
     place: presenterPlace(place),
     host: presenterOpportunityHost(createdByUser, articles?.[0]),
-    slots: presenterActivitySlot(slots, data.feeRequired),
+    slots: presenterActivitySlot(slots, threshold, data.feeRequired),
 
     recentOpportunities: [],
     reservableTickets: [],
@@ -79,21 +94,28 @@ export function presenterOpportunityHost(
 
 function presenterActivitySlot(
   slots: Maybe<GqlOpportunitySlot[]> | undefined,
+  threshold: Date,
   feeRequired?: Maybe<number> | undefined,
 ): ActivitySlot[] {
   return (
-    slots?.map(
-      (slot): ActivitySlot => ({
+    slots?.map((slot): ActivitySlot => {
+      const startsAtDate = slot?.startsAt ? new Date(slot.startsAt) : null;
+
+      // 7日以内 → false、8日以降 → true
+      const isReservable = startsAtDate ? isAfter(startsAtDate, threshold) : false;
+
+      return {
         id: slot?.id,
         hostingStatus: slot?.hostingStatus,
-        startsAt: slot?.startsAt ? new Date(slot.startsAt).toISOString() : "",
+        startsAt: startsAtDate?.toISOString() || "",
         endsAt: slot?.endsAt ? new Date(slot.endsAt).toISOString() : "",
         capacity: slot?.capacity ?? 0,
         remainingCapacity: slot?.remainingCapacity ?? 0,
         feeRequired: feeRequired ?? null,
         applicantCount: 1,
-      }),
-    ) ?? []
+        isReservable,
+      };
+    }) ?? []
   );
 }
 
@@ -140,6 +162,21 @@ export const sliceActivitiesBySection = (
 
   const N = activityCards.length;
 
+  // Filter activities with images
+  const hasImages = (card: ActivityCard) => card.images && card.images.length > 0;
+
+  // Sort function to put cards with images first
+  const sortByImages = (cards: ActivityCard[]) => {
+    return [...cards].sort((a, b) => {
+      const aHasImages = hasImages(a);
+      const bHasImages = hasImages(b);
+
+      if (aHasImages && !bHasImages) return -1;
+      if (!aHasImages && bHasImages) return 1;
+      return 0;
+    });
+  };
+
   const featuredHead = activityCards[0];
 
   if (N < 10) {
@@ -148,7 +185,8 @@ export const sliceActivitiesBySection = (
     const usedIndices = new Set<number>();
     if (featuredHead) usedIndices.add(0);
 
-    const featuredCards = safe([featuredHead]);
+    // Only include activities with images in featuredCards
+    const featuredCards = safe([featuredHead]).filter(hasImages);
 
     const upcomingCards = safe(
       activityCards.slice(1, 1 + maxUpcoming).map((card, i) => {
@@ -157,21 +195,22 @@ export const sliceActivitiesBySection = (
       }),
     );
 
-    const listCards = safe(activityCards.filter((_, idx) => !usedIndices.has(idx)));
+    // Get remaining cards and sort them - activities with images first
+    const listCards = sortByImages(safe(activityCards.filter((_, idx) => !usedIndices.has(idx))));
 
     return { upcomingCards, featuredCards, listCards };
   }
 
   const featuredTail = activityCards.slice(6, 10);
-  const featuredCards = safe([featuredHead, ...featuredTail]);
+  // Only include activities with images in featuredCards
+  const featuredCards = safe([featuredHead, ...featuredTail]).filter(hasImages);
 
   const upcomingCards = safe(activityCards.slice(1, 6));
 
-  const listCards = safe([
-    ...activityCards.slice(3, 6),
-    ...activityCards.slice(6, 10),
-    ...activityCards.slice(10),
-  ]);
+  // Get all list cards and sort them - activities with images first
+  const listCards = sortByImages(
+    safe([...activityCards.slice(3, 6), ...activityCards.slice(6, 10), ...activityCards.slice(10)]),
+  );
 
   return { upcomingCards, featuredCards, listCards };
 };

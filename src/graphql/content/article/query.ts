@@ -21,7 +21,7 @@ export const GET_ARTICLES = gql`
         cursor
         node {
           ...ArticleFields
-          authors {
+          relatedUsers {
             ...UserFields
           }
         }
@@ -36,7 +36,7 @@ export const GET_ARTICLE = gql`
   query GetArticle($id: ID!, $permission: CheckCommunityPermissionInput!) {
     article(id: $id, permission: $permission) {
       ...ArticleFields
-      authors {
+      relatedUsers {
         ...UserFields
         opportunitiesCreatedByMe {
           ...OpportunityFields
@@ -45,7 +45,7 @@ export const GET_ARTICLE = gql`
           }
         }
       }
-      relatedUsers {
+      authors {
         ...UserFields
       }
     }
@@ -62,7 +62,7 @@ export const GET_ARTICLE = gql`
         cursor
         node {
           ...ArticleFields
-          authors {
+          relatedUsers {
             ...UserFields
           }
         }

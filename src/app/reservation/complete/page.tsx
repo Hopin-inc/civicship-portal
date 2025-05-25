@@ -7,7 +7,6 @@ import React, { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useSearchParams } from "next/navigation";
 import { HeaderConfig } from "@/contexts/HeaderContext";
-import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
@@ -63,6 +62,8 @@ export default function CompletePage() {
             totalPrice={dateTimeInfo.totalPrice}
             pricePerPerson={opportunity.feeRequired ?? 0}
             location={oppotunityDetail?.place}
+            phoneNumber={reservation.createdByUser?.phoneNumber}
+            isReserved={true}
           />
         </div>
       )}

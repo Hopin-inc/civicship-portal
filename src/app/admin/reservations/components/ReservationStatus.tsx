@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 export function ReservationStatus({ status }: { status: GqlReservationStatus }) {
   const statusList = {
     [GqlReservationStatus.Applied]: {
-      label: "予約承認待ち",
+      label: "承認待ち",
       color: "status-pending",
     },
     [GqlReservationStatus.Accepted]: {
@@ -12,17 +12,19 @@ export function ReservationStatus({ status }: { status: GqlReservationStatus }) 
       color: "status-approved",
     },
     [GqlReservationStatus.Canceled]: {
-      label: "キャンセル",
+      label: "キャンセル済み",
       color: "status-cancelled",
     },
     [GqlReservationStatus.Rejected]: {
-      label: "予約却下",
+      label: "却下済み",
       color: "status-rejected",
     },
   };
   const { label, color } = statusList[status];
 
   return (
-    <Badge variant="colored" color={ color }>{ label }</Badge>
+    <Badge variant="colored" color={color}>
+      {label}
+    </Badge>
   );
 }

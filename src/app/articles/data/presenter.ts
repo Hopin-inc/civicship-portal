@@ -8,7 +8,6 @@ import {
   TArticleWithAuthor,
 } from "@/app/articles/data/type";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
-import markdownToTxt from 'markdown-to-txt';
 
 export const presenterArticleCards = (
   edges?: (GqlArticleEdge | null | undefined)[],
@@ -23,8 +22,7 @@ export const presenterArticleCard = (node?: GqlArticle): TArticleCard => ({
   id: node?.id || "",
   category: node?.category || GqlArticleCategory.Interview,
   title: node?.title || "",
-  // TODO FEでintroが入ったら修正
-  introduction: node?.body ? markdownToTxt(node.body) : "",
+  introduction: node?.introduction || "",
   thumbnail: node?.thumbnail || null,
   publishedAt: node?.publishedAt ? new Date(node.publishedAt).toISOString() : "",
 });
@@ -40,9 +38,10 @@ export const presenterArticleWithAuthorList = (
 
 export const presenterArticleWithAuthor = (node?: GqlArticle): TArticleWithAuthor => ({
   ...presenterArticleCard(node),
+  //TODO 型そのものを直した方が良いが応急処置、authorは執筆者なので間違い。阪田の英語間違い。
   author: {
-    name: node?.authors?.[0]?.name || "",
-    image: node?.authors?.[0]?.image || "",
+    name: node?.relatedUsers?.[0]?.name || "",
+    image: node?.relatedUsers?.[0]?.image || "",
   },
 });
 
@@ -51,10 +50,8 @@ export const presenterArticleDetail = (article: GqlArticle): TArticleDetail => {
     id: article.id,
     title: article.title,
     category: article.category,
-    // TODO FEでintroが入ったら修正
-    introduction: article.body || "",
+    introduction: article.introduction || "",
     body: article.body || "",
-
     thumbnail: typeof article.thumbnail === "string" ? article.thumbnail : "",
     publishedAt: article.publishedAt ? new Date(article.publishedAt).toISOString() : "",
 
@@ -62,7 +59,7 @@ export const presenterArticleDetail = (article: GqlArticle): TArticleDetail => {
     relatedUsers: article.relatedUsers?.map(presenterUser) || [],
 
     hostedOpportunitiesByAuthors:
-      article.authors?.flatMap(
+      article.relatedUsers?.flatMap(
         (author) => author.opportunitiesCreatedByMe?.map(presenterActivityCard) ?? [],
       ) ?? [],
     relatedArticles: [],

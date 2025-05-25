@@ -1,7 +1,7 @@
-import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useQuery } from "@apollo/client";
-import { useRef, useMemo } from "react";
-import { GET_RESERVATIONS } from "../graphql/experience/reservation/query";
+import { useMemo, useRef } from "react";
+import { GET_RESERVATIONS } from "@/graphql/experience/reservation/query";
 import { GqlReservationFilterInput } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -20,7 +20,7 @@ export const useReservations = (statusFilter?: string | null) => {
 
   const filterVariables = useMemo<GqlReservationFilterInput>(() => {
     const filter: any = {
-      opportunityOwnerId: user?.id
+      opportunityOwnerId: user?.id,
     };
 
     if (!statusFilter) return filter;
@@ -34,12 +34,7 @@ export const useReservations = (statusFilter?: string | null) => {
     return filter;
   }, [statusFilter, user?.id]);
 
-  const {
-    data,
-    loading,
-    error,
-    fetchMore,
-  } = useQuery(GET_RESERVATIONS, {
+  const { data, loading, error, fetchMore } = useQuery(GET_RESERVATIONS, {
     variables: {
       filter: filterVariables,
       first: 10,
@@ -72,10 +67,7 @@ export const useReservations = (statusFilter?: string | null) => {
             ...prev,
             reservations: {
               ...prev.reservations,
-              edges: [
-                ...prev.reservations.edges,
-                ...fetchMoreResult.reservations.edges,
-              ],
+              edges: [...prev.reservations.edges, ...fetchMoreResult.reservations.edges],
               pageInfo: fetchMoreResult.reservations.pageInfo,
             },
           };

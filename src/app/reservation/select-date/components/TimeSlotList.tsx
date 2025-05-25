@@ -54,7 +54,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                       </div>
                     ) : (
                       <div className="flex flex-col items-end gap-1">
-                        {remainingCapacity <= 3 && remainingCapacity > 0 && (
+                        {remainingCapacity <= 10 && remainingCapacity > 0 && (
                           <span className="text-xs text-primary">
                             定員まで残り{remainingCapacity}名
                           </span>

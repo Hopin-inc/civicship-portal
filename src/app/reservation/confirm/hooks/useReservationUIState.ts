@@ -1,13 +1,18 @@
 import { useState } from "react";
 
 export const useReservationUIState = () => {
-  const [useTickets, setUseTickets] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [useTickets, setUseTickets] = useState(false);
+  const [ageComment, setAgeComment] = useState<string | null>(null); // ★追加
+
+  console.log(ageComment, "ageComment");
 
   return {
-    useTickets,
-    setUseTickets,
     isLoginModalOpen,
     setIsLoginModalOpen,
+    useTickets,
+    setUseTickets,
+    ageComment,
+    setAgeComment, // ★追加
   };
 };
