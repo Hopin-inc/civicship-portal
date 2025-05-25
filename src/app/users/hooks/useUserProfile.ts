@@ -14,7 +14,8 @@ export const useUserProfile = (userId?: string) => {
       withWallets: true,
     },
     skip: !userId,
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-first",
+    nextFetchPolicy: "cache-first",
   });
 
   const userData = useMemo(() => {
