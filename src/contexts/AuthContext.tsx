@@ -309,6 +309,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { errorType, errorMessage } = customEvent.detail;
 
       console.log("Auth error event detected:", customEvent.detail);
+      
+      setIsAuthenticating(false);
 
       toast.error(errorMessage, {
         action:
