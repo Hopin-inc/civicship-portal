@@ -26,13 +26,16 @@ const useAnalyticsUserBinding = () => {
       setUserId(analytics, user.id);
     }
 
-    setSafeUserAttributes({
+    const userAttributes = {
       user_id: user?.id ?? "guest",
       firebase_uid: uid ?? "",
       name: user?.name ?? "",
       phone_verified: isPhoneVerified ? "true" : "false",
       ...getDefaultClientAttributes(),
-    });
+    };
+
+    console.log("[AnalyticsView] setUserProperties", userAttributes);
+    setSafeUserAttributes(userAttributes);
   }, [user, uid, isPhoneVerified, isAuthenticating]);
 };
 
@@ -57,6 +60,13 @@ const useAutoPageView = () => {
   );
 
   useEffect(() => {
+    console.log("[AnalyticsView] logPageView called", {
+      normalizedPath,
+      parsedParams,
+      documentTitle: document.title,
+      analytics,
+    });
+
     logPageView({
       path: normalizedPath,
       title: document.title,
@@ -120,6 +130,7 @@ const logPageView = (options: LogPageViewOptions = {}) => {
     return;
   }
 
+  console.log("[Analytics] logEvent - page_view", enrichedParams);
   logEvent(analytics, "page_view", enrichedParams);
 };
 
