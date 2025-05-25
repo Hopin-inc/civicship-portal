@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../../contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../../components/ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 export function PhoneVerificationForm() {
   const { phoneAuth, uid, user } = useAuth();
@@ -45,13 +45,13 @@ export function PhoneVerificationForm() {
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsTransitioning(true);
-    
+
     if (!phoneAuth.verificationId) {
       toast.error("認証IDがありません。もう一度電話番号を入力してください");
       setIsTransitioning(false);
       return;
     }
-    
+
     try {
       const success = await phoneAuth.verifyPhoneCode(verificationCode);
       if (success) {
