@@ -11,6 +11,7 @@ import {
 import { LIFFLoginResponse } from "@/types/line";
 import retry from "retry";
 import { isRunningInLiff } from "@/utils/liff";
+import { getAnalytics } from "@firebase/analytics";
 
 export { PhoneAuthProvider };
 
@@ -24,6 +25,8 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 auth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
+
+export const analytics = typeof window !== "undefined" ? getAnalytics(app) : undefined;
 
 export const phoneApp = initializeApp(firebaseConfig, "phone-auth-app");
 export const phoneAuth = getAuth(phoneApp);
@@ -209,8 +212,7 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
 
     recaptchaVerifier = new RecaptchaVerifier(phoneAuth, "recaptcha-container", {
       size: isRunningInLiff() ? "normal" : "invisible",
-      callback: () => {
-      },
+      callback: () => {},
       "expired-callback": () => {
         clearRecaptcha();
       },
