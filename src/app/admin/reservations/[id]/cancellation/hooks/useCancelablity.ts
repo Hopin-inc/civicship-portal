@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import dayjs from "dayjs";
 import {
   GqlOpportunitySlotHostingStatus,
@@ -5,21 +6,35 @@ import {
   GqlReservationStatus,
 } from "@/types/graphql";
 
-const isSlotCancelled = (r: GqlReservation): boolean =>
-  r.opportunitySlot?.hostingStatus === GqlOpportunitySlotHostingStatus.Cancelled;
+export const useReservationStatus = (reservation: GqlReservation | null | undefined) => {
+  return useMemo(() => {
+    const slot = reservation?.opportunitySlot;
 
-const isSlotCompleted = (r: GqlReservation): boolean =>
-  r.opportunitySlot?.hostingStatus === GqlOpportunitySlotHostingStatus.Completed;
+    const isSlotCancelled = () => slot?.hostingStatus === GqlOpportunitySlotHostingStatus.Cancelled;
 
-const isSlotActive = (r: GqlReservation): boolean => !isSlotCancelled(r) && !isSlotCompleted(r);
+    const isSlotCompleted = () => slot?.hostingStatus === GqlOpportunitySlotHostingStatus.Completed;
 
-const isAccepted = (r: GqlReservation): boolean =>
-  r.status === GqlReservationStatus.Accepted && isSlotActive(r);
+    const isSlotActive = () => !isSlotCancelled() && !isSlotCompleted();
 
-const isWithin1Day = (r: GqlReservation): boolean =>
-  dayjs(r.opportunitySlot?.startsAt).diff(dayjs(), "hour") < 24;
+    const isAccepted = () =>
+      reservation?.status === GqlReservationStatus.Accepted && isSlotActive();
 
-const canCancelReservation = (r: GqlReservation): boolean => isAccepted(r) && !isWithin1Day(r);
-const cannotCancelReservation = (r: GqlReservation): boolean => isAccepted(r) && isWithin1Day(r);
+    const isApplied = () => reservation?.status === GqlReservationStatus.Applied && isSlotActive();
 
-export { canCancelReservation, cannotCancelReservation };
+    const isWithin1Day = () => dayjs(slot?.startsAt).diff(dayjs(), "hour") < 24;
+
+    const canCancelReservation = () => isAccepted() && !isWithin1Day();
+    const cannotCancelReservation = () => isAccepted() && isWithin1Day();
+
+    return {
+      isSlotCancelled,
+      isSlotCompleted,
+      isSlotActive,
+      isAccepted,
+      isApplied,
+      isWithin1Day,
+      canCancelReservation,
+      cannotCancelReservation,
+    };
+  }, [reservation]);
+};

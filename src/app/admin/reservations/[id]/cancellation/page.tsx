@@ -1,26 +1,15 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useParams } from "next/navigation";
-import { toast } from "sonner";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { useAnalytics } from "@/hooks/analytics/useAnalytics";
-import {
-  GqlOpportunitySlotHostingStatus,
-  GqlReservation,
-  useGetReservationQuery,
-  useOpportunitySlotSetHostingStatusMutation,
-} from "@/types/graphql";
+import { GqlReservation, useGetReservationQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import { CalendarIcon, JapaneseYen, Phone, User } from "lucide-react";
-import { COMMUNITY_ID, displayDuration, displayPhoneNumber } from "@/utils";
+import { displayDuration, displayPhoneNumber } from "@/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  canCancelReservation,
-  cannotCancelReservation,
-} from "@/app/admin/reservations/[id]/cancellation/hooks/useCancelablity";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
 import getReservationStatusMeta from "@/app/admin/reservations/hooks/useGetReservationStatusMeta";
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
@@ -38,6 +27,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import NotFound from "@/app/not-found";
+import { useCancelSlot } from "@/app/admin/reservations/[id]/cancellation/hooks/useCancelSlot";
+import { useCancelState } from "@/app/admin/reservations/[id]/cancellation/hooks/useCancelState";
+import { useReservationStatus } from "@/app/admin/reservations/[id]/cancellation/hooks/useCancelablity";
 
 export default function ReservationCancellationPage() {
   const params = useParams();
@@ -54,13 +46,15 @@ export default function ReservationCancellationPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const DEFAULT_MESSAGE =
-    "誠に恐れ入りますが、やむを得ない事情により本開催を中止させていただきます。ご迷惑をおかけしますことをお詫び申し上げます。";
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [editable, setEditable] = useState(false);
-  const [message, setMessage] = useState(DEFAULT_MESSAGE);
-
-  const track = useAnalytics();
+  const {
+    isSheetOpen,
+    setIsSheetOpen,
+    editable,
+    setEditable,
+    message,
+    setMessage,
+    DEFAULT_MESSAGE,
+  } = useCancelState();
 
   const { data, loading, error, refetch } = useGetReservationQuery({
     variables: { id: id ?? "" },
@@ -69,38 +63,13 @@ export default function ReservationCancellationPage() {
   const reservation: GqlReservation | undefined | null = data?.reservation;
   const opportunity = reservation?.opportunitySlot?.opportunity;
 
-  const [cancelSlot, { loading: cancelLoading }] = useOpportunitySlotSetHostingStatusMutation({
+  const { canCancelReservation, cannotCancelReservation } = useReservationStatus(reservation);
+
+  const { handleCancel, loading: cancelLoading } = useCancelSlot(reservation, opportunity, {
     onCompleted: () => {
-      toast.success("開催を中止しました");
       void refetch();
     },
-    onError: () => {
-      toast.error("中止に失敗しました");
-    },
   });
-
-  const handleCancel = async () => {
-    await cancelSlot({
-      variables: {
-        id: reservation?.opportunitySlot?.id ?? "",
-        input: { status: GqlOpportunitySlotHostingStatus.Cancelled },
-        permission: {
-          opportunityId: opportunity?.id ?? "",
-          communityId: opportunity?.community?.id || COMMUNITY_ID,
-        },
-      },
-    });
-
-    track({
-      name: "cancel_slot",
-      params: {
-        slotId: reservation?.opportunitySlot?.id ?? "",
-        opportunityId: opportunity?.id ?? "",
-        opportunityTitle: opportunity?.title ?? "",
-        category: opportunity?.category ?? "",
-      },
-    });
-  };
 
   if (loading) {
     return (
@@ -220,7 +189,7 @@ export default function ReservationCancellationPage() {
         </p>
       </div>
 
-      {canCancelReservation(reservation) && (
+      {canCancelReservation() && (
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
             <div className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto p-4 bg-background border-t-2 border-b-card space-y-3 min-h-[140px]">
@@ -277,7 +246,7 @@ export default function ReservationCancellationPage() {
         </Sheet>
       )}
 
-      {cannotCancelReservation(reservation) && (
+      {cannotCancelReservation() && (
         <div className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto p-4 bg-background border-t-2 border-b-card space-y-3 min-h-[140px]">
           <Button variant="destructive" disabled className="w-full">
             中止不可
