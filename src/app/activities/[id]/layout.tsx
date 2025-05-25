@@ -23,22 +23,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = res.description ?? res.body;
 
   return {
-    title: res.title,
+    title: `${res.title} | NEO四国88祭`,
     description,
     openGraph: {
       type: "article",
       title: res.title,
       description,
-      images: res.images?.[0]
-        ? [
-            {
-              url: res.images[0],
-              width: 1200,
-              height: 630,
-              alt: res.title,
-            },
-          ]
-        : DEFAULT_OPEN_GRAPH_IMAGE,
+      url: `https://www.neo88.app/activities/${id}`,
+      images:
+        Array.isArray(res.images) && res.images.length > 0
+          ? [
+              {
+                url: res.images[0],
+                width: 1200,
+                height: 630,
+                alt: res.title,
+              },
+            ]
+          : DEFAULT_OPEN_GRAPH_IMAGE,
+    },
+    alternates: {
+      canonical: `https://www.neo88.app/activities/${id}`,
     },
   };
 }

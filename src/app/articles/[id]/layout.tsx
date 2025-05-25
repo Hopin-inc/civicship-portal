@@ -28,6 +28,7 @@ export async function generateMetadata(input: Promise<Props>): Promise<Metadata>
     openGraph: {
       type: "article",
       title: res.title,
+      url: `https://www.neo88.app/articles/${id}`,
       description: res.introduction ?? res.body,
       images: res.thumbnail
         ? [
