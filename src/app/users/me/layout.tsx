@@ -1,11 +1,7 @@
-export default function MyPageLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <main className="min-h-screen bg-background">
-      {children}
-    </main>
-  );
-} 
+import { metadata } from "./metadata";
+
+export { metadata };
+
+export default function MyPageLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}
