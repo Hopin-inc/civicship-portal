@@ -1736,11 +1736,16 @@ export type GqlReservationEdge = GqlEdge & {
 };
 
 export type GqlReservationFilterInput = {
+  and?: InputMaybe<Array<GqlReservationFilterInput>>;
   createdByUserId?: InputMaybe<Scalars["ID"]["input"]>;
+  hostingStatus?: InputMaybe<Array<GqlOpportunitySlotHostingStatus>>;
+  not?: InputMaybe<Array<GqlReservationFilterInput>>;
   opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
   opportunityOwnerId?: InputMaybe<Scalars["ID"]["input"]>;
   opportunitySlotId?: InputMaybe<Scalars["ID"]["input"]>;
-  status?: InputMaybe<GqlReservationStatus>;
+  or?: InputMaybe<Array<GqlReservationFilterInput>>;
+  participationStatus?: InputMaybe<Array<GqlParticipationStatus>>;
+  reservationStatus?: InputMaybe<Array<GqlReservationStatus>>;
 };
 
 export type GqlReservationHistoriesConnection = {
@@ -4048,29 +4053,6 @@ export type GqlGetReservationsQuery = {
   reservations: {
     __typename?: "ReservationsConnection";
     totalCount: number;
-    edges: Array<{
-      __typename?: "ReservationEdge";
-      node?: {
-        __typename?: "Reservation";
-        id: string;
-        status: GqlReservationStatus;
-        createdAt?: Date | null;
-        createdByUser?: {
-          __typename?: "User";
-          id: string;
-          name: string;
-          image?: string | null;
-        } | null;
-        opportunitySlot?: {
-          __typename?: "OpportunitySlot";
-          id: string;
-          startsAt: Date;
-          endsAt: Date;
-          opportunity?: { __typename?: "Opportunity"; id: string; title: string } | null;
-        } | null;
-        participations?: Array<{ __typename?: "Participation"; id: string }> | null;
-      } | null;
-    }>;
     pageInfo: {
       __typename?: "PageInfo";
       startCursor?: string | null;
@@ -4078,6 +4060,56 @@ export type GqlGetReservationsQuery = {
       hasNextPage: boolean;
       hasPreviousPage: boolean;
     };
+    edges: Array<{
+      __typename?: "ReservationEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Reservation";
+        createdAt?: Date | null;
+        id: string;
+        status: GqlReservationStatus;
+        comment?: string | null;
+        createdByUser?: {
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
+          urlFacebook?: string | null;
+          urlInstagram?: string | null;
+          urlX?: string | null;
+        } | null;
+        opportunitySlot?: {
+          __typename?: "OpportunitySlot";
+          id: string;
+          hostingStatus: GqlOpportunitySlotHostingStatus;
+          startsAt: Date;
+          endsAt: Date;
+          opportunity?: {
+            __typename?: "Opportunity";
+            id: string;
+            title: string;
+            category: GqlOpportunityCategory;
+            description: string;
+            publishStatus: GqlPublishStatus;
+            requireApproval: boolean;
+          } | null;
+        } | null;
+        participations?: Array<{
+          __typename?: "Participation";
+          id: string;
+          status: GqlParticipationStatus;
+          reason: GqlParticipationStatusReason;
+          evaluation?: {
+            __typename?: "Evaluation";
+            id: string;
+            status: GqlEvaluationStatus;
+          } | null;
+        }> | null;
+      } | null;
+    }>;
   };
 };
 
@@ -7649,30 +7681,6 @@ export const GetReservationsDocument = gql`
     $filter: ReservationFilterInput
   ) {
     reservations(cursor: $cursor, sort: $sort, first: $first, filter: $filter) {
-      edges {
-        node {
-          id
-          status
-          createdAt
-          createdByUser {
-            id
-            name
-            image
-          }
-          opportunitySlot {
-            id
-            startsAt
-            endsAt
-            opportunity {
-              id
-              title
-            }
-          }
-          participations {
-            id
-          }
-        }
-      }
       pageInfo {
         startCursor
         endCursor
@@ -7680,8 +7688,43 @@ export const GetReservationsDocument = gql`
         hasPreviousPage
       }
       totalCount
+      edges {
+        cursor
+        node {
+          ...ReservationFields
+          createdAt
+          createdByUser {
+            ...UserFields
+          }
+          opportunitySlot {
+            id
+            hostingStatus
+            startsAt
+            endsAt
+            opportunity {
+              id
+              title
+              category
+              description
+              publishStatus
+              requireApproval
+            }
+          }
+          participations {
+            id
+            status
+            reason
+            evaluation {
+              id
+              status
+            }
+          }
+        }
+      }
     }
   }
+  ${ReservationFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
 `;
 
 /**
