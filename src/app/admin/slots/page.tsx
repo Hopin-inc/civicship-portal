@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import Link from "next/link";
 import { CardWrapper } from "@/components/ui/card-wrapper";
@@ -10,6 +10,9 @@ import { useOpportunitySlots } from "@/hooks/useOpportunitySlots";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, Users } from "lucide-react";
 import { displayDuration } from "@/utils";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GqlOpportunitySlot } from "@/types/graphql";
 
 export default function SlotsPage() {
   const headerConfig = useMemo(
@@ -20,13 +23,50 @@ export default function SlotsPage() {
     [],
   );
   useHeaderConfig(headerConfig);
+  const router = useRouter();
 
   const { slots, loading, error, loadMoreRef, hasMore, isLoadingMore } = useOpportunitySlots();
   const today = useMemo(() => {
     const d = new Date();
-    d.setHours(0, 0, 0, 0);
+    d.setHours(0, 0, 0, 0); // 時間を切り捨てて純粋な「日」だけで比較
     return d;
   }, []);
+
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+
+  const [activeTab, setActiveTab] = useState<"past" | "future">(
+    tabParam === "future" ? "future" : "past",
+  );
+
+  useEffect(() => {
+    const newTab = tabParam === "future" ? "future" : "past";
+    if (activeTab !== newTab) {
+      setActiveTab(newTab);
+    }
+  }, [tabParam, activeTab]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as "past" | "future");
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (value === "past") {
+      params.delete("tab"); // default
+    } else {
+      params.set("tab", value);
+    }
+
+    router.push(`/admin/slots?${params.toString()}`);
+  };
+
+  const filteredSlots = useMemo(() => {
+    return slots.filter((slot) => {
+      const startsAtDate = slot.startsAt ? new Date(slot.startsAt) : null;
+      if (!startsAtDate) return false;
+
+      return activeTab === "past" ? startsAtDate <= today : startsAtDate > today;
+    });
+  }, [slots, activeTab, today]);
 
   if (loading && slots.length === 0) {
     return (
@@ -46,12 +86,22 @@ export default function SlotsPage() {
 
   return (
     <div className="p-4">
+      <Tabs
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="sticky p-4 pb-0 z-10 bg-white"
+      >
+        <TabsList className="mb-2">
+          <TabsTrigger value="past">開催済み</TabsTrigger>
+          <TabsTrigger value="future">未開催</TabsTrigger>
+        </TabsList>
+      </Tabs>
       <div className="space-y-4">
-        {slots.length === 0 ? (
+        {filteredSlots.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">開催日程が見つかりません</p>
         ) : (
           <div className="flex flex-col gap-4">
-            {slots.map((slot: any) => {
+            {filteredSlots.map((slot: GqlOpportunitySlot) => {
               const startsAtDate = slot.startsAt ? new Date(slot.startsAt) : null;
               const isFuture = startsAtDate ? startsAtDate > today : false;
 
