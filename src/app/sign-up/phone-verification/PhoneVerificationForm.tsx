@@ -46,13 +46,23 @@ export function PhoneVerificationForm() {
     e.preventDefault();
     setIsTransitioning(true);
     
+    if (!phoneAuth.verificationId) {
+      toast.error("認証IDがありません。もう一度電話番号を入力してください");
+      setIsTransitioning(false);
+      return;
+    }
+    
     try {
       const success = await phoneAuth.verifyPhoneCode(verificationCode);
       if (success) {
         toast.success("電話番号認証が完了しました");
         router.push("/sign-up");
       } else {
-        toast.error("認証コードの検証に失敗しました");
+        if (phoneAuth.phoneVerificationState && !phoneAuth.phoneVerificationState.phoneUid) {
+          toast.error("電話番号認証IDが取得できませんでした");
+        } else {
+          toast.error("認証コードの検証に失敗しました");
+        }
       }
     } catch (error) {
       console.error("Phone verification error:", error);
