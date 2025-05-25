@@ -22,6 +22,11 @@ export default function SlotsPage() {
   useHeaderConfig(headerConfig);
 
   const { slots, loading, error, loadMoreRef, hasMore, isLoadingMore } = useOpportunitySlots();
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
 
   if (loading && slots.length === 0) {
     return (
@@ -47,24 +52,29 @@ export default function SlotsPage() {
         ) : (
           <div className="flex flex-col gap-4">
             {slots.map((slot: any) => {
+              const startsAtDate = slot.startsAt ? new Date(slot.startsAt) : null;
+              const isFuture = startsAtDate ? startsAtDate > today : false;
+
               return (
-                <Link key={slot.id} href={`/admin/slots/${slot.id}`}>
-                  <CardWrapper className="p-4 cursor-pointer" clickable>
+                <Link key={slot.id} href={`/admin/slots/${slot.id}`} tabIndex={isFuture ? -1 : 0}>
+                  <CardWrapper
+                    className={`p-4 ${isFuture ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                    clickable={!isFuture}
+                  >
                     <div className="flex flex-col space-y-3">
-                      {/* Header with title and status badge */}
                       <div className="space-y-1">
-                        <Badge
-                          variant="colored"
-                          color={slot.isFullyEvaluated ? "success" : "danger"}
-                        >
-                          {slot.isFullyEvaluated ? "確定済み" : "要入力"}
-                        </Badge>
+                        {!isFuture && (
+                          <Badge
+                            variant="colored"
+                            color={slot.isFullyEvaluated ? "success" : "danger"}
+                          >
+                            {slot.isFullyEvaluated ? "確定済み" : "要入力"}
+                          </Badge>
+                        )}
                         <h2 className="font-semibold">
                           {slot.opportunity?.title || "無題のイベント"}
                         </h2>
                       </div>
-
-                      {/* Slot information with icons */}
                       <div className="flex flex-col flex-wrap text-body-sm gap-1">
                         <p className="inline-flex items-center gap-1">
                           <CalendarIcon size="16" />
@@ -82,8 +92,6 @@ export default function SlotsPage() {
                 </Link>
               );
             })}
-
-            {/* Infinite scroll loading ref */}
             <div ref={loadMoreRef} className="py-4 flex justify-center">
               {hasMore &&
                 (isLoadingMore ? (
