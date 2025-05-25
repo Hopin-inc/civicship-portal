@@ -38,9 +38,10 @@ export const presenterArticleWithAuthorList = (
 
 export const presenterArticleWithAuthor = (node?: GqlArticle): TArticleWithAuthor => ({
   ...presenterArticleCard(node),
+  //TODO 型そのものを直した方が良いが応急処置、authorは執筆者なので間違い。阪田の英語間違い。
   author: {
-    name: node?.authors?.[0]?.name || "",
-    image: node?.authors?.[0]?.image || "",
+    name: node?.relatedUsers?.[0]?.name || "",
+    image: node?.relatedUsers?.[0]?.image || "",
   },
 });
 
