@@ -3,7 +3,6 @@
 import React, { useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import Link from "next/link";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import useReservations from "@/app/admin/reservations/hooks/useReservations";
@@ -128,66 +127,70 @@ export default function ReservationsPage() {
             <>
               {filteredReservations.map((reservation: GqlReservation) => {
                 const { step, label, variant } = getReservationStatusMeta(reservation);
+                const handleClick = () => {
+                  router.push(`/admin/reservations/${reservation.id}/${step}`);
+                };
 
                 return (
-                  <Link key={reservation.id} href={`/admin/reservations/${reservation.id}/${step}`}>
-                    <Card className="cursor-pointer hover:bg-muted-hover transition-colors">
-                      <CardHeader className="flex flex-row items-center justify-between p-4 gap-3">
-                        {/* 左側：アバター＋名前 */}
-                        <div className="flex items-center gap-3 flex-grow min-w-0">
-                          <Avatar>
-                            <AvatarImage src={reservation.createdByUser?.image || ""} />
-                            <AvatarFallback>
-                              {reservation.createdByUser?.name?.[0] || "U"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <CardTitle className="text-base truncate">
-                            {reservation.createdByUser?.name || "未設定"}
-                          </CardTitle>
-                        </div>
+                  <Card
+                    key={reservation.id}
+                    onClick={handleClick}
+                    className="cursor-pointer hover:bg-muted-hover transition-colors"
+                  >
+                    <CardHeader className="flex flex-row items-center justify-between p-4 gap-3">
+                      <div className="flex items-center gap-3 flex-grow min-w-0">
+                        <Avatar>
+                          <AvatarImage src={reservation.createdByUser?.image || ""} />
+                          <AvatarFallback>
+                            {reservation.createdByUser?.name?.[0] || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <CardTitle className="text-base truncate">
+                          {reservation.createdByUser?.name || "未設定"}
+                        </CardTitle>
+                      </div>
 
-                        {/* 右側：バッジ */}
-                        <div className="flex-shrink-0">
-                          <Badge variant={variant}>{label}</Badge>
-                        </div>
-                      </CardHeader>
+                      <div className="flex-shrink-0">
+                        <Badge variant={variant}>{label}</Badge>
+                      </div>
+                    </CardHeader>
 
-                      <CardContent className="space-y-2 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1 truncate">
-                          <Bookmark size={16} />
-                          <span className="truncate">
-                            {reservation.opportunitySlot?.opportunity?.title}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1 truncate">
-                          <CalendarIcon size={16} />
-                          <span className="truncate">
-                            {reservation.opportunitySlot?.startsAt &&
-                              displayDuration(
-                                reservation.opportunitySlot.startsAt,
-                                reservation.opportunitySlot.endsAt,
-                              )}
-                          </span>
-                        </div>
-                      </CardContent>
+                    <CardContent className="space-y-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1 truncate">
+                        <Bookmark size={16} />
+                        <span className="truncate">
+                          {reservation.opportunitySlot?.opportunity?.title}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 truncate">
+                        <CalendarIcon size={16} />
+                        <span className="truncate">
+                          {reservation.opportunitySlot?.startsAt &&
+                            displayDuration(
+                              reservation.opportunitySlot.startsAt,
+                              reservation.opportunitySlot.endsAt,
+                            )}
+                        </span>
+                      </div>
+                    </CardContent>
 
-                      <CardFooter className="text-xs text-muted-foreground pt-0 flex justify-between items-center">
-                        <span>{displayRelativeTime(reservation.createdAt ?? "")}</span>
-                        {activeTab === "pending" && (
-                          <Button
-                            variant={"secondary"}
-                            size={"sm"}
-                            className={"px-10"}
-                            onClick={(e) => {
-                              e.preventDefault();
-                            }}
-                          >
-                            対応する
-                          </Button>
-                        )}
-                      </CardFooter>
-                    </Card>
-                  </Link>
+                    <CardFooter className="text-xs text-muted-foreground pt-0 flex justify-between items-center">
+                      <span>{displayRelativeTime(reservation.createdAt ?? "")}</span>
+                      {activeTab === "pending" && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="px-10"
+                          onClick={(e) => {
+                            e.stopPropagation(); // 親のクリック遷移を防ぐ
+                            handleClick(); // 明示的に遷移
+                          }}
+                        >
+                          対応する
+                        </Button>
+                      )}
+                    </CardFooter>
+                  </Card>
                 );
               })}
 
