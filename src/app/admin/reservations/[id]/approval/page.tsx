@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +28,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
+import { useReservationStatus } from "../cancellation/hooks/useCancelablity";
+import { useApprovalState } from "@/app/admin/reservations/[id]/approval/hooks/useApprovalState";
 
 export default function ReservationApprovalPage() {
   const params = useParams();
@@ -43,18 +45,25 @@ export default function ReservationApprovalPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const DEFAULT_MESSAGE =
-    "今回は日程や運営の都合により、申込をお受けできかねる結果となりました。またの機会がございましたら、ぜひご参加をご検討いただけますと幸いです。";
-  const [isAcceptSheetOpen, setIsAcceptSheetOpen] = useState(false);
-  const [isRejectSheetOpen, setIsRejectSheetOpen] = useState(false);
-  const [editable, setEditable] = useState(false);
-  const [message, setMessage] = useState(DEFAULT_MESSAGE);
+  const {
+    isAcceptSheetOpen,
+    setIsAcceptSheetOpen,
+    isRejectSheetOpen,
+    setIsRejectSheetOpen,
+    editable,
+    setEditable,
+    message,
+    setMessage,
+    DEFAULT_MESSAGE,
+  } = useApprovalState();
 
   const { data, loading, error, refetch } = useGetReservationQuery({
     variables: { id: id ?? "" },
   });
   const reservation: GqlReservation | undefined | null = data?.reservation;
   const opportunity = reservation?.opportunitySlot?.opportunity;
+
+  const { isApplied } = useReservationStatus(reservation);
 
   const { handleAccept, handleReject, acceptLoading, rejectLoading } = useReservationApproval({
     id: id ?? "",
@@ -86,11 +95,6 @@ export default function ReservationApprovalPage() {
       </div>
     );
   }
-
-  const isSlotCancelled = () => reservation.opportunitySlot?.hostingStatus === "CANCELLED";
-  const isSlotCompleted = () => reservation.opportunitySlot?.hostingStatus === "COMPLETED";
-  const isSlotActive = () => !isSlotCancelled() && !isSlotCompleted();
-  const isApplied = () => reservation.status === "APPLIED" && isSlotActive();
 
   const activityCard = presenterActivityCard(opportunity);
   const participantCount = reservation.participations?.length || 0;
