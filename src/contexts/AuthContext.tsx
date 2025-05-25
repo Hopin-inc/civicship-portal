@@ -80,6 +80,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     data: currentUserData,
     loading: queryLoading,
     refetch,
+    error: queryError,
   } = useCurrentUserQuery({
     fetchPolicy: "no-cache",
   });
@@ -369,6 +370,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         try {
+          if (queryLoading) {
+            console.log('Waiting for existing query to complete...');
+            await new Promise<void>((resolve) => {
+              const checkInterval = setInterval(() => {
+                if (!queryLoading) {
+                  clearInterval(checkInterval);
+                  resolve();
+                }
+              }, 100);
+            });
+          }
+          
+          if (queryError) {
+            console.warn('Previous query error detected:', queryError);
+          }
+          
           const { data } = await retryWithBackoff(
             async () => {
               console.log('Attempting to fetch user data...');
