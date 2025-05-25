@@ -24,7 +24,7 @@ const useAnalyticsUserBinding = () => {
     }
     const userProps = {
       user_id: user?.id ?? "guest",
-      firebase_uid: uid ?? "",
+      user_name: user?.name ?? "未設定",
       phone_verified: isPhoneVerified ? "true" : "false",
     };
 
