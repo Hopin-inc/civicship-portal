@@ -8,7 +8,7 @@ import {
 import { apolloClient } from "@/lib/apollo";
 import { fallbackMetadata } from "@/lib/metadata/notFound";
 import React from "react";
-import { DEFAULT_DESCRIPTION, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
+import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
 
 type Props = {
   params: { id: string };
@@ -23,11 +23,11 @@ export async function generateMetadata(input: Promise<Props>): Promise<Metadata>
 
   return {
     title: res.name,
-    description: res.bio ?? DEFAULT_DESCRIPTION,
+    description: res.bio ?? "",
     openGraph: {
       type: "profile",
       title: res.name,
-      description: res.bio ?? DEFAULT_DESCRIPTION,
+      description: res.bio ?? "",
       images: res.image
         ? [
             {
