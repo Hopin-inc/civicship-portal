@@ -51,6 +51,8 @@ export type OpportunityDetail = CommunityId & {
   requiredApproval: boolean;
   requiredTicket: RequiredUtility[];
 
+  isReservable: boolean;
+
   description: string;
   body: string;
   images: string[];

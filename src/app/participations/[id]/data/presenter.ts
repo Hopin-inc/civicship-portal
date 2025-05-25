@@ -17,6 +17,7 @@ import {
 import { ReservationStatus } from "@/types/participationStatus";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { presenterOpportunityHost } from "@/app/activities/data/presenter";
+import { subDays } from "date-fns";
 
 export const presenterParticipation = (raw: GqlParticipation): ParticipationDetail => {
   if (
@@ -193,5 +194,5 @@ export const getStatusInfo = (status: GqlReservationStatus): ReservationStatus |
 
 export const calculateCancellationDeadline = (startTime?: Date): Date | null => {
   if (!startTime) return null;
-  return new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
+  return subDays(startTime, 7); // ← 7日前
 };
