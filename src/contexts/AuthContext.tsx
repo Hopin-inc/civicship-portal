@@ -66,6 +66,8 @@ type AuthContextType = UserInfo & {
     verifyPhoneCode: (code: string) => Promise<boolean>;
   };
   isPhoneVerified: boolean;
+  isTransitioningToSignup: boolean;
+  resetTransitionState: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -95,6 +97,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [verificationId, setVerificationId] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const [isTransitioningToSignup, setIsTransitioningToSignup] = useState(false);
+
+  const resetTransitionState = useCallback(() => {
+    setIsTransitioningToSignup(false);
+  }, []);
 
   const login = useCallback((userInfo: UserInfo | null) => {
     setUid(userInfo?.uid ?? null);
@@ -166,7 +173,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           });
 
           setIsPhoneVerified(true);
-          toast.success("電話番号認証が完了しました");
+          setIsTransitioningToSignup(true);
           router.push("/sign-up");
           return true;
         } else {
@@ -526,6 +533,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           verifyPhoneCode: verifyPhoneCodeLocal,
         },
         isPhoneVerified,
+        isTransitioningToSignup,
+        resetTransitionState,
       }}
     >
       {children}

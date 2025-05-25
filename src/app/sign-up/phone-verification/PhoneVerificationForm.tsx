@@ -43,7 +43,10 @@ export function PhoneVerificationForm() {
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await phoneAuth.verifyPhoneCode(verificationCode);
+    const success = await phoneAuth.verifyPhoneCode(verificationCode);
+    if (success) {
+      toast.success("電話番号認証が完了しました");
+    }
   };
 
   const formatPhoneNumber = (phone: string): string => {
