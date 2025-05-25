@@ -14,30 +14,6 @@ export const GET_RESERVATIONS = gql`
     $filter: ReservationFilterInput
   ) {
     reservations(cursor: $cursor, sort: $sort, first: $first, filter: $filter) {
-      edges {
-        node {
-          id
-          status
-          createdAt
-          createdByUser {
-            id
-            name
-            image
-          }
-          opportunitySlot {
-            id
-            startsAt
-            endsAt
-            opportunity {
-              id
-              title
-            }
-          }
-          participations {
-            id
-          }
-        }
-      }
       pageInfo {
         startCursor
         endCursor
@@ -45,6 +21,39 @@ export const GET_RESERVATIONS = gql`
         hasPreviousPage
       }
       totalCount
+      edges {
+        cursor
+        node {
+          ...ReservationFields
+          createdAt
+          createdByUser {
+            ...UserFields
+          }
+          opportunitySlot {
+            id
+            hostingStatus
+            startsAt
+            endsAt
+            opportunity {
+              id
+              title
+              category
+              description
+              publishStatus
+              requireApproval
+            }
+          }
+          participations {
+            id
+            status
+            reason
+            evaluation {
+              id
+              status
+            }
+          }
+        }
+      }
     }
   }
 `;
