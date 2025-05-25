@@ -5,8 +5,8 @@ import {
   GqlGetPlaceQuery,
   GqlGetPlaceQueryVariables,
   GqlPlace,
+  GqlPublishStatus,
 } from "@/types/graphql";
-import { presenterPlaceDetail } from "@/app/places/data/presenter";
 import { fallbackMetadata } from "@/lib/metadata/notFound";
 import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
 
@@ -19,7 +19,7 @@ export const generateMetadata = async ({
   const place = await fetchPlace(id);
   if (!place) return fallbackMetadata;
 
-  const placeDetail = presenterPlaceDetail(place);
+  const placeDetail = presenterPlaceDetailForMetadata(place);
 
   return {
     title: `${placeDetail.name} | NEO四国88祭`,
@@ -52,6 +52,29 @@ async function fetchPlace(id: string): Promise<GqlPlace | null> {
 
   return data.place ?? null;
 }
+
+const presenterPlaceDetailForMetadata = (place: GqlPlace) => {
+  const opportunities = place.opportunities ?? [];
+  const publicOpportunities = opportunities.filter(
+    (o) => o.publishStatus === GqlPublishStatus.Public,
+  );
+
+  const firstArticle = place.opportunities
+    ?.flatMap((o) => o.articles ?? [])
+    ?.find((a) => !!a?.introduction); // クライアント関数を使わず article から直接取得
+
+  const opportunityImages = publicOpportunities.flatMap((o) => o.images ?? []);
+
+  const images = Array.from(
+    new Set([place.image, ...opportunityImages].filter((v): v is string => typeof v === "string")),
+  );
+
+  return {
+    name: place.name ?? "不明な場所",
+    bio: firstArticle?.introduction ?? "Coming Soon!",
+    images,
+  };
+};
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
