@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
 import { COMMUNITY_ID } from "@/utils";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 const PRESET_AMOUNTS = [1000000, 3000000, 5000000, 10000000, 30000000, 50000000];
 
@@ -24,6 +25,8 @@ export default function IssuePointPage() {
     [],
   );
   useHeaderConfig(headerConfig);
+
+  const track = useAnalytics();
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -69,6 +72,10 @@ export default function IssuePointPage() {
       });
 
       if (res.success) {
+        track({
+          name: "issue_point",
+          params: { amount },
+        });
         toast.success("ポイントを発行しました");
         router.push("/admin/wallet");
       }

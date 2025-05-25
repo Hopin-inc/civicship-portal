@@ -16,6 +16,7 @@ import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInf
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
 import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
+import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
@@ -42,6 +43,8 @@ export default function ParticipationPage() {
     [],
   );
   useHeaderConfig(headerConfig);
+
+  const track = useAnalytics();
 
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
@@ -76,8 +79,24 @@ export default function ParticipationPage() {
       return;
     }
     const result = await handleCancel(reservationId);
+
     if (result.success) {
       toast.success("予約がキャンセルされました。");
+      if (participation && opportunity && dateTimeInfo) {
+        track({
+          name: "cancel_application",
+          params: {
+            reservationId,
+            opportunityId: opportunity.id,
+            opportunityTitle: opportunity.title,
+            category: opportunity.category,
+            guest: dateTimeInfo.participantCount,
+            feeRequired: opportunity.feeRequired ?? 0,
+            totalFee: dateTimeInfo.totalPrice,
+            scheduledAt: dateTimeInfo.startTime,
+          },
+        });
+      }
       if (refetchRef.current) {
         refetchRef.current();
       }
