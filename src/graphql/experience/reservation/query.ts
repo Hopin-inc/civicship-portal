@@ -62,21 +62,24 @@ export const GET_RESERVATION = gql`
   query GetReservation($id: ID!) {
     reservation(id: $id) {
       ...ReservationFields
-      comment
       createdByUser {
         ...UserFields
-        phoneNumber
       }
       opportunitySlot {
+        isFullyEvaluated
+        numParticipants
+        numEvaluated
         ...OpportunitySlotFields
         opportunity {
           ...OpportunityFields
           slots {
+            isFullyEvaluated
+            numParticipants
+            numEvaluated
             ...OpportunitySlotFields
           }
           community {
-            id
-            name
+            ...CommunityFields
           }
           createdByUser {
             ...UserFields
@@ -88,7 +91,6 @@ export const GET_RESERVATION = gql`
       }
       participations {
         ...ParticipationFields
-        id
       }
     }
   }

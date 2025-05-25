@@ -3783,15 +3783,15 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
   __typename?: "Query";
   opportunitySlot?: {
     __typename?: "OpportunitySlot";
-    isFullyEvaluated?: boolean | null;
-    numParticipants?: number | null;
-    numEvaluated?: number | null;
     id: string;
     hostingStatus: GqlOpportunitySlotHostingStatus;
     startsAt: Date;
     endsAt: Date;
     capacity?: number | null;
     remainingCapacity?: number | null;
+    isFullyEvaluated?: boolean | null;
+    numParticipants?: number | null;
+    numEvaluated?: number | null;
     opportunity?: {
       __typename?: "Opportunity";
       id: string;
@@ -3806,20 +3806,37 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
       feeRequired?: number | null;
       pointsToEarn?: number | null;
       earliestReservableAt?: Date | null;
-      community?: { __typename?: "Community"; id: string; name?: string | null } | null;
+      community?: {
+        __typename?: "Community";
+        id: string;
+        name?: string | null;
+        image?: string | null;
+      } | null;
     } | null;
     reservations?: Array<{
       __typename?: "Reservation";
+      id: string;
+      status: GqlReservationStatus;
+      comment?: string | null;
       participations?: Array<{
         __typename?: "Participation";
         id: string;
+        source?: GqlSource | null;
         status: GqlParticipationStatus;
+        reason: GqlParticipationStatusReason;
+        images?: Array<string> | null;
+        description?: string | null;
         user?: {
           __typename?: "User";
           id: string;
           name: string;
           image?: string | null;
+          bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
+          urlFacebook?: string | null;
+          urlInstagram?: string | null;
+          urlX?: string | null;
         } | null;
         evaluation?: { __typename?: "Evaluation"; id: string; status: GqlEvaluationStatus } | null;
       }> | null;
@@ -4121,23 +4138,26 @@ export type GqlGetReservationQuery = {
   __typename?: "Query";
   reservation?: {
     __typename?: "Reservation";
-    comment?: string | null;
     id: string;
     status: GqlReservationStatus;
+    comment?: string | null;
     createdByUser?: {
       __typename?: "User";
-      phoneNumber?: string | null;
       id: string;
       name: string;
       image?: string | null;
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
+      phoneNumber?: string | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
     } | null;
     opportunitySlot?: {
       __typename?: "OpportunitySlot";
+      isFullyEvaluated?: boolean | null;
+      numParticipants?: number | null;
+      numEvaluated?: number | null;
       id: string;
       hostingStatus: GqlOpportunitySlotHostingStatus;
       startsAt: Date;
@@ -4160,6 +4180,9 @@ export type GqlGetReservationQuery = {
         earliestReservableAt?: Date | null;
         slots?: Array<{
           __typename?: "OpportunitySlot";
+          isFullyEvaluated?: boolean | null;
+          numParticipants?: number | null;
+          numEvaluated?: number | null;
           id: string;
           hostingStatus: GqlOpportunitySlotHostingStatus;
           startsAt: Date;
@@ -4167,7 +4190,12 @@ export type GqlGetReservationQuery = {
           capacity?: number | null;
           remainingCapacity?: number | null;
         }> | null;
-        community?: { __typename?: "Community"; id: string; name?: string | null } | null;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
+        } | null;
         createdByUser?: {
           __typename?: "User";
           id: string;
@@ -7163,26 +7191,27 @@ export type GetOpportunitySlotQueryResult = Apollo.QueryResult<
 export const GetOpportunitySlotWithParticipationsDocument = gql`
   query GetOpportunitySlotWithParticipations($id: ID!) {
     opportunitySlot(id: $id) {
-      ...OpportunitySlotFields
+      id
+      hostingStatus
+      startsAt
+      endsAt
+      capacity
+      remainingCapacity
       isFullyEvaluated
       numParticipants
       numEvaluated
       opportunity {
         ...OpportunityFields
         community {
-          id
-          name
+          ...CommunityFields
         }
       }
       reservations {
+        ...ReservationFields
         participations {
-          id
-          status
+          ...ParticipationFields
           user {
-            id
-            name
-            image
-            currentPrefecture
+            ...UserFields
           }
           evaluation {
             id
@@ -7192,8 +7221,11 @@ export const GetOpportunitySlotWithParticipationsDocument = gql`
       }
     }
   }
-  ${OpportunitySlotFieldsFragmentDoc}
   ${OpportunityFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
+  ${ReservationFieldsFragmentDoc}
+  ${ParticipationFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
 `;
 
 /**
@@ -7792,21 +7824,24 @@ export const GetReservationDocument = gql`
   query GetReservation($id: ID!) {
     reservation(id: $id) {
       ...ReservationFields
-      comment
       createdByUser {
         ...UserFields
-        phoneNumber
       }
       opportunitySlot {
+        isFullyEvaluated
+        numParticipants
+        numEvaluated
         ...OpportunitySlotFields
         opportunity {
           ...OpportunityFields
           slots {
+            isFullyEvaluated
+            numParticipants
+            numEvaluated
             ...OpportunitySlotFields
           }
           community {
-            id
-            name
+            ...CommunityFields
           }
           createdByUser {
             ...UserFields
@@ -7818,7 +7853,6 @@ export const GetReservationDocument = gql`
       }
       participations {
         ...ParticipationFields
-        id
       }
     }
   }
@@ -7826,6 +7860,7 @@ export const GetReservationDocument = gql`
   ${UserFieldsFragmentDoc}
   ${OpportunitySlotFieldsFragmentDoc}
   ${OpportunityFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
   ${PlaceFieldsFragmentDoc}
   ${ParticipationFieldsFragmentDoc}
 `;
