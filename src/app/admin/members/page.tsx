@@ -138,33 +138,35 @@ export default function MembersPage() {
 
       {pendingRoleChange && (
         <Dialog open onOpenChange={(open) => !open && setPendingRoleChange(null)}>
-          <DialogContent>
+          <DialogContent className="w-[90vw] max-w-[400px] rounded-sm">
             <DialogHeader>
-              <DialogTitle>権限変更の確認</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-left text-body-sm font-bold pb-2">
+                権限の変更を確定しますか？
+              </DialogTitle>
+              <DialogDescription className="text-left">
                 <strong className="px-1">{pendingRoleChange.userName}</strong>
                 の権限を
                 <strong className="px-1">{roleLabels[pendingRoleChange.newRole]}</strong>
-                に変更しますが、よろしいですか？
+                に変更します。よろしいですか？
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
+            <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-2">
               <DialogClose asChild>
-                <Button variant="tertiary" size="sm">
-                  キャンセル
+                <Button variant="tertiary" className="w-full py-4">
+                  やめる
                 </Button>
               </DialogClose>
               <Button
                 variant="primary"
-                size="sm"
                 onClick={() => {
                   const mutate = roleMutationMap[pendingRoleChange.newRole];
                   if (mutate) void handleMutation(mutate, pendingRoleChange.userId);
                   setPendingRoleChange(null);
                 }}
                 disabled={isLoading}
+                className="w-full py-4"
               >
-                {isLoading ? "変更中..." : "変更を確定"}
+                {isLoading ? "変更中..." : "権限を変更"}
               </Button>
             </DialogFooter>
           </DialogContent>

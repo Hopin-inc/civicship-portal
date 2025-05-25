@@ -5,9 +5,7 @@ import { useActivities } from "@/app/activities/hooks/useActivities";
 import ActivitiesFeaturedSection from "@/app/activities/components/FeaturedSection/FeaturedSection";
 import ActivitiesListSection from "@/app/activities/components/ListSection/ListSection";
 import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
-import { GqlOpportunity, GqlOpportunityEdge } from "@/types/graphql";
-import { ActivityCard } from "@/app/activities/data/type";
-import { presenterActivityCard, sliceActivitiesBySection } from "@/app/activities/data/presenter";
+import { mapOpportunityCards, sliceActivitiesBySection } from "@/app/activities/data/presenter";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import EmptyState from "@/components/shared/EmptyState";
@@ -66,9 +64,3 @@ export default function ActivitiesPage() {
     </div>
   );
 }
-
-const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
-  edges
-    .map((edge) => edge.node)
-    .filter((node): node is GqlOpportunity => !!node)
-    .map(presenterActivityCard);

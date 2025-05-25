@@ -34,7 +34,7 @@ export const useReservationDateHandler = ({
       const params = buildReservationParams(opportunityId, communityId, slot, selectedGuests);
       router.push(`/reservation/confirm?${params.toString()}`);
     },
-    [opportunityId, communityId, selectedGuests, selectedDate, setSelectedDate],
+    [opportunityId, communityId, selectedGuests, selectedDate, setSelectedDate, router],
   );
 
   return {

@@ -13,7 +13,7 @@ export function usePreloadImages(urls: string[]): boolean {
 
     urls.forEach((url) => {
       const img = new Image();
-      img.src = url;
+      img.crossOrigin = "anonymous"; // Add crossOrigin attribute
       img.onload = () => {
         completed += 1;
         if (completed === total) setLoaded(true);
@@ -22,6 +22,7 @@ export function usePreloadImages(urls: string[]): boolean {
         completed += 1;
         if (completed === total) setLoaded(true); // ignore error
       };
+      img.src = url;
     });
   }, [urls]);
 

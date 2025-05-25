@@ -3,15 +3,25 @@
 import React from "react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { Button } from "@/components/ui/button";
-import { ParticipationUIStatus } from "@/app/participations/[id]/page";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ImagePlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ParticipationActionsProps {
   cancellationDeadline: Date | null;
   isCancellable: boolean;
   isAfterParticipation: boolean;
   onCancel?: () => void;
+  isCancelling?: boolean;
 }
 
 const ParticipationActions: React.FC<ParticipationActionsProps> = ({
@@ -19,6 +29,7 @@ const ParticipationActions: React.FC<ParticipationActionsProps> = ({
   isCancellable,
   isAfterParticipation,
   onCancel,
+  isCancelling,
 }) => {
   const renderMessage = () => {
     if (isAfterParticipation) {
@@ -51,9 +62,38 @@ const ParticipationActions: React.FC<ParticipationActionsProps> = ({
 
     if (isCancellable) {
       return (
-        <Button variant="destructive" className="shrink-0 px-6" onClick={onCancel}>
-          予約をキャンセル
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="destructive" className="shrink-0 px-6">
+              申込をキャンセル
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="w-[90vw] max-w-[400px] rounded-sm">
+            <DialogHeader>
+              <DialogTitle className={"text-left text-body-sm font-bold pb-2"}>
+                申込をキャンセルして、案内人にお知らせしますか？
+              </DialogTitle>
+              <DialogDescription className={"text-left"}>
+                キャンセルが完了すると、案内人に通知が送られます。この操作は元に戻せません。
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-2">
+              <DialogClose asChild>
+                <Button variant="tertiary" className="w-full py-4">
+                  やめる
+                </Button>
+              </DialogClose>
+              <Button
+                variant="destructive"
+                onClick={onCancel}
+                disabled={isCancelling}
+                className="w-full py-4"
+              >
+                {isCancelling ? "キャンセル中..." : "キャンセルを送信"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       );
     }
 
