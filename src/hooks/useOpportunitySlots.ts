@@ -1,8 +1,7 @@
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { useQuery } from "@apollo/client";
-import { useRef, useMemo } from 'react';
-import { GET_OPPORTUNITY_SLOTS } from "@/graphql/experience/opportunitySlot/query";
+import { useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGetOpportunitySlotsQuery } from "@/types/graphql";
 
 export interface UseOpportunitySlotsResult {
   slots: any[];
@@ -17,23 +16,21 @@ export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
   const now = useMemo(() => new Date(), []);
   const isLoadingMore = useRef(false);
 
-  const {
-    data,
-    loading,
-    error,
-    fetchMore,
-  } = useQuery(GET_OPPORTUNITY_SLOTS, {
+  const { data, loading, error, fetchMore } = useGetOpportunitySlotsQuery({
     variables: {
       filter: {
         dateRange: {
-          lte: now.toISOString(),
+          lte: now,
         },
       },
       first: 10,
     },
   });
 
-  const opportunitySlots = data?.opportunitySlots || { edges: [], pageInfo: { hasNextPage: false } };
+  const opportunitySlots = data?.opportunitySlots || {
+    edges: [],
+    pageInfo: { hasNextPage: false, endCursor: null },
+  };
   const slots = opportunitySlots.edges?.map((edge: any) => edge.node) || [];
   const endCursor = opportunitySlots.pageInfo?.endCursor;
   const hasNextPage = opportunitySlots.pageInfo?.hasNextPage ?? false;
@@ -62,18 +59,21 @@ export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
           }
 
           const existingSlotIds = new Set(
-            prev.opportunitySlots.edges.map((edge: any) => edge.node.id)
+            prev.opportunitySlots?.edges?.map((edge: any) => edge.node.id),
           );
 
-          const newEdges = fetchMoreResult.opportunitySlots.edges.filter(
-            (edge: any) => !existingSlotIds.has(edge.node.id)
+          const newEdges = fetchMoreResult.opportunitySlots?.edges?.filter(
+            (edge: any) => !existingSlotIds.has(edge.node.id),
           );
+
+          const safePrevEdges = prev.opportunitySlots?.edges ?? [];
+          const safeNewEdges = newEdges ?? [];
 
           return {
             ...prev,
             opportunitySlots: {
               ...prev.opportunitySlots,
-              edges: [...prev.opportunitySlots.edges, ...newEdges],
+              edges: [...safePrevEdges, ...safeNewEdges],
               pageInfo: fetchMoreResult.opportunitySlots.pageInfo,
             },
           };
@@ -81,7 +81,7 @@ export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
       });
     } catch (error) {
       isLoadingMore.current = false;
-      console.error('Error fetching more slots:', error);
+      console.error("Error fetching more slots:", error);
     }
   };
 
