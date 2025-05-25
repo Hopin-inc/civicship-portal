@@ -16,6 +16,7 @@ import {
   DEFAULT_OPEN_GRAPH,
   DEFAULT_TITLE,
 } from "@/lib/metadata/defalut";
+import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -43,6 +44,7 @@ const RootLayout = ({
               <AuthProvider>
                 <HeaderProvider>
                   <LoadingProvider>
+                    <AnalyticsProvider />
                     <MainContent>{children}</MainContent>
                     <Toaster richColors className="mx-8" />
                   </LoadingProvider>

@@ -11,6 +11,7 @@ import {
 import { LIFFLoginResponse } from "@/types/line";
 import retry from "retry";
 import { isRunningInLiff } from "@/utils/liff";
+import { Analytics, getAnalytics, isSupported } from "@firebase/analytics";
 
 export { PhoneAuthProvider };
 
@@ -24,6 +25,30 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 auth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
+
+let analytics: Analytics | undefined;
+
+const isBrowser = typeof window !== "undefined";
+const isAnalyticsEnabled = isBrowser && process.env.NODE_ENV === "production";
+
+if (isAnalyticsEnabled) {
+  isSupported()
+    .then((supported) => {
+      if (supported) {
+        analytics = getAnalytics(app);
+        console.log(`✅ Analytics initialized (env: ${process.env.NODE_ENV})`);
+      } else {
+        console.warn("⚠️ Analytics not supported in this browser.");
+      }
+    })
+    .catch((e) => {
+      console.error("❌ Error initializing Analytics:", e);
+    });
+} else {
+  console.log(`🚫 Analytics disabled (env: ${process.env.NODE_ENV})`);
+}
+
+export { analytics };
 
 export const phoneApp = initializeApp(firebaseConfig, "phone-auth-app");
 export const phoneAuth = getAuth(phoneApp);
@@ -209,8 +234,7 @@ export const startPhoneNumberVerification = async (phoneNumber: string): Promise
 
     recaptchaVerifier = new RecaptchaVerifier(phoneAuth, "recaptcha-container", {
       size: isRunningInLiff() ? "normal" : "invisible",
-      callback: () => {
-      },
+      callback: () => {},
       "expired-callback": () => {
         clearRecaptcha();
       },
