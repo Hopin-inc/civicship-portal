@@ -51,14 +51,18 @@ const useAutoPageView = () => {
     [entityId, queryParams],
   );
 
+  const parsedParams = useMemo(
+    () => ({ ...(entityId ? { entityId } : {}), ...queryParams }),
+    [entityId, queryParams],
+  );
+
   useEffect(() => {
-    const parsedParams = JSON.parse(paramsJson);
     logPageView({
       path: normalizedPath,
       title: document.title,
       ...parsedParams,
     });
-  }, [normalizedPath, paramsJson]);
+  }, [normalizedPath, parsedParams]);
 };
 
 // ---------------- 共通ユーティリティ群 ----------------
