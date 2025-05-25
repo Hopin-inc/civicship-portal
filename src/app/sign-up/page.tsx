@@ -3,8 +3,7 @@
 import { SignUpForm } from "@/app/sign-up/components/SignUpForm";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
-import React from "react";
+import React, { useEffect } from "react";
 
 const RegisterAccount: React.FC = () => {
   const { isTransitioningToSignup, resetTransitionState } = useAuth();
