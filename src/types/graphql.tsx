@@ -3170,7 +3170,7 @@ export type GqlGetArticlesQuery = {
         category: GqlArticleCategory;
         publishStatus: GqlPublishStatus;
         publishedAt?: Date | null;
-        authors?: Array<{
+        relatedUsers?: Array<{
           __typename?: "User";
           id: string;
           name: string;
@@ -3204,7 +3204,7 @@ export type GqlGetArticleQuery = {
     category: GqlArticleCategory;
     publishStatus: GqlPublishStatus;
     publishedAt?: Date | null;
-    authors?: Array<{
+    relatedUsers?: Array<{
       __typename?: "User";
       id: string;
       name: string;
@@ -3250,7 +3250,7 @@ export type GqlGetArticleQuery = {
         } | null;
       }> | null;
     }> | null;
-    relatedUsers?: Array<{
+    authors?: Array<{
       __typename?: "User";
       id: string;
       name: string;
@@ -3286,7 +3286,7 @@ export type GqlGetArticleQuery = {
         category: GqlArticleCategory;
         publishStatus: GqlPublishStatus;
         publishedAt?: Date | null;
-        authors?: Array<{
+        relatedUsers?: Array<{
           __typename?: "User";
           id: string;
           name: string;
@@ -6190,7 +6190,7 @@ export const GetArticlesDocument = gql`
         cursor
         node {
           ...ArticleFields
-          authors {
+          relatedUsers {
             ...UserFields
           }
         }
@@ -6261,7 +6261,7 @@ export const GetArticleDocument = gql`
   query GetArticle($id: ID!, $permission: CheckCommunityPermissionInput!) {
     article(id: $id, permission: $permission) {
       ...ArticleFields
-      authors {
+      relatedUsers {
         ...UserFields
         opportunitiesCreatedByMe {
           ...OpportunityFields
@@ -6270,7 +6270,7 @@ export const GetArticleDocument = gql`
           }
         }
       }
-      relatedUsers {
+      authors {
         ...UserFields
       }
     }
@@ -6286,7 +6286,7 @@ export const GetArticleDocument = gql`
         cursor
         node {
           ...ArticleFields
-          authors {
+          relatedUsers {
             ...UserFields
           }
         }

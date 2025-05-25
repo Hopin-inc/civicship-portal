@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
 import React, { useEffect, useMemo } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useLoading } from "@/hooks/useLoading";
 import { GqlSortDirection as SortDirection, useGetArticlesQuery } from "@/types/graphql";
-import { presenterArticleWithAuthorList, } from "@/app/articles/data/presenter";
-import {  TArticleWithAuthor } from "@/app/articles/data/type";
+import { presenterArticleWithAuthorList } from "@/app/articles/data/presenter";
+import { TArticleWithAuthor } from "@/app/articles/data/type";
 
 export const ARTICLES_PER_PAGE = 10;
 
@@ -35,6 +35,8 @@ export const useArticles = (): UseArticlesResult => {
     return data?.articles?.edges ? presenterArticleWithAuthorList(data.articles.edges) : [];
   }, [data]);
 
+  console.log(articles);
+
   const hasMore = data?.articles.pageInfo.hasNextPage || false;
 
   const handleLoadMore = async () => {
@@ -53,10 +55,7 @@ export const useArticles = (): UseArticlesResult => {
           ...prev,
           articles: {
             ...prev.articles,
-            edges: [
-              ...(prev.articles.edges ?? []),
-              ...(fetchMoreResult.articles.edges ?? [])
-            ],
+            edges: [...(prev.articles.edges ?? []), ...(fetchMoreResult.articles.edges ?? [])],
             pageInfo: fetchMoreResult.articles.pageInfo,
           },
         };
