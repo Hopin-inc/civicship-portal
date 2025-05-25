@@ -58,7 +58,7 @@ export function PhoneVerificationForm() {
         toast.success("電話番号認証が完了しました");
         router.push("/sign-up");
       } else {
-        if (phoneAuth.phoneVerificationState && !phoneAuth.phoneVerificationState.phoneUid) {
+        if (!phoneAuth.phoneUid) {
           toast.error("電話番号認証IDが取得できませんでした");
         } else {
           toast.error("認証コードの検証に失敗しました");
