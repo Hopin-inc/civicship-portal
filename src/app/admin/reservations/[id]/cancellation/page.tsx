@@ -55,7 +55,7 @@ export default function ReservationCancellationPage() {
   useHeaderConfig(headerConfig);
 
   const DEFAULT_MESSAGE =
-    "日程の都合により開催を中止とさせていただきます。ご理解のほどお願いいたします。";
+    "誠に恐れ入りますが、やむを得ない事情により本開催を中止させていただきます。ご迷惑をおかけしますことをお詫び申し上げます。";
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editable, setEditable] = useState(false);
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
@@ -237,7 +237,7 @@ export default function ReservationCancellationPage() {
             <SheetHeader className="text-left pb-6">
               <SheetTitle>開催を中止してよろしいですか？</SheetTitle>
               <SheetDescription>
-                開催を中止すると参加者に通知され、あとから取り消すことはできません。
+                開催を中止すると予約者に通知され、あとから取り消すことはできません。
               </SheetDescription>
             </SheetHeader>
 
