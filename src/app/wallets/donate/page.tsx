@@ -11,10 +11,12 @@ import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
 import UserSelectStep from "@/app/admin/wallet/grant/components/UserSelectStep";
+import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 export default function DonatePointPage() {
   const router = useRouter();
   const { user: currentUser } = useAuth();
+  const track = useAnalytics();
 
   const searchParams = useSearchParams();
   const currentPoint = Number(searchParams.get("currentPoint") ?? "0");
@@ -69,6 +71,21 @@ export default function DonatePointPage() {
       });
 
       if (res.success) {
+        track({
+          name: "donate_point",
+          params: {
+            fromUser: {
+              userId: currentUser?.id ?? "unknown",
+              name: currentUser?.name ?? "未設定",
+            },
+            toUser: {
+              userId: selectedUser.id,
+              name: selectedUser.name ?? "未設定",
+            },
+            amount,
+          },
+        });
+
         toast.success(`+${amount.toLocaleString()} pt をあげました`);
         router.push("/wallets");
       } else {

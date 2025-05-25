@@ -20,14 +20,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const res = await fetchOpportunity(id, COMMUNITY_ID);
 
   if (!res) return fallbackMetadata;
+  const description = res.description ?? res.body;
 
   return {
     title: res.title,
-    description: res.description ?? res.body,
+    description,
     openGraph: {
       type: "article",
       title: res.title,
-      description: res.description ?? res.body,
+      description,
       images: res.images?.[0]
         ? [
             {

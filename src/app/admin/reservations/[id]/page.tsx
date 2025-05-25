@@ -44,6 +44,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 export default function ReservationDetailPage() {
   const params = useParams();
@@ -58,6 +59,8 @@ export default function ReservationDetailPage() {
     [],
   );
   useHeaderConfig(headerConfig);
+
+  const track = useAnalytics();
 
   const { data, loading, error, refetch } = useQuery(GET_RESERVATION, {
     variables: { id },
@@ -92,11 +95,30 @@ export default function ReservationDetailPage() {
         variables: {
           id,
           permission: {
-            opportunityId: data?.reservation?.opportunitySlot?.opportunity?.id,
-            communityId: data?.reservation?.opportunitySlot?.opportunity?.community?.id || "neo88",
+            opportunityId: opportunity?.id,
+            communityId: opportunity?.community?.id || "neo88",
           },
         },
       });
+
+      if (reservation && opportunity) {
+        track({
+          name: "accept_application",
+          params: {
+            reservationId: reservation.id,
+            opportunityId: opportunity.id,
+            opportunityTitle: opportunity.title,
+            category: opportunity.category,
+            guest: reservation.participations?.length ?? 0,
+            feeRequired: opportunity.feeRequired ?? 0,
+            totalFee: (opportunity.feeRequired ?? 0) * (reservation.participations?.length ?? 0),
+            scheduledAt:
+              reservation.opportunitySlot?.startsAt instanceof Date
+                ? reservation.opportunitySlot.startsAt.toISOString()
+                : (reservation.opportunitySlot?.startsAt ?? ""),
+          },
+        });
+      }
     } catch (e) {}
   };
 
@@ -104,16 +126,26 @@ export default function ReservationDetailPage() {
     try {
       await cancelSlot({
         variables: {
-          id: data?.reservation?.opportunitySlot?.id,
-          input: {
-            status: "CANCELLED",
-          },
+          id: reservation?.opportunitySlot?.id,
+          input: { status: "CANCELLED" },
           permission: {
-            opportunityId: data?.reservation?.opportunitySlot?.opportunity?.id,
-            communityId: data?.reservation?.opportunitySlot?.opportunity?.community?.id || "neo88",
+            opportunityId: opportunity?.id,
+            communityId: opportunity?.community?.id || "neo88",
           },
         },
       });
+
+      if (reservation && opportunity) {
+        track({
+          name: "cancel_slot",
+          params: {
+            slotId: reservation.opportunitySlot?.id ?? "",
+            opportunityId: opportunity.id,
+            opportunityTitle: opportunity.title,
+            category: opportunity.category,
+          },
+        });
+      }
     } catch (e) {}
   };
 
@@ -137,11 +169,31 @@ export default function ReservationDetailPage() {
           id,
           input: { comment: rejectComment },
           permission: {
-            opportunityId: data?.reservation?.opportunitySlot?.opportunity?.id,
+            opportunityId: opportunity?.id,
             communityId: COMMUNITY_ID,
           },
         },
       });
+
+      if (reservation && opportunity) {
+        track({
+          name: "reject_application",
+          params: {
+            reservationId: reservation.id,
+            opportunityId: opportunity.id,
+            opportunityTitle: opportunity.title,
+            category: opportunity.category,
+            guest: reservation.participations?.length ?? 0,
+            feeRequired: opportunity.feeRequired ?? 0,
+            totalFee: (opportunity.feeRequired ?? 0) * (reservation.participations?.length ?? 0),
+            scheduledAt:
+              reservation.opportunitySlot?.startsAt instanceof Date
+                ? reservation.opportunitySlot.startsAt.toISOString()
+                : (reservation.opportunitySlot?.startsAt ?? ""),
+          },
+        });
+      }
+
       setIsRejectDialogOpen(false);
       setRejectComment("");
     } catch (e) {}

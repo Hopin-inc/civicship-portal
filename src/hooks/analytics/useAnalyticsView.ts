@@ -1,4 +1,3 @@
-// src/hooks/use-analytics-view.ts
 "use client";
 
 import { analytics } from "@/lib/firebase";
@@ -6,8 +5,6 @@ import { logEvent, setUserId, setUserProperties } from "firebase/analytics";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useMemo } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-
-let currentUserAttributes: Record<string, string> = {};
 
 export const useAnalyticsView = () => {
   useAnalyticsUserBinding();
@@ -25,17 +22,13 @@ const useAnalyticsUserBinding = () => {
     if (user?.id) {
       setUserId(analytics, user.id);
     }
-
-    const userAttributes = {
+    const userProps = {
       user_id: user?.id ?? "guest",
-      firebase_uid: uid ?? "",
-      name: user?.name ?? "",
+      user_name: user?.name ?? "未設定",
       phone_verified: isPhoneVerified ? "true" : "false",
-      ...getDefaultClientAttributes(),
     };
 
-    console.log("[AnalyticsView] setUserProperties", userAttributes);
-    setSafeUserAttributes(userAttributes);
+    setUserProperties(analytics, userProps);
   }, [user, uid, isPhoneVerified, isAuthenticating]);
 };
 
@@ -49,24 +42,12 @@ const useAutoPageView = () => {
     return normalizeUrlForLogging(pathname, searchParams);
   }, [pathname, searchParams]);
 
-  const paramsJson = useMemo(
-    () => JSON.stringify({ ...(entityId ? { entityId } : {}), ...queryParams }),
-    [entityId, queryParams],
-  );
-
   const parsedParams = useMemo(
     () => ({ ...(entityId ? { entityId } : {}), ...queryParams }),
     [entityId, queryParams],
   );
 
   useEffect(() => {
-    console.log("[AnalyticsView] logPageView called", {
-      normalizedPath,
-      parsedParams,
-      documentTitle: document.title,
-      analytics,
-    });
-
     logPageView({
       path: normalizedPath,
       title: document.title,
@@ -85,28 +66,12 @@ const setSafeUserAttributes = (rawProps: Record<string, any>) => {
     }
   }
 
-  const defaultAttrs = getDefaultClientAttributes();
-  const merged = { ...cleanedProps, ...defaultAttrs };
-  currentUserAttributes = merged;
-
   if (!analytics) {
     console.warn("[Analytics] not initialized: skip setUserProperties");
     return;
   }
 
-  setUserProperties(analytics, merged);
-};
-
-const getDefaultClientAttributes = (): Record<string, string> => {
-  if (typeof window === "undefined" || typeof navigator === "undefined") return {};
-
-  return {
-    screen_width: String(window.innerWidth),
-    screen_height: String(window.innerHeight),
-    device_pixel_ratio: String(window.devicePixelRatio),
-    language: navigator.language || "",
-    user_agent: navigator.userAgent || "",
-  };
+  setUserProperties(analytics, cleanedProps);
 };
 
 type LogPageViewOptions = {
@@ -118,20 +83,20 @@ type LogPageViewOptions = {
 const logPageView = (options: LogPageViewOptions = {}) => {
   const { path, title, ...restParams } = options;
 
-  const enrichedParams = {
-    ...currentUserAttributes,
-    page_location: path || window.location.href,
-    page_title: title || document.title,
-    ...restParams,
-  };
-
   if (!analytics) {
     console.warn("[Analytics] not initialized: skip page_view");
     return;
   }
 
-  console.log("[Analytics] logEvent - page_view", enrichedParams);
-  logEvent(analytics, "page_view", enrichedParams);
+  const eventParams = {
+    page_location: window.location.href,
+    page_title: title || document.title,
+    normalized_path: path,
+    ...restParams,
+  };
+
+  console.log("[Analytics] logEvent - page_view", eventParams);
+  logEvent(analytics, "page_view", eventParams);
 };
 
 const cuidRegex = /^c[a-z0-9]{20,}$/;

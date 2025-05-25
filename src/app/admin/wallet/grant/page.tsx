@@ -10,9 +10,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
+import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 export default function GrantPointStepperPage() {
   const router = useRouter();
+  const track = useAnalytics();
 
   const searchParams = useSearchParams();
   const currentPoint = Number(searchParams.get("currentPoint") ?? "0");
@@ -56,6 +58,17 @@ export default function GrantPointStepperPage() {
       });
 
       if (res.success) {
+        track({
+          name: "grant_point",
+          params: {
+            toUser: {
+              userId: selectedUser.id,
+              name: selectedUser.name ?? "未設定",
+            },
+            amount,
+          },
+        });
+
         toast.success(`+${amount.toLocaleString()} pt を渡しました`);
         router.push("/admin/wallet");
       } else {
