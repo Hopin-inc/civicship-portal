@@ -2,7 +2,7 @@ import { useGetReservationQuery } from "@/types/graphql";
 
 export const useReservationComplete = (reservationId: string | null) => {
   const { data, loading, error, refetch } = useGetReservationQuery({
-    variables: { id: reservationId! },
+    variables: { id: reservationId!, includeHostArticle: true },
     skip: !reservationId,
     fetchPolicy: "network-only",
     errorPolicy: "all",
