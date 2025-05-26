@@ -8,7 +8,7 @@ import { GqlRole } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export default function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { user: currentUser, isAuthenticating: loading } = useAuth();
+  const { user: currentUser, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
