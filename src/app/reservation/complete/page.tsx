@@ -13,7 +13,6 @@ import ErrorState from "@/components/shared/ErrorState";
 import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
 import ArticleCard from "@/app/articles/components/Card";
-import { useArticles } from "@/app/articles/hooks/useArticles";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 export default function CompletePage() {
@@ -31,9 +30,19 @@ export default function CompletePage() {
   const searchParams = useSearchParams();
   const opportunityId = searchParams.get("id");
   const reservationId = searchParams.get("reservation_id");
+  const guest = searchParams.get("guests");
+  const participationCount = guest ? parseInt(guest) : 1;
 
-  const { reservation, opportunity, dateTimeInfo, sameStateActivities, loading, error, refetch } =
-    useCompletePageViewModel(opportunityId, reservationId);
+  const {
+    reservation,
+    opportunity,
+    dateTimeInfo,
+    articleCard,
+    sameStateActivities,
+    loading,
+    error,
+    refetch,
+  } = useCompletePageViewModel(opportunityId, reservationId);
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
@@ -60,11 +69,6 @@ export default function CompletePage() {
   // #NOTE: query でまとめて取得したいが、一時的対応
   const { opportunity: oppotunityDetail } = useOpportunityDetail(opportunityId ?? "");
 
-  // 記事データを取得*(同じく query でまとめて取得したいが、一時的対応
-  const { articles, loading: articlesLoading } = useArticles();
-  // 最新の記事を取得（存在する場合）
-  const latestArticle = useMemo(() => (articles.length > 0 ? articles[0] : null), [articles]);
-
   if (loading) return <LoadingIndicator fullScreen />;
   if (error || !reservation || !opportunity || !dateTimeInfo)
     return <ErrorState title="申込完了ページを読み込めませんでした" refetchRef={refetchRef} />;
@@ -79,7 +83,7 @@ export default function CompletePage() {
             formattedDate={dateTimeInfo.formattedDate}
             startTime={dateTimeInfo.startTime}
             endTime={dateTimeInfo.endTime}
-            participantCount={dateTimeInfo.participantCount}
+            participantCount={participationCount}
             totalPrice={dateTimeInfo.totalPrice}
             pricePerPerson={opportunity.feeRequired ?? 0}
             location={oppotunityDetail?.place}
@@ -88,20 +92,12 @@ export default function CompletePage() {
           />
         </div>
       )}
-      {articlesLoading || latestArticle ? (
+      {articleCard ? (
         <>
           <div className="h-2 bg-border -mx-6 w-full" />
           <div className="px-6 w-full pt-6 pb-8 max-w-mobile-l mx-auto space-y-4">
-            <h2 className="text-display-md mb-4">依頼人の想い</h2>
-            {articlesLoading ? (
-              <div className="py-4">
-                <LoadingIndicator />
-              </div>
-            ) : latestArticle ? (
-              <ArticleCard article={latestArticle} showUser />
-            ) : (
-              <p className="text-body-md text-caption">関連記事はありません</p>
-            )}
+            <h2 className="text-display-md mb-4">案内人の想い</h2>
+            <ArticleCard article={articleCard} showUser />
           </div>
         </>
       ) : null}

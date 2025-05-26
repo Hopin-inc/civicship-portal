@@ -2,29 +2,20 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useLiff } from "@/contexts/LiffContext";
 import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
 import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
 
-const INITIAL_PATH_KEY = 'liff_initial_path';
-
 export default function HomePage() {
   const router = useRouter();
-  const { isLiffInitialized } = useLiff();
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedPath = sessionStorage.getItem(INITIAL_PATH_KEY);
-      
-      if (window.location.pathname === "/" && !savedPath) {
-        if (isLiffInitialized) {
-          console.log('Root page redirecting to /activities');
-          router.push("/activities");
-        }
-      }
+    if (typeof window === "undefined") return;
+
+    if (window.location.pathname === "/") {
+      router.replace("/activities");
     }
-  }, [router, isLiffInitialized]);
+  }, [router]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });

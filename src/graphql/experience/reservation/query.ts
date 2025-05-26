@@ -14,30 +14,6 @@ export const GET_RESERVATIONS = gql`
     $filter: ReservationFilterInput
   ) {
     reservations(cursor: $cursor, sort: $sort, first: $first, filter: $filter) {
-      edges {
-        node {
-          id
-          status
-          createdAt
-          createdByUser {
-            id
-            name
-            image
-          }
-          opportunitySlot {
-            id
-            startsAt
-            endsAt
-            opportunity {
-              id
-              title
-            }
-          }
-          participations {
-            id
-          }
-        }
-      }
       pageInfo {
         startCursor
         endCursor
@@ -45,32 +21,71 @@ export const GET_RESERVATIONS = gql`
         hasPreviousPage
       }
       totalCount
+      edges {
+        cursor
+        node {
+          ...ReservationFields
+          createdAt
+          createdByUser {
+            ...UserFields
+          }
+          opportunitySlot {
+            id
+            hostingStatus
+            startsAt
+            endsAt
+            opportunity {
+              id
+              title
+              category
+              description
+              publishStatus
+              requireApproval
+            }
+          }
+          participations {
+            id
+            status
+            reason
+            evaluation {
+              id
+              status
+            }
+          }
+        }
+      }
     }
   }
 `;
 
 export const GET_RESERVATION = gql`
-  query GetReservation($id: ID!) {
+  query GetReservation($id: ID!, $includeHostArticle: Boolean! = false) {
     reservation(id: $id) {
       ...ReservationFields
-      comment
       createdByUser {
         ...UserFields
-        phoneNumber
       }
       opportunitySlot {
+        isFullyEvaluated
+        numParticipants
+        numEvaluated
         ...OpportunitySlotFields
         opportunity {
           ...OpportunityFields
           slots {
+            isFullyEvaluated
+            numParticipants
+            numEvaluated
             ...OpportunitySlotFields
           }
           community {
-            id
-            name
+            ...CommunityFields
           }
           createdByUser {
             ...UserFields
+            articlesAboutMe @include(if: $includeHostArticle) {
+              ...ArticleFields
+            }
           }
           place {
             ...PlaceFields
@@ -79,7 +94,12 @@ export const GET_RESERVATION = gql`
       }
       participations {
         ...ParticipationFields
-        id
+        user {
+          ...UserFields
+        }
+        evaluation {
+          ...EvaluationFields
+        }
       }
     }
   }

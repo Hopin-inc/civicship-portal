@@ -12,7 +12,7 @@ import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCount
 import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
 import { notFound, useRouter } from "next/navigation";
 import { HeaderConfig } from "@/contexts/HeaderContext";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { toast } from "sonner";
 import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
@@ -21,6 +21,7 @@ import ErrorState from "@/components/shared/ErrorState";
 import { ParticipationAge } from "./components/ParticipationAge";
 import { errorMessages } from "@/utils/errorMessage";
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
+import GuestCounterSelector from "@/app/reservation/confirm/components/GuestCounterSelector";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -35,7 +36,14 @@ export default function ConfirmPage() {
 
   const { user } = useAuth();
   const router = useRouter();
-  const { opportunityId, slotId, participantCount, communityId } = useReservationParams();
+  const {
+    opportunityId,
+    slotId,
+    participantCount: initialParticipantCount,
+    communityId,
+  } = useReservationParams();
+
+  const [participantCount, setParticipantCount] = useState<number>(initialParticipantCount);
 
   const {
     opportunity,
@@ -71,6 +79,7 @@ export default function ConfirmPage() {
       wallets,
       user,
       ticketCounter,
+      participantCount,
       useTickets: ui.useTickets,
       comment: ui.ageComment ?? undefined,
     });
@@ -88,11 +97,15 @@ export default function ConfirmPage() {
 
     toast.success("申し込みが完了しました。");
 
+    const participationCount = result.reservation.participations?.length ?? 1;
+
     const query = new URLSearchParams({
       id: opportunityId,
       community_id: communityId ?? "",
-      reservation_id: result.reservationId,
+      reservation_id: result.reservation.id,
+      guests: participationCount.toString(),
     });
+
     router.push(`/reservation/complete?${query.toString()}`);
   };
 
@@ -114,8 +127,8 @@ export default function ConfirmPage() {
           />
         </div>
         <div className="h-2 bg-border" />
+        <GuestCounterSelector value={participantCount} onChange={setParticipantCount} />
         <ParticipationAge ageComment={ui.ageComment} setAgeComment={ui.setAgeComment} />
-        <div className="h-2 bg-border" />
         <PaymentSection
           ticketCount={ticketCounter.count}
           onIncrement={ticketCounter.increment}

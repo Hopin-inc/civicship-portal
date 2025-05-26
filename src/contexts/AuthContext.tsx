@@ -22,20 +22,8 @@ import {
 } from "@/lib/firebase";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
-import { retryWithBackoff } from "@/utils/retry";
 import { useLiff } from "./LiffContext";
 import { COMMUNITY_ID } from "@/utils";
-import { LiffError } from "@liff/util";
-import {
-  CREATE_SUBWINDOW_FAILED,
-  EXCEPTION_IN_SUBWINDOW,
-  FORBIDDEN,
-  INIT_FAILED,
-  INVALID_ARGUMENT,
-  INVALID_CONFIG,
-  INVALID_ID_TOKEN,
-  UNAUTHORIZED,
-} from "@liff/consts";
 
 type UserInfo = {
   uid: string | null;
@@ -66,6 +54,7 @@ type AuthContextType = UserInfo & {
     verifyPhoneCode: (code: string) => Promise<boolean>;
   };
   isPhoneVerified: boolean;
+  loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -78,7 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const {
     data: currentUserData,
-    loading: queryLoading,
+    loading: gqlLoading,
     refetch,
     error: queryError,
   } = useCurrentUserQuery({
@@ -90,11 +79,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserInfo["user"]>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isExplicitLogin, setIsExplicitLogin] = useState(false);
-
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
+
+  // 電話番号認証
   const [verificationId, setVerificationId] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+
+  // 初回の認証状態が終わったか
+  const [authLoading, setAuthLoading] = useState(true);
 
   const login = useCallback((userInfo: UserInfo | null) => {
     setUid(userInfo?.uid ?? null);
@@ -186,81 +179,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const loginWithLiff = async () => {
-    if (!liff) {
-      return;
-    }
+  const loginWithLiff = async (): Promise<void> => {
+    if (!liff) throw new Error("LIFF is not initialized");
+
+    setIsAuthenticating(true);
+    setIsExplicitLogin(true);
+
+    console.log("🔐 loginWithLiff started");
 
     try {
-      setIsExplicitLogin(true);
       await liffLogin();
 
       const phoneVerified = checkPhoneVerified();
       setIsPhoneVerified(phoneVerified);
+
+      console.log("✅ LIFF login completed");
+      console.log("📱 Phone verification status set");
     } catch (error) {
-      console.error("LIFF login failed:", error);
-
-      let title = "ログインに失敗しました";
-      let description = "もう一度お試しください。";
-
-      if (error instanceof LiffError) {
-        switch (error.code) {
-          case INIT_FAILED:
-            title = "アプリを起動できませんでした";
-            description = "ページを更新して、もう一度お試しください。";
-            break;
-          case INVALID_ARGUMENT:
-            title = "内部で問題が発生しました";
-            description = "もう一度だけ操作を試してみてください。";
-            break;
-          case UNAUTHORIZED:
-            title = "ログイン状態が確認できません";
-            description = "お手数ですが、再度ログインをお願いします。";
-            break;
-          case FORBIDDEN:
-            title = "この画面はご利用いただけません";
-            description = "LINEアプリ内から開いてご利用ください。";
-            break;
-          case INVALID_CONFIG:
-            title = "設定の確認が必要です";
-            description = "恐れ入りますが、サポートまでご連絡ください。";
-            break;
-          case INVALID_ID_TOKEN:
-            title = "ログインの期限が切れています";
-            description = "再度ログインしてからお進みください。";
-            break;
-          case EXCEPTION_IN_SUBWINDOW:
-            title = "しばらく操作がなかったようです";
-            description = "もう一度初めからやり直してください。";
-            break;
-          case CREATE_SUBWINDOW_FAILED:
-            title = "ウィンドウを開けませんでした";
-            description = "ブラウザのポップアップ設定をご確認ください。";
-            break;
-          default:
-            title = "予期しないエラーが発生しました";
-            description = "時間をおいてもう一度お試しください。";
-            break;
-        }
-      } else if (error instanceof Error) {
-        const msg = error.message.toLowerCase();
-        if (msg.includes("network") || msg.includes("failed to fetch")) {
-          title = "通信エラーが発生しました";
-          description = "インターネット接続をご確認ください。";
-        } else if (msg.includes("timeout")) {
-          title = "通信がタイムアウトしました";
-          description = "少し時間をおいて、もう一度お試しください。";
-        } else if (msg.includes("access denied") || msg.includes("cancelled")) {
-          title = "ログインがキャンセルされました";
-          description = "お手数ですが、もう一度お試しください。";
-        } else if (msg.includes("expired")) {
-          title = "セッションの有効期限が切れています";
-          description = "再度ログインをお願いいたします。";
-        }
-      }
-
-      toast.error(title, { description });
+      console.error("❌ loginWithLiff encountered an error");
+      throw error;
+    } finally {
+      setIsAuthenticating(false);
       setIsExplicitLogin(false);
+
+      console.log("🔚 loginWithLiff finished");
     }
   };
 
@@ -311,7 +253,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { errorType, errorMessage } = customEvent.detail;
 
       console.log("Auth error event detected:", customEvent.detail);
-      
+
       setIsAuthenticating(false);
 
       toast.error(errorMessage, {
@@ -370,37 +312,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         try {
-          if (queryLoading) {
-            console.log('Waiting for existing query to complete...');
-            await new Promise<void>((resolve) => {
-              const checkInterval = setInterval(() => {
-                if (!queryLoading) {
-                  clearInterval(checkInterval);
-                  resolve();
-                }
-              }, 100);
-            });
+          console.log("Attempting to fetch user data...");
+          const result = await refetch();
+
+          if (!result.data.currentUser?.user) {
+            throw new Error("User data not found after authentication");
           }
-          
-          if (queryError) {
-            console.warn('Previous query error detected:', queryError);
-          }
-          
-          const { data } = await retryWithBackoff(
-            async () => {
-              console.log('Attempting to fetch user data...');
-              const result = await refetch();
-              if (!result.data.currentUser?.user) {
-                throw new Error('User data not found after authentication');
-              }
-              return result;
-            },
-            3, // retries
-            500, // initial delay
-            2 // backoff factor
-          );
-          
-          const fetchedUser = data.currentUser?.user ?? null;
+
+          const fetchedUser = result.data.currentUser?.user ?? null;
           if (fetchedUser) {
             login({
               uid: user.uid,
@@ -413,14 +332,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             if (isExplicitLogin) {
               toast.success("ログインしました！");
-              setIsExplicitLogin(false); // フラグをリセットして再表示を防止
+              setIsExplicitLogin(false);
             }
 
             if (next) {
               router.push(next);
             }
           } else {
-            console.warn('User data fetch failed after all retries, redirecting to sign-up');
+            console.warn("User data fetch failed after all retries, redirecting to sign-up");
             if (isPhoneVerified || checkPhoneVerified()) {
               router.push("/sign-up");
             } else {
@@ -428,7 +347,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
           }
         } catch (error) {
-          console.error('Failed to fetch user data after retries:', error);
+          console.error("Failed to fetch user data after retries:", error);
           if (isPhoneVerified || checkPhoneVerified()) {
             router.push("/sign-up");
           } else {
@@ -443,6 +362,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         cookies.remove("phone_auth_token");
         cookies.remove("phone_refresh_token");
       }
+      setAuthLoading(false);
     });
 
     return () => unsubscribe();
@@ -526,6 +446,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           verifyPhoneCode: verifyPhoneCodeLocal,
         },
         isPhoneVerified,
+        loading: authLoading || gqlLoading,
       }}
     >
       {children}

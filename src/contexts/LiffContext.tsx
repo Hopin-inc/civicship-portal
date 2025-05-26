@@ -1,11 +1,9 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import liff from '@line/liff';
-import { setIsInLiffBrowser } from '@/utils/liff';
-import { useRouter } from 'next/navigation';
-
-const INITIAL_PATH_KEY = 'liff_initial_path';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import liff from "@line/liff";
+import { setIsInLiffBrowser } from "@/utils/liff";
+import { useInitialLiffRedirect } from "@/hooks/useInitialLiffRedirect";
 
 type LiffProfile = {
   userId: string;
@@ -34,8 +32,9 @@ type LiffProviderProps = {
 };
 
 export const LiffProvider = ({ children }: LiffProviderProps) => {
-  const liffId = process.env.NEXT_PUBLIC_LIFF_ID || '';
-  const router = useRouter();
+  const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
+  useInitialLiffRedirect();
+
   const [isLiffInitialized, setIsLiffInitialized] = useState<boolean>(false);
   const [isInLiff, setIsInLiff] = useState<boolean>(false);
   const [isLiffLoggedIn, setIsLiffLoggedIn] = useState<boolean>(false);
@@ -44,26 +43,16 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
   const [liffIdToken, setLiffIdToken] = useState<string | null>(null);
   const [liffAccessToken, setLiffAccessToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (!sessionStorage.getItem(INITIAL_PATH_KEY) && window.location.pathname !== '/') {
-        const fullPath = window.location.pathname + window.location.search;
-        console.log('Saving initial path:', fullPath);
-        sessionStorage.setItem(INITIAL_PATH_KEY, fullPath);
-      }
-    }
-  }, []);
-
   const updateLiffProfile = useCallback(async () => {
     try {
       const profile = await liff.getProfile();
       setLiffProfile({
         userId: profile.userId,
         displayName: profile.displayName,
-        pictureUrl: profile.pictureUrl
+        pictureUrl: profile.pictureUrl,
       });
     } catch (error) {
-      console.error('Failed to get LIFF profile:', error);
+      console.error("Failed to get LIFF profile:", error);
     }
   }, []);
 
@@ -71,12 +60,11 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
     try {
       const accessToken = liff.getAccessToken();
       setLiffAccessToken(accessToken);
-      
+
       const idToken = liff.getIDToken();
       setLiffIdToken(idToken);
-      
     } catch (error) {
-      console.error('Failed to get LIFF tokens:', error);
+      console.error("Failed to get LIFF tokens:", error);
     }
   }, []);
 
@@ -84,28 +72,21 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
     try {
       await liff.init({ liffId });
       setIsLiffInitialized(true);
-      
+
       setIsInLiff(liff.isInClient());
       setIsInLiffBrowser(liff.isInClient());
       setIsLiffLoggedIn(liff.isLoggedIn());
-      
+
       if (liff.isLoggedIn()) {
         await updateLiffProfile();
         updateLiffTokens();
-        
-        const initialPath = sessionStorage.getItem(INITIAL_PATH_KEY);
-        if (initialPath && initialPath !== '/' && initialPath !== '/activities') {
-          console.log('Restoring initial path:', initialPath);
-          router.push(initialPath);
-          sessionStorage.removeItem(INITIAL_PATH_KEY);
-        }
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       setLiffError(errorMessage);
-      console.error('LIFF initialization failed:', error);
+      console.error("LIFF initialization failed:", error);
     }
-  }, [liffId, updateLiffProfile, updateLiffTokens, router]);
+  }, [liffId, updateLiffProfile, updateLiffTokens]);
 
   const liffLogin = useCallback(() => {
     if (!isLiffInitialized) {
@@ -114,7 +95,7 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
       });
       return;
     }
-    
+
     liff.login({ redirectUri: window.location.href });
   }, [isLiffInitialized, liffInit]);
 
@@ -153,7 +134,7 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
         liffAccessToken,
         liffInit,
         liffLogin,
-        liffLogout
+        liffLogout,
       }}
     >
       {children}

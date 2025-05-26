@@ -7,14 +7,38 @@ import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { Label } from "@/components/ui/label";
+import { getLiffLoginErrorMessage } from "@/app/login/utils/getLiffLoginErrorMessage";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useLiff } from "@/contexts/LiffContext";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const { isLiffInitialized, isLiffLoggedIn, liffProfile, liffError } = useLiff();
+  const { loginWithLiff, isAuthenticating } = useAuth();
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
-  const { loginWithLiff, isAuthenticating } = useAuth();
 
+  // 🚀 LIFFログイン済みならトップへ自動遷移
+  useEffect(() => {
+    if (isLiffInitialized && isLiffLoggedIn && liffProfile) {
+      console.log("🚀 Automatically redirect to the top page if already logged in via LIFF");
+      router.replace("/");
+    }
+  }, [isLiffInitialized, isLiffLoggedIn, liffProfile, router]);
+
+  // 🔴 初期化エラー表示
+  useEffect(() => {
+    if (liffError) {
+      console.error(liffError);
+    }
+  }, [liffError]);
+
+  // 📦 ログイン処理
   const handleLogin = async () => {
     if (!agreedTerms || !agreedPrivacy) {
       setError("すべての同意が必要です");
@@ -26,13 +50,16 @@ export default function LoginPage() {
 
     try {
       await loginWithLiff();
-      setIsLoading(false);
+      router.push("/");
     } catch (err) {
-      setError("ログインに失敗しました");
+      const { title, description } = getLiffLoginErrorMessage(error);
+      toast.error(title, { description });
+    } finally {
       setIsLoading(false);
     }
   };
 
+  // 💡 ページスクロール抑制
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -58,6 +85,7 @@ export default function LoginPage() {
                 <Checkbox
                   id="agree-terms"
                   checked={agreedTerms}
+                  disabled={isLoading || isAuthenticating}
                   onCheckedChange={(checked) => setAgreedTerms(!!checked)}
                 />
                 <Label htmlFor="agree-terms" className="text-sm text-muted-foreground">
@@ -72,6 +100,7 @@ export default function LoginPage() {
                 <Checkbox
                   id="agree-privacy"
                   checked={agreedPrivacy}
+                  disabled={isLoading || isAuthenticating}
                   onCheckedChange={(checked) => setAgreedPrivacy(!!checked)}
                 />
                 <Label htmlFor="agree-privacy" className="text-sm text-muted-foreground">

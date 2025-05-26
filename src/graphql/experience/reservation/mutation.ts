@@ -6,6 +6,9 @@ export const CREATE_RESERVATION = gql`
       ... on ReservationCreateSuccess {
         reservation {
           ...ReservationFields
+          participations {
+            ...ParticipationFields
+          }
         }
       }
     }
