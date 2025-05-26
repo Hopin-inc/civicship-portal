@@ -16,6 +16,7 @@ type UseCancelSlotOptions = {
 export const useCancelSlot = (
   reservation: GqlReservation | null | undefined,
   opportunity: GqlOpportunity | null | undefined,
+  comment: string | null,
   options: {
     onCompleted?: () => void;
     onError?: () => void;
@@ -42,7 +43,7 @@ export const useCancelSlot = (
     await cancelSlotMutation({
       variables: {
         id: slotId,
-        input: { status: GqlOpportunitySlotHostingStatus.Cancelled },
+        input: { status: GqlOpportunitySlotHostingStatus.Cancelled, comment: comment ?? undefined },
         permission: { opportunityId, communityId },
       },
     });
