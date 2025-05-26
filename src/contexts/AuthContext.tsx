@@ -424,7 +424,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         cookies.remove("phone_auth_token");
         cookies.remove("phone_refresh_token");
       }
-      console.log("User state changed:", user);
       setAuthLoading(false);
     });
 
