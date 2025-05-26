@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export function PhoneVerificationForm() {
-  const { phoneAuth, user } = useAuth();
+  const { phoneAuth, user, loading } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -28,7 +29,7 @@ export function PhoneVerificationForm() {
     }
 
     // ② ログイン済みならリダイレクト
-    if (user) {
+    if (!loading && user) {
       toast.success("既にログインしています");
       router.replace("/users/me");
       return;
@@ -45,7 +46,7 @@ export function PhoneVerificationForm() {
         clearRecaptcha();
       });
     };
-  }, [router, user]);
+  }, [router, user, loading]);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,6 +84,10 @@ export function PhoneVerificationForm() {
   const handleOTPChange = (value: string) => {
     setVerificationCode(value);
   };
+
+  if (loading) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <div className="w-full max-w-md mx-auto space-y-8">
