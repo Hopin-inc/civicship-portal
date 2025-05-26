@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import { Calendar, MapPin, Users } from "lucide-react";
+import { Calendar, MapPin } from "lucide-react";
 import { formatDateTime } from "@/utils/date";
 import { ja } from "date-fns/locale";
-import IconWrapper from "@/components/shared/IconWrapper";
 
 interface ReservationDetailsCardProps {
   startDateTime: Date | null;
@@ -47,11 +46,6 @@ const ReservationDetailsCard: React.FC<ReservationDetailsCardProps> = ({
           <span className="text-body-md">{location.name}</span>
           <span className="text-body-sm text-caption">{location.address}</span>
         </div>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <Users size={18} strokeWidth={1.5} className="text-caption w-6 h-6 mt-0.5" />
-        <span className="text-body-md">{participantCount}人</span>
       </div>
     </div>
   );
