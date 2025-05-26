@@ -53,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         </Button>
       )}
       {config.showLogo && (
-        <Link href="/activities" className="flex items-center space-x-2">
+        <Link href="/" className="flex items-center space-x-2">
           <Image
             src="/images/neo88-logo-square.jpg"
             alt="NEO88"
