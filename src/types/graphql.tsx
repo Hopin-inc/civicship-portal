@@ -1738,6 +1738,7 @@ export type GqlReservationEdge = GqlEdge & {
 export type GqlReservationFilterInput = {
   and?: InputMaybe<Array<GqlReservationFilterInput>>;
   createdByUserId?: InputMaybe<Scalars["ID"]["input"]>;
+  evaluationStatus?: InputMaybe<GqlEvaluationStatus>;
   hostingStatus?: InputMaybe<Array<GqlOpportunitySlotHostingStatus>>;
   not?: InputMaybe<Array<GqlReservationFilterInput>>;
   opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
@@ -4237,6 +4238,28 @@ export type GqlGetReservationQuery = {
       reason: GqlParticipationStatusReason;
       images?: Array<string> | null;
       description?: string | null;
+      user?: {
+        __typename?: "User";
+        id: string;
+        name: string;
+        image?: string | null;
+        bio?: string | null;
+        currentPrefecture?: GqlCurrentPrefecture | null;
+        phoneNumber?: string | null;
+        urlFacebook?: string | null;
+        urlInstagram?: string | null;
+        urlX?: string | null;
+      } | null;
+      evaluation?: {
+        __typename?: "Evaluation";
+        id: string;
+        comment?: string | null;
+        credentialUrl?: string | null;
+        status: GqlEvaluationStatus;
+        createdAt?: Date | null;
+        updatedAt?: Date | null;
+        issuedAt?: Date | null;
+      } | null;
     }> | null;
   } | null;
 };
@@ -7853,6 +7876,12 @@ export const GetReservationDocument = gql`
       }
       participations {
         ...ParticipationFields
+        user {
+          ...UserFields
+        }
+        evaluation {
+          ...EvaluationFields
+        }
       }
     }
   }
@@ -7863,6 +7892,7 @@ export const GetReservationDocument = gql`
   ${CommunityFieldsFragmentDoc}
   ${PlaceFieldsFragmentDoc}
   ${ParticipationFieldsFragmentDoc}
+  ${EvaluationFieldsFragmentDoc}
 `;
 
 /**
