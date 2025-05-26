@@ -180,18 +180,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const loginWithLiff = async (): Promise<void> => {
-    if (!liff) throw new Error("LIFFが初期化されていません");
+    if (!liff) throw new Error("LIFF is not initialized");
 
     setIsAuthenticating(true);
     setIsExplicitLogin(true);
 
+    console.log("🔐 loginWithLiff started");
+
     try {
       await liffLogin();
+
       const phoneVerified = checkPhoneVerified();
       setIsPhoneVerified(phoneVerified);
+
+      console.log("✅ LIFF login completed");
+      console.log("📱 Phone verification status set");
+    } catch (error) {
+      console.error("❌ loginWithLiff encountered an error");
+      throw error;
     } finally {
       setIsAuthenticating(false);
       setIsExplicitLogin(false);
+
+      console.log("🔚 loginWithLiff finished");
     }
   };
 
