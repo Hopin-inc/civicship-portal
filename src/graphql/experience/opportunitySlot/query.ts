@@ -55,27 +55,26 @@ export const GET_OPPORTUNITY_SLOT = gql`
 export const GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS = gql`
   query GetOpportunitySlotWithParticipations($id: ID!) {
     opportunitySlot(id: $id) {
-      id
-      hostingStatus
-      startsAt
-      endsAt
-      capacity
-      remainingCapacity
+      ...OpportunitySlotFields
       isFullyEvaluated
       numParticipants
       numEvaluated
       opportunity {
         ...OpportunityFields
         community {
-          ...CommunityFields
+          id
+          name
         }
       }
       reservations {
-        ...ReservationFields
         participations {
-          ...ParticipationFields
+          id
+          status
           user {
-            ...UserFields
+            id
+            name
+            image
+            currentPrefecture
           }
           evaluation {
             id
