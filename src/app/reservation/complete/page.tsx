@@ -14,6 +14,7 @@ import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInf
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
 import ArticleCard from "@/app/articles/components/Card";
 import { useArticles } from "@/app/articles/hooks/useArticles";
+import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 export default function CompletePage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -25,6 +26,8 @@ export default function CompletePage() {
   );
   useHeaderConfig(headerConfig);
 
+  const track = useAnalytics();
+
   const searchParams = useSearchParams();
   const opportunityId = searchParams.get("id");
   const reservationId = searchParams.get("reservation_id");
@@ -35,6 +38,24 @@ export default function CompletePage() {
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
+
+  useEffect(() => {
+    if (!reservation || !opportunity || !dateTimeInfo) return;
+
+    track({
+      name: "apply_opportunity",
+      params: {
+        reservationId: reservation.id,
+        opportunityId: opportunity.id,
+        opportunityTitle: opportunity.title,
+        category: opportunity.category,
+        guest: dateTimeInfo.participantCount,
+        feeRequired: opportunity.feeRequired ?? 0,
+        totalFee: dateTimeInfo.totalPrice,
+        scheduledAt: dateTimeInfo.startTime,
+      },
+    });
+  }, [reservation, opportunity, dateTimeInfo, track]);
 
   // #NOTE: query でまとめて取得したいが、一時的対応
   const { opportunity: oppotunityDetail } = useOpportunityDetail(opportunityId ?? "");

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { CookiesProvider } from "next-client-cookies/server";
@@ -16,6 +16,7 @@ import {
   DEFAULT_OPEN_GRAPH,
   DEFAULT_TITLE,
 } from "@/lib/metadata/defalut";
+import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -24,6 +25,16 @@ export const metadata: Metadata = {
   description: DEFAULT_DESCRIPTION,
   icons: DEFAULT_ICONS,
   openGraph: DEFAULT_OPEN_GRAPH,
+  alternates: {
+    canonical: "https://www.neo88.app",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 const RootLayout = ({
@@ -33,9 +44,6 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="ja">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-      </head>
       <body className={font.className}>
         <CookiesProvider>
           <ApolloProvider>
@@ -43,6 +51,7 @@ const RootLayout = ({
               <AuthProvider>
                 <HeaderProvider>
                   <LoadingProvider>
+                    <AnalyticsProvider />
                     <MainContent>{children}</MainContent>
                     <Toaster richColors className="mx-8" />
                   </LoadingProvider>

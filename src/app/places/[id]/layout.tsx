@@ -1,55 +1,80 @@
-//TODO ピュアにplaceから取得できればuserIdをわざわざparamに加えなくても解決する
+import { Metadata } from "next";
+import { apolloClient } from "@/lib/apollo";
+import {
+  GetPlaceDocument,
+  GqlGetPlaceQuery,
+  GqlGetPlaceQueryVariables,
+  GqlPlace,
+  GqlPublishStatus,
+} from "@/types/graphql";
+import { fallbackMetadata } from "@/lib/metadata/notFound";
+import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
 
-// import { Metadata } from "next";
-// import { COMMUNITY_ID, DEFAULT_OGP } from "@/utils";
-// import {
-//   GetSingleMembershipDocument,
-//   GqlGetSingleMembershipQuery,
-//   GqlGetSingleMembershipQueryVariables,
-//   GqlMembership,
-// } from "@/types/graphql";
-// import { apolloClient } from "@/lib/apollo";
-// import { fallbackMetadata } from "@/lib/metadata";
-//
-// export const generateMetadata = async ({
-//   params,
-// }: {
-//   params: { id: string };
-// }): Promise<Metadata> => {
-//   const id = params.id;
-//   const res = await fetchArticle(id, COMMUNITY_ID);
-//
-//   if (!res) return fallbackMetadata;
-//
-//   return {
-//     title: res.title,
-//     description: res.introduction ?? res.body,
-//     openGraph: {
-//       title: res.title,
-//       description: res.introduction ?? res.body,
-//       images: [
-//         {
-//           url: res.thumbnail ?? DEFAULT_OGP,
-//           width: 1200,
-//           height: 630,
-//           alt: res.title,
-//         },
-//       ],
-//     },
-//   };
-// };
-//
-// async function fetchMembership(id: string, communityId: string): Promise<GqlMembership | null> {
-//   const { data } = await apolloClient.query<
-//     GqlGetSingleMembershipQuery,
-//     GqlGetSingleMembershipQueryVariables
-//   >({
-//     query: GetSingleMembershipDocument,
-//     variables: { id, permission: { communityId } },
-//   });
-//
-//   return data.membership ?? null;
-// }
+export const generateMetadata = async ({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> => {
+  const id = params.id;
+  const place = await fetchPlace(id);
+  if (!place) return fallbackMetadata;
+
+  const placeDetail = presenterPlaceDetailForMetadata(place);
+
+  return {
+    title: `${placeDetail.name} | NEO四国88祭`,
+    description: placeDetail.bio,
+    openGraph: {
+      title: placeDetail.name,
+      description: placeDetail.bio,
+      type: "article",
+      url: `https://www.neo88.app/places/${id}`,
+      images: placeDetail.images.length
+        ? placeDetail.images.map((url) => ({
+            url,
+            width: 1200,
+            height: 630,
+            alt: placeDetail.name,
+          }))
+        : DEFAULT_OPEN_GRAPH_IMAGE,
+    },
+    alternates: {
+      canonical: `https://www.neo88.app/places/${id}`,
+    },
+  };
+};
+
+async function fetchPlace(id: string): Promise<GqlPlace | null> {
+  const { data } = await apolloClient.query<GqlGetPlaceQuery, GqlGetPlaceQueryVariables>({
+    query: GetPlaceDocument,
+    variables: { id },
+  });
+
+  return data.place ?? null;
+}
+
+const presenterPlaceDetailForMetadata = (place: GqlPlace) => {
+  const opportunities = place.opportunities ?? [];
+  const publicOpportunities = opportunities.filter(
+    (o) => o.publishStatus === GqlPublishStatus.Public,
+  );
+
+  const firstArticle = place.opportunities
+    ?.flatMap((o) => o.articles ?? [])
+    ?.find((a) => !!a?.introduction); // クライアント関数を使わず article から直接取得
+
+  const opportunityImages = publicOpportunities.flatMap((o) => o.images ?? []);
+
+  const images = Array.from(
+    new Set([place.image, ...opportunityImages].filter((v): v is string => typeof v === "string")),
+  );
+
+  return {
+    name: place.name ?? "不明な場所",
+    bio: firstArticle?.introduction ?? "Coming Soon!",
+    images,
+  };
+};
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;

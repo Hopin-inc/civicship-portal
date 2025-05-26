@@ -13,14 +13,15 @@ export default function ArticlePage() {
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const { article, recommendedArticles, isLoading, error, refetch } = useArticle(id ?? "");
+  const author = article?.relatedUsers?.[0]?.name;
 
   const headerConfig = useMemo(
     () => ({
-      title: `${article?.relatedUsers?.[0]?.name}さんの記事`,
+      title: author ? `${author}さんの記事` : "記事詳細",
       showLogo: false,
       showBackButton: true,
     }),
-    [article],
+    [author],
   );
   useHeaderConfig(headerConfig);
 

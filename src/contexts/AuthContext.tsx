@@ -22,6 +22,7 @@ import {
 } from "@/lib/firebase";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
+import { retryWithBackoff } from "@/utils/retry";
 import { useLiff } from "./LiffContext";
 import { COMMUNITY_ID } from "@/utils";
 import { LiffError } from "@liff/util";
@@ -79,6 +80,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     data: currentUserData,
     loading: queryLoading,
     refetch,
+    error: queryError,
   } = useCurrentUserQuery({
     fetchPolicy: "no-cache",
   });
@@ -309,6 +311,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { errorType, errorMessage } = customEvent.detail;
 
       console.log("Auth error event detected:", customEvent.detail);
+      
+      setIsAuthenticating(false);
 
       toast.error(errorMessage, {
         action:
@@ -365,27 +369,66 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.error("Failed to get token expiration time:", error);
         }
 
-        const { data } = await refetch();
-        const fetchedUser = data.currentUser?.user ?? null;
-        if (fetchedUser) {
-          login({
-            uid: user.uid,
-            user: {
-              id: fetchedUser.id,
-              name: fetchedUser.name,
-              memberships: fetchedUser.memberships || ([] as any),
+        try {
+          if (queryLoading) {
+            console.log('Waiting for existing query to complete...');
+            await new Promise<void>((resolve) => {
+              const checkInterval = setInterval(() => {
+                if (!queryLoading) {
+                  clearInterval(checkInterval);
+                  resolve();
+                }
+              }, 100);
+            });
+          }
+          
+          if (queryError) {
+            console.warn('Previous query error detected:', queryError);
+          }
+          
+          const { data } = await retryWithBackoff(
+            async () => {
+              console.log('Attempting to fetch user data...');
+              const result = await refetch();
+              if (!result.data.currentUser?.user) {
+                throw new Error('User data not found after authentication');
+              }
+              return result;
             },
-          });
+            3, // retries
+            500, // initial delay
+            2 // backoff factor
+          );
+          
+          const fetchedUser = data.currentUser?.user ?? null;
+          if (fetchedUser) {
+            login({
+              uid: user.uid,
+              user: {
+                id: fetchedUser.id,
+                name: fetchedUser.name,
+                memberships: fetchedUser.memberships || ([] as any),
+              },
+            });
 
-          if (isExplicitLogin) {
-            toast.success("ログインしました！");
-            setIsExplicitLogin(false); // フラグをリセットして再表示を防止
-          }
+            if (isExplicitLogin) {
+              toast.success("ログインしました！");
+              setIsExplicitLogin(false); // フラグをリセットして再表示を防止
+            }
 
-          if (next) {
-            router.push(next);
+            if (next) {
+              router.push(next);
+            }
+          } else {
+            console.warn('User data fetch failed after all retries, redirecting to sign-up');
+            if (isPhoneVerified || checkPhoneVerified()) {
+              router.push("/sign-up");
+            } else {
+              router.push("/sign-up/phone-verification");
+            }
           }
-        } else {
+        } catch (error) {
+          console.error('Failed to fetch user data after retries:', error);
           if (isPhoneVerified || checkPhoneVerified()) {
             router.push("/sign-up");
           } else {
@@ -403,7 +446,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [ready, cookies, refetch, router, searchParams, login, isExplicitLogin]);
+  }, [ready, cookies, refetch, router, searchParams, login, isExplicitLogin, isPhoneVerified]);
 
   const logout = async () => {
     setIsAuthenticating(true);
