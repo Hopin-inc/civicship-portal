@@ -1,19 +1,17 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../../../contexts/AuthContext";
+import React, { useEffect, useRef, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../../components/ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 export function PhoneVerificationForm() {
-  const { phoneAuth, uid, user } = useAuth();
+  const { phoneAuth } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   useEffect(() => {
     if (recaptchaContainerRef.current) {

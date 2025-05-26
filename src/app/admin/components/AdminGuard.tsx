@@ -24,8 +24,9 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
     }
   }, [currentUser, router, loading]);
 
-  if (loading || !currentUser) return <LoadingIndicator />;
-  if (!currentUser.memberships || currentUser.memberships.length === 0) return null;
+  if (loading) return <LoadingIndicator />;
+  if (!currentUser) router.push("/sign-up/phone-verification");
+  else if (!currentUser.memberships || currentUser.memberships.length === 0) router.push("/");
 
   return <>{children}</>;
 }
