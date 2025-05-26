@@ -59,7 +59,7 @@ export const GET_RESERVATIONS = gql`
 `;
 
 export const GET_RESERVATION = gql`
-  query GetReservation($id: ID!) {
+  query GetReservation($id: ID!, $includeHostArticle: Boolean! = false) {
     reservation(id: $id) {
       ...ReservationFields
       createdByUser {
@@ -83,6 +83,9 @@ export const GET_RESERVATION = gql`
           }
           createdByUser {
             ...UserFields
+            articlesAboutMe @include(if: $includeHostArticle) {
+              ...ArticleFields
+            }
           }
           place {
             ...PlaceFields
