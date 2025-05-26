@@ -4004,6 +4004,15 @@ export type GqlCreateReservationMutation = {
       id: string;
       status: GqlReservationStatus;
       comment?: string | null;
+      participations?: Array<{
+        __typename?: "Participation";
+        id: string;
+        source?: GqlSource | null;
+        status: GqlParticipationStatus;
+        reason: GqlParticipationStatusReason;
+        images?: Array<string> | null;
+        description?: string | null;
+      }> | null;
     };
   } | null;
 };
@@ -7512,11 +7521,15 @@ export const CreateReservationDocument = gql`
       ... on ReservationCreateSuccess {
         reservation {
           ...ReservationFields
+          participations {
+            ...ParticipationFields
+          }
         }
       }
     }
   }
   ${ReservationFieldsFragmentDoc}
+  ${ParticipationFieldsFragmentDoc}
 `;
 export type GqlCreateReservationMutationFn = Apollo.MutationFunction<
   GqlCreateReservationMutation,
