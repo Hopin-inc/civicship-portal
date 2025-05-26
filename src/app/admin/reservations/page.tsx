@@ -40,7 +40,6 @@ const getReservationFilterFromTab = (tab: TabType): GqlReservationFilterInput =>
           and: [
             { reservationStatus: [GqlReservationStatus.Applied] }, // 未承認の申込
             { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
-            { participationStatus: [GqlParticipationStatus.Participating] },
           ],
         },
         {
