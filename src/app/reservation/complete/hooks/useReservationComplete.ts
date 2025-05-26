@@ -11,11 +11,13 @@ export const useReservationComplete = (reservationId: string | null) => {
   const reservation = data?.reservation ?? null;
   const gqlOpportunitySlot = reservation?.opportunitySlot ?? null;
   const gqlOpportunity = gqlOpportunitySlot?.opportunity ?? null;
+  const gqlArticle = gqlOpportunity?.createdByUser?.articlesAboutMe ?? null;
 
   return {
     reservation,
     gqlOpportunity,
     gqlOpportunitySlot,
+    gqlArticle,
     loading,
     error,
     refetch,
