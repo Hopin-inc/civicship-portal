@@ -14,6 +14,30 @@ export const GET_RESERVATIONS = gql`
     $filter: ReservationFilterInput
   ) {
     reservations(cursor: $cursor, sort: $sort, first: $first, filter: $filter) {
+      edges {
+        node {
+          id
+          status
+          createdAt
+          createdByUser {
+            id
+            name
+            image
+          }
+          opportunitySlot {
+            id
+            startsAt
+            endsAt
+            opportunity {
+              id
+              title
+            }
+          }
+          participations {
+            id
+          }
+        }
+      }
       pageInfo {
         startCursor
         endCursor
@@ -21,39 +45,6 @@ export const GET_RESERVATIONS = gql`
         hasPreviousPage
       }
       totalCount
-      edges {
-        cursor
-        node {
-          ...ReservationFields
-          createdAt
-          createdByUser {
-            ...UserFields
-          }
-          opportunitySlot {
-            id
-            hostingStatus
-            startsAt
-            endsAt
-            opportunity {
-              id
-              title
-              category
-              description
-              publishStatus
-              requireApproval
-            }
-          }
-          participations {
-            id
-            status
-            reason
-            evaluation {
-              id
-              status
-            }
-          }
-        }
-      }
     }
   }
 `;
@@ -62,24 +53,21 @@ export const GET_RESERVATION = gql`
   query GetReservation($id: ID!) {
     reservation(id: $id) {
       ...ReservationFields
+      comment
       createdByUser {
         ...UserFields
+        phoneNumber
       }
       opportunitySlot {
-        isFullyEvaluated
-        numParticipants
-        numEvaluated
         ...OpportunitySlotFields
         opportunity {
           ...OpportunityFields
           slots {
-            isFullyEvaluated
-            numParticipants
-            numEvaluated
             ...OpportunitySlotFields
           }
           community {
-            ...CommunityFields
+            id
+            name
           }
           createdByUser {
             ...UserFields
@@ -91,12 +79,7 @@ export const GET_RESERVATION = gql`
       }
       participations {
         ...ParticipationFields
-        user {
-          ...UserFields
-        }
-        evaluation {
-          ...EvaluationFields
-        }
+        id
       }
     }
   }
