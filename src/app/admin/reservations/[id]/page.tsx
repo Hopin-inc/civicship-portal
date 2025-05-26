@@ -108,11 +108,16 @@ export default function ReservationPage() {
 
   const { canCancelReservation, cannotCancelReservation } = useReservationStatus(reservation);
 
-  const { handleCancel, loading: cancelLoading } = useCancelSlot(reservation, opportunity, {
-    onCompleted: () => {
-      void refetch();
+  const { handleCancel, loading: cancelLoading } = useCancelSlot(
+    reservation,
+    opportunity,
+    cancelMessage,
+    {
+      onCompleted: () => {
+        void refetch();
+      },
     },
-  });
+  );
 
   if (loading) {
     return (
