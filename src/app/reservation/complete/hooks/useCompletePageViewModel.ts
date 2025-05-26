@@ -4,6 +4,7 @@ import {
   presenterReservationDateTimeInfo,
 } from "@/app/activities/data/presenter";
 import { useCompletePageDataRaw } from "./useCompletePageDataRaw";
+import { presenterArticleCard } from "@/app/articles/data/presenter";
 
 export function useCompletePageViewModel(
   opportunityId: string | null,
@@ -13,6 +14,7 @@ export function useCompletePageViewModel(
     reservation,
     gqlOpportunity,
     gqlOpportunitySlot,
+    gqlArticle,
     sameStateActivities,
     loading,
     error,
@@ -28,9 +30,14 @@ export function useCompletePageViewModel(
     return presenterReservationDateTimeInfo(gqlOpportunitySlot, gqlOpportunity, reservation);
   }, [reservation, gqlOpportunity, gqlOpportunitySlot]);
 
+  const articleCard = useMemo(() => {
+    return gqlArticle && gqlArticle.length > 0 ? presenterArticleCard(gqlArticle[0]) : undefined;
+  }, [gqlArticle]);
+
   return {
     reservation,
     opportunity,
+    articleCard,
     dateTimeInfo,
     sameStateActivities,
     loading,

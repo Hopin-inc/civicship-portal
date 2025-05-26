@@ -4142,6 +4142,7 @@ export type GqlGetReservationsQuery = {
 
 export type GqlGetReservationQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
+  includeHostArticle?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetReservationQuery = {
@@ -4217,6 +4218,17 @@ export type GqlGetReservationQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          articlesAboutMe?: Array<{
+            __typename?: "Article";
+            id: string;
+            title: string;
+            body?: string | null;
+            introduction: string;
+            thumbnail?: any | null;
+            category: GqlArticleCategory;
+            publishStatus: GqlPublishStatus;
+            publishedAt?: Date | null;
+          }> | null;
         } | null;
         place?: {
           __typename?: "Place";
@@ -7857,7 +7869,7 @@ export type GetReservationsQueryResult = Apollo.QueryResult<
   GqlGetReservationsQueryVariables
 >;
 export const GetReservationDocument = gql`
-  query GetReservation($id: ID!) {
+  query GetReservation($id: ID!, $includeHostArticle: Boolean! = false) {
     reservation(id: $id) {
       ...ReservationFields
       createdByUser {
@@ -7881,6 +7893,9 @@ export const GetReservationDocument = gql`
           }
           createdByUser {
             ...UserFields
+            articlesAboutMe @include(if: $includeHostArticle) {
+              ...ArticleFields
+            }
           }
           place {
             ...PlaceFields
@@ -7903,6 +7918,7 @@ export const GetReservationDocument = gql`
   ${OpportunitySlotFieldsFragmentDoc}
   ${OpportunityFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
+  ${ArticleFieldsFragmentDoc}
   ${PlaceFieldsFragmentDoc}
   ${ParticipationFieldsFragmentDoc}
   ${EvaluationFieldsFragmentDoc}
@@ -7921,6 +7937,7 @@ export const GetReservationDocument = gql`
  * const { data, loading, error } = useGetReservationQuery({
  *   variables: {
  *      id: // value for 'id'
+ *      includeHostArticle: // value for 'includeHostArticle'
  *   },
  * });
  */
