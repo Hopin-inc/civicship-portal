@@ -40,7 +40,6 @@ const getReservationFilterFromTab = (tab: TabType): GqlReservationFilterInput =>
           and: [
             { reservationStatus: [GqlReservationStatus.Applied] }, // 未承認の申込
             { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
-            { participationStatus: [GqlParticipationStatus.Participating] },
           ],
         },
         {
@@ -103,6 +102,7 @@ export default function ReservationsPage() {
 
   const statusFilter = useMemo(() => getReservationFilterFromTab(activeTab), [activeTab]);
   const { reservations, loading, error, loadMoreRef, refetch } = useReservations(statusFilter);
+  console.log(reservations);
 
   const reservationItems: GqlReservation[] = reservations.edges
     .map((edge) => edge.node)
