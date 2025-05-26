@@ -85,8 +85,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     fetchPolicy: "no-cache",
   });
 
-  console.log("Current user data:", currentUserData);
-
   const [ready] = useState(() => deferred());
   const [uid, setUid] = useState<UserInfo["uid"]>(null);
   const [user, setUser] = useState<UserInfo["user"]>(null);
