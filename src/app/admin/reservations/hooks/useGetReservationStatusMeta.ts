@@ -37,14 +37,14 @@ const getReservationStatusMeta = (
     return { step: "approval", label: "承認待ち", variant: "primary" };
   }
 
-  // ② 却下済み
-  else if (isRejected) {
-    return { step: "approval", label: "却下済み", variant: "warning" };
-  }
-
-  // ③ 開催中止
+  // ② 開催中止
   else if (isCancelled) {
     return { step: "cancellation", label: "開催中止", variant: "warning" };
+  }
+
+  // ③ 却下済み
+  else if (isRejected) {
+    return { step: "approval", label: "却下済み", variant: "destructive" };
   }
 
   // ④ 開催前（承認済み・未来のスロット）
@@ -53,13 +53,13 @@ const getReservationStatusMeta = (
   }
 
   // ⑤ 開催済み・出欠記録が未入力
-  else if (!isEvaluated) {
+  else if (!isEvaluated && !isFuture) {
     return { step: "attendance", label: "出欠未入力", variant: "outline" };
   }
 
   // ⑥ 評価済（すべて対応済み）
   else {
-    return { step: "done", label: "対応済み", variant: "success" };
+    return { step: "attendance", label: "対応済み", variant: "success" };
   }
 };
 

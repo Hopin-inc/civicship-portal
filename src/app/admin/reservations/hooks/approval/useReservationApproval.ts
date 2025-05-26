@@ -7,6 +7,7 @@ import {
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/utils";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
+import { useRouter } from "next/navigation";
 
 export const useReservationApproval = ({
   id,
@@ -20,11 +21,12 @@ export const useReservationApproval = ({
   refetch: () => void;
 }) => {
   const track = useAnalytics();
+  const router = useRouter();
 
   const [acceptReservation, { loading: acceptLoading }] = useReservationAcceptMutation({
     onCompleted: () => {
       toast.success("予約を承認しました");
-      void refetch();
+      router.push(`/admin/reservations/${id}/?mode=cancellation`);
     },
     onError: () => {
       toast.error("承認に失敗しました");

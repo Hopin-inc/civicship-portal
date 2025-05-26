@@ -36,7 +36,13 @@ const getReservationFilterFromTab = (tab: TabType): GqlReservationFilterInput =>
   if (tab === "pending") {
     return {
       or: [
-        { reservationStatus: [GqlReservationStatus.Applied] }, // 未承認の申込
+        {
+          and: [
+            { reservationStatus: [GqlReservationStatus.Applied] }, // 未承認の申込
+            { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
+            { participationStatus: [GqlParticipationStatus.Participating] },
+          ],
+        },
         {
           and: [
             { reservationStatus: [GqlReservationStatus.Accepted] }, // 承認済み
@@ -48,10 +54,26 @@ const getReservationFilterFromTab = (tab: TabType): GqlReservationFilterInput =>
     };
   }
   return {
-    reservationStatus: [
-      GqlReservationStatus.Accepted,
-      GqlReservationStatus.Rejected,
-      GqlReservationStatus.Canceled,
+    or: [
+      // ● 承認済み・出欠対応済み・開催済み
+      {
+        and: [
+          { reservationStatus: [GqlReservationStatus.Accepted] },
+          { participationStatus: [GqlParticipationStatus.Participated] },
+          { hostingStatus: [GqlOpportunitySlotHostingStatus.Completed] },
+        ],
+      },
+      // ● 却下済み または キャンセル済み
+      {
+        reservationStatus: [GqlReservationStatus.Rejected, GqlReservationStatus.Canceled],
+      },
+      {
+        and: [
+          { reservationStatus: [GqlReservationStatus.Accepted] }, // 未承認の申込
+          { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
+          { participationStatus: [GqlParticipationStatus.Participating] },
+        ],
+      },
     ],
   };
 };
@@ -128,7 +150,7 @@ export default function ReservationsPage() {
               {filteredReservations.map((reservation: GqlReservation) => {
                 const { step, label, variant } = getReservationStatusMeta(reservation);
                 const handleClick = () => {
-                  router.push(`/admin/reservations/${reservation.id}/${step}`);
+                  router.push(`/admin/reservations/${reservation.id}/?mode=${step}`);
                 };
 
                 return (

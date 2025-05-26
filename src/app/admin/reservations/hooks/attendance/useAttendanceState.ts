@@ -7,14 +7,19 @@ export const useAttendanceState = (participations: GqlParticipation[]) => {
   const [allEvaluated, setAllEvaluated] = useState(false);
   const processedParticipationIds = useRef<Set<string>>(new Set());
 
+  // トグル操作ごとに “全員選択完了” を再判定
+  useEffect(() => {
+    const vals = Object.values(attendanceData);
+    setAllEvaluated(vals.length > 0 && vals.every((s) => s !== GqlEvaluationStatus.Pending));
+  }, [attendanceData]);
+
+  // 初回マウント or new id 登場時の初期化
   useEffect(() => {
     if (participations.length === 0) return;
-
     const { initialAttendance, hasNew, hasAnyEval, allEval } = createInitialAttendanceState(
       participations,
       processedParticipationIds.current,
     );
-
     if (hasNew) {
       setAttendanceData((prev) => ({ ...prev, ...initialAttendance }));
       if (hasAnyEval && allEval) setIsSaved(true);
@@ -57,7 +62,6 @@ const createInitialAttendanceState = (
     if (!processedIds.has(p.id)) {
       processedIds.add(p.id);
       hasNew = true;
-
       if (p.evaluation?.status) {
         initialAttendance[p.id] = p.evaluation.status;
         hasAnyEval = true;
