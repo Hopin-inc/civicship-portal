@@ -1,5 +1,5 @@
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGetOpportunitySlotsQuery } from "@/types/graphql";
 
@@ -13,15 +13,13 @@ export interface UseOpportunitySlotsResult {
 }
 
 export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
-  const now = useMemo(() => new Date(), []);
   const isLoadingMore = useRef(false);
+  const { user } = useAuth();
 
   const { data, loading, error, fetchMore } = useGetOpportunitySlotsQuery({
     variables: {
       filter: {
-        // dateRange: {
-        //   lte: now,
-        // },
+        ownerId: user?.id,
       },
       first: 10,
     },
@@ -34,7 +32,6 @@ export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
   const slots = opportunitySlots.edges?.map((edge: any) => edge.node) || [];
   const endCursor = opportunitySlots.pageInfo?.endCursor;
   const hasNextPage = opportunitySlots.pageInfo?.hasNextPage ?? false;
-  const { user } = useAuth();
 
   const handleFetchMore = async () => {
     if (!hasNextPage || isLoadingMore.current) return;
@@ -44,9 +41,6 @@ export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
       await fetchMore({
         variables: {
           filter: {
-            dateRange: {
-              lte: now.toISOString(),
-            },
             ownerId: user?.id,
           },
           cursor: endCursor,

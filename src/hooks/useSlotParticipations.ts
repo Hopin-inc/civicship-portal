@@ -1,29 +1,35 @@
-import { useQuery } from "@apollo/client";
 import { useRef } from "react";
-import { GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS } from "@/graphql/experience/opportunitySlot/query";
-import { GqlOpportunitySlot, GqlParticipation } from "@/types/graphql";
+import {
+  GqlOpportunitySlot,
+  GqlParticipation,
+  GqlReservation,
+  useGetOpportunitySlotWithParticipationsQuery,
+} from "@/types/graphql";
 
 export interface UseSlotParticipationsResult {
-  slot: any;
-  participations: any[];
+  slot: GqlOpportunitySlot | null | undefined;
+  participations: GqlParticipation[];
   loading: boolean;
-  error: any;
+  error: Error | undefined;
   isLoadingMore: boolean;
 }
 
 export const useSlotParticipations = (slotId: string): UseSlotParticipationsResult => {
   const isLoadingMore = useRef(false);
 
-  const { data, loading, error } = useQuery(GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS, {
+  const { data, loading, error } = useGetOpportunitySlotWithParticipationsQuery({
     variables: {
       id: slotId,
-      first: 10,
     },
   });
 
-  const slot: GqlOpportunitySlot = data?.opportunitySlot ?? {};
+  console.log(data);
+
+  const slot: GqlOpportunitySlot | null | undefined = data?.opportunitySlot ?? null;
   const allParticipations: GqlParticipation[] =
-    slot.reservations?.flatMap((reservation: any) => reservation.participations ?? []) ?? [];
+    slot?.reservations?.flatMap(
+      (reservation: GqlReservation) => reservation.participations ?? [],
+    ) ?? [];
 
   return {
     slot,

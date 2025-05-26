@@ -1,67 +1,114 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import Link from "next/link";
-import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
-import { useReservations } from "@/hooks/useReservations";
+import useReservations from "@/app/admin/reservations/hooks/useReservations";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { displayDuration, displayRelativeTime } from "@/utils";
-import { ReservationStatus } from "@/app/admin/reservations/components/ReservationStatus";
-import { Bookmark, CalendarIcon, Info, User } from "lucide-react";
+import { Bookmark, CalendarIcon } from "lucide-react";
+import {
+  GqlOpportunitySlotHostingStatus,
+  GqlParticipationStatus,
+  GqlReservation,
+  GqlReservationFilterInput,
+  GqlReservationStatus,
+} from "@/types/graphql";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import getReservationStatusMeta from "@/app/admin/reservations/hooks/useGetReservationStatusMeta";
+import { useReservationSearch } from "@/app/admin/reservations/hooks/useReservationSearch";
+import { Form } from "@/components/ui/form";
+import SearchForm from "@/app/search/components/SearchForm";
+import { Button } from "@/components/ui/button";
+
+const TABS = ["pending", "resolved"] as const;
+type TabType = (typeof TABS)[number];
+
+const isTabType = (value: string): value is TabType => {
+  return TABS.includes(value as TabType);
+};
+
+const getReservationFilterFromTab = (tab: TabType): GqlReservationFilterInput => {
+  if (tab === "pending") {
+    return {
+      or: [
+        {
+          and: [
+            { reservationStatus: [GqlReservationStatus.Applied] }, // 未承認の申込
+            { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
+            { participationStatus: [GqlParticipationStatus.Participating] },
+          ],
+        },
+        {
+          and: [
+            { reservationStatus: [GqlReservationStatus.Accepted] }, // 承認済み
+            { participationStatus: [GqlParticipationStatus.Participating] }, // 出欠未対応
+            { hostingStatus: [GqlOpportunitySlotHostingStatus.Completed] }, // 開催済み
+          ],
+        },
+      ],
+    };
+  }
+  return {
+    or: [
+      // ● 承認済み・出欠対応済み・開催済み
+      {
+        and: [
+          { reservationStatus: [GqlReservationStatus.Accepted] },
+          { participationStatus: [GqlParticipationStatus.Participated] },
+          { hostingStatus: [GqlOpportunitySlotHostingStatus.Completed] },
+        ],
+      },
+      // ● 却下済み または キャンセル済み
+      {
+        reservationStatus: [GqlReservationStatus.Rejected, GqlReservationStatus.Canceled],
+      },
+      {
+        and: [
+          { reservationStatus: [GqlReservationStatus.Accepted] }, // 未承認の申込
+          { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
+          { participationStatus: [GqlParticipationStatus.Participating] },
+        ],
+      },
+    ],
+  };
+};
 
 export default function ReservationsPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const tabParam = searchParams.get("tab");
-
-  const [activeTab, setActiveTab] = useState<string>(
-    tabParam && ["all", "pending", "processed"].includes(tabParam) ? tabParam : "all",
-  );
-
-  useEffect(() => {
-    const newTab =
-      tabParam && ["all", "pending", "processed"].includes(tabParam) ? tabParam : "all";
-    if (activeTab !== newTab) {
-      setActiveTab(newTab);
-    }
-  }, [tabParam, activeTab]);
-
   const headerConfig = useMemo(
     () => ({
-      title: "応募管理",
+      title: "予約管理",
       showLogo: false,
     }),
     [],
   );
   useHeaderConfig(headerConfig);
 
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const activeTab = TABS.includes(tabParam as TabType) ? (tabParam as TabType) : "pending";
+
   const handleTabChange = (value: string) => {
-    setActiveTab(value);
+    if (!isTabType(value)) return;
 
     const params = new URLSearchParams(searchParams.toString());
-
-    if (value === "all") {
-      params.delete("tab"); // Remove tab parameter for default tab
-    } else {
-      params.set("tab", value);
-    }
-
+    params.set("tab", value);
     router.push(`/admin/reservations?${params.toString()}`);
   };
 
-  const statusFilter = useMemo(() => {
-    if (activeTab === "pending") return "APPLIED";
-    if (activeTab === "processed") return "NOT_APPLIED";
-    return null;
-  }, [activeTab]);
+  const statusFilter = useMemo(() => getReservationFilterFromTab(activeTab), [activeTab]);
+  const { reservations, loading, error, loadMoreRef, refetch } = useReservations(statusFilter);
 
-  const { reservations, loading, error, loadMoreRef, hasMore, isLoadingMore } =
-    useReservations(statusFilter);
+  const reservationItems: GqlReservation[] = reservations.edges
+    .map((edge) => edge.node)
+    .filter((n): n is GqlReservation => !!n);
+
+  const { form, filteredReservations, onSubmit } = useReservationSearch(reservationItems);
 
   if (loading) {
     return (
@@ -74,98 +121,110 @@ export default function ReservationsPage() {
   if (error) {
     return (
       <div className="p-4">
-        <ErrorState title="応募情報の取得に失敗しました" />
+        <ErrorState title="予約の取得に失敗しました" />
       </div>
     );
   }
 
   return (
     <>
-      <div className="p-6">
-        <div className="p-3 rounded-xl border-[1px] border-zinc-300 bg-zinc-50 mt-6">
-          <div className="flex items-start gap-2">
-            <Info className="w-5 h-5 mt-[3px] text-zinc-600" />
-            <div className="flex-1">
-              <p className="font-bold leading-6 text-zinc-800">操作のご案内</p>
-              <p className="text-sm text-zinc-700 mt-1">
-                応募が届くと一覧画面に表示されます。タップすると詳細画面で操作できます。
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="sticky p-4 pb-0">
-        <TabsList className="mb-2">
-          <TabsTrigger value="all">すべて</TabsTrigger>
-          <TabsTrigger value="pending">未対応</TabsTrigger>
-          {/*<TabsTrigger value="processed">対応済み</TabsTrigger>*/}
-        </TabsList>
-      </Tabs>
+      <div className={"px-4"}>
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="sticky p-4 pb-0 mt-4">
+          <TabsList className="mb-2">
+            <TabsTrigger value="pending">未対応</TabsTrigger>
+            <TabsTrigger value="resolved">完了</TabsTrigger>
+          </TabsList>
+        </Tabs>
 
-      <div className="flex flex-col gap-4 p-4">
-        {reservations.length === 0 ? (
-          <p className="text-center text-muted-foreground py-8">応募が見つかりません</p>
-        ) : (
-          <>
-            {reservations.map((reservation: any) => (
-              <Link key={reservation.id} href={`/admin/reservations/${reservation.id}`}>
-                <CardWrapper className="p-4 cursor-pointer" clickable>
-                  <div className="flex flex-col space-y-3">
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src={reservation.createdByUser?.image || ""} />
-                        <AvatarFallback>
-                          {reservation.createdByUser?.name?.[0] || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-row content-center gap-2 flex-grow">
-                        <p className="text-label-md my-auto">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="mb-10 mt-4">
+            <SearchForm name="searchQuery" />
+          </form>
+        </Form>
+
+        <div className="flex flex-col gap-4">
+          {filteredReservations.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">予約がありません</p>
+          ) : (
+            <>
+              {filteredReservations.map((reservation: GqlReservation) => {
+                const { step, label, variant } = getReservationStatusMeta(reservation);
+                const handleClick = () => {
+                  router.push(`/admin/reservations/${reservation.id}/?mode=${step}`);
+                };
+
+                return (
+                  <Card
+                    key={reservation.id}
+                    onClick={handleClick}
+                    className="cursor-pointer hover:bg-muted-hover transition-colors"
+                  >
+                    <CardHeader className="flex flex-row items-center justify-between p-4 gap-3">
+                      <div className="flex items-center gap-3 flex-grow min-w-0">
+                        <Avatar>
+                          <AvatarImage src={reservation.createdByUser?.image || ""} />
+                          <AvatarFallback>
+                            {reservation.createdByUser?.name?.[0] || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <CardTitle className="text-base truncate">
                           {reservation.createdByUser?.name || "未設定"}
-                        </p>
+                        </CardTitle>
                       </div>
-                      <ReservationStatus status={reservation.status} />
-                    </div>
 
-                    {/* 予約情報 */}
-                    <div className="flex flex-col flex-wrap text-body-sm gap-1">
-                      <p className="inline-flex items-center gap-1">
-                        <Bookmark size="16" />
-                        {reservation.opportunitySlot?.opportunity?.title}
-                      </p>
-                      <div className="flex flex-wrap text-body-sm gap-x-4 gap-y-1">
-                        <p className="inline-flex items-center gap-1">
-                          <CalendarIcon size="16" />
+                      <div className="flex-shrink-0">
+                        <Badge variant={variant}>{label}</Badge>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="space-y-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1 truncate">
+                        <Bookmark size={16} />
+                        <span className="truncate">
+                          {reservation.opportunitySlot?.opportunity?.title}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 truncate">
+                        <CalendarIcon size={16} />
+                        <span className="truncate">
                           {reservation.opportunitySlot?.startsAt &&
                             displayDuration(
                               reservation.opportunitySlot.startsAt,
                               reservation.opportunitySlot.endsAt,
                             )}
-                        </p>
-                        <p className="inline-flex items-center gap-1">
-                          <User size="16" />
-                          {reservation.participations?.length || 0}名
-                        </p>
+                        </span>
                       </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {displayRelativeTime(reservation.createdAt)}
-                    </p>
-                  </div>
-                </CardWrapper>
-              </Link>
-            ))}
+                    </CardContent>
 
-            {/* Infinite scroll loading ref */}
-            <div ref={loadMoreRef} className="py-4 flex justify-center">
-              {hasMore &&
-                (isLoadingMore ? (
-                  <LoadingIndicator />
-                ) : (
-                  <p className="text-sm text-muted-foreground">スクロールして続きを読み込む</p>
-                ))}
-            </div>
-          </>
-        )}
+                    <CardFooter className="text-xs text-muted-foreground pt-0 flex justify-between items-center">
+                      <span>{displayRelativeTime(reservation.createdAt ?? "")}</span>
+                      {activeTab === "pending" && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="px-10"
+                          onClick={(e) => {
+                            e.stopPropagation(); // 親のクリック遷移を防ぐ
+                            handleClick(); // 明示的に遷移
+                          }}
+                        >
+                          対応する
+                        </Button>
+                      )}
+                    </CardFooter>
+                  </Card>
+                );
+              })}
+
+              <div ref={loadMoreRef} className="h-0" aria-hidden="true" />
+              {loading && (
+                <div className="h-10 flex items-center justify-center">
+                  <div className="animate-spin h-6 w-6 border-b-2 border-foreground rounded-full"></div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </>
   );
