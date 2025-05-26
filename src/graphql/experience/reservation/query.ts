@@ -91,6 +91,12 @@ export const GET_RESERVATION = gql`
       }
       participations {
         ...ParticipationFields
+        user {
+          ...UserFields
+        }
+        evaluation {
+          ...EvaluationFields
+        }
       }
     }
   }
