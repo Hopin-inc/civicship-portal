@@ -85,8 +85,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     fetchPolicy: "no-cache",
   });
 
-  console.log("Current user data:", currentUserData);
-
   const [ready] = useState(() => deferred());
   const [uid, setUid] = useState<UserInfo["uid"]>(null);
   const [user, setUser] = useState<UserInfo["user"]>(null);
@@ -426,7 +424,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         cookies.remove("phone_auth_token");
         cookies.remove("phone_refresh_token");
       }
-      console.log("User state changed:", user);
       setAuthLoading(false);
     });
 
