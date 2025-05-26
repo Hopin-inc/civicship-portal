@@ -66,6 +66,7 @@ type AuthContextType = UserInfo & {
     verifyPhoneCode: (code: string) => Promise<boolean>;
   };
   isPhoneVerified: boolean;
+  loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -78,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const {
     data: currentUserData,
-    loading: queryLoading,
+    loading,
     refetch,
     error: queryError,
   } = useCurrentUserQuery({
@@ -311,7 +312,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { errorType, errorMessage } = customEvent.detail;
 
       console.log("Auth error event detected:", customEvent.detail);
-      
+
       setIsAuthenticating(false);
 
       toast.error(errorMessage, {
@@ -370,36 +371,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         try {
-          if (queryLoading) {
-            console.log('Waiting for existing query to complete...');
+          if (loading) {
+            console.log("Waiting for existing query to complete...");
             await new Promise<void>((resolve) => {
               const checkInterval = setInterval(() => {
-                if (!queryLoading) {
+                if (!loading) {
                   clearInterval(checkInterval);
                   resolve();
                 }
               }, 100);
             });
           }
-          
+
           if (queryError) {
-            console.warn('Previous query error detected:', queryError);
+            console.warn("Previous query error detected:", queryError);
           }
-          
+
           const { data } = await retryWithBackoff(
             async () => {
-              console.log('Attempting to fetch user data...');
+              console.log("Attempting to fetch user data...");
               const result = await refetch();
               if (!result.data.currentUser?.user) {
-                throw new Error('User data not found after authentication');
+                throw new Error("User data not found after authentication");
               }
               return result;
             },
             3, // retries
             500, // initial delay
-            2 // backoff factor
+            2, // backoff factor
           );
-          
+
           const fetchedUser = data.currentUser?.user ?? null;
           if (fetchedUser) {
             login({
@@ -420,7 +421,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               router.push(next);
             }
           } else {
-            console.warn('User data fetch failed after all retries, redirecting to sign-up');
+            console.warn("User data fetch failed after all retries, redirecting to sign-up");
             if (isPhoneVerified || checkPhoneVerified()) {
               router.push("/sign-up");
             } else {
@@ -428,7 +429,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
           }
         } catch (error) {
-          console.error('Failed to fetch user data after retries:', error);
+          console.error("Failed to fetch user data after retries:", error);
           if (isPhoneVerified || checkPhoneVerified()) {
             router.push("/sign-up");
           } else {
@@ -526,6 +527,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           verifyPhoneCode: verifyPhoneCodeLocal,
         },
         isPhoneVerified,
+        loading,
       }}
     >
       {children}
