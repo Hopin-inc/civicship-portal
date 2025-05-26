@@ -48,12 +48,9 @@ const useReservations = (filter: GqlReservationFilterInput): UseReservationsResu
     },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
-    skip: !user?.id, // Skip query execution if user ID is undefined
   });
 
-  const isUserIdMissing = !user?.id;
-  
-  const reservations = (isUserIdMissing || !data) ? fallbackConnection : (data.reservations ?? fallbackConnection);
+  const reservations = data?.reservations ?? fallbackConnection;
   const endCursor = reservations.pageInfo?.endCursor;
   const hasNextPage = reservations.pageInfo?.hasNextPage ?? false;
 
@@ -101,16 +98,10 @@ const useReservations = (filter: GqlReservationFilterInput): UseReservationsResu
     onLoadMore: handleFetchMore,
   });
 
-  const effectiveLoading = loading && !isUserIdMissing;
-  
-  const effectiveError = isUserIdMissing ? 
-    { message: "ユーザー情報が取得できていません。再度ログインしてください。" } : 
-    error;
-
   return {
     reservations,
-    loading: effectiveLoading,
-    error: effectiveError,
+    loading,
+    error,
     loadMoreRef,
     refetch,
   };
