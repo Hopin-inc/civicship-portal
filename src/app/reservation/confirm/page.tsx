@@ -71,6 +71,7 @@ export default function ConfirmPage() {
       wallets,
       user,
       ticketCounter,
+      participantCount,
       useTickets: ui.useTickets,
       comment: ui.ageComment ?? undefined,
     });
@@ -88,11 +89,15 @@ export default function ConfirmPage() {
 
     toast.success("申し込みが完了しました。");
 
+    const participationCount = result.reservation.participations?.length ?? 1;
+
     const query = new URLSearchParams({
       id: opportunityId,
       community_id: communityId ?? "",
-      reservation_id: result.reservationId,
+      reservation_id: result.reservation.id,
+      guests: participationCount.toString(),
     });
+
     router.push(`/reservation/complete?${query.toString()}`);
   };
 

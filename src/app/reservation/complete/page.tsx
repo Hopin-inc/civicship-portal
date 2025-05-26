@@ -31,6 +31,8 @@ export default function CompletePage() {
   const searchParams = useSearchParams();
   const opportunityId = searchParams.get("id");
   const reservationId = searchParams.get("reservation_id");
+  const guest = searchParams.get("guests");
+  const participationCount = guest ? parseInt(guest) : 1;
 
   const { reservation, opportunity, dateTimeInfo, sameStateActivities, loading, error, refetch } =
     useCompletePageViewModel(opportunityId, reservationId);
@@ -79,7 +81,7 @@ export default function CompletePage() {
             formattedDate={dateTimeInfo.formattedDate}
             startTime={dateTimeInfo.startTime}
             endTime={dateTimeInfo.endTime}
-            participantCount={dateTimeInfo.participantCount}
+            participantCount={participationCount}
             totalPrice={dateTimeInfo.totalPrice}
             pricePerPerson={opportunity.feeRequired ?? 0}
             location={oppotunityDetail?.place}

@@ -1,12 +1,20 @@
 import { useCallback } from "react";
-import { GqlErrorCode, GqlUser, GqlWallet, useCreateReservationMutation } from "@/types/graphql";
+import {
+  GqlErrorCode,
+  GqlReservation,
+  GqlUser,
+  GqlWallet,
+  useCreateReservationMutation,
+} from "@/types/graphql";
 import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
 import { ActivityDetail } from "@/app/activities/data/type";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
 import { ApolloError } from "@apollo/client";
 
-type Result = { success: true; reservationId: string } | { success: false; code: GqlErrorCode };
+type Result =
+  | { success: true; reservation: GqlReservation }
+  | { success: false; code: GqlErrorCode };
 
 interface ReservationParams {
   opportunity: ActivityDetail | null;
@@ -14,6 +22,7 @@ interface ReservationParams {
   wallets: GqlWallet[] | null;
   user: Pick<GqlUser, "id"> | null;
   ticketCounter: UseTicketCounterReturn;
+  participantCount: number;
   useTickets: boolean;
   comment?: string;
 }
@@ -30,6 +39,7 @@ export const useReservationCommand = () => {
       ticketCounter,
       useTickets,
       comment,
+      participantCount,
     }: ReservationParams): Promise<Result> => {
       if (loading) return { success: false, code: GqlErrorCode.Unknown };
       if (!user) return { success: false, code: GqlErrorCode.Unauthenticated };
@@ -43,12 +53,13 @@ export const useReservationCommand = () => {
         return { success: false, code: GqlErrorCode.TicketParticipantMismatch };
       }
 
+      // TODO チケット機能リリース時は、チケット数と参加者数が異なっても良い状態にする
       try {
         const res = await createReservation({
           variables: {
             input: {
               opportunitySlotId: selectedSlot.id,
-              totalParticipantCount: count,
+              totalParticipantCount: participantCount,
               paymentMethod: useTickets ? "TICKET" : "FEE",
               ticketIdsIfNeed: useTickets ? ticketIds : undefined,
               comment: comment ?? undefined,
@@ -60,7 +71,7 @@ export const useReservationCommand = () => {
         if (data?.__typename === "ReservationCreateSuccess") {
           return {
             success: true,
-            reservationId: data.reservation.id,
+            reservation: data.reservation,
           };
         } else {
           return { success: false, code: GqlErrorCode.Unknown };
