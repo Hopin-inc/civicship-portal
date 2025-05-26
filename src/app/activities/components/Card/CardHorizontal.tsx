@@ -7,20 +7,29 @@ import { MapPin } from "lucide-react";
 import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
-function OpportunityCardHorizontal({ opportunity }: { opportunity: ActivityCard }) {
+type Props = {
+  opportunity: ActivityCard;
+  withShadow?: boolean;
+};
+
+function OpportunityCardHorizontal({ opportunity, withShadow = true }: Props) {
   return (
     <Link
       href={`/activities/${opportunity.id}?community_id=${opportunity.communityId}`}
       className="block"
     >
       <div className="mx-auto max-w-md">
-        <div className="flex overflow-hidden rounded-xl bg-background shadow-lg">
+        <div
+          className={`flex overflow-hidden rounded-xl bg-background ${
+            withShadow ? "shadow-lg" : ""
+          }`}
+        >
           <div className="relative h-[108px] w-[88px] flex-shrink-0">
             <Image
               src={opportunity.images?.[0] ?? PLACEHOLDER_IMAGE}
               alt={opportunity.title}
               fill
-              placeholder={`blur`}
+              placeholder="blur"
               blurDataURL={PLACEHOLDER_IMAGE}
               className="object-cover rounded-lg"
               onError={(e) => {
