@@ -11,10 +11,10 @@ export const useInitialLiffRedirect = () => {
     const searchParams = new URLSearchParams(window.location.search);
     const initial = searchParams.get("initial");
 
-    if (window.location.pathname === "/" && initial && initial.startsWith("/") && initial !== "/") {
-      hasRedirected.current = true; // 🛑 二度目以降スキップ
+    if (initial && initial.startsWith("/") && initial !== window.location.pathname) {
+      hasRedirected.current = true;
       console.log("🚀 Redirecting to initial path:", initial);
-      router.replace(initial);
+      router.replace(initial); // または window.location.replace(initial)
     }
   }, [router]);
 };

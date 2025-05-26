@@ -4,9 +4,19 @@ import { Link as LinkIcon } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { isRunningInLiff } from "@/utils/liff";
 
 export default function OpenInBrowser() {
   const COPY_URL = "https://www.neo88.app/sign-up/phone-verification";
+  const router = useRouter();
+
+  useEffect(() => {
+    // ✅ LIFF 環境であれば `/sign-up/phone-verification` に戻す
+    if (isRunningInLiff()) {
+      router.replace("/sign-up/phone-verification");
+    }
+  }, [router]);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";

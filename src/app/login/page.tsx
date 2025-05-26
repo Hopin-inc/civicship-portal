@@ -9,14 +9,36 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { getLiffLoginErrorMessage } from "@/app/login/utils/getLiffLoginErrorMessage";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useLiff } from "@/contexts/LiffContext";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const { isLiffInitialized, isLiffLoggedIn, liffProfile, liffError } = useLiff();
+  const { loginWithLiff, isAuthenticating } = useAuth();
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
-  const { loginWithLiff, isAuthenticating } = useAuth();
 
+  // 🚀 LIFFログイン済みならトップへ自動遷移
+  useEffect(() => {
+    if (isLiffInitialized && isLiffLoggedIn && liffProfile) {
+      console.log("🚀 Automatically redirect to the top page if already logged in via LIFF");
+      router.replace("/");
+    }
+  }, [isLiffInitialized, isLiffLoggedIn, liffProfile, router]);
+
+  // 🔴 初期化エラー表示
+  useEffect(() => {
+    if (liffError) {
+      console.error(liffError);
+    }
+  }, [liffError]);
+
+  // 📦 ログイン処理
   const handleLogin = async () => {
     if (!agreedTerms || !agreedPrivacy) {
       setError("すべての同意が必要です");
@@ -28,6 +50,7 @@ export default function LoginPage() {
 
     try {
       await loginWithLiff();
+      router.push("/");
     } catch (err) {
       const { title, description } = getLiffLoginErrorMessage(error);
       toast.error(title, { description });
@@ -36,6 +59,7 @@ export default function LoginPage() {
     }
   };
 
+  // 💡 ページスクロール抑制
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
