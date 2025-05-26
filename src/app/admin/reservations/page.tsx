@@ -102,7 +102,6 @@ export default function ReservationsPage() {
 
   const statusFilter = useMemo(() => getReservationFilterFromTab(activeTab), [activeTab]);
   const { reservations, loading, error, loadMoreRef, refetch } = useReservations(statusFilter);
-  console.log(reservations);
 
   const reservationItems: GqlReservation[] = reservations.edges
     .map((edge) => edge.node)
