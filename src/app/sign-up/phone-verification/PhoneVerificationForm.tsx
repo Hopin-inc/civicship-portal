@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../../contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../../components/ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 export function PhoneVerificationForm() {
-  const { phoneAuth, uid, user } = useAuth();
+  const { phoneAuth, user } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -15,17 +15,37 @@ export function PhoneVerificationForm() {
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  const isLineWebBrowser = () => {
+    const userAgent = navigator.userAgent;
+    return /Line/i.test(userAgent);
+  };
+
   useEffect(() => {
+    // ① LINEブラウザならリダイレクト
+    if (isLineWebBrowser()) {
+      router.replace("/sign-up/phone-verification/line-browser");
+      return;
+    }
+
+    // ② ログイン済みならリダイレクト
+    if (user) {
+      toast.success("既にログインしています");
+      router.replace("/users/me");
+      return;
+    }
+
+    // ③ reCAPTCHA 初期化
     if (recaptchaContainerRef.current) {
       setIsRecaptchaReady(true);
     }
 
+    // ④ クリーンアップ
     return () => {
       import("../../../lib/firebase").then(({ clearRecaptcha }) => {
         clearRecaptcha();
       });
     };
-  }, []);
+  }, [router, user]);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
