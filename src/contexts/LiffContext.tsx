@@ -4,6 +4,7 @@ import { createContext, ReactNode, useCallback, useContext, useEffect, useState 
 import liff from "@line/liff";
 import { setIsInLiffBrowser } from "@/utils/liff";
 import { useRouter } from "next/navigation";
+import LIFFInspectorPlugin from "@line/liff-inspector";
 
 type LiffProfile = {
   userId: string;
@@ -70,6 +71,8 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
 
   const liffInit = useCallback(async () => {
     try {
+      liff.use(new LIFFInspectorPlugin());
+
       await liff.init({ liffId });
       setIsLiffInitialized(true);
 
@@ -82,18 +85,18 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
         updateLiffTokens();
       }
 
-      const searchParams = new URLSearchParams(window.location.search);
-      const initial = searchParams.get("initial");
-      if (initial && initial.startsWith("/") && initial !== window.location.pathname) {
-        console.log("🚀 Redirecting to initial path:", initial);
-        router.replace(initial);
-      }
+      // const searchParams = new URLSearchParams(window.location.search);
+      // const initial = searchParams.get("initial");
+      // if (initial && initial.startsWith("/") && initial !== window.location.pathname) {
+      //   console.log("🚀 Redirecting to initial path:", initial);
+      //   router.replace(initial);
+      // }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       setLiffError(errorMessage);
       console.error("LIFF initialization failed:", error);
     }
-  }, [liffId, updateLiffProfile, updateLiffTokens, router]);
+  }, [liffId, updateLiffProfile, updateLiffTokens]);
 
   const liffLogin = useCallback(() => {
     if (!isLiffInitialized) {
