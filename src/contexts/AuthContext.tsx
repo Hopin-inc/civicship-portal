@@ -22,7 +22,6 @@ import {
 } from "@/lib/firebase";
 import { toast } from "sonner";
 import { deferred } from "@/utils/defer";
-import { retryWithBackoff } from "@/utils/retry";
 import { useLiff } from "./LiffContext";
 import { COMMUNITY_ID } from "@/utils";
 import { LiffError } from "@liff/util";
@@ -79,23 +78,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const {
     data: currentUserData,
-    loading,
+    loading: gqlLoading,
     refetch,
     error: queryError,
   } = useCurrentUserQuery({
     fetchPolicy: "no-cache",
   });
 
+  console.log("Current user data:", currentUserData);
+
   const [ready] = useState(() => deferred());
   const [uid, setUid] = useState<UserInfo["uid"]>(null);
   const [user, setUser] = useState<UserInfo["user"]>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isExplicitLogin, setIsExplicitLogin] = useState(false);
-
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
+
+  // 電話番号認証
   const [verificationId, setVerificationId] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+
+  // 初回の認証状態が終わったか
+  const [authLoading, setAuthLoading] = useState(true);
 
   const login = useCallback((userInfo: UserInfo | null) => {
     setUid(userInfo?.uid ?? null);
@@ -371,37 +376,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         try {
-          if (loading) {
-            console.log("Waiting for existing query to complete...");
-            await new Promise<void>((resolve) => {
-              const checkInterval = setInterval(() => {
-                if (!loading) {
-                  clearInterval(checkInterval);
-                  resolve();
-                }
-              }, 100);
-            });
+          console.log("Attempting to fetch user data...");
+          const result = await refetch();
+
+          if (!result.data.currentUser?.user) {
+            throw new Error("User data not found after authentication");
           }
 
-          if (queryError) {
-            console.warn("Previous query error detected:", queryError);
-          }
-
-          const { data } = await retryWithBackoff(
-            async () => {
-              console.log("Attempting to fetch user data...");
-              const result = await refetch();
-              if (!result.data.currentUser?.user) {
-                throw new Error("User data not found after authentication");
-              }
-              return result;
-            },
-            3, // retries
-            500, // initial delay
-            2, // backoff factor
-          );
-
-          const fetchedUser = data.currentUser?.user ?? null;
+          const fetchedUser = result.data.currentUser?.user ?? null;
           if (fetchedUser) {
             login({
               uid: user.uid,
@@ -414,7 +396,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             if (isExplicitLogin) {
               toast.success("ログインしました！");
-              setIsExplicitLogin(false); // フラグをリセットして再表示を防止
+              setIsExplicitLogin(false);
             }
 
             if (next) {
@@ -444,6 +426,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         cookies.remove("phone_auth_token");
         cookies.remove("phone_refresh_token");
       }
+      console.log("User state changed:", user);
+      setAuthLoading(false);
     });
 
     return () => unsubscribe();
@@ -527,7 +511,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           verifyPhoneCode: verifyPhoneCodeLocal,
         },
         isPhoneVerified,
-        loading,
+        loading: authLoading || gqlLoading,
       }}
     >
       {children}
