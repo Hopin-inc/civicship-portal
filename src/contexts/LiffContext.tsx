@@ -3,9 +3,7 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import liff from "@line/liff";
 import { setIsInLiffBrowser } from "@/utils/liff";
-import { useRouter } from "next/navigation";
-
-const INITIAL_PATH_KEY = "liff_initial_path";
+import { useInitialLiffRedirect } from "@/hooks/useInitialLiffRedirect";
 
 type LiffProfile = {
   userId: string;
@@ -35,7 +33,8 @@ type LiffProviderProps = {
 
 export const LiffProvider = ({ children }: LiffProviderProps) => {
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
-  const router = useRouter();
+  useInitialLiffRedirect();
+
   const [isLiffInitialized, setIsLiffInitialized] = useState<boolean>(false);
   const [isInLiff, setIsInLiff] = useState<boolean>(false);
   const [isLiffLoggedIn, setIsLiffLoggedIn] = useState<boolean>(false);
@@ -43,17 +42,6 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
   const [liffProfile, setLiffProfile] = useState<LiffProfile | null>(null);
   const [liffIdToken, setLiffIdToken] = useState<string | null>(null);
   const [liffAccessToken, setLiffAccessToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const alreadySaved = sessionStorage.getItem(INITIAL_PATH_KEY);
-      if (!alreadySaved && window.location.pathname !== "/") {
-        const fullPath = window.location.pathname + window.location.search;
-        console.log("✅ Saving initial path:", fullPath);
-        sessionStorage.setItem(INITIAL_PATH_KEY, fullPath);
-      }
-    }
-  }, []);
 
   const updateLiffProfile = useCallback(async () => {
     try {
@@ -92,25 +80,13 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
       if (liff.isLoggedIn()) {
         await updateLiffProfile();
         updateLiffTokens();
-
-        const initialPath = sessionStorage.getItem(INITIAL_PATH_KEY);
-        if (
-          initialPath &&
-          initialPath !== "/" &&
-          initialPath !== "/activities" &&
-          window.location.pathname === "/"
-        ) {
-          console.log("✅ Restoring initial path:", initialPath);
-          router.push(initialPath);
-          sessionStorage.removeItem(INITIAL_PATH_KEY);
-        }
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       setLiffError(errorMessage);
       console.error("LIFF initialization failed:", error);
     }
-  }, [liffId, updateLiffProfile, updateLiffTokens, router]);
+  }, [liffId, updateLiffProfile, updateLiffTokens]);
 
   const liffLogin = useCallback(() => {
     if (!isLiffInitialized) {
