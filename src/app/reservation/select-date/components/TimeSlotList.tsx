@@ -9,6 +9,26 @@ interface TimeSlotListProps {
   onSelectSlot: (slot: ActivitySlot) => void;
 }
 
+export const parseJapaneseDateLabel = (label: string) => {
+  const match = label.match(/^(\d+)月(\d+)日（(.+)）$/);
+  if (!match) return { month: "", day: "", weekday: "" };
+
+  const [, month, day, weekday] = match;
+  return { month, day, weekday };
+};
+
+const SectionHeader = ({ label }: { label: string }) => {
+  const { month, day, weekday } = parseJapaneseDateLabel(label);
+
+  return (
+    <h2 className="flex items-baseline gap-1 mb-2">
+      <span className="text-lg text-gray-500">{month}/</span>
+      <span className="text-display-xl">{day}</span>
+      <span className="text-sm text-gray-500">（{weekday}）</span>
+    </h2>
+  );
+};
+
 const TimeSlotList: React.FC<TimeSlotListProps> = ({
   dateSections,
   isSlotAvailable,
@@ -23,12 +43,13 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
     <div className="space-y-8">
       {dateSections.map((section, sectionIndex) => (
         <div key={sectionIndex}>
-          <h3 className="text-lg font-bold mb-4">{section.dateLabel}</h3>
+          <SectionHeader label={section.dateLabel} />
           <div className="space-y-2">
             {section.slots.map((slot, slotIndex) => {
               const remainingCapacity = slot.remainingCapacity || 0;
               const isFull = remainingCapacity === 0;
               const isAvailable = isSlotAvailable(slot);
+              const isFeeSpecified = slot.feeRequired != null;
 
               return (
                 <div
@@ -43,9 +64,11 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                         {formatTimeRange(slot.startsAt, slot.endsAt)}
                       </p>
                       <p
-                        className={`text-md font-bold ${isFull ? "text-muted-foreground/50" : ""}`}
+                        className={`text-md font-bold ${
+                          isFull || !isFeeSpecified ? "text-muted-foreground/50" : ""
+                        }`}
                       >
-                        {slot.feeRequired?.toLocaleString()}円/人
+                        {isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円/人` : "料金未定"}
                       </p>
                     </div>
                     {isFull ? (

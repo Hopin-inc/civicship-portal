@@ -15,14 +15,14 @@ export const presenterOpportunitySlots = (
 
       if (!node || !opportunity) return null;
 
-      return presenterOpportunitySlot(node, opportunity.feeRequired ?? 0);
+      return presenterOpportunitySlot(node, opportunity.feeRequired ?? null);
     })
     .filter((slot): slot is ActivitySlot => slot !== null);
 };
 
 export const presenterOpportunitySlot = (
   slot: GqlOpportunitySlot,
-  feeRequired: number,
+  feeRequired: number | null,
 ): ActivitySlot => {
   const startsAtDate = new Date(slot.startsAt);
   const threshold = addDays(new Date(), 7);
@@ -71,7 +71,7 @@ export const groupActivitySlotsByDate = (slots: ActivitySlot[]): ActivitySlotGro
     const month = date.getMonth() + 1;
     const day = date.getDate();
     const weekday = date.toLocaleDateString("ja-JP", { weekday: "narrow" }); // "水"
-    const dateLabel = `${month}月${day}日(${weekday})`;
+    const dateLabel = `${month}月${day}日（${weekday}）`; // ← 全角括弧に！
 
     if (!groups[dateLabel]) {
       groups[dateLabel] = [];
