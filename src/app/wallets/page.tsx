@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo } from "react";
 import { useWallet } from "@/app/wallets/hooks/useWallet";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
 import { Button } from "@/components/ui/button";

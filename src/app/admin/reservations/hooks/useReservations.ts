@@ -8,7 +8,7 @@ import {
   GqlSortDirection,
   useGetReservationsQuery,
 } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export interface UseReservationsResult {
   reservations: GqlReservationsConnection;

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import { COMMUNITY_ID } from "@/utils";
 import { GqlRole, GqlUser } from "@/types/graphql";
 import { toast } from "sonner";

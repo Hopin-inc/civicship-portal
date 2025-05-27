@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import LoginModal from "@/app/login/components/LoginModal";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useTicketClaim } from "@/app/tickets/receive/hooks/useTicketClaim";

@@ -2,7 +2,7 @@
 
 import { analytics } from "@/lib/firebase";
 import { logEvent, setUserId, setUserProperties } from "firebase/analytics";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import { useEffect, useMemo } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
