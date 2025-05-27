@@ -143,26 +143,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             userId: liffState.profile.userId
           });
           
+          let isRedirectFromLineAuth = false;
           if (typeof window !== "undefined") {
             const searchParams = new URLSearchParams(window.location.search);
-            const hasLiffStateParam = searchParams.has("liff.state");
-            console.log("🔍 URL has liff.state param:", hasLiffStateParam);
-            
-            if (hasLiffStateParam) {
-              console.log("🔍 Detected return from LINE authentication");
-            }
+            isRedirectFromLineAuth = searchParams.has("liff.state") || searchParams.has("code");
+            console.log("🔍 Is redirect from LINE auth:", isRedirectFromLineAuth);
           }
           
-          if (liffState.isLoggedIn && state.lineAuthStatus === "unauthenticated") {
-            console.log("🔍 LIFF is logged in but Firebase auth is not complete, completing authentication");
+          if (isRedirectFromLineAuth || (liffState.isLoggedIn && state.lineAuthStatus === "unauthenticated")) {
+            console.log("🔍 Detected LINE authentication redirect or LIFF is logged in but Firebase auth is not complete");
             try {
-              console.log("🔍 Calling signInWithLiffToken");
+              console.log("🔍 Calling signInWithLiffToken to complete authentication");
               const success = await liffService.signInWithLiffToken();
               console.log("🔍 signInWithLiffToken result:", success);
               
               if (success) {
-                console.log("🔍 Refreshing user data");
+                console.log("🔍 Authentication successful, refreshing user data");
                 await refetchUser();
+              } else {
+                console.error("🔍 Failed to complete authentication with LIFF token");
               }
             } catch (error) {
               console.error("Failed to complete LIFF authentication:", error);
