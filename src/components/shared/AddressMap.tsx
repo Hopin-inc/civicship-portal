@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState, useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { getCoordinatesFromAddress } from "@/utils/maps/geocoding";
@@ -25,7 +25,7 @@ const DEFAULT_CENTER = {
   lng: 133.5,
 };
 
-const DEFAULT_ZOOM = 17;
+const DEFAULT_ZOOM = 12;
 
 const useAddressGeocoding = (
   address: string | undefined,
@@ -182,7 +182,7 @@ export default function AddressMap({
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={DEFAULT_CENTER}
-        zoom={12}
+        zoom={zoom}
         onLoad={onLoad}
         onUnmount={onUnmount}
         options={{
