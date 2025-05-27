@@ -23,14 +23,6 @@ export default function LoginPage() {
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
 
-  // 🚀 LIFFログイン済みならトップへ自動遷移
-  useEffect(() => {
-    if (isLiffInitialized && isLiffLoggedIn && liffProfile) {
-      console.log("🚀 Automatically redirect to the top page if already logged in via LIFF");
-      router.replace("/");
-    }
-  }, [isLiffInitialized, isLiffLoggedIn, liffProfile, router]);
-
   // 🔴 初期化エラー表示
   useEffect(() => {
     if (liffError) {
@@ -50,7 +42,6 @@ export default function LoginPage() {
 
     try {
       await loginWithLiff();
-      router.push("/");
     } catch (err) {
       const { title, description } = getLiffLoginErrorMessage(error);
       toast.error(title, { description });
