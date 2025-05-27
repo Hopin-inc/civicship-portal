@@ -5,15 +5,18 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useQuery } from "@apollo/client";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
+import { matchPaths } from "@/utils/path";
 
 /**
  * 認証が必要なページのパスパターン
  */
 const PROTECTED_PATHS = [
   "/users/me",
+  "/tickets",
+  "/wallets",
+  "/wallets/*",
   "/admin",
-  "/my-activities",
-  "/my-points",
+  "/admin/*",
 ];
 
 /**
@@ -29,7 +32,7 @@ const PHONE_VERIFICATION_REQUIRED_PATHS = [
  * @returns 保護されたパスの場合はtrue
  */
 const isProtectedPath = (path: string): boolean => {
-  return PROTECTED_PATHS.some((protectedPath) => path.startsWith(protectedPath));
+  return matchPaths(path, ...PROTECTED_PATHS);
 };
 
 /**
@@ -57,18 +60,18 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
   const [authorized, setAuthorized] = useState(false);
-  
+
   const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
   });
-  
+
   const isUserRegistered = userData?.currentUser != null;
-  
+
   useEffect(() => {
     if (loading || userLoading) {
       return;
     }
-    
+
     const authCheck = () => {
       if (isProtectedPath(pathname)) {
         if (!isAuthenticated) {
@@ -96,20 +99,20 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         setAuthorized(true);
       }
     };
-    
+
     authCheck();
-    
+
     const handleRouteChange = () => {
       authCheck();
     };
-    
+
     return () => {
     };
   }, [pathname, isAuthenticated, isPhoneVerified, isUserRegistered, loading, userLoading, router]);
-  
+
   if (loading || userLoading) {
     return null;
   }
-  
+
   return authorized ? <>{children}</> : null;
 };

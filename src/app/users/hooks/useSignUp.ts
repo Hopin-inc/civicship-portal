@@ -43,8 +43,7 @@ export const useSignUp = () => {
 
     setIsLoading(true);
     try {
-      const phoneUid = phoneAuth.phoneUid || undefined;
-
+      const phoneUid = phoneAuth.phoneUid ?? null;
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
         toast.success('アカウントが作成されました');

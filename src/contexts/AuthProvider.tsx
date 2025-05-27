@@ -5,9 +5,9 @@ import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { TokenManager } from "@/lib/auth/token-manager";
-import { lineAuth, phoneAuth } from "@/lib/auth/firebase-config";
+import { lineAuth } from "@/lib/auth/firebase-config";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
-import { GqlCurrentPrefecture, GqlCurrentUserQuery } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlCurrentUserPayload, GqlCurrentUserQuery } from "@/types/graphql";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useMutation, useQuery } from "@apollo/client";
@@ -19,7 +19,7 @@ import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
  */
 export type AuthState = {
   firebaseUser: User | null;
-  currentUser: GqlCurrentUserQuery["currentUser"]["user"] | null;
+  currentUser: GqlCurrentUserPayload["user"] | null;
   lineAuthStatus: "authenticated" | "unauthenticated" | "loading";
   phoneAuthStatus: "verified" | "unverified" | "loading";
   environment: AuthEnvironment;
@@ -30,26 +30,26 @@ export type AuthState = {
  * 認証コンテキストの型定義
  */
 interface AuthContextType {
-  user: GqlCurrentUserQuery["currentUser"]["user"] | null;
+  user: GqlCurrentUserPayload["user"] | null;
   firebaseUser: User | null;
   uid: string | null;
   isAuthenticated: boolean;
   isPhoneVerified: boolean;
   isAuthenticating: boolean;
   environment: AuthEnvironment;
-  
+
   loginWithLiff: () => Promise<boolean>;
   logout: () => Promise<void>;
-  
+
   phoneAuth: {
     startPhoneVerification: (phoneNumber: string) => Promise<string | null>;
     verifyPhoneCode: (verificationCode: string) => Promise<boolean>;
     isVerifying: boolean;
     phoneUid: string | null;
   };
-  
+
   createUser: (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string | null) => Promise<User | null>;
-  
+
   loading: boolean;
 }
 
@@ -67,12 +67,12 @@ interface AuthProviderProps {
  */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const environment = detectEnvironment();
-  
+
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
   const liffService = LiffService.getInstance(liffId);
-  
+
   const phoneAuthService = PhoneAuthService.getInstance();
-  
+
   const [state, setState] = useState<AuthState>({
     firebaseUser: null,
     currentUser: null,
@@ -81,16 +81,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     environment,
     isAuthenticating: false,
   });
-  
+
   const router = useRouter();
-  
+
   const [userSignUp] = useMutation(USER_SIGN_UP);
-  
+
   const { data: userData, loading: userLoading, refetch: refetchUser } = useQuery(GET_CURRENT_USER, {
     skip: state.lineAuthStatus !== "authenticated",
     fetchPolicy: "network-only",
   });
-  
+
   useEffect(() => {
     const unsubscribe = lineAuth.onAuthStateChanged((user) => {
       setState((prev) => ({
@@ -99,10 +99,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         lineAuthStatus: user ? "authenticated" : "unauthenticated",
       }));
     });
-    
+
     return () => unsubscribe();
   }, []);
-  
+
   useEffect(() => {
     const phoneState = phoneAuthService.getState();
     setState((prev) => ({
@@ -110,7 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       phoneAuthStatus: phoneState.isVerified ? "verified" : "unverified",
     }));
   }, []);
-  
+
   useEffect(() => {
     if (userData?.currentUser?.user) {
       setState((prev) => ({
@@ -119,16 +119,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }));
     }
   }, [userData]);
-  
+
   useEffect(() => {
     const initializeAuth = async () => {
       setState(prev => ({ ...prev, isAuthenticating: true }));
-      
+
       if (environment === AuthEnvironment.LIFF || environment === AuthEnvironment.LINE_BROWSER) {
         const liffSuccess = await liffService.initialize();
         if (liffSuccess) {
-          if ((environment === AuthEnvironment.LIFF || liffService.getState().isLoggedIn) && 
-              state.lineAuthStatus === "unauthenticated" && 
+          if ((environment === AuthEnvironment.LIFF || liffService.getState().isLoggedIn) &&
+              state.lineAuthStatus === "unauthenticated" &&
               !state.isAuthenticating) {
             console.log("Auto-logging in via LIFF");
             await loginWithLiff();
@@ -137,13 +137,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           console.error("LIFF initialization failed");
         }
       }
-      
+
       setState(prev => ({ ...prev, isAuthenticating: false }));
     };
-    
+
     initializeAuth();
   }, [environment, state.isAuthenticating, state.lineAuthStatus]);
-  
+
   useEffect(() => {
     const handleTokenExpired = (event: CustomEvent) => {
       toast.error("認証の有効期限が切れました", {
@@ -151,37 +151,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       logout();
     };
-    
+
     window.addEventListener("auth:token-expired", handleTokenExpired as EventListener);
-    
+
     return () => {
       window.removeEventListener("auth:token-expired", handleTokenExpired as EventListener);
     };
   }, []);
-  
+
   /**
    * LIFFでログイン
    */
   const loginWithLiff = async (): Promise<boolean> => {
     setState((prev) => ({ ...prev, isAuthenticating: true }));
-    
+
     try {
       const initialized = await liffService.initialize();
       if (!initialized) {
         throw new Error("Failed to initialize LIFF");
       }
-      
+
       const loggedIn = await liffService.login();
       if (!loggedIn) {
         return false; // リダイレクトするのでここには到達しない
       }
-      
+
       const success = await liffService.signInWithLiffToken();
-      
+
       if (success) {
         await refetchUser();
       }
-      
+
       return success;
     } catch (error) {
       console.error("Login with LIFF failed:", error);
@@ -190,20 +190,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setState((prev) => ({ ...prev, isAuthenticating: false }));
     }
   };
-  
+
   /**
    * ログアウト
    */
   const logout = useCallback(async (): Promise<void> => {
     try {
       liffService.logout();
-      
+
       await lineAuth.signOut();
-      
+
       phoneAuthService.reset();
-      
+
       TokenManager.clearAllTokens();
-      
+
       setState((prev) => ({
         ...prev,
         firebaseUser: null,
@@ -211,36 +211,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         lineAuthStatus: "unauthenticated",
         phoneAuthStatus: "unverified",
       }));
-      
+
       router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
   }, [router]);
-  
+
   /**
    * 電話番号認証を開始
    */
   const startPhoneVerification = async (phoneNumber: string): Promise<string | null> => {
     return phoneAuthService.startPhoneVerification(phoneNumber);
   };
-  
+
   /**
    * 電話番号認証コードを検証
    */
   const verifyPhoneCode = async (verificationCode: string): Promise<boolean> => {
     const success = await phoneAuthService.verifyPhoneCode(verificationCode);
-    
+
     if (success) {
       setState((prev) => ({
         ...prev,
         phoneAuthStatus: "verified",
       }));
     }
-    
+
     return success;
   };
-  
+
   /**
    * ユーザーを作成
    */
@@ -254,16 +254,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         toast.error("LINE認証が完了していません");
         return null;
       }
-      
+
       if (!phoneUid) {
         toast.error("電話番号認証が完了していません");
         return null;
       }
-      
+
       const lineTokens = TokenManager.getLineTokens();
-      
+
       const phoneTokens = TokenManager.getPhoneTokens();
-      
+
       const { data } = await userSignUp({
         variables: {
           input: {
@@ -273,14 +273,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             phoneNumber: phoneTokens.phoneNumber,
             lineAccessToken: lineTokens.accessToken,
             lineRefreshToken: lineTokens.refreshToken,
-            lineTokenExpiresAt: lineTokens.expiresAt?.toISOString(),
+            lineTokenExpiresAt: lineTokens.expiresAt ? new Date(lineTokens.expiresAt).toISOString() : undefined,
             phoneAccessToken: phoneTokens.accessToken,
             phoneRefreshToken: phoneTokens.refreshToken,
-            phoneTokenExpiresAt: phoneTokens.expiresAt?.toISOString(),
+            phoneTokenExpiresAt: phoneTokens.expiresAt ? new Date(phoneTokens.expiresAt).toISOString() : undefined,
           },
         },
       });
-      
+
       if (data?.userSignUp?.user) {
         await refetchUser();
         toast.success("アカウントを作成しました");
@@ -297,7 +297,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return null;
     }
   };
-  
+
   const value: AuthContextType = {
     user: state.currentUser,
     firebaseUser: state.firebaseUser,
@@ -317,7 +317,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     createUser,
     loading: state.lineAuthStatus === "loading" || state.phoneAuthStatus === "loading" || userLoading,
   };
-  
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
