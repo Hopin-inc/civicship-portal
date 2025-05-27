@@ -7,17 +7,19 @@ import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { lineAuth, phoneAuth } from "@/lib/auth/firebase-config";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
-import { GqlCurrentPrefecture } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlCurrentUserQuery } from "@/types/graphql";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { USER_SIGN_UP } from "@/graphql/account/identity/mutation";
+import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 
 /**
  * 認証状態の型定義
  */
 export type AuthState = {
-  user: User | null;
+  firebaseUser: User | null;
+  currentUser: GqlCurrentUserQuery["currentUser"]["user"] | null;
   lineAuthStatus: "authenticated" | "unauthenticated" | "loading";
   phoneAuthStatus: "verified" | "unverified" | "loading";
   environment: AuthEnvironment;
@@ -28,7 +30,8 @@ export type AuthState = {
  * 認証コンテキストの型定義
  */
 interface AuthContextType {
-  user: User | null;
+  user: GqlCurrentUserQuery["currentUser"]["user"] | null;
+  firebaseUser: User | null;
   isAuthenticated: boolean;
   isPhoneVerified: boolean;
   isAuthenticating: boolean;
@@ -70,7 +73,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const phoneAuthService = PhoneAuthService.getInstance();
   
   const [state, setState] = useState<AuthState>({
-    user: null,
+    firebaseUser: null,
+    currentUser: null,
     lineAuthStatus: "loading",
     phoneAuthStatus: "loading",
     environment,
@@ -81,11 +85,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   
   const [userSignUp] = useMutation(USER_SIGN_UP);
   
+  const { data: userData, loading: userLoading, refetch: refetchUser } = useQuery(GET_CURRENT_USER, {
+    skip: state.lineAuthStatus !== "authenticated",
+    fetchPolicy: "network-only",
+  });
+  
   useEffect(() => {
     const unsubscribe = lineAuth.onAuthStateChanged((user) => {
       setState((prev) => ({
         ...prev,
-        user,
+        firebaseUser: user,
         lineAuthStatus: user ? "authenticated" : "unauthenticated",
       }));
     });
@@ -100,6 +109,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       phoneAuthStatus: phoneState.isVerified ? "verified" : "unverified",
     }));
   }, []);
+  
+  useEffect(() => {
+    if (userData?.currentUser?.user) {
+      setState((prev) => ({
+        ...prev,
+        currentUser: userData.currentUser.user,
+      }));
+    }
+  }, [userData]);
   
   useEffect(() => {
     const initializeLiff = async () => {
@@ -144,6 +162,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       
       const success = await liffService.signInWithLiffToken();
+      
+      if (success) {
+        await refetchUser();
+      }
+      
       return success;
     } catch (error) {
       console.error("Login with LIFF failed:", error);
@@ -168,7 +191,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       setState((prev) => ({
         ...prev,
-        user: null,
+        firebaseUser: null,
+        currentUser: null,
         lineAuthStatus: "unauthenticated",
         phoneAuthStatus: "unverified",
       }));
@@ -211,7 +235,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     phoneUid: string | null,
   ): Promise<User | null> => {
     try {
-      if (!state.user) {
+      if (!state.firebaseUser) {
         toast.error("LINE認証が完了していません");
         return null;
       }
@@ -243,8 +267,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       
       if (data?.userSignUp?.user) {
+        await refetchUser();
         toast.success("アカウントを作成しました");
-        return state.user;
+        return state.firebaseUser;
       } else {
         toast.error("アカウント作成に失敗しました");
         return null;
@@ -259,7 +284,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
   
   const value: AuthContextType = {
-    user: state.user,
+    user: state.currentUser,
+    firebaseUser: state.firebaseUser,
     isAuthenticated: state.lineAuthStatus === "authenticated",
     isPhoneVerified: state.phoneAuthStatus === "verified",
     isAuthenticating: state.isAuthenticating,
@@ -273,7 +299,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       phoneUid: phoneAuthService.getState().phoneUid,
     },
     createUser,
-    loading: state.lineAuthStatus === "loading" || state.phoneAuthStatus === "loading",
+    loading: state.lineAuthStatus === "loading" || state.phoneAuthStatus === "loading" || userLoading,
   };
   
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
