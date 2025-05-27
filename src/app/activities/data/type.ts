@@ -9,11 +9,11 @@ import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunity
 export type OpportunityCard = ActivityCard | QuestCard;
 
 export type ActivityCard = OpportunityBaseCard & {
-  feeRequired: number;
+  feeRequired: number | null;
 };
 
 export type QuestCard = OpportunityBaseCard & {
-  pointsToEarn: number;
+  pointsToEarn: number | null;
 };
 
 export type OpportunityBaseCard = CommunityId & {
@@ -30,7 +30,7 @@ export type OpportunityBaseCard = CommunityId & {
 // 📄 Opportunity 詳細型（個別ページ用）
 // ---------------------------------------------
 export type ActivityDetail = OpportunityDetail & {
-  feeRequired: number;
+  feeRequired: number | null;
   slots: ActivitySlot[];
 
   reservableTickets: ReservableActivityTicket[];

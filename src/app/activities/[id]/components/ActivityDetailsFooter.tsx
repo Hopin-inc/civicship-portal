@@ -7,7 +7,7 @@ import { COMMUNITY_ID } from "@/utils";
 
 interface ActivityDetailsFooterProps {
   opportunityId: string;
-  price: number;
+  price: number | null;
   communityId: string | undefined;
   disableReason?: "noSlots" | "reservationClosed";
 }
@@ -28,7 +28,11 @@ const ActivityDetailsFooter: React.FC<ActivityDetailsFooterProps> = ({
       <div className="max-w-mobile-l mx-auto px-4 h-20 flex items-center justify-between w-full">
         <div>
           <p className="text-body-sm text-muted-foreground">1人あたり</p>
-          <p className="text-bodylg font-bold">{price.toLocaleString()}円〜</p>
+          <p
+            className={`text-body-lg font-bold ${price == null ? "text-muted-foreground/50" : ""}`}
+          >
+            {price != null ? `${price.toLocaleString()}円〜` : "料金未定"}
+          </p>
         </div>
         {disableReason === "noSlots" ? (
           <p className="text-muted-foreground text-body-md">開催日未定</p>
