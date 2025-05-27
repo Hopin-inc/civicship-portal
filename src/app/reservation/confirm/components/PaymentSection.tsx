@@ -5,7 +5,7 @@ interface PaymentSectionProps {
   onIncrement: () => void;
   onDecrement: () => void;
   maxTickets: number;
-  pricePerPerson: number;
+  pricePerPerson: number | null;
   participantCount: number;
   useTickets: boolean;
   setUseTickets: (value: boolean) => void;
@@ -73,12 +73,17 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
 
         <div className="mb-3 flex justify-between items-center">
           <h4 className="text-display-sm font-bold">当日のお支払い</h4>
-          <span className="text-body-lg font-bold">
-            {(
-              pricePerPerson *
-              (participantCount - (useTickets ? ticketCount : 0))
-            ).toLocaleString()}
-            円
+          <span
+            className={`text-body-lg font-bold ${
+              pricePerPerson == null ? "text-muted-foreground/50" : ""
+            }`}
+          >
+            {pricePerPerson != null
+              ? `${(
+                  pricePerPerson *
+                  (participantCount - (useTickets ? ticketCount : 0))
+                ).toLocaleString()}円`
+              : "料金未定"}
           </span>
         </div>
 
@@ -87,19 +92,26 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
             <div className="flex justify-between text-body-sm text-muted-foreground">
               <span>通常申し込み</span>
               <div>
-                <span>{pricePerPerson.toLocaleString()}円</span>
-                <span className="mx-2">×</span>
-                <span>{participantCount - (useTickets ? ticketCount : 0)}名</span>
-                <span className="mx-2">=</span>
-                <span>
-                  {(
-                    pricePerPerson *
-                    (participantCount - (useTickets ? ticketCount : 0))
-                  ).toLocaleString()}
-                  円
-                </span>
+                {pricePerPerson != null ? (
+                  <>
+                    <span>{pricePerPerson.toLocaleString()}円</span>
+                    <span className="mx-2">×</span>
+                    <span>{participantCount - (useTickets ? ticketCount : 0)}名</span>
+                    <span className="mx-2">=</span>
+                    <span>
+                      {(
+                        pricePerPerson *
+                        (participantCount - (useTickets ? ticketCount : 0))
+                      ).toLocaleString()}
+                      円
+                    </span>
+                  </>
+                ) : (
+                  <span>料金未定</span>
+                )}
               </div>
             </div>
+
             {/*{useTickets && (*/}
             {/*  <div className="flex justify-between text-body-sm text-muted-foreground">*/}
             {/*    <span>チケット利用</span>*/}

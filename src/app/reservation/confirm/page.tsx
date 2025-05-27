@@ -111,7 +111,7 @@ export default function ConfirmPage() {
 
   return (
     <>
-      <main className="pb-8 min-h-screen">
+      <main className="min-h-screen">
         <LoginModal isOpen={ui.isLoginModalOpen} onClose={() => ui.setIsLoginModalOpen(false)} />
         <OpportunityInfo opportunity={opportunity} />
 
@@ -134,14 +134,14 @@ export default function ConfirmPage() {
           onIncrement={ticketCounter.increment}
           onDecrement={ticketCounter.decrement}
           maxTickets={availableTickets}
-          pricePerPerson={opportunity?.feeRequired ?? 0}
+          pricePerPerson={opportunity?.feeRequired ?? null}
           participantCount={participantCount}
           useTickets={ui.useTickets}
           setUseTickets={ui.setUseTickets}
         />
         <div className="h-2 bg-border" />
         <NotesSection />
-        <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border max-w-mobile-l w-full h-20 flex items-center px-4 py-4 justify-between mx-auto">
+        <footer className="max-w-mobile-l w-full h-20 flex items-center px-4 py-6 justify-between mx-auto">
           <Button
             size="lg"
             className="mx-auto px-20"
