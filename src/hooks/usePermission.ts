@@ -66,7 +66,7 @@ export function usePermission() {
     }
 
     const membership = user?.memberships?.find(
-      (m) => m.community.id === communityId
+      (m) => m.community && m.community.id === communityId
     );
 
     if (!membership) {
@@ -140,7 +140,7 @@ export function usePermission() {
     }
 
     const isAdmin = user?.memberships?.some((m) =>
-      [GqlRole.Owner, GqlRole.Manager].includes(m.role)
+      [GqlRole.Owner, GqlRole.Manager].includes(m.role as any)
     );
 
     return {
