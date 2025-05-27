@@ -4,11 +4,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export function PhoneVerificationForm() {
   const { phoneAuth, isAuthenticated, isPhoneVerified, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
   
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
@@ -51,7 +53,8 @@ export function PhoneVerificationForm() {
     const success = await phoneAuth.verifyPhoneCode(verificationCode);
     if (success) {
       toast.success("電話番号認証が完了しました");
-      router.push("/sign-up");
+      const nextUrl = nextParam ? `/sign-up?next=${encodeURIComponent(nextParam)}` : "/sign-up";
+      router.push(nextUrl);
     } else {
       toast.error("認証コードが無効です");
     }

@@ -14,7 +14,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useState, useEffect } from "react";
@@ -32,6 +32,8 @@ type FormValues = z.infer<typeof FormSchema>;
 
 export function SignUpForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
   const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -67,7 +69,8 @@ export function SignUpForm() {
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
         toast.success("アカウントを作成しました");
-        router.push("/");
+        const redirectUrl = nextParam || "/activities";
+        router.push(redirectUrl);
       }
     } catch (error) {
       console.error("Sign up error:", error);

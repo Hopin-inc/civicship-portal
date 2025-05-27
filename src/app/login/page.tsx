@@ -45,7 +45,9 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const success = await loginWithLiff(nextPath);
+      const currentFullPath = typeof window !== "undefined" ? 
+        window.location.pathname + window.location.search : "/";
+      const success = await loginWithLiff(currentFullPath);
       if (success) {
         router.push(nextPath);
       }

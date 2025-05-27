@@ -1,11 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { PhoneVerificationForm } from "./PhoneVerificationForm";
 
 export default function PhoneVerificationPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const hasRedirected = useRef(false);
 
   useEffect(() => {
@@ -19,7 +20,11 @@ export default function PhoneVerificationPage() {
 
     if (isLineWebBrowser()) {
       hasRedirected.current = true;
-      window.location.replace("/sign-up/phone-verification/line-browser");
+      const nextParam = searchParams.get("next");
+      const redirectUrl = nextParam ? 
+        `/sign-up/phone-verification/line-browser?next=${encodeURIComponent(nextParam)}` : 
+        "/sign-up/phone-verification/line-browser";
+      window.location.replace(redirectUrl);
     }
   }, [router]);
 
