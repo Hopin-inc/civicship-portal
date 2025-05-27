@@ -20,8 +20,9 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
 
     // 🚫 Not logged in → Redirect to phone verification
     if (!currentUser) {
-      console.log("🚷 No user found. Redirecting to phone verification.");
-      router.replace("/sign-up/phone-verification");
+      const next = encodeURIComponent(window.location.pathname + window.location.search);
+      console.log("🚷 No user found. Redirecting to login.");
+      router.replace(`/login?next=${next}`);
       return;
     }
 
