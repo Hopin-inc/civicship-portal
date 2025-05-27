@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import LoginModal from "@/app/login/components/LoginModal";
-import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
 import ReservationDetailsCard from "@/app/reservation/confirm/components/ReservationDetailsCard";
 import PaymentSection from "@/app/reservation/confirm/components/PaymentSection";
 import NotesSection from "@/app/reservation/confirm/components/NotesSection";
@@ -21,7 +20,9 @@ import ErrorState from "@/components/shared/ErrorState";
 import { ParticipationAge } from "./components/ParticipationAge";
 import { errorMessages } from "@/utils/errorMessage";
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
-import GuestCounterSelector from "@/app/reservation/confirm/components/GuestCounterSelector";
+import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
+import { GqlOpportunityCategory } from "@/types/graphql";
+import { COMMUNITY_ID } from "@/utils";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -84,6 +85,10 @@ export default function ConfirmPage() {
       comment: ui.ageComment ?? undefined,
     });
 
+    if (creatingReservation) {
+      return <LoadingIndicator fullScreen />;
+    }
+
     if (!result.success) {
       if (!user) {
         ui.setIsLoginModalOpen(true);
@@ -113,9 +118,22 @@ export default function ConfirmPage() {
     <>
       <main className="min-h-screen">
         <LoginModal isOpen={ui.isLoginModalOpen} onClose={() => ui.setIsLoginModalOpen(false)} />
-        <OpportunityInfo opportunity={opportunity} />
-
-        <div className="px-6">
+        <div className="px-6 py-4 mt-4">
+          <OpportunityCardHorizontal
+            opportunity={{
+              id: opportunity.id,
+              title: opportunity.title,
+              feeRequired: opportunity.feeRequired,
+              category: GqlOpportunityCategory.Activity,
+              communityId: COMMUNITY_ID,
+              images: opportunity.images,
+              location: opportunity.place.name,
+              hasReservableTicket: false,
+            }}
+            withShadow={false}
+          />
+        </div>
+        <div className="px-2">
           <ReservationDetailsCard
             startDateTime={startDateTime}
             endDateTime={endDateTime}
@@ -124,11 +142,10 @@ export default function ConfirmPage() {
               name: opportunity?.place?.name || "",
               address: opportunity?.place?.address || "",
             }}
+            onChange={setParticipantCount}
           />
         </div>
-        <div className="h-2 bg-border" />
-        <GuestCounterSelector value={participantCount} onChange={setParticipantCount} />
-        <ParticipationAge ageComment={ui.ageComment} setAgeComment={ui.setAgeComment} />
+        {/*<div className="h-0.5 bg-border" />*/}
         <PaymentSection
           ticketCount={ticketCounter.count}
           onIncrement={ticketCounter.increment}
@@ -139,7 +156,9 @@ export default function ConfirmPage() {
           useTickets={ui.useTickets}
           setUseTickets={ui.setUseTickets}
         />
-        <div className="h-2 bg-border" />
+        <div className="mb-2" />
+        <ParticipationAge ageComment={ui.ageComment} setAgeComment={ui.setAgeComment} />
+        <div className="mb-4 mt-2" />
         <NotesSection />
         <footer className="max-w-mobile-l w-full h-20 flex items-center px-4 py-6 justify-between mx-auto">
           <Button
