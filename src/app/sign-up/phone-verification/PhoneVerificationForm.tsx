@@ -1,12 +1,15 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { useRouter } from "next/navigation";
 
 export function PhoneVerificationForm() {
-  const { phoneAuth } = useAuth();
+  const { phoneAuth, isAuthenticated, isPhoneVerified, loading } = useAuth();
+  const router = useRouter();
+  
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -14,15 +17,19 @@ export function PhoneVerificationForm() {
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!loading) {
+      if (!isAuthenticated) {
+        router.replace("/login");
+      } else if (isPhoneVerified) {
+        router.replace("/sign-up");
+      }
+    }
+  }, [isAuthenticated, isPhoneVerified, loading, router]);
+
+  useEffect(() => {
     if (recaptchaContainerRef.current) {
       setIsRecaptchaReady(true);
     }
-
-    return () => {
-      import("../../../lib/firebase").then(({ clearRecaptcha }) => {
-        clearRecaptcha();
-      });
-    };
   }, []);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
@@ -33,15 +40,21 @@ export function PhoneVerificationForm() {
     }
 
     const formattedPhone = formatPhoneNumber(phoneNumber);
-    const success = await phoneAuth.startPhoneVerification(formattedPhone);
-    if (success) {
+    const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
+    if (verificationId) {
       setStep("code");
     }
   };
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await phoneAuth.verifyPhoneCode(verificationCode);
+    const success = await phoneAuth.verifyPhoneCode(verificationCode);
+    if (success) {
+      toast.success("電話番号認証が完了しました");
+      router.push("/sign-up");
+    } else {
+      toast.error("認証コードが無効です");
+    }
   };
 
   const formatPhoneNumber = (phone: string): string => {
@@ -61,6 +74,14 @@ export function PhoneVerificationForm() {
   const handleOTPChange = (value: string) => {
     setVerificationCode(value);
   };
+
+  if (loading) {
+    return null;
+  }
+
+  if (!isAuthenticated || isPhoneVerified) {
+    return null;
+  }
 
   return (
     <div className="w-full max-w-md mx-auto space-y-8">

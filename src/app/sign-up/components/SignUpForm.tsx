@@ -16,8 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { GqlCurrentPrefecture } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
+import { useAuth } from "@/contexts/AuthProvider";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
@@ -32,8 +32,18 @@ type FormValues = z.infer<typeof FormSchema>;
 
 export function SignUpForm() {
   const router = useRouter();
-  const { createUser, isPhoneVerified, phoneAuth } = useAuth();
+  const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!loading) {
+      if (!isAuthenticated) {
+        router.replace("/login");
+      } else if (!isPhoneVerified) {
+        router.replace("/sign-up/phone-verification");
+      }
+    }
+  }, [isAuthenticated, isPhoneVerified, loading, router]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -56,14 +66,26 @@ export function SignUpForm() {
 
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
+        toast.success("アカウントを作成しました");
         router.push("/");
       }
     } catch (error) {
       console.error("Sign up error:", error);
+      toast.error("アカウント作成に失敗しました", {
+        description: error instanceof Error ? error.message : "不明なエラーが発生しました",
+      });
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (loading) {
+    return null;
+  }
+
+  if (!isAuthenticated || !isPhoneVerified) {
+    return null;
+  }
 
   return (
     <div className="w-full max-w-md mx-auto space-y-8">

@@ -9,6 +9,7 @@ import { onError } from "@apollo/client/link/error";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { __DEV__ } from "@apollo/client/utilities/globals";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
+import { TokenManager } from "./auth/token-manager";
 
 if (__DEV__) {
   loadDevMessages();
@@ -36,27 +37,19 @@ const requestLink = new ApolloLink((operation, forward) => {
     return forward(operation);
   }
 
-  // CSR の場合のみ cookie を読み込む
-  const cookies = document.cookie.split("; ");
-  const accessToken = cookies.find((e) => e.startsWith("access_token"))?.split("=")[1];
-  const refreshToken = cookies.find((e) => e.startsWith("refresh_token"))?.split("=")[1];
-  const tokenExpiresAt = cookies.find((e) => e.startsWith("token_expires_at"))?.split("=")[1];
-  const phoneAuthToken = cookies.find((e) => e.startsWith("phone_auth_token"))?.split("=")[1];
-  const phoneRefreshToken = cookies.find((e) => e.startsWith("phone_refresh_token"))?.split("=")[1];
-  const phoneTokenExpiresAt = cookies
-    .find((e) => e.startsWith("phone_token_expires_at"))
-    ?.split("=")[1];
+  const lineTokens = TokenManager.getLineTokens();
+  const phoneTokens = TokenManager.getPhoneTokens();
 
   operation.setContext(({ headers = {} }) => ({
     headers: {
       ...headers,
-      Authorization: accessToken ? `Bearer ${accessToken}` : "",
+      Authorization: lineTokens.accessToken ? `Bearer ${lineTokens.accessToken}` : "",
       "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-      "X-Refresh-Token": refreshToken || "",
-      "X-Token-Expires-At": tokenExpiresAt || "",
-      "X-Phone-Auth-Token": phoneAuthToken || "",
-      "X-Phone-Refresh-Token": phoneRefreshToken || "",
-      "X-Phone-Token-Expires-At": phoneTokenExpiresAt || "",
+      "X-Refresh-Token": lineTokens.refreshToken || "",
+      "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toISOString() : "",
+      "X-Phone-Auth-Token": phoneTokens.accessToken || "",
+      "X-Phone-Refresh-Token": phoneTokens.refreshToken || "",
+      "X-Phone-Token-Expires-At": phoneTokens.expiresAt ? phoneTokens.expiresAt.toISOString() : "",
     },
   }));
 
