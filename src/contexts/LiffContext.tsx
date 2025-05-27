@@ -4,6 +4,7 @@ import { createContext, ReactNode, useCallback, useContext, useEffect, useState 
 import liff from "@line/liff";
 import { setIsInLiffBrowser } from "@/utils/liff";
 import { useInitialLiffRedirect } from "@/hooks/useInitialLiffRedirect";
+import { authService, AuthProvider, AuthState } from "@/services/AuthService";
 
 type LiffProfile = {
   userId: string;
@@ -63,6 +64,10 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
 
       const idToken = liff.getIDToken();
       setLiffIdToken(idToken);
+      
+      if (accessToken) {
+        authService.authenticate(AuthProvider.LIFF, { accessToken });
+      }
     } catch (error) {
       console.error("Failed to get LIFF tokens:", error);
     }
@@ -101,6 +106,8 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
 
   const liffLogout = useCallback(() => {
     if (liff.isLoggedIn()) {
+      authService.logout().catch(console.error);
+      
       liff.logout();
       setIsLiffLoggedIn(false);
       setLiffProfile(null);
@@ -120,6 +127,20 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
       setIsLiffLoggedIn(true);
     }
   }, [isLiffInitialized, liffProfile, updateLiffProfile, updateLiffTokens]);
+
+  useEffect(() => {
+    const unsubscribe = authService.subscribeToAuthChanges((authState) => {
+      if (authState.state === AuthState.UNAUTHENTICATED && isLiffLoggedIn) {
+        liff.logout();
+        setIsLiffLoggedIn(false);
+        setLiffProfile(null);
+        setLiffIdToken(null);
+        setLiffAccessToken(null);
+      }
+    });
+    
+    return unsubscribe;
+  }, [isLiffLoggedIn]);
 
   return (
     <LiffContext.Provider
