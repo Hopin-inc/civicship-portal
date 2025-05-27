@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { PhoneVerificationForm } from "./PhoneVerificationForm";
-import { isRunningInLiff } from "@/utils/liff";
 
 export default function PhoneVerificationPage() {
   const { user, loading } = useAuth();
@@ -18,9 +17,7 @@ export default function PhoneVerificationPage() {
   };
 
   useEffect(() => {
-    const isLiff = isRunningInLiff();
-
-    if (!isLiff && isLineWebBrowser()) {
+    if (isLineWebBrowser()) {
       router.replace("/sign-up/phone-verification/line-browser");
       return;
     }
