@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useQuery } from "@apollo/client";
-import { CURRENT_USER } from "@/graphql/account/identity/query";
+import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 
 /**
  * 認証が必要なページのパスパターン
@@ -58,7 +58,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const pathname = usePathname();
   const [authorized, setAuthorized] = useState(false);
   
-  const { data: userData, loading: userLoading } = useQuery(CURRENT_USER, {
+  const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
   });
   

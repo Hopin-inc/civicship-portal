@@ -121,17 +121,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [userData]);
   
   useEffect(() => {
-    const initializeLiff = async () => {
+    const initializeAuth = async () => {
+      setState(prev => ({ ...prev, isAuthenticating: true }));
+      
       if (environment === AuthEnvironment.LIFF || environment === AuthEnvironment.LINE_BROWSER) {
-        await liffService.initialize();
-        
-        if (environment === AuthEnvironment.LIFF && !state.isAuthenticating && state.lineAuthStatus === "unauthenticated") {
-          await loginWithLiff();
+        const liffSuccess = await liffService.initialize();
+        if (liffSuccess) {
+          if ((environment === AuthEnvironment.LIFF || liffService.getState().isLoggedIn) && 
+              state.lineAuthStatus === "unauthenticated" && 
+              !state.isAuthenticating) {
+            console.log("Auto-logging in via LIFF");
+            await loginWithLiff();
+          }
+        } else {
+          console.error("LIFF initialization failed");
         }
       }
+      
+      setState(prev => ({ ...prev, isAuthenticating: false }));
     };
     
-    initializeLiff();
+    initializeAuth();
   }, [environment, state.isAuthenticating, state.lineAuthStatus]);
   
   useEffect(() => {
