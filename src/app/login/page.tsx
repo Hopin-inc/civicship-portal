@@ -16,7 +16,7 @@ export default function LoginPage() {
   const router = useRouter();
 
   const { isLiffInitialized, isLiffLoggedIn, liffProfile, liffError } = useLiff();
-  const { loginWithLiff, isAuthenticating } = useAuth();
+  const { user: currentUser, loginWithLiff, isAuthenticating } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,11 +25,11 @@ export default function LoginPage() {
 
   // 🚀 LIFFログイン済みならトップへ自動遷移
   useEffect(() => {
-    if (isLiffInitialized && isLiffLoggedIn && liffProfile) {
+    if (isLiffInitialized && isLiffLoggedIn && liffProfile && currentUser) {
       console.log("🚀 Automatically redirect to the top page if already logged in via LIFF");
       router.replace("/");
     }
-  }, [isLiffInitialized, isLiffLoggedIn, liffProfile, router]);
+  }, [currentUser, isLiffInitialized, isLiffLoggedIn, liffProfile, router]);
 
   // 🔴 初期化エラー表示
   useEffect(() => {
@@ -50,7 +50,9 @@ export default function LoginPage() {
 
     try {
       await loginWithLiff();
-      router.push("/");
+      if (currentUser) {
+        router.push("/");
+      }
     } catch (err) {
       const { title, description } = getLiffLoginErrorMessage(error);
       toast.error(title, { description });
