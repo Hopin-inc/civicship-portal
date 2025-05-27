@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -11,32 +11,32 @@ export default function PhoneVerificationPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  const hasRedirected = useRef(false); // ✅ リダイレクト済みフラグ
-
-  const isLineWebBrowser = () => {
-    if (typeof window === "undefined") return false;
-    return /Line/i.test(navigator.userAgent);
-  };
+  const hasRedirected = useRef(false);
+  const [isClient, setIsClient] = useState(false); // client check
 
   useEffect(() => {
-    if (hasRedirected.current) return; // ✅ すでにリダイレクト済みならスキップ
+    setIsClient(true); // only runs on client
+  }, []);
 
-    if (loading) return; // 認証状態が未確定な間は待つ
+  useEffect(() => {
+    if (!isClient || hasRedirected.current) return;
+
+    if (loading) return;
 
     if (user) {
-      hasRedirected.current = true; // ✅ フラグ更新
+      hasRedirected.current = true;
       toast.success("既にログインしています");
       router.replace("/users/me");
       return;
     }
 
-    if (isLineWebBrowser()) {
-      hasRedirected.current = true; // ✅ フラグ更新
+    if (/Line/i.test(navigator.userAgent)) {
+      hasRedirected.current = true;
       router.replace("/sign-up/phone-verification/line-browser");
     }
-  }, [loading, user, router]);
+  }, [isClient, loading, user, router]);
 
-  if (loading) {
+  if (!isClient || loading) {
     return <LoadingIndicator />;
   }
 
