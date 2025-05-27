@@ -32,11 +32,18 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
     if (!emblaApi) return;
 
     if (selectedPlaceId) {
+      console.debug("[DEBUG] マーカー選択: スクロール開始", {
+        selectedPlaceId,
+        selectedIndex,
+        isProgrammatic: isProgrammaticScrollRef.current,
+      });
+
       isProgrammaticScrollRef.current = true;
       emblaApi.scrollTo(selectedIndex, false);
 
       const timer = setTimeout(() => {
         isProgrammaticScrollRef.current = false;
+        console.debug("[DEBUG] マーカー選択: スクロールフラグリセット");
       }, 100);
 
       return () => clearTimeout(timer);
@@ -47,10 +54,23 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
     if (!emblaApi) return;
 
     const onSelect = () => {
-      if (isProgrammaticScrollRef.current) return;
       const index = emblaApi.selectedScrollSnap();
       const place = places[index];
+
+      console.debug("[DEBUG] カルーセル選択イベント", {
+        index,
+        placeId: place?.id,
+        currentSelectedId: selectedPlaceId,
+        isProgrammatic: isProgrammaticScrollRef.current,
+      });
+
+      if (isProgrammaticScrollRef.current) {
+        console.debug("[DEBUG] プログラムによるスクロール中のため、選択イベントをスキップ");
+        return;
+      }
+
       if (place && place.id !== selectedPlaceId) {
+        console.debug("[DEBUG] カルーセル選択: マーカー選択を更新", place.id);
         onPlaceSelect(place.id);
       }
     };
