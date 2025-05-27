@@ -67,12 +67,11 @@ export const groupActivitySlotsByDate = (slots: ActivitySlot[]): ActivitySlotGro
 
   for (const slot of slots) {
     const date = new Date(slot.startsAt);
-    const dateLabel = date.toLocaleDateString("ja-JP", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "long",
-    });
+
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const weekday = date.toLocaleDateString("ja-JP", { weekday: "narrow" }); // "水"
+    const dateLabel = `${month}月${day}日(${weekday})`;
 
     if (!groups[dateLabel]) {
       groups[dateLabel] = [];
