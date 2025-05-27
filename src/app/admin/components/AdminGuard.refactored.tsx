@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { GqlRole } from "@/types/graphql";
 import { usePermission } from "@/hooks/usePermission";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 type AdminGuardProps = {
   children: React.ReactNode;
@@ -71,7 +71,7 @@ export const AdminGuard = ({
   if (isChecking || loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner size="lg" />
+        <LoadingIndicator />
       </div>
     );
   }
