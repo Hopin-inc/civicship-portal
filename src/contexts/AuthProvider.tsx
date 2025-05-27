@@ -127,7 +127,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (environment === AuthEnvironment.LIFF || environment === AuthEnvironment.LINE_BROWSER) {
         const liffSuccess = await liffService.initialize();
         if (liffSuccess) {
-          if ((environment === AuthEnvironment.LIFF || liffService.getState().isLoggedIn) &&
+          const liffState = liffService.getState();
+          
+          if (liffState.isLoggedIn && state.lineAuthStatus === "unauthenticated") {
+            console.log("Completing LIFF authentication after redirect");
+            try {
+              const success = await liffService.signInWithLiffToken();
+              if (success) {
+                await refetchUser();
+              }
+            } catch (error) {
+              console.error("Failed to complete LIFF authentication:", error);
+            }
+          }
+          else if ((environment === AuthEnvironment.LIFF || liffState.isLoggedIn) &&
               state.lineAuthStatus === "unauthenticated" &&
               !state.isAuthenticating) {
             console.log("Auto-logging in via LIFF");
