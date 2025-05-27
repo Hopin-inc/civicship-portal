@@ -3,8 +3,13 @@ import { OPPORTUNITY_FRAGMENT } from "@/graphql/experience/opportunity/fragment"
 import { SLOT_FRAGMENT } from "@/graphql/experience/opportunitySlot/fragment";
 
 export const GET_OPPORTUNITY_SLOTS = gql`
-  query GetOpportunitySlots($filter: OpportunitySlotFilterInput, $cursor: String, $first: Int) {
-    opportunitySlots(filter: $filter, sort: { startsAt: desc }, cursor: $cursor, first: $first) {
+  query GetOpportunitySlots(
+    $filter: OpportunitySlotFilterInput
+    $sort: OpportunitySlotSortInput
+    $cursor: String
+    $first: Int
+  ) {
+    opportunitySlots(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
       pageInfo {
         startCursor
         endCursor
