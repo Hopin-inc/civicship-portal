@@ -6,7 +6,7 @@
 export interface AuthTokens {
   accessToken: string | null;
   refreshToken: string | null;
-  expiresAt: Date | null;
+  expiresAt: number | null;
 }
 
 /**
@@ -17,7 +17,7 @@ export interface PhoneAuthTokens {
   phoneNumber: string | null;
   accessToken: string | null;
   refreshToken: string | null;
-  expiresAt: Date | null;
+  expiresAt: number | null;
 }
 
 /**
@@ -46,7 +46,7 @@ export class TokenManager {
       this.setCookie(this.LINE_REFRESH_TOKEN_KEY, tokens.refreshToken);
     }
     if (tokens.expiresAt) {
-      this.setCookie(this.LINE_TOKEN_EXPIRES_AT_KEY, tokens.expiresAt.toISOString());
+      this.setCookie(this.LINE_TOKEN_EXPIRES_AT_KEY, tokens.expiresAt.toString());
     }
   }
 
@@ -68,7 +68,7 @@ export class TokenManager {
       this.setCookie(this.PHONE_REFRESH_TOKEN_KEY, tokens.refreshToken);
     }
     if (tokens.expiresAt) {
-      this.setCookie(this.PHONE_TOKEN_EXPIRES_AT_KEY, tokens.expiresAt.toISOString());
+      this.setCookie(this.PHONE_TOKEN_EXPIRES_AT_KEY, tokens.expiresAt.toString());
     }
   }
 
@@ -84,7 +84,7 @@ export class TokenManager {
     return {
       accessToken,
       refreshToken,
-      expiresAt: expiresAtStr ? new Date(expiresAtStr) : null,
+      expiresAt: expiresAtStr ? parseInt(expiresAtStr, 10) : null,
     };
   }
 
@@ -104,7 +104,7 @@ export class TokenManager {
       phoneNumber,
       accessToken,
       refreshToken,
-      expiresAt: expiresAtStr ? new Date(expiresAtStr) : null,
+      expiresAt: expiresAtStr ? parseInt(expiresAtStr, 10) : null,
     };
   }
 
@@ -144,9 +144,9 @@ export class TokenManager {
     const { expiresAt } = this.getLineTokens();
     if (!expiresAt) return true;
     
-    const now = new Date();
+    const now = Date.now();
     const bufferTime = 5 * 60 * 1000; // 5分（ミリ秒）
-    return expiresAt.getTime() - now.getTime() < bufferTime;
+    return expiresAt - now < bufferTime;
   }
 
   /**
@@ -157,9 +157,9 @@ export class TokenManager {
     const { expiresAt } = this.getPhoneTokens();
     if (!expiresAt) return true;
     
-    const now = new Date();
+    const now = Date.now();
     const bufferTime = 5 * 60 * 1000; // 5分（ミリ秒）
-    return expiresAt.getTime() - now.getTime() < bufferTime;
+    return expiresAt - now < bufferTime;
   }
 
   /**

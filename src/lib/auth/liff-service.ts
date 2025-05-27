@@ -209,7 +209,7 @@ export class LiffService {
           const idToken = await userCredential.user.getIdToken();
           const refreshToken = userCredential.user.refreshToken;
           const tokenResult = await userCredential.user.getIdTokenResult();
-          const expirationTime = new Date(tokenResult.expirationTime);
+          const expirationTime = new Date(tokenResult.expirationTime).getTime();
 
           const tokens: AuthTokens = {
             accessToken: idToken,

@@ -167,7 +167,7 @@ export class PhoneAuthService {
             const refreshToken = userCredential.user.refreshToken;
 
             const tokenResult = await userCredential.user.getIdTokenResult();
-            const expirationTime = new Date(tokenResult.expirationTime);
+            const expirationTime = new Date(tokenResult.expirationTime).getTime();
 
             const tokens: PhoneAuthTokens = {
               phoneUid: userCredential.user.uid,
@@ -208,7 +208,7 @@ export class PhoneAuthService {
               const refreshToken = phoneAuth.currentUser.refreshToken;
 
               const tokenResult = await phoneAuth.currentUser.getIdTokenResult();
-              const expirationTime = new Date(tokenResult.expirationTime);
+              const expirationTime = new Date(tokenResult.expirationTime).getTime();
 
               const tokens: PhoneAuthTokens = {
                 phoneUid: phoneAuth.currentUser.uid,
@@ -258,7 +258,7 @@ export class PhoneAuthService {
       const idToken = await phoneAuth.currentUser.getIdToken(true);
       const refreshToken = phoneAuth.currentUser.refreshToken;
       const tokenResult = await phoneAuth.currentUser.getIdTokenResult();
-      const expirationTime = new Date(tokenResult.expirationTime);
+      const expirationTime = new Date(tokenResult.expirationTime).getTime();
 
       const tokens: PhoneAuthTokens = {
         phoneUid: phoneAuth.currentUser.uid,
