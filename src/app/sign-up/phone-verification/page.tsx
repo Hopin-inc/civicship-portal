@@ -2,47 +2,30 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { PhoneVerificationForm } from "./PhoneVerificationForm";
 
 export default function PhoneVerificationPage() {
-  const { user, loading } = useAuth();
   const router = useRouter();
-
   const hasRedirected = useRef(false);
-  const [isClient, setIsClient] = useState(false); // client check
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true); // only runs on client
+    setIsClient(true);
   }, []);
 
   useEffect(() => {
     if (!isClient || hasRedirected.current) return;
 
-    if (loading) return;
+    const isLineWebBrowser = () => {
+      if (typeof navigator === "undefined") return false;
+      return /Line/i.test(navigator.userAgent);
+    };
 
-    if (user) {
-      hasRedirected.current = true;
-      toast.success("既にログインしています");
-      router.replace("/users/me");
-      return;
-    }
-
-    if (/Line/i.test(navigator.userAgent)) {
+    if (isLineWebBrowser()) {
       hasRedirected.current = true;
       router.replace("/sign-up/phone-verification/line-browser");
     }
-  }, [isClient, loading, user, router]);
-
-  if (!isClient || loading) {
-    return <LoadingIndicator />;
-  }
-
-  if (!loading && user) {
-    return null;
-  }
+  }, [isClient, router]);
 
   return (
     <div className="container mx-auto py-8">
