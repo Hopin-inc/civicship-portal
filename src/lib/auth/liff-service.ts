@@ -106,12 +106,11 @@ export class LiffService {
         if (liff.isInClient()) {
           this.state.isLoggedIn = true;
         } else {
-          const state = redirectPath || (typeof window !== "undefined" ? window.location.pathname : "/");
-          
-          liff.login({
-            redirectUri: window.location.href,
-            state: state
-          });
+          const redirectUri = redirectPath && typeof window !== "undefined"
+            ? window.location.origin + redirectPath
+            : typeof window !== "undefined" ? window.location.pathname : undefined;
+
+          liff.login({ redirectUri });
           return false; // リダイレクトするのでここには到達しない
         }
       }

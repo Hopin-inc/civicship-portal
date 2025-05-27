@@ -8,10 +8,11 @@ import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
 import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
+import { extractSearchParamFromRelativePath } from "@/utils/path";
 
 export default function HomePage() {
   const router = useRouter();
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, isAuthenticating, loading: authLoading } = useAuth();
   const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
   });
@@ -24,22 +25,17 @@ export default function HomePage() {
 
     if (liffState) {
       console.log("🚀 Detected return from LINE authentication, liff.state:", liffState);
-      
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
-      
-      if (authLoading || userLoading) {
+
+      if (isAuthenticating || authLoading || userLoading) {
         console.log("🚀 Auth state loading, waiting before redirect");
         return; // Wait for auth state to stabilize
-      }
-      
-      if (isAuthenticated) {
+      } else if (isAuthenticated) {
         if (!userData?.currentUser) {
           console.log("🚀 No user data, redirecting to phone verification");
           router.replace("/sign-up/phone-verification");
           return;
         }
-        
+
         if (liffState.startsWith("/")) {
           console.log("🚀 Redirecting to liff.state path:", liffState);
           router.replace(liffState);
@@ -47,11 +43,13 @@ export default function HomePage() {
         }
       } else {
         console.log("🚀 Not authenticated, redirecting to login");
-        router.replace("/login");
+        const next = extractSearchParamFromRelativePath(liffState, "next");
+        const redirectPath = next && next.startsWith("/") ? `/login?next=${ next }` : "/login";
+        router.replace(redirectPath);
         return;
       }
     }
-    
+
     if (window.location.pathname === "/") {
       router.replace("/activities");
     }

@@ -37,18 +37,16 @@ export default function LoginPage() {
       return;
     }
 
-    // if (nextPath && nextPath !== "/") {
-    //   localStorage.setItem("auth_redirect", nextPath);
-    // }
-
     setIsLoading(true);
     setError(null);
 
     try {
-      const currentFullPath = typeof window !== "undefined" ? 
-        window.location.pathname + window.location.search : "/";
-      const success = await loginWithLiff(currentFullPath);
+      const searchParams = new URLSearchParams(window.location.search);
+      const next = searchParams.get("next");
+      const redirectPath = next && next.startsWith("/") ? `/?next=${ next }` : "/";
+      const success = await loginWithLiff(redirectPath);
       if (success) {
+        const nextPath = next && next.startsWith("/") ? next : "/";
         router.push(nextPath);
       }
     } catch (err) {
