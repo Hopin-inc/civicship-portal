@@ -9,6 +9,7 @@ import { onError } from "@apollo/client/link/error";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { __DEV__ } from "@apollo/client/utilities/globals";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
+import { tokenService } from "@/services/TokenService";
 
 if (__DEV__) {
   loadDevMessages();
@@ -36,27 +37,12 @@ const requestLink = new ApolloLink((operation, forward) => {
     return forward(operation);
   }
 
-  // CSR の場合のみ cookie を読み込む
-  const cookies = document.cookie.split("; ");
-  const accessToken = cookies.find((e) => e.startsWith("access_token"))?.split("=")[1];
-  const refreshToken = cookies.find((e) => e.startsWith("refresh_token"))?.split("=")[1];
-  const tokenExpiresAt = cookies.find((e) => e.startsWith("token_expires_at"))?.split("=")[1];
-  const phoneAuthToken = cookies.find((e) => e.startsWith("phone_auth_token"))?.split("=")[1];
-  const phoneRefreshToken = cookies.find((e) => e.startsWith("phone_refresh_token"))?.split("=")[1];
-  const phoneTokenExpiresAt = cookies
-    .find((e) => e.startsWith("phone_token_expires_at"))
-    ?.split("=")[1];
+  const authHeaders = tokenService.getAuthorizationHeaders();
 
   operation.setContext(({ headers = {} }) => ({
     headers: {
       ...headers,
-      Authorization: accessToken ? `Bearer ${accessToken}` : "",
-      "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-      "X-Refresh-Token": refreshToken || "",
-      "X-Token-Expires-At": tokenExpiresAt || "",
-      "X-Phone-Auth-Token": phoneAuthToken || "",
-      "X-Phone-Refresh-Token": phoneRefreshToken || "",
-      "X-Phone-Token-Expires-At": phoneTokenExpiresAt || "",
+      ...authHeaders,
     },
   }));
 
@@ -78,8 +64,13 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
       ) {
         if (typeof window !== "undefined") {
           window.dispatchEvent(
-            new CustomEvent("auth:token-expired", {
-              detail: { source: "graphql", message: error.message },
+            new CustomEvent("auth:error", {
+              detail: { 
+                source: "graphql", 
+                errorType: "auth",
+                errorMessage: "認証情報が無効です。再ログインしてください。",
+                originalError: error
+              },
             }),
           );
         }
@@ -93,13 +84,20 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
     if ("statusCode" in networkError && networkError.statusCode === 401) {
       if (typeof window !== "undefined") {
         window.dispatchEvent(
-          new CustomEvent("auth:token-expired", {
-            detail: { source: "network", status: 401 },
+          new CustomEvent("auth:error", {
+            detail: { 
+              source: "network", 
+              errorType: "auth",
+              errorMessage: "認証情報が無効です。再ログインしてください。",
+              status: 401 
+            },
           }),
         );
       }
     }
   }
+  
+  return forward(operation);
 });
 
 const link = ApolloLink.from([requestLink, errorLink, httpLink]);
