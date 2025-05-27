@@ -90,7 +90,7 @@ export interface IAuthService {
   
   subscribeToAuthChanges(callback: (state: AuthStateInfo) => void): () => void;
   
-  authenticate(provider: AuthProvider, params?: any): Promise<void>;
+  authenticate(provider: AuthProvider, params?: any): Promise<boolean>;
   
   logout(): Promise<void>;
   
@@ -149,8 +149,9 @@ export class AuthService implements IAuthService {
   
   /**
    * 認証処理
+   * @returns 認証が成功したかどうか
    */
-  async authenticate(provider: AuthProvider, params?: any): Promise<void> {
+  async authenticate(provider: AuthProvider, params?: any): Promise<boolean> {
     try {
       this.updateState({
         state: AuthState.AUTHENTICATING,
@@ -161,7 +162,7 @@ export class AuthService implements IAuthService {
       switch (provider) {
         case AuthProvider.LIFF:
           await this.authenticateWithLiff(params);
-          break;
+          return true;
         case AuthProvider.PHONE:
           throw new Error('Phone authentication should use startPhoneVerification and verifyPhoneCode');
         default:
@@ -169,6 +170,7 @@ export class AuthService implements IAuthService {
       }
     } catch (error) {
       this.handleAuthError(error);
+      return false;
     }
   }
   
@@ -390,6 +392,17 @@ export class AuthService implements IAuthService {
     }
   }
   
+  /**
+   * 電話番号認証の状態を取得
+   */
+  getPhoneVerificationState(): { verificationId: string | null; phoneNumber: string | null; phoneUid: string | null } {
+    return {
+      verificationId: this.verificationId,
+      phoneNumber: this.phoneNumber,
+      phoneUid: this.phoneUid,
+    };
+  }
+
   /**
    * 電話番号認証を開始（Firebase側の処理）
    */
