@@ -1,7 +1,6 @@
 "use client";
 
-import React, { FC, useEffect, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import React, { FC, useEffect, useMemo, useRef } from "react";
 import { IPlaceCard } from "@/app/places/data/type";
 import useEmblaCarousel from "embla-carousel-react";
 import PlaceCard from "@/app/places/components/Card";
@@ -13,36 +12,43 @@ interface PlaceCardsSheetProps {
 }
 
 const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, onPlaceSelect }) => {
-  const router = useRouter();
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: "center",
-    containScroll: "trimSnaps",
-    loop: false,
-  });
+  const isProgrammaticScrollRef = useRef(false);
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  // 選択されたカードのインデックスを取得
-  const initialSelectedIndex = useMemo(() => {
+  const selectedIndex = useMemo(() => {
     if (!selectedPlaceId) return 0;
     const index = places.findIndex((place) => place.id === selectedPlaceId);
     return index >= 0 ? index : 0;
   }, [places, selectedPlaceId]);
 
+  // カルーセルの初期化
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "center",
+    containScroll: "trimSnaps",
+    loop: false,
+    startIndex: selectedIndex,
+  });
+
   useEffect(() => {
     if (!emblaApi) return;
 
-    if (initialSelectedIndex >= 0) {
-      emblaApi.scrollTo(initialSelectedIndex, false);
+    if (selectedPlaceId) {
+      isProgrammaticScrollRef.current = true;
+      emblaApi.scrollTo(selectedIndex, false);
+
+      const timer = setTimeout(() => {
+        isProgrammaticScrollRef.current = false;
+      }, 100);
+
+      return () => clearTimeout(timer);
     }
-  }, [emblaApi, initialSelectedIndex]);
+  }, [emblaApi, selectedPlaceId, selectedIndex]);
 
   useEffect(() => {
     if (!emblaApi) return;
 
     const onSelect = () => {
+      if (isProgrammaticScrollRef.current) return;
       const index = emblaApi.selectedScrollSnap();
-      setSelectedIndex(index);
       const place = places[index];
       if (place && place.id !== selectedPlaceId) {
         onPlaceSelect(place.id);
@@ -50,7 +56,6 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
     };
 
     emblaApi.on("select", onSelect);
-    onSelect();
 
     return () => {
       emblaApi.off("select", onSelect);

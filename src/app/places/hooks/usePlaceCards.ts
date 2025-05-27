@@ -8,7 +8,7 @@ export default function usePlaceCards() {
   const { data, loading, error, refetch } = useGetPlacesQuery({
     variables: {
       filter: {},
-      first: 50,
+      first: 100,
       IsCard: true,
     },
     fetchPolicy: "cache-and-network",
