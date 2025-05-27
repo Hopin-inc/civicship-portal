@@ -74,7 +74,7 @@ export default function ActivityPage() {
       </main>
       <ActivityDetailsFooter
         opportunityId={opportunity.id}
-        price={opportunity.feeRequired || 0}
+        price={opportunity.feeRequired}
         communityId={communityId}
         disableReason={
           !sortedSlots || sortedSlots.length === 0

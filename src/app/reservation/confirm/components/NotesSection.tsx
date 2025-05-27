@@ -6,7 +6,7 @@ import IconWrapper from "@/components/shared/IconWrapper";
 
 const NotesSection = () => {
   return (
-    <div className="rounded-lg p-4 mb-6">
+    <div className="rounded-lg p-6 mb-6">
       <h3 className="text-display-sm mb-6">注意事項</h3>
       <div className="space-y-4">
         <div className="flex items-start gap-3">

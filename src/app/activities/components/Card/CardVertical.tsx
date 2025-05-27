@@ -50,7 +50,7 @@ export default function OpportunityCardVertical({
         <h3 className="text-title-sm text-foreground line-clamp-2">{title}</h3>
         <div className="mt-2 flex flex-col">
           <p className="text-body-sm text-muted-foreground">
-            {feeRequired ? `1人あたり${feeRequired.toLocaleString()}円から` : "要問い合わせ"}
+            {feeRequired ? `1人あたり${feeRequired.toLocaleString()}円から` : "料金未定"}
           </p>
           <div className="flex items-center text-body-sm text-muted-foreground mt-1">
             <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />

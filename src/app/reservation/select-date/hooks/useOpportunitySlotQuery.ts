@@ -1,5 +1,9 @@
 import { useMemo } from "react";
-import { useGetOpportunitySlotsQuery } from "@/types/graphql";
+import {
+  GqlOpportunitySlotHostingStatus,
+  GqlSortDirection,
+  useGetOpportunitySlotsQuery,
+} from "@/types/graphql";
 import { ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 import { ActivityDetail } from "@/app/activities/data/type";
 import {
@@ -17,15 +21,16 @@ export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLo
     variables: {
       filter: {
         opportunityId,
-        hostingStatus: "SCHEDULED",
+        hostingStatus: GqlOpportunitySlotHostingStatus.Scheduled,
       },
+      sort: {
+        startsAt: GqlSortDirection.Desc,
+      },
+      first: 100, // TODO コネクションは見直す必要あり
     },
     skip: !opportunityId,
     fetchPolicy: "network-only",
     errorPolicy: "all",
-    onError: (err) => {
-      console.error("OpportunitySlot query error:", err);
-    },
   });
 
   const opportunity: ActivityDetail | null = useMemo(() => {
