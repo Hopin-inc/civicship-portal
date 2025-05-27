@@ -1,6 +1,6 @@
 "use client";
 
-import { analytics } from "@/lib/firebase";
+import { analytics } from "@/lib/auth/firebase-config";
 import { logEvent, setUserId, setUserProperties } from "firebase/analytics";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useEffect, useMemo } from "react";

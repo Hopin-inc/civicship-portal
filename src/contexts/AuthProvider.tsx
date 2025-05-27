@@ -32,6 +32,7 @@ export type AuthState = {
 interface AuthContextType {
   user: GqlCurrentUserQuery["currentUser"]["user"] | null;
   firebaseUser: User | null;
+  uid: string | null;
   isAuthenticated: boolean;
   isPhoneVerified: boolean;
   isAuthenticating: boolean;
@@ -123,11 +124,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const initializeLiff = async () => {
       if (environment === AuthEnvironment.LIFF || environment === AuthEnvironment.LINE_BROWSER) {
         await liffService.initialize();
+        
+        if (environment === AuthEnvironment.LIFF && !state.isAuthenticating && state.lineAuthStatus === "unauthenticated") {
+          await loginWithLiff();
+        }
       }
     };
     
     initializeLiff();
-  }, [environment]);
+  }, [environment, state.isAuthenticating, state.lineAuthStatus]);
   
   useEffect(() => {
     const handleTokenExpired = (event: CustomEvent) => {
@@ -286,6 +291,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value: AuthContextType = {
     user: state.currentUser,
     firebaseUser: state.firebaseUser,
+    uid: state.firebaseUser?.uid || null,
     isAuthenticated: state.lineAuthStatus === "authenticated",
     isPhoneVerified: state.phoneAuthStatus === "verified",
     isAuthenticating: state.isAuthenticating,
