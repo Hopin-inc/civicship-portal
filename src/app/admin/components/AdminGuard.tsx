@@ -1,16 +1,33 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 import { GqlRole } from "@/types/graphql";
+import { usePermission } from "@/hooks/usePermission";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/utils";
 
-export default function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { user: currentUser, loading } = useAuth();
+type AdminGuardProps = {
+  children: React.ReactNode;
+  communityId?: string;
+  requiredRoles?: GqlRole[];
+};
+
+/**
+ * 管理者権限を持つユーザーのみアクセスを許可するガードコンポーネント
+ * 権限がない場合はリダイレクトする
+ */
+export default function AdminGuard({
+  children,
+  communityId = COMMUNITY_ID,
+  requiredRoles = [GqlRole.Owner, GqlRole.Manager],
+}: AdminGuardProps) {
   const router = useRouter();
+  const { user, loading } = useAuth();
+  const { checkAdminPermission, checkCommunityPermission } = usePermission();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     if (loading) {
@@ -18,60 +35,54 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    // 🚫 Not logged in → Redirect to phone verification
-    if (!currentUser) {
+    if (!user) {
       const next = encodeURIComponent(window.location.pathname + window.location.search);
       console.log("🚷 No user found. Redirecting to login.");
       router.replace(`/login?next=${next}`);
       return;
     }
 
-    // 🧾 No memberships → Redirect to home
-    if (!currentUser.memberships || currentUser.memberships.length === 0) {
-      console.log("🚪 User has no memberships. Redirecting to home.");
+    if (communityId) {
+      const permissionResult = checkCommunityPermission({
+        communityId,
+        requiredRoles,
+      });
+
+      if (!permissionResult.hasPermission) {
+        console.log("⚠️ User does not have required community permissions, redirecting to home");
+        router.replace("/");
+        return;
+      }
+
+      setIsAuthorized(true);
+      setIsChecking(false);
+      console.log("✅ User is authorized as community manager.");
+      return;
+    }
+
+    const permissionResult = checkAdminPermission();
+    
+    if (!permissionResult.hasPermission) {
+      console.log("⚠️ User does not have admin permissions, redirecting to home");
       router.replace("/");
       return;
     }
 
-    // 🎯 Check if user is a manager in the target community
-    const targetMembership = currentUser.memberships.find((m) => m.community?.id === COMMUNITY_ID);
-    const isCommunityManager =
-      targetMembership &&
-      (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
+    setIsAuthorized(true);
+    setIsChecking(false);
+  }, [user, loading, router, communityId, requiredRoles, checkAdminPermission, checkCommunityPermission]);
 
-    if (!targetMembership) {
-      console.log(`❌ No membership found for community ${COMMUNITY_ID}. Redirecting to home.`);
-      router.replace("/");
-      return;
-    }
-
-    if (!isCommunityManager) {
-      console.log("⚠️ User is not a manager. Redirecting to home.");
-      toast.warning("管理者権限がありません");
-      router.replace("/");
-      return;
-    }
-
-    console.log("✅ User is authorized as community manager.");
-  }, [currentUser, loading, router]);
-
-  if (loading) {
+  if (isChecking || loading) {
     console.log("⏳ Showing loading indicator...");
-    return <LoadingIndicator />;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <LoadingIndicator />
+      </div>
+    );
   }
 
-  if (!currentUser || !currentUser.memberships || currentUser.memberships.length === 0) {
+  if (!isAuthorized) {
     console.log("🚫 Unauthorized user state. No UI rendered.");
-    return null;
-  }
-
-  const targetMembership = currentUser.memberships.find((m) => m.community?.id === COMMUNITY_ID);
-  const isCommunityManager =
-    targetMembership &&
-    (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
-
-  if (!isCommunityManager) {
-    console.log("❌ Unauthorized role. No UI rendered.");
     return null;
   }
 
