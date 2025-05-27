@@ -91,7 +91,12 @@ export class LiffService {
    * LIFFでログイン
    * @returns ログインが成功したかどうか
    */
-  public async login(): Promise<boolean> {
+  /**
+   * LIFFでログイン
+   * @param redirectPath リダイレクト先のパス（オプション）
+   * @returns ログインが成功したかどうか
+   */
+  public async login(redirectPath?: string): Promise<boolean> {
     try {
       if (!this.state.isInitialized) {
         await this.initialize();
@@ -101,7 +106,12 @@ export class LiffService {
         if (liff.isInClient()) {
           this.state.isLoggedIn = true;
         } else {
-          liff.login();
+          const state = redirectPath || (typeof window !== "undefined" ? window.location.pathname : "/");
+          
+          liff.login({
+            redirectUri: window.location.href,
+            state: state
+          });
           return false; // リダイレクトするのでここには到達しない
         }
       }
