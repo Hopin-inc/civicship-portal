@@ -67,6 +67,13 @@ export const LiffProvider = ({ children }: LiffProviderProps) => {
       
       if (accessToken) {
         authService.authenticate(AuthProvider.LIFF, { accessToken });
+        
+        if (typeof window !== 'undefined') {
+          console.log("🔄 Emitting LIFF auth complete event");
+          window.dispatchEvent(new CustomEvent('liff:auth-complete', {
+            detail: { shouldRedirectToPhoneVerification: true }
+          }));
+        }
       }
     } catch (error) {
       console.error("Failed to get LIFF tokens:", error);

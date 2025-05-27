@@ -12,7 +12,11 @@ export default function HomePage() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    if (window.location.pathname === "/") {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isFromLine = urlParams.has('liff.state') || urlParams.has('code') || 
+                       window.location.hash.includes('access_token');
+    
+    if (window.location.pathname === "/" && !isFromLine) {
       router.replace("/activities");
     }
   }, [router]);

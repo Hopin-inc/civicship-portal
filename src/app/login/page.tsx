@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -9,32 +10,40 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { getLiffLoginErrorMessage } from "@/app/login/utils/getLiffLoginErrorMessage";
 import { toast } from "sonner";
+import LineAuthLoading from "./components/LineAuthLoading";
 
 export default function LoginPage() {
-  // const router = useRouter();
-
-  // const { isLiffInitialized, isLiffLoggedIn, liffProfile, liffError } = useLiff();
+  const router = useRouter();
   const { user: currentUser, loginWithLiff, isAuthenticating } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
+  const [isLineAuthReturn, setIsLineAuthReturn] = useState(false);
 
-  // // 🚀 LIFFログイン済みならトップへ自動遷移
-  // useEffect(() => {
-  //   if (isLiffInitialized && isLiffLoggedIn && liffProfile && currentUser) {
-  //     console.log("🚀 Automatically redirect to the top page if already logged in via LIFF");
-  //     router.replace("/");
-  //   }
-  // }, [currentUser, isLiffInitialized, isLiffLoggedIn, liffProfile, router]);
-  //
-  // // 🔴 初期化エラー表示
-  // useEffect(() => {
-  //   if (liffError) {
-  //     console.error(liffError);
-  //   }
-  // }, [liffError]);
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasLineParams = urlParams.has('liff.state') || urlParams.has('code') || 
+                         window.location.hash.includes('access_token');
+    
+    if (hasLineParams) {
+      console.log("🔄 Detected return from LINE authentication");
+      setIsLineAuthReturn(true);
+      processLineAuthReturn();
+    }
+  }, [router]);
+  
+  const processLineAuthReturn = async () => {
+    try {
+      console.log("⏳ Processing LINE authentication return");
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      router.replace('/sign-up/phone-verification');
+    } catch (error) {
+      console.error('LINE auth processing failed:', error);
+      setIsLineAuthReturn(false);
+    }
+  };
 
   // 📦 ログイン処理
   const handleLogin = async () => {
@@ -66,6 +75,10 @@ export default function LoginPage() {
       document.body.style.overflow = "";
     };
   }, []);
+
+  if (isLineAuthReturn) {
+    return <LineAuthLoading />;
+  }
 
   return (
     <div className="min-h-screen bg-background">

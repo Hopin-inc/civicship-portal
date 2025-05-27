@@ -257,14 +257,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
     };
 
+    const handleLiffAuthComplete = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      console.log("LIFF auth complete event detected:", customEvent.detail);
+      
+      if (customEvent.detail?.shouldRedirectToPhoneVerification) {
+        router.replace('/sign-up/phone-verification');
+      }
+    };
+
     window.addEventListener("auth:token-expired", handleTokenExpired);
     window.addEventListener("auth:error", handleAuthError);
     window.addEventListener("auth:token-refresh-failed", handleAuthError);
+    window.addEventListener("liff:auth-complete", handleLiffAuthComplete);
 
     return () => {
       window.removeEventListener("auth:token-expired", handleTokenExpired);
       window.removeEventListener("auth:error", handleAuthError);
       window.removeEventListener("auth:token-refresh-failed", handleAuthError);
+      window.removeEventListener("liff:auth-complete", handleLiffAuthComplete);
     };
   }, [router]);
 
