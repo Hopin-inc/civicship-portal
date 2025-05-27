@@ -2,20 +2,60 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthProvider";
+import { useQuery } from "@apollo/client";
+import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
 import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
 
 export default function HomePage() {
   const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
+    skip: !isAuthenticated,
+  });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    const searchParams = new URLSearchParams(window.location.search);
+    const liffState = searchParams.get("liff.state");
+
+    if (liffState) {
+      console.log("🚀 Detected return from LINE authentication, liff.state:", liffState);
+      
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+      
+      if (authLoading || userLoading) {
+        console.log("🚀 Auth state loading, waiting before redirect");
+        return; // Wait for auth state to stabilize
+      }
+      
+      if (isAuthenticated) {
+        if (!userData?.currentUser) {
+          console.log("🚀 No user data, redirecting to phone verification");
+          router.replace("/sign-up/phone-verification");
+          return;
+        }
+        
+        if (liffState.startsWith("/")) {
+          console.log("🚀 Redirecting to liff.state path:", liffState);
+          router.replace(liffState);
+          return;
+        }
+      } else {
+        console.log("🚀 Not authenticated, redirecting to login");
+        router.replace("/login");
+        return;
+      }
+    }
+    
     if (window.location.pathname === "/") {
       router.replace("/activities");
     }
-  }, [router]);
+  }, [router, isAuthenticated, userData, authLoading, userLoading]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });

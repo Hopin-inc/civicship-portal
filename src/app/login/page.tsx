@@ -37,11 +37,15 @@ export default function LoginPage() {
       return;
     }
 
+    // if (nextPath && nextPath !== "/") {
+    //   localStorage.setItem("auth_redirect", nextPath);
+    // }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      const success = await loginWithLiff();
+      const success = await loginWithLiff(nextPath);
       if (success) {
         router.push(nextPath);
       }

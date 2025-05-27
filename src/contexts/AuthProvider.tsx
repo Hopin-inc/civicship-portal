@@ -38,7 +38,7 @@ interface AuthContextType {
   isAuthenticating: boolean;
   environment: AuthEnvironment;
 
-  loginWithLiff: () => Promise<boolean>;
+  loginWithLiff: (redirectPath?: string) => Promise<boolean>;
   logout: () => Promise<void>;
 
   phoneAuth: {
@@ -131,7 +131,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               state.lineAuthStatus === "unauthenticated" &&
               !state.isAuthenticating) {
             console.log("Auto-logging in via LIFF");
-            await loginWithLiff();
+            await loginWithLiff(typeof window !== "undefined" ? window.location.pathname : "/");
           }
         } else {
           console.error("LIFF initialization failed");
@@ -161,8 +161,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   /**
    * LIFFでログイン
+   * @param redirectPath リダイレクト先のパス（オプション）
+   * @returns ログインが成功したかどうか
    */
-  const loginWithLiff = async (): Promise<boolean> => {
+  const loginWithLiff = async (redirectPath?: string): Promise<boolean> => {
     setState((prev) => ({ ...prev, isAuthenticating: true }));
 
     try {
@@ -171,7 +173,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error("Failed to initialize LIFF");
       }
 
-      const loggedIn = await liffService.login();
+      const loggedIn = await liffService.login(redirectPath);
       if (!loggedIn) {
         return false; // リダイレクトするのでここには到達しない
       }
@@ -315,7 +317,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       phoneUid: phoneAuthService.getState().phoneUid,
     },
     createUser,
-    loading: state.lineAuthStatus === "loading" || state.phoneAuthStatus === "loading" || userLoading,
+    loading: state.lineAuthStatus === "loading" || state.phoneAuthStatus === "loading" || userLoading || state.isAuthenticating,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

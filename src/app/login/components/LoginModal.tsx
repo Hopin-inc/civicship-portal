@@ -31,7 +31,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     setError(null);
 
     try {
-      await loginWithLiff();
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : "/";
+      await loginWithLiff(currentPath);
       setIsLoading(false);
       onClose();
     } catch (err) {
