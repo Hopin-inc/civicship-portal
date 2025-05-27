@@ -18,6 +18,7 @@ export default function PhoneVerificationPage() {
 
     const isLineWebBrowser = () => {
       if (typeof navigator === "undefined") return false;
+      console.log("navigator.userAgent: ", navigator.userAgent);
       return /Line/i.test(navigator.userAgent);
     };
 
