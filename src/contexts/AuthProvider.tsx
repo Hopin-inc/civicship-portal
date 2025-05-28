@@ -113,7 +113,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  const authStateManager = React.useMemo(() => {
+    const AuthStateManager = require("@/lib/auth/auth-state-manager").AuthStateManager;
+    return AuthStateManager.getInstance();
+  }, []);
+
+  /**
+   * ログアウト
+   */
+  const logout = useCallback(async (): Promise<void> => {
+    try {
+      liffService.logout();
+
+      await lineAuth.signOut();
+
+      phoneAuthService.reset();
+
+      TokenManager.clearAllTokens();
+
+      setState((prev) => ({
+        ...prev,
+        firebaseUser: null,
+        currentUser: null,
+        authenticationState: "unauthenticated",
+      }));
+
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }, [router]);
+
   useEffect(() => {
+    if (!authStateManager) return; // Guard against initialization error
+    
     const phoneState = phoneAuthService.getState();
     
     if (phoneState.isVerified) {
@@ -248,20 +281,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     handleAutoLogin();
   }, [environment, state.authenticationState, state.isAuthenticating, liffService, refetchUser]);
 
-  const authStateManager = React.useMemo(() => {
-    const AuthStateManager = require("@/lib/auth/auth-state-manager").AuthStateManager;
-    return AuthStateManager.getInstance();
-  }, []);
-
   useEffect(() => {
+    if (!authStateManager) return; // Guard against initialization error
+    
     const handleStateChange = (newState: AuthState["authenticationState"]) => {
       setState(prev => ({ ...prev, authenticationState: newState }));
     };
 
     authStateManager.addStateChangeListener(handleStateChange);
 
-    const handleTokenExpired = async (event: CustomEvent) => {
-      const { source } = event.detail;
+    const handleTokenExpired = (event: Event) => {
+      const customEvent = event as CustomEvent<{ source: string }>;
+      const { source } = customEvent.detail;
       
       if (source === "graphql" || source === "network") {
         if (state.authenticationState === "line_authenticated" || state.authenticationState === "user_registered") {
@@ -285,11 +316,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
 
-    window.addEventListener("auth:token-expired", handleTokenExpired as EventListener);
+    window.addEventListener("auth:token-expired", handleTokenExpired);
 
     return () => {
       authStateManager.removeStateChangeListener(handleStateChange);
-      window.removeEventListener("auth:token-expired", handleTokenExpired as EventListener);
+      window.removeEventListener("auth:token-expired", handleTokenExpired);
     };
   }, [state.authenticationState, logout, authStateManager]);
 
@@ -326,32 +357,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setState((prev) => ({ ...prev, isAuthenticating: false }));
     }
   };
-
-  /**
-   * ログアウト
-   */
-  const logout = useCallback(async (): Promise<void> => {
-    try {
-      liffService.logout();
-
-      await lineAuth.signOut();
-
-      phoneAuthService.reset();
-
-      TokenManager.clearAllTokens();
-
-      setState((prev) => ({
-        ...prev,
-        firebaseUser: null,
-        currentUser: null,
-        authenticationState: "unauthenticated",
-      }));
-
-      router.push("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  }, [router]);
 
   /**
    * 電話番号認証を開始
