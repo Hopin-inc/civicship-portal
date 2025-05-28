@@ -10,7 +10,7 @@ export default function RegisterAccount() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next");
+  const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
 
   useEffect(() => {
     if (!loading && user) {
