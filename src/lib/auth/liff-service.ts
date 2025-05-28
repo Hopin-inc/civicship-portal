@@ -6,7 +6,14 @@ import { lineAuth, categorizeFirebaseError } from "./firebase-config";
 import { TokenManager, AuthTokens } from "./token-manager";
 import retry from "retry";
 import logger from "../logging";
-import { createAuthLogContext, createRetryLogContext, maskUserId } from "./logging-utils";
+import { 
+  createAuthLogContext, 
+  createRetryLogContext, 
+  maskUserId, 
+  startOperation, 
+  endOperation, 
+  generateRequestId 
+} from "./logging-utils";
 
 /**
  * LIFF初期化状態の型定義
@@ -69,8 +76,29 @@ export class LiffService {
    * @returns 初期化が成功したかどうか
    */
   public async initialize(sessionId?: string): Promise<boolean> {
+    const op = startOperation("LiffInitialize");
+    
+    logger.info("InitStart", createAuthLogContext(
+      sessionId || 'unknown_session',
+      "liff",
+      op.getContext({
+        event: "InitStart",
+        component: "LIFF",
+        liffId: this.liffId
+      })
+    ));
+    
     try {
       if (this.state.isInitialized) {
+        logger.info("InitSkipped", createAuthLogContext(
+          sessionId || 'unknown_session',
+          "liff",
+          op.getContext({
+            event: "InitSkipped",
+            component: "LIFF",
+            reason: "Already initialized"
+          })
+        ));
         return true;
       }
 
@@ -82,20 +110,42 @@ export class LiffService {
         await this.updateProfile();
       }
 
-      return true;
-    } catch (error) {
-      logger.error("LIFF initialization error", createAuthLogContext(
+      logger.info("InitSuccess", createAuthLogContext(
         sessionId || 'unknown_session',
         "liff",
-        {
-          operation: "initialize",
+        op.getContext({
+          event: "InitSuccess",
+          component: "LIFF",
+          isLoggedIn: this.state.isLoggedIn,
+          userId: this.state.profile?.userId ? maskUserId(this.state.profile.userId) : "none"
+        })
+      ));
+
+      return true;
+    } catch (error) {
+      logger.error("InitError", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "liff",
+        op.getContext({
+          event: "InitError",
+          component: "LIFF",
           error: error instanceof Error ? error.message : String(error),
+          errorCode: error instanceof Error && 'code' in error ? (error as any).code : 'unknown',
           stack: error instanceof Error ? error.stack : undefined,
           liffId: this.liffId
-        }
+        })
       ));
       this.state.error = error as Error;
       return false;
+    } finally {
+      logger.debug("Operation completed", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "liff",
+        endOperation(op.startTime, op.operationId, {
+          component: "LIFF",
+          operation: "initialize"
+        })
+      ));
     }
   }
 
@@ -110,40 +160,105 @@ export class LiffService {
    * @returns ログインが成功したかどうか
    */
   public async login(redirectPath?: string, sessionId?: string): Promise<boolean> {
+    const op = startOperation("LiffLogin");
+    
+    logger.info("GetLineTokenStart", createAuthLogContext(
+      sessionId || 'unknown_session',
+      "liff",
+      op.getContext({
+        event: "GetLineTokenStart",
+        component: "LIFF",
+        isInitialized: this.state.isInitialized,
+        isLoggedIn: this.state.isLoggedIn,
+        redirectPath: redirectPath || "none"
+      })
+    ));
+    
     try {
       if (!this.state.isInitialized) {
-        await this.initialize();
+        logger.debug("Initializing LIFF before login", createAuthLogContext(
+          sessionId || 'unknown_session',
+          "liff",
+          op.getContext({
+            component: "LIFF",
+            operation: "login_initialize"
+          })
+        ));
+        await this.initialize(sessionId);
       }
 
       if (!this.state.isLoggedIn) {
         if (liff.isInClient()) {
+          logger.debug("In LINE client, setting logged in state", createAuthLogContext(
+            sessionId || 'unknown_session',
+            "liff",
+            op.getContext({
+              component: "LIFF",
+              operation: "login_in_client"
+            })
+          ));
           this.state.isLoggedIn = true;
         } else {
           const redirectUri = redirectPath && typeof window !== "undefined"
             ? window.location.origin + redirectPath
             : typeof window !== "undefined" ? window.location.pathname : undefined;
 
+          logger.info("Redirecting to LINE login", createAuthLogContext(
+            sessionId || 'unknown_session',
+            "liff",
+            op.getContext({
+              event: "GetLineTokenRedirect",
+              component: "LIFF",
+              redirectUri: redirectUri || "default"
+            })
+          ));
+          
           liff.login({ redirectUri });
           return false; // リダイレクトするのでここには到達しない
         }
       }
 
       await this.updateProfile();
-      return true;
-    } catch (error) {
-      logger.error("LIFF login error", createAuthLogContext(
+      
+      logger.info("GetLineTokenSuccess", createAuthLogContext(
         sessionId || 'unknown_session',
         "liff",
-        {
-          operation: "login",
+        op.getContext({
+          event: "GetLineTokenSuccess",
+          component: "LIFF",
+          userId: this.state.profile?.userId ? maskUserId(this.state.profile.userId) : "none",
+          hasDisplayName: !!this.state.profile?.displayName,
+          hasPictureUrl: !!this.state.profile?.pictureUrl,
+          tokenLength: this.getAccessToken()?.length || 0
+        })
+      ));
+      
+      return true;
+    } catch (error) {
+      logger.error("GetLineTokenError", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "liff",
+        op.getContext({
+          event: "GetLineTokenError",
+          component: "LIFF",
           error: error instanceof Error ? error.message : String(error),
+          errorCode: error instanceof Error && 'code' in error ? (error as any).code : 'unknown',
           stack: error instanceof Error ? error.stack : undefined,
           isInitialized: this.state.isInitialized,
           redirectPath: redirectPath || "none"
-        }
+        })
       ));
       this.state.error = error as Error;
       return false;
+    } finally {
+      logger.debug("Operation completed", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "liff",
+        endOperation(op.startTime, op.operationId, {
+          component: "LIFF",
+          operation: "login"
+        })
+      ));
     }
   }
 
@@ -228,16 +343,34 @@ export class LiffService {
    * @returns 認証が成功したかどうか
    */
   public async signInWithLiffToken(sessionId?: string): Promise<boolean> {
+    const op = startOperation("SignInWithLiffToken");
+    const requestId = generateRequestId();
+    
+    logger.info("CustomTokenRequestStart", createAuthLogContext(
+      sessionId || 'unknown_session',
+      "liff",
+      op.getContext({
+        event: "CustomTokenRequestStart",
+        component: "FirebaseAuth",
+        requestId,
+        lineUserId: this.state.profile?.userId ? maskUserId(this.state.profile.userId) : "none"
+      })
+    ));
+    
     const accessToken = this.getAccessToken();
     if (!accessToken) {
-      logger.error("No LIFF access token available", createAuthLogContext(
+      logger.error("CustomTokenRequestError", createAuthLogContext(
         sessionId || 'unknown_session',
         "liff",
-        {
-          operation: "signInWithLiffToken",
+        op.getContext({
+          event: "CustomTokenRequestError",
+          component: "FirebaseAuth",
+          requestId,
+          errorCode: "no_access_token",
+          error: "No LIFF access token available",
           isInitialized: this.state.isInitialized,
           isLoggedIn: this.state.isLoggedIn
-        }
+        })
       ));
       return false;
     }
@@ -252,132 +385,157 @@ export class LiffService {
 
     return new Promise((resolve) => {
       operation.attempt(async (currentAttempt) => {
+        const attemptOp = startOperation(`SignInAttempt${currentAttempt}`);
+        const attemptRequestId = generateRequestId();
+        
         try {
-          const attemptTimestamp = new Date().toISOString();
-          logger.debug("LIFF Auth Attempt Starting", createAuthLogContext(
+          logger.debug("SignInWithTokenStart", createAuthLogContext(
             sessionId || 'unknown_session',
             "liff",
-            {
-              operation: "signInWithLiffToken",
+            attemptOp.getContext({
+              event: "SignInWithTokenStart",
+              component: "FirebaseAuth",
+              requestId: attemptRequestId,
+              parentRequestId: requestId,
               attempt: currentAttempt,
               ...createRetryLogContext(currentAttempt, 3, currentAttempt - 1),
               isInitialized: this.state.isInitialized,
               isLoggedIn: this.state.isLoggedIn,
               accessToken: this.getAccessToken() ? "present" : "missing",
               userId: this.state.profile?.userId ? maskUserId(this.state.profile.userId) : "none"
-            }
+            })
           ));
 
-          const requestTimestamp = new Date().toISOString();
-          logger.debug("Making request to /line/liff-login", createAuthLogContext(
+          logger.debug("VerifyLineIdTokenStart", createAuthLogContext(
             sessionId || 'unknown_session',
             "liff",
-            {
-              operation: "signInWithLiffToken",
-              timestamp: requestTimestamp
-            }
+            attemptOp.getContext({
+              event: "VerifyLineIdTokenStart",
+              component: "Backend",
+              requestId: attemptRequestId,
+              parentRequestId: requestId,
+              tokenLength: accessToken.length
+            })
           ));
           
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`,
             {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "X-Request-ID": attemptRequestId
+              },
               body: JSON.stringify({ accessToken }),
             },
           );
 
-          const responseTimestamp = new Date().toISOString();
-          logger.debug("/line/liff-login response received", createAuthLogContext(
-            sessionId || 'unknown_session',
-            "liff",
-            {
-              operation: "signInWithLiffToken",
-              timestamp: responseTimestamp,
-              status: response.status,
-              ok: response.ok,
-              attempt: currentAttempt,
-              ...createRetryLogContext(currentAttempt, 3, currentAttempt - 1),
-              statusText: response.statusText
-            }
-          ));
-
-          if (!response.ok) {
+          if (response.ok) {
+            logger.debug("VerifyLineIdTokenSuccess", createAuthLogContext(
+              sessionId || 'unknown_session',
+              "liff",
+              attemptOp.getContext({
+                event: "VerifyLineIdTokenSuccess",
+                component: "Backend",
+                requestId: attemptRequestId,
+                parentRequestId: requestId,
+                status: response.status,
+                statusText: response.statusText
+              })
+            ));
+          } else {
+            logger.warn("VerifyLineIdTokenError", createAuthLogContext(
+              sessionId || 'unknown_session',
+              "liff",
+              attemptOp.getContext({
+                event: "VerifyLineIdTokenError",
+                component: "Backend",
+                requestId: attemptRequestId,
+                parentRequestId: requestId,
+                status: response.status,
+                statusText: response.statusText,
+                attempt: currentAttempt,
+                ...createRetryLogContext(currentAttempt, 3, currentAttempt - 1)
+              })
+            ));
             throw new Error(`LIFF authentication failed: ${response.status}`);
           }
 
-          const jsonTimestamp = new Date().toISOString();
-          logger.debug("Parsing response JSON", createAuthLogContext(
-            sessionId || 'unknown_session',
-            "liff",
-            {
-              operation: "signInWithLiffToken",
-              timestamp: jsonTimestamp
-            }
-          ));
           const { customToken, profile } = await response.json();
-          logger.debug("Received custom token and profile", createAuthLogContext(
+          
+          logger.debug("CustomTokenRequestSuccess", createAuthLogContext(
             sessionId || 'unknown_session',
             "liff",
-            {
-              operation: "signInWithLiffToken",
-              timestamp: jsonTimestamp,
-              hasCustomToken: !!customToken,
+            attemptOp.getContext({
+              event: "CustomTokenRequestSuccess",
+              component: "FirebaseAuth",
+              requestId: attemptRequestId,
+              parentRequestId: requestId,
+              customTokenLength: customToken?.length || 0,
               profileName: profile?.displayName || "none"
-            }
+            })
           ));
 
-          const firebaseTimestamp = new Date().toISOString();
-          logger.debug("Signing in with custom token to Firebase", createAuthLogContext(
+          logger.debug("SignInWithTokenStart", createAuthLogContext(
             sessionId || 'unknown_session',
             "liff",
-            {
-              operation: "signInWithLiffToken",
-              timestamp: firebaseTimestamp
-            }
+            attemptOp.getContext({
+              event: "SignInWithTokenStart",
+              component: "FirebaseAuth",
+              requestId: attemptRequestId,
+              parentRequestId: requestId
+            })
           ));
+          
           const userCredential = await signInWithCustomToken(lineAuth, customToken);
-          logger.debug("Firebase sign-in successful", createAuthLogContext(
+          
+          logger.info("SignInWithTokenSuccess", createAuthLogContext(
             sessionId || 'unknown_session',
             "liff",
-            {
-              operation: "signInWithLiffToken",
-              timestamp: firebaseTimestamp,
+            attemptOp.getContext({
+              event: "SignInWithTokenSuccess",
+              component: "FirebaseAuth",
+              requestId: attemptRequestId,
+              parentRequestId: requestId,
               uid: maskUserId(userCredential.user.uid),
               isNewUser: userCredential.user.metadata.creationTime === userCredential.user.metadata.lastSignInTime
-            }
+            })
+          ));
+          
+          logger.debug("FirebaseLinkAccountStart", createAuthLogContext(
+            sessionId || 'unknown_session',
+            "liff",
+            attemptOp.getContext({
+              event: "FirebaseLinkAccountStart",
+              component: "FirebaseAuth",
+              requestId: attemptRequestId,
+              parentRequestId: requestId,
+              existingUid: maskUserId(userCredential.user.uid),
+              newProvider: "LINE"
+            })
           ));
           
           await updateProfile(userCredential.user, {
             displayName: profile.displayName,
             photoURL: profile.pictureUrl,
           });
-
-          const tokenTimestamp = new Date().toISOString();
-          logger.debug("Getting Firebase ID token", createAuthLogContext(
+          
+          logger.debug("FirebaseLinkAccountSuccess", createAuthLogContext(
             sessionId || 'unknown_session',
             "liff",
-            {
-              operation: "signInWithLiffToken",
-              timestamp: tokenTimestamp
-            }
+            attemptOp.getContext({
+              event: "FirebaseLinkAccountSuccess",
+              component: "FirebaseAuth",
+              requestId: attemptRequestId,
+              parentRequestId: requestId,
+              linkedUid: maskUserId(userCredential.user.uid)
+            })
           ));
+
           const idToken = await userCredential.user.getIdToken();
           const refreshToken = userCredential.user.refreshToken;
           const tokenResult = await userCredential.user.getIdTokenResult();
           const expirationTime = new Date(tokenResult.expirationTime).getTime();
-
-          logger.debug("Token details", createAuthLogContext(
-            sessionId || 'unknown_session',
-            "liff",
-            {
-              operation: "signInWithLiffToken",
-              timestamp: tokenTimestamp,
-              hasIdToken: !!idToken,
-              hasRefreshToken: !!refreshToken,
-              expirationTime: new Date(expirationTime).toISOString()
-            }
-          ));
 
           const tokens: AuthTokens = {
             accessToken: idToken,
@@ -386,46 +544,79 @@ export class LiffService {
           };
           TokenManager.saveLineTokens(tokens);
 
-          const completeTimestamp = new Date().toISOString();
-          logger.info("LIFF authentication successful", createAuthLogContext(
+          logger.info("onAuthStateChanged", createAuthLogContext(
             sessionId || 'unknown_session',
             "liff",
-            {
-              operation: "signInWithLiffToken",
-              timestamp: completeTimestamp,
-              userId: maskUserId(userCredential.user.uid)
-            }
+            op.getContext({
+              event: "onAuthStateChanged",
+              component: "FirebaseAuth",
+              requestId,
+              prevState: "unauthenticated",
+              newState: "authenticated",
+              userId: maskUserId(userCredential.user.uid),
+              duration: Date.now() - op.startTime
+            })
           ));
+          
+          logger.debug("Attempt completed", createAuthLogContext(
+            sessionId || 'unknown_session',
+            "liff",
+            endOperation(attemptOp.startTime, attemptOp.operationId, {
+              component: "FirebaseAuth",
+              operation: "signInAttempt",
+              attempt: currentAttempt,
+              status: "success"
+            })
+          ));
+          
           resolve(true);
         } catch (error) {
           const categorizedError = categorizeFirebaseError(error);
 
           const logLevel = categorizedError.retryable ? "info" : "error";
-          logger[logLevel]("LIFF authentication error", createAuthLogContext(
+          logger[logLevel]("SignInWithTokenError", createAuthLogContext(
             sessionId || 'unknown_session',
             "liff",
-            {
-              operation: "signInWithLiffToken",
+            attemptOp.getContext({
+              event: "SignInWithTokenError",
+              component: "FirebaseAuth",
+              requestId: attemptRequestId,
+              parentRequestId: requestId,
               attempt: currentAttempt,
               ...createRetryLogContext(currentAttempt, 3, currentAttempt - 1),
-              errorType: categorizedError.type,
-              message: categorizedError.message,
+              errorCode: categorizedError.type,
+              error: categorizedError.message,
               retryable: categorizedError.retryable,
               stack: error instanceof Error ? error.stack : undefined
-            }
+            })
           ));
           
+          logger.debug("Attempt completed", createAuthLogContext(
+            sessionId || 'unknown_session',
+            "liff",
+            endOperation(attemptOp.startTime, attemptOp.operationId, {
+              component: "FirebaseAuth",
+              operation: "signInAttempt",
+              attempt: currentAttempt,
+              status: "failed",
+              error: categorizedError.message,
+              errorCode: categorizedError.type
+            })
+          ));
 
           if (!categorizedError.retryable || !operation.retry(error as Error)) {
-            logger.error("LIFF authentication failed after all retries", createAuthLogContext(
+            logger.error("CustomTokenRequestError", createAuthLogContext(
               sessionId || 'unknown_session',
               "liff",
-              {
-                operation: "signInWithLiffToken",
-                errorType: categorizedError.type,
-                message: categorizedError.message,
-                stack: error instanceof Error ? error.stack : undefined
-              }
+              op.getContext({
+                event: "CustomTokenRequestError",
+                component: "FirebaseAuth",
+                requestId,
+                errorCode: categorizedError.type,
+                error: categorizedError.message,
+                stack: error instanceof Error ? error.stack : undefined,
+                attempts: currentAttempt
+              })
             ));
 
             if (typeof window !== "undefined") {

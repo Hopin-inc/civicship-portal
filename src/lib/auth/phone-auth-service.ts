@@ -10,7 +10,15 @@ import { phoneAuth, categorizeFirebaseError } from "./firebase-config";
 import { TokenManager, PhoneAuthTokens } from "./token-manager";
 import { isRunningInLiff } from "./environment-detector";
 import logger from "../logging";
-import { createAuthLogContext, maskPhoneNumber, maskUserId, createRetryLogContext } from "./logging-utils";
+import { 
+  createAuthLogContext, 
+  maskPhoneNumber, 
+  maskUserId, 
+  createRetryLogContext,
+  startOperation,
+  endOperation,
+  generateRequestId
+} from "./logging-utils";
 import { categorizeRecaptchaError } from "./recaptcha-utils";
 
 /**
@@ -129,6 +137,20 @@ export class PhoneAuthService {
    * @returns 認証IDまたはnull（エラー時）
    */
   public async startPhoneVerification(phoneNumber: string, sessionId?: string): Promise<string | null> {
+    const op = startOperation("PhoneAuthStart");
+    const requestId = generateRequestId();
+    
+    logger.info("PhoneAuthStart", createAuthLogContext(
+      sessionId || 'unknown_session',
+      "phone",
+      op.getContext({
+        event: "PhoneAuthStart",
+        component: "FirebaseAuth",
+        requestId,
+        phoneNumber: maskPhoneNumber(phoneNumber)
+      })
+    ));
+    
     try {
       this.state.isVerifying = true;
       this.state.error = null;
@@ -136,48 +158,55 @@ export class PhoneAuthService {
 
       this.recaptchaContainerElement = document.getElementById("recaptcha-container");
       if (!this.recaptchaContainerElement) {
-        logger.error("reCAPTCHA container element not found", createAuthLogContext(
+        logger.error("RenderError", createAuthLogContext(
           sessionId || 'unknown_session',
           "phone",
-          {
-            operation: "startPhoneVerification",
-            component: "recaptcha"
-          }
+          op.getContext({
+            event: "RenderError",
+            component: "reCAPTCHA",
+            requestId,
+            errorCode: "container_not_found",
+            error: "reCAPTCHA container element not found"
+          })
         ));
         throw new Error("reCAPTCHA container element not found");
       }
 
-      logger.debug("Initializing reCAPTCHA verifier", createAuthLogContext(
+      logger.info("RenderStart", createAuthLogContext(
         sessionId || 'unknown_session',
         "phone",
-        {
-          operation: "startPhoneVerification",
-          component: "recaptcha",
+        op.getContext({
+          event: "RenderStart",
+          component: "reCAPTCHA",
+          requestId,
+          containerId: "recaptcha-container",
           size: isRunningInLiff() ? "normal" : "invisible",
           inLiff: isRunningInLiff()
-        }
+        })
       ));
       
       this.recaptchaVerifier = new RecaptchaVerifier(phoneAuth, "recaptcha-container", {
         size: isRunningInLiff() ? "normal" : "invisible",
         callback: () => {
-          logger.debug("reCAPTCHA verification completed", createAuthLogContext(
+          logger.info("ChallengeSuccess", createAuthLogContext(
             sessionId || 'unknown_session',
             "phone",
             {
-              operation: "recaptchaCallback",
-              component: "recaptcha",
-              status: "success"
+              event: "ChallengeSuccess",
+              component: "reCAPTCHA",
+              requestId,
+              version: isRunningInLiff() ? "v2" : "invisible"
             }
           ));
         },
         "expired-callback": () => {
-          logger.info("reCAPTCHA expired", createAuthLogContext(
+          logger.info("ChallengeExpired", createAuthLogContext(
             sessionId || 'unknown_session',
             "phone",
             {
-              operation: "recaptchaExpired",
-              component: "recaptcha"
+              event: "ChallengeExpired",
+              component: "reCAPTCHA",
+              requestId
             }
           ));
           this.clearRecaptcha();
@@ -185,6 +214,27 @@ export class PhoneAuthService {
       });
 
       await this.recaptchaVerifier.render();
+      
+      logger.info("RenderSuccess", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "phone",
+        op.getContext({
+          event: "RenderSuccess",
+          component: "reCAPTCHA",
+          requestId
+        })
+      ));
+
+      logger.debug("SignInWithPhoneStart", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "phone",
+        op.getContext({
+          event: "SignInWithPhoneStart",
+          component: "FirebaseAuth",
+          requestId,
+          phoneNumber: maskPhoneNumber(phoneNumber)
+        })
+      ));
 
       const confirmationResult = await signInWithPhoneNumber(
         phoneAuth,
@@ -195,6 +245,18 @@ export class PhoneAuthService {
       this.state.phoneNumber = phoneNumber;
       this.state.verificationId = confirmationResult.verificationId;
 
+      logger.info("PhoneAuthSuccess", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "phone",
+        op.getContext({
+          event: "PhoneAuthSuccess",
+          component: "FirebaseAuth",
+          requestId,
+          phoneNumber: maskPhoneNumber(phoneNumber),
+          verificationIdLength: confirmationResult.verificationId?.length || 0
+        })
+      ));
+
       return confirmationResult.verificationId;
     } catch (error) {
       const isRecaptchaError = error instanceof Error && 
@@ -204,22 +266,34 @@ export class PhoneAuthService {
         ? categorizeRecaptchaError(error)
         : categorizeFirebaseError(error);
       
-      logger.info("Phone verification failed", createAuthLogContext(
+      logger.error("PhoneAuthError", createAuthLogContext(
         sessionId || 'unknown_session',
         "phone",
-        {
-          operation: "startPhoneVerification",
+        op.getContext({
+          event: "PhoneAuthError",
+          component: isRecaptchaError ? "reCAPTCHA" : "FirebaseAuth",
+          requestId,
+          errorCode: errorDetails.code || errorDetails.type,
           error: error instanceof Error ? error.message : String(error),
-          phoneNumber: this.state.phoneNumber ? maskPhoneNumber(this.state.phoneNumber) : "missing",
-          errorDetails,
-          errorType: isRecaptchaError ? "recaptcha" : "firebase",
-          component: isRecaptchaError ? "recaptcha" : "phone_auth"
-        }
+          phoneNumber: this.state.phoneNumber ? maskPhoneNumber(this.state.phoneNumber) : maskPhoneNumber(phoneNumber),
+          stack: error instanceof Error ? error.stack : undefined
+        })
       ));
+      
       this.state.error = error as Error;
       return null;
     } finally {
       this.state.isVerifying = false;
+      
+      logger.debug("Operation completed", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "phone",
+        endOperation(op.startTime, op.operationId, {
+          component: "FirebaseAuth",
+          operation: "startPhoneVerification",
+          status: this.state.error ? "failed" : "success"
+        })
+      ));
     }
   }
 
@@ -230,26 +304,36 @@ export class PhoneAuthService {
    * @returns 検証が成功したかどうか
    */
   public async verifyPhoneCode(verificationCode: string, sessionId?: string): Promise<boolean> {
+    const op = startOperation("VerifyPhoneCode");
+    const requestId = generateRequestId();
+    
+    logger.info("PhoneVerificationStart", createAuthLogContext(
+      sessionId || 'unknown_session',
+      "phone",
+      op.getContext({
+        event: "PhoneVerificationStart",
+        component: "FirebaseAuth",
+        requestId,
+        phoneNumber: this.state.phoneNumber ? maskPhoneNumber(this.state.phoneNumber) : "none",
+        verificationIdExists: !!this.state.verificationId
+      })
+    ));
+    
     try {
       this.state.isVerifying = true;
       this.state.error = null;
 
-      logger.debug("Starting phone verification with code", createAuthLogContext(
-        sessionId || 'unknown_session',
-        "phone",
-        {
-          operation: "verifyPhoneCode",
-          verificationIdExists: !!this.state.verificationId
-        }
-      ));
-
       if (!this.state.verificationId) {
-        logger.info("Missing verificationId for phone verification", createAuthLogContext(
+        logger.warn("PhoneVerificationError", createAuthLogContext(
           sessionId || 'unknown_session',
           "phone",
-          {
-            operation: "verifyPhoneCode"
-          }
+          op.getContext({
+            event: "PhoneVerificationError",
+            component: "FirebaseAuth",
+            requestId,
+            errorCode: "missing_verification_id",
+            error: "Missing verificationId for phone verification"
+          })
         ));
         return false;
       }

@@ -1,5 +1,26 @@
 "use client";
 
+import logger from "../logging";
+import { 
+  createAuthLogContext, 
+  startOperation, 
+  endOperation, 
+  generateRequestId 
+} from "./logging-utils";
+
+/**
+ * reCAPTCHA用のWindow型拡張
+ */
+declare global {
+  interface Window {
+    grecaptcha: {
+      render: (container: string | HTMLElement, parameters: any) => number;
+      execute: (siteKey: string, options: { action: string }) => Promise<string>;
+      reset: (widgetId?: number) => void;
+    };
+  }
+}
+
 /**
  * reCAPTCHA エラー処理のためのユーティリティ関数
  */
@@ -29,6 +50,218 @@ export interface RecaptchaErrorDetails {
   retryable: boolean;
   type: string;
 }
+
+/**
+ * reCAPTCHA チャレンジを実行する
+ * @param siteKey reCAPTCHA サイトキー
+ * @param action アクション名
+ * @param sessionId 認証セッションID（ログ追跡用）
+ * @returns reCAPTCHA トークン
+ */
+export const executeRecaptchaChallenge = async (
+  siteKey: string,
+  action: string,
+  sessionId?: string
+): Promise<string | null> => {
+  const op = startOperation("RecaptchaChallenge");
+  const requestId = generateRequestId();
+  
+  logger.info("ChallengeStart", createAuthLogContext(
+    sessionId || 'unknown_session',
+    "general",
+    op.getContext({
+      event: "ChallengeStart",
+      component: "reCAPTCHA",
+      requestId,
+      action,
+      version: "v3"
+    })
+  ));
+  
+  try {
+    if (typeof window === 'undefined' || !window.grecaptcha || !window.grecaptcha.execute) {
+      logger.warn("RenderError", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "general",
+        op.getContext({
+          event: "RenderError",
+          component: "reCAPTCHA",
+          requestId,
+          errorCode: "grecaptcha_not_loaded",
+          error: "reCAPTCHA script not loaded or initialized"
+        })
+      ));
+      return null;
+    }
+    
+    const token = await window.grecaptcha.execute(siteKey, { action });
+    
+    logger.info("ChallengeSuccess", createAuthLogContext(
+      sessionId || 'unknown_session',
+      "general",
+      op.getContext({
+        event: "ChallengeSuccess",
+        component: "reCAPTCHA",
+        requestId,
+        tokenLength: token?.length || 0
+      })
+    ));
+    
+    return token;
+  } catch (error) {
+    const categorizedError = categorizeRecaptchaError(error);
+    
+    logger.error("ChallengeError", createAuthLogContext(
+      sessionId || 'unknown_session',
+      "general",
+      op.getContext({
+        event: "ChallengeError",
+        component: "reCAPTCHA",
+        requestId,
+        errorCode: categorizedError.code,
+        error: categorizedError.message,
+        stack: error instanceof Error ? error.stack : undefined
+      })
+    ));
+    
+    return null;
+  } finally {
+    logger.debug("Operation completed", createAuthLogContext(
+      sessionId || 'unknown_session',
+      "general",
+      endOperation(op.startTime, op.operationId, {
+        component: "reCAPTCHA",
+        operation: "challenge"
+      })
+    ));
+  }
+};
+
+/**
+ * reCAPTCHA ウィジェットをレンダリングする
+ * @param containerId コンテナ要素のID
+ * @param siteKey reCAPTCHA サイトキー
+ * @param callback コールバック関数
+ * @param sessionId 認証セッションID（ログ追跡用）
+ * @returns ウィジェットID
+ */
+export const renderRecaptchaWidget = (
+  containerId: string,
+  siteKey: string,
+  callback: (token: string) => void,
+  sessionId?: string
+): number | null => {
+  const op = startOperation("RecaptchaRender");
+  
+  logger.info("RenderStart", createAuthLogContext(
+    sessionId || 'unknown_session',
+    "general",
+    op.getContext({
+      event: "RenderStart",
+      component: "reCAPTCHA",
+      containerId,
+      version: "v2"
+    })
+  ));
+  
+  try {
+    if (typeof window === 'undefined' || !window.grecaptcha || !window.grecaptcha.render) {
+      logger.warn("RenderError", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "general",
+        op.getContext({
+          event: "RenderError",
+          component: "reCAPTCHA",
+          errorCode: "grecaptcha_not_loaded",
+          error: "reCAPTCHA script not loaded or initialized"
+        })
+      ));
+      return null;
+    }
+    
+    const widgetId = window.grecaptcha.render(containerId, {
+      sitekey: siteKey,
+      callback: (token: string) => {
+        logger.info("ChallengeSuccess", createAuthLogContext(
+          sessionId || 'unknown_session',
+          "general",
+          {
+            event: "ChallengeSuccess",
+            component: "reCAPTCHA",
+            version: "v2",
+            tokenLength: token?.length || 0,
+            widgetId
+          }
+        ));
+        
+        callback(token);
+      },
+      'expired-callback': () => {
+        logger.info("ChallengeExpired", createAuthLogContext(
+          sessionId || 'unknown_session',
+          "general",
+          {
+            event: "ChallengeExpired",
+            component: "reCAPTCHA",
+            version: "v2",
+            widgetId
+          }
+        ));
+      },
+      'error-callback': () => {
+        logger.warn("ChallengeError", createAuthLogContext(
+          sessionId || 'unknown_session',
+          "general",
+          {
+            event: "ChallengeError",
+            component: "reCAPTCHA",
+            version: "v2",
+            errorCode: "widget_error",
+            error: "reCAPTCHA widget encountered an error",
+            widgetId
+          }
+        ));
+      }
+    });
+    
+    logger.info("RenderSuccess", createAuthLogContext(
+      sessionId || 'unknown_session',
+      "general",
+      op.getContext({
+        event: "RenderSuccess",
+        component: "reCAPTCHA",
+        widgetId
+      })
+    ));
+    
+    return widgetId;
+  } catch (error) {
+    const categorizedError = categorizeRecaptchaError(error);
+    
+    logger.error("RenderError", createAuthLogContext(
+      sessionId || 'unknown_session',
+      "general",
+      op.getContext({
+        event: "RenderError",
+        component: "reCAPTCHA",
+        errorCode: categorizedError.code,
+        error: categorizedError.message,
+        stack: error instanceof Error ? error.stack : undefined
+      })
+    ));
+    
+    return null;
+  } finally {
+    logger.debug("Operation completed", createAuthLogContext(
+      sessionId || 'unknown_session',
+      "general",
+      endOperation(op.startTime, op.operationId, {
+        component: "reCAPTCHA",
+        operation: "render"
+      })
+    ));
+  }
+};
 
 /**
  * reCAPTCHA エラーを分類する
