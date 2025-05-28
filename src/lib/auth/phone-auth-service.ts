@@ -87,12 +87,12 @@ export class PhoneAuthService {
       }
 
       if (this.recaptchaContainerElement) {
-        if (document.getElementById("recaptcha-container")) {
-          const iframes = this.recaptchaContainerElement.querySelectorAll("iframe");
-          iframes.forEach((iframe) => iframe.remove());
-
-          const divs = this.recaptchaContainerElement.querySelectorAll('div[id^="rc-"]');
-          divs.forEach((div) => div.remove());
+        const container = document.getElementById("recaptcha-container");
+        if (container) {
+          container.innerHTML = "";
+          
+          const allRecaptchaElements = document.querySelectorAll('[id^="rc-"], iframe[src*="recaptcha"], div[class*="grecaptcha"]');
+          allRecaptchaElements.forEach((element) => element.remove());
         }
         this.recaptchaContainerElement = null;
       }

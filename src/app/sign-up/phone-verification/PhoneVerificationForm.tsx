@@ -154,7 +154,12 @@ export function PhoneVerificationForm() {
           </button>
           <button
             type="button"
-            onClick={() => setStep("phone")}
+            onClick={() => {
+              phoneAuth.clearRecaptcha?.();
+              setStep("phone");
+              setPhoneNumber("");
+              setVerificationCode("");
+            }}
             className="w-full h-12 border border-gray-300 rounded-md"
           >
             電話番号を再入力

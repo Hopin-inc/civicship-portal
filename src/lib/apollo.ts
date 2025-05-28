@@ -52,18 +52,17 @@ const requestLink = new ApolloLink((operation, forward) => {
     if (tokenRequiredOperations.includes(operation.operationName || '')) {
       const requestHeaders = {
         ...baseHeaders,
-        "X-Refresh-Token": lineTokens.refreshToken || "",
         "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
         "X-Phone-Auth-Token": phoneTokens.accessToken || "",
-        "X-Phone-Refresh-Token": phoneTokens.refreshToken || "",
         "X-Phone-Token-Expires-At": phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
         "X-Phone-Uid": phoneTokens.phoneUid || "",
+        "X-Phone-Number": phoneTokens.phoneNumber || "",
       };
       
-      console.log('🔐 Sending additional tokens for operation:', operation.operationName, {
-        hasLineRefresh: !!lineTokens.refreshToken,
+      console.log('🔐 Sending phone auth tokens for operation:', operation.operationName, {
         hasPhoneToken: !!phoneTokens.accessToken,
-        hasPhoneRefresh: !!phoneTokens.refreshToken
+        hasPhoneUid: !!phoneTokens.phoneUid,
+        hasPhoneNumber: !!phoneTokens.phoneNumber
       });
       
       return { headers: requestHeaders };

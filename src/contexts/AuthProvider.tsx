@@ -53,6 +53,7 @@ interface AuthContextType {
   phoneAuth: {
     startPhoneVerification: (phoneNumber: string) => Promise<string | null>;
     verifyPhoneCode: (verificationCode: string) => Promise<boolean>;
+    clearRecaptcha?: () => void;
     isVerifying: boolean;
     phoneUid: string | null;
   };
@@ -486,6 +487,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     phoneAuth: {
       startPhoneVerification,
       verifyPhoneCode,
+      clearRecaptcha: () => phoneAuthService.clearRecaptcha(),
       isVerifying: phoneAuthService.getState().isVerifying,
       phoneUid: phoneAuthService.getState().phoneUid,
     },
