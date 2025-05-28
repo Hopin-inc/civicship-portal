@@ -11,7 +11,7 @@ export function PhoneVerificationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next");
-  
+
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -23,7 +23,11 @@ export function PhoneVerificationForm() {
       if (!isAuthenticated) {
         router.replace("/login");
       } else if (isPhoneVerified) {
-        router.replace("/sign-up");
+        let signUpWithNext = "/sign-up/phone-verification";
+        if (nextParam) {
+          signUpWithNext += `?next=${ nextParam }`;
+        }
+        router.replace(signUpWithNext);
       }
     }
   }, [isAuthenticated, isPhoneVerified, loading, router]);

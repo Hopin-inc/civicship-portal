@@ -16,7 +16,7 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/";
 
-  const { isAuthenticated, loginWithLiff, isAuthenticating, loading } = useAuth();
+  const { user, isAuthenticated, loginWithLiff, isAuthenticating, loading } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,8 +25,16 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      console.log("🚀 Already authenticated, redirecting to:", nextPath);
-      router.replace(nextPath);
+      if (user) {
+        console.log("🚀 Already authenticated, redirecting to:", nextPath);
+        router.replace(nextPath);
+      } else {
+        let signUpWithNext = "/sign-up/phone-verification";
+        if (nextPath) {
+          signUpWithNext += `?next=${ nextPath }`;
+        }
+        router.replace(signUpWithNext);
+      }
     }
   }, [isAuthenticated, loading, nextPath, router]);
 

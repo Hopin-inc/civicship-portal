@@ -40,9 +40,17 @@ export function SignUpForm() {
   useEffect(() => {
     if (!loading) {
       if (!isAuthenticated) {
-        router.replace("/login");
+        let loginWithNext = "/login";
+        if (nextParam) {
+          loginWithNext += `?next=${ nextParam }`;
+        }
+        router.replace(loginWithNext);
       } else if (!isPhoneVerified) {
-        router.replace("/sign-up/phone-verification");
+        let signUpWithNext = "/sign-up/phone-verification";
+        if (nextParam) {
+          signUpWithNext += `?next=${ nextParam }`;
+        }
+        router.replace(signUpWithNext);
       }
     }
   }, [isAuthenticated, isPhoneVerified, loading, router]);
@@ -60,7 +68,11 @@ export function SignUpForm() {
     try {
       if (!isPhoneVerified) {
         toast.error("電話番号認証が完了していません");
-        router.push("/sign-up/phone-verification");
+        let signUpWithNext = "/sign-up/phone-verification";
+        if (nextParam) {
+          signUpWithNext += `?next=${ nextParam }`;
+        }
+        router.replace(signUpWithNext);
         return;
       }
 
