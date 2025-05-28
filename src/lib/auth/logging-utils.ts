@@ -9,7 +9,15 @@
  * @returns 一意のセッションID
  */
 export const generateSessionId = (): string => {
-  return `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return `auth_${Date.now()}_${crypto.randomUUID().replace(/-/g, '').substring(0, 9)}`;
+  } else if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    const array = new Uint32Array(1);
+    crypto.getRandomValues(array);
+    return `auth_${Date.now()}_${array[0].toString(36)}`;
+  } else {
+    return `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
 };
 
 /**

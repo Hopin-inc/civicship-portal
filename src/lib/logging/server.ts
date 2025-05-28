@@ -38,7 +38,9 @@ const transports: winston.transport[] = [];
 if (isLocal) {
   transports.push(new winston.transports.Console());
 } else {
-  transports.push(new LoggingWinston());
+  transports.push(new LoggingWinston({
+    redirectToStdout: true
+  }));
   transports.push(new winston.transports.Console());
 }
 
