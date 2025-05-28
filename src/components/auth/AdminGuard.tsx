@@ -32,6 +32,11 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   const loading = authLoading || userLoading;
   const currentUser = userData?.currentUser?.user;
 
+  const authRedirectService = React.useMemo(() => {
+    const AuthRedirectService = require("@/lib/auth/auth-redirect-service").AuthRedirectService;
+    return AuthRedirectService.getInstance();
+  }, []);
+
   useEffect(() => {
     if (loading) {
       console.log("⏳ Still loading user...");
@@ -70,7 +75,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     }
 
     console.log("✅ User is authorized as community manager.");
-  }, [currentUser, isAuthenticated, loading, router]);
+  }, [currentUser, isAuthenticated, loading, router, authRedirectService]);
 
   if (loading) {
     console.log("⏳ Showing loading indicator...");

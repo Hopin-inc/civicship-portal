@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useQuery } from "@apollo/client";
@@ -19,6 +19,11 @@ export default function HomePage() {
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/";
 
+  const authRedirectService = useMemo(() => {
+    const AuthRedirectService = require("@/lib/auth/auth-redirect-service").AuthRedirectService;
+    return AuthRedirectService.getInstance();
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -35,33 +40,10 @@ export default function HomePage() {
         console.log("🚀 Auth state loading, waiting before redirect");
         return; // Wait for auth state to stabilize
       } else if (isAuthenticated) {
-        if (authenticationState === "line_authenticated" || authenticationState === "line_token_expired") {
-          console.log("🚀 LINE authenticated, redirecting to phone verification");
-          let signUpWithNext = "/sign-up/phone-verification";
-          if (nextPath) {
-            signUpWithNext += `?next=${ encodeURIComponent(nextPath) }`;
-          }
-          router.replace(signUpWithNext);
-          return;
-        } else if (authenticationState === "phone_authenticated" || authenticationState === "phone_token_expired") {
-          console.log("🚀 Phone authenticated, redirecting to user registration");
-          router.replace("/sign-up");
-          return;
-        } else if (!userData?.currentUser) {
-          console.log("🚀 No user data, redirecting to phone verification");
-          let signUpWithNext = "/sign-up/phone-verification";
-          if (nextPath) {
-            signUpWithNext += `?next=${ encodeURIComponent(nextPath) }`;
-          }
-          router.replace(signUpWithNext);
-          return;
-        }
-
-        if (liffState.startsWith("/")) {
-          console.log("🚀 Redirecting to liff.state path:", liffState);
-          router.replace(liffState);
-          return;
-        }
+        const redirectPath = authRedirectService.getPostLineAuthRedirectPath(liffState);
+        console.log("🚀 Authenticated, redirecting to:", redirectPath);
+        router.replace(redirectPath);
+        return;
       } else if (!isAuthenticating) {
         console.log("🚀 Not authenticated after processing, redirecting to login");
         const next = extractSearchParamFromRelativePath(liffState, "next");
@@ -76,7 +58,7 @@ export default function HomePage() {
         !window.location.href.includes("login")) {
       router.replace("/activities");
     }
-  }, [router, isAuthenticated, authenticationState, userData, authLoading, userLoading, isAuthenticating]);
+  }, [router, isAuthenticated, authenticationState, userData, authLoading, userLoading, isAuthenticating, authRedirectService]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });

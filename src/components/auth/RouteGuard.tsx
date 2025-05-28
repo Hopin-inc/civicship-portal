@@ -66,6 +66,11 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     skip: !isAuthenticated,
   });
 
+  const authRedirectService = React.useMemo(() => {
+    const AuthRedirectService = require("@/lib/auth/auth-redirect-service").AuthRedirectService;
+    return AuthRedirectService.getInstance();
+  }, []);
+
   useEffect(() => {
     if (loading || userLoading) {
       return;
@@ -74,33 +79,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     const authCheck = () => {
       const next = encodeURIComponent(window.location.pathname + window.location.search);
       
-      if (isProtectedPath(pathname)) {
-        if (authenticationState === "unauthenticated" || authenticationState === "loading") {
-          setAuthorized(false);
-          router.replace(`/login?next=${next}`);
-        } else if (authenticationState === "line_authenticated" || authenticationState === "line_token_expired") {
-          setAuthorized(false);
-          router.replace(`/sign-up/phone-verification?next=${next}`);
-        } else if (authenticationState === "phone_authenticated" || authenticationState === "phone_token_expired") {
-          setAuthorized(false);
-          router.replace(`/sign-up?next=${next}`);
-        } else if (authenticationState === "user_registered") {
-          setAuthorized(true);
-        }
-      } 
-      else if (isPhoneVerificationRequiredPath(pathname)) {
-        if (authenticationState === "unauthenticated" || authenticationState === "loading") {
-          setAuthorized(false);
-          router.replace(`/login?next=${next}`);
-        } else if ((authenticationState === "line_authenticated" || authenticationState === "line_token_expired") && 
-                   pathname !== "/sign-up/phone-verification") {
-          setAuthorized(false);
-          router.replace(`/sign-up/phone-verification?next=${next}`);
-        } else {
-          setAuthorized(true);
-        }
-      }
-      else {
+      const redirectPath = authRedirectService.getRedirectPath(pathname, next);
+      
+      if (redirectPath) {
+        setAuthorized(false);
+        router.replace(redirectPath);
+      } else {
         setAuthorized(true);
       }
     };
@@ -112,7 +96,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     };
 
     return () => {};
-  }, [pathname, authenticationState, loading, userLoading, router]);
+  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService]);
 
   if (loading || userLoading) {
     return <LoadingIndicator />;

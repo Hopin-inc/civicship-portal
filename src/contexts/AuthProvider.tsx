@@ -115,13 +115,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const phoneState = phoneAuthService.getState();
+    
+    if (phoneState.isVerified) {
+      authStateManager.handlePhoneAuthStateChange(true);
+    }
+    
     setState((prev) => ({
       ...prev,
       authenticationState: phoneState.isVerified ? 
         (prev.authenticationState === "line_authenticated" ? "phone_authenticated" : prev.authenticationState) : 
         prev.authenticationState,
     }));
-  }, []);
+  }, [authStateManager]);
 
   useEffect(() => {
     if (userData?.currentUser?.user) {
@@ -243,27 +248,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     handleAutoLogin();
   }, [environment, state.authenticationState, state.isAuthenticating, liffService, refetchUser]);
 
+  const authStateManager = React.useMemo(() => {
+    const AuthStateManager = require("@/lib/auth/auth-state-manager").AuthStateManager;
+    return AuthStateManager.getInstance();
+  }, []);
+
   useEffect(() => {
+    const handleStateChange = (newState: AuthState["authenticationState"]) => {
+      setState(prev => ({ ...prev, authenticationState: newState }));
+    };
+
+    authStateManager.addStateChangeListener(handleStateChange);
+
     const handleTokenExpired = async (event: CustomEvent) => {
       const { source } = event.detail;
       
       if (source === "graphql" || source === "network") {
         if (state.authenticationState === "line_authenticated" || state.authenticationState === "user_registered") {
           setState(prev => ({ ...prev, authenticationState: "line_token_expired" }));
-          const renewed = await TokenManager.renewLineToken();
-          if (renewed) {
-            setState(prev => ({ ...prev, authenticationState: state.authenticationState }));
-            return;
-          }
+          const event = new CustomEvent("auth:renew-line-token", { detail: {} });
+          window.dispatchEvent(event);
+          return;
         }
         
         if (state.authenticationState === "phone_authenticated") {
           setState(prev => ({ ...prev, authenticationState: "phone_token_expired" }));
-          const renewed = await TokenManager.renewPhoneToken();
-          if (renewed) {
-            setState(prev => ({ ...prev, authenticationState: "phone_authenticated" }));
-            return;
-          }
+          const event = new CustomEvent("auth:renew-phone-token", { detail: {} });
+          window.dispatchEvent(event);
+          return;
         }
 
         toast.error("認証の有効期限が切れました", {
@@ -273,52 +285,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
 
-    const handleRenewLineToken = async (event: CustomEvent) => {
-      try {
-        const { refreshToken } = event.detail;
-        if (refreshToken) {
-          const success = await liffService.refreshToken(refreshToken);
-          if (success) {
-            setState(prev => ({ 
-              ...prev, 
-              authenticationState: prev.authenticationState === "line_token_expired" ? 
-                "line_authenticated" : prev.authenticationState 
-            }));
-          }
-        }
-      } catch (error) {
-        console.error("Failed to renew LINE token:", error);
-      }
-    };
-
-    const handleRenewPhoneToken = async (event: CustomEvent) => {
-      try {
-        const { refreshToken } = event.detail;
-        if (refreshToken) {
-          const success = await phoneAuthService.refreshToken(refreshToken);
-          if (success) {
-            setState(prev => ({ 
-              ...prev, 
-              authenticationState: prev.authenticationState === "phone_token_expired" ? 
-                "phone_authenticated" : prev.authenticationState 
-            }));
-          }
-        }
-      } catch (error) {
-        console.error("Failed to renew phone token:", error);
-      }
-    };
-
     window.addEventListener("auth:token-expired", handleTokenExpired as EventListener);
-    window.addEventListener("auth:renew-line-token", handleRenewLineToken as EventListener);
-    window.addEventListener("auth:renew-phone-token", handleRenewPhoneToken as EventListener);
 
     return () => {
+      authStateManager.removeStateChangeListener(handleStateChange);
       window.removeEventListener("auth:token-expired", handleTokenExpired as EventListener);
-      window.removeEventListener("auth:renew-line-token", handleRenewLineToken as EventListener);
-      window.removeEventListener("auth:renew-phone-token", handleRenewPhoneToken as EventListener);
     };
-  }, [state.authenticationState]);
+  }, [state.authenticationState, logout, authStateManager]);
 
   /**
    * LIFFでログイン
