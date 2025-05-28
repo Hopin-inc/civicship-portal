@@ -43,10 +43,10 @@ export default function LoginPage() {
     try {
       const searchParams = new URLSearchParams(window.location.search);
       const next = searchParams.get("next");
-      const redirectPath = next && next.startsWith("/") ? `/?next=${ next }` : "/";
+      const redirectPath = next && next.startsWith("/") ? `/?next=${next}&from=line_auth` : "/?from=line_auth";
       const success = await loginWithLiff(redirectPath);
       if (success) {
-        const nextPath = next && next.startsWith("/") ? next : "/";
+        const nextPath = next && next.startsWith("/") ? next : "/activities";
         router.push(nextPath);
       }
     } catch (err) {
