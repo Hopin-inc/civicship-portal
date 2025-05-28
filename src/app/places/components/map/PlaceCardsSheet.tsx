@@ -47,9 +47,16 @@ const PlaceCardsSheet: FC<PlaceCardsSheetProps> = ({ places, selectedPlaceId, on
     if (!emblaApi) return;
 
     const onSelect = () => {
-      if (isProgrammaticScrollRef.current) return;
+      if (isProgrammaticScrollRef.current) {
+        console.debug("プログラムによるスクロール中のため選択イベントをスキップ");
+        return;
+      }
       const index = emblaApi.selectedScrollSnap();
       const place = places[index];
+      console.debug(
+        `カード選択 - インデックス: ${index}, ID: ${place?.id}, 現在の選択ID: ${selectedPlaceId}`,
+      );
+      console.debug(`選択されたカードデータ:`, place);
       if (place && place.id !== selectedPlaceId) {
         onPlaceSelect(place.id);
       }

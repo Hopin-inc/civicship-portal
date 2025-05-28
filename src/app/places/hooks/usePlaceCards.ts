@@ -1,29 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
-import { GqlPlaceEdge, useGetPlacesQuery } from "@/types/graphql";
-import { presenterPlaceCard } from "@/app/places/data/presenter";
+import usePlacesData from "./usePlacesData";
 
 export default function usePlaceCards() {
-  const { data, loading, error, refetch } = useGetPlacesQuery({
-    variables: {
-      filter: {},
-      first: 100,
-      IsCard: true,
-    },
-    fetchPolicy: "cache-and-network",
-    nextFetchPolicy: "cache-first",
-  });
-
-  const placeEdges: GqlPlaceEdge[] = (data?.places?.edges ?? []).filter(
-    (e): e is GqlPlaceEdge => e != null && e.node != null,
-  );
-  const baseCards = useMemo(() => presenterPlaceCard(placeEdges), [placeEdges]);
+  const { cards, loading, error, refetch } = usePlacesData();
 
   return {
-    baseCards,
+    baseCards: cards,
     loading,
-    error: error ?? null,
+    error,
     refetch,
   };
 }

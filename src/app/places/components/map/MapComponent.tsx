@@ -67,7 +67,11 @@ export default function MapComponent({
         <CustomMarker
           key={marker.id}
           data={marker}
-          onClick={() => onPlaceSelect(marker.id)}
+          onClick={() => {
+            console.debug(`マーカークリック - ID: ${marker.id}, 現在の選択ID: ${selectedPlaceId}`);
+            console.debug(`マーカーデータ:`, marker);
+            onPlaceSelect(marker.id);
+          }}
           isSelected={marker.id === selectedPlaceId}
         />
       ))}
