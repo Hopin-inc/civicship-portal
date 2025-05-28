@@ -35,9 +35,7 @@ export default function HomePage() {
       } else if (isAuthenticated) {
         if (!userData?.currentUser) {
           console.log("🚀 No user data, redirecting to phone verification");
-          const next = extractSearchParamFromRelativePath(liffState, "next");
-          const redirectPath = next ? `/sign-up/phone-verification?next=${encodeURIComponent(next)}` : "/sign-up/phone-verification";
-          router.replace(redirectPath);
+          router.replace("/sign-up/phone-verification");
           return;
         }
 
