@@ -27,12 +27,6 @@ export function PhoneVerificationForm() {
           loginWithNext += `?next=${ encodeURIComponent(nextParam) }`;
         }
         router.replace(loginWithNext);
-      } else if (isPhoneVerified) {
-        let signUpWithNext = "/sign-up";
-        if (nextParam) {
-          signUpWithNext += `?next=${ encodeURIComponent(nextParam) }`;
-        }
-        router.replace(signUpWithNext);
       }
     }
   }, [isAuthenticated, isPhoneVerified, loading, router]);
@@ -91,7 +85,7 @@ export function PhoneVerificationForm() {
     return <LoadingIndicator />;
   }
 
-  if (!isAuthenticated || isPhoneVerified) {
+  if (!isAuthenticated) {
     return null;
   }
 

@@ -12,7 +12,7 @@ import { extractSearchParamFromRelativePath } from "@/utils/path";
 
 export default function HomePage() {
   const router = useRouter();
-  const { isAuthenticated, isAuthenticating, loading: authLoading, isPhoneVerified } = useAuth();
+  const { isAuthenticated, isAuthenticating, loading: authLoading } = useAuth();
   const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
   });
@@ -36,21 +36,12 @@ export default function HomePage() {
         return; // Wait for auth state to stabilize
       } else if (isAuthenticated) {
         if (!userData?.currentUser) {
-          if (isPhoneVerified) {
-            console.log("🚀 No user data, redirecting to sign up form");
-            let signUpWithNext = "/sign-up";
-            if (nextPath) {
-              signUpWithNext += `?next=${ encodeURIComponent(nextPath) }`;
-            }
-            router.replace(signUpWithNext);
-          } else {
-            console.log("🚀 No user data, redirecting to phone verification");
-            let signUpWithNext = "/sign-up/phone-verification";
-            if (nextPath) {
-              signUpWithNext += `?next=${ encodeURIComponent(nextPath) }`;
-            }
-            router.replace(signUpWithNext);
+          console.log("🚀 No user data, redirecting to phone verification");
+          let signUpWithNext = "/sign-up/phone-verification";
+          if (nextPath) {
+            signUpWithNext += `?next=${ encodeURIComponent(nextPath) }`;
           }
+          router.replace(signUpWithNext);
           return;
         }
 
