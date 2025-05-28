@@ -5,6 +5,7 @@ import { useGetTransactionsQuery } from "@/types/graphql";
 import { toast } from "sonner";
 import { AppTransaction } from "@/app/wallets/data/type";
 import { presenterTransaction } from "@/app/wallets/data/presenter";
+import logger from "@/lib/logging";
 
 export interface UseTransactionHistoryResult {
   transactions: AppTransaction[];
@@ -39,7 +40,12 @@ export const useTransactionHistory = (
 
   const formattedError = useMemo(() => {
     if (error) {
-      console.error("Error fetching transaction history:", error);
+      logger.error("Error fetching transaction history", {
+        component: "useTransactionHistory",
+        userId,
+        walletId,
+        error: error instanceof Error ? error.message : String(error)
+      });
       toast.error("取引履歴の取得に失敗しました");
       return error;
     }

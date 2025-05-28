@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthProvider';
 import { GqlCurrentPrefecture } from '@/types/graphql';
 import { toast } from 'sonner';
+import logger from '@/lib/logging';
 
 export interface SignUpFormValues {
   name: string;
@@ -50,7 +51,11 @@ export const useSignUp = () => {
         router.push('/');
       }
     } catch (error) {
-      console.error('Sign up error:', error);
+      logger.error('Sign up error', {
+        component: 'useSignUp',
+        error: error instanceof Error ? error.message : String(error),
+        phoneUidExists: !!phoneAuth.phoneUid
+      });
       toast.error('アカウント作成に失敗しました。もう一度お試しください。');
     } finally {
       setIsLoading(false);

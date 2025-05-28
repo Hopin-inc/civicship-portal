@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import logger from "@/lib/logging";
 
 export const useInitialLiffRedirect = () => {
   const router = useRouter();
@@ -13,7 +14,11 @@ export const useInitialLiffRedirect = () => {
 
     if (initial && initial.startsWith("/") && initial !== window.location.pathname) {
       hasRedirected.current = true;
-      console.log("🚀 Redirecting to initial path:", initial);
+      logger.debug("Redirecting to initial path", {
+        hook: "useInitialLiffRedirect",
+        initialPath: initial,
+        currentPath: window.location.pathname
+      });
       router.replace(initial); // または window.location.replace(initial)
     }
   }, [router]);

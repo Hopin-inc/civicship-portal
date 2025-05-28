@@ -125,8 +125,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       const timestamp = new Date().toISOString();
-      console.log(`🔍 [${timestamp}] AuthProvider initializeAuth - Starting initialization`);
-      console.log(`🔍 [${timestamp}] Current state:`, {
+      logger.debug("AuthProvider initializeAuth - Starting initialization", {
+        timestamp,
         environment,
         lineAuthStatus: state.lineAuthStatus,
         isAuthenticating: state.isAuthenticating,
@@ -136,12 +136,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setState(prev => ({ ...prev, isAuthenticating: true }));
 
       if (environment === AuthEnvironment.LIFF) {
-        console.log(`🔍 [${timestamp}] Initializing LIFF in environment:`, environment);
+        logger.debug("Initializing LIFF", {
+          timestamp,
+          environment
+        });
         const liffSuccess = await liffService.initialize();
 
         if (liffSuccess) {
           const liffState = liffService.getState();
-          console.log(`🔍 [${timestamp}] LIFF state after initialization:`, {
+          logger.debug("LIFF state after initialization", {
+            timestamp,
             isInitialized: liffState.isInitialized,
             isLoggedIn: liffState.isLoggedIn,
             userId: liffState.profile?.userId || "none"
@@ -151,21 +155,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (typeof window !== "undefined") {
             const searchParams = new URLSearchParams(window.location.search);
             isRedirectFromLineAuth = searchParams.has("liff.state") || searchParams.has("code");
-            console.log(`🔍 [${timestamp}] Is redirect from LINE auth:`, isRedirectFromLineAuth);
+            logger.debug("LINE auth redirect check", {
+              timestamp,
+              isRedirectFromLineAuth
+            });
           }
 
           if (isRedirectFromLineAuth || (liffState.isLoggedIn && state.lineAuthStatus === "unauthenticated")) {
-            console.log(`🔍 [${timestamp}] Detected LINE authentication redirect or LIFF is logged in but Firebase auth is not complete`);
+            logger.debug("Detected LINE authentication redirect or LIFF login without Firebase auth", {
+              timestamp,
+              isRedirectFromLineAuth,
+              liffLoggedIn: liffState.isLoggedIn,
+              lineAuthStatus: state.lineAuthStatus
+            });
             try {
-              console.log(`🔍 [${timestamp}] Calling signInWithLiffToken to complete authentication`);
+              logger.debug("Calling signInWithLiffToken to complete authentication", {
+                timestamp
+              });
               const success = await liffService.signInWithLiffToken();
-              console.log(`🔍 [${timestamp}] signInWithLiffToken result:`, success);
+              logger.debug("signInWithLiffToken completed", {
+                timestamp,
+                success
+              });
 
               if (success) {
-                console.log(`🔍 [${timestamp}] Authentication successful, refreshing user data`);
+                logger.info("Authentication successful, refreshing user data", {
+                  timestamp,
+                  operation: "signInWithLiffToken"
+                });
                 await refetchUser();
               } else {
-                console.error(`🔍 [${timestamp}] Failed to complete authentication with LIFF token`);
+                logger.error("Failed to complete authentication with LIFF token", {
+                  timestamp,
+                  operation: "signInWithLiffToken"
+                });
               }
             } catch (error) {
               console.error(`🔍 [${timestamp}] Failed to complete LIFF authentication:`, error);

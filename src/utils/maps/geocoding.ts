@@ -2,6 +2,7 @@
  * 住所から緯度経度を取得するユーティリティ関数
  * #NOTE: strapi に保存された緯度経度は若干位置がずれるため、住所から位置情報を再取得して表示するために利用してている
  */
+import logger from "@/lib/logging";
 
 // メモリ内キャッシュ: 住所 -> 緯度経度のマッピング
 const geocodeCache: Record<string, google.maps.LatLngLiteral> = {};
@@ -20,7 +21,10 @@ export const getCoordinatesFromAddress = async (
 
   // Google Maps APIが読み込まれていない場合はfallbackまたはnullを返す
   if (!window.google || !window.google.maps) {
-    console.error("Google Maps API is not loaded");
+    logger.error("Google Maps API is not loaded", {
+      utility: "getCoordinatesFromAddress",
+      address
+    });
     return null;
   }
 
@@ -32,7 +36,11 @@ export const getCoordinatesFromAddress = async (
         if (status === "OK" && results && results.length > 0) {
           resolve(results);
         } else {
-          console.warn(`Geocoding failed for address: ${address}`, status);
+          logger.warn("Geocoding failed for address", {
+            utility: "getCoordinatesFromAddress",
+            address,
+            status
+          });
           resolve(null);
         }
       });
@@ -50,7 +58,11 @@ export const getCoordinatesFromAddress = async (
 
     return coordinates;
   } catch (error) {
-    console.error("Error geocoding address:", error);
+    logger.error("Error geocoding address", {
+      utility: "getCoordinatesFromAddress",
+      address,
+      error: error instanceof Error ? error.message : String(error)
+    });
     return null;
   }
 };

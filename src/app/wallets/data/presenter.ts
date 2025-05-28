@@ -2,6 +2,7 @@
 
 import { GqlTransaction, GqlTransactionReason, GqlWallet, GqlWalletType } from "@/types/graphql";
 import { AppTransaction, AvailableTicket, UserAsset } from "@/app/wallets/data/type";
+import logger from "@/lib/logging";
 
 export const presenterUserAsset = (wallet: GqlWallet | undefined | null): UserAsset => {
   const walletId = wallet?.id ?? "";
@@ -83,7 +84,11 @@ const formatTransactionDescription = (
 };
 
 const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
-  console.log("wallet", wallet);
+  logger.debug("Processing wallet data", {
+    utility: "getNameFromWallet",
+    walletId: wallet?.id,
+    walletType: wallet?.type
+  });
   if (!wallet) return "";
   switch (wallet.type) {
     case GqlWalletType.Member:

@@ -11,6 +11,7 @@ import {
 } from "@/types/graphql";
 import { GeneralUserProfile } from "@/app/users/data/type";
 import { prefectureLabels, presenterUserProfile } from "@/app/users/data/presenter";
+import logger from "@/lib/logging";
 
 const useProfileEdit = () => {
   const router = useRouter();
@@ -110,7 +111,11 @@ const useProfileEdit = () => {
       toast.success("プロフィールを更新しました");
       router.push(`/users/${userId}`);
     } catch (err) {
-      console.error("Failed to update profile:", err);
+      logger.error("Failed to update profile", {
+        component: "useProfileEdit",
+        userId,
+        error: err instanceof Error ? err.message : String(err)
+      });
       toast.error("プロフィールの更新に失敗しました");
     }
   };
@@ -126,7 +131,11 @@ const useProfileEdit = () => {
 
   const formattedError = useMemo(() => {
     if (userError) {
-      console.error("Error fetching user profile:", userError);
+      logger.error("Error fetching user profile", {
+        component: "useProfileEdit",
+        userId,
+        error: userError instanceof Error ? userError.message : String(userError)
+      });
       toast.error("プロフィールの取得に失敗しました");
     }
     return null;

@@ -6,6 +6,7 @@ import { useLoading } from "@/hooks/useLoading";
 import { GqlSortDirection as SortDirection, useGetArticlesQuery } from "@/types/graphql";
 import { presenterArticleWithAuthorList } from "@/app/articles/data/presenter";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
+import logger from "@/lib/logging";
 
 export const ARTICLES_PER_PAGE = 10;
 
@@ -35,7 +36,11 @@ export const useArticles = (): UseArticlesResult => {
     return data?.articles?.edges ? presenterArticleWithAuthorList(data.articles.edges) : [];
   }, [data]);
 
-  console.log(articles);
+  logger.debug("Articles data loaded", {
+    component: "useArticles",
+    articleCount: articles.length,
+    hasData: !!data?.articles?.edges
+  });
 
   const hasMore = data?.articles.pageInfo.hasNextPage || false;
 

@@ -6,6 +6,7 @@
  * @param factor Exponential backoff factor
  * @returns Result of the operation or throws the last error
  */
+import logger from "@/lib/logging";
 export async function retryWithBackoff<T>(
   operation: () => Promise<T>,
   retries = 3,
@@ -22,11 +23,20 @@ export async function retryWithBackoff<T>(
       currentRetry++;
       
       if (currentRetry > retries) {
-        console.error(`Operation failed after ${retries} retries:`, error);
+        logger.error("Operation failed after maximum retries", {
+          utility: "retryWithBackoff",
+          retries,
+          error: error instanceof Error ? error.message : String(error)
+        });
         throw error;
       }
       
-      console.log(`Retry attempt ${currentRetry}/${retries} after ${currentDelay}ms`);
+      logger.debug("Retry attempt", {
+        utility: "retryWithBackoff",
+        attempt: currentRetry,
+        maxRetries: retries,
+        delay: currentDelay
+      });
       
       await new Promise(resolve => setTimeout(resolve, currentDelay));
       

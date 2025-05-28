@@ -11,6 +11,7 @@ import { getLiffLoginErrorMessage } from "@/app/login/utils/getLiffLoginErrorMes
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import logger from "@/lib/logging";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,7 +28,11 @@ export default function LoginPage() {
   useEffect(() => {
     if (!loading && isAuthenticated) {
       if (user) {
-        console.log("🚀 Already authenticated, redirecting to:", nextPath);
+        logger.debug("Already authenticated, redirecting", {
+          component: "LoginPage",
+          nextPath,
+          userId: user.id
+        });
         router.replace(nextPath);
       } else {
         let signUpWithNext = "/sign-up/phone-verification";

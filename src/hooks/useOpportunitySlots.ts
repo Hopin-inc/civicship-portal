@@ -2,6 +2,7 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGetOpportunitySlotsQuery } from "@/types/graphql";
+import logger from "@/lib/logging";
 
 export interface UseOpportunitySlotsResult {
   slots: any[];
@@ -75,7 +76,11 @@ export const useOpportunitySlots = (): UseOpportunitySlotsResult => {
       });
     } catch (error) {
       isLoadingMore.current = false;
-      console.error("Error fetching more slots:", error);
+      logger.error("Error fetching more slots", {
+        hook: "useOpportunitySlots",
+        userId: user?.id,
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   };
 

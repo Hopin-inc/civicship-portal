@@ -6,6 +6,7 @@ import { presenterPlaceCard, presenterPlacePins } from "@/app/places/data/presen
 import { getCoordinatesFromAddress } from "@/utils/maps/geocoding";
 import { IPlaceCard, IPlacePin } from "@/app/places/data/type";
 import { useJsApiLoader } from "@react-google-maps/api";
+import logger from "@/lib/logging";
 
 /**
  * 共通のデータソースからマーカーとカードのデータを提供するフック
@@ -108,11 +109,17 @@ export default function usePlacesData() {
     const missingInCards = markerIds.filter((id) => !cardIds.includes(id));
 
     if (missingInMarkers.length > 0) {
-      console.warn("カードにあってマーカーにないID:", missingInMarkers);
+      logger.warn("カードにあってマーカーにないID", {
+        component: "usePlacesData",
+        missingIds: missingInMarkers
+      });
     }
 
     if (missingInCards.length > 0) {
-      console.warn("マーカーにあってカードにないID:", missingInCards);
+      logger.warn("マーカーにあってカードにないID", {
+        component: "usePlacesData",
+        missingIds: missingInCards
+      });
     }
   }, [placePins, baseCards]);
 

@@ -6,6 +6,7 @@ import { COMMUNITY_ID } from "@/utils";
 import { presenterActivityDetail } from "@/app/activities/data/presenter";
 import { useSlotAndTicketInfo } from "@/app/reservation/confirm/hooks/useSlotAndTicket";
 import type { ActivityDetail } from "@/app/activities/data/type";
+import logger from "@/lib/logging";
 
 export const useReservationConfirm = ({
   opportunityId,
@@ -50,9 +51,18 @@ export const useReservationConfirm = ({
   const hasError = Boolean(oppError || walletError);
 
   useEffect(() => {
-    if (oppError) console.error("Opportunity query error:", oppError);
-    if (walletError) console.error("Slot/Wallet error:", walletError);
-  }, [oppError, walletError]);
+    if (oppError) logger.error("Opportunity query error", {
+      component: "useReservationConfirm",
+      opportunityId,
+      error: oppError instanceof Error ? oppError.message : String(oppError)
+    });
+    if (walletError) logger.error("Slot/Wallet error", {
+      component: "useReservationConfirm",
+      slotId,
+      userId,
+      error: walletError instanceof Error ? walletError.message : String(walletError)
+    });
+  }, [oppError, walletError, opportunityId, slotId, userId]);
 
   return {
     opportunity,

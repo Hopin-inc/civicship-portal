@@ -9,6 +9,7 @@ import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection
 import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
 import { extractSearchParamFromRelativePath } from "@/utils/path";
+import logger from "@/lib/logging";
 
 export default function HomePage() {
   const router = useRouter();
@@ -26,17 +27,29 @@ export default function HomePage() {
     const liffState = searchParams.get("liff.state");
 
     if (liffState) {
-      console.log("🚀 Detected return from LINE authentication, liff.state:", liffState);
+      logger.info("Detected return from LINE authentication", {
+        component: "HomePage",
+        liffState
+      });
 
       const newUrl = window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
 
       if (isAuthenticating || authLoading || userLoading) {
-        console.log("🚀 Auth state loading, waiting before redirect");
+        logger.debug("Auth state loading, waiting before redirect", {
+          component: "HomePage",
+          isAuthenticating,
+          authLoading,
+          userLoading
+        });
         return; // Wait for auth state to stabilize
       } else if (isAuthenticated) {
         if (!userData?.currentUser) {
-          console.log("🚀 No user data, redirecting to phone verification");
+          logger.info("No user data, redirecting to phone verification", {
+            component: "HomePage",
+            isAuthenticated,
+            redirectPath: "/sign-up/phone-verification"
+          });
           let signUpWithNext = "/sign-up/phone-verification";
           if (nextPath) {
             signUpWithNext += `?next=${ encodeURIComponent(nextPath) }`;
@@ -46,12 +59,19 @@ export default function HomePage() {
         }
 
         if (liffState.startsWith("/")) {
-          console.log("🚀 Redirecting to liff.state path:", liffState);
+          logger.info("Redirecting to liff.state path", {
+            component: "HomePage",
+            redirectPath: liffState
+          });
           router.replace(liffState);
           return;
         }
       } else {
-        console.log("🚀 Not authenticated, redirecting to login");
+        logger.info("Not authenticated, redirecting to login", {
+          component: "HomePage",
+          liffState,
+          hasNext: !!extractSearchParamFromRelativePath(liffState, "next")
+        });
         const next = extractSearchParamFromRelativePath(liffState, "next");
         const redirectPath = next && next.startsWith("/") ? `/login?next=${next}` : "/login";
         router.replace(redirectPath);

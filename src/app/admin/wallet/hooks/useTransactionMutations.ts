@@ -11,6 +11,7 @@ import {
   usePointGrantMutation,
   usePointIssueMutation,
 } from "@/types/graphql";
+import logger from "@/lib/logging";
 
 interface IssuePointInput {
   communityId: string;
@@ -56,7 +57,11 @@ export const useTransactionMutations = () => {
         const code = gqlError?.extensions?.code as GqlErrorCode | undefined;
         return { success: false, code: code ?? GqlErrorCode.Unknown };
       }
-      console.error("Issue point mutation failed", e);
+      logger.error("Issue point mutation failed", {
+        hook: "useTransactionMutations",
+        operation: "issuePoint",
+        error: e instanceof Error ? e.message : String(e)
+      });
       return { success: false, code: GqlErrorCode.Unknown };
     }
   };
@@ -85,7 +90,11 @@ export const useTransactionMutations = () => {
         const code = gqlError?.extensions?.code as GqlErrorCode | undefined;
         return { success: false, code: code ?? GqlErrorCode.Unknown };
       }
-      console.error("Grant point mutation failed", e);
+      logger.error("Grant point mutation failed", {
+        hook: "useTransactionMutations",
+        operation: "grantPoint",
+        error: e instanceof Error ? e.message : String(e)
+      });
       return { success: false, code: GqlErrorCode.Unknown };
     }
   };
@@ -111,7 +120,11 @@ export const useTransactionMutations = () => {
         const code = gqlError?.extensions?.code as GqlErrorCode | undefined;
         return { success: false, code: code ?? GqlErrorCode.Unknown };
       }
-      console.error("Donate point mutation failed", e);
+      logger.error("Donate point mutation failed", {
+        hook: "useTransactionMutations",
+        operation: "donatePoint",
+        error: e instanceof Error ? e.message : String(e)
+      });
       return { success: false, code: GqlErrorCode.Unknown };
     }
   };

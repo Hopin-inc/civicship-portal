@@ -5,6 +5,7 @@ import { useArticleQuery } from "./useArticleQuery";
 import { presenterArticleDetail, presenterArticleWithAuthor } from "@/app/articles/data/presenter";
 import type { TArticleDetail, TArticleWithAuthor } from "@/app/articles/data/type";
 import { toast } from "sonner";
+import logger from "@/lib/logging";
 
 interface UseArticleResult {
   article: TArticleDetail | null;
@@ -32,10 +33,14 @@ export const useArticle = (id: string): UseArticleResult => {
 
   useEffect(() => {
     if (error) {
-      console.error("Error fetching article data:", error);
+      logger.error("Error fetching article data", {
+        component: "useArticle",
+        articleId: id,
+        error: error instanceof Error ? error.message : String(error)
+      });
       toast.error("記事データの取得に失敗しました");
     }
-  }, [error]);
+  }, [error, id]);
 
   return {
     article,
