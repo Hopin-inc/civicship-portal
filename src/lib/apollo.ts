@@ -57,6 +57,7 @@ const requestLink = new ApolloLink((operation, forward) => {
         "X-Phone-Auth-Token": phoneTokens.accessToken || "",
         "X-Phone-Refresh-Token": phoneTokens.refreshToken || "",
         "X-Phone-Token-Expires-At": phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
+        "X-Phone-Uid": phoneTokens.phoneUid || "",
       };
       
       console.log('🔐 Sending additional tokens for operation:', operation.operationName, {
