@@ -19,6 +19,7 @@ import Link from "next/link";
 import IconWrapper from "@/components/shared/IconWrapper";
 import AddressMap from "@/components/shared/AddressMap";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import Linkify from "react-linkify";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
@@ -72,7 +73,21 @@ const ActivityBodySection = ({ body }: { body: string }) => {
           className="text-body-md text-foreground whitespace-pre-wrap transition-all duration-300"
           style={getTextStyle()}
         >
-          {body}
+          <Linkify
+            componentDecorator={(href, text, key) => (
+              <a
+                key={key}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline hover:text-blue-800"
+              >
+                {text}
+              </a>
+            )}
+          >
+            {body}
+          </Linkify>
         </p>
         {showReadMore && !expanded && (
           <div className="absolute bottom-0 left-0 w-full">

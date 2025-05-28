@@ -3709,6 +3709,7 @@ export type GqlOpportunitySlotSetHostingStatusMutation = {
 
 export type GqlGetOpportunitySlotsQueryVariables = Exact<{
   filter?: InputMaybe<GqlOpportunitySlotFilterInput>;
+  sort?: InputMaybe<GqlOpportunitySlotSortInput>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
@@ -7061,8 +7062,13 @@ export type OpportunitySlotSetHostingStatusMutationOptions = Apollo.BaseMutation
   GqlOpportunitySlotSetHostingStatusMutationVariables
 >;
 export const GetOpportunitySlotsDocument = gql`
-  query GetOpportunitySlots($filter: OpportunitySlotFilterInput, $cursor: String, $first: Int) {
-    opportunitySlots(filter: $filter, sort: { startsAt: desc }, cursor: $cursor, first: $first) {
+  query GetOpportunitySlots(
+    $filter: OpportunitySlotFilterInput
+    $sort: OpportunitySlotSortInput
+    $cursor: String
+    $first: Int
+  ) {
+    opportunitySlots(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
       pageInfo {
         startCursor
         endCursor
@@ -7117,6 +7123,7 @@ export const GetOpportunitySlotsDocument = gql`
  * const { data, loading, error } = useGetOpportunitySlotsQuery({
  *   variables: {
  *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
  *      cursor: // value for 'cursor'
  *      first: // value for 'first'
  *   },

@@ -28,6 +28,10 @@ const renderFullSlotCard = (slot: ActivitySlot) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
 
+  const isFeeSpecified = slot.feeRequired != null;
+  const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
+  const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-gray-400" : "text-gray-400"}`;
+
   return (
     <div className="bg-gray-100 border border-gray-200 rounded-xl px-6 py-6 w-[280px] flex flex-col">
       <div className="flex-1">
@@ -42,10 +46,8 @@ const renderFullSlotCard = (slot: ActivitySlot) => {
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            <p className="text-body-md text-gray-400 font-bold">
-              {slot.feeRequired?.toLocaleString()}円
-            </p>
-            <p className="text-body-sm ml-1 text-gray-300">/ 人</p>
+            <p className={feeClass}>{feeText}</p>
+            {isFeeSpecified && <p className="text-body-sm ml-1 text-gray-300">/ 人</p>}
           </div>
         </div>
       </div>
@@ -66,6 +68,10 @@ const renderAvailableSlotCard = (
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
   const isReservable = slot.isReservable;
+
+  const isFeeSpecified = slot.feeRequired != null;
+  const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
+  const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-muted-foreground/50" : "text-caption"}`;
 
   const query = new URLSearchParams({
     id: opportunityId,
@@ -90,8 +96,8 @@ const renderAvailableSlotCard = (
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            <p className="text-body-md text-caption">{slot.feeRequired?.toLocaleString()}円</p>
-            <p className="text-body-sm ml-1 text-caption">/ 人</p>
+            <p className={feeClass}>{feeText}</p>
+            {isFeeSpecified && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
           </div>
         </div>
       </div>

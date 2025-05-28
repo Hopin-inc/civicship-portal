@@ -1,20 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 interface ParticipationActionsProps {
   cancellationDeadline: Date | null;
@@ -31,6 +29,8 @@ const ParticipationActions: React.FC<ParticipationActionsProps> = ({
   onCancel,
   isCancelling,
 }) => {
+  const [isCancelSheetOpen, setIsCancelSheetOpen] = useState(false);
+
   const renderMessage = () => {
     if (isAfterParticipation) {
       return (
@@ -62,38 +62,42 @@ const ParticipationActions: React.FC<ParticipationActionsProps> = ({
 
     if (isCancellable) {
       return (
-        <Dialog>
-          <DialogTrigger asChild>
+        <Sheet open={isCancelSheetOpen} onOpenChange={setIsCancelSheetOpen}>
+          <SheetTrigger asChild>
             <Button variant="destructive" className="shrink-0 px-6">
               申込をキャンセル
             </Button>
-          </DialogTrigger>
-          <DialogContent className="w-[90vw] max-w-[400px] rounded-sm">
-            <DialogHeader>
-              <DialogTitle className={"text-left text-body-sm font-bold pb-2"}>
+          </SheetTrigger>
+
+          <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8">
+            <SheetHeader className="text-left pb-6">
+              <SheetTitle className="text-body-sm font-bold">
                 申込をキャンセルして、案内人にお知らせしますか？
-              </DialogTitle>
-              <DialogDescription className={"text-left"}>
+              </SheetTitle>
+              <SheetDescription className="text-left">
                 キャンセルが完了すると、案内人に通知が送られます。この操作は元に戻せません。
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-2">
-              <DialogClose asChild>
-                <Button variant="tertiary" className="w-full py-4">
-                  やめる
-                </Button>
-              </DialogClose>
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="space-y-3 mt-4">
               <Button
                 variant="destructive"
                 onClick={onCancel}
                 disabled={isCancelling}
                 className="w-full py-4"
               >
-                {isCancelling ? "キャンセル中..." : "キャンセルを送信"}
+                {isCancelling ? "キャンセル中..." : "申込をキャンセル"}
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+              <Button
+                variant="tertiary"
+                onClick={() => setIsCancelSheetOpen(false)}
+                className="w-full py-4"
+              >
+                やめる
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
       );
     }
 
@@ -105,7 +109,7 @@ const ParticipationActions: React.FC<ParticipationActionsProps> = ({
   };
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border max-w-mobile-l w-full h-16 flex items-center px-4 justify-between mx-auto">
+    <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border max-w-mobile-l w-full h-16 flex items-center px-4 justify-between mx-auto min-h-[102px]">
       <div className="flex flex-col text-muted-foreground min-w-fit">{renderMessage()}</div>
       {renderButton()}
     </footer>

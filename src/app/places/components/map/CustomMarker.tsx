@@ -95,8 +95,8 @@ const createPlaceholderIcon = async (size: number): Promise<google.maps.Icon> =>
 
 const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }) => {
   const [icon, setIcon] = useState<google.maps.Icon | null>(null);
-  const displaySize = isSelected ? 70 : 48;
-  const cacheKey = `${data.id}-${isSelected ? "selected" : "normal"}`;
+  const displaySize = 48;
+  const cacheKey = `${data.id}-normal`;
 
   // ✅ 安定した依存値にする（nullを避ける）
   const hostImage = useMemo(() => data.host.image ?? PLACEHOLDER_IMAGE, [data.host.image]);
@@ -138,7 +138,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
           canvas,
           displaySize,
           shadowPadding,
-          isSelected ? 110 : 0,
+          0,
         );
 
         markerIconCache.set(cacheKey, markerIcon);
@@ -153,7 +153,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         const fallbackIcon = {
           url: data.image || PLACEHOLDER_IMAGE,
           scaledSize: new google.maps.Size(displaySize, displaySize),
-          anchor: new google.maps.Point(displaySize / 2, displaySize / 2 + (isSelected ? 110 : 0)),
+          anchor: new google.maps.Point(displaySize / 2, displaySize / 2),
         };
 
         markerIconCache.set(cacheKey, fallbackIcon);
@@ -164,7 +164,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
     return () => {
       isMounted = false;
     };
-  }, [data.id, data.image, hostImage, displaySize, isSelected, cacheKey]);
+  }, [data.id, data.image, hostImage, displaySize, cacheKey]);
 
   if (!icon) return null;
 
@@ -172,7 +172,10 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
     <Marker
       position={{ lat: data.latitude, lng: data.longitude }}
       icon={icon}
-      onClick={onClick}
+      onClick={e => {
+        if (e && e.domEvent) e.domEvent.stopPropagation();
+        onClick();
+      }}
       zIndex={isSelected ? 2 : 1}
       title={data.host.name}
     />

@@ -43,7 +43,7 @@ function OpportunityCardHorizontal({ opportunity, withShadow = true }: Props) {
             <p className="mt-1 text-body-sm text-muted-foreground">
               {opportunity.feeRequired
                 ? `1人あたり${opportunity.feeRequired.toLocaleString()}円から`
-                : "要問い合わせ"}
+                : "料金未定"}
             </p>
             <div className="mt-1 flex items-center text-muted-foreground text-body-sm">
               <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
