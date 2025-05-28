@@ -126,6 +126,6 @@ export class AuthRedirectService {
       return next || "/";
     }
 
-    return liffState;
+    return `/login${next ? `?next=${encodeURIComponent(next)}` : ""}`;
   }
 }

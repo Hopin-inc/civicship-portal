@@ -99,6 +99,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     fetchPolicy: "network-only",
   });
 
+  const authStateManager = React.useMemo(() => {
+    if (typeof window === "undefined") return null;
+    const AuthStateManager = require("@/lib/auth/auth-state-manager").AuthStateManager;
+    return AuthStateManager.getInstance();
+  }, []);
+
   useEffect(() => {
     const unsubscribe = lineAuth.onAuthStateChanged((user) => {
       setState((prev) => ({
@@ -108,15 +114,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           (prev.authenticationState === "loading" ? "line_authenticated" : prev.authenticationState) : 
           "unauthenticated",
       }));
+      
+      if (authStateManager) {
+        authStateManager.handleLineAuthStateChange(!!user);
+      }
     });
 
     return () => unsubscribe();
-  }, []);
-
-  const authStateManager = React.useMemo(() => {
-    const AuthStateManager = require("@/lib/auth/auth-state-manager").AuthStateManager;
-    return AuthStateManager.getInstance();
-  }, []);
+  }, [authStateManager]);
 
   /**
    * ログアウト
@@ -148,18 +153,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!authStateManager) return; // Guard against initialization error
     
     const phoneState = phoneAuthService.getState();
+    const isVerified = phoneState.isVerified;
     
-    if (phoneState.isVerified) {
+    if (isVerified) {
       authStateManager.handlePhoneAuthStateChange(true);
     }
     
     setState((prev) => ({
       ...prev,
-      authenticationState: phoneState.isVerified ? 
+      authenticationState: isVerified ? 
         (prev.authenticationState === "line_authenticated" ? "phone_authenticated" : prev.authenticationState) : 
         prev.authenticationState,
     }));
-  }, [authStateManager]);
+  }, [authStateManager, phoneAuthService]);
 
   useEffect(() => {
     if (userData?.currentUser?.user) {
@@ -168,8 +174,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         currentUser: userData.currentUser.user,
         authenticationState: "user_registered",
       }));
+      
+      if (authStateManager) {
+        authStateManager.handleUserRegistrationStateChange(true);
+      }
     }
-  }, [userData]);
+  }, [userData, authStateManager]);
 
   useEffect(() => {
     const initializeLiff = async () => {
@@ -384,6 +394,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         ...prev,
         authenticationState: "phone_authenticated",
       }));
+      
+      if (authStateManager) {
+        authStateManager.handlePhoneAuthStateChange(true);
+      }
     }
 
     return success;
