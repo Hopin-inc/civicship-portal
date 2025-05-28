@@ -4,6 +4,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
 import { Analytics, getAnalytics, isSupported } from "firebase/analytics";
 import logger from "../logging";
+import { createAuthLogContext } from "./logging-utils";
 
 const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -30,18 +31,44 @@ if (isAnalyticsEnabled) {
     .then((supported) => {
       if (supported) {
         analytics = getAnalytics(lineApp);
-        logger.info("Analytics initialized", { environment: process.env.NODE_ENV });
+        logger.info("Analytics initialized", createAuthLogContext(
+          'analytics_session',
+          "general",
+          {
+            operation: "initializeAnalytics",
+            environment: process.env.NODE_ENV
+          }
+        ));
       } else {
-        logger.warn("Analytics not supported in this browser");
+        logger.warn("Analytics not supported in this browser", createAuthLogContext(
+          'analytics_session',
+          "general",
+          {
+            operation: "initializeAnalytics",
+            supported: false
+          }
+        ));
       }
     })
     .catch((e) => {
-      logger.error("Error initializing Analytics", { 
-        error: e instanceof Error ? e.message : String(e) 
-      });
+      logger.error("Error initializing Analytics", createAuthLogContext(
+        'analytics_session',
+        "general",
+        {
+          operation: "initializeAnalytics",
+          error: e instanceof Error ? e.message : String(e)
+        }
+      ));
     });
 } else {
-  logger.info("Analytics disabled", { environment: process.env.NODE_ENV });
+  logger.info("Analytics disabled", createAuthLogContext(
+    'analytics_session',
+    "general",
+    {
+      operation: "initializeAnalytics",
+      environment: process.env.NODE_ENV
+    }
+  ));
 }
 
 export { analytics };

@@ -55,16 +55,22 @@ const requestLink = new ApolloLink((operation, forward) => {
     };
     
     if (operation.operationName === 'userSignUp') {
-      logger.debug('userSignUp request headers', {
-        hasLineToken: !!lineTokens.accessToken,
-        hasPhoneToken: !!phoneTokens.accessToken,
-        lineExpiresAt: lineTokens.expiresAt,
-        phoneExpiresAt: phoneTokens.expiresAt,
-        headers: {
-          'X-Token-Expires-At': lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
-          'X-Phone-Token-Expires-At': phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
+      const sessionId = operation.getContext().sessionId || 'unknown_session';
+      logger.debug('userSignUp request headers', createAuthLogContext(
+        sessionId,
+        "general", 
+        {
+          operation: "userSignUp",
+          hasLineToken: !!lineTokens.accessToken,
+          hasPhoneToken: !!phoneTokens.accessToken,
+          lineExpiresAt: lineTokens.expiresAt,
+          phoneExpiresAt: phoneTokens.expiresAt,
+          tokenExpiryInfo: {
+            lineExpiresAt: lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
+            phoneExpiresAt: phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
+          }
         }
-      });
+      ));
     }
     
     return { headers: requestHeaders };

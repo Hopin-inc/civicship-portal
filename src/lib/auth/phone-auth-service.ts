@@ -53,18 +53,28 @@ export class PhoneAuthService {
       this.state.phoneUid = savedTokens.phoneUid;
       this.state.phoneNumber = savedTokens.phoneNumber;
       
-      logger.debug("Phone verification state initialized from saved tokens", {
-        isVerified: this.state.isVerified,
-        phoneUid: this.state.phoneUid ? "exists" : "missing",
-        phoneNumber: this.state.phoneNumber ? "exists" : "missing",
-        accessToken: savedTokens.accessToken ? "exists" : "missing"
-      });
+      logger.debug("Phone verification state initialized from saved tokens", createAuthLogContext(
+        'unknown_session',
+        "phone",
+        {
+          operation: "initializeState",
+          isVerified: this.state.isVerified,
+          phoneUid: this.state.phoneUid ? "exists" : "missing",
+          phoneNumber: this.state.phoneNumber ? "exists" : "missing",
+          accessToken: savedTokens.accessToken ? "exists" : "missing"
+        }
+      ));
     } else {
-      logger.debug("Phone verification not initialized - incomplete saved tokens", {
-        phoneUid: savedTokens.phoneUid ? "exists" : "missing",
-        phoneNumber: savedTokens.phoneNumber ? "exists" : "missing",
-        accessToken: savedTokens.accessToken ? "exists" : "missing"
-      });
+      logger.debug("Phone verification not initialized - incomplete saved tokens", createAuthLogContext(
+        'unknown_session',
+        "phone",
+        {
+          operation: "initializeState",
+          phoneUid: savedTokens.phoneUid ? "exists" : "missing",
+          phoneNumber: savedTokens.phoneNumber ? "exists" : "missing",
+          accessToken: savedTokens.accessToken ? "exists" : "missing"
+        }
+      ));
     }
   }
 
