@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useMutation, useQuery } from "@apollo/client";
 import { USER_SIGN_UP } from "@/graphql/account/identity/mutation";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
+import { COMMUNITY_ID } from "@/utils";
 
 /**
  * 認証状態の型定義
@@ -386,6 +387,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           input: {
             name,
             prefecture,
+            communityId: COMMUNITY_ID,
             phoneUid,
             phoneNumber: phoneTokens.phoneNumber,
             lineAccessToken: lineTokens.accessToken,
