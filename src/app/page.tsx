@@ -55,7 +55,9 @@ export default function HomePage() {
       }
     }
 
-    if (window.location.pathname === "/") {
+    if (window.location.pathname === "/" && 
+        !window.location.href.includes("liff.state") && 
+        !window.location.href.includes("login")) {
       router.replace("/activities");
     }
   }, [router, isAuthenticated, userData, authLoading, userLoading, isAuthenticating]);
