@@ -2,13 +2,28 @@
 
 /**
  * 認証ログ用のユーティリティ関数
+ * クライアント環境とサーバー環境の両方で動作するよう設計
  */
+
+let serverUtils: any = null;
+
+if (typeof window === 'undefined') {
+  try {
+    serverUtils = require('./logging-utils-server');
+  } catch (e) {
+    console.warn('Failed to load server logging utilities:', e);
+  }
+}
 
 /**
  * 認証セッションIDを生成する
  * @returns 一意のセッションID
  */
 export const generateSessionId = (): string => {
+  if (typeof window === 'undefined' && serverUtils) {
+    return serverUtils.generateSessionId();
+  }
+  
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return `auth_${Date.now()}_${crypto.randomUUID().replace(/-/g, '').substring(0, 9)}`;
   } else if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
@@ -52,8 +67,15 @@ export const maskUserId = (userId: string | null | undefined): string => {
  * @returns デバイスとブラウザ情報
  */
 export const getDeviceInfo = (): Record<string, any> => {
-  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+  if (typeof window === 'undefined') {
+    if (serverUtils) {
+      return serverUtils.getDeviceInfo();
+    }
     return { platform: 'server' };
+  }
+
+  if (typeof navigator === 'undefined') {
+    return { platform: 'unknown' };
   }
 
   const userAgent = navigator.userAgent || '';
@@ -96,6 +118,13 @@ export const getDeviceInfo = (): Record<string, any> => {
  * @returns ネットワーク状態情報
  */
 export const getNetworkInfo = (): Record<string, any> => {
+  if (typeof window === 'undefined') {
+    if (serverUtils) {
+      return serverUtils.getNetworkInfo();
+    }
+    return { online: true };
+  }
+  
   if (typeof navigator === 'undefined') {
     return { online: true };
   }
@@ -126,6 +155,10 @@ export const getNetworkInfo = (): Record<string, any> => {
  * @returns 一意のリクエストID
  */
 export const generateRequestId = (): string => {
+  if (typeof window === 'undefined' && serverUtils) {
+    return serverUtils.generateRequestId();
+  }
+  
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return `req_${crypto.randomUUID().replace(/-/g, '').substring(0, 12)}`;
   } else if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
@@ -147,6 +180,10 @@ export const startOperation = (operationName: string): {
   operationId: string;
   getContext: (additionalContext?: Record<string, any>) => Record<string, any>;
 } => {
+  if (typeof window === 'undefined' && serverUtils) {
+    return serverUtils.startOperation(operationName);
+  }
+  
   const startTime = Date.now();
   const operationId = generateRequestId();
   
@@ -176,6 +213,10 @@ export const endOperation = (
   operationId: string,
   additionalContext?: Record<string, any>
 ): Record<string, any> => {
+  if (typeof window === 'undefined' && serverUtils) {
+    return serverUtils.endOperation(startTime, operationId, additionalContext);
+  }
+  
   const endTime = Date.now();
   const duration = endTime - startTime;
   
@@ -202,6 +243,10 @@ export const createAuthLogContext = (
   authType: "liff" | "phone" | "general", 
   additionalContext?: Record<string, any>
 ): Record<string, any> => {
+  if (typeof window === 'undefined' && serverUtils) {
+    return serverUtils.createAuthLogContext(sessionId, authType, additionalContext);
+  }
+  
   const userId = additionalContext?.userId || 
                 (additionalContext?.user?.uid ? maskUserId(additionalContext.user.uid) : undefined);
   
@@ -219,6 +264,14 @@ export const createAuthLogContext = (
   
   const levelInfo = additionalContext?.level ? { level: additionalContext.level } : {};
   
+  const deviceInfo = typeof window === 'undefined' && serverUtils 
+    ? { platform: 'server' }
+    : getDeviceInfo();
+    
+  const networkInfo = typeof window === 'undefined' && serverUtils
+    ? { online: true }
+    : getNetworkInfo();
+  
   return {
     sessionId,
     timestamp: new Date().toISOString(),
@@ -226,8 +279,8 @@ export const createAuthLogContext = (
     authType,
     ...(userId ? { userId } : {}),
     env: {
-      ...getDeviceInfo(),
-      network: getNetworkInfo()
+      ...deviceInfo,
+      network: networkInfo
     },
     ...levelInfo,
     ...errorInfo,
@@ -247,6 +300,10 @@ export const createRetryLogContext = (
   maxRetries: number,
   backoffStep: number
 ): Record<string, any> => {
+  if (typeof window === 'undefined' && serverUtils) {
+    return serverUtils.createRetryLogContext(retryCount, maxRetries, backoffStep);
+  }
+  
   return {
     retry: {
       count: retryCount,

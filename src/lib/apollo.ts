@@ -33,9 +33,39 @@ const httpLink = createUploadLink({
 });
 
 const requestLink = new ApolloLink((operation, forward) => {
+  // SSR 環境では window は存在しない
+  if (typeof window === "undefined") {
+    const serverRequestId = `server_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+    const sessionId = operation.getContext().sessionId || 'unknown_session';
+    
+    const startTime = Date.now();
+    
+    // SSRではトークン系は不要（または別途 next/headers などで付与）
+    operation.setContext(({ headers = {} }) => ({
+      headers: {
+        ...headers,
+        "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+        "X-Request-ID": serverRequestId
+      },
+    }));
+    
+    return forward(operation).map((response) => {
+      logger.debug("GraphQLRequestComplete", {
+        sessionId,
+        component: "Backend",
+        operation: operation.operationName,
+        status: response.errors?.length ? "error" : "success",
+        environment: "server",
+        duration: Date.now() - startTime,
+        requestId: serverRequestId
+      });
+      return response;
+    });
+  }
+
   const requestId = generateRequestId();
-  const op = startOperation("GraphQLRequest");
   const sessionId = operation.getContext().sessionId || 'unknown_session';
+  const op = startOperation("GraphQLRequest");
   
   logger.debug("GraphQLRequestStart", createAuthLogContext(
     sessionId,
@@ -47,31 +77,6 @@ const requestLink = new ApolloLink((operation, forward) => {
       operation: operation.operationName
     })
   ));
-  
-  // SSR 環境では document は存在しない
-  if (typeof document === "undefined") {
-    // SSRではトークン系は不要（または別途 next/headers などで付与）
-    operation.setContext(({ headers = {} }) => ({
-      headers: {
-        ...headers,
-        "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-        "X-Request-ID": requestId
-      },
-    }));
-    return forward(operation).map((response) => {
-      logger.debug("GraphQLRequestComplete", createAuthLogContext(
-        sessionId,
-        "general",
-        endOperation(op.startTime, op.operationId, {
-          component: "Backend",
-          operation: operation.operationName,
-          status: response.errors?.length ? "error" : "success",
-          environment: "server"
-        })
-      ));
-      return response;
-    });
-  }
 
   const lineTokens = TokenManager.getLineTokens();
   const phoneTokens = TokenManager.getPhoneTokens();
@@ -151,6 +156,49 @@ const requestLink = new ApolloLink((operation, forward) => {
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
   const context = operation.getContext();
   const sessionId = context.sessionId || 'unknown_session';
+  
+  if (typeof window === "undefined") {
+    if (graphQLErrors) {
+      for (const error of graphQLErrors) {
+        const isAuthError = error.message.includes("Authentication required") ||
+          error.message.includes("Invalid token") ||
+          error.message.includes("Token expired") ||
+          error.message.includes("Unauthorized");
+        
+        logger.info(
+          isAuthError ? "AuthenticationError" : "GraphQLError", 
+          {
+            sessionId,
+            component: "Backend",
+            environment: "server",
+            errorCode: error.extensions?.code || "unknown_graphql_error",
+            error: error.message,
+            operation: operation.operationName
+          }
+        );
+      }
+    }
+
+    if (networkError) {
+      const isServerError = "statusCode" in networkError && networkError.statusCode >= 500;
+      const logLevel = isServerError ? "error" : "info";
+      
+      logger[logLevel](
+        "NetworkError", 
+        {
+          sessionId,
+          component: "Backend",
+          environment: "server",
+          errorCode: "statusCode" in networkError ? `http_${networkError.statusCode}` : "network_error",
+          error: networkError.message,
+          operation: operation.operationName
+        }
+      );
+    }
+    
+    return;
+  }
+  
   const requestId = generateRequestId();
   const op = startOperation("GraphQLOperation");
   
@@ -253,15 +301,17 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
     }
   }
   
-  logger.debug("GraphQL operation completed", createAuthLogContext(
-    sessionId,
-    "general",
-    endOperation(op.startTime, op.operationId, {
-      component: "Backend",
-      operation: operation.operationName,
-      status: graphQLErrors?.length || networkError ? "error" : "success"
-    })
-  ));
+  if (typeof window !== "undefined") {
+    logger.debug("GraphQL operation completed", createAuthLogContext(
+      sessionId,
+      "general",
+      endOperation(op.startTime, op.operationId, {
+        component: "Backend",
+        operation: operation.operationName,
+        status: graphQLErrors?.length || networkError ? "error" : "success"
+      })
+    ));
+  }
 });
 
 const link = ApolloLink.from([requestLink, errorLink, httpLink]);
