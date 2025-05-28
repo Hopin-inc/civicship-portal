@@ -226,11 +226,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       const timestamp = new Date().toISOString();
       console.log(`🔍 [${timestamp}] Auto-logging in via LIFF`);
-      await loginWithLiff(typeof window !== "undefined" ? window.location.pathname : "/");
+      
+      setState((prev) => ({ ...prev, isAuthenticating: true }));
+      try {
+        const success = await liffService.signInWithLiffToken();
+        if (success) {
+          await refetchUser();
+        }
+      } catch (error) {
+        console.error("Auto-login with LIFF failed:", error);
+      } finally {
+        setState((prev) => ({ ...prev, isAuthenticating: false }));
+      }
     };
     
     handleAutoLogin();
-  }, [environment, state.authenticationState, state.isAuthenticating, liffService, loginWithLiff]);
+  }, [environment, state.authenticationState, state.isAuthenticating, liffService, refetchUser]);
 
   useEffect(() => {
     const handleTokenExpired = async (event: CustomEvent) => {
