@@ -192,8 +192,18 @@ export class LiffService {
     return new Promise((resolve) => {
       operation.attempt(async (currentAttempt) => {
         try {
-          console.log(`Attempting LIFF authentication (attempt ${currentAttempt})`);
+          const attemptTimestamp = new Date().toISOString();
+          console.log(`🔍 [${attemptTimestamp}] LIFF Auth Attempt ${currentAttempt} - Starting`);
+          console.log(`🔍 [${attemptTimestamp}] LIFF state before request:`, {
+            isInitialized: this.state.isInitialized,
+            isLoggedIn: this.state.isLoggedIn,
+            accessToken: this.getAccessToken() ? "present" : "missing",
+            userId: this.state.profile?.userId || "none"
+          });
 
+          const requestTimestamp = new Date().toISOString();
+          console.log(`🔍 [${requestTimestamp}] Making request to /line/liff-login`);
+          
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`,
             {
@@ -203,22 +213,51 @@ export class LiffService {
             },
           );
 
+          const responseTimestamp = new Date().toISOString();
+          console.log(`🔍 [${responseTimestamp}] /line/liff-login response:`, {
+            status: response.status,
+            ok: response.ok,
+            attempt: currentAttempt,
+            statusText: response.statusText
+          });
+
           if (!response.ok) {
             throw new Error(`LIFF authentication failed: ${response.status}`);
           }
 
+          const jsonTimestamp = new Date().toISOString();
+          console.log(`🔍 [${jsonTimestamp}] Parsing response JSON`);
           const { customToken, profile } = await response.json();
+          console.log(`🔍 [${jsonTimestamp}] Received custom token and profile:`, {
+            hasCustomToken: !!customToken,
+            profileName: profile?.displayName || "none"
+          });
 
+          const firebaseTimestamp = new Date().toISOString();
+          console.log(`🔍 [${firebaseTimestamp}] Signing in with custom token to Firebase`);
           const userCredential = await signInWithCustomToken(lineAuth, customToken);
+          console.log(`🔍 [${firebaseTimestamp}] Firebase sign-in successful:`, {
+            uid: userCredential.user.uid,
+            isNewUser: userCredential.user.metadata.creationTime === userCredential.user.metadata.lastSignInTime
+          });
+          
           await updateProfile(userCredential.user, {
             displayName: profile.displayName,
             photoURL: profile.pictureUrl,
           });
 
+          const tokenTimestamp = new Date().toISOString();
+          console.log(`🔍 [${tokenTimestamp}] Getting Firebase ID token`);
           const idToken = await userCredential.user.getIdToken();
           const refreshToken = userCredential.user.refreshToken;
           const tokenResult = await userCredential.user.getIdTokenResult();
           const expirationTime = new Date(tokenResult.expirationTime).getTime();
+
+          console.log(`🔍 [${tokenTimestamp}] Token details:`, {
+            hasIdToken: !!idToken,
+            hasRefreshToken: !!refreshToken,
+            expirationTime: new Date(expirationTime).toISOString()
+          });
 
           const tokens: AuthTokens = {
             accessToken: idToken,
@@ -227,7 +266,8 @@ export class LiffService {
           };
           TokenManager.saveLineTokens(tokens);
 
-          console.log("LIFF authentication successful");
+          const completeTimestamp = new Date().toISOString();
+          console.log(`🔍 [${completeTimestamp}] LIFF authentication successful`);
           resolve(true);
         } catch (error) {
           const categorizedError = categorizeFirebaseError(error);
