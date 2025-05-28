@@ -1,4 +1,5 @@
-'use client';
+import logger from './logging/index';
+import type { Logger } from './logging/client';
 
-import logger from './logging/client';
-export default logger;
+const typedLogger: Logger = logger as Logger;
+export default typedLogger;

@@ -1,17 +1,14 @@
-import clientLogger from './client';
-
-let logger = clientLogger;
+let logger;
 
 if (typeof window === 'undefined') {
   try {
-    import('./server').then((module) => {
-      logger = module.default;
-    }).catch(() => {
-      console.warn('Failed to load server logger, using client logger instead');
-    });
+    logger = require('./server').default;
   } catch (error) {
     console.warn('Error importing server logger, using client logger instead', error);
+    logger = require('./client').default;
   }
+} else {
+  logger = require('./client').default;
 }
 
 export default logger;

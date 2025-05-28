@@ -39,10 +39,11 @@ if (isLocal) {
   transports.push(new winston.transports.Console());
 } else {
   transports.push(new LoggingWinston());
+  transports.push(new winston.transports.Console());
 }
 
 const winstonLogger = winston.createLogger({
-  level: "debug",
+  level: process.env.NEXT_PUBLIC_LOG_LEVEL || "debug",
   format: winston.format.combine(...format),
   transports,
 });
