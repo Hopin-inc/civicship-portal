@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import { useGetUserWalletQuery } from "@/types/graphql";
 import { presenterUserAsset } from "@/app/wallets/data/presenter";
 import { UserAsset } from "@/app/wallets/data/type";

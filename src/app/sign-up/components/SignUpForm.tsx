@@ -14,12 +14,13 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { GqlCurrentPrefecture } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
+import { useAuth } from "@/contexts/AuthProvider";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 const FormSchema = z.object({
   name: z.string({ required_error: "名前を入力してください。" }),
@@ -32,8 +33,29 @@ type FormValues = z.infer<typeof FormSchema>;
 
 export function SignUpForm() {
   const router = useRouter();
-  const { createUser, isPhoneVerified, phoneAuth } = useAuth();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
+  const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (!loading) {
+      if (!isAuthenticated) {
+        let loginWithNext = "/login";
+        if (nextParam) {
+          loginWithNext += `?next=${ encodeURIComponent(nextParam) }`;
+        }
+        router.replace(loginWithNext);
+      } else if (!isPhoneVerified) {
+        let signUpWithNext = "/sign-up/phone-verification";
+        if (nextParam) {
+          signUpWithNext += `?next=${ encodeURIComponent(nextParam) }`;
+        }
+        router.replace(signUpWithNext);
+      }
+    }
+  }, [isAuthenticated, isPhoneVerified, loading, router]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -48,7 +70,11 @@ export function SignUpForm() {
     try {
       if (!isPhoneVerified) {
         toast.error("電話番号認証が完了していません");
-        router.push("/sign-up/phone-verification");
+        let signUpWithNext = "/sign-up/phone-verification";
+        if (nextParam) {
+          signUpWithNext += `?next=${ encodeURIComponent(nextParam) }`;
+        }
+        router.replace(signUpWithNext);
         return;
       }
 
@@ -56,14 +82,31 @@ export function SignUpForm() {
 
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
-        router.push("/");
+        setIsRedirecting(true);
+        const redirectUrl = nextParam || "/activities";
+        router.push(redirectUrl);
       }
     } catch (error) {
       console.error("Sign up error:", error);
+      toast.error("アカウント作成に失敗しました", {
+        description: error instanceof Error ? error.message : "不明なエラーが発生しました",
+      });
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (loading) {
+    return <LoadingIndicator />;
+  }
+
+  if (isRedirecting) {
+    return <LoadingIndicator />;
+  }
+
+  if (!isAuthenticated || !isPhoneVerified) {
+    return null;
+  }
 
   return (
     <div className="w-full max-w-md mx-auto space-y-8">

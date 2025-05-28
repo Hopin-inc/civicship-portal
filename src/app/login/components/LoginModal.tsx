@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import Image from "next/image";
 import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -31,7 +31,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     setError(null);
 
     try {
-      await loginWithLiff();
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : "/";
+      await loginWithLiff(currentPath);
       setIsLoading(false);
       onClose();
     } catch (err) {

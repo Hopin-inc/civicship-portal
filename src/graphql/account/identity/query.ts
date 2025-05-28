@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
+import { MEMBERSHIP_FRAGMENT } from "@/graphql/account/membership/fragment";
 
-export const GET_CURRENT_USER = gql(`
+export const GET_CURRENT_USER = gql`
   query currentUser {
     currentUser {
       user {
@@ -22,4 +23,5 @@ export const GET_CURRENT_USER = gql(`
       }
     }
   }
-`);
+  ${MEMBERSHIP_FRAGMENT}
+`;

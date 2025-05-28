@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef } from "react";
 import { useTransactionHistory } from "@/app/wallets/[id]/hooks/useTransactionHistory";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import { useHeader } from "@/components/providers/HeaderProvider";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";

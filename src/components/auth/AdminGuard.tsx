@@ -1,16 +1,36 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useAuth } from "@/contexts/AuthProvider";
+import { useQuery } from "@apollo/client";
+import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { toast } from "sonner";
-import { GqlRole } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/utils";
+import { GqlRole } from "@/types/graphql";
 
-export default function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { user: currentUser, loading } = useAuth();
+/**
+ * 管理者ガードコンポーネントのプロパティ
+ */
+interface AdminGuardProps {
+  children: React.ReactNode;
+}
+
+/**
+ * 管理者ガードコンポーネント
+ * 管理者権限を持つユーザーのみアクセスを許可する
+ */
+export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
+
+  const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
+    skip: !isAuthenticated,
+  });
+
+  const loading = authLoading || userLoading;
+  const currentUser = userData?.currentUser?.user;
 
   useEffect(() => {
     if (loading) {
@@ -18,23 +38,20 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    // 🚫 Not logged in → Redirect to phone verification
-    if (!currentUser) {
+    if (!isAuthenticated || !currentUser) {
       const next = encodeURIComponent(window.location.pathname + window.location.search);
       console.log("🚷 No user found. Redirecting to login.");
       router.replace(`/login?next=${next}`);
       return;
     }
 
-    // 🧾 No memberships → Redirect to home
     if (!currentUser.memberships || currentUser.memberships.length === 0) {
       console.log("🚪 User has no memberships. Redirecting to home.");
       router.replace("/");
       return;
     }
 
-    // 🎯 Check if user is a manager in the target community
-    const targetMembership = currentUser.memberships.find((m) => m.community?.id === COMMUNITY_ID);
+    const targetMembership = currentUser.memberships.find((m: any) => m.community?.id === COMMUNITY_ID);
     const isCommunityManager =
       targetMembership &&
       (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
@@ -53,19 +70,19 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
     }
 
     console.log("✅ User is authorized as community manager.");
-  }, [currentUser, loading, router]);
+  }, [currentUser, isAuthenticated, loading, router]);
 
   if (loading) {
     console.log("⏳ Showing loading indicator...");
     return <LoadingIndicator />;
   }
 
-  if (!currentUser || !currentUser.memberships || currentUser.memberships.length === 0) {
+  if (!isAuthenticated || !currentUser || !currentUser.memberships || currentUser.memberships.length === 0) {
     console.log("🚫 Unauthorized user state. No UI rendered.");
     return null;
   }
 
-  const targetMembership = currentUser.memberships.find((m) => m.community?.id === COMMUNITY_ID);
+  const targetMembership = currentUser.memberships.find((m: any) => m.community?.id === COMMUNITY_ID);
   const isCommunityManager =
     targetMembership &&
     (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
@@ -77,4 +94,6 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
 
   console.log("🟢 AdminGuard passed. Rendering children.");
   return <>{children}</>;
-}
+};
+
+export default AdminGuard;

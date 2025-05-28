@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import { transformTickets } from "@/app/tickets/data/presenter";
 import { Ticket } from "@/app/tickets/data/type";
 import { useGetUserWalletQuery } from "@/types/graphql";

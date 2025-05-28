@@ -5,7 +5,7 @@ import { useSortedSlotsByStartsAt } from "@/app/activities/[id]/hooks/useSortedS
 import { ActivityCard, ActivityDetail } from "@/app/activities/data/type";
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
 import { useSameStateActivities } from "@/app/activities/[id]/hooks/useSameStateActivities";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { useFilterFutureSlots } from "./useFilterFutureSlots";
 

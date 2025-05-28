@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import { GqlUser, useGetMemberWalletsQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";

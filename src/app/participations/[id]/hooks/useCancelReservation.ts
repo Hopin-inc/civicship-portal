@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { ApolloError } from "@apollo/client";
 import { GqlErrorCode, useCancelReservationMutation } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 
 type Result = { success: true } | { success: false; code: GqlErrorCode };
 

@@ -7,7 +7,7 @@ import ReservationDetailsCard from "@/app/reservation/confirm/components/Reserva
 import PaymentSection from "@/app/reservation/confirm/components/PaymentSection";
 import NotesSection from "@/app/reservation/confirm/components/NotesSection";
 import { useReservationConfirm } from "@/app/reservation/confirm/hooks/useReservationConfirm";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCounter";
 import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
 import { notFound, useRouter } from "next/navigation";

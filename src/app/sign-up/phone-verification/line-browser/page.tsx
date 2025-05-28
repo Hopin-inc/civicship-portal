@@ -2,11 +2,15 @@
 
 import { Link as LinkIcon } from "lucide-react";
 import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export default function OpenInBrowser() {
-  const COPY_URL = "https://www.neo88.app/sign-up/phone-verification";
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
+  const baseUrl = "https://www.neo88.app/sign-up/phone-verification";
+  const COPY_URL = nextParam ? `${baseUrl}?next=${encodeURIComponent(nextParam)}` : baseUrl;
 
   useEffect(() => {
     document.body.style.overflow = "hidden";

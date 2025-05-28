@@ -1,6 +1,6 @@
 "use client";
 
-import { analytics } from "@/lib/firebase";
+import { analytics } from "@/lib/auth/firebase-config";
 import { logEvent } from "firebase/analytics";
 import { usePathname } from "next/navigation";
 import { IEventName, IEventParamMap } from "@/types/analytics";

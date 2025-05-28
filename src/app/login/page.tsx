@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,32 +9,35 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { getLiffLoginErrorMessage } from "@/app/login/utils/getLiffLoginErrorMessage";
 import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export default function LoginPage() {
-  // const router = useRouter();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next") || "/";
 
-  // const { isLiffInitialized, isLiffLoggedIn, liffProfile, liffError } = useLiff();
-  const { user: currentUser, loginWithLiff, isAuthenticating } = useAuth();
+  const { user, isAuthenticated, loginWithLiff, isAuthenticating, loading } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
 
-  // // 🚀 LIFFログイン済みならトップへ自動遷移
-  // useEffect(() => {
-  //   if (isLiffInitialized && isLiffLoggedIn && liffProfile && currentUser) {
-  //     console.log("🚀 Automatically redirect to the top page if already logged in via LIFF");
-  //     router.replace("/");
-  //   }
-  // }, [currentUser, isLiffInitialized, isLiffLoggedIn, liffProfile, router]);
-  //
-  // // 🔴 初期化エラー表示
-  // useEffect(() => {
-  //   if (liffError) {
-  //     console.error(liffError);
-  //   }
-  // }, [liffError]);
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      if (user) {
+        console.log("🚀 Already authenticated, redirecting to:", nextPath);
+        router.replace(nextPath);
+      } else {
+        let signUpWithNext = "/sign-up/phone-verification";
+        if (nextPath) {
+          signUpWithNext += `?next=${ encodeURIComponent(nextPath) }`;
+        }
+        router.replace(signUpWithNext);
+      }
+    }
+  }, [isAuthenticated, loading, nextPath, router]);
 
   // 📦 ログイン処理
   const handleLogin = async () => {
@@ -47,10 +50,14 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      await loginWithLiff();
-      // if (currentUser) {
-      //   router.push("/");
-      // }
+      const searchParams = new URLSearchParams(window.location.search);
+      const next = searchParams.get("next");
+      const redirectPath = next && next.startsWith("/") ? `/?next=${next}&from=line_auth` : "/?from=line_auth";
+      const success = await loginWithLiff(redirectPath);
+      if (success) {
+        const nextPath = next && next.startsWith("/") ? next : "/activities";
+        router.push(nextPath);
+      }
     } catch (err) {
       const { title, description } = getLiffLoginErrorMessage(error);
       toast.error(title, { description });
@@ -66,6 +73,10 @@ export default function LoginPage() {
       document.body.style.overflow = "";
     };
   }, []);
+
+  if (loading || isAuthenticating) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
