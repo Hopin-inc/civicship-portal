@@ -379,6 +379,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       const phoneTokens = TokenManager.getPhoneTokens();
+      const lineTokens = TokenManager.getLineTokens();
+
+      console.log("🔍 Tokens before userSignUp:", {
+        lineToken: !!lineTokens.accessToken,
+        phoneToken: !!phoneTokens.accessToken,
+        lineExpiresAt: lineTokens.expiresAt ? new Date(lineTokens.expiresAt).toISOString() : null,
+        phoneExpiresAt: phoneTokens.expiresAt ? new Date(phoneTokens.expiresAt).toISOString() : null,
+        phoneUid,
+        phoneNumber: phoneTokens.phoneNumber,
+      });
 
       console.log("Creating user with input:", {
         name,
