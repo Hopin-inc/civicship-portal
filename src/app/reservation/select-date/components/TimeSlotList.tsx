@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 import { formatTimeRange } from "@/utils/date";
+import { addDays, isBefore } from "date-fns";
 
 interface TimeSlotListProps {
   dateSections: ActivitySlotGroup[];
@@ -39,6 +40,8 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
     [onSelectSlot],
   );
 
+  const registrationCutoff = addDays(new Date(), 7);
+
   return (
     <div className="space-y-8">
       {dateSections.map((section, sectionIndex) => (
@@ -51,29 +54,43 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
               const isAvailable = isSlotAvailable(slot);
               const isFeeSpecified = slot.feeRequired != null;
 
+              const startsAtDate = new Date(slot.startsAt);
+              const isRegistrationClosed = isBefore(startsAtDate, registrationCutoff);
+
               return (
                 <div
                   key={slotIndex}
-                  className={`rounded-xl border p-4 ${isFull ? "bg-muted" : "bg-background"}`}
+                  className={`rounded-xl border p-4 ${
+                    isFull || isRegistrationClosed ? "bg-muted" : "bg-background"
+                  }`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
                       <p
-                        className={`text-lg font-bold ${isFull ? "text-muted-foreground/50" : ""}`}
+                        className={`text-lg font-bold ${
+                          isFull || isRegistrationClosed ? "text-muted-foreground/50" : ""
+                        }`}
                       >
                         {formatTimeRange(slot.startsAt, slot.endsAt)}
                       </p>
                       <p
                         className={`text-md font-bold ${
-                          isFull || !isFeeSpecified ? "text-muted-foreground/50" : ""
+                          isFull || !isFeeSpecified || isRegistrationClosed
+                            ? "text-muted-foreground/50"
+                            : ""
                         }`}
                       >
                         {isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円/人` : "料金未定"}
                       </p>
                     </div>
+
                     {isFull ? (
                       <div className="text-muted-foreground/50 bg-muted px-8 py-3 rounded-full">
                         満員
+                      </div>
+                    ) : isRegistrationClosed ? (
+                      <div className="text-muted-foreground/50 bg-muted px-8 py-3 rounded-full">
+                        受付終了
                       </div>
                     ) : (
                       <div className="flex flex-col items-end gap-1">
@@ -85,7 +102,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                         <Button
                           variant="primary"
                           className="rounded-full px-8 py-3"
-                          onClick={handleSelectSlot(slot)} // ✅ 安定した関数
+                          onClick={handleSelectSlot(slot)}
                           disabled={!isAvailable}
                         >
                           選択

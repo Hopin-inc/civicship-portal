@@ -11,7 +11,7 @@ export function PhoneVerificationForm() {
   const { phoneAuth, isAuthenticated, isPhoneVerified, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next");
+  const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
 
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
@@ -24,7 +24,7 @@ export function PhoneVerificationForm() {
       if (!isAuthenticated) {
         let loginWithNext = "/login";
         if (nextParam) {
-          loginWithNext += `?next=${ encodeURIComponent(nextParam) }`;
+          loginWithNext += `?next=${encodeURIComponent(nextParam)}`;
         }
         router.replace(loginWithNext);
       }
