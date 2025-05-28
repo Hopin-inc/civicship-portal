@@ -57,16 +57,14 @@ interface RouteGuardProps {
  * 認証状態に基づいてページアクセスを制御する
  */
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
-  const { isAuthenticated, isPhoneVerified, loading } = useAuth();
+  const { isAuthenticated, isPhoneVerified, isUserRegistered, authenticationState, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [authorized, setAuthorized] = useState(false);
 
-  const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
+  const { loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
   });
-
-  const isUserRegistered = userData?.currentUser != null;
 
   useEffect(() => {
     if (loading || userLoading) {
@@ -75,24 +73,29 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     const authCheck = () => {
       const next = encodeURIComponent(window.location.pathname + window.location.search);
+      
       if (isProtectedPath(pathname)) {
-        if (!isAuthenticated) {
+        if (authenticationState === "unauthenticated" || authenticationState === "loading") {
           setAuthorized(false);
-          router.replace(`/login?next=${ next }`);
-        } else if (!isUserRegistered) {
+          router.replace(`/login?next=${next}`);
+        } else if (authenticationState === "line_authenticated" || authenticationState === "line_token_expired") {
           setAuthorized(false);
-          router.replace(`/sign-up/phone-verification?next=${ next }`);
-        } else {
+          router.replace(`/sign-up/phone-verification?next=${next}`);
+        } else if (authenticationState === "phone_authenticated" || authenticationState === "phone_token_expired") {
+          setAuthorized(false);
+          router.replace(`/sign-up?next=${next}`);
+        } else if (authenticationState === "user_registered") {
           setAuthorized(true);
         }
-      }
+      } 
       else if (isPhoneVerificationRequiredPath(pathname)) {
-        if (!isAuthenticated) {
+        if (authenticationState === "unauthenticated" || authenticationState === "loading") {
           setAuthorized(false);
-          router.replace(`/login?next=${ next }`);
-        } else if (!isPhoneVerified && pathname !== "/sign-up/phone-verification") {
+          router.replace(`/login?next=${next}`);
+        } else if ((authenticationState === "line_authenticated" || authenticationState === "line_token_expired") && 
+                   pathname !== "/sign-up/phone-verification") {
           setAuthorized(false);
-          router.replace(`/sign-up/phone-verification?next=${ next }`);
+          router.replace(`/sign-up/phone-verification?next=${next}`);
         } else {
           setAuthorized(true);
         }
@@ -109,7 +112,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     };
 
     return () => {};
-  }, [pathname, isAuthenticated, isPhoneVerified, isUserRegistered, loading, userLoading, router]);
+  }, [pathname, authenticationState, loading, userLoading, router]);
 
   if (loading || userLoading) {
     return <LoadingIndicator />;

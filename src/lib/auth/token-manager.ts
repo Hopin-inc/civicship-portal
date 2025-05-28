@@ -163,6 +163,52 @@ export class TokenManager {
   }
 
   /**
+   * LINE認証トークンを自動更新
+   * @returns 更新が成功したかどうか
+   */
+  static async renewLineToken(): Promise<boolean> {
+    try {
+      const { refreshToken } = this.getLineTokens();
+      if (!refreshToken) return false;
+
+      if (typeof window !== "undefined") {
+        const event = new CustomEvent("auth:renew-line-token", {
+          detail: { refreshToken },
+        });
+        window.dispatchEvent(event);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Failed to renew LINE token:", error);
+      return false;
+    }
+  }
+
+  /**
+   * 電話番号認証トークンを自動更新  
+   * @returns 更新が成功したかどうか
+   */
+  static async renewPhoneToken(): Promise<boolean> {
+    try {
+      const { refreshToken } = this.getPhoneTokens();
+      if (!refreshToken) return false;
+
+      if (typeof window !== "undefined") {
+        const event = new CustomEvent("auth:renew-phone-token", {
+          detail: { refreshToken },
+        });
+        window.dispatchEvent(event);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Failed to renew phone token:", error);
+      return false;
+    }
+  }
+
+  /**
    * Cookieを設定
    * @param name Cookieの名前
    * @param value Cookieの値

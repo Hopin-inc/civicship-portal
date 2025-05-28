@@ -12,7 +12,7 @@ import { extractSearchParamFromRelativePath } from "@/utils/path";
 
 export default function HomePage() {
   const router = useRouter();
-  const { isAuthenticated, isAuthenticating, loading: authLoading } = useAuth();
+  const { isAuthenticated, isAuthenticating, authenticationState, loading: authLoading } = useAuth();
   const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
   });
@@ -35,7 +35,19 @@ export default function HomePage() {
         console.log("🚀 Auth state loading, waiting before redirect");
         return; // Wait for auth state to stabilize
       } else if (isAuthenticated) {
-        if (!userData?.currentUser) {
+        if (authenticationState === "line_authenticated" || authenticationState === "line_token_expired") {
+          console.log("🚀 LINE authenticated, redirecting to phone verification");
+          let signUpWithNext = "/sign-up/phone-verification";
+          if (nextPath) {
+            signUpWithNext += `?next=${ encodeURIComponent(nextPath) }`;
+          }
+          router.replace(signUpWithNext);
+          return;
+        } else if (authenticationState === "phone_authenticated" || authenticationState === "phone_token_expired") {
+          console.log("🚀 Phone authenticated, redirecting to user registration");
+          router.replace("/sign-up");
+          return;
+        } else if (!userData?.currentUser) {
           console.log("🚀 No user data, redirecting to phone verification");
           let signUpWithNext = "/sign-up/phone-verification";
           if (nextPath) {
@@ -64,7 +76,7 @@ export default function HomePage() {
         !window.location.href.includes("login")) {
       router.replace("/activities");
     }
-  }, [router, isAuthenticated, userData, authLoading, userLoading, isAuthenticating]);
+  }, [router, isAuthenticated, authenticationState, userData, authLoading, userLoading, isAuthenticating]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });

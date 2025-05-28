@@ -21,8 +21,14 @@ import { COMMUNITY_ID } from "@/utils";
 export type AuthState = {
   firebaseUser: User | null;
   currentUser: GqlCurrentUserPayload["user"] | null;
-  lineAuthStatus: "authenticated" | "unauthenticated" | "loading";
-  phoneAuthStatus: "verified" | "unverified" | "loading";
+  authenticationState: 
+    | "unauthenticated"           // S0: 未認証
+    | "line_authenticated"        // S1: LINE認証済み  
+    | "line_token_expired"        // S1e: LINEトークン期限切れ
+    | "phone_authenticated"       // S2: 電話番号認証済み
+    | "phone_token_expired"       // S2e: 電話番号トークン期限切れ
+    | "user_registered"           // S3: ユーザ情報登録済み
+    | "loading";                  // L0: 状態チェック中
   environment: AuthEnvironment;
   isAuthenticating: boolean;
 };
@@ -36,6 +42,8 @@ interface AuthContextType {
   uid: string | null;
   isAuthenticated: boolean;
   isPhoneVerified: boolean;
+  isUserRegistered: boolean;
+  authenticationState: AuthState["authenticationState"];
   isAuthenticating: boolean;
   environment: AuthEnvironment;
 
@@ -77,8 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, setState] = useState<AuthState>({
     firebaseUser: null,
     currentUser: null,
-    lineAuthStatus: "loading",
-    phoneAuthStatus: "loading",
+    authenticationState: "loading",
     environment,
     isAuthenticating: false,
   });
@@ -97,7 +104,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setState((prev) => ({
         ...prev,
         firebaseUser: user,
-        lineAuthStatus: user ? "authenticated" : "unauthenticated",
+        authenticationState: user ? 
+          (prev.authenticationState === "loading" ? "line_authenticated" : prev.authenticationState) : 
+          "unauthenticated",
       }));
     });
 
@@ -108,7 +117,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const phoneState = phoneAuthService.getState();
     setState((prev) => ({
       ...prev,
-      phoneAuthStatus: phoneState.isVerified ? "verified" : "unverified",
+      authenticationState: phoneState.isVerified ? 
+        (prev.authenticationState === "line_authenticated" ? "phone_authenticated" : prev.authenticationState) : 
+        prev.authenticationState,
     }));
   }, []);
 
@@ -117,6 +128,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setState((prev) => ({
         ...prev,
         currentUser: userData.currentUser.user,
+        authenticationState: "user_registered",
       }));
     }
   }, [userData]);
@@ -261,19 +273,81 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [environment, state.isAuthenticating, state.lineAuthStatus]);
 
   useEffect(() => {
-    const handleTokenExpired = (event: CustomEvent) => {
-      toast.error("認証の有効期限が切れました", {
-        description: "再度ログインしてください",
-      });
-      logout();
+    const handleTokenExpired = async (event: CustomEvent) => {
+      const { source } = event.detail;
+      
+      if (source === "graphql" || source === "network") {
+        if (state.authenticationState === "line_authenticated" || state.authenticationState === "user_registered") {
+          setState(prev => ({ ...prev, authenticationState: "line_token_expired" }));
+          const renewed = await TokenManager.renewLineToken();
+          if (renewed) {
+            setState(prev => ({ ...prev, authenticationState: state.authenticationState }));
+            return;
+          }
+        }
+        
+        if (state.authenticationState === "phone_authenticated") {
+          setState(prev => ({ ...prev, authenticationState: "phone_token_expired" }));
+          const renewed = await TokenManager.renewPhoneToken();
+          if (renewed) {
+            setState(prev => ({ ...prev, authenticationState: "phone_authenticated" }));
+            return;
+          }
+        }
+
+        toast.error("認証の有効期限が切れました", {
+          description: "再度ログインしてください",
+        });
+        logout();
+      }
+    };
+
+    const handleRenewLineToken = async (event: CustomEvent) => {
+      try {
+        const { refreshToken } = event.detail;
+        if (refreshToken) {
+          const success = await liffService.refreshToken(refreshToken);
+          if (success) {
+            setState(prev => ({ 
+              ...prev, 
+              authenticationState: prev.authenticationState === "line_token_expired" ? 
+                "line_authenticated" : prev.authenticationState 
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("Failed to renew LINE token:", error);
+      }
+    };
+
+    const handleRenewPhoneToken = async (event: CustomEvent) => {
+      try {
+        const { refreshToken } = event.detail;
+        if (refreshToken) {
+          const success = await phoneAuthService.refreshToken(refreshToken);
+          if (success) {
+            setState(prev => ({ 
+              ...prev, 
+              authenticationState: prev.authenticationState === "phone_token_expired" ? 
+                "phone_authenticated" : prev.authenticationState 
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("Failed to renew phone token:", error);
+      }
     };
 
     window.addEventListener("auth:token-expired", handleTokenExpired as EventListener);
+    window.addEventListener("auth:renew-line-token", handleRenewLineToken as EventListener);
+    window.addEventListener("auth:renew-phone-token", handleRenewPhoneToken as EventListener);
 
     return () => {
       window.removeEventListener("auth:token-expired", handleTokenExpired as EventListener);
+      window.removeEventListener("auth:renew-line-token", handleRenewLineToken as EventListener);
+      window.removeEventListener("auth:renew-phone-token", handleRenewPhoneToken as EventListener);
     };
-  }, []);
+  }, [state.authenticationState]);
 
   /**
    * LIFFでログイン
@@ -326,8 +400,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         ...prev,
         firebaseUser: null,
         currentUser: null,
-        lineAuthStatus: "unauthenticated",
-        phoneAuthStatus: "unverified",
+        authenticationState: "unauthenticated",
       }));
 
       router.push("/login");
@@ -352,7 +425,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (success) {
       setState((prev) => ({
         ...prev,
-        phoneAuthStatus: "verified",
+        authenticationState: "phone_authenticated",
       }));
     }
 
@@ -431,8 +504,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user: state.currentUser,
     firebaseUser: state.firebaseUser,
     uid: state.firebaseUser?.uid || null,
-    isAuthenticated: state.lineAuthStatus === "authenticated",
-    isPhoneVerified: state.phoneAuthStatus === "verified",
+    isAuthenticated: ["line_authenticated", "phone_authenticated", "user_registered"].includes(state.authenticationState),
+    isPhoneVerified: ["phone_authenticated", "user_registered"].includes(state.authenticationState),
+    isUserRegistered: state.authenticationState === "user_registered",
+    authenticationState: state.authenticationState,
     isAuthenticating: state.isAuthenticating,
     environment: state.environment,
     loginWithLiff,
@@ -444,7 +519,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       phoneUid: phoneAuthService.getState().phoneUid,
     },
     createUser,
-    loading: state.lineAuthStatus === "loading" || state.phoneAuthStatus === "loading" || userLoading || state.isAuthenticating,
+    loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
