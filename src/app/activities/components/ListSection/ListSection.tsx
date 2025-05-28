@@ -24,14 +24,15 @@ const ActivitiesListSection: React.FC<ActivitiesAllSectionProps> = ({
   return (
     <section className="mt-6 px-6">
       <h2 className="text-display-md">すべての体験</h2>
-      <div className="mt-6 grid grid-cols-2 gap-4 pb-8">
+      <div className="mt-6 grid grid-cols-2 gap-4">
         {opportunities.map((opportunity) => (
           <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} />
         ))}
       </div>
-      <div ref={loadMoreRef} className="h-0" aria-hidden="true" />
+      <div className="h-20" aria-hidden="true"></div>
+      <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
       {isSectionLoading && (
-        <div className="h-10 flex items-center justify-center">
+        <div className="py-6 flex items-center justify-center">
           <div className="animate-spin h-6 w-6 border-b-2 border-foreground rounded-full"></div>
         </div>
       )}
