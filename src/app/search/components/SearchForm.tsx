@@ -25,7 +25,6 @@ const SearchForm: React.FC<SearchFormProps> = ({ name = "searchQuery" }) => {
                 {...field}
                 placeholder="検索ワードを入力"
                 className="pl-12 py-6 text-body-md rounded-xl text-base min-h-[48px]"
-                style={{ fontSize: "16px" }} // Prevents zoom on iOS devices
               />
             </FormControl>
             <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
