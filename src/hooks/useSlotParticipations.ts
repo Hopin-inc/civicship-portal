@@ -5,6 +5,7 @@ import {
   GqlReservation,
   useGetOpportunitySlotWithParticipationsQuery,
 } from "@/types/graphql";
+import logger from "@/lib/logging";
 
 export interface UseSlotParticipationsResult {
   slot: GqlOpportunitySlot | null | undefined;
@@ -23,7 +24,11 @@ export const useSlotParticipations = (slotId: string): UseSlotParticipationsResu
     },
   });
 
-  console.log(data);
+  logger.debug("Slot participations data received", {
+    hasData: !!data,
+    slotId,
+    hasOpportunitySlot: !!data?.opportunitySlot
+  });
 
   const slot: GqlOpportunitySlot | null | undefined = data?.opportunitySlot ?? null;
   const allParticipations: GqlParticipation[] =

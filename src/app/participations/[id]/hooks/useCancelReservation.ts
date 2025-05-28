@@ -60,7 +60,6 @@ const useCancelReservation = () => {
           isUserError,
           error: e instanceof Error ? e.message : String(e)
         });
-        console.error("Reservation cancellation mutation failed", e);
         return { success: false, code: GqlErrorCode.Unknown };
       } finally {
         setIsCancelling(false);
