@@ -1,5 +1,12 @@
 "use client";
 
+import logger from "../logging";
+import { 
+  createAuthLogContext, 
+  maskUserId, 
+  generateRequestId 
+} from "./logging-utils";
+
 /**
  * 認証トークン情報の型定義
  */
@@ -37,8 +44,26 @@ export class TokenManager {
   /**
    * LINE認証トークンをCookieに保存
    * @param tokens 保存するトークン情報
+   * @param sessionId セッションID（ログ追跡用）
    */
-  static saveLineTokens(tokens: AuthTokens): void {
+  static saveLineTokens(tokens: AuthTokens, sessionId?: string): void {
+    const requestId = generateRequestId();
+    const sid = sessionId || 'unknown_session';
+    
+    logger.info("SaveLineTokens", createAuthLogContext(
+      sid,
+      "general",
+      {
+        event: "SaveLineTokens",
+        component: "TokenManager",
+        requestId,
+        hasAccessToken: !!tokens.accessToken,
+        hasRefreshToken: !!tokens.refreshToken,
+        hasExpiresAt: !!tokens.expiresAt,
+        expiresIn: tokens.expiresAt ? Math.floor((tokens.expiresAt - Date.now()) / 1000) : null
+      }
+    ));
+    
     if (tokens.accessToken) {
       this.setCookie(this.LINE_ACCESS_TOKEN_KEY, tokens.accessToken);
     }
@@ -53,8 +78,29 @@ export class TokenManager {
   /**
    * 電話番号認証トークンをCookieに保存
    * @param tokens 保存するトークン情報
+   * @param sessionId セッションID（ログ追跡用）
    */
-  static savePhoneTokens(tokens: PhoneAuthTokens): void {
+  static savePhoneTokens(tokens: PhoneAuthTokens, sessionId?: string): void {
+    const requestId = generateRequestId();
+    const sid = sessionId || 'unknown_session';
+    
+    logger.info("SavePhoneTokens", createAuthLogContext(
+      sid,
+      "general",
+      {
+        event: "SavePhoneTokens",
+        component: "TokenManager",
+        requestId,
+        hasPhoneUid: !!tokens.phoneUid,
+        hasPhoneNumber: !!tokens.phoneNumber,
+        hasAccessToken: !!tokens.accessToken,
+        hasRefreshToken: !!tokens.refreshToken,
+        hasExpiresAt: !!tokens.expiresAt,
+        expiresIn: tokens.expiresAt ? Math.floor((tokens.expiresAt - Date.now()) / 1000) : null,
+        phoneUid: tokens.phoneUid ? maskUserId(tokens.phoneUid) : null
+      }
+    ));
+    
     if (tokens.phoneUid) {
       this.setCookie(this.PHONE_UID_KEY, tokens.phoneUid);
     }
@@ -74,44 +120,101 @@ export class TokenManager {
 
   /**
    * LINE認証トークンをCookieから取得
+   * @param sessionId セッションID（ログ追跡用）
    * @returns 取得したトークン情報
    */
-  static getLineTokens(): AuthTokens {
+  static getLineTokens(sessionId?: string): AuthTokens {
+    const requestId = generateRequestId();
+    const sid = sessionId || 'unknown_session';
+    
     const accessToken = this.getCookie(this.LINE_ACCESS_TOKEN_KEY);
     const refreshToken = this.getCookie(this.LINE_REFRESH_TOKEN_KEY);
     const expiresAtStr = this.getCookie(this.LINE_TOKEN_EXPIRES_AT_KEY);
     
-    return {
+    const tokens = {
       accessToken,
       refreshToken,
       expiresAt: expiresAtStr ? parseInt(expiresAtStr, 10) : null,
     };
+    
+    logger.debug("GetLineTokens", createAuthLogContext(
+      sid,
+      "general",
+      {
+        event: "GetLineTokens",
+        component: "TokenManager",
+        requestId,
+        hasAccessToken: !!tokens.accessToken,
+        hasRefreshToken: !!tokens.refreshToken,
+        hasExpiresAt: !!tokens.expiresAt,
+        expiresIn: tokens.expiresAt ? Math.floor((tokens.expiresAt - Date.now()) / 1000) : null
+      }
+    ));
+    
+    return tokens;
   }
 
   /**
    * 電話番号認証トークンをCookieから取得
+   * @param sessionId セッションID（ログ追跡用）
    * @returns 取得したトークン情報
    */
-  static getPhoneTokens(): PhoneAuthTokens {
+  static getPhoneTokens(sessionId?: string): PhoneAuthTokens {
+    const requestId = generateRequestId();
+    const sid = sessionId || 'unknown_session';
+    
     const phoneUid = this.getCookie(this.PHONE_UID_KEY);
     const phoneNumber = this.getCookie(this.PHONE_NUMBER_KEY);
     const accessToken = this.getCookie(this.PHONE_ACCESS_TOKEN_KEY);
     const refreshToken = this.getCookie(this.PHONE_REFRESH_TOKEN_KEY);
     const expiresAtStr = this.getCookie(this.PHONE_TOKEN_EXPIRES_AT_KEY);
     
-    return {
+    const tokens = {
       phoneUid,
       phoneNumber,
       accessToken,
       refreshToken,
       expiresAt: expiresAtStr ? parseInt(expiresAtStr, 10) : null,
     };
+    
+    logger.debug("GetPhoneTokens", createAuthLogContext(
+      sid,
+      "general",
+      {
+        event: "GetPhoneTokens",
+        component: "TokenManager",
+        requestId,
+        hasPhoneUid: !!tokens.phoneUid,
+        hasPhoneNumber: !!tokens.phoneNumber,
+        hasAccessToken: !!tokens.accessToken,
+        hasRefreshToken: !!tokens.refreshToken,
+        hasExpiresAt: !!tokens.expiresAt,
+        expiresIn: tokens.expiresAt ? Math.floor((tokens.expiresAt - Date.now()) / 1000) : null,
+        phoneUid: tokens.phoneUid ? maskUserId(tokens.phoneUid) : null
+      }
+    ));
+    
+    return tokens;
   }
 
   /**
    * LINE認証トークンをCookieから削除
+   * @param sessionId セッションID（ログ追跡用）
    */
-  static clearLineTokens(): void {
+  static clearLineTokens(sessionId?: string): void {
+    const requestId = generateRequestId();
+    const sid = sessionId || 'unknown_session';
+    
+    logger.info("ClearLineTokens", createAuthLogContext(
+      sid,
+      "general",
+      {
+        event: "ClearLineTokens",
+        component: "TokenManager",
+        requestId
+      }
+    ));
+    
     this.deleteCookie(this.LINE_ACCESS_TOKEN_KEY);
     this.deleteCookie(this.LINE_REFRESH_TOKEN_KEY);
     this.deleteCookie(this.LINE_TOKEN_EXPIRES_AT_KEY);
@@ -119,8 +222,22 @@ export class TokenManager {
 
   /**
    * 電話番号認証トークンをCookieから削除
+   * @param sessionId セッションID（ログ追跡用）
    */
-  static clearPhoneTokens(): void {
+  static clearPhoneTokens(sessionId?: string): void {
+    const requestId = generateRequestId();
+    const sid = sessionId || 'unknown_session';
+    
+    logger.info("ClearPhoneTokens", createAuthLogContext(
+      sid,
+      "general",
+      {
+        event: "ClearPhoneTokens",
+        component: "TokenManager",
+        requestId
+      }
+    ));
+    
     this.deleteCookie(this.PHONE_UID_KEY);
     this.deleteCookie(this.PHONE_NUMBER_KEY);
     this.deleteCookie(this.PHONE_ACCESS_TOKEN_KEY);
@@ -130,36 +247,120 @@ export class TokenManager {
 
   /**
    * すべての認証トークンをCookieから削除
+   * @param sessionId セッションID（ログ追跡用）
    */
-  static clearAllTokens(): void {
-    this.clearLineTokens();
-    this.clearPhoneTokens();
+  static clearAllTokens(sessionId?: string): void {
+    const requestId = generateRequestId();
+    const sid = sessionId || 'unknown_session';
+    
+    logger.info("ClearAllTokens", createAuthLogContext(
+      sid,
+      "general",
+      {
+        event: "ClearAllTokens",
+        component: "TokenManager",
+        requestId
+      }
+    ));
+    
+    this.clearLineTokens(sid);
+    this.clearPhoneTokens(sid);
   }
 
   /**
    * LINE認証トークンが有効期限切れかどうかを確認
+   * @param sessionId セッションID（ログ追跡用）
    * @returns 有効期限切れの場合はtrue
    */
-  static isLineTokenExpired(): boolean {
-    const { expiresAt } = this.getLineTokens();
-    if (!expiresAt) return true;
+  static isLineTokenExpired(sessionId?: string): boolean {
+    const requestId = generateRequestId();
+    const sid = sessionId || 'unknown_session';
+    
+    const { expiresAt } = this.getLineTokens(sid);
+    if (!expiresAt) {
+      logger.info("LineTokenExpired", createAuthLogContext(
+        sid,
+        "general",
+        {
+          event: "TokenExpired",
+          component: "TokenManager",
+          requestId,
+          tokenType: "line",
+          reason: "no_expiry_time"
+        }
+      ));
+      return true;
+    }
     
     const now = Date.now();
     const bufferTime = 5 * 60 * 1000; // 5分（ミリ秒）
-    return expiresAt - now < bufferTime;
+    const isExpired = expiresAt - now < bufferTime;
+    
+    if (isExpired) {
+      logger.info("LineTokenExpired", createAuthLogContext(
+        sid,
+        "general",
+        {
+          event: "TokenExpired",
+          component: "TokenManager",
+          requestId,
+          tokenType: "line",
+          reason: "time_expired",
+          expiresIn: Math.floor((expiresAt - now) / 1000)
+        }
+      ));
+    }
+    
+    return isExpired;
   }
 
   /**
    * 電話番号認証トークンが有効期限切れかどうかを確認
+   * @param sessionId セッションID（ログ追跡用）
    * @returns 有効期限切れの場合はtrue
    */
-  static isPhoneTokenExpired(): boolean {
-    const { expiresAt } = this.getPhoneTokens();
-    if (!expiresAt) return true;
+  static isPhoneTokenExpired(sessionId?: string): boolean {
+    const requestId = generateRequestId();
+    const sid = sessionId || 'unknown_session';
+    
+    const { expiresAt, phoneUid } = this.getPhoneTokens(sid);
+    if (!expiresAt) {
+      logger.info("PhoneTokenExpired", createAuthLogContext(
+        sid,
+        "general",
+        {
+          event: "TokenExpired",
+          component: "TokenManager",
+          requestId,
+          tokenType: "phone",
+          reason: "no_expiry_time",
+          phoneUid: phoneUid ? maskUserId(phoneUid) : null
+        }
+      ));
+      return true;
+    }
     
     const now = Date.now();
     const bufferTime = 5 * 60 * 1000; // 5分（ミリ秒）
-    return expiresAt - now < bufferTime;
+    const isExpired = expiresAt - now < bufferTime;
+    
+    if (isExpired) {
+      logger.info("PhoneTokenExpired", createAuthLogContext(
+        sid,
+        "general",
+        {
+          event: "TokenExpired",
+          component: "TokenManager",
+          requestId,
+          tokenType: "phone",
+          reason: "time_expired",
+          expiresIn: Math.floor((expiresAt - now) / 1000),
+          phoneUid: phoneUid ? maskUserId(phoneUid) : null
+        }
+      ));
+    }
+    
+    return isExpired;
   }
 
   /**
