@@ -15,8 +15,6 @@ interface PlaceMapViewProps {
   places: IPlaceCard[];
 }
 
-const CARD_BOTTOM_MARGIN = 32;
-
 const PlaceMapView: React.FC<PlaceMapViewProps> = ({
   selectedPlaceId,
   onPlaceSelect,
