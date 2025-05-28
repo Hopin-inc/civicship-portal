@@ -378,24 +378,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return null;
       }
 
-      const lineTokens = TokenManager.getLineTokens();
-
       const phoneTokens = TokenManager.getPhoneTokens();
+
+      console.log("Creating user with input:", {
+        name,
+        currentPrefecture: prefecture,
+        communityId: COMMUNITY_ID,
+        phoneUid,
+        phoneNumber: phoneTokens.phoneNumber,
+      });
 
       const { data } = await userSignUp({
         variables: {
           input: {
             name,
-            prefecture,
+            currentPrefecture: prefecture, // Changed from prefecture to currentPrefecture to match backend schema
             communityId: COMMUNITY_ID,
             phoneUid,
             phoneNumber: phoneTokens.phoneNumber,
-            lineAccessToken: lineTokens.accessToken,
-            lineRefreshToken: lineTokens.refreshToken,
-            lineTokenExpiresAt: lineTokens.expiresAt ? new Date(lineTokens.expiresAt).toISOString() : undefined,
-            phoneAccessToken: phoneTokens.accessToken,
-            phoneRefreshToken: phoneTokens.refreshToken,
-            phoneTokenExpiresAt: phoneTokens.expiresAt ? new Date(phoneTokens.expiresAt).toISOString() : undefined,
           },
         },
       });
