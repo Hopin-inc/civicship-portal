@@ -36,11 +36,10 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, buttonVariant = 
         />
       </div>
       <CardContent className="flex flex-col px-4 py-3 w-full">
-        {/*//TODO 適切に1行に収めるか、name, addressで2行にした方が良い？ユーザーがどの地域なのか分からない問題を解消したい*/}
         <div className="flex items-center justify-between mb-2 w-full">
-          <div className="mt-1 flex items-start text-foreground text-body-xs max-w-[75%] overflow-hidden">
+          <div className="mt-1 flex items-start text-foreground text-body-xs overflow-hidden">
             <MapPin className="mr-1 h-4 w-4 flex-shrink-0 mt-0.5" />
-            <div className="flex-1 flex flex-wrap overflow-hidden min-w-0">
+            <div className="flex-1 flex flex-wrap overflow-hidden min-w-0 max-w-[248px]">
               <span className="font-bold text-body-xs truncate min-w-0 max-w-full mr-2">
                 {place.name}
               </span>
