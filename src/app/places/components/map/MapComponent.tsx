@@ -11,18 +11,18 @@ const containerStyle = {
   height: "100%",
 };
 
-const INITIAL_ZOOM_LEVEL = 8.0;
-
 interface MapComponentProps {
   placePins: IPlacePin[];
   selectedPlaceId: string | null;
   onPlaceSelect: (placeId: string) => void;
+  onRecenterReady?: (fn: () => void) => void;
 }
 
 export default function MapComponent({
   placePins,
   selectedPlaceId,
   onPlaceSelect,
+  onRecenterReady,
 }: MapComponentProps) {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -40,10 +40,17 @@ export default function MapComponent({
   );
   const imagesReady = usePreloadImages(allImageUrls);
 
-  const { markers, center, onLoad, onUnmount } = useMapState({
+  const { markers, center, zoom, onLoad, onUnmount, recenterToSelectedMarker } = useMapState({
     placePins,
     selectedPlaceId,
   });
+
+  React.useEffect(() => {
+    if (onRecenterReady) {
+      onRecenterReady(recenterToSelectedMarker);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recenterToSelectedMarker]);
 
   if (!isLoaded || !imagesReady) {
     return <LoadingIndicator fullScreen />;
@@ -53,7 +60,7 @@ export default function MapComponent({
     <GoogleMap
       mapContainerStyle={containerStyle}
       center={center}
-      zoom={INITIAL_ZOOM_LEVEL}
+      zoom={zoom}
       onLoad={onLoad}
       onUnmount={onUnmount}
       options={{

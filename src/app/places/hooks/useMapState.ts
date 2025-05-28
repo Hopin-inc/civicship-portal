@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useReducer } from "react";
-import { BasePin } from "@/app/places/data/type";
+import { IPlacePin } from "@/app/places/data/type";
 
 const INITIAL_CENTER_COORDINATE = { lat: 33.0, lng: 133.5 };
 
@@ -10,20 +10,22 @@ const INITIAL_CENTER_COORDINATE = { lat: 33.0, lng: 133.5 };
  * ------------------------------------------ */
 
 interface MapState {
-  markers: BasePin[];
-  places: BasePin[];
+  markers: IPlacePin[];
+  places: IPlacePin[];
   center: google.maps.LatLngLiteral;
   map: google.maps.Map | null;
   isLoaded: boolean;
   error: string | null;
+  zoom: number;
 }
 
 type MapAction =
-  | { type: "SET_MARKERS"; payload: { markers: BasePin[]; places: BasePin[] } }
+  | { type: "SET_MARKERS"; payload: { markers: IPlacePin[]; places: IPlacePin[] } }
   | { type: "SET_CENTER"; payload: google.maps.LatLngLiteral }
   | { type: "SET_MAP"; payload: google.maps.Map | null }
   | { type: "SET_LOADED"; payload: boolean }
-  | { type: "SET_ERROR"; payload: string | null };
+  | { type: "SET_ERROR"; payload: string | null }
+  | { type: "SET_ZOOM"; payload: number };
 
 const initialState: MapState = {
   markers: [],
@@ -32,6 +34,7 @@ const initialState: MapState = {
   map: null,
   isLoaded: false,
   error: null,
+  zoom: 8,
 };
 
 const mapReducer = (state: MapState, action: MapAction): MapState => {
@@ -46,6 +49,8 @@ const mapReducer = (state: MapState, action: MapAction): MapState => {
       return { ...state, isLoaded: action.payload };
     case "SET_ERROR":
       return { ...state, error: action.payload };
+    case "SET_ZOOM":
+      return { ...state, zoom: action.payload };
     default:
       return state;
   }
@@ -56,7 +61,7 @@ const mapReducer = (state: MapState, action: MapAction): MapState => {
  * ------------------------------------------ */
 
 interface MapComponentProps {
-  placePins: BasePin[];
+  placePins: IPlacePin[];
   selectedPlaceId: string | null;
 }
 
@@ -64,7 +69,7 @@ interface MapComponentProps {
  * 分離された副作用関数
  * ------------------------------------------ */
 
-const initializeMarkers = (places: BasePin[], dispatch: React.Dispatch<MapAction>) => {
+const initializeMarkers = (places: IPlacePin[], dispatch: React.Dispatch<MapAction>) => {
   try {
     dispatch({ type: "SET_MARKERS", payload: { markers: places, places } });
   } catch (error) {
@@ -76,33 +81,38 @@ const initializeMarkers = (places: BasePin[], dispatch: React.Dispatch<MapAction
 const panToSelectedMarker = (
   selectedPlaceId: string | null,
   map: google.maps.Map | null,
-  markers: BasePin[],
+  markers: IPlacePin[],
+  dispatch?: React.Dispatch<MapAction>,
 ) => {
   if (!map || !selectedPlaceId) return;
 
   const marker = markers.find((m) => m.id === selectedPlaceId);
   if (!marker) return;
 
-  // カードシートの高さを考慮して、マーカーが画面の上半分に表示されるように調整
-  // これにより、マーカーとカードの両方が同時に見えるようになる
-  const sheetHeight = window.innerHeight * 0.45;
+  // ヘッダー・カード・下部余白を合計した分だけ地図中心を上にずらす（カード高さは固定値）
+  const HEADER_HEIGHT = 64; // px
+  const CARD_HEIGHT = 324; // px
+  const CARD_BOTTOM_MARGIN = 32; // px
+  const cardAndMarginHeight = CARD_HEIGHT + CARD_BOTTOM_MARGIN;
   const mapDiv = map.getDiv();
   const mapHeight = mapDiv.clientHeight;
-
-  // マップの高さに対するオフセット比率を計算
-  const offsetRatio = (sheetHeight * 0.25) / mapHeight;
   const bounds = map.getBounds();
-  const markerLatLng = new google.maps.LatLng(marker.latitude, marker.longitude);
+  if (!bounds) return;
+  const latSpan = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
+  // 画面全体の高さに対するオフセット比率
+  const offsetPx = HEADER_HEIGHT + cardAndMarginHeight / 2;
+  const offsetRatio = offsetPx / mapHeight;
+  const latOffset = latSpan * offsetRatio;
 
-  map.setZoom(17);
+  if (dispatch) {
+    dispatch({ type: "SET_ZOOM", payload: 10 });
+  }
 
-  if (bounds) {
-    const latSpan = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
-    const latOffset = latSpan * offsetRatio;
-
-    // マーカーの位置から少し上にずらした新しい中心位置を設定
-    const newCenter = new google.maps.LatLng(marker.latitude - latOffset, marker.longitude);
-    map.panTo(newCenter);
+  // マーカーの位置からオフセット分だけ上にずらした新しい中心位置を設定
+  const newCenter = new google.maps.LatLng(marker.latitude - latOffset, marker.longitude);
+  map.panTo(newCenter);
+  if (dispatch) {
+    dispatch({ type: "SET_CENTER", payload: { lat: newCenter.lat(), lng: newCenter.lng() } });
   }
 };
 
@@ -118,7 +128,7 @@ export const useMapState = ({ placePins, selectedPlaceId }: MapComponentProps) =
   }, [placePins]);
 
   useEffect(() => {
-    panToSelectedMarker(selectedPlaceId, state.map, state.markers);
+    panToSelectedMarker(selectedPlaceId, state.map, state.markers, dispatch);
   }, [selectedPlaceId, state.map, state.markers]);
 
   const onLoad = useCallback((map: google.maps.Map) => {
@@ -133,10 +143,16 @@ export const useMapState = ({ placePins, selectedPlaceId }: MapComponentProps) =
     dispatch({ type: "SET_LOADED", payload: isLoaded });
   }, []);
 
+  // imperativeに中心を再調整する関数
+  const recenterToSelectedMarker = () => {
+    panToSelectedMarker(selectedPlaceId, state.map, state.markers, dispatch);
+  };
+
   return {
     ...state,
     onLoad,
     onUnmount,
     setLoaded,
+    recenterToSelectedMarker,
   };
 };
