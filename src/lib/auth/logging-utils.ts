@@ -48,6 +48,149 @@ export const maskUserId = (userId: string | null | undefined): string => {
 };
 
 /**
+ * デバイスとブラウザ情報を取得する
+ * @returns デバイスとブラウザ情報
+ */
+export const getDeviceInfo = (): Record<string, any> => {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    return { platform: 'server' };
+  }
+
+  const userAgent = navigator.userAgent || '';
+  const isLINE = /Line/i.test(userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
+  const isAndroid = /Android/i.test(userAgent);
+  const isMobile = isIOS || isAndroid;
+  
+  const isChrome = /Chrome/i.test(userAgent) && !/Edg|Edge/i.test(userAgent);
+  const isFirefox = /Firefox/i.test(userAgent);
+  const isSafari = /Safari/i.test(userAgent) && !/Chrome/i.test(userAgent);
+  const isEdge = /Edg|Edge/i.test(userAgent);
+  
+  return {
+    platform: isLINE ? 'LINE' : 'Web',
+    device: {
+      type: isMobile ? (isIOS ? 'iOS' : 'Android') : 'Desktop',
+      isMobile,
+      isIOS,
+      isAndroid,
+      isLINE
+    },
+    browser: {
+      userAgent: userAgent.substring(0, 100), // 長すぎる場合は切り詰める
+      isChrome,
+      isFirefox,
+      isSafari,
+      isEdge,
+      name: isChrome ? 'Chrome' : isFirefox ? 'Firefox' : isSafari ? 'Safari' : isEdge ? 'Edge' : 'Other'
+    },
+    screen: typeof window !== 'undefined' ? {
+      width: window.innerWidth,
+      height: window.innerHeight
+    } : undefined
+  };
+};
+
+/**
+ * ネットワーク状態を取得する
+ * @returns ネットワーク状態情報
+ */
+export const getNetworkInfo = (): Record<string, any> => {
+  if (typeof navigator === 'undefined') {
+    return { online: true };
+  }
+  
+  interface NetworkInformation {
+    effectiveType?: string;
+    downlink?: number;
+    rtt?: number;
+    saveData?: boolean;
+  }
+  
+  const connection = 'connection' in navigator ? 
+    (navigator as any).connection as NetworkInformation : null;
+  
+  return {
+    online: navigator.onLine,
+    connection: connection ? {
+      effectiveType: connection.effectiveType,
+      downlink: connection.downlink,
+      rtt: connection.rtt,
+      saveData: connection.saveData
+    } : undefined
+  };
+};
+
+/**
+ * リクエストIDを生成する
+ * @returns 一意のリクエストID
+ */
+export const generateRequestId = (): string => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return `req_${crypto.randomUUID().replace(/-/g, '').substring(0, 12)}`;
+  } else if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    const array = new Uint32Array(2);
+    crypto.getRandomValues(array);
+    return `req_${array[0].toString(36)}${array[1].toString(36)}`;
+  } else {
+    return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+};
+
+/**
+ * 操作の開始時間を記録する
+ * @param operationName 操作名
+ * @returns 開始時間とoperationIdを含むオブジェクト
+ */
+export const startOperation = (operationName: string): { 
+  startTime: number; 
+  operationId: string;
+  getContext: (additionalContext?: Record<string, any>) => Record<string, any>;
+} => {
+  const startTime = Date.now();
+  const operationId = generateRequestId();
+  
+  return {
+    startTime,
+    operationId,
+    getContext: (additionalContext?: Record<string, any>) => ({
+      operation: {
+        name: operationName,
+        id: operationId,
+        startTime: new Date(startTime).toISOString(),
+      },
+      ...additionalContext
+    })
+  };
+};
+
+/**
+ * 操作の所要時間を計算する
+ * @param startTime 開始時間
+ * @param operationId 操作ID
+ * @param additionalContext 追加のコンテキスト情報
+ * @returns 所要時間を含むコンテキスト
+ */
+export const endOperation = (
+  startTime: number,
+  operationId: string,
+  additionalContext?: Record<string, any>
+): Record<string, any> => {
+  const endTime = Date.now();
+  const duration = endTime - startTime;
+  
+  return {
+    operation: {
+      id: operationId,
+      endTime: new Date(endTime).toISOString(),
+      duration,
+      status: additionalContext?.error ? 'failed' : 'success'
+    },
+    ...additionalContext
+  };
+};
+
+/**
  * 認証ログのコンテキストを作成する
  * @param sessionId セッションID
  * @param authType 認証タイプ（"liff" または "phone"）
@@ -59,11 +202,35 @@ export const createAuthLogContext = (
   authType: "liff" | "phone" | "general", 
   additionalContext?: Record<string, any>
 ): Record<string, any> => {
+  const userId = additionalContext?.userId || 
+                (additionalContext?.user?.uid ? maskUserId(additionalContext.user.uid) : undefined);
+  
+  const errorInfo = additionalContext?.error ? {
+    error: {
+      message: additionalContext.error instanceof Error 
+        ? additionalContext.error.message 
+        : String(additionalContext.error),
+      code: additionalContext.errorCode || 'unknown',
+      stack: additionalContext.error instanceof Error 
+        ? additionalContext.error.stack 
+        : undefined
+    }
+  } : {};
+  
+  const levelInfo = additionalContext?.level ? { level: additionalContext.level } : {};
+  
   return {
     sessionId,
     timestamp: new Date().toISOString(),
     component: "AuthProvider",
     authType,
+    ...(userId ? { userId } : {}),
+    env: {
+      ...getDeviceInfo(),
+      network: getNetworkInfo()
+    },
+    ...levelInfo,
+    ...errorInfo,
     ...additionalContext
   };
 };
