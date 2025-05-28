@@ -10,7 +10,8 @@ import { phoneAuth, categorizeFirebaseError } from "./firebase-config";
 import { TokenManager, PhoneAuthTokens } from "./token-manager";
 import { isRunningInLiff } from "./environment-detector";
 import logger from "../logging";
-import { createAuthLogContext, maskPhoneNumber, maskUserId } from "./logging-utils";
+import { createAuthLogContext, maskPhoneNumber, maskUserId, createRetryLogContext } from "./logging-utils";
+import { categorizeRecaptchaError } from "./recaptcha-utils";
 
 /**
  * 電話番号認証の状態
@@ -99,9 +100,15 @@ export class PhoneAuthService {
         this.recaptchaContainerElement = null;
       }
     } catch (e) {
-      logger.warn("Error clearing reCAPTCHA", {
-        error: e instanceof Error ? e.message : String(e)
-      });
+      logger.warn("Error clearing reCAPTCHA", createAuthLogContext(
+        'unknown_session',
+        "phone",
+        {
+          operation: "clearRecaptcha",
+          error: e instanceof Error ? e.message : String(e),
+          errorDetails: categorizeRecaptchaError(e)
+        }
+      ));
     }
   }
 
@@ -119,13 +126,50 @@ export class PhoneAuthService {
 
       this.recaptchaContainerElement = document.getElementById("recaptcha-container");
       if (!this.recaptchaContainerElement) {
+        logger.error("reCAPTCHA container element not found", createAuthLogContext(
+          sessionId || 'unknown_session',
+          "phone",
+          {
+            operation: "startPhoneVerification",
+            component: "recaptcha"
+          }
+        ));
         throw new Error("reCAPTCHA container element not found");
       }
 
+      logger.debug("Initializing reCAPTCHA verifier", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "phone",
+        {
+          operation: "startPhoneVerification",
+          component: "recaptcha",
+          size: isRunningInLiff() ? "normal" : "invisible",
+          inLiff: isRunningInLiff()
+        }
+      ));
+      
       this.recaptchaVerifier = new RecaptchaVerifier(phoneAuth, "recaptcha-container", {
         size: isRunningInLiff() ? "normal" : "invisible",
-        callback: () => {},
+        callback: () => {
+          logger.debug("reCAPTCHA verification completed", createAuthLogContext(
+            sessionId || 'unknown_session',
+            "phone",
+            {
+              operation: "recaptchaCallback",
+              component: "recaptcha",
+              status: "success"
+            }
+          ));
+        },
         "expired-callback": () => {
+          logger.info("reCAPTCHA expired", createAuthLogContext(
+            sessionId || 'unknown_session',
+            "phone",
+            {
+              operation: "recaptchaExpired",
+              component: "recaptcha"
+            }
+          ));
           this.clearRecaptcha();
         },
       });
@@ -143,6 +187,13 @@ export class PhoneAuthService {
 
       return confirmationResult.verificationId;
     } catch (error) {
+      const isRecaptchaError = error instanceof Error && 
+        (error.message.includes("recaptcha") || error.message.includes("reCAPTCHA"));
+      
+      const errorDetails = isRecaptchaError 
+        ? categorizeRecaptchaError(error)
+        : categorizeFirebaseError(error);
+      
       logger.info("Phone verification failed", createAuthLogContext(
         sessionId || 'unknown_session',
         "phone",
@@ -150,7 +201,9 @@ export class PhoneAuthService {
           operation: "startPhoneVerification",
           error: error instanceof Error ? error.message : String(error),
           phoneNumber: this.state.phoneNumber ? maskPhoneNumber(this.state.phoneNumber) : "missing",
-          errorDetails: categorizeFirebaseError(error)
+          errorDetails,
+          errorType: isRecaptchaError ? "recaptcha" : "firebase",
+          component: isRecaptchaError ? "recaptcha" : "phone_auth"
         }
       ));
       this.state.error = error as Error;

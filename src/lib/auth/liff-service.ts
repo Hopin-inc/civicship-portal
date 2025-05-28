@@ -149,9 +149,19 @@ export class LiffService {
 
   /**
    * LIFFからログアウト
+   * @param sessionId 認証セッションID（ログ追跡用）
    */
-  public logout(): void {
+  public logout(sessionId?: string): void {
     if (this.state.isInitialized && this.state.isLoggedIn) {
+      logger.info("LIFF logout initiated", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "liff",
+        {
+          operation: "logout",
+          userId: this.state.profile?.userId ? maskUserId(this.state.profile.userId) : "none"
+        }
+      ));
+      
       liff.logout();
       this.state.isLoggedIn = false;
       this.state.profile = {
@@ -159,6 +169,14 @@ export class LiffService {
         displayName: null,
         pictureUrl: null,
       };
+      
+      logger.info("LIFF logout completed", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "liff",
+        {
+          operation: "logout"
+        }
+      ));
     }
   }
 

@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export function PhoneVerificationForm() {
-  const { phoneAuth, isAuthenticated, isPhoneVerified, loading } = useAuth();
+  const { phoneAuth, isAuthenticated, isPhoneVerified, loading, sessionId } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next");
@@ -45,7 +45,7 @@ export function PhoneVerificationForm() {
     }
 
     const formattedPhone = formatPhoneNumber(phoneNumber);
-    const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
+    const verificationId = await phoneAuth.startPhoneVerification(formattedPhone, sessionId);
     if (verificationId) {
       setStep("code");
     }
@@ -53,7 +53,7 @@ export function PhoneVerificationForm() {
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await phoneAuth.verifyPhoneCode(verificationCode);
+    const success = await phoneAuth.verifyPhoneCode(verificationCode, sessionId);
     if (success) {
       toast.success("電話番号認証が完了しました");
       const nextUrl = nextParam ? `/sign-up?next=${encodeURIComponent(nextParam)}` : "/sign-up";

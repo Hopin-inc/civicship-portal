@@ -41,13 +41,14 @@ interface AuthContextType {
   isPhoneVerified: boolean;
   isAuthenticating: boolean;
   environment: AuthEnvironment;
+  sessionId: string;
 
-  loginWithLiff: (redirectPath?: string) => Promise<boolean>;
-  logout: () => Promise<void>;
+  loginWithLiff: (redirectPath?: string, sessionId?: string) => Promise<boolean>;
+  logout: (sessionId?: string) => Promise<void>;
 
   phoneAuth: {
-    startPhoneVerification: (phoneNumber: string) => Promise<string | null>;
-    verifyPhoneCode: (verificationCode: string) => Promise<boolean>;
+    startPhoneVerification: (phoneNumber: string, sessionId?: string) => Promise<string | null>;
+    verifyPhoneCode: (verificationCode: string, sessionId?: string) => Promise<boolean>;
     isVerifying: boolean;
     phoneUid: string | null;
   };
@@ -209,7 +210,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 });
               }
             } catch (error) {
-              console.error(`🔍 [${timestamp}] Failed to complete LIFF authentication:`, error);
+              logger.error("Failed to complete LIFF authentication", createAuthLogContext(
+                state.sessionId,
+                "liff",
+                {
+                  operation: "initializeAuth",
+                  error: error instanceof Error ? error.message : String(error),
+                  stack: error instanceof Error ? error.stack : undefined,
+                  timestamp
+                }
+              ));
             }
           }
           else if ((environment === AuthEnvironment.LIFF || liffState.isLoggedIn) &&
@@ -232,7 +242,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             });
           }
         } else {
-          console.error(`🔍 [${timestamp}] LIFF initialization failed`);
+          logger.error("LIFF initialization failed", createAuthLogContext(
+            state.sessionId,
+            "liff",
+            {
+              operation: "initializeAuth",
+              timestamp
+            }
+          ));
         }
       }
 
@@ -241,75 +258,161 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const searchParams = new URLSearchParams(window.location.search);
         isRedirectFromLineAuth = searchParams.has("liff.state") || searchParams.has("code");
         const redirectTimestamp = new Date().toISOString();
-        console.log(`🔍 [${redirectTimestamp}] LINE redirect detection:`, {
-          hasLiffState: searchParams.has("liff.state"),
-          hasCode: searchParams.has("code"),
-          isRedirect: isRedirectFromLineAuth,
-          currentUrl: window.location.href
-        });
+        logger.debug("LINE redirect detection", createAuthLogContext(
+          state.sessionId,
+          "liff",
+          {
+            operation: "initializeAuth",
+            timestamp: redirectTimestamp,
+            hasLiffState: searchParams.has("liff.state"),
+            hasCode: searchParams.has("code"),
+            isRedirect: isRedirectFromLineAuth,
+            currentUrl: typeof window !== "undefined" ? window.location.href : "SSR"
+          }
+        ));
       }
 
       if (isRedirectFromLineAuth && state.lineAuthStatus === "unauthenticated" && !state.isAuthenticating) {
         const redirectTimestamp = new Date().toISOString();
-        console.log(`🔍 [${redirectTimestamp}] Detected LINE authentication redirect - starting completion process`);
-        console.log(`🔍 [${redirectTimestamp}] Current state:`, {
-          lineAuthStatus: state.lineAuthStatus,
-          isAuthenticating: state.isAuthenticating,
-          environment,
-          windowHref: typeof window !== "undefined" ? window.location.href : "SSR"
-        });
+        logger.info("Detected LINE authentication redirect - starting completion process", createAuthLogContext(
+          state.sessionId,
+          "liff",
+          {
+            operation: "initializeAuth",
+            timestamp: redirectTimestamp,
+            lineAuthStatus: state.lineAuthStatus,
+            isAuthenticating: state.isAuthenticating,
+            environment,
+            windowHref: typeof window !== "undefined" ? window.location.href : "SSR"
+          }
+        ));
 
         setState(prev => ({ ...prev, isAuthenticating: true }));
 
         try {
-          console.log(`🔍 [${redirectTimestamp}] Initializing LIFF for authentication completion...`);
-          const liffSuccess = await liffService.initialize();
+          logger.debug("Initializing LIFF for authentication completion", createAuthLogContext(
+            state.sessionId,
+            "liff",
+            {
+              operation: "initializeAuth",
+              timestamp: redirectTimestamp
+            }
+          ));
+          const liffSuccess = await liffService.initialize(state.sessionId);
           const initTimestamp = new Date().toISOString();
-          console.log(`🔍 [${initTimestamp}] LIFF initialization result:`, liffSuccess);
+          logger.debug("LIFF initialization result", createAuthLogContext(
+            state.sessionId,
+            "liff",
+            {
+              operation: "initializeAuth",
+              timestamp: initTimestamp,
+              success: liffSuccess
+            }
+          ));
 
           if (liffSuccess) {
             const liffState = liffService.getState();
-            console.log(`🔍 [${initTimestamp}] LIFF state after initialization:`, {
-              isInitialized: liffState.isInitialized,
-              isLoggedIn: liffState.isLoggedIn,
-              userId: liffState.profile?.userId || "none",
-              accessToken: liffService.getAccessToken() ? "present" : "missing"
-            });
+            logger.debug("LIFF state after initialization", createAuthLogContext(
+              state.sessionId,
+              "liff",
+              {
+                operation: "initializeAuth",
+                timestamp: initTimestamp,
+                isInitialized: liffState.isInitialized,
+                isLoggedIn: liffState.isLoggedIn,
+                userId: liffState.profile?.userId ? maskUserId(liffState.profile.userId) : "none",
+                hasAccessToken: !!liffService.getAccessToken()
+              }
+            ));
 
             if (liffState.isLoggedIn) {
-              console.log(`🔍 [${initTimestamp}] LIFF is logged in - calling signInWithLiffToken`);
+              logger.debug("LIFF is logged in - calling signInWithLiffToken", createAuthLogContext(
+                state.sessionId,
+                "liff",
+                {
+                  operation: "initializeAuth",
+                  timestamp: initTimestamp
+                }
+              ));
               const authTimestamp = new Date().toISOString();
-              const success = await liffService.signInWithLiffToken();
+              const success = await liffService.signInWithLiffToken(state.sessionId);
               const completeTimestamp = new Date().toISOString();
-              console.log(`🔍 [${completeTimestamp}] signInWithLiffToken result:`, success);
+              logger.debug("signInWithLiffToken result", createAuthLogContext(
+                state.sessionId,
+                "liff",
+                {
+                  operation: "initializeAuth",
+                  timestamp: completeTimestamp,
+                  success
+                }
+              ));
 
               if (success) {
-                console.log(`🔍 [${completeTimestamp}] LINE authentication successful - refreshing user data`);
+                logger.info("LINE authentication successful - refreshing user data", createAuthLogContext(
+                  state.sessionId,
+                  "liff",
+                  {
+                    operation: "initializeAuth",
+                    timestamp: completeTimestamp
+                  }
+                ));
                 await refetchUser();
               } else {
-                console.error(`🔍 [${completeTimestamp}] Failed to complete LINE authentication with LIFF token`);
+                logger.error("Failed to complete LINE authentication with LIFF token", createAuthLogContext(
+                  state.sessionId,
+                  "liff",
+                  {
+                    operation: "initializeAuth",
+                    timestamp: completeTimestamp
+                  }
+                ));
               }
             } else {
-              console.log(`🔍 [${initTimestamp}] LIFF not logged in after initialization`);
+              logger.debug("LIFF not logged in after initialization", createAuthLogContext(
+                state.sessionId,
+                "liff",
+                {
+                  operation: "initializeAuth",
+                  timestamp: initTimestamp
+                }
+              ));
             }
           } else {
-            console.error(`🔍 [${initTimestamp}] LIFF initialization failed during redirect completion`);
+            logger.error("LIFF initialization failed during redirect completion", createAuthLogContext(
+              state.sessionId,
+              "liff",
+              {
+                operation: "initializeAuth",
+                timestamp: initTimestamp
+              }
+            ));
           }
         } catch (error) {
           const errorTimestamp = new Date().toISOString();
-          logger.info("LINE authentication completion failed", {
-            source: "AuthProvider",
-            operation: "initializeAuth", 
-            error: error instanceof Error ? error.message : String(error),
-            environment
-          });
-          console.error(`🔍 [${errorTimestamp}] Error during LINE authentication completion:`, error);
+          logger.error("LINE authentication completion failed", createAuthLogContext(
+            state.sessionId,
+            "liff",
+            {
+              operation: "initializeAuth", 
+              timestamp: errorTimestamp,
+              error: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+              environment
+            }
+          ));
         }
       }
 
       setState(prev => ({ ...prev, isAuthenticating: false }));
       const endTimestamp = new Date().toISOString();
-      console.log(`🔍 [${endTimestamp}] AuthProvider initializeAuth - Completed`);
+      logger.debug("AuthProvider initializeAuth - Completed", createAuthLogContext(
+        state.sessionId,
+        "general",
+        {
+          operation: "initializeAuth",
+          timestamp: endTimestamp
+        }
+      ));
     };
 
     initializeAuth();
@@ -333,23 +436,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   /**
    * LIFFでログイン
    * @param redirectPath リダイレクト先のパス（オプション）
+   * @param sessionId セッションID（オプション）
    * @returns ログインが成功したかどうか
    */
-  const loginWithLiff = async (redirectPath?: string): Promise<boolean> => {
+  const loginWithLiff = async (redirectPath?: string, sessionId?: string): Promise<boolean> => {
+    const authSessionId = sessionId || state.sessionId;
     setState((prev) => ({ ...prev, isAuthenticating: true }));
 
     try {
-      const initialized = await liffService.initialize();
+      const initialized = await liffService.initialize(authSessionId);
       if (!initialized) {
         throw new Error("Failed to initialize LIFF");
       }
 
-      const loggedIn = await liffService.login(redirectPath);
+      const loggedIn = await liffService.login(redirectPath, authSessionId);
       if (!loggedIn) {
         return false; // リダイレクトするのでここには到達しない
       }
 
-      const success = await liffService.signInWithLiffToken();
+      const success = await liffService.signInWithLiffToken(authSessionId);
 
       if (success) {
         await refetchUser();
@@ -357,11 +462,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return success;
     } catch (error) {
-      logger.info("Login with LIFF failed", {
-        operation: "loginWithLiff",
-        error: error instanceof Error ? error.message : String(error)
-      });
-      console.error("Login with LIFF failed:", error);
+      logger.info("Login with LIFF failed", createAuthLogContext(
+        authSessionId,
+        "liff",
+        {
+          operation: "loginWithLiff",
+          error: error instanceof Error ? error.message : String(error)
+        }
+      ));
       return false;
     } finally {
       setState((prev) => ({ ...prev, isAuthenticating: false }));
@@ -370,10 +478,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   /**
    * ログアウト
+   * @param sessionId セッションID（オプション）
    */
-  const logout = useCallback(async (): Promise<void> => {
+  const logout = useCallback(async (sessionId?: string): Promise<void> => {
+    const authSessionId = sessionId || state.sessionId;
     try {
-      liffService.logout();
+      logger.info("User logout initiated", createAuthLogContext(
+        authSessionId,
+        "general",
+        {
+          operation: "logout"
+        }
+      ));
+      
+      liffService.logout(authSessionId);
 
       await lineAuth.signOut();
 
@@ -389,24 +507,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         phoneAuthStatus: "unverified",
       }));
 
+      logger.info("User logout completed", createAuthLogContext(
+        authSessionId,
+        "general",
+        {
+          operation: "logout",
+          status: "success"
+        }
+      ));
+
       router.push("/login");
     } catch (error) {
+      logger.error("Logout failed", createAuthLogContext(
+        authSessionId,
+        "general",
+        {
+          operation: "logout",
+          error: error instanceof Error ? error.message : String(error)
+        }
+      ));
       console.error("Logout failed:", error);
     }
-  }, [router]);
+  }, [router, state.sessionId]);
 
   /**
    * 電話番号認証を開始
    */
-  const startPhoneVerification = async (phoneNumber: string): Promise<string | null> => {
-    return phoneAuthService.startPhoneVerification(phoneNumber);
+  const startPhoneVerification = async (phoneNumber: string, sessionId?: string): Promise<string | null> => {
+    return phoneAuthService.startPhoneVerification(phoneNumber, sessionId || state.sessionId);
   };
 
   /**
    * 電話番号認証コードを検証
    */
-  const verifyPhoneCode = async (verificationCode: string): Promise<boolean> => {
-    const success = await phoneAuthService.verifyPhoneCode(verificationCode);
+  const verifyPhoneCode = async (verificationCode: string, sessionId?: string): Promise<boolean> => {
+    const success = await phoneAuthService.verifyPhoneCode(verificationCode, sessionId || state.sessionId);
 
     if (success) {
       setState((prev) => ({
@@ -440,22 +575,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const phoneTokens = TokenManager.getPhoneTokens();
       const lineTokens = TokenManager.getLineTokens();
 
-      console.log("🔍 Tokens before userSignUp:", {
-        lineToken: !!lineTokens.accessToken,
-        phoneToken: !!phoneTokens.accessToken,
-        lineExpiresAt: lineTokens.expiresAt,
-        phoneExpiresAt: phoneTokens.expiresAt,
-        phoneUid,
-        phoneNumber: phoneTokens.phoneNumber,
-      });
+      logger.debug("Tokens before userSignUp", createAuthLogContext(
+        state.sessionId,
+        "general",
+        {
+          operation: "createUser",
+          hasLineToken: !!lineTokens.accessToken,
+          hasPhoneToken: !!phoneTokens.accessToken,
+          lineExpiresAt: lineTokens.expiresAt,
+          phoneExpiresAt: phoneTokens.expiresAt,
+          phoneUid: phoneUid ? maskUserId(phoneUid) : null,
+          phoneNumber: phoneTokens.phoneNumber ? maskPhoneNumber(phoneTokens.phoneNumber) : null
+        }
+      ));
 
-      console.log("Creating user with input:", {
-        name,
-        currentPrefecture: prefecture,
-        communityId: COMMUNITY_ID,
-        phoneUid,
-        phoneNumber: phoneTokens.phoneNumber,
-      });
+      logger.debug("Creating user with input", createAuthLogContext(
+        state.sessionId,
+        "general",
+        {
+          operation: "createUser",
+          name,
+          currentPrefecture: prefecture,
+          communityId: COMMUNITY_ID,
+          phoneUid: phoneUid ? maskUserId(phoneUid) : null,
+          phoneNumber: phoneTokens.phoneNumber ? maskPhoneNumber(phoneTokens.phoneNumber) : null
+        }
+      ));
 
       const { data } = await userSignUp({
         variables: {
@@ -478,7 +623,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return null;
       }
     } catch (error) {
-      console.error("User creation failed:", error);
+      logger.error("User creation failed", createAuthLogContext(
+        state.sessionId,
+        "general",
+        {
+          operation: "createUser",
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined
+        }
+      ));
       toast.error("アカウント作成に失敗しました", {
         description: error instanceof Error ? error.message : "不明なエラーが発生しました",
       });
@@ -494,6 +647,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isPhoneVerified: state.phoneAuthStatus === "verified",
     isAuthenticating: state.isAuthenticating,
     environment: state.environment,
+    sessionId: state.sessionId,
     loginWithLiff,
     logout,
     phoneAuth: {
