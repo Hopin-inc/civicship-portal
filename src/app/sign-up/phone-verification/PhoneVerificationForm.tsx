@@ -23,7 +23,7 @@ export function PhoneVerificationForm() {
       if (!isAuthenticated) {
         router.replace("/login");
       } else if (isPhoneVerified) {
-        let signUpWithNext = "/sign-up/phone-verification";
+        let signUpWithNext = "/sign-up";
         if (nextParam) {
           signUpWithNext += `?next=${ nextParam }`;
         }
