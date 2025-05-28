@@ -33,14 +33,27 @@ export default function SearchPage() {
     defaultValues: {
       searchQuery: searchParams.get("q") || "",
       location: searchParams.get("location") || "",
-      dateRange:
-        searchParams.get("from") && searchParams.get("to")
-          ? {
-              from: new Date(searchParams.get("from") as string),
-              to: new Date(searchParams.get("to") as string),
-            }
-          : undefined,
-      guests: searchParams.get("guests") ? parseInt(searchParams.get("guests") as string, 10) : 0,
+      dateRange: (() => {
+        const fromStr = searchParams.get("from");
+        const toStr = searchParams.get("to");
+        if (fromStr && toStr) {
+          const fromDate = new Date(fromStr);
+          const toDate = new Date(toStr);
+          if (!Number.isNaN(fromDate.valueOf()) && !Number.isNaN(toDate.valueOf())) {
+            return {
+              from: fromDate,
+              to: toDate,
+            };
+          }
+          console.warn(`Invalid date strings in URL: from='${fromStr}', to='${toStr}'`);
+        }
+        return undefined; // Default if params not present or dates are invalid
+      })(),
+      guests: searchParams.get("guests")
+        ? ((parsed) => (Number.isNaN(parsed) ? 0 : parsed))(
+            parseInt(searchParams.get("guests") as string, 10),
+          )
+        : 0,
       useTicket: searchParams.get("ticket") === "true",
     },
   });
