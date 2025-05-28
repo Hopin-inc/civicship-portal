@@ -209,6 +209,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           windowHref: typeof window !== "undefined" ? window.location.href : "SSR"
         });
         
+        setState(prev => ({ ...prev, isAuthenticating: true }));
+        
         try {
           console.log(`🔍 [${redirectTimestamp}] Initializing LIFF for authentication completion...`);
           const liffSuccess = await liffService.initialize();

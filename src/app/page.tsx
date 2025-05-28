@@ -26,13 +26,18 @@ export default function HomePage() {
     if (liffState) {
       console.log("🚀 Detected return from LINE authentication, liff.state:", liffState);
 
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+
       if (isAuthenticating || authLoading || userLoading) {
         console.log("🚀 Auth state loading, waiting before redirect");
         return; // Wait for auth state to stabilize
       } else if (isAuthenticated) {
         if (!userData?.currentUser) {
           console.log("🚀 No user data, redirecting to phone verification");
-          router.replace("/sign-up/phone-verification");
+          const next = extractSearchParamFromRelativePath(liffState, "next");
+          const redirectPath = next ? `/sign-up/phone-verification?next=${encodeURIComponent(next)}` : "/sign-up/phone-verification";
+          router.replace(redirectPath);
           return;
         }
 
@@ -44,7 +49,7 @@ export default function HomePage() {
       } else {
         console.log("🚀 Not authenticated, redirecting to login");
         const next = extractSearchParamFromRelativePath(liffState, "next");
-        const redirectPath = next && next.startsWith("/") ? `/login?next=${ next }` : "/login";
+        const redirectPath = next && next.startsWith("/") ? `/login?next=${next}` : "/login";
         router.replace(redirectPath);
         return;
       }
@@ -53,7 +58,7 @@ export default function HomePage() {
     if (window.location.pathname === "/") {
       router.replace("/activities");
     }
-  }, [router, isAuthenticated, userData, authLoading, userLoading]);
+  }, [router, isAuthenticated, userData, authLoading, userLoading, isAuthenticating]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
