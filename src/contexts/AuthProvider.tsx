@@ -15,7 +15,16 @@ import { USER_SIGN_UP } from "@/graphql/account/identity/mutation";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { COMMUNITY_ID } from "@/utils";
 import logger from "@/lib/logging";
-import { generateSessionId, maskPhoneNumber, maskUserId, createAuthLogContext, createRetryLogContext } from "@/lib/auth/logging-utils";
+import { 
+  generateSessionId, 
+  maskPhoneNumber, 
+  maskUserId, 
+  createAuthLogContext, 
+  createRetryLogContext,
+  startOperation,
+  endOperation,
+  generateRequestId
+} from "@/lib/auth/logging-utils";
 
 /**
  * 認証状態の型定義
@@ -492,39 +501,152 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * @returns ログインが成功したかどうか
    */
   const loginWithLiff = async (redirectPath?: string, sessionId?: string): Promise<boolean> => {
+    const op = startOperation("LoginWithLiff");
+    const requestId = generateRequestId();
+    
     const authSessionId = sessionId || state.sessionId;
+    logger.info("GetLineTokenStart", createAuthLogContext(
+      authSessionId,
+      "liff",
+      op.getContext({
+        event: "GetLineTokenStart",
+        component: "LIFF",
+        requestId,
+        redirectPath: redirectPath || "none"
+      })
+    ));
+    
     setState((prev) => ({ ...prev, isAuthenticating: true }));
 
     try {
+      logger.debug("InitStart", createAuthLogContext(
+        authSessionId,
+        "liff",
+        op.getContext({
+          event: "InitStart",
+          component: "LIFF",
+          requestId
+        })
+      ));
+      
       const initialized = await liffService.initialize(authSessionId);
       if (!initialized) {
+        logger.error("InitError", createAuthLogContext(
+          authSessionId,
+          "liff",
+          op.getContext({
+            event: "InitError",
+            component: "LIFF",
+            requestId,
+            errorCode: "initialization_failed",
+            error: "Failed to initialize LIFF"
+          })
+        ));
         throw new Error("Failed to initialize LIFF");
       }
+      
+      logger.info("InitSuccess", createAuthLogContext(
+        authSessionId,
+        "liff",
+        op.getContext({
+          event: "InitSuccess",
+          component: "LIFF",
+          requestId
+        })
+      ));
 
       const loggedIn = await liffService.login(redirectPath, authSessionId);
       if (!loggedIn) {
+        logger.info("GetLineTokenRedirect", createAuthLogContext(
+          authSessionId,
+          "liff",
+          op.getContext({
+            event: "GetLineTokenRedirect",
+            component: "LIFF",
+            requestId,
+            redirectPath: redirectPath || "/"
+          })
+        ));
         return false; // リダイレクトするのでここには到達しない
       }
+      
+      logger.info("GetLineTokenSuccess", createAuthLogContext(
+        authSessionId,
+        "liff",
+        op.getContext({
+          event: "GetLineTokenSuccess",
+          component: "LIFF",
+          requestId
+        })
+      ));
 
+      logger.debug("SignInWithTokenStart", createAuthLogContext(
+        authSessionId,
+        "liff",
+        op.getContext({
+          event: "SignInWithTokenStart",
+          component: "FirebaseAuth",
+          requestId
+        })
+      ));
+      
       const success = await liffService.signInWithLiffToken(authSessionId);
 
       if (success) {
+        logger.info("SignInWithTokenSuccess", createAuthLogContext(
+          authSessionId,
+          "liff",
+          op.getContext({
+            event: "SignInWithTokenSuccess",
+            component: "FirebaseAuth",
+            requestId,
+            userId: state.firebaseUser ? maskUserId(state.firebaseUser.uid) : "none",
+            duration: Date.now() - op.startTime
+          })
+        ));
+        
         await refetchUser();
+      } else {
+        logger.error("SignInWithTokenError", createAuthLogContext(
+          authSessionId,
+          "liff",
+          op.getContext({
+            event: "SignInWithTokenError",
+            component: "FirebaseAuth",
+            requestId,
+            errorCode: "firebase_signin_failed",
+            error: "Failed to sign in with LIFF token"
+          })
+        ));
       }
 
       return success;
     } catch (error) {
-      logger.info("Login with LIFF failed", createAuthLogContext(
+      logger.error("GetLineTokenError", createAuthLogContext(
         authSessionId,
         "liff",
-        {
-          operation: "loginWithLiff",
-          error: error instanceof Error ? error.message : String(error)
-        }
+        op.getContext({
+          event: "GetLineTokenError",
+          component: "LIFF",
+          requestId,
+          errorCode: error instanceof Error ? error.name : "unknown",
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined
+        })
       ));
       return false;
     } finally {
       setState((prev) => ({ ...prev, isAuthenticating: false }));
+      
+      logger.debug("Operation completed", createAuthLogContext(
+        authSessionId,
+        "liff",
+        endOperation(op.startTime, op.operationId, {
+          component: "LIFF",
+          operation: "loginWithLiff",
+          status: state.lineAuthStatus === "authenticated" ? "success" : "failed"
+        })
+      ));
     }
   };
 
@@ -533,19 +655,66 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * @param sessionId セッションID（オプション）
    */
   const logout = useCallback(async (sessionId?: string): Promise<void> => {
+    const op = startOperation("Logout");
+    const requestId = generateRequestId();
+    
     const authSessionId = sessionId || state.sessionId;
+    
+    logger.info("LogoutStart", createAuthLogContext(
+      authSessionId,
+      "general",
+      op.getContext({
+        event: "LogoutStart",
+        component: "AuthProvider",
+        requestId,
+        userId: state.firebaseUser ? maskUserId(state.firebaseUser.uid) : "none"
+      })
+    ));
+    
     try {
-      logger.info("User logout initiated", createAuthLogContext(
+      logger.debug("LiffLogoutStart", createAuthLogContext(
         authSessionId,
-        "general",
-        {
-          operation: "logout"
-        }
+        "liff",
+        op.getContext({
+          event: "LiffLogoutStart",
+          component: "LIFF",
+          requestId
+        })
       ));
       
       liffService.logout(authSessionId);
+      
+      logger.debug("LiffLogoutSuccess", createAuthLogContext(
+        authSessionId,
+        "liff",
+        op.getContext({
+          event: "LiffLogoutSuccess",
+          component: "LIFF",
+          requestId
+        })
+      ));
 
+      logger.debug("FirebaseSignOutStart", createAuthLogContext(
+        authSessionId,
+        "general",
+        op.getContext({
+          event: "FirebaseSignOutStart",
+          component: "FirebaseAuth",
+          requestId
+        })
+      ));
+      
       await lineAuth.signOut();
+      
+      logger.debug("FirebaseSignOutSuccess", createAuthLogContext(
+        authSessionId,
+        "general",
+        op.getContext({
+          event: "FirebaseSignOutSuccess",
+          component: "FirebaseAuth",
+          requestId
+        })
+      ));
 
       phoneAuthService.reset();
 
@@ -559,26 +728,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         phoneAuthStatus: "unverified",
       }));
 
-      logger.info("User logout completed", createAuthLogContext(
+      logger.info("LogoutSuccess", createAuthLogContext(
         authSessionId,
         "general",
-        {
-          operation: "logout",
-          status: "success"
-        }
+        op.getContext({
+          event: "LogoutSuccess",
+          component: "AuthProvider",
+          requestId,
+          duration: Date.now() - op.startTime
+        })
       ));
 
       router.push("/login");
     } catch (error) {
-      logger.error("Logout failed", createAuthLogContext(
+      logger.error("LogoutError", createAuthLogContext(
         authSessionId,
         "general",
-        {
-          operation: "logout",
-          error: error instanceof Error ? error.message : String(error)
-        }
+        op.getContext({
+          event: "LogoutError",
+          component: "AuthProvider",
+          requestId,
+          errorCode: error instanceof Error ? error.name : "unknown",
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined
+        })
       ));
-      console.error("Logout failed:", error);
+    } finally {
+      logger.debug("Operation completed", createAuthLogContext(
+        authSessionId,
+        "general",
+        endOperation(op.startTime, op.operationId, {
+          component: "AuthProvider",
+          operation: "logout",
+          status: state.lineAuthStatus === "unauthenticated" ? "success" : "failed"
+        })
+      ));
     }
   }, [router, state.sessionId]);
 
@@ -586,23 +770,157 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * 電話番号認証を開始
    */
   const startPhoneVerification = async (phoneNumber: string, sessionId?: string): Promise<string | null> => {
-    return phoneAuthService.startPhoneVerification(phoneNumber, sessionId || state.sessionId);
+    const op = startOperation("StartPhoneVerification");
+    const requestId = generateRequestId();
+    const authSessionId = sessionId || state.sessionId;
+    
+    logger.info("PhoneAuthStart", createAuthLogContext(
+      authSessionId,
+      "phone",
+      op.getContext({
+        event: "PhoneAuthStart",
+        component: "FirebaseAuth",
+        requestId,
+        phoneNumber: maskPhoneNumber(phoneNumber)
+      })
+    ));
+    
+    try {
+      const result = await phoneAuthService.startPhoneVerification(phoneNumber, authSessionId);
+      
+      if (result) {
+        logger.info("PhoneAuthSuccess", createAuthLogContext(
+          authSessionId,
+          "phone",
+          op.getContext({
+            event: "PhoneAuthSuccess",
+            component: "FirebaseAuth",
+            requestId,
+            verificationId: result ? "present" : "none",
+            duration: Date.now() - op.startTime
+          })
+        ));
+      } else {
+        logger.error("PhoneAuthError", createAuthLogContext(
+          authSessionId,
+          "phone",
+          op.getContext({
+            event: "PhoneAuthError",
+            component: "FirebaseAuth",
+            requestId,
+            errorCode: "verification_failed",
+            error: "Failed to start phone verification"
+          })
+        ));
+      }
+      
+      return result;
+    } catch (error) {
+      logger.error("PhoneAuthError", createAuthLogContext(
+        authSessionId,
+        "phone",
+        op.getContext({
+          event: "PhoneAuthError",
+          component: "FirebaseAuth",
+          requestId,
+          errorCode: error instanceof Error ? error.name : "unknown",
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined
+        })
+      ));
+      return null;
+    } finally {
+      logger.debug("Operation completed", createAuthLogContext(
+        authSessionId,
+        "phone",
+        endOperation(op.startTime, op.operationId, {
+          component: "FirebaseAuth",
+          operation: "startPhoneVerification"
+        })
+      ));
+    }
   };
 
   /**
    * 電話番号認証コードを検証
    */
   const verifyPhoneCode = async (verificationCode: string, sessionId?: string): Promise<boolean> => {
-    const success = await phoneAuthService.verifyPhoneCode(verificationCode, sessionId || state.sessionId);
+    const op = startOperation("VerifyPhoneCode");
+    const requestId = generateRequestId();
+    const authSessionId = sessionId || state.sessionId;
+    
+    logger.info("PhoneVerificationStart", createAuthLogContext(
+      authSessionId,
+      "phone",
+      op.getContext({
+        event: "PhoneVerificationStart",
+        component: "FirebaseAuth",
+        requestId,
+        codeLength: verificationCode?.length || 0
+      })
+    ));
+    
+    try {
+      const success = await phoneAuthService.verifyPhoneCode(verificationCode, authSessionId);
 
-    if (success) {
-      setState((prev) => ({
-        ...prev,
-        phoneAuthStatus: "verified",
-      }));
+      if (success) {
+        logger.info("PhoneVerificationSuccess", createAuthLogContext(
+          authSessionId,
+          "phone",
+          op.getContext({
+            event: "PhoneVerificationSuccess",
+            component: "FirebaseAuth",
+            requestId,
+            phoneUid: phoneAuthService.getState().phoneUid ? 
+              maskUserId(phoneAuthService.getState().phoneUid) : "none",
+            duration: Date.now() - op.startTime
+          })
+        ));
+        
+        setState((prev) => ({
+          ...prev,
+          phoneAuthStatus: "verified",
+        }));
+      } else {
+        logger.error("PhoneVerificationError", createAuthLogContext(
+          authSessionId,
+          "phone",
+          op.getContext({
+            event: "PhoneVerificationError",
+            component: "FirebaseAuth",
+            requestId,
+            errorCode: "invalid_verification_code",
+            error: "Failed to verify phone code"
+          })
+        ));
+      }
+
+      return success;
+    } catch (error) {
+      logger.error("PhoneVerificationError", createAuthLogContext(
+        authSessionId,
+        "phone",
+        op.getContext({
+          event: "PhoneVerificationError",
+          component: "FirebaseAuth",
+          requestId,
+          errorCode: error instanceof Error ? error.name : "unknown",
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined
+        })
+      ));
+      return false;
+    } finally {
+      logger.debug("Operation completed", createAuthLogContext(
+        authSessionId,
+        "phone",
+        endOperation(op.startTime, op.operationId, {
+          component: "FirebaseAuth",
+          operation: "verifyPhoneCode",
+          status: state.phoneAuthStatus === "verified" ? "success" : "failed"
+        })
+      ));
     }
-
-    return success;
   };
 
   /**
@@ -613,13 +931,50 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     prefecture: GqlCurrentPrefecture,
     phoneUid: string | null,
   ): Promise<User | null> => {
+    const op = startOperation("CreateUser");
+    const requestId = generateRequestId();
+    
+    logger.info("FirebaseLinkAccountStart", createAuthLogContext(
+      state.sessionId,
+      "general",
+      op.getContext({
+        event: "FirebaseLinkAccountStart",
+        component: "Backend",
+        requestId,
+        existingUid: state.firebaseUser ? maskUserId(state.firebaseUser.uid) : "none",
+        newProvider: phoneUid ? "Phone" : "LINE"
+      })
+    ));
+    
     try {
       if (!state.firebaseUser) {
+        logger.error("FirebaseLinkAccountError", createAuthLogContext(
+          state.sessionId,
+          "general",
+          op.getContext({
+            event: "FirebaseLinkAccountError",
+            component: "Backend",
+            requestId,
+            errorCode: "no_firebase_user",
+            error: "Cannot create user: No authenticated Firebase user"
+          })
+        ));
         toast.error("LINE認証が完了していません");
         return null;
       }
 
       if (!phoneUid) {
+        logger.error("FirebaseLinkAccountError", createAuthLogContext(
+          state.sessionId,
+          "general",
+          op.getContext({
+            event: "FirebaseLinkAccountError",
+            component: "Backend",
+            requestId,
+            errorCode: "no_phone_uid",
+            error: "Cannot create user: No phone authentication UID"
+          })
+        ));
         toast.error("電話番号認証が完了していません");
         return null;
       }
@@ -627,67 +982,112 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const phoneTokens = TokenManager.getPhoneTokens();
       const lineTokens = TokenManager.getLineTokens();
 
-      logger.debug("Tokens before userSignUp", createAuthLogContext(
+      logger.debug("TokenValidation", createAuthLogContext(
         state.sessionId,
         "general",
-        {
-          operation: "createUser",
+        op.getContext({
+          event: "TokenValidation",
+          component: "Backend",
+          requestId,
           hasLineToken: !!lineTokens.accessToken,
           hasPhoneToken: !!phoneTokens.accessToken,
           lineExpiresAt: lineTokens.expiresAt,
           phoneExpiresAt: phoneTokens.expiresAt,
-          phoneUid: phoneUid ? maskUserId(phoneUid) : null,
-          phoneNumber: phoneTokens.phoneNumber ? maskPhoneNumber(phoneTokens.phoneNumber) : null
-        }
+          phoneUid: phoneUid ? maskUserId(phoneUid) : "none",
+          phoneNumber: phoneTokens.phoneNumber ? maskPhoneNumber(phoneTokens.phoneNumber) : "none"
+        })
       ));
 
-      logger.debug("Creating user with input", createAuthLogContext(
+      logger.info("CustomTokenRequestStart", createAuthLogContext(
         state.sessionId,
         "general",
-        {
-          operation: "createUser",
+        op.getContext({
+          event: "CustomTokenRequestStart",
+          component: "Backend",
+          requestId,
           name,
-          currentPrefecture: prefecture,
+          prefecture: prefecture,
           communityId: COMMUNITY_ID,
-          phoneUid: phoneUid ? maskUserId(phoneUid) : null,
-          phoneNumber: phoneTokens.phoneNumber ? maskPhoneNumber(phoneTokens.phoneNumber) : null
-        }
+          phoneUid: phoneUid ? maskUserId(phoneUid) : "none",
+          phoneNumber: phoneTokens.phoneNumber ? maskPhoneNumber(phoneTokens.phoneNumber) : "none"
+        })
       ));
 
       const { data } = await userSignUp({
         variables: {
           input: {
             name,
-            currentPrefecture: prefecture, // Changed from prefecture to currentPrefecture to match backend schema
+            currentPrefecture: prefecture,
             communityId: COMMUNITY_ID,
             phoneUid,
             phoneNumber: phoneTokens.phoneNumber,
           },
         },
+        context: {
+          headers: {
+            "X-Request-ID": requestId
+          }
+        }
       });
 
       if (data?.userSignUp?.user) {
+        logger.info("FirebaseLinkAccountSuccess", createAuthLogContext(
+          state.sessionId,
+          "general",
+          op.getContext({
+            event: "FirebaseLinkAccountSuccess",
+            component: "Backend",
+            requestId,
+            linkedUid: data.userSignUp.user.id ? maskUserId(data.userSignUp.user.id) : "none",
+            duration: Date.now() - op.startTime
+          })
+        ));
+        
         await refetchUser();
         toast.success("アカウントを作成しました");
         return state.firebaseUser;
       } else {
+        logger.error("FirebaseLinkAccountError", createAuthLogContext(
+          state.sessionId,
+          "general",
+          op.getContext({
+            event: "FirebaseLinkAccountError",
+            component: "Backend",
+            requestId,
+            errorCode: "no_user_data",
+            error: "Failed to create user: No user data returned"
+          })
+        ));
         toast.error("アカウント作成に失敗しました");
         return null;
       }
     } catch (error) {
-      logger.error("User creation failed", createAuthLogContext(
+      logger.error("FirebaseLinkAccountError", createAuthLogContext(
         state.sessionId,
         "general",
-        {
-          operation: "createUser",
+        op.getContext({
+          event: "FirebaseLinkAccountError",
+          component: "Backend",
+          requestId,
+          errorCode: error instanceof Error ? error.name : "unknown",
           error: error instanceof Error ? error.message : String(error),
           stack: error instanceof Error ? error.stack : undefined
-        }
+        })
       ));
       toast.error("アカウント作成に失敗しました", {
         description: error instanceof Error ? error.message : "不明なエラーが発生しました",
       });
       return null;
+    } finally {
+      logger.debug("Operation completed", createAuthLogContext(
+        state.sessionId,
+        "general",
+        endOperation(op.startTime, op.operationId, {
+          component: "Backend",
+          operation: "createUser",
+          status: state.currentUser ? "success" : "failed"
+        })
+      ));
     }
   };
 
