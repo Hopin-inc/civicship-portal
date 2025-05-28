@@ -5,6 +5,7 @@ import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { lineAuth, categorizeFirebaseError } from "./firebase-config";
 import { TokenManager, AuthTokens } from "./token-manager";
 import retry from "retry";
+import logger from "../logging";
 
 /**
  * LIFF初期化状態の型定義
@@ -272,6 +273,15 @@ export class LiffService {
         } catch (error) {
           const categorizedError = categorizeFirebaseError(error);
 
+          const logLevel = categorizedError.retryable ? "info" : "error";
+          logger[logLevel]("LIFF authentication error", {
+            attempt: currentAttempt,
+            errorType: categorizedError.type,
+            message: categorizedError.message,
+            retryable: categorizedError.retryable,
+            operation: "signInWithLiffToken"
+          });
+          
           console.error(`LIFF authentication error (attempt ${currentAttempt}):`, {
             type: categorizedError.type,
             message: categorizedError.message,

@@ -11,6 +11,7 @@ import { ActivityDetail } from "@/app/activities/data/type";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
 import { ApolloError } from "@apollo/client";
+import logger from "@/lib/logging";
 
 type Result =
   | { success: true; reservation: GqlReservation }
@@ -69,6 +70,12 @@ export const useReservationCommand = () => {
 
         const data = res.data?.reservationCreate;
         if (data?.__typename === "ReservationCreateSuccess") {
+          logger.info("Reservation created successfully", {
+            operation: "createReservation",
+            reservationId: data.reservation.id,
+            opportunitySlotId: selectedSlot.id,
+            userId: user.id
+          });
           return {
             success: true,
             reservation: data.reservation,
@@ -86,6 +93,18 @@ export const useReservationCommand = () => {
             code: code ?? GqlErrorCode.Unknown,
           };
         }
+        const isUserError = e instanceof ApolloError && 
+          [GqlErrorCode.ValidationError, GqlErrorCode.TicketParticipantMismatch].includes(
+            e.graphQLErrors[0]?.extensions?.code as GqlErrorCode
+          );
+        const logLevel = isUserError ? "info" : "error";
+        logger[logLevel]("Reservation mutation failed", {
+          operation: "createReservation",
+          opportunitySlotId: selectedSlot?.id,
+          userId: user?.id,
+          isUserError,
+          error: e instanceof Error ? e.message : String(e)
+        });
         console.error("Reservation mutation failed", e);
         return { success: false, code: GqlErrorCode.Unknown };
       }

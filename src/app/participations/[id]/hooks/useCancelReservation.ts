@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { ApolloError } from "@apollo/client";
 import { GqlErrorCode, useCancelReservationMutation } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
+import logger from "@/lib/logging";
 
 type Result = { success: true } | { success: false; code: GqlErrorCode };
 
@@ -49,6 +50,16 @@ const useCancelReservation = () => {
           };
         }
 
+        const isUserError = e instanceof ApolloError && 
+          e.graphQLErrors[0]?.extensions?.code === GqlErrorCode.ValidationError;
+        const logLevel = isUserError ? "info" : "error";
+        logger[logLevel]("Reservation cancellation mutation failed", {
+          operation: "cancelReservation", 
+          reservationId,
+          userId: user?.id,
+          isUserError,
+          error: e instanceof Error ? e.message : String(e)
+        });
         console.error("Reservation cancellation mutation failed", e);
         return { success: false, code: GqlErrorCode.Unknown };
       } finally {

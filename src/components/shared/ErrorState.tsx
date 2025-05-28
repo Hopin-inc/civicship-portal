@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { AlertCircle, Home, RefreshCcw } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import logger from "@/lib/logging";
 
 interface ErrorStateProps {
   title?: string;
@@ -21,11 +22,17 @@ const ErrorState: React.FC<ErrorStateProps> = ({
   };
 
   useEffect(() => {
+    logger.info("Error state displayed to user", {
+      component: "ErrorState",
+      title,
+      hasRefetch: !!refetchRef?.current,
+      timestamp: new Date().toISOString()
+    });
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "";
     };
-  }, []);
+  }, [title, refetchRef]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">

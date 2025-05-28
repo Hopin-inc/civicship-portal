@@ -10,6 +10,7 @@ import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { __DEV__ } from "@apollo/client/utilities/globals";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { TokenManager } from "./auth/token-manager";
+import logger from "./logging";
 
 if (__DEV__) {
   loadDevMessages();
@@ -74,9 +75,13 @@ const requestLink = new ApolloLink((operation, forward) => {
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
   if (graphQLErrors) {
     for (const error of graphQLErrors) {
-      console.log(
-        `[GraphQL error]: Message: ${error.message}, Location: ${error.locations}, Path: ${error.path}`,
-      );
+      logger.info("GraphQL error occurred", {
+        message: error.message,
+        locations: error.locations,
+        path: error.path,
+        extensions: error.extensions,
+        operation: operation.operationName
+      });
 
       if (
         error.message.includes("Authentication required") ||
@@ -96,7 +101,13 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
   }
 
   if (networkError) {
-    console.log(`[Network error]: ${networkError}`);
+    const logLevel = ("statusCode" in networkError && networkError.statusCode >= 500) ? "error" : "info";
+    logger[logLevel]("Network error occurred", {
+      message: networkError.message,
+      statusCode: "statusCode" in networkError ? networkError.statusCode : undefined,
+      networkErrorType: networkError.name,
+      operation: operation.operationName
+    });
 
     if ("statusCode" in networkError && networkError.statusCode === 401) {
       if (typeof window !== "undefined") {

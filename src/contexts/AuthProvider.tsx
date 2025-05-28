@@ -14,6 +14,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { USER_SIGN_UP } from "@/graphql/account/identity/mutation";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { COMMUNITY_ID } from "@/utils";
+import logger from "@/lib/logging";
 
 /**
  * 認証状態の型定義
@@ -248,6 +249,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         } catch (error) {
           const errorTimestamp = new Date().toISOString();
+          logger.info("LINE authentication completion failed", {
+            source: "AuthProvider",
+            operation: "initializeAuth", 
+            error: error instanceof Error ? error.message : String(error),
+            environment
+          });
           console.error(`🔍 [${errorTimestamp}] Error during LINE authentication completion:`, error);
         }
       }
@@ -302,6 +309,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return success;
     } catch (error) {
+      logger.info("Login with LIFF failed", {
+        operation: "loginWithLiff",
+        error: error instanceof Error ? error.message : String(error)
+      });
       console.error("Login with LIFF failed:", error);
       return false;
     } finally {
