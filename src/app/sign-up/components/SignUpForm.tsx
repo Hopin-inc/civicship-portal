@@ -20,6 +20,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 const FormSchema = z.object({
   name: z.string({ required_error: "名前を入力してください。" }),
@@ -36,6 +37,7 @@ export function SignUpForm() {
   const nextParam = searchParams.get("next");
   const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -80,7 +82,7 @@ export function SignUpForm() {
 
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
-        toast.success("アカウントを作成しました");
+        setIsRedirecting(true);
         const redirectUrl = nextParam || "/activities";
         router.push(redirectUrl);
       }
@@ -95,7 +97,11 @@ export function SignUpForm() {
   };
 
   if (loading) {
-    return null;
+    return <LoadingIndicator />;
+  }
+
+  if (isRedirecting) {
+    return <LoadingIndicator />;
   }
 
   if (!isAuthenticated || !isPhoneVerified) {

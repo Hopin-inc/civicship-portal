@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { getLiffLoginErrorMessage } from "@/app/login/utils/getLiffLoginErrorMessage";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -73,8 +74,8 @@ export default function LoginPage() {
     };
   }, []);
 
-  if (loading) {
-    return null;
+  if (loading || isAuthenticating) {
+    return <LoadingIndicator />;
   }
 
   return (

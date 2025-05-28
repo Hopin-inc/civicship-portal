@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useRouter, useSearchParams } from "next/navigation";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export function PhoneVerificationForm() {
   const { phoneAuth, isAuthenticated, isPhoneVerified, loading } = useAuth();
@@ -87,7 +88,7 @@ export function PhoneVerificationForm() {
   };
 
   if (loading) {
-    return null;
+    return <LoadingIndicator />;
   }
 
   if (!isAuthenticated || isPhoneVerified) {
