@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
 // import SearchTabs, { SearchTabType } from "@/app/search/components/Tabs";
@@ -26,13 +26,35 @@ export default function SearchPage() {
   );
   useHeaderConfig(headerConfig);
 
+  const searchParams = useSearchParams();
+
+  // Initialize form with search parameters from URL
   const methods = useForm({
     defaultValues: {
-      searchQuery: "",
-      location: "",
-      dateRange: undefined,
-      guests: 0,
-      useTicket: false,
+      searchQuery: searchParams.get("q") || "",
+      location: searchParams.get("location") || "",
+      dateRange: (() => {
+        const fromStr = searchParams.get("from");
+        const toStr = searchParams.get("to");
+        if (fromStr && toStr) {
+          const fromDate = new Date(fromStr);
+          const toDate = new Date(toStr);
+          if (!Number.isNaN(fromDate.valueOf()) && !Number.isNaN(toDate.valueOf())) {
+            return {
+              from: fromDate,
+              to: toDate,
+            };
+          }
+          console.warn(`Invalid date strings in URL: from='${fromStr}', to='${toStr}'`);
+        }
+        return undefined; // Default if params not present or dates are invalid
+      })(),
+      guests: searchParams.get("guests")
+        ? ((parsed) => (Number.isNaN(parsed) ? 0 : parsed))(
+            parseInt(searchParams.get("guests") as string, 10),
+          )
+        : 0,
+      useTicket: searchParams.get("ticket") === "true",
     },
   });
 
