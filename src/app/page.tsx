@@ -62,8 +62,8 @@ export default function HomePage() {
           router.replace(liffState);
           return;
         }
-      } else {
-        console.log("🚀 Not authenticated, redirecting to login");
+      } else if (!isAuthenticating) {
+        console.log("🚀 Not authenticated after processing, redirecting to login");
         const next = extractSearchParamFromRelativePath(liffState, "next");
         const redirectPath = next && next.startsWith("/") ? `/login?next=${next}` : "/login";
         router.replace(redirectPath);
