@@ -26,8 +26,10 @@ export class AuthStateManager {
     this.liffService = LiffService.getInstance();
     this.phoneAuthService = PhoneAuthService.getInstance();
     
-    window.addEventListener("auth:renew-line-token", this.handleLineTokenRenewal.bind(this));
-    window.addEventListener("auth:renew-phone-token", this.handlePhoneTokenRenewal.bind(this));
+    if (typeof window !== "undefined") {
+      window.addEventListener("auth:renew-line-token", this.handleLineTokenRenewal.bind(this));
+      window.addEventListener("auth:renew-phone-token", this.handlePhoneTokenRenewal.bind(this));
+    }
   }
 
   /**

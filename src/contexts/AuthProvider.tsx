@@ -297,15 +297,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (source === "graphql" || source === "network") {
         if (state.authenticationState === "line_authenticated" || state.authenticationState === "user_registered") {
           setState(prev => ({ ...prev, authenticationState: "line_token_expired" }));
-          const event = new CustomEvent("auth:renew-line-token", { detail: {} });
-          window.dispatchEvent(event);
+          if (typeof window !== "undefined") {
+            const event = new CustomEvent("auth:renew-line-token", { detail: {} });
+            window.dispatchEvent(event);
+          }
           return;
         }
         
         if (state.authenticationState === "phone_authenticated") {
           setState(prev => ({ ...prev, authenticationState: "phone_token_expired" }));
-          const event = new CustomEvent("auth:renew-phone-token", { detail: {} });
-          window.dispatchEvent(event);
+          if (typeof window !== "undefined") {
+            const event = new CustomEvent("auth:renew-phone-token", { detail: {} });
+            window.dispatchEvent(event);
+          }
           return;
         }
 
@@ -316,11 +320,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
 
-    window.addEventListener("auth:token-expired", handleTokenExpired);
+    if (typeof window !== "undefined") {
+      window.addEventListener("auth:token-expired", handleTokenExpired);
+    }
 
     return () => {
       authStateManager.removeStateChangeListener(handleStateChange);
-      window.removeEventListener("auth:token-expired", handleTokenExpired);
+      if (typeof window !== "undefined") {
+        window.removeEventListener("auth:token-expired", handleTokenExpired);
+      }
     };
   }, [state.authenticationState, logout, authStateManager]);
 
