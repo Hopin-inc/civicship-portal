@@ -273,7 +273,7 @@ export class PhoneAuthService {
           event: "PhoneAuthError",
           component: isRecaptchaError ? "reCAPTCHA" : "FirebaseAuth",
           requestId,
-          errorCode: errorDetails.code || errorDetails.type,
+          errorCode: isRecaptchaError ? (errorDetails as RecaptchaErrorDetails).code : errorDetails.type,
           error: error instanceof Error ? error.message : String(error),
           phoneNumber: this.state.phoneNumber ? maskPhoneNumber(this.state.phoneNumber) : maskPhoneNumber(phoneNumber),
           stack: error instanceof Error ? error.stack : undefined
