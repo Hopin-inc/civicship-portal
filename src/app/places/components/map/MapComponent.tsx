@@ -14,7 +14,7 @@ const containerStyle = {
 interface MapComponentProps {
   placePins: IPlacePin[];
   selectedPlaceId: string | null;
-  onPlaceSelect: (placeId: string) => void;
+  onPlaceSelect: (placeId: string | null) => void;
   onRecenterReady?: (fn: () => void) => void;
 }
 
@@ -69,6 +69,7 @@ export default function MapComponent({
         scrollwheel: true,
         zoomControl: true,
       }}
+      onClick={() => onPlaceSelect(null)}
     >
       {markers.map((marker: IPlacePin) => (
         <CustomMarker

@@ -172,8 +172,11 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
     <Marker
       position={{ lat: data.latitude, lng: data.longitude }}
       icon={icon}
-      onClick={onClick}
-      zIndex={1}
+      onClick={e => {
+        if (e && e.domEvent) e.domEvent.stopPropagation();
+        onClick();
+      }}
+      zIndex={isSelected ? 2 : 1}
       title={data.host.name}
     />
   );

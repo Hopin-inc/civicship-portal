@@ -10,8 +10,14 @@ export function usePlaceQueryActions() {
     router.push(`/places?${params.toString()}`);
   };
 
-  const handlePlaceSelect = (placeId: string) => updateParams((p) => p.set("placeId", placeId));
-  const handleClose = () => updateParams((p) => p.delete("placeId"));
+  const handlePlaceSelect = (placeId: string | null) => {
+    if (placeId) {
+      updateParams((p) => p.set("placeId", placeId));
+    } else {
+      updateParams((p) => p.delete("placeId"));
+    }
+  };
+
   const toggleMode = () =>
     updateParams((p) => {
       const mode = searchParams.get("mode") || "map";
@@ -19,5 +25,5 @@ export function usePlaceQueryActions() {
       p.delete("placeId");
     });
 
-  return { handlePlaceSelect, handleClose, toggleMode };
+  return { handlePlaceSelect, toggleMode };
 }

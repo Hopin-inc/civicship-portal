@@ -9,7 +9,7 @@ import { IPlaceCard, IPlacePin } from "@/app/places/data/type";
 
 interface PlaceMapViewProps {
   selectedPlaceId: string | null;
-  onPlaceSelect: (placeId: string) => void;
+  onPlaceSelect: (placeId: string | null) => void;
   toggleMode: () => void;
   placePins: IPlacePin[];
   places: IPlaceCard[];
