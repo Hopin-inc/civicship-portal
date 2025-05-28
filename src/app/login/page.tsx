@@ -31,7 +31,7 @@ export default function LoginPage() {
       } else {
         let signUpWithNext = "/sign-up/phone-verification";
         if (nextPath) {
-          signUpWithNext += `?next=${ nextPath }`;
+          signUpWithNext += `?next=${ encodeURIComponent(nextPath) }`;
         }
         router.replace(signUpWithNext);
       }

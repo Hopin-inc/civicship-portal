@@ -21,11 +21,15 @@ export function PhoneVerificationForm() {
   useEffect(() => {
     if (!loading) {
       if (!isAuthenticated) {
-        router.replace("/login");
+        let loginWithNext = "/login";
+        if (nextParam) {
+          loginWithNext += `?next=${ encodeURIComponent(nextParam) }`;
+        }
+        router.replace(loginWithNext);
       } else if (isPhoneVerified) {
         let signUpWithNext = "/sign-up";
         if (nextParam) {
-          signUpWithNext += `?next=${ nextParam }`;
+          signUpWithNext += `?next=${ encodeURIComponent(nextParam) }`;
         }
         router.replace(signUpWithNext);
       }

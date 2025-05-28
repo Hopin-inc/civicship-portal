@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { useQuery } from "@apollo/client";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { matchPaths } from "@/utils/path";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 /**
  * 認証が必要なページのパスパターン
@@ -41,7 +42,7 @@ const isProtectedPath = (path: string): boolean => {
  * @returns 電話番号認証が必要なパスの場合はtrue
  */
 const isPhoneVerificationRequiredPath = (path: string): boolean => {
-  return PHONE_VERIFICATION_REQUIRED_PATHS.some((requiredPath) => path.startsWith(requiredPath));
+  return matchPaths(path, ...PHONE_VERIFICATION_REQUIRED_PATHS);
 };
 
 /**
@@ -73,13 +74,14 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     }
 
     const authCheck = () => {
+      const next = encodeURIComponent(window.location.pathname + window.location.search);
       if (isProtectedPath(pathname)) {
         if (!isAuthenticated) {
           setAuthorized(false);
-          router.push("/login");
+          router.replace(`/login?next=${ next }`);
         } else if (!isUserRegistered) {
           setAuthorized(false);
-          router.push("/sign-up/phone-verification");
+          router.replace(`/sign-up/phone-verification?next=${ next }`);
         } else {
           setAuthorized(true);
         }
@@ -87,10 +89,10 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       else if (isPhoneVerificationRequiredPath(pathname)) {
         if (!isAuthenticated) {
           setAuthorized(false);
-          router.push("/login");
+          router.replace(`/login?next=${ next }`);
         } else if (!isPhoneVerified && pathname !== "/sign-up/phone-verification") {
           setAuthorized(false);
-          router.push("/sign-up/phone-verification");
+          router.replace(`/sign-up/phone-verification?next=${ next }`);
         } else {
           setAuthorized(true);
         }
@@ -106,12 +108,11 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       authCheck();
     };
 
-    return () => {
-    };
+    return () => {};
   }, [pathname, isAuthenticated, isPhoneVerified, isUserRegistered, loading, userLoading, router]);
 
   if (loading || userLoading) {
-    return null;
+    return <LoadingIndicator />;
   }
 
   return authorized ? <>{children}</> : null;

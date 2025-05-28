@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useQuery } from "@apollo/client";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
@@ -12,10 +12,12 @@ import { extractSearchParamFromRelativePath } from "@/utils/path";
 
 export default function HomePage() {
   const router = useRouter();
-  const { isAuthenticated, isAuthenticating, loading: authLoading } = useAuth();
+  const { isAuthenticated, isAuthenticating, loading: authLoading, isPhoneVerified } = useAuth();
   const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
   });
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next") || "/";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -34,7 +36,21 @@ export default function HomePage() {
         return; // Wait for auth state to stabilize
       } else if (isAuthenticated) {
         if (!userData?.currentUser) {
-          console.log("🚀 No user data, redirecting to phone verification");
+          if (isPhoneVerified) {
+            console.log("🚀 No user data, redirecting to sign up form");
+            let signUpWithNext = "/sign-up";
+            if (nextPath) {
+              signUpWithNext += `?next=${ encodeURIComponent(nextPath) }`;
+            }
+            router.replace(signUpWithNext);
+          } else {
+            console.log("🚀 No user data, redirecting to phone verification");
+            let signUpWithNext = "/sign-up/phone-verification";
+            if (nextPath) {
+              signUpWithNext += `?next=${ encodeURIComponent(nextPath) }`;
+            }
+            router.replace(signUpWithNext);
+          }
           router.replace("/sign-up/phone-verification");
           return;
         }
@@ -53,8 +69,8 @@ export default function HomePage() {
       }
     }
 
-    if (window.location.pathname === "/" && 
-        !window.location.href.includes("liff.state") && 
+    if (window.location.pathname === "/" &&
+        !window.location.href.includes("liff.state") &&
         !window.location.href.includes("login")) {
       router.replace("/activities");
     }

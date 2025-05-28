@@ -42,13 +42,13 @@ export function SignUpForm() {
       if (!isAuthenticated) {
         let loginWithNext = "/login";
         if (nextParam) {
-          loginWithNext += `?next=${ nextParam }`;
+          loginWithNext += `?next=${ encodeURIComponent(nextParam) }`;
         }
         router.replace(loginWithNext);
       } else if (!isPhoneVerified) {
         let signUpWithNext = "/sign-up/phone-verification";
         if (nextParam) {
-          signUpWithNext += `?next=${ nextParam }`;
+          signUpWithNext += `?next=${ encodeURIComponent(nextParam) }`;
         }
         router.replace(signUpWithNext);
       }
@@ -70,7 +70,7 @@ export function SignUpForm() {
         toast.error("電話番号認証が完了していません");
         let signUpWithNext = "/sign-up/phone-verification";
         if (nextParam) {
-          signUpWithNext += `?next=${ nextParam }`;
+          signUpWithNext += `?next=${ encodeURIComponent(nextParam) }`;
         }
         router.replace(signUpWithNext);
         return;
