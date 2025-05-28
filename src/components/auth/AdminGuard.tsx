@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/utils";
 import { GqlRole } from "@/types/graphql";
+import logger from "@/lib/logging";
 
 /**
  * 管理者ガードコンポーネントのプロパティ
@@ -34,19 +35,32 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
 
   useEffect(() => {
     if (loading) {
-      console.log("⏳ Still loading user...");
+      logger.debug("Still loading user", {
+        component: "AdminGuard",
+        authLoading,
+        userLoading
+      });
       return;
     }
 
     if (!isAuthenticated || !currentUser) {
       const next = encodeURIComponent(window.location.pathname + window.location.search);
-      console.log("🚷 No user found. Redirecting to login.");
+      logger.info("No user found, redirecting to login", {
+        component: "AdminGuard",
+        isAuthenticated,
+        hasCurrentUser: !!currentUser,
+        redirectPath: `/login?next=${next}`
+      });
       router.replace(`/login?next=${next}`);
       return;
     }
 
     if (!currentUser.memberships || currentUser.memberships.length === 0) {
-      console.log("🚪 User has no memberships. Redirecting to home.");
+      logger.info("User has no memberships, redirecting to home", {
+        component: "AdminGuard",
+        userId: currentUser.id,
+        redirectPath: "/"
+      });
       router.replace("/");
       return;
     }
@@ -57,28 +71,53 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
       (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
 
     if (!targetMembership) {
-      console.log(`❌ No membership found for community ${COMMUNITY_ID}. Redirecting to home.`);
+      logger.info("No membership found for community, redirecting to home", {
+        component: "AdminGuard",
+        userId: currentUser.id,
+        communityId: COMMUNITY_ID,
+        redirectPath: "/"
+      });
       router.replace("/");
       return;
     }
 
     if (!isCommunityManager) {
-      console.log("⚠️ User is not a manager. Redirecting to home.");
+      logger.warn("User is not a manager, redirecting to home", {
+        component: "AdminGuard",
+        userId: currentUser.id,
+        communityId: COMMUNITY_ID,
+        membershipRole: targetMembership.role,
+        redirectPath: "/"
+      });
       toast.warning("管理者権限がありません");
       router.replace("/");
       return;
     }
 
-    console.log("✅ User is authorized as community manager.");
-  }, [currentUser, isAuthenticated, loading, router]);
+    logger.info("User is authorized as community manager", {
+      component: "AdminGuard",
+      userId: currentUser.id,
+      communityId: COMMUNITY_ID,
+      role: targetMembership.role
+    });
+  }, [currentUser, isAuthenticated, loading, router, authLoading, userLoading]);
 
   if (loading) {
-    console.log("⏳ Showing loading indicator...");
+    logger.debug("Showing loading indicator", {
+      component: "AdminGuard",
+      authLoading,
+      userLoading
+    });
     return <LoadingIndicator />;
   }
 
   if (!isAuthenticated || !currentUser || !currentUser.memberships || currentUser.memberships.length === 0) {
-    console.log("🚫 Unauthorized user state. No UI rendered.");
+    logger.info("Unauthorized user state, no UI rendered", {
+      component: "AdminGuard",
+      isAuthenticated,
+      hasCurrentUser: !!currentUser,
+      hasMemberships: !!(currentUser?.memberships?.length)
+    });
     return null;
   }
 
@@ -88,11 +127,20 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
 
   if (!isCommunityManager) {
-    console.log("❌ Unauthorized role. No UI rendered.");
+    logger.info("Unauthorized role, no UI rendered", {
+      component: "AdminGuard",
+      userId: currentUser.id,
+      communityId: COMMUNITY_ID,
+      membershipRole: targetMembership?.role
+    });
     return null;
   }
 
-  console.log("🟢 AdminGuard passed. Rendering children.");
+  logger.debug("AdminGuard passed, rendering children", {
+    component: "AdminGuard",
+    userId: currentUser.id,
+    communityId: COMMUNITY_ID
+  });
   return <>{children}</>;
 };
 
