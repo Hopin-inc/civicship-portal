@@ -10,6 +10,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
+import { ActivityCard } from "./data/type";
 
 export default function ActivitiesPage() {
   const headerConfig = useMemo(
@@ -20,6 +21,9 @@ export default function ActivitiesPage() {
     [],
   );
   useHeaderConfig(headerConfig);
+
+  const prevEdgeCountRef = useRef<number>(0);
+  const listCardsRef = useRef<ActivityCard[]>([]);
 
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
 
@@ -32,7 +36,42 @@ export default function ActivitiesPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  if (loading) {
+  // opportunitiesが変更されたときにデータを処理
+  const { upcomingCards, featuredCards, listCards } = useMemo(() => {
+    if (!opportunities?.edges?.length) {
+      return { upcomingCards: [], featuredCards: [], listCards: [] };
+    }
+
+    const activityCards = mapOpportunityCards(opportunities.edges);
+    const result = sliceActivitiesBySection(activityCards);
+
+    // 初回ロード時はリストカードを設定
+    if (prevEdgeCountRef.current === 0) {
+      listCardsRef.current = result.listCards;
+    }
+
+    // 追加ロード時は順序を保持するために新しいアイテムのみを追加
+    else if (opportunities.edges.length > prevEdgeCountRef.current) {
+      const newCards = mapOpportunityCards(opportunities.edges.slice(prevEdgeCountRef.current));
+      // すでにfeaturedまたはupcomingセクションに含まれていないカードのみをフィルタリング
+      const newListCards = newCards.filter(
+        (card) =>
+          !result.featuredCards.some((fc) => fc.id === card.id) &&
+          !result.upcomingCards.some((uc) => uc.id === card.id),
+      );
+      listCardsRef.current = [...listCardsRef.current, ...newListCards];
+    }
+
+    prevEdgeCountRef.current = opportunities.edges.length;
+
+    return {
+      upcomingCards: result.upcomingCards,
+      featuredCards: result.featuredCards,
+      listCards: listCardsRef.current,
+    };
+  }, [opportunities]);
+
+  if (loading && prevEdgeCountRef.current === 0) {
     return <LoadingIndicator />;
   }
 
@@ -43,9 +82,6 @@ export default function ActivitiesPage() {
   if (!loading && !opportunities?.edges?.length) {
     return <EmptyState title={"募集"} />;
   }
-
-  const activityCards = mapOpportunityCards(opportunities.edges);
-  const { upcomingCards, featuredCards, listCards } = sliceActivitiesBySection(activityCards);
 
   return (
     <div className="min-h-screen">
