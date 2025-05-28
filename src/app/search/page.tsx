@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
 // import SearchTabs, { SearchTabType } from "@/app/search/components/Tabs";
@@ -26,13 +26,22 @@ export default function SearchPage() {
   );
   useHeaderConfig(headerConfig);
 
+  const searchParams = useSearchParams();
+
+  // Initialize form with search parameters from URL
   const methods = useForm({
     defaultValues: {
-      searchQuery: "",
-      location: "",
-      dateRange: undefined,
-      guests: 0,
-      useTicket: false,
+      searchQuery: searchParams.get("q") || "",
+      location: searchParams.get("location") || "",
+      dateRange:
+        searchParams.get("from") && searchParams.get("to")
+          ? {
+              from: new Date(searchParams.get("from") as string),
+              to: new Date(searchParams.get("to") as string),
+            }
+          : undefined,
+      guests: searchParams.get("guests") ? parseInt(searchParams.get("guests") as string, 10) : 0,
+      useTicket: searchParams.get("ticket") === "true",
     },
   });
 
