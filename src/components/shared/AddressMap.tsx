@@ -4,6 +4,7 @@ import React, { useCallback, useRef, useState } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { getCoordinatesFromAddress } from "@/utils/maps/geocoding";
+import logger from "@/lib/logging";
 
 interface AddressMapProps {
   address: string;
@@ -70,7 +71,12 @@ const useAddressGeocoding = (
         // 住所からの取得に失敗した場合、フォールバックの座標を使用
         return setFallbackLocation(map, zoom);
       } catch (error) {
-        console.error("Error geocoding address:", error);
+        logger.warn("Error geocoding address", {
+          component: "AddressMap",
+          address,
+          error: error instanceof Error ? error.message : String(error),
+          fallbackUsed: !!(fallbackLat && fallbackLng)
+        });
 
         // エラー発生時もフォールバックの座標を使用
         return setFallbackLocation(map, zoom);
