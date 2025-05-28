@@ -54,7 +54,7 @@ const requestLink = new ApolloLink((operation, forward) => {
     };
     
     if (operation.operationName === 'userSignUp') {
-      console.log('🔍 userSignUp headers:', {
+      logger.debug('userSignUp request headers', {
         hasLineToken: !!lineTokens.accessToken,
         hasPhoneToken: !!phoneTokens.accessToken,
         lineExpiresAt: lineTokens.expiresAt,
