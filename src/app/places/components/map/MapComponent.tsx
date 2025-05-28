@@ -17,12 +17,14 @@ interface MapComponentProps {
   placePins: IPlacePin[];
   selectedPlaceId: string | null;
   onPlaceSelect: (placeId: string) => void;
+  onMapLoad?: (map: google.maps.Map) => void;
 }
 
 export default function MapComponent({
   placePins,
   selectedPlaceId,
   onPlaceSelect,
+  onMapLoad,
 }: MapComponentProps) {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -45,6 +47,16 @@ export default function MapComponent({
     selectedPlaceId,
   });
 
+  const handleMapLoad = React.useCallback(
+    (map: google.maps.Map) => {
+      onLoad(map);
+      if (onMapLoad) {
+        onMapLoad(map);
+      }
+    },
+    [onLoad, onMapLoad],
+  );
+
   if (!isLoaded || !imagesReady) {
     return <LoadingIndicator fullScreen />;
   }
@@ -54,7 +66,7 @@ export default function MapComponent({
       mapContainerStyle={containerStyle}
       center={center}
       zoom={INITIAL_ZOOM_LEVEL}
-      onLoad={onLoad}
+      onLoad={handleMapLoad}
       onUnmount={onUnmount}
       options={{
         gestureHandling: "greedy",
@@ -67,11 +79,7 @@ export default function MapComponent({
         <CustomMarker
           key={marker.id}
           data={marker}
-          onClick={() => {
-            console.debug(`マーカークリック - ID: ${marker.id}, 現在の選択ID: ${selectedPlaceId}`);
-            console.debug(`マーカーデータ:`, marker);
-            onPlaceSelect(marker.id);
-          }}
+          onClick={() => onPlaceSelect(marker.id)}
           isSelected={marker.id === selectedPlaceId}
         />
       ))}

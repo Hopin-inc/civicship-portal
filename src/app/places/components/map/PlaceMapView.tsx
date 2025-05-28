@@ -1,11 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import PlaceToggleButton from "../ToggleButton";
 import PlaceCardsSheet from "./PlaceCardsSheet";
 import MapComponent from "./MapComponent";
 import { AnimatePresence, motion } from "framer-motion";
 import { IPlaceCard, IPlacePin } from "@/app/places/data/type";
+import { ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+// Initial map center coordinates for Shikoku
+const INITIAL_CENTER = { lat: 33.0, lng: 133.5 };
+const INITIAL_ZOOM = 8.0;
 
 interface PlaceMapViewProps {
   selectedPlaceId: string | null;
@@ -22,12 +28,47 @@ const PlaceMapView: React.FC<PlaceMapViewProps> = ({
   placePins,
   places,
 }) => {
+  // Reference to store the Google Map instance
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  // Function to clear the selected place and reset map view
+  const handleClearSelection = () => {
+    // Clear the selected place
+    onPlaceSelect("");
+
+    // Reset map to initial position if we have a map reference
+    if (mapRef.current) {
+      mapRef.current.setZoom(INITIAL_ZOOM);
+      mapRef.current.setCenter(INITIAL_CENTER);
+    }
+  };
+
+  // Function to store the map reference
+  const handleMapLoad = (map: google.maps.Map) => {
+    mapRef.current = map;
+  };
+
   return (
     <div className="relative h-full w-full">
+      {selectedPlaceId && (
+        <div className="absolute top-8 left-4 z-50">
+          <Button
+            onClick={handleClearSelection}
+            variant="secondary"
+            size="sm"
+            className="shadow-md"
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            戻る
+          </Button>
+        </div>
+      )}
+
       <MapComponent
         placePins={placePins}
         selectedPlaceId={selectedPlaceId}
         onPlaceSelect={onPlaceSelect}
+        onMapLoad={handleMapLoad}
       />
       <AnimatePresence mode="wait">
         {selectedPlaceId ? (
