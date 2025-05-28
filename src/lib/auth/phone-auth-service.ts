@@ -45,10 +45,23 @@ export class PhoneAuthService {
     };
 
     const savedTokens = TokenManager.getPhoneTokens();
-    if (savedTokens.phoneUid && savedTokens.phoneNumber) {
+    if (savedTokens.phoneUid && savedTokens.phoneNumber && savedTokens.accessToken) {
       this.state.isVerified = true;
       this.state.phoneUid = savedTokens.phoneUid;
       this.state.phoneNumber = savedTokens.phoneNumber;
+      
+      console.log("Phone verification state initialized from saved tokens:", {
+        isVerified: this.state.isVerified,
+        phoneUid: this.state.phoneUid ? "exists" : "missing",
+        phoneNumber: this.state.phoneNumber ? "exists" : "missing",
+        accessToken: savedTokens.accessToken ? "exists" : "missing"
+      });
+    } else {
+      console.log("Phone verification not initialized - incomplete saved tokens:", {
+        phoneUid: savedTokens.phoneUid ? "exists" : "missing",
+        phoneNumber: savedTokens.phoneNumber ? "exists" : "missing",
+        accessToken: savedTokens.accessToken ? "exists" : "missing"
+      });
     }
   }
 

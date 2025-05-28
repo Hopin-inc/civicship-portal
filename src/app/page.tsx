@@ -51,7 +51,6 @@ export default function HomePage() {
             }
             router.replace(signUpWithNext);
           }
-          router.replace("/sign-up/phone-verification");
           return;
         }
 
