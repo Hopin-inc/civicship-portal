@@ -11,6 +11,7 @@ import { __DEV__ } from "@apollo/client/utilities/globals";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { TokenManager } from "./auth/token-manager";
 import logger from "./logging";
+import { createAuthLogContext } from "./auth/logging-utils";
 
 if (__DEV__) {
   loadDevMessages();
@@ -73,15 +74,22 @@ const requestLink = new ApolloLink((operation, forward) => {
 });
 
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
+  const context = operation.getContext();
+  const sessionId = context.sessionId || 'unknown_session';
+  
   if (graphQLErrors) {
     for (const error of graphQLErrors) {
-      logger.info("GraphQL error occurred", {
-        message: error.message,
-        locations: error.locations,
-        path: error.path,
-        extensions: error.extensions,
-        operation: operation.operationName
-      });
+      logger.info("GraphQL error occurred", createAuthLogContext(
+        sessionId,
+        "general",
+        {
+          message: error.message,
+          locations: error.locations,
+          path: error.path,
+          extensions: error.extensions,
+          operation: operation.operationName
+        }
+      ));
 
       if (
         error.message.includes("Authentication required") ||
@@ -89,6 +97,16 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
         error.message.includes("Token expired") ||
         error.message.includes("Unauthorized")
       ) {
+        logger.info("Authentication token expired or invalid", createAuthLogContext(
+          sessionId,
+          "general",
+          {
+            operation: operation.operationName,
+            source: "graphql",
+            message: error.message
+          }
+        ));
+        
         if (typeof window !== "undefined") {
           window.dispatchEvent(
             new CustomEvent("auth:token-expired", {
@@ -102,14 +120,28 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
 
   if (networkError) {
     const logLevel = ("statusCode" in networkError && networkError.statusCode >= 500) ? "error" : "info";
-    logger[logLevel]("Network error occurred", {
-      message: networkError.message,
-      statusCode: "statusCode" in networkError ? networkError.statusCode : undefined,
-      networkErrorType: networkError.name,
-      operation: operation.operationName
-    });
+    logger[logLevel]("Network error occurred", createAuthLogContext(
+      sessionId,
+      "general",
+      {
+        message: networkError.message,
+        statusCode: "statusCode" in networkError ? networkError.statusCode : undefined,
+        networkErrorType: networkError.name,
+        operation: operation.operationName
+      }
+    ));
 
     if ("statusCode" in networkError && networkError.statusCode === 401) {
+      logger.info("Network authentication error (401)", createAuthLogContext(
+        sessionId,
+        "general",
+        {
+          operation: operation.operationName,
+          source: "network",
+          status: 401
+        }
+      ));
+      
       if (typeof window !== "undefined") {
         window.dispatchEvent(
           new CustomEvent("auth:token-expired", {

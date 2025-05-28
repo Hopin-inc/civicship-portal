@@ -10,6 +10,7 @@ import { phoneAuth, categorizeFirebaseError } from "./firebase-config";
 import { TokenManager, PhoneAuthTokens } from "./token-manager";
 import { isRunningInLiff } from "./environment-detector";
 import logger from "../logging";
+import { createAuthLogContext, maskPhoneNumber, maskUserId } from "./logging-utils";
 
 /**
  * 電話番号認証の状態
@@ -107,9 +108,10 @@ export class PhoneAuthService {
   /**
    * 電話番号認証を開始
    * @param phoneNumber 電話番号
+   * @param sessionId セッションID（ログ追跡用）
    * @returns 認証IDまたはnull（エラー時）
    */
-  public async startPhoneVerification(phoneNumber: string): Promise<string | null> {
+  public async startPhoneVerification(phoneNumber: string, sessionId?: string): Promise<string | null> {
     try {
       this.state.isVerifying = true;
       this.state.error = null;
@@ -141,10 +143,16 @@ export class PhoneAuthService {
 
       return confirmationResult.verificationId;
     } catch (error) {
-      logger.info("Phone verification failed", {
-        error: error instanceof Error ? error.message : String(error),
-        phoneNumber: this.state.phoneNumber ? "provided" : "missing"
-      });
+      logger.info("Phone verification failed", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "phone",
+        {
+          operation: "startPhoneVerification",
+          error: error instanceof Error ? error.message : String(error),
+          phoneNumber: this.state.phoneNumber ? maskPhoneNumber(this.state.phoneNumber) : "missing",
+          errorDetails: categorizeFirebaseError(error)
+        }
+      ));
       this.state.error = error as Error;
       return null;
     } finally {
@@ -155,34 +163,72 @@ export class PhoneAuthService {
   /**
    * 電話番号認証コードを検証
    * @param verificationCode 認証コード
+   * @param sessionId セッションID（ログ追跡用）
    * @returns 検証が成功したかどうか
    */
-  public async verifyPhoneCode(verificationCode: string): Promise<boolean> {
+  public async verifyPhoneCode(verificationCode: string, sessionId?: string): Promise<boolean> {
     try {
       this.state.isVerifying = true;
       this.state.error = null;
 
-      logger.debug("Starting phone verification with code, using phoneAuth instance (no tenant)");
+      logger.debug("Starting phone verification with code", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "phone",
+        {
+          operation: "verifyPhoneCode",
+          verificationIdExists: !!this.state.verificationId
+        }
+      ));
 
       if (!this.state.verificationId) {
-        logger.info("Missing verificationId for phone verification", {
-          operation: "verifyPhoneCode"
-        });
+        logger.info("Missing verificationId for phone verification", createAuthLogContext(
+          sessionId || 'unknown_session',
+          "phone",
+          {
+            operation: "verifyPhoneCode"
+          }
+        ));
         return false;
       }
 
       try {
         const credential = PhoneAuthProvider.credential(this.state.verificationId, verificationCode);
-        logger.debug("Successfully created phone credential");
+        logger.debug("Successfully created phone credential", createAuthLogContext(
+          sessionId || 'unknown_session',
+          "phone",
+          {
+            operation: "verifyPhoneCode"
+          }
+        ));
 
         try {
-          logger.debug("Signing in with credential to get user ID");
+          logger.debug("Signing in with credential to get user ID", createAuthLogContext(
+            sessionId || 'unknown_session',
+            "phone",
+            {
+              operation: "verifyPhoneCode"
+            }
+          ));
           const userCredential = await signInWithCredential(phoneAuth, credential);
-          logger.info("Phone sign-in successful with credential");
+          logger.info("Phone sign-in successful with credential", createAuthLogContext(
+            sessionId || 'unknown_session',
+            "phone",
+            {
+              operation: "verifyPhoneCode",
+              userId: userCredential.user ? maskUserId(userCredential.user.uid) : "none"
+            }
+          ));
 
           if (userCredential.user) {
             this.state.phoneUid = userCredential.user.uid;
-            logger.debug("Stored phone UID", { uid: this.state.phoneUid });
+            logger.debug("Stored phone UID", createAuthLogContext(
+              sessionId || 'unknown_session',
+              "phone",
+              {
+                operation: "verifyPhoneCode",
+                uid: maskUserId(this.state.phoneUid || '')
+              }
+            ));
 
             const idToken = await userCredential.user.getIdToken();
             const refreshToken = userCredential.user.refreshToken;
@@ -199,22 +245,56 @@ export class PhoneAuthService {
             };
             TokenManager.savePhoneTokens(tokens);
 
-            logger.debug("Extracted phone auth tokens successfully");
+            logger.debug("Extracted phone auth tokens successfully", createAuthLogContext(
+              sessionId || 'unknown_session',
+              "phone",
+              {
+                operation: "verifyPhoneCode",
+                hasIdToken: !!idToken,
+                hasRefreshToken: !!refreshToken,
+                expiresAt: new Date(expirationTime).toISOString()
+              }
+            ));
           } else {
-            logger.error("No user returned from signInWithCredential", {
-              operation: "verifyPhoneCode"
-            });
+            logger.error("No user returned from signInWithCredential", createAuthLogContext(
+              sessionId || 'unknown_session',
+              "phone",
+              {
+                operation: "verifyPhoneCode"
+              }
+            ));
           }
 
           await phoneAuth.signOut();
-          logger.debug("Signed out of phone auth");
+          logger.debug("Signed out of phone auth", createAuthLogContext(
+            sessionId || 'unknown_session',
+            "phone",
+            {
+              operation: "verifyPhoneCode"
+            }
+          ));
         } catch (signInError) {
-          logger.info("Could not sign in with phone credential", {
-            error: signInError instanceof Error ? signInError.message : String(signInError)
-          });
+          logger.info("Could not sign in with phone credential", createAuthLogContext(
+            sessionId || 'unknown_session',
+            "phone",
+            {
+              operation: "verifyPhoneCode",
+              error: signInError instanceof Error ? signInError.message : String(signInError),
+              errorDetails: categorizeFirebaseError(signInError)
+            }
+          ));
 
           try {
-            logger.debug("Attempting fallback with signInWithPhoneNumber");
+            logger.debug("Attempting fallback with signInWithPhoneNumber", createAuthLogContext(
+              sessionId || 'unknown_session',
+              "phone",
+              {
+                operation: "verifyPhoneCode",
+                fallback: true,
+                hasPhoneNumber: !!this.state.phoneNumber,
+                hasRecaptchaVerifier: !!this.recaptchaVerifier
+              }
+            ));
             if (!this.state.phoneNumber || !this.recaptchaVerifier) {
               throw new Error("Missing phone number or recaptcha verifier for fallback");
             }
@@ -227,7 +307,15 @@ export class PhoneAuthService {
 
             if (phoneAuth.currentUser) {
               this.state.phoneUid = phoneAuth.currentUser.uid;
-              logger.debug("Stored phone UID from fallback", { uid: this.state.phoneUid });
+              logger.debug("Stored phone UID from fallback", createAuthLogContext(
+                sessionId || 'unknown_session',
+                "phone",
+                {
+                  operation: "verifyPhoneCode",
+                  fallback: true,
+                  uid: maskUserId(this.state.phoneUid || '')
+                }
+              ));
 
               const idToken = await phoneAuth.currentUser.getIdToken();
               const refreshToken = phoneAuth.currentUser.refreshToken;
@@ -244,33 +332,67 @@ export class PhoneAuthService {
               };
               TokenManager.savePhoneTokens(tokens);
 
-              logger.debug("Extracted phone auth tokens successfully (fallback)");
+              logger.debug("Extracted phone auth tokens successfully (fallback)", createAuthLogContext(
+                sessionId || 'unknown_session',
+                "phone",
+                {
+                  operation: "verifyPhoneCode",
+                  fallback: true,
+                  hasIdToken: !!idToken,
+                  hasRefreshToken: !!refreshToken,
+                  expiresAt: new Date(expirationTime).toISOString()
+                }
+              ));
             }
 
             await phoneAuth.signOut();
           } catch (fallbackError) {
-            logger.error("Phone verification fallback failed", {
-              error: fallbackError instanceof Error ? fallbackError.message : String(fallbackError)
-            });
+            logger.error("Phone verification fallback failed", createAuthLogContext(
+              sessionId || 'unknown_session',
+              "phone",
+              {
+                operation: "verifyPhoneCode",
+                fallback: true,
+                error: fallbackError instanceof Error ? fallbackError.message : String(fallbackError),
+                errorDetails: categorizeFirebaseError(fallbackError)
+              }
+            ));
           }
         }
 
         this.state.isVerified = true;
-        logger.info("Phone verification state set to verified", {
-          phoneNumber: this.state.phoneNumber,
-          phoneUid: this.state.phoneUid
-        });
+        logger.info("Phone verification state set to verified", createAuthLogContext(
+          sessionId || 'unknown_session',
+          "phone",
+          {
+            operation: "verifyPhoneCode",
+            phoneNumber: this.state.phoneNumber ? maskPhoneNumber(this.state.phoneNumber) : "none",
+            phoneUid: this.state.phoneUid ? maskUserId(this.state.phoneUid) : "none"
+          }
+        ));
         return true;
       } catch (credentialError) {
-        logger.info("Invalid verification code", {
-          error: credentialError instanceof Error ? credentialError.message : String(credentialError)
-        });
+        logger.info("Invalid verification code", createAuthLogContext(
+          sessionId || 'unknown_session',
+          "phone",
+          {
+            operation: "verifyPhoneCode",
+            error: credentialError instanceof Error ? credentialError.message : String(credentialError),
+            errorDetails: categorizeFirebaseError(credentialError)
+          }
+        ));
         return false;
       }
     } catch (error) {
-      logger.error("Code verification failed", {
-        error: error instanceof Error ? error.message : String(error)
-      });
+      logger.error("Code verification failed", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "phone",
+        {
+          operation: "verifyPhoneCode",
+          error: error instanceof Error ? error.message : String(error),
+          errorDetails: categorizeFirebaseError(error)
+        }
+      ));
       this.state.error = error as Error;
       return false;
     } finally {
@@ -280,12 +402,19 @@ export class PhoneAuthService {
 
   /**
    * 電話番号認証トークンを更新
+   * @param sessionId セッションID（ログ追跡用）
    * @returns 新しいトークンまたはnull（エラー時）
    */
-  public async refreshPhoneIdToken(): Promise<string | null> {
+  public async refreshPhoneIdToken(sessionId?: string): Promise<string | null> {
     try {
       if (!phoneAuth.currentUser) {
-        logger.info("Cannot refresh phone token: No authenticated user");
+        logger.info("Cannot refresh phone token: No authenticated user", createAuthLogContext(
+          sessionId || 'unknown_session',
+          "phone",
+          {
+            operation: "refreshPhoneIdToken"
+          }
+        ));
         return null;
       }
 
@@ -305,9 +434,15 @@ export class PhoneAuthService {
 
       return idToken;
     } catch (error) {
-      logger.error("Failed to refresh phone ID token", {
-        error: error instanceof Error ? error.message : String(error)
-      });
+      logger.error("Failed to refresh phone ID token", createAuthLogContext(
+        sessionId || 'unknown_session',
+        "phone",
+        {
+          operation: "refreshPhoneIdToken",
+          error: error instanceof Error ? error.message : String(error),
+          errorDetails: categorizeFirebaseError(error)
+        }
+      ));
       return null;
     }
   }

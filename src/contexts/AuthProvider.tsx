@@ -15,6 +15,7 @@ import { USER_SIGN_UP } from "@/graphql/account/identity/mutation";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { COMMUNITY_ID } from "@/utils";
 import logger from "@/lib/logging";
+import { generateSessionId, maskPhoneNumber, maskUserId, createAuthLogContext, createRetryLogContext } from "@/lib/auth/logging-utils";
 
 /**
  * 認証状態の型定義
@@ -26,6 +27,7 @@ export type AuthState = {
   phoneAuthStatus: "verified" | "unverified" | "loading";
   environment: AuthEnvironment;
   isAuthenticating: boolean;
+  sessionId: string;
 };
 
 /**
@@ -82,6 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     phoneAuthStatus: "loading",
     environment,
     isAuthenticating: false,
+    sessionId: generateSessionId(),
   });
 
   const router = useRouter();
@@ -95,15 +98,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = lineAuth.onAuthStateChanged((user) => {
+      const prevAuthStatus = state.lineAuthStatus;
+      const newAuthStatus = user ? "authenticated" : "unauthenticated";
+      
+      logger.info("Firebase auth state changed", createAuthLogContext(
+        state.sessionId,
+        "liff",
+        {
+          operation: "authStateChanged",
+          prevState: prevAuthStatus,
+          newState: newAuthStatus,
+          userId: user ? maskUserId(user.uid) : "none",
+          hasUser: !!user
+        }
+      ));
+      
       setState((prev) => ({
         ...prev,
         firebaseUser: user,
-        lineAuthStatus: user ? "authenticated" : "unauthenticated",
+        lineAuthStatus: newAuthStatus,
       }));
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [state.sessionId, state.lineAuthStatus]);
 
   useEffect(() => {
     const phoneState = phoneAuthService.getState();
@@ -197,13 +215,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           else if ((environment === AuthEnvironment.LIFF || liffState.isLoggedIn) &&
               state.lineAuthStatus === "unauthenticated" &&
               !state.isAuthenticating) {
-            console.log(`🔍 [${timestamp}] Auto-logging in via LIFF`);
+            logger.debug("Auto-logging in via LIFF", {
+              timestamp,
+              operation: "autoLogin",
+              path: typeof window !== "undefined" ? window.location.pathname : "/",
+              environment
+            });
             await loginWithLiff(typeof window !== "undefined" ? window.location.pathname : "/");
           } else {
-            console.log(`🔍 [${timestamp}] No authentication action needed. Current state:`, {
+            logger.debug("No authentication action needed", {
+              timestamp,
               liffLoggedIn: liffState.isLoggedIn,
               lineAuthStatus: state.lineAuthStatus,
-              isAuthenticating: state.isAuthenticating
+              isAuthenticating: state.isAuthenticating,
+              environment
             });
           }
         } else {
