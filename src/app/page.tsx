@@ -26,18 +26,13 @@ export default function HomePage() {
     if (liffState) {
       console.log("🚀 Detected return from LINE authentication, liff.state:", liffState);
 
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
-
       if (isAuthenticating || authLoading || userLoading) {
         console.log("🚀 Auth state loading, waiting before redirect");
         return; // Wait for auth state to stabilize
       } else if (isAuthenticated) {
         if (!userData?.currentUser) {
           console.log("🚀 No user data, redirecting to phone verification");
-          const next = extractSearchParamFromRelativePath(liffState, "next");
-          const redirectPath = next ? `/sign-up/phone-verification?next=${encodeURIComponent(next)}` : "/sign-up/phone-verification";
-          router.replace(redirectPath);
+          router.replace("/sign-up/phone-verification");
           return;
         }
 
