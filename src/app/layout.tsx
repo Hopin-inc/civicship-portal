@@ -5,8 +5,7 @@ import { CookiesProvider } from "next-client-cookies/server";
 import ApolloProvider from "@/components/providers/ApolloProvider";
 import { Toaster } from "@/components/ui/sonner";
 import LoadingProvider from "@/components/providers/LoadingProvider";
-import { LiffProvider } from "@/contexts/LiffContext";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
 import React from "react";
@@ -38,29 +37,27 @@ export const viewport: Viewport = {
 };
 
 const RootLayout = ({
-  children,
-}: Readonly<{
+                      children,
+                    }: Readonly<{
   children: React.ReactNode;
 }>) => {
   return (
     <html lang="ja">
-      <body className={font.className}>
-        <CookiesProvider>
-          <ApolloProvider>
-            <LiffProvider>
-              <AuthProvider>
-                <HeaderProvider>
-                  <LoadingProvider>
-                    <AnalyticsProvider />
-                    <MainContent>{children}</MainContent>
-                    <Toaster richColors className="mx-8" />
-                  </LoadingProvider>
-                </HeaderProvider>
-              </AuthProvider>
-            </LiffProvider>
-          </ApolloProvider>
-        </CookiesProvider>
-      </body>
+    <body className={ font.className }>
+    <CookiesProvider>
+      <ApolloProvider>
+        <AuthProvider>
+          <HeaderProvider>
+            <LoadingProvider>
+              <AnalyticsProvider />
+              <MainContent>{ children }</MainContent>
+              <Toaster richColors className="mx-8" />
+            </LoadingProvider>
+          </HeaderProvider>
+        </AuthProvider>
+      </ApolloProvider>
+    </CookiesProvider>
+    </body>
     </html>
   );
 };

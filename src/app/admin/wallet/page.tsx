@@ -3,10 +3,10 @@
 import React, { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { COMMUNITY_ID } from "@/utils";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
-import { GqlRole, useGetCommunityWalletQuery } from "@/types/graphql";
+import { GqlMembership, GqlRole, useGetCommunityWalletQuery } from "@/types/graphql";
 import { Coins, Gift } from "lucide-react";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,7 @@ export default function WalletPage() {
   const communityId = COMMUNITY_ID;
   const { user: currentUser } = useAuth();
   const currentUserRole = currentUser?.memberships?.find(
-    (m) => m.community?.id === communityId,
+    (m: GqlMembership) => m.community?.id === communityId,
   )?.role;
 
   const headerConfig = useMemo(

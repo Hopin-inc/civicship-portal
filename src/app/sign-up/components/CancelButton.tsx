@@ -2,7 +2,7 @@
 
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { auth } from "@/lib/firebase";
+import { lineAuth as auth } from "@/lib/auth/firebase-config";
 import { useCookies } from "next-client-cookies";
 import { useRouter } from "next/navigation";
 import { MouseEventHandler } from "react";

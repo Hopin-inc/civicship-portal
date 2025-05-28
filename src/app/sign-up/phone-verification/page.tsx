@@ -1,43 +1,32 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { PhoneVerificationForm } from "./PhoneVerificationForm";
-import { isRunningInLiff } from "@/utils/liff";
 
 export default function PhoneVerificationPage() {
-  const { user, loading } = useAuth();
   const router = useRouter();
-
-  const isLineWebBrowser = () => {
-    if (typeof window === "undefined") return false;
-    return /Line/i.test(navigator.userAgent);
-  };
+  const searchParams = useSearchParams();
+  const hasRedirected = useRef(false);
 
   useEffect(() => {
-    const isLiff = isRunningInLiff();
+    if (hasRedirected.current) return;
 
-    if (!isLiff && isLineWebBrowser()) {
-      router.replace("/sign-up/phone-verification/line-browser");
-      return;
+    const isLineWebBrowser = () => {
+      if (typeof navigator === "undefined") return false;
+      const userAgent = navigator.userAgent;
+      return /Line/i.test(userAgent);
+    };
+
+    if (isLineWebBrowser()) {
+      hasRedirected.current = true;
+      const nextParam = searchParams.get("next");
+      const redirectUrl = nextParam ? 
+        `/sign-up/phone-verification/line-browser?next=${encodeURIComponent(nextParam)}` : 
+        "/sign-up/phone-verification/line-browser";
+      window.location.replace(redirectUrl);
     }
-
-    if (!loading && user) {
-      toast.success("既にログインしています");
-      router.replace("/users/me");
-    }
-  }, [router, user, loading]);
-
-  if (loading) {
-    return <LoadingIndicator />;
-  }
-
-  if (!loading && user) {
-    return null;
-  }
+  }, [router]);
 
   return (
     <div className="container mx-auto py-8">

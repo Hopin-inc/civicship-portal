@@ -1,4 +1,4 @@
-import AdminGuard from "@/app/admin/components/AdminGuard";
+import { AdminGuard } from "@/components/auth/AdminGuard";
 import { metadata } from "./metadata";
 
 export { metadata };

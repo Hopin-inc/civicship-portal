@@ -1,12 +1,18 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { useRouter, useSearchParams } from "next/navigation";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export function PhoneVerificationForm() {
-  const { phoneAuth } = useAuth();
+  const { phoneAuth, isAuthenticated, isPhoneVerified, loading } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
+
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -14,15 +20,21 @@ export function PhoneVerificationForm() {
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!loading) {
+      if (!isAuthenticated) {
+        let loginWithNext = "/login";
+        if (nextParam) {
+          loginWithNext += `?next=${ encodeURIComponent(nextParam) }`;
+        }
+        router.replace(loginWithNext);
+      }
+    }
+  }, [isAuthenticated, isPhoneVerified, loading, router]);
+
+  useEffect(() => {
     if (recaptchaContainerRef.current) {
       setIsRecaptchaReady(true);
     }
-
-    return () => {
-      import("../../../lib/firebase").then(({ clearRecaptcha }) => {
-        clearRecaptcha();
-      });
-    };
   }, []);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
@@ -33,15 +45,22 @@ export function PhoneVerificationForm() {
     }
 
     const formattedPhone = formatPhoneNumber(phoneNumber);
-    const success = await phoneAuth.startPhoneVerification(formattedPhone);
-    if (success) {
+    const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
+    if (verificationId) {
       setStep("code");
     }
   };
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await phoneAuth.verifyPhoneCode(verificationCode);
+    const success = await phoneAuth.verifyPhoneCode(verificationCode);
+    if (success) {
+      toast.success("電話番号認証が完了しました");
+      const nextUrl = nextParam ? `/sign-up?next=${encodeURIComponent(nextParam)}` : "/sign-up";
+      router.push(nextUrl);
+    } else {
+      toast.error("認証コードが無効です");
+    }
   };
 
   const formatPhoneNumber = (phone: string): string => {
@@ -61,6 +80,14 @@ export function PhoneVerificationForm() {
   const handleOTPChange = (value: string) => {
     setVerificationCode(value);
   };
+
+  if (loading) {
+    return <LoadingIndicator />;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="w-full max-w-md mx-auto space-y-8">
