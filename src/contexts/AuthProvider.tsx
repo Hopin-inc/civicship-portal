@@ -384,8 +384,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log("🔍 Tokens before userSignUp:", {
         lineToken: !!lineTokens.accessToken,
         phoneToken: !!phoneTokens.accessToken,
-        lineExpiresAt: lineTokens.expiresAt ? new Date(lineTokens.expiresAt).toISOString() : null,
-        phoneExpiresAt: phoneTokens.expiresAt ? new Date(phoneTokens.expiresAt).toISOString() : null,
+        lineExpiresAt: lineTokens.expiresAt,
+        phoneExpiresAt: phoneTokens.expiresAt,
         phoneUid,
         phoneNumber: phoneTokens.phoneNumber,
       });
