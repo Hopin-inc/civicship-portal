@@ -46,21 +46,21 @@ const requestLink = new ApolloLink((operation, forward) => {
       Authorization: lineTokens.accessToken ? `Bearer ${lineTokens.accessToken}` : "",
       "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
       "X-Refresh-Token": lineTokens.refreshToken || "",
-      "X-Token-Expires-At": lineTokens.expiresAt ? new Date(lineTokens.expiresAt).toISOString() : "",
+      "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
       "X-Phone-Auth-Token": phoneTokens.accessToken || "",
       "X-Phone-Refresh-Token": phoneTokens.refreshToken || "",
-      "X-Phone-Token-Expires-At": phoneTokens.expiresAt ? new Date(phoneTokens.expiresAt).toISOString() : "",
+      "X-Phone-Token-Expires-At": phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
     };
     
     if (operation.operationName === 'userSignUp') {
       console.log('🔍 userSignUp headers:', {
         hasLineToken: !!lineTokens.accessToken,
         hasPhoneToken: !!phoneTokens.accessToken,
-        lineExpiresAt: lineTokens.expiresAt ? new Date(lineTokens.expiresAt).toISOString() : null,
-        phoneExpiresAt: phoneTokens.expiresAt ? new Date(phoneTokens.expiresAt).toISOString() : null,
+        lineExpiresAt: lineTokens.expiresAt,
+        phoneExpiresAt: phoneTokens.expiresAt,
         headers: {
-          'X-Token-Expires-At': lineTokens.expiresAt ? new Date(lineTokens.expiresAt).toISOString() : "",
-          'X-Phone-Token-Expires-At': phoneTokens.expiresAt ? new Date(phoneTokens.expiresAt).toISOString() : "",
+          'X-Token-Expires-At': lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
+          'X-Phone-Token-Expires-At': phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
         }
       });
     }
