@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
-import { toast } from "sonner";
 import { SignUpForm } from "@/app/sign-up/components/SignUpForm";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
@@ -11,11 +10,10 @@ export default function RegisterAccount() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next");
+  const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
 
   useEffect(() => {
     if (!loading && user) {
-      toast.success("既にログインしています");
       router.replace(nextParam ?? "/users/me");
     }
   }, [user, loading, router]);

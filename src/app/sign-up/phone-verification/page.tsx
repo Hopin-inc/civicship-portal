@@ -20,10 +20,10 @@ export default function PhoneVerificationPage() {
 
     if (isLineWebBrowser()) {
       hasRedirected.current = true;
-      const nextParam = searchParams.get("next");
-      const redirectUrl = nextParam ? 
-        `/sign-up/phone-verification/line-browser?next=${encodeURIComponent(nextParam)}` : 
-        "/sign-up/phone-verification/line-browser";
+      const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
+      const redirectUrl = nextParam
+        ? `/sign-up/phone-verification/line-browser?next=${encodeURIComponent(nextParam)}`
+        : "/sign-up/phone-verification/line-browser";
       window.location.replace(redirectUrl);
     }
   }, [router]);
