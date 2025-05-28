@@ -105,7 +105,6 @@ export const useReservationCommand = () => {
           isUserError,
           error: e instanceof Error ? e.message : String(e)
         });
-        console.error("Reservation mutation failed", e);
         return { success: false, code: GqlErrorCode.Unknown };
       }
     },
