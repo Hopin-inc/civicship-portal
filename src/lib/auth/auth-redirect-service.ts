@@ -70,15 +70,23 @@ export class AuthRedirectService {
   public getRedirectPath(pathname: string, next?: string | null): string | null {
     const authState = this.authStateStore.getState();
     const nextParam = next ? `?next=${ next }` : "";
+    
+    console.log(`🔍 AuthRedirect check: pathname=${pathname}, authState=${authState}`);
 
     if (this.isProtectedPath(pathname)) {
       switch (authState) {
         case "unauthenticated":
+          console.log(`📍 Redirecting unauthenticated user to login`);
           return `/login${ nextParam }`;
         case "line_authenticated":
+          console.log(`📍 Redirecting LINE-only user to phone verification`);
           return `/sign-up/phone-verification${ nextParam }`;
         case "phone_authenticated":
+          console.log(`📍 Redirecting phone-verified user to sign-up`);
           return `/sign-up${ nextParam }`;
+        case "user_registered":
+          console.log(`✅ User registered, allowing access to protected path`);
+          return null;
         default:
           break;
       }
