@@ -17,23 +17,46 @@ export const useLineAuthRedirect = (
   const hasProcessedRedirect = useRef(false);
 
   useEffect(() => {
+    const hookTimestamp = new Date().toISOString();
+    console.log(`🔄 [${hookTimestamp}] useLineAuthRedirect hook initialized, authState=${authenticationState}, isAuthenticating=${isAuthenticating}`);
+    
     const handleLineAuthRedirect = async () => {
-      console.log("👀 handleLineAuthRedirect started!")
-      if (typeof window === "undefined") return;
-      if (isAuthenticating) return;
-      if (hasProcessedRedirect.current) return;
+      const fnTimestamp = new Date().toISOString();
+      console.log(`👀 [${fnTimestamp}] handleLineAuthRedirect started! authState=${authenticationState}, isAuthenticating=${isAuthenticating}`);
+      
+      if (typeof window === "undefined") {
+        console.log(`🔄 [${fnTimestamp}] Early return: window is undefined`);
+        return;
+      }
+      
+      if (isAuthenticating) {
+        console.log(`🔄 [${fnTimestamp}] Early return: isAuthenticating is already true`);
+        return;
+      }
+      
+      if (hasProcessedRedirect.current) {
+        console.log(`🔄 [${fnTimestamp}] Early return: hasProcessedRedirect is already true`);
+        return;
+      }
 
       const isReturnFromLineAuth = searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
-      if (!isReturnFromLineAuth) return;
-      console.log("👀 handleLineAuthRedirect continue condition met!")
+      if (!isReturnFromLineAuth) {
+        console.log(`🔄 [${fnTimestamp}] Early return: not a LINE auth redirect`);
+        return;
+      }
+      
+      console.log(`👀 [${fnTimestamp}] handleLineAuthRedirect continue condition met!`);
 
-      if (authenticationState !== "unauthenticated" && authenticationState !== "loading") return;
+      if (authenticationState !== "unauthenticated" && authenticationState !== "loading") {
+        console.log(`🔄 [${fnTimestamp}] Early return: authState is ${authenticationState}, not 'unauthenticated' or 'loading'`);
+        return;
+      }
 
       hasProcessedRedirect.current = true;
+      console.log(`🔄 [${fnTimestamp}] Set hasProcessedRedirect to true`);
 
-      const timestamp = new Date().toISOString();
-      console.log(`🔍 [${timestamp}] Detected LINE authentication redirect`);
-      console.log(`🔍 [${timestamp}] Current state:`, {
+      console.log(`🔍 [${fnTimestamp}] Detected LINE authentication redirect`);
+      console.log(`🔍 [${fnTimestamp}] Current state:`, {
         authenticationState,
         isAuthenticating,
         environment,
@@ -45,15 +68,16 @@ export const useLineAuthRedirect = (
         }
       });
 
+      console.log(`🔄 [${fnTimestamp}] About to set isAuthenticating=true`);
       setIsAuthenticating(true);
-      console.log("🔍 Starting LINE authentication processing - blocking other auth initialization");
+      console.log(`🔍 [${fnTimestamp}] Starting LINE authentication processing - blocking other auth initialization`);
 
       try {
         const liffSuccess = await liffService.initialize();
         if (liffSuccess) {
-          console.log("👀 handleLineAuthRedirect liffSuccess!")
+          console.log(`👀 [${fnTimestamp}] handleLineAuthRedirect liffSuccess!`);
           const liffState = liffService.getState();
-          console.log(`🔍 [${timestamp}] LIFF state after initialization:`, {
+          console.log(`🔍 [${fnTimestamp}] LIFF state after initialization:`, {
             isInitialized: liffState.isInitialized,
             isLoggedIn: liffState.isLoggedIn,
             userId: liffState.profile?.userId || "none",
@@ -62,22 +86,22 @@ export const useLineAuthRedirect = (
 
           if (liffState.isLoggedIn) {
             const success = await liffService.signInWithLiffToken();
-            console.log(`🔍 [${timestamp}] signInWithLiffToken result:`, success);
+            console.log(`🔍 [${fnTimestamp}] signInWithLiffToken result:`, success);
 
             if (success) {
-              console.log(`🔍 [${timestamp}] LINE authentication successful - refreshing user data`);
+              console.log(`🔍 [${fnTimestamp}] LINE authentication successful - refreshing user data`);
               await refetchUser();
             } else {
-              console.error(`🔍 [${timestamp}] Failed to complete LINE authentication with LIFF token`);
+              console.error(`🔍 [${fnTimestamp}] Failed to complete LINE authentication with LIFF token`);
             }
           } else {
-            console.log(`🔍 [${timestamp}] LIFF not logged in after initialization`);
+            console.log(`🔍 [${fnTimestamp}] LIFF not logged in after initialization`);
           }
         } else {
-          console.error(`🔍 [${timestamp}] LIFF initialization failed during redirect completion`);
+          console.error(`🔍 [${fnTimestamp}] LIFF initialization failed during redirect completion`);
         }
       } catch (error) {
-        console.error(`🔍 [${timestamp}] Error during LINE authentication completion:`, error);
+        console.error(`🔍 [${fnTimestamp}] Error during LINE authentication completion:`, error);
       } finally {
         setIsAuthenticating(false);
       }

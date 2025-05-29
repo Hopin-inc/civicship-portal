@@ -17,8 +17,17 @@ export const useTokenExpiration = (
   const hasInitialized = useRef(false);
 
   useEffect(() => {
+    const hookTimestamp = new Date().toISOString();
+    console.log(`🔄 [${hookTimestamp}] useTokenExpiration hook initialized, authState=${authenticationState}, isAuthenticating=${isAuthenticating}`);
+    
     const initializeAuthState = async () => {
-      if (hasInitialized.current) return;
+      const fnTimestamp = new Date().toISOString();
+      console.log(`🔄 [${fnTimestamp}] initializeAuthState started, hasInitialized=${hasInitialized.current}, isAuthenticating=${isAuthenticating}`);
+      
+      if (hasInitialized.current) {
+        console.log(`🔄 [${fnTimestamp}] Early return: hasInitialized is already true`);
+        return;
+      }
       
       if (typeof window !== "undefined") {
         const url = new URL(window.location.href);
@@ -27,17 +36,17 @@ export const useTokenExpiration = (
                                     url.searchParams.has("liffClientId");
         
         if (isReturnFromLineAuth) {
-          console.log("🔍 Detected LINE auth redirect in useTokenExpiration - skipping initialization");
+          console.log(`🔄 [${fnTimestamp}] Detected LINE auth redirect in useTokenExpiration - skipping initialization`);
           return;
         }
       }
       
       if (isAuthenticating) {
-        console.log("🔍 Skipping auth state initialization - authentication in progress");
+        console.log(`🔄 [${fnTimestamp}] Skipping auth state initialization - authentication in progress`);
         return;
       }
 
-      console.log("🔍 Initializing authentication state");
+      console.log(`🔄 [${fnTimestamp}] Initializing authentication state`);
       await authService.initializeAuthState(isAuthenticating);
 
       const tokenService = TokenService.getInstance();

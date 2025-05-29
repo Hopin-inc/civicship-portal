@@ -14,23 +14,36 @@ export const useFirebaseAuth = (
   const authService = AuthService.getInstance();
 
   useEffect(() => {
+    const timestamp = new Date().toISOString();
+    console.log(`🔄 [${timestamp}] useFirebaseAuth hook initialized, isAuthenticating=${isAuthenticating}`);
+    
     const unsubscribe = lineAuth.onAuthStateChanged((user) => {
-      console.log("👀 lineAuth.onAuthStateChanged started!")
+      const callbackTimestamp = new Date().toISOString();
+      console.log(`👀 [${callbackTimestamp}] lineAuth.onAuthStateChanged callback triggered, user=${user?.uid || 'null'}, isAuthenticating=${isAuthenticating}`);
       onFirebaseUserChange(user);
 
       if (user) {
+        console.log(`🔄 [${callbackTimestamp}] Setting auth state to line_authenticated if currently loading`);
         onAuthStateChange(prev =>
           prev === "loading" ? "line_authenticated" : prev
         );
       } else {
+        console.log(`🔄 [${callbackTimestamp}] Setting auth state to unauthenticated, isAuthenticating=${isAuthenticating}`);
         onAuthStateChange("unauthenticated");
       }
 
       if (!isAuthenticating) {
+        console.log(`🔄 [${callbackTimestamp}] Calling authService.handleLineAuthStateChange(${!!user})`);
         authService.handleLineAuthStateChange(!!user);
+      } else {
+        console.log(`🔄 [${callbackTimestamp}] Skipping authService.handleLineAuthStateChange because isAuthenticating=true`);
       }
+      console.log(`🔄 [${callbackTimestamp}] lineAuth.onAuthStateChanged callback completed`);
     });
 
-    return () => unsubscribe();
+    return () => {
+      console.log(`🔄 [${new Date().toISOString()}] useFirebaseAuth hook cleanup`);
+      unsubscribe();
+    };
   }, [isAuthenticating, authService, onFirebaseUserChange, onAuthStateChange]);
 };
