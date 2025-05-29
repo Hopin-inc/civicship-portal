@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Globe, User } from "lucide-react";
+import { Globe, Search, User } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -25,6 +25,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     (pathname.startsWith("/reservation") && !pathname.includes("/complete")) ||
     pathname.startsWith("/activities/") ||
     pathname.startsWith("/participations/") ||
+    pathname.startsWith("/sign-up") ||
     pathname === "/users/me/edit" ||
     (pathname.startsWith("/places") && placeId)
   ) {
