@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { Button } from "@/components/ui/button";
 
 export function PhoneVerificationForm() {
   const { phoneAuth, isAuthenticated, isPhoneVerified, loading } = useAuth();
@@ -25,7 +26,7 @@ export function PhoneVerificationForm() {
       if (!isAuthenticated) {
         let loginWithNext = "/login";
         if (nextParam) {
-          loginWithNext += `?next=${nextParam}`;
+          loginWithNext += `?next=${ nextParam }`;
         }
         router.replace(loginWithNext);
       }
@@ -61,7 +62,7 @@ export function PhoneVerificationForm() {
     setIsVerifying(false);
     if (success) {
       toast.success("電話番号認証が完了しました");
-      const nextUrl = nextParam ? `/sign-up?next=${nextParam}` : "/sign-up";
+      const nextUrl = nextParam ? `/sign-up?next=${ nextParam }` : "/sign-up";
       router.push(nextUrl);
     } else {
       toast.error("認証コードが無効です");
@@ -98,18 +99,18 @@ export function PhoneVerificationForm() {
     <div className="w-full max-w-md mx-auto space-y-8">
       <div className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">
-          {step === "phone" && "電話番号を入力"}
-          {step === "code" && "認証コードを入力"}
+          { step === "phone" && "電話番号を入力" }
+          { step === "code" && "認証コードを入力" }
         </h1>
         <p className="text-sm text-muted-foreground">
-          {step === "phone" &&
-            "電話番号認証のため、あなたの電話番号を入力してください。SMSで認証コードが送信されます。"}
-          {step === "code" && "電話番号に送信された6桁の認証コードを入力してください。"}
+          { step === "phone" &&
+            "電話番号認証のため、あなたの電話番号を入力してください。SMSで認証コードが送信されます。" }
+          { step === "code" && "電話番号に送信された6桁の認証コードを入力してください。" }
         </p>
       </div>
 
-      {step === "phone" && (
-        <form onSubmit={handlePhoneSubmit} className="space-y-4">
+      { step === "phone" && (
+        <form onSubmit={ handlePhoneSubmit } className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="phone" className="text-sm font-medium">
               電話番号
@@ -117,60 +118,52 @@ export function PhoneVerificationForm() {
             <input
               id="phone"
               type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              value={ phoneNumber }
+              onChange={ (e) => setPhoneNumber(e.target.value) }
               placeholder="090-1234-5678"
               className="w-full h-12 px-3 border rounded-md"
               required
             />
           </div>
-          <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
-          <button
-            type="submit"
-            className="w-full h-12 bg-primary text-white rounded-md"
-            disabled={isVerifying}
-          >
-            {isVerifying ? "送信中..." : "認証コードを送信"}
-          </button>
+          <div id="recaptcha-container" ref={ recaptchaContainerRef }></div>
+          <Button type="submit" disabled={ isVerifying } className="w-full">
+            { isVerifying ? "送信中..." : "認証コードを送信" }
+          </Button>
         </form>
-      )}
-      {step === "code" && (
-        <form onSubmit={handleCodeSubmit} className="space-y-4">
+      ) }
+      { step === "code" && (
+        <form onSubmit={ handleCodeSubmit } className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="code" className="text-sm font-medium">
               認証コード
             </label>
             <div className="flex justify-center py-4">
-              <InputOTP maxLength={6} value={verificationCode} onChange={handleOTPChange}>
+              <InputOTP maxLength={ 6 } value={ verificationCode } onChange={ handleOTPChange }>
                 <InputOTPGroup>
-                  {Array.from({ length: 6 }).map((_, index) => (
-                    <InputOTPSlot key={index} index={index} />
-                  ))}
+                  { Array.from({ length: 6 }).map((_, index) => (
+                    <InputOTPSlot key={ index } index={ index } />
+                  )) }
                 </InputOTPGroup>
               </InputOTP>
             </div>
           </div>
-          <button
-            type="submit"
-            className="w-full h-12 bg-primary text-white rounded-md"
-            disabled={isVerifying || verificationCode.length < 6}
-          >
-            {isVerifying ? "検証中..." : "コードを検証"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
+          <Button type="submit" disabled={ isVerifying || verificationCode.length < 6 } className="w-full">
+            { isVerifying ? "検証中..." : "コードを検証" }
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={ () => {
               phoneAuth.clearRecaptcha?.();
               setStep("phone");
               setPhoneNumber("");
               setVerificationCode("");
-            }}
-            className="w-full h-12 border border-gray-300 rounded-md"
+            } }
+            className="w-full"
           >
             電話番号を再入力
-          </button>
+          </Button>
         </form>
-      )}
+      ) }
     </div>
   );
 }
