@@ -9,16 +9,14 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
 import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
-import { extractSearchParamFromRelativePath } from "@/utils/path";
 
 export default function HomePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated, isAuthenticating, authenticationState, loading: authLoading } = useAuth();
   const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
   });
-  const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") || "/";
 
   const authRedirectService = useMemo(() => {
     const AuthRedirectService = require("@/lib/auth/auth-redirect-service").AuthRedirectService;
@@ -26,43 +24,22 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    const isReturnFromLineAuth = searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
+    const nextPath = searchParams.get("liff.state");
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const liffState = searchParams.get("liff.state");
+    if (isReturnFromLineAuth) {
+      console.log("🚀 Detected return from LINE authentication, liff.state:", nextPath);
 
-    if (liffState) {
-      console.log("🚀 Detected return from LINE authentication, liff.state:", liffState);
+      const cleanedNextPath = nextPath?.startsWith("/login") ? null : nextPath;
+      const cleanedUrl = cleanedNextPath ? `${ window.location.pathname }?next=${ cleanedNextPath }` : window.location.pathname;
+      console.log("cleaned: ", cleanedNextPath, cleanedUrl)
+      router.replace(cleanedUrl);
 
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
-
-      if (isAuthenticating || authLoading || userLoading) {
-        console.log("🚀 Auth state loading, waiting before redirect");
-        return; // Wait for auth state to stabilize
-      } else if (isAuthenticated) {
-        const redirectPath = authRedirectService.getPostLineAuthRedirectPath(liffState);
-        console.log("🚀 Authenticated, redirecting to:", redirectPath);
-        router.replace(redirectPath);
-        return;
-      } else if (!isAuthenticating) {
-        console.log("🚀 Not authenticated after processing, redirecting to login");
-        const next = extractSearchParamFromRelativePath(liffState, "next");
-        const redirectPath = authRedirectService.getRedirectPath("/", next);
-        router.replace(redirectPath || "/login");
-        return;
-      }
-    }
-
-    if (window.location.pathname === "/" &&
-        !window.location.href.includes("liff.state") &&
-        !window.location.href.includes("login")) {
-      const redirectPath = authRedirectService.getRedirectPath("/");
-      if (redirectPath) {
-        router.replace(redirectPath);
-      } else {
-        router.replace("/activities");
-      }
+      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(cleanedNextPath);
+      console.log("🚀 Authenticated, redirecting to:", redirectPath);
+      router.replace(redirectPath);
+    } else {
+      router.replace("/activities");
     }
   }, [router, isAuthenticated, authenticationState, userData, authLoading, userLoading, isAuthenticating, authRedirectService]);
 
@@ -71,13 +48,13 @@ export default function HomePage() {
   }, []);
 
   if (isAuthenticating || authLoading) {
-    return <LoadingIndicator fullScreen={true} />;
+    return <LoadingIndicator fullScreen={ true } />;
   }
 
   return (
     <div className="min-h-screen pb-16">
       <FeaturedSectionSkeleton />
-      <OpportunitiesCarouselSectionSkeleton title={"もうすぐ開催予定"} />
+      <OpportunitiesCarouselSectionSkeleton title={ "もうすぐ開催予定" } />
       <ListSectionSkeleton />
     </div>
   );

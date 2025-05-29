@@ -13,7 +13,6 @@ import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   const { user: currentUser, isAuthenticating } = useAuth();
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
@@ -25,22 +24,8 @@ export default function MyProfilePage() {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  // リダイレクト済みフラグで多重 push を防止
-  const hasRedirectedRef = useRef(false);
-  const authRedirectService = React.useMemo(() => {
-    return AuthRedirectService.getInstance();
-  }, []);
-
-  useEffect(() => {
-    if (!isAuthenticating && !currentUser && !hasRedirectedRef.current) {
-      hasRedirectedRef.current = true;
-      const redirectPath = authRedirectService.getRedirectPath("/users/me");
-      router.push(redirectPath || "/login?next=/users/me");
-    }
-  }, [currentUser, isAuthenticating, router, authRedirectService]);
-
   // 認証中 or リダイレクト待ち → ローディング表示
-  if (isAuthenticating || (!currentUser && !hasRedirectedRef.current)) {
+  if (isAuthenticating || !currentUser) {
     return <LoadingIndicator />;
   }
 

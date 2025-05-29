@@ -101,18 +101,19 @@ export class LiffService {
       if (!this.state.isInitialized) {
         await this.initialize();
       }
+      console.log("LIFF LOGIN in progress")
 
-      if (!this.state.isLoggedIn) {
-        if (liff.isInClient()) {
-          this.state.isLoggedIn = true;
-        } else {
-          const redirectUri = redirectPath && typeof window !== "undefined"
-            ? window.location.origin + redirectPath
-            : typeof window !== "undefined" ? window.location.pathname : undefined;
+      if (liff.isInClient()) {
+        console.log("liff.isInClient(): true")
+        this.state.isLoggedIn = true;
+      } else {
+        console.log("liff.isInClient(): false")
+        const redirectUri = redirectPath && typeof window !== "undefined"
+          ? window.location.origin + redirectPath
+          : typeof window !== "undefined" ? window.location.pathname : undefined;
 
-          liff.login({ redirectUri });
-          return false; // リダイレクトするのでここには到達しない
-        }
+        liff.login({ redirectUri });
+        return false; // リダイレクトするのでここには到達しない
       }
 
       await this.updateProfile();
@@ -203,7 +204,7 @@ export class LiffService {
 
           const requestTimestamp = new Date().toISOString();
           console.log(`🔍 [${requestTimestamp}] Making request to /line/liff-login`);
-          
+
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`,
             {
@@ -240,7 +241,7 @@ export class LiffService {
             uid: userCredential.user.uid,
             isNewUser: userCredential.user.metadata.creationTime === userCredential.user.metadata.lastSignInTime
           });
-          
+
           await updateProfile(userCredential.user, {
             displayName: profile.displayName,
             photoURL: profile.pictureUrl,

@@ -14,29 +14,16 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export default function LoginPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/";
 
-  const { user, isAuthenticated, loginWithLiff, isAuthenticating, loading } = useAuth();
+  const { loginWithLiff, isAuthenticating, loading } = useAuth();
   const authRedirectService = AuthRedirectService.getInstance();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
-
-  useEffect(() => {
-    if (!loading && isAuthenticated) {
-      const redirectPath = authRedirectService.getRedirectPath("/login", nextPath);
-      if (redirectPath) {
-        console.log("🚀 Already authenticated, redirecting to:", redirectPath);
-        router.replace(redirectPath);
-      } else {
-        router.replace(nextPath);
-      }
-    }
-  }, [isAuthenticated, loading, nextPath, router, authRedirectService]);
 
   // 📦 ログイン処理
   const handleLogin = async () => {
@@ -51,9 +38,9 @@ export default function LoginPage() {
     try {
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
       console.log("🚀 Using redirect path from AuthRedirectService:", redirectPath);
-      
-      const success = await loginWithLiff(redirectPath);
-      
+
+      const success = await loginWithLiff(nextPath);
+
       if (success) {
         console.log("🚀 LINE認証成功、リダイレクト処理中...");
       }

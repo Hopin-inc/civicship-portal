@@ -14,16 +14,16 @@ export default function RegisterAccount() {
   const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
   const authRedirectService = AuthRedirectService.getInstance();
 
-  useEffect(() => {
-    if (!loading && user) {
-      const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
-      if (redirectPath) {
-        router.replace(redirectPath);
-      } else {
-        router.replace(nextParam ?? "/users/me");
-      }
-    }
-  }, [user, loading, router, nextParam, authRedirectService]);
+  // useEffect(() => {
+  //   if (!loading && user) {
+  //     const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
+  //     if (redirectPath) {
+  //       router.replace(redirectPath);
+  //     } else {
+  //       router.replace(nextParam ?? "/users/me");
+  //     }
+  //   }
+  // }, [user, loading, router, nextParam, authRedirectService]);
 
   if (loading) {
     return <LoadingIndicator />;

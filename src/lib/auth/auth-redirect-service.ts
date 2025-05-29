@@ -112,14 +112,8 @@ export class AuthRedirectService {
    * @param liffState LIFFの状態パラメータ
    * @returns リダイレクト先のパス
    */
-  public getPostLineAuthRedirectPath(liffState: string | null): string {
-    if (!liffState) {
-      return "/";
-    }
-
-    const nextMatch = liffState.match(/next=([^&]*)/);
-    const next = nextMatch ? decodeURIComponent(nextMatch[1]) : null;
-
+  public getPostLineAuthRedirectPath(nextPath: string | null): string {
+    const next = nextPath ? decodeURIComponent(nextPath) : null;
     const authState = this.authStateManager.getState();
 
     if (authState === "line_authenticated" || authState === "line_token_expired") {
@@ -127,7 +121,7 @@ export class AuthRedirectService {
     } else if (authState === "phone_authenticated" || authState === "phone_token_expired") {
       return `/sign-up${next ? `?next=${next}` : ""}`;
     } else if (authState === "user_registered") {
-      return next || "/";
+      return next ?? "/";
     }
 
     return `/login${next ? `?next=${next}` : ""}`;
