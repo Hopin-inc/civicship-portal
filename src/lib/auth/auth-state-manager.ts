@@ -85,7 +85,7 @@ export class AuthStateManager {
     this.setState("loading");
 
     const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = lineTokens.accessToken && !TokenManager.isLineTokenExpired();
+    const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
     if (!hasValidLineToken) {
       this.setState("unauthenticated");
@@ -93,7 +93,7 @@ export class AuthStateManager {
     }
 
     const phoneTokens = TokenManager.getPhoneTokens();
-    const hasValidPhoneToken = phoneTokens.accessToken && !TokenManager.isPhoneTokenExpired();
+    const hasValidPhoneToken = phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
 
     if (hasValidPhoneToken) {
       const isUserRegistered = await this.checkUserRegistration();
@@ -140,7 +140,12 @@ export class AuthStateManager {
       const renewed = await TokenManager.renewLineToken();
 
       if (renewed && this.currentState === "line_token_expired") {
-        this.setState("line_authenticated");
+        const isUserRegistered = await this.checkUserRegistration();
+        if (isUserRegistered) {
+          this.setState("user_registered");
+        } else {
+          this.setState("line_authenticated");
+        }
       } else if (!renewed) {
         this.setState("unauthenticated");
       }
@@ -157,7 +162,7 @@ export class AuthStateManager {
     try {
       const renewed = await TokenManager.renewPhoneToken();
       const lineTokens = TokenManager.getLineTokens();
-      const hasValidLineToken = lineTokens.accessToken && !TokenManager.isLineTokenExpired();
+      const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
       if (renewed && this.currentState === "phone_token_expired") {
         this.setState("phone_authenticated");
@@ -172,7 +177,7 @@ export class AuthStateManager {
       console.error("Failed to renew phone token:", error);
       
       const lineTokens = TokenManager.getLineTokens();
-      const hasValidLineToken = lineTokens.accessToken && !TokenManager.isLineTokenExpired();
+      const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
       
       if (!hasValidLineToken) {
         this.setState("unauthenticated");
@@ -185,7 +190,7 @@ export class AuthStateManager {
   /**
    * LINE認証状態の変更を処理
    */
-  public handleLineAuthStateChange(isAuthenticated: boolean): void {
+  public async handleLineAuthStateChange(isAuthenticated: boolean): Promise<void> {
     if (isAuthenticated) {
       if (this.currentState === "unauthenticated" || this.currentState === "loading") {
         this.setState("line_authenticated");
@@ -198,9 +203,9 @@ export class AuthStateManager {
   /**
    * 電話番号認証状態の変更を処理
    */
-  public handlePhoneAuthStateChange(isVerified: boolean): void {
+  public async handlePhoneAuthStateChange(isVerified: boolean): Promise<void> {
     const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = lineTokens.accessToken && !TokenManager.isLineTokenExpired();
+    const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
     if (!hasValidLineToken) {
       this.setState("unauthenticated");
@@ -221,9 +226,9 @@ export class AuthStateManager {
   /**
    * ユーザー情報登録状態の変更を処理
    */
-  public handleUserRegistrationStateChange(isRegistered: boolean): void {
+  public async handleUserRegistrationStateChange(isRegistered: boolean): Promise<void> {
     const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = lineTokens.accessToken && !TokenManager.isLineTokenExpired();
+    const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
     if (!hasValidLineToken) {
       this.setState("unauthenticated");
@@ -231,7 +236,7 @@ export class AuthStateManager {
     }
 
     const phoneTokens = TokenManager.getPhoneTokens();
-    const hasValidPhoneToken = phoneTokens.accessToken && !TokenManager.isPhoneTokenExpired();
+    const hasValidPhoneToken = phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
 
     if (!hasValidPhoneToken) {
       this.setState("line_authenticated");

@@ -140,26 +140,41 @@ export class TokenManager {
    * LINE認証トークンが有効期限切れかどうかを確認
    * @returns 有効期限切れの場合はtrue
    */
-  static isLineTokenExpired(): boolean {
-    const { expiresAt } = this.getLineTokens();
-    if (!expiresAt) return true;
-    
-    const now = Date.now();
-    const bufferTime = 5 * 60 * 1000; // 5分（ミリ秒）
-    return expiresAt - now < bufferTime;
+  static async isLineTokenExpired(): Promise<boolean> {
+    try {
+      const { lineAuth } = await import("./firebase-config");
+      
+      if (!lineAuth.currentUser) {
+        return true; // No current user means not authenticated
+      }
+      
+      await lineAuth.currentUser.getIdToken();
+      return false; // Successfully got token, so it's valid
+    } catch (error) {
+      console.error("LINE token validation failed:", error);
+      return true; // Any error means the token/session is invalid
+    }
   }
 
   /**
    * 電話番号認証トークンが有効期限切れかどうかを確認
    * @returns 有効期限切れの場合はtrue
    */
-  static isPhoneTokenExpired(): boolean {
-    const { expiresAt } = this.getPhoneTokens();
-    if (!expiresAt) return true;
-    
-    const now = Date.now();
-    const bufferTime = 5 * 60 * 1000; // 5分（ミリ秒）
-    return expiresAt - now < bufferTime;
+  static async isPhoneTokenExpired(): Promise<boolean> {
+    try {
+      const { phoneAuth } = await import("./firebase-config");
+      
+      if (!phoneAuth.currentUser) {
+        return true; // No current user means not authenticated
+      }
+      
+      // Try to get a fresh token - this will fail if the session is invalid
+      await phoneAuth.currentUser.getIdToken();
+      return false; // Successfully got token, so it's valid
+    } catch (error) {
+      console.error("Phone token validation failed:", error);
+      return true; // Any error means the token/session is invalid
+    }
   }
 
   /**
