@@ -30,6 +30,11 @@ interface ActivityDetailsContentProps {
   isExternalBooking: boolean;
 }
 
+// NOTE: キャンセルの注意事項を表示しない例外的な体験のID
+const HIDE_CANCEL_NOTICE_OPPORTUNITY_IDS = [
+  "cmap6xqwn001os60nllhcq65s", // 【直接予約】手島で摘む、夏だけのブラックベリー https://www.neo88.app/activities/cmap6xqwn001os60nllhcq65s?community_id=neo88
+];
+
 const ActivityDetailsContent = ({
   opportunity,
   availableTickets,
@@ -49,7 +54,10 @@ const ActivityDetailsContent = ({
         communityId={communityId}
         isExternalBooking={isExternalBooking}
       />
-      <NoticeSection isExternalBooking={isExternalBooking} />
+      <NoticeSection
+        hideCancelNotice={HIDE_CANCEL_NOTICE_OPPORTUNITY_IDS.includes(opportunity.id)}
+        isExternalBooking={isExternalBooking}
+      />
       <SameStateActivities
         header={"近くでおすすめの体験"}
         opportunities={sameStateActivities}
@@ -250,7 +258,10 @@ const ScheduleSection = ({
   );
 };
 
-const NoticeSection: React.FC<{ isExternalBooking: boolean }> = ({ isExternalBooking }) => {
+const NoticeSection: React.FC<{ isExternalBooking: boolean; hideCancelNotice: boolean }> = ({
+  isExternalBooking,
+  hideCancelNotice,
+}) => {
   const commonNotices = [
     {
       text: "ホストによる確認後に、予約が確定します。",
@@ -287,7 +298,7 @@ const NoticeSection: React.FC<{ isExternalBooking: boolean }> = ({ isExternalBoo
   const noticesToShow = [
     ...commonNotices.slice(0, 1),
     ...(isExternalBooking ? externalBookingNotices : normalBookingNotices),
-    ...commonNotices.slice(1),
+    ...(hideCancelNotice ? [] : commonNotices.slice(1)),
   ];
 
   return (
