@@ -27,9 +27,11 @@ export const useFirebaseAuth = (
         onAuthStateChange(prev =>
           prev === "loading" ? "line_authenticated" : prev
         );
-      } else {
+      } else if (!isAuthenticating) {
         console.log(`🔄 [${callbackTimestamp}] Setting auth state to unauthenticated, isAuthenticating=${isAuthenticating}`);
         onAuthStateChange("unauthenticated");
+      } else {
+        console.log(`🔄 [${callbackTimestamp}] Skipping setting auth state to unauthenticated because isAuthenticating=${isAuthenticating}`);
       }
 
       if (!isAuthenticating) {
