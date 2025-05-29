@@ -13,10 +13,11 @@ export function PhoneVerificationForm() {
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
 
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [verificationCode, setVerificationCode] = useState<string>("");
   const [step, setStep] = useState<"phone" | "code">("phone");
-  const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
+  const [isRecaptchaReady, setIsRecaptchaReady] = useState<boolean>(false);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export function PhoneVerificationForm() {
         router.replace(loginWithNext);
       }
     }
-  }, [isAuthenticated, isPhoneVerified, loading, router]);
+  }, [isAuthenticated, isPhoneVerified, loading, nextParam, router]);
 
   useEffect(() => {
     if (recaptchaContainerRef.current) {
@@ -44,16 +45,20 @@ export function PhoneVerificationForm() {
       return;
     }
 
+    setIsVerifying(true);
     const formattedPhone = formatPhoneNumber(phoneNumber);
     const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
     if (verificationId) {
       setStep("code");
     }
+    setIsVerifying(false);
   };
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsVerifying(true);
     const success = await phoneAuth.verifyPhoneCode(verificationCode);
+    setIsVerifying(false);
     if (success) {
       toast.success("電話番号認証が完了しました");
       const nextUrl = nextParam ? `/sign-up?next=${nextParam}` : "/sign-up";
@@ -123,9 +128,9 @@ export function PhoneVerificationForm() {
           <button
             type="submit"
             className="w-full h-12 bg-primary text-white rounded-md"
-            disabled={phoneAuth.isVerifying}
+            disabled={isVerifying}
           >
-            {phoneAuth.isVerifying ? "送信中..." : "認証コードを送信"}
+            {isVerifying ? "送信中..." : "認証コードを送信"}
           </button>
         </form>
       )}
@@ -148,9 +153,9 @@ export function PhoneVerificationForm() {
           <button
             type="submit"
             className="w-full h-12 bg-primary text-white rounded-md"
-            disabled={phoneAuth.isVerifying || verificationCode.length < 6}
+            disabled={isVerifying || verificationCode.length < 6}
           >
-            {phoneAuth.isVerifying ? "検証中..." : "コードを検証"}
+            {isVerifying ? "検証中..." : "コードを検証"}
           </button>
           <button
             type="button"
