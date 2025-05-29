@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 
@@ -12,11 +13,21 @@ export const useLineAuthRedirect = (
   setIsAuthenticating: (value: boolean) => void,
   refetchUser: () => Promise<any>
 ) => {
+  const searchParams = useSearchParams();
+  const hasProcessedRedirect = useRef(false);
+
   useEffect(() => {
     const handleLineAuthRedirect = async () => {
       if (typeof window === "undefined") return;
       if (isAuthenticating) return;
+      if (hasProcessedRedirect.current) return;
+
+      const isReturnFromLineAuth = searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
+      if (!isReturnFromLineAuth) return;
+
       if (authenticationState !== "unauthenticated" && authenticationState !== "loading") return;
+
+      hasProcessedRedirect.current = true;
 
       const timestamp = new Date().toISOString();
       console.log(`🔍 [${timestamp}] Detected LINE authentication redirect`);
@@ -24,7 +35,12 @@ export const useLineAuthRedirect = (
         authenticationState,
         isAuthenticating,
         environment,
-        windowHref: window.location.href
+        windowHref: window.location.href,
+        urlParams: { 
+          hasCode: searchParams.has("code"),
+          hasState: searchParams.has("state"), 
+          hasLiffClientId: searchParams.has("liffClientId")
+        }
       });
 
       setIsAuthenticating(true);
@@ -64,5 +80,5 @@ export const useLineAuthRedirect = (
     };
 
     handleLineAuthRedirect();
-  }, [authenticationState, isAuthenticating, environment, liffService, refetchUser, setIsAuthenticating]);
+  }, [authenticationState, isAuthenticating, environment, liffService, refetchUser, setIsAuthenticating, searchParams]);
 };
