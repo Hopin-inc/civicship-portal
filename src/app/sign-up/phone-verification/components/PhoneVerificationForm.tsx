@@ -116,14 +116,9 @@ export function PhoneVerificationForm() {
 
   return (
     <>
-      <div
-        id="recaptcha-container"
-        ref={recaptchaContainerRef}
-        style={{ display: step === "phone" ? "block" : "none" }}
-      ></div>
-
+      <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
       <div className="w-full max-w-md mx-auto space-y-8">
-        {(isPhoneSubmitting || isCodeVerifying || isReloading) && <LoadingIndicator fullScreen />}
+        {(isPhoneSubmitting || isCodeVerifying || isReloading) && <LoadingIndicator />}
         <div className="space-y-2">
           <h1 className="text-2xl font-bold tracking-tight">
             {step === "phone" && "電話番号を入力"}
@@ -156,15 +151,16 @@ export function PhoneVerificationForm() {
               <Button
                 type="submit"
                 className="w-full h-12 bg-primary text-white rounded-md"
-                disabled={phoneAuth.isVerifying || isPhoneSubmitting || !isPhoneValid}
+                disabled={isPhoneSubmitting || !isPhoneValid || isReloading}
               >
-                {phoneAuth.isVerifying ? "送信中..." : "認証コードを送信"}
+                {isPhoneSubmitting ? "送信中..." : "認証コードを送信"}
               </Button>
               <Button
                 type="button"
                 className="px-4"
                 size="sm"
                 variant="text"
+                disabled={isPhoneSubmitting}
                 onClick={() => {
                   setIsReloading(true);
                   setTimeout(() => {
@@ -197,16 +193,21 @@ export function PhoneVerificationForm() {
               <Button
                 type="submit"
                 className="w-full h-12 bg-primary text-white rounded-md"
-                disabled={isCodeVerifying || verificationCode.length < 6}
+                disabled={isCodeVerifying || verificationCode.length < 6 || isReloading}
               >
                 {isCodeVerifying ? "検証中..." : "コードを検証"}
               </Button>
               <Button
                 type="button"
                 variant={"text"}
+                disabled={isCodeVerifying || isReloading}
                 onClick={() => {
                   phoneAuth.clearRecaptcha?.();
+                  setIsReloading(true);
                   setStep("phone");
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 300);
                   setPhoneNumber("");
                   setVerificationCode("");
                 }}
