@@ -49,7 +49,10 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const success = await loginWithLiff("/");
+      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
+      console.log("🚀 Using redirect path from AuthRedirectService:", redirectPath);
+      
+      const success = await loginWithLiff(redirectPath);
       
       if (success) {
         console.log("🚀 LINE認証成功、リダイレクト処理中...");

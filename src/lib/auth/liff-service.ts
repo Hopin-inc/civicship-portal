@@ -266,6 +266,17 @@ export class LiffService {
           };
           TokenManager.saveLineTokens(tokens);
 
+          if (typeof window !== "undefined") {
+            try {
+              const AuthStateManager = require("./auth-state-manager").AuthStateManager;
+              const authStateManager = AuthStateManager.getInstance();
+              authStateManager.handleLineAuthStateChange(true);
+              console.log("🔍 AuthStateManager state updated to line_authenticated");
+            } catch (error) {
+              console.error("Failed to update AuthStateManager state:", error);
+            }
+          }
+
           const completeTimestamp = new Date().toISOString();
           console.log(`🔍 [${completeTimestamp}] LIFF authentication successful`);
           resolve(true);
