@@ -1,24 +1,20 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { PhoneVerificationForm } from "./components/PhoneVerificationForm";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
 
 export default function PhoneVerificationPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const hasRedirected = useRef(false);
 
   useEffect(() => {
     if (hasRedirected.current) return;
 
-    const isLineWebBrowser = () => {
-      if (typeof navigator === "undefined") return false;
-      const userAgent = navigator.userAgent;
-      return /Line/i.test(userAgent);
-    };
+    const env = detectEnvironment();
 
-    if (isLineWebBrowser()) {
+    if (env === AuthEnvironment.LINE_BROWSER) {
       hasRedirected.current = true;
       const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
       const redirectUrl = nextParam
@@ -26,7 +22,7 @@ export default function PhoneVerificationPage() {
         : "/sign-up/phone-verification/line-browser";
       window.location.replace(redirectUrl);
     }
-  }, [router, searchParams]);
+  }, [searchParams]);
 
   return (
     <div className="container mx-auto py-8">
