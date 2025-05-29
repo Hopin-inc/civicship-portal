@@ -51,17 +51,28 @@ export class PhoneAuthService {
     };
 
     const savedTokens = this.tokenService.getPhoneTokens();
-    if (savedTokens.phoneUid && savedTokens.phoneNumber && savedTokens.accessToken) {
-      this.state.isVerified = true;
-      this.state.phoneUid = savedTokens.phoneUid;
-      this.state.phoneNumber = savedTokens.phoneNumber;
-      
-      console.log("Phone verification state initialized from saved tokens:", {
-        isVerified: this.state.isVerified,
-        phoneUid: this.state.phoneUid ? "exists" : "missing",
-        phoneNumber: this.state.phoneNumber ? "exists" : "missing",
-        accessToken: savedTokens.accessToken ? "exists" : "missing"
+    if (savedTokens.phoneUid && savedTokens.phoneNumber && savedTokens.accessToken && savedTokens.expiresAt) {
+      const isValid = this.tokenService.isTokenValid({
+        accessToken: savedTokens.accessToken,
+        refreshToken: savedTokens.refreshToken || "",
+        expiresAt: savedTokens.expiresAt
       });
+      
+      if (isValid) {
+        this.state.isVerified = true;
+        this.state.phoneUid = savedTokens.phoneUid;
+        this.state.phoneNumber = savedTokens.phoneNumber;
+        
+        console.log("Phone verification state initialized from valid saved tokens:", {
+          isVerified: this.state.isVerified,
+          phoneUid: this.state.phoneUid ? "exists" : "missing",
+          phoneNumber: this.state.phoneNumber ? "exists" : "missing",
+          accessToken: savedTokens.accessToken ? "exists" : "missing"
+        });
+      } else {
+        console.log("❌ Saved phone tokens are expired, clearing state");
+        this.reset();
+      }
     } else {
       console.log("Phone verification not initialized - incomplete saved tokens:", {
         phoneUid: savedTokens.phoneUid ? "exists" : "missing",

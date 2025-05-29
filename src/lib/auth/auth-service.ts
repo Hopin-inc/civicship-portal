@@ -48,6 +48,7 @@ export class AuthService {
         console.log("📞 Valid phone tokens found");
         this.authStateStore.setState("phone_authenticated");
       } else {
+        console.log("❌ Phone tokens invalid or expired");
         this.authStateStore.setState("line_authenticated");
       }
     } else {
@@ -129,8 +130,18 @@ export class AuthService {
       
       const currentState = this.authStateStore.getState();
       if (currentState === "user_registered") {
-        console.log("📱 User already registered, no action needed for phone token expiry");
-        return;
+        console.log("📱 User already registered, attempting token refresh");
+        const lineTokens = this.tokenService.getLineTokens();
+        if (this.tokenService.isTokenValid(lineTokens)) {
+          console.log("✅ LINE tokens still valid, maintaining user_registered state");
+          return;
+        } else {
+          console.log("❌ Both LINE and phone tokens expired, forcing logout");
+          this.authStateStore.forceSetState("unauthenticated");
+          if (typeof window !== "undefined") {
+            window.location.href = "/login";
+          }
+        }
       } else {
         console.log("📱 User not registered, redirecting to phone verification");
         const lineTokens = this.tokenService.getLineTokens();

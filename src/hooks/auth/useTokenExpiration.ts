@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { AuthenticationState, AuthStateStore } from "@/lib/auth/auth-state-store";
 import { AuthService } from "@/lib/auth/auth-service";
+import { TokenService } from "@/lib/auth/token-service";
 import { toast } from "sonner";
 
 export const useTokenExpiration = (
@@ -20,6 +21,20 @@ export const useTokenExpiration = (
       
       console.log("🔍 Initializing authentication state");
       await authService.initializeAuthState();
+      
+      const tokenService = TokenService.getInstance();
+      const phoneTokens = tokenService.getPhoneTokens();
+      const lineTokens = tokenService.getLineTokens();
+      
+      const currentState = authStateStore.getState();
+      if (currentState === "phone_authenticated" && !tokenService.isTokenValid(phoneTokens)) {
+        console.log("🔄 Phone tokens expired, handling token expiration");
+        authService.handleTokenExpired("phone");
+      } else if ((currentState === "line_authenticated" || currentState === "user_registered") && !tokenService.isTokenValid(lineTokens)) {
+        console.log("🔄 LINE tokens expired, handling token expiration");
+        authService.handleTokenExpired("line");
+      }
+      
       hasInitialized.current = true;
     };
 
