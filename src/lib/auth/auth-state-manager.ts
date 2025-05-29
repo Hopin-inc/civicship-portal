@@ -1,5 +1,3 @@
-import { LiffService } from "./liff-service";
-import { PhoneAuthService } from "./phone-auth-service";
 import { TokenManager } from "./token-manager";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
@@ -20,14 +18,9 @@ export type AuthenticationState =
 export class AuthStateManager {
   private static instance: AuthStateManager;
   private currentState: AuthenticationState = "loading";
-  private liffService: LiffService;
-  private phoneAuthService: PhoneAuthService;
   private stateChangeListeners: ((state: AuthenticationState) => void)[] = [];
 
   private constructor() {
-    this.liffService = LiffService.getInstance();
-    this.phoneAuthService = PhoneAuthService.getInstance();
-
     if (typeof window !== "undefined") {
       window.addEventListener("auth:renew-line-token", this.handleLineTokenRenewal.bind(this));
       window.addEventListener("auth:renew-phone-token", this.handlePhoneTokenRenewal.bind(this));
@@ -83,35 +76,6 @@ export class AuthStateManager {
     this.stateChangeListeners.forEach(listener => {
       listener(this.currentState);
     });
-  }
-
-  /**
-   * 認証状態を初期化
-   */
-  public async initialize(): Promise<void> {
-    this.setState("loading");
-
-    const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = lineTokens.accessToken && !TokenManager.isLineTokenExpired();
-
-    if (hasValidLineToken) {
-      const phoneTokens = TokenManager.getPhoneTokens();
-      const hasValidPhoneToken = phoneTokens.accessToken && !TokenManager.isPhoneTokenExpired();
-
-      if (hasValidPhoneToken) {
-        const isUserRegistered = await this.checkUserRegistration();
-
-        if (isUserRegistered) {
-          this.setState("user_registered");
-        } else {
-          this.setState("phone_authenticated");
-        }
-      } else {
-        this.setState("line_authenticated");
-      }
-    } else {
-      this.setState("unauthenticated");
-    }
   }
 
   /**
