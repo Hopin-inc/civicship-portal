@@ -6,8 +6,8 @@ import {
   signInWithCredential,
   signInWithPhoneNumber,
 } from "firebase/auth";
-import { phoneAuth, categorizeFirebaseError } from "./firebase-config";
-import { TokenManager, PhoneAuthTokens } from "./token-manager";
+import { phoneAuth } from "./firebase-config";
+import { PhoneAuthTokens, TokenManager } from "./token-manager";
 import { isRunningInLiff } from "./environment-detector";
 
 /**
@@ -30,6 +30,7 @@ export class PhoneAuthService {
   private state: PhoneAuthState;
   private recaptchaVerifier: RecaptchaVerifier | null = null;
   private recaptchaContainerElement: HTMLElement | null = null;
+  private isRecaptchaRendered: boolean = false;
 
   /**
    * コンストラクタ
@@ -49,18 +50,18 @@ export class PhoneAuthService {
       this.state.isVerified = true;
       this.state.phoneUid = savedTokens.phoneUid;
       this.state.phoneNumber = savedTokens.phoneNumber;
-      
+
       console.log("Phone verification state initialized from saved tokens:", {
         isVerified: this.state.isVerified,
         phoneUid: this.state.phoneUid ? "exists" : "missing",
         phoneNumber: this.state.phoneNumber ? "exists" : "missing",
-        accessToken: savedTokens.accessToken ? "exists" : "missing"
+        accessToken: savedTokens.accessToken ? "exists" : "missing",
       });
     } else {
       console.log("Phone verification not initialized - incomplete saved tokens:", {
         phoneUid: savedTokens.phoneUid ? "exists" : "missing",
         phoneNumber: savedTokens.phoneNumber ? "exists" : "missing",
-        accessToken: savedTokens.accessToken ? "exists" : "missing"
+        accessToken: savedTokens.accessToken ? "exists" : "missing",
       });
     }
   }
@@ -90,8 +91,10 @@ export class PhoneAuthService {
         const container = document.getElementById("recaptcha-container");
         if (container) {
           container.innerHTML = "";
-          
-          const allRecaptchaElements = document.querySelectorAll('[id^="rc-"], iframe[src*="recaptcha"], div[class*="grecaptcha"]');
+
+          const allRecaptchaElements = document.querySelectorAll(
+            '[id^="rc-"], iframe[src*="recaptcha"], div[class*="grecaptcha"]',
+          );
           allRecaptchaElements.forEach((element) => element.remove());
         }
         this.recaptchaContainerElement = null;
@@ -164,7 +167,10 @@ export class PhoneAuthService {
       }
 
       try {
-        const credential = PhoneAuthProvider.credential(this.state.verificationId, verificationCode);
+        const credential = PhoneAuthProvider.credential(
+          this.state.verificationId,
+          verificationCode,
+        );
         console.log("Successfully created phone credential");
 
         try {
