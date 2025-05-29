@@ -9,10 +9,10 @@ import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import ErrorState from "@/components/shared/ErrorState";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
+import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   const { user: currentUser, isAuthenticating } = useAuth();
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
@@ -24,17 +24,8 @@ export default function MyProfilePage() {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  // リダイレクト済みフラグで多重 push を防止
-  const hasRedirectedRef = useRef(false);
-  useEffect(() => {
-    if (!isAuthenticating && !currentUser && !hasRedirectedRef.current) {
-      hasRedirectedRef.current = true;
-      router.push("/login?next=/users/me");
-    }
-  }, [currentUser, isAuthenticating, router]);
-
   // 認証中 or リダイレクト待ち → ローディング表示
-  if (isAuthenticating || (!currentUser && !hasRedirectedRef.current)) {
+  if (isAuthenticating || !currentUser) {
     return <LoadingIndicator />;
   }
 

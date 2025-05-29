@@ -10,7 +10,7 @@ export default function OpenInBrowser() {
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next");
   const baseUrl = "https://www.neo88.app/sign-up/phone-verification";
-  const COPY_URL = nextParam ? `${baseUrl}?next=${encodeURIComponent(nextParam)}` : baseUrl;
+  const COPY_URL = nextParam ? `${baseUrl}?next=${nextParam}` : baseUrl;
 
   useEffect(() => {
     document.body.style.overflow = "hidden";

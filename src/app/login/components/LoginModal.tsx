@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 type LoginModalProps = {
   isOpen: boolean;
@@ -20,6 +21,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { loginWithLiff, isAuthenticating } = useAuth();
+  const authRedirectService = AuthRedirectService.getInstance();
 
   const handleLogin = async () => {
     if (!agreedTerms || !agreedPrivacy) {
@@ -32,7 +34,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
     try {
       const currentPath = typeof window !== "undefined" ? window.location.pathname : "/";
-      await loginWithLiff(currentPath);
+      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(currentPath);
+      console.log("🚀 Using redirect path from AuthRedirectService in modal:", redirectPath);
+      
+      await loginWithLiff(redirectPath);
       setIsLoading(false);
       onClose();
     } catch (err) {

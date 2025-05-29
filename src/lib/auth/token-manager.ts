@@ -80,7 +80,7 @@ export class TokenManager {
     const accessToken = this.getCookie(this.LINE_ACCESS_TOKEN_KEY);
     const refreshToken = this.getCookie(this.LINE_REFRESH_TOKEN_KEY);
     const expiresAtStr = this.getCookie(this.LINE_TOKEN_EXPIRES_AT_KEY);
-    
+
     return {
       accessToken,
       refreshToken,
@@ -98,7 +98,7 @@ export class TokenManager {
     const accessToken = this.getCookie(this.PHONE_ACCESS_TOKEN_KEY);
     const refreshToken = this.getCookie(this.PHONE_REFRESH_TOKEN_KEY);
     const expiresAtStr = this.getCookie(this.PHONE_TOKEN_EXPIRES_AT_KEY);
-    
+
     return {
       phoneUid,
       phoneNumber,
@@ -140,26 +140,81 @@ export class TokenManager {
    * LINE認証トークンが有効期限切れかどうかを確認
    * @returns 有効期限切れの場合はtrue
    */
-  static isLineTokenExpired(): boolean {
-    const { expiresAt } = this.getLineTokens();
-    if (!expiresAt) return true;
-    
-    const now = Date.now();
-    const bufferTime = 5 * 60 * 1000; // 5分（ミリ秒）
-    return expiresAt - now < bufferTime;
+  static async isLineTokenExpired(): Promise<boolean> {
+    try {
+      const { lineAuth } = await import("./firebase-config");
+
+      if (!lineAuth.currentUser) {
+        return true; // No current user means not authenticated
+      }
+
+      await lineAuth.currentUser.getIdToken();
+      return false; // Successfully got token, so it's valid
+    } catch (error) {
+      console.error("LINE token validation failed:", error);
+      return true; // Any error means the token/session is invalid
+    }
   }
 
   /**
    * 電話番号認証トークンが有効期限切れかどうかを確認
    * @returns 有効期限切れの場合はtrue
    */
-  static isPhoneTokenExpired(): boolean {
+  static async isPhoneTokenExpired(): Promise<boolean> {
     const { expiresAt } = this.getPhoneTokens();
     if (!expiresAt) return true;
-    
+
     const now = Date.now();
     const bufferTime = 5 * 60 * 1000; // 5分（ミリ秒）
     return expiresAt - now < bufferTime;
+  }
+
+  /**
+   * LINE認証トークンを自動更新
+   * @param providedRefreshToken 更新に使用するリフレッシュトークン（省略時はCookieから取得を試みる）
+   * @returns 更新が成功したかどうか
+   */
+  static async renewLineToken(providedRefreshToken?: string | null): Promise<boolean> {
+    try {
+      const refreshToken = providedRefreshToken || this.getLineTokens().refreshToken;
+      if (!refreshToken) return false;
+
+      if (typeof window !== "undefined") {
+        const event = new CustomEvent("auth:renew-line-token", {
+          detail: { refreshToken },
+        });
+        window.dispatchEvent(event);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Failed to renew LINE token:", error);
+      return false;
+    }
+  }
+
+  /**
+   * 電話番号認証トークンを自動更新
+   * @param providedRefreshToken 更新に使用するリフレッシュトークン（省略時はCookieから取得を試みる）
+   * @returns 更新が成功したかどうか
+   */
+  static async renewPhoneToken(providedRefreshToken?: string | null): Promise<boolean> {
+    try {
+      const refreshToken = providedRefreshToken || this.getPhoneTokens().refreshToken;
+      if (!refreshToken) return false;
+
+      if (typeof window !== "undefined") {
+        const event = new CustomEvent("auth:renew-phone-token", {
+          detail: { refreshToken },
+        });
+        window.dispatchEvent(event);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Failed to renew phone token:", error);
+      return false;
+    }
   }
 
   /**
@@ -170,7 +225,7 @@ export class TokenManager {
    */
   private static setCookie(name: string, value: string, days = 30): void {
     if (typeof document === "undefined") return;
-    
+
     const expires = new Date();
     expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
     document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
@@ -183,10 +238,11 @@ export class TokenManager {
    */
   private static getCookie(name: string): string | null {
     if (typeof document === "undefined") return null;
-    
+
     const cookies = document.cookie.split("; ");
     const cookie = cookies.find((c) => c.startsWith(`${name}=`));
-    return cookie ? cookie.split("=")[1] : null;
+    const [_, ...cookieValues] = cookie?.split("=") ?? [];
+    return cookieValues?.length ? cookieValues.join("=") : null;
   }
 
   /**
@@ -195,7 +251,7 @@ export class TokenManager {
    */
   private static deleteCookie(name: string): void {
     if (typeof document === "undefined") return;
-    
+
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
   }
 }

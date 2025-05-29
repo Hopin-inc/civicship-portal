@@ -35,8 +35,6 @@ export const useArticles = (): UseArticlesResult => {
     return data?.articles?.edges ? presenterArticleWithAuthorList(data.articles.edges) : [];
   }, [data]);
 
-  console.log(articles);
-
   const hasMore = data?.articles.pageInfo.hasNextPage || false;
 
   const handleLoadMore = async () => {

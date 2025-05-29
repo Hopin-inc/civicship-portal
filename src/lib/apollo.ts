@@ -41,31 +41,35 @@ const requestLink = new ApolloLink((operation, forward) => {
   const phoneTokens = TokenManager.getPhoneTokens();
 
   operation.setContext(({ headers = {} }) => {
-    const requestHeaders = {
+    const baseHeaders = {
       ...headers,
       Authorization: lineTokens.accessToken ? `Bearer ${lineTokens.accessToken}` : "",
       "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-      "X-Refresh-Token": lineTokens.refreshToken || "",
-      "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
-      "X-Phone-Auth-Token": phoneTokens.accessToken || "",
-      "X-Phone-Refresh-Token": phoneTokens.refreshToken || "",
-      "X-Phone-Token-Expires-At": phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
     };
+
+    const tokenRequiredOperations = ['userSignUp', 'linkPhoneAuth', 'storePhoneAuthToken'];
     
-    if (operation.operationName === 'userSignUp') {
-      console.log('🔍 userSignUp headers:', {
-        hasLineToken: !!lineTokens.accessToken,
+    if (tokenRequiredOperations.includes(operation.operationName || '')) {
+      const requestHeaders = {
+        ...baseHeaders,
+        "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
+        "X-Phone-Auth-Token": phoneTokens.accessToken || "",
+        "X-Phone-Token-Expires-At": phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
+        "X-Phone-Uid": phoneTokens.phoneUid || "",
+        "X-Phone-Number": phoneTokens.phoneNumber || "",
+      };
+      
+      console.log('🔐 Sending phone auth tokens for operation:', operation.operationName, {
         hasPhoneToken: !!phoneTokens.accessToken,
-        lineExpiresAt: lineTokens.expiresAt,
-        phoneExpiresAt: phoneTokens.expiresAt,
-        headers: {
-          'X-Token-Expires-At': lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
-          'X-Phone-Token-Expires-At': phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
-        }
+        hasPhoneUid: !!phoneTokens.phoneUid,
+        hasPhoneNumber: !!phoneTokens.phoneNumber
       });
+      
+      return { headers: requestHeaders };
     }
     
-    return { headers: requestHeaders };
+    console.log('🔒 Sending minimal tokens for operation:', operation.operationName);
+    return { headers: baseHeaders };
   });
 
   return forward(operation);

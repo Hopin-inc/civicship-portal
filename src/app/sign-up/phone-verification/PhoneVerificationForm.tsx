@@ -24,7 +24,7 @@ export function PhoneVerificationForm() {
       if (!isAuthenticated) {
         let loginWithNext = "/login";
         if (nextParam) {
-          loginWithNext += `?next=${encodeURIComponent(nextParam)}`;
+          loginWithNext += `?next=${nextParam}`;
         }
         router.replace(loginWithNext);
       }
@@ -56,7 +56,7 @@ export function PhoneVerificationForm() {
     const success = await phoneAuth.verifyPhoneCode(verificationCode);
     if (success) {
       toast.success("電話番号認証が完了しました");
-      const nextUrl = nextParam ? `/sign-up?next=${encodeURIComponent(nextParam)}` : "/sign-up";
+      const nextUrl = nextParam ? `/sign-up?next=${nextParam}` : "/sign-up";
       router.push(nextUrl);
     } else {
       toast.error("認証コードが無効です");
@@ -154,7 +154,12 @@ export function PhoneVerificationForm() {
           </button>
           <button
             type="button"
-            onClick={() => setStep("phone")}
+            onClick={() => {
+              phoneAuth.clearRecaptcha?.();
+              setStep("phone");
+              setPhoneNumber("");
+              setVerificationCode("");
+            }}
             className="w-full h-12 border border-gray-300 rounded-md"
           >
             電話番号を再入力
