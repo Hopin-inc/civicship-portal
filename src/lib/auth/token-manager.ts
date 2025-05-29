@@ -42,9 +42,9 @@ export class TokenManager {
     if (tokens.accessToken) {
       this.setCookie(this.LINE_ACCESS_TOKEN_KEY, tokens.accessToken);
     }
-    // if (tokens.refreshToken) {
-    //   this.setCookie(this.LINE_REFRESH_TOKEN_KEY, tokens.refreshToken);
-    // }
+    if (tokens.refreshToken) {
+      this.setCookie(this.LINE_REFRESH_TOKEN_KEY, tokens.refreshToken);
+    }
     if (tokens.expiresAt) {
       this.setCookie(this.LINE_TOKEN_EXPIRES_AT_KEY, tokens.expiresAt.toString());
     }
@@ -64,9 +64,9 @@ export class TokenManager {
     if (tokens.accessToken) {
       this.setCookie(this.PHONE_ACCESS_TOKEN_KEY, tokens.accessToken);
     }
-    // if (tokens.refreshToken) {
-    //   this.setCookie(this.PHONE_REFRESH_TOKEN_KEY, tokens.refreshToken);
-    // }
+    if (tokens.refreshToken) {
+      this.setCookie(this.PHONE_REFRESH_TOKEN_KEY, tokens.refreshToken);
+    }
     if (tokens.expiresAt) {
       this.setCookie(this.PHONE_TOKEN_EXPIRES_AT_KEY, tokens.expiresAt.toString());
     }
@@ -78,8 +78,7 @@ export class TokenManager {
    */
   static getLineTokens(): AuthTokens {
     const accessToken = this.getCookie(this.LINE_ACCESS_TOKEN_KEY);
-    // const refreshToken = this.getCookie(this.LINE_REFRESH_TOKEN_KEY);
-    const refreshToken = null;
+    const refreshToken = this.getCookie(this.LINE_REFRESH_TOKEN_KEY);
     const expiresAtStr = this.getCookie(this.LINE_TOKEN_EXPIRES_AT_KEY);
     
     return {
@@ -97,8 +96,7 @@ export class TokenManager {
     const phoneUid = this.getCookie(this.PHONE_UID_KEY);
     const phoneNumber = this.getCookie(this.PHONE_NUMBER_KEY);
     const accessToken = this.getCookie(this.PHONE_ACCESS_TOKEN_KEY);
-    // const refreshToken = this.getCookie(this.PHONE_REFRESH_TOKEN_KEY);
-    const refreshToken = null;
+    const refreshToken = this.getCookie(this.PHONE_REFRESH_TOKEN_KEY);
     const expiresAtStr = this.getCookie(this.PHONE_TOKEN_EXPIRES_AT_KEY);
     
     return {
@@ -115,7 +113,7 @@ export class TokenManager {
    */
   static clearLineTokens(): void {
     this.deleteCookie(this.LINE_ACCESS_TOKEN_KEY);
-    // this.deleteCookie(this.LINE_REFRESH_TOKEN_KEY);
+    this.deleteCookie(this.LINE_REFRESH_TOKEN_KEY);
     this.deleteCookie(this.LINE_TOKEN_EXPIRES_AT_KEY);
   }
 
@@ -126,7 +124,7 @@ export class TokenManager {
     this.deleteCookie(this.PHONE_UID_KEY);
     this.deleteCookie(this.PHONE_NUMBER_KEY);
     this.deleteCookie(this.PHONE_ACCESS_TOKEN_KEY);
-    // this.deleteCookie(this.PHONE_REFRESH_TOKEN_KEY);
+    this.deleteCookie(this.PHONE_REFRESH_TOKEN_KEY);
     this.deleteCookie(this.PHONE_TOKEN_EXPIRES_AT_KEY);
   }
 

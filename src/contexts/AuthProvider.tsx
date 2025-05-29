@@ -458,6 +458,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             communityId: COMMUNITY_ID,
             phoneUid,
             phoneNumber: phoneTokens.phoneNumber,
+            lineRefreshToken: lineTokens.refreshToken,
+            phoneRefreshToken: phoneTokens.refreshToken,
           },
         },
       });
