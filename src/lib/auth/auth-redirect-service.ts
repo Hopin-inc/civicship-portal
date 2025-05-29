@@ -37,17 +37,7 @@ export class AuthRedirectService {
       "/admin",
       "/admin/*",
     ];
-
-    const publicPaths = [
-      "/login",
-      "/sign-up",
-      "/sign-up/phone-verification",
-      "/privacy-policy",
-      "/terms-of-service",
-    ];
-
-    return !publicPaths.includes(pathname) && 
-           (matchPaths(pathname, ...protectedPaths) || !pathname.startsWith("/admin"));
+    return matchPaths(pathname, ...protectedPaths);
   }
 
   /**
@@ -57,7 +47,6 @@ export class AuthRedirectService {
     const phoneVerificationRequiredPaths = [
       "/sign-up",
     ];
-
     return matchPaths(pathname, ...phoneVerificationRequiredPaths);
   }
 
@@ -65,7 +54,11 @@ export class AuthRedirectService {
    * 管理者権限が必要なパスかどうかを判定
    */
   public isAdminPath(pathname: string): boolean {
-    return pathname.startsWith("/admin");
+    const adminRequiredPaths = [
+      "/admin",
+      "/admin/*",
+    ];
+    return matchPaths(pathname, ...adminRequiredPaths);
   }
 
   /**
@@ -91,22 +84,22 @@ export class AuthRedirectService {
         return `/sign-up${nextParam}`;
       }
     }
-    
+
     else if (this.isPhoneVerificationRequiredPath(pathname)) {
       if (authState === "unauthenticated") {
         return `/login${nextParam}`;
-      } else if ((authState === "line_authenticated" || authState === "line_token_expired") && 
+      } else if ((authState === "line_authenticated" || authState === "line_token_expired") &&
                  pathname !== "/sign-up/phone-verification") {
         return `/sign-up/phone-verification${nextParam}`;
       }
     }
-    
+
     else if (this.isAdminPath(pathname)) {
       if (authState !== "user_registered") {
         return `/login${nextParam}`;
       }
     }
-    
+
     else if (pathname === "/login" && authState === "user_registered") {
       return "/";
     }
@@ -157,7 +150,7 @@ export class AuthRedirectService {
       return { hasAccess: false, redirectPath: "/" };
     }
 
-    const isCommunityManager = targetMembership && 
+    const isCommunityManager = targetMembership &&
       (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
 
     if (!isCommunityManager) {

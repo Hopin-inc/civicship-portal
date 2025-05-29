@@ -2,9 +2,9 @@ import { LiffService } from "./liff-service";
 import { PhoneAuthService } from "./phone-auth-service";
 import { TokenManager } from "./token-manager";
 
-export type AuthenticationState = 
-  | "unauthenticated" 
-  | "line_authenticated" 
+export type AuthenticationState =
+  | "unauthenticated"
+  | "line_authenticated"
   | "line_token_expired"
   | "phone_authenticated"
   | "phone_token_expired"
@@ -25,7 +25,7 @@ export class AuthStateManager {
   private constructor() {
     this.liffService = LiffService.getInstance();
     this.phoneAuthService = PhoneAuthService.getInstance();
-    
+
     if (typeof window !== "undefined") {
       window.addEventListener("auth:renew-line-token", this.handleLineTokenRenewal.bind(this));
       window.addEventListener("auth:renew-phone-token", this.handlePhoneTokenRenewal.bind(this));
@@ -46,6 +46,7 @@ export class AuthStateManager {
    * 現在の認証状態を取得
    */
   public getState(): AuthenticationState {
+    console.log("🔃getState: ", this.currentState);
     return this.currentState;
   }
 
@@ -87,17 +88,17 @@ export class AuthStateManager {
    */
   public async initialize(): Promise<void> {
     this.setState("loading");
-    
+
     const lineTokens = TokenManager.getLineTokens();
     const hasValidLineToken = lineTokens.accessToken && !TokenManager.isLineTokenExpired();
-    
+
     if (hasValidLineToken) {
       const phoneTokens = TokenManager.getPhoneTokens();
       const hasValidPhoneToken = phoneTokens.accessToken && !TokenManager.isPhoneTokenExpired();
-      
+
       if (hasValidPhoneToken) {
         const isUserRegistered = await this.checkUserRegistration();
-        
+
         if (isUserRegistered) {
           this.setState("user_registered");
         } else {
@@ -118,7 +119,7 @@ export class AuthStateManager {
     try {
       const lineTokens = TokenManager.getLineTokens();
       const phoneTokens = TokenManager.getPhoneTokens();
-      
+
       return !!(lineTokens.accessToken && phoneTokens.accessToken && phoneTokens.phoneUid);
     } catch (error) {
       console.error("Failed to check user registration:", error);
@@ -132,7 +133,7 @@ export class AuthStateManager {
   private async handleLineTokenRenewal(event: Event): Promise<void> {
     try {
       const renewed = await TokenManager.renewLineToken();
-      
+
       if (renewed && this.currentState === "line_token_expired") {
         this.setState("line_authenticated");
       } else if (!renewed) {
@@ -150,7 +151,7 @@ export class AuthStateManager {
   private async handlePhoneTokenRenewal(event: Event): Promise<void> {
     try {
       const renewed = await TokenManager.renewPhoneToken();
-      
+
       if (renewed && this.currentState === "phone_token_expired") {
         this.setState("phone_authenticated");
       } else if (!renewed) {
