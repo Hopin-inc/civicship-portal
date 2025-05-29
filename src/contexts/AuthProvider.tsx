@@ -404,7 +404,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * 電話番号認証を開始
    */
   const startPhoneVerification = async (phoneNumber: string): Promise<string | null> => {
-    return phoneAuthService.startPhoneVerification(phoneNumber);
+    return await phoneAuthService.startPhoneVerification(phoneNumber);
   };
 
   /**
