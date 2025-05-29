@@ -66,7 +66,7 @@ export function SignUpForm() {
         toast.error("電話番号認証が完了していません");
         let signUpWithNext = "/sign-up/phone-verification";
         if (nextParam) {
-          signUpWithNext += `?next=${ encodeURIComponent(nextParam) }`;
+          signUpWithNext += `?next=${ nextParam }`;
         }
         router.replace(signUpWithNext);
         return;

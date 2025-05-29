@@ -22,7 +22,7 @@ export default function PhoneVerificationPage() {
       hasRedirected.current = true;
       const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
       const redirectUrl = nextParam
-        ? `/sign-up/phone-verification/line-browser?next=${encodeURIComponent(nextParam)}`
+        ? `/sign-up/phone-verification/line-browser?next=${nextParam}`
         : "/sign-up/phone-verification/line-browser";
       window.location.replace(redirectUrl);
     }

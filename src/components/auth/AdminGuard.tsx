@@ -44,7 +44,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     }
 
     if (!isAuthenticated || !currentUser) {
-      const next = encodeURIComponent(window.location.pathname + window.location.search);
+      const next = window.location.pathname + window.location.search;
       console.log("🚷 No user found. Redirecting to login.");
       router.replace(`/login?next=${next}`);
       return;
@@ -52,7 +52,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
 
     const checkAdminAccess = async () => {
       const { hasAccess, redirectPath } = await authRedirectService.checkAdminAccess(currentUser);
-      
+
       if (!hasAccess && redirectPath) {
         if (redirectPath === "/") {
           toast.warning("管理者権限がありません");
@@ -84,7 +84,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     }
 
     const targetMembership = currentUser.memberships.find((m: any) => m.community?.id === COMMUNITY_ID);
-    return targetMembership && 
+    return targetMembership &&
            (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
   };
 

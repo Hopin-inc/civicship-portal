@@ -67,9 +67,9 @@ export class AuthRedirectService {
    * @param next リダイレクト後に戻るパス（オプション）
    * @returns リダイレクト先のパス、またはnull（リダイレクト不要の場合）
    */
-  public getRedirectPath(pathname: string, next?: string): string | null {
+  public getRedirectPath(pathname: string, next?: string | null): string | null {
     const authState = this.authStateManager.getState();
-    const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
+    const nextParam = next ? `?next=${next}` : "";
 
     if (authState === "loading") {
       return null;
@@ -130,7 +130,7 @@ export class AuthRedirectService {
       return next || "/";
     }
 
-    return `/login${next ? `?next=${encodeURIComponent(next)}` : ""}`;
+    return `/login${next ? `?next=${next}` : ""}`;
   }
 
   /**

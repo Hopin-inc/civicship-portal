@@ -24,7 +24,7 @@ export function PhoneVerificationForm() {
       if (!isAuthenticated) {
         let loginWithNext = "/login";
         if (nextParam) {
-          loginWithNext += `?next=${encodeURIComponent(nextParam)}`;
+          loginWithNext += `?next=${nextParam}`;
         }
         router.replace(loginWithNext);
       }
@@ -56,7 +56,7 @@ export function PhoneVerificationForm() {
     const success = await phoneAuth.verifyPhoneCode(verificationCode);
     if (success) {
       toast.success("電話番号認証が完了しました");
-      const nextUrl = nextParam ? `/sign-up?next=${encodeURIComponent(nextParam)}` : "/sign-up";
+      const nextUrl = nextParam ? `/sign-up?next=${nextParam}` : "/sign-up";
       router.push(nextUrl);
     } else {
       toast.error("認証コードが無効です");

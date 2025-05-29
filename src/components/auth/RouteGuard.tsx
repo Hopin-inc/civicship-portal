@@ -39,10 +39,10 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     }
 
     const authCheck = () => {
-      const next = encodeURIComponent(window.location.pathname + window.location.search);
-      
+      const next = window.location.pathname + window.location.search;
+
       const redirectPath = authRedirectService.getRedirectPath(pathname, next);
-      
+
       if (redirectPath) {
         setAuthorized(false);
         router.replace(redirectPath);
