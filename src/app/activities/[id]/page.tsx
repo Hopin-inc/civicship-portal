@@ -3,13 +3,16 @@
 import { useActivityDetails } from "@/app/activities/[id]/hooks/useActivityDetails";
 import ActivityDetailsHeader from "@/app/activities/[id]/components/ActivityDetailsHeader";
 import ActivityDetailsContent from "@/app/activities/[id]/components/ActivityDetailsContent";
-import ActivityDetailsFooter from "@/app/activities/[id]/components/ActivityDetailsFooter";
+import ActivityDetailsFooter, {
+  DisableReasonType,
+} from "@/app/activities/[id]/components/ActivityDetailsFooter";
 import { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
 import { notFound, useParams, useSearchParams } from "next/navigation";
 import ErrorState from "@/components/shared/ErrorState";
+import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 
 export default function ActivityPage() {
   const headerConfig = useMemo(
@@ -39,6 +42,10 @@ export default function ActivityPage() {
     refetch,
   } = useActivityDetails(id ?? "");
 
+  // NOTE: LINE で予約しない場合はタイトルに予約、問い合わせを含むようにしているので、タイトルの文字で判断している(NEO88の場合)
+  const isExternalBooking =
+    (opportunity?.title.includes("予約") || opportunity?.title.includes("問い合わせ")) ?? false;
+
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
@@ -53,6 +60,17 @@ export default function ActivityPage() {
   if (!opportunity) {
     return notFound();
   }
+
+  const getDisableReason = (
+    slots: ActivitySlot[] | null | undefined,
+    isExternalBooking: boolean,
+    isReservable: boolean,
+  ): DisableReasonType | undefined => {
+    if (isExternalBooking) return "externalBooking";
+    if (!slots || slots.length === 0) return "noSlots";
+    if (!isReservable) return "reservationClosed";
+    return undefined;
+  };
 
   return (
     <>
@@ -69,6 +87,7 @@ export default function ActivityPage() {
             availableDates={sortedSlots}
             sameStateActivities={sameStateActivities}
             communityId={communityId}
+            isExternalBooking={isExternalBooking}
           />
         </div>
       </main>
@@ -76,13 +95,7 @@ export default function ActivityPage() {
         opportunityId={opportunity.id}
         price={opportunity.feeRequired}
         communityId={communityId}
-        disableReason={
-          !sortedSlots || sortedSlots.length === 0
-            ? "noSlots"
-            : !opportunity.isReservable
-              ? "reservationClosed"
-              : undefined
-        }
+        disableReason={getDisableReason(sortedSlots, isExternalBooking, opportunity.isReservable)}
       />
     </>
   );
