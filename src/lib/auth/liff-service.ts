@@ -111,10 +111,14 @@ export class LiffService {
       if (liff.isInClient()) {
         this.state.isLoggedIn = true;
       } else {
-        const redirectUri = redirectPath && typeof window !== "undefined"
-          ? window.location.origin + redirectPath
-          : typeof window !== "undefined" ? window.location.pathname : undefined;
-
+        if (redirectPath && typeof window !== "undefined") {
+          sessionStorage.setItem('liff_redirect_after_auth', redirectPath);
+          console.log(`🔍 [${new Date().toISOString()}] Stored redirect path in sessionStorage: ${redirectPath}`);
+        }
+        
+        const redirectUri = typeof window !== "undefined" ? window.location.origin : undefined;
+        
+        console.log(`🔍 [${new Date().toISOString()}] LINE login with redirectUri: ${redirectUri}`);
         liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない
       }

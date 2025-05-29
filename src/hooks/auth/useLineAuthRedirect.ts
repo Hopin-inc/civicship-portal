@@ -91,6 +91,19 @@ export const useLineAuthRedirect = (
             if (success) {
               console.log(`🔍 [${fnTimestamp}] LINE authentication successful - refreshing user data`);
               await refetchUser();
+              
+              if (typeof window !== "undefined") {
+                const storedRedirect = sessionStorage.getItem('liff_redirect_after_auth');
+                if (storedRedirect) {
+                  console.log(`🔍 [${fnTimestamp}] Found stored redirect path: ${storedRedirect}`);
+                  sessionStorage.removeItem('liff_redirect_after_auth');
+                  
+                  setTimeout(() => {
+                    console.log(`🔍 [${fnTimestamp}] Redirecting to stored path: ${storedRedirect}`);
+                    window.location.href = storedRedirect;
+                  }, 500);
+                }
+              }
             } else {
               console.error(`🔍 [${fnTimestamp}] Failed to complete LINE authentication with LIFF token`);
             }
