@@ -145,14 +145,15 @@ export function PhoneVerificationForm() {
                 required
               />
             </div>
-            <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
             <div className="flex flex-col items-center gap-8 w-full mx-auto">
               <Button
                 type="submit"
                 className="w-full h-12 bg-primary text-white rounded-md"
-                disabled={isPhoneSubmitting || !isPhoneValid || isReloading}
+                disabled={
+                  isPhoneSubmitting || phoneAuth.isVerifying || !isPhoneValid || isReloading
+                }
               >
-                {isPhoneSubmitting ? "送信中..." : "認証コードを送信"}
+                {isPhoneSubmitting || phoneAuth.isVerifying ? "送信中..." : "認証コードを送信"}
               </Button>
               <Button
                 type="button"
@@ -171,6 +172,7 @@ export function PhoneVerificationForm() {
               </Button>
             </div>
           </form>
+          <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
         </>
       )}
       {step === "code" && (
@@ -193,14 +195,19 @@ export function PhoneVerificationForm() {
             <Button
               type="submit"
               className="w-full h-12 bg-primary text-white rounded-md"
-              disabled={isCodeVerifying || verificationCode.length < 6 || isReloading}
+              disabled={
+                isCodeVerifying ||
+                phoneAuth.isVerifying ||
+                verificationCode.length < 6 ||
+                isReloading
+              }
             >
               {isCodeVerifying ? "検証中..." : "コードを検証"}
             </Button>
             <Button
               type="button"
               variant={"text"}
-              disabled={isCodeVerifying || isReloading}
+              disabled={isCodeVerifying || phoneAuth.isVerifying || isReloading}
               onClick={() => {
                 phoneAuth.clearRecaptcha?.();
                 setIsReloading(true);
