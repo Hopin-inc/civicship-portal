@@ -115,23 +115,22 @@ export function PhoneVerificationForm() {
   }
 
   return (
-    <>
-      <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
-      <div className="w-full max-w-md mx-auto space-y-8">
-        {/*{(isPhoneSubmitting || isCodeVerifying || isReloading) && <LoadingIndicator />}*/}
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">
-            {step === "phone" && "電話番号を入力"}
-            {step === "code" && "認証コードを入力"}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {step === "phone" &&
-              "電話番号認証のため、あなたの電話番号を入力してください。SMSで認証コードが送信されます。"}
-            {step === "code" && "電話番号に送信された6桁の認証コードを入力してください。"}
-          </p>
-        </div>
+    <div className="w-full max-w-md mx-auto space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight">
+          {step === "phone" && "電話番号を入力"}
+          {step === "code" && "認証コードを入力"}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {step === "phone" &&
+            "電話番号認証のため、あなたの電話番号を入力してください。SMSで認証コードが送信されます。"}
+          {step === "code" && "電話番号に送信された6桁の認証コードを入力してください。"}
+        </p>
+      </div>
 
-        {step === "phone" && (
+      {step === "phone" && (
+        <>
+          <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
           <form onSubmit={handlePhoneSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="phone" className="text-sm font-medium">
@@ -172,52 +171,52 @@ export function PhoneVerificationForm() {
               </Button>
             </div>
           </form>
-        )}
-        {step === "code" && (
-          <form onSubmit={handleCodeSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="code" className="text-sm font-medium">
-                認証コード
-              </label>
-              <div className="flex justify-center py-4">
-                <InputOTP maxLength={6} value={verificationCode} onChange={handleOTPChange}>
-                  <InputOTPGroup>
-                    {Array.from({ length: 6 }).map((_, index) => (
-                      <InputOTPSlot key={index} index={index} />
-                    ))}
-                  </InputOTPGroup>
-                </InputOTP>
-              </div>
+        </>
+      )}
+      {step === "code" && (
+        <form onSubmit={handleCodeSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="code" className="text-sm font-medium">
+              認証コード
+            </label>
+            <div className="flex justify-center py-4">
+              <InputOTP maxLength={6} value={verificationCode} onChange={handleOTPChange}>
+                <InputOTPGroup>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <InputOTPSlot key={index} index={index} />
+                  ))}
+                </InputOTPGroup>
+              </InputOTP>
             </div>
-            <div className="flex flex-col items-center gap-8 w-full mx-auto">
-              <Button
-                type="submit"
-                className="w-full h-12 bg-primary text-white rounded-md"
-                disabled={isCodeVerifying || verificationCode.length < 6 || isReloading}
-              >
-                {isCodeVerifying ? "検証中..." : "コードを検証"}
-              </Button>
-              <Button
-                type="button"
-                variant={"text"}
-                disabled={isCodeVerifying || isReloading}
-                onClick={() => {
-                  phoneAuth.clearRecaptcha?.();
-                  setIsReloading(true);
-                  setStep("phone");
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 300);
-                  setPhoneNumber("");
-                  setVerificationCode("");
-                }}
-              >
-                電話番号を再入力
-              </Button>
-            </div>
-          </form>
-        )}
-      </div>
-    </>
+          </div>
+          <div className="flex flex-col items-center gap-8 w-full mx-auto">
+            <Button
+              type="submit"
+              className="w-full h-12 bg-primary text-white rounded-md"
+              disabled={isCodeVerifying || verificationCode.length < 6 || isReloading}
+            >
+              {isCodeVerifying ? "検証中..." : "コードを検証"}
+            </Button>
+            <Button
+              type="button"
+              variant={"text"}
+              disabled={isCodeVerifying || isReloading}
+              onClick={() => {
+                phoneAuth.clearRecaptcha?.();
+                setIsReloading(true);
+                setStep("phone");
+                setTimeout(() => {
+                  window.location.reload();
+                }, 300);
+                setPhoneNumber("");
+                setVerificationCode("");
+              }}
+            >
+              電話番号を再入力
+            </Button>
+          </div>
+        </form>
+      )}
+    </div>
   );
 }
