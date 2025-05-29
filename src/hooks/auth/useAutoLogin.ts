@@ -13,29 +13,56 @@ export const useAutoLogin = (
   refetchUser: () => Promise<any>
 ) => {
   useEffect(() => {
+    const hookTimestamp = new Date().toISOString();
+    console.log(`🔄 [${hookTimestamp}] useAutoLogin hook initialized, authState=${authenticationState}, isAuthenticating=${isAuthenticating}, environment=${environment}`);
+    
     const handleAutoLogin = async () => {
-      console.log("👀 handleAutoLogin started!")
-      if (environment !== AuthEnvironment.LIFF) return;
-      if (authenticationState !== "unauthenticated") return;
-      if (isAuthenticating) return;
-      console.log("👀 handleAutoLogin continue condition met!")
+      const fnTimestamp = new Date().toISOString();
+      console.log(`👀 [${fnTimestamp}] handleAutoLogin started! authState=${authenticationState}, isAuthenticating=${isAuthenticating}, environment=${environment}`);
+      
+      if (environment !== AuthEnvironment.LIFF) {
+        console.log(`🔄 [${fnTimestamp}] Early return: environment is not LIFF (${environment})`);
+        return;
+      }
+      
+      if (authenticationState !== "unauthenticated") {
+        console.log(`🔄 [${fnTimestamp}] Early return: authState is ${authenticationState}, not 'unauthenticated'`);
+        return;
+      }
+      
+      if (isAuthenticating) {
+        console.log(`🔄 [${fnTimestamp}] Early return: isAuthenticating is already true`);
+        return;
+      }
+      
+      console.log(`👀 [${fnTimestamp}] handleAutoLogin continue condition met!`);
 
       const liffState = liffService.getState();
-      if (!liffState.isInitialized || !liffState.isLoggedIn) return;
+      if (!liffState.isInitialized || !liffState.isLoggedIn) {
+        console.log(`🔄 [${fnTimestamp}] Early return: LIFF not initialized (${liffState.isInitialized}) or not logged in (${liffState.isLoggedIn})`);
+        return;
+      }
 
-      const timestamp = new Date().toISOString();
-      console.log(`🔍 [${timestamp}] Auto-logging in via LIFF`);
+      console.log(`🔍 [${fnTimestamp}] Auto-logging in via LIFF`);
 
+      console.log(`🔄 [${fnTimestamp}] About to set isAuthenticating=true`);
       setIsAuthenticating(true);
-      console.log("🔍 Starting auto-login processing - blocking other auth initialization");
+      console.log(`🔍 [${fnTimestamp}] Starting auto-login processing - blocking other auth initialization`);
+      
       try {
         const success = await liffService.signInWithLiffToken();
+        console.log(`🔄 [${fnTimestamp}] signInWithLiffToken result: ${success}`);
+        
         if (success) {
+          console.log(`🔄 [${fnTimestamp}] Auto-login successful - refreshing user data`);
           await refetchUser();
+        } else {
+          console.log(`🔄 [${fnTimestamp}] Auto-login failed - no success from signInWithLiffToken`);
         }
       } catch (error) {
-        console.error("Auto-login with LIFF failed:", error);
+        console.error(`🔄 [${fnTimestamp}] Auto-login failed with error:`, error);
       } finally {
+        console.log(`🔄 [${fnTimestamp}] Setting isAuthenticating=false`);
         setIsAuthenticating(false);
       }
     };
