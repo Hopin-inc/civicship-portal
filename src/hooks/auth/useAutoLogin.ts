@@ -27,6 +27,7 @@ export const useAutoLogin = (
       console.log(`🔍 [${timestamp}] Auto-logging in via LIFF`);
 
       setIsAuthenticating(true);
+      console.log("🔍 Starting auto-login processing - blocking other auth initialization");
       try {
         const success = await liffService.signInWithLiffToken();
         if (success) {

@@ -26,7 +26,7 @@ export const useTokenExpiration = (
       }
 
       console.log("🔍 Initializing authentication state");
-      await authService.initializeAuthState();
+      await authService.initializeAuthState(isAuthenticating);
 
       const tokenService = TokenService.getInstance();
       const phoneTokens = tokenService.getPhoneTokens();

@@ -101,7 +101,7 @@ export class AuthStateManager {
     console.warn("AuthStateManager.initialize is deprecated. Use AuthService.initializeAuthState instead.");
     this.setState("loading");
     
-    await this.authService.initializeAuthState();
+    await this.authService.initializeAuthState(false);
     
     return;
   }

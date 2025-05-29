@@ -29,8 +29,13 @@ export class AuthService {
   /**
    * 初期認証状態を確認
    */
-  public async initializeAuthState(): Promise<void> {
+  public async initializeAuthState(isAuthenticating?: boolean): Promise<void> {
     console.log("🔍 Initializing authentication state...");
+
+    if (isAuthenticating) {
+      console.log("🔍 Skipping auth state initialization - authentication in progress from service");
+      return;
+    }
 
     const currentState = this.authStateStore.getState();
     if (currentState === "user_registered") {
