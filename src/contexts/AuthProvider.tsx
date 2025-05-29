@@ -295,6 +295,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     if (!authStateManager) return; // Guard against initialization error
     
+    const initializeAuthState = async () => {
+      console.log("🔍 Initializing AuthStateManager");
+      await authStateManager.initialize();
+    };
+    
+    initializeAuthState();
+    
     const handleStateChange = (newState: AuthState["authenticationState"]) => {
       setState(prev => ({ ...prev, authenticationState: newState }));
     };

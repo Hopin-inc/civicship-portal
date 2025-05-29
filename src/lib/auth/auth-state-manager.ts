@@ -79,6 +79,35 @@ export class AuthStateManager {
   }
 
   /**
+   * 認証状態を初期化
+   */
+  public async initialize(): Promise<void> {
+    this.setState("loading");
+
+    const lineTokens = TokenManager.getLineTokens();
+    const hasValidLineToken = lineTokens.accessToken && !TokenManager.isLineTokenExpired();
+
+    if (hasValidLineToken) {
+      const phoneTokens = TokenManager.getPhoneTokens();
+      const hasValidPhoneToken = phoneTokens.accessToken && !TokenManager.isPhoneTokenExpired();
+
+      if (hasValidPhoneToken) {
+        const isUserRegistered = await this.checkUserRegistration();
+
+        if (isUserRegistered) {
+          this.setState("user_registered");
+        } else {
+          this.setState("phone_authenticated");
+        }
+      } else {
+        this.setState("line_authenticated");
+      }
+    } else {
+      this.setState("unauthenticated");
+    }
+  }
+
+  /**
    * ユーザー情報の登録状態を確認
    * useAuth()のuserプロパティと同じ logic を使用
    */
