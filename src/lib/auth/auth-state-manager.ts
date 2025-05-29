@@ -1,6 +1,8 @@
 import { LiffService } from "./liff-service";
 import { PhoneAuthService } from "./phone-auth-service";
 import { TokenManager } from "./token-manager";
+import { apolloClient } from "@/lib/apollo";
+import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 
 export type AuthenticationState =
   | "unauthenticated"
@@ -46,7 +48,7 @@ export class AuthStateManager {
    * 現在の認証状態を取得
    */
   public getState(): AuthenticationState {
-    console.log("🔃getState: ", this.currentState);
+    console.log("🔃 getState: ", this.currentState);
     return this.currentState;
   }
 
@@ -114,13 +116,16 @@ export class AuthStateManager {
 
   /**
    * ユーザー情報の登録状態を確認
+   * useAuth()のuserプロパティと同じ logic を使用
    */
   private async checkUserRegistration(): Promise<boolean> {
     try {
-      const lineTokens = TokenManager.getLineTokens();
-      const phoneTokens = TokenManager.getPhoneTokens();
+      const { data } = await apolloClient.query({
+        query: GET_CURRENT_USER,
+        fetchPolicy: "network-only"
+      });
 
-      return !!(lineTokens.accessToken && phoneTokens.accessToken && phoneTokens.phoneUid);
+      return data?.currentUser?.user != null;
     } catch (error) {
       console.error("Failed to check user registration:", error);
       return false;
