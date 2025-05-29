@@ -130,7 +130,6 @@ export function PhoneVerificationForm() {
 
       {step === "phone" && (
         <>
-          <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
           <form onSubmit={handlePhoneSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="phone" className="text-sm font-medium">
@@ -146,6 +145,7 @@ export function PhoneVerificationForm() {
                 required
               />
             </div>
+            <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
             <div className="flex flex-col items-center gap-8 w-full mx-auto">
               <Button
                 type="submit"
