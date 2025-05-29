@@ -87,23 +87,30 @@ export class AuthStateManager {
     const lineTokens = TokenManager.getLineTokens();
     const hasValidLineToken = lineTokens.accessToken && !TokenManager.isLineTokenExpired();
 
-    if (hasValidLineToken) {
-      const phoneTokens = TokenManager.getPhoneTokens();
-      const hasValidPhoneToken = phoneTokens.accessToken && !TokenManager.isPhoneTokenExpired();
+    if (!hasValidLineToken) {
+      this.setState("unauthenticated");
+      return;
+    }
 
-      if (hasValidPhoneToken) {
-        const isUserRegistered = await this.checkUserRegistration();
+    const phoneTokens = TokenManager.getPhoneTokens();
+    const hasValidPhoneToken = phoneTokens.accessToken && !TokenManager.isPhoneTokenExpired();
 
-        if (isUserRegistered) {
-          this.setState("user_registered");
-        } else {
-          this.setState("phone_authenticated");
-        }
+    if (hasValidPhoneToken) {
+      const isUserRegistered = await this.checkUserRegistration();
+
+      if (isUserRegistered) {
+        this.setState("user_registered");
+      } else {
+        this.setState("phone_authenticated");
+      }
+    } else {
+      const isUserRegistered = await this.checkUserRegistration();
+      
+      if (isUserRegistered) {
+        this.setState("user_registered");
       } else {
         this.setState("line_authenticated");
       }
-    } else {
-      this.setState("unauthenticated");
     }
   }
 
