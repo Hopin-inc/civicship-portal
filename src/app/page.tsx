@@ -48,8 +48,8 @@ export default function HomePage() {
       } else if (!isAuthenticating) {
         console.log("🚀 Not authenticated after processing, redirecting to login");
         const next = extractSearchParamFromRelativePath(liffState, "next");
-        const redirectPath = next && next.startsWith("/") ? `/login?next=${next}` : "/login";
-        router.replace(redirectPath);
+        const redirectPath = authRedirectService.getRedirectPath("/", next);
+        router.replace(redirectPath || "/login");
         return;
       }
     }
@@ -57,7 +57,12 @@ export default function HomePage() {
     if (window.location.pathname === "/" &&
         !window.location.href.includes("liff.state") &&
         !window.location.href.includes("login")) {
-      router.replace("/activities");
+      const redirectPath = authRedirectService.getRedirectPath("/");
+      if (redirectPath) {
+        router.replace(redirectPath);
+      } else {
+        router.replace("/activities");
+      }
     }
   }, [router, isAuthenticated, authenticationState, userData, authLoading, userLoading, isAuthenticating, authRedirectService]);
 

@@ -9,6 +9,7 @@ import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import ErrorState from "@/components/shared/ErrorState";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
+import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
@@ -26,12 +27,17 @@ export default function MyProfilePage() {
 
   // リダイレクト済みフラグで多重 push を防止
   const hasRedirectedRef = useRef(false);
+  const authRedirectService = React.useMemo(() => {
+    return AuthRedirectService.getInstance();
+  }, []);
+
   useEffect(() => {
     if (!isAuthenticating && !currentUser && !hasRedirectedRef.current) {
       hasRedirectedRef.current = true;
-      router.push("/login?next=/users/me");
+      const redirectPath = authRedirectService.getRedirectPath("/users/me");
+      router.push(redirectPath || "/login?next=/users/me");
     }
-  }, [currentUser, isAuthenticating, router]);
+  }, [currentUser, isAuthenticating, router, authRedirectService]);
 
   // 認証中 or リダイレクト待ち → ローディング表示
   if (isAuthenticating || (!currentUser && !hasRedirectedRef.current)) {
