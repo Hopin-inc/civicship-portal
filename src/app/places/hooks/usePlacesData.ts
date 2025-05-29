@@ -3,7 +3,7 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import { GqlPlaceEdge, useGetPlacesQuery } from "@/types/graphql";
 import { presenterPlaceCard, presenterPlacePins } from "@/app/places/data/presenter";
-import { getCoordinatesFromAddress } from "@/utils/maps/geocoding";
+import { getCoordinatesFromAddress, PRIORITIZE_LAT_LNG_PLACE_IDS } from "@/utils/maps/geocoding";
 import { IPlaceCard, IPlacePin } from "@/app/places/data/type";
 import { useJsApiLoader } from "@react-google-maps/api";
 
@@ -70,6 +70,12 @@ export default function usePlacesData() {
       const updatedPins = await Promise.all(
         basePlacePins.map(async (pin) => {
           if (!pin.address) return pin;
+
+          const prioritizeLatLng = PRIORITIZE_LAT_LNG_PLACE_IDS.includes(pin.id);
+
+          if (prioritizeLatLng) {
+            return pin;
+          }
 
           const coordinates = await getCoordinatesFromAddress(pin.address);
 

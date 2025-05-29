@@ -3,7 +3,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { getCoordinatesFromAddress } from "@/utils/maps/geocoding";
+import { getCoordinatesFromAddress, PRIORITIZE_LAT_LNG_PLACE_IDS } from "@/utils/maps/geocoding";
 
 interface AddressMapProps {
   address: string;
@@ -18,6 +18,7 @@ interface AddressMapProps {
   onLocationFound?: (location: google.maps.LatLng) => void;
   latitude?: number; // 緯度（フォールバック用）
   longitude?: number; //経度（フォールバック用）
+  placeId: string;
 }
 
 const DEFAULT_CENTER = {
@@ -29,6 +30,7 @@ const DEFAULT_ZOOM = 12;
 
 const useAddressGeocoding = (
   address: string | undefined,
+  placeId: string,
   fallbackLat?: number,
   fallbackLng?: number,
   onSuccess?: (location: google.maps.LatLng) => void,
@@ -37,9 +39,38 @@ const useAddressGeocoding = (
   const [isGeocoding, setIsGeocoding] = useState(false);
   const geocodeRequestRef = useRef<AbortController | null>(null);
 
+  const prioritizeLatLng = PRIORITIZE_LAT_LNG_PLACE_IDS.includes(placeId);
+
+  const setFallbackLocation = useCallback(
+    (map?: google.maps.Map | null, zoom?: number) => {
+      if (fallbackLat === undefined || fallbackLng === undefined) {
+        return null;
+      }
+
+      const fallbackLocation = new google.maps.LatLng(fallbackLat, fallbackLng);
+      setLocation(fallbackLocation);
+
+      if (map) {
+        map.setCenter(fallbackLocation);
+        if (zoom !== undefined) map.setZoom(zoom);
+      }
+
+      if (onSuccess) {
+        onSuccess(fallbackLocation);
+      }
+
+      return fallbackLocation;
+    },
+    [fallbackLat, fallbackLng, onSuccess, setLocation],
+  );
+
   const geocodeAddress = useCallback(
     async (map?: google.maps.Map | null, zoom?: number) => {
       if (!address) return null;
+
+      if (prioritizeLatLng && fallbackLat && fallbackLng) {
+        return setFallbackLocation(map, zoom);
+      }
 
       // 前回のリクエストがあればキャンセル
       if (geocodeRequestRef.current) {
@@ -78,30 +109,7 @@ const useAddressGeocoding = (
         setIsGeocoding(false);
       }
     },
-    [address, fallbackLat, fallbackLng, onSuccess],
-  );
-
-  const setFallbackLocation = useCallback(
-    (map?: google.maps.Map | null, zoom?: number) => {
-      if (fallbackLat === undefined || fallbackLng === undefined) {
-        return null;
-      }
-
-      const fallbackLocation = new google.maps.LatLng(fallbackLat, fallbackLng);
-      setLocation(fallbackLocation);
-
-      if (map) {
-        map.setCenter(fallbackLocation);
-        if (zoom !== undefined) map.setZoom(zoom);
-      }
-
-      if (onSuccess) {
-        onSuccess(fallbackLocation);
-      }
-
-      return fallbackLocation;
-    },
-    [fallbackLat, fallbackLng, onSuccess],
+    [address, fallbackLat, fallbackLng, onSuccess, prioritizeLatLng, setFallbackLocation],
   );
 
   return {
@@ -128,11 +136,13 @@ export default function AddressMap({
   onLocationFound,
   latitude,
   longitude,
+  placeId,
 }: AddressMapProps) {
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
   const { location: markerPosition, geocodeAddress } = useAddressGeocoding(
     address,
+    placeId,
     latitude,
     longitude,
     onLocationFound,

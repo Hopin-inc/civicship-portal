@@ -3,6 +3,16 @@
  * #NOTE: strapi に保存された緯度経度は若干位置がずれるため、住所から位置情報を再取得して表示するために利用してている
  */
 
+// 住所からだと若干住所がズレる拠点ID
+export const PRIORITIZE_LAT_LNG_PLACE_IDS = [
+  "cmahq8fb5000rs60nhlqmuz0h", // SAKAZUKI BOTANICAL
+  "cmahr04i90015s60nt3942swi", // 田村神社
+  "cmap18zk20006s60ns5f2cz44", // 大庄屋
+  "cmahtero00038s60n9y0iotq7", // 萬翠荘
+  "cmahv5tcx004es60nh9pvayyh", // 田渕石材株式会社
+  "cmahq8fb5000rs60nhlqmuz0h", // 眞鍋自転車店
+];
+
 // メモリ内キャッシュ: 住所 -> 緯度経度のマッピング
 const geocodeCache: Record<string, google.maps.LatLngLiteral> = {};
 
