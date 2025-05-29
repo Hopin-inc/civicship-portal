@@ -33,7 +33,9 @@ export function PhoneVerificationForm() {
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isReloading, setIsReloading] = useState(false);
+  const [isPhoneSubmitting, setIsSubmitting] = useState(false);
+  const [isCodeVerifying, setIsCodeVerifying] = useState(false);
 
   const formattedPhone = formatPhoneNumber(phoneNumber);
   const digitsOnly = formattedPhone.replace(/\D/g, "");
@@ -62,7 +64,7 @@ export function PhoneVerificationForm() {
       toast.error("認証コード送信を準備中です");
       return;
     }
-    if (isSubmitting) return;
+    if (isPhoneSubmitting) return;
     setIsSubmitting(true);
 
     try {
@@ -80,13 +82,23 @@ export function PhoneVerificationForm() {
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await phoneAuth.verifyPhoneCode(verificationCode);
-    if (success) {
-      toast.success("電話番号認証が完了しました");
-      const nextUrl = nextParam ? `/sign-up?next=${nextParam}` : "/sign-up";
-      router.push(nextUrl);
-    } else {
-      toast.error("認証コードが無効です");
+
+    if (isCodeVerifying) return; // 二重送信防止
+    setIsCodeVerifying(true);
+
+    try {
+      const success = await phoneAuth.verifyPhoneCode(verificationCode);
+      if (success) {
+        toast.success("電話番号認証が完了しました");
+        const nextUrl = nextParam ? `/sign-up?next=${nextParam}` : "/sign-up";
+        router.push(nextUrl);
+      } else {
+        toast.error("認証コードが無効です");
+      }
+    } catch (error) {
+      toast.error("電話番号からやり直して下さい");
+    } finally {
+      setIsCodeVerifying(false);
     }
   };
 
@@ -111,6 +123,7 @@ export function PhoneVerificationForm() {
       ></div>
 
       <div className="w-full max-w-md mx-auto space-y-8">
+        {(isPhoneSubmitting || isCodeVerifying || isReloading) && <LoadingIndicator fullScreen />}
         <div className="space-y-2">
           <h1 className="text-2xl font-bold tracking-tight">
             {step === "phone" && "電話番号を入力"}
@@ -143,15 +156,21 @@ export function PhoneVerificationForm() {
               <Button
                 type="submit"
                 className="w-full h-12 bg-primary text-white rounded-md"
-                disabled={phoneAuth.isVerifying || isSubmitting || !isPhoneValid}
+                disabled={phoneAuth.isVerifying || isPhoneSubmitting || !isPhoneValid}
               >
                 {phoneAuth.isVerifying ? "送信中..." : "認証コードを送信"}
               </Button>
               <Button
-                className={"px-4"}
+                type="button"
+                className="px-4"
                 size="sm"
                 variant="text"
-                onClick={() => window.location.reload()}
+                onClick={() => {
+                  setIsReloading(true);
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 300);
+                }}
               >
                 切り替わらない際は再読み込み
               </Button>
@@ -174,26 +193,27 @@ export function PhoneVerificationForm() {
                 </InputOTP>
               </div>
             </div>
-            <Button
-              type="submit"
-              className="w-full h-12 bg-primary text-white rounded-md"
-              disabled={phoneAuth.isVerifying || verificationCode.length < 6}
-            >
-              {phoneAuth.isVerifying ? "検証中..." : "コードを検証"}
-            </Button>
-            <Button
-              type="button"
-              variant={"tertiary"}
-              onClick={() => {
-                phoneAuth.clearRecaptcha?.();
-                setStep("phone");
-                setPhoneNumber("");
-                setVerificationCode("");
-              }}
-              className="w-full h-12 border border-gray-300 rounded-md"
-            >
-              電話番号を再入力
-            </Button>
+            <div className="flex flex-col items-center gap-8 w-full mx-auto">
+              <Button
+                type="submit"
+                className="w-full h-12 bg-primary text-white rounded-md"
+                disabled={isCodeVerifying || verificationCode.length < 6}
+              >
+                {isCodeVerifying ? "検証中..." : "コードを検証"}
+              </Button>
+              <Button
+                type="button"
+                variant={"text"}
+                onClick={() => {
+                  phoneAuth.clearRecaptcha?.();
+                  setStep("phone");
+                  setPhoneNumber("");
+                  setVerificationCode("");
+                }}
+              >
+                電話番号を再入力
+              </Button>
+            </div>
           </form>
         )}
       </div>
