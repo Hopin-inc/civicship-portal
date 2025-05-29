@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/utils";
 import { GqlRole } from "@/types/graphql";
+import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 /**
  * 管理者ガードコンポーネントのプロパティ
@@ -33,7 +34,6 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   const currentUser = userData?.currentUser?.user;
 
   const authRedirectService = React.useMemo(() => {
-    const AuthRedirectService = require("@/lib/auth/auth-redirect-service").AuthRedirectService;
     return AuthRedirectService.getInstance();
   }, []);
 
@@ -50,31 +50,22 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
       return;
     }
 
-    if (!currentUser.memberships || currentUser.memberships.length === 0) {
-      console.log("🚪 User has no memberships. Redirecting to home.");
-      router.replace("/");
-      return;
-    }
+    const checkAdminAccess = async () => {
+      const { hasAccess, redirectPath } = await authRedirectService.checkAdminAccess(currentUser);
+      
+      if (!hasAccess && redirectPath) {
+        if (redirectPath === "/") {
+          toast.warning("管理者権限がありません");
+        }
+        console.log(`❌ Admin access denied. Redirecting to: ${redirectPath}`);
+        router.replace(redirectPath);
+        return;
+      }
 
-    const targetMembership = currentUser.memberships.find((m: any) => m.community?.id === COMMUNITY_ID);
-    const isCommunityManager =
-      targetMembership &&
-      (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
+      console.log("✅ User is authorized as community manager.");
+    };
 
-    if (!targetMembership) {
-      console.log(`❌ No membership found for community ${COMMUNITY_ID}. Redirecting to home.`);
-      router.replace("/");
-      return;
-    }
-
-    if (!isCommunityManager) {
-      console.log("⚠️ User is not a manager. Redirecting to home.");
-      toast.warning("管理者権限がありません");
-      router.replace("/");
-      return;
-    }
-
-    console.log("✅ User is authorized as community manager.");
+    checkAdminAccess();
   }, [currentUser, isAuthenticated, loading, router, authRedirectService]);
 
   if (loading) {
@@ -82,17 +73,22 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     return <LoadingIndicator />;
   }
 
-  if (!isAuthenticated || !currentUser || !currentUser.memberships || currentUser.memberships.length === 0) {
+  if (!isAuthenticated || !currentUser) {
     console.log("🚫 Unauthorized user state. No UI rendered.");
     return null;
   }
 
-  const targetMembership = currentUser.memberships.find((m: any) => m.community?.id === COMMUNITY_ID);
-  const isCommunityManager =
-    targetMembership &&
-    (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
+  const checkSyncAdminAccess = () => {
+    if (!currentUser?.memberships || currentUser.memberships.length === 0) {
+      return false;
+    }
 
-  if (!isCommunityManager) {
+    const targetMembership = currentUser.memberships.find((m: any) => m.community?.id === COMMUNITY_ID);
+    return targetMembership && 
+           (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
+  };
+
+  if (!checkSyncAdminAccess()) {
     console.log("❌ Unauthorized role. No UI rendered.");
     return null;
   }

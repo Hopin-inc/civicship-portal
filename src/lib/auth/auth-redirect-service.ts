@@ -1,5 +1,8 @@
 import type { AuthenticationState } from "./auth-state-manager";
 import { AuthStateManager } from "./auth-state-manager";
+import { GqlRole } from "@/types/graphql";
+import { COMMUNITY_ID } from "@/utils";
+import { matchPaths } from "@/utils/path";
 
 /**
  * 認証状態に基づくリダイレクト処理を一元管理するサービス
@@ -26,6 +29,15 @@ export class AuthRedirectService {
    * 保護されたパスかどうかを判定
    */
   public isProtectedPath(pathname: string): boolean {
+    const protectedPaths = [
+      "/users/me",
+      "/tickets",
+      "/wallets",
+      "/wallets/*",
+      "/admin",
+      "/admin/*",
+    ];
+
     const publicPaths = [
       "/login",
       "/sign-up",
@@ -34,9 +46,8 @@ export class AuthRedirectService {
       "/terms-of-service",
     ];
 
-    const adminPathPrefix = "/admin";
-
-    return !publicPaths.includes(pathname) && !pathname.startsWith(adminPathPrefix);
+    return !publicPaths.includes(pathname) && 
+           (matchPaths(pathname, ...protectedPaths) || !pathname.startsWith("/admin"));
   }
 
   /**
@@ -47,7 +58,7 @@ export class AuthRedirectService {
       "/sign-up",
     ];
 
-    return phoneVerificationRequiredPaths.includes(pathname);
+    return matchPaths(pathname, ...phoneVerificationRequiredPaths);
   }
 
   /**
@@ -127,5 +138,32 @@ export class AuthRedirectService {
     }
 
     return `/login${next ? `?next=${encodeURIComponent(next)}` : ""}`;
+  }
+
+  /**
+   * 管理者権限チェック用のユーザー情報を取得
+   */
+  public async checkAdminAccess(currentUser: any): Promise<{ hasAccess: boolean; redirectPath: string | null }> {
+    if (!currentUser) {
+      return { hasAccess: false, redirectPath: "/login" };
+    }
+
+    if (!currentUser.memberships || currentUser.memberships.length === 0) {
+      return { hasAccess: false, redirectPath: "/" };
+    }
+
+    const targetMembership = currentUser.memberships.find((m: any) => m.community?.id === COMMUNITY_ID);
+    if (!targetMembership) {
+      return { hasAccess: false, redirectPath: "/" };
+    }
+
+    const isCommunityManager = targetMembership && 
+      (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
+
+    if (!isCommunityManager) {
+      return { hasAccess: false, redirectPath: "/" };
+    }
+
+    return { hasAccess: true, redirectPath: null };
   }
 }
