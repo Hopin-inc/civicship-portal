@@ -9,7 +9,7 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { getLiffLoginErrorMessage } from "@/app/login/utils/getLiffLoginErrorMessage";
 import { toast } from "sonner";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
@@ -42,7 +42,7 @@ export default function LoginPage() {
       const success = await loginWithLiff(nextPath);
 
       if (success) {
-        console.log("🚀 LINE認証成功、リダイレクト処理中...");
+        console.log("🚀 LINE authentication succeeded. Redirecting...");
       }
     } catch (err) {
       const { title, description } = getLiffLoginErrorMessage(error);

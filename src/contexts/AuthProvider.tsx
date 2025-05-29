@@ -7,7 +7,7 @@ import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { lineAuth } from "@/lib/auth/firebase-config";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
-import { GqlCurrentPrefecture, GqlCurrentUserPayload, GqlCurrentUserQuery } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlCurrentUserPayload } from "@/types/graphql";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useMutation, useQuery } from "@apollo/client";
@@ -122,7 +122,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
 
     return () => unsubscribe();
-  }, [authStateManager]);
+  }, [authStateManager, state.isAuthenticating]);
 
   /**
    * ログアウト
@@ -146,7 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error("Logout failed:", error);
     }
-  }, [router]);
+  }, [liffService, phoneAuthService]);
 
   useEffect(() => {
     if (!authStateManager) return; // Guard against initialization error
@@ -223,18 +223,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     initializeLiff();
-  }, [environment]);
+  }, [environment, liffService]);
 
   useEffect(() => {
     const handleLineAuthRedirect = async () => {
       if (typeof window === "undefined") return;
       if (state.isAuthenticating) return;
 
-      const searchParams = new URLSearchParams(window.location.search);
-      const isRedirectFromLineAuth = searchParams.has("liff.state") || searchParams.has("code");
-
-      if (!isRedirectFromLineAuth) return;
-      if (state.authenticationState !== "unauthenticated") return;
+      if (state.authenticationState !== "unauthenticated" && state.authenticationState !== "loading") return;
 
       const timestamp = new Date().toISOString();
       console.log(`🔍 [${timestamp}] Detected LINE authentication redirect`);
@@ -459,15 +455,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const phoneTokens = TokenManager.getPhoneTokens();
       const lineTokens = TokenManager.getLineTokens();
-
-      console.log("🔍 Tokens before userSignUp:", {
-        lineToken: !!lineTokens.accessToken,
-        phoneToken: !!phoneTokens.accessToken,
-        lineExpiresAt: lineTokens.expiresAt,
-        phoneExpiresAt: phoneTokens.expiresAt,
-        phoneUid,
-        phoneNumber: phoneTokens.phoneNumber,
-      });
 
       console.log("Creating user with input:", {
         name,

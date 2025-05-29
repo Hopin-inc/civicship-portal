@@ -101,13 +101,10 @@ export class LiffService {
       if (!this.state.isInitialized) {
         await this.initialize();
       }
-      console.log("LIFF LOGIN in progress")
 
       if (liff.isInClient()) {
-        console.log("liff.isInClient(): true")
         this.state.isLoggedIn = true;
       } else {
-        console.log("liff.isInClient(): false")
         const redirectUri = redirectPath && typeof window !== "undefined"
           ? window.location.origin + redirectPath
           : typeof window !== "undefined" ? window.location.pathname : undefined;

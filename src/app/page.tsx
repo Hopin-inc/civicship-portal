@@ -9,6 +9,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
 import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
+import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export default function HomePage() {
   const router = useRouter();
@@ -19,7 +20,6 @@ export default function HomePage() {
   });
 
   const authRedirectService = useMemo(() => {
-    const AuthRedirectService = require("@/lib/auth/auth-redirect-service").AuthRedirectService;
     return AuthRedirectService.getInstance();
   }, []);
 
@@ -32,7 +32,6 @@ export default function HomePage() {
 
       const cleanedNextPath = nextPath?.startsWith("/login") ? null : nextPath;
       const cleanedUrl = cleanedNextPath ? `${ window.location.pathname }?next=${ cleanedNextPath }` : window.location.pathname;
-      console.log("cleaned: ", cleanedNextPath, cleanedUrl)
       router.replace(cleanedUrl);
 
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(cleanedNextPath);
@@ -41,7 +40,7 @@ export default function HomePage() {
     } else {
       router.replace("/activities");
     }
-  }, [router, isAuthenticated, authenticationState, userData, authLoading, userLoading, isAuthenticating, authRedirectService]);
+  }, [router, isAuthenticated, authenticationState, userData, authLoading, userLoading, isAuthenticating, authRedirectService, searchParams]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });

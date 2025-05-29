@@ -41,7 +41,6 @@ export class AuthStateManager {
    * 現在の認証状態を取得
    */
   public getState(): AuthenticationState {
-    console.log("👀 getState: ", this.currentState);
     return this.currentState;
   }
 
@@ -63,7 +62,7 @@ export class AuthStateManager {
    * 認証状態を更新
    */
   public setState(state: AuthenticationState): void {
-    console.log("🔃 setState: ", this.currentState, "->", state);
+    console.log("🔃 AuthStateManager.setState: ", this.currentState, "->", state);
     if (this.currentState !== state) {
       this.currentState = state;
       this.notifyStateChange();
@@ -87,10 +86,8 @@ export class AuthStateManager {
 
     const lineTokens = TokenManager.getLineTokens();
     const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
-    console.log(lineTokens, hasValidLineToken);
 
     if (!hasValidLineToken) {
-      console.log("!!initialize!!")
       this.setState("unauthenticated");
       return;
     } else {
@@ -193,7 +190,6 @@ export class AuthStateManager {
         this.setState("line_authenticated");
       }
     } else {
-      console.log("!!handleLineAuthStateChange!!")
       this.setState("unauthenticated");
     }
   }
@@ -206,7 +202,6 @@ export class AuthStateManager {
     const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
     if (!hasValidLineToken && this.currentState !== "loading") {
-      console.log("!!handlePhoneAuthStateChange!!")
       this.setState("unauthenticated");
       return;
     }
@@ -230,7 +225,6 @@ export class AuthStateManager {
     const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
     if (!hasValidLineToken) {
-      console.log("!!handleUserRegistrationStateChange!!")
       this.setState("unauthenticated");
       return;
     }
