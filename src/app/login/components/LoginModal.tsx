@@ -20,7 +20,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { loginWithLiff, isAuthenticating } = useAuth();
+  const { loginWithLiff, isAuthenticating, isAuthenticated } = useAuth();
   const authRedirectService = AuthRedirectService.getInstance();
 
   const handleLogin = async () => {
@@ -33,11 +33,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     setError(null);
 
     try {
+      //TODO isLoggedInに合わせて画面が切り替わっていないことが問題なのかもしれない
+      //TODO ログイン結果に応じてトーストを表示するのと、画面遷移をハンドリングしないといけない。
+
       const currentPath = typeof window !== "undefined" ? window.location.pathname : "/";
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(currentPath);
       console.log("🚀 Using redirect path from AuthRedirectService in modal:", redirectPath);
-      
-      await loginWithLiff(redirectPath);
+
+      const success = await loginWithLiff(redirectPath);
       setIsLoading(false);
       onClose();
     } catch (err) {
@@ -98,6 +101,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
 
+          {/*//TODO disabledになる条件　isLoading && isAuthenticating && notCheck*/}
           <Button
             onClick={handleLogin}
             disabled={isLoading || isAuthenticating}
