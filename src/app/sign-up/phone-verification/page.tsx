@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { PhoneVerificationForm } from "./PhoneVerificationForm";
+import { PhoneVerificationForm } from "./components/PhoneVerificationForm";
 
 export default function PhoneVerificationPage() {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function PhoneVerificationPage() {
         : "/sign-up/phone-verification/line-browser";
       window.location.replace(redirectUrl);
     }
-  }, [router]);
+  }, [router, searchParams]);
 
   return (
     <div className="container mx-auto py-8">
