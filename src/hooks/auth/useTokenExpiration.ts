@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 export const useTokenExpiration = (
   authenticationState: string,
+  isAuthenticating: boolean,
   onAuthStateChange: (state: AuthenticationState) => void,
   logout: () => Promise<void>
 ) => {
@@ -18,6 +19,11 @@ export const useTokenExpiration = (
   useEffect(() => {
     const initializeAuthState = async () => {
       if (hasInitialized.current) return;
+      
+      if (isAuthenticating) {
+        console.log("🔍 Skipping auth state initialization - authentication in progress");
+        return;
+      }
 
       console.log("🔍 Initializing authentication state");
       await authService.initializeAuthState();
@@ -95,5 +101,5 @@ export const useTokenExpiration = (
         window.removeEventListener("auth:token-expired", handleTokenExpired);
       }
     };
-  }, [authService, authStateStore, authenticationState, logout, onAuthStateChange]);
+  }, [authService, authStateStore, authenticationState, isAuthenticating, logout, onAuthStateChange]);
 };

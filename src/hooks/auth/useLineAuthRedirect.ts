@@ -46,6 +46,7 @@ export const useLineAuthRedirect = (
       });
 
       setIsAuthenticating(true);
+      console.log("🔍 Starting LINE authentication processing - blocking other auth initialization");
 
       try {
         const liffSuccess = await liffService.initialize();

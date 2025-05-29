@@ -149,7 +149,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useLiffInitialization(environment, liffService);
   useLineAuthRedirect(state.authenticationState, state.isAuthenticating, environment, liffService, setIsAuthenticating, refetchUser);
   useAutoLogin(state.authenticationState, state.isAuthenticating, environment, liffService, setIsAuthenticating, refetchUser);
-  useTokenExpiration(state.authenticationState, setAuthenticationState, logout);
+  useTokenExpiration(state.authenticationState, state.isAuthenticating, setAuthenticationState, logout);
 
   /**
    * LIFFでログイン
