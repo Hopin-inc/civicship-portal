@@ -35,31 +35,17 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
   useEffect(() => {
     if (loading || userLoading) {
-      console.log("⏳ Waiting for auth or user data to load...");
-      return;
-    }
-
-    if (!isAuthenticated) {
-      console.log("🚫 User not authenticated");
       return;
     }
 
     const authCheck = () => {
       const next = window.location.pathname + window.location.search;
-      console.log(`🔍 Checking auth for path: ${pathname}, authState: ${authenticationState}`);
-      
-      if (isAuthenticated && !isUserRegistered && !userLoading) {
-        console.log("🔄 User authenticated but not registered, checking redirect path...");
-      }
-      
       const redirectPath = authRedirectService.getRedirectPath(pathname, next);
 
       if (redirectPath) {
-        console.log(`🔄 Redirecting to: ${redirectPath}`);
         setAuthorized(false);
         router.replace(redirectPath);
       } else {
-        console.log("✅ User authorized for current path");
         setAuthorized(true);
       }
     };
@@ -71,7 +57,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     };
 
     return () => {};
-  }, [pathname, authenticationState, loading, userLoading, isAuthenticated, isUserRegistered, router, authRedirectService]);
+  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService]);
 
   if (loading || userLoading) {
     return <LoadingIndicator />;

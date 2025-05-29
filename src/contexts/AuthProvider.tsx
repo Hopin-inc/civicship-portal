@@ -146,7 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useFirebaseAuth(state.isAuthenticating, setFirebaseUser, setAuthenticationState);
   usePhoneAuth(setAuthenticationState);
-  useUserData(userData, setCurrentUser, setAuthenticationState, phoneAuthService.getState());
+  useUserData(userData, setCurrentUser, setAuthenticationState);
   useLiffInitialization(environment, liffService);
   useLineAuthRedirect(state.authenticationState, state.isAuthenticating, environment, liffService, setIsAuthenticating, refetchUser);
   useAutoLogin(state.authenticationState, state.isAuthenticating, environment, liffService, setIsAuthenticating, refetchUser);
