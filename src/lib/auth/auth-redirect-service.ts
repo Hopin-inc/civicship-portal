@@ -78,9 +78,9 @@ export class AuthRedirectService {
     if (this.isProtectedPath(pathname)) {
       if (authState === "unauthenticated") {
         return `/login${nextParam}`;
-      } else if (authState === "line_authenticated" || authState === "line_token_expired") {
+      } else if (authState === "line_authenticated") {
         return `/sign-up/phone-verification${nextParam}`;
-      } else if (authState === "phone_authenticated" || authState === "phone_token_expired") {
+      } else if (authState === "phone_authenticated") {
         return `/sign-up${nextParam}`;
       }
     }
@@ -88,7 +88,7 @@ export class AuthRedirectService {
     else if (this.isPhoneVerificationRequiredPath(pathname)) {
       if (authState === "unauthenticated") {
         return `/login${nextParam}`;
-      } else if ((authState === "line_authenticated" || authState === "line_token_expired") &&
+      } else if (authState === "line_authenticated" &&
                  pathname !== "/sign-up/phone-verification") {
         return `/sign-up/phone-verification${nextParam}`;
       }
@@ -116,9 +116,9 @@ export class AuthRedirectService {
     const next = nextPath ? decodeURIComponent(nextPath) : null;
     const authState = this.authStateStore.getState();
 
-    if (authState === "line_authenticated" || authState === "line_token_expired") {
+    if (authState === "line_authenticated") {
       return `/sign-up/phone-verification${next ? `?next=${next}` : ""}`;
-    } else if (authState === "phone_authenticated" || authState === "phone_token_expired") {
+    } else if (authState === "phone_authenticated") {
       return `/sign-up${next ? `?next=${next}` : ""}`;
     } else if (authState === "user_registered") {
       return next ?? "/";

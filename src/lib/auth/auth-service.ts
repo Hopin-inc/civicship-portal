@@ -106,14 +106,39 @@ export class AuthService {
 
   /**
    * トークン期限切れ処理
+   * LINEトークン期限切れ: /loginへリダイレクト
+   * 電話番号トークン期限切れ: ユーザー登録済みなら更新不要、未登録なら/sign-up/phone-verificationへリダイレクト
    */
-  public handleTokenExpired(tokenType: "line" | "phone"): void {
+  public async handleTokenExpired(tokenType: "line" | "phone"): Promise<void> {
     if (tokenType === "line") {
+      console.log("🔄 LINE token expired, redirecting to login");
       this.tokenService.clearLineTokens();
-      this.authStateStore.setState("line_token_expired");
+      this.authStateStore.setState("unauthenticated");
+      
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
     } else {
+      console.log("🔄 Phone token expired, checking user registration status");
       this.tokenService.clearPhoneTokens();
-      this.authStateStore.setState("phone_token_expired");
+      
+      const currentState = this.authStateStore.getState();
+      if (currentState === "user_registered") {
+        console.log("📱 User already registered, no action needed for phone token expiry");
+        return;
+      } else {
+        console.log("📱 User not registered, redirecting to phone verification");
+        const lineTokens = this.tokenService.getLineTokens();
+        if (this.tokenService.isTokenValid(lineTokens)) {
+          this.authStateStore.setState("line_authenticated");
+        } else {
+          this.authStateStore.setState("unauthenticated");
+        }
+        
+        if (typeof window !== "undefined") {
+          window.location.href = "/sign-up/phone-verification";
+        }
+      }
     }
   }
 

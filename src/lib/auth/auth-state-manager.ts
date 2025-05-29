@@ -7,9 +7,7 @@ import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 export type AuthenticationState =
   | "unauthenticated"
   | "line_authenticated"
-  | "line_token_expired"
   | "phone_authenticated"
-  | "phone_token_expired"
   | "user_registered"
   | "loading";
 
@@ -136,9 +134,9 @@ export class AuthStateManager {
       const lineTokens = this.tokenService.getLineTokens();
       const isValid = this.tokenService.isTokenValid(lineTokens);
       
-      if (isValid && this.currentState === "line_token_expired") {
+      if (isValid) {
         await this.authService.handleLineAuthSuccess();
-      } else if (!isValid) {
+      } else {
         await this.authService.logout();
       }
     } catch (error) {
@@ -159,7 +157,7 @@ export class AuthStateManager {
       const isPhoneValid = this.tokenService.isTokenValid(phoneTokens);
       const isLineValid = this.tokenService.isTokenValid(lineTokens);
 
-      if (isPhoneValid && this.currentState === "phone_token_expired") {
+      if (isPhoneValid) {
         await this.authService.handlePhoneAuthSuccess();
       } else if (!isPhoneValid) {
         if (!isLineValid) {
