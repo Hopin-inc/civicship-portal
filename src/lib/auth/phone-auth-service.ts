@@ -80,25 +80,16 @@ export class PhoneAuthService {
   /**
    * reCAPTCHAをクリア
    */
+  /**
+   * reCAPTCHAをクリア
+   */
   public clearRecaptcha(): void {
     try {
       if (this.recaptchaVerifier) {
         this.recaptchaVerifier.clear();
         this.recaptchaVerifier = null;
       }
-
-      if (this.recaptchaContainerElement) {
-        const container = document.getElementById("recaptcha-container");
-        if (container) {
-          container.innerHTML = "";
-
-          const allRecaptchaElements = document.querySelectorAll(
-            '[id^="rc-"], iframe[src*="recaptcha"], div[class*="grecaptcha"]',
-          );
-          allRecaptchaElements.forEach((element) => element.remove());
-        }
-        this.recaptchaContainerElement = null;
-      }
+      this.recaptchaContainerElement = null;
     } catch (e) {
       console.error("Error clearing reCAPTCHA:", e);
     }
@@ -113,13 +104,19 @@ export class PhoneAuthService {
     try {
       this.state.isVerifying = true;
       this.state.error = null;
+
+      // 前回のVerifierを明示的にクリア（DOM操作しない）
       this.clearRecaptcha();
+
+      // Googleの内部非同期処理との競合を避けるため少し待つ
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       this.recaptchaContainerElement = document.getElementById("recaptcha-container");
       if (!this.recaptchaContainerElement) {
         throw new Error("reCAPTCHA container element not found");
       }
 
+      // 新しいインスタンスを作る
       this.recaptchaVerifier = new RecaptchaVerifier(phoneAuth, "recaptcha-container", {
         size: isRunningInLiff() ? "normal" : "invisible",
         callback: () => {},
