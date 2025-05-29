@@ -157,7 +157,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const isVerified = phoneState.isVerified;
     
     if (isVerified) {
-      authStateManager.handlePhoneAuthStateChange(true);
+      const updatePhoneAuthState = async () => {
+        try {
+          const timestamp = new Date().toISOString();
+          console.log(`🔍 [${timestamp}] Updating phone auth state in useEffect - isVerified:`, isVerified);
+          await authStateManager.handlePhoneAuthStateChange(true);
+          console.log(`🔍 [${timestamp}] AuthStateManager phone state updated successfully in useEffect`);
+        } catch (error) {
+          console.error("Failed to update AuthStateManager phone state in useEffect:", error);
+        }
+      };
+      
+      updatePhoneAuthState();
     }
     
     setState((prev) => ({
@@ -177,7 +188,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }));
       
       if (authStateManager) {
-        authStateManager.handleUserRegistrationStateChange(true);
+        const updateUserRegistrationState = async () => {
+          try {
+            const timestamp = new Date().toISOString();
+            console.log(`🔍 [${timestamp}] Updating user registration state in useEffect`);
+            await authStateManager.handleUserRegistrationStateChange(true);
+            console.log(`🔍 [${timestamp}] AuthStateManager user registration state updated successfully`);
+          } catch (error) {
+            console.error("Failed to update AuthStateManager user registration state:", error);
+          }
+        };
+        
+        updateUserRegistrationState();
       }
     }
   }, [userData, authStateManager]);
@@ -404,7 +426,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }));
       
       if (authStateManager) {
-        authStateManager.handlePhoneAuthStateChange(true);
+        try {
+          const timestamp = new Date().toISOString();
+          console.log(`🔍 [${timestamp}] Updating phone auth state in verifyPhoneCode`);
+          await authStateManager.handlePhoneAuthStateChange(true);
+          console.log(`🔍 [${timestamp}] AuthStateManager phone state updated successfully in verifyPhoneCode`);
+        } catch (error) {
+          console.error("Failed to update AuthStateManager phone state in verifyPhoneCode:", error);
+        }
       }
     }
 

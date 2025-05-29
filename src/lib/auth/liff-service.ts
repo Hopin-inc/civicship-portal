@@ -270,8 +270,10 @@ export class LiffService {
             try {
               const AuthStateManager = require("./auth-state-manager").AuthStateManager;
               const authStateManager = AuthStateManager.getInstance();
-              authStateManager.handleLineAuthStateChange(true);
-              console.log("🔍 AuthStateManager state updated to line_authenticated");
+              const timestamp = new Date().toISOString();
+              console.log(`🔍 [${timestamp}] Updating LINE auth state in signInWithLiffToken`);
+              await authStateManager.handleLineAuthStateChange(true);
+              console.log(`🔍 [${timestamp}] AuthStateManager state updated to line_authenticated in signInWithLiffToken`);
             } catch (error) {
               console.error("Failed to update AuthStateManager state:", error);
             }
