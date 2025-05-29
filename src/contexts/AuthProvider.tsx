@@ -98,6 +98,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { data: userData, loading: userLoading, refetch: refetchUser } = useQuery(GET_CURRENT_USER, {
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(state.authenticationState),
     fetchPolicy: "network-only",
+    onCompleted: (data) => {
+      console.log(`🔍 [${new Date().toISOString()}] GET_CURRENT_USER query completed:`, {
+        hasData: !!data,
+        hasCurrentUser: !!data?.currentUser,
+        hasUser: !!data?.currentUser?.user,
+        userId: data?.currentUser?.user?.id || 'none'
+      });
+    },
+    onError: (error) => {
+      console.error(`❌ [${new Date().toISOString()}] GET_CURRENT_USER query error:`, error);
+    }
   });
 
   const authService = AuthService.getInstance();

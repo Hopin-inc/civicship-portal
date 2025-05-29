@@ -13,23 +13,34 @@ export const useUserData = (
   const authService = AuthService.getInstance();
 
   useEffect(() => {
+    const hookTimestamp = new Date().toISOString();
+    console.log(`🔄 [${hookTimestamp}] useUserData hook effect triggered with userData:`, {
+      hasUserData: !!userData,
+      hasCurrentUser: !!userData?.currentUser,
+      hasUser: !!userData?.currentUser?.user,
+      userId: userData?.currentUser?.user?.id || 'none'
+    });
+
     if (userData?.currentUser?.user) {
+      console.log(`🔄 [${hookTimestamp}] Setting currentUser and updating auth state to user_registered`);
       onCurrentUserChange(userData.currentUser.user);
       onAuthStateChange("user_registered");
 
       const updateUserRegistrationState = async () => {
-        console.log("👀 updateUserRegistrationState started!")
+        const fnTimestamp = new Date().toISOString();
+        console.log(`👀 [${fnTimestamp}] updateUserRegistrationState started!`);
         try {
-          const timestamp = new Date().toISOString();
-          console.log(`🔍 [${timestamp}] Updating user registration state in useEffect`);
+          console.log(`🔍 [${fnTimestamp}] Updating user registration state in useEffect`);
           await authService.handleUserRegistrationSuccess();
-          console.log(`🔍 [${timestamp}] User registration state updated successfully`);
+          console.log(`🔍 [${fnTimestamp}] User registration state updated successfully`);
         } catch (error) {
-          console.error("Failed to update user registration state:", error);
+          console.error(`❌ [${fnTimestamp}] Failed to update user registration state:`, error);
         }
       };
 
       updateUserRegistrationState();
+    } else {
+      console.log(`🔄 [${hookTimestamp}] No user data available, not updating currentUser or auth state`);
     }
   }, [userData, authService, onCurrentUserChange, onAuthStateChange]);
 };
