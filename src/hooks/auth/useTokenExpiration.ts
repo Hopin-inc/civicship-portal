@@ -20,6 +20,18 @@ export const useTokenExpiration = (
     const initializeAuthState = async () => {
       if (hasInitialized.current) return;
       
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        const isReturnFromLineAuth = url.searchParams.has("code") && 
+                                    url.searchParams.has("state") && 
+                                    url.searchParams.has("liffClientId");
+        
+        if (isReturnFromLineAuth) {
+          console.log("🔍 Detected LINE auth redirect in useTokenExpiration - skipping initialization");
+          return;
+        }
+      }
+      
       if (isAuthenticating) {
         console.log("🔍 Skipping auth state initialization - authentication in progress");
         return;
