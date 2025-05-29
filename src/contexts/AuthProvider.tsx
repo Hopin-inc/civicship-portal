@@ -143,11 +143,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [liffService, phoneAuthService, authService]);
 
+  useLineAuthRedirect(state.authenticationState, state.isAuthenticating, environment, liffService, setIsAuthenticating, refetchUser);
+  useLiffInitialization(environment, liffService);
   useFirebaseAuth(state.isAuthenticating, setFirebaseUser, setAuthenticationState);
   usePhoneAuth(setAuthenticationState);
   useUserData(userData, setCurrentUser, setAuthenticationState);
-  useLiffInitialization(environment, liffService);
-  useLineAuthRedirect(state.authenticationState, state.isAuthenticating, environment, liffService, setIsAuthenticating, refetchUser);
   useAutoLogin(state.authenticationState, state.isAuthenticating, environment, liffService, setIsAuthenticating, refetchUser);
   useTokenExpiration(state.authenticationState, state.isAuthenticating, setAuthenticationState, logout);
 
