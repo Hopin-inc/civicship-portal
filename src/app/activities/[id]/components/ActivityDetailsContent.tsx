@@ -208,8 +208,8 @@ const ScheduleSection = ({
     <>
       <p className="text-muted-foreground font-bold mb-4 px-1">※予約は各日程の7日前まで受付中 </p>
       <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
-        {slots.map((slot, index) => (
-          <div key={index} className="flex-shrink-0 first:ml-0">
+        {slots.map((slot) => (
+          <div key={slot.id} className="flex-shrink-0 first:ml-0">
             <ActivityScheduleCard
               slot={slot}
               opportunityId={opportunityId}
