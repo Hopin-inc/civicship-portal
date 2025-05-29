@@ -65,11 +65,17 @@ export class AuthRedirectService {
    * 現在の認証状態とパスに基づいて適切なリダイレクト先を取得
    * @param pathname 現在のパス
    * @param next リダイレクト後に戻るパス（オプション）
+   * @param isAuthenticating 認証処理中かどうか
    * @returns リダイレクト先のパス、またはnull（リダイレクト不要の場合）
    */
-  public getRedirectPath(pathname: string, next?: string | null): string | null {
+  public getRedirectPath(pathname: string, next?: string | null, isAuthenticating?: boolean): string | null {
     const authState = this.authStateStore.getState();
     const nextParam = next ? `?next=${ next }` : "";
+    
+    if (isAuthenticating) {
+      console.log(`🔄 [${new Date().toISOString()}] Skipping redirect check - authentication in progress`);
+      return null;
+    }
 
     if (this.isProtectedPath(pathname)) {
       switch (authState) {

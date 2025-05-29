@@ -20,7 +20,7 @@ interface RouteGuardProps {
  * 認証状態に基づいてページアクセスを制御する
  */
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
-  const { isAuthenticated, isPhoneVerified, isUserRegistered, authenticationState, loading } = useAuth();
+  const { isAuthenticated, isPhoneVerified, isUserRegistered, authenticationState, isAuthenticating, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [authorized, setAuthorized] = useState(false);
@@ -40,9 +40,10 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     const authCheck = () => {
       const next = window.location.pathname + window.location.search;
-      const redirectPath = authRedirectService.getRedirectPath(pathname, next);
+      const redirectPath = authRedirectService.getRedirectPath(pathname, next, isAuthenticating);
 
       if (redirectPath) {
+        console.log(`🔄 [${new Date().toISOString()}] RouteGuard redirecting to: ${redirectPath}`);
         setAuthorized(false);
         router.replace(redirectPath);
       } else {
@@ -53,7 +54,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     authCheck();
 
     return () => {};
-  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService]);
+  }, [pathname, authenticationState, isAuthenticating, loading, userLoading, router, authRedirectService]);
 
   if (loading || userLoading) {
     return <LoadingIndicator />;

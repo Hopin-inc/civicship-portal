@@ -44,8 +44,9 @@ export function SignUpForm() {
 
   useEffect(() => {
     if (!loading) {
-      const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
+      const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam, false);
       if (redirectPath) {
+        console.log(`🔄 [${new Date().toISOString()}] SignUpForm redirecting to: ${redirectPath}`);
         router.replace(redirectPath);
       }
     }
