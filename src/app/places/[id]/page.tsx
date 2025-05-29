@@ -38,7 +38,7 @@ const PlaceDetail: FC = () => {
         <PlaceOverview detail={place} />
         <PlaceAddress detail={place} />
         <PlaceOpportunities opportunities={place.currentlyHiringOpportunities} />
-        <PlaceFeaturedArticle article={place.relatedArticles?.[0]} />
+        <PlaceFeaturedArticle articles={place.relatedArticles} />
       </div>
     </>
   );

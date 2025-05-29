@@ -8,17 +8,21 @@ import { TArticleWithAuthor } from "@/app/articles/data/type";
 import ArticleCard from "@/app/articles/components/Card";
 
 interface PlaceFeaturedArticleProps {
-  article: TArticleWithAuthor | null;
+  articles: TArticleWithAuthor[] | null;
 }
 
 //TODO 複数記事が並ぶはず、Figma参照
-const PlaceFeaturedArticle: React.FC<PlaceFeaturedArticleProps> = ({ article }) => {
-  if (!article) return null;
+const PlaceFeaturedArticle: React.FC<PlaceFeaturedArticleProps> = ({ articles }) => {
+  if (!articles) return null;
 
   return (
     <div className="px-4 pt-6 pb-8 max-w-mobile-l mx-auto space-y-4">
       <h2 className="text-display-sm mb-4">関連記事</h2>
-      <ArticleCard article={article} showUser />
+      <div className="grid grid-cols-1 gap-6">
+        {articles.map((article) => (
+          <ArticleCard key={article.id} article={article} showUser />
+        ))}
+      </div>
     </div>
   );
 };
