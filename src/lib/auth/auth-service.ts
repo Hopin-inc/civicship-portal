@@ -31,6 +31,12 @@ export class AuthService {
    */
   public async initializeAuthState(): Promise<void> {
     console.log("🔍 Initializing authentication state...");
+    
+    const currentState = this.authStateStore.getState();
+    if (currentState === "user_registered") {
+      console.log("✅ User already registered, maintaining state");
+      return;
+    }
 
     const lineTokens = this.tokenService.getLineTokens();
     const phoneTokens = this.tokenService.getPhoneTokens();
@@ -40,7 +46,6 @@ export class AuthService {
       
       if (this.tokenService.isTokenValid(phoneTokens) && phoneTokens.phoneUid) {
         console.log("📞 Valid phone tokens found");
-        
         this.authStateStore.setState("phone_authenticated");
       } else {
         this.authStateStore.setState("line_authenticated");
@@ -113,7 +118,7 @@ export class AuthService {
     if (tokenType === "line") {
       console.log("🔄 LINE token expired, redirecting to login");
       this.tokenService.clearLineTokens();
-      this.authStateStore.setState("unauthenticated");
+      this.authStateStore.forceSetState("unauthenticated");
       
       if (typeof window !== "undefined") {
         window.location.href = "/login";
@@ -130,9 +135,9 @@ export class AuthService {
         console.log("📱 User not registered, redirecting to phone verification");
         const lineTokens = this.tokenService.getLineTokens();
         if (this.tokenService.isTokenValid(lineTokens)) {
-          this.authStateStore.setState("line_authenticated");
+          this.authStateStore.forceSetState("line_authenticated");
         } else {
-          this.authStateStore.setState("unauthenticated");
+          this.authStateStore.forceSetState("unauthenticated");
         }
         
         if (typeof window !== "undefined") {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AuthenticationState, AuthStateStore } from "@/lib/auth/auth-state-store";
 import { AuthService } from "@/lib/auth/auth-service";
 import { toast } from "sonner";
@@ -12,11 +12,15 @@ export const useTokenExpiration = (
 ) => {
   const authStateStore = AuthStateStore.getInstance();
   const authService = AuthService.getInstance();
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
     const initializeAuthState = async () => {
+      if (hasInitialized.current) return;
+      
       console.log("🔍 Initializing authentication state");
       await authService.initializeAuthState();
+      hasInitialized.current = true;
     };
 
     initializeAuthState();
@@ -67,5 +71,5 @@ export const useTokenExpiration = (
         window.removeEventListener("auth:token-expired", handleTokenExpired);
       }
     };
-  }, [authenticationState, logout, authService, authStateStore, onAuthStateChange]);
+  }, [logout]); // Removed authenticationState, authService, authStateStore, onAuthStateChange to prevent re-runs
 };

@@ -30,10 +30,12 @@ export const usePhoneAuth = (
       updatePhoneAuthState();
     }
 
-    onAuthStateChange((prev) => isVerified ?
-      (prev === "line_authenticated" ? "phone_authenticated" : prev) :
-      prev
-    );
+    onAuthStateChange((prev) => {
+      if (isVerified && prev !== "user_registered" && prev !== "phone_authenticated") {
+        return "phone_authenticated";
+      }
+      return prev;
+    });
   }, [phoneAuthService, authService, onAuthStateChange]);
 
   return phoneAuthService;

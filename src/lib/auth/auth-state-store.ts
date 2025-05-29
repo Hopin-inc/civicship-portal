@@ -46,8 +46,35 @@ export class AuthStateStore {
    * 認証状態を設定
    */
   public setState(state: AuthenticationState): void {
+    const statePriority = {
+      "user_registered": 4,
+      "phone_authenticated": 3, 
+      "line_authenticated": 2,
+      "unauthenticated": 1,
+      "loading": 0
+    };
+    
+    const currentPriority = statePriority[this.currentState];
+    const newPriority = statePriority[state];
+    
+    if (newPriority < currentPriority && this.currentState !== "loading") {
+      console.log(`🛑 Prevented state downgrade: ${this.currentState} → ${state} (priority: ${currentPriority} → ${newPriority})`);
+      return;
+    }
+    
     if (this.currentState !== state) {
-      console.log(`🔄 Auth state transition: ${this.currentState} → ${state}`);
+      console.log(`🔄 Auth state transition: ${this.currentState} → ${state} (priority: ${currentPriority} → ${newPriority})`);
+      this.currentState = state;
+      this.notifyStateChange();
+    }
+  }
+  
+  /**
+   * Force state transition (used for token expiration)
+   */
+  public forceSetState(state: AuthenticationState): void {
+    if (this.currentState !== state) {
+      console.log(`🔄 Forced auth state transition: ${this.currentState} → ${state}`);
       this.currentState = state;
       this.notifyStateChange();
     }
