@@ -2,8 +2,8 @@
 
 import liff from "@line/liff";
 import { signInWithCustomToken, updateProfile } from "firebase/auth";
-import { categorizeFirebaseError, lineAuth } from "./firebase-config";
-import { AuthTokens, TokenManager } from "./token-manager";
+import { lineAuth, categorizeFirebaseError } from "./firebase-config";
+import { TokenManager, AuthTokens } from "./token-manager";
 import retry from "retry";
 
 /**
@@ -75,9 +75,9 @@ export class LiffService {
       this.state.isInitialized = true;
       this.state.isLoggedIn = liff.isLoggedIn();
 
-      // if (this.state.isLoggedIn) {
-      //   await this.updateProfile();
-      // }
+      if (this.state.isLoggedIn) {
+        await this.updateProfile();
+      }
 
       return true;
     } catch (error) {
@@ -103,20 +103,17 @@ export class LiffService {
       }
 
       if (liff.isInClient()) {
-        this.state.isLoggedIn = liff.isLoggedIn();
+        this.state.isLoggedIn = true;
       } else {
-        const redirectUri =
-          redirectPath && typeof window !== "undefined"
-            ? window.location.origin + redirectPath
-            : typeof window !== "undefined"
-              ? window.location.pathname
-              : undefined;
+        const redirectUri = redirectPath && typeof window !== "undefined"
+          ? window.location.origin + redirectPath
+          : typeof window !== "undefined" ? window.location.pathname : undefined;
 
         liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない
       }
 
-      // await this.updateProfile();
+      await this.updateProfile();
       return true;
     } catch (error) {
       console.error("LIFF login error:", error);
@@ -143,22 +140,22 @@ export class LiffService {
   /**
    * LIFFプロファイル情報を更新
    */
-  // private async updateProfile(): Promise<void> {
-  //   try {
-  //     if (!this.state.isInitialized || !this.state.isLoggedIn) {
-  //       return;
-  //     }
-  //
-  //     const profile = await liff.getProfile();
-  //     this.state.profile = {
-  //       userId: profile.userId,
-  //       displayName: profile.displayName,
-  //       pictureUrl: profile.pictureUrl || null,
-  //     };
-  //   } catch (error) {
-  //     console.error("Failed to get LIFF profile:", error);
-  //   }
-  // }
+  private async updateProfile(): Promise<void> {
+    try {
+      if (!this.state.isInitialized || !this.state.isLoggedIn) {
+        return;
+      }
+
+      const profile = await liff.getProfile();
+      this.state.profile = {
+        userId: profile.userId,
+        displayName: profile.displayName,
+        pictureUrl: profile.pictureUrl || null,
+      };
+    } catch (error) {
+      console.error("Failed to get LIFF profile:", error);
+    }
+  }
 
   /**
    * LIFFアクセストークンを取得
@@ -199,7 +196,7 @@ export class LiffService {
             isInitialized: this.state.isInitialized,
             isLoggedIn: this.state.isLoggedIn,
             accessToken: this.getAccessToken() ? "present" : "missing",
-            userId: this.state.profile?.userId || "none",
+            userId: this.state.profile?.userId || "none"
           });
 
           const requestTimestamp = new Date().toISOString();
@@ -219,7 +216,7 @@ export class LiffService {
             status: response.status,
             ok: response.ok,
             attempt: currentAttempt,
-            statusText: response.statusText,
+            statusText: response.statusText
           });
 
           if (!response.ok) {
@@ -231,7 +228,7 @@ export class LiffService {
           const { customToken, profile } = await response.json();
           console.log(`🔍 [${jsonTimestamp}] Received custom token and profile:`, {
             hasCustomToken: !!customToken,
-            profileName: profile?.displayName || "none",
+            profileName: profile?.displayName || "none"
           });
 
           const firebaseTimestamp = new Date().toISOString();
@@ -239,9 +236,7 @@ export class LiffService {
           const userCredential = await signInWithCustomToken(lineAuth, customToken);
           console.log(`🔍 [${firebaseTimestamp}] Firebase sign-in successful:`, {
             uid: userCredential.user.uid,
-            isNewUser:
-              userCredential.user.metadata.creationTime ===
-              userCredential.user.metadata.lastSignInTime,
+            isNewUser: userCredential.user.metadata.creationTime === userCredential.user.metadata.lastSignInTime
           });
 
           await updateProfile(userCredential.user, {
@@ -259,7 +254,7 @@ export class LiffService {
           console.log(`🔍 [${tokenTimestamp}] Token details:`, {
             hasIdToken: !!idToken,
             hasRefreshToken: !!refreshToken,
-            expirationTime: new Date(expirationTime).toISOString(),
+            expirationTime: new Date(expirationTime).toISOString()
           });
 
           const tokens: AuthTokens = {
@@ -276,9 +271,7 @@ export class LiffService {
               const timestamp = new Date().toISOString();
               console.log(`🔍 [${timestamp}] Updating LINE auth state in signInWithLiffToken`);
               await authStateManager.handleLineAuthStateChange(true);
-              console.log(
-                `🔍 [${timestamp}] AuthStateManager state updated to line_authenticated in signInWithLiffToken`,
-              );
+              console.log(`🔍 [${timestamp}] AuthStateManager state updated to line_authenticated in signInWithLiffToken`);
             } catch (error) {
               console.error("Failed to update AuthStateManager state:", error);
             }
