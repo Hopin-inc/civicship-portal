@@ -42,7 +42,7 @@ export function PhoneVerificationForm() {
   const isPhoneValid = digitsOnly.startsWith("81") && digitsOnly.length === 12;
 
   useEffect(() => {
-    if (!loading) return;
+    if (loading) return;
     if (!isAuthenticated) {
       let loginWithNext = "/login";
       if (nextParam) {
