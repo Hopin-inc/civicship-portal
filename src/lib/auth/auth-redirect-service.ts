@@ -147,4 +147,22 @@ export class AuthRedirectService {
 
     return { hasAccess: true, redirectPath: null };
   }
+
+  /**
+   * ログインページにリダイレクト
+   */
+  public redirectToLogin(): void {
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+  }
+
+  /**
+   * 電話番号認証ページにリダイレクト
+   */
+  public redirectToPhoneVerification(): void {
+    if (typeof window !== "undefined") {
+      window.location.href = "/sign-up/phone-verification";
+    }
+  }
 }

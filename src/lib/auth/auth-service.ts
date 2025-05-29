@@ -2,6 +2,7 @@
 
 import { AuthStateStore } from "./auth-state-store";
 import { TokenService } from "./token-service";
+import { AuthRedirectService } from "./auth-redirect-service";
 
 /**
  * 認証サービス - 認証処理のみを担当（状態を持たない）
@@ -10,10 +11,12 @@ export class AuthService {
   private static instance: AuthService;
   private authStateStore: AuthStateStore;
   private tokenService: TokenService;
+  private authRedirectService: AuthRedirectService;
 
   private constructor() {
     this.authStateStore = AuthStateStore.getInstance();
     this.tokenService = TokenService.getInstance();
+    this.authRedirectService = AuthRedirectService.getInstance();
   }
 
   /**
@@ -122,7 +125,7 @@ export class AuthService {
       this.authStateStore.forceSetState("unauthenticated");
       
       if (typeof window !== "undefined") {
-        window.location.href = "/login";
+        this.authRedirectService.redirectToLogin();
       }
     } else {
       console.log("🔄 Phone token expired, checking user registration status");
@@ -141,7 +144,7 @@ export class AuthService {
           console.log("❌ Both LINE and phone tokens expired, forcing logout");
           this.authStateStore.forceSetState("unauthenticated");
           if (typeof window !== "undefined") {
-            window.location.href = "/login";
+            this.authRedirectService.redirectToLogin();
           }
         }
       } else {
@@ -156,7 +159,7 @@ export class AuthService {
         }
         
         if (typeof window !== "undefined") {
-          window.location.href = "/sign-up/phone-verification";
+          this.authRedirectService.redirectToPhoneVerification();
         }
       }
     }
