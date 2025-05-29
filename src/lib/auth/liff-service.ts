@@ -116,7 +116,8 @@ export class LiffService {
           console.log(`🔍 [${new Date().toISOString()}] Stored redirect path in sessionStorage: ${redirectPath}`);
         }
         
-        const redirectUri = typeof window !== "undefined" ? window.location.origin : undefined;
+        const redirectUri = process.env.NEXT_PUBLIC_DOMAIN || 
+                           (typeof window !== "undefined" ? window.location.origin : undefined);
         
         console.log(`🔍 [${new Date().toISOString()}] LINE login with redirectUri: ${redirectUri}`);
         liff.login({ redirectUri });
