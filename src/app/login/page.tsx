@@ -49,13 +49,10 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const searchParams = new URLSearchParams(window.location.search);
-      const next = searchParams.get("next");
-      const redirectPath = next && next.startsWith("/") ? `/?next=${next}&from=line_auth` : "/?from=line_auth";
-      const success = await loginWithLiff(redirectPath);
+      const success = await loginWithLiff("/");
+      
       if (success) {
-        const nextPath = next && next.startsWith("/") ? next : "/activities";
-        router.push(nextPath);
+        console.log("🚀 LINE認証成功、リダイレクト処理中...");
       }
     } catch (err) {
       const { title, description } = getLiffLoginErrorMessage(error);
