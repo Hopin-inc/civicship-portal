@@ -40,11 +40,11 @@ export class AuthService {
 
     const lineTokens = this.tokenService.getLineTokens();
     const phoneTokens = this.tokenService.getPhoneTokens();
-
-    if (this.tokenService.isTokenValid(lineTokens)) {
+    
+    if (lineTokens.accessToken && await this.tokenService.isLineTokenValid(lineTokens)) {
       console.log("📱 Valid LINE tokens found");
       
-      if (this.tokenService.isTokenValid(phoneTokens) && phoneTokens.phoneUid) {
+      if (phoneTokens.accessToken && await this.tokenService.isPhoneTokenValid(phoneTokens) && phoneTokens.phoneUid) {
         console.log("📞 Valid phone tokens found");
         this.authStateStore.setState("phone_authenticated");
       } else {
@@ -94,7 +94,7 @@ export class AuthService {
       this.authStateStore.setState("phone_authenticated");
     } else {
       const lineTokens = this.tokenService.getLineTokens();
-      if (this.tokenService.isTokenValid(lineTokens)) {
+      if (lineTokens.accessToken && await this.tokenService.isLineTokenValid(lineTokens)) {
         this.authStateStore.setState("line_authenticated");
       } else {
         this.authStateStore.setState("unauthenticated");
@@ -130,9 +130,11 @@ export class AuthService {
       
       const currentState = this.authStateStore.getState();
       if (currentState === "user_registered") {
-        console.log("📱 User already registered, attempting token refresh");
+        console.log("📱 User already registered, checking LINE token validity");
         const lineTokens = this.tokenService.getLineTokens();
-        if (this.tokenService.isTokenValid(lineTokens)) {
+        const isLineValid = await this.tokenService.isLineTokenValid(lineTokens);
+        
+        if (isLineValid) {
           console.log("✅ LINE tokens still valid, maintaining user_registered state");
           return;
         } else {
@@ -143,9 +145,11 @@ export class AuthService {
           }
         }
       } else {
-        console.log("📱 User not registered, redirecting to phone verification");
+        console.log("📱 User not registered, transitioning to appropriate state");
         const lineTokens = this.tokenService.getLineTokens();
-        if (this.tokenService.isTokenValid(lineTokens)) {
+        const isLineValid = await this.tokenService.isLineTokenValid(lineTokens);
+        
+        if (isLineValid) {
           this.authStateStore.forceSetState("line_authenticated");
         } else {
           this.authStateStore.forceSetState("unauthenticated");

@@ -52,7 +52,22 @@ export class PhoneAuthService {
 
     const savedTokens = this.tokenService.getPhoneTokens();
     if (savedTokens.phoneUid && savedTokens.phoneNumber && savedTokens.accessToken && savedTokens.expiresAt) {
-      const isValid = this.tokenService.isTokenValid({
+      this.validateSavedTokens(savedTokens);
+    } else {
+      console.log("Phone verification not initialized - incomplete saved tokens:", {
+        phoneUid: savedTokens.phoneUid ? "exists" : "missing",
+        phoneNumber: savedTokens.phoneNumber ? "exists" : "missing",
+        accessToken: savedTokens.accessToken ? "exists" : "missing"
+      });
+    }
+  }
+
+  /**
+   * 保存されたトークンを非同期で検証
+   */
+  private async validateSavedTokens(savedTokens: PhoneAuthTokens): Promise<void> {
+    try {
+      const isValid = await this.tokenService.isPhoneTokenValid({
         accessToken: savedTokens.accessToken,
         refreshToken: savedTokens.refreshToken || "",
         expiresAt: savedTokens.expiresAt
@@ -71,14 +86,11 @@ export class PhoneAuthService {
         });
       } else {
         console.log("❌ Saved phone tokens are expired, clearing state");
-        this.reset();
+        await this.reset();
       }
-    } else {
-      console.log("Phone verification not initialized - incomplete saved tokens:", {
-        phoneUid: savedTokens.phoneUid ? "exists" : "missing",
-        phoneNumber: savedTokens.phoneNumber ? "exists" : "missing",
-        accessToken: savedTokens.accessToken ? "exists" : "missing"
-      });
+    } catch (error) {
+      console.error("Error validating saved tokens:", error);
+      await this.reset();
     }
   }
 
