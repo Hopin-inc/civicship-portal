@@ -118,7 +118,7 @@ export function PhoneVerificationForm() {
     <>
       <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
       <div className="w-full max-w-md mx-auto space-y-8">
-        {(isPhoneSubmitting || isCodeVerifying || isReloading) && <LoadingIndicator />}
+        {/*{(isPhoneSubmitting || isCodeVerifying || isReloading) && <LoadingIndicator />}*/}
         <div className="space-y-2">
           <h1 className="text-2xl font-bold tracking-tight">
             {step === "phone" && "電話番号を入力"}
