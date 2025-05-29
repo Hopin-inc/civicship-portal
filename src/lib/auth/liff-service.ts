@@ -3,7 +3,9 @@
 import liff from "@line/liff";
 import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { lineAuth, categorizeFirebaseError } from "./firebase-config";
-import { TokenManager, AuthTokens } from "./token-manager";
+import { AuthTokens } from "./token-service";
+import { TokenService } from "./token-service";
+import { AuthService } from "./auth-service";
 import retry from "retry";
 
 /**
@@ -27,6 +29,8 @@ export class LiffService {
   private static instance: LiffService;
   private liffId: string;
   private state: LiffState;
+  private tokenService: TokenService;
+  private authService: AuthService;
 
   /**
    * コンストラクタ
@@ -34,6 +38,8 @@ export class LiffService {
    */
   private constructor(liffId: string) {
     this.liffId = liffId;
+    this.tokenService = TokenService.getInstance();
+    this.authService = AuthService.getInstance();
     this.state = {
       isInitialized: false,
       isLoggedIn: false,
@@ -125,7 +131,7 @@ export class LiffService {
   /**
    * LIFFからログアウト
    */
-  public logout(): void {
+  public async logout(): Promise<void> {
     if (this.state.isInitialized && this.state.isLoggedIn) {
       liff.logout();
       this.state.isLoggedIn = false;
@@ -134,6 +140,8 @@ export class LiffService {
         displayName: null,
         pictureUrl: null,
       };
+      
+      await this.authService.logout();
     }
   }
 
@@ -262,20 +270,12 @@ export class LiffService {
             refreshToken: refreshToken,
             expiresAt: expirationTime,
           };
-          TokenManager.saveLineTokens(tokens);
+          this.tokenService.saveLineTokens(tokens);
 
-          if (typeof window !== "undefined") {
-            try {
-              const AuthStateManager = require("./auth-state-manager").AuthStateManager;
-              const authStateManager = AuthStateManager.getInstance();
-              const timestamp = new Date().toISOString();
-              console.log(`🔍 [${timestamp}] Updating LINE auth state in signInWithLiffToken`);
-              await authStateManager.handleLineAuthStateChange(true);
-              console.log(`🔍 [${timestamp}] AuthStateManager state updated to line_authenticated in signInWithLiffToken`);
-            } catch (error) {
-              console.error("Failed to update AuthStateManager state:", error);
-            }
-          }
+          const timestamp = new Date().toISOString();
+          console.log(`🔍 [${timestamp}] Updating LINE auth state in signInWithLiffToken`);
+          await this.authService.handleLineAuthSuccess();
+          console.log(`🔍 [${timestamp}] Auth state updated to line_authenticated in signInWithLiffToken`);
 
           const completeTimestamp = new Date().toISOString();
           console.log(`🔍 [${completeTimestamp}] LIFF authentication successful`);

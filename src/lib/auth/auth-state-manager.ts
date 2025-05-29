@@ -1,4 +1,6 @@
-import { TokenManager } from "./token-manager";
+import { TokenService } from "./token-service";
+import { AuthStateStore } from "./auth-state-store";
+import { AuthService } from "./auth-service";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 
@@ -14,17 +16,32 @@ export type AuthenticationState =
 /**
  * 認証状態の管理を担当するクラス
  * 認証状態の遷移ロジックを集約し、他のコンポーネントから参照できるようにする
+ * 
+ * @deprecated このクラスは非推奨です。代わりに AuthStateStore と AuthService を使用してください。
+ * 後方互換性のために維持されていますが、新しいコードでは使用しないでください。
  */
 export class AuthStateManager {
   private static instance: AuthStateManager;
   private currentState: AuthenticationState = "loading";
   private stateChangeListeners: ((state: AuthenticationState) => void)[] = [];
+  private authStateStore: AuthStateStore;
+  private authService: AuthService;
+  private tokenService: TokenService;
 
   private constructor() {
     if (typeof window !== "undefined") {
       window.addEventListener("auth:renew-line-token", this.handleLineTokenRenewal.bind(this));
       window.addEventListener("auth:renew-phone-token", this.handlePhoneTokenRenewal.bind(this));
     }
+    
+    this.authStateStore = AuthStateStore.getInstance();
+    this.authService = AuthService.getInstance();
+    this.tokenService = TokenService.getInstance();
+    
+    this.authStateStore.addStateChangeListener((state) => {
+      this.currentState = state;
+      this.notifyStateChange();
+    });
   }
 
   /**
@@ -80,32 +97,15 @@ export class AuthStateManager {
 
   /**
    * 認証状態を初期化
+   * @deprecated 代わりに AuthService.initializeAuthState() を使用してください。
    */
   public async initialize(): Promise<void> {
+    console.warn("AuthStateManager.initialize is deprecated. Use AuthService.initializeAuthState instead.");
     this.setState("loading");
-
-    const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
-
-    if (!hasValidLineToken) {
-      this.setState("unauthenticated");
-      return;
-    } else {
-      const isUserRegistered = await this.checkUserRegistration();
-
-      if (isUserRegistered) {
-        this.setState("user_registered");
-      } else {
-        const phoneTokens = TokenManager.getPhoneTokens();
-        const hasValidPhoneToken = phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
-
-        if (hasValidPhoneToken) {
-          this.setState("phone_authenticated");
-        } else {
-          this.setState("line_authenticated");
-        }
-      }
-    }
+    
+    await this.authService.initializeAuthState();
+    
+    return;
   }
 
   /**
@@ -128,123 +128,86 @@ export class AuthStateManager {
 
   /**
    * LINEトークン更新イベントのハンドラー
+   * @deprecated 代わりに AuthService を使用してください。
    */
   private async handleLineTokenRenewal(event: Event): Promise<void> {
+    console.warn("AuthStateManager.handleLineTokenRenewal is deprecated. Use AuthService instead.");
     try {
-      const renewed = await TokenManager.renewLineToken();
-
-      if (renewed && this.currentState === "line_token_expired") {
-        const isUserRegistered = await this.checkUserRegistration();
-        if (isUserRegistered) {
-          this.setState("user_registered");
-        } else {
-          this.setState("line_authenticated");
-        }
-      } else if (!renewed) {
-        this.setState("unauthenticated");
+      const lineTokens = this.tokenService.getLineTokens();
+      const isValid = this.tokenService.isTokenValid(lineTokens);
+      
+      if (isValid && this.currentState === "line_token_expired") {
+        await this.authService.handleLineAuthSuccess();
+      } else if (!isValid) {
+        await this.authService.logout();
       }
     } catch (error) {
       console.error("Failed to renew LINE token:", error);
-      this.setState("unauthenticated");
+      await this.authService.logout();
     }
   }
 
   /**
    * 電話番号トークン更新イベントのハンドラー
+   * @deprecated 代わりに AuthService を使用してください。
    */
   private async handlePhoneTokenRenewal(event: Event): Promise<void> {
+    console.warn("AuthStateManager.handlePhoneTokenRenewal is deprecated. Use AuthService instead.");
     try {
-      const renewed = await TokenManager.renewPhoneToken();
-      const lineTokens = TokenManager.getLineTokens();
-      const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+      const phoneTokens = this.tokenService.getPhoneTokens();
+      const lineTokens = this.tokenService.getLineTokens();
+      const isPhoneValid = this.tokenService.isTokenValid(phoneTokens);
+      const isLineValid = this.tokenService.isTokenValid(lineTokens);
 
-      if (renewed && this.currentState === "phone_token_expired") {
-        this.setState("phone_authenticated");
-      } else if (!renewed) {
-        if (!hasValidLineToken) {
-          this.setState("unauthenticated");
+      if (isPhoneValid && this.currentState === "phone_token_expired") {
+        await this.authService.handlePhoneAuthSuccess();
+      } else if (!isPhoneValid) {
+        if (!isLineValid) {
+          await this.authService.logout();
         } else {
-          this.setState("line_authenticated");
+          await this.authService.handleLineAuthSuccess();
         }
       }
     } catch (error) {
       console.error("Failed to renew phone token:", error);
 
-      const lineTokens = TokenManager.getLineTokens();
-      const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+      const lineTokens = this.tokenService.getLineTokens();
+      const isLineValid = this.tokenService.isTokenValid(lineTokens);
 
-      if (!hasValidLineToken) {
-        this.setState("unauthenticated");
+      if (!isLineValid) {
+        await this.authService.logout();
       } else {
-        this.setState("line_authenticated");
+        await this.authService.handleLineAuthSuccess();
       }
     }
   }
 
   /**
    * LINE認証状態の変更を処理
+   * @deprecated 代わりに AuthService.handleLineAuthStateChange() を使用してください。
    */
   public async handleLineAuthStateChange(isAuthenticated: boolean): Promise<void> {
-    if (isAuthenticated) {
-      if (this.currentState === "unauthenticated" || this.currentState === "loading") {
-        this.setState("line_authenticated");
-      }
-    } else {
-      this.setState("unauthenticated");
-    }
+    console.warn("AuthStateManager.handleLineAuthStateChange is deprecated. Use AuthService.handleLineAuthStateChange instead.");
+    await this.authService.handleLineAuthStateChange(isAuthenticated);
   }
 
   /**
    * 電話番号認証状態の変更を処理
+   * @deprecated 代わりに AuthService.handlePhoneAuthStateChange() を使用してください。
    */
   public async handlePhoneAuthStateChange(isVerified: boolean): Promise<void> {
-    const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
-
-    if (!hasValidLineToken && this.currentState !== "loading") {
-      this.setState("unauthenticated");
-      return;
-    }
-
-    if (isVerified) {
-      if (this.currentState === "line_authenticated" || this.currentState === "line_token_expired") {
-        this.setState("phone_authenticated");
-      }
-    } else {
-      if (this.currentState !== "unauthenticated" && this.currentState !== "loading") {
-        this.setState("line_authenticated");
-      }
-    }
+    console.warn("AuthStateManager.handlePhoneAuthStateChange is deprecated. Use AuthService.handlePhoneAuthStateChange instead.");
+    await this.authService.handlePhoneAuthStateChange(isVerified);
   }
 
   /**
    * ユーザー情報登録状態の変更を処理
+   * @deprecated 代わりに AuthService.handleUserRegistrationSuccess() を使用してください。
    */
   public async handleUserRegistrationStateChange(isRegistered: boolean): Promise<void> {
-    const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
-
-    if (!hasValidLineToken) {
-      this.setState("unauthenticated");
-      return;
-    }
-
-    const phoneTokens = TokenManager.getPhoneTokens();
-    const hasValidPhoneToken = phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
-
-    if (!hasValidPhoneToken) {
-      this.setState("line_authenticated");
-      return;
-    }
-
+    console.warn("AuthStateManager.handleUserRegistrationStateChange is deprecated. Use AuthService.handleUserRegistrationSuccess instead.");
     if (isRegistered) {
-      if (this.currentState === "phone_authenticated" || this.currentState === "phone_token_expired") {
-        this.setState("user_registered");
-      }
-    } else {
-      if (this.currentState === "user_registered") {
-        this.setState("phone_authenticated");
-      }
+      await this.authService.handleUserRegistrationSuccess();
     }
   }
 }

@@ -7,7 +7,9 @@ import {
   signInWithPhoneNumber,
 } from "firebase/auth";
 import { phoneAuth, categorizeFirebaseError } from "./firebase-config";
-import { TokenManager, PhoneAuthTokens } from "./token-manager";
+import { PhoneAuthTokens } from "./token-service";
+import { TokenService } from "./token-service";
+import { AuthService } from "./auth-service";
 import { isRunningInLiff } from "./environment-detector";
 
 /**
@@ -28,6 +30,8 @@ export type PhoneAuthState = {
 export class PhoneAuthService {
   private static instance: PhoneAuthService;
   private state: PhoneAuthState;
+  private tokenService: TokenService;
+  private authService: AuthService;
   private recaptchaVerifier: RecaptchaVerifier | null = null;
   private recaptchaContainerElement: HTMLElement | null = null;
 
@@ -35,6 +39,8 @@ export class PhoneAuthService {
    * コンストラクタ
    */
   private constructor() {
+    this.tokenService = TokenService.getInstance();
+    this.authService = AuthService.getInstance();
     this.state = {
       isVerifying: false,
       isVerified: false,
@@ -44,7 +50,7 @@ export class PhoneAuthService {
       error: null,
     };
 
-    const savedTokens = TokenManager.getPhoneTokens();
+    const savedTokens = this.tokenService.getPhoneTokens();
     if (savedTokens.phoneUid && savedTokens.phoneNumber && savedTokens.accessToken) {
       this.state.isVerified = true;
       this.state.phoneUid = savedTokens.phoneUid;
@@ -189,7 +195,7 @@ export class PhoneAuthService {
               refreshToken: refreshToken,
               expiresAt: expirationTime,
             };
-            TokenManager.savePhoneTokens(tokens);
+            this.tokenService.savePhoneTokens(tokens);
 
             console.log("Extracted phone auth tokens successfully");
           } else {
@@ -230,7 +236,7 @@ export class PhoneAuthService {
                 refreshToken: refreshToken,
                 expiresAt: expirationTime,
               };
-              TokenManager.savePhoneTokens(tokens);
+              this.tokenService.savePhoneTokens(tokens);
 
               console.log("Extracted phone auth tokens successfully (fallback)");
             }
@@ -243,6 +249,9 @@ export class PhoneAuthService {
 
         this.state.isVerified = true;
         console.log("Phone verification state set to verified:", this.state);
+        
+        await this.authService.handlePhoneAuthSuccess();
+        
         return true;
       } catch (credentialError) {
         console.error("Invalid verification code:", credentialError);
@@ -280,7 +289,7 @@ export class PhoneAuthService {
         refreshToken: refreshToken,
         expiresAt: expirationTime,
       };
-      TokenManager.savePhoneTokens(tokens);
+      this.tokenService.savePhoneTokens(tokens);
 
       return idToken;
     } catch (error) {
@@ -300,9 +309,9 @@ export class PhoneAuthService {
   /**
    * 電話番号認証状態をリセット
    */
-  public reset(): void {
+  public async reset(): Promise<void> {
     this.clearRecaptcha();
-    TokenManager.clearPhoneTokens();
+    this.tokenService.clearPhoneTokens();
     this.state = {
       isVerifying: false,
       isVerified: false,
@@ -311,5 +320,7 @@ export class PhoneAuthService {
       verificationId: null,
       error: null,
     };
+    
+    await this.authService.handlePhoneAuthStateChange(false);
   }
 }

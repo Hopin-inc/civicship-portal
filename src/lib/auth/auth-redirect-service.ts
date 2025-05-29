@@ -1,5 +1,5 @@
-import type { AuthenticationState } from "./auth-state-manager";
-import { AuthStateManager } from "./auth-state-manager";
+import type { AuthenticationState } from "./auth-state-store";
+import { AuthStateStore } from "./auth-state-store";
 import { GqlRole } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
 import { matchPaths } from "@/utils/path";
@@ -9,10 +9,10 @@ import { matchPaths } from "@/utils/path";
  */
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
-  private authStateManager: AuthStateManager;
+  private authStateStore: AuthStateStore;
 
   private constructor() {
-    this.authStateManager = AuthStateManager.getInstance();
+    this.authStateStore = AuthStateStore.getInstance();
   }
 
   /**
@@ -68,7 +68,7 @@ export class AuthRedirectService {
    * @returns リダイレクト先のパス、またはnull（リダイレクト不要の場合）
    */
   public getRedirectPath(pathname: string, next?: string | null): string | null {
-    const authState = this.authStateManager.getState();
+    const authState = this.authStateStore.getState();
     const nextParam = next ? `?next=${next}` : "";
 
     if (authState === "loading") {
@@ -114,7 +114,7 @@ export class AuthRedirectService {
    */
   public getPostLineAuthRedirectPath(nextPath: string | null): string {
     const next = nextPath ? decodeURIComponent(nextPath) : null;
-    const authState = this.authStateManager.getState();
+    const authState = this.authStateStore.getState();
 
     if (authState === "line_authenticated" || authState === "line_token_expired") {
       return `/sign-up/phone-verification${next ? `?next=${next}` : ""}`;

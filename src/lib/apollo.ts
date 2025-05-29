@@ -9,7 +9,7 @@ import { onError } from "@apollo/client/link/error";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { __DEV__ } from "@apollo/client/utilities/globals";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
-import { TokenManager } from "./auth/token-manager";
+import { TokenService } from "./auth/token-service";
 
 if (__DEV__) {
   loadDevMessages();
@@ -37,8 +37,9 @@ const requestLink = new ApolloLink((operation, forward) => {
     return forward(operation);
   }
 
-  const lineTokens = TokenManager.getLineTokens();
-  const phoneTokens = TokenManager.getPhoneTokens();
+  const tokenService = TokenService.getInstance();
+  const lineTokens = tokenService.getLineTokens();
+  const phoneTokens = tokenService.getPhoneTokens();
 
   operation.setContext(({ headers = {} }) => {
     const baseHeaders = {

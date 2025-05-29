@@ -4,7 +4,9 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
-import { TokenManager } from "@/lib/auth/token-manager";
+import { TokenService } from "@/lib/auth/token-service";
+import { AuthStateStore } from "@/lib/auth/auth-state-store";
+import { AuthService } from "@/lib/auth/auth-service";
 import { lineAuth } from "@/lib/auth/firebase-config";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
 import { GqlCurrentPrefecture, GqlCurrentUserPayload } from "@/types/graphql";
@@ -100,11 +102,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     fetchPolicy: "network-only",
   });
 
-  const authStateManager = React.useMemo(() => {
-    if (typeof window === "undefined") return null;
-    const AuthStateManager = require("@/lib/auth/auth-state-manager").AuthStateManager;
-    return AuthStateManager.getInstance();
-  }, []);
+  const authStateStore = AuthStateStore.getInstance();
+  const authService = AuthService.getInstance();
 
   useEffect(() => {
     const unsubscribe = lineAuth.onAuthStateChanged((user) => {
@@ -116,26 +115,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           "unauthenticated",
       }));
 
-      if (authStateManager && !state.isAuthenticating) {
-        authStateManager.handleLineAuthStateChange(!!user);
+      if (!state.isAuthenticating) {
+        authService.handleLineAuthStateChange(!!user);
       }
     });
 
     return () => unsubscribe();
-  }, [authStateManager, state.isAuthenticating]);
+  }, [state.isAuthenticating, authService]);
 
   /**
    * ログアウト
    */
   const logout = useCallback(async (): Promise<void> => {
     try {
-      liffService.logout();
+      await liffService.logout();
 
       await lineAuth.signOut();
 
       phoneAuthService.reset();
 
-      TokenManager.clearAllTokens();
+      await authService.logout();
 
       setState((prev) => ({
         ...prev,
@@ -146,11 +145,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error("Logout failed:", error);
     }
-  }, [liffService, phoneAuthService]);
+  }, [liffService, phoneAuthService, authService]);
 
   useEffect(() => {
-    if (!authStateManager) return; // Guard against initialization error
-
     const phoneState = phoneAuthService.getState();
     const isVerified = phoneState.isVerified;
 
@@ -159,10 +156,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
           const timestamp = new Date().toISOString();
           console.log(`🔍 [${timestamp}] Updating phone auth state in useEffect - isVerified:`, isVerified);
-          await authStateManager.handlePhoneAuthStateChange(true);
-          console.log(`🔍 [${timestamp}] AuthStateManager phone state updated successfully in useEffect`);
+          await authService.handlePhoneAuthSuccess();
+          console.log(`🔍 [${timestamp}] Auth state updated to phone_authenticated in useEffect`);
         } catch (error) {
-          console.error("Failed to update AuthStateManager phone state in useEffect:", error);
+          console.error("Failed to update auth state in useEffect:", error);
         }
       };
 
@@ -175,7 +172,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         (prev.authenticationState === "line_authenticated" ? "phone_authenticated" : prev.authenticationState) :
         prev.authenticationState,
     }));
-  }, [authStateManager, phoneAuthService]);
+  }, [phoneAuthService, authService]);
 
   useEffect(() => {
     if (userData?.currentUser?.user) {
@@ -185,22 +182,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         authenticationState: "user_registered",
       }));
 
-      if (authStateManager) {
-        const updateUserRegistrationState = async () => {
-          try {
-            const timestamp = new Date().toISOString();
-            console.log(`🔍 [${timestamp}] Updating user registration state in useEffect`);
-            await authStateManager.handleUserRegistrationStateChange(true);
-            console.log(`🔍 [${timestamp}] AuthStateManager user registration state updated successfully`);
-          } catch (error) {
-            console.error("Failed to update AuthStateManager user registration state:", error);
-          }
-        };
+      const updateUserRegistrationState = async () => {
+        try {
+          const timestamp = new Date().toISOString();
+          console.log(`🔍 [${timestamp}] Updating user registration state in useEffect`);
+          await authService.handleUserRegistrationSuccess();
+          console.log(`🔍 [${timestamp}] User registration state updated successfully`);
+        } catch (error) {
+          console.error("Failed to update user registration state:", error);
+        }
+      };
 
-        updateUserRegistrationState();
-      }
+      updateUserRegistrationState();
     }
-  }, [userData, authStateManager]);
+  }, [userData, authService]);
 
   useEffect(() => {
     const initializeLiff = async () => {
@@ -309,11 +304,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [environment, state.authenticationState, state.isAuthenticating, liffService, refetchUser]);
 
   useEffect(() => {
-    if (!authStateManager) return; // Guard against initialization error
-
     const initializeAuthState = async () => {
-      console.log("🔍 Initializing AuthStateManager");
-      await authStateManager.initialize();
+      console.log("🔍 Initializing authentication state");
+      await authService.initializeAuthState();
     };
 
     initializeAuthState();
@@ -322,7 +315,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setState(prev => ({ ...prev, authenticationState: newState }));
     };
 
-    authStateManager.addStateChangeListener(handleStateChange);
+    authStateStore.addStateChangeListener(handleStateChange);
 
     const handleTokenExpired = (event: Event) => {
       const customEvent = event as CustomEvent<{ source: string }>;
@@ -330,7 +323,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (source === "graphql" || source === "network") {
         if (state.authenticationState === "line_authenticated" || state.authenticationState === "user_registered") {
-          setState(prev => ({ ...prev, authenticationState: "line_token_expired" }));
+          authService.handleTokenExpired("line");
           if (typeof window !== "undefined") {
             const event = new CustomEvent("auth:renew-line-token", { detail: {} });
             window.dispatchEvent(event);
@@ -339,7 +332,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
 
         if (state.authenticationState === "phone_authenticated") {
-          setState(prev => ({ ...prev, authenticationState: "phone_token_expired" }));
+          authService.handleTokenExpired("phone");
           if (typeof window !== "undefined") {
             const event = new CustomEvent("auth:renew-phone-token", { detail: {} });
             window.dispatchEvent(event);
@@ -359,12 +352,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     return () => {
-      authStateManager.removeStateChangeListener(handleStateChange);
+      authStateStore.removeStateChangeListener(handleStateChange);
       if (typeof window !== "undefined") {
         window.removeEventListener("auth:token-expired", handleTokenExpired);
       }
     };
-  }, [state.authenticationState, logout, authStateManager]);
+  }, [state.authenticationState, logout, authService, authStateStore]);
 
   /**
    * LIFFでログイン
@@ -419,15 +412,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         authenticationState: "phone_authenticated",
       }));
 
-      if (authStateManager) {
-        try {
-          const timestamp = new Date().toISOString();
-          console.log(`🔍 [${timestamp}] Updating phone auth state in verifyPhoneCode`);
-          await authStateManager.handlePhoneAuthStateChange(true);
-          console.log(`🔍 [${timestamp}] AuthStateManager phone state updated successfully in verifyPhoneCode`);
-        } catch (error) {
-          console.error("Failed to update AuthStateManager phone state in verifyPhoneCode:", error);
-        }
+      try {
+        const timestamp = new Date().toISOString();
+        console.log(`🔍 [${timestamp}] Updating phone auth state in verifyPhoneCode`);
+        await authService.handlePhoneAuthSuccess();
+        console.log(`🔍 [${timestamp}] Auth state updated to phone_authenticated in verifyPhoneCode`);
+      } catch (error) {
+        console.error("Failed to update auth state in verifyPhoneCode:", error);
       }
     }
 
@@ -453,8 +444,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return null;
       }
 
-      const phoneTokens = TokenManager.getPhoneTokens();
-      const lineTokens = TokenManager.getLineTokens();
+      const tokenService = TokenService.getInstance();
+      const phoneTokens = tokenService.getPhoneTokens();
+      const lineTokens = tokenService.getLineTokens();
 
       console.log("Creating user with input:", {
         name,
