@@ -27,12 +27,21 @@ export const useTokenExpiration = (
       const lineTokens = tokenService.getLineTokens();
       
       const currentState = authStateStore.getState();
-      if (currentState === "phone_authenticated" && !tokenService.isTokenValid(phoneTokens)) {
-        console.log("🔄 Phone tokens expired, handling token expiration");
-        authService.handleTokenExpired("phone");
-      } else if ((currentState === "line_authenticated" || currentState === "user_registered") && !tokenService.isTokenValid(lineTokens)) {
-        console.log("🔄 LINE tokens expired, handling token expiration");
-        authService.handleTokenExpired("line");
+      
+      if (currentState === "phone_authenticated") {
+        const isPhoneValid = await tokenService.isPhoneTokenValid(phoneTokens);
+        if (!isPhoneValid) {
+          console.log("🔄 Phone tokens expired, handling token expiration");
+          await authService.handleTokenExpired("phone");
+        }
+      }
+      
+      if (currentState === "line_authenticated" || currentState === "user_registered") {
+        const isLineValid = await tokenService.isLineTokenValid(lineTokens);
+        if (!isLineValid) {
+          console.log("🔄 LINE tokens expired, handling token expiration");
+          await authService.handleTokenExpired("line");
+        }
       }
       
       hasInitialized.current = true;

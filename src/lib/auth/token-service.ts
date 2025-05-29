@@ -91,10 +91,69 @@ export class TokenService {
   }
 
   /**
-   * トークンが有効かどうかを確認
+   * LINE認証トークンが有効かどうかを確認
+   * @param tokens LINE認証トークン
+   * @returns 有効かどうか
    */
-  public isTokenValid(tokens: AuthTokens): boolean {
-    return !!(tokens.accessToken && tokens.expiresAt && tokens.expiresAt > Date.now());
+  public async isLineTokenValid(tokens: AuthTokens): Promise<boolean> {
+    if (!tokens.accessToken) {
+      return false;
+    }
+
+    try {
+      const { lineAuth } = await import("./firebase-config");
+      
+      if (!lineAuth.currentUser) {
+        return false;
+      }
+
+      await lineAuth.currentUser.getIdToken();
+      return true;
+    } catch (error) {
+      console.error("LINE token validation failed:", error);
+      return false;
+    }
+  }
+
+  /**
+   * 電話番号認証トークンが有効かどうかを確認
+   * @param tokens 電話番号認証トークン
+   * @returns 有効かどうか
+   */
+  public async isPhoneTokenValid(tokens: AuthTokens): Promise<boolean> {
+    if (!tokens.accessToken) {
+      return false;
+    }
+
+    try {
+      const { phoneAuth } = await import("./firebase-config");
+      
+      if (!phoneAuth.currentUser) {
+        return false;
+      }
+
+      await phoneAuth.currentUser.getIdToken();
+      return true;
+    } catch (error) {
+      console.error("Phone token validation failed:", error);
+      return false;
+    }
+  }
+
+  /**
+   * トークンが有効かどうかを確認（後方互換性のため）
+   * @deprecated Use isLineTokenValid or isPhoneTokenValid instead
+   */
+  public async isTokenValid(tokens: AuthTokens): Promise<boolean> {
+    try {
+      const isLineValid = await this.isLineTokenValid(tokens);
+      if (isLineValid) return true;
+      
+      const isPhoneValid = await this.isPhoneTokenValid(tokens);
+      return isPhoneValid;
+    } catch (error) {
+      return false;
+    }
   }
 
   /**
