@@ -27,7 +27,7 @@ export type LiffState = {
  */
 export class LiffService {
   private static instance: LiffService;
-  private liffId: string;
+  private readonly liffId: string;
   private state: LiffState;
   private tokenService: TokenService;
   private authService: AuthService;
@@ -118,8 +118,6 @@ export class LiffService {
         liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない
       }
-
-      await this.updateProfile();
       return true;
     } catch (error) {
       console.error("LIFF login error:", error);
@@ -140,7 +138,7 @@ export class LiffService {
         displayName: null,
         pictureUrl: null,
       };
-      
+
       await this.authService.logout();
     }
   }

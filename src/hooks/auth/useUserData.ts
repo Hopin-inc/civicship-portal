@@ -3,11 +3,12 @@
 import { useEffect } from "react";
 import { AuthService } from "@/lib/auth/auth-service";
 import { GqlCurrentUserPayload } from "@/types/graphql";
+import { AuthenticationState } from "@/lib/auth/auth-state-store";
 
 export const useUserData = (
   userData: { currentUser?: { user: GqlCurrentUserPayload["user"] } } | null | undefined,
   onCurrentUserChange: (user: GqlCurrentUserPayload["user"] | null) => void,
-  onAuthStateChange: (state: string) => void
+  onAuthStateChange: (state: AuthenticationState) => void
 ) => {
   const authService = AuthService.getInstance();
 

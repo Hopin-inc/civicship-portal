@@ -69,38 +69,31 @@ export class AuthRedirectService {
    */
   public getRedirectPath(pathname: string, next?: string | null): string | null {
     const authState = this.authStateStore.getState();
-    const nextParam = next ? `?next=${next}` : "";
-
-    if (authState === "loading") {
-      return null;
-    }
+    const nextParam = next ? `?next=${ next }` : "";
 
     if (this.isProtectedPath(pathname)) {
-      if (authState === "unauthenticated") {
-        return `/login${nextParam}`;
-      } else if (authState === "line_authenticated") {
-        return `/sign-up/phone-verification${nextParam}`;
-      } else if (authState === "phone_authenticated") {
-        return `/sign-up${nextParam}`;
+      switch (authState) {
+        case "unauthenticated":
+          return `/login${ nextParam }`;
+        case "line_authenticated":
+          return `/sign-up/phone-verification${ nextParam }`;
+        case "phone_authenticated":
+          return `/sign-up${ nextParam }`;
+        default:
+          break;
       }
-    }
-
-    else if (this.isPhoneVerificationRequiredPath(pathname)) {
+    } else if (this.isPhoneVerificationRequiredPath(pathname)) {
       if (authState === "unauthenticated") {
-        return `/login${nextParam}`;
+        return `/login${ nextParam }`;
       } else if (authState === "line_authenticated" &&
-                 pathname !== "/sign-up/phone-verification") {
-        return `/sign-up/phone-verification${nextParam}`;
+        pathname !== "/sign-up/phone-verification") {
+        return `/sign-up/phone-verification${ nextParam }`;
       }
-    }
-
-    else if (this.isAdminPath(pathname)) {
+    } else if (this.isAdminPath(pathname)) {
       if (authState !== "user_registered") {
-        return `/login${nextParam}`;
+        return `/login${ nextParam }`;
       }
-    }
-
-    else if (pathname === "/login" && authState === "user_registered") {
+    } else if (pathname === "/login" && authState === "user_registered") {
       return "/";
     }
 
@@ -116,15 +109,16 @@ export class AuthRedirectService {
     const next = nextPath ? decodeURIComponent(nextPath) : null;
     const authState = this.authStateStore.getState();
 
-    if (authState === "line_authenticated") {
-      return `/sign-up/phone-verification${next ? `?next=${next}` : ""}`;
-    } else if (authState === "phone_authenticated") {
-      return `/sign-up${next ? `?next=${next}` : ""}`;
-    } else if (authState === "user_registered") {
-      return next ?? "/";
+    switch (authState) {
+      case "line_authenticated":
+        return `/sign-up/phone-verification${ next ? `?next=${ next }` : "" }`;
+      case "phone_authenticated":
+        return `/sign-up${ next ? `?next=${ next }` : "" }`;
+      case "user_registered":
+        return next ?? "/";
+      default:
+        return `/login${ next ? `?next=${ next }` : "" }`;
     }
-
-    return `/login${next ? `?next=${next}` : ""}`;
   }
 
   /**

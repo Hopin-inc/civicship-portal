@@ -3,9 +3,10 @@
 import { useEffect } from "react";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthService } from "@/lib/auth/auth-service";
+import { AuthenticationState } from "@/lib/auth/auth-state-store";
 
 export const usePhoneAuth = (
-  onAuthStateChange: (updater: (prev: string) => string) => void
+  onAuthStateChange: (updater: (prev: AuthenticationState) => AuthenticationState) => void
 ) => {
   const phoneAuthService = PhoneAuthService.getInstance();
   const authService = AuthService.getInstance();

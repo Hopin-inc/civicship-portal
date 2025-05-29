@@ -4,20 +4,21 @@ import { useEffect } from "react";
 import { User } from "firebase/auth";
 import { lineAuth } from "@/lib/auth/firebase-config";
 import { AuthService } from "@/lib/auth/auth-service";
+import { AuthenticationState } from "@/lib/auth/auth-state-store";
 
 export const useFirebaseAuth = (
   isAuthenticating: boolean,
   onFirebaseUserChange: (user: User | null) => void,
-  onAuthStateChange: (state: string) => void
+  onAuthStateChange: (stateOrUpdater: AuthenticationState | ((prev: AuthenticationState) => AuthenticationState)) => void
 ) => {
   const authService = AuthService.getInstance();
 
   useEffect(() => {
     const unsubscribe = lineAuth.onAuthStateChanged((user) => {
       onFirebaseUserChange(user);
-      
+
       if (user) {
-        onAuthStateChange(prev => 
+        onAuthStateChange(prev =>
           prev === "loading" ? "line_authenticated" : prev
         );
       } else {

@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { AuthStateStore } from "@/lib/auth/auth-state-store";
+import { AuthenticationState, AuthStateStore } from "@/lib/auth/auth-state-store";
 import { AuthService } from "@/lib/auth/auth-service";
 import { toast } from "sonner";
 
 export const useTokenExpiration = (
   authenticationState: string,
-  onAuthStateChange: (state: string) => void,
+  onAuthStateChange: (state: AuthenticationState) => void,
   logout: () => Promise<void>
 ) => {
   const authStateStore = AuthStateStore.getInstance();
@@ -21,7 +21,7 @@ export const useTokenExpiration = (
 
     initializeAuthState();
 
-    const handleStateChange = (newState: string) => {
+    const handleStateChange = (newState: AuthenticationState) => {
       onAuthStateChange(newState);
     };
 
