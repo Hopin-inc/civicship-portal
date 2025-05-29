@@ -1,5 +1,7 @@
 "use client";
 
+import { lineAuth, phoneAuth } from "@/lib/auth/firebase-config";
+
 /**
  * 認証トークンの型定義
  */
@@ -36,6 +38,7 @@ export class TokenService {
    * LINEトークンを保存
    */
   public saveLineTokens(tokens: AuthTokens): void {
+    console.log("👀 Saving line tokens...")
     if (typeof document !== "undefined") {
       document.cookie = `line_access_token=${tokens.accessToken}; path=/; secure; samesite=strict`;
       document.cookie = `line_refresh_token=${tokens.refreshToken}; path=/; secure; samesite=strict`;
@@ -101,8 +104,6 @@ export class TokenService {
     }
 
     try {
-      const { lineAuth } = await import("./firebase-config");
-      
       if (!lineAuth.currentUser) {
         return false;
       }
@@ -126,8 +127,6 @@ export class TokenService {
     }
 
     try {
-      const { phoneAuth } = await import("./firebase-config");
-      
       if (!phoneAuth.currentUser) {
         return false;
       }
@@ -148,7 +147,7 @@ export class TokenService {
     try {
       const isLineValid = await this.isLineTokenValid(tokens);
       if (isLineValid) return true;
-      
+
       const isPhoneValid = await this.isPhoneTokenValid(tokens);
       return isPhoneValid;
     } catch (error) {
@@ -193,7 +192,7 @@ export class TokenService {
    */
   private getCookie(name: string): string | null {
     if (typeof document === "undefined") return null;
-    
+
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {

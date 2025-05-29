@@ -18,6 +18,7 @@ export const useUserData = (
       onAuthStateChange("user_registered");
 
       const updateUserRegistrationState = async () => {
+        console.log("👀 updateUserRegistrationState started!")
         try {
           const timestamp = new Date().toISOString();
           console.log(`🔍 [${timestamp}] Updating user registration state in useEffect`);

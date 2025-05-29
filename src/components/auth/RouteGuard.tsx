@@ -52,10 +52,6 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     authCheck();
 
-    const handleRouteChange = () => {
-      authCheck();
-    };
-
     return () => {};
   }, [pathname, authenticationState, loading, userLoading, router, authRedirectService]);
 

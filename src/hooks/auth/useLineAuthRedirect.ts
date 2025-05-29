@@ -18,12 +18,14 @@ export const useLineAuthRedirect = (
 
   useEffect(() => {
     const handleLineAuthRedirect = async () => {
+      console.log("👀 handleLineAuthRedirect started!")
       if (typeof window === "undefined") return;
       if (isAuthenticating) return;
       if (hasProcessedRedirect.current) return;
 
       const isReturnFromLineAuth = searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
       if (!isReturnFromLineAuth) return;
+      console.log("👀 handleLineAuthRedirect continue condition met!")
 
       if (authenticationState !== "unauthenticated" && authenticationState !== "loading") return;
 
@@ -36,9 +38,9 @@ export const useLineAuthRedirect = (
         isAuthenticating,
         environment,
         windowHref: window.location.href,
-        urlParams: { 
+        urlParams: {
           hasCode: searchParams.has("code"),
-          hasState: searchParams.has("state"), 
+          hasState: searchParams.has("state"),
           hasLiffClientId: searchParams.has("liffClientId")
         }
       });
@@ -48,6 +50,7 @@ export const useLineAuthRedirect = (
       try {
         const liffSuccess = await liffService.initialize();
         if (liffSuccess) {
+          console.log("👀 handleLineAuthRedirect liffSuccess!")
           const liffState = liffService.getState();
           console.log(`🔍 [${timestamp}] LIFF state after initialization:`, {
             isInitialized: liffState.isInitialized,

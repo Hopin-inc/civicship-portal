@@ -15,6 +15,7 @@ export const useFirebaseAuth = (
 
   useEffect(() => {
     const unsubscribe = lineAuth.onAuthStateChanged((user) => {
+      console.log("👀 lineAuth.onAuthStateChanged started!")
       onFirebaseUserChange(user);
 
       if (user) {

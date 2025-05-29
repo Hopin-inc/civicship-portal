@@ -17,6 +17,7 @@ export const usePhoneAuth = (
 
     if (isVerified) {
       const updatePhoneAuthState = async () => {
+        console.log("👀 updatePhoneAuthState started!")
         try {
           const timestamp = new Date().toISOString();
           console.log(`🔍 [${timestamp}] Updating phone auth state in useEffect - isVerified:`, isVerified);

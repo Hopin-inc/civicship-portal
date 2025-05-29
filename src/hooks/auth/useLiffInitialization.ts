@@ -7,7 +7,9 @@ import { AuthEnvironment } from "@/lib/auth/environment-detector";
 export const useLiffInitialization = (environment: AuthEnvironment, liffService: LiffService) => {
   useEffect(() => {
     const initializeLiff = async () => {
+      console.log("👀 initializeLiff started!")
       if (environment !== AuthEnvironment.LIFF) return;
+      console.log("👀 initializeLiff continue condition met!")
 
       const timestamp = new Date().toISOString();
       console.log(`🔍 [${timestamp}] Initializing LIFF in environment:`, environment);

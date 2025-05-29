@@ -18,16 +18,16 @@ export const useTokenExpiration = (
   useEffect(() => {
     const initializeAuthState = async () => {
       if (hasInitialized.current) return;
-      
+
       console.log("🔍 Initializing authentication state");
       await authService.initializeAuthState();
-      
+
       const tokenService = TokenService.getInstance();
       const phoneTokens = tokenService.getPhoneTokens();
       const lineTokens = tokenService.getLineTokens();
-      
+
       const currentState = authStateStore.getState();
-      
+
       if (currentState === "phone_authenticated") {
         const isPhoneValid = await tokenService.isPhoneTokenValid(phoneTokens);
         if (!isPhoneValid) {
@@ -35,7 +35,7 @@ export const useTokenExpiration = (
           await authService.handleTokenExpired("phone");
         }
       }
-      
+
       if (currentState === "line_authenticated" || currentState === "user_registered") {
         const isLineValid = await tokenService.isLineTokenValid(lineTokens);
         if (!isLineValid) {
@@ -43,7 +43,7 @@ export const useTokenExpiration = (
           await authService.handleTokenExpired("line");
         }
       }
-      
+
       hasInitialized.current = true;
     };
 
@@ -55,13 +55,13 @@ export const useTokenExpiration = (
 
     authStateStore.addStateChangeListener(handleStateChange);
 
-    const handleTokenExpired = (event: Event) => {
+    const handleTokenExpired = async (event: Event) => {
       const customEvent = event as CustomEvent<{ source: string }>;
       const { source } = customEvent.detail;
 
       if (source === "graphql" || source === "network") {
         if (authenticationState === "line_authenticated" || authenticationState === "user_registered") {
-          authService.handleTokenExpired("line");
+          await authService.handleTokenExpired("line");
           if (typeof window !== "undefined") {
             const event = new CustomEvent("auth:renew-line-token", { detail: {} });
             window.dispatchEvent(event);
@@ -70,7 +70,7 @@ export const useTokenExpiration = (
         }
 
         if (authenticationState === "phone_authenticated") {
-          authService.handleTokenExpired("phone");
+          await authService.handleTokenExpired("phone");
           if (typeof window !== "undefined") {
             const event = new CustomEvent("auth:renew-phone-token", { detail: {} });
             window.dispatchEvent(event);
@@ -81,7 +81,7 @@ export const useTokenExpiration = (
         toast.error("認証の有効期限が切れました", {
           description: "再度ログインしてください",
         });
-        logout();
+        await logout();
       }
     };
 
@@ -95,5 +95,5 @@ export const useTokenExpiration = (
         window.removeEventListener("auth:token-expired", handleTokenExpired);
       }
     };
-  }, [logout]); // Removed authenticationState, authService, authStateStore, onAuthStateChange to prevent re-runs
+  }, [authService, authStateStore, authenticationState, logout, onAuthStateChange]);
 };

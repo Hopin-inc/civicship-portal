@@ -31,7 +31,7 @@ export class AuthService {
    */
   public async initializeAuthState(): Promise<void> {
     console.log("🔍 Initializing authentication state...");
-    
+
     const currentState = this.authStateStore.getState();
     if (currentState === "user_registered") {
       console.log("✅ User already registered, maintaining state");
@@ -40,10 +40,10 @@ export class AuthService {
 
     const lineTokens = this.tokenService.getLineTokens();
     const phoneTokens = this.tokenService.getPhoneTokens();
-    
+
     if (lineTokens.accessToken && await this.tokenService.isLineTokenValid(lineTokens)) {
       console.log("📱 Valid LINE tokens found");
-      
+
       if (phoneTokens.accessToken && await this.tokenService.isPhoneTokenValid(phoneTokens) && phoneTokens.phoneUid) {
         console.log("📞 Valid phone tokens found");
         this.authStateStore.setState("phone_authenticated");
@@ -64,7 +64,7 @@ export class AuthService {
     console.log("✅ LINE authentication successful");
     this.authStateStore.setState("line_authenticated");
   }
-  
+
   /**
    * LINE認証状態の変更を処理
    */
@@ -84,7 +84,7 @@ export class AuthService {
     console.log("✅ Phone authentication successful");
     this.authStateStore.setState("phone_authenticated");
   }
-  
+
   /**
    * 電話番号認証状態の変更を処理
    */
@@ -120,43 +120,32 @@ export class AuthService {
       console.log("🔄 LINE token expired, redirecting to login");
       this.tokenService.clearLineTokens();
       this.authStateStore.forceSetState("unauthenticated");
-      
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
     } else {
       console.log("🔄 Phone token expired, checking user registration status");
       this.tokenService.clearPhoneTokens();
-      
+
       const currentState = this.authStateStore.getState();
       if (currentState === "user_registered") {
         console.log("📱 User already registered, checking LINE token validity");
         const lineTokens = this.tokenService.getLineTokens();
         const isLineValid = await this.tokenService.isLineTokenValid(lineTokens);
-        
+
         if (isLineValid) {
           console.log("✅ LINE tokens still valid, maintaining user_registered state");
           return;
         } else {
           console.log("❌ Both LINE and phone tokens expired, forcing logout");
           this.authStateStore.forceSetState("unauthenticated");
-          if (typeof window !== "undefined") {
-            window.location.href = "/login";
-          }
         }
       } else {
         console.log("📱 User not registered, transitioning to appropriate state");
         const lineTokens = this.tokenService.getLineTokens();
         const isLineValid = await this.tokenService.isLineTokenValid(lineTokens);
-        
+
         if (isLineValid) {
           this.authStateStore.forceSetState("line_authenticated");
         } else {
           this.authStateStore.forceSetState("unauthenticated");
-        }
-        
-        if (typeof window !== "undefined") {
-          window.location.href = "/sign-up/phone-verification";
         }
       }
     }

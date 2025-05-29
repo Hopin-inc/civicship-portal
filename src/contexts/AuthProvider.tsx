@@ -93,8 +93,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticating: false,
   });
 
-  const router = useRouter();
-
   const [userSignUp] = useMutation(USER_SIGN_UP);
 
   const { data: userData, loading: userLoading, refetch: refetchUser } = useQuery(GET_CURRENT_USER, {
@@ -106,6 +104,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const phoneAuthService = PhoneAuthService.getInstance();
 
   const setFirebaseUser = useCallback((user: User | null) => {
+    console.log("👀 Setting firebase user: ", user?.uid)
     setState(prev => ({ ...prev, firebaseUser: user }));
   }, []);
 

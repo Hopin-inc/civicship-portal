@@ -14,9 +14,11 @@ export const useAutoLogin = (
 ) => {
   useEffect(() => {
     const handleAutoLogin = async () => {
+      console.log("👀 handleAutoLogin started!")
       if (environment !== AuthEnvironment.LIFF) return;
       if (authenticationState !== "unauthenticated") return;
       if (isAuthenticating) return;
+      console.log("👀 handleAutoLogin continue condition met!")
 
       const liffState = liffService.getState();
       if (!liffState.isInitialized || !liffState.isLoggedIn) return;
