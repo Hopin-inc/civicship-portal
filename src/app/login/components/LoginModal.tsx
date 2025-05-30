@@ -13,9 +13,10 @@ import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 type LoginModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  nextPath?: string;
 };
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
@@ -33,10 +34,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     setError(null);
 
     try {
-      const currentPath = typeof window !== "undefined" ? window.location.pathname : "/";
-      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(currentPath);
-      console.log("🚀 Using redirect path from AuthRedirectService in modal:", redirectPath);
-
+      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath ?? null);
       await loginWithLiff(redirectPath);
       setIsLoading(false);
       onClose();
