@@ -227,13 +227,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const handleLineAuthRedirect = async () => {
       if (typeof window === "undefined") return;
-      if (state.isAuthenticating) return;
+
+      if (state.isAuthenticating) {
+        console.log("[Debug] Skipping: already authenticating");
+        return;
+      }
 
       if (
         state.authenticationState !== "unauthenticated" &&
         state.authenticationState !== "loading"
-      )
+      ) {
+        console.log("[Debug] Skipping: already authenticated or in progress");
         return;
+      }
+
+      const { isInitialized, isLoggedIn } = liffService.getState();
+
+      if (isInitialized && !isLoggedIn) {
+        console.log("[Debug] LIFF initialized but user not logged in - skipping redirect logic");
+        return;
+      }
 
       const timestamp = new Date().toISOString();
       console.log(`🔍 [${timestamp}] Detected LINE authentication redirect`);
@@ -253,8 +266,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           return;
         }
 
-        const { isInitialized, isLoggedIn, profile } = liffService.getState();
-        console.log("LIFF State:", { isInitialized, isLoggedIn, userId: profile?.userId });
+        const { isLoggedIn, profile } = liffService.getState();
+        console.log("LIFF State:", {
+          isInitialized: true,
+          isLoggedIn,
+          userId: profile?.userId || "none",
+        });
 
         if (!isLoggedIn) {
           console.log("User not logged in via LIFF");
