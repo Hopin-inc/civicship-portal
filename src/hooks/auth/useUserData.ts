@@ -21,7 +21,7 @@ export const useUserData = (
       userId: userData?.currentUser?.user?.id || 'none'
     });
 
-    if (userData?.currentUser?.user) {
+    if (userData?.currentUser) {
       console.log(`🔄 [${hookTimestamp}] Setting currentUser and updating auth state to user_registered`);
       onCurrentUserChange(userData.currentUser.user);
       onAuthStateChange("user_registered");
