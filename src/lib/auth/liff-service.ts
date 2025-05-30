@@ -101,10 +101,6 @@ export class LiffService {
 
   /**
    * LIFFでログイン
-   * @returns ログインが成功したかどうか
-   */
-  /**
-   * LIFFでログイン
    * @param redirectPath リダイレクト先のパス（オプション）
    * @returns ログインが成功したかどうか
    */
