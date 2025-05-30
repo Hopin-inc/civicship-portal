@@ -9,7 +9,7 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { getLiffLoginErrorMessage } from "@/app/login/utils/getLiffLoginErrorMessage";
 import { toast } from "sonner";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -17,6 +17,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 export default function LoginPage() {
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/";
+  const router = useRouter();
 
   const headerConfig = useMemo(
     () => ({
@@ -28,7 +29,7 @@ export default function LoginPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { loginWithLiff, isAuthenticating, loading } = useAuth();
+  const { loginWithLiff, isAuthenticating, authenticationState, loading } = useAuth();
   const authRedirectService = AuthRedirectService.getInstance();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -36,8 +37,17 @@ export default function LoginPage() {
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
 
+  useEffect(() => {
+    if (!isAuthenticating && authenticationState === "line_authenticated") {
+      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
+      router.replace(redirectPath);
+    }
+  }, [authenticationState, router, nextPath, authRedirectService, isAuthenticating]);
+
   // 📦 ログイン処理
   const handleLogin = async () => {
+    console.log("🔥 handleLogin triggered");
+
     if (!agreedTerms || !agreedPrivacy) {
       setError("すべての同意が必要です");
       return;
@@ -50,7 +60,7 @@ export default function LoginPage() {
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
       console.log("🚀 Using redirect path from AuthRedirectService:", redirectPath);
 
-      const success = await loginWithLiff(nextPath);
+      const success = await loginWithLiff(redirectPath);
 
       if (success) {
         console.log("🚀 LINE authentication succeeded. Redirecting...");

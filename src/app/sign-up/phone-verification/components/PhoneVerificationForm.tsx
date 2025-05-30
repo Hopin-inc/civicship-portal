@@ -1,31 +1,24 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatPhoneNumber } from "@/app/sign-up/phone-verification/utils";
 import { Button } from "@/components/ui/button";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export function PhoneVerificationForm() {
-  const { phoneAuth, isAuthenticated, isPhoneVerified, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
 
-  const headerConfig = useMemo(
-    () => ({
-      title: "電話番号認証",
-      showBackButton: false,
-      showLogo: false,
-    }),
-    [],
-  );
-  useHeaderConfig(headerConfig);
+  const authRedirectService = AuthRedirectService.getInstance();
 
+  // ==================================
+  const { phoneAuth, isAuthenticated, loading, authenticationState } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -33,24 +26,15 @@ export function PhoneVerificationForm() {
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
+  // ==================================
   const [isReloading, setIsReloading] = useState(false);
   const [isPhoneSubmitting, setIsSubmitting] = useState(false);
   const [isCodeVerifying, setIsCodeVerifying] = useState(false);
+  // ==================================
 
   const formattedPhone = formatPhoneNumber(phoneNumber);
   const digitsOnly = formattedPhone.replace(/\D/g, "");
   const isPhoneValid = digitsOnly.startsWith("81") && digitsOnly.length === 12;
-
-  useEffect(() => {
-    if (loading) return;
-    if (!isAuthenticated) {
-      let loginWithNext = "/login";
-      if (nextParam) {
-        loginWithNext += `?next=${nextParam}`;
-      }
-      router.replace(loginWithNext);
-    }
-  }, [isAuthenticated, isPhoneVerified, loading, router, nextParam]);
 
   useEffect(() => {
     if (recaptchaContainerRef.current) {
@@ -90,8 +74,10 @@ export function PhoneVerificationForm() {
       const success = await phoneAuth.verifyPhoneCode(verificationCode);
       if (success) {
         toast.success("電話番号認証が完了しました");
-        const nextUrl = nextParam ? `/sign-up?next=${nextParam}` : "/sign-up";
-        router.push(nextUrl);
+
+        const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextParam);
+
+        router.push(redirectPath ?? "/");
       } else {
         toast.error("認証コードが無効です");
       }

@@ -3,6 +3,7 @@
 import React from "react";
 import { List, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
 
 interface PlaceToggleButtonProps {
   isMapMode: boolean;
@@ -10,8 +11,11 @@ interface PlaceToggleButtonProps {
 }
 
 const PlaceToggleButton: React.FC<PlaceToggleButtonProps> = ({ isMapMode, onClick }) => {
+  const env = detectEnvironment();
+  const isLiff = env === AuthEnvironment.LIFF;
+
   return (
-    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50">
+    <div className={`fixed left-1/2 -translate-x-1/2 z-50 ${isLiff ? "bottom-28" : "bottom-24"}`}>
       <Button onClick={onClick} variant={"secondary"} size={"md"}>
         {isMapMode ? (
           <>

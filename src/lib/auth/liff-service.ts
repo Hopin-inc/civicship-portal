@@ -47,6 +47,14 @@ export class LiffService {
     };
   }
 
+  public getLiffUrl(redirectPath?: string): string {
+    const baseUrl = `https://liff.line.me/${this.liffId}`;
+    if (!redirectPath) return baseUrl;
+
+    const encodedNext = encodeURIComponent(redirectPath);
+    return `${baseUrl}?next=${encodedNext}`;
+  }
+
   /**
    * シングルトンインスタンスを取得
    * @param liffId LIFF ID（初回のみ必要）
@@ -99,10 +107,6 @@ export class LiffService {
     }
   }
 
-  /**
-   * LIFFでログイン
-   * @returns ログインが成功したかどうか
-   */
   /**
    * LIFFでログイン
    * @param redirectPath リダイレクト先のパス（オプション）

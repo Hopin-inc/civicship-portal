@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import LoginModal from "@/app/login/components/LoginModal";
 import ReservationDetailsCard from "@/app/reservation/confirm/components/ReservationDetailsCard";
 import PaymentSection from "@/app/reservation/confirm/components/PaymentSection";
 import NotesSection from "@/app/reservation/confirm/components/NotesSection";
@@ -23,6 +22,7 @@ import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReserv
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
+import { LiffService } from "@/lib/auth/liff-service";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -43,6 +43,8 @@ export default function ConfirmPage() {
     participantCount: initialParticipantCount,
     communityId,
   } = useReservationParams();
+  const currentPath =
+    typeof window !== "undefined" ? window.location.pathname + window.location.search : "/";
 
   const [participantCount, setParticipantCount] = useState<number>(initialParticipantCount);
 
@@ -74,11 +76,17 @@ export default function ConfirmPage() {
   if (!opportunity) return notFound();
 
   const handleConfirm = async () => {
+    if (!user) {
+      const liffService = LiffService.getInstance();
+      window.location.href = liffService.getLiffUrl(currentPath);
+      return;
+    }
+
     const result = await handleReservation({
       opportunity,
       selectedSlot,
       wallets,
-      user,
+      user: user ? { id: user.id } : null,
       ticketCounter,
       participantCount,
       useTickets: ui.useTickets,
@@ -90,13 +98,9 @@ export default function ConfirmPage() {
     }
 
     if (!result.success) {
-      if (!user) {
-        ui.setIsLoginModalOpen(true);
-      } else {
-        const message = errorMessages[result.code] ?? "予期しないエラーが発生しました。";
-        toast.error(message);
-        console.error("Reservation failed:", result.code);
-      }
+      const message = errorMessages[result.code] ?? "予期しないエラーが発生しました。";
+      toast.error(message);
+      console.error("Reservation failed:", result.code);
       return;
     }
 
@@ -117,7 +121,6 @@ export default function ConfirmPage() {
   return (
     <>
       <main className="min-h-screen">
-        <LoginModal isOpen={ui.isLoginModalOpen} onClose={() => ui.setIsLoginModalOpen(false)} />
         <div className="px-6 py-4 mt-4">
           <OpportunityCardHorizontal
             opportunity={{
@@ -161,16 +164,29 @@ export default function ConfirmPage() {
         <div className="mb-4 mt-2" />
         <NotesSection />
         <footer className="max-w-mobile-l w-full h-20 flex items-center px-4 py-6 justify-between mx-auto">
-          <Button
-            size="lg"
-            className="mx-auto px-20"
-            onClick={handleConfirm}
-            disabled={
-              creatingReservation || (ui.useTickets && ticketCounter.count > availableTickets)
-            }
-          >
-            {creatingReservation ? "申込処理中..." : "申し込みを確定"}
-          </Button>
+          {user ? (
+            <Button
+              size="lg"
+              className="mx-auto px-20"
+              onClick={handleConfirm}
+              disabled={
+                creatingReservation || (ui.useTickets && ticketCounter.count > availableTickets)
+              }
+            >
+              {creatingReservation ? "申込処理中..." : "申し込みを確定"}
+            </Button>
+          ) : (
+            <Button
+              size="lg"
+              className="mx-auto px-20 bg-[#06C755] hover:bg-[#05B74B] text-white"
+              onClick={() => {
+                const liffService = LiffService.getInstance();
+                window.location.href = liffService.getLiffUrl(currentPath);
+              }}
+            >
+              LINE登録して申込
+            </Button>
+          )}
         </footer>
       </main>
     </>
