@@ -11,11 +11,14 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export function PhoneVerificationForm() {
-  const { phoneAuth, isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
+
   const authRedirectService = AuthRedirectService.getInstance();
 
+  // ==================================
+  const { phoneAuth, isAuthenticated, loading, authenticationState } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -23,27 +26,15 @@ export function PhoneVerificationForm() {
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
+  // ==================================
   const [isReloading, setIsReloading] = useState(false);
   const [isPhoneSubmitting, setIsSubmitting] = useState(false);
   const [isCodeVerifying, setIsCodeVerifying] = useState(false);
+  // ==================================
 
   const formattedPhone = formatPhoneNumber(phoneNumber);
   const digitsOnly = formattedPhone.replace(/\D/g, "");
   const isPhoneValid = digitsOnly.startsWith("81") && digitsOnly.length === 12;
-
-  const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
-
-  useEffect(() => {
-    if (loading) return;
-    const redirectPath = authRedirectService.getRedirectPath(
-      "/sign-up/phone-verification",
-      nextParam,
-    );
-
-    if (!isAuthenticated && redirectPath) {
-      router.replace(redirectPath);
-    }
-  }, [isAuthenticated, loading, router, nextParam, authRedirectService]);
 
   useEffect(() => {
     if (recaptchaContainerRef.current) {
@@ -84,10 +75,7 @@ export function PhoneVerificationForm() {
       if (success) {
         toast.success("電話番号認証が完了しました");
 
-        const redirectPath = authRedirectService.getRedirectPath(
-          "/sign-up/phone-verification",
-          nextParam,
-        );
+        const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextParam);
 
         router.push(redirectPath ?? "/");
       } else {

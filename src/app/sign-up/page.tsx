@@ -10,21 +10,21 @@ import { useRouter, useSearchParams } from "next/navigation";
 export default function RegisterAccount() {
   const authRedirectService = AuthRedirectService.getInstance();
 
-  const { loading, authenticationState } = useAuth();
+  const { loading, authenticationState, user } = useAuth();
   const router = useRouter();
 
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next");
 
   useEffect(() => {
-    if (!loading && authenticationState === "user_registered") {
+    if (!loading && authenticationState === "user_registered" && user) {
       const redirectPath = authRedirectService.getRedirectPath("sign-up", nextParam);
 
       if (redirectPath) {
         router.replace(redirectPath);
       }
     }
-  }, [loading, router, authRedirectService, authenticationState, nextParam]);
+  }, [loading, router, authRedirectService, authenticationState, nextParam, user]);
 
   if (loading) {
     return <LoadingIndicator />;
