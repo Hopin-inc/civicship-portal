@@ -65,6 +65,8 @@ export class AuthRedirectService {
     const authState = this.authStateManager.getState();
     const nextParam = next ? `?next=${next}` : "";
 
+    console.log("getRedirectPath", { pathname, authState, next, nextParam });
+
     if (authState === "loading") {
       return null;
     }
@@ -85,15 +87,29 @@ export class AuthRedirectService {
     }
 
     if (this.isPhoneVerificationRequiredPath(pathname)) {
-      if (authState === "unauthenticated") {
-        return `/login${nextParam}`;
-      }
+      switch (authState) {
+        case "unauthenticated":
+          return `/login${nextParam}`;
 
-      if (
-        (authState === "line_authenticated" || authState === "line_token_expired") &&
-        pathname !== "/sign-up/phone-verification"
-      ) {
-        return `/sign-up/phone-verification${nextParam}`;
+        case "line_authenticated":
+        case "line_token_expired":
+          if (pathname !== "/sign-up/phone-verification") {
+            return `/sign-up/phone-verification${nextParam}`;
+          }
+          return null; // stay here
+
+        case "phone_authenticated":
+          if (pathname !== "/sign-up") {
+            return `/sign-up${nextParam}`;
+          }
+          return null; // stay here
+
+        case "user_registered":
+        default:
+          if (next && next.startsWith("/") && !next.startsWith("/sign-up")) {
+            return next;
+          }
+          return "/";
       }
     }
 
@@ -103,7 +119,15 @@ export class AuthRedirectService {
       }
     }
 
-    if (pathname === "/login" && authState === "user_registered") {
+    if ((pathname === "/login" || pathname === "/sign-up") && authState === "user_registered") {
+      if (
+        next &&
+        next.startsWith("/") &&
+        !next.startsWith("/login") &&
+        !next.startsWith("/sign-up")
+      ) {
+        return next;
+      }
       return "/";
     }
 
@@ -117,26 +141,24 @@ export class AuthRedirectService {
    */
   public getPostLineAuthRedirectPath(nextPath: string | null): string {
     const next = nextPath ? decodeURIComponent(nextPath) : null;
+    const nextParam = next ? `?next=${next}` : "";
+
     const authState = this.authStateManager.getState();
 
-    // TODO ここの遷移あってるかチェックする
-
     switch (authState) {
-      case "loading":
-      case "user_registered":
-        return next ?? "/";
-
       case "unauthenticated":
       case "line_token_expired":
-        return `/login${next ? `?next=${next}` : ""}`;
+        return `/login${nextParam}`;
 
       case "line_authenticated":
       case "phone_token_expired":
-        return `/sign-up/phone-verification${next ? `?next=${next}` : ""}`;
+        return `/sign-up/phone-verification${nextParam}`;
 
       case "phone_authenticated":
-        return `/sign-up${next ? `?next=${next}` : ""}`;
+        return `/sign-up${nextParam}`;
 
+      case "loading":
+      case "user_registered":
       default:
         return next ?? "/";
     }

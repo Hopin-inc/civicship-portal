@@ -22,14 +22,16 @@ export async function generateMetadata(input: Promise<Props>): Promise<Metadata>
 
   if (!res) return fallbackMetadata;
 
+  const description = res.introduction ?? res.body;
+
   return {
     title: res.title,
-    description: res.introduction ?? res.body,
+    description,
     openGraph: {
       type: "article",
       title: res.title,
       url: `https://www.neo88.app/articles/${id}`,
-      description: res.introduction ?? res.body,
+      description,
       images: res.thumbnail
         ? [
             {

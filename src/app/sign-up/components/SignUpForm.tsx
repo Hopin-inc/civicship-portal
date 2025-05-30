@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -41,25 +41,7 @@ export function SignUpForm() {
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   const authRedirectService = AuthRedirectService.getInstance();
-
-  useEffect(() => {
-    if (!loading) {
-      const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
-      console.log("[Debug] getRedirectPath('/sign-up', nextParam) called with:", {
-        nextParam,
-        redirectPath,
-        isAuthenticated,
-        isPhoneVerified,
-      });
-
-      if (redirectPath) {
-        console.log("[Debug] Redirecting to:", redirectPath);
-        router.replace(redirectPath);
-      } else {
-        console.log("[Debug] No redirect needed for /sign-up");
-      }
-    }
-  }, [isAuthenticated, isPhoneVerified, loading, router, nextParam, authRedirectService]);
+  const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -74,11 +56,7 @@ export function SignUpForm() {
     try {
       if (!isPhoneVerified) {
         toast.error("電話番号認証が完了していません");
-        let signUpWithNext = "/sign-up/phone-verification";
-        if (nextParam) {
-          signUpWithNext += `?next=${nextParam}`;
-        }
-        router.replace(signUpWithNext);
+        router.replace(redirectPath ?? "/users/me");
         return;
       }
 
@@ -87,8 +65,7 @@ export function SignUpForm() {
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
         setIsRedirecting(true);
-        const redirectUrl = nextParam || "/activities";
-        router.push(redirectUrl);
+        router.push(redirectPath ?? "/users/me");
       }
     } catch (error) {
       console.error("Sign up error:", error);
