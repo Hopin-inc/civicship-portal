@@ -63,8 +63,9 @@ export class AuthRedirectService {
    */
   public getRedirectPath(pathname: string, next?: string | null): string | null {
     const authState = this.authStateManager.getState();
-    const safeNext = this.sanitizeNext(next);
-    const nextParam = safeNext ? `?next=${safeNext}` : "";
+    const nextParam = next ? `?next=${next}` : "";
+
+    console.log("getRedirectPath", { pathname, authState, next, nextParam });
 
     if (authState === "loading") {
       return null;
@@ -98,7 +99,7 @@ export class AuthRedirectService {
           return null; // stay here
 
         case "phone_authenticated":
-          if (pathname !== `/sign-up`) {
+          if (pathname !== "/sign-up") {
             return `/sign-up${nextParam}`;
           }
           return null; // stay here
@@ -139,8 +140,7 @@ export class AuthRedirectService {
    * @param nextPath
    */
   public getPostLineAuthRedirectPath(nextPath: string | null): string {
-    const rawNext = nextPath ? decodeURIComponent(nextPath) : null;
-    const next = this.sanitizeNext(rawNext);
+    const next = nextPath ? decodeURIComponent(nextPath) : null;
     const nextParam = next ? `?next=${next}` : "";
 
     const authState = this.authStateManager.getState();
@@ -194,13 +194,5 @@ export class AuthRedirectService {
     }
 
     return { hasAccess: true, redirectPath: null };
-  }
-
-  private sanitizeNext(next?: string | null): string | null {
-    if (!next) return null;
-    if (!next.startsWith("/")) return null;
-    if (next.includes("?next=")) return null;
-    if (next.startsWith("/login") || next.startsWith("/sign-up")) return null;
-    return next;
   }
 }
