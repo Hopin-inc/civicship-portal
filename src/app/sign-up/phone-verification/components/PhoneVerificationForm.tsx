@@ -11,7 +11,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export function PhoneVerificationForm() {
-  const { phoneAuth, isAuthenticated, isPhoneVerified, loading } = useAuth();
+  const { phoneAuth, isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const authRedirectService = AuthRedirectService.getInstance();
@@ -35,8 +35,11 @@ export function PhoneVerificationForm() {
 
   useEffect(() => {
     if (loading) return;
+    const redirectPath = authRedirectService.getRedirectPath(
+      "/sign-up/phone-verification",
+      nextParam,
+    );
 
-    const redirectPath = authRedirectService.getRedirectPath("/login", nextParam);
     if (!isAuthenticated && redirectPath) {
       router.replace(redirectPath);
     }
@@ -80,8 +83,13 @@ export function PhoneVerificationForm() {
       const success = await phoneAuth.verifyPhoneCode(verificationCode);
       if (success) {
         toast.success("電話番号認証が完了しました");
-        const nextUrl = nextParam ? `/sign-up?next=${nextParam}` : "/sign-up";
-        router.push(nextUrl);
+
+        const redirectPath = authRedirectService.getRedirectPath(
+          "/sign-up/phone-verification",
+          nextParam,
+        );
+
+        router.push(redirectPath ?? "/");
       } else {
         toast.error("認証コードが無効です");
       }
