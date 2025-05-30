@@ -80,6 +80,7 @@ export const presenterPlaceCard = (edges: GqlPlaceEdge[]): IPlaceCard[] => {
 // #NOTE 拠点に複数人の案内人の体験が掲載されている場合、意図しない順序で表示されている拠点のID（順序を逆にすることで簡易的に解決する）
 const REVERSE_ORDER_PLACE_IDS = [
   "cmahru0gg001vs60nnkqrgugc", // 坂東商店guest room〜藍染めと宿〜 https://www.neo88.app/places/cmahru0gg001vs60nnkqrgugc
+  "cmahrua5f001xs60n3vp4csom",
 ];
 
 const getOrderedArray = <T>(array: T[] | null | undefined, shouldReverse: boolean): T[] => {

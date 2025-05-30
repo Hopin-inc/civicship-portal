@@ -46,6 +46,9 @@ export const GET_PLACE = gql`
       ...PlaceFields
       opportunities {
         ...OpportunityFields
+        place {
+          ...PlaceFields
+        }
         createdByUser {
           ...UserFields
           articlesAboutMe {
@@ -54,7 +57,7 @@ export const GET_PLACE = gql`
         }
         articles {
           ...ArticleFields
-          authors {
+          relatedUsers {
             ...UserFields
           }
         }
