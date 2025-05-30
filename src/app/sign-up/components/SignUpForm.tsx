@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -42,25 +42,6 @@ export function SignUpForm() {
 
   const authRedirectService = AuthRedirectService.getInstance();
 
-  useEffect(() => {
-    if (!loading) {
-      const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
-      console.log("[Debug] getRedirectPath('/sign-up', nextParam) called with:", {
-        nextParam,
-        redirectPath,
-        isAuthenticated,
-        isPhoneVerified,
-      });
-
-      if (redirectPath) {
-        console.log("[Debug] Redirecting to:", redirectPath);
-        router.replace(redirectPath);
-      } else {
-        console.log("[Debug] No redirect needed for /sign-up");
-      }
-    }
-  }, [isAuthenticated, isPhoneVerified, loading, router, nextParam, authRedirectService]);
-
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -74,11 +55,8 @@ export function SignUpForm() {
     try {
       if (!isPhoneVerified) {
         toast.error("電話番号認証が完了していません");
-        const redirectPath = authRedirectService.getRedirectPath(
-          "/sign-up/phone-verification",
-          nextParam,
-        );
-        router.replace(redirectPath ?? "/sign-up/phone-verification");
+        const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
+        router.replace(redirectPath ?? "/users/me");
         return;
       }
 
