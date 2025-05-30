@@ -61,16 +61,7 @@ const PlaceMapView: React.FC<PlaceMapViewProps> = ({
             </div>
           </motion.div>
         ) : (
-          <motion.div
-            key="toggle-button"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-[80px] right-4 z-50"
-          >
-            <PlaceToggleButton isMapMode={true} onClick={toggleMode} />
-          </motion.div>
+          <PlaceToggleButton isMapMode={true} onClick={toggleMode} />
         )}
       </AnimatePresence>
     </div>
