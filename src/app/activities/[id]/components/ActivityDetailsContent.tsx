@@ -161,6 +161,7 @@ const PlaceSection = ({ place }: { place: OpportunityPlace }) => {
         <p className="text-body-md font-bold">{place.name}</p>
         <p className="text-body-sm text-caption mb-2">{place.address}</p>
         <AddressMap
+          placeId={place.id}
           address={place.address}
           markerTitle={place.name || "集合場所"}
           height={300}
