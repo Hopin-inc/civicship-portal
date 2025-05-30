@@ -77,19 +77,40 @@ export const presenterPlaceCard = (edges: GqlPlaceEdge[]): IPlaceCard[] => {
   return places;
 };
 
+// #NOTE 拠点に複数人の案内人の体験が掲載されている場合、意図しない順序で表示されている拠点のID（順序を逆にすることで簡易的に解決する）
+const REVERSE_ORDER_PLACE_IDS = [
+  "cmahru0gg001vs60nnkqrgugc", // 坂東商店guest room〜藍染めと宿〜 https://www.neo88.app/places/cmahru0gg001vs60nnkqrgugc
+];
+
+const getOrderedArray = <T>(array: T[] | null | undefined, shouldReverse: boolean): T[] => {
+  if (!array) return [];
+  return shouldReverse ? [...array].reverse() : array;
+};
+
 export const presenterPlaceDetail = (place: GqlPlace): IPlaceDetail => {
   const opportunity = place.opportunities?.[0];
   const user = opportunity?.createdByUser;
 
   const pin = presenterPlacePin(place);
-  const opportunities = place.opportunities ?? [];
+
+  const isReverseOrder = REVERSE_ORDER_PLACE_IDS.includes(place.id);
+
+  const opportunities = getOrderedArray(place.opportunities, isReverseOrder);
   const publicOpportunities = opportunities.filter(
     (o) => o.publishStatus === GqlPublishStatus.Public,
   );
+
   const currentlyHiringOpportunities = publicOpportunities.map(presenterActivityCard);
 
-  const relatedArticles = getRelatedArticles(user, publicOpportunities);
-  const images = getPlaceImages(place.image, currentlyHiringOpportunities);
+  const relatedArticles = getOrderedArray(
+    getRelatedArticles(user, publicOpportunities),
+    isReverseOrder,
+  );
+
+  const images = getOrderedArray(
+    getPlaceImages(place.image, currentlyHiringOpportunities),
+    isReverseOrder,
+  );
 
   return {
     ...pin,

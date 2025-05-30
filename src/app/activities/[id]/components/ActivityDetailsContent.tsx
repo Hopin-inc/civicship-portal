@@ -27,7 +27,13 @@ interface ActivityDetailsContentProps {
   availableDates: ActivitySlot[];
   sameStateActivities: ActivityCard[];
   communityId?: string;
+  isExternalBooking: boolean;
 }
+
+// NOTE: キャンセルの注意事項を表示しない例外的な体験のID
+const HIDE_CANCEL_NOTICE_OPPORTUNITY_IDS = [
+  "cmap6xqwn001os60nllhcq65s", // 【直接予約】手島で摘む、夏だけのブラックベリー https://www.neo88.app/activities/cmap6xqwn001os60nllhcq65s?community_id=neo88
+];
 
 const ActivityDetailsContent = ({
   opportunity,
@@ -35,6 +41,7 @@ const ActivityDetailsContent = ({
   availableDates,
   sameStateActivities,
   communityId = "",
+  isExternalBooking,
 }: ActivityDetailsContentProps) => {
   return (
     <>
@@ -45,8 +52,12 @@ const ActivityDetailsContent = ({
         slots={availableDates}
         opportunityId={opportunity.id}
         communityId={communityId}
+        isExternalBooking={isExternalBooking}
       />
-      <NoticeSection />
+      <NoticeSection
+        hideCancelNotice={HIDE_CANCEL_NOTICE_OPPORTUNITY_IDS.includes(opportunity.id)}
+        isExternalBooking={isExternalBooking}
+      />
       <SameStateActivities
         header={"近くでおすすめの体験"}
         opportunities={sameStateActivities}
@@ -161,6 +172,7 @@ const PlaceSection = ({ place }: { place: OpportunityPlace }) => {
         <p className="text-body-md font-bold">{place.name}</p>
         <p className="text-body-sm text-caption mb-2">{place.address}</p>
         <AddressMap
+          placeId={place.id}
           address={place.address}
           markerTitle={place.name || "集合場所"}
           height={300}
@@ -179,10 +191,12 @@ const ScheduleSection = ({
   slots,
   opportunityId,
   communityId,
+  isExternalBooking,
 }: {
   slots: ActivitySlot[];
   opportunityId: string;
   communityId: string;
+  isExternalBooking: boolean;
 }) => {
   const query = new URLSearchParams({
     id: opportunityId,
@@ -191,79 +205,117 @@ const ScheduleSection = ({
 
   const hasSchedule = slots.length > 0;
 
+  const renderScheduleContent = () => (
+    <>
+      <p className="text-muted-foreground font-bold mb-4 px-1">※予約は各日程の7日前まで受付中 </p>
+      <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
+        {slots.map((slot) => (
+          <div key={slot.id} className="flex-shrink-0 first:ml-0">
+            <ActivityScheduleCard
+              slot={slot}
+              opportunityId={opportunityId}
+              communityId={communityId}
+            />
+          </div>
+        ))}
+      </div>
+      <Link href={`/reservation/select-date?${query.toString()}`}>
+        <Button variant="secondary" size="md" className="w-full">
+          参加できる日程を探す
+        </Button>
+      </Link>
+    </>
+  );
+
+  const renderEmptyScheduleMessage = () => {
+    const messageContent = isExternalBooking
+      ? {
+          title: "日程は別途ご確認ください",
+          description:
+            "ページ上部の「体験できること」にある電話番号または外部リンクよりご確認ください",
+        }
+      : {
+          title: "現在予定されている日程はありません",
+          description:
+            "日程はまだ登録されていません。後日再度確認するか、主催者にお問い合わせください。",
+        };
+
+    return (
+      <div className="text-center py-8 px-4 bg-card rounded-lg border border-muted/20 flex flex-col items-center">
+        <CalendarX className="h-12 w-12 text-muted-foreground/50 mb-3" />
+        <p className="text-body-lg font-medium text-foreground">{messageContent.title}</p>
+        <p className="text-body-sm text-caption mt-2 max-w-xs">{messageContent.description}</p>
+      </div>
+    );
+  };
+
   return (
     <section className="pt-6 pb-8 mt-0">
       <h2 className="text-display-md text-foreground mb-4">開催日</h2>
       <div className="relative">
-        {hasSchedule ? (
-          <>
-            <p className="text-muted-foreground font-bold mb-4 px-1">
-              ※予約は各日程の7日前まで受付中{" "}
-            </p>
-            <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
-              {slots.map((slot, index) => (
-                <div key={index} className="flex-shrink-0 first:ml-0">
-                  <ActivityScheduleCard
-                    slot={slot}
-                    opportunityId={opportunityId}
-                    communityId={communityId}
-                  />
-                </div>
-              ))}
-            </div>
-            <Link href={`/reservation/select-date?${query.toString()}`}>
-              <Button variant="secondary" size="md" className="w-full">
-                参加できる日程を探す
-              </Button>
-            </Link>
-          </>
-        ) : (
-          <div className="text-center py-8 px-4 bg-card rounded-lg border border-muted/20 flex flex-col items-center">
-            <CalendarX className="h-12 w-12 text-muted-foreground/50 mb-3" />
-            <p className="text-body-lg font-medium text-foreground">
-              現在予定されている日程はありません
-            </p>
-            <p className="text-body-sm text-caption mt-2 max-w-xs">
-              日程はまだ登録されていません。後日再度確認するか、主催者にお問い合わせください。
-            </p>
-          </div>
-        )}
+        {hasSchedule ? renderScheduleContent() : renderEmptyScheduleMessage()}
       </div>
     </section>
   );
 };
 
-const NoticeSection: React.FC = () => {
+const NoticeSection: React.FC<{ isExternalBooking: boolean; hideCancelNotice: boolean }> = ({
+  isExternalBooking,
+  hideCancelNotice,
+}) => {
+  const commonNotices = [
+    {
+      text: "ホストによる確認後に、予約が確定します。",
+      isBold: true,
+    },
+    {
+      text: "キャンセルは開催日の7日前まで可能です。",
+      isBold: false,
+    },
+  ];
+
+  const externalBookingNotices = [
+    {
+      text: "日程の確定、もしくは中止の連絡方法は、事前にご確認ください。",
+      isBold: false,
+    },
+    {
+      text: "支払い方法は、事前にご確認ください。",
+      isBold: false,
+    },
+  ];
+
+  const normalBookingNotices = [
+    {
+      text: "実施確定または中止のどちらの場合でも、公式LINEからご連絡します。",
+      isBold: false,
+    },
+    {
+      text: "当日は現金をご用意下さい。",
+      isBold: false,
+    },
+  ];
+
+  const noticesToShow = [
+    ...commonNotices.slice(0, 1),
+    ...(isExternalBooking ? externalBookingNotices : normalBookingNotices),
+    ...(hideCancelNotice ? [] : commonNotices.slice(1)),
+  ];
+
   return (
     <section className="pt-6 pb-8 mt-0 bg-background-hover -mx-4 px-4">
       <h2 className="text-display-md text-foreground mb-4">注意事項</h2>
       <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <IconWrapper color="warning">
-            <AlertCircle size={20} strokeWidth={2.5} />
-          </IconWrapper>
-          <p className="text-body-md flex-1 font-bold">ホストによる確認後に、予約が確定します。</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <IconWrapper color="warning">
-            <AlertCircle size={20} strokeWidth={2.5} />
-          </IconWrapper>
-          <p className="text-body-md flex-1">
-            実施確定または中止のどちらの場合でも、公式LINEからご連絡します。
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <IconWrapper color="warning">
-            <AlertCircle size={20} strokeWidth={2.5} />
-          </IconWrapper>
-          <p className="text-body-md flex-1">当日は現金をご用意下さい。</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <IconWrapper color="warning">
-            <AlertCircle size={20} strokeWidth={2.5} />
-          </IconWrapper>
-          <p className="text-body-md flex-1">キャンセルは開催日の7日前まで可能です。</p>
-        </div>
+        {noticesToShow.map((notice, index) => (
+          <div key={index} className="flex items-center gap-3">
+            <IconWrapper color="warning">
+              <AlertCircle size={20} strokeWidth={2.5} />
+            </IconWrapper>
+            <p className={`text-body-md flex-1 ${notice.isBold ? "font-bold" : ""}`}>
+              {notice.text}
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   );
