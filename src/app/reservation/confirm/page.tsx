@@ -78,7 +78,7 @@ export default function ConfirmPage() {
       opportunity,
       selectedSlot,
       wallets,
-      user,
+      user: user ? { id: user.id } : null,
       ticketCounter,
       participantCount,
       useTickets: ui.useTickets,
