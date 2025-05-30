@@ -3,13 +3,30 @@
 import { useAuth } from "@/contexts/AuthProvider";
 import { SignUpForm } from "@/app/sign-up/components/SignUpForm";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { useEffect } from "react";
+import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export default function RegisterAccount() {
-  const { user, loading } = useAuth();
+  const authRedirectService = AuthRedirectService.getInstance();
+
+  const { user: currentUser, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && currentUser) {
+      const currentPath =
+        typeof window !== "undefined" ? window.location.pathname + window.location.search : "/";
+      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(currentPath);
+      console.log("[Debug] Redirecting existing user from /sign-up to:", redirectPath);
+    }
+  }, [loading, currentUser, authRedirectService]);
+
   if (loading) {
     return <LoadingIndicator />;
   }
-  if (!loading && user) return null;
+
+  if (currentUser) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <main className="min-h-screen p-8">
