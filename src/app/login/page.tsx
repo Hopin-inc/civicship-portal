@@ -76,57 +76,55 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md bg-background rounded-2xl p-6 mx-4">
-        <div className="flex flex-col items-center pt-8">
-          <div className="mb-12">
-            <Image src="/images/neo88-logo.jpg" alt="NEO88" width={120} height={40} priority />
-          </div>
-
-          <div className="space-y-3 mb-10">
-            <div className="flex items-start space-x-4">
-              <Checkbox
-                id="agree-terms"
-                checked={agreedTerms}
-                className="w-5 h-5"
-                disabled={isLoading || isAuthenticating}
-                onCheckedChange={(checked) => setAgreedTerms(!!checked)}
-              />
-              <Label htmlFor="agree-terms" className="text-sm text-muted-foreground">
-                <Link href="/terms" className="underline">
-                  利用規約
-                </Link>
-                に同意する
-              </Label>
-            </div>
-
-            <div className="flex items-start space-x-4">
-              <Checkbox
-                id="agree-privacy"
-                checked={agreedPrivacy}
-                className="w-5 h-5"
-                disabled={isLoading || isAuthenticating}
-                onCheckedChange={(checked) => setAgreedPrivacy(!!checked)}
-              />
-              <Label htmlFor="agree-privacy" className="text-sm text-muted-foreground">
-                <Link href="/privacy" className="underline">
-                  プライバシーポリシー
-                </Link>
-                に同意する
-              </Label>
-            </div>
-          </div>
-
-          <Button
-            onClick={handleLogin}
-            disabled={isLoading || isAuthenticating || !agreedTerms || !agreedPrivacy}
-            className="w-full bg-[#06C755] hover:bg-[#05B74B] text-white rounded-xl h-12 flex items-center justify-center gap-2"
-          >
-            <Image src="/images/line-icon.png" alt="LINE" width={24} height={24} priority />
-            {isLoading || isAuthenticating ? "ログイン中..." : "LINEでログイン"}
-          </Button>
-          {error && <div className="text-destructive text-sm mt-2">{error}</div>}
+    <div className="w-full max-w-md bg-background rounded-2xl p-6 mx-4">
+      <div className="flex flex-col items-center pt-8">
+        <div className="mb-12">
+          <Image src="/images/neo88-logo.jpg" alt="NEO88" width={120} height={40} priority />
         </div>
+
+        <div className="space-y-3 mb-10">
+          <div className="flex items-start space-x-4">
+            <Checkbox
+              id="agree-terms"
+              checked={agreedTerms}
+              className="w-5 h-5"
+              disabled={isLoading || isAuthenticating}
+              onCheckedChange={(checked) => setAgreedTerms(!!checked)}
+            />
+            <Label htmlFor="agree-terms" className="text-sm text-muted-foreground">
+              <Link href="/terms" className="underline">
+                利用規約
+              </Link>
+              に同意する
+            </Label>
+          </div>
+
+          <div className="flex items-start space-x-4">
+            <Checkbox
+              id="agree-privacy"
+              checked={agreedPrivacy}
+              className="w-5 h-5"
+              disabled={isLoading || isAuthenticating}
+              onCheckedChange={(checked) => setAgreedPrivacy(!!checked)}
+            />
+            <Label htmlFor="agree-privacy" className="text-sm text-muted-foreground">
+              <Link href="/privacy" className="underline">
+                プライバシーポリシー
+              </Link>
+              に同意する
+            </Label>
+          </div>
+        </div>
+
+        <Button
+          onClick={handleLogin}
+          disabled={isLoading || isAuthenticating || !agreedTerms || !agreedPrivacy}
+          className="w-full bg-[#06C755] hover:bg-[#05B74B] text-white rounded-xl h-12 flex items-center justify-center gap-2"
+        >
+          <Image src="/images/line-icon.png" alt="LINE" width={24} height={24} priority />
+          {isLoading || isAuthenticating ? "ログイン中..." : "LINEでログイン"}
+        </Button>
+        {error && <div className="text-destructive text-sm mt-2">{error}</div>}
       </div>
     </div>
   );
