@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatPhoneNumber } from "@/app/sign-up/phone-verification/utils";
 import { Button } from "@/components/ui/button";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
@@ -16,16 +15,6 @@ export function PhoneVerificationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authRedirectService = AuthRedirectService.getInstance();
-
-  const headerConfig = useMemo(
-    () => ({
-      title: "電話番号認証",
-      showBackButton: false,
-      showLogo: false,
-    }),
-    [],
-  );
-  useHeaderConfig(headerConfig);
 
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
