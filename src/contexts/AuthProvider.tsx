@@ -116,6 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    console.log("[Debug] authenticationState changed to:", state.authenticationState);
     const unsubscribe = lineAuth.onAuthStateChanged((user) => {
       setState((prev) => ({
         ...prev,
@@ -133,7 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
 
     return () => unsubscribe();
-  }, [authStateManager, state.isAuthenticating]);
+  }, [authStateManager, state.isAuthenticating, state.authenticationState]);
 
   useEffect(() => {
     if (!authStateManager) return; // Guard against initialization error
@@ -222,6 +223,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [environment, liffService]);
 
   useEffect(() => {
+    console.log("[Debug] 🔁 useEffect(handleLineAuthRedirect) fired");
+
     const handleLineAuthRedirect = async () => {
       if (typeof window === "undefined") return;
       if (state.isAuthenticating) return;
@@ -274,9 +277,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     handleLineAuthRedirect();
-  }, [state.authenticationState, state.isAuthenticating, liffService, refetchUser]);
+  }, [state.authenticationState, state.isAuthenticating, liffService, refetchUser, environment]);
 
   useEffect(() => {
+    console.log("[Debug] 🔁 useEffect(handleAutoLogin) fired");
+
     const handleAutoLogin = async () => {
       if (environment !== AuthEnvironment.LIFF) return;
       if (state.authenticationState !== "unauthenticated") return;
