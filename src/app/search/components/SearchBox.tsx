@@ -55,8 +55,6 @@ const SearchBox = ({ location, from, to, guests }: SearchFormProps) => {
     router.push(`/search${params.toString() ? `?${params.toString()}` : ""}`);
   };
 
-  const hasAnyCondition = location || from || to || guests;
-
   return (
     <Button
       onClick={handleClick}
@@ -66,7 +64,7 @@ const SearchBox = ({ location, from, to, guests }: SearchFormProps) => {
       <div className="absolute left-4 top-1/2 -translate-y-1/2">
         <Search className="h-6 w-6 text-muted-foreground" />
       </div>
-      {!hasAnyCondition ? (
+      {!location && !from && !to && !guests ? (
         <div className="flex items-center justify-center w-full h-full">
           <span className="text-body-sm text-caption font-medium">タップして検索する</span>
         </div>
