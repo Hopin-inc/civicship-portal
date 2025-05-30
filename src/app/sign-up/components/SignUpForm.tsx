@@ -92,9 +92,7 @@ export function SignUpForm() {
       }
     } catch (error) {
       console.error("Sign up error:", error);
-      toast.error("アカウント作成に失敗しました", {
-        description: error instanceof Error ? error.message : "不明なエラーが発生しました",
-      });
+      toast.error("アカウント作成に失敗しました");
     } finally {
       setIsLoading(false);
     }
