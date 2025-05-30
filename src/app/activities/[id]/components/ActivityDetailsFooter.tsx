@@ -4,6 +4,8 @@ import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { COMMUNITY_ID } from "@/utils";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import { cn } from "@/lib/utils";
 
 interface ActivityDetailsFooterProps {
   opportunityId: string;
@@ -23,14 +25,20 @@ const ActivityDetailsFooter: React.FC<ActivityDetailsFooterProps> = ({
     community_id: communityId ?? COMMUNITY_ID,
   });
 
+  const env = detectEnvironment();
+  const isLiff = env === AuthEnvironment.LIFF;
+
   return (
     <footer className="fixed bottom-0 left-0 right-0 bg-background border-t z-50">
-      <div className="max-w-mobile-l mx-auto px-4 h-20 flex items-center justify-between w-full">
+      <div
+        className={cn(
+          "max-w-mobile-l mx-auto px-4 flex items-center justify-between w-full",
+          isLiff ? "h-28" : "h-20",
+        )}
+      >
         <div>
           <p className="text-body-sm text-muted-foreground">1人あたり</p>
-          <p
-            className={`text-body-lg font-bold ${price == null ? "text-muted-foreground/50" : ""}`}
-          >
+          <p className={cn("text-body-lg font-bold", price == null && "text-muted-foreground/50")}>
             {price != null ? `${price.toLocaleString()}円〜` : "料金未定"}
           </p>
         </div>

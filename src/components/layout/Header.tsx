@@ -11,7 +11,7 @@ import { useHeader } from "@/components/providers/HeaderProvider";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { cn } from "@/lib/utils";
 import SearchBox from "@/app/search/components/SearchBox";
-import { isRunningInLiff } from "@/utils/liff";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
 
 interface HeaderProps {
   className?: string;
@@ -23,6 +23,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const pathname = usePathname();
 
+  const env = detectEnvironment();
   const router = useRouter();
 
   const handleBackButton = () => {
@@ -37,7 +38,10 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     return null;
   }
 
-  const shouldShowBackButton = config.showBackButton && pathname !== "/" && !isRunningInLiff();
+  const shouldShowBackButton =
+    config.showBackButton &&
+    pathname !== "/" &&
+    !(env === AuthEnvironment.LIFF || env === AuthEnvironment.LINE_BROWSER);
 
   return (
     <header
