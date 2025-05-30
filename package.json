@@ -19,6 +19,7 @@
     "@firebase/analytics": "^0.10.15",
     "@firebase/auth": "^1.10.4",
     "@google-analytics/admin": "^8.2.0",
+    "@google-cloud/logging-winston": "^6.0.1",
     "@graphql-codegen/typescript-operations": "^4.6.1",
     "@graphql-codegen/typescript-react-apollo": "^4.3.2",
     "@headlessui/react": "^2.2.3",
@@ -78,6 +79,7 @@
     "undici": "^7.9.0",
     "unified": "^11.0.5",
     "utility-types": "^3.11.0",
+    "winston": "^3.17.0",
     "xss": "^1.0.15",
     "zod": "^3.25.32"
   },
