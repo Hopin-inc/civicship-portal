@@ -76,6 +76,18 @@ export class AuthRedirectService {
       console.log(`🔄 [${new Date().toISOString()}] Skipping redirect check - authentication in progress`);
       return null;
     }
+    
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      const isReturnFromLineAuth = url.searchParams.has("code") && 
+                                  url.searchParams.has("state") && 
+                                  url.searchParams.has("liffClientId");
+      
+      if (isReturnFromLineAuth) {
+        console.log(`🔄 [${new Date().toISOString()}] Detected LINE auth redirect in getRedirectPath - skipping redirect`);
+        return null;
+      }
+    }
 
     if (this.isProtectedPath(pathname)) {
       switch (authState) {

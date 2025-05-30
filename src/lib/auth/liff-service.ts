@@ -116,11 +116,15 @@ export class LiffService {
           console.log(`🔍 [${new Date().toISOString()}] Stored redirect path in sessionStorage: ${redirectPath}`);
         }
         
-        const redirectUri = process.env.NEXT_PUBLIC_DOMAIN || 
-                           (typeof window !== "undefined" ? window.location.origin : undefined);
+        console.log(`🔍 [${new Date().toISOString()}] LINE login without redirectUri to use default configured URL`);
         
-        console.log(`🔍 [${new Date().toISOString()}] LINE login with redirectUri: ${redirectUri}`);
-        liff.login({ redirectUri });
+        if (typeof window !== "undefined") {
+          const currentPath = window.location.pathname + window.location.search;
+          sessionStorage.setItem('liff_redirect_after_auth', currentPath);
+          console.log(`🔍 [${new Date().toISOString()}] Stored current path in sessionStorage: ${currentPath}`);
+        }
+        
+        liff.login();
         return false; // リダイレクトするのでここには到達しない
       }
       return true;
