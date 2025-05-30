@@ -46,7 +46,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
       className={cn(
         className,
         "fixed bottom-0 left-0 w-full bg-background border-t border-input z-50 transition-transform duration-300",
-        isLiff ? "py-6" : "py-4",
+        isLiff ? "py-8" : "py-4",
         !isVisible && "transform translate-y-full",
       )}
     >
