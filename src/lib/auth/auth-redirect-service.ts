@@ -98,7 +98,7 @@ export class AuthRedirectService {
           return null; // stay here
 
         case "phone_authenticated":
-          if (pathname !== `/sign-up${nextParam}`) {
+          if (pathname !== `/sign-up`) {
             return `/sign-up${nextParam}`;
           }
           return null; // stay here
