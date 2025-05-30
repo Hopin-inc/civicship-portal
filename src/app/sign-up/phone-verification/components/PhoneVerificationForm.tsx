@@ -114,6 +114,8 @@ export function PhoneVerificationForm() {
     return null;
   }
 
+  // If it breaks in production, revert phoneAuth.isVerifying and reCAPTCHA to the same positions as in master.
+
   return (
     <div className="w-full max-w-md mx-auto space-y-8">
       <div className="space-y-2">
@@ -160,7 +162,7 @@ export function PhoneVerificationForm() {
                 className="px-4"
                 size="sm"
                 variant="text"
-                disabled={isPhoneSubmitting}
+                disabled={isReloading}
                 onClick={() => {
                   setIsReloading(true);
                   setTimeout(() => {
@@ -207,7 +209,7 @@ export function PhoneVerificationForm() {
             <Button
               type="button"
               variant={"text"}
-              disabled={isCodeVerifying || phoneAuth.isVerifying || isReloading}
+              disabled={isReloading}
               onClick={() => {
                 phoneAuth.clearRecaptcha?.();
                 setIsReloading(true);
