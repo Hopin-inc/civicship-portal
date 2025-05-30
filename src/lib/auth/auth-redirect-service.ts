@@ -119,13 +119,7 @@ export class AuthRedirectService {
     const next = nextPath ? decodeURIComponent(nextPath) : null;
     const authState = this.authStateManager.getState();
 
-    // TODO ここの遷移あってるかチェックする
-
     switch (authState) {
-      case "loading":
-      case "user_registered":
-        return next ?? "/";
-
       case "unauthenticated":
       case "line_token_expired":
         return `/login${next ? `?next=${next}` : ""}`;
@@ -137,6 +131,8 @@ export class AuthRedirectService {
       case "phone_authenticated":
         return `/sign-up${next ? `?next=${next}` : ""}`;
 
+      case "loading":
+      case "user_registered":
       default:
         return next ?? "/";
     }
