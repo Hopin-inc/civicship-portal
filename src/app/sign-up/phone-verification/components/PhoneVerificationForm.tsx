@@ -9,12 +9,13 @@ import { formatPhoneNumber } from "@/app/sign-up/phone-verification/utils";
 import { Button } from "@/components/ui/button";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export function PhoneVerificationForm() {
   const { phoneAuth, isAuthenticated, isPhoneVerified, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
+  const authRedirectService = AuthRedirectService.getInstance();
 
   const headerConfig = useMemo(
     () => ({
@@ -41,16 +42,16 @@ export function PhoneVerificationForm() {
   const digitsOnly = formattedPhone.replace(/\D/g, "");
   const isPhoneValid = digitsOnly.startsWith("81") && digitsOnly.length === 12;
 
+  const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
+
   useEffect(() => {
     if (loading) return;
-    if (!isAuthenticated) {
-      let loginWithNext = "/login";
-      if (nextParam) {
-        loginWithNext += `?next=${nextParam}`;
-      }
-      router.replace(loginWithNext);
+
+    const redirectPath = authRedirectService.getRedirectPath("/login", nextParam);
+    if (!isAuthenticated && redirectPath) {
+      router.replace(redirectPath);
     }
-  }, [isAuthenticated, isPhoneVerified, loading, router, nextParam]);
+  }, [isAuthenticated, loading, router, nextParam, authRedirectService]);
 
   useEffect(() => {
     if (recaptchaContainerRef.current) {

@@ -74,11 +74,11 @@ export function SignUpForm() {
     try {
       if (!isPhoneVerified) {
         toast.error("電話番号認証が完了していません");
-        let signUpWithNext = "/sign-up/phone-verification";
-        if (nextParam) {
-          signUpWithNext += `?next=${nextParam}`;
-        }
-        router.replace(signUpWithNext);
+        const redirectPath = authRedirectService.getRedirectPath(
+          "/sign-up/phone-verification",
+          nextParam,
+        );
+        router.replace(redirectPath ?? "/sign-up/phone-verification");
         return;
       }
 
