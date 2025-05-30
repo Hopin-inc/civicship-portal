@@ -5,26 +5,30 @@ import { SignUpForm } from "@/app/sign-up/components/SignUpForm";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useEffect } from "react";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import { useRouter } from "next/navigation";
 
 export default function RegisterAccount() {
   const authRedirectService = AuthRedirectService.getInstance();
 
-  const { user: currentUser, loading } = useAuth();
+  const { loading, authenticationState } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    if (!loading && currentUser) {
-      const currentPath =
-        typeof window !== "undefined" ? window.location.pathname + window.location.search : "/";
-      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(currentPath);
-      console.log("[Debug] Redirecting existing user from /sign-up to:", redirectPath);
+    if (!loading && authenticationState === "user_registered") {
+      const currentPath = window.location.pathname + window.location.search;
+      const redirectPath = authRedirectService.getRedirectPath(currentPath);
+
+      if (redirectPath) {
+        router.replace(redirectPath);
+      }
     }
-  }, [loading, currentUser, authRedirectService]);
+  }, [loading, router, authRedirectService, authenticationState]);
 
   if (loading) {
     return <LoadingIndicator />;
   }
 
-  if (currentUser) {
+  if (authenticationState === "user_registered") {
     return <LoadingIndicator />;
   }
 
