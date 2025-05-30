@@ -7,6 +7,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
 
 interface HeaderProps {
   className?: string;
@@ -16,6 +17,9 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const placeId = searchParams.get("placeId");
+
+  const env = detectEnvironment();
+  const isLiff = env === AuthEnvironment.LIFF;
 
   const { isVisible } = useScrollDirection({ threshold: 20 });
 
@@ -41,7 +45,8 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     <nav
       className={cn(
         className,
-        "fixed bottom-0 left-0 w-full bg-background border-t border-input py-4 z-50 transition-transform duration-300",
+        "fixed bottom-0 left-0 w-full bg-background border-t border-input z-50 transition-transform duration-300",
+        isLiff ? "py-6" : "py-4",
         !isVisible && "transform translate-y-full",
       )}
     >
