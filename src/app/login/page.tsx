@@ -76,7 +76,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-md bg-background rounded-2xl p-6 mx-4">
+    <div className="w-full max-w-mobile-l bg-background rounded-2xl p-6 mx-4">
       <div className="flex flex-col items-center pt-8">
         <div className="mb-12">
           <Image src="/images/neo88-logo.jpg" alt="NEO88" width={120} height={40} priority />
