@@ -63,7 +63,8 @@ export class AuthRedirectService {
    */
   public getRedirectPath(pathname: string, next?: string | null): string | null {
     const authState = this.authStateManager.getState();
-    const nextParam = next ? `?next=${next}` : "";
+    const safeNext = this.sanitizeNext(next);
+    const nextParam = safeNext ? `?next=${safeNext}` : "";
 
     if (authState === "loading") {
       return null;
@@ -85,15 +86,29 @@ export class AuthRedirectService {
     }
 
     if (this.isPhoneVerificationRequiredPath(pathname)) {
-      if (authState === "unauthenticated") {
-        return `/login${nextParam}`;
-      }
+      switch (authState) {
+        case "unauthenticated":
+          return `/login${nextParam}`;
 
-      if (
-        (authState === "line_authenticated" || authState === "line_token_expired") &&
-        pathname !== "/sign-up/phone-verification"
-      ) {
-        return `/sign-up/phone-verification${nextParam}`;
+        case "line_authenticated":
+        case "line_token_expired":
+          if (pathname !== "/sign-up/phone-verification") {
+            return `/sign-up/phone-verification${nextParam}`;
+          }
+          return null; // stay here
+
+        case "phone_authenticated":
+          if (pathname !== `/sign-up${nextParam}`) {
+            return `/sign-up${nextParam}`;
+          }
+          return null; // stay here
+
+        case "user_registered":
+        default:
+          if (next && next.startsWith("/") && !next.startsWith("/sign-up")) {
+            return next;
+          }
+          return "/";
       }
     }
 
@@ -124,20 +139,23 @@ export class AuthRedirectService {
    * @param nextPath
    */
   public getPostLineAuthRedirectPath(nextPath: string | null): string {
-    const next = nextPath ? decodeURIComponent(nextPath) : null;
+    const rawNext = nextPath ? decodeURIComponent(nextPath) : null;
+    const next = this.sanitizeNext(rawNext);
+    const nextParam = next ? `?next=${next}` : "";
+
     const authState = this.authStateManager.getState();
 
     switch (authState) {
       case "unauthenticated":
       case "line_token_expired":
-        return `/login${next ? `?next=${next}` : ""}`;
+        return `/login${nextParam}`;
 
       case "line_authenticated":
       case "phone_token_expired":
-        return `/sign-up/phone-verification${next ? `?next=${next}` : ""}`;
+        return `/sign-up/phone-verification${nextParam}`;
 
       case "phone_authenticated":
-        return `/sign-up${next ? `?next=${next}` : ""}`;
+        return `/sign-up${nextParam}`;
 
       case "loading":
       case "user_registered":
@@ -176,5 +194,13 @@ export class AuthRedirectService {
     }
 
     return { hasAccess: true, redirectPath: null };
+  }
+
+  private sanitizeNext(next?: string | null): string | null {
+    if (!next) return null;
+    if (!next.startsWith("/")) return null;
+    if (next.includes("?next=")) return null;
+    if (next.startsWith("/login") || next.startsWith("/sign-up")) return null;
+    return next;
   }
 }
