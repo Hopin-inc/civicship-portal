@@ -74,11 +74,11 @@ export function SignUpForm() {
     try {
       if (!isPhoneVerified) {
         toast.error("電話番号認証が完了していません");
-        let signUpWithNext = "/sign-up/phone-verification";
-        if (nextParam) {
-          signUpWithNext += `?next=${nextParam}`;
-        }
-        router.replace(signUpWithNext);
+        const redirectPath = authRedirectService.getRedirectPath(
+          "/sign-up/phone-verification",
+          nextParam,
+        );
+        router.replace(redirectPath ?? "/sign-up/phone-verification");
         return;
       }
 
@@ -92,9 +92,7 @@ export function SignUpForm() {
       }
     } catch (error) {
       console.error("Sign up error:", error);
-      toast.error("アカウント作成に失敗しました", {
-        description: error instanceof Error ? error.message : "不明なエラーが発生しました",
-      });
+      toast.error("アカウント作成に失敗しました");
     } finally {
       setIsLoading(false);
     }

@@ -1,30 +1,20 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatPhoneNumber } from "@/app/sign-up/phone-verification/utils";
 import { Button } from "@/components/ui/button";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export function PhoneVerificationForm() {
   const { phoneAuth, isAuthenticated, isPhoneVerified, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
-
-  const headerConfig = useMemo(
-    () => ({
-      title: "電話番号認証",
-      showBackButton: false,
-      showLogo: false,
-    }),
-    [],
-  );
-  useHeaderConfig(headerConfig);
+  const authRedirectService = AuthRedirectService.getInstance();
 
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
@@ -41,16 +31,16 @@ export function PhoneVerificationForm() {
   const digitsOnly = formattedPhone.replace(/\D/g, "");
   const isPhoneValid = digitsOnly.startsWith("81") && digitsOnly.length === 12;
 
+  const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
+
   useEffect(() => {
     if (loading) return;
-    if (!isAuthenticated) {
-      let loginWithNext = "/login";
-      if (nextParam) {
-        loginWithNext += `?next=${nextParam}`;
-      }
-      router.replace(loginWithNext);
+
+    const redirectPath = authRedirectService.getRedirectPath("/login", nextParam);
+    if (!isAuthenticated && redirectPath) {
+      router.replace(redirectPath);
     }
-  }, [isAuthenticated, isPhoneVerified, loading, router, nextParam]);
+  }, [isAuthenticated, loading, router, nextParam, authRedirectService]);
 
   useEffect(() => {
     if (recaptchaContainerRef.current) {

@@ -103,7 +103,15 @@ export class AuthRedirectService {
       }
     }
 
-    if (pathname === "/login" && authState === "user_registered") {
+    if ((pathname === "/login" || pathname === "/sign-up") && authState === "user_registered") {
+      if (
+        next &&
+        next.startsWith("/") &&
+        !next.startsWith("/login") &&
+        !next.startsWith("/sign-up")
+      ) {
+        return next;
+      }
       return "/";
     }
 

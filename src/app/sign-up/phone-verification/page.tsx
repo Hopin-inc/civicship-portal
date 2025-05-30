@@ -1,13 +1,24 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { PhoneVerificationForm } from "./components/PhoneVerificationForm";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function PhoneVerificationPage() {
   const searchParams = useSearchParams();
   const hasRedirected = useRef(false);
+
+  const headerConfig = useMemo(
+    () => ({
+      title: "電話番号認証",
+      showBackButton: false,
+      showLogo: false,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
 
   useEffect(() => {
     if (hasRedirected.current) return;
