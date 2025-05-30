@@ -43,6 +43,8 @@ export default function ConfirmPage() {
     participantCount: initialParticipantCount,
     communityId,
   } = useReservationParams();
+  const currentPath =
+    typeof window !== "undefined" ? window.location.pathname + window.location.search : "/";
 
   const [participantCount, setParticipantCount] = useState<number>(initialParticipantCount);
 
@@ -74,6 +76,11 @@ export default function ConfirmPage() {
   if (!opportunity) return notFound();
 
   const handleConfirm = async () => {
+    if (!user) {
+      ui.setIsLoginModalOpen(true);
+      return;
+    }
+
     const result = await handleReservation({
       opportunity,
       selectedSlot,
@@ -90,13 +97,9 @@ export default function ConfirmPage() {
     }
 
     if (!result.success) {
-      if (!user) {
-        ui.setIsLoginModalOpen(true);
-      } else {
-        const message = errorMessages[result.code] ?? "予期しないエラーが発生しました。";
-        toast.error(message);
-        console.error("Reservation failed:", result.code);
-      }
+      const message = errorMessages[result.code] ?? "予期しないエラーが発生しました。";
+      toast.error(message);
+      console.error("Reservation failed:", result.code);
       return;
     }
 
@@ -117,7 +120,11 @@ export default function ConfirmPage() {
   return (
     <>
       <main className="min-h-screen">
-        <LoginModal isOpen={ui.isLoginModalOpen} onClose={() => ui.setIsLoginModalOpen(false)} />
+        <LoginModal
+          isOpen={ui.isLoginModalOpen}
+          onClose={() => ui.setIsLoginModalOpen(false)}
+          nextPath={currentPath}
+        />
         <div className="px-6 py-4 mt-4">
           <OpportunityCardHorizontal
             opportunity={{
