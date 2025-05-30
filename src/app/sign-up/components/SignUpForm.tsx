@@ -21,6 +21,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 const FormSchema = z.object({
   name: z.string({ required_error: "名前を入力してください。" }),
@@ -39,23 +40,16 @@ export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
+  const authRedirectService = AuthRedirectService.getInstance();
+
   useEffect(() => {
     if (!loading) {
-      if (!isAuthenticated) {
-        let loginWithNext = "/login";
-        if (nextParam) {
-          loginWithNext += `?next=${ encodeURIComponent(nextParam) }`;
-        }
-        router.replace(loginWithNext);
-      } else if (!isPhoneVerified) {
-        let signUpWithNext = "/sign-up/phone-verification";
-        if (nextParam) {
-          signUpWithNext += `?next=${ encodeURIComponent(nextParam) }`;
-        }
-        router.replace(signUpWithNext);
+      const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
+      if (redirectPath) {
+        router.replace(redirectPath);
       }
     }
-  }, [isAuthenticated, isPhoneVerified, loading, router]);
+  }, [isAuthenticated, isPhoneVerified, loading, router, nextParam, authRedirectService]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -72,7 +66,7 @@ export function SignUpForm() {
         toast.error("電話番号認証が完了していません");
         let signUpWithNext = "/sign-up/phone-verification";
         if (nextParam) {
-          signUpWithNext += `?next=${ encodeURIComponent(nextParam) }`;
+          signUpWithNext += `?next=${ nextParam }`;
         }
         router.replace(signUpWithNext);
         return;

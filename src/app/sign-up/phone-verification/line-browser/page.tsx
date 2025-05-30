@@ -10,7 +10,7 @@ export default function OpenInBrowser() {
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next");
   const baseUrl = "https://www.neo88.app/sign-up/phone-verification";
-  const COPY_URL = nextParam ? `${baseUrl}?next=${encodeURIComponent(nextParam)}` : baseUrl;
+  const COPY_URL = nextParam ? `${baseUrl}?next=${nextParam}` : baseUrl;
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -29,19 +29,19 @@ export default function OpenInBrowser() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <div className="text-center space-y-6">
+    <div className="flex items-center justify-center h-screen px-4">
+      <div className="text-center space-y-6 max-w-mobile-l w-full">
         <h1 className="text-body-md font-bold">
           電話番号認証は
           <br />
           LINEブラウザでご利用いただけません
         </h1>
 
-        <p className="text-left text-body-sm text-muted-foreground px-[40px]">
+        <p className="text-sm text-muted-foreground">
           正常にご利用いただくためには、SafariやChromeなどの通常のブラウザでこのページを開いてください。
         </p>
 
-        <div className="space-y-2 px-[40px] w-full">
+        <div className="space-y-2">
           <Button onClick={handleCopy} variant="secondary" className="w-full flex justify-center">
             <LinkIcon className="mr-2 h-4 w-4" />
             リンクをコピー

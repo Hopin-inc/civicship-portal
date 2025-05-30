@@ -47,7 +47,6 @@ export const useSignUp = () => {
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
         toast.success('アカウントが作成されました');
-        router.push('/');
       }
     } catch (error) {
       console.error('Sign up error:', error);

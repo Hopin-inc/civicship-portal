@@ -5,19 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { SignUpForm } from "@/app/sign-up/components/SignUpForm";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export default function RegisterAccount() {
   const { user, loading } = useAuth();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
-
-  useEffect(() => {
-    if (!loading && user) {
-      router.replace(nextParam ?? "/users/me");
-    }
-  }, [user, loading, router]);
-
   if (loading) {
     return <LoadingIndicator />;
   }

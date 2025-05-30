@@ -83,7 +83,6 @@ const formatTransactionDescription = (
 };
 
 const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
-  console.log("wallet", wallet);
   if (!wallet) return "";
   switch (wallet.type) {
     case GqlWalletType.Member:

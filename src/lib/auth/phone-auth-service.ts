@@ -6,8 +6,8 @@ import {
   signInWithCredential,
   signInWithPhoneNumber,
 } from "firebase/auth";
-import { phoneAuth, categorizeFirebaseError } from "./firebase-config";
-import { TokenManager, PhoneAuthTokens } from "./token-manager";
+import { phoneAuth } from "./firebase-config";
+import { PhoneAuthTokens, TokenManager } from "./token-manager";
 import { isRunningInLiff } from "./environment-detector";
 
 /**
@@ -30,6 +30,7 @@ export class PhoneAuthService {
   private state: PhoneAuthState;
   private recaptchaVerifier: RecaptchaVerifier | null = null;
   private recaptchaContainerElement: HTMLElement | null = null;
+  private isRecaptchaRendered: boolean = false;
 
   /**
    * コンストラクタ
@@ -49,18 +50,18 @@ export class PhoneAuthService {
       this.state.isVerified = true;
       this.state.phoneUid = savedTokens.phoneUid;
       this.state.phoneNumber = savedTokens.phoneNumber;
-      
+
       console.log("Phone verification state initialized from saved tokens:", {
         isVerified: this.state.isVerified,
         phoneUid: this.state.phoneUid ? "exists" : "missing",
         phoneNumber: this.state.phoneNumber ? "exists" : "missing",
-        accessToken: savedTokens.accessToken ? "exists" : "missing"
+        accessToken: savedTokens.accessToken ? "exists" : "missing",
       });
     } else {
       console.log("Phone verification not initialized - incomplete saved tokens:", {
         phoneUid: savedTokens.phoneUid ? "exists" : "missing",
         phoneNumber: savedTokens.phoneNumber ? "exists" : "missing",
-        accessToken: savedTokens.accessToken ? "exists" : "missing"
+        accessToken: savedTokens.accessToken ? "exists" : "missing",
       });
     }
   }
@@ -79,23 +80,16 @@ export class PhoneAuthService {
   /**
    * reCAPTCHAをクリア
    */
+  /**
+   * reCAPTCHAをクリア
+   */
   public clearRecaptcha(): void {
     try {
       if (this.recaptchaVerifier) {
         this.recaptchaVerifier.clear();
         this.recaptchaVerifier = null;
       }
-
-      if (this.recaptchaContainerElement) {
-        if (document.getElementById("recaptcha-container")) {
-          const iframes = this.recaptchaContainerElement.querySelectorAll("iframe");
-          iframes.forEach((iframe) => iframe.remove());
-
-          const divs = this.recaptchaContainerElement.querySelectorAll('div[id^="rc-"]');
-          divs.forEach((div) => div.remove());
-        }
-        this.recaptchaContainerElement = null;
-      }
+      this.recaptchaContainerElement = null;
     } catch (e) {
       console.error("Error clearing reCAPTCHA:", e);
     }
@@ -110,13 +104,19 @@ export class PhoneAuthService {
     try {
       this.state.isVerifying = true;
       this.state.error = null;
+
+      // 前回のVerifierを明示的にクリア（DOM操作しない）
       this.clearRecaptcha();
+
+      // Googleの内部非同期処理との競合を避けるため少し待つ
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       this.recaptchaContainerElement = document.getElementById("recaptcha-container");
       if (!this.recaptchaContainerElement) {
         throw new Error("reCAPTCHA container element not found");
       }
 
+      // 新しいインスタンスを作る
       this.recaptchaVerifier = new RecaptchaVerifier(phoneAuth, "recaptcha-container", {
         size: isRunningInLiff() ? "normal" : "invisible",
         callback: () => {},
@@ -164,7 +164,10 @@ export class PhoneAuthService {
       }
 
       try {
-        const credential = PhoneAuthProvider.credential(this.state.verificationId, verificationCode);
+        const credential = PhoneAuthProvider.credential(
+          this.state.verificationId,
+          verificationCode,
+        );
         console.log("Successfully created phone credential");
 
         try {

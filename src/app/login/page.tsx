@@ -9,35 +9,21 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { getLiffLoginErrorMessage } from "@/app/login/utils/getLiffLoginErrorMessage";
 import { toast } from "sonner";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export default function LoginPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/";
 
-  const { user, isAuthenticated, loginWithLiff, isAuthenticating, loading } = useAuth();
+  const { loginWithLiff, isAuthenticating, loading } = useAuth();
+  const authRedirectService = AuthRedirectService.getInstance();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
-
-  useEffect(() => {
-    if (!loading && isAuthenticated) {
-      if (user) {
-        console.log("🚀 Already authenticated, redirecting to:", nextPath);
-        router.replace(nextPath);
-      } else {
-        let signUpWithNext = "/sign-up/phone-verification";
-        if (nextPath) {
-          signUpWithNext += `?next=${ encodeURIComponent(nextPath) }`;
-        }
-        router.replace(signUpWithNext);
-      }
-    }
-  }, [isAuthenticated, loading, nextPath, router]);
 
   // 📦 ログイン処理
   const handleLogin = async () => {
@@ -50,13 +36,13 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const searchParams = new URLSearchParams(window.location.search);
-      const next = searchParams.get("next");
-      const redirectPath = next && next.startsWith("/") ? `/?next=${next}&from=line_auth` : "/?from=line_auth";
-      const success = await loginWithLiff(redirectPath);
+      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
+      console.log("🚀 Using redirect path from AuthRedirectService:", redirectPath);
+
+      const success = await loginWithLiff(nextPath);
+
       if (success) {
-        const nextPath = next && next.startsWith("/") ? next : "/activities";
-        router.push(nextPath);
+        console.log("🚀 LINE authentication succeeded. Redirecting...");
       }
     } catch (err) {
       const { title, description } = getLiffLoginErrorMessage(error);

@@ -23,8 +23,6 @@ export const useSlotParticipations = (slotId: string): UseSlotParticipationsResu
     },
   });
 
-  console.log(data);
-
   const slot: GqlOpportunitySlot | null | undefined = data?.opportunitySlot ?? null;
   const allParticipations: GqlParticipation[] =
     slot?.reservations?.flatMap(
