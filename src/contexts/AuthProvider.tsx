@@ -7,12 +7,13 @@ import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { lineAuth } from "@/lib/auth/firebase-config";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
-import { GqlCurrentPrefecture, GqlCurrentUserPayload } from "@/types/graphql";
-import { useRouter } from "next/navigation";
+import {
+  GqlCurrentPrefecture,
+  GqlCurrentUserPayload,
+  useCurrentUserQuery,
+  useUserSignUpMutation,
+} from "@/types/graphql";
 import { toast } from "sonner";
-import { useMutation, useQuery } from "@apollo/client";
-import { USER_SIGN_UP } from "@/graphql/account/identity/mutation";
-import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { COMMUNITY_ID } from "@/utils";
 
 /**
@@ -95,15 +96,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticating: false,
   });
 
-  const router = useRouter();
-
-  const [userSignUp] = useMutation(USER_SIGN_UP);
+  const [userSignUp] = useUserSignUpMutation();
 
   const {
     data: userData,
     loading: userLoading,
     refetch: refetchUser,
-  } = useQuery(GET_CURRENT_USER, {
+  } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
       state.authenticationState,
     ),
@@ -135,30 +134,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     return () => unsubscribe();
   }, [authStateManager, state.isAuthenticating]);
-
-  /**
-   * ログアウト
-   */
-  const logout = useCallback(async (): Promise<void> => {
-    try {
-      liffService.logout();
-
-      await lineAuth.signOut();
-
-      phoneAuthService.reset();
-
-      TokenManager.clearAllTokens();
-
-      setState((prev) => ({
-        ...prev,
-        firebaseUser: null,
-        currentUser: null,
-        authenticationState: "unauthenticated",
-      }));
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  }, [liffService, phoneAuthService]);
 
   useEffect(() => {
     if (!authStateManager) return; // Guard against initialization error
@@ -200,7 +175,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (userData?.currentUser?.user) {
       setState((prev) => ({
         ...prev,
-        currentUser: userData.currentUser.user,
+        currentUser: userData.currentUser?.user,
         authenticationState: "user_registered",
       }));
 
@@ -329,6 +304,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     handleAutoLogin();
   }, [environment, state.authenticationState, state.isAuthenticating, liffService, refetchUser]);
 
+  /**
+   * ログアウト
+   */
+  const logout = useCallback(async (): Promise<void> => {
+    try {
+      liffService.logout();
+
+      await lineAuth.signOut();
+
+      phoneAuthService.reset();
+
+      TokenManager.clearAllTokens();
+
+      setState((prev) => ({
+        ...prev,
+        firebaseUser: null,
+        currentUser: null,
+        authenticationState: "unauthenticated",
+      }));
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }, [liffService, phoneAuthService]);
+
   useEffect(() => {
     if (!authStateManager) return; // Guard against initialization error
 
@@ -424,6 +423,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // ====================================================================
+  // ====================================================================
+  // ====================================================================
+
   /**
    * 電話番号認証を開始
    */
@@ -497,9 +500,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             currentPrefecture: prefecture, // Changed from prefecture to currentPrefecture to match backend schema
             communityId: COMMUNITY_ID,
             phoneUid,
-            phoneNumber: phoneTokens.phoneNumber,
-            lineRefreshToken: lineTokens.refreshToken,
-            phoneRefreshToken: phoneTokens.refreshToken,
+            phoneNumber: phoneTokens.phoneNumber ?? undefined,
+            lineRefreshToken: lineTokens.refreshToken ?? undefined,
+            phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
           },
         },
       });
