@@ -27,6 +27,7 @@ export class LiffService {
   private static instance: LiffService;
   private liffId: string;
   private state: LiffState;
+  private initializing = false;
 
   /**
    * コンストラクタ
@@ -69,8 +70,14 @@ export class LiffService {
     console.log("[Debug] Calling liffService.initialize()");
     try {
       if (this.state.isInitialized) {
+        console.log("[Debug] Already initialized, skipping");
         return true;
       }
+      if (this.initializing) {
+        console.log("[Debug] Already initializing, skipping");
+        return true;
+      }
+      this.initializing = true;
 
       await liff.init({ liffId: this.liffId });
       this.state.isInitialized = true;
@@ -80,11 +87,15 @@ export class LiffService {
         await this.updateProfile();
       }
 
+      console.log("[Debug] liffService.initialize() success:", this.state.isInitialized);
+
       return true;
     } catch (error) {
       console.error("LIFF initialization error:", error);
       this.state.error = error as Error;
       return false;
+    } finally {
+      this.initializing = false;
     }
   }
 
