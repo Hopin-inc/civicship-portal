@@ -5,11 +5,11 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -41,15 +41,7 @@ export function SignUpForm() {
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   const authRedirectService = AuthRedirectService.getInstance();
-
-  useEffect(() => {
-    if (!loading) {
-      const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
-      if (redirectPath) {
-        router.replace(redirectPath);
-      }
-    }
-  }, [isAuthenticated, isPhoneVerified, loading, router, nextParam, authRedirectService]);
+  const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -64,11 +56,7 @@ export function SignUpForm() {
     try {
       if (!isPhoneVerified) {
         toast.error("電話番号認証が完了していません");
-        let signUpWithNext = "/sign-up/phone-verification";
-        if (nextParam) {
-          signUpWithNext += `?next=${ nextParam }`;
-        }
-        router.replace(signUpWithNext);
+        router.replace(redirectPath ?? "/users/me");
         return;
       }
 
@@ -77,14 +65,11 @@ export function SignUpForm() {
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
         setIsRedirecting(true);
-        const redirectUrl = nextParam || "/activities";
-        router.push(redirectUrl);
+        router.push(redirectPath ?? "/users/me");
       }
     } catch (error) {
       console.error("Sign up error:", error);
-      toast.error("アカウント作成に失敗しました", {
-        description: error instanceof Error ? error.message : "不明なエラーが発生しました",
-      });
+      toast.error("アカウント作成に失敗しました");
     } finally {
       setIsLoading(false);
     }

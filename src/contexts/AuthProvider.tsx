@@ -1,18 +1,19 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { lineAuth } from "@/lib/auth/firebase-config";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
-import { GqlCurrentPrefecture, GqlCurrentUserPayload } from "@/types/graphql";
-import { useRouter } from "next/navigation";
+import {
+  GqlCurrentPrefecture,
+  GqlCurrentUserPayload,
+  useCurrentUserQuery,
+  useUserSignUpMutation,
+} from "@/types/graphql";
 import { toast } from "sonner";
-import { useMutation, useQuery } from "@apollo/client";
-import { USER_SIGN_UP } from "@/graphql/account/identity/mutation";
-import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { COMMUNITY_ID } from "@/utils";
 
 /**
@@ -22,13 +23,13 @@ export type AuthState = {
   firebaseUser: User | null;
   currentUser: GqlCurrentUserPayload["user"] | null;
   authenticationState:
-    | "unauthenticated"           // S0: 未認証
-    | "line_authenticated"        // S1: LINE認証済み
-    | "line_token_expired"        // S1e: LINEトークン期限切れ
-    | "phone_authenticated"       // S2: 電話番号認証済み
-    | "phone_token_expired"       // S2e: 電話番号トークン期限切れ
-    | "user_registered"           // S3: ユーザ情報登録済み
-    | "loading";                  // L0: 状態チェック中
+    | "unauthenticated" // S0: 未認証
+    | "line_authenticated" // S1: LINE認証済み
+    | "line_token_expired" // S1e: LINEトークン期限切れ
+    | "phone_authenticated" // S2: 電話番号認証済み
+    | "phone_token_expired" // S2e: 電話番号トークン期限切れ
+    | "user_registered" // S3: ユーザ情報登録済み
+    | "loading"; // L0: 状態チェック中
   environment: AuthEnvironment;
   isAuthenticating: boolean;
 };
@@ -58,7 +59,11 @@ interface AuthContextType {
     phoneUid: string | null;
   };
 
-  createUser: (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string | null) => Promise<User | null>;
+  createUser: (
+    name: string,
+    prefecture: GqlCurrentPrefecture,
+    phoneUid: string | null,
+  ) => Promise<User | null>;
 
   loading: boolean;
 }
@@ -91,12 +96,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticating: false,
   });
 
-  const router = useRouter();
+  const [userSignUp] = useUserSignUpMutation();
 
-  const [userSignUp] = useMutation(USER_SIGN_UP);
-
-  const { data: userData, loading: userLoading, refetch: refetchUser } = useQuery(GET_CURRENT_USER, {
-    skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(state.authenticationState),
+  const {
+    data: userData,
+    loading: userLoading,
+    refetch: refetchUser,
+  } = useCurrentUserQuery({
+    skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
+      state.authenticationState,
+    ),
     fetchPolicy: "network-only",
   });
 
@@ -107,13 +116,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    console.log("[Debug] authenticationState changed to:", state.authenticationState);
     const unsubscribe = lineAuth.onAuthStateChanged((user) => {
       setState((prev) => ({
         ...prev,
         firebaseUser: user,
-        authenticationState: user ?
-          (prev.authenticationState === "loading" ? "line_authenticated" : prev.authenticationState) :
-          "unauthenticated",
+        authenticationState: user
+          ? prev.authenticationState === "loading"
+            ? "line_authenticated"
+            : prev.authenticationState
+          : "unauthenticated",
       }));
 
       if (authStateManager && !state.isAuthenticating) {
@@ -122,7 +134,197 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
 
     return () => unsubscribe();
-  }, [authStateManager, state.isAuthenticating]);
+  }, [authStateManager, state.isAuthenticating, state.authenticationState]);
+
+  useEffect(() => {
+    if (!authStateManager) return; // Guard against initialization error
+
+    const phoneState = phoneAuthService.getState();
+    const isVerified = phoneState.isVerified;
+
+    if (isVerified) {
+      const updatePhoneAuthState = async () => {
+        try {
+          const timestamp = new Date().toISOString();
+          console.log(
+            `🔍 [${timestamp}] Updating phone auth state in useEffect - isVerified:`,
+            isVerified,
+          );
+          await authStateManager.handlePhoneAuthStateChange(true);
+          console.log(
+            `🔍 [${timestamp}] AuthStateManager phone state updated successfully in useEffect`,
+          );
+        } catch (error) {
+          console.error("Failed to update AuthStateManager phone state in useEffect:", error);
+        }
+      };
+
+      updatePhoneAuthState();
+    }
+
+    setState((prev) => ({
+      ...prev,
+      authenticationState: isVerified
+        ? prev.authenticationState === "line_authenticated"
+          ? "phone_authenticated"
+          : prev.authenticationState
+        : prev.authenticationState,
+    }));
+  }, [authStateManager, phoneAuthService]);
+
+  useEffect(() => {
+    if (userData?.currentUser?.user) {
+      setState((prev) => ({
+        ...prev,
+        currentUser: userData.currentUser?.user,
+        authenticationState: "user_registered",
+      }));
+
+      if (authStateManager) {
+        const updateUserRegistrationState = async () => {
+          try {
+            const timestamp = new Date().toISOString();
+            console.log(`🔍 [${timestamp}] Updating user registration state in useEffect`);
+            await authStateManager.handleUserRegistrationStateChange(true);
+            console.log(
+              `🔍 [${timestamp}] AuthStateManager user registration state updated successfully`,
+            );
+          } catch (error) {
+            console.error("Failed to update AuthStateManager user registration state:", error);
+          }
+        };
+
+        updateUserRegistrationState();
+      }
+    }
+  }, [userData, authStateManager]);
+
+  useEffect(() => {
+    const initializeLiff = async () => {
+      if (environment !== AuthEnvironment.LIFF) return;
+
+      const timestamp = new Date().toISOString();
+      console.log(`🔍 [${timestamp}] Initializing LIFF in environment:`, environment);
+
+      const liffSuccess = await liffService.initialize();
+      if (liffSuccess) {
+        const liffState = liffService.getState();
+        console.log(`🔍 [${timestamp}] LIFF state after initialization:`, {
+          isInitialized: liffState.isInitialized,
+          isLoggedIn: liffState.isLoggedIn,
+          userId: liffState.profile?.userId || "none",
+        });
+      } else {
+        console.error(`🔍 [${timestamp}] LIFF initialization failed`);
+      }
+    };
+
+    initializeLiff();
+  }, [environment, liffService]);
+
+  useEffect(() => {
+    console.log("[Debug] 🔁 useEffect(handleLineAuthRedirect) fired");
+
+    const handleLineAuthRedirect = async () => {
+      if (typeof window === "undefined") return;
+
+      if (state.isAuthenticating) {
+        console.log("[Debug] Skipping: already authenticating");
+        return;
+      }
+
+      if (
+        state.authenticationState !== "unauthenticated" &&
+        state.authenticationState !== "loading"
+      ) {
+        console.log("[Debug] Skipping: already authenticated or in progress");
+        return;
+      }
+
+      const { isInitialized, isLoggedIn } = liffService.getState();
+
+      if (isInitialized && !isLoggedIn) {
+        console.log("[Debug] LIFF initialized but user not logged in - skipping redirect logic");
+        return;
+      }
+
+      const timestamp = new Date().toISOString();
+      console.log(`🔍 [${timestamp}] Detected LINE authentication redirect`);
+      console.log(`🔍 [${timestamp}] Current state:`, {
+        authenticationState: state.authenticationState,
+        isAuthenticating: state.isAuthenticating,
+        environment,
+        windowHref: window.location.href,
+      });
+
+      setState((prev) => ({ ...prev, isAuthenticating: true }));
+
+      try {
+        const initialized = await liffService.initialize();
+        if (!initialized) {
+          console.error("LIFF init failed");
+          return;
+        }
+
+        const { isLoggedIn, profile } = liffService.getState();
+        console.log("LIFF State:", {
+          isInitialized: true,
+          isLoggedIn,
+          userId: profile?.userId || "none",
+        });
+
+        if (!isLoggedIn) {
+          console.log("User not logged in via LIFF");
+          return;
+        }
+
+        const success = await liffService.signInWithLiffToken();
+        if (!success) {
+          console.error("signInWithLiffToken failed");
+          return;
+        }
+
+        console.log("LINE auth successful. Refetching user...");
+        await refetchUser();
+      } catch (err) {
+        console.error("Error during LINE auth:", err);
+      } finally {
+        setState((prev) => ({ ...prev, isAuthenticating: false }));
+      }
+    };
+
+    handleLineAuthRedirect();
+  }, [state.authenticationState, state.isAuthenticating, liffService, refetchUser, environment]);
+
+  useEffect(() => {
+    console.log("[Debug] 🔁 useEffect(handleAutoLogin) fired");
+
+    const handleAutoLogin = async () => {
+      if (environment !== AuthEnvironment.LIFF) return;
+      if (state.authenticationState !== "unauthenticated") return;
+      if (state.isAuthenticating) return;
+
+      const liffState = liffService.getState();
+      if (!liffState.isInitialized || !liffState.isLoggedIn) return;
+
+      const timestamp = new Date().toISOString();
+      console.log(`🔍 [${timestamp}] Auto-logging in via LIFF`);
+
+      setState((prev) => ({ ...prev, isAuthenticating: true }));
+      try {
+        const success = await liffService.signInWithLiffToken();
+        if (success) {
+          await refetchUser();
+        }
+      } catch (error) {
+        console.error("Auto-login with LIFF failed:", error);
+      } finally {
+        setState((prev) => ({ ...prev, isAuthenticating: false }));
+      }
+    };
+
+    handleAutoLogin();
+  }, [environment, state.authenticationState, state.isAuthenticating, liffService, refetchUser]);
 
   /**
    * ログアウト
@@ -151,166 +353,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     if (!authStateManager) return; // Guard against initialization error
 
-    const phoneState = phoneAuthService.getState();
-    const isVerified = phoneState.isVerified;
-
-    if (isVerified) {
-      const updatePhoneAuthState = async () => {
-        try {
-          const timestamp = new Date().toISOString();
-          console.log(`🔍 [${timestamp}] Updating phone auth state in useEffect - isVerified:`, isVerified);
-          await authStateManager.handlePhoneAuthStateChange(true);
-          console.log(`🔍 [${timestamp}] AuthStateManager phone state updated successfully in useEffect`);
-        } catch (error) {
-          console.error("Failed to update AuthStateManager phone state in useEffect:", error);
-        }
-      };
-
-      updatePhoneAuthState();
-    }
-
-    setState((prev) => ({
-      ...prev,
-      authenticationState: isVerified ?
-        (prev.authenticationState === "line_authenticated" ? "phone_authenticated" : prev.authenticationState) :
-        prev.authenticationState,
-    }));
-  }, [authStateManager, phoneAuthService]);
-
-  useEffect(() => {
-    if (userData?.currentUser?.user) {
-      setState((prev) => ({
-        ...prev,
-        currentUser: userData.currentUser.user,
-        authenticationState: "user_registered",
-      }));
-
-      if (authStateManager) {
-        const updateUserRegistrationState = async () => {
-          try {
-            const timestamp = new Date().toISOString();
-            console.log(`🔍 [${timestamp}] Updating user registration state in useEffect`);
-            await authStateManager.handleUserRegistrationStateChange(true);
-            console.log(`🔍 [${timestamp}] AuthStateManager user registration state updated successfully`);
-          } catch (error) {
-            console.error("Failed to update AuthStateManager user registration state:", error);
-          }
-        };
-
-        updateUserRegistrationState();
-      }
-    }
-  }, [userData, authStateManager]);
-
-  useEffect(() => {
-    const initializeLiff = async () => {
-      if (environment !== AuthEnvironment.LIFF) return;
-
-      const timestamp = new Date().toISOString();
-      console.log(`🔍 [${timestamp}] Initializing LIFF in environment:`, environment);
-
-      const liffSuccess = await liffService.initialize();
-      if (liffSuccess) {
-        const liffState = liffService.getState();
-        console.log(`🔍 [${timestamp}] LIFF state after initialization:`, {
-          isInitialized: liffState.isInitialized,
-          isLoggedIn: liffState.isLoggedIn,
-          userId: liffState.profile?.userId || "none"
-        });
-      } else {
-        console.error(`🔍 [${timestamp}] LIFF initialization failed`);
-      }
-    };
-
-    initializeLiff();
-  }, [environment, liffService]);
-
-  useEffect(() => {
-    const handleLineAuthRedirect = async () => {
-      if (typeof window === "undefined") return;
-      if (state.isAuthenticating) return;
-
-      if (state.authenticationState !== "unauthenticated" && state.authenticationState !== "loading") return;
-
-      const timestamp = new Date().toISOString();
-      console.log(`🔍 [${timestamp}] Detected LINE authentication redirect`);
-      console.log(`🔍 [${timestamp}] Current state:`, {
-        authenticationState: state.authenticationState,
-        isAuthenticating: state.isAuthenticating,
-        environment,
-        windowHref: window.location.href
-      });
-
-      setState(prev => ({ ...prev, isAuthenticating: true }));
-
-      try {
-        const liffSuccess = await liffService.initialize();
-        if (liffSuccess) {
-          const liffState = liffService.getState();
-          console.log(`🔍 [${timestamp}] LIFF state after initialization:`, {
-            isInitialized: liffState.isInitialized,
-            isLoggedIn: liffState.isLoggedIn,
-            userId: liffState.profile?.userId || "none",
-            accessToken: liffService.getAccessToken() ? "present" : "missing"
-          });
-
-          if (liffState.isLoggedIn) {
-            const success = await liffService.signInWithLiffToken();
-            console.log(`🔍 [${timestamp}] signInWithLiffToken result:`, success);
-
-            if (success) {
-              console.log(`🔍 [${timestamp}] LINE authentication successful - refreshing user data`);
-              await refetchUser();
-            } else {
-              console.error(`🔍 [${timestamp}] Failed to complete LINE authentication with LIFF token`);
-            }
-          } else {
-            console.log(`🔍 [${timestamp}] LIFF not logged in after initialization`);
-          }
-        } else {
-          console.error(`🔍 [${timestamp}] LIFF initialization failed during redirect completion`);
-        }
-      } catch (error) {
-        console.error(`🔍 [${timestamp}] Error during LINE authentication completion:`, error);
-      } finally {
-        setState(prev => ({ ...prev, isAuthenticating: false }));
-      }
-    };
-
-    handleLineAuthRedirect();
-  }, [state.authenticationState, state.isAuthenticating, environment, liffService, refetchUser]);
-
-  useEffect(() => {
-    const handleAutoLogin = async () => {
-      if (environment !== AuthEnvironment.LIFF) return;
-      if (state.authenticationState !== "unauthenticated") return;
-      if (state.isAuthenticating) return;
-
-      const liffState = liffService.getState();
-      if (!liffState.isInitialized || !liffState.isLoggedIn) return;
-
-      const timestamp = new Date().toISOString();
-      console.log(`🔍 [${timestamp}] Auto-logging in via LIFF`);
-
-      setState((prev) => ({ ...prev, isAuthenticating: true }));
-      try {
-        const success = await liffService.signInWithLiffToken();
-        if (success) {
-          await refetchUser();
-        }
-      } catch (error) {
-        console.error("Auto-login with LIFF failed:", error);
-      } finally {
-        setState((prev) => ({ ...prev, isAuthenticating: false }));
-      }
-    };
-
-    handleAutoLogin();
-  }, [environment, state.authenticationState, state.isAuthenticating, liffService, refetchUser]);
-
-  useEffect(() => {
-    if (!authStateManager) return; // Guard against initialization error
-
     const initializeAuthState = async () => {
       console.log("🔍 Initializing AuthStateManager");
       await authStateManager.initialize();
@@ -319,7 +361,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuthState();
 
     const handleStateChange = (newState: AuthState["authenticationState"]) => {
-      setState(prev => ({ ...prev, authenticationState: newState }));
+      setState((prev) => ({ ...prev, authenticationState: newState }));
     };
 
     authStateManager.addStateChangeListener(handleStateChange);
@@ -329,8 +371,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { source } = customEvent.detail;
 
       if (source === "graphql" || source === "network") {
-        if (state.authenticationState === "line_authenticated" || state.authenticationState === "user_registered") {
-          setState(prev => ({ ...prev, authenticationState: "line_token_expired" }));
+        if (
+          state.authenticationState === "line_authenticated" ||
+          state.authenticationState === "user_registered"
+        ) {
+          setState((prev) => ({ ...prev, authenticationState: "line_token_expired" }));
           if (typeof window !== "undefined") {
             const event = new CustomEvent("auth:renew-line-token", { detail: {} });
             window.dispatchEvent(event);
@@ -339,7 +384,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
 
         if (state.authenticationState === "phone_authenticated") {
-          setState(prev => ({ ...prev, authenticationState: "phone_token_expired" }));
+          setState((prev) => ({ ...prev, authenticationState: "phone_token_expired" }));
           if (typeof window !== "undefined") {
             const event = new CustomEvent("auth:renew-phone-token", { detail: {} });
             window.dispatchEvent(event);
@@ -377,7 +422,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const initialized = await liffService.initialize();
       if (!initialized) {
-        throw new Error("Failed to initialize LIFF");
+        console.error("Failed to initialize LIFF");
       }
 
       const loggedIn = await liffService.login(redirectPath);
@@ -399,6 +444,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setState((prev) => ({ ...prev, isAuthenticating: false }));
     }
   };
+
+  // ====================================================================
+  // ====================================================================
+  // ====================================================================
 
   /**
    * 電話番号認証を開始
@@ -424,7 +473,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const timestamp = new Date().toISOString();
           console.log(`🔍 [${timestamp}] Updating phone auth state in verifyPhoneCode`);
           await authStateManager.handlePhoneAuthStateChange(true);
-          console.log(`🔍 [${timestamp}] AuthStateManager phone state updated successfully in verifyPhoneCode`);
+          console.log(
+            `🔍 [${timestamp}] AuthStateManager phone state updated successfully in verifyPhoneCode`,
+          );
         } catch (error) {
           console.error("Failed to update AuthStateManager phone state in verifyPhoneCode:", error);
         }
@@ -471,9 +522,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             currentPrefecture: prefecture, // Changed from prefecture to currentPrefecture to match backend schema
             communityId: COMMUNITY_ID,
             phoneUid,
-            phoneNumber: phoneTokens.phoneNumber,
-            lineRefreshToken: lineTokens.refreshToken,
-            phoneRefreshToken: phoneTokens.refreshToken,
+            phoneNumber: phoneTokens.phoneNumber ?? undefined,
+            lineRefreshToken: lineTokens.refreshToken ?? undefined,
+            phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
           },
         },
       });
@@ -499,7 +550,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user: state.currentUser,
     firebaseUser: state.firebaseUser,
     uid: state.firebaseUser?.uid || null,
-    isAuthenticated: ["line_authenticated", "phone_authenticated", "user_registered"].includes(state.authenticationState),
+    isAuthenticated: ["line_authenticated", "phone_authenticated", "user_registered"].includes(
+      state.authenticationState,
+    ),
     isPhoneVerified: ["phone_authenticated", "user_registered"].includes(state.authenticationState),
     isUserRegistered: state.authenticationState === "user_registered",
     authenticationState: state.authenticationState,

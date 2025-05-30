@@ -2,8 +2,8 @@
 
 import liff from "@line/liff";
 import { signInWithCustomToken, updateProfile } from "firebase/auth";
-import { lineAuth, categorizeFirebaseError } from "./firebase-config";
-import { TokenManager, AuthTokens } from "./token-manager";
+import { categorizeFirebaseError, lineAuth } from "./firebase-config";
+import { AuthTokens, TokenManager } from "./token-manager";
 import retry from "retry";
 
 /**
@@ -27,6 +27,7 @@ export class LiffService {
   private static instance: LiffService;
   private liffId: string;
   private state: LiffState;
+  private initializing = false;
 
   /**
    * コンストラクタ
@@ -44,6 +45,14 @@ export class LiffService {
       },
       error: null,
     };
+  }
+
+  public getLiffUrl(redirectPath?: string): string {
+    const baseUrl = `https://liff.line.me/${this.liffId}`;
+    if (!redirectPath) return baseUrl;
+
+    const encodedNext = encodeURIComponent(redirectPath);
+    return `${baseUrl}?next=${encodedNext}`;
   }
 
   /**
@@ -66,10 +75,17 @@ export class LiffService {
    * @returns 初期化が成功したかどうか
    */
   public async initialize(): Promise<boolean> {
+    console.log("[Debug] Calling liffService.initialize()");
     try {
       if (this.state.isInitialized) {
+        console.log("[Debug] Already initialized, skipping");
         return true;
       }
+      if (this.initializing) {
+        console.log("[Debug] Already initializing, skipping");
+        return true;
+      }
+      this.initializing = true;
 
       await liff.init({ liffId: this.liffId });
       this.state.isInitialized = true;
@@ -79,18 +95,18 @@ export class LiffService {
         await this.updateProfile();
       }
 
+      console.log("[Debug] liffService.initialize() success:", this.state.isInitialized);
+
       return true;
     } catch (error) {
       console.error("LIFF initialization error:", error);
       this.state.error = error as Error;
       return false;
+    } finally {
+      this.initializing = false;
     }
   }
 
-  /**
-   * LIFFでログイン
-   * @returns ログインが成功したかどうか
-   */
   /**
    * LIFFでログイン
    * @param redirectPath リダイレクト先のパス（オプション）
@@ -105,9 +121,12 @@ export class LiffService {
       if (liff.isInClient()) {
         this.state.isLoggedIn = true;
       } else {
-        const redirectUri = redirectPath && typeof window !== "undefined"
-          ? window.location.origin + redirectPath
-          : typeof window !== "undefined" ? window.location.pathname : undefined;
+        const redirectUri =
+          redirectPath && typeof window !== "undefined"
+            ? window.location.origin + redirectPath
+            : typeof window !== "undefined"
+              ? window.location.pathname
+              : undefined;
 
         liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない
@@ -196,7 +215,7 @@ export class LiffService {
             isInitialized: this.state.isInitialized,
             isLoggedIn: this.state.isLoggedIn,
             accessToken: this.getAccessToken() ? "present" : "missing",
-            userId: this.state.profile?.userId || "none"
+            userId: this.state.profile?.userId || "none",
           });
 
           const requestTimestamp = new Date().toISOString();
@@ -216,7 +235,7 @@ export class LiffService {
             status: response.status,
             ok: response.ok,
             attempt: currentAttempt,
-            statusText: response.statusText
+            statusText: response.statusText,
           });
 
           if (!response.ok) {
@@ -228,7 +247,7 @@ export class LiffService {
           const { customToken, profile } = await response.json();
           console.log(`🔍 [${jsonTimestamp}] Received custom token and profile:`, {
             hasCustomToken: !!customToken,
-            profileName: profile?.displayName || "none"
+            profileName: profile?.displayName || "none",
           });
 
           const firebaseTimestamp = new Date().toISOString();
@@ -236,7 +255,9 @@ export class LiffService {
           const userCredential = await signInWithCustomToken(lineAuth, customToken);
           console.log(`🔍 [${firebaseTimestamp}] Firebase sign-in successful:`, {
             uid: userCredential.user.uid,
-            isNewUser: userCredential.user.metadata.creationTime === userCredential.user.metadata.lastSignInTime
+            isNewUser:
+              userCredential.user.metadata.creationTime ===
+              userCredential.user.metadata.lastSignInTime,
           });
 
           await updateProfile(userCredential.user, {
@@ -254,7 +275,7 @@ export class LiffService {
           console.log(`🔍 [${tokenTimestamp}] Token details:`, {
             hasIdToken: !!idToken,
             hasRefreshToken: !!refreshToken,
-            expirationTime: new Date(expirationTime).toISOString()
+            expirationTime: new Date(expirationTime).toISOString(),
           });
 
           const tokens: AuthTokens = {
@@ -271,7 +292,9 @@ export class LiffService {
               const timestamp = new Date().toISOString();
               console.log(`🔍 [${timestamp}] Updating LINE auth state in signInWithLiffToken`);
               await authStateManager.handleLineAuthStateChange(true);
-              console.log(`🔍 [${timestamp}] AuthStateManager state updated to line_authenticated in signInWithLiffToken`);
+              console.log(
+                `🔍 [${timestamp}] AuthStateManager state updated to line_authenticated in signInWithLiffToken`,
+              );
             } catch (error) {
               console.error("Failed to update AuthStateManager state:", error);
             }
