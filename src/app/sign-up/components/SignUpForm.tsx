@@ -41,6 +41,7 @@ export function SignUpForm() {
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   const authRedirectService = AuthRedirectService.getInstance();
+  const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -55,7 +56,6 @@ export function SignUpForm() {
     try {
       if (!isPhoneVerified) {
         toast.error("電話番号認証が完了していません");
-        const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
         router.replace(redirectPath ?? "/users/me");
         return;
       }
@@ -65,8 +65,7 @@ export function SignUpForm() {
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
         setIsRedirecting(true);
-        const redirectUrl = nextParam || "/activities";
-        router.push(redirectUrl);
+        router.push(redirectPath ?? "/users/me");
       }
     } catch (error) {
       console.error("Sign up error:", error);
