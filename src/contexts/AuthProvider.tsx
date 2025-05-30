@@ -269,45 +269,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setState((prev) => ({ ...prev, isAuthenticating: true }));
 
       try {
-        const liffSuccess = await liffService.initialize();
-        if (liffSuccess) {
-          const liffState = liffService.getState();
-          console.log(`🔍 [${timestamp}] LIFF state after initialization:`, {
-            isInitialized: liffState.isInitialized,
-            isLoggedIn: liffState.isLoggedIn,
-            userId: liffState.profile?.userId || "none",
-            accessToken: liffService.getAccessToken() ? "present" : "missing",
-          });
-
-          if (liffState.isLoggedIn) {
-            const success = await liffService.signInWithLiffToken();
-            console.log(`🔍 [${timestamp}] signInWithLiffToken result:`, success);
-
-            if (success) {
-              console.log(
-                `🔍 [${timestamp}] LINE authentication successful - refreshing user data`,
-              );
-              await refetchUser();
-            } else {
-              console.error(
-                `🔍 [${timestamp}] Failed to complete LINE authentication with LIFF token`,
-              );
-            }
-          } else {
-            console.log(`🔍 [${timestamp}] LIFF not logged in after initialization`);
-          }
-        } else {
-          console.error(`🔍 [${timestamp}] LIFF initialization failed during redirect completion`);
+        const initialized = await liffService.initialize();
+        if (!initialized) {
+          console.error("LIFF init failed");
+          return;
         }
-      } catch (error) {
-        console.error(`🔍 [${timestamp}] Error during LINE authentication completion:`, error);
+
+        const { isInitialized, isLoggedIn, profile } = liffService.getState();
+        console.log("LIFF State:", { isInitialized, isLoggedIn, userId: profile?.userId });
+
+        if (!isLoggedIn) {
+          console.log("User not logged in via LIFF");
+          return;
+        }
+
+        const success = await liffService.signInWithLiffToken();
+        if (!success) {
+          console.error("signInWithLiffToken failed");
+          return;
+        }
+
+        console.log("LINE auth successful. Refetching user...");
+        await refetchUser();
+      } catch (err) {
+        console.error("Error during LINE auth:", err);
       } finally {
         setState((prev) => ({ ...prev, isAuthenticating: false }));
       }
     };
 
     handleLineAuthRedirect();
-  }, [state.authenticationState, state.isAuthenticating, environment, liffService, refetchUser]);
+  }, [state.authenticationState, state.isAuthenticating, liffService, refetchUser]);
 
   useEffect(() => {
     const handleAutoLogin = async () => {
