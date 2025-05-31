@@ -55,18 +55,19 @@ export const presenterPlaceCard = (edges: GqlPlaceEdge[]): IPlaceCard[] => {
 
     //TODO neo88専用の並び替えハードコード
     const opportunity = getPrimaryOpportunity(place);
-    const user = opportunity?.createdByUser;
 
-    const firstOpportunityOwnerWrittenArticle =
-      user?.articlesAboutMe?.map(presenterArticleWithAuthor) ?? [];
+    const articles = opportunity?.articles?.map(presenterArticleWithAuthor) ?? [];
+    const fallbackArticles =
+      opportunity?.createdByUser?.articlesAboutMe?.map(presenterArticleWithAuthor) ?? [];
+    const article = articles[0] ?? fallbackArticles[0];
     const pin = presenterPlacePin(place);
 
     places.push({
       ...pin,
       name: place.name,
       address: place.address,
-      headline: firstOpportunityOwnerWrittenArticle[0]?.title || "",
-      bio: firstOpportunityOwnerWrittenArticle[0]?.introduction || "",
+      headline: article?.title || "",
+      bio: article?.introduction || "",
       publicOpportunityCount: place.currentPublicOpportunityCount ?? 0,
       participantCount: place.accumulatedParticipants ?? 0,
       communityId: place.community?.id ?? "",
@@ -113,14 +114,14 @@ const getRelatedArticles = (
   user?: Maybe<GqlUser>,
   opportunities: GqlOpportunity[] = [],
 ): TArticleWithAuthor[] => {
-  const profileArticles = user?.articlesAboutMe?.map(presenterArticleWithAuthor) ?? [];
-
   const opportunityArticles = opportunities.flatMap(
     (o) => o.articles?.map(presenterArticleWithAuthor) ?? [],
   );
+  const profileArticles = user?.articlesAboutMe?.map(presenterArticleWithAuthor) ?? [];
 
+  // 順序を保ったまま重複除去
   return Array.from(
-    new Map([...profileArticles, ...opportunityArticles].map((a) => [a.id, a])).values(),
+    new Map([...opportunityArticles, ...profileArticles].map((a) => [a.id, a])).values(),
   );
 };
 
