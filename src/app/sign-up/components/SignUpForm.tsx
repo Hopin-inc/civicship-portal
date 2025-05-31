@@ -98,7 +98,10 @@ export function SignUpForm() {
         <h1 className="text-2xl font-bold tracking-tight">アカウント情報の登録</h1>
       </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={event => {
+          event.preventDefault();
+          return form.handleSubmit(onSubmit)(event);
+        }} className="space-y-8">
           <FormField
             control={form.control}
             name="name"
