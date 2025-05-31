@@ -15,7 +15,8 @@ if (typeof window === "undefined") {
 }
 
 /**
- * 認証セッションIDを生成する
+ * 認証セッションIDを生成する（永続化対応）
+ * ブラウザ環境では localStorage を使用してセッションIDを永続化
  * @returns 一意のセッションID
  */
 export const generateSessionId = (): string => {
@@ -23,6 +24,31 @@ export const generateSessionId = (): string => {
     return serverUtils.generateSessionId();
   }
 
+  if (typeof window === "undefined") {
+    return generateNewSessionId();
+  }
+
+  const SESSION_ID_KEY = "civicship_auth_session_id";
+  
+  try {
+    let sessionId = localStorage.getItem(SESSION_ID_KEY);
+    
+    if (!sessionId) {
+      sessionId = generateNewSessionId();
+      localStorage.setItem(SESSION_ID_KEY, sessionId);
+    }
+    
+    return sessionId;
+  } catch (error) {
+    return generateNewSessionId();
+  }
+};
+
+/**
+ * 新しいセッションIDを生成する内部関数
+ * @returns 新しい一意のセッションID
+ */
+const generateNewSessionId = (): string => {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
     return `auth_${Date.now()}_${crypto.randomUUID().replace(/-/g, "").substring(0, 9)}`;
   } else if (typeof crypto !== "undefined" && crypto.getRandomValues) {
@@ -31,6 +57,20 @@ export const generateSessionId = (): string => {
     return `auth_${Date.now()}_${array[0].toString(36)}`;
   } else {
     return `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+};
+
+/**
+ * セッションIDをクリアする
+ * ログアウト時などに呼び出される
+ */
+export const clearSessionId = (): void => {
+  if (typeof window !== "undefined") {
+    try {
+      const SESSION_ID_KEY = "civicship_auth_session_id";
+      localStorage.removeItem(SESSION_ID_KEY);
+    } catch (error) {
+    }
   }
 };
 

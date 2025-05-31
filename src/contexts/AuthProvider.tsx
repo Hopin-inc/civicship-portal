@@ -27,7 +27,7 @@ import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDe
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 import { useAutoLogin } from "@/hooks/auth/useAutoLogin";
 import clientLogger from "@/lib/logging/client";
-import { createAuthLogContext, generateSessionId, maskPhoneNumber } from "@/lib/logging/client/utils";
+import { createAuthLogContext, generateSessionId, maskPhoneNumber, clearSessionId } from "@/lib/logging/client/utils";
 
 /**
  * 認証状態の型定義
@@ -140,6 +140,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       TokenManager.clearAllTokens();
 
+      clearSessionId();
+      authStateManager?.resetSessionId();
+      
       setState((prev) => ({
         ...prev,
         firebaseUser: null,
@@ -177,7 +180,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const initialized = await liffService.initialize();
       if (!initialized) {
         clientLogger.info("Failed to initialize LIFF", createAuthLogContext(
-          generateSessionId(),
+          authStateManager?.getSessionId() || generateSessionId(),
           "liff",
           { component: "AuthProvider" }
         ));
@@ -197,7 +200,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return success;
     } catch (error) {
       clientLogger.info("Login with LIFF failed", createAuthLogContext(
-        generateSessionId(),
+        authStateManager?.getSessionId() || generateSessionId(),
         "liff",
         { 
           error: error instanceof Error ? error.message : String(error),

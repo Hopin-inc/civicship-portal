@@ -2,7 +2,7 @@ import { TokenManager } from "./token-manager";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import clientLogger from "../logging/client";
-import { createAuthLogContext, generateSessionId } from "../logging/client/utils";
+import { createAuthLogContext, clearSessionId } from "../logging/client/utils";
 
 export type AuthenticationState =
   | "unauthenticated"
@@ -21,8 +21,10 @@ export class AuthStateManager {
   private static instance: AuthStateManager;
   private currentState: AuthenticationState = "loading";
   private stateChangeListeners: ((state: AuthenticationState) => void)[] = [];
+  private sessionId: string;
 
   private constructor() {
+    this.sessionId = this.initializeSessionId();
     if (typeof window !== "undefined") {
       window.addEventListener("auth:renew-line-token", this.handleLineTokenRenewal.bind(this));
       window.addEventListener("auth:renew-phone-token", this.handlePhoneTokenRenewal.bind(this));
@@ -44,6 +46,69 @@ export class AuthStateManager {
    */
   public getState(): AuthenticationState {
     return this.currentState;
+  }
+
+  /**
+   * 現在のセッションIDを取得
+   */
+  public getSessionId(): string {
+    return this.sessionId;
+  }
+
+  /**
+   * セッションIDを初期化する
+   * localStorage から既存のIDを取得するか、新しいIDを生成する
+   */
+  private initializeSessionId(): string {
+    if (typeof window === "undefined") {
+      return this.generateSessionId();
+    }
+
+    const SESSION_ID_KEY = "civicship_auth_session_id";
+    
+    try {
+      let sessionId = localStorage.getItem(SESSION_ID_KEY);
+      
+      if (!sessionId) {
+        sessionId = this.generateSessionId();
+        localStorage.setItem(SESSION_ID_KEY, sessionId);
+      }
+      
+      return sessionId;
+    } catch (error) {
+      return this.generateSessionId();
+    }
+  }
+
+  /**
+   * セッションIDを生成する
+   */
+  private generateSessionId(): string {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) {
+      return `auth_${Date.now()}_${crypto.randomUUID().replace(/-/g, "").substring(0, 9)}`;
+    } else if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+      const array = new Uint32Array(1);
+      crypto.getRandomValues(array);
+      return `auth_${Date.now()}_${array[0].toString(36)}`;
+    } else {
+      return `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+  }
+
+  /**
+   * 新しいセッションIDを生成してリセットする
+   * ログアウト時や新しい認証セッション開始時に呼び出される
+   */
+  public resetSessionId(): void {
+    this.sessionId = this.generateSessionId();
+    
+    if (typeof window !== "undefined") {
+      try {
+        const SESSION_ID_KEY = "civicship_auth_session_id";
+        localStorage.setItem(SESSION_ID_KEY, this.sessionId);
+      } catch (error) {
+      }
+    }
   }
 
   /**
@@ -133,7 +198,7 @@ export class AuthStateManager {
         accessToken = await lineAuth.currentUser.getIdToken();
       } catch (tokenError) {
         clientLogger.info("Failed to get Firebase token for user registration check", createAuthLogContext(
-          generateSessionId(),
+          this.sessionId,
           "general",
           { 
             error: tokenError instanceof Error ? tokenError.message : String(tokenError),
@@ -165,7 +230,7 @@ export class AuthStateManager {
       return isRegistered;
     } catch (error) {
       clientLogger.info("Failed to check user registration", createAuthLogContext(
-        generateSessionId(),
+        this.sessionId,
         "general",
         { 
           error: error instanceof Error ? error.message : String(error),
@@ -195,7 +260,7 @@ export class AuthStateManager {
       }
     } catch (error) {
       clientLogger.info("Failed to renew LINE token", createAuthLogContext(
-        generateSessionId(),
+        this.sessionId,
         "general",
         { 
           error: error instanceof Error ? error.message : String(error),
@@ -226,7 +291,7 @@ export class AuthStateManager {
       }
     } catch (error) {
       clientLogger.info("Failed to renew phone token", createAuthLogContext(
-        generateSessionId(),
+        this.sessionId,
         "general",
         { 
           error: error instanceof Error ? error.message : String(error),
