@@ -27,6 +27,13 @@ export default function HomePage() {
     const isReturnFromLineAuth = searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
     const nextPath = searchParams.get("liff.state");
 
+    console.log("🔍 HomePage useEffect - checking LINE auth return:", {
+      isReturnFromLineAuth,
+      nextPath,
+      currentUrl: window.location.href,
+      searchParamsString: searchParams.toString()
+    });
+
     if (isReturnFromLineAuth) {
       console.log("🚀 Detected return from LINE authentication, liff.state:", nextPath);
 
@@ -34,18 +41,41 @@ export default function HomePage() {
       if (nextPath?.startsWith("/login?next=")) {
         const urlParams = new URLSearchParams(nextPath.split("?")[1]);
         cleanedNextPath = urlParams.get("next");
+        console.log("🔍 Extracted nested next path:", cleanedNextPath);
       } else if (nextPath?.startsWith("/login")) {
         cleanedNextPath = null;
+        console.log("🔍 Cleared login path, setting to null");
       }
+
+      console.log("🔍 Final cleaned next path:", cleanedNextPath);
+      
+      if (cleanedNextPath && typeof window !== "undefined") {
+        sessionStorage.setItem("lineAuthRedirectPath", cleanedNextPath);
+        console.log("🔍 Stored redirect path in sessionStorage:", cleanedNextPath);
+      }
+
       const cleanedUrl = cleanedNextPath ? `${ window.location.pathname }?next=${ cleanedNextPath }` : window.location.pathname;
+      console.log("🔍 Cleaning URL to:", cleanedUrl);
       router.replace(cleanedUrl);
 
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(cleanedNextPath);
       console.log("🚀 Authenticated, redirecting to:", redirectPath);
       router.replace(redirectPath);
-    } else {
-      router.replace("/activities");
+      return;
     }
+
+    if (typeof window !== "undefined") {
+      const storedRedirectPath = sessionStorage.getItem("lineAuthRedirectPath");
+      if (storedRedirectPath && isAuthenticated && authenticationState === "user_registered") {
+        console.log("🔍 Found stored redirect path, redirecting to:", storedRedirectPath);
+        sessionStorage.removeItem("lineAuthRedirectPath");
+        router.replace(storedRedirectPath);
+        return;
+      }
+    }
+
+    console.log("🔍 No LINE auth return detected, redirecting to activities");
+    router.replace("/activities");
   }, [router, isAuthenticated, authenticationState, userData, authLoading, userLoading, isAuthenticating, authRedirectService, searchParams]);
 
   useEffect(() => {
