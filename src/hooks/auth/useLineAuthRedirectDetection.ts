@@ -13,8 +13,6 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
   const [shouldProcessRedirect, setShouldProcessRedirect] = useState(false);
 
   useEffect(() => {
-    console.log("[Debug] 🔁 useEffect(handleLineAuthRedirect) fired");
-
     const checkRedirectConditions = () => {
       if (typeof window === "undefined") return false;
 

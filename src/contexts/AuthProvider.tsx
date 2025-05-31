@@ -149,27 +149,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [liffService, phoneAuthService]);
 
-  const { isInitialized } = useAuthStateManagerInitialization(authStateManager);
-
+  useAuthStateManagerInitialization(authStateManager);
   useAuthStateChangeListener({ authStateManager, setState });
-
   useTokenExpirationHandler({ state, setState, logout });
-
   useFirebaseAuthState({ authStateManager, state, setState });
-
   usePhoneAuthState({ authStateManager, phoneAuthService, setState });
-
   useUserRegistrationState({ authStateManager, userData, setState });
-
   useLiffInitialization({ environment, liffService });
-
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
-
   useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
-
   useAutoLogin({ environment, state, liffService, setState, refetchUser });
-
-
 
   /**
    * LIFFでログイン
@@ -205,10 +194,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // ====================================================================
-  // ====================================================================
-  // ====================================================================
-
   /**
    * 電話番号認証を開始
    */
@@ -231,10 +216,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (authStateManager) {
         try {
           const timestamp = new Date().toISOString();
-          console.log(`🔍 [${timestamp}] Updating phone auth state in verifyPhoneCode`);
+          console.log(`🔍 [${ timestamp }] Updating phone auth state in verifyPhoneCode`);
           await authStateManager.handlePhoneAuthStateChange(true);
           console.log(
-            `🔍 [${timestamp}] AuthStateManager phone state updated successfully in verifyPhoneCode`,
+            `🔍 [${ timestamp }] AuthStateManager phone state updated successfully in verifyPhoneCode`,
           );
         } catch (error) {
           console.error("Failed to update AuthStateManager phone state in verifyPhoneCode:", error);
@@ -331,7 +316,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={ value }>{ children }</AuthContext.Provider>;
 };
 
 /**
