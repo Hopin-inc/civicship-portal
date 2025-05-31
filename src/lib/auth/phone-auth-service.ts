@@ -89,7 +89,11 @@ export class PhoneAuthService {
         this.recaptchaVerifier.clear();
         this.recaptchaVerifier = null;
       }
+      if (this.recaptchaContainerElement) {
+        this.recaptchaContainerElement.innerHTML = '';
+      }
       this.recaptchaContainerElement = null;
+      this.isRecaptchaRendered = false;
     } catch (e) {
       console.error("Error clearing reCAPTCHA:", e);
     }
@@ -170,6 +174,8 @@ export class PhoneAuthService {
         );
         console.log("Successfully created phone credential");
 
+        let verificationSuccessful = false;
+
         try {
           console.log("Signing in with credential to get user ID");
           const userCredential = await signInWithCredential(phoneAuth, credential);
@@ -195,6 +201,7 @@ export class PhoneAuthService {
             TokenManager.savePhoneTokens(tokens);
 
             console.log("Extracted phone auth tokens successfully");
+            verificationSuccessful = true;
           } else {
             console.error("No user returned from signInWithCredential");
           }
@@ -203,50 +210,17 @@ export class PhoneAuthService {
           console.log("Signed out of phone auth");
         } catch (signInError) {
           console.warn("Could not sign in with phone credential:", signInError);
-
-          try {
-            console.log("Attempting fallback with signInWithPhoneNumber");
-            if (!this.state.phoneNumber || !this.recaptchaVerifier) {
-              throw new Error("Missing phone number or recaptcha verifier for fallback");
-            }
-
-            const result = await signInWithPhoneNumber(
-              phoneAuth,
-              this.state.phoneNumber,
-              this.recaptchaVerifier,
-            );
-
-            if (phoneAuth.currentUser) {
-              this.state.phoneUid = phoneAuth.currentUser.uid;
-              console.log("Stored phone UID from fallback:", this.state.phoneUid);
-
-              const idToken = await phoneAuth.currentUser.getIdToken();
-              const refreshToken = phoneAuth.currentUser.refreshToken;
-
-              const tokenResult = await phoneAuth.currentUser.getIdTokenResult();
-              const expirationTime = new Date(tokenResult.expirationTime).getTime();
-
-              const tokens: PhoneAuthTokens = {
-                phoneUid: phoneAuth.currentUser.uid,
-                phoneNumber: this.state.phoneNumber,
-                accessToken: idToken,
-                refreshToken: refreshToken,
-                expiresAt: expirationTime,
-              };
-              TokenManager.savePhoneTokens(tokens);
-
-              console.log("Extracted phone auth tokens successfully (fallback)");
-            }
-
-            await phoneAuth.signOut();
-          } catch (fallbackError) {
-            console.error("Fallback also failed:", fallbackError);
-          }
+          console.log("Verification failed - invalid code");
+          return false;
         }
 
-        this.state.isVerified = true;
-        console.log("Phone verification state set to verified:", this.state);
-        return true;
+        if (verificationSuccessful) {
+          this.state.isVerified = true;
+          console.log("Phone verification state set to verified:", this.state);
+          return true;
+        } else {
+          return false;
+        }
       } catch (credentialError) {
         console.error("Invalid verification code:", credentialError);
         return false;
