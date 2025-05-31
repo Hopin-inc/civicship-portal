@@ -71,20 +71,6 @@ export class AuthRedirectService {
       return null;
     }
 
-    if (pathname === "/sign-up/phone-verification" && authState !== "line_authenticated") {
-      if (next && next.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
-        return next;
-      }
-      return "/";
-    }
-
-    if (pathname === "/sign-up" && authState !== "phone_authenticated") {
-      if (next && next.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
-        return next;
-      }
-      return "/";
-    }
-
     if (this.isProtectedPath(pathname)) {
       switch (authState) {
         case "unauthenticated":
