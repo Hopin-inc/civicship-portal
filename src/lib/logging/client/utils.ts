@@ -11,7 +11,6 @@ if (typeof window === "undefined") {
   try {
     serverUtils = require("./logging-utils-server");
   } catch (e) {
-    console.warn("Failed to load server logging utilities:", e);
   }
 }
 

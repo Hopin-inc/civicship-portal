@@ -6,6 +6,8 @@ import { lineAuth } from "@/lib/auth/firebase-config";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
+import clientLogger from "@/lib/logging/client";
+import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
 
 interface UseFirebaseAuthStateProps {
   authStateManager: AuthStateManager | null;
@@ -21,7 +23,7 @@ export const useFirebaseAuthState = ({ authStateManager, state, setState }: UseF
   stateRef.current = state;
 
   useEffect(() => {
-    console.log("[Debug] 🔥 useFirebaseAuthState fired.");
+    clientLogger.debug("useFirebaseAuthState fired", { component: "useFirebaseAuthState" });
     
     const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
       setState((prev) => ({
@@ -47,13 +49,20 @@ export const useFirebaseAuthState = ({ authStateManager, state, setState }: UseF
             expiresAt: expirationTime,
           });
 
-          console.log('🔄 Firebase Auth token synced to cookies');
+          clientLogger.debug("Firebase Auth token synced to cookies", { component: "useFirebaseAuthState" });
         } catch (error) {
-          console.error('Failed to sync Firebase token to cookies:', error);
+          clientLogger.info("Failed to sync Firebase token to cookies", createAuthLogContext(
+            generateSessionId(),
+            "general",
+            { 
+              error: error instanceof Error ? error.message : String(error),
+              component: "useFirebaseAuthState" 
+            }
+          ));
         }
       } else {
         TokenManager.clearLineTokens();
-        console.log('🔄 LINE tokens cleared from cookies');
+        clientLogger.debug("LINE tokens cleared from cookies", { component: "useFirebaseAuthState" });
       }
 
       const currentAuthStateManager = authStateManagerRef.current;

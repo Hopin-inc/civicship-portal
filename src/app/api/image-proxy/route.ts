@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverLogger } from '@/lib/logging/server';
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.searchParams.get('url');
@@ -28,7 +29,11 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Image proxy error:', error);
+    serverLogger.error('Image proxy error', {
+      error: error instanceof Error ? error.message : String(error),
+      url,
+      component: 'ImageProxyAPI'
+    });
     return NextResponse.json({ error: 'Failed to fetch image' }, { status: 500 });
   }
 }

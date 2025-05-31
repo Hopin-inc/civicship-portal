@@ -20,6 +20,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import clientLogger from "@/lib/logging/client";
 
 const FormSchema = z.object({
   name: z.string({ required_error: "名前を入力してください。" }),
@@ -58,7 +59,10 @@ export function SignUpForm() {
         setIsRedirecting(true);
       }
     } catch (error) {
-      console.error("Sign up error:", error);
+      clientLogger.error("Sign up error", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "SignUpForm"
+      });
       toast.error("アカウント作成に失敗しました");
     } finally {
       setIsLoading(false);

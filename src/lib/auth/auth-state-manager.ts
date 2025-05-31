@@ -1,6 +1,8 @@
 import { TokenManager } from "./token-manager";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
+import clientLogger from "../logging/client";
+import { createAuthLogContext, generateSessionId } from "../logging/client/utils";
 
 export type AuthenticationState =
   | "unauthenticated"
@@ -62,7 +64,11 @@ export class AuthStateManager {
    * 認証状態を更新
    */
   public setState(state: AuthenticationState): void {
-    console.log("🔃 AuthStateManager.setState: ", this.currentState, "->", state);
+    clientLogger.debug("AuthStateManager.setState", {
+      from: this.currentState,
+      to: state,
+      component: "AuthStateManager"
+    });
     if (this.currentState !== state) {
       this.currentState = state;
       this.notifyStateChange();
@@ -116,7 +122,9 @@ export class AuthStateManager {
     try {
       const { lineAuth } = await import("./firebase-config");
       if (!lineAuth.currentUser) {
-        console.log("No Firebase Auth user found");
+        clientLogger.debug("No Firebase Auth user found", {
+          component: "AuthStateManager"
+        });
         return false;
       }
 
@@ -124,7 +132,14 @@ export class AuthStateManager {
       try {
         accessToken = await lineAuth.currentUser.getIdToken();
       } catch (tokenError) {
-        console.error("Failed to get Firebase token for user registration check:", tokenError);
+        clientLogger.info("Failed to get Firebase token for user registration check", createAuthLogContext(
+          generateSessionId(),
+          "general",
+          { 
+            error: tokenError instanceof Error ? tokenError.message : String(tokenError),
+            component: "AuthStateManager" 
+          }
+        ));
         return false;
       }
 
@@ -139,16 +154,24 @@ export class AuthStateManager {
       });
 
       const isRegistered = data?.currentUser?.user != null;
-      console.log("User registration check result:", {
+      clientLogger.debug("User registration check result", {
         hasFirebaseUser: !!lineAuth.currentUser,
         hasAccessToken: !!accessToken,
         isRegistered,
-        userId: data?.currentUser?.user?.id || null
+        userId: data?.currentUser?.user?.id || null,
+        component: "AuthStateManager"
       });
 
       return isRegistered;
     } catch (error) {
-      console.error("Failed to check user registration:", error);
+      clientLogger.info("Failed to check user registration", createAuthLogContext(
+        generateSessionId(),
+        "general",
+        { 
+          error: error instanceof Error ? error.message : String(error),
+          component: "AuthStateManager" 
+        }
+      ));
       return false;
     }
   }
@@ -171,7 +194,14 @@ export class AuthStateManager {
         this.setState("unauthenticated");
       }
     } catch (error) {
-      console.error("Failed to renew LINE token:", error);
+      clientLogger.info("Failed to renew LINE token", createAuthLogContext(
+        generateSessionId(),
+        "general",
+        { 
+          error: error instanceof Error ? error.message : String(error),
+          component: "AuthStateManager" 
+        }
+      ));
       this.setState("unauthenticated");
     }
   }
@@ -195,7 +225,14 @@ export class AuthStateManager {
         }
       }
     } catch (error) {
-      console.error("Failed to renew phone token:", error);
+      clientLogger.info("Failed to renew phone token", createAuthLogContext(
+        generateSessionId(),
+        "general",
+        { 
+          error: error instanceof Error ? error.message : String(error),
+          component: "AuthStateManager" 
+        }
+      ));
 
       const lineTokens = TokenManager.getLineTokens();
       const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
@@ -258,7 +295,9 @@ export class AuthStateManager {
 
     if (isRegistered) {
       this.setState("user_registered");
-      console.log("🔄 User is registered - setting state to user_registered regardless of phone token status");
+      clientLogger.debug("User is registered - setting state to user_registered regardless of phone token status", {
+        component: "AuthStateManager"
+      });
     } else {
       const phoneTokens = TokenManager.getPhoneTokens();
       const hasValidPhoneToken = phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());

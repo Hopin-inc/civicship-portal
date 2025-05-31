@@ -39,7 +39,6 @@ export const getCoordinatesFromAddress = async (
   }
 
   if (!window.google || !window.google.maps) {
-    console.error("Google Maps API is not loaded");
     return null;
   }
 
@@ -51,7 +50,6 @@ export const getCoordinatesFromAddress = async (
         if (status === "OK" && results && results.length > 0) {
           resolve(results);
         } else {
-          console.warn(`Geocoding failed for address: ${address}`, status);
           resolve(null);
         }
       });
@@ -69,7 +67,6 @@ export const getCoordinatesFromAddress = async (
 
     return coordinates;
   } catch (error) {
-    console.error("Error geocoding address:", error);
     return null;
   }
 };

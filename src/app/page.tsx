@@ -10,6 +10,7 @@ import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection
 import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import clientLogger from "@/lib/logging/client";
 
 export default function HomePage() {
   const router = useRouter();

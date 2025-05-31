@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
+import clientLogger from "@/lib/logging/client";
 
 interface UsePhoneAuthStateProps {
   authStateManager: AuthStateManager | null;
@@ -19,7 +20,7 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
   phoneAuthServiceRef.current = phoneAuthService;
 
   useEffect(() => {
-    console.log("[Debug] 🔥 usePhoneAuthState fired.");
+    clientLogger.debug("usePhoneAuthState fired", { component: "usePhoneAuthState" });
     
     const currentAuthStateManager = authStateManagerRef.current;
     
@@ -32,16 +33,21 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
       const updatePhoneAuthState = async () => {
         try {
           const timestamp = new Date().toISOString();
-          console.log(
-            `🔍 [${timestamp}] Updating phone auth state in useEffect - isVerified:`,
+          clientLogger.debug("Updating phone auth state in useEffect", {
+            timestamp,
             isVerified,
-          );
+            component: "usePhoneAuthState"
+          });
           await currentAuthStateManager.handlePhoneAuthStateChange(true);
-          console.log(
-            `🔍 [${timestamp}] AuthStateManager phone state updated successfully in useEffect`,
-          );
+          clientLogger.debug("AuthStateManager phone state updated successfully in useEffect", {
+            timestamp,
+            component: "usePhoneAuthState"
+          });
         } catch (error) {
-          console.error("Failed to update AuthStateManager phone state in useEffect:", error);
+          clientLogger.error("Failed to update AuthStateManager phone state in useEffect", {
+            error: error instanceof Error ? error.message : String(error),
+            component: "usePhoneAuthState"
+          });
         }
       };
 

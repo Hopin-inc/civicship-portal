@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
+import clientLogger from "@/lib/logging/client";
 
 interface UseAuthStateChangeListenerProps {
   authStateManager: AuthStateManager | null;
@@ -11,7 +12,9 @@ interface UseAuthStateChangeListenerProps {
 
 export const useAuthStateChangeListener = ({ authStateManager, setState }: UseAuthStateChangeListenerProps) => {
   useEffect(() => {
-    console.log("[Debug] 🔥 useAuthStateChangeListener fired.");
+    clientLogger.debug("useAuthStateChangeListener fired", {
+      component: "useAuthStateChangeListener"
+    });
     
     if (!authStateManager) return;
 

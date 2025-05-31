@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import type { Locale } from "date-fns";
+import clientLogger from "@/lib/logging/client";
 
 export const parseDateTime = (dateTimeStr: string | null | undefined): Date | null => {
   if (!dateTimeStr) return null;
@@ -8,7 +9,11 @@ export const parseDateTime = (dateTimeStr: string | null | undefined): Date | nu
     const isoDateTimePart = dateTimeStr.split(' ')[0];
     return new Date(isoDateTimePart);
   } catch (error) {
-    console.error('Error parsing date:', error);
+    clientLogger.error('Error parsing date', {
+      error: error instanceof Error ? error.message : String(error),
+      dateTimeStr,
+      component: 'DateUtils'
+    });
     return null;
   }
 };

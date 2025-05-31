@@ -26,6 +26,8 @@ import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 import { useAutoLogin } from "@/hooks/auth/useAutoLogin";
+import clientLogger from "@/lib/logging/client";
+import { createAuthLogContext, generateSessionId, maskPhoneNumber } from "@/lib/logging/client/utils";
 
 /**
  * 認証状態の型定義
@@ -145,7 +147,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         authenticationState: "unauthenticated",
       }));
     } catch (error) {
-      console.error("Logout failed:", error);
+      clientLogger.error("Logout failed", { 
+        error: error instanceof Error ? error.message : String(error),
+        component: "AuthProvider" 
+      });
     }
   }, [liffService, phoneAuthService]);
 
@@ -171,7 +176,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const initialized = await liffService.initialize();
       if (!initialized) {
-        console.error("Failed to initialize LIFF");
+        clientLogger.info("Failed to initialize LIFF", createAuthLogContext(
+          generateSessionId(),
+          "liff",
+          { component: "AuthProvider" }
+        ));
       }
 
       const loggedIn = await liffService.login(redirectPath);
@@ -187,7 +196,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return success;
     } catch (error) {
-      console.error("Login with LIFF failed:", error);
+      clientLogger.info("Login with LIFF failed", createAuthLogContext(
+        generateSessionId(),
+        "liff",
+        { 
+          error: error instanceof Error ? error.message : String(error),
+          component: "AuthProvider" 
+        }
+      ));
       return false;
     } finally {
       setState((prev) => ({ ...prev, isAuthenticating: false }));
@@ -216,13 +232,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (authStateManager) {
         try {
           const timestamp = new Date().toISOString();
-          console.log(`🔍 [${ timestamp }] Updating phone auth state in verifyPhoneCode`);
+          clientLogger.debug("Updating phone auth state in verifyPhoneCode", {
+            timestamp,
+            component: "AuthProvider"
+          });
           await authStateManager.handlePhoneAuthStateChange(true);
-          console.log(
-            `🔍 [${ timestamp }] AuthStateManager phone state updated successfully in verifyPhoneCode`,
-          );
+          clientLogger.debug("AuthStateManager phone state updated successfully in verifyPhoneCode", {
+            timestamp,
+            component: "AuthProvider"
+          });
         } catch (error) {
-          console.error("Failed to update AuthStateManager phone state in verifyPhoneCode:", error);
+          clientLogger.error("Failed to update AuthStateManager phone state in verifyPhoneCode", {
+            error: error instanceof Error ? error.message : String(error),
+            component: "AuthProvider"
+          });
         }
       }
     }
@@ -252,12 +275,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const phoneTokens = TokenManager.getPhoneTokens();
       const lineTokens = TokenManager.getLineTokens();
 
-      console.log("Creating user with input:", {
+      clientLogger.debug("Creating user with input", {
         name,
         currentPrefecture: prefecture,
         communityId: COMMUNITY_ID,
         phoneUid,
-        phoneNumber: phoneTokens.phoneNumber,
+        phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
+        component: "AuthProvider"
       });
 
       const { data } = await userSignUp({
@@ -283,7 +307,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return null;
       }
     } catch (error) {
-      console.error("User creation failed:", error);
+      clientLogger.error("User creation failed", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "AuthProvider"
+      });
       toast.error("アカウント作成に失敗しました", {
         description: error instanceof Error ? error.message : "不明なエラーが発生しました",
       });

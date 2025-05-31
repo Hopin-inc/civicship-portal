@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthState } from "@/contexts/AuthProvider";
+import clientLogger from "@/lib/logging/client";
 
 interface UseLineAuthRedirectDetectionProps {
   state: AuthState;
@@ -15,7 +16,7 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
   const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
 
   useEffect(() => {
-    console.log("[Debug] 🔥 useLineAuthRedirectDetection fired.");
+    clientLogger.debug("useLineAuthRedirectDetection fired", { component: "useLineAuthRedirectDetection" });
 
     const currentState = {
       authenticationState: state.authenticationState,
@@ -46,7 +47,7 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
     }
 
     if (state.isAuthenticating) {
-      console.log("[Debug] Skipping: already authenticating");
+      clientLogger.debug("Skipping: already authenticating", { component: "useLineAuthRedirectDetection" });
       setShouldProcessRedirect(false);
       return;
     }
@@ -55,7 +56,7 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
       state.authenticationState !== "unauthenticated" &&
       state.authenticationState !== "loading"
     ) {
-      console.log("[Debug] Skipping: already authenticated or in progress");
+      clientLogger.debug("Skipping: already authenticated or in progress", { component: "useLineAuthRedirectDetection" });
       setShouldProcessRedirect(false);
       return;
     }
@@ -63,17 +64,22 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
     const { isInitialized, isLoggedIn } = currentLiffState;
 
     if (isInitialized && !isLoggedIn) {
-      console.log("[Debug] LIFF initialized but user not logged in - skipping redirect logic");
+      clientLogger.debug("LIFF initialized but user not logged in - skipping redirect logic", { component: "useLineAuthRedirectDetection" });
       setShouldProcessRedirect(false);
       return;
     }
 
     const timestamp = new Date().toISOString();
-    console.log(`🔍 [${timestamp}] Detected LINE authentication redirect`);
-    console.log(`🔍 [${timestamp}] Current state:`, {
+    clientLogger.debug("Detected LINE authentication redirect", {
+      timestamp,
+      component: "useLineAuthRedirectDetection"
+    });
+    clientLogger.debug("Current state", {
+      timestamp,
       authenticationState: state.authenticationState,
       isAuthenticating: state.isAuthenticating,
       windowHref: window.location.href,
+      component: "useLineAuthRedirectDetection"
     });
 
     setShouldProcessRedirect(true);
