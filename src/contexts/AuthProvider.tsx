@@ -125,26 +125,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return AuthStateManager.getInstance();
   }, []);
 
-  const { isInitialized } = useAuthStateManagerInitialization(authStateManager);
-
-  useAuthStateChangeListener({ authStateManager, setState });
-
-  useTokenExpirationHandler({ state, setState, logout });
-
-  useFirebaseAuthState({ authStateManager, state, setState });
-
-  usePhoneAuthState({ authStateManager, phoneAuthService, setState });
-
-  useUserRegistrationState({ authStateManager, userData, setState });
-
-  useLiffInitialization({ environment, liffService });
-
-  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
-
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
-
-  useAutoLogin({ environment, state, liffService, setState, refetchUser });
-
   /**
    * ログアウト
    */
@@ -168,6 +148,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error("Logout failed:", error);
     }
   }, [liffService, phoneAuthService]);
+
+  const { isInitialized } = useAuthStateManagerInitialization(authStateManager);
+
+  useAuthStateChangeListener({ authStateManager, setState });
+
+  useTokenExpirationHandler({ state, setState, logout });
+
+  useFirebaseAuthState({ authStateManager, state, setState });
+
+  usePhoneAuthState({ authStateManager, phoneAuthService, setState });
+
+  useUserRegistrationState({ authStateManager, userData, setState });
+
+  useLiffInitialization({ environment, liffService });
+
+  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
+
+  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
+
+  useAutoLogin({ environment, state, liffService, setState, refetchUser });
 
 
 

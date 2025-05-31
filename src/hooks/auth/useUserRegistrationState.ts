@@ -3,11 +3,11 @@
 import { useEffect } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
-import { GqlCurrentUserPayload } from "@/types/graphql";
+import { GqlCurrentUserQuery } from "@/types/graphql";
 
 interface UseUserRegistrationStateProps {
   authStateManager: AuthStateManager | null;
-  userData: { currentUser?: GqlCurrentUserPayload } | undefined;
+  userData: GqlCurrentUserQuery | undefined;
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
 }
 
