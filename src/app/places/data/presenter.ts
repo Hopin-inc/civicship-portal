@@ -55,18 +55,15 @@ export const presenterPlaceCard = (edges: GqlPlaceEdge[]): IPlaceCard[] => {
 
     //TODO neo88専用の並び替えハードコード
     const opportunity = getPrimaryOpportunity(place);
-    const user = opportunity?.createdByUser;
-
-    const firstOpportunityOwnerWrittenArticle =
-      user?.articlesAboutMe?.map(presenterArticleWithAuthor) ?? [];
+    const articles = opportunity?.articles?.map(presenterArticleWithAuthor) ?? [];
     const pin = presenterPlacePin(place);
 
     places.push({
       ...pin,
       name: place.name,
       address: place.address,
-      headline: firstOpportunityOwnerWrittenArticle[0]?.title || "",
-      bio: firstOpportunityOwnerWrittenArticle[0]?.introduction || "",
+      headline: articles[0]?.title || "",
+      bio: articles[0]?.introduction || "",
       publicOpportunityCount: place.currentPublicOpportunityCount ?? 0,
       participantCount: place.accumulatedParticipants ?? 0,
       communityId: place.community?.id ?? "",
@@ -87,6 +84,7 @@ export const presenterPlaceDetail = (place: GqlPlace): IPlaceDetail => {
 
   const opportunity = orderedOpportunities[0];
   const user = opportunity?.createdByUser;
+  const articles = opportunity?.articles?.map(presenterArticleWithAuthor) ?? [];
 
   const pin = presenterPlacePin(place);
 
@@ -97,8 +95,8 @@ export const presenterPlaceDetail = (place: GqlPlace): IPlaceDetail => {
     ...pin,
     name: place.name,
     address: place.address,
-    headline: relatedArticles[0]?.title || "Coming Soon!",
-    bio: relatedArticles[0]?.introduction || "Coming Soon!",
+    headline: articles[0]?.title || "Coming Soon!",
+    bio: articles[0]?.introduction || "Coming Soon!",
     publicOpportunityCount: publicOpportunities.length,
     participantCount: place.accumulatedParticipants ?? 0,
     communityId: place.community?.id ?? "",
