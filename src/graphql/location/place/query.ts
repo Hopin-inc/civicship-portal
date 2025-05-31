@@ -25,6 +25,12 @@ export const GET_PLACES = gql`
           opportunities {
             id
             images
+            articles @include(if: $IsCard) {
+              ...ArticleFields
+              relatedUsers {
+                ...UserFields
+              }
+            }
             createdByUser {
               image
               articlesAboutMe @include(if: $IsCard) {

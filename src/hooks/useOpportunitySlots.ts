@@ -1,7 +1,7 @@
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useRef } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import { useGetOpportunitySlotsQuery } from "@/types/graphql";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export interface UseOpportunitySlotsResult {
   slots: any[];

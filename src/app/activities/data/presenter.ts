@@ -38,7 +38,7 @@ export const presenterActivityCard = (node: GqlOpportunity): ActivityCard => {
     id: node?.id || "",
     title: node?.title || "",
     category: node?.category || GqlOpportunityCategory.Activity,
-    feeRequired: node?.feeRequired || null,
+    feeRequired: node?.feeRequired ?? null,
     location: node?.place?.name || "場所未定",
     images: node?.images || [],
     communityId: node?.community?.id || "",
@@ -147,7 +147,7 @@ export const presenterReservationDateTimeInfo = (
       hour12: false,
     }),
     participantCount,
-    totalPrice: (opportunity.feeRequired || 0) * participantCount,
+    totalPrice: (opportunity.feeRequired ?? 0) * participantCount,
   };
 };
 

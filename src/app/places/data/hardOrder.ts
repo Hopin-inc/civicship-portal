@@ -6,6 +6,7 @@ import { GqlOpportunity, GqlPlace } from "@/types/graphql";
 export const OPPORTUNITY_ORDER_BY_PLACE: Record<string, string[]> = {
   cmahru0gg001vs60nnkqrgugc: ["cmavanchu00a0s60nku50uvrz", "cmaibrt4k000ps60nzbrtikv1"],
   cmahrua5f001xs60n3vp4csom: ["cmap78zrg0029s60nww1mrl37", "cmaiwjrq7000rs60ne9oespcs"],
+  cmavecll700dps60nd5wjpciy: ["cmajoz0hl0024s60n65cqvuz0"],
   // LOCAL mock data
   // cmbar2ver00468ze0bpmsqexi: [
   //   "cmbar2vi300a88ze05mjpi5cn",
