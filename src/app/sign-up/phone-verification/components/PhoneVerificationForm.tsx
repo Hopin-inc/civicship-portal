@@ -75,7 +75,6 @@ export function PhoneVerificationForm() {
       if (success) {
         toast.success("電話番号認証が完了しました");
         const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextParam);
-        alert(redirectPath);
         router.push(redirectPath);
       } else {
         toast.error("認証コードが無効です");
