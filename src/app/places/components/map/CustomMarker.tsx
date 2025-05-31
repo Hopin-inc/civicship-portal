@@ -15,7 +15,7 @@ interface CustomMarkerProps {
 const markerIconCache = new Map<string, google.maps.Icon>();
 
 const HARDCODED_COORDINATES: Record<string, google.maps.LatLngLiteral> = {
-  cmap18zk20006s60ns5f2cz44: { lat: 34.178142, lng: 133.818358 }, // 大庄屋
+  cmahstwr4002rs60n6map2wiu: { lat: 34.178142, lng: 133.818358 }, // 大庄屋
 };
 
 const loadImage = (src: string): Promise<HTMLImageElement> =>
@@ -108,6 +108,12 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
   const position: google.maps.LatLngLiteral = useMemo(() => {
     return HARDCODED_COORDINATES[data.id] ?? { lat: data.latitude, lng: data.longitude };
   }, [data.id, data.latitude, data.longitude]);
+
+  useEffect(() => {
+    if (HARDCODED_COORDINATES[data.id]) {
+      console.log("✅ HARDCODE:", data.id, HARDCODED_COORDINATES[data.id]);
+    }
+  }, [data.id]);
 
   useEffect(() => {
     let isMounted = true;
