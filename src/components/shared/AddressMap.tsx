@@ -80,7 +80,7 @@ const useAddressGeocoding = (
       setIsGeocoding(true);
 
       try {
-        const coordinates = await getCoordinatesFromAddress(address);
+        const coordinates = await getCoordinatesFromAddress(address, placeId);
 
         if (coordinates) {
           const newLocation = new google.maps.LatLng(coordinates.lat, coordinates.lng);

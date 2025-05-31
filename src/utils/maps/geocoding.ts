@@ -13,22 +13,31 @@ export const PRIORITIZE_LAT_LNG_PLACE_IDS = [
   "cmahq8fb5000rs60nhlqmuz0h", // 眞鍋自転車店
 ];
 
+const HARDCODED_COORDINATES: Record<string, google.maps.LatLngLiteral> = {
+  cmap18zk20006s60ns5f2cz44: { lat: 34.178142, lng: 133.818358 }, // 大庄屋
+};
+
 // メモリ内キャッシュ: 住所 -> 緯度経度のマッピング
 const geocodeCache: Record<string, google.maps.LatLngLiteral> = {};
 
 /**
  * 住所から緯度経度を取得する
  * @param address 住所
+ * @param placeId
  * @returns Promise<{lat: number, lng: number} | null> 緯度経度の情報、取得できなかった場合はnull
  */
 export const getCoordinatesFromAddress = async (
   address: string,
+  placeId?: string, // 追加：placeIdが分かる場合に使用
 ): Promise<google.maps.LatLngLiteral | null> => {
+  if (placeId && HARDCODED_COORDINATES[placeId]) {
+    return HARDCODED_COORDINATES[placeId];
+  }
+
   if (geocodeCache[address]) {
     return geocodeCache[address];
   }
 
-  // Google Maps APIが読み込まれていない場合はfallbackまたはnullを返す
   if (!window.google || !window.google.maps) {
     console.error("Google Maps API is not loaded");
     return null;
@@ -37,7 +46,7 @@ export const getCoordinatesFromAddress = async (
   const geocoder = new google.maps.Geocoder();
 
   try {
-    const result = await new Promise<google.maps.GeocoderResult[] | null>((resolve, reject) => {
+    const result = await new Promise<google.maps.GeocoderResult[] | null>((resolve) => {
       geocoder.geocode({ address, language: "ja" }, (results, status) => {
         if (status === "OK" && results && results.length > 0) {
           resolve(results);

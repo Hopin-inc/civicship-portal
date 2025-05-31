@@ -1,9 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 import ArticleCard from "@/app/articles/components/Card";
 
@@ -20,7 +17,7 @@ const PlaceFeaturedArticle: React.FC<PlaceFeaturedArticleProps> = ({ articles })
       <h2 className="text-display-sm mb-4">関連記事</h2>
       <div className="grid grid-cols-1 gap-6">
         {articles.map((article) => (
-          <ArticleCard key={article.id} article={article} showUser />
+          <ArticleCard key={article.id} article={article} />
         ))}
       </div>
     </div>

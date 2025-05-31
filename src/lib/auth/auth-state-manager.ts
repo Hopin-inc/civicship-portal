@@ -110,16 +110,43 @@ export class AuthStateManager {
 
   /**
    * ユーザー情報の登録状態を確認
-   * useAuth()のuserプロパティと同じ logic を使用
+   * Firebase Authの状態も考慮してより確実にチェック
    */
   private async checkUserRegistration(): Promise<boolean> {
     try {
+      const { lineAuth } = await import("./firebase-config");
+      if (!lineAuth.currentUser) {
+        console.log("No Firebase Auth user found");
+        return false;
+      }
+
+      let accessToken = null;
+      try {
+        accessToken = await lineAuth.currentUser.getIdToken();
+      } catch (tokenError) {
+        console.error("Failed to get Firebase token for user registration check:", tokenError);
+        return false;
+      }
+
       const { data } = await apolloClient.query({
         query: GET_CURRENT_USER,
-        fetchPolicy: "network-only"
+        fetchPolicy: "network-only",
+        context: {
+          headers: {
+            Authorization: accessToken ? `Bearer ${accessToken}` : "",
+          },
+        },
       });
 
-      return data?.currentUser?.user != null;
+      const isRegistered = data?.currentUser?.user != null;
+      console.log("User registration check result:", {
+        hasFirebaseUser: !!lineAuth.currentUser,
+        hasAccessToken: !!accessToken,
+        isRegistered,
+        userId: data?.currentUser?.user?.id || null
+      });
+
+      return isRegistered;
     } catch (error) {
       console.error("Failed to check user registration:", error);
       return false;
@@ -229,21 +256,17 @@ export class AuthStateManager {
       return;
     }
 
-    const phoneTokens = TokenManager.getPhoneTokens();
-    const hasValidPhoneToken = phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
-
-    if (!hasValidPhoneToken) {
-      this.setState("line_authenticated");
-      return;
-    }
-
     if (isRegistered) {
-      if (this.currentState === "phone_authenticated" || this.currentState === "phone_token_expired") {
-        this.setState("user_registered");
-      }
+      this.setState("user_registered");
+      console.log("🔄 User is registered - setting state to user_registered regardless of phone token status");
     } else {
-      if (this.currentState === "user_registered") {
+      const phoneTokens = TokenManager.getPhoneTokens();
+      const hasValidPhoneToken = phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
+
+      if (hasValidPhoneToken) {
         this.setState("phone_authenticated");
+      } else {
+        this.setState("line_authenticated");
       }
     }
   }
