@@ -37,42 +37,75 @@ const requestLink = new ApolloLink((operation, forward) => {
     return forward(operation);
   }
 
-  const lineTokens = TokenManager.getLineTokens();
-  const phoneTokens = TokenManager.getPhoneTokens();
-
-  operation.setContext(({ headers = {} }) => {
-    const baseHeaders = {
-      ...headers,
-      Authorization: lineTokens.accessToken ? `Bearer ${lineTokens.accessToken}` : "",
-      "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-    };
-
-    const tokenRequiredOperations = ['userSignUp', 'linkPhoneAuth', 'storePhoneAuthToken'];
-    
-    if (tokenRequiredOperations.includes(operation.operationName || '')) {
-      const requestHeaders = {
-        ...baseHeaders,
-        "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
-        "X-Phone-Auth-Token": phoneTokens.accessToken || "",
-        "X-Phone-Token-Expires-At": phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
-        "X-Phone-Uid": phoneTokens.phoneUid || "",
-        "X-Phone-Number": phoneTokens.phoneNumber || "",
-      };
+  return new Promise(async (resolve) => {
+    try {
+      const { lineAuth } = await import("./auth/firebase-config");
+      const phoneTokens = TokenManager.getPhoneTokens();
       
-      console.log('🔐 Sending phone auth tokens for operation:', operation.operationName, {
-        hasPhoneToken: !!phoneTokens.accessToken,
-        hasPhoneUid: !!phoneTokens.phoneUid,
-        hasPhoneNumber: !!phoneTokens.phoneNumber
+      let firebaseToken = null;
+      if (lineAuth.currentUser) {
+        try {
+          firebaseToken = await lineAuth.currentUser.getIdToken();
+        } catch (error) {
+          console.warn('Failed to get Firebase token:', error);
+        }
+      }
+      
+      const lineTokens = TokenManager.getLineTokens();
+      const accessToken = firebaseToken || lineTokens.accessToken;
+
+      operation.setContext(({ headers = {} }) => {
+        const baseHeaders = {
+          ...headers,
+          Authorization: accessToken ? `Bearer ${accessToken}` : "",
+          "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+        };
+
+        const tokenRequiredOperations = ['userSignUp', 'linkPhoneAuth', 'storePhoneAuthToken'];
+        
+        if (tokenRequiredOperations.includes(operation.operationName || '')) {
+          const requestHeaders = {
+            ...baseHeaders,
+            "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
+            "X-Phone-Auth-Token": phoneTokens.accessToken || "",
+            "X-Phone-Token-Expires-At": phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
+            "X-Phone-Uid": phoneTokens.phoneUid || "",
+            "X-Phone-Number": phoneTokens.phoneNumber || "",
+          };
+          
+          console.log('🔐 Sending phone auth tokens for operation:', operation.operationName, {
+            hasPhoneToken: !!phoneTokens.accessToken,
+            hasPhoneUid: !!phoneTokens.phoneUid,
+            hasPhoneNumber: !!phoneTokens.phoneNumber,
+            tokenSource: firebaseToken ? 'firebase' : 'cookie'
+          });
+          
+          return { headers: requestHeaders };
+        }
+        
+        console.log('🔒 Sending tokens for operation:', operation.operationName, {
+          tokenSource: firebaseToken ? 'firebase' : 'cookie',
+          hasToken: !!accessToken
+        });
+        return { headers: baseHeaders };
       });
-      
-      return { headers: requestHeaders };
-    }
-    
-    console.log('🔒 Sending minimal tokens for operation:', operation.operationName);
-    return { headers: baseHeaders };
-  });
 
-  return forward(operation);
+      resolve(forward(operation));
+    } catch (error) {
+      console.error('Error in requestLink:', error);
+      const lineTokens = TokenManager.getLineTokens();
+
+      operation.setContext(({ headers = {} }) => ({
+        headers: {
+          ...headers,
+          Authorization: lineTokens.accessToken ? `Bearer ${lineTokens.accessToken}` : "",
+          "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+        },
+      }));
+
+      resolve(forward(operation));
+    }
+  });
 });
 
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {

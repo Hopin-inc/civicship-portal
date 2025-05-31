@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     console.log("[Debug] authenticationState changed to:", state.authenticationState);
-    const unsubscribe = lineAuth.onAuthStateChanged((user) => {
+    const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
       setState((prev) => ({
         ...prev,
         firebaseUser: user,
@@ -127,6 +127,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             : prev.authenticationState
           : "unauthenticated",
       }));
+
+      if (user) {
+        try {
+          const idToken = await user.getIdToken();
+          const refreshToken = user.refreshToken;
+          const tokenResult = await user.getIdTokenResult();
+          const expirationTime = new Date(tokenResult.expirationTime).getTime();
+
+          TokenManager.saveLineTokens({
+            accessToken: idToken,
+            refreshToken: refreshToken,
+            expiresAt: expirationTime,
+          });
+
+          console.log('🔄 Firebase Auth token synced to cookies');
+        } catch (error) {
+          console.error('Failed to sync Firebase token to cookies:', error);
+        }
+      } else {
+        TokenManager.clearLineTokens();
+        console.log('🔄 LINE tokens cleared from cookies');
+      }
 
       if (authStateManager && !state.isAuthenticating) {
         authStateManager.handleLineAuthStateChange(!!user);
