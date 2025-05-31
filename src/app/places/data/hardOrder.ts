@@ -1,18 +1,37 @@
+import { GqlOpportunity, GqlPlace } from "@/types/graphql";
+import { TArticleWithAuthor } from "@/app/articles/data/type";
+
 // #NOTE 拠点に複数人の案内人の体験が掲載されている場合、意図しない順序で表示されている拠点のID（順序を逆にすることで簡易的に解決する）
 // 坂東商店guest room〜藍染めと宿〜 https://www.neo88.app/places/cmahru0gg001vs60nnkqrgugc
 // たねのや https://www.neo88.app/places/cmahrua5f001xs60n3vp4csom
-import { GqlOpportunity, GqlPlace } from "@/types/graphql";
-
-export const OPPORTUNITY_ORDER_BY_PLACE: Record<string, string[]> = {
+const OPPORTUNITY_ORDER_BY_PLACE: Record<string, string[]> = {
   cmahru0gg001vs60nnkqrgugc: ["cmavanchu00a0s60nku50uvrz", "cmaibrt4k000ps60nzbrtikv1"],
   cmahrua5f001xs60n3vp4csom: ["cmap78zrg0029s60nww1mrl37", "cmaiwjrq7000rs60ne9oespcs"],
-  cmavecll700dps60nd5wjpciy: ["cmajoz0hl0024s60n65cqvuz0"],
   // LOCAL mock data
   // cmbar2ver00468ze0bpmsqexi: [
   //   "cmbar2vi300a88ze05mjpi5cn",
   //   "cmbar2vjd00cv8ze0b52illve",
   //   "cmbar2vj400cc8ze0po9o44l8",
   // ],
+};
+
+// 鴨島駅 https://www.neo88.app/places/cmavecll700dps60nd5wjpciy
+const PRIMARY_ARTICLE_BY_PLACE: Record<string, string> = {
+  cmavecll700dps60nd5wjpciy: "cmankc5fq001ks60nh6g1jpvq",
+};
+
+export const pickPrimaryArticleByPlaceId = (
+  articles: TArticleWithAuthor[],
+  placeId: string,
+): TArticleWithAuthor => {
+  const overrideId = PRIMARY_ARTICLE_BY_PLACE[placeId];
+
+  if (overrideId) {
+    const matched = articles.find((a) => a.id === overrideId);
+    if (matched) return matched;
+  }
+
+  return articles[0];
 };
 
 export const orderOpportunities = (

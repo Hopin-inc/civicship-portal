@@ -12,7 +12,11 @@ import { IPlaceCard, IPlaceDetail, IPlaceHost, IPlacePin } from "@/app/places/da
 import { presenterArticleWithAuthor } from "@/app/articles/data/presenter";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
-import { getPrimaryOpportunity, orderOpportunities } from "@/app/places/data/hardOrder";
+import {
+  getPrimaryOpportunity,
+  orderOpportunities,
+  pickPrimaryArticleByPlaceId,
+} from "@/app/places/data/hardOrder";
 
 export const presenterPlacePins = (edges: GqlPlaceEdge[]): IPlacePin[] => {
   return edges
@@ -57,16 +61,20 @@ export const presenterPlaceCard = (edges: GqlPlaceEdge[]): IPlaceCard[] => {
     const opportunity = getPrimaryOpportunity(place);
     const user = opportunity?.createdByUser;
 
-    const firstOpportunityOwnerWrittenArticle =
+    const opportunityOwnerWrittenArticle =
       user?.articlesAboutMe?.map(presenterArticleWithAuthor) ?? [];
+
+    //TODO neo88専用の並び替えハードコード
+    const article = pickPrimaryArticleByPlaceId(opportunityOwnerWrittenArticle, place.id);
+
     const pin = presenterPlacePin(place);
 
     places.push({
       ...pin,
       name: place.name,
       address: place.address,
-      headline: firstOpportunityOwnerWrittenArticle[0]?.title || "",
-      bio: firstOpportunityOwnerWrittenArticle[0]?.introduction || "",
+      headline: article.title || "",
+      bio: article.introduction || "",
       publicOpportunityCount: place.currentPublicOpportunityCount ?? 0,
       participantCount: place.accumulatedParticipants ?? 0,
       communityId: place.community?.id ?? "",
@@ -91,14 +99,17 @@ export const presenterPlaceDetail = (place: GqlPlace): IPlaceDetail => {
   const pin = presenterPlacePin(place);
 
   const relatedArticles = getRelatedArticles(user, publicOpportunities);
+  //TODO neo88専用の並び替えハードコード
+  const article = pickPrimaryArticleByPlaceId(relatedArticles, place.id);
+
   const images = getPlaceImages(place.image, currentlyHiringOpportunities);
 
   return {
     ...pin,
     name: place.name,
     address: place.address,
-    headline: relatedArticles[0]?.title || "Coming Soon!",
-    bio: relatedArticles[0]?.introduction || "Coming Soon!",
+    headline: article.title || "Coming Soon!",
+    bio: article.introduction || "Coming Soon!",
     publicOpportunityCount: publicOpportunities.length,
     participantCount: place.accumulatedParticipants ?? 0,
     communityId: place.community?.id ?? "",
