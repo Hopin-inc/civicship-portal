@@ -1,0 +1,60 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
+import { AuthStateManager } from "@/lib/auth/auth-state-manager";
+import { AuthState } from "@/contexts/AuthProvider";
+
+interface UsePhoneAuthStateProps {
+  authStateManager: AuthStateManager | null;
+  phoneAuthService: PhoneAuthService;
+  setState: React.Dispatch<React.SetStateAction<AuthState>>;
+}
+
+export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState }: UsePhoneAuthStateProps) => {
+  const authStateManagerRef = useRef(authStateManager);
+  const phoneAuthServiceRef = useRef(phoneAuthService);
+  
+  authStateManagerRef.current = authStateManager;
+  phoneAuthServiceRef.current = phoneAuthService;
+
+  useEffect(() => {
+    console.log("[Debug] 🔥 usePhoneAuthState fired.");
+    
+    const currentAuthStateManager = authStateManagerRef.current;
+    
+    if (!currentAuthStateManager) return;
+
+    const phoneState = phoneAuthServiceRef.current.getState();
+    const isVerified = phoneState.isVerified;
+
+    if (isVerified) {
+      const updatePhoneAuthState = async () => {
+        try {
+          const timestamp = new Date().toISOString();
+          console.log(
+            `🔍 [${timestamp}] Updating phone auth state in useEffect - isVerified:`,
+            isVerified,
+          );
+          await currentAuthStateManager.handlePhoneAuthStateChange(true);
+          console.log(
+            `🔍 [${timestamp}] AuthStateManager phone state updated successfully in useEffect`,
+          );
+        } catch (error) {
+          console.error("Failed to update AuthStateManager phone state in useEffect:", error);
+        }
+      };
+
+      updatePhoneAuthState();
+    }
+
+    setState((prev) => ({
+      ...prev,
+      authenticationState: isVerified
+        ? prev.authenticationState === "line_authenticated"
+          ? "phone_authenticated"
+          : prev.authenticationState
+        : prev.authenticationState,
+    }));
+  }, [setState]);
+};

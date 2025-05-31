@@ -56,11 +56,6 @@ export default function HomePage() {
 
       console.log("🔍 Final cleaned next path:", cleanedNextPath);
 
-      if (cleanedNextPath && typeof window !== "undefined") {
-        sessionStorage.setItem("lineAuthRedirectPath", cleanedNextPath);
-        console.log("🔍 Stored redirect path in sessionStorage:", cleanedNextPath);
-      }
-
       const cleanedUrl = cleanedNextPath ? `${window.location.pathname}?next=${cleanedNextPath}` : window.location.pathname;
       console.log("🔍 Cleaning URL to:", cleanedUrl);
       router.replace(cleanedUrl);
@@ -73,16 +68,6 @@ export default function HomePage() {
         console.log("🔍 Waiting for authentication state to be ready...");
       }
       return;
-    }
-
-    if (typeof window !== "undefined") {
-      const storedRedirectPath = sessionStorage.getItem("lineAuthRedirectPath");
-      if (storedRedirectPath && isAuthenticated && authenticationState === "user_registered") {
-        console.log("🔍 Found stored redirect path, redirecting to:", storedRedirectPath);
-        sessionStorage.removeItem("lineAuthRedirectPath");
-        router.replace(storedRedirectPath);
-        return;
-      }
     }
 
     console.log("🔍 No LINE auth return detected, redirecting to activities");
