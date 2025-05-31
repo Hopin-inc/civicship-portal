@@ -109,6 +109,20 @@ export class PhoneAuthService {
       this.state.isVerifying = true;
       this.state.error = null;
 
+      if (this.isRecaptchaRendered && this.recaptchaVerifier) {
+        console.log("reCAPTCHA already rendered, reusing existing verifier");
+        
+        const confirmationResult = await signInWithPhoneNumber(
+          phoneAuth,
+          phoneNumber,
+          this.recaptchaVerifier,
+        );
+
+        this.state.phoneNumber = phoneNumber;
+        this.state.verificationId = confirmationResult.verificationId;
+        return confirmationResult.verificationId;
+      }
+
       // 前回のVerifierを明示的にクリア（DOM操作しない）
       this.clearRecaptcha();
 
@@ -130,6 +144,7 @@ export class PhoneAuthService {
       });
 
       await this.recaptchaVerifier.render();
+      this.isRecaptchaRendered = true;
 
       const confirmationResult = await signInWithPhoneNumber(
         phoneAuth,
@@ -144,6 +159,7 @@ export class PhoneAuthService {
     } catch (error) {
       console.error("Phone verification failed:", error);
       this.state.error = error as Error;
+      this.clearRecaptcha();
       return null;
     } finally {
       this.state.isVerifying = false;
