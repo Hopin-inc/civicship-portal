@@ -14,7 +14,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useState } from "react";
@@ -34,6 +34,7 @@ type FormValues = z.infer<typeof FormSchema>;
 
 export function SignUpForm() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next");
   const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
@@ -41,7 +42,7 @@ export function SignUpForm() {
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   const authRedirectService = AuthRedirectService.getInstance();
-  const redirectPath = authRedirectService.getRedirectPath("/sign-up", nextParam);
+  const redirectPath = authRedirectService.getRedirectPath(pathname, nextParam);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -56,7 +57,9 @@ export function SignUpForm() {
     try {
       if (!isPhoneVerified) {
         toast.error("電話番号認証が完了していません");
-        router.replace(redirectPath ?? "/users/me");
+        if (redirectPath) {
+          router.replace(redirectPath);
+        }
         return;
       }
 
@@ -65,7 +68,9 @@ export function SignUpForm() {
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
         setIsRedirecting(true);
-        router.push(redirectPath ?? "/users/me");
+        if (redirectPath) {
+          router.replace(redirectPath);
+        }
       }
     } catch (error) {
       console.error("Sign up error:", error);

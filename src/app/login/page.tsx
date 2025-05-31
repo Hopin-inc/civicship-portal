@@ -46,8 +46,6 @@ export default function LoginPage() {
 
   // 📦 ログイン処理
   const handleLogin = async () => {
-    console.log("🔥 handleLogin triggered");
-
     if (!agreedTerms || !agreedPrivacy) {
       setError("すべての同意が必要です");
       return;
