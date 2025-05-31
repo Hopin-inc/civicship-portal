@@ -15,8 +15,9 @@ if (typeof window === "undefined") {
 }
 
 /**
- * 認証セッションIDを生成する（永続化対応）
+ * 認証セッションIDを生成する（ブラウザ永続化対応）
  * ブラウザ環境では localStorage を使用してセッションIDを永続化
+ * ログイン・ログアウトに関係なく同一ブラウザでは同じIDを使用
  * @returns 一意のセッションID
  */
 export const generateSessionId = (): string => {
@@ -60,19 +61,7 @@ const generateNewSessionId = (): string => {
   }
 };
 
-/**
- * セッションIDをクリアする
- * ログアウト時などに呼び出される
- */
-export const clearSessionId = (): void => {
-  if (typeof window !== "undefined") {
-    try {
-      const SESSION_ID_KEY = "civicship_auth_session_id";
-      localStorage.removeItem(SESSION_ID_KEY);
-    } catch (error) {
-    }
-  }
-};
+
 
 /**
  * 電話番号をマスクする（下4桁のみ表示）

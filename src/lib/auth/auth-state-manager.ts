@@ -2,7 +2,7 @@ import { TokenManager } from "./token-manager";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import clientLogger from "../logging/client";
-import { createAuthLogContext, clearSessionId } from "../logging/client/utils";
+import { createAuthLogContext } from "../logging/client/utils";
 
 export type AuthenticationState =
   | "unauthenticated"
@@ -58,6 +58,7 @@ export class AuthStateManager {
   /**
    * セッションIDを初期化する
    * localStorage から既存のIDを取得するか、新しいIDを生成する
+   * ログイン状態に関係なく同一ブラウザでは同じIDを維持
    */
   private initializeSessionId(): string {
     if (typeof window === "undefined") {
@@ -95,21 +96,7 @@ export class AuthStateManager {
     }
   }
 
-  /**
-   * 新しいセッションIDを生成してリセットする
-   * ログアウト時や新しい認証セッション開始時に呼び出される
-   */
-  public resetSessionId(): void {
-    this.sessionId = this.generateSessionId();
-    
-    if (typeof window !== "undefined") {
-      try {
-        const SESSION_ID_KEY = "civicship_auth_session_id";
-        localStorage.setItem(SESSION_ID_KEY, this.sessionId);
-      } catch (error) {
-      }
-    }
-  }
+
 
   /**
    * 認証状態の変更を監視するリスナーを追加

@@ -27,7 +27,7 @@ import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDe
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 import { useAutoLogin } from "@/hooks/auth/useAutoLogin";
 import clientLogger from "@/lib/logging/client";
-import { createAuthLogContext, generateSessionId, maskPhoneNumber, clearSessionId } from "@/lib/logging/client/utils";
+import { createAuthLogContext, generateSessionId, maskPhoneNumber } from "@/lib/logging/client/utils";
 
 /**
  * 認証状態の型定義
@@ -140,8 +140,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       TokenManager.clearAllTokens();
 
-      clearSessionId();
-      authStateManager?.resetSessionId();
+
       
       setState((prev) => ({
         ...prev,
