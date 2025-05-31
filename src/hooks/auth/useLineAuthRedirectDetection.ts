@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthState } from "@/contexts/AuthProvider";
 
@@ -11,44 +11,71 @@ interface UseLineAuthRedirectDetectionProps {
 
 export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuthRedirectDetectionProps) => {
   const [shouldProcessRedirect, setShouldProcessRedirect] = useState(false);
+  const stateRef = useRef(state);
+  const liffServiceRef = useRef(liffService);
+  const lastCheckRef = useRef<string>("");
+  
+  stateRef.current = state;
+  liffServiceRef.current = liffService;
 
   useEffect(() => {
     const checkRedirectConditions = () => {
-      if (typeof window === "undefined") return false;
+      const currentState = stateRef.current;
+      const currentLiffService = liffServiceRef.current;
+      
+      const stateKey = `${currentState.authenticationState}-${currentState.isAuthenticating}`;
+      if (lastCheckRef.current === stateKey) {
+        return;
+      }
+      lastCheckRef.current = stateKey;
 
-      if (state.isAuthenticating) {
+      if (typeof window === "undefined") {
+        setShouldProcessRedirect(false);
+        return;
+      }
+
+      if (currentState.isAuthenticating) {
         console.log("[Debug] Skipping: already authenticating");
-        return false;
+        setShouldProcessRedirect(false);
+        return;
       }
 
       if (
-        state.authenticationState !== "unauthenticated" &&
-        state.authenticationState !== "loading"
+        currentState.authenticationState !== "unauthenticated" &&
+        currentState.authenticationState !== "loading"
       ) {
         console.log("[Debug] Skipping: already authenticated or in progress");
-        return false;
+        setShouldProcessRedirect(false);
+        return;
       }
 
-      const { isInitialized, isLoggedIn } = liffService.getState();
+      const { isInitialized, isLoggedIn } = currentLiffService.getState();
 
       if (isInitialized && !isLoggedIn) {
         console.log("[Debug] LIFF initialized but user not logged in - skipping redirect logic");
-        return false;
+        setShouldProcessRedirect(false);
+        return;
       }
 
       const timestamp = new Date().toISOString();
       console.log(`🔍 [${timestamp}] Detected LINE authentication redirect`);
       console.log(`🔍 [${timestamp}] Current state:`, {
-        authenticationState: state.authenticationState,
-        isAuthenticating: state.isAuthenticating,
+        authenticationState: currentState.authenticationState,
+        isAuthenticating: currentState.isAuthenticating,
         windowHref: window.location.href,
       });
 
-      return true;
+      setShouldProcessRedirect(true);
     };
 
-    setShouldProcessRedirect(checkRedirectConditions());
-  }, [state.authenticationState, state.isAuthenticating, liffService]);
+    checkRedirectConditions();
+    
+    const interval = setInterval(checkRedirectConditions, 2000);
+    
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   return { shouldProcessRedirect };
 };

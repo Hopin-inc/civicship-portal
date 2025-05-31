@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { User } from "firebase/auth";
 import { lineAuth } from "@/lib/auth/firebase-config";
 import { TokenManager } from "@/lib/auth/token-manager";
@@ -14,8 +14,15 @@ interface UseFirebaseAuthStateProps {
 }
 
 export const useFirebaseAuthState = ({ authStateManager, state, setState }: UseFirebaseAuthStateProps) => {
+  const authStateManagerRef = useRef(authStateManager);
+  const stateRef = useRef(state);
+  
+  authStateManagerRef.current = authStateManager;
+  stateRef.current = state;
+
   useEffect(() => {
-    console.log("[Debug] authenticationState changed to:", state.authenticationState);
+    console.log("[Debug] 🔥 useFirebaseAuthState fired.");
+    
     const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
       setState((prev) => ({
         ...prev,
@@ -49,11 +56,13 @@ export const useFirebaseAuthState = ({ authStateManager, state, setState }: UseF
         console.log('🔄 LINE tokens cleared from cookies');
       }
 
-      if (authStateManager && !state.isAuthenticating) {
-        authStateManager.handleLineAuthStateChange(!!user);
+      const currentAuthStateManager = authStateManagerRef.current;
+      const currentState = stateRef.current;
+      if (currentAuthStateManager && !currentState.isAuthenticating) {
+        currentAuthStateManager.handleLineAuthStateChange(!!user);
       }
     });
 
     return () => unsubscribe();
-  }, [authStateManager, state.isAuthenticating, state.authenticationState, setState]);
+  }, [setState]);
 };

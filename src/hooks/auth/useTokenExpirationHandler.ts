@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { AuthState } from "@/contexts/AuthProvider";
 
@@ -11,16 +11,20 @@ interface UseTokenExpirationHandlerProps {
 }
 
 export const useTokenExpirationHandler = ({ state, setState, logout }: UseTokenExpirationHandlerProps) => {
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
   useEffect(() => {
+    console.log("[Debug] 🔥 useTokenExpirationHandler fired.");
+    
     const handleTokenExpired = (event: Event) => {
       const customEvent = event as CustomEvent<{ source: string }>;
       const { source } = customEvent.detail;
 
       if (source === "graphql" || source === "network") {
-        if (
-          state.authenticationState === "line_authenticated" ||
-          state.authenticationState === "user_registered"
-        ) {
+        const currentState = stateRef.current.authenticationState;
+        
+        if (currentState === "line_authenticated" || currentState === "user_registered") {
           setState((prev) => ({ ...prev, authenticationState: "line_token_expired" }));
           if (typeof window !== "undefined") {
             const event = new CustomEvent("auth:renew-line-token", { detail: {} });
@@ -29,7 +33,7 @@ export const useTokenExpirationHandler = ({ state, setState, logout }: UseTokenE
           return;
         }
 
-        if (state.authenticationState === "phone_authenticated") {
+        if (currentState === "phone_authenticated") {
           setState((prev) => ({ ...prev, authenticationState: "phone_token_expired" }));
           if (typeof window !== "undefined") {
             const event = new CustomEvent("auth:renew-phone-token", { detail: {} });
@@ -54,5 +58,5 @@ export const useTokenExpirationHandler = ({ state, setState, logout }: UseTokenE
         window.removeEventListener("auth:token-expired", handleTokenExpired);
       }
     };
-  }, [state.authenticationState, setState, logout]);
+  }, [setState, logout]);
 };
