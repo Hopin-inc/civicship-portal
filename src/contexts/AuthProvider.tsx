@@ -250,13 +250,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const handleLineAuthRedirect = async () => {
       if (typeof window === "undefined") return;
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const isReturnFromLineAuth = urlParams.has("code") && urlParams.has("state") && urlParams.has("liffClientId");
-      if (isReturnFromLineAuth && window.location.pathname === "/") {
-        console.log("[Debug] Skipping: HomePage will handle LINE auth redirect");
-        return;
-      }
-
       if (state.isAuthenticating) {
         console.log("[Debug] Skipping: already authenticating");
         return;
