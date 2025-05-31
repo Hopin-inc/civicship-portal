@@ -4400,6 +4400,20 @@ export type GqlGetPlaceQuery = {
       feeRequired?: number | null;
       pointsToEarn?: number | null;
       earliestReservableAt?: Date | null;
+      place?: {
+        __typename?: "Place";
+        id: string;
+        name: string;
+        address: string;
+        latitude: any;
+        longitude: any;
+        city?: {
+          __typename?: "City";
+          code: string;
+          name: string;
+          state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
+        } | null;
+      } | null;
       createdByUser?: {
         __typename?: "User";
         id: string;
@@ -4433,7 +4447,7 @@ export type GqlGetPlaceQuery = {
         category: GqlArticleCategory;
         publishStatus: GqlPublishStatus;
         publishedAt?: Date | null;
-        authors?: Array<{
+        relatedUsers?: Array<{
           __typename?: "User";
           id: string;
           name: string;
@@ -8109,6 +8123,9 @@ export const GetPlaceDocument = gql`
       ...PlaceFields
       opportunities {
         ...OpportunityFields
+        place {
+          ...PlaceFields
+        }
         createdByUser {
           ...UserFields
           articlesAboutMe {
@@ -8117,7 +8134,7 @@ export const GetPlaceDocument = gql`
         }
         articles {
           ...ArticleFields
-          authors {
+          relatedUsers {
             ...UserFields
           }
         }
