@@ -74,16 +74,14 @@ export function PhoneVerificationForm() {
       const success = await phoneAuth.verifyPhoneCode(verificationCode);
       if (success) {
         toast.success("電話番号認証が完了しました");
-
         const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextParam);
-
-        router.push(redirectPath ?? "/");
+        router.push(redirectPath);
       } else {
         toast.error("認証コードが無効です");
+        setIsCodeVerifying(false);
       }
     } catch (error) {
       toast.error("電話番号からやり直して下さい");
-    } finally {
       setIsCodeVerifying(false);
     }
   };
