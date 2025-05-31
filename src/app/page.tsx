@@ -30,7 +30,13 @@ export default function HomePage() {
     if (isReturnFromLineAuth) {
       console.log("🚀 Detected return from LINE authentication, liff.state:", nextPath);
 
-      const cleanedNextPath = nextPath?.startsWith("/login") ? null : nextPath;
+      let cleanedNextPath = nextPath;
+      if (nextPath?.startsWith("/login?next=")) {
+        const urlParams = new URLSearchParams(nextPath.split("?")[1]);
+        cleanedNextPath = urlParams.get("next");
+      } else if (nextPath?.startsWith("/login")) {
+        cleanedNextPath = null;
+      }
       const cleanedUrl = cleanedNextPath ? `${ window.location.pathname }?next=${ cleanedNextPath }` : window.location.pathname;
       router.replace(cleanedUrl);
 
