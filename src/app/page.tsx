@@ -55,7 +55,7 @@ export default function HomePage() {
       }
 
       console.log("🔍 Final cleaned next path:", cleanedNextPath);
-      
+
       if (cleanedNextPath && typeof window !== "undefined") {
         sessionStorage.setItem("lineAuthRedirectPath", cleanedNextPath);
         console.log("🔍 Stored redirect path in sessionStorage:", cleanedNextPath);
@@ -85,11 +85,9 @@ export default function HomePage() {
       }
     }
 
-    if (isAuthenticated) {
-      console.log("🔍 No LINE auth return detected, redirecting to activities");
-      router.replace("/activities");
-    }
-  }, [router, isAuthenticated, authenticationState, userData, authLoading, userLoading, isAuthenticating, authRedirectService, searchParams]);
+    console.log("🔍 No LINE auth return detected, redirecting to activities");
+    router.replace("/activities");
+  }, [authLoading, authRedirectService, authenticationState, isAuthenticated, isAuthenticating, router, searchParams, userLoading]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
