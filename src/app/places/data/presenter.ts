@@ -12,36 +12,34 @@ import { IPlaceCard, IPlaceDetail, IPlaceHost, IPlacePin } from "@/app/places/da
 import { presenterArticleWithAuthor } from "@/app/articles/data/presenter";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
+import { getPrimaryOpportunity, orderOpportunities } from "@/app/places/data/hardOrder";
 
 export const presenterPlacePins = (edges: GqlPlaceEdge[]): IPlacePin[] => {
   return edges
     .map((edge) => edge.node)
     .filter((node): node is GqlPlace => !!node && node.latitude != null && node.longitude != null)
-    .map((node) => ({
-      id: node.id,
-      image:
-        node.opportunities?.length &&
-        node.opportunities?.[0].images &&
-        node.opportunities?.[0].images?.[0]
-          ? node.opportunities?.[0].images?.[0]
-          : PLACEHOLDER_IMAGE,
-      host: extractFirstHostFromPlace(node.opportunities?.[0]?.createdByUser),
-      latitude: Number(node.latitude),
-      longitude: Number(node.longitude),
-      address: node.address,
-    }));
+    .map((node) => {
+      //TODO neo88専用の並び替えハードコード
+      const opportunity = getPrimaryOpportunity(node);
+      return {
+        id: node.id,
+        image: opportunity?.images?.[0] ?? PLACEHOLDER_IMAGE,
+        host: extractFirstHostFromPlace(opportunity?.createdByUser),
+        latitude: Number(node.latitude),
+        longitude: Number(node.longitude),
+        address: node.address,
+      };
+    });
 };
 
 export const presenterPlacePin = (node: GqlPlace): IPlacePin => {
+  //TODO neo88専用の並び替えハードコード
+  const opportunity = getPrimaryOpportunity(node);
+
   return {
     id: node.id,
-    image:
-      node.opportunities?.length &&
-      node.opportunities?.[0].images &&
-      node.opportunities?.[0].images?.[0]
-        ? node.opportunities?.[0].images?.[0]
-        : PLACEHOLDER_IMAGE,
-    host: extractFirstHostFromPlace(node.opportunities?.[0]?.createdByUser),
+    image: opportunity?.images?.[0] ?? PLACEHOLDER_IMAGE,
+    host: extractFirstHostFromPlace(opportunity?.createdByUser),
     latitude: Number(node.latitude),
     longitude: Number(node.longitude),
     address: node.address,
@@ -55,7 +53,8 @@ export const presenterPlaceCard = (edges: GqlPlaceEdge[]): IPlaceCard[] => {
     const place = edge.node;
     if (!place || place.latitude == null || place.longitude == null) return;
 
-    const opportunity = place.opportunities?.[0];
+    //TODO neo88専用の並び替えハードコード
+    const opportunity = getPrimaryOpportunity(place);
     const user = opportunity?.createdByUser;
 
     const firstOpportunityOwnerWrittenArticle =
@@ -77,41 +76,22 @@ export const presenterPlaceCard = (edges: GqlPlaceEdge[]): IPlaceCard[] => {
   return places;
 };
 
-// #NOTE 拠点に複数人の案内人の体験が掲載されている場合、意図しない順序で表示されている拠点のID（順序を逆にすることで簡易的に解決する）
-const REVERSE_ORDER_PLACE_IDS = [
-  "cmahru0gg001vs60nnkqrgugc", // 坂東商店guest room〜藍染めと宿〜 https://www.neo88.app/places/cmahru0gg001vs60nnkqrgugc
-  "cmahrua5f001xs60n3vp4csom", // たねのや https://www.neo88.app/places/cmahrua5f001xs60n3vp4csom
-];
-
-const getOrderedArray = <T>(array: T[] | null | undefined, shouldReverse: boolean): T[] => {
-  if (!array) return [];
-  return shouldReverse ? [...array].reverse() : array;
-};
-
 export const presenterPlaceDetail = (place: GqlPlace): IPlaceDetail => {
-  const opportunity = place.opportunities?.[0];
-  const user = opportunity?.createdByUser;
-
-  const pin = presenterPlacePin(place);
-
-  const isReverseOrder = REVERSE_ORDER_PLACE_IDS.includes(place.id);
-
-  const opportunities = getOrderedArray(place.opportunities, isReverseOrder);
-  const publicOpportunities = opportunities.filter(
+  //TODO neo88専用の並び替えハードコード
+  const orderedOpportunities = orderOpportunities(place.opportunities ?? [], place.id);
+  const publicOpportunities = orderedOpportunities.filter(
     (o) => o.publishStatus === GqlPublishStatus.Public,
   );
 
   const currentlyHiringOpportunities = publicOpportunities.map(presenterActivityCard);
 
-  const relatedArticles = getOrderedArray(
-    getRelatedArticles(user, publicOpportunities),
-    isReverseOrder,
-  );
+  const opportunity = orderedOpportunities[0];
+  const user = opportunity?.createdByUser;
 
-  const images = getOrderedArray(
-    getPlaceImages(place.image, currentlyHiringOpportunities),
-    isReverseOrder,
-  );
+  const pin = presenterPlacePin(place);
+
+  const relatedArticles = getRelatedArticles(user, publicOpportunities);
+  const images = getPlaceImages(place.image, currentlyHiringOpportunities);
 
   return {
     ...pin,
@@ -122,10 +102,8 @@ export const presenterPlaceDetail = (place: GqlPlace): IPlaceDetail => {
     publicOpportunityCount: publicOpportunities.length,
     participantCount: place.accumulatedParticipants ?? 0,
     communityId: place.community?.id ?? "",
-
     images,
     totalImageCount: images.length,
-
     currentlyHiringOpportunities,
     relatedArticles,
   };
