@@ -14,6 +14,10 @@ interface CustomMarkerProps {
 
 const markerIconCache = new Map<string, google.maps.Icon>();
 
+const HARDCODED_COORDINATES: Record<string, google.maps.LatLngLiteral> = {
+  cmahstwr4002rs60n6map2wiu: { lat: 34.178142, lng: 133.818358 }, // 大庄屋
+};
+
 const loadImage = (src: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const img = new Image();
@@ -101,6 +105,16 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
   // ✅ 安定した依存値にする（nullを避ける）
   const hostImage = useMemo(() => data.host.image ?? PLACEHOLDER_IMAGE, [data.host.image]);
 
+  const position: google.maps.LatLngLiteral = useMemo(() => {
+    return HARDCODED_COORDINATES[data.id] ?? { lat: data.latitude, lng: data.longitude };
+  }, [data.id, data.latitude, data.longitude]);
+
+  useEffect(() => {
+    if (HARDCODED_COORDINATES[data.id]) {
+      console.log("✅ HARDCODE:", data.id, HARDCODED_COORDINATES[data.id]);
+    }
+  }, [data.id]);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -134,12 +148,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         // const userImg = await loadImage(hostImage);
         // await drawCircleWithImage(context, userImg, smallX, smallY, smallRadius, false);
 
-        const markerIcon = createIconObject(
-          canvas,
-          displaySize,
-          shadowPadding,
-          0,
-        );
+        const markerIcon = createIconObject(canvas, displaySize, shadowPadding, 0);
 
         markerIconCache.set(cacheKey, markerIcon);
         isMounted && setIcon(markerIcon);
@@ -170,9 +179,9 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
 
   return (
     <Marker
-      position={{ lat: data.latitude, lng: data.longitude }}
+      position={position}
       icon={icon}
-      onClick={e => {
+      onClick={(e) => {
         if (e && e.domEvent) e.domEvent.stopPropagation();
         onClick();
       }}
