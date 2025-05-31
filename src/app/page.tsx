@@ -24,6 +24,11 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
+    if (authLoading || userLoading || isAuthenticating) {
+      console.log("🔍 HomePage: Still loading, skipping redirect logic");
+      return;
+    }
+
     const isReturnFromLineAuth = searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
     const nextPath = searchParams.get("liff.state");
 
@@ -31,7 +36,9 @@ export default function HomePage() {
       isReturnFromLineAuth,
       nextPath,
       currentUrl: window.location.href,
-      searchParamsString: searchParams.toString()
+      searchParamsString: searchParams.toString(),
+      authenticationState,
+      isAuthenticated
     });
 
     if (isReturnFromLineAuth) {
@@ -54,13 +61,17 @@ export default function HomePage() {
         console.log("🔍 Stored redirect path in sessionStorage:", cleanedNextPath);
       }
 
-      const cleanedUrl = cleanedNextPath ? `${ window.location.pathname }?next=${ cleanedNextPath }` : window.location.pathname;
+      const cleanedUrl = cleanedNextPath ? `${window.location.pathname}?next=${cleanedNextPath}` : window.location.pathname;
       console.log("🔍 Cleaning URL to:", cleanedUrl);
       router.replace(cleanedUrl);
 
-      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(cleanedNextPath);
-      console.log("🚀 Authenticated, redirecting to:", redirectPath);
-      router.replace(redirectPath);
+      if (isAuthenticated && authenticationState === "user_registered") {
+        const redirectPath = authRedirectService.getPostLineAuthRedirectPath(cleanedNextPath);
+        console.log("🚀 Authenticated and registered, redirecting to:", redirectPath);
+        router.replace(redirectPath);
+      } else {
+        console.log("🔍 Waiting for authentication state to be ready...");
+      }
       return;
     }
 
@@ -74,8 +85,10 @@ export default function HomePage() {
       }
     }
 
-    console.log("🔍 No LINE auth return detected, redirecting to activities");
-    router.replace("/activities");
+    if (isAuthenticated) {
+      console.log("🔍 No LINE auth return detected, redirecting to activities");
+      router.replace("/activities");
+    }
   }, [router, isAuthenticated, authenticationState, userData, authLoading, userLoading, isAuthenticating, authRedirectService, searchParams]);
 
   useEffect(() => {

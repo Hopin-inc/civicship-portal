@@ -38,6 +38,16 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       return;
     }
 
+    if (typeof window !== "undefined" && pathname === "/") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isReturnFromLineAuth = urlParams.has("code") && urlParams.has("state") && urlParams.has("liffClientId");
+      if (isReturnFromLineAuth) {
+        console.log("🔍 RouteGuard: Skipping redirect for LINE auth return to homepage");
+        setAuthorized(true);
+        return;
+      }
+    }
+
     const authCheck = () => {
       const next = window.location.pathname + window.location.search;
       const redirectPath = authRedirectService.getRedirectPath(pathname, next);
