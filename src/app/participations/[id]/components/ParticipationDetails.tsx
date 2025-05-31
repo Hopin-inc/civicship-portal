@@ -3,7 +3,7 @@
 import React from "react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { Calendar, MapPin, Users, Banknote } from "lucide-react";
+import { Banknote, Calendar, MapPin, Users } from "lucide-react";
 import type { ParticipationDetail } from "@/app/participations/[id]/data/type";
 import { ActivityCard } from "@/app/activities/data/type";
 
@@ -46,9 +46,9 @@ const ParticipationDetails: React.FC<ParticipationDetailsProps> = ({
           <div className="flex items-center gap-2">
             <Banknote className="w-5 h-5 text-blue-600 flex-shrink-0" />
             <div>
-              <p>{opportunity.feeRequired.toLocaleString()}円</p>
+              <p>{opportunity.feeRequired?.toLocaleString()}円</p>
               <p className="text-sm text-gray-600">
-                ({opportunity.feeRequired.toLocaleString()}円/人)
+                ({opportunity.feeRequired?.toLocaleString()}円/人)
               </p>
             </div>
           </div>

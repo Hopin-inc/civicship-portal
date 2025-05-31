@@ -3,7 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GqlPlaceEdge, useGetPlacesQuery } from "@/types/graphql";
 import { presenterPlaceCard, presenterPlacePins } from "@/app/places/data/presenter";
-import { getCoordinatesFromAddress, PRIORITIZE_LAT_LNG_PLACE_IDS } from "@/utils/maps/geocoding";
+import {
+  getCoordinatesFromAddress,
+  PRIORITIZE_LAT_LNG_PLACE_IDS,
+} from "@/app/places/utils/geocoding";
 import { IPlacePin } from "@/app/places/data/type";
 import { useJsApiLoader } from "@react-google-maps/api";
 

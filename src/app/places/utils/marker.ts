@@ -1,5 +1,3 @@
-import { BasePin, BaseCardInfo } from "@/app/places/data/type";
-
 export const defaultImageUrl = "https://via.placeholder.com/200";
 
 // 影の設定を行う共通関数
@@ -117,13 +115,4 @@ export const drawCircleWithImage = async (
 
     loadImage(img.src);
   });
-};
-
-export const processMapData = (
-  places: BaseCardInfo[],
-): {
-  markers: BasePin[];
-  places: BasePin[];
-} => {
-  return { markers: places, places };
 };
