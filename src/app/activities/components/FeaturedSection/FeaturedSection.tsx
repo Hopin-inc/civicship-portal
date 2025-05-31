@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ActivityCard } from "@/app/activities/data/type";
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
@@ -121,7 +121,6 @@ function OpportunityImageSlider({
     loop: true,
     align: "start",
     dragFree: false,
-    speed: 20,
     slidesToScroll: 1,
   });
 
