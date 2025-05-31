@@ -15,65 +15,66 @@ interface UseAutoLoginProps {
 
 export const useAutoLogin = ({ environment, state, liffService, setState, refetchUser }: UseAutoLoginProps) => {
   const attemptedRef = useRef(false);
-  const stateRef = useRef(state);
-  const liffServiceRef = useRef(liffService);
-  const setStateRef = useRef(setState);
-  const refetchUserRef = useRef(refetchUser);
-  
-  stateRef.current = state;
-  liffServiceRef.current = liffService;
-  setStateRef.current = setState;
-  refetchUserRef.current = refetchUser;
+  const prevStateRef = useRef<{ authenticationState: string; isAuthenticating: boolean } | null>(null);
+  const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
 
   useEffect(() => {
-    console.log("[Debug] 🔁 useEffect(handleAutoLogin) fired");
+    console.log("[Debug] 🔥 useAutoLogin fired.");
 
-    if (environment !== AuthEnvironment.LIFF || attemptedRef.current) {
+    if (environment !== AuthEnvironment.LIFF) {
       return;
     }
 
-    const checkAndPerformAutoLogin = () => {
-      const currentState = stateRef.current;
-      
+    const currentState = {
+      authenticationState: state.authenticationState,
+      isAuthenticating: state.isAuthenticating
+    };
+    
+    const currentLiffState = liffService.getState();
+    const liffStateKey = { isInitialized: currentLiffState.isInitialized, isLoggedIn: currentLiffState.isLoggedIn };
+
+    const stateChanged = !prevStateRef.current || 
+      prevStateRef.current.authenticationState !== currentState.authenticationState ||
+      prevStateRef.current.isAuthenticating !== currentState.isAuthenticating;
+    
+    const liffStateChanged = !prevLiffStateRef.current ||
+      prevLiffStateRef.current.isInitialized !== liffStateKey.isInitialized ||
+      prevLiffStateRef.current.isLoggedIn !== liffStateKey.isLoggedIn;
+
+    if (stateChanged || liffStateChanged) {
+      prevStateRef.current = currentState;
+      prevLiffStateRef.current = liffStateKey;
+
       if (
-        currentState.authenticationState !== "unauthenticated" ||
-        currentState.isAuthenticating
+        state.authenticationState === "unauthenticated" &&
+        !state.isAuthenticating &&
+        !attemptedRef.current &&
+        currentLiffState.isInitialized &&
+        currentLiffState.isLoggedIn
       ) {
-        return;
-      }
+        const handleAutoLogin = async () => {
+          attemptedRef.current = true;
+          
+          const timestamp = new Date().toISOString();
+          console.log(`🔍 [${timestamp}] Auto-logging in via LIFF`);
 
-      const handleAutoLogin = async () => {
-        attemptedRef.current = true;
-        
-        const liffState = liffServiceRef.current.getState();
-        if (!liffState.isInitialized || !liffState.isLoggedIn) return;
-
-        const timestamp = new Date().toISOString();
-        console.log(`🔍 [${timestamp}] Auto-logging in via LIFF`);
-
-        setStateRef.current((prev) => ({ ...prev, isAuthenticating: true }));
-        try {
-          const success = await liffServiceRef.current.signInWithLiffToken();
-          if (success) {
-            await refetchUserRef.current();
+          setState((prev) => ({ ...prev, isAuthenticating: true }));
+          try {
+            const success = await liffService.signInWithLiffToken();
+            if (success) {
+              await refetchUser();
+            }
+          } catch (error) {
+            console.error("Auto-login with LIFF failed:", error);
+          } finally {
+            setState((prev) => ({ ...prev, isAuthenticating: false }));
           }
-        } catch (error) {
-          console.error("Auto-login with LIFF failed:", error);
-        } finally {
-          setStateRef.current((prev) => ({ ...prev, isAuthenticating: false }));
-        }
-      };
+        };
 
-      handleAutoLogin();
-    };
-
-    const interval = setInterval(checkAndPerformAutoLogin, 3000);
-    checkAndPerformAutoLogin();
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [environment]);
+        handleAutoLogin();
+      }
+    }
+  }, [environment, state.authenticationState, state.isAuthenticating, liffService, setState, refetchUser]);
 
   useEffect(() => {
     if (state.authenticationState !== "unauthenticated") {
