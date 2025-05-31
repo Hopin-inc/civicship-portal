@@ -147,7 +147,7 @@ export const presenterReservationDateTimeInfo = (
       hour12: false,
     }),
     participantCount,
-    totalPrice: (opportunity.feeRequired || 0) * participantCount,
+    totalPrice: (opportunity.feeRequired ?? 0) * participantCount,
   };
 };
 
