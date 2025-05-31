@@ -1,7 +1,6 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { createContext, useCallback, useContext, useState } from "react";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
@@ -22,7 +21,6 @@ import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListe
 import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
 import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
 import { usePhoneAuthState } from "@/hooks/auth/usePhoneAuthState";
-import { AuthRedirectHandler } from "@/lib/auth/auth-redirect-handler";
 import { useUserRegistrationState } from "@/hooks/auth/useUserRegistrationState";
 import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
@@ -94,7 +92,6 @@ interface AuthProviderProps {
  * 認証プロバイダーコンポーネント
  */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const router = useRouter();
   const environment = detectEnvironment();
 
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
@@ -157,12 +154,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useTokenExpirationHandler({ state, setState, logout });
   useFirebaseAuthState({ authStateManager, state, setState });
   usePhoneAuthState({ authStateManager, phoneAuthService, setState });
-
-  useEffect(() => {
-    const redirectHandler = AuthRedirectHandler.getInstance();
-    redirectHandler.setRouter(router);
-    redirectHandler.initialize();
-  }, [router]);
   useUserRegistrationState({ authStateManager, userData, setState });
   useLiffInitialization({ environment, liffService });
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
