@@ -14,6 +14,7 @@ import SearchForm from "@/app/search/components/SearchForm";
 import SearchFilters from "@/app/search/components/SearchFilters";
 import SearchFooter from "@/app/search/components/Footer";
 import SearchFilterSheets from "@/app/search/components/SearchFilterSheet";
+import clientLogger from "@/lib/logging/client";
 
 export default function SearchPage() {
   const headerConfig = useMemo(
@@ -45,7 +46,11 @@ export default function SearchPage() {
               to: toDate,
             };
           }
-          console.warn(`Invalid date strings in URL: from='${fromStr}', to='${toStr}'`);
+          clientLogger.warn("Invalid date strings in URL", {
+            from: fromStr,
+            to: toStr,
+            component: "SearchPage"
+          });
         }
         return undefined; // Default if params not present or dates are invalid
       })(),

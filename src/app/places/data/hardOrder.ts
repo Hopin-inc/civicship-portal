@@ -1,5 +1,6 @@
 import { GqlOpportunity, GqlPlace } from "@/types/graphql";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
+import clientLogger from "@/lib/logging/client";
 
 // #NOTE 拠点に複数人の案内人の体験が掲載されている場合、意図しない順序で表示されている拠点のID（順序を逆にすることで簡易的に解決する）
 // 坂東商店guest room〜藍染めと宿〜 https://www.neo88.app/places/cmahru0gg001vs60nnkqrgugc
@@ -44,12 +45,12 @@ export const orderOpportunities = (
     return opportunities;
   }
 
-  console.log(`[orderOpportunities] ${placeId}`);
-  console.log(
-    "  original:",
-    opportunities.map((o) => o.id),
-  );
-  console.log("  definedOrder:", order);
+  clientLogger.debug("orderOpportunities", {
+    placeId,
+    original: opportunities.map((o) => o.id),
+    definedOrder: order,
+    component: "hardOrder"
+  });
 
   const sorted = [...opportunities].sort((a, b) => {
     const indexA = order.indexOf(a.id);
@@ -61,10 +62,11 @@ export const orderOpportunities = (
     return indexA - indexB;
   });
 
-  console.log(
-    "  sorted:",
-    sorted.map((o) => o.id),
-  );
+  clientLogger.debug("orderOpportunities sorted", {
+    placeId,
+    sorted: sorted.map((o) => o.id),
+    component: "hardOrder"
+  });
 
   return sorted;
 };
@@ -81,13 +83,13 @@ export const getPrimaryOpportunity = (place: GqlPlace): GqlOpportunity | undefin
     .map((id) => opportunities.find((o) => o.id === id))
     .find((o): o is GqlOpportunity => !!o);
 
-  console.log(`[getPrimaryOpportunity] ${place.id}`);
-  console.log("  preferred order:", preferredOrder);
-  console.log(
-    "  available:",
-    opportunities.map((o) => o.id),
-  );
-  console.log("  selected:", found?.id ?? opportunities[0]?.id);
+  clientLogger.debug("getPrimaryOpportunity", {
+    placeId: place.id,
+    preferredOrder,
+    available: opportunities.map((o) => o.id),
+    selected: found?.id ?? opportunities[0]?.id,
+    component: "hardOrder"
+  });
 
   return found ?? opportunities[0];
 };

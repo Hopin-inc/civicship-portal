@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { AuthState } from "@/contexts/AuthProvider";
+import clientLogger from "@/lib/logging/client";
 
 interface UseTokenExpirationHandlerProps {
   state: AuthState;
@@ -15,7 +16,7 @@ export const useTokenExpirationHandler = ({ state, setState, logout }: UseTokenE
   stateRef.current = state;
 
   useEffect(() => {
-    console.log("[Debug] 🔥 useTokenExpirationHandler fired.");
+    clientLogger.debug("useTokenExpirationHandler fired", { component: "useTokenExpirationHandler" });
     
     const handleTokenExpired = (event: Event) => {
       const customEvent = event as CustomEvent<{ source: string }>;

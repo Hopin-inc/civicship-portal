@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { ActivityCard } from "@/app/activities/data/type";
 import { presenterActivityCards } from "@/app/activities/data/presenter";
 import { IPrefectureCodeMap } from "@/app/search/data/type";
+import clientLogger from "@/lib/logging/client";
 
 export const useSearchResults = (
   searchParams: SearchParams = {},
@@ -79,7 +80,10 @@ export const useSearchResults = (
 
   useEffect(() => {
     if (error) {
-      console.error("Error fetching search results:", error);
+      clientLogger.info("Error fetching search results", {
+        error: error.message || String(error),
+        component: "useSearchResults"
+      });
       toast.error("検索結果の取得に失敗しました");
     }
   }, [error]);

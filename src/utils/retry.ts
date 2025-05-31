@@ -1,3 +1,5 @@
+import clientLogger from "@/lib/logging/client";
+
 /**
  * Utility function to retry an async operation with exponential backoff
  * @param operation The async operation to retry
@@ -22,11 +24,20 @@ export async function retryWithBackoff<T>(
       currentRetry++;
       
       if (currentRetry > retries) {
-        console.error(`Operation failed after ${retries} retries:`, error);
+        clientLogger.error(`Operation failed after ${retries} retries`, {
+          error: error instanceof Error ? error.message : String(error),
+          retries,
+          component: "retryWithBackoff"
+        });
         throw error;
       }
       
-      console.log(`Retry attempt ${currentRetry}/${retries} after ${currentDelay}ms`);
+      clientLogger.debug(`Retry attempt ${currentRetry}/${retries} after ${currentDelay}ms`, {
+        currentRetry,
+        retries,
+        currentDelay,
+        component: "retryWithBackoff"
+      });
       
       await new Promise(resolve => setTimeout(resolve, currentDelay));
       

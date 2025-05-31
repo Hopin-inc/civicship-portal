@@ -1,6 +1,8 @@
 import { TokenManager } from "./token-manager";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
+import clientLogger from "../logging/client";
+import { createAuthLogContext } from "../logging/client/utils";
 
 export type AuthenticationState =
   | "unauthenticated"
@@ -19,8 +21,10 @@ export class AuthStateManager {
   private static instance: AuthStateManager;
   private currentState: AuthenticationState = "loading";
   private stateChangeListeners: ((state: AuthenticationState) => void)[] = [];
+  private sessionId: string;
 
   private constructor() {
+    this.sessionId = this.initializeSessionId();
     if (typeof window !== "undefined") {
       window.addEventListener("auth:renew-line-token", this.handleLineTokenRenewal.bind(this));
       window.addEventListener("auth:renew-phone-token", this.handlePhoneTokenRenewal.bind(this));
@@ -45,6 +49,56 @@ export class AuthStateManager {
   }
 
   /**
+   * 現在のセッションIDを取得
+   */
+  public getSessionId(): string {
+    return this.sessionId;
+  }
+
+  /**
+   * セッションIDを初期化する
+   * localStorage から既存のIDを取得するか、新しいIDを生成する
+   * ログイン状態に関係なく同一ブラウザでは同じIDを維持
+   */
+  private initializeSessionId(): string {
+    if (typeof window === "undefined") {
+      return this.generateSessionId();
+    }
+
+    const SESSION_ID_KEY = "civicship_auth_session_id";
+    
+    try {
+      let sessionId = localStorage.getItem(SESSION_ID_KEY);
+      
+      if (!sessionId) {
+        sessionId = this.generateSessionId();
+        localStorage.setItem(SESSION_ID_KEY, sessionId);
+      }
+      
+      return sessionId;
+    } catch (error) {
+      return this.generateSessionId();
+    }
+  }
+
+  /**
+   * セッションIDを生成する
+   */
+  private generateSessionId(): string {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) {
+      return `auth_${Date.now()}_${crypto.randomUUID().replace(/-/g, "").substring(0, 9)}`;
+    } else if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+      const array = new Uint32Array(1);
+      crypto.getRandomValues(array);
+      return `auth_${Date.now()}_${array[0].toString(36)}`;
+    } else {
+      return `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+  }
+
+
+
+  /**
    * 認証状態の変更を監視するリスナーを追加
    */
   public addStateChangeListener(listener: (state: AuthenticationState) => void): void {
@@ -62,7 +116,11 @@ export class AuthStateManager {
    * 認証状態を更新
    */
   public setState(state: AuthenticationState): void {
-    console.log("🔃 AuthStateManager.setState: ", this.currentState, "->", state);
+    clientLogger.debug("AuthStateManager.setState", {
+      from: this.currentState,
+      to: state,
+      component: "AuthStateManager"
+    });
     if (this.currentState !== state) {
       this.currentState = state;
       this.notifyStateChange();
@@ -116,7 +174,9 @@ export class AuthStateManager {
     try {
       const { lineAuth } = await import("./firebase-config");
       if (!lineAuth.currentUser) {
-        console.log("No Firebase Auth user found");
+        clientLogger.debug("No Firebase Auth user found", {
+          component: "AuthStateManager"
+        });
         return false;
       }
 
@@ -124,7 +184,14 @@ export class AuthStateManager {
       try {
         accessToken = await lineAuth.currentUser.getIdToken();
       } catch (tokenError) {
-        console.error("Failed to get Firebase token for user registration check:", tokenError);
+        clientLogger.info("Failed to get Firebase token for user registration check", createAuthLogContext(
+          this.sessionId,
+          "general",
+          { 
+            error: tokenError instanceof Error ? tokenError.message : String(tokenError),
+            component: "AuthStateManager" 
+          }
+        ));
         return false;
       }
 
@@ -139,16 +206,24 @@ export class AuthStateManager {
       });
 
       const isRegistered = data?.currentUser?.user != null;
-      console.log("User registration check result:", {
+      clientLogger.debug("User registration check result", {
         hasFirebaseUser: !!lineAuth.currentUser,
         hasAccessToken: !!accessToken,
         isRegistered,
-        userId: data?.currentUser?.user?.id || null
+        userId: data?.currentUser?.user?.id || null,
+        component: "AuthStateManager"
       });
 
       return isRegistered;
     } catch (error) {
-      console.error("Failed to check user registration:", error);
+      clientLogger.info("Failed to check user registration", createAuthLogContext(
+        this.sessionId,
+        "general",
+        { 
+          error: error instanceof Error ? error.message : String(error),
+          component: "AuthStateManager" 
+        }
+      ));
       return false;
     }
   }
@@ -171,7 +246,14 @@ export class AuthStateManager {
         this.setState("unauthenticated");
       }
     } catch (error) {
-      console.error("Failed to renew LINE token:", error);
+      clientLogger.info("Failed to renew LINE token", createAuthLogContext(
+        this.sessionId,
+        "general",
+        { 
+          error: error instanceof Error ? error.message : String(error),
+          component: "AuthStateManager" 
+        }
+      ));
       this.setState("unauthenticated");
     }
   }
@@ -195,7 +277,14 @@ export class AuthStateManager {
         }
       }
     } catch (error) {
-      console.error("Failed to renew phone token:", error);
+      clientLogger.info("Failed to renew phone token", createAuthLogContext(
+        this.sessionId,
+        "general",
+        { 
+          error: error instanceof Error ? error.message : String(error),
+          component: "AuthStateManager" 
+        }
+      ));
 
       const lineTokens = TokenManager.getLineTokens();
       const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
@@ -258,7 +347,9 @@ export class AuthStateManager {
 
     if (isRegistered) {
       this.setState("user_registered");
-      console.log("🔄 User is registered - setting state to user_registered regardless of phone token status");
+      clientLogger.debug("User is registered - setting state to user_registered regardless of phone token status", {
+        component: "AuthStateManager"
+      });
     } else {
       const phoneTokens = TokenManager.getPhoneTokens();
       const hasValidPhoneToken = phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());

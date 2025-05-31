@@ -10,6 +10,7 @@ import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection
 import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import clientLogger from "@/lib/logging/client";
 
 export default function HomePage() {
   const router = useRouter();
@@ -25,52 +26,76 @@ export default function HomePage() {
 
   useEffect(() => {
     if (authLoading || userLoading || isAuthenticating) {
-      console.log("🔍 HomePage: Still loading, skipping redirect logic");
+      clientLogger.debug("HomePage: Still loading, skipping redirect logic", {
+        component: "HomePage"
+      });
       return;
     }
 
     const isReturnFromLineAuth = searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
     const nextPath = searchParams.get("liff.state");
 
-    console.log("🔍 HomePage useEffect - checking LINE auth return:", {
+    clientLogger.debug("HomePage useEffect - checking LINE auth return", {
       isReturnFromLineAuth,
       nextPath,
       currentUrl: window.location.href,
       searchParamsString: searchParams.toString(),
       authenticationState,
-      isAuthenticated
+      isAuthenticated,
+      component: "HomePage"
     });
 
     if (isReturnFromLineAuth) {
-      console.log("🚀 Detected return from LINE authentication, liff.state:", nextPath);
+      clientLogger.debug("Detected return from LINE authentication", {
+        nextPath,
+        component: "HomePage"
+      });
 
       let cleanedNextPath = nextPath;
       if (nextPath?.startsWith("/login?next=")) {
         const urlParams = new URLSearchParams(nextPath.split("?")[1]);
         cleanedNextPath = urlParams.get("next");
-        console.log("🔍 Extracted nested next path:", cleanedNextPath);
+        clientLogger.debug("Extracted nested next path", {
+          cleanedNextPath,
+          component: "HomePage"
+        });
       } else if (nextPath?.startsWith("/login")) {
         cleanedNextPath = null;
-        console.log("🔍 Cleared login path, setting to null");
+        clientLogger.debug("Cleared login path, setting to null", {
+          component: "HomePage"
+        });
       }
 
-      console.log("🔍 Final cleaned next path:", cleanedNextPath);
+      clientLogger.debug("Final cleaned next path", {
+        cleanedNextPath,
+        component: "HomePage"
+      });
 
       const cleanedUrl = cleanedNextPath ? `${window.location.pathname}?next=${cleanedNextPath}` : window.location.pathname;
-      console.log("🔍 Cleaning URL to:", cleanedUrl);
+      clientLogger.debug("Cleaning URL", {
+        cleanedUrl,
+        component: "HomePage"
+      });
       router.replace(cleanedUrl);
 
       if (isAuthenticated && authenticationState === "user_registered") {
         const redirectPath = authRedirectService.getPostLineAuthRedirectPath(cleanedNextPath);
-        console.log("🚀 Authenticated and registered, redirecting to:", redirectPath);
+        clientLogger.debug("Authenticated and registered, redirecting", {
+          redirectPath,
+          component: "HomePage"
+        });
         router.replace(redirectPath);
       } else {
-        console.log("🔍 Waiting for authentication state to be ready...");
+        clientLogger.debug("Waiting for authentication state to be ready", {
+          component: "HomePage"
+        });
       }
       return;
     }
 
-    console.log("🔍 No LINE auth return detected, redirecting to activities");
+    clientLogger.debug("No LINE auth return detected, redirecting to activities", {
+      component: "HomePage"
+    });
     router.replace("/activities");
   }, [authLoading, authRedirectService, authenticationState, isAuthenticated, isAuthenticating, router, searchParams, userLoading]);
 

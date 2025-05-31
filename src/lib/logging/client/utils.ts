@@ -11,12 +11,13 @@ if (typeof window === "undefined") {
   try {
     serverUtils = require("./logging-utils-server");
   } catch (e) {
-    console.warn("Failed to load server logging utilities:", e);
   }
 }
 
 /**
- * 認証セッションIDを生成する
+ * 認証セッションIDを生成する（ブラウザ永続化対応）
+ * ブラウザ環境では localStorage を使用してセッションIDを永続化
+ * ログイン・ログアウトに関係なく同一ブラウザでは同じIDを使用
  * @returns 一意のセッションID
  */
 export const generateSessionId = (): string => {
@@ -24,6 +25,31 @@ export const generateSessionId = (): string => {
     return serverUtils.generateSessionId();
   }
 
+  if (typeof window === "undefined") {
+    return generateNewSessionId();
+  }
+
+  const SESSION_ID_KEY = "civicship_auth_session_id";
+  
+  try {
+    let sessionId = localStorage.getItem(SESSION_ID_KEY);
+    
+    if (!sessionId) {
+      sessionId = generateNewSessionId();
+      localStorage.setItem(SESSION_ID_KEY, sessionId);
+    }
+    
+    return sessionId;
+  } catch (error) {
+    return generateNewSessionId();
+  }
+};
+
+/**
+ * 新しいセッションIDを生成する内部関数
+ * @returns 新しい一意のセッションID
+ */
+const generateNewSessionId = (): string => {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
     return `auth_${Date.now()}_${crypto.randomUUID().replace(/-/g, "").substring(0, 9)}`;
   } else if (typeof crypto !== "undefined" && crypto.getRandomValues) {
@@ -34,6 +60,8 @@ export const generateSessionId = (): string => {
     return `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 };
+
+
 
 /**
  * 電話番号をマスクする（下4桁のみ表示）
