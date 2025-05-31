@@ -15,6 +15,7 @@ import {
 } from "@/types/graphql";
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/utils";
+import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 
 /**
  * 認証状態の型定義
@@ -111,7 +112,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const authStateManager = React.useMemo(() => {
     if (typeof window === "undefined") return null;
-    const AuthStateManager = require("@/lib/auth/auth-state-manager").AuthStateManager;
     return AuthStateManager.getInstance();
   }, []);
 
