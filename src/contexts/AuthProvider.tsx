@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
@@ -93,6 +94,7 @@ interface AuthProviderProps {
  * 認証プロバイダーコンポーネント
  */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const router = useRouter();
   const environment = detectEnvironment();
 
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
@@ -158,8 +160,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const redirectHandler = AuthRedirectHandler.getInstance();
+    redirectHandler.setRouter(router);
     redirectHandler.initialize();
-  }, []);
+  }, [router]);
   useUserRegistrationState({ authStateManager, userData, setState });
   useLiffInitialization({ environment, liffService });
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
