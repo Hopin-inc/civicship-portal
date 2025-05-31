@@ -256,21 +256,17 @@ export class AuthStateManager {
       return;
     }
 
-    const phoneTokens = TokenManager.getPhoneTokens();
-    const hasValidPhoneToken = phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
-
-    if (!hasValidPhoneToken) {
-      this.setState("line_authenticated");
-      return;
-    }
-
     if (isRegistered) {
-      if (this.currentState === "phone_authenticated" || this.currentState === "phone_token_expired") {
-        this.setState("user_registered");
-      }
+      this.setState("user_registered");
+      console.log("🔄 User is registered - setting state to user_registered regardless of phone token status");
     } else {
-      if (this.currentState === "user_registered") {
+      const phoneTokens = TokenManager.getPhoneTokens();
+      const hasValidPhoneToken = phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
+
+      if (hasValidPhoneToken) {
         this.setState("phone_authenticated");
+      } else {
+        this.setState("line_authenticated");
       }
     }
   }
