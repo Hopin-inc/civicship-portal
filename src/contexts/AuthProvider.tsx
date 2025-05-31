@@ -15,6 +15,7 @@ import {
 } from "@/types/graphql";
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/utils";
+import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 
 /**
  * 認証状態の型定義
@@ -111,13 +112,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const authStateManager = React.useMemo(() => {
     if (typeof window === "undefined") return null;
-    const AuthStateManager = require("@/lib/auth/auth-state-manager").AuthStateManager;
     return AuthStateManager.getInstance();
   }, []);
 
   useEffect(() => {
     console.log("[Debug] authenticationState changed to:", state.authenticationState);
-    const unsubscribe = lineAuth.onAuthStateChanged((user) => {
+    const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
       setState((prev) => ({
         ...prev,
         firebaseUser: user,
@@ -127,6 +127,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             : prev.authenticationState
           : "unauthenticated",
       }));
+
+      if (user) {
+        try {
+          const idToken = await user.getIdToken();
+          const refreshToken = user.refreshToken;
+          const tokenResult = await user.getIdTokenResult();
+          const expirationTime = new Date(tokenResult.expirationTime).getTime();
+
+          TokenManager.saveLineTokens({
+            accessToken: idToken,
+            refreshToken: refreshToken,
+            expiresAt: expirationTime,
+          });
+
+          console.log('🔄 Firebase Auth token synced to cookies');
+        } catch (error) {
+          console.error('Failed to sync Firebase token to cookies:', error);
+        }
+      } else {
+        TokenManager.clearLineTokens();
+        console.log('🔄 LINE tokens cleared from cookies');
+      }
 
       if (authStateManager && !state.isAuthenticating) {
         authStateManager.handleLineAuthStateChange(!!user);
