@@ -75,16 +75,6 @@ export default function HomePage() {
       return;
     }
 
-    if (typeof window !== "undefined") {
-      const storedRedirectPath = sessionStorage.getItem("lineAuthRedirectPath");
-      if (storedRedirectPath && isAuthenticated && authenticationState === "user_registered") {
-        console.log("🔍 Found stored redirect path, redirecting to:", storedRedirectPath);
-        sessionStorage.removeItem("lineAuthRedirectPath");
-        router.replace(storedRedirectPath);
-        return;
-      }
-    }
-
     console.log("🔍 No LINE auth return detected, redirecting to activities");
     router.replace("/activities");
   }, [authLoading, authRedirectService, authenticationState, isAuthenticated, isAuthenticating, router, searchParams, userLoading]);

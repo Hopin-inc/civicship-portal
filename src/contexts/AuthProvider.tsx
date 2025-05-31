@@ -21,6 +21,7 @@ import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListe
 import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
 import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
 import { usePhoneAuthState } from "@/hooks/auth/usePhoneAuthState";
+import { AuthRedirectHandler } from "@/lib/auth/auth-redirect-handler";
 import { useUserRegistrationState } from "@/hooks/auth/useUserRegistrationState";
 import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
@@ -154,6 +155,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useTokenExpirationHandler({ state, setState, logout });
   useFirebaseAuthState({ authStateManager, state, setState });
   usePhoneAuthState({ authStateManager, phoneAuthService, setState });
+
+  useEffect(() => {
+    const redirectHandler = AuthRedirectHandler.getInstance();
+    redirectHandler.initialize();
+  }, []);
   useUserRegistrationState({ authStateManager, userData, setState });
   useLiffInitialization({ environment, liffService });
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
