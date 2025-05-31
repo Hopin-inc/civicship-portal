@@ -56,11 +56,6 @@ export default function HomePage() {
 
       console.log("🔍 Final cleaned next path:", cleanedNextPath);
 
-      if (cleanedNextPath && typeof window !== "undefined") {
-        sessionStorage.setItem("lineAuthRedirectPath", cleanedNextPath);
-        console.log("🔍 Stored redirect path in sessionStorage:", cleanedNextPath);
-      }
-
       const cleanedUrl = cleanedNextPath ? `${window.location.pathname}?next=${cleanedNextPath}` : window.location.pathname;
       console.log("🔍 Cleaning URL to:", cleanedUrl);
       router.replace(cleanedUrl);
