@@ -7,6 +7,8 @@ export const useAuthStateManagerInitialization = (authStateManager: AuthStateMan
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    console.log("[Debug] 🔥 useAuthStateManagerInitialization fired.");
+    
     if (!authStateManager) return;
 
     const initializeAuthState = async () => {

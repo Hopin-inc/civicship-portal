@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
@@ -12,10 +12,20 @@ interface UsePhoneAuthStateProps {
 }
 
 export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState }: UsePhoneAuthStateProps) => {
-  useEffect(() => {
-    if (!authStateManager) return;
+  const authStateManagerRef = useRef(authStateManager);
+  const phoneAuthServiceRef = useRef(phoneAuthService);
+  
+  authStateManagerRef.current = authStateManager;
+  phoneAuthServiceRef.current = phoneAuthService;
 
-    const phoneState = phoneAuthService.getState();
+  useEffect(() => {
+    console.log("[Debug] 🔥 usePhoneAuthState fired.");
+    
+    const currentAuthStateManager = authStateManagerRef.current;
+    
+    if (!currentAuthStateManager) return;
+
+    const phoneState = phoneAuthServiceRef.current.getState();
     const isVerified = phoneState.isVerified;
 
     if (isVerified) {
@@ -26,7 +36,7 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
             `🔍 [${timestamp}] Updating phone auth state in useEffect - isVerified:`,
             isVerified,
           );
-          await authStateManager.handlePhoneAuthStateChange(true);
+          await currentAuthStateManager.handlePhoneAuthStateChange(true);
           console.log(
             `🔍 [${timestamp}] AuthStateManager phone state updated successfully in useEffect`,
           );
@@ -46,5 +56,5 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
           : prev.authenticationState
         : prev.authenticationState,
     }));
-  }, [authStateManager, phoneAuthService, setState]);
+  }, [setState]);
 };

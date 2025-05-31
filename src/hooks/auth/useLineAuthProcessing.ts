@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthState } from "@/contexts/AuthProvider";
 
@@ -12,20 +12,32 @@ interface UseLineAuthProcessingProps {
 }
 
 export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setState, refetchUser }: UseLineAuthProcessingProps) => {
+  const processedRef = useRef(false);
+  const liffServiceRef = useRef(liffService);
+  const setStateRef = useRef(setState);
+  const refetchUserRef = useRef(refetchUser);
+  
+  liffServiceRef.current = liffService;
+  setStateRef.current = setState;
+  refetchUserRef.current = refetchUser;
+
   useEffect(() => {
-    if (!shouldProcessRedirect) return;
+    console.log("[Debug] 🔥 useLineAuthProcessing fired.");
+    
+    if (!shouldProcessRedirect || processedRef.current) return;
 
     const handleLineAuthRedirect = async () => {
-      setState((prev) => ({ ...prev, isAuthenticating: true }));
+      processedRef.current = true;
+      setStateRef.current((prev) => ({ ...prev, isAuthenticating: true }));
 
       try {
-        const initialized = await liffService.initialize();
+        const initialized = await liffServiceRef.current.initialize();
         if (!initialized) {
           console.error("LIFF init failed");
           return;
         }
 
-        const { isLoggedIn, profile } = liffService.getState();
+        const { isLoggedIn, profile } = liffServiceRef.current.getState();
         console.log("LIFF State:", {
           isInitialized: true,
           isLoggedIn,
@@ -37,21 +49,27 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
           return;
         }
 
-        const success = await liffService.signInWithLiffToken();
+        const success = await liffServiceRef.current.signInWithLiffToken();
         if (!success) {
           console.error("signInWithLiffToken failed");
           return;
         }
 
         console.log("LINE auth successful. Refetching user...");
-        await refetchUser();
+        await refetchUserRef.current();
       } catch (err) {
         console.error("Error during LINE auth:", err);
       } finally {
-        setState((prev) => ({ ...prev, isAuthenticating: false }));
+        setStateRef.current((prev) => ({ ...prev, isAuthenticating: false }));
       }
     };
 
     handleLineAuthRedirect();
-  }, [shouldProcessRedirect, liffService, setState, refetchUser]);
+  }, [shouldProcessRedirect]);
+
+  useEffect(() => {
+    if (!shouldProcessRedirect) {
+      processedRef.current = false;
+    }
+  }, [shouldProcessRedirect]);
 };

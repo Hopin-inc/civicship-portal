@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
 import { GqlCurrentUserQuery } from "@/types/graphql";
@@ -12,20 +12,35 @@ interface UseUserRegistrationStateProps {
 }
 
 export const useUserRegistrationState = ({ authStateManager, userData, setState }: UseUserRegistrationStateProps) => {
+  const processedUserIdRef = useRef<string | null>(null);
+  const authStateManagerRef = useRef(authStateManager);
+  authStateManagerRef.current = authStateManager;
+
   useEffect(() => {
+    console.log("[Debug] 🔥 useUserRegistrationState fired.");
+    
     if (userData?.currentUser?.user) {
+      const userId = userData.currentUser.user.id;
+      
+      if (processedUserIdRef.current === userId) {
+        return;
+      }
+      
+      processedUserIdRef.current = userId;
+
       setState((prev) => ({
         ...prev,
         currentUser: userData.currentUser?.user,
         authenticationState: "user_registered",
       }));
 
-      if (authStateManager) {
+      const currentAuthStateManager = authStateManagerRef.current;
+      if (currentAuthStateManager) {
         const updateUserRegistrationState = async () => {
           try {
             const timestamp = new Date().toISOString();
             console.log(`🔍 [${timestamp}] Updating user registration state in useEffect`);
-            await authStateManager.handleUserRegistrationStateChange(true);
+            await currentAuthStateManager.handleUserRegistrationStateChange(true);
             console.log(
               `🔍 [${timestamp}] AuthStateManager user registration state updated successfully`,
             );
@@ -36,6 +51,8 @@ export const useUserRegistrationState = ({ authStateManager, userData, setState 
 
         updateUserRegistrationState();
       }
+    } else {
+      processedUserIdRef.current = null;
     }
-  }, [userData, authStateManager, setState]);
+  }, [userData, setState]);
 };

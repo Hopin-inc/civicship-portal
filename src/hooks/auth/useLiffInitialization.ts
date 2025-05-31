@@ -11,6 +11,8 @@ interface UseLiffInitializationProps {
 
 export const useLiffInitialization = ({ environment, liffService }: UseLiffInitializationProps) => {
   useEffect(() => {
+    console.log("[Debug] 🔥 useLiffInitialization fired.");
+    
     const initializeLiff = async () => {
       if (environment !== AuthEnvironment.LIFF) return;
 
