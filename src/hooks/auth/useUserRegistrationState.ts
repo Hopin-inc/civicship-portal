@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
 import { GqlCurrentUserQuery } from "@/types/graphql";
+import clientLogger from "@/lib/logging/client";
 
 interface UseUserRegistrationStateProps {
   authStateManager: AuthStateManager | null;
@@ -17,15 +18,13 @@ export const useUserRegistrationState = ({ authStateManager, userData, setState 
   authStateManagerRef.current = authStateManager;
 
   useEffect(() => {
-    console.log("[Debug] 🔥 useUserRegistrationState fired.");
-    
     if (userData?.currentUser?.user) {
       const userId = userData.currentUser.user.id;
-      
+
       if (processedUserIdRef.current === userId) {
         return;
       }
-      
+
       processedUserIdRef.current = userId;
 
       setState((prev) => ({
@@ -38,14 +37,12 @@ export const useUserRegistrationState = ({ authStateManager, userData, setState 
       if (currentAuthStateManager) {
         const updateUserRegistrationState = async () => {
           try {
-            const timestamp = new Date().toISOString();
-            console.log(`🔍 [${timestamp}] Updating user registration state in useEffect`);
             await currentAuthStateManager.handleUserRegistrationStateChange(true);
-            console.log(
-              `🔍 [${timestamp}] AuthStateManager user registration state updated successfully`,
-            );
           } catch (error) {
-            console.error("Failed to update AuthStateManager user registration state:", error);
+            clientLogger.error("Failed to update AuthStateManager user registration state", {
+              error: error instanceof Error ? error.message : String(error),
+              component: "useUserRegistrationState"
+            });
           }
         };
 

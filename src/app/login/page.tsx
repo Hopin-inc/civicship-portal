@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import clientLogger from "@/lib/logging/client";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -56,12 +57,17 @@ export default function LoginPage() {
 
     try {
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
-      console.log("🚀 Using redirect path from AuthRedirectService:", redirectPath);
+      clientLogger.debug("Using redirect path from AuthRedirectService", {
+        redirectPath,
+        component: "LoginPage"
+      });
 
       const success = await loginWithLiff(redirectPath);
 
       if (success) {
-        console.log("🚀 LINE authentication succeeded. Redirecting...");
+        clientLogger.debug("LINE authentication succeeded. Redirecting...", {
+          component: "LoginPage"
+        });
       }
     } catch (err) {
       const { title, description } = getLiffLoginErrorMessage(error);
