@@ -63,7 +63,7 @@ export class AuthRedirectService {
    */
   public getRedirectPath(pathname: string, next?: string | null): string | null {
     const authState = this.authStateManager.getState();
-    const nextParam = next ? `?next=${next}` : "";
+    const nextParam = next ? `?next=${next}` : `?next=${pathname}`;
 
     console.log("getRedirectPath", { pathname, authState, next, nextParam });
 
@@ -71,15 +71,13 @@ export class AuthRedirectService {
       return null;
     }
 
-    if (pathname === "/sign-up/phone-verification" && authState !== "line_authenticated") {
-      if (next && next.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
-        return next;
-      }
-      return "/";
-    }
-
-    if (pathname === "/sign-up" && authState !== "phone_authenticated") {
-      if (next && next.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
+    if ((pathname === "/login" || pathname === "/sign-up") && authState === "user_registered") {
+      if (
+        next &&
+        next.startsWith("/") &&
+        !next.startsWith("/login") &&
+        !next.startsWith("/sign-up")
+      ) {
         return next;
       }
       return "/";
@@ -133,18 +131,6 @@ export class AuthRedirectService {
       }
     }
 
-    if ((pathname === "/login" || pathname === "/sign-up") && authState === "user_registered") {
-      if (
-        next &&
-        next.startsWith("/") &&
-        !next.startsWith("/login") &&
-        !next.startsWith("/sign-up")
-      ) {
-        return next;
-      }
-      return "/";
-    }
-
     return null;
   }
 
@@ -156,6 +142,7 @@ export class AuthRedirectService {
   public getPostLineAuthRedirectPath(nextPath: string | null): string {
     const next = nextPath ? decodeURIComponent(nextPath) : null;
     const nextParam = next ? `?next=${next}` : "";
+    console.log("getPostLineAuthRedirectPath", { nextPath, next, nextParam });
 
     const authState = this.authStateManager.getState();
 
