@@ -2269,7 +2269,6 @@ export type GqlUtility = {
 };
 
 export type GqlUtilityCreateInput = {
-  communityId: Scalars["ID"]["input"];
   description?: InputMaybe<Scalars["String"]["input"]>;
   images?: InputMaybe<Array<GqlImageInput>>;
   name: Scalars["String"]["input"];
@@ -4351,6 +4350,29 @@ export type GqlGetPlacesQuery = {
           __typename?: "Opportunity";
           id: string;
           images?: Array<string> | null;
+          articles?: Array<{
+            __typename?: "Article";
+            id: string;
+            title: string;
+            body?: string | null;
+            introduction: string;
+            thumbnail?: any | null;
+            category: GqlArticleCategory;
+            publishStatus: GqlPublishStatus;
+            publishedAt?: Date | null;
+            relatedUsers?: Array<{
+              __typename?: "User";
+              id: string;
+              name: string;
+              image?: string | null;
+              bio?: string | null;
+              currentPrefecture?: GqlCurrentPrefecture | null;
+              phoneNumber?: string | null;
+              urlFacebook?: string | null;
+              urlInstagram?: string | null;
+              urlX?: string | null;
+            }> | null;
+          }> | null;
           createdByUser?: {
             __typename?: "User";
             image?: string | null;
@@ -4477,6 +4499,39 @@ export type GqlTicketFieldsFragment = {
   status: GqlTicketStatus;
 };
 
+export type GqlTicketIssueMutationVariables = Exact<{
+  input: GqlTicketIssueInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlTicketIssueMutation = {
+  __typename?: "Mutation";
+  ticketIssue?: {
+    __typename?: "TicketIssueSuccess";
+    issue: {
+      __typename?: "TicketIssuer";
+      id: string;
+      qtyToBeIssued: number;
+      claimLink?: {
+        __typename?: "TicketClaimLink";
+        id: string;
+        qty: number;
+        status: GqlClaimLinkStatus;
+        claimedAt?: Date | null;
+      } | null;
+      utility?: {
+        __typename?: "Utility";
+        id: string;
+        name?: string | null;
+        description?: string | null;
+        images?: Array<string> | null;
+        publishStatus: GqlPublishStatus;
+        pointsRequired: number;
+      } | null;
+    };
+  } | null;
+};
+
 export type GqlTicketClaimMutationVariables = Exact<{
   input: GqlTicketClaimInput;
 }>;
@@ -4565,6 +4620,27 @@ export type GqlUtilityFieldsFragment = {
   images?: Array<string> | null;
   publishStatus: GqlPublishStatus;
   pointsRequired: number;
+};
+
+export type GqlCreateUtilityMutationVariables = Exact<{
+  input: GqlUtilityCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlCreateUtilityMutation = {
+  __typename?: "Mutation";
+  utilityCreate?: {
+    __typename?: "UtilityCreateSuccess";
+    utility: {
+      __typename?: "Utility";
+      id: string;
+      name?: string | null;
+      description?: string | null;
+      images?: Array<string> | null;
+      publishStatus: GqlPublishStatus;
+      pointsRequired: number;
+    };
+  } | null;
 };
 
 export type GqlGetUtilitiesQueryVariables = Exact<{ [key: string]: never }>;
@@ -8047,6 +8123,12 @@ export const GetPlacesDocument = gql`
           opportunities {
             id
             images
+            articles @include(if: $IsCard) {
+              ...ArticleFields
+              relatedUsers {
+                ...UserFields
+              }
+            }
             createdByUser {
               image
               articlesAboutMe @include(if: $IsCard) {
@@ -8061,6 +8143,8 @@ export const GetPlacesDocument = gql`
     }
   }
   ${PlaceFieldsFragmentDoc}
+  ${ArticleFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
 `;
 
 /**
@@ -8195,6 +8279,64 @@ export type GetPlaceQueryHookResult = ReturnType<typeof useGetPlaceQuery>;
 export type GetPlaceLazyQueryHookResult = ReturnType<typeof useGetPlaceLazyQuery>;
 export type GetPlaceSuspenseQueryHookResult = ReturnType<typeof useGetPlaceSuspenseQuery>;
 export type GetPlaceQueryResult = Apollo.QueryResult<GqlGetPlaceQuery, GqlGetPlaceQueryVariables>;
+export const TicketIssueDocument = gql`
+  mutation ticketIssue($input: TicketIssueInput!, $permission: CheckCommunityPermissionInput!) {
+    ticketIssue(input: $input, permission: $permission) {
+      ... on TicketIssueSuccess {
+        issue {
+          id
+          qtyToBeIssued
+          claimLink {
+            ...TicketClaimLinkFields
+          }
+          utility {
+            ...UtilityFields
+          }
+        }
+      }
+    }
+  }
+  ${TicketClaimLinkFieldsFragmentDoc}
+  ${UtilityFieldsFragmentDoc}
+`;
+export type GqlTicketIssueMutationFn = Apollo.MutationFunction<
+  GqlTicketIssueMutation,
+  GqlTicketIssueMutationVariables
+>;
+
+/**
+ * __useTicketIssueMutation__
+ *
+ * To run a mutation, you first call `useTicketIssueMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTicketIssueMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [ticketIssueMutation, { data, loading, error }] = useTicketIssueMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useTicketIssueMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlTicketIssueMutation, GqlTicketIssueMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlTicketIssueMutation, GqlTicketIssueMutationVariables>(
+    TicketIssueDocument,
+    options,
+  );
+}
+export type TicketIssueMutationHookResult = ReturnType<typeof useTicketIssueMutation>;
+export type TicketIssueMutationResult = Apollo.MutationResult<GqlTicketIssueMutation>;
+export type TicketIssueMutationOptions = Apollo.BaseMutationOptions<
+  GqlTicketIssueMutation,
+  GqlTicketIssueMutationVariables
+>;
 export const TicketClaimDocument = gql`
   mutation ticketClaim($input: TicketClaimInput!) {
     ticketClaim(input: $input) {
@@ -8521,6 +8663,59 @@ export type GetTicketIssuersSuspenseQueryHookResult = ReturnType<
 export type GetTicketIssuersQueryResult = Apollo.QueryResult<
   GqlGetTicketIssuersQuery,
   GqlGetTicketIssuersQueryVariables
+>;
+export const CreateUtilityDocument = gql`
+  mutation CreateUtility($input: UtilityCreateInput!, $permission: CheckCommunityPermissionInput!) {
+    utilityCreate(input: $input, permission: $permission) {
+      ... on UtilityCreateSuccess {
+        utility {
+          ...UtilityFields
+        }
+      }
+    }
+  }
+  ${UtilityFieldsFragmentDoc}
+`;
+export type GqlCreateUtilityMutationFn = Apollo.MutationFunction<
+  GqlCreateUtilityMutation,
+  GqlCreateUtilityMutationVariables
+>;
+
+/**
+ * __useCreateUtilityMutation__
+ *
+ * To run a mutation, you first call `useCreateUtilityMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUtilityMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUtilityMutation, { data, loading, error }] = useCreateUtilityMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useCreateUtilityMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlCreateUtilityMutation,
+    GqlCreateUtilityMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlCreateUtilityMutation, GqlCreateUtilityMutationVariables>(
+    CreateUtilityDocument,
+    options,
+  );
+}
+export type CreateUtilityMutationHookResult = ReturnType<typeof useCreateUtilityMutation>;
+export type CreateUtilityMutationResult = Apollo.MutationResult<GqlCreateUtilityMutation>;
+export type CreateUtilityMutationOptions = Apollo.BaseMutationOptions<
+  GqlCreateUtilityMutation,
+  GqlCreateUtilityMutationVariables
 >;
 export const GetUtilitiesDocument = gql`
   query GetUtilities {
