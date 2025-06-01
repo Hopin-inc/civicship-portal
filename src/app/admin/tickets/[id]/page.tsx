@@ -8,19 +8,27 @@ import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import dynamic from "next/dynamic";
+import { useParams } from "next/navigation";
 
 const QRCode = dynamic(() => import("react-qr-code"), { ssr: false });
 
-export default function TicketDetailPage({ params }: { params: { id: string } }) {
-  const headerConfig = useMemo(() => ({
-    title: `チケット ${params.id}`,
-    showBackButton: true,
-    backTo: "/admin/tickets",
-  }), [params.id]);
+export default function TicketDetailPage() {
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+
+  const headerConfig = useMemo(
+    () => ({
+      title: `チケット発行`,
+      showBackButton: true,
+      showLogo: false,
+      backTo: "/admin/tickets",
+    }),
+    [],
+  );
   useHeaderConfig(headerConfig);
 
   const { data, loading, error } = useQuery(VIEW_TICKET_CLAIM, {
-    variables: { id: params.id },
+    variables: { id },
   });
 
   if (loading) {
@@ -48,9 +56,8 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
     );
   }
 
-  const qrUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/tickets/receive?id=${params.id}`
-    : '';
+  const qrUrl =
+    typeof window !== "undefined" ? `${window.location.origin}/tickets/receive?id=${id}` : "";
 
   return (
     <div className="p-4 pt-16">
@@ -65,11 +72,16 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
         </div>
 
         <div className="space-y-2 mt-4">
-          <p><span className="font-medium">ステータス:</span> {ticketClaimLink.status}</p>
-          <p><span className="font-medium">発行枚数:</span> {ticketClaimLink.qty}</p>
+          <p>
+            <span className="font-medium">ステータス:</span> {ticketClaimLink.status}
+          </p>
+          <p>
+            <span className="font-medium">発行枚数:</span> {ticketClaimLink.qty}
+          </p>
           {ticketClaimLink.issuer?.owner && (
             <p>
-              <span className="font-medium">発行者:</span> {ticketClaimLink.issuer.owner.name || '未設定'}
+              <span className="font-medium">発行者:</span>{" "}
+              {ticketClaimLink.issuer.owner.name || "未設定"}
             </p>
           )}
         </div>
