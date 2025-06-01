@@ -2,10 +2,10 @@ import { Metadata } from "next";
 import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
 
 export const metadata: Metadata = {
-  title: "NEO四国88祭 - ログイン",
+  title: "ログイン",
   description: "ログインして、あなただけのNEO四国88祭を。",
   openGraph: {
-    title: "NEO四国88祭 - ログイン",
+    title: "ログイン",
     description: "ログインして、あなただけのNEO四国88祭を。",
     url: "https://www.neo88.app/login",
     type: "website",
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "NEO四国88祭 - ログイン",
+    title: "ログイン",
     description: "ログインして、あなただけのNEO四国88祭を。",
     images: DEFAULT_OPEN_GRAPH_IMAGE,
   },
