@@ -2,6 +2,7 @@ import { useTicketClaimQuery } from "@/app/tickets/receive/hooks/useTicketClaimQ
 import { useEffect, useState } from "react";
 import { GqlClaimLinkStatus } from "@/types/graphql";
 import { toast } from "sonner";
+import { getSimpleErrorMessage } from "@/utils/getErrorMessage";
 
 export const useTicketClaimController = (ticketClaimLinkId: string) => {
   const { view, claim, claimTicket } = useTicketClaimQuery(ticketClaimLinkId);
@@ -23,7 +24,7 @@ export const useTicketClaimController = (ticketClaimLinkId: string) => {
 
   useEffect(() => {
     if (claim.error) {
-      toast.error("チケット発行中にエラーが発生しました: " + claim.error.message);
+      toast.error(getSimpleErrorMessage(claim.error, "チケット発行"));
     }
   }, [claim.error]);
 

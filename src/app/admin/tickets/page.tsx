@@ -12,6 +12,7 @@ import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import { toast } from "sonner";
+import { getSimpleErrorMessage } from "@/utils/getErrorMessage";
 
 export default function TicketsPage() {
   const headerConfig = useMemo(() => ({
@@ -33,7 +34,7 @@ export default function TicketsPage() {
     },
     onError: (error) => {
       setIsIssuing(false);
-      toast.error(`チケット発行に失敗しました: ${error.message}`);
+      toast.error(getSimpleErrorMessage(error, "チケット発行"));
     }
   });
 

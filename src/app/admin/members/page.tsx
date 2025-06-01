@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { COMMUNITY_ID } from "@/utils";
 import { GqlRole, GqlUser } from "@/types/graphql";
 import { toast } from "sonner";
+import { getSimpleErrorMessage } from "@/utils/getErrorMessage";
 import {
   Dialog,
   DialogClose,
@@ -91,7 +92,7 @@ export default function MembersPage() {
         toast.success("権限を更新しました");
         window.location.reload();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "不明なエラーが発生しました");
+        toast.error(getSimpleErrorMessage(err, "権限変更"));
       } finally {
         setIsLoading(false);
       }

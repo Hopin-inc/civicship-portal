@@ -14,6 +14,7 @@ import {
   useUserSignUpMutation,
 } from "@/types/graphql";
 import { toast } from "sonner";
+import { getSimpleErrorMessage } from "@/utils/getErrorMessage";
 import { COMMUNITY_ID } from "@/utils";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { useAuthStateManagerInitialization } from "@/hooks/auth/useAuthStateManagerInitialization";
@@ -284,9 +285,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error("User creation failed:", error);
-      toast.error("アカウント作成に失敗しました", {
-        description: error instanceof Error ? error.message : "不明なエラーが発生しました",
-      });
+      toast.error(getSimpleErrorMessage(error, "アカウント作成"));
       return null;
     }
   };
