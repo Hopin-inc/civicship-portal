@@ -1,103 +1,143 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useQuery, useMutation } from "@apollo/client";
 import { useRouter } from "next/navigation";
-import { GET_TICKET_ISSUERS } from "@/graphql/reward/ticketIssuer/query";
-import { TICKET_CLAIM } from "@/graphql/reward/ticket/mutation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { CardWrapper } from "@/components/ui/card-wrapper";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useCreateUtilityMutation, useTicketIssueMutation } from "@/types/graphql";
+import { COMMUNITY_ID } from "@/utils";
 
 export default function TicketsPage() {
-  const headerConfig = useMemo(() => ({
-    title: "チケット発行",
-    showLogo: false,
-  }), []);
+  const headerConfig = useMemo(
+    () => ({
+      title: "チケット発行",
+      showLogo: false,
+    }),
+    [],
+  );
   useHeaderConfig(headerConfig);
   const router = useRouter();
-  const [isIssuing, setIsIssuing] = useState(false);
 
-  const { data, loading, error } = useQuery(GET_TICKET_ISSUERS);
+  const [step, setStep] = useState<"utility" | "issue">("utility");
+  const [utilityId, setUtilityId] = useState<string | null>(null);
+  const [utilityName, setUtilityName] = useState("");
+  const [utilityDescription, setUtilityDescription] = useState("");
+  const [pointsRequired, setPointsRequired] = useState(1);
+  const [ticketQty, setTicketQty] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [claimTicket, { loading: claimLoading }] = useMutation(TICKET_CLAIM, {
-    onCompleted: (data) => {
-      setIsIssuing(false);
-      if (data?.ticketClaim?.tickets?.[0]?.id) {
-        router.push(`/admin/tickets/${data.ticketClaim.tickets[0].id}`);
+  const [createUtility] = useCreateUtilityMutation();
+  const [issueTicket] = useTicketIssueMutation();
+
+  const handleCreateUtility = async () => {
+    setIsSubmitting(true);
+    try {
+      const res = await createUtility({
+        variables: {
+          input: {
+            name: utilityName,
+            description: utilityDescription || undefined,
+            pointsRequired,
+            images: [],
+          },
+          permission: {
+            communityId: COMMUNITY_ID,
+          },
+        },
+      });
+      const id = res.data?.utilityCreate?.utility?.id;
+      if (id) {
+        setUtilityId(id);
+        setStep("issue");
+        toast.success("ユーティリティを作成しました");
+      } else {
+        toast.error("ユーティリティ作成に失敗しました");
       }
-    },
-    onError: (error) => {
-      setIsIssuing(false);
-      toast.error(`チケット発行に失敗しました: ${error.message}`);
+    } catch {
+      toast.error("ユーティリティ作成エラー");
+    } finally {
+      setIsSubmitting(false);
     }
-  });
-
-  const handleIssueTicket = async (ticketClaimLinkId: string) => {
-    setIsIssuing(true);
-    await claimTicket({ variables: { input: { ticketClaimLinkId } } });
   };
 
-  if (loading) {
-    return (
-      <div className="p-4 flex justify-center items-center h-screen">
-        <LoadingIndicator />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-4">
-        <ErrorState title="チケット情報の取得に失敗しました" />
-      </div>
-    );
-  }
-
-  const tickets = data?.ticketIssuers?.edges?.map((edge: any) => edge.node) || [];
+  const handleIssueTicket = async () => {
+    if (!utilityId) return;
+    setIsSubmitting(true);
+    try {
+      const res = await issueTicket({
+        variables: {
+          input: {
+            utilityId,
+            qtyToBeIssued: ticketQty,
+          },
+          permission: { communityId: COMMUNITY_ID },
+        },
+      });
+      const ticketId = res.data?.ticketIssue?.issue?.id;
+      if (ticketId) {
+        toast.success("チケットを発行しました");
+        router.push(`/admin/tickets/${ticketId}`);
+      } else {
+        toast.error("チケット発行に失敗しました");
+      }
+    } catch {
+      toast.error("チケット発行エラー");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">チケット一覧</h1>
-        <Button
-          onClick={() => tickets.length > 0 && handleIssueTicket(tickets[0]?.id)}
-          disabled={isIssuing || claimLoading || tickets.length === 0}
-        >
-          {isIssuing || claimLoading ? "処理中..." : "チケット発行"}
-        </Button>
-      </div>
-      <div className="space-y-4">
-        {tickets.length === 0 ? (
-          <p className="text-center text-muted-foreground py-8">チケットが見つかりません</p>
-        ) : (
-          tickets.map((ticket: any) => (
-            <Link key={ticket.id} href={`/admin/tickets/${ticket.id}`}>
-              <CardWrapper className="p-4 cursor-pointer">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="font-semibold">チケット #{ticket.id}</h2>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(ticket.createdAt).toLocaleDateString('ja-JP')}
-                    </p>
-                    <p className="text-sm mt-1">
-                      <span className="font-medium">発行者:</span> {ticket.owner?.name || '未設定'}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">発行数:</span> {ticket.qtyToBeIssued}
-                    </p>
-                  </div>
-                  <Button variant="secondary" size="sm">詳細</Button>
-                </div>
-              </CardWrapper>
-            </Link>
-          ))
-        )}
-      </div>
+    <div className="p-4 space-y-6 max-w-md mx-auto">
+      <h1 className="text-2xl font-bold">
+        {step === "utility" ? "ユーティリティ作成" : "チケット発行"}
+      </h1>
+
+      {step === "utility" && (
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="utility-name">ユーティリティ名</Label>
+            <Input
+              id="utility-name"
+              value={utilityName}
+              onChange={(e) => setUtilityName(e.target.value)}
+              placeholder="例：参加特典ポイント"
+            />
+          </div>
+          <Button
+            onClick={handleCreateUtility}
+            disabled={isSubmitting || utilityName.trim() === ""}
+            className="w-full py-4"
+          >
+            {isSubmitting ? "作成中..." : "ユーティリティを作成"}
+          </Button>
+        </div>
+      )}
+
+      {step === "issue" && utilityId && (
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="ticket-qty">発行数</Label>
+            <Input
+              id="ticket-qty"
+              type="number"
+              min={1}
+              value={ticketQty}
+              onChange={(e) => setTicketQty(Number(e.target.value))}
+            />
+          </div>
+          <Button
+            onClick={handleIssueTicket}
+            disabled={isSubmitting || ticketQty <= 0}
+            className="w-full py-4"
+          >
+            {isSubmitting ? "発行中..." : "チケットを発行"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
