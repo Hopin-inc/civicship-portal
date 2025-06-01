@@ -1,23 +1,22 @@
-"use client";
-
-import { Ticket } from "@/app/tickets/data/type";
+import { GqlGetTicketsQuery } from "@/types/graphql";
+import { TTicket } from "@/app/tickets/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
-/**
- * Transform wallet data from GraphQL to tickets array
- */
-export const transformTickets = (data: any): Ticket[] => {
-  return (
-    data?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.map((edge: any) => ({
-      id: edge?.node?.id,
-      status: edge?.node?.status,
-      utilityId: edge?.node?.utility?.id,
-      hostName: edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser?.name || "不明",
-      hostImage:
-        edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser?.image ||
-        PLACEHOLDER_IMAGE,
-      quantity: 1,
-      createdByUser: edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser,
-    })) || []
-  );
+export const transformTickets = (data: GqlGetTicketsQuery | undefined): TTicket[] => {
+  const edges = data?.tickets.edges ?? [];
+
+  return edges
+    .map((edge) => {
+      const node = edge?.node;
+      if (!node) return null;
+
+      return {
+        id: node.id,
+        status: node.status,
+        hostName: node.claimLink?.issuer?.owner?.name || "不明",
+        hostImage: node.claimLink?.issuer?.owner?.image || PLACEHOLDER_IMAGE,
+        quantity: 1,
+      };
+    })
+    .filter((t): t is TTicket => t !== null); // null を除去
 };

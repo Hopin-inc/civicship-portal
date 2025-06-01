@@ -1,14 +1,14 @@
 "use client";
 
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { Ticket as TicketIcon } from 'lucide-react';
-import { Ticket } from '@/app/tickets/data/type';
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Ticket as TicketIcon } from "lucide-react";
+import { TTicket } from "@/app/tickets/data/type";
 import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface TicketListProps {
-  tickets: Ticket[];
+  tickets: TTicket[];
 }
 
 export default function TicketList({ tickets }: TicketListProps) {
