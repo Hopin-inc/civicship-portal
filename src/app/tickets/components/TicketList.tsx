@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { Ticket as TicketIcon } from "lucide-react";
 import { TTicket } from "@/app/tickets/data/type";
 import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 
 interface TicketListProps {
   tickets: TTicket[];
@@ -46,9 +47,12 @@ export default function TicketList({ tickets }: TicketListProps) {
                 <span className="text-[#4361EE] font-medium">{ticket.quantity}枚</span>
               </div>
             </div>
-            <Button variant={"secondary"} size="md">
-              関わりを見つける
-            </Button>
+            <Link
+              href={`/search/result?type=activity&q=${encodeURIComponent(ticket.hostName)}&useTicket=true`}
+              className={buttonVariants({ variant: "secondary", size: "md" })}
+            >
+              体験を探す
+            </Link>
           </div>
           <p className="mt-4 text-foreground">{ticket.hostName}さんからの招待</p>
         </div>
