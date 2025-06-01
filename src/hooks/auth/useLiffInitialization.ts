@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
+import clientLogger from "@/lib/logging/client";
+import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
 
 interface UseLiffInitializationProps {
   environment: AuthEnvironment;
@@ -11,24 +13,18 @@ interface UseLiffInitializationProps {
 
 export const useLiffInitialization = ({ environment, liffService }: UseLiffInitializationProps) => {
   useEffect(() => {
-    console.log("[Debug] 🔥 useLiffInitialization fired.");
-    
     const initializeLiff = async () => {
       if (environment !== AuthEnvironment.LIFF) return;
 
       const timestamp = new Date().toISOString();
-      console.log(`🔍 [${timestamp}] Initializing LIFF in environment:`, environment);
 
       const liffSuccess = await liffService.initialize();
-      if (liffSuccess) {
-        const liffState = liffService.getState();
-        console.log(`🔍 [${timestamp}] LIFF state after initialization:`, {
-          isInitialized: liffState.isInitialized,
-          isLoggedIn: liffState.isLoggedIn,
-          userId: liffState.profile?.userId || "none",
-        });
-      } else {
-        console.error(`🔍 [${timestamp}] LIFF initialization failed`);
+      if (!liffSuccess) {
+        clientLogger.warn("LIFF initialization failed", createAuthLogContext(
+          generateSessionId(),
+          "liff",
+          { timestamp, component: "useLiffInitialization" }
+        ));
       }
     };
 

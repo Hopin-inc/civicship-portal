@@ -13,7 +13,8 @@ import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 export function PhoneVerificationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
+  const next = searchParams.get("next");
+  const nextParam = next ? `?next=${ encodeURIComponent(next) }` : "";
 
   const authRedirectService = AuthRedirectService.getInstance();
 
@@ -74,7 +75,7 @@ export function PhoneVerificationForm() {
       const success = await phoneAuth.verifyPhoneCode(verificationCode);
       if (success) {
         toast.success("電話番号認証が完了しました");
-        const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextParam);
+        const redirectPath = `/sign-up${nextParam}`;
         router.push(redirectPath);
       } else {
         toast.error("認証コードが無効です");

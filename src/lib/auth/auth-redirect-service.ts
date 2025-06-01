@@ -2,6 +2,7 @@ import { AuthStateManager } from "./auth-state-manager";
 import { GqlRole } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
 import { matchPaths } from "@/utils/path";
+import clientLogger from "../logging/client";
 
 /**
  * 認証状態に基づくリダイレクト処理を一元管理するサービス
@@ -65,20 +66,18 @@ export class AuthRedirectService {
     const authState = this.authStateManager.getState();
     const nextParam = next ? `?next=${next}` : `?next=${pathname}`;
 
-    console.log("getRedirectPath", { pathname, authState, next, nextParam });
-
     if (authState === "loading") {
       return null;
     }
 
-    if ((pathname === "/login" || pathname === "/sign-up") && authState === "user_registered") {
+    if ((pathname === "/login" || pathname === "/sign-up/phone-verification" || pathname === "/sign-up") && authState === "user_registered") {
       if (
         next &&
         next.startsWith("/") &&
         !next.startsWith("/login") &&
         !next.startsWith("/sign-up")
       ) {
-        return next;
+        return decodeURIComponent(next);
       }
       return "/";
     }
@@ -141,7 +140,7 @@ export class AuthRedirectService {
    */
   public getPostLineAuthRedirectPath(nextPath: string | null): string {
     const next = nextPath ? decodeURIComponent(nextPath) : null;
-    const nextParam = next ? `?next=${next}` : "";
+    const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
     console.log("getPostLineAuthRedirectPath", { nextPath, next, nextParam });
 
     const authState = this.authStateManager.getState();

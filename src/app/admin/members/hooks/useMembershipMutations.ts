@@ -8,6 +8,7 @@ import {
   useAssignOwnerMutation,
 } from "@/types/graphql";
 import { ApolloError } from "@apollo/client";
+import clientLogger from "@/lib/logging/client";
 
 interface MembershipSetRoleInput {
   userId: string;
@@ -53,7 +54,10 @@ export const useMembershipCommand = () => {
           const code = gqlError?.extensions?.code as GqlErrorCode | undefined;
           return { success: false, code: code ?? GqlErrorCode.Unknown };
         }
-        console.error("Mutation failed", e);
+        clientLogger.error("Mutation failed", {
+          error: e instanceof Error ? e.message : String(e),
+          component: "useMembershipMutations"
+        });
         return { success: false, code: GqlErrorCode.Unknown };
       }
     };

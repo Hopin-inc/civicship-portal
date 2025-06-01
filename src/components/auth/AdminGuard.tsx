@@ -10,6 +10,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/utils";
 import { GqlRole } from "@/types/graphql";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import clientLogger from "@/lib/logging/client";
 
 /**
  * 管理者ガードコンポーネントのプロパティ
@@ -39,13 +40,15 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
 
   useEffect(() => {
     if (loading) {
-      console.log("⏳ Still loading user...");
       return;
     }
 
     if (!isAuthenticated || !currentUser) {
       const next = window.location.pathname + window.location.search;
-      console.log("🚷 No user found. Redirecting to login.");
+      clientLogger.debug("No user found. Redirecting to login", {
+        component: "AdminGuard",
+        redirectTo: `/login?next=${next}`
+      });
       router.replace(`/login?next=${next}`);
       return;
     }
@@ -57,24 +60,28 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
         if (redirectPath === "/") {
           toast.warning("管理者権限がありません");
         }
-        console.log(`❌ Admin access denied. Redirecting to: ${redirectPath}`);
+        clientLogger.debug("Admin access denied. Redirecting", {
+          component: "AdminGuard",
+          redirectPath
+        });
         router.replace(redirectPath);
         return;
       }
 
-      console.log("✅ User is authorized as community manager.");
+      clientLogger.debug("User is authorized as community manager", {
+        component: "AdminGuard"
+      });
     };
 
     checkAdminAccess();
   }, [currentUser, isAuthenticated, loading, router, authRedirectService]);
 
   if (loading) {
-    console.log("⏳ Showing loading indicator...");
     return <LoadingIndicator />;
   }
 
   if (!isAuthenticated || !currentUser) {
-    console.log("🚫 Unauthorized user state. No UI rendered.");
+    clientLogger.debug("Unauthorized user state. No UI rendered", { component: "AdminGuard" });
     return null;
   }
 
@@ -89,11 +96,10 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   };
 
   if (!checkSyncAdminAccess()) {
-    console.log("❌ Unauthorized role. No UI rendered.");
+    clientLogger.debug("Unauthorized role. No UI rendered", { component: "AdminGuard" });
     return null;
   }
 
-  console.log("🟢 AdminGuard passed. Rendering children.");
   return <>{children}</>;
 };
 
