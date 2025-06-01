@@ -3,10 +3,17 @@ import { PhoneNumberUtil } from "google-libphonenumber";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ja";
 
+declare const process: {
+  env: {
+    NEXT_PUBLIC_COMMUNITY_ID?: string;
+    [key: string]: string | undefined;
+  };
+};
+
 dayjs.locale("ja");
 dayjs.extend(relativeTime);
 
-export const COMMUNITY_ID = "neo88";
+export const COMMUNITY_ID = (process.env.NEXT_PUBLIC_COMMUNITY_ID as string) || "neo88";
 // export const PLACEHOLDER_IMAGE =
 //   "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/placeholder.jpg";
 
