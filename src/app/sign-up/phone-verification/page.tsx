@@ -1,12 +1,13 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import { PhoneVerificationForm } from "./components/PhoneVerificationForm";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function PhoneVerificationPage() {
+  const router = useRouter();
   const hasRedirected = useRef(false);
 
   const headerConfig = useMemo(
@@ -31,7 +32,7 @@ export default function PhoneVerificationPage() {
       const redirectUrl = nextParam
         ? `/sign-up/phone-verification/line-browser?next=${nextParam}`
         : "/sign-up/phone-verification/line-browser";
-      window.location.replace(redirectUrl);
+      router.replace(redirectUrl);
     }
   }, [nextParam]);
 

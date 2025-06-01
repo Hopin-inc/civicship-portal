@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
-import { auth } from '@/lib/firebase';
-import { useCookies } from 'next-client-cookies';
-import { useRouter } from 'next/navigation';
+import React from "react";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
+import { lineAuth as auth } from "@/lib/auth/firebase-config";
+import { useCookies } from "next-client-cookies";
+import { useRouter } from "next/navigation";
 
 /**
  * Header component for the sign-up page with cancel functionality
@@ -17,13 +17,15 @@ const SignUpHeader: React.FC = () => {
   const handleCancel = async (e: React.MouseEvent) => {
     e.preventDefault();
     await auth.signOut();
-    cookies.remove('access_token');
-    router.push('/');
+    cookies.remove("access_token");
+    router.push("/");
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b max-w-mobile-l mx-auto w-full h-16 flex items-center px-4">
-      <Link href="/public" onClick={handleCancel} className="absolute left-4 inline-flex items-center text-muted-foreground hover:text-foreground">
+    <header
+      className="fixed top-0 left-0 right-0 z-50 bg-background border-b max-w-mobile-l mx-auto w-full h-16 flex items-center px-4">
+      <Link href="/public" onClick={ handleCancel }
+            className="absolute left-4 inline-flex items-center text-muted-foreground hover:text-foreground">
         <ChevronLeft className="h-5 w-5 mr-1" />
         戻る
       </Link>
