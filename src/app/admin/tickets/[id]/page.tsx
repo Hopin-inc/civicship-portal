@@ -57,7 +57,7 @@ export default function TicketDetailPage() {
   }
 
   const qrUrl =
-    typeof window !== "undefined" ? `${window.location.origin}/tickets/receive?id=${id}` : "";
+    typeof window !== "undefined" ? `${window.location.origin}/tickets/receive?token=${id}` : "";
 
   return (
     <div className="p-4 pt-16">
