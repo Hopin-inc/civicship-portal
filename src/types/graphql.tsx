@@ -1908,6 +1908,7 @@ export type GqlTicketEdge = GqlEdge & {
 };
 
 export type GqlTicketFilterInput = {
+  ownerId?: InputMaybe<Scalars["ID"]["input"]>;
   status?: InputMaybe<GqlTicketStatus>;
   utilityId?: InputMaybe<Scalars["ID"]["input"]>;
   walletId?: InputMaybe<Scalars["ID"]["input"]>;
@@ -4545,16 +4546,58 @@ export type GqlTicketClaimMutation = {
   } | null;
 };
 
-export type GqlGetTicketsQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetTicketsQueryVariables = Exact<{
+  filter?: InputMaybe<GqlTicketFilterInput>;
+  sort?: InputMaybe<GqlTicketSortInput>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
 
 export type GqlGetTicketsQuery = {
   __typename?: "Query";
   tickets: {
     __typename?: "TicketsConnection";
     totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
     edges?: Array<{
       __typename?: "TicketEdge";
-      node?: { __typename?: "Ticket"; id: string } | null;
+      cursor: string;
+      node?: {
+        __typename?: "Ticket";
+        id: string;
+        reason: GqlTicketStatusReason;
+        status: GqlTicketStatus;
+        claimLink?: {
+          __typename?: "TicketClaimLink";
+          id: string;
+          qty: number;
+          status: GqlClaimLinkStatus;
+          claimedAt?: Date | null;
+          issuer?: {
+            __typename?: "TicketIssuer";
+            id: string;
+            qtyToBeIssued: number;
+            owner?: {
+              __typename?: "User";
+              id: string;
+              name: string;
+              image?: string | null;
+              bio?: string | null;
+              currentPrefecture?: GqlCurrentPrefecture | null;
+              phoneNumber?: string | null;
+              urlFacebook?: string | null;
+              urlInstagram?: string | null;
+              urlX?: string | null;
+            } | null;
+          } | null;
+        } | null;
+      } | null;
     } | null> | null;
   };
 };
@@ -8425,16 +8468,41 @@ export type TicketClaimMutationOptions = Apollo.BaseMutationOptions<
   GqlTicketClaimMutationVariables
 >;
 export const GetTicketsDocument = gql`
-  query GetTickets {
-    tickets {
-      edges {
-        node {
-          id
-        }
+  query GetTickets(
+    $filter: TicketFilterInput
+    $sort: TicketSortInput
+    $cursor: String
+    $first: Int
+  ) {
+    tickets(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
       }
       totalCount
+      edges {
+        cursor
+        node {
+          ...TicketFields
+          claimLink {
+            ...TicketClaimLinkFields
+            issuer {
+              id
+              qtyToBeIssued
+              owner {
+                ...UserFields
+              }
+            }
+          }
+        }
+      }
     }
   }
+  ${TicketFieldsFragmentDoc}
+  ${TicketClaimLinkFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
 `;
 
 /**
@@ -8449,6 +8517,10 @@ export const GetTicketsDocument = gql`
  * @example
  * const { data, loading, error } = useGetTicketsQuery({
  *   variables: {
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
  *   },
  * });
  */
