@@ -2297,7 +2297,7 @@ export type GqlUtilityEdge = GqlEdge & {
 
 export type GqlUtilityFilterInput = {
   and?: InputMaybe<Array<GqlUtilityFilterInput>>;
-  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  communityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   not?: InputMaybe<GqlUtilityFilterInput>;
   or?: InputMaybe<Array<GqlUtilityFilterInput>>;
   publishStatus?: InputMaybe<Array<GqlPublishStatus>>;
@@ -4592,20 +4592,40 @@ export type GqlTicketClaimLinkQuery = {
   } | null;
 };
 
-export type GqlGetTicketIssuersQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetTicketIssuersQueryVariables = Exact<{
+  filter?: InputMaybe<GqlTicketIssuerFilterInput>;
+  sort?: InputMaybe<GqlTicketIssuerSortInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
 
 export type GqlGetTicketIssuersQuery = {
   __typename?: "Query";
   ticketIssuers: {
     __typename?: "TicketIssuersConnection";
     totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
     edges?: Array<{
       __typename?: "TicketIssuerEdge";
+      cursor: string;
       node?: {
         __typename?: "TicketIssuer";
         id: string;
         qtyToBeIssued: number;
         createdAt?: Date | null;
+        utility?: { __typename?: "Utility"; id: string; name?: string | null } | null;
+        claimLink?: {
+          __typename?: "TicketClaimLink";
+          id: string;
+          qty: number;
+          status: GqlClaimLinkStatus;
+          claimedAt?: Date | null;
+        } | null;
         owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
       } | null;
     } | null> | null;
@@ -4643,16 +4663,34 @@ export type GqlCreateUtilityMutation = {
   } | null;
 };
 
-export type GqlGetUtilitiesQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetUtilitiesQueryVariables = Exact<{
+  filter?: InputMaybe<GqlUtilityFilterInput>;
+  sort?: InputMaybe<GqlUtilitySortInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
 
 export type GqlGetUtilitiesQuery = {
   __typename?: "Query";
   utilities: {
     __typename?: "UtilitiesConnection";
     totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
     edges?: Array<{
       __typename?: "UtilityEdge";
-      node?: { __typename?: "Utility"; id: string; name?: string | null } | null;
+      cursor: string;
+      node?: {
+        __typename?: "Utility";
+        id: string;
+        name?: string | null;
+        description?: string | null;
+        pointsRequired: number;
+      } | null;
     } | null> | null;
   };
 };
@@ -8585,13 +8623,32 @@ export type TicketClaimLinkQueryResult = Apollo.QueryResult<
   GqlTicketClaimLinkQueryVariables
 >;
 export const GetTicketIssuersDocument = gql`
-  query GetTicketIssuers {
-    ticketIssuers {
+  query GetTicketIssuers(
+    $filter: TicketIssuerFilterInput
+    $sort: TicketIssuerSortInput
+    $first: Int
+  ) {
+    ticketIssuers(filter: $filter, sort: $sort, first: $first) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
       edges {
+        cursor
         node {
           id
           qtyToBeIssued
           createdAt
+          utility {
+            id
+            name
+          }
+          claimLink {
+            ...TicketClaimLinkFields
+          }
           owner {
             id
             name
@@ -8599,9 +8656,9 @@ export const GetTicketIssuersDocument = gql`
           }
         }
       }
-      totalCount
     }
   }
+  ${TicketClaimLinkFieldsFragmentDoc}
 `;
 
 /**
@@ -8616,6 +8673,9 @@ export const GetTicketIssuersDocument = gql`
  * @example
  * const { data, loading, error } = useGetTicketIssuersQuery({
  *   variables: {
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      first: // value for 'first'
  *   },
  * });
  */
@@ -8718,15 +8778,24 @@ export type CreateUtilityMutationOptions = Apollo.BaseMutationOptions<
   GqlCreateUtilityMutationVariables
 >;
 export const GetUtilitiesDocument = gql`
-  query GetUtilities {
-    utilities {
+  query GetUtilities($filter: UtilityFilterInput, $sort: UtilitySortInput, $first: Int) {
+    utilities(filter: $filter, sort: $sort, first: $first) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
       edges {
+        cursor
         node {
           id
           name
+          description
+          pointsRequired
         }
       }
-      totalCount
     }
   }
 `;
@@ -8743,6 +8812,9 @@ export const GetUtilitiesDocument = gql`
  * @example
  * const { data, loading, error } = useGetUtilitiesQuery({
  *   variables: {
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      first: // value for 'first'
  *   },
  * });
  */
