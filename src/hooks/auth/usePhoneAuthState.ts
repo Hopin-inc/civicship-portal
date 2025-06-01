@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
+import clientLogger from "@/lib/logging/client";
 
 interface UsePhoneAuthStateProps {
   authStateManager: AuthStateManager | null;
@@ -14,15 +15,13 @@ interface UsePhoneAuthStateProps {
 export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState }: UsePhoneAuthStateProps) => {
   const authStateManagerRef = useRef(authStateManager);
   const phoneAuthServiceRef = useRef(phoneAuthService);
-  
+
   authStateManagerRef.current = authStateManager;
   phoneAuthServiceRef.current = phoneAuthService;
 
   useEffect(() => {
-    console.log("[Debug] 🔥 usePhoneAuthState fired.");
-    
     const currentAuthStateManager = authStateManagerRef.current;
-    
+
     if (!currentAuthStateManager) return;
 
     const phoneState = phoneAuthServiceRef.current.getState();
@@ -31,17 +30,12 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
     if (isVerified) {
       const updatePhoneAuthState = async () => {
         try {
-          const timestamp = new Date().toISOString();
-          console.log(
-            `🔍 [${timestamp}] Updating phone auth state in useEffect - isVerified:`,
-            isVerified,
-          );
           await currentAuthStateManager.handlePhoneAuthStateChange(true);
-          console.log(
-            `🔍 [${timestamp}] AuthStateManager phone state updated successfully in useEffect`,
-          );
         } catch (error) {
-          console.error("Failed to update AuthStateManager phone state in useEffect:", error);
+          clientLogger.error("Failed to update AuthStateManager phone state in useEffect", {
+            error: error instanceof Error ? error.message : String(error),
+            component: "usePhoneAuthState"
+          });
         }
       };
 

@@ -2,6 +2,7 @@ import { AuthStateManager } from "./auth-state-manager";
 import { GqlRole } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
 import { matchPaths } from "@/utils/path";
+import clientLogger from "../logging/client";
 
 /**
  * 認証状態に基づくリダイレクト処理を一元管理するサービス
@@ -64,8 +65,6 @@ export class AuthRedirectService {
   public getRedirectPath(pathname: string, next?: string | null): string | null {
     const authState = this.authStateManager.getState();
     const nextParam = next ? `?next=${next}` : `?next=${pathname}`;
-
-    console.log("getRedirectPath", { pathname, authState, next, nextParam });
 
     if (authState === "loading") {
       return null;

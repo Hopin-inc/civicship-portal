@@ -9,6 +9,8 @@ import {
 import { phoneAuth } from "./firebase-config";
 import { PhoneAuthTokens, TokenManager } from "./token-manager";
 import { isRunningInLiff } from "./environment-detector";
+import clientLogger from "../logging/client";
+import { createAuthLogContext, generateSessionId, maskPhoneNumber } from "../logging/client/utils";
 
 /**
  * 電話番号認証の状態
@@ -51,17 +53,19 @@ export class PhoneAuthService {
       this.state.phoneUid = savedTokens.phoneUid;
       this.state.phoneNumber = savedTokens.phoneNumber;
 
-      console.log("Phone verification state initialized from saved tokens:", {
+      clientLogger.debug("Phone verification state initialized from saved tokens", {
         isVerified: this.state.isVerified,
         phoneUid: this.state.phoneUid ? "exists" : "missing",
         phoneNumber: this.state.phoneNumber ? "exists" : "missing",
         accessToken: savedTokens.accessToken ? "exists" : "missing",
+        component: "PhoneAuthService"
       });
     } else {
-      console.log("Phone verification not initialized - incomplete saved tokens:", {
+      clientLogger.debug("Phone verification not initialized - incomplete saved tokens", {
         phoneUid: savedTokens.phoneUid ? "exists" : "missing",
         phoneNumber: savedTokens.phoneNumber ? "exists" : "missing",
         accessToken: savedTokens.accessToken ? "exists" : "missing",
+        component: "PhoneAuthService"
       });
     }
   }
@@ -95,7 +99,14 @@ export class PhoneAuthService {
       this.recaptchaContainerElement = null;
       this.isRecaptchaRendered = false;
     } catch (e) {
-      console.error("Error clearing reCAPTCHA:", e);
+      clientLogger.info("Error clearing reCAPTCHA", createAuthLogContext(
+        generateSessionId(),
+        "phone",
+        {
+          error: e instanceof Error ? e.message : String(e),
+          component: "PhoneAuthService"
+        }
+      ));
     }
   }
 
@@ -142,7 +153,15 @@ export class PhoneAuthService {
 
       return confirmationResult.verificationId;
     } catch (error) {
-      console.error("Phone verification failed:", error);
+      clientLogger.info("Phone verification failed", createAuthLogContext(
+        generateSessionId(),
+        "phone",
+        {
+          error: error instanceof Error ? error.message : String(error),
+          component: "PhoneAuthService",
+          phoneNumber: maskPhoneNumber(phoneNumber)
+        }
+      ));
       this.state.error = error as Error;
       return null;
     } finally {
@@ -160,10 +179,10 @@ export class PhoneAuthService {
       this.state.isVerifying = true;
       this.state.error = null;
 
-      console.log("Starting phone verification with code, using phoneAuth instance (no tenant)");
-
       if (!this.state.verificationId) {
-        console.error("Missing verificationId");
+        clientLogger.error("Missing verificationId", {
+          component: "PhoneAuthService"
+        });
         return false;
       }
 
@@ -172,18 +191,20 @@ export class PhoneAuthService {
           this.state.verificationId,
           verificationCode,
         );
-        console.log("Successfully created phone credential");
+        clientLogger.debug("Successfully created phone credential", {
+          component: "PhoneAuthService"
+        });
 
         let verificationSuccessful = false;
 
         try {
-          console.log("Signing in with credential to get user ID");
           const userCredential = await signInWithCredential(phoneAuth, credential);
-          console.log("Phone sign-in successful with credential");
+          clientLogger.debug("Phone sign-in successful with credential", {
+            component: "PhoneAuthService"
+          });
 
           if (userCredential.user) {
             this.state.phoneUid = userCredential.user.uid;
-            console.log("Stored phone UID:", this.state.phoneUid);
 
             const idToken = await userCredential.user.getIdToken();
             const refreshToken = userCredential.user.refreshToken;
@@ -199,34 +220,62 @@ export class PhoneAuthService {
               expiresAt: expirationTime,
             };
             TokenManager.savePhoneTokens(tokens);
-
-            console.log("Extracted phone auth tokens successfully");
             verificationSuccessful = true;
           } else {
-            console.error("No user returned from signInWithCredential");
+            clientLogger.error("No user returned from signInWithCredential", {
+              component: "PhoneAuthService"
+            });
           }
 
           await phoneAuth.signOut();
-          console.log("Signed out of phone auth");
+          clientLogger.debug("Signed out of phone auth", {
+            component: "PhoneAuthService"
+          });
         } catch (signInError) {
-          console.warn("Could not sign in with phone credential:", signInError);
-          console.log("Verification failed - invalid code");
+          clientLogger.info("Could not sign in with phone credential", createAuthLogContext(
+            generateSessionId(),
+            "phone",
+            {
+              error: signInError instanceof Error ? signInError.message : String(signInError),
+              component: "PhoneAuthService"
+            }
+          ));
+          clientLogger.debug("Verification failed - invalid code", {
+            component: "PhoneAuthService"
+          });
           return false;
         }
 
         if (verificationSuccessful) {
           this.state.isVerified = true;
-          console.log("Phone verification state set to verified:", this.state);
+          clientLogger.debug("Phone verification state set to verified", {
+            isVerified: this.state.isVerified,
+            component: "PhoneAuthService"
+          });
           return true;
         } else {
           return false;
         }
       } catch (credentialError) {
-        console.error("Invalid verification code:", credentialError);
+        clientLogger.info("Invalid verification code", createAuthLogContext(
+          generateSessionId(),
+          "phone",
+          {
+            error: credentialError instanceof Error ? credentialError.message : String(credentialError),
+            component: "PhoneAuthService"
+          }
+        ));
         return false;
       }
     } catch (error) {
-      console.error("Code verification failed:", error);
+      clientLogger.info("Code verification failed", createAuthLogContext(
+        generateSessionId(),
+        "phone",
+        {
+          error: error instanceof Error ? error.message : String(error),
+          component: "PhoneAuthService"
+        }
+      ));
       this.state.error = error as Error;
       return false;
     } finally {
@@ -241,7 +290,11 @@ export class PhoneAuthService {
   public async refreshPhoneIdToken(): Promise<string | null> {
     try {
       if (!phoneAuth.currentUser) {
-        console.warn("Cannot refresh phone token: No authenticated user");
+        clientLogger.info("Cannot refresh phone token: No authenticated user", createAuthLogContext(
+          generateSessionId(),
+          "phone",
+          { component: "PhoneAuthService" }
+        ));
         return null;
       }
 
@@ -261,7 +314,14 @@ export class PhoneAuthService {
 
       return idToken;
     } catch (error) {
-      console.error("Failed to refresh phone ID token:", error);
+      clientLogger.info("Failed to refresh phone ID token", createAuthLogContext(
+        generateSessionId(),
+        "phone",
+        {
+          error: error instanceof Error ? error.message : String(error),
+          component: "PhoneAuthService"
+        }
+      ));
       return null;
     }
   }

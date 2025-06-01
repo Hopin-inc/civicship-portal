@@ -87,7 +87,7 @@ export default function ActivityPage() {
             availableDates={sortedSlots}
             sameStateActivities={sameStateActivities}
             communityId={communityId}
-            isExternalBooking={isExternalBooking}
+            // isExternalBooking={isExternalBooking}
           />
         </div>
       </main>
