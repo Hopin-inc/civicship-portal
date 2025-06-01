@@ -9,6 +9,8 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 const QRCode = dynamic(() => import("react-qr-code"), { ssr: false });
 
@@ -68,7 +70,23 @@ export default function TicketDetailPage() {
           <div className="bg-white p-4 rounded-lg mb-2">
             {qrUrl && <QRCode value={qrUrl} size={200} />}
           </div>
-          <p className="text-sm text-center text-muted-foreground">{qrUrl}</p>
+          <p className="text-sm text-center text-muted-foreground break-all">{qrUrl}</p>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="mt-2"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(qrUrl);
+                toast.success("リンクをコピーしました");
+              } catch (err) {
+                toast.error("リンクのコピーに失敗しました");
+                console.error("Clipboard copy failed:", err);
+              }
+            }}
+          >
+            リンクをコピー
+          </Button>
         </div>
 
         <div className="space-y-2 mt-4">
