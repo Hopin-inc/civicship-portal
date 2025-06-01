@@ -66,14 +66,6 @@ export class AuthRedirectService {
     const authState = this.authStateManager.getState();
     const nextParam = next ? `?next=${next}` : `?next=${pathname}`;
 
-    clientLogger.debug("getRedirectPath", { 
-      pathname, 
-      authState, 
-      next, 
-      nextParam,
-      component: "AuthRedirectService"
-    });
-
     if (authState === "loading") {
       return null;
     }
@@ -149,12 +141,6 @@ export class AuthRedirectService {
   public getPostLineAuthRedirectPath(nextPath: string | null): string {
     const next = nextPath ? decodeURIComponent(nextPath) : null;
     const nextParam = next ? `?next=${next}` : "";
-    clientLogger.debug("getPostLineAuthRedirectPath", { 
-      nextPath, 
-      next, 
-      nextParam,
-      component: "AuthRedirectService"
-    });
 
     const authState = this.authStateManager.getState();
 

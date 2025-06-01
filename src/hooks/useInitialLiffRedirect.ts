@@ -14,10 +14,6 @@ export const useInitialLiffRedirect = () => {
 
     if (initial && initial.startsWith("/") && initial !== window.location.pathname) {
       hasRedirected.current = true;
-      clientLogger.debug("Redirecting to initial path", {
-        initialPath: initial,
-        component: "useInitialLiffRedirect"
-      });
       router.replace(initial); // または window.location.replace(initial)
     }
   }, [router]);

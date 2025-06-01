@@ -16,15 +16,13 @@ export const useTokenExpirationHandler = ({ state, setState, logout }: UseTokenE
   stateRef.current = state;
 
   useEffect(() => {
-    clientLogger.debug("useTokenExpirationHandler fired", { component: "useTokenExpirationHandler" });
-    
     const handleTokenExpired = (event: Event) => {
       const customEvent = event as CustomEvent<{ source: string }>;
       const { source } = customEvent.detail;
 
       if (source === "graphql" || source === "network") {
         const currentState = stateRef.current.authenticationState;
-        
+
         if (currentState === "line_authenticated" || currentState === "user_registered") {
           setState((prev) => ({ ...prev, authenticationState: "line_token_expired" }));
           if (typeof window !== "undefined") {

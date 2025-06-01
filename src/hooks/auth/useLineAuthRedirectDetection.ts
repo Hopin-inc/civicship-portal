@@ -16,20 +16,18 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
   const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
 
   useEffect(() => {
-    clientLogger.debug("useLineAuthRedirectDetection fired", { component: "useLineAuthRedirectDetection" });
-
     const currentState = {
       authenticationState: state.authenticationState,
       isAuthenticating: state.isAuthenticating
     };
-    
+
     const currentLiffState = liffService.getState();
     const liffStateKey = { isInitialized: currentLiffState.isInitialized, isLoggedIn: currentLiffState.isLoggedIn };
 
-    const stateChanged = !prevStateRef.current || 
+    const stateChanged = !prevStateRef.current ||
       prevStateRef.current.authenticationState !== currentState.authenticationState ||
       prevStateRef.current.isAuthenticating !== currentState.isAuthenticating;
-    
+
     const liffStateChanged = !prevLiffStateRef.current ||
       prevLiffStateRef.current.isInitialized !== liffStateKey.isInitialized ||
       prevLiffStateRef.current.isLoggedIn !== liffStateKey.isLoggedIn;
@@ -47,7 +45,6 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
     }
 
     if (state.isAuthenticating) {
-      clientLogger.debug("Skipping: already authenticating", { component: "useLineAuthRedirectDetection" });
       setShouldProcessRedirect(false);
       return;
     }
@@ -56,7 +53,6 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
       state.authenticationState !== "unauthenticated" &&
       state.authenticationState !== "loading"
     ) {
-      clientLogger.debug("Skipping: already authenticated or in progress", { component: "useLineAuthRedirectDetection" });
       setShouldProcessRedirect(false);
       return;
     }
@@ -72,13 +68,6 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
     const timestamp = new Date().toISOString();
     clientLogger.debug("Detected LINE authentication redirect", {
       timestamp,
-      component: "useLineAuthRedirectDetection"
-    });
-    clientLogger.debug("Current state", {
-      timestamp,
-      authenticationState: state.authenticationState,
-      isAuthenticating: state.isAuthenticating,
-      windowHref: window.location.href,
       component: "useLineAuthRedirectDetection"
     });
 

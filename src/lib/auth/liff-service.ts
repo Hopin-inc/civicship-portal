@@ -77,14 +77,11 @@ export class LiffService {
    * @returns 初期化が成功したかどうか
    */
   public async initialize(): Promise<boolean> {
-    clientLogger.debug("Calling liffService.initialize()", { component: "LiffService" });
     try {
       if (this.state.isInitialized) {
-        clientLogger.debug("Already initialized, skipping", { component: "LiffService" });
         return true;
       }
       if (this.initializing) {
-        clientLogger.debug("Already initializing, skipping", { component: "LiffService" });
         return true;
       }
       this.initializing = true;
@@ -97,19 +94,14 @@ export class LiffService {
         await this.updateProfile();
       }
 
-      clientLogger.debug("liffService.initialize() success", { 
-        isInitialized: this.state.isInitialized,
-        component: "LiffService" 
-      });
-
       return true;
     } catch (error) {
       clientLogger.info("LIFF initialization error", createAuthLogContext(
         generateSessionId(),
         "liff",
-        { 
+        {
           error: error instanceof Error ? error.message : String(error),
-          component: "LiffService" 
+          component: "LiffService"
         }
       ));
       this.state.error = error as Error;
@@ -150,9 +142,9 @@ export class LiffService {
       clientLogger.info("LIFF login error", createAuthLogContext(
         generateSessionId(),
         "liff",
-        { 
+        {
           error: error instanceof Error ? error.message : String(error),
-          component: "LiffService" 
+          component: "LiffService"
         }
       ));
       this.state.error = error as Error;
@@ -194,9 +186,9 @@ export class LiffService {
       clientLogger.info("Failed to get LIFF profile", createAuthLogContext(
         generateSessionId(),
         "liff",
-        { 
+        {
           error: error instanceof Error ? error.message : String(error),
-          component: "LiffService" 
+          component: "LiffService"
         }
       ));
     }
@@ -240,23 +232,6 @@ export class LiffService {
       operation.attempt(async (currentAttempt) => {
         try {
           const attemptTimestamp = new Date().toISOString();
-          clientLogger.debug(`LIFF Auth Attempt ${currentAttempt} - Starting`, {
-            timestamp: attemptTimestamp,
-            component: "LiffService"
-          });
-          clientLogger.debug("LIFF state before request", {
-            isInitialized: this.state.isInitialized,
-            isLoggedIn: this.state.isLoggedIn,
-            accessToken: this.getAccessToken() ? "present" : "missing",
-            userId: this.state.profile?.userId || "none",
-            component: "LiffService"
-          });
-
-          const requestTimestamp = new Date().toISOString();
-          clientLogger.debug("Making request to /line/liff-login", {
-            timestamp: requestTimestamp,
-            component: "LiffService"
-          });
 
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`,
@@ -267,70 +242,22 @@ export class LiffService {
             },
           );
 
-          const responseTimestamp = new Date().toISOString();
-          clientLogger.debug("/line/liff-login response", {
-            timestamp: responseTimestamp,
-            status: response.status,
-            ok: response.ok,
-            attempt: currentAttempt,
-            statusText: response.statusText,
-            component: "LiffService"
-          });
-
           if (!response.ok) {
             throw new Error(`LIFF authentication failed: ${response.status}`);
           }
-
-          const jsonTimestamp = new Date().toISOString();
-          clientLogger.debug("Parsing response JSON", {
-            timestamp: jsonTimestamp,
-            component: "LiffService"
-          });
           const { customToken, profile } = await response.json();
-          clientLogger.debug("Received custom token and profile", {
-            timestamp: jsonTimestamp,
-            hasCustomToken: !!customToken,
-            profileName: profile?.displayName || "none",
-            component: "LiffService"
-          });
 
-          const firebaseTimestamp = new Date().toISOString();
-          clientLogger.debug("Signing in with custom token to Firebase", {
-            timestamp: firebaseTimestamp,
-            component: "LiffService"
-          });
           const userCredential = await signInWithCustomToken(lineAuth, customToken);
-          clientLogger.debug("Firebase sign-in successful", {
-            timestamp: firebaseTimestamp,
-            uid: userCredential.user.uid,
-            isNewUser:
-              userCredential.user.metadata.creationTime ===
-              userCredential.user.metadata.lastSignInTime,
-            component: "LiffService"
-          });
 
           await updateProfile(userCredential.user, {
             displayName: profile.displayName,
             photoURL: profile.pictureUrl,
           });
 
-          const tokenTimestamp = new Date().toISOString();
-          clientLogger.debug("Getting Firebase ID token", {
-            timestamp: tokenTimestamp,
-            component: "LiffService"
-          });
           const idToken = await userCredential.user.getIdToken();
           const refreshToken = userCredential.user.refreshToken;
           const tokenResult = await userCredential.user.getIdTokenResult();
           const expirationTime = new Date(tokenResult.expirationTime).getTime();
-
-          clientLogger.debug("Token details", {
-            timestamp: tokenTimestamp,
-            hasIdToken: !!idToken,
-            hasRefreshToken: !!refreshToken,
-            expirationTime: new Date(expirationTime).toISOString(),
-            component: "LiffService"
-          });
 
           const tokens: AuthTokens = {
             accessToken: idToken,

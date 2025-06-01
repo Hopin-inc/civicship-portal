@@ -18,17 +18,13 @@ export const useUserRegistrationState = ({ authStateManager, userData, setState 
   authStateManagerRef.current = authStateManager;
 
   useEffect(() => {
-    clientLogger.debug("useUserRegistrationState fired", {
-      component: "useUserRegistrationState"
-    });
-    
     if (userData?.currentUser?.user) {
       const userId = userData.currentUser.user.id;
-      
+
       if (processedUserIdRef.current === userId) {
         return;
       }
-      
+
       processedUserIdRef.current = userId;
 
       setState((prev) => ({
@@ -41,16 +37,7 @@ export const useUserRegistrationState = ({ authStateManager, userData, setState 
       if (currentAuthStateManager) {
         const updateUserRegistrationState = async () => {
           try {
-            const timestamp = new Date().toISOString();
-            clientLogger.debug("Updating user registration state in useEffect", {
-              timestamp,
-              component: "useUserRegistrationState"
-            });
             await currentAuthStateManager.handleUserRegistrationStateChange(true);
-            clientLogger.debug("AuthStateManager user registration state updated successfully", {
-              timestamp,
-              component: "useUserRegistrationState"
-            });
           } catch (error) {
             clientLogger.error("Failed to update AuthStateManager user registration state", {
               error: error instanceof Error ? error.message : String(error),

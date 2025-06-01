@@ -11,6 +11,7 @@ if (typeof window === "undefined") {
   try {
     serverUtils = require("./logging-utils-server");
   } catch (e) {
+    console.warn("Failed to load server logging utilities:", e);
   }
 }
 
@@ -29,16 +30,16 @@ export const generateSessionId = (): string => {
     return generateNewSessionId();
   }
 
-  const SESSION_ID_KEY = "civicship_auth_session_id";
-  
+  const SESSION_ID_KEY = "civicship_session_id";
+
   try {
     let sessionId = localStorage.getItem(SESSION_ID_KEY);
-    
+
     if (!sessionId) {
       sessionId = generateNewSessionId();
       localStorage.setItem(SESSION_ID_KEY, sessionId);
     }
-    
+
     return sessionId;
   } catch (error) {
     return generateNewSessionId();
@@ -60,8 +61,6 @@ const generateNewSessionId = (): string => {
     return `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 };
-
-
 
 /**
  * 電話番号をマスクする（下4桁のみ表示）

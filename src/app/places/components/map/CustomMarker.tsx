@@ -117,16 +117,6 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
   }, [data.id, data.latitude, data.longitude]);
 
   useEffect(() => {
-    if (HARDCODED_COORDINATES[data.id]) {
-      clientLogger.debug("Using hardcoded coordinates", {
-        placeId: data.id,
-        coordinates: HARDCODED_COORDINATES[data.id],
-        component: "CustomMarker"
-      });
-    }
-  }, [data.id]);
-
-  useEffect(() => {
     let isMounted = true;
 
     (async () => {

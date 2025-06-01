@@ -18,13 +18,11 @@ interface UseFirebaseAuthStateProps {
 export const useFirebaseAuthState = ({ authStateManager, state, setState }: UseFirebaseAuthStateProps) => {
   const authStateManagerRef = useRef(authStateManager);
   const stateRef = useRef(state);
-  
+
   authStateManagerRef.current = authStateManager;
   stateRef.current = state;
 
   useEffect(() => {
-    clientLogger.debug("useFirebaseAuthState fired", { component: "useFirebaseAuthState" });
-    
     const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
       setState((prev) => ({
         ...prev,
@@ -48,21 +46,18 @@ export const useFirebaseAuthState = ({ authStateManager, state, setState }: UseF
             refreshToken: refreshToken,
             expiresAt: expirationTime,
           });
-
-          clientLogger.debug("Firebase Auth token synced to cookies", { component: "useFirebaseAuthState" });
         } catch (error) {
           clientLogger.info("Failed to sync Firebase token to cookies", createAuthLogContext(
             generateSessionId(),
             "general",
-            { 
+            {
               error: error instanceof Error ? error.message : String(error),
-              component: "useFirebaseAuthState" 
+              component: "useFirebaseAuthState"
             }
           ));
         }
       } else {
         TokenManager.clearLineTokens();
-        clientLogger.debug("LINE tokens cleared from cookies", { component: "useFirebaseAuthState" });
       }
 
       const currentAuthStateManager = authStateManagerRef.current;

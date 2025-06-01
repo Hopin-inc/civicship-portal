@@ -102,9 +102,9 @@ export class PhoneAuthService {
       clientLogger.info("Error clearing reCAPTCHA", createAuthLogContext(
         generateSessionId(),
         "phone",
-        { 
+        {
           error: e instanceof Error ? e.message : String(e),
-          component: "PhoneAuthService" 
+          component: "PhoneAuthService"
         }
       ));
     }
@@ -156,7 +156,7 @@ export class PhoneAuthService {
       clientLogger.info("Phone verification failed", createAuthLogContext(
         generateSessionId(),
         "phone",
-        { 
+        {
           error: error instanceof Error ? error.message : String(error),
           component: "PhoneAuthService",
           phoneNumber: maskPhoneNumber(phoneNumber)
@@ -179,10 +179,6 @@ export class PhoneAuthService {
       this.state.isVerifying = true;
       this.state.error = null;
 
-      clientLogger.debug("Starting phone verification with code, using phoneAuth instance (no tenant)", {
-        component: "PhoneAuthService"
-      });
-
       if (!this.state.verificationId) {
         clientLogger.error("Missing verificationId", {
           component: "PhoneAuthService"
@@ -202,9 +198,6 @@ export class PhoneAuthService {
         let verificationSuccessful = false;
 
         try {
-          clientLogger.debug("Signing in with credential to get user ID", {
-            component: "PhoneAuthService"
-          });
           const userCredential = await signInWithCredential(phoneAuth, credential);
           clientLogger.debug("Phone sign-in successful with credential", {
             component: "PhoneAuthService"
@@ -212,10 +205,6 @@ export class PhoneAuthService {
 
           if (userCredential.user) {
             this.state.phoneUid = userCredential.user.uid;
-            clientLogger.debug("Stored phone UID", {
-              phoneUid: this.state.phoneUid,
-              component: "PhoneAuthService"
-            });
 
             const idToken = await userCredential.user.getIdToken();
             const refreshToken = userCredential.user.refreshToken;
@@ -231,10 +220,6 @@ export class PhoneAuthService {
               expiresAt: expirationTime,
             };
             TokenManager.savePhoneTokens(tokens);
-
-            clientLogger.debug("Extracted phone auth tokens successfully", {
-              component: "PhoneAuthService"
-            });
             verificationSuccessful = true;
           } else {
             clientLogger.error("No user returned from signInWithCredential", {
@@ -250,9 +235,9 @@ export class PhoneAuthService {
           clientLogger.info("Could not sign in with phone credential", createAuthLogContext(
             generateSessionId(),
             "phone",
-            { 
+            {
               error: signInError instanceof Error ? signInError.message : String(signInError),
-              component: "PhoneAuthService" 
+              component: "PhoneAuthService"
             }
           ));
           clientLogger.debug("Verification failed - invalid code", {
@@ -275,9 +260,9 @@ export class PhoneAuthService {
         clientLogger.info("Invalid verification code", createAuthLogContext(
           generateSessionId(),
           "phone",
-          { 
+          {
             error: credentialError instanceof Error ? credentialError.message : String(credentialError),
-            component: "PhoneAuthService" 
+            component: "PhoneAuthService"
           }
         ));
         return false;
@@ -286,9 +271,9 @@ export class PhoneAuthService {
       clientLogger.info("Code verification failed", createAuthLogContext(
         generateSessionId(),
         "phone",
-        { 
+        {
           error: error instanceof Error ? error.message : String(error),
-          component: "PhoneAuthService" 
+          component: "PhoneAuthService"
         }
       ));
       this.state.error = error as Error;
@@ -332,9 +317,9 @@ export class PhoneAuthService {
       clientLogger.info("Failed to refresh phone ID token", createAuthLogContext(
         generateSessionId(),
         "phone",
-        { 
+        {
           error: error instanceof Error ? error.message : String(error),
-          component: "PhoneAuthService" 
+          component: "PhoneAuthService"
         }
       ));
       return null;

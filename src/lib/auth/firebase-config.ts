@@ -30,9 +30,9 @@ if (isAnalyticsEnabled) {
     .then((supported) => {
       if (supported) {
         analytics = getAnalytics(lineApp);
-        clientLogger.debug("Analytics initialized", { 
+        clientLogger.debug("Analytics initialized", {
           env: process.env.NODE_ENV,
-          component: "FirebaseConfig" 
+          component: "FirebaseConfig"
         });
       } else {
         clientLogger.debug("Analytics not supported in this browser", {
@@ -47,9 +47,9 @@ if (isAnalyticsEnabled) {
       });
     });
 } else {
-  clientLogger.debug("Analytics disabled", { 
+  clientLogger.warn("Analytics disabled", {
     env: process.env.NODE_ENV,
-    component: "FirebaseConfig" 
+    component: "FirebaseConfig"
   });
 }
 

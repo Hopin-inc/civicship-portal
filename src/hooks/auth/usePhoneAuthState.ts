@@ -15,15 +15,13 @@ interface UsePhoneAuthStateProps {
 export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState }: UsePhoneAuthStateProps) => {
   const authStateManagerRef = useRef(authStateManager);
   const phoneAuthServiceRef = useRef(phoneAuthService);
-  
+
   authStateManagerRef.current = authStateManager;
   phoneAuthServiceRef.current = phoneAuthService;
 
   useEffect(() => {
-    clientLogger.debug("usePhoneAuthState fired", { component: "usePhoneAuthState" });
-    
     const currentAuthStateManager = authStateManagerRef.current;
-    
+
     if (!currentAuthStateManager) return;
 
     const phoneState = phoneAuthServiceRef.current.getState();
@@ -32,17 +30,7 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
     if (isVerified) {
       const updatePhoneAuthState = async () => {
         try {
-          const timestamp = new Date().toISOString();
-          clientLogger.debug("Updating phone auth state in useEffect", {
-            timestamp,
-            isVerified,
-            component: "usePhoneAuthState"
-          });
           await currentAuthStateManager.handlePhoneAuthStateChange(true);
-          clientLogger.debug("AuthStateManager phone state updated successfully in useEffect", {
-            timestamp,
-            component: "usePhoneAuthState"
-          });
         } catch (error) {
           clientLogger.error("Failed to update AuthStateManager phone state in useEffect", {
             error: error instanceof Error ? error.message : String(error),

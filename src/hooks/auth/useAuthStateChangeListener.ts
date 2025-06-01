@@ -12,10 +12,6 @@ interface UseAuthStateChangeListenerProps {
 
 export const useAuthStateChangeListener = ({ authStateManager, setState }: UseAuthStateChangeListenerProps) => {
   useEffect(() => {
-    clientLogger.debug("useAuthStateChangeListener fired", {
-      component: "useAuthStateChangeListener"
-    });
-    
     if (!authStateManager) return;
 
     const handleStateChange = (newState: AuthState["authenticationState"]) => {

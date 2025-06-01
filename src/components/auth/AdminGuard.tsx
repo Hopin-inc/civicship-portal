@@ -40,13 +40,12 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
 
   useEffect(() => {
     if (loading) {
-      clientLogger.debug("Still loading user", { component: "AdminGuard" });
       return;
     }
 
     if (!isAuthenticated || !currentUser) {
       const next = window.location.pathname + window.location.search;
-      clientLogger.debug("No user found. Redirecting to login", { 
+      clientLogger.debug("No user found. Redirecting to login", {
         component: "AdminGuard",
         redirectTo: `/login?next=${next}`
       });
@@ -61,16 +60,16 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
         if (redirectPath === "/") {
           toast.warning("管理者権限がありません");
         }
-        clientLogger.debug("Admin access denied. Redirecting", { 
+        clientLogger.debug("Admin access denied. Redirecting", {
           component: "AdminGuard",
-          redirectPath 
+          redirectPath
         });
         router.replace(redirectPath);
         return;
       }
 
-      clientLogger.debug("User is authorized as community manager", { 
-        component: "AdminGuard" 
+      clientLogger.debug("User is authorized as community manager", {
+        component: "AdminGuard"
       });
     };
 
@@ -78,7 +77,6 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   }, [currentUser, isAuthenticated, loading, router, authRedirectService]);
 
   if (loading) {
-    clientLogger.debug("Showing loading indicator", { component: "AdminGuard" });
     return <LoadingIndicator />;
   }
 
@@ -102,7 +100,6 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     return null;
   }
 
-  clientLogger.debug("AdminGuard passed. Rendering children", { component: "AdminGuard" });
   return <>{children}</>;
 };
 

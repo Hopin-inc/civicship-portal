@@ -45,13 +45,6 @@ export const orderOpportunities = (
     return opportunities;
   }
 
-  clientLogger.debug("orderOpportunities", {
-    placeId,
-    original: opportunities.map((o) => o.id),
-    definedOrder: order,
-    component: "hardOrder"
-  });
-
   const sorted = [...opportunities].sort((a, b) => {
     const indexA = order.indexOf(a.id);
     const indexB = order.indexOf(b.id);
@@ -60,12 +53,6 @@ export const orderOpportunities = (
     if (indexA === -1) return 1;
     if (indexB === -1) return -1;
     return indexA - indexB;
-  });
-
-  clientLogger.debug("orderOpportunities sorted", {
-    placeId,
-    sorted: sorted.map((o) => o.id),
-    component: "hardOrder"
   });
 
   return sorted;
@@ -82,14 +69,6 @@ export const getPrimaryOpportunity = (place: GqlPlace): GqlOpportunity | undefin
   const found = preferredOrder
     .map((id) => opportunities.find((o) => o.id === id))
     .find((o): o is GqlOpportunity => !!o);
-
-  clientLogger.debug("getPrimaryOpportunity", {
-    placeId: place.id,
-    preferredOrder,
-    available: opportunities.map((o) => o.id),
-    selected: found?.id ?? opportunities[0]?.id,
-    component: "hardOrder"
-  });
 
   return found ?? opportunities[0];
 };

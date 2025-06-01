@@ -18,16 +18,12 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
   const liffServiceRef = useRef(liffService);
   const setStateRef = useRef(setState);
   const refetchUserRef = useRef(refetchUser);
-  
+
   liffServiceRef.current = liffService;
   setStateRef.current = setState;
   refetchUserRef.current = refetchUser;
 
   useEffect(() => {
-    clientLogger.debug("useLineAuthProcessing fired", {
-      component: "useLineAuthProcessing"
-    });
-    
     if (!shouldProcessRedirect || processedRef.current) return;
 
     const handleLineAuthRedirect = async () => {
@@ -78,9 +74,9 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         clientLogger.info("Error during LINE auth", createAuthLogContext(
           generateSessionId(),
           "liff",
-          { 
+          {
             error: err instanceof Error ? err.message : String(err),
-            component: "useLineAuthProcessing" 
+            component: "useLineAuthProcessing"
           }
         ));
       } finally {

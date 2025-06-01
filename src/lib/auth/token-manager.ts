@@ -1,7 +1,7 @@
 "use client";
 
-import clientLogger from "./logging/client";
-import { createAuthLogContext, generateSessionId } from "./logging/client/utils";
+import clientLogger from "@/lib/logging/client";
+import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
 
 /**
  * 認証トークン情報の型定義
@@ -157,9 +157,9 @@ export class TokenManager {
       clientLogger.info("LINE token validation failed", createAuthLogContext(
         generateSessionId(),
         "general",
-        { 
+        {
           error: error instanceof Error ? error.message : String(error),
-          component: "TokenManager" 
+          component: "TokenManager"
         }
       ));
       return true; // Any error means the token/session is invalid
@@ -201,9 +201,9 @@ export class TokenManager {
       clientLogger.info("Failed to renew LINE token", createAuthLogContext(
         generateSessionId(),
         "general",
-        { 
+        {
           error: error instanceof Error ? error.message : String(error),
-          component: "TokenManager" 
+          component: "TokenManager"
         }
       ));
       return false;
@@ -232,9 +232,9 @@ export class TokenManager {
       clientLogger.info("Failed to renew phone token", createAuthLogContext(
         generateSessionId(),
         "phone",
-        { 
+        {
           error: error instanceof Error ? error.message : String(error),
-          component: "TokenManager" 
+          component: "TokenManager"
         }
       ));
       return false;

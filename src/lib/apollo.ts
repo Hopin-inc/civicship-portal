@@ -45,7 +45,7 @@ const requestLink = new ApolloLink((operation, forward) => {
       try {
         const { lineAuth } = await import("./auth/firebase-config");
         const phoneTokens = TokenManager.getPhoneTokens();
-        
+
         let firebaseToken = null;
         if (lineAuth.currentUser) {
           try {
@@ -54,15 +54,15 @@ const requestLink = new ApolloLink((operation, forward) => {
             clientLogger.info('Failed to get Firebase token', createAuthLogContext(
               generateSessionId(),
               "general",
-              { 
+              {
                 error: error instanceof Error ? error.message : String(error),
                 component: 'ApolloRequestLink',
-                operation: operation.operationName 
+                operation: operation.operationName
               }
             ));
           }
         }
-        
+
         const lineTokens = TokenManager.getLineTokens();
         const accessToken = firebaseToken || lineTokens.accessToken;
 
@@ -74,7 +74,7 @@ const requestLink = new ApolloLink((operation, forward) => {
           };
 
           const tokenRequiredOperations = ['userSignUp', 'linkPhoneAuth', 'storePhoneAuthToken'];
-          
+
           if (tokenRequiredOperations.includes(operation.operationName || '')) {
             const requestHeaders = {
               ...baseHeaders,
@@ -84,25 +84,9 @@ const requestLink = new ApolloLink((operation, forward) => {
               "X-Phone-Uid": phoneTokens.phoneUid || "",
               "X-Phone-Number": phoneTokens.phoneNumber || "",
             };
-            
-            clientLogger.debug('Sending phone auth tokens for operation', {
-              operation: operation.operationName,
-              hasPhoneToken: !!phoneTokens.accessToken,
-              hasPhoneUid: !!phoneTokens.phoneUid,
-              hasPhoneNumber: !!phoneTokens.phoneNumber,
-              tokenSource: firebaseToken ? 'firebase' : 'cookie',
-              component: 'ApolloRequestLink'
-            });
-            
+
             return { headers: requestHeaders };
           }
-          
-          clientLogger.debug('Sending tokens for operation', {
-            operation: operation.operationName,
-            tokenSource: firebaseToken ? 'firebase' : 'cookie',
-            hasToken: !!accessToken,
-            component: 'ApolloRequestLink'
-          });
           return { headers: baseHeaders };
         });
 
