@@ -1,6 +1,15 @@
 import { Metadata } from "next";
+import { COMMUNITY_ID } from "@/utils";
 
-const DEFAULT_TITLE = "NEO四国88祭";
+const getCommunityName = (): string => {
+  const communityNames: Record<string, string> = {
+    "neo88": "NEO四国88祭"
+  };
+  
+  return communityNames[COMMUNITY_ID] || COMMUNITY_ID;
+};
+
+const DEFAULT_TITLE = getCommunityName();
 const DEFAULT_DESCRIPTION =
   "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。心が躍るさまざまな体験を通じて、新しい自分に出会う旅へ。地域の方々が用意する特別な体験がたくさん待っています。あなたのお気に入りを選んで、一期一会のオリジナルな旅を楽しんでみませんか？";
 

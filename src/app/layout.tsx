@@ -20,7 +20,10 @@ import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 const font = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: DEFAULT_TITLE,
+  title: {
+    default: DEFAULT_TITLE,
+    template: `%s | ${DEFAULT_TITLE}`,
+  },
   description: DEFAULT_DESCRIPTION,
   icons: DEFAULT_ICONS,
   openGraph: DEFAULT_OPEN_GRAPH,

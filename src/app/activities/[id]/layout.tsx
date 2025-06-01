@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = res.description ?? res.body;
 
   return {
-    title: `${res.title} | NEO四国88祭`,
+    title: res.title,
     description,
     openGraph: {
       type: "article",
