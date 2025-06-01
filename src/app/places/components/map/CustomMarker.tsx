@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { drawCircleWithImage } from "@/utils/maps/markerUtils";
+import { drawCircleWithImage } from "@/app/places/utils/marker";
 import { Marker } from "@react-google-maps/api";
 import { IPlacePin } from "@/app/places/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";

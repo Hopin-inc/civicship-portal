@@ -3,7 +3,10 @@
 import React, { useCallback, useRef, useState } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { getCoordinatesFromAddress, PRIORITIZE_LAT_LNG_PLACE_IDS } from "@/utils/maps/geocoding";
+import {
+  getCoordinatesFromAddress,
+  PRIORITIZE_LAT_LNG_PLACE_IDS,
+} from "@/app/places/utils/geocoding";
 import clientLogger from "@/lib/logging/client";
 
 interface AddressMapProps {
