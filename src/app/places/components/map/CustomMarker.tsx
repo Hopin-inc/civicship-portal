@@ -5,6 +5,7 @@ import { drawCircleWithImage } from "@/app/places/utils/marker";
 import { Marker } from "@react-google-maps/api";
 import { IPlacePin } from "@/app/places/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import clientLogger from "@/lib/logging/client";
 
 interface CustomMarkerProps {
   data: IPlacePin;
@@ -24,7 +25,10 @@ const loadImage = (src: string): Promise<HTMLImageElement> =>
     img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
     img.onerror = (e) => {
-      console.warn(`Failed to load image from ${src}:`, e);
+      clientLogger.warn(`Failed to load image from ${src}`, {
+        error: e,
+        component: "CustomMarker"
+      });
       // Try without crossOrigin as a fallback
       if (img.crossOrigin) {
         const fallbackImg = new Image();
@@ -87,7 +91,10 @@ const createPlaceholderIcon = async (size: number): Promise<google.maps.Icon> =>
 
     return createIconObject(canvas, size, 0, 10);
   } catch (error) {
-    console.warn("Failed to create placeholder icon, using direct URL:", error);
+    clientLogger.warn("Failed to create placeholder icon, using direct URL", {
+      error: error instanceof Error ? error.message : String(error),
+      component: "CustomMarker"
+    });
     // Fallback to direct URL approach when Canvas fails
     return {
       url: PLACEHOLDER_IMAGE,
@@ -110,12 +117,6 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
   }, [data.id, data.latitude, data.longitude]);
 
   useEffect(() => {
-    if (HARDCODED_COORDINATES[data.id]) {
-      console.log("✅ HARDCODE:", data.id, HARDCODED_COORDINATES[data.id]);
-    }
-  }, [data.id]);
-
-  useEffect(() => {
     let isMounted = true;
 
     (async () => {
@@ -128,7 +129,10 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         const placeholder = await createPlaceholderIcon(displaySize);
         isMounted && setIcon(placeholder);
       } catch (error) {
-        console.warn("Failed to create placeholder icon:", error);
+        clientLogger.warn("Failed to create placeholder icon", {
+          error: error instanceof Error ? error.message : String(error),
+          component: "CustomMarker"
+        });
       }
 
       try {
@@ -153,10 +157,10 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         markerIconCache.set(cacheKey, markerIcon);
         isMounted && setIcon(markerIcon);
       } catch (error) {
-        console.warn(
-          "Failed to create marker icon with Canvas, falling back to direct URL:",
-          error,
-        );
+        clientLogger.warn("Failed to create marker icon with Canvas, falling back to direct URL", {
+          error: error instanceof Error ? error.message : String(error),
+          component: "CustomMarker"
+        });
 
         // Fallback to direct URL approach when Canvas fails
         const fallbackIcon = {

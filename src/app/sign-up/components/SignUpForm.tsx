@@ -14,14 +14,13 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import clientLogger from "@/lib/logging/client";
 
 const FormSchema = z.object({
   name: z.string({ required_error: "名前を入力してください。" }),
@@ -33,16 +32,9 @@ const FormSchema = z.object({
 type FormValues = z.infer<typeof FormSchema>;
 
 export function SignUpForm() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next");
   const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
-
-  const authRedirectService = AuthRedirectService.getInstance();
-  const redirectPath = authRedirectService.getRedirectPath(pathname, nextParam);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -57,9 +49,6 @@ export function SignUpForm() {
     try {
       if (!isPhoneVerified) {
         toast.error("電話番号認証が完了していません");
-        if (redirectPath) {
-          router.replace(redirectPath);
-        }
         return;
       }
 
@@ -68,12 +57,12 @@ export function SignUpForm() {
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
         setIsRedirecting(true);
-        if (redirectPath) {
-          router.replace(redirectPath);
-        }
       }
     } catch (error) {
-      console.error("Sign up error:", error);
+      clientLogger.error("Sign up error", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "SignUpForm"
+      });
       toast.error("アカウント作成に失敗しました");
     } finally {
       setIsLoading(false);

@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { AuthState } from "@/contexts/AuthProvider";
+import clientLogger from "@/lib/logging/client";
+import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
 
 interface UseAutoLoginProps {
   environment: AuthEnvironment;
@@ -19,8 +21,6 @@ export const useAutoLogin = ({ environment, state, liffService, setState, refetc
   const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
 
   useEffect(() => {
-    console.log("[Debug] 🔥 useAutoLogin fired.");
-
     if (environment !== AuthEnvironment.LIFF) {
       return;
     }
@@ -29,14 +29,14 @@ export const useAutoLogin = ({ environment, state, liffService, setState, refetc
       authenticationState: state.authenticationState,
       isAuthenticating: state.isAuthenticating
     };
-    
+
     const currentLiffState = liffService.getState();
     const liffStateKey = { isInitialized: currentLiffState.isInitialized, isLoggedIn: currentLiffState.isLoggedIn };
 
-    const stateChanged = !prevStateRef.current || 
+    const stateChanged = !prevStateRef.current ||
       prevStateRef.current.authenticationState !== currentState.authenticationState ||
       prevStateRef.current.isAuthenticating !== currentState.isAuthenticating;
-    
+
     const liffStateChanged = !prevLiffStateRef.current ||
       prevLiffStateRef.current.isInitialized !== liffStateKey.isInitialized ||
       prevLiffStateRef.current.isLoggedIn !== liffStateKey.isLoggedIn;
@@ -54,9 +54,8 @@ export const useAutoLogin = ({ environment, state, liffService, setState, refetc
       ) {
         const handleAutoLogin = async () => {
           attemptedRef.current = true;
-          
+
           const timestamp = new Date().toISOString();
-          console.log(`🔍 [${timestamp}] Auto-logging in via LIFF`);
 
           setState((prev) => ({ ...prev, isAuthenticating: true }));
           try {
@@ -65,7 +64,14 @@ export const useAutoLogin = ({ environment, state, liffService, setState, refetc
               await refetchUser();
             }
           } catch (error) {
-            console.error("Auto-login with LIFF failed:", error);
+            clientLogger.info("Auto-login with LIFF failed", createAuthLogContext(
+              generateSessionId(),
+              "liff",
+              {
+                error: error instanceof Error ? error.message : String(error),
+                component: "useAutoLogin"
+              }
+            ));
           } finally {
             setState((prev) => ({ ...prev, isAuthenticating: false }));
           }

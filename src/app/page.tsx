@@ -24,53 +24,30 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (authLoading || userLoading || isAuthenticating) {
-      console.log("🔍 HomePage: Still loading, skipping redirect logic");
-      return;
-    }
+    if (authLoading || userLoading || isAuthenticating) return;
 
     const isReturnFromLineAuth = searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
     const nextPath = searchParams.get("liff.state");
 
-    console.log("🔍 HomePage useEffect - checking LINE auth return:", {
-      isReturnFromLineAuth,
-      nextPath,
-      currentUrl: window.location.href,
-      searchParamsString: searchParams.toString(),
-      authenticationState,
-      isAuthenticated
-    });
-
     if (isReturnFromLineAuth) {
-      console.log("🚀 Detected return from LINE authentication, liff.state:", nextPath);
-
       let cleanedNextPath = nextPath;
       if (nextPath?.startsWith("/login?next=")) {
         const urlParams = new URLSearchParams(nextPath.split("?")[1]);
         cleanedNextPath = urlParams.get("next");
-        console.log("🔍 Extracted nested next path:", cleanedNextPath);
       } else if (nextPath?.startsWith("/login")) {
         cleanedNextPath = null;
-        console.log("🔍 Cleared login path, setting to null");
       }
 
-      console.log("🔍 Final cleaned next path:", cleanedNextPath);
-
       const cleanedUrl = cleanedNextPath ? `${window.location.pathname}?next=${cleanedNextPath}` : window.location.pathname;
-      console.log("🔍 Cleaning URL to:", cleanedUrl);
       router.replace(cleanedUrl);
 
       if (isAuthenticated && authenticationState === "user_registered") {
         const redirectPath = authRedirectService.getPostLineAuthRedirectPath(cleanedNextPath);
-        console.log("🚀 Authenticated and registered, redirecting to:", redirectPath);
         router.replace(redirectPath);
-      } else {
-        console.log("🔍 Waiting for authentication state to be ready...");
       }
       return;
     }
 
-    console.log("🔍 No LINE auth return detected, redirecting to activities");
     router.replace("/activities");
   }, [authLoading, authRedirectService, authenticationState, isAuthenticated, isAuthenticating, router, searchParams, userLoading]);
 

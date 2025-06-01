@@ -10,6 +10,7 @@ import ArticleRecommendations from "./ArticleRecommendations";
 import { TArticleDetail, TArticleWithAuthor } from "@/app/articles/data/type";
 import { ActivitiesCarouselSection } from "./ActivitiesCarouselSection";
 import { Calendar } from "lucide-react";
+import clientLogger from "@/lib/logging/client";
 
 type ArticleDetailProps = {
   article: TArticleDetail;
@@ -73,7 +74,10 @@ const ArticleBody = ({ markdown }: { markdown: string }) => {
   useEffect(() => {
     convertMarkdownToHtml(markdown)
       .then(setHtml)
-      .catch((error) => console.error("Error converting markdown:", error));
+      .catch((error) => clientLogger.error("Error converting markdown", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "ArticleBody"
+      }));
   }, [markdown]);
 
   return (
