@@ -87,7 +87,7 @@ export default function CompletePage() {
             totalPrice={dateTimeInfo.totalPrice}
             pricePerPerson={opportunity.feeRequired ?? 0}
             location={oppotunityDetail?.place}
-            phoneNumber={reservation.createdByUser?.phoneNumber}
+            phoneNumber={reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber}
             isReserved={true}
           />
         </div>
