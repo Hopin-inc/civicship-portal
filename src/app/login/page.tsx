@@ -132,16 +132,16 @@ export default function LoginPage() {
           </div>
         </div>
 
+        {error && <div className="text-destructive text-sm mt-2">{error}</div>}
+
         <Button
           onClick={handleLogin}
-          disabled={isLoading || isAuthenticating || !agreedTerms || !agreedPrivacy}
+          disabled={isLoading || isAuthenticating}
           className="w-full bg-[#06C755] hover:bg-[#05B74B] text-white rounded-full h-14 flex items-center justify-center gap-2"
         >
           <Image src="/images/line-icon.png" alt="LINE" width={24} height={24} priority />
           {isLoading || isAuthenticating ? "ログイン中..." : "LINEでログイン"}
         </Button>
-
-        {error && <div className="text-destructive text-sm mt-2">{error}</div>}
       </div>
     </div>
   );
