@@ -9,6 +9,7 @@ import {
 } from "@/types/graphql";
 import { presenterActivityDetail } from "@/app/activities/data/presenter";
 import { ActivityDetail } from "@/app/activities/data/type";
+import clientLogger from "@/lib/logging/client";
 
 export const useOpportunityDetail = (id: string) => {
   const { data, loading, error, refetch } = useGetOpportunityQuery({
@@ -21,6 +22,22 @@ export const useOpportunityDetail = (id: string) => {
     skip: !id,
     fetchPolicy: "network-only",
     errorPolicy: "all",
+    onCompleted: (data) => {
+      clientLogger.info("Opportunity detail query completed", {
+        component: "useOpportunityDetail",
+        operation: "getOpportunity",
+        opportunityId: id,
+        hasData: !!data?.opportunity
+      });
+    },
+    onError: (error) => {
+      clientLogger.error("Opportunity detail query failed", {
+        component: "useOpportunityDetail",
+        operation: "getOpportunity",
+        opportunityId: id,
+        error: error.message
+      });
+    }
   });
 
   const opportunity: ActivityDetail | null = useMemo(() => {

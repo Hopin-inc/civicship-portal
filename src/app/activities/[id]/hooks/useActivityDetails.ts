@@ -8,6 +8,7 @@ import { useSameStateActivities } from "@/app/activities/[id]/hooks/useSameState
 import { useAuth } from "@/contexts/AuthProvider";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { useFilterFutureSlots } from "./useFilterFutureSlots";
+import clientLogger from "@/lib/logging/client";
 
 interface UseActivityDetailsResult {
   opportunity: ActivityDetail | null;
@@ -53,6 +54,10 @@ export const useActivityDetails = (id: string): UseActivityDetailsResult => {
     isLoading,
     error: error ?? null,
     refetch: async () => {
+      clientLogger.info("Refetching activity details", {
+        component: "useActivityDetails",
+        opportunityId: id
+      });
       await Promise.all([refetchOpportunity(), refetchSameState()]);
     },
   };
