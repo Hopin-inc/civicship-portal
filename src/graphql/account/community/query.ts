@@ -21,4 +21,18 @@ export const GET_COMMUNITY = gql`
       name
     }
   }
-`; 
+`;
+
+export const GET_COMMUNITY_METADATA = gql`
+  query GetCommunityMetadata($id: ID!) {
+    community(id: $id) {
+      id
+      name
+      image
+      description
+      siteUrl
+      ogImageUrl
+      faviconUrl
+    }
+  }
+`;   

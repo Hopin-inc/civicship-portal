@@ -15,7 +15,9 @@ const MONTH_DATE_FMT = "M月D日(ddd)";
 const TIME_FMT = "H:mm";
 const FULL_FMT = `${YEAR_FMT}${MONTH_DATE_FMT} ${TIME_FMT}`;
 
-export const PLACEHOLDER_IMAGE = "/images/placeholder.jpg";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
+
+export const PLACEHOLDER_IMAGE = getCommunityPlaceholder();
 
 type Name = {
   lastName: string;

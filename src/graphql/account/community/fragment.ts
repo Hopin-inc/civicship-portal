@@ -5,5 +5,9 @@ export const COMMUNITY_FRAGMENT = gql`
     id
     name
     image
+    description
+    siteUrl
+    ogImageUrl
+    faviconUrl
   }
 `;
