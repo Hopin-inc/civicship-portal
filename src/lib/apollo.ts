@@ -90,63 +90,22 @@ const requestLink = new ApolloLink((operation, forward) => {
           return { headers: baseHeaders };
         });
 
-        const activitiesOperations = ['getOpportunities', 'getOpportunity'];
-        
-        const getComponentContext = (operationName: string, variables: any) => {
-          const context: any = {
-            operation: operationName
-          };
-
-          if (operationName === 'getOpportunities') {
-            if (variables?.filter?.category === 'ACTIVITY') {
-              context.component = 'useActivities';
-            } else if (variables?.filter?.stateCodes?.length > 0) {
-              context.component = 'useSameStateActivities';
-              context.stateCode = variables.filter.stateCodes[0];
-            } else {
-              context.component = 'useActivities';
-            }
-          } else if (operationName === 'getOpportunity') {
-            context.component = 'useOpportunityDetail';
-            context.opportunityId = variables?.id;
-          }
-
-          return context;
-        };
-
-        if (activitiesOperations.includes(operation.operationName || '')) {
-          const startContext = getComponentContext(operation.operationName || '', operation.variables);
-          clientLogger.info('GraphQL operation started', startContext);
-        }
+        clientLogger.info('GraphQL operation started', {
+          operation: operation.operationName
+        });
 
         forward(operation).subscribe({
           next: (result) => {
-            if (activitiesOperations.includes(operation.operationName || '')) {
-              const metadata = getComponentContext(operation.operationName || '', operation.variables);
-
-              if (operation.operationName === 'getOpportunities' && result.data?.opportunities) {
-                metadata.totalCount = result.data.opportunities.totalCount;
-                metadata.resultCount = result.data.opportunities.edges?.length || 0;
-                
-                if (operation.variables?.filter?.stateCodes?.length > 0) {
-                  metadata.stateCode = operation.variables.filter.stateCodes[0];
-                }
-              } else if (operation.operationName === 'getOpportunity' && result.data?.opportunity) {
-                metadata.hasData = !!result.data.opportunity;
-                metadata.opportunityId = operation.variables?.id;
-              }
-
-              clientLogger.info('GraphQL operation completed', metadata);
-            }
+            clientLogger.info('GraphQL operation completed', {
+              operation: operation.operationName
+            });
             observer.next(result);
           },
           error: (error) => {
-            if (activitiesOperations.includes(operation.operationName || '')) {
-              const errorContext = getComponentContext(operation.operationName || '', operation.variables);
-              errorContext.error = error.message || String(error);
-              
-              clientLogger.error('GraphQL operation failed', errorContext);
-            }
+            clientLogger.error('GraphQL operation failed', {
+              operation: operation.operationName,
+              error: error.message || String(error)
+            });
             observer.error(error);
           },
           complete: () => observer.complete()
