@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { AlertCircle, Home, RefreshCcw } from "lucide-react";
+import { Home, RefreshCcw } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -28,33 +28,31 @@ const ErrorState: React.FC<ErrorStateProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <div className="text-center space-y-6">
-        <div className="bg-muted rounded-full p-4 mx-auto w-fit">
-          <AlertCircle className="h-10 w-10 text-muted-foreground" />
-        </div>
-
-        <h1 className="text-display-sm font-bold">{title}</h1>
-        <p className="text-left text-body-sm text-muted-foreground px-[40px]">
+    <div className="flex items-center justify-center p-12">
+      <div className="w-full max-w-mobile-l space-y-6 text-center">
+        <h1 className="text-left text-display-md font-bold">{title}</h1>
+        <p className="text-left text-body-sm text-muted-foreground">
           以下のボタンから再読み込みをお試しください。
-          <br />
-          <br />
           再試行しても改善しない場合は、時間をおいて再度アクセスするか、
           トップページにお戻りください。
         </p>
 
-        <div className="w-full px-[40px]">
+        <div className="mt-6">
           {refetchRef?.current && (
-            <Button className="w-full flex justify-center" onClick={handleRetry} variant="primary">
-              <RefreshCcw className="mr-2 h-4 w-4" />
+            <Button
+              className="w-full flex justify-center mb-1"
+              onClick={handleRetry}
+              variant="primary"
+            >
+              <RefreshCcw className="h-4 w-4" />
               再度読み込み
             </Button>
           )}
-          <div className="h-3" />
+
           <Link href="/" passHref>
-            <Button className="w-full flex justify-center" size={"sm"} variant="text">
-              <Home className="mr-2 h-4 w-4" />
-              トップページに戻る
+            <Button className="w-full flex justify-center" size="sm" variant="text">
+              <Home className="h-4 w-4" />
+              トップに戻る
             </Button>
           </Link>
         </div>
