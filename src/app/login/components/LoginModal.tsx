@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import { getCommunityLogo } from "@/lib/community/assetService";
 
 type LoginModalProps = {
   isOpen: boolean;
@@ -59,7 +60,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
       >
         <div className="flex flex-col items-center pt-8">
           <div className="mb-8">
-            <Image src="/images/neo88-logo.jpg" alt="NEO88" width={120} height={40} priority />
+            <Image src={getCommunityLogo()} alt="NEO88" width={120} height={40} priority />
           </div>
           <p className="text-center font-bold mb-6">
             予約を続けるには

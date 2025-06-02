@@ -14,6 +14,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import clientLogger from "@/lib/logging/client";
+import { getCommunityLogo } from "@/lib/community/assetService";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -93,7 +94,7 @@ export default function LoginPage() {
     <div className="w-full max-w-mobile-l bg-background rounded-2xl p-6 mx-4">
       <div className="flex flex-col items-center pt-8">
         <div className="mb-12">
-          <Image src="/images/neo88-logo.jpg" alt="NEO88" width={120} height={40} priority />
+          <Image src={getCommunityLogo()} alt="NEO88" width={120} height={40} priority />
         </div>
 
         <div className="space-y-3 mb-10">

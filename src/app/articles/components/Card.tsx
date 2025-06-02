@@ -7,7 +7,7 @@ import { TArticleCard, TArticleWithAuthor } from "@/app/articles/data/type";
 import { Card } from "@/components/ui/card";
 import CategoryBadge from "@/app/articles/components/CategoryBadge";
 import { Calendar } from "lucide-react";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 
@@ -29,15 +29,15 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory, showUs
               </div>
             )}
             <Image
-              src={article.thumbnail || PLACEHOLDER_IMAGE}
+              src={article.thumbnail || getCommunityPlaceholder()}
               alt={article.title}
               fill
               placeholder={`blur`}
-              blurDataURL={PLACEHOLDER_IMAGE}
+              blurDataURL={getCommunityPlaceholder()}
               className="object-cover rounded-t-lg"
               onError={(e) => {
                 const img = e.target as HTMLImageElement;
-                img.src = PLACEHOLDER_IMAGE;
+                img.src = getCommunityPlaceholder();
               }}
             />
           </div>
@@ -51,7 +51,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory, showUs
               <div className="flex items-center gap-x-1">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                   <Image
-                    src={article.author?.image || PLACEHOLDER_IMAGE}
+                    src={article.author?.image || getCommunityPlaceholder()}
                     alt={article.author?.name || "作者"}
                     fill
                     className="object-cover"

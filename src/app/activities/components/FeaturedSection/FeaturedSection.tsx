@@ -6,7 +6,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 interface FeaturedSectionProps {
   opportunities: ActivityCard[];
@@ -65,7 +65,7 @@ export default function ActivitiesFeaturedSection({
     if (opportunity.images && opportunity.images.length > 1) {
       return opportunity.images[1];
     }
-    return PLACEHOLDER_IMAGE;
+    return getCommunityPlaceholder();
   });
 
   return (
@@ -168,7 +168,7 @@ function OpportunityImageSlider({
     }
   }, [emblaApi, isVisible]);
 
-  const slideImages = images.length > 0 ? images : [PLACEHOLDER_IMAGE];
+  const slideImages = images.length > 0 ? images : [getCommunityPlaceholder()];
 
   return (
     <div className="absolute inset-0 z-0">
@@ -177,18 +177,18 @@ function OpportunityImageSlider({
           {slideImages.map((img, index) => (
             <div key={index} className="embla__slide relative h-full w-full flex-[0_0_100%]">
               <Image
-                src={img ?? PLACEHOLDER_IMAGE}
+                src={img ?? getCommunityPlaceholder()}
                 alt={`${title} - ${index + 1}`}
                 fill
                 sizes="(max-width: 480px) 100vw, 480px"
                 loading={index === 0 ? "eager" : "lazy"}
                 priority={index === 0}
                 placeholder={`blur`}
-                blurDataURL={PLACEHOLDER_IMAGE}
+                blurDataURL={getCommunityPlaceholder()}
                 className="object-cover"
                 onError={(e) => {
                   const img = e.target as HTMLImageElement;
-                  img.src = PLACEHOLDER_IMAGE;
+                  img.src = getCommunityPlaceholder();
                 }}
               />
             </div>

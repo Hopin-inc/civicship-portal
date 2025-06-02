@@ -7,7 +7,7 @@ import {
   Maybe,
 } from "@/types/graphql";
 import { ActivityCard, OpportunityPlace } from "@/app/activities/data/type";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 import { IPlaceCard, IPlaceDetail, IPlaceHost, IPlacePin } from "@/app/places/data/type";
 import { presenterArticleWithAuthor } from "@/app/articles/data/presenter";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
@@ -27,7 +27,7 @@ export const presenterPlacePins = (edges: GqlPlaceEdge[]): IPlacePin[] => {
       const opportunity = getPrimaryOpportunity(node);
       return {
         id: node.id,
-        image: opportunity?.images?.[0] ?? PLACEHOLDER_IMAGE,
+        image: opportunity?.images?.[0] ?? getCommunityPlaceholder(),
         host: extractFirstHostFromPlace(opportunity?.createdByUser),
         latitude: Number(node.latitude),
         longitude: Number(node.longitude),
@@ -42,7 +42,7 @@ export const presenterPlacePin = (node: GqlPlace): IPlacePin => {
 
   return {
     id: node.id,
-    image: opportunity?.images?.[0] ?? PLACEHOLDER_IMAGE,
+    image: opportunity?.images?.[0] ?? getCommunityPlaceholder(),
     host: extractFirstHostFromPlace(opportunity?.createdByUser),
     latitude: Number(node.latitude),
     longitude: Number(node.longitude),
@@ -152,7 +152,7 @@ const extractFirstHostFromPlace = (host?: Maybe<GqlUser>): IPlaceHost => {
   return {
     id: host?.id ?? "",
     name: host?.name ?? "",
-    image: host?.image ?? PLACEHOLDER_IMAGE,
+    image: host?.image ?? getCommunityPlaceholder(),
     bio: host?.bio ?? "",
   };
 };

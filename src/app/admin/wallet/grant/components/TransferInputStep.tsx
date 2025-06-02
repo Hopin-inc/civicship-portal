@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GqlUser } from "@/types/graphql";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { HeaderConfig } from "@/contexts/HeaderContext";
 import { toast } from "sonner";
@@ -99,7 +99,7 @@ function TransferInputStep({
         <div className="flex flex-col items-center space-y-6 max-w-xl w-full">
           <div className="flex items-center gap-3 w-full">
             <Image
-              src={user.image ?? PLACEHOLDER_IMAGE}
+              src={user.image ?? getCommunityPlaceholder()}
               alt={user.name ?? "要確認"}
               width={40}
               height={40}

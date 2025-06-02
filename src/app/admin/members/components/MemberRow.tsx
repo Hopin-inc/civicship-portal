@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { GqlRole, GqlUser } from "@/types/graphql";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 export const roleLabels: Record<GqlRole, string> = {
   OWNER: "管理者",
@@ -26,7 +26,7 @@ export const MemberRow = ({ user, role, currentUserRole, onRoleChange }: Props) 
   <div className="flex justify-between items-center rounded px-4 py-2">
     <div className="flex items-center gap-3">
       <Image
-        src={user.image ?? PLACEHOLDER_IMAGE}
+        src={user.image ?? getCommunityPlaceholder()}
         alt={user.name ?? "要確認"}
         width={40}
         height={40}

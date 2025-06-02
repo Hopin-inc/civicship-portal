@@ -5,7 +5,7 @@ import UserProfileHeader from "./UserProfileHeader";
 import UserTicketsAndPoints from "./UserTicketsAndPoints";
 import { GeneralUserProfile } from "@/app/users/data/type";
 import { UserAsset } from "@/app/wallets/data/type";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 interface UserProfileSectionProps {
   userId: string;
@@ -25,7 +25,7 @@ const UserProfileSection: React.FC<UserProfileSectionProps> = ({
       <UserProfileHeader
         id={userId}
         name={profile.name}
-        image={profile.imagePreviewUrl || PLACEHOLDER_IMAGE}
+        image={profile.imagePreviewUrl || getCommunityPlaceholder()}
         bio={profile.bio ?? ""}
         currentPrefecture={profile.currentPrefecture}
         isOwner={isOwner}

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Ticket as TicketIcon } from 'lucide-react';
 import { Ticket } from '@/app/tickets/data/type';
 import React from "react";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 interface TicketListProps {
   tickets: Ticket[];
@@ -29,15 +29,15 @@ export default function TicketList({ tickets }: TicketListProps) {
             <div className="flex items-center gap-3">
               <div className="relative w-12 h-12 rounded-full overflow-hidden">
                 <Image
-                  src={ticket.hostImage ?? PLACEHOLDER_IMAGE}
+                  src={ticket.hostImage ?? getCommunityPlaceholder()}
                   alt={ticket.hostName}
                   fill
                   placeholder={`blur`}
-                  blurDataURL={PLACEHOLDER_IMAGE}
+                  blurDataURL={getCommunityPlaceholder()}
                   className="object-cover"
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
-                    img.src = PLACEHOLDER_IMAGE;
+                    img.src = getCommunityPlaceholder();
                   }}
                 />
               </div>

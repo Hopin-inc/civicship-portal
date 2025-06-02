@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import IconWrapper from "@/components/shared/IconWrapper";
 import AddressMap from "@/components/shared/AddressMap";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 import { ActivityBodySection } from "@/app/activities/[id]/components/ActivityBodySection";
 
 interface ActivityDetailsContentProps {
@@ -69,7 +69,7 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
               className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0"
             >
               <Image
-                src={host.image || PLACEHOLDER_IMAGE}
+                src={host.image || getCommunityPlaceholder()}
                 alt={host.name || "案内者"}
                 fill
                 className="object-cover"
@@ -78,7 +78,7 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
           ) : (
             <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
               <Image
-                src={host.image || PLACEHOLDER_IMAGE}
+                src={host.image || getCommunityPlaceholder()}
                 alt={host.name || "案内者"}
                 fill
                 className="object-cover"

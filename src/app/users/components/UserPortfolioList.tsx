@@ -10,7 +10,7 @@ import OpportunityCardVertical from "@/app/activities/components/Card/CardVertic
 import { ActivityCard } from "@/app/activities/data/type";
 import { AppPortfolio } from "@/app/users/data/type";
 import { GqlOpportunityCategory, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 type Props = {
   userId: string;
@@ -115,16 +115,16 @@ const PortfolioCard = ({
       >
         <div className="relative w-full aspect-[164/205]">
           <Image
-            src={portfolio.image ?? PLACEHOLDER_IMAGE}
+            src={portfolio.image ?? getCommunityPlaceholder()}
             alt={portfolio.title}
             fill
             className="object-cover"
             placeholder={"blur"}
-            blurDataURL={PLACEHOLDER_IMAGE}
+            blurDataURL={getCommunityPlaceholder()}
             sizes="(min-width: 640px) 50vw, 100vw"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
-              img.src = PLACEHOLDER_IMAGE;
+              img.src = getCommunityPlaceholder();
             }}
           />
           {portfolio.source === "OPPORTUNITY" &&
@@ -408,7 +408,7 @@ const dummyActivityCards: ActivityCard[] = dummyPortfolios.map((portfolio) => ({
   category:
     portfolio.category === "EVENT" ? GqlOpportunityCategory.Event : GqlOpportunityCategory.Quest,
   title: portfolio.title,
-  images: [portfolio.image || PLACEHOLDER_IMAGE],
+  images: [portfolio.image || getCommunityPlaceholder()],
   location: portfolio.location || "",
   hasReservableTicket: true,
   feeRequired: 200,

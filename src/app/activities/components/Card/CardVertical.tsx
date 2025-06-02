@@ -5,7 +5,7 @@ import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { ActivityCard } from "@/app/activities/data/type";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 interface OpportunityCardVerticalProps {
   opportunity: ActivityCard;
@@ -31,18 +31,18 @@ export default function OpportunityCardVertical({
           </div>
         )}
         <Image
-          src={images?.[0] || PLACEHOLDER_IMAGE}
+          src={images?.[0] || getCommunityPlaceholder()}
           alt={title}
           width={400}
           height={400}
           sizes="164px"
           placeholder={`blur`}
-          blurDataURL={PLACEHOLDER_IMAGE}
+          blurDataURL={getCommunityPlaceholder()}
           loading="lazy"
           className="h-full w-full object-cover"
           onError={(e) => {
             const img = e.target as HTMLImageElement;
-            img.src = PLACEHOLDER_IMAGE;
+            img.src = getCommunityPlaceholder();
           }}
         />
       </Card>

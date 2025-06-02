@@ -8,7 +8,7 @@ import { prefectureLabels } from "@/app/users/data/presenter";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { Facebook, Home, Instagram, Twitter } from "lucide-react";
 import { useReadMore } from "@/hooks/useReadMore";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 interface UserProfileHeaderProps {
   id: string;
@@ -43,16 +43,16 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
         <div className="flex items-center w-full mb-4">
           <div className="relative w-24 h-24 rounded-full overflow-hidden">
             <Image
-              src={image || PLACEHOLDER_IMAGE}
+              src={image || getCommunityPlaceholder()}
               alt={name}
               fill
               placeholder={"blur"}
-              blurDataURL={PLACEHOLDER_IMAGE}
+              blurDataURL={getCommunityPlaceholder()}
               className="object-cover"
               priority
               onError={(e) => {
                 const img = e.target as HTMLImageElement;
-                img.src = PLACEHOLDER_IMAGE;
+                img.src = getCommunityPlaceholder();
               }}
             />
           </div>

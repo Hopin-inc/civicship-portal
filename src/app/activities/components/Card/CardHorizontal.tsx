@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
 import React from "react";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 type Props = {
   opportunity: ActivityCard;
@@ -26,15 +26,15 @@ function OpportunityCardHorizontal({ opportunity, withShadow = true }: Props) {
         >
           <div className="relative h-[108px] w-[88px] flex-shrink-0">
             <Image
-              src={opportunity.images?.[0] ?? PLACEHOLDER_IMAGE}
+              src={opportunity.images?.[0] ?? getCommunityPlaceholder()}
               alt={opportunity.title}
               fill
               placeholder="blur"
-              blurDataURL={PLACEHOLDER_IMAGE}
+              blurDataURL={getCommunityPlaceholder()}
               className="object-cover rounded-lg"
               onError={(e) => {
                 const img = e.target as HTMLImageElement;
-                img.src = PLACEHOLDER_IMAGE;
+                img.src = getCommunityPlaceholder();
               }}
             />
           </div>

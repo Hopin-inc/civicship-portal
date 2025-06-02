@@ -12,6 +12,7 @@ import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { cn } from "@/lib/utils";
 import SearchBox from "@/app/search/components/SearchBox";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import { getCommunityLogoSquare } from "@/lib/community/assetService";
 
 interface HeaderProps {
   className?: string;
@@ -59,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       {config.showLogo && (
         <Link href="/" className="flex items-center space-x-2">
           <Image
-            src="/images/neo88-logo-square.jpg"
+            src={getCommunityLogoSquare()}
             alt="NEO88"
             width={88}
             height={72}

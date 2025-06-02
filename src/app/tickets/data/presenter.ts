@@ -1,7 +1,7 @@
 "use client";
 
 import { Ticket } from "@/app/tickets/data/type";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 /**
  * Transform wallet data from GraphQL to tickets array
@@ -15,7 +15,7 @@ export const transformTickets = (data: any): Ticket[] => {
       hostName: edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser?.name || "不明",
       hostImage:
         edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser?.image ||
-        PLACEHOLDER_IMAGE,
+        getCommunityPlaceholder(),
       quantity: 1,
       createdByUser: edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser,
     })) || []

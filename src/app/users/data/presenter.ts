@@ -11,7 +11,7 @@ import {
 import { presenterUserAsset } from "@/app/wallets/data/presenter";
 import { Participant } from "@/types/utils";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 export const presenterAppUser = (gqlUser: GqlUser): AppUser => {
   return {
@@ -43,7 +43,7 @@ export const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
   return {
     name: gqlUser.name,
     image: null, // File object is not available from server data
-    imagePreviewUrl: gqlUser.image ?? PLACEHOLDER_IMAGE,
+    imagePreviewUrl: gqlUser.image ?? getCommunityPlaceholder(),
     bio: gqlUser.bio ?? null,
     currentPrefecture: gqlUser.currentPrefecture ?? undefined,
     urlFacebook: gqlUser.urlFacebook ?? null,
@@ -61,7 +61,7 @@ export const presenterPortfolio = (gqlPortfolio: GqlPortfolio): AppPortfolio => 
     category: gqlPortfolio.category,
     reservationStatus: gqlPortfolio.reservationStatus ?? null,
     title: gqlPortfolio.title,
-    image: gqlPortfolio.thumbnailUrl ?? PLACEHOLDER_IMAGE,
+    image: gqlPortfolio.thumbnailUrl ?? getCommunityPlaceholder(),
     date: dateObj.toLocaleDateString("ja-JP", {
       year: "numeric",
       month: "long",
@@ -75,7 +75,7 @@ export const presenterPortfolio = (gqlPortfolio: GqlPortfolio): AppPortfolio => 
 export const presentParticipant = (gqlParticipant: GqlUser): Participant => {
   return {
     id: gqlParticipant.id,
-    image: gqlParticipant.image ?? PLACEHOLDER_IMAGE,
+    image: gqlParticipant.image ?? getCommunityPlaceholder(),
     name: gqlParticipant.name,
   };
 };

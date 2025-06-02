@@ -4,7 +4,7 @@ import React from "react";
 import { ChevronRight, MapPin, Ticket } from "lucide-react";
 import { ActivityDetail } from "@/app/activities/data/type";
 import ImagesCarousel from "@/components/ui/images-carousel";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 interface ActivityDetailsHeaderProps {
   opportunity: ActivityDetail;
@@ -15,7 +15,7 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
   opportunity,
   availableTickets,
 }) => {
-  const images = opportunity.images?.length ? opportunity.images : [PLACEHOLDER_IMAGE];
+  const images = opportunity.images?.length ? opportunity.images : [getCommunityPlaceholder()];
 
   return (
     <div className="relative w-full bg-background pb-6 max-w-mobile-l mx-auto">

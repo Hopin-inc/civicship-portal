@@ -4,7 +4,7 @@ import Image from "next/image";
 import React from "react";
 import { formatCurrency } from "@/app/wallets/data/presenter";
 import { AppTransaction } from "@/app/wallets/data/type";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 import { Card } from "@/components/ui/card";
 
 interface TransactionItemProps {
@@ -33,7 +33,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image })
       {/* 左: アイコンと説明 */}
       <div className="flex items-center gap-3 flex-grow min-w-0">
         <Image
-          src={image ?? PLACEHOLDER_IMAGE}
+          src={image ?? getCommunityPlaceholder()}
           alt="user"
           width={40}
           height={40}

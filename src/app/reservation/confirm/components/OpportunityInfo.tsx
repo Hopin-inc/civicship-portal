@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { ActivityDetail } from "@/app/activities/data/type";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 interface OpportunityInfoProps {
   opportunity: ActivityDetail | null;
@@ -15,11 +15,11 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity }) => {
       <div className="flex justify-between items-center gap-4">
         <div className="relative w-[108px] h-[108px] rounded-lg overflow-hidden flex-shrink-0">
           <Image
-            src={opportunity?.images?.[0] || PLACEHOLDER_IMAGE}
+            src={opportunity?.images?.[0] || getCommunityPlaceholder()}
             alt={opportunity?.title ?? ""}
             fill
             placeholder={"blur"}
-            blurDataURL={PLACEHOLDER_IMAGE}
+            blurDataURL={getCommunityPlaceholder()}
             className="object-cover"
           />
         </div>
@@ -30,15 +30,15 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity }) => {
           {/*<div className="flex items-center gap-3">*/}
           {/*  <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">*/}
           {/*    <Image*/}
-          {/*      src={opportunity?.host?.image ?? PLACEHOLDER_IMAGE ?? null}*/}
+          {/*      src={opportunity?.host?.image ?? getCommunityPlaceholder() ?? null}*/}
           {/*      alt={opportunity?.host?.name ?? "案内人"}*/}
           {/*      fill*/}
           {/*      placeholder={"blur"}*/}
-          {/*      blurDataURL={PLACEHOLDER_IMAGE}*/}
+          {/*      blurDataURL={getCommunityPlaceholder()}*/}
           {/*      className="object-cover"*/}
           {/*      onError={(e) => {*/}
           {/*        const img = e.target as HTMLImageElement;*/}
-          {/*        img.src = PLACEHOLDER_IMAGE;*/}
+          {/*        img.src = getCommunityPlaceholder();*/}
           {/*      }}*/}
           {/*    />*/}
           {/*  </div>*/}

@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { drawCircleWithImage } from "@/utils/maps/markerUtils";
 import { Marker } from "@react-google-maps/api";
 import { IPlacePin } from "@/app/places/data/type";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 import clientLogger from "@/lib/logging/client";
 
 interface CustomMarkerProps {
@@ -86,7 +86,7 @@ const createPlaceholderIcon = async (size: number): Promise<google.maps.Icon> =>
     const centerY = size / 2;
     const radius = size / 2 - 2;
 
-    const placeholderImage = await loadImage(PLACEHOLDER_IMAGE);
+    const placeholderImage = await loadImage(getCommunityPlaceholder());
     await drawCircleWithImage(context, placeholderImage, centerX, centerY, radius, true);
 
     return createIconObject(canvas, size, 0, 10);
@@ -97,7 +97,7 @@ const createPlaceholderIcon = async (size: number): Promise<google.maps.Icon> =>
     });
     // Fallback to direct URL approach when Canvas fails
     return {
-      url: PLACEHOLDER_IMAGE,
+      url: getCommunityPlaceholder(),
       scaledSize: new google.maps.Size(size, size),
       anchor: new google.maps.Point(size / 2, size / 2 + 10),
     };
@@ -110,7 +110,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
   const cacheKey = `${data.id}-normal`;
 
   // ✅ 安定した依存値にする（nullを避ける）
-  const hostImage = useMemo(() => data.host.image ?? PLACEHOLDER_IMAGE, [data.host.image]);
+  const hostImage = useMemo(() => data.host.image ?? getCommunityPlaceholder(), [data.host.image]);
 
   const position: google.maps.LatLngLiteral = useMemo(() => {
     return HARDCODED_COORDINATES[data.id] ?? { lat: data.latitude, lng: data.longitude };
@@ -164,7 +164,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
 
         // Fallback to direct URL approach when Canvas fails
         const fallbackIcon = {
-          url: data.image || PLACEHOLDER_IMAGE,
+          url: data.image || getCommunityPlaceholder(),
           scaledSize: new google.maps.Size(displaySize, displaySize),
           anchor: new google.maps.Point(displaySize / 2, displaySize / 2),
         };

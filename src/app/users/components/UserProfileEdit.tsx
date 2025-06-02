@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 
 interface UserProfileEditProps {
   profileImage: string | null;
@@ -59,16 +59,16 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
           <div className="w-24 h-24 rounded-full overflow-hidden bg-muted">
             {profileImage ? (
               <Image
-                src={profileImage ?? PLACEHOLDER_IMAGE}
+                src={profileImage ?? getCommunityPlaceholder()}
                 alt="Profile"
                 width={96}
                 height={96}
                 placeholder={"blur"}
-                blurDataURL={PLACEHOLDER_IMAGE}
+                blurDataURL={getCommunityPlaceholder()}
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   const img = e.target as HTMLImageElement;
-                  img.src = PLACEHOLDER_IMAGE;
+                  img.src = getCommunityPlaceholder();
                 }}
               />
             ) : (

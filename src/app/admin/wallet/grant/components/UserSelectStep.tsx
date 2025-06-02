@@ -3,7 +3,7 @@
 import Image from "next/image";
 import React, { useEffect, useMemo, useRef } from "react";
 import { GqlUser } from "@/types/graphql";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityPlaceholder } from "@/lib/community/assetService";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import SearchForm from "@/app/search/components/SearchForm";
@@ -69,7 +69,7 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title }: P
           >
             <CardHeader className="flex flex-row items-center gap-3 p-4">
               <Image
-                src={user.image ?? PLACEHOLDER_IMAGE}
+                src={user.image ?? getCommunityPlaceholder()}
                 alt={user.name ?? "要確認"}
                 width={40}
                 height={40}
