@@ -3432,8 +3432,6 @@ export type GqlGetOpportunitiesQueryVariables = Exact<{
   filter?: InputMaybe<GqlOpportunityFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  slotFilter?: InputMaybe<GqlOpportunitySlotFilterInput>;
-  slotSort?: InputMaybe<GqlOpportunitySlotSortInput>;
 }>;
 
 export type GqlGetOpportunitiesQuery = {
@@ -3465,40 +3463,7 @@ export type GqlGetOpportunitiesQuery = {
         feeRequired?: number | null;
         pointsToEarn?: number | null;
         earliestReservableAt?: Date | null;
-        community?: {
-          __typename?: "Community";
-          id: string;
-          name?: string | null;
-          image?: string | null;
-        } | null;
-        slots?: Array<{
-          __typename?: "OpportunitySlot";
-          id: string;
-          hostingStatus: GqlOpportunitySlotHostingStatus;
-          startsAt: Date;
-          endsAt: Date;
-          capacity?: number | null;
-          remainingCapacity?: number | null;
-        }> | null;
-        place?: {
-          __typename?: "Place";
-          id: string;
-          name: string;
-          address: string;
-          latitude: any;
-          longitude: any;
-          city?: {
-            __typename?: "City";
-            code: string;
-            name: string;
-            state?: {
-              __typename?: "State";
-              code: string;
-              countryCode: string;
-              name: string;
-            } | null;
-          } | null;
-        } | null;
+        place?: { __typename?: "Place"; id: string; name: string } | null;
       } | null;
     }>;
   };
@@ -4351,6 +4316,29 @@ export type GqlGetPlacesQuery = {
           __typename?: "Opportunity";
           id: string;
           images?: Array<string> | null;
+          articles?: Array<{
+            __typename?: "Article";
+            id: string;
+            title: string;
+            body?: string | null;
+            introduction: string;
+            thumbnail?: any | null;
+            category: GqlArticleCategory;
+            publishStatus: GqlPublishStatus;
+            publishedAt?: Date | null;
+            relatedUsers?: Array<{
+              __typename?: "User";
+              id: string;
+              name: string;
+              image?: string | null;
+              bio?: string | null;
+              currentPrefecture?: GqlCurrentPrefecture | null;
+              phoneNumber?: string | null;
+              urlFacebook?: string | null;
+              urlInstagram?: string | null;
+              urlX?: string | null;
+            }> | null;
+          }> | null;
           createdByUser?: {
             __typename?: "User";
             image?: string | null;
@@ -6780,13 +6768,7 @@ export type GetEvaluationQueryResult = Apollo.QueryResult<
   GqlGetEvaluationQueryVariables
 >;
 export const GetOpportunitiesDocument = gql`
-  query GetOpportunities(
-    $filter: OpportunityFilterInput
-    $first: Int
-    $cursor: String
-    $slotFilter: OpportunitySlotFilterInput
-    $slotSort: OpportunitySlotSortInput
-  ) {
+  query GetOpportunities($filter: OpportunityFilterInput, $first: Int, $cursor: String) {
     opportunities(
       filter: $filter
       sort: { earliestSlotStartsAt: asc }
@@ -6804,23 +6786,15 @@ export const GetOpportunitiesDocument = gql`
         cursor
         node {
           ...OpportunityFields
-          community {
-            ...CommunityFields
-          }
-          slots(filter: $slotFilter, sort: $slotSort) {
-            ...OpportunitySlotFields
-          }
           place {
-            ...PlaceFields
+            id
+            name
           }
         }
       }
     }
   }
   ${OpportunityFieldsFragmentDoc}
-  ${CommunityFieldsFragmentDoc}
-  ${OpportunitySlotFieldsFragmentDoc}
-  ${PlaceFieldsFragmentDoc}
 `;
 
 /**
@@ -6838,8 +6812,6 @@ export const GetOpportunitiesDocument = gql`
  *      filter: // value for 'filter'
  *      first: // value for 'first'
  *      cursor: // value for 'cursor'
- *      slotFilter: // value for 'slotFilter'
- *      slotSort: // value for 'slotSort'
  *   },
  * });
  */
@@ -8047,6 +8019,12 @@ export const GetPlacesDocument = gql`
           opportunities {
             id
             images
+            articles @include(if: $IsCard) {
+              ...ArticleFields
+              relatedUsers {
+                ...UserFields
+              }
+            }
             createdByUser {
               image
               articlesAboutMe @include(if: $IsCard) {
@@ -8061,6 +8039,8 @@ export const GetPlacesDocument = gql`
     }
   }
   ${PlaceFieldsFragmentDoc}
+  ${ArticleFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
 `;
 
 /**
