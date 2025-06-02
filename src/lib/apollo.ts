@@ -12,7 +12,6 @@ import { __DEV__ } from "@apollo/client/utilities/globals";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { TokenManager } from "./auth/token-manager";
 import clientLogger from "./logging/client";
-import { createAuthLogContext, generateSessionId } from "./logging/client/utils";
 
 if (__DEV__) {
   loadDevMessages();
@@ -28,9 +27,7 @@ const httpLink = createUploadLink({
 });
 
 const requestLink = new ApolloLink((operation, forward) => {
-  // SSR 環境では document は存在しない
   if (typeof document === "undefined") {
-    // SSRではトークン系は不要（または別途 next/headers などで付与）
     operation.setContext(({ headers = {} }) => ({
       headers: {
         ...headers,
@@ -40,7 +37,7 @@ const requestLink = new ApolloLink((operation, forward) => {
     return forward(operation);
   }
 
-  return new Observable(observer => {
+  return new Observable((observer) => {
     (async () => {
       try {
         const { lineAuth } = await import("./auth/firebase-config");
@@ -51,15 +48,11 @@ const requestLink = new ApolloLink((operation, forward) => {
           try {
             firebaseToken = await lineAuth.currentUser.getIdToken();
           } catch (error) {
-            clientLogger.info('Failed to get Firebase token', createAuthLogContext(
-              generateSessionId(),
-              "general",
-              {
-                error: error instanceof Error ? error.message : String(error),
-                component: 'ApolloRequestLink',
-                operation: operation.operationName
-              }
-            ));
+            clientLogger.error("GraphQL: token fetch failed", {
+              component: "ApolloRequestLink",
+              operation: operation.operationName,
+              message: error instanceof Error ? error.message : String(error),
+            });
           }
         }
 
@@ -73,51 +66,57 @@ const requestLink = new ApolloLink((operation, forward) => {
             "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
           };
 
-          const tokenRequiredOperations = ['userSignUp', 'linkPhoneAuth', 'storePhoneAuthToken'];
-
-          if (tokenRequiredOperations.includes(operation.operationName || '')) {
-            const requestHeaders = {
-              ...baseHeaders,
-              "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
-              "X-Phone-Auth-Token": phoneTokens.accessToken || "",
-              "X-Phone-Token-Expires-At": phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
-              "X-Phone-Uid": phoneTokens.phoneUid || "",
-              "X-Phone-Number": phoneTokens.phoneNumber || "",
+          const tokenRequiredOperations = ["userSignUp", "linkPhoneAuth", "storePhoneAuthToken"];
+          if (tokenRequiredOperations.includes(operation.operationName || "")) {
+            return {
+              headers: {
+                ...baseHeaders,
+                "X-Token-Expires-At": lineTokens.expiresAt?.toString() || "",
+                "X-Phone-Auth-Token": phoneTokens.accessToken || "",
+                "X-Phone-Token-Expires-At": phoneTokens.expiresAt?.toString() || "",
+                "X-Phone-Uid": phoneTokens.phoneUid || "",
+                "X-Phone-Number": phoneTokens.phoneNumber || "",
+              },
             };
-
-            return { headers: requestHeaders };
           }
           return { headers: baseHeaders };
         });
 
-        clientLogger.info('GraphQL operation started', {
-          operation: operation.operationName
+        clientLogger.info("GraphQL: started", {
+          component: "ApolloRequestLink",
+          operation: operation.operationName,
+          phase: "start",
         });
 
         forward(operation).subscribe({
           next: (result) => {
-            clientLogger.info('GraphQL operation completed', {
-              operation: operation.operationName
+            clientLogger.info("GraphQL: completed", {
+              component: "ApolloRequestLink",
+              operation: operation.operationName,
+              phase: "complete",
             });
             observer.next(result);
           },
           error: (error) => {
-            clientLogger.error('GraphQL operation failed', {
+            clientLogger.error("GraphQL: failed", {
+              component: "ApolloRequestLink",
               operation: operation.operationName,
-              error: error.message || String(error)
+              phase: "fail",
+              message: error.message || String(error),
             });
             observer.error(error);
           },
-          complete: () => observer.complete()
+          complete: () => observer.complete(),
         });
       } catch (error) {
-        clientLogger.error('Error in requestLink', {
-          error: error instanceof Error ? error.message : String(error),
-          component: 'ApolloRequestLink',
-          operation: operation.operationName
+        clientLogger.error("GraphQL: requestLink unexpected error", {
+          component: "ApolloRequestLink",
+          operation: operation.operationName,
+          phase: "fail",
+          message: error instanceof Error ? error.message : String(error),
         });
-        const lineTokens = TokenManager.getLineTokens();
 
+        const lineTokens = TokenManager.getLineTokens();
         operation.setContext(({ headers = {} }) => ({
           headers: {
             ...headers,
@@ -132,20 +131,14 @@ const requestLink = new ApolloLink((operation, forward) => {
   });
 });
 
-const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
+const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
   if (graphQLErrors) {
     for (const error of graphQLErrors) {
-      clientLogger.info('GraphQL error', createAuthLogContext(
-        generateSessionId(),
-        "general",
-        {
-          message: error.message,
-          locations: error.locations,
-          path: error.path,
-          component: 'ApolloErrorLink',
-          operation: operation.operationName
-        }
-      ));
+      clientLogger.error("GraphQL: errorLink GraphQL error", {
+        component: "ApolloErrorLink",
+        operation: operation.operationName,
+        message: error.message,
+      });
 
       if (
         error.message.includes("Authentication required") ||
@@ -165,24 +158,12 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
   }
 
   if (networkError) {
-    if ("statusCode" in networkError && networkError.statusCode === 401) {
-      clientLogger.info('Network authentication error', createAuthLogContext(
-        generateSessionId(),
-        "general",
-        {
-          error: networkError.message || String(networkError),
-          statusCode: networkError.statusCode,
-          component: 'ApolloErrorLink',
-          operation: operation.operationName
-        }
-      ));
-    } else {
-      clientLogger.error('Network error', {
-        error: networkError.message || String(networkError),
-        component: 'ApolloErrorLink',
-        operation: operation.operationName
-      });
-    }
+    clientLogger.error("GraphQL: errorLink Network error", {
+      component: "ApolloErrorLink",
+      operation: operation.operationName,
+      message: networkError.message || String(networkError),
+      statusCode: "statusCode" in networkError ? networkError.statusCode : undefined,
+    });
 
     if ("statusCode" in networkError && networkError.statusCode === 401) {
       if (typeof window !== "undefined") {
