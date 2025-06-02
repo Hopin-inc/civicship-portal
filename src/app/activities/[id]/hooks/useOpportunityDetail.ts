@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { COMMUNITY_ID } from "@/utils";
 import {
   GqlOpportunitySlotHostingStatus,
@@ -22,15 +22,25 @@ export const useOpportunityDetail = (id: string) => {
     skip: !id,
     fetchPolicy: "network-only",
     errorPolicy: "all",
-    onCompleted: (data) => {
+  });
+
+  const opportunity: ActivityDetail | null = useMemo(() => {
+    return data?.opportunity ? presenterActivityDetail(data.opportunity) : null;
+  }, [data?.opportunity]);
+
+  useEffect(() => {
+    if (data && !loading) {
       clientLogger.info("Opportunity detail query completed", {
         component: "useOpportunityDetail",
         operation: "getOpportunity",
         opportunityId: id,
         hasData: !!data?.opportunity
       });
-    },
-    onError: (error) => {
+    }
+  }, [data, loading, id]);
+
+  useEffect(() => {
+    if (error) {
       clientLogger.error("Opportunity detail query failed", {
         component: "useOpportunityDetail",
         operation: "getOpportunity",
@@ -38,11 +48,7 @@ export const useOpportunityDetail = (id: string) => {
         error: error.message
       });
     }
-  });
-
-  const opportunity: ActivityDetail | null = useMemo(() => {
-    return data?.opportunity ? presenterActivityDetail(data.opportunity) : null;
-  }, [data?.opportunity]);
+  }, [error, id]);
 
   return {
     data,

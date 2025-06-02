@@ -1,7 +1,7 @@
 "use client";
 
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   GqlOpportunitiesConnection,
   GqlOpportunityCategory,
@@ -40,20 +40,6 @@ export const useActivities = (): UseActivitiesResult => {
     },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
-    onCompleted: (data) => {
-      clientLogger.info("Activities query completed", {
-        component: "useActivities",
-        operation: "getOpportunities",
-        totalCount: data?.opportunities?.totalCount || 0
-      });
-    },
-    onError: (error) => {
-      clientLogger.error("Activities query failed", {
-        component: "useActivities", 
-        operation: "getOpportunities",
-        error: error.message
-      });
-    }
   });
 
   const opportunities = data?.opportunities ?? fallbackConnection;
@@ -94,6 +80,26 @@ export const useActivities = (): UseActivitiesResult => {
     isLoading: loading,
     onLoadMore: handleFetchMore,
   });
+
+  useEffect(() => {
+    if (data && !loading) {
+      clientLogger.info("Activities query completed", {
+        component: "useActivities",
+        operation: "getOpportunities",
+        totalCount: data?.opportunities?.totalCount || 0
+      });
+    }
+  }, [data, loading]);
+
+  useEffect(() => {
+    if (error) {
+      clientLogger.error("Activities query failed", {
+        component: "useActivities", 
+        operation: "getOpportunities",
+        error: error.message
+      });
+    }
+  }, [error]);
 
   return {
     opportunities,
