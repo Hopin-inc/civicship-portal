@@ -30,6 +30,9 @@ export const GET_OPPORTUNITIES = gql`
           place {
             id
             name
+            address
+            latitude
+            longitude
           }
         }
       }

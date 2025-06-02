@@ -3463,7 +3463,14 @@ export type GqlGetOpportunitiesQuery = {
         feeRequired?: number | null;
         pointsToEarn?: number | null;
         earliestReservableAt?: Date | null;
-        place?: { __typename?: "Place"; id: string; name: string } | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+        } | null;
       } | null;
     }>;
   };
@@ -6789,6 +6796,9 @@ export const GetOpportunitiesDocument = gql`
           place {
             id
             name
+            address
+            latitude
+            longitude
           }
         }
       }

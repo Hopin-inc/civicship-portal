@@ -35,7 +35,7 @@ export const useActivities = (): UseActivitiesResult => {
         category: GqlOpportunityCategory.Activity,
         publishStatus: [GqlPublishStatus.Public],
       },
-      first: 20,
+      first: 10,
     },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
