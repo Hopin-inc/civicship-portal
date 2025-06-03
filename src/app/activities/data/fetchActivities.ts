@@ -3,31 +3,12 @@ import {
   GetOpportunitiesDocument,
   GqlGetOpportunitiesQuery,
   GqlGetOpportunitiesQueryVariables,
-  GqlOpportunitiesConnection,
   GqlOpportunityCategory,
   GqlPublishStatus,
+  GqlSortDirection,
 } from "@/types/graphql";
 import { mapOpportunityCards, sliceActivitiesBySection } from "./presenter";
 
-export async function fetchInitialActivities(): Promise<GqlOpportunitiesConnection> {
-  const { data } = await apolloClient.query<
-    GqlGetOpportunitiesQuery,
-    GqlGetOpportunitiesQueryVariables
-  >({
-    query: GetOpportunitiesDocument,
-    variables: {
-      filter: {
-        category: GqlOpportunityCategory.Activity,
-        publishStatus: [GqlPublishStatus.Public],
-      },
-      first: 5,
-    },
-    fetchPolicy: "no-cache",
-  });
-  return data.opportunities;
-}
-
-// 新規追加: FeaturedSectionとCarouselSection用のデータのみ取得
 export async function fetchFeaturedAndCarousel() {
   const { data } = await apolloClient.query<
     GqlGetOpportunitiesQuery,
@@ -38,6 +19,9 @@ export async function fetchFeaturedAndCarousel() {
       filter: {
         category: GqlOpportunityCategory.Activity,
         publishStatus: [GqlPublishStatus.Public],
+      },
+      sort: {
+        earliestSlotStartsAt: GqlSortDirection.Asc,
       },
       first: 10,
     },

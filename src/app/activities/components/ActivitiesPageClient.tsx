@@ -1,12 +1,12 @@
 "use client";
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import { ActivityCard } from "../data/type";
 import { useActivities } from "../hooks/useActivities";
 import dynamic from "next/dynamic";
 import FeaturedSectionSkeleton from "./FeaturedSection/FeaturedSectionSkeleton";
 import OpportunitiesCarouselSectionSkeleton from "./CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "./ListSection/ListSectionSkeleton";
-import { mapOpportunityCards, sliceActivitiesBySection } from "../data/presenter";
+import { mapOpportunityCards } from "../data/presenter";
 import ErrorState from "@/components/shared/ErrorState";
 import EmptyState from "@/components/shared/EmptyState";
 
@@ -29,16 +29,7 @@ export default function ActivitiesPageClient({ featuredCards, upcomingCards }: P
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
   const refetchRef = useRef<(() => void) | null>(refetch);
 
-  const { listCards } = useMemo(() => {
-    const activityCards = mapOpportunityCards(opportunities.edges ?? []);
-    // featuredCards, upcomingCardsに含まれるものを除外
-    const excludeIds = new Set([
-      ...featuredCards.map((c) => c.id),
-      ...upcomingCards.map((c) => c.id),
-    ]);
-    const filtered = activityCards.filter((c) => !excludeIds.has(c.id));
-    return { listCards: filtered };
-  }, [opportunities, featuredCards, upcomingCards]);
+  const listCards = mapOpportunityCards(opportunities.edges ?? []);
 
   if (loading && !opportunities?.edges?.length) {
     return (
