@@ -20,11 +20,13 @@ export const useLiffInitialization = ({ environment, liffService }: UseLiffIniti
 
       const liffSuccess = await liffService.initialize();
       if (!liffSuccess) {
-        clientLogger.warn("LIFF initialization failed", createAuthLogContext(
-          generateSessionId(),
-          "liff",
-          { timestamp, component: "useLiffInitialization" }
-        ));
+        clientLogger.warn(
+          "LIFF initialization failed",
+          createAuthLogContext(generateSessionId(), AuthEnvironment.LIFF, {
+            timestamp,
+            component: "useLiffInitialization",
+          }),
+        );
       }
     };
 

@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { User } from "firebase/auth";
 import { lineAuth } from "@/lib/auth/firebase-config";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
 import clientLogger from "@/lib/logging/client";
 import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
+import { AuthEnvironment } from "@/lib/auth/environment-detector";
 
 interface UseFirebaseAuthStateProps {
   authStateManager: AuthStateManager | null;
@@ -15,7 +15,11 @@ interface UseFirebaseAuthStateProps {
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
 }
 
-export const useFirebaseAuthState = ({ authStateManager, state, setState }: UseFirebaseAuthStateProps) => {
+export const useFirebaseAuthState = ({
+  authStateManager,
+  state,
+  setState,
+}: UseFirebaseAuthStateProps) => {
   const authStateManagerRef = useRef(authStateManager);
   const stateRef = useRef(state);
 
@@ -47,14 +51,13 @@ export const useFirebaseAuthState = ({ authStateManager, state, setState }: UseF
             expiresAt: expirationTime,
           });
         } catch (error) {
-          clientLogger.info("Failed to sync Firebase token to cookies", createAuthLogContext(
-            generateSessionId(),
-            "general",
-            {
+          clientLogger.info(
+            "Failed to sync Firebase token to cookies",
+            createAuthLogContext(generateSessionId(), AuthEnvironment.REGULAR_BROWSER, {
               error: error instanceof Error ? error.message : String(error),
-              component: "useFirebaseAuthState"
-            }
-          ));
+              component: "useFirebaseAuthState",
+            }),
+          );
         }
       } else {
         TokenManager.clearLineTokens();
@@ -63,7 +66,7 @@ export const useFirebaseAuthState = ({ authStateManager, state, setState }: UseF
       const currentAuthStateManager = authStateManagerRef.current;
       const currentState = stateRef.current;
       if (currentAuthStateManager && !currentState.isAuthenticating) {
-        currentAuthStateManager.handleLineAuthStateChange(!!user);
+        await currentAuthStateManager.handleLineAuthStateChange(!!user);
       }
     });
 
