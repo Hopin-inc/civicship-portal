@@ -1,7 +1,5 @@
 "use client";
 
-import { AuthEnvironment } from "@/lib/auth/environment-detector";
-
 /**
  * 認証ログ用のユーティリティ関数
  * クライアント環境とサーバー環境の両方で動作するよう設計
@@ -284,7 +282,7 @@ export const endOperation = (
  */
 export const createAuthLogContext = (
   sessionId: string,
-  authType: AuthEnvironment,
+  authType: "liff" | "phone" | "general",
   additionalContext?: Record<string, any>,
 ): Record<string, any> => {
   if (typeof window === "undefined" && serverUtils) {
