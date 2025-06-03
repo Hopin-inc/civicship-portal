@@ -9,8 +9,8 @@ import {
 import { phoneAuth } from "./firebase-config";
 import { PhoneAuthTokens, TokenManager } from "./token-manager";
 import { isRunningInLiff } from "./environment-detector";
-import clientLogger from "../logging/client";
 import { createAuthLogContext, generateSessionId, maskPhoneNumber } from "../logging/client/utils";
+import { logger } from "@/lib/logging";
 
 /**
  * 電話番号認証の状態
@@ -53,19 +53,19 @@ export class PhoneAuthService {
       this.state.phoneUid = savedTokens.phoneUid;
       this.state.phoneNumber = savedTokens.phoneNumber;
 
-      clientLogger.debug("Phone verification state initialized from saved tokens", {
+      logger.debug("Phone verification state initialized from saved tokens", {
         isVerified: this.state.isVerified,
         phoneUid: this.state.phoneUid ? "exists" : "missing",
         phoneNumber: this.state.phoneNumber ? "exists" : "missing",
         accessToken: savedTokens.accessToken ? "exists" : "missing",
-        component: "PhoneAuthService"
+        component: "PhoneAuthService",
       });
     } else {
-      clientLogger.debug("Phone verification not initialized - incomplete saved tokens", {
+      logger.debug("Phone verification not initialized - incomplete saved tokens", {
         phoneUid: savedTokens.phoneUid ? "exists" : "missing",
         phoneNumber: savedTokens.phoneNumber ? "exists" : "missing",
         accessToken: savedTokens.accessToken ? "exists" : "missing",
-        component: "PhoneAuthService"
+        component: "PhoneAuthService",
       });
     }
   }
@@ -94,19 +94,18 @@ export class PhoneAuthService {
         this.recaptchaVerifier = null;
       }
       if (this.recaptchaContainerElement) {
-        this.recaptchaContainerElement.innerHTML = '';
+        this.recaptchaContainerElement.innerHTML = "";
       }
       this.recaptchaContainerElement = null;
       this.isRecaptchaRendered = false;
     } catch (e) {
-      clientLogger.info("Error clearing reCAPTCHA", createAuthLogContext(
-        generateSessionId(),
-        "phone",
-        {
+      logger.info(
+        "Error clearing reCAPTCHA",
+        createAuthLogContext(generateSessionId(), "phone", {
           error: e instanceof Error ? e.message : String(e),
-          component: "PhoneAuthService"
-        }
-      ));
+          component: "PhoneAuthService",
+        }),
+      );
     }
   }
 
@@ -153,15 +152,14 @@ export class PhoneAuthService {
 
       return confirmationResult.verificationId;
     } catch (error) {
-      clientLogger.info("Phone verification failed", createAuthLogContext(
-        generateSessionId(),
-        "phone",
-        {
+      logger.info(
+        "Phone verification failed",
+        createAuthLogContext(generateSessionId(), "phone", {
           error: error instanceof Error ? error.message : String(error),
           component: "PhoneAuthService",
-          phoneNumber: maskPhoneNumber(phoneNumber)
-        }
-      ));
+          phoneNumber: maskPhoneNumber(phoneNumber),
+        }),
+      );
       this.state.error = error as Error;
       return null;
     } finally {
@@ -180,8 +178,8 @@ export class PhoneAuthService {
       this.state.error = null;
 
       if (!this.state.verificationId) {
-        clientLogger.error("Missing verificationId", {
-          component: "PhoneAuthService"
+        logger.error("Missing verificationId", {
+          component: "PhoneAuthService",
         });
         return false;
       }
@@ -191,16 +189,16 @@ export class PhoneAuthService {
           this.state.verificationId,
           verificationCode,
         );
-        clientLogger.debug("Successfully created phone credential", {
-          component: "PhoneAuthService"
+        logger.debug("Successfully created phone credential", {
+          component: "PhoneAuthService",
         });
 
         let verificationSuccessful = false;
 
         try {
           const userCredential = await signInWithCredential(phoneAuth, credential);
-          clientLogger.debug("Phone sign-in successful with credential", {
-            component: "PhoneAuthService"
+          logger.debug("Phone sign-in successful with credential", {
+            component: "PhoneAuthService",
           });
 
           if (userCredential.user) {
@@ -222,60 +220,58 @@ export class PhoneAuthService {
             TokenManager.savePhoneTokens(tokens);
             verificationSuccessful = true;
           } else {
-            clientLogger.error("No user returned from signInWithCredential", {
-              component: "PhoneAuthService"
+            logger.error("No user returned from signInWithCredential", {
+              component: "PhoneAuthService",
             });
           }
 
           await phoneAuth.signOut();
-          clientLogger.debug("Signed out of phone auth", {
-            component: "PhoneAuthService"
+          logger.debug("Signed out of phone auth", {
+            component: "PhoneAuthService",
           });
         } catch (signInError) {
-          clientLogger.info("Could not sign in with phone credential", createAuthLogContext(
-            generateSessionId(),
-            "phone",
-            {
+          logger.info(
+            "Could not sign in with phone credential",
+            createAuthLogContext(generateSessionId(), "phone", {
               error: signInError instanceof Error ? signInError.message : String(signInError),
-              component: "PhoneAuthService"
-            }
-          ));
-          clientLogger.debug("Verification failed - invalid code", {
-            component: "PhoneAuthService"
+              component: "PhoneAuthService",
+            }),
+          );
+          logger.debug("Verification failed - invalid code", {
+            component: "PhoneAuthService",
           });
           return false;
         }
 
         if (verificationSuccessful) {
           this.state.isVerified = true;
-          clientLogger.debug("Phone verification state set to verified", {
+          logger.debug("Phone verification state set to verified", {
             isVerified: this.state.isVerified,
-            component: "PhoneAuthService"
+            component: "PhoneAuthService",
           });
           return true;
         } else {
           return false;
         }
       } catch (credentialError) {
-        clientLogger.info("Invalid verification code", createAuthLogContext(
-          generateSessionId(),
-          "phone",
-          {
-            error: credentialError instanceof Error ? credentialError.message : String(credentialError),
-            component: "PhoneAuthService"
-          }
-        ));
+        logger.info(
+          "Invalid verification code",
+          createAuthLogContext(generateSessionId(), "phone", {
+            error:
+              credentialError instanceof Error ? credentialError.message : String(credentialError),
+            component: "PhoneAuthService",
+          }),
+        );
         return false;
       }
     } catch (error) {
-      clientLogger.info("Code verification failed", createAuthLogContext(
-        generateSessionId(),
-        "phone",
-        {
+      logger.info(
+        "Code verification failed",
+        createAuthLogContext(generateSessionId(), "phone", {
           error: error instanceof Error ? error.message : String(error),
-          component: "PhoneAuthService"
-        }
-      ));
+          component: "PhoneAuthService",
+        }),
+      );
       this.state.error = error as Error;
       return false;
     } finally {
@@ -290,11 +286,10 @@ export class PhoneAuthService {
   public async refreshPhoneIdToken(): Promise<string | null> {
     try {
       if (!phoneAuth.currentUser) {
-        clientLogger.info("Cannot refresh phone token: No authenticated user", createAuthLogContext(
-          generateSessionId(),
-          "phone",
-          { component: "PhoneAuthService" }
-        ));
+        logger.info(
+          "Cannot refresh phone token: No authenticated user",
+          createAuthLogContext(generateSessionId(), "phone", { component: "PhoneAuthService" }),
+        );
         return null;
       }
 
@@ -314,14 +309,13 @@ export class PhoneAuthService {
 
       return idToken;
     } catch (error) {
-      clientLogger.info("Failed to refresh phone ID token", createAuthLogContext(
-        generateSessionId(),
-        "phone",
-        {
+      logger.info(
+        "Failed to refresh phone ID token",
+        createAuthLogContext(generateSessionId(), "phone", {
           error: error instanceof Error ? error.message : String(error),
-          component: "PhoneAuthService"
-        }
-      ));
+          component: "PhoneAuthService",
+        }),
+      );
       return null;
     }
   }

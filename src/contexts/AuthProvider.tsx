@@ -25,7 +25,7 @@ import { useUserRegistrationState } from "@/hooks/auth/useUserRegistrationState"
 import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 import {
   createAuthLogContext,
   generateSessionId,
@@ -151,7 +151,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         authenticationState: "unauthenticated",
       }));
     } catch (error) {
-      clientLogger.error("Logout failed", {
+      logger.error("Logout failed", {
         error: error instanceof Error ? error.message : String(error),
         component: "AuthProvider",
       });
@@ -193,7 +193,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return success;
     } catch (error) {
-      clientLogger.info(
+      logger.info(
         "Login with LIFF failed",
         createAuthLogContext(
           authStateManager?.getSessionId() || generateSessionId(),
@@ -232,20 +232,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (authStateManager) {
         try {
           const timestamp = new Date().toISOString();
-          clientLogger.debug("Updating phone auth state in verifyPhoneCode", {
+          logger.debug("Updating phone auth state in verifyPhoneCode", {
             timestamp,
             component: "AuthProvider",
           });
           await authStateManager.handlePhoneAuthStateChange(true);
-          clientLogger.debug(
-            "AuthStateManager phone state updated successfully in verifyPhoneCode",
-            {
-              timestamp,
-              component: "AuthProvider",
-            },
-          );
+          logger.debug("AuthStateManager phone state updated successfully in verifyPhoneCode", {
+            timestamp,
+            component: "AuthProvider",
+          });
         } catch (error) {
-          clientLogger.error("Failed to update AuthStateManager phone state in verifyPhoneCode", {
+          logger.error("Failed to update AuthStateManager phone state in verifyPhoneCode", {
             error: error instanceof Error ? error.message : String(error),
             component: "AuthProvider",
           });
@@ -278,7 +275,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const phoneTokens = TokenManager.getPhoneTokens();
       const lineTokens = TokenManager.getLineTokens();
 
-      clientLogger.debug("Creating user with input", {
+      logger.debug("Creating user with input", {
         name,
         currentPrefecture: prefecture,
         communityId: COMMUNITY_ID,
@@ -310,7 +307,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return null;
       }
     } catch (error) {
-      clientLogger.error("User creation failed", {
+      logger.error("User creation failed", {
         error: error instanceof Error ? error.message : String(error),
         component: "AuthProvider",
       });
