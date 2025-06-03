@@ -27,8 +27,6 @@ import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDe
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 import { logger } from "@/lib/logging";
 import {
-  createAuthLogContext,
-  generateSessionId,
   maskPhoneNumber,
 } from "@/lib/logging/client/utils";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
@@ -193,17 +191,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return success;
     } catch (error) {
-      logger.info(
-        "Login with LIFF failed",
-        createAuthLogContext(
-          authStateManager?.getSessionId() || generateSessionId(),
-          AuthEnvironment.LIFF,
-          {
-            error: error instanceof Error ? error.message : String(error),
-            component: "AuthProvider",
-          },
-        ),
-      );
+      logger.info("Login with LIFF failed", {
+        authType: "liff",
+        error: error instanceof Error ? error.message : String(error),
+        component: "AuthProvider",
+      });
       return false;
     } finally {
       setState((prev) => ({ ...prev, isAuthenticating: false }));

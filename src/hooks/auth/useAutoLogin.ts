@@ -5,7 +5,7 @@ import { LiffService } from "@/lib/auth/liff-service";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { AuthState } from "@/contexts/AuthProvider";
 import { logger } from "@/lib/logging";
-import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
+
 
 interface UseAutoLoginProps {
   environment: AuthEnvironment;
@@ -77,13 +77,11 @@ const useAutoLogin = ({
               await refetchUser();
             }
           } catch (error) {
-            logger.info(
-              "Auto-login with LIFF failed",
-              createAuthLogContext(generateSessionId(), AuthEnvironment.LIFF, {
-                error: error instanceof Error ? error.message : String(error),
-                component: "useAutoLogin",
-              }),
-            );
+            logger.info("Auto-login with LIFF failed", {
+              authType: "liff",
+              error: error instanceof Error ? error.message : String(error),
+              component: "useAutoLogin",
+            });
           } finally {
             setState((prev) => ({ ...prev, isAuthenticating: false }));
           }

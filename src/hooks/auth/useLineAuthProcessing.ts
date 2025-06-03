@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthState } from "@/contexts/AuthProvider";
 import { logger } from "@/lib/logging";
-import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
+
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 
 interface UseLineAuthProcessingProps {
@@ -34,11 +34,10 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
       try {
         const initialized = await liffServiceRef.current.initialize();
         if (!initialized) {
-          logger.info("LIFF init failed", createAuthLogContext(
-            generateSessionId(),
-            AuthEnvironment.LIFF,
-            { component: "useLineAuthProcessing" }
-          ));
+          logger.info("LIFF init failed", {
+            authType: "liff",
+            component: "useLineAuthProcessing"
+          });
           return;
         }
 
@@ -59,11 +58,10 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
 
         const success = await liffServiceRef.current.signInWithLiffToken();
         if (!success) {
-          logger.info("signInWithLiffToken failed", createAuthLogContext(
-            generateSessionId(),
-            AuthEnvironment.LIFF,
-            { component: "useLineAuthProcessing" }
-          ));
+          logger.info("signInWithLiffToken failed", {
+            authType: "liff",
+            component: "useLineAuthProcessing"
+          });
           return;
         }
 
@@ -72,14 +70,11 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         });
         await refetchUserRef.current();
       } catch (err) {
-        logger.info("Error during LINE auth", createAuthLogContext(
-          generateSessionId(),
-          AuthEnvironment.LIFF,
-          {
-            error: err instanceof Error ? err.message : String(err),
-            component: "useLineAuthProcessing"
-          }
-        ));
+        logger.info("Error during LINE auth", {
+          authType: "liff",
+          error: err instanceof Error ? err.message : String(err),
+          component: "useLineAuthProcessing"
+        });
       } finally {
         setStateRef.current((prev) => ({ ...prev, isAuthenticating: false }));
       }

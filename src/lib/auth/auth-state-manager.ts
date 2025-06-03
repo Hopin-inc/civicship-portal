@@ -1,7 +1,7 @@
 import { TokenManager } from "./token-manager";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
-import { createAuthLogContext } from "../logging/client/utils";
+
 import { logger } from "@/lib/logging";
 
 export type AuthenticationState =
@@ -183,13 +183,10 @@ export class AuthStateManager {
       try {
         accessToken = await lineAuth.currentUser.getIdToken();
       } catch (tokenError) {
-        logger.info(
-          "Failed to get Firebase token for user registration check",
-          createAuthLogContext(this.sessionId, "general", {
-            error: tokenError instanceof Error ? tokenError.message : String(tokenError),
-            component: "AuthStateManager",
-          }),
-        );
+        logger.info("Failed to get Firebase token for user registration check", {
+          error: tokenError instanceof Error ? tokenError.message : String(tokenError),
+          component: "AuthStateManager",
+        });
         return false;
       }
 
@@ -214,13 +211,10 @@ export class AuthStateManager {
 
       return isRegistered;
     } catch (error) {
-      logger.info(
-        "Failed to check user registration",
-        createAuthLogContext(this.sessionId, "general", {
-          error: error instanceof Error ? error.message : String(error),
-          component: "AuthStateManager",
-        }),
-      );
+      logger.info("Failed to check user registration", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "AuthStateManager",
+      });
       return false;
     }
   }
@@ -243,13 +237,10 @@ export class AuthStateManager {
         this.setState("unauthenticated");
       }
     } catch (error) {
-      logger.info(
-        "Failed to renew LINE token",
-        createAuthLogContext(this.sessionId, "general", {
-          error: error instanceof Error ? error.message : String(error),
-          component: "AuthStateManager",
-        }),
-      );
+      logger.info("Failed to renew LINE token", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "AuthStateManager",
+      });
       this.setState("unauthenticated");
     }
   }
@@ -274,13 +265,11 @@ export class AuthStateManager {
         }
       }
     } catch (error) {
-      logger.info(
-        "Failed to renew phone token",
-        createAuthLogContext(this.sessionId, "general", {
-          error: error instanceof Error ? error.message : String(error),
-          component: "AuthStateManager",
-        }),
-      );
+      logger.info("Failed to renew phone token", {
+        authType: "phone",
+        error: error instanceof Error ? error.message : String(error),
+        component: "AuthStateManager",
+      });
 
       const lineTokens = TokenManager.getLineTokens();
       const hasValidLineToken =

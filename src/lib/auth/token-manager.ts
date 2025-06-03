@@ -1,6 +1,6 @@
 "use client";
 
-import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
+
 import { logger } from "@/lib/logging";
 
 /**
@@ -154,13 +154,10 @@ export class TokenManager {
       await lineAuth.currentUser.getIdToken();
       return false; // Successfully got token, so it's valid
     } catch (error) {
-      logger.info(
-        "LINE token validation failed",
-        createAuthLogContext(generateSessionId(), "general", {
-          error: error instanceof Error ? error.message : String(error),
-          component: "TokenManager",
-        }),
-      );
+      logger.info("LINE token validation failed", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "TokenManager",
+      });
       return true; // Any error means the token/session is invalid
     }
   }
@@ -197,13 +194,10 @@ export class TokenManager {
       }
       return false;
     } catch (error) {
-      logger.info(
-        "Failed to renew LINE token",
-        createAuthLogContext(generateSessionId(), "general", {
-          error: error instanceof Error ? error.message : String(error),
-          component: "TokenManager",
-        }),
-      );
+      logger.info("Failed to renew LINE token", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "TokenManager",
+      });
       return false;
     }
   }
@@ -227,13 +221,11 @@ export class TokenManager {
       }
       return false;
     } catch (error) {
-      logger.info(
-        "Failed to renew phone token",
-        createAuthLogContext(generateSessionId(), "phone", {
-          error: error instanceof Error ? error.message : String(error),
-          component: "TokenManager",
-        }),
-      );
+      logger.info("Failed to renew phone token", {
+        authType: "phone",
+        error: error instanceof Error ? error.message : String(error),
+        component: "TokenManager",
+      });
       return false;
     }
   }

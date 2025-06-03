@@ -6,7 +6,7 @@ import { TokenManager } from "@/lib/auth/token-manager";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
 import { logger } from "@/lib/logging";
-import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
+
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 
 interface UseFirebaseAuthStateProps {
@@ -51,13 +51,10 @@ export const useFirebaseAuthState = ({
             expiresAt: expirationTime,
           });
         } catch (error) {
-          logger.info(
-            "Failed to sync Firebase token to cookies",
-            createAuthLogContext(generateSessionId(), AuthEnvironment.REGULAR_BROWSER, {
-              error: error instanceof Error ? error.message : String(error),
-              component: "useFirebaseAuthState",
-            }),
-          );
+          logger.info("Failed to sync Firebase token to cookies", {
+            error: error instanceof Error ? error.message : String(error),
+            component: "useFirebaseAuthState",
+          });
         }
       } else {
         TokenManager.clearLineTokens();
