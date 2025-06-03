@@ -1,7 +1,7 @@
-import { fetchInitialActivities } from "./data/fetchActivities";
+import { fetchFeaturedAndCarousel } from "./data/fetchActivities";
 import ActivitiesPageClient from "./components/ActivitiesPageClient";
 
 export default async function ActivitiesPage() {
-  const initialData = await fetchInitialActivities();
-  return <ActivitiesPageClient initialData={initialData} />;
+  const { featuredCards, upcomingCards } = await fetchFeaturedAndCarousel();
+  return <ActivitiesPageClient featuredCards={featuredCards} upcomingCards={upcomingCards} />;
 }

@@ -1,30 +1,53 @@
 "use client";
 import { useMemo, useRef } from "react";
-import { GqlOpportunitiesConnection } from "@/types/graphql";
+import { ActivityCard } from "../data/type";
 import { useActivities } from "../hooks/useActivities";
-import ActivitiesFeaturedSection from "./FeaturedSection/FeaturedSection";
-import ActivitiesListSection from "./ListSection/ListSection";
-import ActivitiesCarouselSection from "./CarouselSection/CarouselSection";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import EmptyState from "@/components/shared/EmptyState";
-import ErrorState from "@/components/shared/ErrorState";
+import dynamic from "next/dynamic";
+import FeaturedSectionSkeleton from "./FeaturedSection/FeaturedSectionSkeleton";
+import OpportunitiesCarouselSectionSkeleton from "./CarouselSection/CarouselSectionSkeleton";
+import ListSectionSkeleton from "./ListSection/ListSectionSkeleton";
 import { mapOpportunityCards, sliceActivitiesBySection } from "../data/presenter";
+import ErrorState from "@/components/shared/ErrorState";
+import EmptyState from "@/components/shared/EmptyState";
 
 interface Props {
-  initialData: GqlOpportunitiesConnection;
+  featuredCards: ActivityCard[];
+  upcomingCards: ActivityCard[];
 }
 
-export default function ActivitiesPageClient({ initialData }: Props) {
-  const { opportunities, loading, error, loadMoreRef, refetch } = useActivities({ initialData });
+const ActivitiesFeaturedSection = dynamic(() => import("./FeaturedSection/FeaturedSection"), {
+  loading: () => <FeaturedSectionSkeleton />,
+});
+const ActivitiesCarouselSection = dynamic(() => import("./CarouselSection/CarouselSection"), {
+  loading: () => <OpportunitiesCarouselSectionSkeleton title="もうすぐ開催予定" />,
+});
+const ActivitiesListSection = dynamic(() => import("./ListSection/ListSection"), {
+  loading: () => <ListSectionSkeleton />,
+});
+
+export default function ActivitiesPageClient({ featuredCards, upcomingCards }: Props) {
+  const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
   const refetchRef = useRef<(() => void) | null>(refetch);
 
-  const { upcomingCards, featuredCards, listCards } = useMemo(() => {
+  const { listCards } = useMemo(() => {
     const activityCards = mapOpportunityCards(opportunities.edges ?? []);
-    return sliceActivitiesBySection(activityCards);
-  }, [opportunities]);
+    // featuredCards, upcomingCardsに含まれるものを除外
+    const excludeIds = new Set([
+      ...featuredCards.map((c) => c.id),
+      ...upcomingCards.map((c) => c.id),
+    ]);
+    const filtered = activityCards.filter((c) => !excludeIds.has(c.id));
+    return { listCards: filtered };
+  }, [opportunities, featuredCards, upcomingCards]);
 
   if (loading && !opportunities?.edges?.length) {
-    return <LoadingIndicator />;
+    return (
+      <div className="min-h-screen pb-16">
+        <FeaturedSectionSkeleton />
+        <OpportunitiesCarouselSectionSkeleton title="もうすぐ開催予定" />
+        <ListSectionSkeleton />
+      </div>
+    );
   }
   if (error) {
     return <ErrorState title="募集一覧を読み込めませんでした" refetchRef={refetchRef} />;
