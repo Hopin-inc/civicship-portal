@@ -14,7 +14,7 @@ export async function getActivitiesData(): Promise<{
 }> {
   try {
     const httpLink = createHttpLink({
-      uri: process.env.NEXT_PUBLIC_API_ENDPOINT || `${process.env.APP_BASE_URL}/graphql` || "https://dev.neo88.app/graphql",
+      uri: process.env.NEXT_PUBLIC_API_ENDPOINT || "https://dev.neo88.app/graphql",
       headers: {
         "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID || "",
       },
