@@ -75,10 +75,17 @@ export default function ActivitiesPage() {
 
   useEffect(() => {
     if (!loading && featuredCards.length > 0) {
-      const timer = setTimeout(() => {
-        setShowOtherSections(true);
-      }, 100);
-      return () => clearTimeout(timer);
+      if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+        const idleCallback = requestIdleCallback(() => {
+          setShowOtherSections(true);
+        });
+        return () => cancelIdleCallback(idleCallback);
+      } else {
+        const timer = setTimeout(() => {
+          setShowOtherSections(true);
+        }, 100);
+        return () => clearTimeout(timer);
+      }
     }
   }, [loading, featuredCards.length]);
 
