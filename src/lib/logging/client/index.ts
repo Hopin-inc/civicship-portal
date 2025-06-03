@@ -6,7 +6,8 @@ import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/ut
 const cachedSessionId = generateSessionId();
 
 const forwardLogToServer = async (level: string, message: string, meta?: Record<string, any>) => {
-  const enrichedMeta = createAuthLogContext(cachedSessionId, "general", meta);
+  const { authType = "general", ...restMeta } = meta ?? {};
+  const enrichedMeta = createAuthLogContext(cachedSessionId, authType, restMeta);
 
   try {
     await fetch("/api/client-log", {
@@ -24,15 +25,6 @@ const forwardLogToServer = async (level: string, message: string, meta?: Record<
         e instanceof Error ? e.message : String(e)
       }`,
     );
-  }
-};
-
-const formatMeta = (meta?: Record<string, any>): string => {
-  if (!meta) return "";
-  try {
-    return ` ${JSON.stringify(meta)}`;
-  } catch (e) {
-    return " [Meta formatting error]";
   }
 };
 

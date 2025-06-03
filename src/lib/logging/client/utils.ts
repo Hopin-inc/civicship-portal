@@ -240,7 +240,7 @@ export const createAuthLogContext = (
     sessionId,
     runtime: typeof window === "undefined" ? "server" : "client",
     timestamp: new Date().toISOString(),
-    component: "AuthProvider",
+    component: additionalContext?.component || "AuthProvider",
     authType,
     ...(userId ? { userId } : {}),
     env: {
