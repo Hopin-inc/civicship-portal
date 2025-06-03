@@ -1,6 +1,6 @@
 import { GqlOpportunity, GqlPlace } from "@/types/graphql";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 
 // #NOTE 拠点に複数人の案内人の体験が掲載されている場合、意図しない順序で表示されている拠点のID（順序を逆にすることで簡易的に解決する）
 // 坂東商店guest room〜藍染めと宿〜 https://www.neo88.app/places/cmahru0gg001vs60nnkqrgugc

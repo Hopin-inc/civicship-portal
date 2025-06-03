@@ -11,7 +11,7 @@ import { useParticipationState } from "@/app/participations/[id]/hooks/usePartic
 import type { ParticipationDetail } from "@/app/participations/[id]/data/type";
 import type { ReservationStatus } from "@/types/participationStatus";
 import type { ActivityCard } from "@/app/activities/data/type";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 
 interface UseParticipationPageResult {
   participation: ParticipationDetail | null;
@@ -46,7 +46,7 @@ const useParticipationPage = (id: string): UseParticipationPageResult => {
 
   useEffect(() => {
     if (error) {
-      clientLogger.error("Participation query error", {
+      logger.error("Participation query error", {
         error: error.message || String(error),
         participationId: id,
         component: "useParticipationPage"
