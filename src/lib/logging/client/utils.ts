@@ -238,6 +238,7 @@ export const createAuthLogContext = (
 
   return {
     sessionId,
+    runtime: typeof window === "undefined" ? "server" : "client",
     timestamp: new Date().toISOString(),
     component: "AuthProvider",
     authType,
