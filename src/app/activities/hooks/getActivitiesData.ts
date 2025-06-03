@@ -1,4 +1,4 @@
-import { apolloClient } from "@/lib/apollo";
+import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import {
   GetOpportunitiesDocument,
   GqlGetOpportunitiesQuery,
@@ -13,7 +13,20 @@ export async function getActivitiesData(): Promise<{
   featuredCards: ActivityCard[];
 }> {
   try {
-    const { data } = await apolloClient.query<
+    const httpLink = createHttpLink({
+      uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
+      headers: {
+        "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID || "",
+      },
+    });
+
+    const serverClient = new ApolloClient({
+      link: httpLink,
+      cache: new InMemoryCache(),
+      ssrMode: true,
+    });
+
+    const { data } = await serverClient.query<
       GqlGetOpportunitiesQuery,
       GqlGetOpportunitiesQueryVariables
     >({

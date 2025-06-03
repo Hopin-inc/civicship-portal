@@ -51,15 +51,11 @@ const requestLink = new ApolloLink((operation, forward) => {
           try {
             firebaseToken = await lineAuth.currentUser.getIdToken();
           } catch (error) {
-            clientLogger.info('Failed to get Firebase token', createAuthLogContext(
-              generateSessionId(),
-              "general",
-              {
-                error: error instanceof Error ? error.message : String(error),
-                component: 'ApolloRequestLink',
-                operation: operation.operationName
-              }
-            ));
+            clientLogger.info('Failed to get Firebase token', {
+              error: error instanceof Error ? error.message : String(error),
+              component: 'ApolloRequestLink',
+              operation: operation.operationName
+            });
           }
         }
 
@@ -116,17 +112,13 @@ const requestLink = new ApolloLink((operation, forward) => {
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
   if (graphQLErrors) {
     for (const error of graphQLErrors) {
-      clientLogger.info('GraphQL error', createAuthLogContext(
-        generateSessionId(),
-        "general",
-        {
-          message: error.message,
-          locations: error.locations,
-          path: error.path,
-          component: 'ApolloErrorLink',
-          operation: operation.operationName
-        }
-      ));
+      clientLogger.info('GraphQL error', {
+        message: error.message,
+        locations: error.locations,
+        path: error.path,
+        component: 'ApolloErrorLink',
+        operation: operation.operationName
+      });
 
       if (
         error.message.includes("Authentication required") ||
@@ -147,16 +139,12 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
 
   if (networkError) {
     if ("statusCode" in networkError && networkError.statusCode === 401) {
-      clientLogger.info('Network authentication error', createAuthLogContext(
-        generateSessionId(),
-        "general",
-        {
-          error: networkError.message || String(networkError),
-          statusCode: networkError.statusCode,
-          component: 'ApolloErrorLink',
-          operation: operation.operationName
-        }
-      ));
+      clientLogger.info('Network authentication error', {
+        error: networkError.message || String(networkError),
+        statusCode: networkError.statusCode,
+        component: 'ApolloErrorLink',
+        operation: operation.operationName
+      });
     } else {
       clientLogger.error('Network error', {
         error: networkError.message || String(networkError),

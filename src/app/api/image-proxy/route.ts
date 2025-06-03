@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse(buffer, {
       headers: {
         'Content-Type': response.headers.get('Content-Type') || 'image/jpeg',
-        'Cache-Control': 'public, max-age=31536000, immutable',
+        'Cache-Control': 'public, max-age=604800, immutable',
         'Access-Control-Allow-Origin': '*',
         'Vary': 'Accept',
       }
