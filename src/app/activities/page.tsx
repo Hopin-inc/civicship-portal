@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState, Suspense, lazy } from "react";
 import { useActivities } from "@/app/activities/hooks/useActivities";
 import ActivitiesFeaturedSection from "@/app/activities/components/FeaturedSection/FeaturedSection";
-import ActivitiesListSection from "@/app/activities/components/ListSection/ListSection";
-import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
 import { mapOpportunityCards, sliceActivitiesBySection } from "@/app/activities/data/presenter";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
 import { ActivityCard } from "./data/type";
+
+const ActivitiesListSection = lazy(() => import("@/app/activities/components/ListSection/ListSection"));
+const ActivitiesCarouselSection = lazy(() => import("@/app/activities/components/CarouselSection/CarouselSection"));
 
 export default function ActivitiesPage() {
   const headerConfig = useMemo(
@@ -24,6 +25,7 @@ export default function ActivitiesPage() {
 
   const prevEdgeCountRef = useRef<number>(0);
   const listCardsRef = useRef<ActivityCard[]>([]);
+  const [showOtherSections, setShowOtherSections] = useState(false);
 
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
 
@@ -71,6 +73,22 @@ export default function ActivitiesPage() {
     };
   }, [opportunities]);
 
+  useEffect(() => {
+    if (!loading && featuredCards.length > 0) {
+      if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+        const idleCallback = requestIdleCallback(() => {
+          setShowOtherSections(true);
+        });
+        return () => cancelIdleCallback(idleCallback);
+      } else {
+        const timer = setTimeout(() => {
+          setShowOtherSections(true);
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [loading, featuredCards.length]);
+
   if (loading && prevEdgeCountRef.current === 0) {
     return <LoadingIndicator />;
   }
@@ -86,17 +104,21 @@ export default function ActivitiesPage() {
   return (
     <div className="min-h-screen">
       <ActivitiesFeaturedSection opportunities={featuredCards} isInitialLoading={false} />
-      <ActivitiesCarouselSection
-        title="もうすぐ開催予定"
-        opportunities={upcomingCards}
-        isInitialLoading={false}
-      />
-      <ActivitiesListSection
-        opportunities={listCards}
-        loadMoreRef={loadMoreRef}
-        isInitialLoading={false}
-        isSectionLoading={loading}
-      />
+      {showOtherSections && (
+        <Suspense fallback={<div className="h-32 flex items-center justify-center"><LoadingIndicator /></div>}>
+          <ActivitiesCarouselSection
+            title="もうすぐ開催予定"
+            opportunities={upcomingCards}
+            isInitialLoading={false}
+          />
+          <ActivitiesListSection
+            opportunities={listCards}
+            loadMoreRef={loadMoreRef}
+            isInitialLoading={false}
+            isSectionLoading={loading}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
