@@ -75,18 +75,20 @@ export default function ClientSideSections() {
   }
 
   return (
-    <Suspense fallback={<div className="h-32 flex items-center justify-center"><LoadingIndicator /></div>}>
-      <ActivitiesCarouselSection
-        title="もうすぐ開催予定"
-        opportunities={upcomingCards}
-        isInitialLoading={false}
-      />
-      <ActivitiesListSection
-        opportunities={listCards}
-        loadMoreRef={loadMoreRef}
-        isInitialLoading={false}
-        isSectionLoading={loading}
-      />
-    </Suspense>
+    <>
+      <Suspense fallback={<div className="h-32 flex items-center justify-center"><LoadingIndicator /></div>}>
+        <ActivitiesCarouselSection
+          title="もうすぐ開催予定"
+          opportunities={upcomingCards}
+          isInitialLoading={false}
+        />
+        <ActivitiesListSection
+          opportunities={listCards}
+          isInitialLoading={false}
+          isSectionLoading={loading}
+        />
+      </Suspense>
+      <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
+    </>
   );
 }
