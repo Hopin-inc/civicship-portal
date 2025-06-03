@@ -25,9 +25,13 @@ import { useUserRegistrationState } from "@/hooks/auth/useUserRegistrationState"
 import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
-import { useAutoLogin } from "@/hooks/auth/useAutoLogin";
 import clientLogger from "@/lib/logging/client";
-import { createAuthLogContext, generateSessionId, maskPhoneNumber } from "@/lib/logging/client/utils";
+import {
+  createAuthLogContext,
+  generateSessionId,
+  maskPhoneNumber,
+} from "@/lib/logging/client/utils";
+import useAutoLogin from "@/hooks/auth/useAutoLogin";
 
 /**
  * 認証状態の型定義
@@ -140,8 +144,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       TokenManager.clearAllTokens();
 
-
-      
       setState((prev) => ({
         ...prev,
         firebaseUser: null,
@@ -149,9 +151,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         authenticationState: "unauthenticated",
       }));
     } catch (error) {
-      clientLogger.error("Logout failed", { 
+      clientLogger.error("Logout failed", {
         error: error instanceof Error ? error.message : String(error),
-        component: "AuthProvider" 
+        component: "AuthProvider",
       });
     }
   }, [liffService, phoneAuthService]);
@@ -176,14 +178,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setState((prev) => ({ ...prev, isAuthenticating: true }));
 
     try {
-      const initialized = await liffService.initialize();
-      if (!initialized) {
-        clientLogger.info("Failed to initialize LIFF", createAuthLogContext(
-          authStateManager?.getSessionId() || generateSessionId(),
-          "liff",
-          { component: "AuthProvider" }
-        ));
-      }
+      await liffService.initialize();
 
       const loggedIn = await liffService.login(redirectPath);
       if (!loggedIn) {
@@ -198,14 +193,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return success;
     } catch (error) {
-      clientLogger.info("Login with LIFF failed", createAuthLogContext(
-        authStateManager?.getSessionId() || generateSessionId(),
-        "liff",
-        { 
-          error: error instanceof Error ? error.message : String(error),
-          component: "AuthProvider" 
-        }
-      ));
+      clientLogger.info(
+        "Login with LIFF failed",
+        createAuthLogContext(
+          authStateManager?.getSessionId() || generateSessionId(),
+          AuthEnvironment.LIFF,
+          {
+            error: error instanceof Error ? error.message : String(error),
+            component: "AuthProvider",
+          },
+        ),
+      );
       return false;
     } finally {
       setState((prev) => ({ ...prev, isAuthenticating: false }));
@@ -236,17 +234,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const timestamp = new Date().toISOString();
           clientLogger.debug("Updating phone auth state in verifyPhoneCode", {
             timestamp,
-            component: "AuthProvider"
+            component: "AuthProvider",
           });
           await authStateManager.handlePhoneAuthStateChange(true);
-          clientLogger.debug("AuthStateManager phone state updated successfully in verifyPhoneCode", {
-            timestamp,
-            component: "AuthProvider"
-          });
+          clientLogger.debug(
+            "AuthStateManager phone state updated successfully in verifyPhoneCode",
+            {
+              timestamp,
+              component: "AuthProvider",
+            },
+          );
         } catch (error) {
           clientLogger.error("Failed to update AuthStateManager phone state in verifyPhoneCode", {
             error: error instanceof Error ? error.message : String(error),
-            component: "AuthProvider"
+            component: "AuthProvider",
           });
         }
       }
@@ -283,7 +284,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         communityId: COMMUNITY_ID,
         phoneUid,
         phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
-        component: "AuthProvider"
+        component: "AuthProvider",
       });
 
       const { data } = await userSignUp({
@@ -311,7 +312,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       clientLogger.error("User creation failed", {
         error: error instanceof Error ? error.message : String(error),
-        component: "AuthProvider"
+        component: "AuthProvider",
       });
       toast.error("アカウント作成に失敗しました", {
         description: error instanceof Error ? error.message : "不明なエラーが発生しました",
@@ -345,7 +346,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
   };
 
-  return <AuthContext.Provider value={ value }>{ children }</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 /**
