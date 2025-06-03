@@ -7,6 +7,7 @@ import { AuthTokens, TokenManager } from "./token-manager";
 import retry from "retry";
 import clientLogger from "../logging/client";
 import { createAuthLogContext, generateSessionId } from "../logging/client/utils";
+import { AuthEnvironment } from "@/lib/auth/environment-detector";
 
 /**
  * LIFF初期化状態の型定義
@@ -98,9 +99,9 @@ export class LiffService {
     } catch (error) {
       clientLogger.info("LIFF initialization error", createAuthLogContext(
         generateSessionId(),
-        "liff",
+        AuthEnvironment.LIFF,
         {
-          error: error instanceof Error ? error.message : String(error),
+          error,
           component: "LiffService"
         }
       ));
@@ -141,7 +142,7 @@ export class LiffService {
     } catch (error) {
       clientLogger.info("LIFF login error", createAuthLogContext(
         generateSessionId(),
-        "liff",
+        AuthEnvironment.LIFF,
         {
           error: error instanceof Error ? error.message : String(error),
           component: "LiffService"
@@ -185,7 +186,7 @@ export class LiffService {
     } catch (error) {
       clientLogger.info("Failed to get LIFF profile", createAuthLogContext(
         generateSessionId(),
-        "liff",
+        AuthEnvironment.LIFF,
         {
           error: error instanceof Error ? error.message : String(error),
           component: "LiffService"
@@ -214,7 +215,7 @@ export class LiffService {
     if (!accessToken) {
       clientLogger.info("No LIFF access token available", createAuthLogContext(
         generateSessionId(),
-        "liff",
+        AuthEnvironment.LIFF,
         { component: "LiffService" }
       ));
       return false;
@@ -299,7 +300,7 @@ export class LiffService {
 
           clientLogger.info(`LIFF authentication error (attempt ${currentAttempt})`, createAuthLogContext(
             generateSessionId(),
-            "liff",
+            AuthEnvironment.LIFF,
             {
               type: categorizedError.type,
               message: categorizedError.message,
@@ -313,7 +314,7 @@ export class LiffService {
           if (!categorizedError.retryable || !operation.retry(error as Error)) {
             clientLogger.info("LIFF authentication failed after all retries", createAuthLogContext(
               generateSessionId(),
-              "liff",
+              AuthEnvironment.LIFF,
               { component: "LiffService" }
             ));
 
