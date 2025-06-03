@@ -7,14 +7,12 @@ import OpportunitiesListSectionSkeleton from "@/app/activities/components/ListSe
 
 interface ActivitiesAllSectionProps {
   opportunities: ActivityCard[];
-  loadMoreRef: React.RefObject<HTMLDivElement>;
   isSectionLoading: boolean;
   isInitialLoading?: boolean;
 }
 
 const ActivitiesListSection: React.FC<ActivitiesAllSectionProps> = ({
   opportunities,
-  loadMoreRef,
   isInitialLoading,
   isSectionLoading,
 }) => {
@@ -30,7 +28,7 @@ const ActivitiesListSection: React.FC<ActivitiesAllSectionProps> = ({
         ))}
       </div>
       <div className="h-20" aria-hidden="true"></div>
-      <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
+      {/*<div ref={loadMoreRef} className="h-10" aria-hidden="true" />*/}
       {isSectionLoading && (
         <div className="py-6 flex items-center justify-center">
           <div className="animate-spin h-6 w-6 border-b-2 border-foreground rounded-full"></div>

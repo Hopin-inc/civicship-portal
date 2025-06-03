@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, Suspense, lazy } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useActivities } from "@/app/activities/hooks/useActivities";
 import ActivitiesFeaturedSection from "@/app/activities/components/FeaturedSection/FeaturedSection";
 import { mapOpportunityCards, sliceActivitiesBySection } from "@/app/activities/data/presenter";
@@ -10,8 +10,12 @@ import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
 import { ActivityCard } from "./data/type";
 
-const ActivitiesListSection = lazy(() => import("@/app/activities/components/ListSection/ListSection"));
-const ActivitiesCarouselSection = lazy(() => import("@/app/activities/components/CarouselSection/CarouselSection"));
+const ActivitiesListSection = lazy(
+  () => import("@/app/activities/components/ListSection/ListSection"),
+);
+const ActivitiesCarouselSection = lazy(
+  () => import("@/app/activities/components/CarouselSection/CarouselSection"),
+);
 
 export default function ActivitiesPage() {
   const headerConfig = useMemo(
@@ -38,7 +42,6 @@ export default function ActivitiesPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // opportunitiesが変更されたときにデータを処理
   const { upcomingCards, featuredCards, listCards } = useMemo(() => {
     if (!opportunities?.edges?.length) {
       return { upcomingCards: [], featuredCards: [], listCards: [] };
@@ -47,15 +50,10 @@ export default function ActivitiesPage() {
     const activityCards = mapOpportunityCards(opportunities.edges);
     const result = sliceActivitiesBySection(activityCards);
 
-    // 初回ロード時はリストカードを設定
     if (prevEdgeCountRef.current === 0) {
       listCardsRef.current = result.listCards;
-    }
-
-    // 追加ロード時は順序を保持するために新しいアイテムのみを追加
-    else if (opportunities.edges.length > prevEdgeCountRef.current) {
+    } else if (opportunities.edges.length > prevEdgeCountRef.current) {
       const newCards = mapOpportunityCards(opportunities.edges.slice(prevEdgeCountRef.current));
-      // すでにfeaturedまたはupcomingセクションに含まれていないカードのみをフィルタリング
       const newListCards = newCards.filter(
         (card) =>
           !result.featuredCards.some((fc) => fc.id === card.id) &&
@@ -63,9 +61,7 @@ export default function ActivitiesPage() {
       );
       listCardsRef.current = [...listCardsRef.current, ...newListCards];
     }
-
     prevEdgeCountRef.current = opportunities.edges.length;
-
     return {
       upcomingCards: result.upcomingCards,
       featuredCards: result.featuredCards,
@@ -75,7 +71,7 @@ export default function ActivitiesPage() {
 
   useEffect(() => {
     if (!loading && featuredCards.length > 0) {
-      if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
         const idleCallback = requestIdleCallback(() => {
           setShowOtherSections(true);
         });
@@ -104,20 +100,30 @@ export default function ActivitiesPage() {
   return (
     <div className="min-h-screen">
       <ActivitiesFeaturedSection opportunities={featuredCards} isInitialLoading={false} />
+
       {showOtherSections && (
-        <Suspense fallback={<div className="h-32 flex items-center justify-center"><LoadingIndicator /></div>}>
-          <ActivitiesCarouselSection
-            title="もうすぐ開催予定"
-            opportunities={upcomingCards}
-            isInitialLoading={false}
-          />
-          <ActivitiesListSection
-            opportunities={listCards}
-            loadMoreRef={loadMoreRef}
-            isInitialLoading={false}
-            isSectionLoading={loading}
-          />
-        </Suspense>
+        <>
+          <Suspense
+            fallback={
+              <div className="h-32 flex items-center justify-center">
+                <LoadingIndicator />
+              </div>
+            }
+          >
+            <ActivitiesCarouselSection
+              title="もうすぐ開催予定"
+              opportunities={upcomingCards}
+              isInitialLoading={false}
+            />
+            <ActivitiesListSection
+              opportunities={listCards}
+              isInitialLoading={false}
+              isSectionLoading={loading}
+            />
+          </Suspense>
+
+          <div ref={loadMoreRef} className="h-10" />
+        </>
       )}
     </div>
   );
