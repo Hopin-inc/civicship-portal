@@ -32,20 +32,3 @@ export const detectEnvironment = (): AuthEnvironment => {
 export const isRunningInLiff = (): boolean => {
   return detectEnvironment() === AuthEnvironment.LIFF;
 };
-
-/**
- * 現在の環境がLINEブラウザ内かどうかを確認
- * @returns LINEブラウザ内で実行されている場合はtrue
- */
-export const isRunningInLineBrowser = (): boolean => {
-  return detectEnvironment() === AuthEnvironment.LINE_BROWSER;
-};
-
-/**
- * 現在の環境がLIFFまたはLINEブラウザ内かどうかを確認
- * @returns LIFFまたはLINEブラウザ内で実行されている場合はtrue
- */
-export const isRunningInLineEnvironment = (): boolean => {
-  const env = detectEnvironment();
-  return env === AuthEnvironment.LIFF || env === AuthEnvironment.LINE_BROWSER;
-};
