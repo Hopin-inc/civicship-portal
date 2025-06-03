@@ -31,8 +31,8 @@ const AsymmetricImageGrid = memo(
                 alt={featured.alt}
                 className="rounded-lg object-cover"
                 fill
-                sizes="(max-width: 226px) 100vw, 226px"
-                priority={true}
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 226px"
+                loading="lazy"
               />
             </div>
           </div>
@@ -47,7 +47,7 @@ const AsymmetricImageGrid = memo(
                   alt={image.alt}
                   className="rounded-lg object-cover"
                   fill
-                  sizes="(max-width: 112px) 100vw, 112px"
+                  sizes="(max-width: 768px) 25vw, (max-width: 1024px) 16vw, 112px"
                 />
                 {remainingCount && index === thumbnails.length - 1 && (
                   <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
