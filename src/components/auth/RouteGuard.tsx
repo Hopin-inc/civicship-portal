@@ -7,7 +7,7 @@ import { useQuery } from "@apollo/client";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 
 /**
  * ルートガードコンポーネントのプロパティ
@@ -45,7 +45,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       const urlParams = new URLSearchParams(window.location.search);
       const isReturnFromLineAuth = urlParams.has("code") && urlParams.has("state") && urlParams.has("liffClientId");
       if (isReturnFromLineAuth) {
-        clientLogger.debug("RouteGuard: Skipping redirect for LINE auth return to homepage", {
+        logger.debug("RouteGuard: Skipping redirect for LINE auth return to homepage", {
           component: "RouteGuard"
         });
         setAuthorized(true);

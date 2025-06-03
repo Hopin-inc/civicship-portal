@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { AuthState } from "@/contexts/AuthProvider";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
 
 interface UseAutoLoginProps {
@@ -77,7 +77,7 @@ const useAutoLogin = ({
               await refetchUser();
             }
           } catch (error) {
-            clientLogger.info(
+            logger.info(
               "Auto-login with LIFF failed",
               createAuthLogContext(generateSessionId(), AuthEnvironment.LIFF, {
                 error: error instanceof Error ? error.message : String(error),

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthState } from "@/contexts/AuthProvider";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 
@@ -34,7 +34,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
       try {
         const initialized = await liffServiceRef.current.initialize();
         if (!initialized) {
-          clientLogger.info("LIFF init failed", createAuthLogContext(
+          logger.info("LIFF init failed", createAuthLogContext(
             generateSessionId(),
             AuthEnvironment.LIFF,
             { component: "useLineAuthProcessing" }
@@ -43,7 +43,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         }
 
         const { isLoggedIn, profile } = liffServiceRef.current.getState();
-        clientLogger.debug("LIFF State", {
+        logger.debug("LIFF State", {
           isInitialized: true,
           isLoggedIn,
           userId: profile?.userId || "none",
@@ -51,7 +51,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         });
 
         if (!isLoggedIn) {
-          clientLogger.debug("User not logged in via LIFF", {
+          logger.debug("User not logged in via LIFF", {
             component: "useLineAuthProcessing"
           });
           return;
@@ -59,7 +59,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
 
         const success = await liffServiceRef.current.signInWithLiffToken();
         if (!success) {
-          clientLogger.info("signInWithLiffToken failed", createAuthLogContext(
+          logger.info("signInWithLiffToken failed", createAuthLogContext(
             generateSessionId(),
             AuthEnvironment.LIFF,
             { component: "useLineAuthProcessing" }
@@ -67,12 +67,12 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
           return;
         }
 
-        clientLogger.debug("LINE auth successful. Refetching user", {
+        logger.debug("LINE auth successful. Refetching user", {
           component: "useLineAuthProcessing"
         });
         await refetchUserRef.current();
       } catch (err) {
-        clientLogger.info("Error during LINE auth", createAuthLogContext(
+        logger.info("Error during LINE auth", createAuthLogContext(
           generateSessionId(),
           AuthEnvironment.LIFF,
           {

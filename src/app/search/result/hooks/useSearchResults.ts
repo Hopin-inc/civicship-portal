@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { ActivityCard } from "@/app/activities/data/type";
 import { presenterActivityCards } from "@/app/activities/data/presenter";
 import { IPrefectureCodeMap } from "@/app/search/data/type";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 
 export const useSearchResults = (
   searchParams: SearchParams = {},
@@ -80,7 +80,7 @@ export const useSearchResults = (
 
   useEffect(() => {
     if (error) {
-      clientLogger.info("Error fetching search results", {
+      logger.info("Error fetching search results", {
         error: error.message || String(error),
         component: "useSearchResults"
       });
