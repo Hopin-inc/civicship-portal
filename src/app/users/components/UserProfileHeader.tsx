@@ -49,7 +49,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
               placeholder={"blur"}
               blurDataURL={PLACEHOLDER_IMAGE}
               className="object-cover"
-              priority
+              loading="lazy"
               onError={(e) => {
                 const img = e.target as HTMLImageElement;
                 img.src = PLACEHOLDER_IMAGE;
