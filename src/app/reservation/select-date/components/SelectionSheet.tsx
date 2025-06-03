@@ -37,8 +37,13 @@ const SelectionSheet: React.FC<SelectionSheetProps> = ({
   }, [activeForm, setSelectedDate, setSelectedGuests]);
 
   const handleSelectDate = useCallback(
-    (dateLabel: string) => () => setSelectedDate(dateLabel),
-    [setSelectedDate],
+    (dateLabel: string) => () => {
+      setSelectedDate(dateLabel);
+      setTimeout(() => {
+        onClose();
+      }, 0);
+    },
+    [setSelectedDate, onClose],
   );
 
   const handleDecreaseGuests = useCallback(
