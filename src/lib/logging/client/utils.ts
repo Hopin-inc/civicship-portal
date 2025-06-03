@@ -1,5 +1,7 @@
 "use client";
 
+import { detectEnvironment } from "@/lib/auth/environment-detector";
+
 /**
  * 認証ログ用のユーティリティ関数
  * クライアント環境とサーバー環境の両方で動作するよう設計
@@ -210,6 +212,8 @@ export const createAuthLogContext = (
     additionalContext?.userId ||
     (additionalContext?.user?.uid ? maskUserId(additionalContext.user.uid) : undefined);
 
+  const authEnvironment = detectEnvironment();
+
   const errorInfo = additionalContext?.error
     ? {
         error: {
@@ -242,6 +246,7 @@ export const createAuthLogContext = (
       ...deviceInfo,
       network: networkInfo,
     },
+    authEnvironment,
     ...levelInfo,
     ...errorInfo,
     ...additionalContext,
