@@ -35,7 +35,6 @@ export default function ActivitiesFeaturedSection({
       const index = emblaApi.selectedScrollSnap();
       setSelectedIndex(index);
 
-      // Synchronize image slider with main carousel
       if (imageSliderApi) {
         imageSliderApi.scrollTo(index);
       }

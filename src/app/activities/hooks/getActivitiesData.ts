@@ -36,7 +36,7 @@ export async function getActivitiesData(): Promise<{
           category: GqlOpportunityCategory.Activity,
           publishStatus: [GqlPublishStatus.Public],
         },
-        first: 20,
+        first: 10,
       },
     });
 
@@ -49,7 +49,7 @@ export async function getActivitiesData(): Promise<{
 
     return { featuredCards };
   } catch (error) {
-    console.error('Failed to fetch activities data:', error);
+    console.error("Failed to fetch activities data:", error);
     return { featuredCards: [] };
   }
 }
