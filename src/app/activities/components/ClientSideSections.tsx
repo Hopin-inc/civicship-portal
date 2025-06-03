@@ -23,18 +23,20 @@ export default function ClientSideSections() {
   }, [refetch]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      const idleCallback = requestIdleCallback(() => {
-        setShowOtherSections(true);
-      });
-      return () => cancelIdleCallback(idleCallback);
-    } else {
-      const timer = setTimeout(() => {
-        setShowOtherSections(true);
-      }, 100);
-      return () => clearTimeout(timer);
+    if (!loading && opportunities?.edges?.length) {
+      if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+        const idleCallback = requestIdleCallback(() => {
+          setShowOtherSections(true);
+        });
+        return () => cancelIdleCallback(idleCallback);
+      } else {
+        const timer = setTimeout(() => {
+          setShowOtherSections(true);
+        }, 100);
+        return () => clearTimeout(timer);
+      }
     }
-  }, []);
+  }, [loading, opportunities?.edges?.length]);
 
   const { upcomingCards, listCards } = useMemo(() => {
     if (!opportunities?.edges?.length) {
