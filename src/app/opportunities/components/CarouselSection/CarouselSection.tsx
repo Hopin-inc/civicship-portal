@@ -3,16 +3,16 @@
 import React from "react";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
 import { OpportunityCard } from "@/app/activities/data/type";
-import CarouselSectionSkeleton from "./CarouselSectionSkeleton";
+import CarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 
-interface OpportunitiesCarouselSectionProps {
+interface ActivitiesCarouselSectionProps {
   title: string;
   opportunities: OpportunityCard[];
   isInitialLoading?: boolean;
   isSearchResult?: boolean;
 }
 
-const OpportunitiesCarouselSection: React.FC<OpportunitiesCarouselSectionProps> = ({
+const ActivitiesCarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
   title,
   opportunities,
   isInitialLoading = false,
@@ -44,4 +44,4 @@ const OpportunitiesCarouselSection: React.FC<OpportunitiesCarouselSectionProps> 
   );
 };
 
-export default OpportunitiesCarouselSection;
+export default ActivitiesCarouselSection;

@@ -7,9 +7,7 @@ import {
   GqlOpportunity,
   GqlCheckCommunityPermissionInput,
 } from "@/types/graphql";
-import { presenterActivityDetail } from "@/app/activities/data/presenter";
-import { presenterQuestDetail } from "@/app/quests/data/presenter";
-import { fetchQuestDetail } from "@/app/quests/[id]/data/fetchQuestDetail";
+import { presenterOpportunityDetail } from "../data/presenter";
 import { COMMUNITY_ID } from "@/utils";
 import OpportunityDetailPageClient from "./components/OpportunityDetailPageClient";
 
@@ -42,13 +40,8 @@ async function fetchOpportunityDetail(id: string): Promise<GqlOpportunity> {
 export default async function OpportunityDetailPage({ params }: OpportunityDetailPageProps) {
   const opportunity = await fetchOpportunityDetail(params.id);
 
-  if (opportunity.category === "ACTIVITY") {
-    const activityDetail = presenterActivityDetail(opportunity);
-    return <OpportunityDetailPageClient opportunityDetail={activityDetail} type="activity" />;
-  } else if (opportunity.category === "QUEST") {
-    const questDetail = await fetchQuestDetail(params.id, COMMUNITY_ID);
-    return <OpportunityDetailPageClient opportunityDetail={questDetail} type="quest" />;
-  }
-
-  notFound();
+  const opportunityDetail = presenterOpportunityDetail(opportunity);
+  const type = opportunity.category === "ACTIVITY" ? "activity" : "quest";
+  
+  return <OpportunityDetailPageClient opportunityDetail={opportunityDetail} type={type} />;
 }

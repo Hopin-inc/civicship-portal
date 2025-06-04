@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const OpportunitiesListSectionSkeleton = () => {
   return (
     <section className="mt-6 px-6">
-      <h2 className="text-display-md">すべての機会</h2>
+      <h2 className="text-display-md">すべての体験</h2>
       <div className="mt-6 flex gap-4 overflow-x-auto pb-8 scrollbar-hide">
         {[...Array(3)].map((_, i) => (
           <div key={i} className="w-[164px] flex-shrink-0 space-y-3">

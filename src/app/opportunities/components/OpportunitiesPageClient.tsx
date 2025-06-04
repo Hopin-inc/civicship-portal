@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import FeaturedSectionSkeleton from "./FeaturedSection/FeaturedSectionSkeleton";
 import OpportunitiesCarouselSectionSkeleton from "./CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "./ListSection/ListSectionSkeleton";
-import { mapOpportunityCards } from "@/app/activities/data/presenter";
+import { mapOpportunityCards } from "../data/presenter";
 import ErrorState from "@/components/shared/ErrorState";
 import EmptyState from "@/components/shared/EmptyState";
 import { GqlOpportunityCategory } from "@/types/graphql";

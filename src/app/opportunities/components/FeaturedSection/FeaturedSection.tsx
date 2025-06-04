@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { OpportunityCard } from "@/app/activities/data/type";
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
-import FeaturedSectionSkeleton from "./FeaturedSectionSkeleton";
+import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
@@ -13,7 +13,7 @@ interface FeaturedSectionProps {
   isInitialLoading?: boolean;
 }
 
-export default function OpportunitiesFeaturedSection({
+export default function ActivitiesFeaturedSection({
   opportunities,
   isInitialLoading = false,
 }: FeaturedSectionProps) {
