@@ -6,13 +6,13 @@ import { AlertCircle, CalendarX } from "lucide-react";
 import SameStateActivities from "./SimilarActivitiesList";
 import ActivityScheduleCard from "./ActivityScheduleCard";
 import {
-  ActivityCard,
-  ActivityDetail,
+  OpportunityCard,
+  OpportunityDetail,
   OpportunityHost,
   OpportunityPlace,
 } from "@/app/activities/data/type";
 import ArticleCard from "@/app/articles/components/Card";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import IconWrapper from "@/components/shared/IconWrapper";
@@ -22,20 +22,22 @@ import { ActivityBodySection } from "@/app/activities/[id]/components/ActivityBo
 import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 
 interface ActivityDetailsContentProps {
-  opportunity: ActivityDetail;
-  availableTickets: number;
-  availableDates: ActivitySlot[];
-  sameStateActivities: ActivityCard[];
+  opportunity: OpportunityDetail;
+  availableTickets?: number;
+  availableDates?: (ActivitySlot | QuestSlot)[];
+  sameStateActivities?: OpportunityCard[];
   communityId?: string;
 }
 
 const ActivityDetailsContent = ({
   opportunity,
   availableTickets,
-  availableDates,
-  sameStateActivities,
+  availableDates = [],
+  sameStateActivities = [],
   communityId = "",
 }: ActivityDetailsContentProps) => {
+  const isQuest = 'pointsToEarn' in opportunity;
+  
   return (
     <>
       <ActivityBodySection body={opportunity.description + "\n\n" + opportunity.body} />
@@ -45,10 +47,11 @@ const ActivityDetailsContent = ({
         slots={availableDates}
         opportunityId={opportunity.id}
         communityId={communityId}
+        isQuest={isQuest}
       />
-      <NoticeSection />
+      <NoticeSection isQuest={isQuest} />
       <SameStateActivities
-        header={"近くでおすすめの体験"}
+        header={isQuest ? "近くでおすすめのクエスト" : "近くでおすすめの体験"}
         opportunities={sameStateActivities}
         currentOpportunityId={opportunity.id}
       />
@@ -126,10 +129,12 @@ const ScheduleSection = ({
   slots,
   opportunityId,
   communityId,
+  isQuest = false,
 }: {
-  slots: ActivitySlot[];
+  slots: (ActivitySlot | QuestSlot)[];
   opportunityId: string;
   communityId: string;
+  isQuest?: boolean;
 }) => {
   const query = new URLSearchParams({
     id: opportunityId,
@@ -169,7 +174,7 @@ const ScheduleSection = ({
             {visibleSlots.length > 2 && (
               <Link href={`/reservation/select-date?${query.toString()}`}>
                 <Button variant="secondary" size="md" className="w-full">
-                  参加できる日程を探す
+                  {isQuest ? "参加できる日程を探す" : "参加できる日程を探す"}
                 </Button>
               </Link>
             )}
@@ -190,7 +195,7 @@ const ScheduleSection = ({
   );
 };
 
-const NoticeSection: React.FC = () => {
+const NoticeSection: React.FC<{ isQuest?: boolean }> = ({ isQuest = false }) => {
   return (
     <section className="pt-6 pb-8 mt-0 bg-background-hover -mx-4 px-4">
       <h2 className="text-display-md text-foreground mb-4">注意事項</h2>
@@ -213,7 +218,7 @@ const NoticeSection: React.FC = () => {
           <IconWrapper color="warning">
             <AlertCircle size={20} strokeWidth={2.5} />
           </IconWrapper>
-          <p className="text-body-md flex-1">当日は現金をご用意下さい。</p>
+          <p className="text-body-md flex-1">{isQuest ? "参加時にポイントが付与されます。" : "当日は現金をご用意下さい。"}</p>
         </div>
         <div className="flex items-center gap-3">
           <IconWrapper color="warning">

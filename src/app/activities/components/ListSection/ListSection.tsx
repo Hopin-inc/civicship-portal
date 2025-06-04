@@ -2,11 +2,11 @@
 
 import React from "react";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/app/activities/data/type";
+import { OpportunityCard } from "@/app/activities/data/type";
 import OpportunitiesListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
 
 interface ActivitiesAllSectionProps {
-  opportunities: ActivityCard[];
+  opportunities: OpportunityCard[];
   isSectionLoading: boolean;
   isInitialLoading?: boolean;
 }
@@ -21,7 +21,7 @@ const ActivitiesListSection: React.FC<ActivitiesAllSectionProps> = ({
 
   return (
     <section className="mt-6 px-6">
-      <h2 className="text-display-md">すべての体験</h2>
+      <h2 className="text-display-md">すべてのクエスト</h2>
       <div className="mt-6 grid grid-cols-2 gap-4">
         {opportunities.map((opportunity) => (
           <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} />

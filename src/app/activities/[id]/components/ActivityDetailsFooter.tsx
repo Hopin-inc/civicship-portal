@@ -10,8 +10,7 @@ import { cn } from "@/lib/utils";
 export type DisableReasonType = "noSlots" | "reservationClosed" | "externalBooking";
 
 interface ActivityDetailsFooterProps {
-  opportunityId: string;
-  price: number | null;
+  opportunity: { id: string; feeRequired?: number | null; pointsToEarn?: number | null };
   communityId: string | undefined;
   disableReason?: DisableReasonType;
 }
@@ -23,15 +22,18 @@ const DISABLE_MESSAGES = {
 } as const;
 
 const ActivityDetailsFooter: React.FC<ActivityDetailsFooterProps> = ({
-  opportunityId,
-  price,
+  opportunity,
   communityId,
   disableReason,
 }) => {
   const query = new URLSearchParams({
-    id: opportunityId,
+    id: opportunity.id,
     community_id: communityId ?? COMMUNITY_ID,
   });
+  
+  const isQuest = 'pointsToEarn' in opportunity;
+  const price = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
+  const points = 'pointsToEarn' in opportunity ? opportunity.pointsToEarn : null;
 
   const env = detectEnvironment();
   const isLiff = env === AuthEnvironment.LIFF;
@@ -63,9 +65,11 @@ const ActivityDetailsFooter: React.FC<ActivityDetailsFooterProps> = ({
         )}
       >
         <div>
-          <p className="text-body-sm text-muted-foreground">1人あたり</p>
-          <p className={cn("text-body-lg font-bold", price == null && "text-muted-foreground/50")}>
-            {price != null ? `${price.toLocaleString()}円〜` : "料金未定"}
+          <p className="text-body-sm text-muted-foreground">{isQuest ? "獲得ポイント" : "1人あたり"}</p>
+          <p className={cn("text-body-lg font-bold", (price == null && points == null) && "text-muted-foreground/50")}>
+            {isQuest 
+              ? points != null ? `${points}ポイント` : "ポイント未定"
+              : price != null ? `${price.toLocaleString()}円〜` : "料金未定"}
           </p>
         </div>
         {renderActionElement()}

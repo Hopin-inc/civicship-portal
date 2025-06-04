@@ -1,6 +1,6 @@
 "use client";
 
-import { ActivityCard } from "@/app/activities/data/type";
+import { OpportunityCard } from "@/app/activities/data/type";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
@@ -8,14 +8,14 @@ import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 type Props = {
-  opportunity: ActivityCard;
+  opportunity: OpportunityCard;
   withShadow?: boolean;
 };
 
 function OpportunityCardHorizontal({ opportunity, withShadow = true }: Props) {
   return (
     <Link
-      href={`/activities/${opportunity.id}?community_id=${opportunity.communityId}`}
+      href={`/${'feeRequired' in opportunity ? 'activities' : 'quests'}/${opportunity.id}?community_id=${opportunity.communityId}`}
       className="block"
     >
       <div className="mx-auto max-w-md">
@@ -42,9 +42,13 @@ function OpportunityCardHorizontal({ opportunity, withShadow = true }: Props) {
           <div className="flex-1 px-4 py-3">
             <h2 className="text-title-sm text-foreground line-clamp-1">{opportunity.title}</h2>
             <p className="mt-1 text-body-sm text-muted-foreground">
-              {opportunity.feeRequired
-                ? `1人あたり${opportunity.feeRequired.toLocaleString()}円から`
-                : "料金未定"}
+              {'feeRequired' in opportunity
+                ? opportunity.feeRequired
+                  ? `1人あたり${opportunity.feeRequired.toLocaleString()}円から`
+                  : "料金未定"
+                : opportunity.pointsToEarn
+                ? `${opportunity.pointsToEarn}ポイント獲得`
+                : "ポイント未定"}
             </p>
             <div className="mt-1 flex items-center text-muted-foreground text-body-sm">
               <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />

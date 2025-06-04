@@ -4,11 +4,11 @@ import Image from "next/image";
 import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { ActivityCard } from "@/app/activities/data/type";
+import { OpportunityCard } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface OpportunityCardVerticalProps {
-  opportunity: ActivityCard;
+  opportunity: OpportunityCard;
   isCarousel?: boolean;
 }
 
@@ -16,12 +16,13 @@ export default function OpportunityCardVertical({
   opportunity,
   isCarousel = false,
 }: OpportunityCardVerticalProps) {
-  const { id, title, feeRequired, location, images, hasReservableTicket, communityId } =
-    opportunity;
+  const { id, title, location, images, hasReservableTicket, communityId } = opportunity;
+  const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
+  const pointsToEarn = 'pointsToEarn' in opportunity ? opportunity.pointsToEarn : null;
 
   return (
     <Link
-      href={`/activities/${id}?community_id=${communityId}`}
+      href={`/${'feeRequired' in opportunity ? 'activities' : 'quests'}/${id}?community_id=${communityId}`}
       className={`relative w-full flex-shrink-0 ${isCarousel ? "max-w-[150px] sm:max-w-[164px]" : ""}`}
     >
       <Card className="w-full h-[205px] overflow-hidden relative">
@@ -50,7 +51,13 @@ export default function OpportunityCardVertical({
         <h3 className="text-title-sm text-foreground line-clamp-2">{title}</h3>
         <div className="mt-2 flex flex-col">
           <p className="text-body-sm text-muted-foreground">
-            {feeRequired != null ? `1人あたり${feeRequired.toLocaleString()}円から` : "料金未定"}
+            {feeRequired != null 
+              ? `1人あたり${feeRequired.toLocaleString()}円から` 
+              : pointsToEarn != null 
+              ? `${pointsToEarn}ポイント獲得`
+              : feeRequired === null && pointsToEarn === null 
+              ? "料金未定" 
+              : "ポイント未定"}
           </p>
           <div className="flex items-center text-body-sm text-muted-foreground mt-1">
             <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />

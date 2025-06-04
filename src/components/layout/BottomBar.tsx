@@ -27,6 +27,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     pathname.startsWith("/admin") ||
     (pathname.startsWith("/reservation") && !pathname.includes("/complete")) ||
     pathname.startsWith("/activities/") ||
+    pathname.startsWith("/quests/") ||
     pathname.startsWith("/participations/") ||
     pathname.startsWith("/sign-up") ||
     pathname === "/users/me/edit" ||
@@ -54,7 +55,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
         <div className="flex justify-around items-center">
           <Link
             href="/activities"
-            className={cn(getLinkStyle("/activities", "/activities/*", "/search/*"), "flex-grow")}
+            className={cn(getLinkStyle("/activities", "/activities/*", "/quests", "/quests/*", "/search/*"), "flex-grow")}
           >
             <Search size={24} />
             <span className="text-xs mt-1">見つける</span>
