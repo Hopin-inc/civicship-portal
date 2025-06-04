@@ -2,12 +2,15 @@ import { GqlOpportunity, GqlPlace } from "@/types/graphql";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 import clientLogger from "@/lib/logging/client";
 
-// #NOTE 拠点に複数人の案内人の体験が掲載されている場合、意図しない順序で表示されている拠点のID（順序を逆にすることで簡易的に解決する）
-// 坂東商店guest room〜藍染めと宿〜 https://www.neo88.app/places/cmahru0gg001vs60nnkqrgugc
-// たねのや https://www.neo88.app/places/cmahrua5f001xs60n3vp4csom
+// #NOTE 意図しない順序で体験やその画像が表示されている場合に順序を指定して並べるようにする（拠点 ID をキーに、並べたい体験の ID の配列を値に持つ）
+
 const OPPORTUNITY_ORDER_BY_PLACE: Record<string, string[]> = {
+  // 坂東商店guest room〜藍染めと宿〜 https://www.neo88.app/places/cmahru0gg001vs60nnkqrgugc
   cmahru0gg001vs60nnkqrgugc: ["cmavanchu00a0s60nku50uvrz", "cmaibrt4k000ps60nzbrtikv1"],
+  // たねのや https://www.neo88.app/places/cmahrua5f001xs60n3vp4csom
   cmahrua5f001xs60n3vp4csom: ["cmap78zrg0029s60nww1mrl37", "cmaiwjrq7000rs60ne9oespcs"],
+  // 那賀川BLUEBERRY みき農園 https://www.neo88.app/places/cmahpv9ip000hs60n0mpxswx8
+  cmahpv9ip000hs60n0mpxswx8: ["cmajqr2uu002ws60nvkfsfl65", "cmajqgnqa002vs60n255j27sp"],
   // LOCAL mock data
   // cmbar2ver00468ze0bpmsqexi: [
   //   "cmbar2vi300a88ze05mjpi5cn",
