@@ -85,7 +85,12 @@ export default function LoginPage() {
     };
   }, []);
 
-  if (loading || isAuthenticating) {
+  if (
+    loading ||
+    isAuthenticating ||
+    authenticationState === "line_authenticated" ||
+    authenticationState === "loading"
+  ) {
     return <LoadingIndicator />;
   }
 
