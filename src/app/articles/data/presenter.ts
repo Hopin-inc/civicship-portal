@@ -1,5 +1,3 @@
-"use client";
-
 import { GqlArticle, GqlArticleCategory, GqlArticleEdge, GqlUser, Maybe } from "@/types/graphql";
 import {
   TArticleCard,

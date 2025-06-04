@@ -5,10 +5,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 
 interface ActivityScheduleCardProps {
-  slot: ActivitySlot;
+  slot: ActivitySlot | QuestSlot;
   opportunityId: string;
   communityId: string;
 }
@@ -24,13 +24,37 @@ const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
     : renderAvailableSlotCard(slot, opportunityId, communityId);
 };
 
-const renderFullSlotCard = (slot: ActivitySlot) => {
+// 共通の表示ラベル抽出
+const getSlotLabelInfo = (
+  slot: ActivitySlot | QuestSlot,
+): { text: string; className: string; suffix?: string } => {
+  if ("feeRequired" in slot) {
+    return {
+      text: slot.feeRequired != null ? `${slot.feeRequired.toLocaleString()}円` : "料金未定",
+      className:
+        slot.feeRequired != null ? "text-caption font-bold" : "text-muted-foreground/50 font-bold",
+      suffix: slot.feeRequired != null ? "/ 人" : undefined,
+    };
+  }
+
+  if ("pointsToEarn" in slot) {
+    return {
+      text: slot.pointsToEarn != null ? `${slot.pointsToEarn.toLocaleString()}pt` : "ポイント未定",
+      className:
+        slot.pointsToEarn != null ? "text-primary font-bold" : "text-muted-foreground/50 font-bold",
+    };
+  }
+
+  return {
+    text: "未定",
+    className: "text-muted-foreground/50 font-bold",
+  };
+};
+
+const renderFullSlotCard = (slot: ActivitySlot | QuestSlot) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
-
-  const isFeeSpecified = slot.feeRequired != null;
-  const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
-  const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-gray-400" : "text-gray-400"}`;
+  const { text, className, suffix } = getSlotLabelInfo(slot);
 
   return (
     <div className="bg-gray-100 border border-gray-200 rounded-xl px-6 py-6 w-[280px] flex flex-col">
@@ -46,8 +70,8 @@ const renderFullSlotCard = (slot: ActivitySlot) => {
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            <p className={feeClass}>{feeText}</p>
-            {isFeeSpecified && <p className="text-body-sm ml-1 text-gray-300">/ 人</p>}
+            <p className={className}>{text}</p>
+            {suffix && <p className="text-body-sm ml-1 text-gray-300">{suffix}</p>}
           </div>
         </div>
       </div>
@@ -61,23 +85,20 @@ const renderFullSlotCard = (slot: ActivitySlot) => {
 };
 
 const renderAvailableSlotCard = (
-  slot: ActivitySlot,
+  slot: ActivitySlot | QuestSlot,
   opportunityId: string,
   communityId: string,
 ) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
   const isReservable = slot.isReservable;
-
-  const isFeeSpecified = slot.feeRequired != null;
-  const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
-  const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-muted-foreground/50" : "text-caption"}`;
+  const { text, className, suffix } = getSlotLabelInfo(slot);
 
   const query = new URLSearchParams({
     id: opportunityId,
     community_id: communityId,
     slot_id: slot.id,
-    guests: String(slot.applicantCount),
+    guests: String(slot.applicantCount ?? 0),
   });
 
   const href = `/reservation/confirm?${query.toString()}`;
@@ -96,8 +117,8 @@ const renderAvailableSlotCard = (
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            <p className={feeClass}>{feeText}</p>
-            {isFeeSpecified && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
+            <p className={className}>{text}</p>
+            {suffix && <p className="text-body-sm ml-1 text-caption">{suffix}</p>}
           </div>
         </div>
       </div>

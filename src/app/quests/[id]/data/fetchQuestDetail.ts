@@ -9,7 +9,7 @@ import { QuestDetail } from "@/app/activities/data/type";
 
 export async function fetchQuestDetail(
   id: string,
-  communityId?: string,
+  communityId: string,
 ): Promise<QuestDetail | null> {
   try {
     const { data } = await apolloClient.query<
@@ -19,7 +19,7 @@ export async function fetchQuestDetail(
       query: GetOpportunityDocument,
       variables: {
         id,
-        communityId,
+        permission: { communityId },
       },
       fetchPolicy: "no-cache",
     });

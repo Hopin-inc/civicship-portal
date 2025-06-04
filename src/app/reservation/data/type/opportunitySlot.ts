@@ -5,15 +5,15 @@ export type ActivitySlotGroup = {
   slots: ActivitySlot[];
 };
 
-export type ActivitySlot = OpportunitySlot & {
+export type ActivitySlot = IOpportunitySlot & {
   feeRequired: number | null;
 };
 
-export type QuestSlot = OpportunitySlot & {
+export type QuestSlot = IOpportunitySlot & {
   pointsToEarn: number | null;
 };
 
-type OpportunitySlot = {
+type IOpportunitySlot = {
   id: string;
   hostingStatus: GqlOpportunitySlotHostingStatus;
   capacity: number;

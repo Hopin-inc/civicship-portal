@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  useGetOpportunityQuery,
-  GqlGetOpportunityQuery,
-  GqlGetOpportunityQueryVariables,
-} from "@/types/graphql";
+import { useGetOpportunityQuery } from "@/types/graphql";
 import { presenterQuestDetail } from "../../data/presenter";
 import { QuestDetail } from "@/app/activities/data/type";
 
@@ -15,14 +11,11 @@ export interface UseQuestDetailResult {
   refetch: () => void;
 }
 
-export const useQuestDetail = (
-  id: string,
-  communityId?: string,
-): UseQuestDetailResult => {
+export const useQuestDetail = (id: string, communityId: string): UseQuestDetailResult => {
   const { data, loading, error, refetch } = useGetOpportunityQuery({
     variables: {
       id,
-      communityId,
+      permission: { communityId },
     },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
