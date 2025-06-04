@@ -1,25 +1,25 @@
 "use client";
 
 import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
-import { useSortedSlotsByStartsAt } from "@/app/activities/[id]/hooks/useSortedSlotsByStartsAt";
-import { ActivityCard, ActivityDetail } from "@/app/activities/data/type";
-import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
-import { useSameStateActivities } from "@/app/activities/[id]/hooks/useSameStateActivities";
+import { useSortedSlotsByStartsAt } from "./useSortedSlotsByStartsAt";
+import { OpportunityCard, OpportunityDetail } from "../../data/type";
+import { useOpportunityDetail } from "./useOpportunityDetail";
+import { useSameStateOpportunities } from "./useSameStateOpportunities";
 import { useAuth } from "@/contexts/AuthProvider";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { useFilterFutureSlots } from "./useFilterFutureSlots";
 
-interface UseActivityDetailsResult {
-  opportunity: ActivityDetail | null;
-  sameStateActivities: ActivityCard[];
+interface UseOpportunityDetailsResult {
+  opportunity: OpportunityDetail | null;
+  sameStateOpportunities: OpportunityCard[];
   availableTickets: number;
-  sortedSlots: ActivitySlot[];
+  sortedSlots: (ActivitySlot | QuestSlot)[];
   isLoading: boolean;
   error: Error | null;
   refetch: () => void;
 }
 
-export const useActivityDetails = (id: string): UseActivityDetailsResult => {
+export const useOpportunityDetails = (id: string): UseOpportunityDetailsResult => {
   const { user } = useAuth();
 
   const {
@@ -32,14 +32,14 @@ export const useActivityDetails = (id: string): UseActivityDetailsResult => {
 
   const stateCode = data?.opportunity?.place?.city?.state?.code;
   const {
-    sameStateActivities,
+    sameStateOpportunities,
     loading: loadingSameState,
     error: errorSameState,
     refetch: refetchSameState,
-  } = useSameStateActivities(id, stateCode ?? "");
+  } = useSameStateOpportunities(id, stateCode ?? "");
 
   const availableTickets = useAvailableTickets(opportunity, user?.id);
-  const futureSlots = useFilterFutureSlots(opportunity?.slots);
+  const futureSlots = useFilterFutureSlots(opportunity?.slots || []);
   const sortedSlots = useSortedSlotsByStartsAt(futureSlots);
 
   const isLoading = loadingOpportunity || loadingSameState;
@@ -47,7 +47,7 @@ export const useActivityDetails = (id: string): UseActivityDetailsResult => {
 
   return {
     opportunity,
-    sameStateActivities,
+    sameStateOpportunities,
     availableTickets,
     sortedSlots,
     isLoading,

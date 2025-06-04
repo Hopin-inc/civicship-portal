@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef } from "react";
-import { OpportunityCard } from "@/app/activities/data/type";
+import { OpportunityCard } from "../data/type";
 import { useOpportunities } from "../hooks/useOpportunities";
 import dynamic from "next/dynamic";
 import FeaturedSectionSkeleton from "./FeaturedSection/FeaturedSectionSkeleton";

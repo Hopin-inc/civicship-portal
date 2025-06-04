@@ -4,10 +4,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, JapaneseYen, Phone, User } from "lucide-react";
 import { displayDuration, displayPhoneNumber } from "@/utils";
-import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
+import OpportunityCardHorizontal from "@/app/opportunities/components/Card/CardHorizontal";
 import { cn } from "@/lib/utils";
 import { GqlReservation, Maybe } from "@/types/graphql";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/app/opportunities/data/type";
 
 interface ReservationDetailsProps {
   reservation: GqlReservation;

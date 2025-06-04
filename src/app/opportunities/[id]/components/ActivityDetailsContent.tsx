@@ -4,13 +4,13 @@ import React, { useMemo } from "react";
 import Image from "next/image";
 import { AlertCircle, CalendarX } from "lucide-react";
 import SameStateActivities from "./SimilarActivitiesList";
-import ActivityScheduleCard from "./ActivityScheduleCard";
+import OpportunityScheduleCard from "./ActivityScheduleCard";
 import {
   OpportunityCard,
   OpportunityDetail,
   OpportunityHost,
   OpportunityPlace,
-} from "@/app/activities/data/type";
+} from "../../data/type";
 import ArticleCard from "@/app/articles/components/Card";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Button } from "@/components/ui/button";
@@ -18,10 +18,10 @@ import Link from "next/link";
 import IconWrapper from "@/components/shared/IconWrapper";
 import AddressMap from "@/components/shared/AddressMap";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { ActivityBodySection } from "@/app/activities/[id]/components/ActivityBodySection";
+import { OpportunityBodySection } from "./OpportunityBodySection";
 import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 
-interface ActivityDetailsContentProps {
+interface OpportunityDetailsContentProps {
   opportunity: OpportunityDetail;
   availableTickets?: number;
   availableDates?: (ActivitySlot | QuestSlot)[];
@@ -29,18 +29,18 @@ interface ActivityDetailsContentProps {
   communityId?: string;
 }
 
-const ActivityDetailsContent = ({
+const OpportunityDetailsContent = ({
   opportunity,
   availableTickets,
   availableDates = [],
   sameStateActivities = [],
   communityId = "",
-}: ActivityDetailsContentProps) => {
+}: OpportunityDetailsContentProps) => {
   const isQuest = 'pointsToEarn' in opportunity;
   
   return (
     <>
-      <ActivityBodySection body={opportunity.description + "\n\n" + opportunity.body} />
+      <OpportunityBodySection body={opportunity.description + "\n\n" + opportunity.body} />
       <HostInfoSection host={opportunity.host} />
       <PlaceSection place={opportunity.place} />
       <ScheduleSection
@@ -163,7 +163,7 @@ const ScheduleSection = ({
             <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
               {slots.map((slot, index) => (
                 <div key={index} className="flex-shrink-0 first:ml-0">
-                  <ActivityScheduleCard
+                  <OpportunityScheduleCard
                     slot={slot}
                     opportunityId={opportunityId}
                     communityId={communityId}
@@ -231,4 +231,4 @@ const NoticeSection: React.FC<{ isQuest?: boolean }> = ({ isQuest = false }) => 
   );
 };
 
-export default ActivityDetailsContent;
+export default OpportunityDetailsContent;

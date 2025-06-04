@@ -4,10 +4,10 @@ import React, { useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import NavigationButtons from "@/components/shared/NavigationButtons";
-import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
-import ActivityDetailsHeader from "@/app/activities/[id]/components/ActivityDetailsHeader";
-import ActivityDetailsContent from "@/app/activities/[id]/components/ActivityDetailsContent";
-import ActivityDetailsFooter from "@/app/activities/[id]/components/ActivityDetailsFooter";
+import { ActivityDetail, QuestDetail } from "../../data/type";
+import ActivityDetailsHeader from "./ActivityDetailsHeader";
+import ActivityDetailsContent from "./ActivityDetailsContent";
+import ActivityDetailsFooter from "./ActivityDetailsFooter";
 
 interface OpportunityDetailPageClientProps {
   opportunityDetail: ActivityDetail | QuestDetail | null;
@@ -57,7 +57,6 @@ export default function OpportunityDetailPageClient({
       </main>
       <ActivityDetailsFooter
         opportunity={opportunityDetail}
-        price={type === "activity" ? (opportunityDetail as any).feeRequired : (opportunityDetail as any).pointsToEarn}
         communityId={communityId}
         disableReason={undefined}
       />

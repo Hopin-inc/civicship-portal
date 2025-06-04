@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { OpportunityCard } from "@/app/activities/data/type";
-import CarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
+import OpportunityCardVertical from "../Card/CardVertical";
+import { OpportunityCard } from "../../data/type";
+import CarouselSectionSkeleton from "./CarouselSectionSkeleton";
 
 interface ActivitiesCarouselSectionProps {
   title: string;

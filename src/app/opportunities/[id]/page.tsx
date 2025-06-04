@@ -18,7 +18,6 @@ interface OpportunityDetailPageProps {
 async function fetchOpportunityDetail(id: string): Promise<GqlOpportunity> {
   const permission: GqlCheckCommunityPermissionInput = {
     communityId: COMMUNITY_ID,
-    permissionType: "READ" as any,
   };
 
   const { data } = await apolloClient.query<

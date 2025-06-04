@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { OpportunityCard } from "@/app/activities/data/type";
+import OpportunityCardVertical from "../../components/Card/CardVertical";
+import { OpportunityCard } from "../../data/type";
 
 interface SameStateActivitiesProps {
   header: string;

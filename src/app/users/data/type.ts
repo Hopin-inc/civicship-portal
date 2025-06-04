@@ -4,7 +4,7 @@ import {
   GqlPortfolioSource,
   GqlReservationStatus,
 } from "@/types/graphql";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/app/opportunities/data/type";
 import { Participant } from "@/types/utils";
 import { UserAsset } from "@/app/wallets/data/type";
 

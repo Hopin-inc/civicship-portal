@@ -8,7 +8,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import ErrorState from "@/components/shared/ErrorState";
-import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
+import OpportunityCardVertical from "@/app/opportunities/components/Card/CardVertical";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export default function MyProfilePage() {

@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { OpportunityCard } from "@/app/activities/data/type";
+import { OpportunityCard } from "../../data/type";
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
-import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
-import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
+import FeaturedSectionSkeleton from "./FeaturedSectionSkeleton";
+import OpportunityCardHorizontal from "../Card/CardHorizontal";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface FeaturedSectionProps {

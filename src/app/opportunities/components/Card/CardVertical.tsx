@@ -1,10 +1,11 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { OpportunityCard } from "@/app/activities/data/type";
+import { OpportunityCard } from "../../data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface OpportunityCardVerticalProps {
@@ -22,7 +23,7 @@ export default function OpportunityCardVertical({
 
   return (
     <Link
-      href={`/${'feeRequired' in opportunity ? 'activities' : 'quests'}/${id}?community_id=${communityId}`}
+      href={`/opportunities/${id}?community_id=${communityId}`}
       className={`relative w-full flex-shrink-0 ${isCarousel ? "max-w-[150px] sm:max-w-[164px]" : ""}`}
     >
       <Card className="w-full h-[205px] overflow-hidden relative">

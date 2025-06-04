@@ -10,7 +10,7 @@ import {
 } from "@/app/users/data/type";
 import { presenterUserAsset } from "@/app/wallets/data/presenter";
 import { Participant } from "@/types/utils";
-import { presenterActivityCard } from "@/app/activities/data/presenter";
+import { presenterOpportunityCard } from "@/app/opportunities/data/presenter";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 export const presenterAppUser = (gqlUser: GqlUser): AppUser => {
@@ -34,7 +34,7 @@ export const presenterManagerProfile = (gqlUser: GqlUser): ManagerProfile => {
     ...presenterAppUser(gqlUser),
     asset: presenterUserAsset(gqlUser.wallets?.[0]),
     currentlyHiringOpportunities: (gqlUser.opportunitiesCreatedByMe ?? []).map(
-      presenterActivityCard,
+      presenterOpportunityCard,
     ),
   };
 };

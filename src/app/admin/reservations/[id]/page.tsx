@@ -6,7 +6,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useGetReservationQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
-import { presenterActivityCard } from "@/app/activities/data/presenter";
+import { presenterOpportunityCard } from "@/app/opportunities/data/presenter";
 import getReservationStatusMeta from "@/app/admin/reservations/hooks/useGetReservationStatusMeta";
 import NotFound from "@/app/not-found";
 import { useReservationApproval } from "@/app/admin/reservations/hooks/approval/useReservationApproval";
@@ -143,7 +143,7 @@ export default function ReservationPage() {
     );
   }
 
-  const activityCard = presenterActivityCard(opportunity);
+  const activityCard = presenterOpportunityCard(opportunity);
   const participantCount = reservation.participations?.length || 0;
   const participationFee = (opportunity.feeRequired || 0) * participantCount;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { OpportunityCard } from "@/app/activities/data/type";
+import { OpportunityCard } from "../../data/type";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
@@ -15,7 +15,7 @@ type Props = {
 function OpportunityCardHorizontal({ opportunity, withShadow = true }: Props) {
   return (
     <Link
-      href={`/${'feeRequired' in opportunity ? 'activities' : 'quests'}/${opportunity.id}?community_id=${opportunity.communityId}`}
+      href={`/opportunities/${opportunity.id}?community_id=${opportunity.communityId}`}
       className="block"
     >
       <div className="mx-auto max-w-md">

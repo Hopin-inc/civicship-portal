@@ -3,9 +3,6 @@ import { CommunityId } from "@/types";
 import { TArticleCard } from "@/app/articles/data/type";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 
-// ---------------------------------------------
-// 📦 Opportunity カード型（サマリ表示用）
-// ---------------------------------------------
 export type OpportunityCard = ActivityCard | QuestCard;
 
 export type ActivityCard = OpportunityBaseCard & {
@@ -26,9 +23,6 @@ export type OpportunityBaseCard = CommunityId & {
   hasReservableTicket: boolean;
 };
 
-// ---------------------------------------------
-// 📄 Opportunity 詳細型（個別ページ用）
-// ---------------------------------------------
 export type ActivityDetail = OpportunityDetail & {
   feeRequired: number | null;
   slots: ActivitySlot[];
@@ -37,7 +31,6 @@ export type ActivityDetail = OpportunityDetail & {
   relatedActivities: ActivityCard[];
 };
 
-// ⚠️直近では使わない⚠️
 export type QuestDetail = OpportunityDetail & {
   slots: QuestSlot[];
   relatedQuests: QuestCard[];
@@ -61,11 +54,13 @@ export type OpportunityDetail = CommunityId & {
   host: OpportunityHost;
   recentOpportunities: OpportunityCard[];
   notes: string;
+  
+  slots: (ActivitySlot | QuestSlot)[];
+  feeRequired?: number | null;
+  pointsToEarn?: number | null;
+  reservableTickets?: ReservableActivityTicket[];
 };
 
-// ---------------------------------------------
-// 👤 主催者情報
-// ---------------------------------------------
 export type OpportunityHost = {
   id: string;
   name: string;
@@ -75,9 +70,6 @@ export type OpportunityHost = {
   interview?: TArticleCard;
 };
 
-// ---------------------------------------------
-// 🏠 開催場所
-// ---------------------------------------------
 export type OpportunityPlace = {
   id: string;
   name: string;
@@ -88,9 +80,6 @@ export type OpportunityPlace = {
   longitude: number;
 };
 
-// ---------------------------------------------
-// 🎫 チケット
-// ---------------------------------------------
 export type ReservableActivityTicket = {
   id: string;
 };

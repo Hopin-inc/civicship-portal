@@ -6,8 +6,8 @@ import Link from "next/link";
 import EmptyStateWithSearch from "@/components/shared/EmptyStateWithSearch";
 import { RefObject } from "react";
 import { ParticipantsList } from "@/components/shared/ParticipantsList";
-import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/app/activities/data/type";
+import OpportunityCardVertical from "@/app/opportunities/components/Card/CardVertical";
+import { OpportunityCard } from "@/app/opportunities/data/type";
 import { AppPortfolio } from "@/app/users/data/type";
 import { GqlOpportunityCategory, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
@@ -20,11 +20,11 @@ type Props = {
   hasMore: boolean;
   lastPortfolioRef: RefObject<HTMLDivElement>;
   isSysAdmin?: boolean;
-  activeOpportunities?: ActivityCard[];
+  activeOpportunities?: OpportunityCard[];
 };
 
 type ActiveOpportunitiesProps = {
-  opportunities: ActivityCard[];
+  opportunities: OpportunityCard[];
 };
 
 const getCategoryLabel = (
@@ -403,7 +403,7 @@ const dummyPortfolios: AppPortfolio[] = [
   },
 ];
 
-const dummyActivityCards: ActivityCard[] = dummyPortfolios.map((portfolio) => ({
+const dummyActivityCards: OpportunityCard[] = dummyPortfolios.map((portfolio) => ({
   id: portfolio.id,
   category:
     portfolio.category === "EVENT" ? GqlOpportunityCategory.Event : GqlOpportunityCategory.Quest,

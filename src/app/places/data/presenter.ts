@@ -6,11 +6,11 @@ import {
   GqlUser,
   Maybe,
 } from "@/types/graphql";
-import { ActivityCard, OpportunityPlace } from "@/app/activities/data/type";
+import { OpportunityCard, OpportunityPlace } from "@/app/opportunities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { IPlaceCard, IPlaceDetail, IPlaceHost, IPlacePin } from "@/app/places/data/type";
 import { presenterArticleWithAuthor } from "@/app/articles/data/presenter";
-import { presenterActivityCard } from "@/app/activities/data/presenter";
+import { presenterOpportunityCard } from "@/app/opportunities/data/presenter";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 import {
   getPrimaryOpportunity,
@@ -91,7 +91,7 @@ export const presenterPlaceDetail = (place: GqlPlace): IPlaceDetail => {
     (o) => o.publishStatus === GqlPublishStatus.Public,
   );
 
-  const currentlyHiringOpportunities = publicOpportunities.map(presenterActivityCard);
+  const currentlyHiringOpportunities = publicOpportunities.map(presenterOpportunityCard);
 
   const opportunity = orderedOpportunities[0];
   const user = opportunity?.createdByUser;
@@ -137,7 +137,7 @@ const getRelatedArticles = (
 
 const getPlaceImages = (
   placeImage?: string | null,
-  opportunityCards: ActivityCard[] = [],
+  opportunityCards: OpportunityCard[] = [],
 ): string[] => {
   return Array.from(
     new Set(

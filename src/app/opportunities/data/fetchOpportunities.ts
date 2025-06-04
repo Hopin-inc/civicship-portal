@@ -7,8 +7,8 @@ import {
   GqlPublishStatus,
   GqlSortDirection,
 } from "@/types/graphql";
-import { mapOpportunityCards, sliceActivitiesBySection } from "@/app/activities/data/presenter";
-import { presenterQuestCards, sliceQuestsBySection } from "@/app/quests/data/presenter";
+import { mapOpportunityCards, sliceActivitiesBySection } from "./presenter";
+
 
 export async function fetchFeaturedAndCarousel() {
   try {
