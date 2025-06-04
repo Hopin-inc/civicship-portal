@@ -30,7 +30,6 @@ const fallbackConnection: GqlOpportunitiesConnection = {
 };
 
 export const useOpportunities = (
-  category?: GqlOpportunityCategory,
   options?: {
     initialData?: GqlOpportunitiesConnection;
   }
@@ -38,11 +37,10 @@ export const useOpportunities = (
   const { data, loading, error, fetchMore, refetch } = useGetOpportunitiesQuery({
     variables: {
       filter: {
-        category,
         publishStatus: [GqlPublishStatus.Public],
       },
       sort: {
-        earliestSlotStartsAt: GqlSortDirection.Desc,
+        earliestSlotStartsAt: GqlSortDirection.Asc,
       },
       first: 10,
     },
@@ -60,11 +58,10 @@ export const useOpportunities = (
     await fetchMore({
       variables: {
         filter: {
-          category,
           publishStatus: [GqlPublishStatus.Public],
         },
         sort: {
-          earliestSlotStartsAt: GqlSortDirection.Desc,
+          earliestSlotStartsAt: GqlSortDirection.Asc,
         },
         cursor: endCursor,
         first: 10,

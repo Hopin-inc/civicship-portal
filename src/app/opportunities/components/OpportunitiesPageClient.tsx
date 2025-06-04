@@ -14,7 +14,6 @@ import { GqlOpportunityCategory } from "@/types/graphql";
 interface Props {
   featuredCards: OpportunityCard[];
   upcomingCards: OpportunityCard[];
-  category?: GqlOpportunityCategory;
 }
 
 const OpportunitiesFeaturedSection = dynamic(() => import("./FeaturedSection/FeaturedSection"), {
@@ -27,8 +26,8 @@ const OpportunitiesListSection = dynamic(() => import("./ListSection/ListSection
   loading: () => <ListSectionSkeleton />,
 });
 
-export default function OpportunitiesPageClient({ featuredCards, upcomingCards, category }: Props) {
-  const { opportunities, loading, error, loadMoreRef, refetch } = useOpportunities(category);
+export default function OpportunitiesPageClient({ featuredCards, upcomingCards }: Props) {
+  const { opportunities, loading, error, loadMoreRef, refetch } = useOpportunities();
   const refetchRef = useRef<(() => void) | null>(refetch);
 
   const listCards = mapOpportunityCards(opportunities.edges ?? []);
@@ -49,17 +48,11 @@ export default function OpportunitiesPageClient({ featuredCards, upcomingCards, 
     return <EmptyState title={"機会"} />;
   }
 
-  const carouselTitle = category === GqlOpportunityCategory.Quest 
-    ? "注目のクエスト" 
-    : category === GqlOpportunityCategory.Activity 
-    ? "もうすぐ開催予定" 
-    : "もうすぐ開催予定";
-
   return (
     <div className="min-h-screen">
       <OpportunitiesFeaturedSection opportunities={featuredCards} isInitialLoading={loading} />
       <OpportunitiesCarouselSection
-        title={carouselTitle}
+        title="もうすぐ開催予定"
         opportunities={upcomingCards}
         isInitialLoading={loading}
       />
