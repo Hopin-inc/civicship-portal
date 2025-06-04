@@ -1,7 +1,5 @@
-import { fetchFeaturedAndCarousel } from "./data/fetchQuests";
-import QuestsPageClient from "./components/QuestsPageClient";
+import { redirect } from "next/navigation";
 
-export default async function QuestsPage() {
-  const { featuredCards, upcomingCards } = await fetchFeaturedAndCarousel();
-  return <QuestsPageClient featuredCards={featuredCards} upcomingCards={upcomingCards} />;
+export default function QuestsRedirect() {
+  redirect("/opportunities?category=QUEST");
 }

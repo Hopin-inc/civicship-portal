@@ -10,7 +10,7 @@ import {
   useGetOpportunitiesQuery,
 } from "@/types/graphql";
 
-export interface UseQuestsResult {
+export interface UseOpportunitiesResult {
   opportunities: GqlOpportunitiesConnection;
   loading: boolean;
   error: any;
@@ -29,13 +29,16 @@ const fallbackConnection: GqlOpportunitiesConnection = {
   totalCount: 0,
 };
 
-export const useQuests = (options?: {
-  initialData?: GqlOpportunitiesConnection;
-}): UseQuestsResult => {
+export const useOpportunities = (
+  category?: GqlOpportunityCategory,
+  options?: {
+    initialData?: GqlOpportunitiesConnection;
+  }
+): UseOpportunitiesResult => {
   const { data, loading, error, fetchMore, refetch } = useGetOpportunitiesQuery({
     variables: {
       filter: {
-        category: GqlOpportunityCategory.Quest,
+        category,
         publishStatus: [GqlPublishStatus.Public],
       },
       sort: {
@@ -57,7 +60,7 @@ export const useQuests = (options?: {
     await fetchMore({
       variables: {
         filter: {
-          category: GqlOpportunityCategory.Quest,
+          category,
           publishStatus: [GqlPublishStatus.Public],
         },
         sort: {

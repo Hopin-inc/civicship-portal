@@ -1,7 +1,5 @@
-import { fetchFeaturedAndCarousel } from "./data/fetchActivities";
-import ActivitiesPageClient from "./components/ActivitiesPageClient";
+import { redirect } from "next/navigation";
 
-export default async function ActivitiesPage() {
-  const { featuredCards, upcomingCards } = await fetchFeaturedAndCarousel();
-  return <ActivitiesPageClient featuredCards={featuredCards} upcomingCards={upcomingCards} />;
+export default function ActivitiesRedirect() {
+  redirect("/opportunities?category=ACTIVITY");
 }
