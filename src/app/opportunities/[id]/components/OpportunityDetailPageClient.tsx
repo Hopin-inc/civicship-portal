@@ -45,10 +45,10 @@ export default function OpportunityDetailPageClient({
 
       <main className="min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
-          <ActivityDetailsHeader opportunity={opportunityDetail} availableTickets={[]} />
+          <ActivityDetailsHeader opportunity={opportunityDetail} availableTickets={0} />
           <ActivityDetailsContent
             opportunity={opportunityDetail}
-            availableTickets={[]}
+            availableTickets={0}
             availableDates={[]}
             sameStateActivities={[]}
             communityId={communityId}
@@ -56,8 +56,8 @@ export default function OpportunityDetailPageClient({
         </div>
       </main>
       <ActivityDetailsFooter
-        opportunityId={opportunityDetail.id}
-        price={type === "activity" ? opportunityDetail.feeRequired : opportunityDetail.pointsToEarn}
+        opportunity={opportunityDetail}
+        price={type === "activity" ? (opportunityDetail as any).feeRequired : (opportunityDetail as any).pointsToEarn}
         communityId={communityId}
         disableReason={undefined}
       />

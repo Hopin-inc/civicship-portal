@@ -5,6 +5,7 @@ import {
   GqlGetOpportunityQuery,
   GqlGetOpportunityQueryVariables,
   GqlOpportunity,
+  GqlCheckCommunityPermissionInput,
 } from "@/types/graphql";
 import { presenterActivityDetail } from "@/app/activities/data/presenter";
 import { presenterQuestDetail } from "@/app/quests/data/presenter";
@@ -17,12 +18,17 @@ interface OpportunityDetailPageProps {
 }
 
 async function fetchOpportunityDetail(id: string): Promise<GqlOpportunity> {
+  const permission: GqlCheckCommunityPermissionInput = {
+    communityId: COMMUNITY_ID,
+    permissionType: "READ" as any,
+  };
+
   const { data } = await apolloClient.query<
     GqlGetOpportunityQuery,
     GqlGetOpportunityQueryVariables
   >({
     query: GetOpportunityDocument,
-    variables: { id },
+    variables: { id, permission },
     fetchPolicy: "no-cache",
   });
 
