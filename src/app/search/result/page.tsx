@@ -5,7 +5,7 @@ import { useSearchResults } from "@/app/search/result/hooks/useSearchResults";
 import DateGroupedOpportunities from "@/app/search/result/components/DateGroupedOpportunities";
 import EmptySearchResults from "@/app/search/result/components/EmptySearchResults";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
+import ActivitiesCarouselSection from "@/app/opportunities/components/CarouselSection/CarouselSection";
 import ErrorState from "@/components/shared/ErrorState";
 import { useSearchParams } from "next/navigation";
 import useSearchResultHeader from "@/app/search/result/components/SearchResultHeader";

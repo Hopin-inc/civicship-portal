@@ -19,7 +19,7 @@ import ErrorState from "@/components/shared/ErrorState";
 import { ParticipationAge } from "./components/ParticipationAge";
 import { errorMessages } from "@/utils/errorMessage";
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
-import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
+import OpportunityCardHorizontal from "@/app/opportunities/components/Card/CardHorizontal";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
 import { LiffService } from "@/lib/auth/liff-service";
@@ -116,7 +116,7 @@ export default function ConfirmPage() {
             opportunity={{
               id: opportunity.id,
               title: opportunity.title,
-              feeRequired: opportunity.feeRequired,
+              feeRequired: opportunity.feeRequired ?? null,
               category: GqlOpportunityCategory.Activity,
               communityId: COMMUNITY_ID,
               images: opportunity.images,

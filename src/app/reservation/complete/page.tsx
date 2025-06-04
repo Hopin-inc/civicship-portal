@@ -1,6 +1,6 @@
 "use client";
 
-import SameStateActivities from "@/app/activities/[id]/components/SimilarActivitiesList";
+import SameStateActivities from "@/app/opportunities/[id]/components/SimilarActivitiesList";
 import CompletionHeader from "@/app/reservation/complete/components/CompletionHeader";
 import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
 import React, { useEffect, useMemo, useRef } from "react";
@@ -11,7 +11,7 @@ import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCo
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
-import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
+import { useOpportunityDetail } from "@/app/opportunities/[id]/hooks/useOpportunityDetail";
 import ArticleCard from "@/app/articles/components/Card";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 

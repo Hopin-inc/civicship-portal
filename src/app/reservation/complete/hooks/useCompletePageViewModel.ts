@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import {
-  presenterActivityCard,
+  presenterOpportunityCard,
   presenterReservationDateTimeInfo,
-} from "@/app/activities/data/presenter";
+} from "@/app/opportunities/data/presenter";
 import { useCompletePageDataRaw } from "./useCompletePageDataRaw";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 
@@ -22,7 +22,7 @@ export function useCompletePageViewModel(
   } = useCompletePageDataRaw(opportunityId, reservationId);
 
   const opportunity = useMemo(() => {
-    return gqlOpportunity ? presenterActivityCard(gqlOpportunity) : null;
+    return gqlOpportunity ? presenterOpportunityCard(gqlOpportunity) : null;
   }, [gqlOpportunity]);
 
   const dateTimeInfo = useMemo(() => {

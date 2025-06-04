@@ -7,8 +7,8 @@ import {
   useCreateReservationMutation,
 } from "@/types/graphql";
 import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
-import { ActivityDetail } from "@/app/activities/data/type";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { OpportunityDetail } from "@/app/opportunities/data/type";
+import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
 import { ApolloError } from "@apollo/client";
 import { logger } from "@/lib/logging";
@@ -18,8 +18,8 @@ type Result =
   | { success: false; code: GqlErrorCode };
 
 interface ReservationParams {
-  opportunity: ActivityDetail | null;
-  selectedSlot: ActivitySlot | null;
+  opportunity: OpportunityDetail | null;
+  selectedSlot: ActivitySlot | QuestSlot | null;
   wallets: GqlWallet[] | null;
   user: Pick<GqlUser, "id"> | null;
   ticketCounter: UseTicketCounterReturn;

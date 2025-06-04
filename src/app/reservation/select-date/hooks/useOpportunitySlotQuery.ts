@@ -5,12 +5,12 @@ import {
   useGetOpportunitySlotsQuery,
 } from "@/types/graphql";
 import { ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
-import { ActivityDetail } from "@/app/activities/data/type";
+import { OpportunityDetail } from "@/app/opportunities/data/type";
 import {
   groupActivitySlotsByDate,
   presenterOpportunitySlots,
 } from "@/app/reservation/data/presenter/opportunitySlot";
-import { presenterActivityDetail } from "@/app/activities/data/presenter";
+import { presenterOpportunityDetail } from "@/app/opportunities/data/presenter";
 
 interface UseReservationDateLoaderProps {
   opportunityId: string;
@@ -33,11 +33,11 @@ export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLo
     errorPolicy: "all",
   });
 
-  const opportunity: ActivityDetail | null = useMemo(() => {
+  const opportunity: OpportunityDetail | null = useMemo(() => {
     const raw = data?.opportunitySlots?.edges?.find((edge) => edge?.node?.opportunity != null)?.node
       ?.opportunity;
 
-    return raw ? presenterActivityDetail(raw) : null;
+    return raw ? presenterOpportunityDetail(raw) : null;
   }, [data]);
 
   const groupedSlots: ActivitySlotGroup[] = useMemo(() => {

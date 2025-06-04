@@ -1,13 +1,13 @@
 "use client";
 
 import React from "react";
-import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/app/activities/data/type";
-import CarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
+import OpportunityCardVertical from "@/app/opportunities/components/Card/CardVertical";
+import { OpportunityCard } from "@/app/opportunities/data/type";
+import CarouselSectionSkeleton from "@/app/opportunities/components/CarouselSection/CarouselSectionSkeleton";
 
 interface Props {
   title: string;
-  opportunities: ActivityCard[];
+  opportunities: OpportunityCard[];
   isInitialLoading?: boolean;
 }
 

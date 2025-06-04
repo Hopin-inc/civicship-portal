@@ -6,9 +6,9 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { useQuery } from "@apollo/client";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
-import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
-import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
+import FeaturedSectionSkeleton from "@/app/opportunities/components/FeaturedSection/FeaturedSectionSkeleton";
+import OpportunitiesCarouselSectionSkeleton from "@/app/opportunities/components/CarouselSection/CarouselSectionSkeleton";
+import ListSectionSkeleton from "@/app/opportunities/components/ListSection/ListSectionSkeleton";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export default function HomePage() {

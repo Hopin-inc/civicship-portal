@@ -3,9 +3,9 @@
 import { useEffect, useMemo } from "react";
 import { useGetOpportunityQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
-import { presenterActivityDetail } from "@/app/activities/data/presenter";
+import { presenterOpportunityDetail } from "@/app/opportunities/data/presenter";
 import { useSlotAndTicketInfo } from "@/app/reservation/confirm/hooks/useSlotAndTicket";
-import type { ActivityDetail } from "@/app/activities/data/type";
+import type { OpportunityDetail } from "@/app/opportunities/data/type";
 import { logger } from "@/lib/logging";
 
 export const useReservationConfirm = ({
@@ -32,8 +32,8 @@ export const useReservationConfirm = ({
     errorPolicy: "all",
   });
 
-  const opportunity: ActivityDetail | null = useMemo(() => {
-    return data?.opportunity ? presenterActivityDetail(data.opportunity) : null;
+  const opportunity: OpportunityDetail | null = useMemo(() => {
+    return data?.opportunity ? presenterOpportunityDetail(data.opportunity) : null;
   }, [data]);
 
   const {

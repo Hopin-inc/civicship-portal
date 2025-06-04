@@ -6,16 +6,16 @@ import {
   calculateCancellationDeadline,
   presenterParticipation,
 } from "@/app/participations/[id]/data/presenter";
-import { presenterActivityCard } from "@/app/activities/data/presenter";
+import { presenterOpportunityCard } from "@/app/opportunities/data/presenter";
 import { useParticipationState } from "@/app/participations/[id]/hooks/useParticipationState";
 import type { ParticipationDetail } from "@/app/participations/[id]/data/type";
 import type { ReservationStatus } from "@/types/participationStatus";
-import type { ActivityCard } from "@/app/activities/data/type";
+import type { OpportunityCard } from "@/app/opportunities/data/type";
 import { logger } from "@/lib/logging";
 
 interface UseParticipationPageResult {
   participation: ParticipationDetail | null;
-  opportunity: ActivityCard | null;
+  opportunity: OpportunityCard | null;
   currentStatus: ReservationStatus | null;
   cancellationDeadline: Date | null;
   loading: boolean;
@@ -34,7 +34,7 @@ const useParticipationPage = (id: string): UseParticipationPageResult => {
   const rawOpportunity = rawParticipation?.reservation?.opportunitySlot?.opportunity;
 
   const participation = rawParticipation ? presenterParticipation(rawParticipation) : null;
-  const opportunity = rawOpportunity ? presenterActivityCard(rawOpportunity) : null;
+  const opportunity = rawOpportunity ? presenterOpportunityCard(rawOpportunity) : null;
 
   const { currentStatus } = useParticipationState({ participation });
 

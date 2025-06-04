@@ -13,7 +13,7 @@ import { useParams } from "next/navigation";
 import { errorMessages } from "@/utils/errorMessage";
 import useCancelReservation from "@/app/participations/[id]/hooks/useCancelReservation";
 import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
-import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
+import { useOpportunityDetail } from "@/app/opportunities/[id]/hooks/useOpportunityDetail";
 import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
@@ -92,7 +92,7 @@ export default function ParticipationPage() {
             opportunityTitle: opportunity.title,
             category: opportunity.category,
             guest: dateTimeInfo.participantCount,
-            feeRequired: opportunity.feeRequired ?? 0,
+            feeRequired: ('feeRequired' in opportunity && typeof opportunity.feeRequired === 'number') ? opportunity.feeRequired : 0,
             totalFee: dateTimeInfo.totalPrice,
             scheduledAt: dateTimeInfo.startTime,
           },
@@ -153,7 +153,7 @@ export default function ParticipationPage() {
             endTime={dateTimeInfo.endTime}
             participantCount={dateTimeInfo.participantCount}
             totalPrice={dateTimeInfo.totalPrice}
-            pricePerPerson={opportunityDetail.feeRequired ?? 0}
+            pricePerPerson={('feeRequired' in opportunityDetail && typeof opportunityDetail.feeRequired === 'number') ? opportunityDetail.feeRequired : 0}
             location={opportunityDetail.place}
             phoneNumber={participation.emergencyContactPhone}
             isReserved={true}

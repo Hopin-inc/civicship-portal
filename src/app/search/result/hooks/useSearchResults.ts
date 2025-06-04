@@ -13,8 +13,8 @@ import {
 } from "@/types/graphql";
 import { groupOpportunitiesByDate, SearchParams } from "@/app/search/data/presenter";
 import { toast } from "sonner";
-import { ActivityCard } from "@/app/activities/data/type";
-import { presenterActivityCards } from "@/app/activities/data/presenter";
+import { OpportunityCard } from "@/app/opportunities/data/type";
+import { presenterOpportunityCards } from "@/app/opportunities/data/presenter";
 import { IPrefectureCodeMap } from "@/app/search/data/type";
 import { logger } from "@/lib/logging";
 
@@ -22,8 +22,8 @@ export const useSearchResults = (
   searchParams: SearchParams = {},
 ): {
   opportunities: GqlOpportunitiesConnection;
-  recommendedOpportunities: ActivityCard[];
-  groupedOpportunities: { [key: string]: ActivityCard[] };
+  recommendedOpportunities: OpportunityCard[];
+  groupedOpportunities: { [key: string]: OpportunityCard[] };
   loading: boolean;
   error: Error | null;
   hasResults: boolean;
@@ -40,8 +40,6 @@ export const useSearchResults = (
     variables: {
       filter,
       first: 20,
-      slotFilter: { hostingStatus: GqlOpportunitySlotHostingStatus.Scheduled },
-      slotSort: { startsAt: GqlSortDirection.Asc },
     },
     fetchPolicy: "network-only",
     nextFetchPolicy: "network-only",
@@ -63,7 +61,7 @@ export const useSearchResults = (
   );
 
   const recommendedOpportunities = useMemo(
-    () => presenterActivityCards(opportunities.edges),
+    () => presenterOpportunityCards(opportunities.edges),
     [opportunities],
   );
 

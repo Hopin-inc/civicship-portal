@@ -7,7 +7,7 @@ import {
   GqlWallet,
   Maybe,
 } from "@/types/graphql";
-import { OpportunityCard, RequiredUtility } from "@/app/activities/data/type";
+import { OpportunityCard, RequiredUtility } from "@/app/opportunities/data/type";
 import {
   ActivityField,
   QuestField,
@@ -15,7 +15,7 @@ import {
 } from "@/app/reservation/data/type/reservation";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 import { presenterPlace } from "@/app/places/data/presenter";
-import { presenterOpportunityHost } from "@/app/activities/data/presenter";
+import { presenterOpportunityHost } from "@/app/opportunities/data/presenter";
 
 export const getTicketIds = (
   wallets: GqlWallet[] | null,

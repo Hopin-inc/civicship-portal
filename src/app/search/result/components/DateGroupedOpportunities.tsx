@@ -3,11 +3,11 @@
 import React from "react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { ActivityCard } from "@/app/activities/data/type";
-import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
+import { OpportunityCard } from "@/app/opportunities/data/type";
+import ActivitiesCarouselSection from "@/app/opportunities/components/CarouselSection/CarouselSection";
 
 interface DateGroupedOpportunitiesProps {
-  groupedOpportunities: Record<string, ActivityCard[]>;
+  groupedOpportunities: Record<string, OpportunityCard[]>;
 }
 
 const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({

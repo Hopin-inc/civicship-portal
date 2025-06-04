@@ -5,7 +5,7 @@ import {
   TArticleRelatedUser,
   TArticleWithAuthor,
 } from "@/app/articles/data/type";
-import { presenterActivityCard } from "@/app/activities/data/presenter";
+import { presenterOpportunityCard } from "@/app/opportunities/data/presenter";
 
 export const presenterArticleCards = (
   edges?: (GqlArticleEdge | null | undefined)[],
@@ -58,7 +58,7 @@ export const presenterArticleDetail = (article: GqlArticle): TArticleDetail => {
 
     hostedOpportunitiesByAuthors:
       article.relatedUsers?.flatMap(
-        (author) => author.opportunitiesCreatedByMe?.map(presenterActivityCard) ?? [],
+        (author) => author.opportunitiesCreatedByMe?.map(presenterOpportunityCard) ?? [],
       ) ?? [],
     relatedArticles: [],
   };

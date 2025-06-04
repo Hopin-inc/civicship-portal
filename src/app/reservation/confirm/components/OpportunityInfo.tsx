@@ -2,11 +2,11 @@
 
 import React from "react";
 import Image from "next/image";
-import { ActivityDetail } from "@/app/activities/data/type";
+import { OpportunityDetail } from "@/app/opportunities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface OpportunityInfoProps {
-  opportunity: ActivityDetail | null;
+  opportunity: OpportunityDetail | null;
 }
 
 const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity }) => {
