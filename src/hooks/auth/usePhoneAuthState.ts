@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 
 interface UsePhoneAuthStateProps {
   authStateManager: AuthStateManager | null;
@@ -32,7 +32,7 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
         try {
           await currentAuthStateManager.handlePhoneAuthStateChange(true);
         } catch (error) {
-          clientLogger.error("Failed to update AuthStateManager phone state in useEffect", {
+          logger.error("Failed to update AuthStateManager phone state in useEffect", {
             error: error instanceof Error ? error.message : String(error),
             component: "usePhoneAuthState"
           });

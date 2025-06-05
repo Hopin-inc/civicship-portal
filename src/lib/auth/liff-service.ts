@@ -5,9 +5,9 @@ import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { categorizeFirebaseError, lineAuth } from "./firebase-config";
 import { AuthTokens, TokenManager } from "./token-manager";
 import retry from "retry";
-import clientLogger from "../logging/client";
-import { createAuthLogContext, generateSessionId } from "../logging/client/utils";
+
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
+import { logger } from "@/lib/logging";
 
 /**
  * LIFF初期化状態の型定義
@@ -97,14 +97,11 @@ export class LiffService {
 
       return true;
     } catch (error) {
-      clientLogger.info("LIFF initialization error", createAuthLogContext(
-        generateSessionId(),
-        AuthEnvironment.LIFF,
-        {
-          error,
-          component: "LiffService"
-        }
-      ));
+      logger.info("LIFF initialization error", {
+        authType: "liff",
+        error,
+        component: "LiffService",
+      });
       this.state.error = error as Error;
       return false;
     } finally {
@@ -140,14 +137,11 @@ export class LiffService {
       await this.updateProfile();
       return true;
     } catch (error) {
-      clientLogger.info("LIFF login error", createAuthLogContext(
-        generateSessionId(),
-        AuthEnvironment.LIFF,
-        {
-          error: error instanceof Error ? error.message : String(error),
-          component: "LiffService"
-        }
-      ));
+      logger.info("LIFF login error", {
+        authType: "liff",
+        error: error instanceof Error ? error.message : String(error),
+        component: "LiffService",
+      });
       this.state.error = error as Error;
       return false;
     }
@@ -184,14 +178,11 @@ export class LiffService {
         pictureUrl: profile.pictureUrl || null,
       };
     } catch (error) {
-      clientLogger.info("Failed to get LIFF profile", createAuthLogContext(
-        generateSessionId(),
-        AuthEnvironment.LIFF,
-        {
-          error: error instanceof Error ? error.message : String(error),
-          component: "LiffService"
-        }
-      ));
+      logger.info("Failed to get LIFF profile", {
+        authType: "liff",
+        error: error instanceof Error ? error.message : String(error),
+        component: "LiffService",
+      });
     }
   }
 
@@ -213,11 +204,10 @@ export class LiffService {
   public async signInWithLiffToken(): Promise<boolean> {
     const accessToken = this.getAccessToken();
     if (!accessToken) {
-      clientLogger.info("No LIFF access token available", createAuthLogContext(
-        generateSessionId(),
-        AuthEnvironment.LIFF,
-        { component: "LiffService" }
-      ));
+      logger.info("No LIFF access token available", {
+        authType: "liff",
+        component: "LiffService",
+      });
       return false;
     }
 
@@ -272,51 +262,50 @@ export class LiffService {
               const AuthStateManager = require("./auth-state-manager").AuthStateManager;
               const authStateManager = AuthStateManager.getInstance();
               const timestamp = new Date().toISOString();
-              clientLogger.debug("Updating LINE auth state in signInWithLiffToken", {
+              logger.debug("Updating LINE auth state in signInWithLiffToken", {
                 timestamp,
-                component: "LiffService"
+                component: "LiffService",
               });
               await authStateManager.handleLineAuthStateChange(true);
-              clientLogger.debug("AuthStateManager state updated to line_authenticated in signInWithLiffToken", {
-                timestamp,
-                component: "LiffService"
-              });
+              logger.debug(
+                "AuthStateManager state updated to line_authenticated in signInWithLiffToken",
+                {
+                  timestamp,
+                  component: "LiffService",
+                },
+              );
             } catch (error) {
-              clientLogger.error("Failed to update AuthStateManager state", {
+              logger.error("Failed to update AuthStateManager state", {
                 error: error instanceof Error ? error.message : String(error),
-                component: "LiffService"
+                component: "LiffService",
               });
             }
           }
 
           const completeTimestamp = new Date().toISOString();
-          clientLogger.debug("LIFF authentication successful", {
+          logger.debug("LIFF authentication successful", {
             timestamp: completeTimestamp,
-            component: "LiffService"
+            component: "LiffService",
           });
           resolve(true);
         } catch (error) {
           const categorizedError = categorizeFirebaseError(error);
 
-          clientLogger.info(`LIFF authentication error (attempt ${currentAttempt})`, createAuthLogContext(
-            generateSessionId(),
-            AuthEnvironment.LIFF,
-            {
-              type: categorizedError.type,
-              message: categorizedError.message,
-              error: error instanceof Error ? error.message : String(error),
-              retryable: categorizedError.retryable,
-              attempt: currentAttempt,
-              component: "LiffService"
-            }
-          ));
+          logger.info(`LIFF authentication error (attempt ${currentAttempt})`, {
+            authType: "liff",
+            type: categorizedError.type,
+            message: categorizedError.message,
+            error: error instanceof Error ? error.message : String(error),
+            retryable: categorizedError.retryable,
+            attempt: currentAttempt,
+            component: "LiffService",
+          });
 
           if (!categorizedError.retryable || !operation.retry(error as Error)) {
-            clientLogger.info("LIFF authentication failed after all retries", createAuthLogContext(
-              generateSessionId(),
-              AuthEnvironment.LIFF,
-              { component: "LiffService" }
-            ));
+            logger.info("LIFF authentication failed after all retries", {
+              authType: "liff",
+              component: "LiffService",
+            });
 
             if (typeof window !== "undefined") {
               window.dispatchEvent(

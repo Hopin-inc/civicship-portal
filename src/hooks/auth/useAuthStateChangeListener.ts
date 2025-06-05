@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 
 interface UseAuthStateChangeListenerProps {
   authStateManager: AuthStateManager | null;

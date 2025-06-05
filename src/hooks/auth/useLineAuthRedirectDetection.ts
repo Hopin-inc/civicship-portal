@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthState } from "@/contexts/AuthProvider";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 
 interface UseLineAuthRedirectDetectionProps {
   state: AuthState;
@@ -60,13 +60,13 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
     const { isInitialized, isLoggedIn } = currentLiffState;
 
     if (isInitialized && !isLoggedIn) {
-      clientLogger.debug("LIFF initialized but user not logged in - skipping redirect logic", { component: "useLineAuthRedirectDetection" });
+      logger.debug("LIFF initialized but user not logged in - skipping redirect logic", { component: "useLineAuthRedirectDetection" });
       setShouldProcessRedirect(false);
       return;
     }
 
     const timestamp = new Date().toISOString();
-    clientLogger.debug("Detected LINE authentication redirect", {
+    logger.debug("Detected LINE authentication redirect", {
       timestamp,
       component: "useLineAuthRedirectDetection"
     });
