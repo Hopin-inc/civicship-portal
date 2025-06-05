@@ -137,7 +137,7 @@ function SearchPageContent({
 
   return (
     <div className="space-y-6 pt-4">
-      <SearchForm />
+      <SearchForm onSearch={handleSearch} />
       <SearchFilters
         onFilterClick={setActiveForm}
         formatDateRange={formatDateRange}
