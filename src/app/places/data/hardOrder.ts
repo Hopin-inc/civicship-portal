@@ -19,9 +19,11 @@ const OPPORTUNITY_ORDER_BY_PLACE: Record<string, string[]> = {
   // ],
 };
 
-// 鴨島駅 https://www.neo88.app/places/cmavecll700dps60nd5wjpciy
 const PRIMARY_ARTICLE_BY_PLACE: Record<string, string> = {
+  // 鴨島駅 https://www.neo88.app/places/cmavecll700dps60nd5wjpciy
   cmavecll700dps60nd5wjpciy: "cmankc5fq001ks60nh6g1jpvq",
+  // 未生流笹岡いけばな教室 https://www.neo88.app/places/cmahuyc2m0046s60ne4o9oyyk
+  cmahuyc2m0046s60ne4o9oyyk: "cmarp3k8m0011s60nvx01t3uo",
 };
 
 export const pickPrimaryArticleByPlaceId = (
