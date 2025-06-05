@@ -5,7 +5,7 @@ import { drawCircleWithImage } from "@/app/places/utils/marker";
 import { Marker } from "@react-google-maps/api";
 import { IPlacePin } from "@/app/places/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 interface CustomMarkerProps {
   data: IPlacePin;
@@ -25,7 +25,7 @@ const loadImage = (src: string): Promise<HTMLImageElement> =>
     img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
     img.onerror = (e) => {
-      logger.warn(`Failed to load image from ${src}`, {
+      clientLogger.warn(`Failed to load image from ${src}`, {
         error: e,
         component: "CustomMarker"
       });
@@ -91,7 +91,7 @@ const createPlaceholderIcon = async (size: number): Promise<google.maps.Icon> =>
 
     return createIconObject(canvas, size, 0, 10);
   } catch (error) {
-    logger.warn("Failed to create placeholder icon, using direct URL", {
+    clientLogger.warn("Failed to create placeholder icon, using direct URL", {
       error: error instanceof Error ? error.message : String(error),
       component: "CustomMarker"
     });
@@ -129,7 +129,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         const placeholder = await createPlaceholderIcon(displaySize);
         isMounted && setIcon(placeholder);
       } catch (error) {
-        logger.warn("Failed to create placeholder icon", {
+        clientLogger.warn("Failed to create placeholder icon", {
           error: error instanceof Error ? error.message : String(error),
           component: "CustomMarker"
         });
@@ -157,7 +157,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ data, onClick, isSelected }
         markerIconCache.set(cacheKey, markerIcon);
         isMounted && setIcon(markerIcon);
       } catch (error) {
-        logger.warn("Failed to create marker icon with Canvas, falling back to direct URL", {
+        clientLogger.warn("Failed to create marker icon with Canvas, falling back to direct URL", {
           error: error instanceof Error ? error.message : String(error),
           component: "CustomMarker"
         });

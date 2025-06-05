@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import type { Locale } from "date-fns";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 export const parseDateTime = (dateTimeStr: string | null | undefined): Date | null => {
   if (!dateTimeStr) return null;
@@ -9,7 +9,7 @@ export const parseDateTime = (dateTimeStr: string | null | undefined): Date | nu
     const isoDateTimePart = dateTimeStr.split(" ")[0];
     return new Date(isoDateTimePart);
   } catch (error) {
-    logger.error('Error parsing date', {
+    clientLogger.error('Error parsing date', {
       error: error instanceof Error ? error.message : String(error),
       dateTimeStr,
       component: 'DateUtils'

@@ -4,7 +4,7 @@ import React from "react";
 import { ArrowLeft, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 interface NavigationButtonsProps {
   title: string;
@@ -20,7 +20,7 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({ title }) => {
           title: title,
           url: window.location.href,
         })
-        .catch((err) => logger.error("共有に失敗しました", {
+        .catch((err) => clientLogger.error("共有に失敗しました", {
           error: err instanceof Error ? err.message : String(err),
           component: "NavigationButtons"
         }));

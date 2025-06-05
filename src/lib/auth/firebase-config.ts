@@ -1,9 +1,9 @@
 "use client";
 
 import { initializeApp } from "firebase/app";
-import { Auth, getAuth } from "firebase/auth";
+import { getAuth, Auth } from "firebase/auth";
 import { Analytics, getAnalytics, isSupported } from "firebase/analytics";
-import { logger } from "@/lib/logging";
+import clientLogger from "../logging/client";
 
 const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -30,26 +30,26 @@ if (isAnalyticsEnabled) {
     .then((supported) => {
       if (supported) {
         analytics = getAnalytics(lineApp);
-        logger.debug("Analytics initialized", {
+        clientLogger.debug("Analytics initialized", {
           env: process.env.NODE_ENV,
-          component: "FirebaseConfig",
+          component: "FirebaseConfig"
         });
       } else {
-        logger.debug("Analytics not supported in this browser", {
-          component: "FirebaseConfig",
+        clientLogger.debug("Analytics not supported in this browser", {
+          component: "FirebaseConfig"
         });
       }
     })
     .catch((e) => {
-      logger.error("Error initializing Analytics", {
+      clientLogger.error("Error initializing Analytics", {
         error: e instanceof Error ? e.message : String(e),
-        component: "FirebaseConfig",
+        component: "FirebaseConfig"
       });
     });
 } else {
-  logger.warn("Analytics disabled", {
+  clientLogger.warn("Analytics disabled", {
     env: process.env.NODE_ENV,
-    component: "FirebaseConfig",
+    component: "FirebaseConfig"
   });
 }
 

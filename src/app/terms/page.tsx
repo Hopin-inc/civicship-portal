@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import { proseClassName } from "@/utils/md";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 const termsMarkdown = `
 ## 1．事前予約
@@ -84,7 +84,7 @@ export default function TermsPage() {
 
   useEffect(() => {
     convertMarkdownToHtml(termsMarkdown).then(setHtml).catch((error) => {
-      logger.error("Failed to convert markdown to HTML", {
+      clientLogger.error("Failed to convert markdown to HTML", {
         error: error instanceof Error ? error.message : String(error),
         component: "TermsPage"
       });

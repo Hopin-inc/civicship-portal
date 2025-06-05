@@ -11,7 +11,7 @@ import { ActivityDetail } from "@/app/activities/data/type";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
 import { ApolloError } from "@apollo/client";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 type Result =
   | { success: true; reservation: GqlReservation }
@@ -87,7 +87,7 @@ export const useReservationCommand = () => {
             code: code ?? GqlErrorCode.Unknown,
           };
         }
-        logger.error("Reservation mutation failed", {
+        clientLogger.error("Reservation mutation failed", {
           error: e instanceof Error ? e.message : String(e),
           component: "useReservationAction"
         });

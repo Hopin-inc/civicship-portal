@@ -5,7 +5,7 @@ import { useGetTransactionsQuery } from "@/types/graphql";
 import { toast } from "sonner";
 import { AppTransaction } from "@/app/wallets/data/type";
 import { presenterTransaction } from "@/app/wallets/data/presenter";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 export interface UseTransactionHistoryResult {
   transactions: AppTransaction[];
@@ -40,7 +40,7 @@ export const useTransactionHistory = (
 
   const formattedError = useMemo(() => {
     if (error) {
-      logger.error("Error fetching transaction history", {
+      clientLogger.error("Error fetching transaction history", {
         error: error.message,
         userId,
         walletId,

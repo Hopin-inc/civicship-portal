@@ -5,7 +5,7 @@ import { logEvent, setUserId, setUserProperties } from "firebase/analytics";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useEffect, useMemo } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 export const useAnalyticsView = () => {
   useAnalyticsUserBinding();
@@ -68,7 +68,7 @@ const setSafeUserAttributes = (rawProps: Record<string, any>) => {
   }
 
   if (!analytics) {
-    logger.warn("Analytics not initialized: skip setUserProperties", {
+    clientLogger.warn("Analytics not initialized: skip setUserProperties", {
       component: "useAnalyticsView"
     });
     return;
@@ -87,7 +87,7 @@ const logPageView = (options: LogPageViewOptions = {}) => {
   const { path, title, ...restParams } = options;
 
   if (!analytics) {
-    logger.warn("Analytics not initialized: skip page_view", {
+    clientLogger.warn("Analytics not initialized: skip page_view", {
       component: "useAnalyticsView"
     });
     return;
@@ -100,7 +100,7 @@ const logPageView = (options: LogPageViewOptions = {}) => {
     ...restParams,
   };
 
-  logger.debug("Analytics logEvent - page_view", {
+  clientLogger.debug("Analytics logEvent - page_view", {
     eventParams,
     component: "useAnalyticsView"
   });

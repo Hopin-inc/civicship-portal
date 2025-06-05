@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 const policyMarkdown = `
 共創DAO合同会社（以下「当社」といいます。）は、当社が提供するサービス、運営するイベント、関与するプロジェクトなどの当社の事業（以下「当事業等」といいます。）に関して、当社が取得した個人情報（以下、個人情報によって特定識別される当該本人を「ユーザー」といいます。）の取扱いについて、以下の通りプライバシーポリシー（以下「本ポリシー」といいます。）を定め、プライバシーの適切な保護の重要性と社会的責任を十分に認識し、個人情報の保護に関する法律（以下「個人情報保護法」といいます。）その他の関係法令を遵守いたします。なお、本プライバシーポリシーにおける「個人情報」は、個人情報保護法の定義に従います。
@@ -319,7 +319,7 @@ export default function PrivacyPage() {
 
   useEffect(() => {
     convertMarkdownToHtml(policyMarkdown).then(setHtml).catch((error) => {
-      logger.error("Failed to convert markdown to HTML", {
+      clientLogger.error("Failed to convert markdown to HTML", {
         error: error instanceof Error ? error.message : String(error),
         component: "PrivacyPage"
       });

@@ -13,7 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -57,7 +57,7 @@ export default function LoginPage() {
 
     try {
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
-      logger.debug("Using redirect path from AuthRedirectService", {
+      clientLogger.debug("Using redirect path from AuthRedirectService", {
         redirectPath,
         component: "LoginPage",
       });
@@ -65,7 +65,7 @@ export default function LoginPage() {
       const success = await loginWithLiff(redirectPath);
 
       if (success) {
-        logger.debug("LINE authentication succeeded. Redirecting...", {
+        clientLogger.debug("LINE authentication succeeded. Redirecting...", {
           component: "LoginPage",
         });
       }

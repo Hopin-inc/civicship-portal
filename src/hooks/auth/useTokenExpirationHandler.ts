@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { AuthState } from "@/contexts/AuthProvider";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 interface UseTokenExpirationHandlerProps {
   state: AuthState;

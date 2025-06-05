@@ -5,7 +5,7 @@ import { useArticleQuery } from "./useArticleQuery";
 import { presenterArticleDetail, presenterArticleWithAuthor } from "@/app/articles/data/presenter";
 import type { TArticleDetail, TArticleWithAuthor } from "@/app/articles/data/type";
 import { toast } from "sonner";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 interface UseArticleResult {
   article: TArticleDetail | null;
@@ -33,7 +33,7 @@ export const useArticle = (id: string): UseArticleResult => {
 
   useEffect(() => {
     if (error) {
-      logger.error("Error fetching article data", {
+      clientLogger.error("Error fetching article data", {
         error: error.message,
         component: "useArticle",
         articleId: id
