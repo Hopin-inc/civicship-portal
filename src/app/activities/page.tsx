@@ -1,6 +1,6 @@
 "use client";
 
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useActivities } from "@/app/activities/hooks/useActivities";
 import ActivitiesFeaturedSection from "@/app/activities/components/FeaturedSection/FeaturedSection";
 import { mapOpportunityCards, sliceActivitiesBySection } from "@/app/activities/data/presenter";
@@ -17,7 +17,7 @@ const ActivitiesCarouselSection = lazy(
   () => import("@/app/activities/components/CarouselSection/CarouselSection"),
 );
 
-export default function ActivitiesPage() {
+const ActivitiesPage = React.memo(() => {
   const headerConfig = useMemo(
     () => ({
       showLogo: true,
@@ -33,6 +33,10 @@ export default function ActivitiesPage() {
 
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
 
+  const handleShowOtherSections = useCallback(() => {
+    setShowOtherSections(true);
+  }, []);
+
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
@@ -42,48 +46,72 @@ export default function ActivitiesPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const { upcomingCards, featuredCards, listCards } = useMemo(() => {
+  const processedCards = useMemo(() => {
     if (!opportunities?.edges?.length) {
       return { upcomingCards: [], featuredCards: [], listCards: [] };
     }
+    
+    const allCards = mapOpportunityCards(opportunities.edges);
+    return sliceActivitiesBySection(allCards);
+  }, [opportunities?.edges]);
 
-    const activityCards = mapOpportunityCards(opportunities.edges);
-    const result = sliceActivitiesBySection(activityCards);
-
+  const { upcomingCards, featuredCards, listCards } = useMemo(() => {
+    if (!processedCards) return { upcomingCards: [], featuredCards: [], listCards: [] };
+    
     if (prevEdgeCountRef.current === 0) {
-      listCardsRef.current = result.listCards;
-    } else if (opportunities.edges.length > prevEdgeCountRef.current) {
-      const newCards = mapOpportunityCards(opportunities.edges.slice(prevEdgeCountRef.current));
-      const newListCards = newCards.filter(
-        (card) =>
-          !result.featuredCards.some((fc) => fc.id === card.id) &&
-          !result.upcomingCards.some((uc) => uc.id === card.id),
-      );
-      listCardsRef.current = [...listCardsRef.current, ...newListCards];
+      listCardsRef.current = processedCards.listCards;
+      prevEdgeCountRef.current = opportunities?.edges?.length || 0;
+      return processedCards;
     }
+    
+    if (!opportunities?.edges?.length || opportunities.edges.length <= prevEdgeCountRef.current) {
+      return {
+        upcomingCards: processedCards.upcomingCards,
+        featuredCards: processedCards.featuredCards,
+        listCards: listCardsRef.current,
+      };
+    }
+    
+    const newCards = mapOpportunityCards(
+      opportunities.edges.slice(prevEdgeCountRef.current)
+    );
+    
+    if (newCards.length === 0) {
+      return {
+        upcomingCards: processedCards.upcomingCards,
+        featuredCards: processedCards.featuredCards,
+        listCards: listCardsRef.current,
+      };
+    }
+    
+    const existingIds = new Set([
+      ...processedCards.featuredCards.map(card => card.id),
+      ...processedCards.upcomingCards.map(card => card.id),
+      ...listCardsRef.current.map(card => card.id)
+    ]);
+    
+    const uniqueNewCards = newCards.filter(card => !existingIds.has(card.id));
+    listCardsRef.current = [...listCardsRef.current, ...uniqueNewCards];
     prevEdgeCountRef.current = opportunities.edges.length;
+    
     return {
-      upcomingCards: result.upcomingCards,
-      featuredCards: result.featuredCards,
+      upcomingCards: processedCards.upcomingCards,
+      featuredCards: processedCards.featuredCards,
       listCards: listCardsRef.current,
     };
-  }, [opportunities]);
+  }, [processedCards, opportunities?.edges]);
 
   useEffect(() => {
     if (!loading && featuredCards.length > 0) {
       if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-        const idleCallback = requestIdleCallback(() => {
-          setShowOtherSections(true);
-        });
+        const idleCallback = requestIdleCallback(handleShowOtherSections);
         return () => cancelIdleCallback(idleCallback);
       } else {
-        const timer = setTimeout(() => {
-          setShowOtherSections(true);
-        }, 100);
+        const timer = setTimeout(handleShowOtherSections, 100);
         return () => clearTimeout(timer);
       }
     }
-  }, [loading, featuredCards.length]);
+  }, [loading, featuredCards.length, handleShowOtherSections]);
 
   if (loading && prevEdgeCountRef.current === 0) {
     return <LoadingIndicator />;
@@ -127,4 +155,8 @@ export default function ActivitiesPage() {
       )}
     </div>
   );
-}
+});
+
+ActivitiesPage.displayName = 'ActivitiesPage';
+
+export default ActivitiesPage;

@@ -35,10 +35,11 @@ export const useActivities = (): UseActivitiesResult => {
         category: GqlOpportunityCategory.Activity,
         publishStatus: [GqlPublishStatus.Public],
       },
-      first: 10,
+      first: 20,
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-first",
     nextFetchPolicy: "cache-first",
+    notifyOnNetworkStatusChange: true,
   });
 
   const opportunities = data?.opportunities ?? fallbackConnection;
@@ -55,7 +56,7 @@ export const useActivities = (): UseActivitiesResult => {
           publishStatus: [GqlPublishStatus.Public],
         },
         cursor: endCursor,
-        first: 10,
+        first: 20,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult || !prev.opportunities || !fetchMoreResult.opportunities) {

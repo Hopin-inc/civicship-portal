@@ -166,52 +166,83 @@ export const sliceActivitiesBySection = (
   // Filter activities with images
   const hasImages = (card: ActivityCard) => card.images && card.images.length > 0;
 
-  // Sort function to put cards with images first
-  const sortByImages = (cards: ActivityCard[]) => {
-    return [...cards].sort((a, b) => {
-      const aHasImages = hasImages(a);
-      const bHasImages = hasImages(b);
+  if (N === 0) {
+    return { upcomingCards: [], featuredCards: [], listCards: [] };
+  }
 
-      if (aHasImages && !bHasImages) return -1;
-      if (!aHasImages && bHasImages) return 1;
-      return 0;
-    });
-  };
-
-  const featuredHead = activityCards[0];
+  const upcomingCardsWithImages: ActivityCard[] = [];
+  const upcomingCardsWithoutImages: ActivityCard[] = [];
+  const featuredCardsWithImages: ActivityCard[] = [];
+  const featuredCardsWithoutImages: ActivityCard[] = [];
+  const listCardsWithImages: ActivityCard[] = [];
+  const listCardsWithoutImages: ActivityCard[] = [];
 
   if (N < 10) {
     const maxUpcoming = N >= 6 ? 3 : 2;
+    const featuredHead = activityCards[0];
 
-    const usedIndices = new Set<number>();
-    if (featuredHead) usedIndices.add(0);
+    if (featuredHead && hasImages(featuredHead)) {
+      featuredCardsWithImages.push(featuredHead);
+    }
 
-    // Only include activities with images in featuredCards
-    const featuredCards = safe([featuredHead]).filter(hasImages);
+    for (let i = 1; i <= maxUpcoming && i < N; i++) {
+      const card = activityCards[i];
+      if (card) {
+        if (hasImages(card)) {
+          upcomingCardsWithImages.push(card);
+        } else {
+          upcomingCardsWithoutImages.push(card);
+        }
+      }
+    }
 
-    const upcomingCards = safe(
-      activityCards.slice(1, 1 + maxUpcoming).map((card, i) => {
-        usedIndices.add(i + 1);
-        return card;
-      }),
-    );
+    for (let i = maxUpcoming + 1; i < N; i++) {
+      const card = activityCards[i];
+      if (card) {
+        if (hasImages(card)) {
+          listCardsWithImages.push(card);
+        } else {
+          listCardsWithoutImages.push(card);
+        }
+      }
+    }
+  } else {
+    const featuredHead = activityCards[0];
 
-    // Get remaining cards and sort them - activities with images first
-    const listCards = sortByImages(safe(activityCards.filter((_, idx) => !usedIndices.has(idx))));
+    if (featuredHead && hasImages(featuredHead)) {
+      featuredCardsWithImages.push(featuredHead);
+    }
 
-    return { upcomingCards, featuredCards, listCards };
+    for (let i = 1; i < 6 && i < N; i++) {
+      const card = activityCards[i];
+      if (card) {
+        if (hasImages(card)) {
+          upcomingCardsWithImages.push(card);
+        } else {
+          upcomingCardsWithoutImages.push(card);
+        }
+      }
+    }
+
+    for (let i = 3; i < N; i++) {
+      const card = activityCards[i];
+      if (card) {
+        if (i >= 6 && i < 10 && hasImages(card)) {
+          featuredCardsWithImages.push(card);
+        } else {
+          if (hasImages(card)) {
+            listCardsWithImages.push(card);
+          } else {
+            listCardsWithoutImages.push(card);
+          }
+        }
+      }
+    }
   }
 
-  const featuredTail = activityCards.slice(6, 10);
-  // Only include activities with images in featuredCards
-  const featuredCards = safe([featuredHead, ...featuredTail]).filter(hasImages);
-
-  const upcomingCards = safe(activityCards.slice(1, 6));
-
-  // Get all list cards and sort them - activities with images first
-  const listCards = sortByImages(
-    safe([...activityCards.slice(3, 6), ...activityCards.slice(6, 10), ...activityCards.slice(10)]),
-  );
+  const upcomingCards = safe([...upcomingCardsWithImages, ...upcomingCardsWithoutImages]);
+  const featuredCards = safe([...featuredCardsWithImages, ...featuredCardsWithoutImages]);
+  const listCards = safe([...listCardsWithImages, ...listCardsWithoutImages]);
 
   return { upcomingCards, featuredCards, listCards };
 };
