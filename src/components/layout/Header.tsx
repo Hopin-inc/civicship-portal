@@ -32,10 +32,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       router.push(config.backTo);
     } else if (pathname === "/search/result") {
       // When on search results page, preserve all search parameters when going back to search page
-      const params = new URLSearchParams();
-      searchParams.forEach((value, key) => {
-        params.set(key, value);
-      });
+      const params = new URLSearchParams(searchParams);
       router.push(`/search?${params.toString()}`);
     } else {
       navigateBack();
