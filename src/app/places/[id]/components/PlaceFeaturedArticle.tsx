@@ -8,7 +8,6 @@ interface PlaceFeaturedArticleProps {
   articles: TArticleWithAuthor[] | null;
 }
 
-//TODO 複数記事が並ぶはず、Figma参照
 const PlaceFeaturedArticle: React.FC<PlaceFeaturedArticleProps> = ({ articles }) => {
   if (!articles) return null;
 
