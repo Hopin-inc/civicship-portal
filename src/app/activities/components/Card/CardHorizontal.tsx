@@ -31,6 +31,7 @@ function OpportunityCardHorizontal({ opportunity, withShadow = true }: Props) {
               fill
               placeholder="blur"
               blurDataURL={PLACEHOLDER_IMAGE}
+              loading="lazy"
               className="object-cover rounded-lg"
               onError={(e) => {
                 const img = e.target as HTMLImageElement;

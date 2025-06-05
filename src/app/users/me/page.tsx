@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { notFound, useRouter } from "next/navigation";
+import { notFound } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import UserProfileSection from "@/app/users/components/UserProfileSection";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -9,7 +9,6 @@ import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import ErrorState from "@/components/shared/ErrorState";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
@@ -30,12 +29,7 @@ export default function MyProfilePage() {
   }
 
   // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
-  if (!currentUser) {
-    return null;
-  }
-
-  // データ取得中
-  if (isLoading) {
+  if (!currentUser || isLoading) {
     return <LoadingIndicator />;
   }
 

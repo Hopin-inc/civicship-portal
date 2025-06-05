@@ -5,6 +5,7 @@ import { LiffService } from "@/lib/auth/liff-service";
 import { AuthState } from "@/contexts/AuthProvider";
 import clientLogger from "@/lib/logging/client";
 import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
+import { AuthEnvironment } from "@/lib/auth/environment-detector";
 
 interface UseLineAuthProcessingProps {
   shouldProcessRedirect: boolean;
@@ -35,7 +36,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         if (!initialized) {
           clientLogger.info("LIFF init failed", createAuthLogContext(
             generateSessionId(),
-            "liff",
+            AuthEnvironment.LIFF,
             { component: "useLineAuthProcessing" }
           ));
           return;
@@ -60,7 +61,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         if (!success) {
           clientLogger.info("signInWithLiffToken failed", createAuthLogContext(
             generateSessionId(),
-            "liff",
+            AuthEnvironment.LIFF,
             { component: "useLineAuthProcessing" }
           ));
           return;
@@ -73,7 +74,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
       } catch (err) {
         clientLogger.info("Error during LINE auth", createAuthLogContext(
           generateSessionId(),
-          "liff",
+          AuthEnvironment.LIFF,
           {
             error: err instanceof Error ? err.message : String(err),
             component: "useLineAuthProcessing"
