@@ -3430,7 +3430,6 @@ export type GqlOpportunityFieldsFragment = {
 
 export type GqlGetOpportunitiesQueryVariables = Exact<{
   filter?: InputMaybe<GqlOpportunityFilterInput>;
-  sort?: InputMaybe<GqlOpportunitySortInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
 }>;
@@ -6776,13 +6775,13 @@ export type GetEvaluationQueryResult = Apollo.QueryResult<
   GqlGetEvaluationQueryVariables
 >;
 export const GetOpportunitiesDocument = gql`
-  query GetOpportunities(
-    $filter: OpportunityFilterInput
-    $sort: OpportunitySortInput
-    $first: Int
-    $cursor: String
-  ) {
-    opportunities(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
+  query GetOpportunities($filter: OpportunityFilterInput, $first: Int, $cursor: String) {
+    opportunities(
+      filter: $filter
+      sort: { earliestSlotStartsAt: asc }
+      first: $first
+      cursor: $cursor
+    ) {
       pageInfo {
         startCursor
         endCursor
@@ -6821,7 +6820,6 @@ export const GetOpportunitiesDocument = gql`
  * const { data, loading, error } = useGetOpportunitiesQuery({
  *   variables: {
  *      filter: // value for 'filter'
- *      sort: // value for 'sort'
  *      first: // value for 'first'
  *      cursor: // value for 'cursor'
  *   },

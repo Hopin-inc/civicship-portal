@@ -17,7 +17,7 @@ import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunity
 import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
@@ -117,7 +117,7 @@ export default function ParticipationPage() {
     }
     const eventDate = new Date(relevantDateString);
     if (isNaN(eventDate.getTime())) {
-      logger.warn("Invalid date string for participation check", {
+      clientLogger.warn("Invalid date string for participation check", {
         relevantDateString,
         component: "ParticipationPage"
       });

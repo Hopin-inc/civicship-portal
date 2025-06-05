@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
-import { logger } from "@/lib/logging";
-
+import clientLogger from "@/lib/logging/client";
+import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
 
 interface UseLiffInitializationProps {
   environment: AuthEnvironment;
@@ -20,11 +20,11 @@ export const useLiffInitialization = ({ environment, liffService }: UseLiffIniti
 
       const liffSuccess = await liffService.initialize();
       if (!liffSuccess) {
-        logger.warn("LIFF initialization failed", {
-          authType: "liff",
-          timestamp,
-          component: "useLiffInitialization",
-        });
+        clientLogger.warn("LIFF initialization failed", createAuthLogContext(
+          generateSessionId(),
+          "liff",
+          { timestamp, component: "useLiffInitialization" }
+        ));
       }
     };
 

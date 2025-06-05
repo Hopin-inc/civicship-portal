@@ -10,7 +10,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/utils";
 import { GqlRole } from "@/types/graphql";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 /**
  * 管理者ガードコンポーネントのプロパティ
@@ -45,7 +45,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
 
     if (!isAuthenticated || !currentUser) {
       const next = window.location.pathname + window.location.search;
-      logger.debug("No user found. Redirecting to login", {
+      clientLogger.debug("No user found. Redirecting to login", {
         component: "AdminGuard",
         redirectTo: `/login?next=${next}`
       });
@@ -60,7 +60,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
         if (redirectPath === "/") {
           toast.warning("管理者権限がありません");
         }
-        logger.debug("Admin access denied. Redirecting", {
+        clientLogger.debug("Admin access denied. Redirecting", {
           component: "AdminGuard",
           redirectPath
         });
@@ -68,7 +68,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
         return;
       }
 
-      logger.debug("User is authorized as community manager", {
+      clientLogger.debug("User is authorized as community manager", {
         component: "AdminGuard"
       });
     };
@@ -81,7 +81,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   }
 
   if (!isAuthenticated || !currentUser) {
-    logger.debug("Unauthorized user state. No UI rendered", { component: "AdminGuard" });
+    clientLogger.debug("Unauthorized user state. No UI rendered", { component: "AdminGuard" });
     return null;
   }
 
@@ -96,7 +96,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   };
 
   if (!checkSyncAdminAccess()) {
-    logger.debug("Unauthorized role. No UI rendered", { component: "AdminGuard" });
+    clientLogger.debug("Unauthorized role. No UI rendered", { component: "AdminGuard" });
     return null;
   }
 

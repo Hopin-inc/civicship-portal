@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
 import { GqlCurrentUserQuery } from "@/types/graphql";
-import { logger } from "@/lib/logging";
+import clientLogger from "@/lib/logging/client";
 
 interface UseUserRegistrationStateProps {
   authStateManager: AuthStateManager | null;
@@ -39,7 +39,7 @@ export const useUserRegistrationState = ({ authStateManager, userData, setState 
           try {
             await currentAuthStateManager.handleUserRegistrationStateChange(true);
           } catch (error) {
-            logger.error("Failed to update AuthStateManager user registration state", {
+            clientLogger.error("Failed to update AuthStateManager user registration state", {
               error: error instanceof Error ? error.message : String(error),
               component: "useUserRegistrationState"
             });
