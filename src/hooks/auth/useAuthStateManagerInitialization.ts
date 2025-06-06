@@ -2,17 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
+import { logger } from "@/lib/logging";
 
 export const useAuthStateManagerInitialization = (authStateManager: AuthStateManager | null) => {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    console.log("[Debug] 🔥 useAuthStateManagerInitialization fired.");
-    
     if (!authStateManager) return;
 
     const initializeAuthState = async () => {
-      console.log("🔍 Initializing AuthStateManager");
       await authStateManager.initialize();
       setIsInitialized(true);
     };

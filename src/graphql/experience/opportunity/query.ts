@@ -11,17 +11,11 @@ import { ARTICLE_FRAGMENT } from "@/graphql/content/article/fragment";
 export const GET_OPPORTUNITIES = gql`
   query GetOpportunities(
     $filter: OpportunityFilterInput
+    $sort: OpportunitySortInput
     $first: Int
     $cursor: String
-    $slotFilter: OpportunitySlotFilterInput
-    $slotSort: OpportunitySlotSortInput
   ) {
-    opportunities(
-      filter: $filter
-      sort: { earliestSlotStartsAt: asc }
-      first: $first
-      cursor: $cursor
-    ) {
+    opportunities(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
       pageInfo {
         startCursor
         endCursor
@@ -33,14 +27,12 @@ export const GET_OPPORTUNITIES = gql`
         cursor
         node {
           ...OpportunityFields
-          community {
-            ...CommunityFields
-          }
-          slots(filter: $slotFilter, sort: $slotSort) {
-            ...OpportunitySlotFields
-          }
           place {
-            ...PlaceFields
+            id
+            name
+            address
+            latitude
+            longitude
           }
         }
       }

@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { logger } from "@/lib/logging";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -56,12 +57,17 @@ export default function LoginPage() {
 
     try {
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
-      console.log("🚀 Using redirect path from AuthRedirectService:", redirectPath);
+      logger.debug("Using redirect path from AuthRedirectService", {
+        redirectPath,
+        component: "LoginPage",
+      });
 
       const success = await loginWithLiff(redirectPath);
 
       if (success) {
-        console.log("🚀 LINE authentication succeeded. Redirecting...");
+        logger.debug("LINE authentication succeeded. Redirecting...", {
+          component: "LoginPage",
+        });
       }
     } catch (err) {
       const { title, description } = getLiffLoginErrorMessage(error);
@@ -79,60 +85,68 @@ export default function LoginPage() {
     };
   }, []);
 
-  if (loading || isAuthenticating) {
+  if (
+    loading ||
+    isAuthenticating ||
+    authenticationState === "line_authenticated" ||
+    authenticationState === "loading"
+  ) {
     return <LoadingIndicator />;
   }
 
   return (
-    <div className="w-full max-w-mobile-l bg-background rounded-2xl p-6 mx-4">
-      <div className="flex flex-col items-center pt-8">
-        <div className="mb-12">
-          <Image src="/images/neo88-logo.jpg" alt="NEO88" width={120} height={40} priority />
-        </div>
-
+    <div className="flex items-center justify-center p-12">
+      <div className="w-full max-w-mobile-l">
         <div className="space-y-3 mb-10">
-          <div className="flex items-start space-x-4">
-            <Checkbox
-              id="agree-terms"
-              checked={agreedTerms}
-              className="w-5 h-5"
-              disabled={isLoading || isAuthenticating}
-              onCheckedChange={(checked) => setAgreedTerms(!!checked)}
-            />
-            <Label htmlFor="agree-terms" className="text-sm text-muted-foreground">
-              <Link href="/terms" className="underline">
-                利用規約
-              </Link>
-              に同意する
-            </Label>
+          <div className="text-body-md mb-6">
+            <strong className="font-bold">NEO88四国祭</strong>
+            を利用するにはLINEでログインして下さい
           </div>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-4">
+              <Checkbox
+                id="agree-terms"
+                checked={agreedTerms}
+                className="w-5 h-5"
+                disabled={isLoading || isAuthenticating}
+                onCheckedChange={(checked) => setAgreedTerms(!!checked)}
+              />
+              <Label htmlFor="agree-terms" className="text-label-md text-muted-foreground">
+                <Link href="/terms" className="underline">
+                  利用規約
+                </Link>
+                <span className="text-label-sm">に同意する</span>
+              </Label>
+            </div>
 
-          <div className="flex items-start space-x-4">
-            <Checkbox
-              id="agree-privacy"
-              checked={agreedPrivacy}
-              className="w-5 h-5"
-              disabled={isLoading || isAuthenticating}
-              onCheckedChange={(checked) => setAgreedPrivacy(!!checked)}
-            />
-            <Label htmlFor="agree-privacy" className="text-sm text-muted-foreground">
-              <Link href="/privacy" className="underline">
-                プライバシーポリシー
-              </Link>
-              に同意する
-            </Label>
+            <div className="flex items-center space-x-4">
+              <Checkbox
+                id="agree-privacy"
+                checked={agreedPrivacy}
+                className="w-5 h-5"
+                disabled={isLoading || isAuthenticating}
+                onCheckedChange={(checked) => setAgreedPrivacy(!!checked)}
+              />
+              <Label htmlFor="agree-privacy" className="text-label-md text-muted-foreground">
+                <Link href="/privacy" className="underline">
+                  プライバシーポリシー
+                </Link>
+                <span className="text-label-sm">に同意する</span>
+              </Label>
+            </div>
           </div>
         </div>
+
+        {error && <div className="text-destructive text-sm mt-2">{error}</div>}
 
         <Button
           onClick={handleLogin}
-          disabled={isLoading || isAuthenticating || !agreedTerms || !agreedPrivacy}
-          className="w-full bg-[#06C755] hover:bg-[#05B74B] text-white rounded-xl h-12 flex items-center justify-center gap-2"
+          disabled={isLoading || isAuthenticating}
+          className="w-full bg-[#06C755] hover:bg-[#05B74B] text-white rounded-full h-14 flex items-center justify-center gap-2"
         >
           <Image src="/images/line-icon.png" alt="LINE" width={24} height={24} priority />
           {isLoading || isAuthenticating ? "ログイン中..." : "LINEでログイン"}
         </Button>
-        {error && <div className="text-destructive text-sm mt-2">{error}</div>}
       </div>
     </div>
   );

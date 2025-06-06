@@ -3431,10 +3431,9 @@ export type GqlOpportunityFieldsFragment = {
 
 export type GqlGetOpportunitiesQueryVariables = Exact<{
   filter?: InputMaybe<GqlOpportunityFilterInput>;
+  sort?: InputMaybe<GqlOpportunitySortInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
-  slotFilter?: InputMaybe<GqlOpportunitySlotFilterInput>;
-  slotSort?: InputMaybe<GqlOpportunitySlotSortInput>;
 }>;
 
 export type GqlGetOpportunitiesQuery = {
@@ -3466,21 +3465,6 @@ export type GqlGetOpportunitiesQuery = {
         feeRequired?: number | null;
         pointsToEarn?: number | null;
         earliestReservableAt?: Date | null;
-        community?: {
-          __typename?: "Community";
-          id: string;
-          name?: string | null;
-          image?: string | null;
-        } | null;
-        slots?: Array<{
-          __typename?: "OpportunitySlot";
-          id: string;
-          hostingStatus: GqlOpportunitySlotHostingStatus;
-          startsAt: Date;
-          endsAt: Date;
-          capacity?: number | null;
-          remainingCapacity?: number | null;
-        }> | null;
         place?: {
           __typename?: "Place";
           id: string;
@@ -3488,17 +3472,6 @@ export type GqlGetOpportunitiesQuery = {
           address: string;
           latitude: any;
           longitude: any;
-          city?: {
-            __typename?: "City";
-            code: string;
-            name: string;
-            state?: {
-              __typename?: "State";
-              code: string;
-              countryCode: string;
-              name: string;
-            } | null;
-          } | null;
         } | null;
       } | null;
     }>;
@@ -6940,17 +6913,11 @@ export type GetEvaluationQueryResult = Apollo.QueryResult<
 export const GetOpportunitiesDocument = gql`
   query GetOpportunities(
     $filter: OpportunityFilterInput
+    $sort: OpportunitySortInput
     $first: Int
     $cursor: String
-    $slotFilter: OpportunitySlotFilterInput
-    $slotSort: OpportunitySlotSortInput
   ) {
-    opportunities(
-      filter: $filter
-      sort: { earliestSlotStartsAt: asc }
-      first: $first
-      cursor: $cursor
-    ) {
+    opportunities(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
       pageInfo {
         startCursor
         endCursor
@@ -6962,23 +6929,18 @@ export const GetOpportunitiesDocument = gql`
         cursor
         node {
           ...OpportunityFields
-          community {
-            ...CommunityFields
-          }
-          slots(filter: $slotFilter, sort: $slotSort) {
-            ...OpportunitySlotFields
-          }
           place {
-            ...PlaceFields
+            id
+            name
+            address
+            latitude
+            longitude
           }
         }
       }
     }
   }
   ${OpportunityFieldsFragmentDoc}
-  ${CommunityFieldsFragmentDoc}
-  ${OpportunitySlotFieldsFragmentDoc}
-  ${PlaceFieldsFragmentDoc}
 `;
 
 /**
@@ -6994,10 +6956,9 @@ export const GetOpportunitiesDocument = gql`
  * const { data, loading, error } = useGetOpportunitiesQuery({
  *   variables: {
  *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
  *      first: // value for 'first'
  *      cursor: // value for 'cursor'
- *      slotFilter: // value for 'slotFilter'
- *      slotSort: // value for 'slotSort'
  *   },
  * });
  */

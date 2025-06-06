@@ -12,6 +12,8 @@ import { __DEV__ } from "@apollo/client/utilities/globals";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { TokenManager } from "./auth/token-manager";
 
+import { logger } from "@/lib/logging";
+
 if (__DEV__) {
   loadDevMessages();
   loadErrorMessages();
@@ -38,21 +40,25 @@ const requestLink = new ApolloLink((operation, forward) => {
     return forward(operation);
   }
 
-  return new Observable(observer => {
+  return new Observable((observer) => {
     (async () => {
       try {
         const { lineAuth } = await import("./auth/firebase-config");
         const phoneTokens = TokenManager.getPhoneTokens();
-        
+
         let firebaseToken = null;
         if (lineAuth.currentUser) {
           try {
             firebaseToken = await lineAuth.currentUser.getIdToken();
           } catch (error) {
-            console.warn('Failed to get Firebase token:', error);
+            logger.info("Failed to get Firebase token", {
+              error: error instanceof Error ? error.message : String(error),
+              component: "ApolloRequestLink",
+              operation: operation.operationName,
+            });
           }
         }
-        
+
         const lineTokens = TokenManager.getLineTokens();
         const accessToken = firebaseToken || lineTokens.accessToken;
 
@@ -63,38 +69,32 @@ const requestLink = new ApolloLink((operation, forward) => {
             "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
           };
 
-          const tokenRequiredOperations = ['userSignUp', 'linkPhoneAuth', 'storePhoneAuthToken'];
-          
-          if (tokenRequiredOperations.includes(operation.operationName || '')) {
+          const tokenRequiredOperations = ["userSignUp", "linkPhoneAuth", "storePhoneAuthToken"];
+
+          if (tokenRequiredOperations.includes(operation.operationName || "")) {
             const requestHeaders = {
               ...baseHeaders,
               "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
               "X-Phone-Auth-Token": phoneTokens.accessToken || "",
-              "X-Phone-Token-Expires-At": phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
+              "X-Phone-Token-Expires-At": phoneTokens.expiresAt
+                ? phoneTokens.expiresAt.toString()
+                : "",
               "X-Phone-Uid": phoneTokens.phoneUid || "",
               "X-Phone-Number": phoneTokens.phoneNumber || "",
             };
-            
-            console.log('🔐 Sending phone auth tokens for operation:', operation.operationName, {
-              hasPhoneToken: !!phoneTokens.accessToken,
-              hasPhoneUid: !!phoneTokens.phoneUid,
-              hasPhoneNumber: !!phoneTokens.phoneNumber,
-              tokenSource: firebaseToken ? 'firebase' : 'cookie'
-            });
-            
+
             return { headers: requestHeaders };
           }
-          
-          console.log('🔒 Sending tokens for operation:', operation.operationName, {
-            tokenSource: firebaseToken ? 'firebase' : 'cookie',
-            hasToken: !!accessToken
-          });
           return { headers: baseHeaders };
         });
 
         forward(operation).subscribe(observer);
       } catch (error) {
-        console.error('Error in requestLink:', error);
+        logger.error("Error in requestLink", {
+          error: error instanceof Error ? error.message : String(error),
+          component: "ApolloRequestLink",
+          operation: operation.operationName,
+        });
         const lineTokens = TokenManager.getLineTokens();
 
         operation.setContext(({ headers = {} }) => ({
@@ -114,9 +114,13 @@ const requestLink = new ApolloLink((operation, forward) => {
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
   if (graphQLErrors) {
     for (const error of graphQLErrors) {
-      console.log(
-        `[GraphQL error]: Message: ${error.message}, Location: ${error.locations}, Path: ${error.path}`,
-      );
+      logger.info("GraphQL error", {
+        message: error.message,
+        locations: error.locations,
+        path: error.path,
+        component: "ApolloErrorLink",
+        operation: operation.operationName,
+      });
 
       if (
         error.message.includes("Authentication required") ||
@@ -136,7 +140,20 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
   }
 
   if (networkError) {
-    console.log(`[Network error]: ${networkError}`);
+    if ("statusCode" in networkError && networkError.statusCode === 401) {
+      logger.info("Network authentication error", {
+        error: networkError.message || String(networkError),
+        statusCode: networkError.statusCode,
+        component: "ApolloErrorLink",
+        operation: operation.operationName,
+      });
+    } else {
+      logger.error("Network error", {
+        error: networkError.message || String(networkError),
+        component: "ApolloErrorLink",
+        operation: operation.operationName,
+      });
+    }
 
     if ("statusCode" in networkError && networkError.statusCode === 401) {
       if (typeof window !== "undefined") {

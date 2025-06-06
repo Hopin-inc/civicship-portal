@@ -1,5 +1,3 @@
-"use client";
-
 import {
   GqlArticle,
   GqlOpportunity,
@@ -15,6 +13,7 @@ import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { addDays, isAfter } from "date-fns";
+import { COMMUNITY_ID } from "@/utils";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
@@ -41,7 +40,7 @@ export const presenterActivityCard = (node: GqlOpportunity): ActivityCard => {
     feeRequired: node?.feeRequired ?? null,
     location: node?.place?.name || "場所未定",
     images: node?.images || [],
-    communityId: node?.community?.id || "",
+    communityId: COMMUNITY_ID || "",
     hasReservableTicket: node?.isReservableWithTicket || false,
   };
 };
@@ -54,7 +53,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
-    communityId: data.community?.id || "",
+    communityId: COMMUNITY_ID || "",
     id: data.id,
     title: data.title,
     description: data.description || "",

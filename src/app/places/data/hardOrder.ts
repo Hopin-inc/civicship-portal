@@ -1,5 +1,6 @@
 import { GqlOpportunity, GqlPlace } from "@/types/graphql";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
+import { logger } from "@/lib/logging";
 
 // #NOTE 拠点に複数人の案内人の体験が掲載されている場合、意図しない順序で表示されている拠点のID（順序を逆にすることで簡易的に解決する）
 // 坂東商店guest room〜藍染めと宿〜 https://www.neo88.app/places/cmahru0gg001vs60nnkqrgugc
@@ -44,13 +45,6 @@ export const orderOpportunities = (
     return opportunities;
   }
 
-  console.log(`[orderOpportunities] ${placeId}`);
-  console.log(
-    "  original:",
-    opportunities.map((o) => o.id),
-  );
-  console.log("  definedOrder:", order);
-
   const sorted = [...opportunities].sort((a, b) => {
     const indexA = order.indexOf(a.id);
     const indexB = order.indexOf(b.id);
@@ -60,11 +54,6 @@ export const orderOpportunities = (
     if (indexB === -1) return -1;
     return indexA - indexB;
   });
-
-  console.log(
-    "  sorted:",
-    sorted.map((o) => o.id),
-  );
 
   return sorted;
 };
@@ -80,14 +69,6 @@ export const getPrimaryOpportunity = (place: GqlPlace): GqlOpportunity | undefin
   const found = preferredOrder
     .map((id) => opportunities.find((o) => o.id === id))
     .find((o): o is GqlOpportunity => !!o);
-
-  console.log(`[getPrimaryOpportunity] ${place.id}`);
-  console.log("  preferred order:", preferredOrder);
-  console.log(
-    "  available:",
-    opportunities.map((o) => o.id),
-  );
-  console.log("  selected:", found?.id ?? opportunities[0]?.id);
 
   return found ?? opportunities[0];
 };

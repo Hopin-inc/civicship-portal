@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { AuthState } from "@/contexts/AuthProvider";
+import { logger } from "@/lib/logging";
 
 interface UseTokenExpirationHandlerProps {
   state: AuthState;
@@ -15,15 +16,13 @@ export const useTokenExpirationHandler = ({ state, setState, logout }: UseTokenE
   stateRef.current = state;
 
   useEffect(() => {
-    console.log("[Debug] 🔥 useTokenExpirationHandler fired.");
-    
     const handleTokenExpired = (event: Event) => {
       const customEvent = event as CustomEvent<{ source: string }>;
       const { source } = customEvent.detail;
 
       if (source === "graphql" || source === "network") {
         const currentState = stateRef.current.authenticationState;
-        
+
         if (currentState === "line_authenticated" || currentState === "user_registered") {
           setState((prev) => ({ ...prev, authenticationState: "line_token_expired" }));
           if (typeof window !== "undefined") {

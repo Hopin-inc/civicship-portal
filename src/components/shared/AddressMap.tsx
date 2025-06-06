@@ -7,6 +7,7 @@ import {
   getCoordinatesFromAddress,
   PRIORITIZE_LAT_LNG_PLACE_IDS,
 } from "@/app/places/utils/geocoding";
+import { logger } from "@/lib/logging";
 
 interface AddressMapProps {
   address: string;
@@ -104,11 +105,16 @@ const useAddressGeocoding = (
         // 住所からの取得に失敗した場合、フォールバックの座標を使用
         return setFallbackLocation(map, zoom);
       } catch (error) {
-        console.error("Error geocoding address:", error);
+        logger.error("Error geocoding address", {
+          error: error instanceof Error ? error.message : String(error),
+          address,
+          placeId,
+          component: "AddressMap"
+        });
 
         // エラー発生時もフォールバックの座標を使用
         return setFallbackLocation(map, zoom);
-      } finally {
+      }finally {
         setIsGeocoding(false);
       }
     },

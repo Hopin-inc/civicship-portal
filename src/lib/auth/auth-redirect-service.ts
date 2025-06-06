@@ -65,20 +65,23 @@ export class AuthRedirectService {
     const authState = this.authStateManager.getState();
     const nextParam = next ? `?next=${next}` : `?next=${pathname}`;
 
-    console.log("getRedirectPath", { pathname, authState, next, nextParam });
-
     if (authState === "loading") {
       return null;
     }
 
-    if ((pathname === "/login" || pathname === "/sign-up") && authState === "user_registered") {
+    if (
+      (pathname === "/login" ||
+        pathname === "/sign-up/phone-verification" ||
+        pathname === "/sign-up") &&
+      authState === "user_registered"
+    ) {
       if (
         next &&
         next.startsWith("/") &&
         !next.startsWith("/login") &&
         !next.startsWith("/sign-up")
       ) {
-        return next;
+        return decodeURIComponent(next);
       }
       return "/";
     }
@@ -141,8 +144,7 @@ export class AuthRedirectService {
    */
   public getPostLineAuthRedirectPath(nextPath: string | null): string {
     const next = nextPath ? decodeURIComponent(nextPath) : null;
-    const nextParam = next ? `?next=${next}` : "";
-    console.log("getPostLineAuthRedirectPath", { nextPath, next, nextParam });
+    const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
 
     const authState = this.authStateManager.getState();
 

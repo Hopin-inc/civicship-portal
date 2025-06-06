@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { presenterTransaction } from "@/app/wallets/data/presenter";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
+import { logger } from "@/lib/logging";
 
 export default function WalletPage() {
   const communityId = COMMUNITY_ID;
@@ -53,7 +54,10 @@ export default function WalletPage() {
         await refetchWallet();
         refetchTransactions();
       } catch (err) {
-        console.error("Refetch failed on window focus", err);
+        logger.error("Refetch failed on window focus", {
+          error: err instanceof Error ? err.message : String(err),
+          component: "WalletPage"
+        });
       }
     };
     window.addEventListener("focus", handleFocus);
