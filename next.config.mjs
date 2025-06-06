@@ -1,11 +1,4 @@
-let userConfig = undefined;
-try {
-  userConfig = await import("./v0-user-next.config");
-} catch (e) {
-  // ignore error
-}
-
-/** @type {import('next').NextConfig} */
+/** @type {import("next").NextConfig} */
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -15,6 +8,10 @@ const nextConfig = {
   },
   images: {
     unoptimized: false,
+    formats: ["image/webp", "image/avif"],
+    minimumCacheTTL: 86400,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       {
         protocol: "https",
@@ -37,6 +34,7 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  compress: true,
   webpack(config) {
     const fileLoaderRule = config.module.rules.find((rule) => rule.test?.test?.(".svg"));
 
@@ -57,25 +55,19 @@ const nextConfig = {
 
     return config;
   },
+  async headers() {
+    return [
+      {
+        source: "/_next/image",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable", // cache for 1 year
+          },
+        ],
+      },
+    ];
+  },
 };
-
-mergeConfig(nextConfig, userConfig);
-
-function mergeConfig(nextConfig, userConfig) {
-  if (!userConfig) {
-    return;
-  }
-
-  for (const key in userConfig) {
-    if (typeof nextConfig[key] === "object" && !Array.isArray(nextConfig[key])) {
-      nextConfig[key] = {
-        ...nextConfig[key],
-        ...userConfig[key],
-      };
-    } else {
-      nextConfig[key] = userConfig[key];
-    }
-  }
-}
 
 export default nextConfig;

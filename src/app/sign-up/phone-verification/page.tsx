@@ -34,7 +34,7 @@ export default function PhoneVerificationPage() {
         : "/sign-up/phone-verification/line-browser";
       router.replace(redirectUrl);
     }
-  }, [nextParam]);
+  }, [nextParam, router]);
 
   return (
     <div className="container mx-auto py-8">

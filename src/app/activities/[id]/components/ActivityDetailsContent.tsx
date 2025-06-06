@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
 import { AlertCircle, CalendarX } from "lucide-react";
 import SameStateActivities from "./SimilarActivitiesList";
@@ -19,6 +19,7 @@ import IconWrapper from "@/components/shared/IconWrapper";
 import AddressMap from "@/components/shared/AddressMap";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { ActivityBodySection } from "@/app/activities/[id]/components/ActivityBodySection";
+import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
@@ -134,6 +135,14 @@ const ScheduleSection = ({
     id: opportunityId,
     community_id: communityId ?? "",
   });
+  const visibleSlots = useMemo(
+    () =>
+      slots.filter(
+        (slot) =>
+          slot.hostingStatus === GqlOpportunitySlotHostingStatus.Scheduled && slot.isReservable,
+      ),
+    [slots],
+  );
 
   const hasSchedule = slots.length > 0;
 
@@ -157,11 +166,13 @@ const ScheduleSection = ({
                 </div>
               ))}
             </div>
-            <Link href={`/reservation/select-date?${query.toString()}`}>
-              <Button variant="secondary" size="md" className="w-full">
-                参加できる日程を探す
-              </Button>
-            </Link>
+            {visibleSlots.length > 2 && (
+              <Link href={`/reservation/select-date?${query.toString()}`}>
+                <Button variant="secondary" size="md" className="w-full">
+                  参加できる日程を探す
+                </Button>
+              </Link>
+            )}
           </>
         ) : (
           <div className="text-center py-8 px-4 bg-card rounded-lg border border-muted/20 flex flex-col items-center">

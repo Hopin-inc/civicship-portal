@@ -1,5 +1,8 @@
 "use client";
 
+
+import { logger } from "@/lib/logging";
+
 /**
  * 認証トークン情報の型定義
  */
@@ -151,7 +154,10 @@ export class TokenManager {
       await lineAuth.currentUser.getIdToken();
       return false; // Successfully got token, so it's valid
     } catch (error) {
-      console.error("LINE token validation failed:", error);
+      logger.info("LINE token validation failed", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "TokenManager",
+      });
       return true; // Any error means the token/session is invalid
     }
   }
@@ -188,7 +194,10 @@ export class TokenManager {
       }
       return false;
     } catch (error) {
-      console.error("Failed to renew LINE token:", error);
+      logger.info("Failed to renew LINE token", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "TokenManager",
+      });
       return false;
     }
   }
@@ -212,7 +221,11 @@ export class TokenManager {
       }
       return false;
     } catch (error) {
-      console.error("Failed to renew phone token:", error);
+      logger.info("Failed to renew phone token", {
+        authType: "phone",
+        error: error instanceof Error ? error.message : String(error),
+        component: "TokenManager",
+      });
       return false;
     }
   }
