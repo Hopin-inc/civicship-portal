@@ -40,6 +40,19 @@ export default function TicketsPage() {
   const utilityList = utilityData?.utilities?.edges?.map((e) => e?.node) ?? [];
   const ticketList = ticketData?.ticketIssuers?.edges?.map((e) => e?.node) ?? [];
 
+  if (utilityList.length === 0) {
+    return (
+      <div className="p-4 space-y-8 max-w-2xl mx-auto">
+        <div className="text-center space-y-6">
+          <h2 className="text-2xl font-bold">チケットの利用を始めましょう！</h2>
+          <Button onClick={() => router.push("/admin/tickets/utilities")}>
+            チケットの種類を追加
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 space-y-8 max-w-2xl mx-auto">
       {/* チケットリンク一覧セクション */}
@@ -90,19 +103,15 @@ export default function TicketsPage() {
           </Button>
         </div>
         <div className="space-y-2">
-          {utilityList.length === 0 ? (
-            <p className="text-muted-foreground">チケットの種類がありません</p>
-          ) : (
-            utilityList.map((utility) => (
-              <CardWrapper key={utility?.id} className="p-4">
-                <div className="text-sm">
-                  <div className="font-semibold">{utility?.name}</div>
-                  <div className="text-muted-foreground">{utility?.description}</div>
-                  <div>交換ポイント: {utility?.pointsRequired}</div>
-                </div>
-              </CardWrapper>
-            ))
-          )}
+          {utilityList.map((utility) => (
+            <CardWrapper key={utility?.id} className="p-4">
+              <div className="text-sm">
+                <div className="font-semibold">{utility?.name}</div>
+                <div className="text-muted-foreground">{utility?.description}</div>
+                <div>交換ポイント: {utility?.pointsRequired}</div>
+              </div>
+            </CardWrapper>
+          ))}
         </div>
       </div>
     </div>
