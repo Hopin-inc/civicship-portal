@@ -40,7 +40,7 @@ export default function UtilitiesPage() {
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold">チケットの種類一覧</h2>
-          <CreateUtilitySheet onUtilityCreated={() => refetchUtilities()} />
+          <CreateUtilitySheet onUtilityCreated={async () => { await refetchUtilities(); }} />
         </div>
         <div className="space-y-2">
           {utilityList.length === 0 ? (
