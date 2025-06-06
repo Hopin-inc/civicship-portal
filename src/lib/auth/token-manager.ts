@@ -2,6 +2,8 @@
 
 import clientLogger from "@/lib/logging/client";
 import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
+import { AuthEnvironment } from "./environment-detector";
+import { toAuthEnvironment } from "./environment-helpers";
 
 /**
  * 認証トークン情報の型定義
@@ -27,6 +29,48 @@ export interface PhoneAuthTokens {
  * 認証トークンを管理するクラス
  */
 export class TokenManager {
+  private static instance: TokenManager;
+
+  /**
+   * シングルトンインスタンスを取得
+   * 後方互換性のために残しています
+   */
+  public static getInstance(): TokenManager {
+    if (!TokenManager.instance) {
+      TokenManager.instance = new TokenManager();
+    }
+    return TokenManager.instance;
+  }
+
+  /**
+   * LINEトークンを設定
+   * @param token LINEトークン
+   * @param environment 認証環境
+   * @param saveToStorage ストレージに保存するかどうか
+   */
+  public async setLineToken(token: string, environment: AuthEnvironment, saveToStorage: boolean): Promise<void> {
+    // Static methodに委譲
+    TokenManager.saveLineTokens({
+      accessToken: token,
+      refreshToken: null,
+      expiresAt: null
+    });
+  }
+
+  /**
+   * Firebaseトークンを設定
+   * @param token Firebaseトークン
+   * @param environment 認証環境
+   * @param saveToStorage ストレージに保存するかどうか
+   */
+  public async setFirebaseToken(token: string, environment: AuthEnvironment, saveToStorage: boolean): Promise<void> {
+    // Static methodに委譲
+    TokenManager.saveLineTokens({
+      accessToken: token,
+      refreshToken: null,
+      expiresAt: null
+    });
+  }
   private static readonly LINE_ACCESS_TOKEN_KEY = "access_token";
   private static readonly LINE_REFRESH_TOKEN_KEY = "refresh_token";
   private static readonly LINE_TOKEN_EXPIRES_AT_KEY = "token_expires_at";
@@ -156,7 +200,7 @@ export class TokenManager {
     } catch (error) {
       clientLogger.info("LINE token validation failed", createAuthLogContext(
         generateSessionId(),
-        "general",
+        toAuthEnvironment("general"),
         {
           error: error instanceof Error ? error.message : String(error),
           component: "TokenManager"
@@ -200,7 +244,7 @@ export class TokenManager {
     } catch (error) {
       clientLogger.info("Failed to renew LINE token", createAuthLogContext(
         generateSessionId(),
-        "general",
+        toAuthEnvironment("general"),
         {
           error: error instanceof Error ? error.message : String(error),
           component: "TokenManager"
@@ -231,7 +275,7 @@ export class TokenManager {
     } catch (error) {
       clientLogger.info("Failed to renew phone token", createAuthLogContext(
         generateSessionId(),
-        "phone",
+        toAuthEnvironment("phone"),
         {
           error: error instanceof Error ? error.message : String(error),
           component: "TokenManager"

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
+import { toAuthEnvironment } from "@/lib/auth/environment-helpers";
 import { AuthState } from "@/contexts/AuthProvider";
 import clientLogger from "@/lib/logging/client";
 import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
@@ -66,7 +67,7 @@ export const useAutoLogin = ({ environment, state, liffService, setState, refetc
           } catch (error) {
             clientLogger.info("Auto-login with LIFF failed", createAuthLogContext(
               generateSessionId(),
-              "liff",
+              toAuthEnvironment("liff"),
               {
                 error: error instanceof Error ? error.message : String(error),
                 component: "useAutoLogin"

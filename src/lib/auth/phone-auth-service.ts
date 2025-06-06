@@ -9,6 +9,7 @@ import {
 import { phoneAuth } from "./firebase-config";
 import { PhoneAuthTokens, TokenManager } from "./token-manager";
 import { isRunningInLiff } from "./environment-detector";
+import { toAuthEnvironment } from "./environment-helpers";
 import clientLogger from "../logging/client";
 import { createAuthLogContext, generateSessionId, maskPhoneNumber } from "../logging/client/utils";
 
@@ -101,7 +102,7 @@ export class PhoneAuthService {
     } catch (e) {
       clientLogger.info("Error clearing reCAPTCHA", createAuthLogContext(
         generateSessionId(),
-        "phone",
+        toAuthEnvironment("phone"),
         {
           error: e instanceof Error ? e.message : String(e),
           component: "PhoneAuthService"
@@ -155,7 +156,7 @@ export class PhoneAuthService {
     } catch (error) {
       clientLogger.info("Phone verification failed", createAuthLogContext(
         generateSessionId(),
-        "phone",
+        toAuthEnvironment("phone"),
         {
           error: error instanceof Error ? error.message : String(error),
           component: "PhoneAuthService",
@@ -234,7 +235,7 @@ export class PhoneAuthService {
         } catch (signInError) {
           clientLogger.info("Could not sign in with phone credential", createAuthLogContext(
             generateSessionId(),
-            "phone",
+            toAuthEnvironment("phone"),
             {
               error: signInError instanceof Error ? signInError.message : String(signInError),
               component: "PhoneAuthService"
@@ -259,7 +260,7 @@ export class PhoneAuthService {
       } catch (credentialError) {
         clientLogger.info("Invalid verification code", createAuthLogContext(
           generateSessionId(),
-          "phone",
+          toAuthEnvironment("phone"),
           {
             error: credentialError instanceof Error ? credentialError.message : String(credentialError),
             component: "PhoneAuthService"
@@ -270,7 +271,7 @@ export class PhoneAuthService {
     } catch (error) {
       clientLogger.info("Code verification failed", createAuthLogContext(
         generateSessionId(),
-        "phone",
+        toAuthEnvironment("phone"),
         {
           error: error instanceof Error ? error.message : String(error),
           component: "PhoneAuthService"
@@ -292,7 +293,7 @@ export class PhoneAuthService {
       if (!phoneAuth.currentUser) {
         clientLogger.info("Cannot refresh phone token: No authenticated user", createAuthLogContext(
           generateSessionId(),
-          "phone",
+          toAuthEnvironment("phone"),
           { component: "PhoneAuthService" }
         ));
         return null;
@@ -316,7 +317,7 @@ export class PhoneAuthService {
     } catch (error) {
       clientLogger.info("Failed to refresh phone ID token", createAuthLogContext(
         generateSessionId(),
-        "phone",
+        toAuthEnvironment("phone"),
         {
           error: error instanceof Error ? error.message : String(error),
           component: "PhoneAuthService"

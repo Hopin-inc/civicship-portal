@@ -7,6 +7,7 @@ import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { lineAuth } from "@/lib/auth/firebase-config";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import { toAuthEnvironment } from "@/lib/auth/environment-helpers";
 import {
   GqlCurrentPrefecture,
   GqlCurrentUserPayload,
@@ -178,9 +179,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const initialized = await liffService.initialize();
       if (!initialized) {
+        const lineToken = await window.liff.getAccessToken();
+        await TokenManager.getInstance().setLineToken(lineToken, toAuthEnvironment("liff"), true);
         clientLogger.info("Failed to initialize LIFF", createAuthLogContext(
           authStateManager?.getSessionId() || generateSessionId(),
-          "liff",
+          toAuthEnvironment("liff"),
           { component: "AuthProvider" }
         ));
       }
@@ -200,7 +203,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       clientLogger.info("Login with LIFF failed", createAuthLogContext(
         authStateManager?.getSessionId() || generateSessionId(),
-        "liff",
+        toAuthEnvironment("liff"),
         { 
           error: error instanceof Error ? error.message : String(error),
           component: "AuthProvider" 
