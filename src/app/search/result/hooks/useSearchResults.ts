@@ -40,8 +40,6 @@ export const useSearchResults = (
     variables: {
       filter,
       first: 20,
-      slotFilter: { hostingStatus: GqlOpportunitySlotHostingStatus.Scheduled },
-      slotSort: { startsAt: GqlSortDirection.Asc },
     },
     fetchPolicy: "network-only",
     nextFetchPolicy: "network-only",

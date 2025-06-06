@@ -1,4 +1,5 @@
 import { TokenManager } from "./token-manager";
+import { toAuthEnvironment } from "./environment-helpers";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import clientLogger from "../logging/client";
@@ -186,7 +187,7 @@ export class AuthStateManager {
       } catch (tokenError) {
         clientLogger.info("Failed to get Firebase token for user registration check", createAuthLogContext(
           this.sessionId,
-          "general",
+          toAuthEnvironment("general"),
           { 
             error: tokenError instanceof Error ? tokenError.message : String(tokenError),
             component: "AuthStateManager" 
@@ -218,7 +219,7 @@ export class AuthStateManager {
     } catch (error) {
       clientLogger.info("Failed to check user registration", createAuthLogContext(
         this.sessionId,
-        "general",
+        toAuthEnvironment("general"),
         { 
           error: error instanceof Error ? error.message : String(error),
           component: "AuthStateManager" 
@@ -248,7 +249,7 @@ export class AuthStateManager {
     } catch (error) {
       clientLogger.info("Failed to renew LINE token", createAuthLogContext(
         this.sessionId,
-        "general",
+        toAuthEnvironment("general"),
         { 
           error: error instanceof Error ? error.message : String(error),
           component: "AuthStateManager" 
@@ -279,7 +280,7 @@ export class AuthStateManager {
     } catch (error) {
       clientLogger.info("Failed to renew phone token", createAuthLogContext(
         this.sessionId,
-        "general",
+        toAuthEnvironment("general"),
         { 
           error: error instanceof Error ? error.message : String(error),
           component: "AuthStateManager" 

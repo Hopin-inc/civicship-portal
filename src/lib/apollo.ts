@@ -11,6 +11,7 @@ import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { __DEV__ } from "@apollo/client/utilities/globals";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { TokenManager } from "./auth/token-manager";
+import { toAuthEnvironment } from "./auth/environment-helpers";
 import clientLogger from "./logging/client";
 import { createAuthLogContext, generateSessionId } from "./logging/client/utils";
 
@@ -53,7 +54,7 @@ const requestLink = new ApolloLink((operation, forward) => {
           } catch (error) {
             clientLogger.info('Failed to get Firebase token', createAuthLogContext(
               generateSessionId(),
-              "general",
+              toAuthEnvironment("general"),
               {
                 error: error instanceof Error ? error.message : String(error),
                 component: 'ApolloRequestLink',
@@ -118,7 +119,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
     for (const error of graphQLErrors) {
       clientLogger.info('GraphQL error', createAuthLogContext(
         generateSessionId(),
-        "general",
+        toAuthEnvironment("general"),
         {
           message: error.message,
           locations: error.locations,
@@ -149,7 +150,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
     if ("statusCode" in networkError && networkError.statusCode === 401) {
       clientLogger.info('Network authentication error', createAuthLogContext(
         generateSessionId(),
-        "general",
+        toAuthEnvironment("general"),
         {
           error: networkError.message || String(networkError),
           statusCode: networkError.statusCode,

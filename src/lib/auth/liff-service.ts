@@ -8,6 +8,7 @@ import retry from "retry";
 import clientLogger from "../logging/client";
 import { createAuthLogContext, generateSessionId } from "../logging/client/utils";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
+import { toAuthEnvironment } from "./environment-helpers";
 
 /**
  * LIFF初期化状態の型定義

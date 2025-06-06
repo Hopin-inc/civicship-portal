@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { User } from "firebase/auth";
 import { lineAuth } from "@/lib/auth/firebase-config";
 import { TokenManager } from "@/lib/auth/token-manager";
+import { toAuthEnvironment } from "@/lib/auth/environment-helpers";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
 import clientLogger from "@/lib/logging/client";
@@ -49,7 +50,7 @@ export const useFirebaseAuthState = ({ authStateManager, state, setState }: UseF
         } catch (error) {
           clientLogger.info("Failed to sync Firebase token to cookies", createAuthLogContext(
             generateSessionId(),
-            "general",
+            toAuthEnvironment("general"),
             {
               error: error instanceof Error ? error.message : String(error),
               component: "useFirebaseAuthState"
