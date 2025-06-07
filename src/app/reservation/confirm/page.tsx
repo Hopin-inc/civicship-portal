@@ -23,7 +23,7 @@ import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHori
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
 import { LiffService } from "@/lib/auth/liff-service";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -86,7 +86,7 @@ export default function ConfirmPage() {
       } else {
         const message = errorMessages[result.code] ?? "予期しないエラーが発生しました。";
         toast.error(message);
-        clientLogger.error("Reservation failed", {
+        logger.error("Reservation failed", {
           code: result.code,
           component: "ReservationConfirmPage"
         });

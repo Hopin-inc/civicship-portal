@@ -2,7 +2,7 @@
 
 import { COMMUNITY_ID } from '@/utils';
 import { useGetArticleQuery } from "@/types/graphql";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 
 export const useArticleQuery = (id: string) => {
   return useGetArticleQuery({
@@ -14,7 +14,7 @@ export const useArticleQuery = (id: string) => {
     },
     skip: !id,
     onError: (error) => {
-      clientLogger.info('Article query error', {
+      logger.info('Article query error', {
         error: error instanceof Error ? error.message : String(error),
         component: 'useArticleQuery',
         articleId: id

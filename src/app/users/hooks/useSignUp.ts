@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthProvider';
 import { GqlCurrentPrefecture } from '@/types/graphql';
 import { toast } from 'sonner';
-import clientLogger from '@/lib/logging/client';
+import { logger } from '@/lib/logging';
 
 export interface SignUpFormValues {
   name: string;
@@ -50,7 +50,7 @@ export const useSignUp = () => {
         toast.success('アカウントが作成されました');
       }
     } catch (error) {
-      clientLogger.error('Sign up error', {
+      logger.error('Sign up error', {
         error: error instanceof Error ? error.message : String(error),
         component: 'useSignUp'
       });
