@@ -41,10 +41,11 @@ export const useActivities = (options?: {
       sort: {
         earliestSlotStartsAt: GqlSortDirection.Desc,
       },
-      first: 10,
+      first: 20,
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-first",
     nextFetchPolicy: "cache-first",
+    notifyOnNetworkStatusChange: true,
   });
 
   const opportunities = data?.opportunities ?? options?.initialData ?? fallbackConnection;
@@ -64,7 +65,7 @@ export const useActivities = (options?: {
           earliestSlotStartsAt: GqlSortDirection.Desc,
         },
         cursor: endCursor,
-        first: 10,
+        first: 20,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult || !prev.opportunities || !fetchMoreResult.opportunities) {

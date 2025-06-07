@@ -22,6 +22,7 @@ export default function SearchPage() {
       title: "体験・お手伝いを検索",
       showBackButton: true,
       showLogo: false,
+      backTo: "/",
     }),
     [],
   );
@@ -49,7 +50,7 @@ export default function SearchPage() {
           logger.warn("Invalid date strings in URL", {
             from: fromStr,
             to: toStr,
-            component: "SearchPage"
+            component: "SearchPage",
           });
         }
         return undefined; // Default if params not present or dates are invalid
@@ -137,7 +138,7 @@ function SearchPageContent({
 
   return (
     <div className="space-y-6 pt-4">
-      <SearchForm />
+      <SearchForm onSearch={handleSearch} />
       <SearchFilters
         onFilterClick={setActiveForm}
         formatDateRange={formatDateRange}

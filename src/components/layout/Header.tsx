@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
@@ -22,6 +22,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const { navigateBack } = useHierarchicalNavigation();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const env = detectEnvironment();
   const router = useRouter();
@@ -29,6 +30,10 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const handleBackButton = () => {
     if (config?.backTo) {
       router.push(config.backTo);
+    } else if (pathname === "/search/result") {
+      // When on search results page, preserve all search parameters when going back to search page
+      const params = new URLSearchParams(searchParams);
+      router.push(`/search?${params.toString()}`);
     } else {
       navigateBack();
     }
