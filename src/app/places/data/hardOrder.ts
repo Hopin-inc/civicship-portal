@@ -1,6 +1,6 @@
 import { GqlOpportunity, GqlPlace } from "@/types/graphql";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 
 // #NOTE 意図しない順序で体験やその画像が表示されている場合に順序を指定して並べるようにする（拠点 ID をキーに、並べたい体験の ID の配列を値に持つ）
 

@@ -6,6 +6,7 @@ import {
   GqlOpportunitiesConnection,
   GqlOpportunityCategory,
   GqlPublishStatus,
+  GqlSortDirection,
   useGetOpportunitiesQuery,
 } from "@/types/graphql";
 
@@ -28,12 +29,17 @@ const fallbackConnection: GqlOpportunitiesConnection = {
   totalCount: 0,
 };
 
-export const useActivities = (): UseActivitiesResult => {
+export const useActivities = (options?: {
+  initialData?: GqlOpportunitiesConnection;
+}): UseActivitiesResult => {
   const { data, loading, error, fetchMore, refetch } = useGetOpportunitiesQuery({
     variables: {
       filter: {
         category: GqlOpportunityCategory.Activity,
         publishStatus: [GqlPublishStatus.Public],
+      },
+      sort: {
+        earliestSlotStartsAt: GqlSortDirection.Desc,
       },
       first: 20,
     },
@@ -42,7 +48,7 @@ export const useActivities = (): UseActivitiesResult => {
     notifyOnNetworkStatusChange: true,
   });
 
-  const opportunities = data?.opportunities ?? fallbackConnection;
+  const opportunities = data?.opportunities ?? options?.initialData ?? fallbackConnection;
   const endCursor = opportunities.pageInfo?.endCursor;
   const hasNextPage = opportunities.pageInfo?.hasNextPage ?? false;
 
@@ -54,6 +60,9 @@ export const useActivities = (): UseActivitiesResult => {
         filter: {
           category: GqlOpportunityCategory.Activity,
           publishStatus: [GqlPublishStatus.Public],
+        },
+        sort: {
+          earliestSlotStartsAt: GqlSortDirection.Desc,
         },
         cursor: endCursor,
         first: 20,
