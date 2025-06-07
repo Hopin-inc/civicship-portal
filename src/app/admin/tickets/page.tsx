@@ -13,6 +13,7 @@ import {
 import { COMMUNITY_ID } from "@/utils";
 import { useAuth } from "@/contexts/AuthProvider";
 import { TicketIssueCard } from "@/app/admin/tickets/components/IssuerCard";
+import CreateUtilitySheet from "@/app/admin/tickets/utilities/components/CreateUtilitySheet";
 
 export default function TicketsPage() {
   const headerConfig = useMemo(() => ({ title: "チケット管理", showLogo: false }), []);
@@ -21,7 +22,7 @@ export default function TicketsPage() {
 
   const { user } = useAuth();
 
-  const { data: utilityData } = useGetUtilitiesQuery({
+  const { data: utilityData, refetch: refetchUtilities } = useGetUtilitiesQuery({
     variables: {
       filter: { communityIds: [COMMUNITY_ID], ownerIds: [user?.id ?? ""] },
       sort: { createdAt: GqlSortDirection.Desc },
@@ -45,9 +46,7 @@ export default function TicketsPage() {
       <div className="p-4 space-y-8 max-w-2xl mx-auto">
         <div className="text-center space-y-6">
           <h2 className="text-2xl font-bold">チケットの利用を始めましょう！</h2>
-          <Button onClick={() => router.push("/admin/tickets/utilities")}>
-            チケットの種類を追加
-          </Button>
+          <CreateUtilitySheet onUtilityCreated={async () => { await refetchUtilities(); }} />
         </div>
       </div>
     );
