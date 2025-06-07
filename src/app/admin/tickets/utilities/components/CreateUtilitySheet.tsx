@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Sheet,
   SheetContent,
@@ -13,8 +14,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
-import { useCreateUtilityMutation } from "@/types/graphql";
+import {
+  useCreateUtilityMutation,
+  useGetOpportunitiesQuery,
+  GqlSortDirection,
+} from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
+import { useAuth } from "@/contexts/AuthProvider";
 
 interface CreateUtilitySheetProps {
   onUtilityCreated: () => Promise<void>;
@@ -25,9 +31,25 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
   const [utilityName, setUtilityName] = useState("");
   const [utilityDescription, setUtilityDescription] = useState("");
   const [pointsRequired, setPointsRequired] = useState(1);
+  const [selectedOpportunityIds, setSelectedOpportunityIds] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { user } = useAuth();
   const [createUtility] = useCreateUtilityMutation();
+
+  const { data: opportunityData, loading: opportunitiesLoading } = useGetOpportunitiesQuery({
+    variables: {
+      filter: {
+        communityIds: [COMMUNITY_ID],
+        createdByUserIds: [user?.id ?? ""],
+      },
+      sort: { createdAt: GqlSortDirection.Desc },
+      first: 20,
+    },
+    skip: !user?.id,
+  });
+
+  const opportunityList = opportunityData?.opportunities?.edges?.map((e) => e?.node) ?? [];
 
   const handleCreateUtility = async () => {
     setIsSubmitting(true);
@@ -39,6 +61,7 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
             description: utilityDescription || undefined,
             pointsRequired,
             images: [],
+
           },
           permission: { communityId: COMMUNITY_ID },
         },
@@ -50,6 +73,7 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
         setUtilityName("");
         setUtilityDescription("");
         setPointsRequired(1);
+        setSelectedOpportunityIds([]);
         await onUtilityCreated();
       } else {
         toast.error("ユーティリティ作成に失敗しました");
@@ -58,6 +82,14 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
       toast.error("ユーティリティ作成エラー");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleOpportunityToggle = (opportunityId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedOpportunityIds(prev => [...prev, opportunityId]);
+    } else {
+      setSelectedOpportunityIds(prev => prev.filter(id => id !== opportunityId));
     }
   };
 
@@ -93,6 +125,41 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
               value={pointsRequired}
               onChange={(e) => setPointsRequired(Number(e.target.value))}
             />
+          </div>
+          <div>
+            <Label>関連する機会（オプション）</Label>
+            {opportunitiesLoading ? (
+              <p className="text-sm text-muted-foreground">機会を読み込み中...</p>
+            ) : opportunityList.length === 0 ? (
+              <p className="text-sm text-muted-foreground">作成した機会がありません</p>
+            ) : (
+              <div className="space-y-2 max-h-32 overflow-y-auto">
+                {opportunityList.map((opportunity) => (
+                  <div key={opportunity?.id} className="flex items-start space-x-2">
+                    <Checkbox
+                      id={`opportunity-${opportunity?.id}`}
+                      checked={selectedOpportunityIds.includes(opportunity?.id ?? "")}
+                      onCheckedChange={(checked) =>
+                        handleOpportunityToggle(opportunity?.id ?? "", checked as boolean)
+                      }
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label
+                        htmlFor={`opportunity-${opportunity?.id}`}
+                        className="text-sm font-medium cursor-pointer"
+                      >
+                        {opportunity?.title}
+                      </label>
+                      {opportunity?.description && (
+                        <p className="text-xs text-muted-foreground truncate">
+                          {opportunity.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="space-y-3">
             <Button onClick={handleCreateUtility} disabled={isSubmitting} className="w-full">
