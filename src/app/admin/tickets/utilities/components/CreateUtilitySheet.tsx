@@ -121,10 +121,10 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
   };
 
   const handleSelectAllToggle = (checked: boolean) => {
-    if (checked) {
-      setSelectedOpportunityIds(allOpportunityIds);
-    } else {
+    if (isAllSelected) {
       setSelectedOpportunityIds([]);
+    } else {
+      setSelectedOpportunityIds(allOpportunityIds);
     }
   };
 
@@ -174,23 +174,33 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
                     </Label>
                   </div>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    { opportunityList.map((opportunity) => (
-                      <div key={ opportunity?.id } className="flex items-start space-x-2">
-                        <Checkbox
-                          id={ `opportunity-${ opportunity?.id }` }
-                          checked={ selectedOpportunityIds.includes(opportunity?.id ?? "") }
-                          onCheckedChange={ (checked) =>
-                            handleOpportunityToggle(opportunity?.id ?? "", checked as boolean)
-                          }
-                        />
-                        <Label
-                          htmlFor={ `opportunity-${ opportunity?.id }` }
-                          className="text-sm font-medium cursor-pointer"
+                    { opportunityList.map((opportunity) => {
+                      const isSelected = selectedOpportunityIds.includes(opportunity?.id ?? "");
+                      return (
+                        <div 
+                          key={ opportunity?.id } 
+                          className={`flex items-start space-x-2 p-3 rounded-lg border-2 transition-colors ${
+                            isSelected 
+                              ? 'border-primary bg-primary/5' 
+                              : 'border-border hover:border-primary/50'
+                          }`}
                         >
-                          { opportunity?.title }
-                        </Label>
-                      </div>
-                    )) }
+                          <Checkbox
+                            id={ `opportunity-${ opportunity?.id }` }
+                            checked={ isSelected }
+                            onCheckedChange={ (checked) =>
+                              handleOpportunityToggle(opportunity?.id ?? "", checked as boolean)
+                            }
+                          />
+                          <Label
+                            htmlFor={ `opportunity-${ opportunity?.id }` }
+                            className="text-sm font-medium cursor-pointer flex-1"
+                          >
+                            { opportunity?.title }
+                          </Label>
+                        </div>
+                      );
+                    }) }
                   </div>
                 </div>
               ) }
