@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +51,18 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
 
   const opportunityList = opportunityData?.opportunities?.edges?.map((e) => e?.node) ?? [];
 
+  useEffect(() => {
+    if (opportunityList.length > 0 && selectedOpportunityIds.length === 0) {
+      const allOpportunityIds = opportunityList.map(opp => opp?.id).filter(Boolean) as string[];
+      setSelectedOpportunityIds(allOpportunityIds);
+    }
+  }, [opportunityList, selectedOpportunityIds.length]);
+
+  const allOpportunityIds = opportunityList.map(opp => opp?.id).filter(Boolean) as string[];
+  const isAllSelected = allOpportunityIds.length > 0 && allOpportunityIds.every(id => selectedOpportunityIds.includes(id));
+  const isNoneSelected = selectedOpportunityIds.length === 0;
+  const isPartiallySelected = !isAllSelected && !isNoneSelected;
+
   const handleCreateUtility = async () => {
     setIsSubmitting(true);
     try {
@@ -61,7 +73,7 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
             description: utilityDescription || undefined,
             pointsRequired,
             images: [],
-
+            // requiredForOpportunityIds: selectedOpportunityIds.length > 0 ? selectedOpportunityIds : undefined,
           },
           permission: { communityId: COMMUNITY_ID },
         },
@@ -90,6 +102,14 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
       setSelectedOpportunityIds(prev => [...prev, opportunityId]);
     } else {
       setSelectedOpportunityIds(prev => prev.filter(id => id !== opportunityId));
+    }
+  };
+
+  const handleSelectAllToggle = (checked: boolean) => {
+    if (checked) {
+      setSelectedOpportunityIds(allOpportunityIds);
+    } else {
+      setSelectedOpportunityIds([]);
     }
   };
 
@@ -133,31 +153,51 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
             ) : opportunityList.length === 0 ? (
               <p className="text-sm text-muted-foreground">作成した機会がありません</p>
             ) : (
-              <div className="space-y-2 max-h-32 overflow-y-auto">
-                {opportunityList.map((opportunity) => (
-                  <div key={opportunity?.id} className="flex items-start space-x-2">
-                    <Checkbox
-                      id={`opportunity-${opportunity?.id}`}
-                      checked={selectedOpportunityIds.includes(opportunity?.id ?? "")}
-                      onCheckedChange={(checked) =>
-                        handleOpportunityToggle(opportunity?.id ?? "", checked as boolean)
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 pb-2 border-b">
+                  <Checkbox
+                    id="select-all-opportunities"
+                    checked={isAllSelected}
+                    ref={(el) => {
+                      if (el && 'indeterminate' in el) {
+                        (el as any).indeterminate = isPartiallySelected;
                       }
-                    />
-                    <div className="flex-1 min-w-0">
-                      <label
-                        htmlFor={`opportunity-${opportunity?.id}`}
-                        className="text-sm font-medium cursor-pointer"
-                      >
-                        {opportunity?.title}
-                      </label>
-                      {opportunity?.description && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {opportunity.description}
-                        </p>
-                      )}
+                    }}
+                    onCheckedChange={(checked) => handleSelectAllToggle(checked as boolean)}
+                  />
+                  <label
+                    htmlFor="select-all-opportunities"
+                    className="text-sm font-medium cursor-pointer"
+                  >
+                    すべて選択
+                  </label>
+                </div>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {opportunityList.map((opportunity) => (
+                    <div key={opportunity?.id} className="flex items-start space-x-2">
+                      <Checkbox
+                        id={`opportunity-${opportunity?.id}`}
+                        checked={selectedOpportunityIds.includes(opportunity?.id ?? "")}
+                        onCheckedChange={(checked) =>
+                          handleOpportunityToggle(opportunity?.id ?? "", checked as boolean)
+                        }
+                      />
+                      <div className="flex-1 min-w-0">
+                        <label
+                          htmlFor={`opportunity-${opportunity?.id}`}
+                          className="text-sm font-medium cursor-pointer"
+                        >
+                          {opportunity?.title}
+                        </label>
+                        {opportunity?.description && (
+                          <p className="text-xs text-muted-foreground truncate">
+                            {opportunity.description}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
           </div>
