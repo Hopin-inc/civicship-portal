@@ -29,6 +29,24 @@ export interface CommunityMetadata {
   };
 }
 
+export function getCommunityIdFromEnv(): string {
+  const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+
+  if (!communityId) {
+    console.warn("COMMUNITY_ID environment variable is not set. Using default community settings.");
+    return "default";
+  }
+
+  if (!COMMUNITY_BASE_CONFIG[communityId]) {
+    console.warn(
+      `COMMUNITY_ID "${communityId}" is not configured. Using default community settings.`,
+    );
+    return "default";
+  }
+
+  return communityId;
+}
+
 const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
   neo88: {
     id: "neo88",
@@ -42,11 +60,24 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/community/neo88/logo.png",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
   },
+  // デフォルト値も明示的に追加
+  default: {
+    id: "default",
+    title: "Civicship Portal",
+    description: "地域の特別な体験を発見しよう",
+    shortDescription: "地域の特別な体験を発見しよう",
+    domain: "https://portal.civicship.jp",
+    faviconPrefix: "/images",
+    logoPath: "/images/logo.png",
+    ogImagePath:
+      "https://storage.googleapis.com/prod-civicship-storage-public/asset/default/ogp.jpg",
+  },
 };
 
 // コミュニティメタデータの取得関数
-export async function getCommunityMetadata(communityId: string): Promise<CommunityMetadata> {
-  return await fetchCommunityMetadata(communityId);
+export async function getCommunityMetadata(communityId?: string): Promise<CommunityMetadata> {
+  const targetCommunityId = communityId || getCommunityIdFromEnv();
+  return await fetchCommunityMetadata(targetCommunityId);
 }
 
 // コミュニティメタデータのフェッチ関数
@@ -112,45 +143,7 @@ function generateCommunityMetadata(communityId: string): CommunityMetadata {
 
 // デフォルトのコミュニティメタデータ生成関数
 function generateDefaultMetadata(): CommunityMetadata {
-  return {
-    title: "Civicship Portal",
-    description: "地域の特別な体験を発見しよう",
-    icons: {
-      icon: [
-        { url: "/favicon.ico" },
-        { url: "/images/favicon-16.png", type: "image/png", sizes: "16x16" },
-        { url: "/images/favicon-32.png", type: "image/png", sizes: "32x32" },
-        { url: "/images/favicon-48.png", type: "image/png", sizes: "48x48" },
-      ],
-    },
-    openGraph: {
-      title: "Civicship Portal",
-      description: "地域の特別な体験を発見しよう",
-      url: "https://portal.civicship.jp",
-      siteName: "Civicship Portal",
-      images: [
-        {
-          url: "https://storage.googleapis.com/prod-civicship-storage-public/asset/default/ogp.jpg",
-          width: 1200,
-          height: 630,
-          alt: "Civicship Portal",
-        },
-      ],
-      locale: "ja_JP",
-      type: "website",
-    },
-    alternates: {
-      canonical: "https://portal.civicship.jp",
-    },
-    logo: {
-      url: "/images/logo.png",
-      alt: "Civicship Portal",
-    },
-    terms: {
-      url: "/terms",
-      title: "利用規約",
-    },
-  };
+  return generateCommunityMetadata("default");
 }
 
 // エクスポート用の定数

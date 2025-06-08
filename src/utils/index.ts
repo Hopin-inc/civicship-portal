@@ -2,11 +2,12 @@ import dayjs from "dayjs";
 import { PhoneNumberUtil } from "google-libphonenumber";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ja";
+import { getCommunityIdFromEnv } from "@/lib/metadata/communityMetadata";
 
 dayjs.locale("ja");
 dayjs.extend(relativeTime);
 
-export const COMMUNITY_ID = "neo88";
+export const COMMUNITY_ID = getCommunityIdFromEnv();
 export const PLACEHOLDER_IMAGE = "/images/placeholder.jpg";
 
 const YEAR_FMT = "YYYY年";
