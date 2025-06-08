@@ -2299,10 +2299,10 @@ export type GqlUtilityEdge = GqlEdge & {
 
 export type GqlUtilityFilterInput = {
   and?: InputMaybe<Array<GqlUtilityFilterInput>>;
-  communityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  createdBy?: InputMaybe<Scalars["ID"]["input"]>;
   not?: InputMaybe<GqlUtilityFilterInput>;
   or?: InputMaybe<Array<GqlUtilityFilterInput>>;
-  ownerIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   publishStatus?: InputMaybe<Array<GqlPublishStatus>>;
 };
 
