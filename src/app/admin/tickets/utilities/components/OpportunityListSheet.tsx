@@ -1,0 +1,62 @@
+"use client";
+
+import React from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
+import { presenterActivityCard } from "@/app/activities/data/presenter";
+import { GqlOpportunity } from "@/types/graphql";
+import { ActivityCard } from "@/app/activities/data/type";
+
+interface OpportunityListSheetProps {
+  opportunities: GqlOpportunity[];
+  utilityName: string;
+  children: React.ReactNode;
+}
+
+export default function OpportunityListSheet({ 
+  opportunities, 
+  utilityName, 
+  children 
+}: OpportunityListSheetProps) {
+  const activityCards: ActivityCard[] = opportunities.map(presenterActivityCard);
+
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        {children}
+      </SheetTrigger>
+      <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8">
+        <SheetHeader className="text-left pb-6">
+          <SheetTitle>関連する機会</SheetTitle>
+          <SheetDescription>
+            {utilityName}に関連する機会一覧です。
+          </SheetDescription>
+        </SheetHeader>
+
+        <div className="space-y-4 max-h-96 overflow-y-auto">
+          {activityCards.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">
+              関連する機会がありません
+            </p>
+          ) : (
+            activityCards.map((opportunity: ActivityCard) => (
+              <OpportunityCardHorizontal
+                key={opportunity.id}
+                opportunity={opportunity}
+                withShadow={false}
+              />
+            ))
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}

@@ -17,6 +17,18 @@ export const GET_UTILITIES = gql`
           name
           description
           pointsRequired
+          requiredForOpportunities {
+            id
+            title
+            description
+            images
+            place {
+              id
+              name
+            }
+            feeRequired
+            category
+          }
         }
       }
     }
