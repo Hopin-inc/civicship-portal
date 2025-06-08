@@ -74,7 +74,8 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
             description: utilityDescription || undefined,
             pointsRequired,
             images: [],
-            // requiredForOpportunityIds: selectedOpportunityIds.length > 0 ? selectedOpportunityIds : undefined,
+            requiredForOpportunityIds: selectedOpportunityIds.length > 0 ? selectedOpportunityIds : undefined,
+            communityId: COMMUNITY_ID,
           },
           permission: { communityId: COMMUNITY_ID },
         },
@@ -239,9 +240,9 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
               />
             </div>
             <div className="space-y-3">
-              <Button 
-                onClick={handleCreateUtility} 
-                disabled={isSubmitting || !utilityName.trim()} 
+              <Button
+                onClick={handleCreateUtility}
+                disabled={isSubmitting || !utilityName.trim()}
                 className="w-full"
               >
                 {isSubmitting ? "作成中..." : "チケットの種類を作成"}
