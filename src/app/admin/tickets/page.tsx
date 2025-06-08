@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";
 import { CardWrapper } from "@/components/ui/card-wrapper";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import {
   GqlSortDirection,
   useGetTicketIssuersQuery,
@@ -22,7 +23,7 @@ export default function TicketsPage() {
 
   const { user } = useAuth();
 
-  const { data: utilityData, refetch: refetchUtilities } = useGetUtilitiesQuery({
+  const { data: utilityData, loading: utilitiesLoading, refetch: refetchUtilities } = useGetUtilitiesQuery({
     variables: {
       filter: { communityId: COMMUNITY_ID, createdBy: user?.id },
       sort: { createdAt: GqlSortDirection.Desc },
@@ -40,6 +41,10 @@ export default function TicketsPage() {
 
   const utilityList = utilityData?.utilities?.edges?.map((e) => e?.node) ?? [];
   const ticketList = ticketData?.ticketIssuers?.edges?.map((e) => e?.node) ?? [];
+
+  if (utilitiesLoading) {
+    return <LoadingIndicator />;
+  }
 
   if (utilityList.length === 0) {
     return (
