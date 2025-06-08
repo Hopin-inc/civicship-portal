@@ -9,25 +9,23 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
 import React from "react";
-import {
-  DEFAULT_DESCRIPTION,
-  DEFAULT_ICONS,
-  DEFAULT_OPEN_GRAPH,
-  DEFAULT_TITLE,
-} from "@/lib/metadata/defalut";
+import { COMMUNITY_ID } from "@/utils";
+import { getCommunityMetadata } from "@/lib/metadata/communityMetadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 
 const font = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: DEFAULT_TITLE,
-  description: DEFAULT_DESCRIPTION,
-  icons: DEFAULT_ICONS,
-  openGraph: DEFAULT_OPEN_GRAPH,
-  alternates: {
-    canonical: "https://www.neo88.app",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const metadata = await getCommunityMetadata(COMMUNITY_ID);
+
+  return {
+    title: metadata.title,
+    description: metadata.description,
+    icons: metadata.icons,
+    openGraph: metadata.openGraph,
+    alternates: metadata.alternates,
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -37,27 +35,27 @@ export const viewport: Viewport = {
 };
 
 const RootLayout = ({
-                      children,
-                    }: Readonly<{
+  children,
+}: Readonly<{
   children: React.ReactNode;
 }>) => {
   return (
     <html lang="ja">
-    <body className={ font.className }>
-    <CookiesProvider>
-      <ApolloProvider>
-        <AuthProvider>
-          <HeaderProvider>
-            <LoadingProvider>
-              <AnalyticsProvider />
-              <MainContent>{ children }</MainContent>
-              <Toaster richColors className="mx-8" />
-            </LoadingProvider>
-          </HeaderProvider>
-        </AuthProvider>
-      </ApolloProvider>
-    </CookiesProvider>
-    </body>
+      <body className={font.className}>
+        <CookiesProvider>
+          <ApolloProvider>
+            <AuthProvider>
+              <HeaderProvider>
+                <LoadingProvider>
+                  <AnalyticsProvider />
+                  <MainContent>{children}</MainContent>
+                  <Toaster richColors className="mx-8" />
+                </LoadingProvider>
+              </HeaderProvider>
+            </AuthProvider>
+          </ApolloProvider>
+        </CookiesProvider>
+      </body>
     </html>
   );
 };
