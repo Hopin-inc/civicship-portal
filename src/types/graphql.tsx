@@ -2257,6 +2257,7 @@ export type GqlUtility = {
   __typename?: "Utility";
   community?: Maybe<GqlCommunity>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  createdByUser?: Maybe<GqlUser>;
   description?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
   images?: Maybe<Array<Scalars["String"]["output"]>>;
