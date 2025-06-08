@@ -27,7 +27,7 @@ export default function UtilitiesPage() {
 
   const { data: utilityData, refetch: refetchUtilities } = useGetUtilitiesQuery({
     variables: {
-      filter: { communityIds: [COMMUNITY_ID], ownerIds: [user?.id ?? ""] },
+      filter: { communityId: COMMUNITY_ID, createdBy: user?.id },
       sort: { createdAt: GqlSortDirection.Desc },
       first: 20,
     },
@@ -40,22 +40,24 @@ export default function UtilitiesPage() {
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold">チケットの種類一覧</h2>
-          <CreateUtilitySheet onUtilityCreated={async () => { await refetchUtilities(); }} />
+          <CreateUtilitySheet onUtilityCreated={ async () => {
+            await refetchUtilities();
+          } } />
         </div>
         <div className="space-y-2">
-          {utilityList.length === 0 ? (
+          { utilityList.length === 0 ? (
             <p className="text-muted-foreground">チケットの種類がありません</p>
           ) : (
             utilityList.map((utility) => (
-              <CardWrapper key={utility?.id} className="p-4">
+              <CardWrapper key={ utility?.id } className="p-4">
                 <div className="text-sm">
-                  <div className="font-semibold">{utility?.name}</div>
-                  <div className="text-muted-foreground">{utility?.description}</div>
-                  <div>交換ポイント: {utility?.pointsRequired}</div>
+                  <div className="font-semibold">{ utility?.name }</div>
+                  <div className="text-muted-foreground">{ utility?.description }</div>
+                  <div>交換ポイント: { utility?.pointsRequired }</div>
                 </div>
               </CardWrapper>
             ))
-          )}
+          ) }
         </div>
       </div>
     </div>

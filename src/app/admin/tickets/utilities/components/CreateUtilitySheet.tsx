@@ -129,27 +129,27 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
   };
 
   return (
-    <Sheet open={showUtilityForm} onOpenChange={setShowUtilityForm}>
+    <Sheet open={ showUtilityForm } onOpenChange={ setShowUtilityForm }>
       <SheetTrigger asChild>
         <Button>新規追加</Button>
       </SheetTrigger>
       <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8">
         <SheetHeader className="text-left pb-6">
           <SheetTitle>
-            {step === "opportunities" && "機会を選択"}
-            {step === "details" && "チケットの詳細を入力"}
+            { step === "opportunities" && "機会を選択" }
+            { step === "details" && "チケットの詳細を入力" }
           </SheetTitle>
           <SheetDescription>
-            {step === "opportunities" && "このチケットに関連する機会を選択してください。"}
-            {step === "details" && "チケットの種類の詳細を入力してください。"}
+            { step === "opportunities" && "このチケットに関連する機会を選択してください。" }
+            { step === "details" && "チケットの種類の詳細を入力してください。" }
           </SheetDescription>
         </SheetHeader>
 
-        {step === "opportunities" && (
+        { step === "opportunities" && (
           <div className="space-y-4">
             <div>
               <Label>関連する機会（オプション）</Label>
-              {opportunitiesLoading ? (
+              { opportunitiesLoading ? (
                 <p className="text-sm text-muted-foreground">機会を読み込み中...</p>
               ) : opportunityList.length === 0 ? (
                 <p className="text-sm text-muted-foreground">作成した機会がありません</p>
@@ -158,105 +158,98 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
                   <div className="flex items-center space-x-2 pb-2 border-b">
                     <Checkbox
                       id="select-all-opportunities"
-                      checked={isAllSelected}
-                      ref={(el) => {
-                        if (el && 'indeterminate' in el) {
+                      checked={ isAllSelected }
+                      ref={ (el) => {
+                        if (el && "indeterminate" in el) {
                           (el as any).indeterminate = isPartiallySelected;
                         }
-                      }}
-                      onCheckedChange={(checked) => handleSelectAllToggle(checked as boolean)}
+                      } }
+                      onCheckedChange={ (checked) => handleSelectAllToggle(checked as boolean) }
                     />
-                    <label
+                    <Label
                       htmlFor="select-all-opportunities"
                       className="text-sm font-medium cursor-pointer"
                     >
                       すべて選択
-                    </label>
+                    </Label>
                   </div>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {opportunityList.map((opportunity) => (
-                      <div key={opportunity?.id} className="flex items-start space-x-2">
+                    { opportunityList.map((opportunity) => (
+                      <div key={ opportunity?.id } className="flex items-start space-x-2">
                         <Checkbox
-                          id={`opportunity-${opportunity?.id}`}
-                          checked={selectedOpportunityIds.includes(opportunity?.id ?? "")}
-                          onCheckedChange={(checked) =>
+                          id={ `opportunity-${ opportunity?.id }` }
+                          checked={ selectedOpportunityIds.includes(opportunity?.id ?? "") }
+                          onCheckedChange={ (checked) =>
                             handleOpportunityToggle(opportunity?.id ?? "", checked as boolean)
                           }
                         />
-                        <div className="flex-1 min-w-0">
-                          <label
-                            htmlFor={`opportunity-${opportunity?.id}`}
-                            className="text-sm font-medium cursor-pointer"
-                          >
-                            {opportunity?.title}
-                          </label>
-                          {opportunity?.description && (
-                            <p className="text-xs text-muted-foreground truncate">
-                              {opportunity.description}
-                            </p>
-                          )}
-                        </div>
+                        <Label
+                          htmlFor={ `opportunity-${ opportunity?.id }` }
+                          className="text-sm font-medium cursor-pointer"
+                        >
+                          { opportunity?.title }
+                        </Label>
                       </div>
-                    ))}
+                    )) }
                   </div>
                 </div>
-              )}
+              ) }
             </div>
             <div className="space-y-3">
-              <Button onClick={handleNextStep} className="w-full">
+              <Button onClick={ handleNextStep } className="w-full">
                 次へ
               </Button>
               <Button
                 variant="tertiary"
-                onClick={handleReset}
+                onClick={ handleReset }
                 className="w-full"
               >
                 キャンセル
               </Button>
             </div>
           </div>
-        )}
+        ) }
 
-        {step === "details" && (
+        { step === "details" && (
           <div className="space-y-4">
             <div>
               <Label>チケット名</Label>
-              <Input value={utilityName} onChange={(e) => setUtilityName(e.target.value)} />
+              <Input value={ utilityName } onChange={ (e) => setUtilityName(e.target.value) } />
             </div>
             <div>
               <Label>説明</Label>
               <Input
-                value={utilityDescription}
-                onChange={(e) => setUtilityDescription(e.target.value)}
+                value={ utilityDescription }
+                onChange={ (e) => setUtilityDescription(e.target.value) }
               />
             </div>
             <div>
               <Label>交換ポイント</Label>
               <Input
                 type="number"
-                min={0}
-                value={pointsRequired}
-                onChange={(e) => setPointsRequired(Number(e.target.value))}
+                min={ 0 }
+                value={ pointsRequired }
+                onChange={ (e) => setPointsRequired(Number(e.target.value)) }
               />
             </div>
             <div className="space-y-3">
               <Button
-                onClick={handleCreateUtility}
-                disabled={isSubmitting || !utilityName.trim()}
+                onClick={ handleCreateUtility }
+                disabled={ isSubmitting || !utilityName.trim() }
                 className="w-full"
               >
-                {isSubmitting ? "作成中..." : "チケットの種類を作成"}
+                { isSubmitting ? "作成中..." : "チケットの種類を作成" }
               </Button>
               <Button
                 variant="tertiary"
-                onClick={handleBackStep}
+                onClick={ handleBackStep }
                 className="w-full"
               >
                 戻る
               </Button>
             </div>
           </div>
-        )}
+        ) }
       </SheetContent>
     </Sheet>
   );

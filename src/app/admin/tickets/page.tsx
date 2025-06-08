@@ -52,7 +52,9 @@ export default function TicketsPage() {
       <div className="p-4 space-y-8 max-w-2xl mx-auto">
         <div className="text-center space-y-6">
           <h2 className="text-2xl font-bold">チケットの利用を始めましょう！</h2>
-          <CreateUtilitySheet onUtilityCreated={async () => { await refetchUtilities(); }} />
+          <CreateUtilitySheet onUtilityCreated={ async () => {
+            await refetchUtilities();
+          } } />
         </div>
       </div>
     );
@@ -60,61 +62,63 @@ export default function TicketsPage() {
 
   return (
     <div className="p-4 space-y-8 max-w-2xl mx-auto">
-      {/* チケットリンク一覧セクション */}
+      {/* チケットリンク一覧セクション */ }
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold">チケットリンク一覧</h2>
-          <CreateTicketSheet onTicketCreated={async () => { await refetchTickets(); }} />
+          <CreateTicketSheet onTicketCreated={ async () => {
+            await refetchTickets();
+          } } />
         </div>
-        <div className="space-y-2">
-          {ticketList.length === 0 ? (
+        <div className="flex flex-col gap-3">
+          { ticketList.length === 0 ? (
             <p className="text-muted-foreground">発行リンクがありません</p>
           ) : (
             ticketList.map((ticket) => (
               <TicketIssueCard
-                key={`${ticket?.id}-${ticket?.claimLink?.id ?? "no-claimLink"}`}
-                qtyToBeIssued={ticket?.qtyToBeIssued}
-                claimQty={ticket?.claimLink?.qty}
+                key={ `${ ticket?.id }-${ ticket?.claimLink?.id ?? "no-claimLink" }` }
+                qtyToBeIssued={ ticket?.qtyToBeIssued }
+                claimQty={ ticket?.claimLink?.qty }
                 createdAt={
                   ticket?.createdAt instanceof Date
                     ? ticket.createdAt.toISOString()
                     : (ticket?.createdAt ?? "")
                 }
-                href={`/admin/tickets/${ticket?.claimLink?.id}`}
+                href={ `/admin/tickets/${ ticket?.claimLink?.id }` }
                 statusVariant={
                   ticket?.claimLink?.qty != null &&
                   ticket?.qtyToBeIssued != null &&
                   ticket?.claimLink.qty < ticket?.qtyToBeIssued
-                    ? "success"
-                    : "destructive"
+                    ? "primary"
+                    : "secondary"
                 }
               />
             ))
-          )}
+          ) }
         </div>
       </div>
 
-      {/* チケットの種類一覧セクション */}
+      {/* チケットの種類一覧セクション */ }
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold">チケットの種類一覧</h2>
           <Button
             variant="text"
-            onClick={() => router.push("/admin/tickets/utilities")}
+            onClick={ () => router.push("/admin/tickets/utilities") }
           >
             チケットの種類を管理する
           </Button>
         </div>
         <div className="space-y-2">
-          {utilityList.map((utility) => (
-            <CardWrapper key={utility?.id} className="p-4">
+          { utilityList.map((utility) => (
+            <CardWrapper key={ utility?.id } className="p-4">
               <div className="text-sm">
-                <div className="font-semibold">{utility?.name}</div>
-                <div className="text-muted-foreground">{utility?.description}</div>
-                <div>交換ポイント: {utility?.pointsRequired}</div>
+                <div className="font-semibold">{ utility?.name }</div>
+                <div className="text-muted-foreground">{ utility?.description }</div>
+                <div>交換ポイント: { utility?.pointsRequired }</div>
               </div>
             </CardWrapper>
-          ))}
+          )) }
         </div>
       </div>
     </div>
