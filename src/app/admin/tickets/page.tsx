@@ -15,6 +15,7 @@ import { COMMUNITY_ID } from "@/utils";
 import { useAuth } from "@/contexts/AuthProvider";
 import { TicketIssueCard } from "@/app/admin/tickets/components/IssuerCard";
 import CreateUtilitySheet from "@/app/admin/tickets/utilities/components/CreateUtilitySheet";
+import CreateTicketSheet from "@/app/admin/tickets/components/CreateTicketSheet";
 
 export default function TicketsPage() {
   const headerConfig = useMemo(() => ({ title: "チケット管理", showLogo: false }), []);
@@ -31,7 +32,7 @@ export default function TicketsPage() {
     },
   });
 
-  const { data: ticketData } = useGetTicketIssuersQuery({
+  const { data: ticketData, refetch: refetchTickets } = useGetTicketIssuersQuery({
     variables: {
       filter: { ownerId: user?.id ?? "" },
       sort: { createdAt: GqlSortDirection.Desc },
@@ -63,9 +64,7 @@ export default function TicketsPage() {
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold">チケットリンク一覧</h2>
-          <Button onClick={() => router.push("/admin/tickets/new")}>
-            新規発行
-          </Button>
+          <CreateTicketSheet onTicketCreated={async () => { await refetchTickets(); }} />
         </div>
         <div className="space-y-2">
           {ticketList.length === 0 ? (
