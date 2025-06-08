@@ -14,7 +14,7 @@ import useUserTransactions from "@/app/wallets/hooks/useUserTransaction";
 import { toast } from "sonner";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 
 export default function UserWalletPage() {
   const { user: currentUser } = useAuth();
@@ -50,7 +50,7 @@ export default function UserWalletPage() {
         await refetchWallet();
         refetchTransactions();
       } catch (err) {
-        clientLogger.error("Refetch failed on focus", {
+        logger.error("Refetch failed on focus", {
           error: err instanceof Error ? err.message : String(err),
           component: "UserWalletPage"
         });

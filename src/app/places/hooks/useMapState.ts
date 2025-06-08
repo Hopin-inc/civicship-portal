@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useReducer } from "react";
 import { IPlacePin } from "@/app/places/data/type";
-import clientLogger from "@/lib/logging/client";
+import { logger } from "@/lib/logging";
 
 const INITIAL_CENTER_COORDINATE = { lat: 33.0, lng: 133.5 };
 
@@ -74,7 +74,7 @@ const initializeMarkers = (places: IPlacePin[], dispatch: React.Dispatch<MapActi
   try {
     dispatch({ type: "SET_MARKERS", payload: { markers: places, places } });
   } catch (error) {
-    clientLogger.error("Error processing map data", {
+    logger.error("Error processing map data", {
       error: error instanceof Error ? error.message : String(error),
       component: "useMapState"
     });
