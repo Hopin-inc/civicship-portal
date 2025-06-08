@@ -38,7 +38,7 @@ export default function NewTicketPage() {
 
   const { data: utilityData } = useGetUtilitiesQuery({
     variables: {
-      filter: { communityId: COMMUNITY_ID, createdBy: user?.id ?? "" },
+      filter: { communityId: COMMUNITY_ID, createdBy: user?.id },
       sort: { createdAt: GqlSortDirection.Desc },
       first: 20,
     },
