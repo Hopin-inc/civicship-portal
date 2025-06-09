@@ -9,6 +9,7 @@ import ListSectionSkeleton from "./ListSection/ListSectionSkeleton";
 import { mapOpportunityCards } from "../data/presenter";
 import ErrorState from "@/components/shared/ErrorState";
 import EmptyState from "@/components/shared/EmptyState";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface Props {
   featuredCards: ActivityCard[];
@@ -25,7 +26,13 @@ const ActivitiesListSection = dynamic(() => import("./ListSection/ListSection"),
   loading: () => <ListSectionSkeleton />,
 });
 
+const headerConfig = {
+  showLogo: true,
+  showSearchForm: true,
+};
+
 export default function ActivitiesPageClient({ featuredCards, upcomingCards }: Props) {
+  useHeaderConfig(headerConfig);
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
   const refetchRef = useRef<(() => void) | null>(refetch);
 
