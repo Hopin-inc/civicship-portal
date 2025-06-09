@@ -46,7 +46,7 @@ export default function CreateTicketSheet({ onTicketCreated }: CreateTicketSheet
 
   const { data: utilityData } = useGetUtilitiesQuery({
     variables: {
-      filter: { communityId: COMMUNITY_ID, createdBy: user?.id ?? "" },
+      filter: { communityIds: [COMMUNITY_ID], ownerIds: user?.id ? [user.id] : undefined },
       sort: { createdAt: GqlSortDirection.Desc },
       first: 20,
     },
@@ -75,7 +75,7 @@ export default function CreateTicketSheet({ onTicketCreated }: CreateTicketSheet
         if (onTicketCreated) {
           await onTicketCreated();
         }
-        router.push(`/admin/tickets/${ticketId}`);
+        router.push(`/admin/tickets/${ ticketId }`);
       } else {
         toast.error("チケット発行に失敗しました");
       }
@@ -93,7 +93,7 @@ export default function CreateTicketSheet({ onTicketCreated }: CreateTicketSheet
   };
 
   return (
-    <Sheet open={showTicketForm} onOpenChange={setShowTicketForm}>
+    <Sheet open={ showTicketForm } onOpenChange={ setShowTicketForm }>
       <SheetTrigger asChild>
         <Button>新規発行</Button>
       </SheetTrigger>
@@ -108,16 +108,16 @@ export default function CreateTicketSheet({ onTicketCreated }: CreateTicketSheet
         <div className="space-y-4">
           <div>
             <Label>チケットの種類を選択</Label>
-            <Select value={selectedUtilityId ?? ""} onValueChange={setSelectedUtilityId}>
+            <Select value={ selectedUtilityId ?? "" } onValueChange={ setSelectedUtilityId }>
               <SelectTrigger>
                 <SelectValue placeholder="選択してください" />
               </SelectTrigger>
               <SelectContent>
-                {utilityList.map((utility) => (
-                  <SelectItem key={utility?.id} value={utility?.id ?? ""}>
-                    {utility?.name}
+                { utilityList.map((utility) => (
+                  <SelectItem key={ utility?.id } value={ utility?.id ?? "" }>
+                    { utility?.name }
                   </SelectItem>
-                ))}
+                )) }
               </SelectContent>
             </Select>
           </div>
@@ -125,22 +125,22 @@ export default function CreateTicketSheet({ onTicketCreated }: CreateTicketSheet
             <Label>発行数</Label>
             <Input
               type="number"
-              min={1}
-              value={ticketQty}
-              onChange={(e) => setTicketQty(Number(e.target.value))}
+              min={ 1 }
+              value={ ticketQty }
+              onChange={ (e) => setTicketQty(Number(e.target.value)) }
             />
           </div>
           <div className="space-y-3">
             <Button
-              onClick={handleIssueTicket}
-              disabled={isSubmitting || !selectedUtilityId}
+              onClick={ handleIssueTicket }
+              disabled={ isSubmitting || !selectedUtilityId }
               className="w-full"
             >
-              {isSubmitting ? "発行中..." : "リンクを発行"}
+              { isSubmitting ? "発行中..." : "リンクを発行" }
             </Button>
             <Button
               variant="tertiary"
-              onClick={handleReset}
+              onClick={ handleReset }
               className="w-full"
             >
               キャンセル

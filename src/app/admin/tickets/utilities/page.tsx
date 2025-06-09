@@ -12,11 +12,12 @@ import { COMMUNITY_ID } from "@/utils";
 import { useAuth } from "@/contexts/AuthProvider";
 import CreateUtilitySheet from "./components/CreateUtilitySheet";
 import OpportunityListSheet from "./components/OpportunityListSheet";
+import { Coins, MessageSquareText, Tickets } from "lucide-react";
 
 export default function UtilitiesPage() {
   const headerConfig = useMemo(
     () => ({
-      title: "チケットの種類管理",
+      title: "チケットの種類",
       showBackButton: true,
       showLogo: false,
       backTo: "/admin/tickets",
@@ -29,7 +30,7 @@ export default function UtilitiesPage() {
 
   const { data: utilityData, refetch: refetchUtilities } = useGetUtilitiesQuery({
     variables: {
-      filter: { communityId: COMMUNITY_ID, createdBy: user?.id },
+      filter: { communityIds: [COMMUNITY_ID], ownerIds: user?.id ? [user.id] : undefined },
       sort: { createdAt: GqlSortDirection.Desc },
       first: 20,
     },
@@ -41,8 +42,8 @@ export default function UtilitiesPage() {
     <div className="p-4 space-y-8 max-w-2xl mx-auto">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold">チケットの種類一覧</h2>
-          <CreateUtilitySheet onUtilityCreated={ async () => {
+          <h2 className="text-xl font-bold">チケットの種類</h2>
+          <CreateUtilitySheet buttonLabel="新規追加" onUtilityCreated={ async () => {
             await refetchUtilities();
           } } />
         </div>
@@ -52,27 +53,34 @@ export default function UtilitiesPage() {
           ) : (
             utilityList.map((utility) => {
               const opportunityCount = (utility as any)?.requiredForOpportunities?.length ?? 0;
-              
+
               return (
                 <CardWrapper key={ utility?.id } className="p-4">
-                  <div className="text-sm">
-                    <div className="font-semibold">{ utility?.name }</div>
-                    <div className="text-muted-foreground">{ utility?.description }</div>
-                    <div>交換ポイント: { utility?.pointsRequired }</div>
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className="text-muted-foreground">
-                        関連する機会: {opportunityCount}件
-                      </span>
-                      {opportunityCount > 0 && (
-                        <OpportunityListSheet
-                          opportunities={(utility as any)?.requiredForOpportunities ?? []}
-                          utilityName={utility?.name ?? ""}
-                        >
-                          <Button variant="text" size="sm">
-                            機会を見る
-                          </Button>
-                        </OpportunityListSheet>
-                      )}
+                  <div>
+                    <p className="text-title-md mb-2">{ utility?.name }</p>
+                    <div className="flex items-end">
+                      <div className="text-tertiary-foreground space-y-1 flex-grow">
+                        <div className="flex align-center gap-1">
+                          <MessageSquareText size="20" className="mt-0.5 text-muted-foreground" />
+                          <p>{ utility?.description }</p>
+                        </div>
+                        <div className="flex align-center gap-1">
+                          <Coins size="20" className="mt-0.5 text-muted-foreground" />
+                          <p>{ utility?.pointsRequired }ポイントで発行可能</p>
+                        </div>
+                        <div className="flex align-center gap-1">
+                          <Tickets size="20" className="mt-0.5 text-muted-foreground" />
+                          <p>{ opportunityCount }件の体験で利用可能</p>
+                        </div>
+                      </div>
+                      <OpportunityListSheet
+                        opportunities={ (utility as any)?.requiredForOpportunities ?? [] }
+                        utilityName={ utility?.name ?? "" }
+                      >
+                        <Button variant="secondary" size="sm">
+                          詳細
+                        </Button>
+                      </OpportunityListSheet>
                     </div>
                   </div>
                 </CardWrapper>

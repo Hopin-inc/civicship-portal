@@ -23,15 +23,18 @@ import { COMMUNITY_ID } from "@/utils";
 import { useAuth } from "@/contexts/AuthProvider";
 
 interface CreateUtilitySheetProps {
+  buttonLabel: string;
   onUtilityCreated: () => Promise<void>;
 }
 
-export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySheetProps) {
+const POINTS_REQUIRED = 100;
+
+export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: CreateUtilitySheetProps) {
   const [showUtilityForm, setShowUtilityForm] = useState(false);
   const [step, setStep] = useState<"opportunities" | "details">("opportunities");
   const [utilityName, setUtilityName] = useState("");
   const [utilityDescription, setUtilityDescription] = useState("");
-  const [pointsRequired, setPointsRequired] = useState(1);
+  const [pointsRequired, setPointsRequired] = useState(POINTS_REQUIRED);
   const [selectedOpportunityIds, setSelectedOpportunityIds] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -75,7 +78,6 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
             pointsRequired,
             images: [],
             requiredForOpportunityIds: selectedOpportunityIds.length > 0 ? selectedOpportunityIds : undefined,
-            communityId: COMMUNITY_ID,
           },
           permission: { communityId: COMMUNITY_ID },
         },
@@ -131,7 +133,7 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
   return (
     <Sheet open={ showUtilityForm } onOpenChange={ setShowUtilityForm }>
       <SheetTrigger asChild>
-        <Button>新規追加</Button>
+        <Button>{ buttonLabel }</Button>
       </SheetTrigger>
       <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8">
         <SheetHeader className="text-left pb-6">
@@ -173,15 +175,15 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
                       すべて選択
                     </Label>
                   </div>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                  <div className="space-y-2 max-h-80 overflow-y-auto">
                     { opportunityList.map((opportunity) => {
                       const isSelected = selectedOpportunityIds.includes(opportunity?.id ?? "");
                       return (
-                        <div 
-                          key={ opportunity?.id } 
+                        <div
+                          key={ opportunity?.id }
                           className={`flex items-start space-x-2 p-3 rounded-lg border-2 transition-colors ${
                             isSelected 
-                              ? 'border-primary bg-primary/5' 
+                              ? 'border-primary bg-primary-foreground' 
                               : 'border-border hover:border-primary/50'
                           }`}
                         >
@@ -223,25 +225,34 @@ export default function CreateUtilitySheet({ onUtilityCreated }: CreateUtilitySh
         { step === "details" && (
           <div className="space-y-4">
             <div>
-              <Label>チケット名</Label>
+              <Label>チケット名 (管理用)</Label>
               <Input value={ utilityName } onChange={ (e) => setUtilityName(e.target.value) } />
+              <p className="text-body-sm text-muted-foreground mt-1">
+                チケットを贈る相手には表示されません。
+              </p>
             </div>
             <div>
-              <Label>説明</Label>
+              <Label>コメント</Label>
               <Input
                 value={ utilityDescription }
                 onChange={ (e) => setUtilityDescription(e.target.value) }
               />
+              <p className="text-body-sm text-muted-foreground mt-1">
+                チケットを贈る相手に表示されるメッセージを設定できます。
+              </p>
             </div>
-            <div>
-              <Label>交換ポイント</Label>
-              <Input
-                type="number"
-                min={ 0 }
-                value={ pointsRequired }
-                onChange={ (e) => setPointsRequired(Number(e.target.value)) }
-              />
-            </div>
+            {/*<div>*/ }
+            {/*  <Label>交換ポイント</Label>*/ }
+            {/*  <Input*/}
+            {/*    type="number"*/}
+            {/*    min={ 0 }*/}
+            {/*    value={ pointsRequired }*/}
+            {/*    onChange={ (e) => setPointsRequired(Number(e.target.value)) }*/}
+            {/*  />*/}
+            {/*  <p className="text-body-sm text-muted-foreground mt-1">*/}
+            {/*    チケットの交換に必要なポイント数です。*/}
+            {/*  </p>*/}
+            {/*</div>*/}
             <div className="space-y-3">
               <Button
                 onClick={ handleCreateUtility }

@@ -1,10 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useRouter } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { Button } from "@/components/ui/button";
-import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import {
   GqlSortDirection,
@@ -16,17 +13,16 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { TicketIssueCard } from "@/app/admin/tickets/components/IssuerCard";
 import CreateUtilitySheet from "@/app/admin/tickets/utilities/components/CreateUtilitySheet";
 import CreateTicketSheet from "@/app/admin/tickets/components/CreateTicketSheet";
+import Link from "next/link";
 
 export default function TicketsPage() {
   const headerConfig = useMemo(() => ({ title: "チケット管理", showLogo: false }), []);
   useHeaderConfig(headerConfig);
-  const router = useRouter();
-
   const { user } = useAuth();
 
   const { data: utilityData, loading: utilitiesLoading, refetch: refetchUtilities } = useGetUtilitiesQuery({
     variables: {
-      filter: { communityId: COMMUNITY_ID, createdBy: user?.id },
+      filter: { communityIds: [COMMUNITY_ID], ownerIds: user?.id ? [user.id] : undefined },
       sort: { createdAt: GqlSortDirection.Desc },
       first: 20,
     },
@@ -49,10 +45,10 @@ export default function TicketsPage() {
 
   if (utilityList.length === 0) {
     return (
-      <div className="p-4 space-y-8 max-w-2xl mx-auto">
-        <div className="text-center space-y-6">
-          <h2 className="text-2xl font-bold">チケットの利用を始めましょう！</h2>
-          <CreateUtilitySheet onUtilityCreated={ async () => {
+      <div className="p-4 pb-8 space-y-4 max-w-2xl mx-auto h-[calc(100svh-64px)]">
+        <div className="flex flex-col h-full w-full justify-center align-center text-center space-y-6">
+          <p className="text-body-md">まずはチケットの種類を追加して、チケット機能を使ってみましょう！</p>
+          <CreateUtilitySheet buttonLabel="利用開始" onUtilityCreated={ async () => {
             await refetchUtilities();
           } } />
         </div>
@@ -70,6 +66,11 @@ export default function TicketsPage() {
             await refetchTickets();
           } } />
         </div>
+        <p className="text-body-sm text-muted-foreground">
+          発行するチケットの種類は
+          <Link href="/admin/tickets/utilities" className="text-primary hover:text-primary-hover underline">こちら</Link>
+          から確認・追加できます。
+        </p>
         <div className="flex flex-col gap-3">
           { ticketList.length === 0 ? (
             <p className="text-muted-foreground">発行リンクがありません</p>
@@ -77,48 +78,18 @@ export default function TicketsPage() {
             ticketList.map((ticket) => (
               <TicketIssueCard
                 key={ `${ ticket?.id }-${ ticket?.claimLink?.id ?? "no-claimLink" }` }
-                qtyToBeIssued={ ticket?.qtyToBeIssued }
-                claimQty={ ticket?.claimLink?.qty }
+                title={ ticket?.utility?.name ?? "名称未設定のチケット" }
+                qty={ ticket?.claimLink?.qty }
                 createdAt={
                   ticket?.createdAt instanceof Date
                     ? ticket.createdAt.toISOString()
                     : (ticket?.createdAt ?? "")
                 }
                 href={ `/admin/tickets/${ ticket?.claimLink?.id }` }
-                statusVariant={
-                  ticket?.claimLink?.qty != null &&
-                  ticket?.qtyToBeIssued != null &&
-                  ticket?.claimLink.qty < ticket?.qtyToBeIssued
-                    ? "primary"
-                    : "secondary"
-                }
+                status={ ticket?.claimLink?.status }
               />
             ))
           ) }
-        </div>
-      </div>
-
-      {/* チケットの種類一覧セクション */ }
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold">チケットの種類一覧</h2>
-          <Button
-            variant="text"
-            onClick={ () => router.push("/admin/tickets/utilities") }
-          >
-            チケットの種類を管理する
-          </Button>
-        </div>
-        <div className="space-y-2">
-          { utilityList.map((utility) => (
-            <CardWrapper key={ utility?.id } className="p-4">
-              <div className="text-sm">
-                <div className="font-semibold">{ utility?.name }</div>
-                <div className="text-muted-foreground">{ utility?.description }</div>
-                <div>交換ポイント: { utility?.pointsRequired }</div>
-              </div>
-            </CardWrapper>
-          )) }
         </div>
       </div>
     </div>

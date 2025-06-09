@@ -14,6 +14,7 @@ import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHori
 import { presenterActivityCard } from "@/app/activities/data/presenter";
 import { GqlOpportunity } from "@/types/graphql";
 import { ActivityCard } from "@/app/activities/data/type";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface OpportunityListSheetProps {
   opportunities: GqlOpportunity[];
@@ -21,41 +22,45 @@ interface OpportunityListSheetProps {
   children: React.ReactNode;
 }
 
-export default function OpportunityListSheet({ 
-  opportunities, 
-  utilityName, 
-  children 
-}: OpportunityListSheetProps) {
+export default function OpportunityListSheet({
+                                               opportunities,
+                                               utilityName,
+                                               children,
+                                             }: OpportunityListSheetProps) {
   const activityCards: ActivityCard[] = opportunities.map(presenterActivityCard);
 
   return (
     <Sheet>
       <SheetTrigger asChild>
-        {children}
+        { children }
       </SheetTrigger>
       <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8">
         <SheetHeader className="text-left pb-6">
-          <SheetTitle>関連する機会</SheetTitle>
+          <SheetTitle>{ utilityName }</SheetTitle>
           <SheetDescription>
-            {utilityName}に関連する機会一覧です。
+            このチケットは
+            <span className="font-bold">{ activityCards.length }</span>
+            件の体験で利用可能です。
           </SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-4 max-h-96 overflow-y-auto">
-          {activityCards.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
-              関連する機会がありません
-            </p>
-          ) : (
-            activityCards.map((opportunity: ActivityCard) => (
-              <OpportunityCardHorizontal
-                key={opportunity.id}
-                opportunity={opportunity}
-                withShadow={false}
-              />
-            ))
-          )}
-        </div>
+        <ScrollArea className="max-h-[60vh]">
+          <div className="space-y-4">
+            { activityCards.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                関連する機会がありません
+              </p>
+            ) : (
+              activityCards.map((opportunity: ActivityCard) => (
+                <OpportunityCardHorizontal
+                  key={ opportunity.id }
+                  opportunity={ opportunity }
+                  withShadow={ false }
+                />
+              ))
+            ) }
+          </div>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );
