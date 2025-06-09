@@ -1,7 +1,7 @@
 import React from "react";
 import { Metadata } from "next";
 import { fallbackMetadata } from "@/lib/metadata/notFound";
-import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
+import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/communityMetadata";
 import {
   GetParticipationDocument,
   GqlGetParticipationQuery,

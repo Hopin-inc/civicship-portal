@@ -8,7 +8,7 @@ import {
 import { apolloClient } from "@/lib/apollo";
 import { fallbackMetadata } from "@/lib/metadata/notFound";
 import React from "react";
-import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
+import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/communityMetadata";
 
 type Props = {
   params: { id: string };
