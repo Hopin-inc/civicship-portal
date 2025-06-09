@@ -5,8 +5,12 @@ import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import { proseClassName } from "@/utils/md";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { logger } from "@/lib/logging";
+import { currentCommunityConfig } from "@/lib/metadata/communityMetadata";
 
-const termsMarkdown = `
+const getTermsMarkdown = () => {
+  const communityName = currentCommunityConfig.title;
+
+  return `
 ## 1．事前予約
 
 - 参加には、事前の予約が必要です。
@@ -15,12 +19,12 @@ const termsMarkdown = `
 
 ## 2．自己責任
 
-- 参加者は、自己の責任でNEO四国88祭にご参加ください。
-- NEO四国88祭実行委員会は、各プログラムにおける怪我や病気、事故などについて一切の責任を負いません。
+- 参加者は、自己の責任で${communityName}にご参加ください。
+- ${communityName}実行委員会は、各プログラムにおける怪我や病気、事故などについて一切の責任を負いません。
 
 ## 3．プログラム主催者の指示など
 
-- プログラム主催者及びNEO四国88祭実行委員会の指示・注意事項は、必ず守ってください。
+- プログラム主催者及び${communityName}実行委員会の指示・注意事項は、必ず守ってください。
 - 指示・注意事項を守っていただけない場合は、プログラムの途中であっても参加をご遠慮いただくことがあります。
 
 ## 4．法令の遵守
@@ -59,41 +63,39 @@ const termsMarkdown = `
 
 ## 10．web会員
 
-- NEO四国88祭のプログラムにwebサイトからご予約いただくには、web会員に登録する必要があります。
+- ${communityName}のプログラムにwebサイトからご予約いただくには、web会員に登録する必要があります。
 - webサイトで会員登録を行うことで、webからの予約が可能になります。
 
 ## 11．その他
 
-- 次に該当する場合には、NEO四国88祭実行委員会の判断により、参加をお断りすることがあります。
+- 次に該当する場合には、${communityName}実行委員会の判断により、参加をお断りすることがあります。
 - 他の参加者、案内人、又は会場近隣住民などに対する迷惑行為があった場合。
-- NEO四国88祭への参加が不適切であると認められた場合。
+- ${communityName}への参加が不適切であると認められた場合。
 `;
+};
 
 export default function TermsPage() {
-  const headerConfig = useMemo(
-    () => ({
-      title: "利用規約",
-      showBackButton: true,
-      showLogo: false,
-    }),
-    [],
-  );
-  useHeaderConfig(headerConfig);
+  const [htmlContent, setHtmlContent] = useState("");
 
-  const [html, setHtml] = useState("");
+  useHeaderConfig({
+    title: "利用規約",
+    showBackButton: true,
+    showLogo: false,
+  });
 
   useEffect(() => {
-    convertMarkdownToHtml(termsMarkdown).then(setHtml).catch((error) => {
-      logger.error("Failed to convert markdown to HTML", {
-        error: error instanceof Error ? error.message : String(error),
-        component: "TermsPage"
-      });
-    });
+    try {
+      const termsMarkdown = getTermsMarkdown();
+      const html = convertMarkdownToHtml(termsMarkdown);
+      setHtmlContent(html);
+    } catch (error) {
+      logger.error("Failed to convert markdown to HTML", { error });
+    }
   }, []);
 
   return (
     <div className="max-w-[720px] mx-auto px-4 py-8">
-      <div className={proseClassName} dangerouslySetInnerHTML={{ __html: html }} />
+      <div className={proseClassName} dangerouslySetInnerHTML={{ __html: htmlContent }} />
     </div>
   );
 }

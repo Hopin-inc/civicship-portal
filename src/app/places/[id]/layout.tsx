@@ -22,7 +22,7 @@ export const generateMetadata = async ({
   const placeDetail = presenterPlaceDetailForMetadata(place);
 
   return {
-    title: `${placeDetail.name} | NEO四国88祭`,
+    title: `${placeDetail.name} | ${currentCommunityConfig.title}`,
     description: placeDetail.bio,
     openGraph: {
       title: placeDetail.name,
