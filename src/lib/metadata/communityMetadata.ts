@@ -9,6 +9,7 @@ interface CommunityBaseConfig {
   domain: string;
   faviconPrefix: string;
   logoPath: string;
+  squareLogoPath: string;
   ogImagePath: string;
 }
 
@@ -56,21 +57,23 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     shortDescription:
       "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。",
     domain: "https://www.neo88.app",
-    faviconPrefix: "/community/neo88",
-    logoPath: "/community/neo88/logo.png",
+    faviconPrefix: "/communities/neo88",
+    logoPath: "/communities/neo88/logo.jpg",
+    squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
   },
-  // デフォルト値も明示的に追加
   default: {
     id: "default",
-    title: "Civicship Portal",
-    description: "地域の特別な体験を発見しよう",
-    shortDescription: "地域の特別な体験を発見しよう",
-    domain: "https://portal.civicship.jp",
-    faviconPrefix: "/images",
-    logoPath: "/images/logo.png",
-    ogImagePath:
-      "https://storage.googleapis.com/prod-civicship-storage-public/asset/default/ogp.jpg",
+    title: "NEO四国88祭",
+    description:
+      "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。心が躍るさまざまな体験を通じて、新しい自分に出会う旅へ。地域の方々が用意する特別な体験がたくさん待っています。あなたのお気に入りを選んで、一期一会のオリジナルな旅を楽しんでみませんか？",
+    shortDescription:
+      "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。",
+    domain: "https://www.neo88.app",
+    faviconPrefix: "/communities/neo88",
+    logoPath: "/communities/neo88/logo.jpg",
+    squareLogoPath: "/communities/neo88/logo-square.jpg",
+    ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
   },
 };
 
@@ -148,3 +151,29 @@ function generateDefaultMetadata(): CommunityMetadata {
 
 // エクスポート用の定数
 export const DEFAULT_COMMUNITY_METADATA = generateDefaultMetadata();
+
+// 現在のコミュニティID取得
+const currentCommunityId = getCommunityIdFromEnv();
+
+// 現在のコミュニティ設定を取得（エクスポート用）
+export const currentCommunityConfig =
+  COMMUNITY_BASE_CONFIG[currentCommunityId] || COMMUNITY_BASE_CONFIG.default;
+
+export const DEFAULT_OPEN_GRAPH_IMAGE = [
+  {
+    url: currentCommunityConfig.ogImagePath,
+    width: 1200,
+    height: 630,
+    alt: currentCommunityConfig.title,
+  },
+];
+
+export const DEFAULT_OPEN_GRAPH: Metadata["openGraph"] = {
+  title: currentCommunityConfig.title,
+  description: currentCommunityConfig.description,
+  url: currentCommunityConfig.domain,
+  siteName: currentCommunityConfig.title,
+  images: DEFAULT_OPEN_GRAPH_IMAGE,
+  locale: "ja_JP",
+  type: "website",
+};

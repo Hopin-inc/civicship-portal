@@ -8,7 +8,7 @@ import {
   GqlPublishStatus,
 } from "@/types/graphql";
 import { fallbackMetadata } from "@/lib/metadata/notFound";
-import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
+import { DEFAULT_OPEN_GRAPH_IMAGE, currentCommunityConfig } from "@/lib/metadata/communityMetadata";
 
 export const generateMetadata = async ({
   params,
@@ -28,7 +28,7 @@ export const generateMetadata = async ({
       title: placeDetail.name,
       description: placeDetail.bio,
       type: "article",
-      url: `https://www.neo88.app/places/${id}`,
+      url: `${currentCommunityConfig.domain}/places/${id}`,
       images: placeDetail.images.length
         ? placeDetail.images.map((url) => ({
             url,
@@ -39,7 +39,7 @@ export const generateMetadata = async ({
         : DEFAULT_OPEN_GRAPH_IMAGE,
     },
     alternates: {
-      canonical: `https://www.neo88.app/places/${id}`,
+      canonical: `${currentCommunityConfig.domain}/places/${id}`,
     },
   };
 };

@@ -331,11 +331,11 @@ const dummyPortfolios: AppPortfolio[] = [
     date: "2025-05-15",
     location: "四国",
     participants: [
-      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "1", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "2", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "3", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "4", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "5", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
     ],
   },
   {
@@ -348,11 +348,11 @@ const dummyPortfolios: AppPortfolio[] = [
     date: "2025-05-25",
     location: "四国",
     participants: [
-      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "1", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "2", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "3", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "4", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "5", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
     ],
   },
   {
@@ -365,11 +365,11 @@ const dummyPortfolios: AppPortfolio[] = [
     date: "2025-05-25",
     location: "四国",
     participants: [
-      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "4", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "5", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "1", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "2", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "3", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "4", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "5", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
     ],
   },
   {
@@ -382,9 +382,9 @@ const dummyPortfolios: AppPortfolio[] = [
     date: "2025-05-15",
     location: "四国",
     participants: [
-      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "3", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "1", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "2", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "3", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
     ],
   },
   {
@@ -397,8 +397,8 @@ const dummyPortfolios: AppPortfolio[] = [
     date: "2025-05-25",
     location: "四国",
     participants: [
-      { id: "1", name: "ユーザー名", image: "/images/users/placeholder.png" },
-      { id: "2", name: "ユーザー名", image: "/images/users/placeholder.png" },
+      { id: "1", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
+      { id: "2", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
     ],
   },
 ];

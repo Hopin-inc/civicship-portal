@@ -8,7 +8,7 @@ dayjs.locale("ja");
 dayjs.extend(relativeTime);
 
 export const COMMUNITY_ID = getCommunityIdFromEnv();
-export const PLACEHOLDER_IMAGE = "/images/placeholder.jpg";
+export const PLACEHOLDER_IMAGE = `/communities/${COMMUNITY_ID}/placeholder.jpg`;
 
 const YEAR_FMT = "YYYY年";
 const MONTH_DATE_FMT = "M月D日(ddd)";

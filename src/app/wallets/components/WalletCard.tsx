@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { currentCommunityConfig } from "@/lib/metadata/communityMetadata";
 
 interface WalletCardProps {
   currentPoint: number;
@@ -28,8 +29,8 @@ const WalletCard: React.FC<WalletCardProps> = ({ currentPoint, isLoading, onRefe
 
       <div className="flex justify-between items-center">
         <Image
-          src="/images/neo88-logo.jpg"
-          alt="NEO88"
+          src={currentCommunityConfig.logoPath}
+          alt="Logo"
           width={80}
           height={24}
           className="opacity-60"
