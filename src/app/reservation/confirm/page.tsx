@@ -22,7 +22,6 @@ import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReserv
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
-import { LiffService } from "@/lib/auth/liff-service";
 import { logger } from "@/lib/logging";
 
 export default function ConfirmPage() {
@@ -37,12 +36,14 @@ export default function ConfirmPage() {
   useHeaderConfig(headerConfig);
   const { user } = useAuth();
   const router = useRouter();
+
   const {
     opportunityId,
     slotId,
     participantCount: initialParticipantCount,
     communityId,
   } = useReservationParams();
+
   const [participantCount, setParticipantCount] = useState<number>(initialParticipantCount);
   const {
     opportunity,
@@ -55,17 +56,21 @@ export default function ConfirmPage() {
     hasError,
     triggerRefetch,
   } = useReservationConfirm({ opportunityId, slotId, userId: user?.id });
+
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = triggerRefetch;
   }, [triggerRefetch]);
+
   const ticketCounter = useTicketCounter(availableTickets);
   const ui = useReservationUIState();
   const { handleReservation, creatingReservation } = useReservationCommand();
+
   if (loading) return <LoadingIndicator />;
   if (hasError)
     return <ErrorState title="予約情報を読み込めませんでした" refetchRef={refetchRef} />;
   if (!opportunity) return notFound();
+
   const handleConfirm = async () => {
     const result = await handleReservation({
       opportunity,
@@ -77,9 +82,11 @@ export default function ConfirmPage() {
       useTickets: ui.useTickets,
       comment: ui.ageComment ?? undefined,
     });
+
     if (creatingReservation) {
       return <LoadingIndicator fullScreen />;
     }
+
     if (!result.success) {
       if (!user) {
         ui.setIsLoginModalOpen(true);

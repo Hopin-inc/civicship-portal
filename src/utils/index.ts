@@ -9,12 +9,14 @@ dayjs.extend(relativeTime);
 export const COMMUNITY_ID = "neo88";
 export const PLACEHOLDER_IMAGE = "/images/placeholder.jpg";
 
+
 const YEAR_FMT = "YYYY年";
 const MONTH_DATE_FMT = "M月D日(ddd)";
 const TIME_FMT = "H:mm";
 const FULL_FMT = `${YEAR_FMT}${MONTH_DATE_FMT} ${TIME_FMT}`;
 
-export const displayDatetime = (date: Date | string, format: string = "YYYY-MM-DD HH:mm") => {
+export const displayDatetime = (date: Date | string | null | undefined, format: string = FULL_FMT, nullString: string = "未設定") => {
+  if (!date) return nullString;
   return dayjs(date).format(format);
 };
 

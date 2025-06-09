@@ -2,12 +2,12 @@
 
 import React from "react";
 import TicketList from "./TicketList";
-import { Ticket } from "@/app/tickets/data/type";
+import { TTicket } from "@/app/tickets/data/type";
 import EmptyStateWithSearch from "@/components/shared/EmptyStateWithSearch";
 import { Info } from "lucide-react";
 
 interface TicketContentProps {
-  tickets: Ticket[];
+  tickets: TTicket[];
 }
 
 const TicketContent: React.FC<TicketContentProps> = ({ tickets }) => {
