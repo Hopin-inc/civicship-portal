@@ -57,30 +57,30 @@ export default function UtilitiesPage() {
               return (
                 <CardWrapper key={ utility?.id } className="p-4">
                   <div>
-                    <p className="text-title-md mb-2">{ utility?.name }</p>
-                    <div className="flex items-end">
-                      <div className="text-tertiary-foreground space-y-1 flex-grow">
-                        <div className="flex align-center gap-1">
-                          <MessageSquareText size="20" className="mt-0.5 text-muted-foreground" />
-                          <p>{ utility?.description }</p>
-                        </div>
-                        <div className="flex align-center gap-1">
-                          <Coins size="20" className="mt-0.5 text-muted-foreground" />
-                          <p>{ utility?.pointsRequired }ポイントで発行可能</p>
-                        </div>
-                        <div className="flex align-center gap-1">
-                          <Tickets size="20" className="mt-0.5 text-muted-foreground" />
-                          <p>{ opportunityCount }件の体験で利用可能</p>
-                        </div>
-                      </div>
+                    <div className="flex items-center mb-2">
+                      <p className="text-title-md flex-grow">{ utility?.name }</p>
                       <OpportunityListSheet
-                        opportunities={ (utility as any)?.requiredForOpportunities ?? [] }
+                        opportunities={ utility?.requiredForOpportunities ?? [] }
                         utilityName={ utility?.name ?? "" }
                       >
                         <Button variant="secondary" size="sm">
                           詳細
                         </Button>
                       </OpportunityListSheet>
+                    </div>
+                    <div className="text-tertiary-foreground space-y-1">
+                      <div className="flex align-center gap-1">
+                        <MessageSquareText size="20" className="min-w-[20px] mt-0.5 text-muted-foreground" />
+                        <p className="flex-grow text-pretty">{ utility?.description }</p>
+                      </div>
+                      <div className="flex align-center gap-1">
+                        <Coins size="20" className="min-w-[20px] mt-0.5 text-muted-foreground" />
+                        <p className="flex-grow text-pretty">{ utility?.pointsRequired }ポイントで発行可能</p>
+                      </div>
+                      <div className="flex align-center gap-1">
+                        <Tickets size="20" className="min-w-[20px] mt-0.5 text-muted-foreground" />
+                        <p className="flex-grow text-pretty">{ opportunityCount }件の体験で利用可能</p>
+                      </div>
                     </div>
                   </div>
                 </CardWrapper>

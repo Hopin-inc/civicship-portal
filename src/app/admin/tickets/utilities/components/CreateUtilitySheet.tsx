@@ -21,6 +21,8 @@ import {
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/utils";
 import { useAuth } from "@/contexts/AuthProvider";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 interface CreateUtilitySheetProps {
   buttonLabel: string;
@@ -54,13 +56,6 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
   });
 
   const opportunityList = opportunityData?.opportunities?.edges?.map((e) => e?.node) ?? [];
-
-  useEffect(() => {
-    if (opportunityList.length > 0 && selectedOpportunityIds.length === 0) {
-      const allOpportunityIds = opportunityList.map(opp => opp?.id).filter(Boolean) as string[];
-      setSelectedOpportunityIds(allOpportunityIds);
-    }
-  }, [opportunityList, selectedOpportunityIds.length]);
 
   const allOpportunityIds = opportunityList.map(opp => opp?.id).filter(Boolean) as string[];
   const isAllSelected = allOpportunityIds.length > 0 && allOpportunityIds.every(id => selectedOpportunityIds.includes(id));
@@ -114,7 +109,7 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
     setStep("opportunities");
   };
 
-  const handleOpportunityToggle = (opportunityId: string, checked: boolean) => {
+  const handleOpportunityToggle = (opportunityId: string, checked: CheckedState) => {
     if (checked) {
       setSelectedOpportunityIds(prev => [...prev, opportunityId]);
     } else {
@@ -122,7 +117,7 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
     }
   };
 
-  const handleSelectAllToggle = (checked: boolean) => {
+  const handleSelectAllToggle = () => {
     if (isAllSelected) {
       setSelectedOpportunityIds([]);
     } else {
@@ -138,11 +133,11 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
       <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8">
         <SheetHeader className="text-left pb-6">
           <SheetTitle>
-            { step === "opportunities" && "機会を選択" }
+            { step === "opportunities" && "体験を選択" }
             { step === "details" && "チケットの詳細を入力" }
           </SheetTitle>
           <SheetDescription>
-            { step === "opportunities" && "このチケットに関連する機会を選択してください。" }
+            { step === "opportunities" && "このチケットで利用できるようにしたい体験を選択してください。" }
             { step === "details" && "チケットの種類の詳細を入力してください。" }
           </SheetDescription>
         </SheetHeader>
@@ -150,11 +145,11 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
         { step === "opportunities" && (
           <div className="space-y-4">
             <div>
-              <Label>関連する機会（オプション）</Label>
+              <Label>体験を選択</Label>
               { opportunitiesLoading ? (
-                <p className="text-sm text-muted-foreground">機会を読み込み中...</p>
+                <p className="text-sm text-muted-foreground">体験を読み込み中...</p>
               ) : opportunityList.length === 0 ? (
-                <p className="text-sm text-muted-foreground">作成した機会がありません</p>
+                <p className="text-sm text-muted-foreground">紐付けられる体験がありません</p>
               ) : (
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2 pb-2 border-b">
@@ -166,7 +161,7 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
                           (el as any).indeterminate = isPartiallySelected;
                         }
                       } }
-                      onCheckedChange={ (checked) => handleSelectAllToggle(checked as boolean) }
+                      onCheckedChange={ handleSelectAllToggle }
                     />
                     <Label
                       htmlFor="select-all-opportunities"
@@ -175,35 +170,37 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
                       すべて選択
                     </Label>
                   </div>
-                  <div className="space-y-2 max-h-80 overflow-y-auto">
-                    { opportunityList.map((opportunity) => {
-                      const isSelected = selectedOpportunityIds.includes(opportunity?.id ?? "");
-                      return (
-                        <div
-                          key={ opportunity?.id }
-                          className={`flex items-start space-x-2 p-3 rounded-lg border-2 transition-colors ${
-                            isSelected 
-                              ? 'border-primary bg-primary-foreground' 
-                              : 'border-border hover:border-primary/50'
-                          }`}
-                        >
-                          <Checkbox
-                            id={ `opportunity-${ opportunity?.id }` }
-                            checked={ isSelected }
-                            onCheckedChange={ (checked) =>
-                              handleOpportunityToggle(opportunity?.id ?? "", checked as boolean)
-                            }
-                          />
-                          <Label
-                            htmlFor={ `opportunity-${ opportunity?.id }` }
-                            className="text-sm font-medium cursor-pointer flex-1"
+                  <ScrollArea className="max-h-80">
+                    <div className="space-y-2">
+                      { opportunityList.map((opportunity) => {
+                        const isSelected = selectedOpportunityIds.includes(opportunity?.id ?? "");
+                        return (
+                          <div
+                            key={ opportunity?.id }
+                            className={ `flex items-start space-x-2 p-3 rounded-lg border-2 transition-colors ${
+                              isSelected
+                                ? "border-primary bg-primary-foreground"
+                                : "border-border hover:border-primary/50"
+                            }` }
                           >
-                            { opportunity?.title }
-                          </Label>
-                        </div>
-                      );
-                    }) }
-                  </div>
+                            <Checkbox
+                              id={ `opportunity-${ opportunity?.id }` }
+                              checked={ isSelected }
+                              onCheckedChange={ (checked) =>
+                                handleOpportunityToggle(opportunity?.id ?? "", checked as boolean)
+                              }
+                            />
+                            <Label
+                              htmlFor={ `opportunity-${ opportunity?.id }` }
+                              className="text-sm font-medium cursor-pointer flex-1"
+                            >
+                              { opportunity?.title }
+                            </Label>
+                          </div>
+                        );
+                      }) }
+                    </div>
+                  </ScrollArea>
                 </div>
               ) }
             </div>
@@ -243,16 +240,16 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
             </div>
             {/*<div>*/ }
             {/*  <Label>交換ポイント</Label>*/ }
-            {/*  <Input*/}
-            {/*    type="number"*/}
-            {/*    min={ 0 }*/}
-            {/*    value={ pointsRequired }*/}
-            {/*    onChange={ (e) => setPointsRequired(Number(e.target.value)) }*/}
-            {/*  />*/}
-            {/*  <p className="text-body-sm text-muted-foreground mt-1">*/}
-            {/*    チケットの交換に必要なポイント数です。*/}
-            {/*  </p>*/}
-            {/*</div>*/}
+            {/*  <Input*/ }
+            {/*    type="number"*/ }
+            {/*    min={ 0 }*/ }
+            {/*    value={ pointsRequired }*/ }
+            {/*    onChange={ (e) => setPointsRequired(Number(e.target.value)) }*/ }
+            {/*  />*/ }
+            {/*  <p className="text-body-sm text-muted-foreground mt-1">*/ }
+            {/*    チケットの交換に必要なポイント数です。*/ }
+            {/*  </p>*/ }
+            {/*</div>*/ }
             <div className="space-y-3">
               <Button
                 onClick={ handleCreateUtility }

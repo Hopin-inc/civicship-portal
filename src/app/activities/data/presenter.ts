@@ -32,7 +32,7 @@ export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[]
     .filter((node): node is GqlOpportunity => !!node)
     .map(presenterActivityCard);
 
-export const presenterActivityCard = (node: GqlOpportunity): ActivityCard => {
+export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCard => {
   return {
     id: node?.id || "",
     title: node?.title || "",
