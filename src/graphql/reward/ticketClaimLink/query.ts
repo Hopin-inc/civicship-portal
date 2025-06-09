@@ -5,11 +5,16 @@ export const VIEW_TICKET_CLAIM = gql(`
     ticketClaimLink(id: $id) {
       qty
       status
+      createdAt
+      claimedAt
       issuer {
         owner {
           id
           name
           image
+        }
+        utility {
+          name
         }
       }
     }

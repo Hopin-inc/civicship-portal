@@ -1908,6 +1908,7 @@ export type GqlTicketEdge = GqlEdge & {
 };
 
 export type GqlTicketFilterInput = {
+  ownerId?: InputMaybe<Scalars["ID"]["input"]>;
   status?: InputMaybe<GqlTicketStatus>;
   utilityId?: InputMaybe<Scalars["ID"]["input"]>;
   walletId?: InputMaybe<Scalars["ID"]["input"]>;
@@ -2256,7 +2257,6 @@ export type GqlUtility = {
   __typename?: "Utility";
   community?: Maybe<GqlCommunity>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
-  createdByUser?: Maybe<GqlUser>;
   description?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
   images?: Maybe<Array<Scalars["String"]["output"]>>;
@@ -2270,12 +2270,11 @@ export type GqlUtility = {
 };
 
 export type GqlUtilityCreateInput = {
-  communityId: Scalars["ID"]["input"];
   description?: InputMaybe<Scalars["String"]["input"]>;
   images?: InputMaybe<Array<GqlImageInput>>;
   name: Scalars["String"]["input"];
   pointsRequired: Scalars["Int"]["input"];
-  requiredForOpportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  requiredForOpportunityIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
 };
 
 export type GqlUtilityCreatePayload = GqlUtilityCreateSuccess;
@@ -2300,10 +2299,10 @@ export type GqlUtilityEdge = GqlEdge & {
 
 export type GqlUtilityFilterInput = {
   and?: InputMaybe<Array<GqlUtilityFilterInput>>;
-  communityId?: InputMaybe<Scalars["ID"]["input"]>;
-  createdBy?: InputMaybe<Scalars["ID"]["input"]>;
+  communityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   not?: InputMaybe<GqlUtilityFilterInput>;
   or?: InputMaybe<Array<GqlUtilityFilterInput>>;
+  ownerIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   publishStatus?: InputMaybe<Array<GqlPublishStatus>>;
 };
 
@@ -4604,9 +4603,12 @@ export type GqlTicketClaimLinkQuery = {
     __typename?: "TicketClaimLink";
     qty: number;
     status: GqlClaimLinkStatus;
+    createdAt?: Date | null;
+    claimedAt?: Date | null;
     issuer?: {
       __typename?: "TicketIssuer";
       owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+      utility?: { __typename?: "Utility"; name?: string | null } | null;
     } | null;
   } | null;
 };
@@ -4709,6 +4711,16 @@ export type GqlGetUtilitiesQuery = {
         name?: string | null;
         description?: string | null;
         pointsRequired: number;
+        requiredForOpportunities?: Array<{
+          __typename?: "Opportunity";
+          id: string;
+          title: string;
+          description: string;
+          images?: Array<string> | null;
+          feeRequired?: number | null;
+          category: GqlOpportunityCategory;
+          place?: { __typename?: "Place"; id: string; name: string } | null;
+        }> | null;
       } | null;
     } | null> | null;
   };
@@ -8588,11 +8600,16 @@ export const TicketClaimLinkDocument = gql`
     ticketClaimLink(id: $id) {
       qty
       status
+      createdAt
+      claimedAt
       issuer {
         owner {
           id
           name
           image
+        }
+        utility {
+          name
         }
       }
     }
@@ -8830,6 +8847,18 @@ export const GetUtilitiesDocument = gql`
           name
           description
           pointsRequired
+          requiredForOpportunities {
+            id
+            title
+            description
+            images
+            place {
+              id
+              name
+            }
+            feeRequired
+            category
+          }
         }
       }
     }
