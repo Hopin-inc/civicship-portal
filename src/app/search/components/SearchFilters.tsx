@@ -7,7 +7,7 @@ import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { DateRange } from "react-day-picker";
 import { FormItem, FormField, FormControl } from "@/components/ui/form";
 import FilterButton from "@/app/search/components/Button";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface SearchFiltersProps {
   onFilterClick: (filter: SearchFilterType) => void;
