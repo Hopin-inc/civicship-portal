@@ -1,5 +1,6 @@
 "use client";
-import { useRef } from "react";
+
+import { useEffect, useRef } from "react";
 import { useActivities } from "../hooks/useActivities";
 import dynamic from "next/dynamic";
 import ListSectionSkeleton from "./ListSection/ListSectionSkeleton";
@@ -13,22 +14,31 @@ const ActivitiesListSection = dynamic(() => import("./ListSection/ListSection"),
 
 export default function ActivitiesPageClient() {
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
-  const refetchRef = useRef<(() => void) | null>(refetch);
+
+  // refetchRef を正しく更新
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   const listCards = mapOpportunityCards(opportunities.edges ?? []);
+  const isFirstLoaded = !loading && opportunities?.edges?.length > 0;
+  const isEmpty = !loading && opportunities?.edges?.length === 0;
 
-  if (loading && !opportunities?.edges?.length) {
+  if (!isFirstLoaded && loading) {
     return (
       <div className="min-h-screen pb-16">
         <ListSectionSkeleton />
       </div>
     );
   }
+
   if (error) {
     return <ErrorState title="募集一覧を読み込めませんでした" refetchRef={refetchRef} />;
   }
-  if (!loading && !opportunities?.edges?.length) {
-    return <EmptyState title={"募集"} />;
+
+  if (isEmpty) {
+    return <EmptyState title="募集" />;
   }
 
   return (
@@ -38,7 +48,7 @@ export default function ActivitiesPageClient() {
         isInitialLoading={loading}
         isSectionLoading={loading}
       />
-      <div ref={loadMoreRef} className="h-10" />
+      <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
     </div>
   );
 }
