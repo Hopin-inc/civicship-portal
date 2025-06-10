@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   GqlOpportunitySlotHostingStatus,
   GqlSortDirection,

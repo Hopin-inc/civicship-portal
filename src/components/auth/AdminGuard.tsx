@@ -7,7 +7,7 @@ import { useQuery } from "@apollo/client";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { toast } from "sonner";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlRole } from "@/types/graphql";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
@@ -47,7 +47,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
       const next = window.location.pathname + window.location.search;
       logger.debug("No user found. Redirecting to login", {
         component: "AdminGuard",
-        redirectTo: `/login?next=${next}`
+        redirectTo: `/login?next=${next}`,
       });
       router.replace(`/login?next=${next}`);
       return;
@@ -62,14 +62,14 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
         }
         logger.debug("Admin access denied. Redirecting", {
           component: "AdminGuard",
-          redirectPath
+          redirectPath,
         });
         router.replace(redirectPath);
         return;
       }
 
       logger.debug("User is authorized as community manager", {
-        component: "AdminGuard"
+        component: "AdminGuard",
       });
     };
 
@@ -90,9 +90,13 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
       return false;
     }
 
-    const targetMembership = currentUser.memberships.find((m: any) => m.community?.id === COMMUNITY_ID);
-    return targetMembership &&
-           (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
+    const targetMembership = currentUser.memberships.find(
+      (m: any) => m.community?.id === COMMUNITY_ID,
+    );
+    return (
+      targetMembership &&
+      (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager)
+    );
   };
 
   if (!checkSyncAdminAccess()) {

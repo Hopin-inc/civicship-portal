@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlOpportunity, useGetOpportunitiesQuery } from "@/types/graphql";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
 import { ActivityCard } from "@/app/activities/data/type";

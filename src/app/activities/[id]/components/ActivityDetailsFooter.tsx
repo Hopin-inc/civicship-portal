@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
 import { cn } from "@/lib/utils";
 

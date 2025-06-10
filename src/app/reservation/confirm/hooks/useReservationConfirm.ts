@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { useGetOpportunityQuery } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { presenterActivityDetail } from "@/app/activities/data/presenter";
 import { useSlotAndTicketInfo } from "@/app/reservation/confirm/hooks/useSlotAndTicket";
 import type { ActivityDetail } from "@/app/activities/data/type";
@@ -51,16 +51,18 @@ export const useReservationConfirm = ({
   const hasError = Boolean(oppError || walletError);
 
   useEffect(() => {
-    if (oppError) logger.info("Opportunity query error", {
-      error: oppError.message || String(oppError),
-      component: "useReservationConfirm",
-      opportunityId
-    });
-    if (walletError) logger.info("Slot/Wallet error", {
-      error: walletError.message || String(walletError),
-      component: "useReservationConfirm",
-      slotId
-    });
+    if (oppError)
+      logger.info("Opportunity query error", {
+        error: oppError.message || String(oppError),
+        component: "useReservationConfirm",
+        opportunityId,
+      });
+    if (walletError)
+      logger.info("Slot/Wallet error", {
+        error: walletError.message || String(walletError),
+        component: "useReservationConfirm",
+        slotId,
+      });
   }, [oppError, walletError, opportunityId, slotId]);
 
   return {

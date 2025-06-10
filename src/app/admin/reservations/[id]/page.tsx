@@ -20,7 +20,7 @@ import ApprovalSheet from "@/app/admin/reservations/components/ApprovalSheet";
 import AttendanceSheet from "@/app/admin/reservations/components/AttendanceSheet";
 import { useAttendanceState } from "@/app/admin/reservations/hooks/attendance/useAttendanceState";
 import { useSaveAttendances } from "@/app/admin/reservations/hooks/attendance/useSaveAttendances";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export default function ReservationPage() {
   const params = useParams();

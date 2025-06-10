@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
@@ -56,7 +56,7 @@ export default function WalletPage() {
       } catch (err) {
         logger.error("Refetch failed on window focus", {
           error: err instanceof Error ? err.message : String(err),
-          component: "WalletPage"
+          component: "WalletPage",
         });
       }
     };
