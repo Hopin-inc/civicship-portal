@@ -25,7 +25,7 @@ export async function fetchFeaturedAndCarousel() {
       },
       first: 10,
     },
-    fetchPolicy: "no-cache",
+    fetchPolicy: "cache-first",
   });
   const activityCards = mapOpportunityCards(data.opportunities.edges ?? []);
   const { featuredCards, upcomingCards } = sliceActivitiesBySection(activityCards);
