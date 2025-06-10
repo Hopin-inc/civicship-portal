@@ -17,6 +17,14 @@ export const VIEW_TICKET_CLAIM = gql(`
           name
         }
       }
+      tickets {
+        wallet {
+          user {
+            id
+            name
+          }
+        }
+      }
     }
   }
 `);

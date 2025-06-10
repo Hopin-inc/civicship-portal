@@ -4610,6 +4610,13 @@ export type GqlTicketClaimLinkQuery = {
       owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
       utility?: { __typename?: "Utility"; name?: string | null } | null;
     } | null;
+    tickets?: Array<{
+      __typename?: "Ticket";
+      wallet?: {
+        __typename?: "Wallet";
+        user?: { __typename?: "User"; id: string; name: string } | null;
+      } | null;
+    }> | null;
   } | null;
 };
 
@@ -8610,6 +8617,14 @@ export const TicketClaimLinkDocument = gql`
         }
         utility {
           name
+        }
+      }
+      tickets {
+        wallet {
+          user {
+            id
+            name
+          }
         }
       }
     }
