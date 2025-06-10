@@ -2,18 +2,36 @@
 
 import { useEffect, useRef } from "react";
 import { useActivities } from "../hooks/useActivities";
-import dynamic from "next/dynamic";
+import ActivitiesListSection from "./ListSection/ListSection";
 import ListSectionSkeleton from "./ListSection/ListSectionSkeleton";
 import { mapOpportunityCards } from "../data/presenter";
 import ErrorState from "@/components/shared/ErrorState";
 import EmptyState from "@/components/shared/EmptyState";
+import { ActivityCard } from "../data/type";
 
-const ActivitiesListSection = dynamic(() => import("./ListSection/ListSection"), {
-  loading: () => <ListSectionSkeleton />,
-});
+interface Props {
+  initialData?: ActivityCard[];
+}
 
-export default function ActivitiesPageClient() {
-  const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
+export default function ActivitiesPageClient({ initialData }: Props) {
+  const { opportunities, loading, error, loadMoreRef, refetch } = useActivities({
+    initialData: initialData ? { 
+      edges: initialData.map((card, index) => ({ 
+        __typename: "OpportunityEdge" as const,
+        cursor: `cursor_${index}`, 
+        node: card as any
+      })), 
+      pageInfo: { 
+        __typename: "PageInfo" as const,
+        hasNextPage: true, 
+        hasPreviousPage: false, 
+        startCursor: null, 
+        endCursor: `cursor_${initialData.length - 1}` 
+      },
+      totalCount: initialData.length,
+      __typename: "OpportunitiesConnection" as const
+    } : undefined
+  });
 
   // refetchRef を正しく更新
   const refetchRef = useRef<(() => void) | null>(null);

@@ -14,7 +14,7 @@ export default async function ActivitiesPage() {
           opportunities={upcomingCards}
           isInitialLoading={loading}
         />
-        <ActivitiesPageClient />
+        <ActivitiesPageClient initialData={upcomingCards} />
       </div>
     </>
   );
