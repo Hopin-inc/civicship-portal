@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { DateRange } from "react-day-picker";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { IPrefecture } from "@/app/search/data/type";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface FilterSheetsProps {
   activeForm: SearchFilterType;
@@ -171,18 +172,49 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
   };
 
   return (
-    <Sheet open={activeForm !== null} onOpenChange={(open) => !open && setActiveForm(null)}>
-      <SheetContent
-        side="bottom"
-        className={`${getSheetHeight()} rounded-t-3xl overflow-auto max-w-md mx-auto pt-2 px-6`}
-        onPointerDownOutside={() => setActiveForm(null)}
-      >
-        <div className="flex justify-center mb-3">
-          <div className="w-10 h-1 bg-muted-foreground/30 rounded-full"></div>
-        </div>
-        {renderSheetContent()}
-      </SheetContent>
-    </Sheet>
+    <>
+      {/* Location Sheet */}
+      {COMMUNITY_ID === "neo88" && (
+        <Sheet open={activeForm === "location"} onOpenChange={() => setActiveForm(null)}>
+          <SheetContent
+            side="bottom"
+            className={`p-6 ${getSheetHeight()} rounded-t-xl overflow-hidden`}
+          >
+            {renderLocationContent()}
+          </SheetContent>
+        </Sheet>
+      )}
+
+      {/* Date Sheet */}
+      <Sheet open={activeForm === "date"} onOpenChange={() => setActiveForm(null)}>
+        <SheetContent
+          side="bottom"
+          className={`p-6 ${getSheetHeight()} rounded-t-xl overflow-hidden`}
+        >
+          {renderDateContent()}
+        </SheetContent>
+      </Sheet>
+
+      {/* Guests Sheet */}
+      <Sheet open={activeForm === "guests"} onOpenChange={() => setActiveForm(null)}>
+        <SheetContent
+          side="bottom"
+          className={`p-6 ${getSheetHeight()} rounded-t-xl overflow-hidden`}
+        >
+          {renderGuestsContent()}
+        </SheetContent>
+      </Sheet>
+
+      {/* Other Sheet */}
+      <Sheet open={activeForm === "other"} onOpenChange={() => setActiveForm(null)}>
+        <SheetContent
+          side="bottom"
+          className={`p-6 ${getSheetHeight()} rounded-t-xl overflow-hidden`}
+        >
+          {renderOtherContent()}
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };
 
