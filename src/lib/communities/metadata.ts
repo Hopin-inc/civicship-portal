@@ -73,7 +73,14 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
   },
 };
 
-// 現在のコミュニティID
+export function getRegionNameByCommunityId(communityId: string = getCommunityIdFromEnv()): string {
+  return communityId === "neo88" ? "四国" : "地域";
+}
+
+export function getCurrentRegionName(): string {
+  return getRegionNameByCommunityId(getCommunityIdFromEnv());
+}
+
 export const COMMUNITY_ID = getCommunityIdFromEnv();
 
 // 現在のコミュニティの設定

@@ -11,6 +11,7 @@ import { ActivityCard } from "@/app/activities/data/type";
 import { AppPortfolio } from "@/app/users/data/type";
 import { GqlOpportunityCategory, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCurrentRegionName } from "@/lib/communities/metadata";
 
 type Props = {
   userId: string;
@@ -253,9 +254,9 @@ const UserPortfolioList = ({
   const showEmptyState = enableDummyPortfolios ? false : portfolios.length === 0;
 
   const emptyStateProps = {
-    title: "四国にふれよう",
+    title: `${getCurrentRegionName()}にふれよう`,
     description: isOwner
-      ? "四国の素敵な88人との\n関わりを探してみましょう"
+      ? `${getCurrentRegionName()}の素敵な人との\n関わりを探してみましょう`
       : "体験に参加すると、タイムラインが作成されます",
     actionLabel: isOwner ? "関わりを探す" : undefined,
     onAction: isOwner ? () => (window.location.href = "/") : undefined,
