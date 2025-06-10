@@ -6,7 +6,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { COMMUNITY_ID, PLACEHOLDER_IMAGE } from "@/utils";
 import { getCurrentRegionName } from "@/lib/communities/metadata";
 
 interface FeaturedSectionProps {
@@ -68,6 +68,8 @@ export default function ActivitiesFeaturedSection({
     }
     return PLACEHOLDER_IMAGE;
   });
+
+  console.debug(COMMUNITY_ID);
 
   return (
     <section className="relative h-[70vh] w-full overflow-hidden [&]:mt-0 mb-12">
