@@ -4,12 +4,16 @@ import ActivitiesFeaturedSection from "@/app/activities/components/FeaturedSecti
 import ActivitiesCarouselSection from "./components/CarouselSection/CarouselSection";
 
 export default async function ActivitiesPage() {
-  const { featuredCards, upcomingCards } = await fetchFeaturedAndCarousel();
+  const { featuredCards, upcomingCards, loading } = await fetchFeaturedAndCarousel();
   return (
     <>
       <div className="min-h-screen">
-        <ActivitiesFeaturedSection opportunities={featuredCards} />
-        <ActivitiesCarouselSection title="もうすぐ開催予定" opportunities={upcomingCards} />
+        <ActivitiesFeaturedSection opportunities={featuredCards} isInitialLoading={loading} />
+        <ActivitiesCarouselSection
+          title="もうすぐ開催予定"
+          opportunities={upcomingCards}
+          isInitialLoading={loading}
+        />
         <ActivitiesPageClient />
       </div>
     </>

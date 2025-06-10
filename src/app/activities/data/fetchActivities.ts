@@ -10,7 +10,7 @@ import {
 import { mapOpportunityCards, sliceActivitiesBySection } from "./presenter";
 
 export async function fetchFeaturedAndCarousel() {
-  const { data } = await apolloClient.query<
+  const { data, loading } = await apolloClient.query<
     GqlGetOpportunitiesQuery,
     GqlGetOpportunitiesQueryVariables
   >({
@@ -29,5 +29,5 @@ export async function fetchFeaturedAndCarousel() {
   });
   const activityCards = mapOpportunityCards(data.opportunities.edges ?? []);
   const { featuredCards, upcomingCards } = sliceActivitiesBySection(activityCards);
-  return { featuredCards, upcomingCards };
+  return { featuredCards, upcomingCards, loading };
 }
