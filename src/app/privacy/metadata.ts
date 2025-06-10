@@ -1,4 +1,4 @@
-import { DEFAULT_OPEN_GRAPH_IMAGE, currentCommunityConfig } from "@/lib/metadata/communityMetadata";
+import { DEFAULT_OPEN_GRAPH_IMAGE, currentCommunityConfig } from "@/lib/communities/metadata";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

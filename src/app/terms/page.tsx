@@ -5,35 +5,37 @@ import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import { proseClassName } from "@/utils/md";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { logger } from "@/lib/logging";
-import { getTermsContent } from "@/lib/community/communityContent";
+import { getTermsContent } from "@/lib/communities/content";
 
-// 利用規約のマークダウンを取得する関数
-const getTermsMarkdown = () => {
-  return getTermsContent();
-};
+const termsMarkdown = getTermsContent();
 
 export default function TermsPage() {
-  const [htmlContent, setHtmlContent] = useState<string>("");
-  const markdownContent = useMemo(() => getTermsMarkdown(), []);
+  const headerConfig = useMemo(
+    () => ({
+      title: "利用規約",
+      showBackButton: true,
+      showLogo: false,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
 
-  useHeaderConfig({
-    title: "利用規約",
-    showBackButton: true,
-  });
+  const [html, setHtml] = useState("");
 
   useEffect(() => {
-    try {
-      const html = convertMarkdownToHtml(markdownContent);
-      setHtmlContent(html);
-    } catch (error) {
-      logger.error("Error converting markdown to HTML", { error });
-    }
-  }, [markdownContent]);
+    convertMarkdownToHtml(termsMarkdown)
+      .then(setHtml)
+      .catch((error) => {
+        logger.error("Failed to convert markdown to HTML", {
+          error: error instanceof Error ? error.message : String(error),
+          component: "TermsPage",
+        });
+      });
+  }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
-      <h1 className="text-2xl font-bold mb-6">利用規約</h1>
-      <div className={proseClassName} dangerouslySetInnerHTML={{ __html: htmlContent }} />
+    <div className="max-w-[720px] mx-auto px-4 py-8">
+      <div className={proseClassName} dangerouslySetInnerHTML={{ __html: html }} />
     </div>
   );
 }

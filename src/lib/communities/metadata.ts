@@ -73,48 +73,58 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
   },
 };
 
-// コミュニティメタデータの取得関数
-export async function getCommunityMetadata(communityId?: string): Promise<CommunityMetadata> {
-  const targetCommunityId = communityId || getCommunityIdFromEnv();
-  return await fetchCommunityMetadata(targetCommunityId);
+// 現在のコミュニティID
+export const COMMUNITY_ID = getCommunityIdFromEnv();
+
+// 現在のコミュニティの設定
+export const currentCommunityConfig = COMMUNITY_BASE_CONFIG[COMMUNITY_ID];
+
+// デフォルトのOGP画像
+export const DEFAULT_OPEN_GRAPH_IMAGE = [
+  {
+    url: currentCommunityConfig.ogImagePath,
+    width: 1200,
+    height: 630,
+    alt: currentCommunityConfig.title,
+  },
+];
+
+// ロゴのパスを取得
+export function getLogoPath(): string {
+  return currentCommunityConfig.logoPath;
 }
 
-// コミュニティメタデータのフェッチ関数
-async function fetchCommunityMetadata(communityId: string): Promise<CommunityMetadata> {
-  try {
-    // TODO: 実際のAPIエンドポイントやGraphQLクエリに置き換える
-    // 現在は静的なマッピングを使用
-    return generateCommunityMetadata(communityId);
-  } catch (error) {
-    console.error("Error fetching community metadata:", error);
-    return generateDefaultMetadata();
-  }
+// 正方形ロゴのパスを取得
+export function getSquareLogoPath(): string {
+  return currentCommunityConfig.squareLogoPath;
 }
 
-// コミュニティメタデータの生成
+// コミュニティのメタデータを生成
 function generateCommunityMetadata(communityId: string): CommunityMetadata {
-  const baseConfig = COMMUNITY_BASE_CONFIG[communityId];
-
-  if (!baseConfig) {
-    return generateDefaultMetadata();
-  }
+  const baseConfig = COMMUNITY_BASE_CONFIG[communityId] || COMMUNITY_BASE_CONFIG.default;
 
   return {
     title: baseConfig.title,
     description: baseConfig.description,
     icons: {
       icon: [
-        { url: `${baseConfig.faviconPrefix}/favicon.ico` },
-        { url: `${baseConfig.faviconPrefix}/favicon-16.png`, type: "image/png", sizes: "16x16" },
-        { url: `${baseConfig.faviconPrefix}/favicon-32.png`, type: "image/png", sizes: "32x32" },
-        { url: `${baseConfig.faviconPrefix}/favicon-48.png`, type: "image/png", sizes: "48x48" },
+        {
+          url: `${baseConfig.faviconPrefix}/favicon.ico`,
+        },
+      ],
+      apple: [
+        {
+          url: `${baseConfig.faviconPrefix}/apple-touch-icon.png`,
+        },
       ],
     },
     openGraph: {
       title: baseConfig.title,
-      description: baseConfig.shortDescription || baseConfig.description,
+      description: baseConfig.description,
       url: baseConfig.domain,
       siteName: baseConfig.title,
+      locale: "ja_JP",
+      type: "website",
       images: [
         {
           url: baseConfig.ogImagePath,
@@ -123,8 +133,6 @@ function generateCommunityMetadata(communityId: string): CommunityMetadata {
           alt: baseConfig.title,
         },
       ],
-      locale: "ja_JP",
-      type: "website",
     },
     alternates: {
       canonical: baseConfig.domain,
@@ -136,36 +144,26 @@ function generateCommunityMetadata(communityId: string): CommunityMetadata {
   };
 }
 
-// デフォルトのコミュニティメタデータ生成関数
-function generateDefaultMetadata(): CommunityMetadata {
-  return generateCommunityMetadata("default");
-}
+// 現在のコミュニティのメタデータ
+export const currentCommunityMetadata = generateCommunityMetadata(COMMUNITY_ID);
 
-// エクスポート用の定数
-export const DEFAULT_COMMUNITY_METADATA = generateDefaultMetadata();
-
-// 現在のコミュニティID取得
-const currentCommunityId = getCommunityIdFromEnv();
-
-// 現在のコミュニティ設定を取得（エクスポート用）
-export const currentCommunityConfig =
-  COMMUNITY_BASE_CONFIG[currentCommunityId] || COMMUNITY_BASE_CONFIG.default;
-
-export const DEFAULT_OPEN_GRAPH_IMAGE = [
-  {
-    url: currentCommunityConfig.ogImagePath,
-    width: 1200,
-    height: 630,
-    alt: currentCommunityConfig.title,
+export const fallbackMetadata: Metadata = {
+  title: "お探しのページは見つかりません",
+  description: "この機会は存在しないか、削除された可能性があります。",
+  openGraph: {
+    title: "お探しのページは見つかりません",
+    description: "この機会は存在しないか、削除された可能性があります。",
+    images: [
+      {
+        url: "DEFAULT_OGP",
+        width: 1200,
+        height: 630,
+        alt: "Not Found",
+      },
+    ],
   },
-];
+};
 
-export const DEFAULT_OPEN_GRAPH: Metadata["openGraph"] = {
-  title: currentCommunityConfig.title,
-  description: currentCommunityConfig.description,
-  url: currentCommunityConfig.domain,
-  siteName: currentCommunityConfig.title,
-  images: DEFAULT_OPEN_GRAPH_IMAGE,
-  locale: "ja_JP",
-  type: "website",
+export const getCommunityMetadata = (communityId: string): CommunityMetadata => {
+  return generateCommunityMetadata(communityId);
 };

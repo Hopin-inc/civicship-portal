@@ -9,14 +9,13 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
 import React from "react";
-import { COMMUNITY_ID } from "@/utils";
-import { getCommunityMetadata } from "@/lib/metadata/communityMetadata";
+import { currentCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 
 const font = Inter({ subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const metadata = await getCommunityMetadata(COMMUNITY_ID);
+  const metadata = currentCommunityMetadata;
 
   return {
     title: metadata.title,

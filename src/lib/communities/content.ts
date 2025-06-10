@@ -1,4 +1,4 @@
-import { getCommunityIdFromEnv } from "../metadata/communityMetadata";
+import { getCommunityIdFromEnv } from "./metadata";
 
 // コミュニティごとのコンテンツ設定
 interface CommunityContent {

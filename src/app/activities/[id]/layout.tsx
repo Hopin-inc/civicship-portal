@@ -7,9 +7,8 @@ import {
   GqlOpportunity,
 } from "@/types/graphql";
 import { apolloClient } from "@/lib/apollo";
-import { fallbackMetadata } from "@/lib/metadata/notFound";
+import { fallbackMetadata, currentCommunityMetadata } from "@/lib/communities/metadata";
 import React from "react";
-import { getCommunityMetadata, DEFAULT_COMMUNITY_METADATA } from "@/lib/metadata/communityMetadata";
 
 type Props = {
   params: { id: string };
@@ -19,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const id = params.id;
   const communityId = COMMUNITY_ID;
   const res = await fetchOpportunity(id, communityId);
-  const communityMetadata = await getCommunityMetadata(communityId);
+  const communityMetadata = currentCommunityMetadata;
 
   if (!res) return fallbackMetadata;
   const description = res.description ?? res.body;

@@ -9,7 +9,7 @@ import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
-import { currentCommunityConfig } from "@/lib/metadata/communityMetadata";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 type LoginModalProps = {
   isOpen: boolean;

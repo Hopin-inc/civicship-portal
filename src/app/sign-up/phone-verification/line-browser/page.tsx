@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { currentCommunityConfig } from "@/lib/metadata/communityMetadata";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function OpenInBrowser() {
   const searchParams = useSearchParams();

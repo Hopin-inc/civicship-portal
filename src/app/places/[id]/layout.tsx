@@ -7,8 +7,11 @@ import {
   GqlPlace,
   GqlPublishStatus,
 } from "@/types/graphql";
-import { fallbackMetadata } from "@/lib/metadata/notFound";
-import { DEFAULT_OPEN_GRAPH_IMAGE, currentCommunityConfig } from "@/lib/metadata/communityMetadata";
+import {
+  fallbackMetadata,
+  DEFAULT_OPEN_GRAPH_IMAGE,
+  currentCommunityConfig,
+} from "@/lib/communities/metadata";
 
 export const generateMetadata = async ({
   params,

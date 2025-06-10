@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { currentCommunityConfig } from "@/lib/metadata/communityMetadata";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 interface WalletCardProps {
   currentPoint: number;

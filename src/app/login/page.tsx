@@ -14,7 +14,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { logger } from "@/lib/logging";
-import { currentCommunityConfig } from "@/lib/metadata/communityMetadata";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();

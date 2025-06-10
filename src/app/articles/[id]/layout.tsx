@@ -7,9 +7,8 @@ import {
   GqlGetArticleQueryVariables,
 } from "@/types/graphql";
 import { apolloClient } from "@/lib/apollo";
-import { fallbackMetadata } from "@/lib/metadata/notFound";
+import { fallbackMetadata, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
 import React from "react";
-import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/communityMetadata";
 
 type Props = {
   params: { id: string };

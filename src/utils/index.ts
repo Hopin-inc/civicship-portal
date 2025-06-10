@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { PhoneNumberUtil } from "google-libphonenumber";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ja";
-import { getCommunityIdFromEnv } from "@/lib/metadata/communityMetadata";
+import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 
 dayjs.locale("ja");
 dayjs.extend(relativeTime);

@@ -12,7 +12,7 @@ import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { cn } from "@/lib/utils";
 import SearchBox from "@/app/search/components/SearchBox";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
-import { currentCommunityConfig } from "@/lib/metadata/communityMetadata";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 interface HeaderProps {
   className?: string;
