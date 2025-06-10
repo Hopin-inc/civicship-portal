@@ -6,7 +6,7 @@ import {
 } from "@/types/graphql";
 import { toast } from "sonner";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 type UseCancelSlotOptions = {
   onCompleted?: () => void;

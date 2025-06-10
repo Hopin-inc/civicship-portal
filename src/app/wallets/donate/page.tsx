@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { GqlUser, useGetMemberWalletsQuery } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";

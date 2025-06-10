@@ -14,7 +14,7 @@ import {
   useUserSignUpMutation,
 } from "@/types/graphql";
 import { toast } from "sonner";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { useAuthStateManagerInitialization } from "@/hooks/auth/useAuthStateManagerInitialization";
 import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
@@ -26,9 +26,7 @@ import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 import { logger } from "@/lib/logging";
-import {
-  maskPhoneNumber,
-} from "@/lib/logging/client/utils";
+import { maskPhoneNumber } from "@/lib/logging/client/utils";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
 
 /**

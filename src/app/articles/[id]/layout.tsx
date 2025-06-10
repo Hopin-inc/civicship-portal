@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   GetArticleDocument,
   GqlArticle,
