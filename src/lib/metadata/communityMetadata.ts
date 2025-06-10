@@ -20,10 +20,6 @@ export interface CommunityMetadata {
   icons: Metadata["icons"];
   openGraph: Metadata["openGraph"];
   alternates?: Metadata["alternates"];
-  terms?: {
-    url: string;
-    title: string;
-  };
   logo: {
     url: string;
     alt: string;
@@ -136,10 +132,6 @@ function generateCommunityMetadata(communityId: string): CommunityMetadata {
     logo: {
       url: baseConfig.logoPath,
       alt: baseConfig.title,
-    },
-    terms: {
-      url: "/terms",
-      title: "利用規約",
     },
   };
 }

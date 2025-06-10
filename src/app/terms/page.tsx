@@ -5,96 +5,34 @@ import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import { proseClassName } from "@/utils/md";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { logger } from "@/lib/logging";
-import { currentCommunityConfig } from "@/lib/metadata/communityMetadata";
+import { getTermsContent } from "@/lib/community/communityContent";
 
+// 利用規約のマークダウンを取得する関数
 const getTermsMarkdown = () => {
-  const communityName = currentCommunityConfig.title;
-
-  return `
-## 1．事前予約
-
-- 参加には、事前の予約が必要です。
-- 応募締切日前に定員に達したプログラムについては、応募を締め切らせていただきます。
-- web会員でキャンセル待ち登録をされた方は、キャンセルをお知らせするメールの受信が可能です。
-
-## 2．自己責任
-
-- 参加者は、自己の責任で${communityName}にご参加ください。
-- ${communityName}実行委員会は、各プログラムにおける怪我や病気、事故などについて一切の責任を負いません。
-
-## 3．プログラム主催者の指示など
-
-- プログラム主催者及び${communityName}実行委員会の指示・注意事項は、必ず守ってください。
-- 指示・注意事項を守っていただけない場合は、プログラムの途中であっても参加をご遠慮いただくことがあります。
-
-## 4．法令の遵守
-
-- 国の定める法律を遵守してください。
-  - 屋外を歩くプログラムについては、道路交通法・交通ルール・マナーを守ってください。
-  - 未成年者の飲酒を伴うプログラムへの参加はご遠慮ください。
-  - 飲酒運転は法律で禁じられています。
-
-## 5．料金及び参加制限
-
-- プログラムによっては、大人料金と子ども料金、組料金の設定があります。
-- 中学生以上は大人料金、小学生以下は子ども料金です。
-- 子ども料金の設定がない場合は、一律料金です。
-- 小学生以下の方は必ず保護者同伴でご参加ください。
-
-## 6．プログラムの中止及びコースの変更
-
-- 天候の悪化によりプログラムの開催を中止、又は内容を変更する場合があります。
-  - プログラムを中止するときは、主催者より参加者にご連絡します。
-
-## 7．服装、持ち物
-
-- 各プログラムに適した服装でお越しください。
-  - 屋外を歩くプログラムについては、スニーカーやトレッキングシューズなど歩きやすいお履物でご参加ください。
-  - 屋外のプログラムについては、防寒具や雨具をご持参ください。
-  - 万一に備えて、健康保険証のコピーをご用意ください。
-
-## 8．飲食
-
-- 食材アレルギーがある方は、予約時及び当日スタッフにお申し出ください。
-
-## 9．キャンセル
-
-- やむを得ずキャンセルする場合は、必ず前日までに各プログラム主催者へご連絡ください。
-
-## 10．web会員
-
-- ${communityName}のプログラムにwebサイトからご予約いただくには、web会員に登録する必要があります。
-- webサイトで会員登録を行うことで、webからの予約が可能になります。
-
-## 11．その他
-
-- 次に該当する場合には、${communityName}実行委員会の判断により、参加をお断りすることがあります。
-- 他の参加者、案内人、又は会場近隣住民などに対する迷惑行為があった場合。
-- ${communityName}への参加が不適切であると認められた場合。
-`;
+  return getTermsContent();
 };
 
 export default function TermsPage() {
-  const [htmlContent, setHtmlContent] = useState("");
+  const [htmlContent, setHtmlContent] = useState<string>("");
+  const markdownContent = useMemo(() => getTermsMarkdown(), []);
 
   useHeaderConfig({
     title: "利用規約",
     showBackButton: true,
-    showLogo: false,
   });
 
   useEffect(() => {
     try {
-      const termsMarkdown = getTermsMarkdown();
-      const html = convertMarkdownToHtml(termsMarkdown);
+      const html = convertMarkdownToHtml(markdownContent);
       setHtmlContent(html);
     } catch (error) {
-      logger.error("Failed to convert markdown to HTML", { error });
+      logger.error("Error converting markdown to HTML", { error });
     }
-  }, []);
+  }, [markdownContent]);
 
   return (
-    <div className="max-w-[720px] mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <h1 className="text-2xl font-bold mb-6">利用規約</h1>
       <div className={proseClassName} dangerouslySetInnerHTML={{ __html: htmlContent }} />
     </div>
   );
