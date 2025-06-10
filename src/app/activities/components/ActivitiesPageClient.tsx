@@ -45,7 +45,7 @@ export default function ActivitiesPageClient() {
     <div className="min-h-screen">
       <ActivitiesListSection
         opportunities={listCards}
-        isInitialLoading={loading}
+        isInitialLoading={false}
         isSectionLoading={loading}
       />
       <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
