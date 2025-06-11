@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-export const GET_USER_FLEXIBLE = gql(`
+export const GET_USER_FLEXIBLE = gql`
   query GetUserFlexible(
     $id: ID!,
     $withPortfolios: Boolean! = false,
@@ -29,9 +29,9 @@ export const GET_USER_FLEXIBLE = gql(`
       }
     }
   } 
-`);
+`;
 
-export const GET_USER_WALLET = gql(`
+export const GET_USER_WALLET = gql`
   query GetUserWallet($id: ID!) {
     user(id: $id) {
       ...UserFields
@@ -67,4 +67,4 @@ export const GET_USER_WALLET = gql(`
       }
     }
   }
-`);
+`;

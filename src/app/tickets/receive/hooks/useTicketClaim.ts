@@ -10,6 +10,7 @@ export interface TicketClaimData {
       name: string;
       image: string | null;
     };
+    qtyToBeIssued: number;
   };
 }
 export interface UseTicketClaimResult {
@@ -29,7 +30,7 @@ export const useTicketClaim = (ticketClaimLinkId: string): UseTicketClaimResult 
   const owner = raw?.issuer?.owner;
 
   const claimLinkData: TicketClaimData | null =
-    raw && owner?.id && owner?.name && raw.qty !== undefined && raw.status !== undefined
+    raw?.issuer && owner?.id && owner?.name && raw.qty !== undefined && raw.status !== undefined
       ? {
           qty: raw.qty,
           status: raw.status,
@@ -39,6 +40,7 @@ export const useTicketClaim = (ticketClaimLinkId: string): UseTicketClaimResult 
               name: owner.name,
               image: owner.image ?? null,
             },
+            qtyToBeIssued: raw.issuer.qtyToBeIssued,
           },
         }
       : null;

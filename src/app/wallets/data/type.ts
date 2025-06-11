@@ -1,4 +1,4 @@
-import { GqlTransactionReason } from "@/types/graphql";
+import { GqlTicketStatus, GqlTicketStatusReason, GqlTransactionReason } from "@/types/graphql";
 
 export type Wallet = {
   currentPoint: number;
@@ -11,6 +11,8 @@ export type UserAsset = {
 
 export type AvailableTicket = {
   id: string;
+  status: GqlTicketStatus;
+  reason: GqlTicketStatusReason;
 };
 
 export type AvailablePoint = {

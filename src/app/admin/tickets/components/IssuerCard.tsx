@@ -24,8 +24,8 @@ export function TicketIssueCard({
   const statusVariant = status === GqlClaimLinkStatus.Issued ? "primary"
     : status === GqlClaimLinkStatus.Claimed ? "secondary"
       : "destructive";
-  const statusLabel = status === GqlClaimLinkStatus.Issued ? "使用可能"
-    : status === GqlClaimLinkStatus.Claimed ? "使用済み"
+  const statusLabel = status === GqlClaimLinkStatus.Issued ? "受取可能"
+    : status === GqlClaimLinkStatus.Claimed ? "受取済み"
       : "無効";
 
   const content = (

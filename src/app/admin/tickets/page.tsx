@@ -68,28 +68,31 @@ export default function TicketsPage() {
         </div>
         <p className="text-body-sm text-muted-foreground">
           発行するチケットの種類は
-          <Link href="/admin/tickets/utilities" className="text-primary hover:text-primary-hover underline">こちら</Link>
+          <Link href="/admin/tickets/utilities"
+                className="text-primary hover:text-primary-hover underline">こちら</Link>
           から確認・追加できます。
         </p>
         <div className="flex flex-col gap-3">
           { ticketList.length === 0 ? (
             <p className="text-muted-foreground">発行リンクがありません</p>
           ) : (
-            ticketList.map((ticket) => (
-              <TicketIssueCard
-                key={ `${ ticket?.id }-${ ticket?.claimLink?.id ?? "no-claimLink" }` }
-                title={ ticket?.utility?.name ?? "名称未設定のチケット" }
-                qty={ ticket?.claimLink?.qty }
-                createdAt={
-                  ticket?.createdAt instanceof Date
-                    ? ticket.createdAt.toISOString()
-                    : (ticket?.createdAt ?? "")
-                }
-                href={ `/admin/tickets/${ ticket?.claimLink?.id }` }
-                status={ ticket?.claimLink?.status }
-              />
-            ))
-          ) }
+            ticketList.map((ticket) => {
+              const qty = ticket?.qtyToBeIssued;
+              return (
+                <TicketIssueCard
+                  key={ `${ ticket?.id }-${ ticket?.claimLink?.id ?? "no-claimLink" }` }
+                  title={ ticket?.utility?.name ?? "名称未設定のチケット" }
+                  qty={ qty }
+                  createdAt={
+                    ticket?.createdAt instanceof Date
+                      ? ticket.createdAt.toISOString()
+                      : (ticket?.createdAt ?? "")
+                  }
+                  href={ `/admin/tickets/${ ticket?.claimLink?.id }` }
+                  status={ ticket?.claimLink?.status }
+                />
+              );
+            })) }
         </div>
       </div>
     </div>
