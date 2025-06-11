@@ -14,8 +14,9 @@ interface TicketReceiveContentProps {
         id: string;
         name: string;
         image: string | null;
-      }
-    }
+      },
+      qtyToBeIssued: number;
+    };
   };
   hasIssued: boolean;
   isClaimLoading: boolean;
@@ -31,14 +32,14 @@ const TicketReceiveContent: React.FC<TicketReceiveContentProps> = ({
                                                                      onClaimClick,
                                                                      onLoginClick,
                                                                    }) => {
-  const { qty, issuer } = claimLinkData;
-  const { owner } = issuer;
+  const { qty: qtyIssued, issuer } = claimLinkData;
+  const { owner, qtyToBeIssued } = issuer;
 
   return (
     <Card className="flex-1 min-h-0 grid content-center gap-6 p-6 w-full">
       <div className="flex flex-col justify-center items-center gap-2">
-        <p className="text-center text-body-md">
-          <span className="text-display-sm">{ owner.name }</span>
+        <p className="text-center text-body-lg">
+          <span className="text-display-md">{ owner.name }</span>
           さんから
           <br />
           招待チケットが届きました！
@@ -52,12 +53,12 @@ const TicketReceiveContent: React.FC<TicketReceiveContentProps> = ({
         </Avatar>
         <div className="m-6 flex flex-col gap-2">
           <div className="flex gap-4 items-baseline">
-            <p className="text-caption text-body-sm w-8 min-w-8">枚数</p>
-            <p className="text-body-sm flex-grow">{ qty } 枚</p>
+            <p className="text-caption w-8 min-w-8">枚数</p>
+            <p className="flex-grow">{ qtyToBeIssued - qtyIssued } 枚</p>
           </div>
           <div className="flex gap-4 items-baseline">
-            <p className="text-caption text-body-sm w-8 min-w-8">用途</p>
-            <p className="text-body-sm flex-grow">{ owner.name }さんが主催する体験に無料参加できます</p>
+            <p className="text-caption w-8 min-w-8">用途</p>
+            <p className="flex-grow">{ owner.name }さんが主催する体験に無料参加できます</p>
           </div>
         </div>
       </div>

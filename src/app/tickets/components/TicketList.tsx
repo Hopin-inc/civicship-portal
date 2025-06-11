@@ -34,8 +34,8 @@ export default function TicketList({ tickets }: TicketListProps) {
                 />
               </div>
               <div className="flex items-center gap-2">
-                <TicketIcon className="w-5 h-5 text-[#4361EE]" />
-                <span className="text-[#4361EE] font-medium">{ ticket.quantity }枚</span>
+                <TicketIcon className="w-5 h-5" />
+                <span className="text-label-md">{ ticket.quantity }枚</span>
               </div>
             </div>
             <Link

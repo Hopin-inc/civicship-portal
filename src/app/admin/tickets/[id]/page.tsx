@@ -66,6 +66,10 @@ export default function TicketDetailPage() {
     .map(el => el?.name)
     .sort()
     .map(el => el ?? "不明なユーザー");
+  const qty = data?.ticketClaimLink?.issuer
+    ? data?.ticketClaimLink?.issuer?.qtyToBeIssued
+    : undefined;
+
   const qrUrl =
     typeof window !== "undefined" ? `${ window.location.origin }/tickets/receive?token=${ id }` : "";
   const copyLink = async () => {
@@ -87,7 +91,7 @@ export default function TicketDetailPage() {
             size="md"
             variant={ ticketClaimLink.status === GqlClaimLinkStatus.Issued ? "primary" : ticketClaimLink.status === GqlClaimLinkStatus.Claimed ? "secondary" : "destructive" }
           >
-            { ticketClaimLink.status === GqlClaimLinkStatus.Issued ? "使用可能" : ticketClaimLink.status === GqlClaimLinkStatus.Claimed ? "使用済み" : "無効" }
+            { ticketClaimLink.status === GqlClaimLinkStatus.Issued ? "受取可能" : ticketClaimLink.status === GqlClaimLinkStatus.Claimed ? "受取済み" : "無効" }
           </Badge>
         </div>
         <p className="text-body-md text-muted-foreground mb-4">
@@ -109,7 +113,7 @@ export default function TicketDetailPage() {
         <div className="space-y-2 p-4 rounded-md bg-card">
           <div className="flex items-center">
             <p className="font-medium !text-tertiary-foreground">発行枚数:</p>
-            <p className="ml-2">{ ticketClaimLink.qty }</p>
+            <p className="ml-2">{ qty }</p>
           </div>
           <div className="flex items-center">
             <p className="font-medium !text-tertiary-foreground">発行日時:</p>
