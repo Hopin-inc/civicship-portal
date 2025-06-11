@@ -16,8 +16,6 @@ export default function OpportunityImageSSR({ image, title }: Props) {
           fill
           sizes="100vw"
           priority // LCP対象に昇格
-          placeholder="blur"
-          blurDataURL={PLACEHOLDER_IMAGE}
           className="object-cover"
         />
       </div>
