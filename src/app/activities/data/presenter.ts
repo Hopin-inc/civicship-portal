@@ -155,92 +155,22 @@ export const sliceActivitiesBySection = (
 ): {
   upcomingCards: ActivityCard[];
   featuredCards: ActivityCard[];
-  listCards: ActivityCard[];
 } => {
   const safe = <T>(cards: (T | undefined)[]): T[] => cards.filter((c): c is T => !!c);
 
   const N = activityCards.length;
-
-  // Filter activities with images
   const hasImages = (card: ActivityCard) => card.images && card.images.length > 0;
 
   if (N === 0) {
-    return { upcomingCards: [], featuredCards: [], listCards: [] };
+    return { upcomingCards: [], featuredCards: [] };
   }
 
-  const upcomingCardsWithImages: ActivityCard[] = [];
-  const upcomingCardsWithoutImages: ActivityCard[] = [];
-  const featuredCardsWithImages: ActivityCard[] = [];
-  const featuredCardsWithoutImages: ActivityCard[] = [];
-  const listCardsWithImages: ActivityCard[] = [];
-  const listCardsWithoutImages: ActivityCard[] = [];
+  const featuredHead = activityCards[0];
+  const featuredCards = safe(hasImages(featuredHead) ? [featuredHead] : []);
 
-  if (N < 10) {
-    const maxUpcoming = N >= 6 ? 3 : 2;
-    const featuredHead = activityCards[0];
+  const maxUpcoming = N >= 6 ? 3 : 2;
+  const upcomingRaw = activityCards.slice(1, 1 + maxUpcoming);
+  const upcomingCards = safe(upcomingRaw.filter(hasImages));
 
-    if (featuredHead && hasImages(featuredHead)) {
-      featuredCardsWithImages.push(featuredHead);
-    }
-
-    for (let i = 1; i <= maxUpcoming && i < N; i++) {
-      const card = activityCards[i];
-      if (card) {
-        if (hasImages(card)) {
-          upcomingCardsWithImages.push(card);
-        } else {
-          upcomingCardsWithoutImages.push(card);
-        }
-      }
-    }
-
-    for (let i = maxUpcoming + 1; i < N; i++) {
-      const card = activityCards[i];
-      if (card) {
-        if (hasImages(card)) {
-          listCardsWithImages.push(card);
-        } else {
-          listCardsWithoutImages.push(card);
-        }
-      }
-    }
-  } else {
-    const featuredHead = activityCards[0];
-
-    if (featuredHead && hasImages(featuredHead)) {
-      featuredCardsWithImages.push(featuredHead);
-    }
-
-    for (let i = 1; i < 6 && i < N; i++) {
-      const card = activityCards[i];
-      if (card) {
-        if (hasImages(card)) {
-          upcomingCardsWithImages.push(card);
-        } else {
-          upcomingCardsWithoutImages.push(card);
-        }
-      }
-    }
-
-    for (let i = 3; i < N; i++) {
-      const card = activityCards[i];
-      if (card) {
-        if (i >= 6 && i < 10 && hasImages(card)) {
-          featuredCardsWithImages.push(card);
-        } else {
-          if (hasImages(card)) {
-            listCardsWithImages.push(card);
-          } else {
-            listCardsWithoutImages.push(card);
-          }
-        }
-      }
-    }
-  }
-
-  const upcomingCards = safe([...upcomingCardsWithImages, ...upcomingCardsWithoutImages]);
-  const featuredCards = safe([...featuredCardsWithImages, ...featuredCardsWithoutImages]);
-  const listCards = safe([...listCardsWithImages, ...listCardsWithoutImages]);
-
-  return { upcomingCards, featuredCards, listCards };
+  return { upcomingCards, featuredCards };
 };
