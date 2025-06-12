@@ -1,6 +1,6 @@
 "use client";
 
-import { Ticket } from "@/app/tickets/data/type";
+import { Ticket, TicketClaimLink } from "@/app/tickets/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 /**
@@ -18,6 +18,24 @@ export const transformTickets = (data: any): Ticket[] => {
         PLACEHOLDER_IMAGE,
       quantity: 1,
       createdByUser: edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser,
+    })) || []
+  );
+};
+
+/**
+ * Transform TicketClaimLink data from GraphQL to display format
+ */
+export const transformTicketClaimLinks = (connection: any): TicketClaimLink[] => {
+  return (
+    connection?.edges?.map((edge: any) => ({
+      id: edge?.node?.id,
+      status: edge?.node?.status,
+      qty: edge?.node?.qty,
+      claimedAt: edge?.node?.claimedAt,
+      createdAt: edge?.node?.createdAt,
+      hostName: edge?.node?.issuer?.owner?.name || "不明",
+      hostImage: edge?.node?.issuer?.owner?.image || PLACEHOLDER_IMAGE,
+      issuer: edge?.node?.issuer,
     })) || []
   );
 };

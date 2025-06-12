@@ -1,0 +1,39 @@
+query ticketClaimLinks(
+  $filter: TicketClaimLinkFilterInput
+  $sort: TicketClaimLinkSortInput
+  $cursor: String
+  $first: Int
+) {
+  ticketClaimLinks(
+    filter: $filter
+    sort: $sort
+    cursor: $cursor
+    first: $first
+  ) {
+    edges {
+      node {
+        id
+        status
+        qty
+        claimedAt
+        createdAt
+        issuer {
+          id
+          owner {
+            id
+            name
+            image
+          }
+        }
+      }
+      cursor
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+  }
+}

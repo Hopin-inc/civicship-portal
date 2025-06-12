@@ -3,12 +3,12 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Ticket as TicketIcon } from 'lucide-react';
-import { Ticket } from '@/app/tickets/data/type';
+import { TicketClaimLink } from '@/app/tickets/data/type';
 import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface TicketListProps {
-  tickets: Ticket[];
+  tickets: TicketClaimLink[];
 }
 
 export default function TicketList({ tickets }: TicketListProps) {
@@ -43,7 +43,7 @@ export default function TicketList({ tickets }: TicketListProps) {
               </div>
               <div className="flex items-center gap-2">
                 <TicketIcon className="w-5 h-5 text-[#4361EE]" />
-                <span className="text-[#4361EE] font-medium">{ticket.quantity}枚</span>
+                <span className="text-[#4361EE] font-medium">{ticket.qty}枚</span>
               </div>
             </div>
             <Button variant={"secondary"} size="md">

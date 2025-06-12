@@ -2,15 +2,24 @@
 
 import React from "react";
 import TicketList from "./TicketList";
-import { Ticket } from "@/app/tickets/data/type";
+import { TicketClaimLink } from "@/app/tickets/data/type";
 import EmptyStateWithSearch from "@/components/shared/EmptyStateWithSearch";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { Info } from "lucide-react";
 
 interface TicketContentProps {
-  tickets: Ticket[];
+  ticketClaimLinks: TicketClaimLink[];
+  loadMoreRef: React.RefObject<HTMLDivElement>;
+  hasNextPage: boolean;
+  loading: boolean;
 }
 
-const TicketContent: React.FC<TicketContentProps> = ({ tickets }) => {
+const TicketContent: React.FC<TicketContentProps> = ({ 
+  ticketClaimLinks, 
+  loadMoreRef, 
+  hasNextPage, 
+  loading 
+}) => {
   return (
     <main className="pt-14 px-4">
       <div className="mb-6">
@@ -29,7 +38,18 @@ const TicketContent: React.FC<TicketContentProps> = ({ tickets }) => {
         </div>
       </div>
 
-      {tickets.length > 0 ? <TicketList tickets={tickets} /> : <EmptyStateWithSearch />}
+      {ticketClaimLinks.length > 0 ? (
+        <>
+          <TicketList tickets={ticketClaimLinks} />
+          {hasNextPage && (
+            <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
+              {loading && <LoadingIndicator />}
+            </div>
+          )}
+        </>
+      ) : (
+        <EmptyStateWithSearch />
+      )}
     </main>
   );
 };
