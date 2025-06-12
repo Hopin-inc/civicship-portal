@@ -14,6 +14,9 @@ export const GET_OPPORTUNITIES = gql`
     $sort: OpportunitySortInput
     $first: Int
     $cursor: String
+    $includeSlot: Boolean! = false
+    $slotFilter: OpportunitySlotFilterInput
+    $slotSort: OpportunitySlotSortInput
   ) {
     opportunities(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
       pageInfo {
@@ -33,6 +36,9 @@ export const GET_OPPORTUNITIES = gql`
             address
             latitude
             longitude
+          }
+          slots(filter: $slotFilter, sort: $slotSort) @include(if: $includeSlot) {
+            ...OpportunitySlotFields
           }
         }
       }

@@ -1908,6 +1908,7 @@ export type GqlTicketEdge = GqlEdge & {
 };
 
 export type GqlTicketFilterInput = {
+  ownerId?: InputMaybe<Scalars["ID"]["input"]>;
   status?: InputMaybe<GqlTicketStatus>;
   utilityId?: InputMaybe<Scalars["ID"]["input"]>;
   walletId?: InputMaybe<Scalars["ID"]["input"]>;
@@ -2269,11 +2270,11 @@ export type GqlUtility = {
 };
 
 export type GqlUtilityCreateInput = {
-  communityId: Scalars["ID"]["input"];
   description?: InputMaybe<Scalars["String"]["input"]>;
   images?: InputMaybe<Array<GqlImageInput>>;
   name: Scalars["String"]["input"];
   pointsRequired: Scalars["Int"]["input"];
+  requiredForOpportunityIds?: InputMaybe<Array<Scalars["String"]["input"]>>;
 };
 
 export type GqlUtilityCreatePayload = GqlUtilityCreateSuccess;
@@ -2298,9 +2299,10 @@ export type GqlUtilityEdge = GqlEdge & {
 
 export type GqlUtilityFilterInput = {
   and?: InputMaybe<Array<GqlUtilityFilterInput>>;
-  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  communityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   not?: InputMaybe<GqlUtilityFilterInput>;
   or?: InputMaybe<Array<GqlUtilityFilterInput>>;
+  ownerIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   publishStatus?: InputMaybe<Array<GqlPublishStatus>>;
 };
 
@@ -3433,6 +3435,9 @@ export type GqlGetOpportunitiesQueryVariables = Exact<{
   sort?: InputMaybe<GqlOpportunitySortInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
+  includeSlot?: Scalars["Boolean"]["input"];
+  slotFilter?: InputMaybe<GqlOpportunitySlotFilterInput>;
+  slotSort?: InputMaybe<GqlOpportunitySlotSortInput>;
 }>;
 
 export type GqlGetOpportunitiesQuery = {
@@ -3472,6 +3477,15 @@ export type GqlGetOpportunitiesQuery = {
           latitude: any;
           longitude: any;
         } | null;
+        slots?: Array<{
+          __typename?: "OpportunitySlot";
+          id: string;
+          hostingStatus: GqlOpportunitySlotHostingStatus;
+          startsAt: Date;
+          endsAt: Date;
+          capacity?: number | null;
+          remainingCapacity?: number | null;
+        }> | null;
       } | null;
     }>;
   };
@@ -6781,6 +6795,9 @@ export const GetOpportunitiesDocument = gql`
     $sort: OpportunitySortInput
     $first: Int
     $cursor: String
+    $includeSlot: Boolean! = false
+    $slotFilter: OpportunitySlotFilterInput
+    $slotSort: OpportunitySlotSortInput
   ) {
     opportunities(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
       pageInfo {
@@ -6801,11 +6818,15 @@ export const GetOpportunitiesDocument = gql`
             latitude
             longitude
           }
+          slots(filter: $slotFilter, sort: $slotSort) @include(if: $includeSlot) {
+            ...OpportunitySlotFields
+          }
         }
       }
     }
   }
   ${OpportunityFieldsFragmentDoc}
+  ${OpportunitySlotFieldsFragmentDoc}
 `;
 
 /**
@@ -6824,6 +6845,9 @@ export const GetOpportunitiesDocument = gql`
  *      sort: // value for 'sort'
  *      first: // value for 'first'
  *      cursor: // value for 'cursor'
+ *      includeSlot: // value for 'includeSlot'
+ *      slotFilter: // value for 'slotFilter'
+ *      slotSort: // value for 'slotSort'
  *   },
  * });
  */
