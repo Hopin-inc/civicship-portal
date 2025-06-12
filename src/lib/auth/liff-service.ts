@@ -123,14 +123,14 @@ export class LiffService {
       if (liff.isInClient()) {
         this.state.isLoggedIn = true;
       } else {
-        const redirectUri = typeof window !== "undefined" 
-          ? window.location.origin 
-          : undefined;
+        const redirectUri =
+          redirectPath && typeof window !== "undefined"
+            ? window.location.origin + redirectPath
+            : typeof window !== "undefined"
+              ? window.location.origin
+              : undefined;
 
-        liff.login({ 
-          redirectUri,
-          state: redirectPath // nextパラメータを含むパスをliff.stateとして保存
-        });
+        liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない
       }
 
