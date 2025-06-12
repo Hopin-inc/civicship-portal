@@ -75,10 +75,15 @@ export const groupOpportunitiesByDate = (
 
     matchedSlots.forEach((slot) => {
       const dateKey = format(new Date(slot.startsAt), "yyyy-MM-dd");
+
       if (!acc[dateKey]) {
         acc[dateKey] = [];
       }
-      acc[dateKey].push(mapNodeToCardProps(node));
+
+      const alreadyExists = acc[dateKey].some((card) => card.id === node.id);
+      if (!alreadyExists) {
+        acc[dateKey].push(mapNodeToCardProps(node));
+      }
     });
 
     return acc;
