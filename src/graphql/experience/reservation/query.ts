@@ -100,6 +100,16 @@ export const GET_RESERVATION = gql`
         evaluation {
           ...EvaluationFields
         }
+        ticketStatusHistories {
+          id
+          reason
+          status
+          ticket {
+            id
+            reason
+            status
+          }
+        }
       }
     }
   }

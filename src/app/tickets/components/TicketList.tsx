@@ -1,11 +1,12 @@
 "use client";
 
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { Ticket as TicketIcon } from 'lucide-react';
-import { TicketClaimLink } from '@/app/tickets/data/type';
+import Image from "next/image";
+import { Ticket as TicketIcon } from "lucide-react";
+import { TicketClaimLink } from "@/app/tickets/data/type";
 import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 
 interface TicketListProps {
   tickets: TicketClaimLink[];
@@ -14,31 +15,22 @@ interface TicketListProps {
 export default function TicketList({ tickets }: TicketListProps) {
   return (
     <div className="space-y-4">
-      <div className="relative">
-        <input
-          type="text"
-          placeholder="検索ワードを入力"
-          className="w-full px-4 py-3 pl-10 border rounded-lg"
-        />
-        <span className="absolute left-3 top-1/2 -translate-y-1/2">🔍</span>
-      </div>
-
-      {tickets.map((ticket) => (
-        <div key={ticket.id} className="bg-background rounded-[20px] p-6 border border-input">
+      { tickets.map((ticket) => (
+        <div key={ ticket.id } className="bg-background rounded-[20px] p-6 border border-input">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative w-12 h-12 rounded-full overflow-hidden">
                 <Image
-                  src={ticket.hostImage ?? PLACEHOLDER_IMAGE}
-                  alt={ticket.hostName}
+                  src={ ticket.hostImage ?? PLACEHOLDER_IMAGE }
+                  alt={ ticket.hostName }
                   fill
-                  placeholder={`blur`}
-                  blurDataURL={PLACEHOLDER_IMAGE}
+                  placeholder={ `blur` }
+                  blurDataURL={ PLACEHOLDER_IMAGE }
                   className="object-cover"
-                  onError={(e) => {
+                  onError={ (e) => {
                     const img = e.target as HTMLImageElement;
                     img.src = PLACEHOLDER_IMAGE;
-                  }}
+                  } }
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -46,13 +38,16 @@ export default function TicketList({ tickets }: TicketListProps) {
                 <span className="text-[#4361EE] font-medium">{ticket.qty}枚</span>
               </div>
             </div>
-            <Button variant={"secondary"} size="md">
-              関わりを見つける
-            </Button>
+            <Link
+              href={ `/search/result?type=activity&q=${ encodeURIComponent(ticket.hostName) }&useTicket=true` }
+              className={ buttonVariants({ variant: "secondary", size: "md" }) }
+            >
+              体験を探す
+            </Link>
           </div>
-          <p className="mt-4 text-foreground">{ticket.hostName}さんからの招待</p>
+          <p className="mt-4 text-foreground">{ ticket.hostName }さんからの招待</p>
         </div>
-      ))}
+      )) }
     </div>
   );
 }

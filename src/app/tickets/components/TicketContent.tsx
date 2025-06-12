@@ -29,9 +29,7 @@ const TicketContent: React.FC<TicketContentProps> = ({
             <div>
               <h2 className="text-base font-bold mb-1">チケットとは</h2>
               <p className="text-muted-foreground leading-relaxed">
-                チケットを送ってくれた人が主催する体験に
-                <br />
-                無料で参加することができます。
+                チケットを送ってくれた人が主催する体験に無料で参加することができます。
               </p>
             </div>
           </div>

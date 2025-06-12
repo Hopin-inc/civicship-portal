@@ -6,6 +6,7 @@ import UserTicketsAndPoints from "./UserTicketsAndPoints";
 import { GeneralUserProfile } from "@/app/users/data/type";
 import { UserAsset } from "@/app/wallets/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { GqlTicketStatus } from "@/types/graphql";
 
 interface UserProfileSectionProps {
   userId: string;
@@ -38,7 +39,7 @@ const UserProfileSection: React.FC<UserProfileSectionProps> = ({
 
       {isOwner && (
         <UserTicketsAndPoints
-          ticketCount={userAsset.tickets.length || 0}
+          ticketCount={userAsset.tickets.filter(t => t.status === GqlTicketStatus.Available).length || 0}
           pointCount={userAsset.points.currentPoint || 0}
         />
       )}
