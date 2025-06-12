@@ -16,6 +16,15 @@ export const VIEW_TICKET_CLAIM = gql(`
         utility {
           name
         }
+        qtyToBeIssued
+      }
+      tickets {
+        wallet {
+          user {
+            id
+            name
+          }
+        }
       }
     }
   }

@@ -127,6 +127,12 @@ export const presenterReservationDateTimeInfo = (
   const endDate = new Date(opportunitySlot.endsAt);
 
   const participantCount = reservation.participations?.length || 0;
+  const paidTicketIds = reservation.participations
+    ?.map((p => p.ticketStatusHistories?.map(h => h.ticket?.id)))
+    .flat()
+    .filter(ticketId => ticketId !== undefined) ?? [];
+  const paidParticipantCount = participantCount - [...new Set(paidTicketIds)].length;
+  console.log("!!!", reservation.participations);
 
   return {
     formattedDate: startDate.toLocaleDateString("ja-JP", {
@@ -146,7 +152,8 @@ export const presenterReservationDateTimeInfo = (
       hour12: false,
     }),
     participantCount,
-    totalPrice: (opportunity.feeRequired ?? 0) * participantCount,
+    paidParticipantCount,
+    totalPrice: (opportunity.feeRequired ?? 0) * paidParticipantCount,
   };
 };
 

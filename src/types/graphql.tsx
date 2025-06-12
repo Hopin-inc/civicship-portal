@@ -4271,6 +4271,18 @@ export type GqlGetReservationQuery = {
         updatedAt?: Date | null;
         issuedAt?: Date | null;
       } | null;
+      ticketStatusHistories?: Array<{
+        __typename?: "TicketStatusHistory";
+        id: string;
+        reason: GqlTicketStatusReason;
+        status: GqlTicketStatus;
+        ticket?: {
+          __typename?: "Ticket";
+          id: string;
+          reason: GqlTicketStatusReason;
+          status: GqlTicketStatus;
+        } | null;
+      }> | null;
     }> | null;
   } | null;
 };
@@ -4607,9 +4619,17 @@ export type GqlTicketClaimLinkQuery = {
     claimedAt?: Date | null;
     issuer?: {
       __typename?: "TicketIssuer";
+      qtyToBeIssued: number;
       owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
       utility?: { __typename?: "Utility"; name?: string | null } | null;
     } | null;
+    tickets?: Array<{
+      __typename?: "Ticket";
+      wallet?: {
+        __typename?: "Wallet";
+        user?: { __typename?: "User"; id: string; name: string } | null;
+      } | null;
+    }> | null;
   } | null;
 };
 
@@ -8081,6 +8101,16 @@ export const GetReservationDocument = gql`
         evaluation {
           ...EvaluationFields
         }
+        ticketStatusHistories {
+          id
+          reason
+          status
+          ticket {
+            id
+            reason
+            status
+          }
+        }
       }
     }
   }
@@ -8610,6 +8640,15 @@ export const TicketClaimLinkDocument = gql`
         }
         utility {
           name
+        }
+        qtyToBeIssued
+      }
+      tickets {
+        wallet {
+          user {
+            id
+            name
+          }
         }
       }
     }

@@ -85,8 +85,8 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
       } else {
         toast.error("ユーティリティ作成に失敗しました");
       }
-    } catch {
-      toast.error("ユーティリティ作成エラー");
+    } catch (error) {
+      toast.error("ユーティリティ作成に失敗しました");
     } finally {
       setIsSubmitting(false);
     }
@@ -149,7 +149,10 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
               { opportunitiesLoading ? (
                 <p className="text-sm text-muted-foreground">体験を読み込み中...</p>
               ) : opportunityList.length === 0 ? (
-                <p className="text-sm text-muted-foreground">紐付けられる体験がありません</p>
+                <p className="text-sm text-muted-foreground">
+                  紐付けられる体験がありません。<br />
+                  まずは主催する体験を追加してください。
+                </p>
               ) : (
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2 pb-2 border-b">
@@ -205,7 +208,11 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
               ) }
             </div>
             <div className="space-y-3">
-              <Button onClick={ handleNextStep } className="w-full">
+              <Button
+                onClick={ handleNextStep }
+                disabled={ opportunityList.length === 0 }
+                className="w-full"
+              >
                 次へ
               </Button>
               <Button

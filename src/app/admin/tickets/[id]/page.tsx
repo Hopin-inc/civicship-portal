@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GqlClaimLinkStatus, useTicketClaimLinkQuery } from "@/types/graphql";
 import { Input } from "@/components/ui/input";
-import { displayDatetime } from "@/utils";
+import { displayDatetime, displayMultipleUsers } from "@/utils";
 
 const QRCode = dynamic(() => import("react-qr-code"), { ssr: false });
 
@@ -60,6 +60,16 @@ export default function TicketDetailPage() {
     );
   }
 
+  const ticketRecipients = ticketClaimLink.tickets?.map(t => t.wallet?.user) ?? [];
+  const uniqueRecipients = ticketRecipients.filter((el1, idx, self) => idx === self.findIndex(el2 => el1?.id === el2?.id));
+  const uniqueRecipientNames = uniqueRecipients
+    .map(el => el?.name)
+    .sort()
+    .map(el => el ?? "不明なユーザー");
+  const qty = data?.ticketClaimLink?.issuer
+    ? data?.ticketClaimLink?.issuer?.qtyToBeIssued
+    : undefined;
+
   const qrUrl =
     typeof window !== "undefined" ? `${ window.location.origin }/tickets/receive?token=${ id }` : "";
   const copyLink = async () => {
@@ -81,7 +91,7 @@ export default function TicketDetailPage() {
             size="md"
             variant={ ticketClaimLink.status === GqlClaimLinkStatus.Issued ? "primary" : ticketClaimLink.status === GqlClaimLinkStatus.Claimed ? "secondary" : "destructive" }
           >
-            { ticketClaimLink.status === GqlClaimLinkStatus.Issued ? "使用可能" : ticketClaimLink.status === GqlClaimLinkStatus.Claimed ? "使用済み" : "無効" }
+            { ticketClaimLink.status === GqlClaimLinkStatus.Issued ? "受取可能" : ticketClaimLink.status === GqlClaimLinkStatus.Claimed ? "受取済み" : "無効" }
           </Badge>
         </div>
         <p className="text-body-md text-muted-foreground mb-4">
@@ -103,17 +113,23 @@ export default function TicketDetailPage() {
         <div className="space-y-2 p-4 rounded-md bg-card">
           <div className="flex items-center">
             <p className="font-medium !text-tertiary-foreground">発行枚数:</p>
-            <p className="ml-2">{ ticketClaimLink.qty }</p>
+            <p className="ml-2">{ qty }</p>
           </div>
           <div className="flex items-center">
             <p className="font-medium !text-tertiary-foreground">発行日時:</p>
             <p className="ml-2">{ displayDatetime(ticketClaimLink.createdAt) }</p>
           </div>
           { ticketClaimLink.claimedAt && (
-            <div className="flex items-center">
-              <p className="font-medium !text-tertiary-foreground">使用された日時:</p>
-              <p className="ml-2">{ displayDatetime(ticketClaimLink.claimedAt) }</p>
-            </div>
+            <>
+              <div className="flex items-center">
+                <p className="font-medium !text-tertiary-foreground">受取日時:</p>
+                <p className="ml-2">{ displayDatetime(ticketClaimLink.claimedAt) }</p>
+              </div>
+              <div className="flex items-center">
+                <p className="font-medium !text-tertiary-foreground">受け取った人:</p>
+                <p className="ml-2">{ displayMultipleUsers(uniqueRecipientNames, 1) }</p>
+              </div>
+            </>
           ) }
         </div>
       </CardWrapper>

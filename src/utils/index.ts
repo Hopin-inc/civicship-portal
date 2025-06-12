@@ -45,6 +45,17 @@ export const displayPhoneNumber = (phoneNumber: string) => {
   );
 };
 
+export const displayMultipleUsers = (names: string[], numDisplayed: number = 1, blankText: string = "なし") => {
+  if (names.length === 0) return blankText;
+  const numHidden = names.length - numDisplayed;
+  const displayedNames = names.slice(0, numDisplayed);
+  let result = displayedNames.join(", ");
+  if (numHidden > 0) {
+    result += ` ほか${ numHidden }名`;
+  }
+  return result;
+}
+
 export const wait = async (seconds: number) => {
   return new Promise((resolve) => setTimeout(resolve, 1_000 * seconds));
 };
