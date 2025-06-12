@@ -175,7 +175,7 @@ function OpportunityImageSlider({
       <div className="embla h-full relative" ref={emblaRef}>
         <div className="embla__container h-full">
           {slideImages.map((img, index) => (
-            <div key={index} className="embla__slide relative h-full w-full flex-[0_0_100%]">
+            <div key={index} className="embla__slide relative h-[70vh] w-full flex-[0_0_100%]">
               <Image
                 src={img ?? PLACEHOLDER_IMAGE}
                 alt={`${title} - ${index + 1}`}

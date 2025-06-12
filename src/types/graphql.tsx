@@ -4271,6 +4271,18 @@ export type GqlGetReservationQuery = {
         updatedAt?: Date | null;
         issuedAt?: Date | null;
       } | null;
+      ticketStatusHistories?: Array<{
+        __typename?: "TicketStatusHistory";
+        id: string;
+        reason: GqlTicketStatusReason;
+        status: GqlTicketStatus;
+        ticket?: {
+          __typename?: "Ticket";
+          id: string;
+          reason: GqlTicketStatusReason;
+          status: GqlTicketStatus;
+        } | null;
+      }> | null;
     }> | null;
   } | null;
 };
@@ -8088,6 +8100,16 @@ export const GetReservationDocument = gql`
         }
         evaluation {
           ...EvaluationFields
+        }
+        ticketStatusHistories {
+          id
+          reason
+          status
+          ticket {
+            id
+            reason
+            status
+          }
         }
       }
     }
