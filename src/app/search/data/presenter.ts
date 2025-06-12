@@ -67,20 +67,20 @@ export const groupOpportunitiesByDate = (
     const node = edge?.node;
     if (!node || !node.slots || node.slots.length === 0) return acc;
 
-    const matchedSlot = node.slots.find((slot) => {
+    const matchedSlots = node.slots.filter((slot) => {
       const start = new Date(slot.startsAt);
       if (dateRange?.gte && start < dateRange.gte) return false;
       return !(dateRange?.lte && start > dateRange.lte);
     });
 
-    if (!matchedSlot) return acc;
+    matchedSlots.forEach((slot) => {
+      const dateKey = format(new Date(slot.startsAt), "yyyy-MM-dd");
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
+      }
+      acc[dateKey].push(mapNodeToCardProps(node));
+    });
 
-    const dateKey = format(new Date(matchedSlot.startsAt), "yyyy-MM-dd");
-
-    if (!acc[dateKey]) {
-      acc[dateKey] = [];
-    }
-    acc[dateKey].push(mapNodeToCardProps(node));
     return acc;
   }, {});
 };
