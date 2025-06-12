@@ -29,9 +29,7 @@ const fallbackConnection: GqlOpportunitiesConnection = {
   totalCount: 0,
 };
 
-export const useActivities = (options?: {
-  initialData?: GqlOpportunitiesConnection;
-}): UseActivitiesResult => {
+export const useActivities = (): UseActivitiesResult => {
   const { data, loading, error, fetchMore, refetch } = useGetOpportunitiesQuery({
     variables: {
       filter: {
@@ -39,7 +37,7 @@ export const useActivities = (options?: {
         publishStatus: [GqlPublishStatus.Public],
       },
       sort: {
-        earliestSlotStartsAt: GqlSortDirection.Desc,
+        earliestSlotStartsAt: GqlSortDirection.Asc,
       },
       first: 20,
     },
@@ -48,7 +46,7 @@ export const useActivities = (options?: {
     notifyOnNetworkStatusChange: true,
   });
 
-  const opportunities = data?.opportunities ?? options?.initialData ?? fallbackConnection;
+  const opportunities = data?.opportunities ?? fallbackConnection;
   const endCursor = opportunities.pageInfo?.endCursor;
   const hasNextPage = opportunities.pageInfo?.hasNextPage ?? false;
 
@@ -62,10 +60,10 @@ export const useActivities = (options?: {
           publishStatus: [GqlPublishStatus.Public],
         },
         sort: {
-          earliestSlotStartsAt: GqlSortDirection.Desc,
+          earliestSlotStartsAt: GqlSortDirection.Asc,
         },
         cursor: endCursor,
-        first: 20,
+        first: 10,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult || !prev.opportunities || !fetchMoreResult.opportunities) {
@@ -76,7 +74,13 @@ export const useActivities = (options?: {
           ...prev,
           opportunities: {
             ...prev.opportunities,
-            edges: [...prev.opportunities.edges, ...fetchMoreResult.opportunities.edges],
+            edges: [
+              ...new Map(
+                [...prev.opportunities.edges, ...fetchMoreResult.opportunities.edges].map(
+                  (edge) => [edge?.node?.id, edge],
+                ),
+              ).values(),
+            ],
             pageInfo: fetchMoreResult.opportunities.pageInfo,
           },
         };
