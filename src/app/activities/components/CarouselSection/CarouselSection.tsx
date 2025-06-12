@@ -36,8 +36,12 @@ const ActivitiesCarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
         <h2 className="text-display-md">{title}</h2>
       )}
       <div className="mt-4 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-        {opportunities.map((opportunity) => (
-          <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} isCarousel />
+        {opportunities.map((opportunity, index) => (
+          <OpportunityCardVertical
+            key={`${opportunity.id}_${index}`}
+            opportunity={opportunity}
+            isCarousel
+          />
         ))}
       </div>
     </section>
