@@ -10,11 +10,13 @@ import {
   GqlSortDirection,
   GqlPageInfo
 } from "@/types/graphql";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export type GqlTicketClaimLinksQueryVariables = {
   filter?: {
     status?: GqlClaimLinkStatus;
     issuerId?: string;
+    issuedTo?: string;
     hasAvailableTickets?: boolean;
   };
   sort?: {
@@ -116,6 +118,7 @@ const fallbackConnection = {
 };
 
 export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
+  const { user } = useAuth();
   const { data, loading, error, fetchMore, refetch } = useQuery<
     GqlTicketClaimLinksQuery,
     GqlTicketClaimLinksQueryVariables
@@ -123,6 +126,7 @@ export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
     variables: {
       filter: {
         hasAvailableTickets: true,
+        issuedTo: user?.id ?? undefined,
       },
       sort: {
         createdAt: "desc" as GqlSortDirection,
