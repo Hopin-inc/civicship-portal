@@ -6,6 +6,7 @@ import ActivitiesListSection from "./ListSection/ListSection";
 import { mapOpportunityCards } from "../data/presenter";
 import ErrorState from "@/components/shared/ErrorState";
 import EmptyState from "@/components/shared/EmptyState";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function ActivitiesPageClient() {
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
@@ -26,6 +27,12 @@ export default function ActivitiesPageClient() {
   //     </div>
   //   );
   // }
+
+  const headerConfig = {
+    showLogo: true,
+    showSearchForm: true,
+  };
+  useHeaderConfig(headerConfig);
 
   if (error) {
     return <ErrorState title="募集一覧を読み込めませんでした" refetchRef={refetchRef} />;
