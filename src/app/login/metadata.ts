@@ -1,24 +1,24 @@
 import { Metadata } from "next";
-import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
+import { DEFAULT_OPEN_GRAPH_IMAGE, currentCommunityConfig } from "@/lib/communities/metadata";
 
 export const metadata: Metadata = {
-  title: "NEO四国88祭 - ログイン",
-  description: "ログインして、あなただけのNEO四国88祭を。",
+  title: `${currentCommunityConfig.title} - ログイン`,
+  description: "ログインして、あなただけの" + currentCommunityConfig.title + "を。",
   openGraph: {
-    title: "NEO四国88祭 - ログイン",
-    description: "ログインして、あなただけのNEO四国88祭を。",
-    url: "https://www.neo88.app/login",
+    title: `${currentCommunityConfig.title} - ログイン`,
+    description: "ログインして、あなただけの" + currentCommunityConfig.title + "を。",
+    url: `${currentCommunityConfig.domain}/login`,
     type: "website",
     locale: "ja_JP",
     images: DEFAULT_OPEN_GRAPH_IMAGE,
   },
   twitter: {
     card: "summary_large_image",
-    title: "NEO四国88祭 - ログイン",
-    description: "ログインして、あなただけのNEO四国88祭を。",
+    title: `${currentCommunityConfig.title} - ログイン`,
+    description: "ログインして、あなただけの" + currentCommunityConfig.title + "を。",
     images: DEFAULT_OPEN_GRAPH_IMAGE,
   },
   alternates: {
-    canonical: "https://www.neo88.app/login",
+    canonical: `${currentCommunityConfig.domain}/login`,
   },
 };

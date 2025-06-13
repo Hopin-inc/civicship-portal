@@ -5,11 +5,12 @@ import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function OpenInBrowser() {
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next");
-  const baseUrl = "https://www.neo88.app/sign-up/phone-verification";
+  const baseUrl = `${currentCommunityConfig.domain}/sign-up/phone-verification`;
   const COPY_URL = nextParam ? `${baseUrl}?next=${nextParam}` : baseUrl;
 
   useEffect(() => {

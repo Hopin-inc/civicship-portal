@@ -14,6 +14,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { logger } from "@/lib/logging";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -99,7 +100,7 @@ export default function LoginPage() {
       <div className="w-full max-w-mobile-l">
         <div className="space-y-3 mb-10">
           <div className="text-body-md mb-6">
-            <strong className="font-bold">NEO88四国祭</strong>
+            <strong className="font-bold">{currentCommunityConfig.title}</strong>
             を利用するにはLINEでログインして下さい
           </div>
           <div className="space-y-3">

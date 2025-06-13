@@ -21,7 +21,7 @@ import { errorMessages } from "@/utils/errorMessage";
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { GqlOpportunityCategory } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
 
 export default function ConfirmPage() {
@@ -95,7 +95,7 @@ export default function ConfirmPage() {
         toast.error(message);
         logger.error("Reservation failed", {
           code: result.code,
-          component: "ReservationConfirmPage"
+          component: "ReservationConfirmPage",
         });
       }
       return;
