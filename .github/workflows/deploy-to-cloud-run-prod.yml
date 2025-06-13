@@ -65,7 +65,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest . \
-            --build-arg NEXT_PUBLIC_COMMUNITY_ID=${{ env.NEXT_PUBLIC_COMMUNITY_ID }}
+            --build-arg NEXT_PUBLIC_COMMUNITY_ID=${{ env.NEXT_PUBLIC_COMMUNITY_ID }} \
             --build-arg NEXT_PUBLIC_LIFF_ID=${{ env.NEXT_PUBLIC_LIFF_ID }} \
             --build-arg NEXT_PUBLIC_LINE_CLIENT=${{ env.NEXT_PUBLIC_LINE_CLIENT }} \
             --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ env.NEXT_PUBLIC_FIREBASE_PROJECT_ID }} \
