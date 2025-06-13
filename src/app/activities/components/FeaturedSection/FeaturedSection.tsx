@@ -20,7 +20,7 @@ export default function ActivitiesFeaturedSection({
   const firstTitle = opportunities[0]?.title ?? "";
 
   return (
-    <section className="relative h-[70vh] w-full overflow-hidden mb-12">
+    <section className="relative h-[70vh] w-full overflow-hidden mb-12 mt-0">
       <HeroHeader />
       <OpportunityImageSSR image={firstImage} title={firstTitle} />
       <ActivitiesFeaturedSliderWrapper opportunities={opportunities} />
