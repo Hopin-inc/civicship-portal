@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 type LoginModalProps = {
   isOpen: boolean;
@@ -59,7 +60,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
       >
         <SheetTitle className={"text-body-md mb-4"}>
           <div className="text-body-md mb-6">
-            <strong className="font-bold">NEO88四国祭</strong>
+            <strong className="font-bold">{currentCommunityConfig.title}</strong>
             を利用するにはLINEでログインして下さい
           </div>
         </SheetTitle>

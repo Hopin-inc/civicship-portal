@@ -5,7 +5,7 @@ import {
   useReservationAcceptMutation,
 } from "@/types/graphql";
 import { toast } from "sonner";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useRouter } from "next/navigation";
 

@@ -7,8 +7,11 @@ import {
   GqlPlace,
   GqlPublishStatus,
 } from "@/types/graphql";
-import { fallbackMetadata } from "@/lib/metadata/notFound";
-import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
+import {
+  fallbackMetadata,
+  DEFAULT_OPEN_GRAPH_IMAGE,
+  currentCommunityConfig,
+} from "@/lib/communities/metadata";
 
 export const generateMetadata = async ({
   params,
@@ -22,13 +25,13 @@ export const generateMetadata = async ({
   const placeDetail = presenterPlaceDetailForMetadata(place);
 
   return {
-    title: `${placeDetail.name} | NEO四国88祭`,
+    title: `${placeDetail.name} | ${currentCommunityConfig.title}`,
     description: placeDetail.bio,
     openGraph: {
       title: placeDetail.name,
       description: placeDetail.bio,
       type: "article",
-      url: `https://www.neo88.app/places/${id}`,
+      url: `${currentCommunityConfig.domain}/places/${id}`,
       images: placeDetail.images.length
         ? placeDetail.images.map((url) => ({
             url,
@@ -39,7 +42,7 @@ export const generateMetadata = async ({
         : DEFAULT_OPEN_GRAPH_IMAGE,
     },
     alternates: {
-      canonical: `https://www.neo88.app/places/${id}`,
+      canonical: `${currentCommunityConfig.domain}/places/${id}`,
     },
   };
 };

@@ -7,6 +7,7 @@ import Image from "next/image";
 import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCurrentRegionName } from "@/lib/communities/metadata";
 
 interface FeaturedSectionProps {
   opportunities: ActivityCard[];
@@ -72,7 +73,7 @@ export default function ActivitiesFeaturedSection({
     <section className="relative h-[70vh] w-full overflow-hidden [&]:mt-0 mb-12">
       <div className="absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/60 to-transparent pt-16 pb-10 px-6 text-white">
         <h1 className="text-4xl font-bold leading-tight">
-          四国にふれる
+          {getCurrentRegionName()}にふれる
           <br />
           わたし、ふるえる
         </h1>

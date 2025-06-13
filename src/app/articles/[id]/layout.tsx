@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   GetArticleDocument,
   GqlArticle,
@@ -7,9 +7,8 @@ import {
   GqlGetArticleQueryVariables,
 } from "@/types/graphql";
 import { apolloClient } from "@/lib/apollo";
-import { fallbackMetadata } from "@/lib/metadata/notFound";
+import { fallbackMetadata, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
 import React from "react";
-import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
 
 type Props = {
   params: { id: string };

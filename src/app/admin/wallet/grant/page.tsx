@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlUser, useGetMemberWalletsQuery } from "@/types/graphql";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
 import UserSelectStep from "./components/UserSelectStep";

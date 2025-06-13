@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   GetOpportunityDocument,
   GqlGetOpportunityQuery,
@@ -7,9 +7,8 @@ import {
   GqlOpportunity,
 } from "@/types/graphql";
 import { apolloClient } from "@/lib/apollo";
-import { fallbackMetadata } from "@/lib/metadata/notFound";
+import { fallbackMetadata, currentCommunityMetadata } from "@/lib/communities/metadata";
 import React from "react";
-import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/metadata/defalut";
 
 type Props = {
   params: { id: string };
@@ -17,19 +16,30 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const id = params.id;
-  const res = await fetchOpportunity(id, COMMUNITY_ID);
+  const communityId = COMMUNITY_ID;
+  const res = await fetchOpportunity(id, communityId);
+  const communityMetadata = currentCommunityMetadata;
 
   if (!res) return fallbackMetadata;
   const description = res.description ?? res.body;
 
+  const title = `${res.title} | ${communityMetadata.title}`;
+
+  const openGraph = communityMetadata.openGraph ?? DEFAULT_COMMUNITY_METADATA.openGraph;
+  const baseUrl = openGraph?.url ?? "https://portal.civicship.jp";
+  const siteName = openGraph?.siteName ?? communityMetadata.title;
+  const locale = openGraph?.locale ?? "ja_JP";
+  const defaultImages = openGraph?.images ?? [];
+
   return {
-    title: `${res.title} | NEO四国88祭`,
+    title,
     description,
     openGraph: {
       type: "article",
       title: res.title,
       description,
-      url: `https://www.neo88.app/activities/${id}`,
+      url: `${baseUrl}/activities/${id}`,
+      siteName,
       images:
         Array.isArray(res.images) && res.images.length > 0
           ? [
@@ -40,10 +50,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
                 alt: res.title,
               },
             ]
-          : DEFAULT_OPEN_GRAPH_IMAGE,
+          : defaultImages,
+      locale,
     },
     alternates: {
-      canonical: `https://www.neo88.app/activities/${id}`,
+      canonical: `${communityMetadata.alternates?.canonical || baseUrl}/activities/${id}`,
     },
   };
 }
