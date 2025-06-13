@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useActivities } from "../hooks/useActivities";
 import ActivitiesListSection from "./ListSection/ListSection";
 import { mapOpportunityCards } from "../data/presenter";
@@ -28,10 +28,13 @@ export default function ActivitiesPageClient() {
   //   );
   // }
 
-  const headerConfig = {
-    showLogo: true,
-    showSearchForm: true,
-  };
+  const headerConfig = useMemo(
+    () => ({
+      showLogo: true,
+      showSearchForm: true,
+    }),
+    [],
+  );
   useHeaderConfig(headerConfig);
 
   if (error) {
