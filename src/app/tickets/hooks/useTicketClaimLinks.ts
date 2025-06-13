@@ -5,10 +5,10 @@ import React from "react";
 import { gql, useQuery } from "@apollo/client";
 import { transformTicketClaimLinks } from "@/app/tickets/data/presenter";
 import { TicketClaimLink } from "@/app/tickets/data/type";
-import { 
-  GqlClaimLinkStatus, 
+import {
+  GqlClaimLinkStatus,
   GqlSortDirection,
-  GqlPageInfo 
+  GqlPageInfo
 } from "@/types/graphql";
 
 export type GqlTicketClaimLinksQueryVariables = {
@@ -77,6 +77,9 @@ const TICKET_CLAIM_LINKS_QUERY = gql`
               name
               image
             }
+          }
+          tickets {
+            status
           }
         }
         cursor

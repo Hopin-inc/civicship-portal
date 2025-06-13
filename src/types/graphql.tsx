@@ -1456,6 +1456,7 @@ export type GqlQuery = {
   states: Array<GqlState>;
   ticket?: Maybe<GqlTicket>;
   ticketClaimLink?: Maybe<GqlTicketClaimLink>;
+  ticketClaimLinks: GqlTicketClaimLinksConnection;
   ticketIssuer?: Maybe<GqlTicketIssuer>;
   ticketIssuers: GqlTicketIssuersConnection;
   ticketStatusHistories: GqlTicketStatusHistoriesConnection;
@@ -1620,6 +1621,13 @@ export type GqlQueryTicketArgs = {
 
 export type GqlQueryTicketClaimLinkArgs = {
   id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryTicketClaimLinksArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlTicketClaimLinkFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlTicketClaimLinkSortInput>;
 };
 
 export type GqlQueryTicketIssuerArgs = {
@@ -1892,6 +1900,30 @@ export type GqlTicketClaimLink = {
   qty: Scalars["Int"]["output"];
   status: GqlClaimLinkStatus;
   tickets?: Maybe<Array<GqlTicket>>;
+};
+
+export type GqlTicketClaimLinkEdge = GqlEdge & {
+  __typename?: "TicketClaimLinkEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlTicketClaimLink>;
+};
+
+export type GqlTicketClaimLinkFilterInput = {
+  hasAvailableTickets?: InputMaybe<Scalars["Boolean"]["input"]>;
+  issuerId?: InputMaybe<Scalars["ID"]["input"]>;
+  status?: InputMaybe<GqlClaimLinkStatus>;
+};
+
+export type GqlTicketClaimLinkSortInput = {
+  createdAt?: InputMaybe<GqlSortDirection>;
+  status?: InputMaybe<GqlSortDirection>;
+};
+
+export type GqlTicketClaimLinksConnection = {
+  __typename?: "TicketClaimLinksConnection";
+  edges?: Maybe<Array<Maybe<GqlTicketClaimLinkEdge>>>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type GqlTicketClaimPayload = GqlTicketClaimSuccess;
@@ -2383,6 +2415,46 @@ export type GqlWalletsConnection = {
   edges?: Maybe<Array<Maybe<GqlWalletEdge>>>;
   pageInfo: GqlPageInfo;
   totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlTicketClaimLinksQueryVariables = Exact<{
+  filter?: InputMaybe<GqlTicketClaimLinkFilterInput>;
+  sort?: InputMaybe<GqlTicketClaimLinkSortInput>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlTicketClaimLinksQuery = {
+  __typename?: "Query";
+  ticketClaimLinks: {
+    __typename?: "TicketClaimLinksConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "TicketClaimLinkEdge";
+      cursor: string;
+      node?: {
+        __typename?: "TicketClaimLink";
+        id: string;
+        status: GqlClaimLinkStatus;
+        qty: number;
+        claimedAt?: Date | null;
+        createdAt?: Date | null;
+        issuer?: {
+          __typename?: "TicketIssuer";
+          id: string;
+          owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+        } | null;
+        tickets?: Array<{ __typename?: "Ticket"; status: GqlTicketStatus }> | null;
+      } | null;
+    } | null> | null;
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
+  };
 };
 
 export type GqlCommunityFieldsFragment = {
@@ -5118,6 +5190,110 @@ export const TransactionFieldsFragmentDoc = gql`
     createdAt
   }
 `;
+export const TicketClaimLinksDocument = gql`
+  query ticketClaimLinks(
+    $filter: TicketClaimLinkFilterInput
+    $sort: TicketClaimLinkSortInput
+    $cursor: String
+    $first: Int
+  ) {
+    ticketClaimLinks(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
+      edges {
+        node {
+          id
+          status
+          qty
+          claimedAt
+          createdAt
+          issuer {
+            id
+            owner {
+              id
+              name
+              image
+            }
+          }
+          tickets {
+            status
+          }
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useTicketClaimLinksQuery__
+ *
+ * To run a query within a React component, call `useTicketClaimLinksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTicketClaimLinksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTicketClaimLinksQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useTicketClaimLinksQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlTicketClaimLinksQuery,
+    GqlTicketClaimLinksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
+    TicketClaimLinksDocument,
+    options,
+  );
+}
+export function useTicketClaimLinksLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlTicketClaimLinksQuery,
+    GqlTicketClaimLinksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
+    TicketClaimLinksDocument,
+    options,
+  );
+}
+export function useTicketClaimLinksSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
+    TicketClaimLinksDocument,
+    options,
+  );
+}
+export type TicketClaimLinksQueryHookResult = ReturnType<typeof useTicketClaimLinksQuery>;
+export type TicketClaimLinksLazyQueryHookResult = ReturnType<typeof useTicketClaimLinksLazyQuery>;
+export type TicketClaimLinksSuspenseQueryHookResult = ReturnType<
+  typeof useTicketClaimLinksSuspenseQuery
+>;
+export type TicketClaimLinksQueryResult = Apollo.QueryResult<
+  GqlTicketClaimLinksQuery,
+  GqlTicketClaimLinksQueryVariables
+>;
 export const GetCommunitiesDocument = gql`
   query GetCommunities {
     communities {
