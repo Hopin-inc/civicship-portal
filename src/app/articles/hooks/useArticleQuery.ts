@@ -4,6 +4,8 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useGetArticleQuery } from "@/types/graphql";
 
 export const useArticleQuery = (id: string) => {
+  console.log("communityId", COMMUNITY_ID);
+
   return useGetArticleQuery({
     variables: {
       id,
