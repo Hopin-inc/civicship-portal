@@ -1,6 +1,6 @@
 'use client';
 
-import { COMMUNITY_ID } from '@/utils';
+import { COMMUNITY_ID } from '@/lib/communities/metadata';
 import { useGetArticleQuery } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 

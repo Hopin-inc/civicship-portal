@@ -19,7 +19,7 @@ import {
   useGetOpportunitiesQuery,
   GqlSortDirection,
 } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useAuth } from "@/contexts/AuthProvider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckedState } from "@radix-ui/react-checkbox";

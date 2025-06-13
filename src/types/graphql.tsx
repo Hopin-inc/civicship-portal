@@ -4828,7 +4828,16 @@ export type GqlGetUtilitiesQuery = {
           images?: Array<string> | null;
           feeRequired?: number | null;
           category: GqlOpportunityCategory;
-          place?: { __typename?: "Place"; id: string; name: string } | null;
+          publishStatus: GqlPublishStatus;
+          requireApproval: boolean;
+          place?: {
+            __typename?: "Place";
+            id: string;
+            name: string;
+            address: string;
+            latitude: any;
+            longitude: any;
+          } | null;
         }> | null;
       } | null;
     } | null> | null;
@@ -9098,9 +9107,14 @@ export const GetUtilitiesDocument = gql`
             place {
               id
               name
+              address
+              latitude
+              longitude
             }
             feeRequired
             category
+            publishStatus
+            requireApproval
           }
         }
       }

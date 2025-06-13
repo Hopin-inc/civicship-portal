@@ -25,9 +25,14 @@ export const GET_UTILITIES = gql`
             place {
               id
               name
+              address
+              latitude
+              longitude
             }
             feeRequired
             category
+            publishStatus
+            requireApproval
           }
         }
       }

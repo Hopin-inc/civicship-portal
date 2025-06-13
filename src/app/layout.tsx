@@ -40,10 +40,10 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="ja">
-      <body className={font.className}>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
+    <body className={ font.className }>
+    <script
+      dangerouslySetInnerHTML={ {
+        __html: `
             if (typeof window !== 'undefined' && !window.requestIdleCallback) {
               let lastId = 0;
               const timeouts = new Map();
@@ -72,22 +72,22 @@ const RootLayout = ({
               };
             }
           `,
-          }}
-        />
-        <CookiesProvider>
-          <ApolloProvider>
-            <AuthProvider>
-              <HeaderProvider>
-                <LoadingProvider>
-                  <AnalyticsProvider />
-                  <MainContent>{children}</MainContent>
-                  <Toaster richColors className="mx-8" />
-                </LoadingProvider>
-              </HeaderProvider>
-            </AuthProvider>
-          </ApolloProvider>
-        </CookiesProvider>
-      </body>
+      } }
+    />
+    <CookiesProvider>
+      <ApolloProvider>
+        <AuthProvider>
+          <HeaderProvider>
+            <LoadingProvider>
+              <AnalyticsProvider />
+              <MainContent>{ children }</MainContent>
+              <Toaster richColors className="mx-8" />
+            </LoadingProvider>
+          </HeaderProvider>
+        </AuthProvider>
+      </ApolloProvider>
+    </CookiesProvider>
+    </body>
     </html>
   );
 };

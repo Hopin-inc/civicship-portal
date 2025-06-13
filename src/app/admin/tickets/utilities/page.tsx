@@ -8,7 +8,7 @@ import {
   GqlSortDirection,
   useGetUtilitiesQuery,
 } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/utils";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useAuth } from "@/contexts/AuthProvider";
 import CreateUtilitySheet from "./components/CreateUtilitySheet";
 import OpportunityListSheet from "./components/OpportunityListSheet";
