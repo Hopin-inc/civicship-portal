@@ -17,6 +17,10 @@ query ticketClaimLinks(
         qty
         claimedAt
         createdAt
+        tickets {
+          id
+          status
+        }
         issuer {
           id
           owner {

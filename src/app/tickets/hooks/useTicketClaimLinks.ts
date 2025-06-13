@@ -15,6 +15,7 @@ export type GqlTicketClaimLinksQueryVariables = {
   filter?: {
     status?: GqlClaimLinkStatus;
     issuerId?: string;
+    hasAvailableTickets?: boolean;
   };
   sort?: {
     createdAt?: GqlSortDirection;
@@ -117,6 +118,9 @@ export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
     GqlTicketClaimLinksQueryVariables
   >(TICKET_CLAIM_LINKS_QUERY, {
     variables: {
+      filter: {
+        hasAvailableTickets: true,
+      },
       sort: {
         createdAt: "desc" as GqlSortDirection,
       },
@@ -136,6 +140,9 @@ export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
 
     await fetchMore({
       variables: {
+        filter: {
+          hasAvailableTickets: true,
+        },
         sort: {
           createdAt: "desc",
         },

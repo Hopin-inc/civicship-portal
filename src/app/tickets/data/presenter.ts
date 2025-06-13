@@ -22,15 +22,18 @@ export const transformTickets = (data: any): Ticket[] => {
  */
 export const transformTicketClaimLinks = (connection: any): TicketClaimLink[] => {
   return (
-    connection?.edges?.map((edge: any) => ({
-      id: edge?.node?.id,
-      status: edge?.node?.status,
-      qty: edge?.node?.qty,
-      claimedAt: edge?.node?.claimedAt,
-      createdAt: edge?.node?.createdAt,
-      hostName: edge?.node?.issuer?.owner?.name || "不明",
-      hostImage: edge?.node?.issuer?.owner?.image || PLACEHOLDER_IMAGE,
-      issuer: edge?.node?.issuer,
-    })) || []
+    connection?.edges?.map((edge: any) => {
+      const availableTickets = edge?.node?.tickets?.filter((ticket: any) => ticket.status === "AVAILABLE") || [];
+      return {
+        id: edge?.node?.id,
+        status: edge?.node?.status,
+        qty: availableTickets.length,
+        claimedAt: edge?.node?.claimedAt,
+        createdAt: edge?.node?.createdAt,
+        hostName: edge?.node?.issuer?.owner?.name || "不明",
+        hostImage: edge?.node?.issuer?.owner?.image || PLACEHOLDER_IMAGE,
+        issuer: edge?.node?.issuer,
+      };
+    }) || []
   );
 };
