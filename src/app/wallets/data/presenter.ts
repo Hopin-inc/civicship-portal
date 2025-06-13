@@ -9,6 +9,8 @@ export const presenterUserAsset = (wallet: GqlWallet | undefined | null): UserAs
 
   const tickets: AvailableTicket[] = (wallet?.tickets ?? []).map((ticket) => ({
     id: ticket.id,
+    status: ticket.status,
+    reason: ticket.reason,
   }));
 
   return {
