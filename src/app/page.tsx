@@ -31,7 +31,16 @@ export default function HomePage() {
 
     if (isReturnFromLineAuth) {
       let cleanedNextPath = nextPath;
-      if (nextPath?.startsWith("/login?next=")) {
+      
+      if (nextPath?.includes("?next=")) {
+        try {
+          const url = new URL(`https://dummy.com${nextPath}`);
+          cleanedNextPath = url.searchParams.get("next");
+        } catch {
+          const nextMatch = nextPath.match(/[?&]next=([^&]*)/);
+          cleanedNextPath = nextMatch ? decodeURIComponent(nextMatch[1]) : null;
+        }
+      } else if (nextPath?.startsWith("/login?next=")) {
         const urlParams = new URLSearchParams(nextPath.split("?")[1]);
         cleanedNextPath = urlParams.get("next");
       } else if (nextPath?.startsWith("/login")) {

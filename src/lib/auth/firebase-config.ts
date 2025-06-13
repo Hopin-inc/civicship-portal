@@ -20,40 +20,24 @@ export const phoneApp = initializeApp(firebaseConfig, "phone-auth-app");
 export const phoneAuth: Auth = getAuth(phoneApp);
 phoneAuth.tenantId = null;
 
-let analytics: Analytics | undefined;
+let analyticsInstance: Analytics | undefined;
 
-const isBrowser = typeof window !== "undefined";
-const isAnalyticsEnabled = isBrowser && process.env.NODE_ENV === "production";
+export const getFirebaseAnalytics = async (): Promise<Analytics | undefined> => {
+  const isBrowser = typeof window !== "undefined";
+  if (!isBrowser || process.env.NODE_ENV !== "production") return;
 
-if (isAnalyticsEnabled) {
-  isSupported()
-    .then((supported) => {
-      if (supported) {
-        analytics = getAnalytics(lineApp);
-        logger.debug("Analytics initialized", {
-          env: process.env.NODE_ENV,
-          component: "FirebaseConfig",
-        });
-      } else {
-        logger.debug("Analytics not supported in this browser", {
-          component: "FirebaseConfig",
-        });
-      }
-    })
-    .catch((e) => {
-      logger.error("Error initializing Analytics", {
-        error: e instanceof Error ? e.message : String(e),
-        component: "FirebaseConfig",
-      });
-    });
-} else {
-  logger.warn("Analytics disabled", {
-    env: process.env.NODE_ENV,
-    component: "FirebaseConfig",
-  });
-}
+  if (!analyticsInstance) {
+    const supported = await isSupported();
+    if (supported) {
+      analyticsInstance = getAnalytics(lineApp);
+      logger.debug("Analytics initialized", { component: "FirebaseConfig" });
+    }
+  }
 
-export { analytics };
+  return analyticsInstance;
+};
+
+export const analytics = await getFirebaseAnalytics();
 
 /**
  * Firebase認証エラーを分類する

@@ -39,7 +39,7 @@ export const useSearchResults = (
   } = useGetOpportunitiesQuery({
     variables: {
       filter,
-      first: 20,
+      first: 100,
       includeSlot: true,
       slotFilter: { hostingStatus: GqlOpportunitySlotHostingStatus.Scheduled },
       slotSort: { startsAt: GqlSortDirection.Asc },

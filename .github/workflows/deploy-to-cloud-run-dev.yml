@@ -23,6 +23,7 @@ jobs:
       LINE_SECRET: ${{ secrets.LINE_SECRET }}
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
       ENV: ${{ secrets. ENV }}
+      NEXT_PUBLIC_COMMUNITY_ID: ${{ secrets.NEXT_PUBLIC_COMMUNITY_ID }}
       NEXT_PUBLIC_LIFF_ID: ${{ secrets.NEXT_PUBLIC_LIFF_ID }}
       NEXT_PUBLIC_LINE_CLIENT: ${{ secrets.NEXT_PUBLIC_LINE_CLIENT }}
       NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
@@ -34,7 +35,6 @@ jobs:
       NEXT_PUBLIC_API_ENDPOINT: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT }}
       NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT: ${{ secrets.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }}
       NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
-      NEXT_PUBLIC_COMMUNITY_ID: ${{ secrets.NEXT_PUBLIC_COMMUNITY_ID }}
 
     steps:
       - name: Checkout code
@@ -66,6 +66,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest . \
+            --build-arg NEXT_PUBLIC_COMMUNITY_ID=${{ env.NEXT_PUBLIC_COMMUNITY_ID }} \
             --build-arg NEXT_PUBLIC_LIFF_ID=${{ env.NEXT_PUBLIC_LIFF_ID }} \
             --build-arg NEXT_PUBLIC_LINE_CLIENT=${{ env.NEXT_PUBLIC_LINE_CLIENT }} \
             --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ env.NEXT_PUBLIC_FIREBASE_PROJECT_ID }} \
@@ -77,7 +78,6 @@ jobs:
             --build-arg NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }} \
             --build-arg NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT=${{ env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }} \
             --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }} \
-            --build-arg NEXT_PUBLIC_COMMUNITY_ID=${{ env.NEXT_PUBLIC_COMMUNITY_ID }}
 
       - name: Push Docker image to Artifact Registry
         run: |

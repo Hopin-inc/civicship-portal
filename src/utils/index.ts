@@ -9,12 +9,14 @@ dayjs.extend(relativeTime);
 
 export const PLACEHOLDER_IMAGE = `/communities/${COMMUNITY_ID}/placeholder.jpg`;
 
+
 const YEAR_FMT = "YYYY年";
 const MONTH_DATE_FMT = "M月D日(ddd)";
 const TIME_FMT = "H:mm";
 const FULL_FMT = `${YEAR_FMT}${MONTH_DATE_FMT} ${TIME_FMT}`;
 
-export const displayDatetime = (date: Date | string, format: string = "YYYY-MM-DD HH:mm") => {
+export const displayDatetime = (date: Date | string | null | undefined, format: string = FULL_FMT, nullString: string = "未設定") => {
+  if (!date) return nullString;
   return dayjs(date).format(format);
 };
 
@@ -42,6 +44,17 @@ export const displayPhoneNumber = (phoneNumber: string) => {
     "JP",
   );
 };
+
+export const displayMultipleUsers = (names: string[], numDisplayed: number = 1, blankText: string = "なし") => {
+  if (names.length === 0) return blankText;
+  const numHidden = names.length - numDisplayed;
+  const displayedNames = names.slice(0, numDisplayed);
+  let result = displayedNames.join(", ");
+  if (numHidden > 0) {
+    result += ` ほか${ numHidden }名`;
+  }
+  return result;
+}
 
 export const wait = async (seconds: number) => {
   return new Promise((resolve) => setTimeout(resolve, 1_000 * seconds));

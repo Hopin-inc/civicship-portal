@@ -1456,6 +1456,7 @@ export type GqlQuery = {
   states: Array<GqlState>;
   ticket?: Maybe<GqlTicket>;
   ticketClaimLink?: Maybe<GqlTicketClaimLink>;
+  ticketClaimLinks: GqlTicketClaimLinksConnection;
   ticketIssuer?: Maybe<GqlTicketIssuer>;
   ticketIssuers: GqlTicketIssuersConnection;
   ticketStatusHistories: GqlTicketStatusHistoriesConnection;
@@ -1620,6 +1621,13 @@ export type GqlQueryTicketArgs = {
 
 export type GqlQueryTicketClaimLinkArgs = {
   id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryTicketClaimLinksArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlTicketClaimLinkFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlTicketClaimLinkSortInput>;
 };
 
 export type GqlQueryTicketIssuerArgs = {
@@ -1892,6 +1900,31 @@ export type GqlTicketClaimLink = {
   qty: Scalars["Int"]["output"];
   status: GqlClaimLinkStatus;
   tickets?: Maybe<Array<GqlTicket>>;
+};
+
+export type GqlTicketClaimLinkEdge = GqlEdge & {
+  __typename?: "TicketClaimLinkEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlTicketClaimLink>;
+};
+
+export type GqlTicketClaimLinkFilterInput = {
+  hasAvailableTickets?: InputMaybe<Scalars["Boolean"]["input"]>;
+  issuedTo?: InputMaybe<Scalars["ID"]["input"]>;
+  issuerId?: InputMaybe<Scalars["ID"]["input"]>;
+  status?: InputMaybe<GqlClaimLinkStatus>;
+};
+
+export type GqlTicketClaimLinkSortInput = {
+  createdAt?: InputMaybe<GqlSortDirection>;
+  status?: InputMaybe<GqlSortDirection>;
+};
+
+export type GqlTicketClaimLinksConnection = {
+  __typename?: "TicketClaimLinksConnection";
+  edges?: Maybe<Array<Maybe<GqlTicketClaimLinkEdge>>>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type GqlTicketClaimPayload = GqlTicketClaimSuccess;
@@ -2383,6 +2416,46 @@ export type GqlWalletsConnection = {
   edges?: Maybe<Array<Maybe<GqlWalletEdge>>>;
   pageInfo: GqlPageInfo;
   totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlTicketClaimLinksQueryVariables = Exact<{
+  filter?: InputMaybe<GqlTicketClaimLinkFilterInput>;
+  sort?: InputMaybe<GqlTicketClaimLinkSortInput>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlTicketClaimLinksQuery = {
+  __typename?: "Query";
+  ticketClaimLinks: {
+    __typename?: "TicketClaimLinksConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "TicketClaimLinkEdge";
+      cursor: string;
+      node?: {
+        __typename?: "TicketClaimLink";
+        id: string;
+        status: GqlClaimLinkStatus;
+        qty: number;
+        claimedAt?: Date | null;
+        createdAt?: Date | null;
+        issuer?: {
+          __typename?: "TicketIssuer";
+          id: string;
+          owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+        } | null;
+        tickets?: Array<{ __typename?: "Ticket"; status: GqlTicketStatus }> | null;
+      } | null;
+    } | null> | null;
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
+  };
 };
 
 export type GqlCommunityFieldsFragment = {
@@ -4283,6 +4356,18 @@ export type GqlGetReservationQuery = {
         updatedAt?: Date | null;
         issuedAt?: Date | null;
       } | null;
+      ticketStatusHistories?: Array<{
+        __typename?: "TicketStatusHistory";
+        id: string;
+        reason: GqlTicketStatusReason;
+        status: GqlTicketStatus;
+        ticket?: {
+          __typename?: "Ticket";
+          id: string;
+          reason: GqlTicketStatusReason;
+          status: GqlTicketStatus;
+        } | null;
+      }> | null;
     }> | null;
   } | null;
 };
@@ -4487,6 +4572,39 @@ export type GqlTicketFieldsFragment = {
   status: GqlTicketStatus;
 };
 
+export type GqlTicketIssueMutationVariables = Exact<{
+  input: GqlTicketIssueInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlTicketIssueMutation = {
+  __typename?: "Mutation";
+  ticketIssue?: {
+    __typename?: "TicketIssueSuccess";
+    issue: {
+      __typename?: "TicketIssuer";
+      id: string;
+      qtyToBeIssued: number;
+      claimLink?: {
+        __typename?: "TicketClaimLink";
+        id: string;
+        qty: number;
+        status: GqlClaimLinkStatus;
+        claimedAt?: Date | null;
+      } | null;
+      utility?: {
+        __typename?: "Utility";
+        id: string;
+        name?: string | null;
+        description?: string | null;
+        images?: Array<string> | null;
+        publishStatus: GqlPublishStatus;
+        pointsRequired: number;
+      } | null;
+    };
+  } | null;
+};
+
 export type GqlTicketClaimMutationVariables = Exact<{
   input: GqlTicketClaimInput;
 }>;
@@ -4499,16 +4617,58 @@ export type GqlTicketClaimMutation = {
   } | null;
 };
 
-export type GqlGetTicketsQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetTicketsQueryVariables = Exact<{
+  filter?: InputMaybe<GqlTicketFilterInput>;
+  sort?: InputMaybe<GqlTicketSortInput>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
 
 export type GqlGetTicketsQuery = {
   __typename?: "Query";
   tickets: {
     __typename?: "TicketsConnection";
     totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
     edges?: Array<{
       __typename?: "TicketEdge";
-      node?: { __typename?: "Ticket"; id: string } | null;
+      cursor: string;
+      node?: {
+        __typename?: "Ticket";
+        id: string;
+        reason: GqlTicketStatusReason;
+        status: GqlTicketStatus;
+        claimLink?: {
+          __typename?: "TicketClaimLink";
+          id: string;
+          qty: number;
+          status: GqlClaimLinkStatus;
+          claimedAt?: Date | null;
+          issuer?: {
+            __typename?: "TicketIssuer";
+            id: string;
+            qtyToBeIssued: number;
+            owner?: {
+              __typename?: "User";
+              id: string;
+              name: string;
+              image?: string | null;
+              bio?: string | null;
+              currentPrefecture?: GqlCurrentPrefecture | null;
+              phoneNumber?: string | null;
+              urlFacebook?: string | null;
+              urlInstagram?: string | null;
+              urlX?: string | null;
+            } | null;
+          } | null;
+        } | null;
+      } | null;
     } | null> | null;
   };
 };
@@ -4540,27 +4700,62 @@ export type GqlTicketClaimLinkQuery = {
     __typename?: "TicketClaimLink";
     qty: number;
     status: GqlClaimLinkStatus;
+    createdAt?: Date | null;
+    claimedAt?: Date | null;
     issuer?: {
       __typename?: "TicketIssuer";
+      qtyToBeIssued: number;
       owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+      utility?: {
+        __typename?: "Utility";
+        name?: string | null;
+        description?: string | null;
+      } | null;
     } | null;
+    tickets?: Array<{
+      __typename?: "Ticket";
+      wallet?: {
+        __typename?: "Wallet";
+        user?: { __typename?: "User"; id: string; name: string } | null;
+      } | null;
+    }> | null;
   } | null;
 };
 
-export type GqlGetTicketIssuersQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetTicketIssuersQueryVariables = Exact<{
+  filter?: InputMaybe<GqlTicketIssuerFilterInput>;
+  sort?: InputMaybe<GqlTicketIssuerSortInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
 
 export type GqlGetTicketIssuersQuery = {
   __typename?: "Query";
   ticketIssuers: {
     __typename?: "TicketIssuersConnection";
     totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
     edges?: Array<{
       __typename?: "TicketIssuerEdge";
+      cursor: string;
       node?: {
         __typename?: "TicketIssuer";
         id: string;
         qtyToBeIssued: number;
         createdAt?: Date | null;
+        utility?: { __typename?: "Utility"; id: string; name?: string | null } | null;
+        claimLink?: {
+          __typename?: "TicketClaimLink";
+          id: string;
+          qty: number;
+          status: GqlClaimLinkStatus;
+          claimedAt?: Date | null;
+        } | null;
         owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
       } | null;
     } | null> | null;
@@ -4577,16 +4772,74 @@ export type GqlUtilityFieldsFragment = {
   pointsRequired: number;
 };
 
-export type GqlGetUtilitiesQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlCreateUtilityMutationVariables = Exact<{
+  input: GqlUtilityCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlCreateUtilityMutation = {
+  __typename?: "Mutation";
+  utilityCreate?: {
+    __typename?: "UtilityCreateSuccess";
+    utility: {
+      __typename?: "Utility";
+      id: string;
+      name?: string | null;
+      description?: string | null;
+      images?: Array<string> | null;
+      publishStatus: GqlPublishStatus;
+      pointsRequired: number;
+    };
+  } | null;
+};
+
+export type GqlGetUtilitiesQueryVariables = Exact<{
+  filter?: InputMaybe<GqlUtilityFilterInput>;
+  sort?: InputMaybe<GqlUtilitySortInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
 
 export type GqlGetUtilitiesQuery = {
   __typename?: "Query";
   utilities: {
     __typename?: "UtilitiesConnection";
     totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
     edges?: Array<{
       __typename?: "UtilityEdge";
-      node?: { __typename?: "Utility"; id: string; name?: string | null } | null;
+      cursor: string;
+      node?: {
+        __typename?: "Utility";
+        id: string;
+        name?: string | null;
+        description?: string | null;
+        pointsRequired: number;
+        requiredForOpportunities?: Array<{
+          __typename?: "Opportunity";
+          id: string;
+          title: string;
+          description: string;
+          images?: Array<string> | null;
+          feeRequired?: number | null;
+          category: GqlOpportunityCategory;
+          publishStatus: GqlPublishStatus;
+          requireApproval: boolean;
+          place?: {
+            __typename?: "Place";
+            id: string;
+            name: string;
+            address: string;
+            latitude: any;
+            longitude: any;
+          } | null;
+        }> | null;
+      } | null;
     } | null> | null;
   };
 };
@@ -4947,6 +5200,110 @@ export const TransactionFieldsFragmentDoc = gql`
     createdAt
   }
 `;
+export const TicketClaimLinksDocument = gql`
+  query ticketClaimLinks(
+    $filter: TicketClaimLinkFilterInput
+    $sort: TicketClaimLinkSortInput
+    $cursor: String
+    $first: Int
+  ) {
+    ticketClaimLinks(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
+      edges {
+        node {
+          id
+          status
+          qty
+          claimedAt
+          createdAt
+          issuer {
+            id
+            owner {
+              id
+              name
+              image
+            }
+          }
+          tickets {
+            status
+          }
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useTicketClaimLinksQuery__
+ *
+ * To run a query within a React component, call `useTicketClaimLinksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTicketClaimLinksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTicketClaimLinksQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useTicketClaimLinksQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlTicketClaimLinksQuery,
+    GqlTicketClaimLinksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
+    TicketClaimLinksDocument,
+    options,
+  );
+}
+export function useTicketClaimLinksLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlTicketClaimLinksQuery,
+    GqlTicketClaimLinksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
+    TicketClaimLinksDocument,
+    options,
+  );
+}
+export function useTicketClaimLinksSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
+    TicketClaimLinksDocument,
+    options,
+  );
+}
+export type TicketClaimLinksQueryHookResult = ReturnType<typeof useTicketClaimLinksQuery>;
+export type TicketClaimLinksLazyQueryHookResult = ReturnType<typeof useTicketClaimLinksLazyQuery>;
+export type TicketClaimLinksSuspenseQueryHookResult = ReturnType<
+  typeof useTicketClaimLinksSuspenseQuery
+>;
+export type TicketClaimLinksQueryResult = Apollo.QueryResult<
+  GqlTicketClaimLinksQuery,
+  GqlTicketClaimLinksQueryVariables
+>;
 export const GetCommunitiesDocument = gql`
   query GetCommunities {
     communities {
@@ -7956,6 +8313,16 @@ export const GetReservationDocument = gql`
         evaluation {
           ...EvaluationFields
         }
+        ticketStatusHistories {
+          id
+          reason
+          status
+          ticket {
+            id
+            reason
+            status
+          }
+        }
       }
     }
   }
@@ -8211,6 +8578,64 @@ export type GetPlaceQueryHookResult = ReturnType<typeof useGetPlaceQuery>;
 export type GetPlaceLazyQueryHookResult = ReturnType<typeof useGetPlaceLazyQuery>;
 export type GetPlaceSuspenseQueryHookResult = ReturnType<typeof useGetPlaceSuspenseQuery>;
 export type GetPlaceQueryResult = Apollo.QueryResult<GqlGetPlaceQuery, GqlGetPlaceQueryVariables>;
+export const TicketIssueDocument = gql`
+  mutation ticketIssue($input: TicketIssueInput!, $permission: CheckCommunityPermissionInput!) {
+    ticketIssue(input: $input, permission: $permission) {
+      ... on TicketIssueSuccess {
+        issue {
+          id
+          qtyToBeIssued
+          claimLink {
+            ...TicketClaimLinkFields
+          }
+          utility {
+            ...UtilityFields
+          }
+        }
+      }
+    }
+  }
+  ${TicketClaimLinkFieldsFragmentDoc}
+  ${UtilityFieldsFragmentDoc}
+`;
+export type GqlTicketIssueMutationFn = Apollo.MutationFunction<
+  GqlTicketIssueMutation,
+  GqlTicketIssueMutationVariables
+>;
+
+/**
+ * __useTicketIssueMutation__
+ *
+ * To run a mutation, you first call `useTicketIssueMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTicketIssueMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [ticketIssueMutation, { data, loading, error }] = useTicketIssueMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useTicketIssueMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlTicketIssueMutation, GqlTicketIssueMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlTicketIssueMutation, GqlTicketIssueMutationVariables>(
+    TicketIssueDocument,
+    options,
+  );
+}
+export type TicketIssueMutationHookResult = ReturnType<typeof useTicketIssueMutation>;
+export type TicketIssueMutationResult = Apollo.MutationResult<GqlTicketIssueMutation>;
+export type TicketIssueMutationOptions = Apollo.BaseMutationOptions<
+  GqlTicketIssueMutation,
+  GqlTicketIssueMutationVariables
+>;
 export const TicketClaimDocument = gql`
   mutation ticketClaim($input: TicketClaimInput!) {
     ticketClaim(input: $input) {
@@ -8260,16 +8685,41 @@ export type TicketClaimMutationOptions = Apollo.BaseMutationOptions<
   GqlTicketClaimMutationVariables
 >;
 export const GetTicketsDocument = gql`
-  query GetTickets {
-    tickets {
-      edges {
-        node {
-          id
-        }
+  query GetTickets(
+    $filter: TicketFilterInput
+    $sort: TicketSortInput
+    $cursor: String
+    $first: Int
+  ) {
+    tickets(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
       }
       totalCount
+      edges {
+        cursor
+        node {
+          ...TicketFields
+          claimLink {
+            ...TicketClaimLinkFields
+            issuer {
+              id
+              qtyToBeIssued
+              owner {
+                ...UserFields
+              }
+            }
+          }
+        }
+      }
     }
   }
+  ${TicketFieldsFragmentDoc}
+  ${TicketClaimLinkFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
 `;
 
 /**
@@ -8284,6 +8734,10 @@ export const GetTicketsDocument = gql`
  * @example
  * const { data, loading, error } = useGetTicketsQuery({
  *   variables: {
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
  *   },
  * });
  */
@@ -8388,11 +8842,26 @@ export const TicketClaimLinkDocument = gql`
     ticketClaimLink(id: $id) {
       qty
       status
+      createdAt
+      claimedAt
       issuer {
         owner {
           id
           name
           image
+        }
+        utility {
+          name
+          description
+        }
+        qtyToBeIssued
+      }
+      tickets {
+        wallet {
+          user {
+            id
+            name
+          }
         }
       }
     }
@@ -8459,13 +8928,32 @@ export type TicketClaimLinkQueryResult = Apollo.QueryResult<
   GqlTicketClaimLinkQueryVariables
 >;
 export const GetTicketIssuersDocument = gql`
-  query GetTicketIssuers {
-    ticketIssuers {
+  query GetTicketIssuers(
+    $filter: TicketIssuerFilterInput
+    $sort: TicketIssuerSortInput
+    $first: Int
+  ) {
+    ticketIssuers(filter: $filter, sort: $sort, first: $first) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
       edges {
+        cursor
         node {
           id
           qtyToBeIssued
           createdAt
+          utility {
+            id
+            name
+          }
+          claimLink {
+            ...TicketClaimLinkFields
+          }
           owner {
             id
             name
@@ -8473,9 +8961,9 @@ export const GetTicketIssuersDocument = gql`
           }
         }
       }
-      totalCount
     }
   }
+  ${TicketClaimLinkFieldsFragmentDoc}
 `;
 
 /**
@@ -8490,6 +8978,9 @@ export const GetTicketIssuersDocument = gql`
  * @example
  * const { data, loading, error } = useGetTicketIssuersQuery({
  *   variables: {
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      first: // value for 'first'
  *   },
  * });
  */
@@ -8538,16 +9029,95 @@ export type GetTicketIssuersQueryResult = Apollo.QueryResult<
   GqlGetTicketIssuersQuery,
   GqlGetTicketIssuersQueryVariables
 >;
+export const CreateUtilityDocument = gql`
+  mutation CreateUtility($input: UtilityCreateInput!, $permission: CheckCommunityPermissionInput!) {
+    utilityCreate(input: $input, permission: $permission) {
+      ... on UtilityCreateSuccess {
+        utility {
+          ...UtilityFields
+        }
+      }
+    }
+  }
+  ${UtilityFieldsFragmentDoc}
+`;
+export type GqlCreateUtilityMutationFn = Apollo.MutationFunction<
+  GqlCreateUtilityMutation,
+  GqlCreateUtilityMutationVariables
+>;
+
+/**
+ * __useCreateUtilityMutation__
+ *
+ * To run a mutation, you first call `useCreateUtilityMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUtilityMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUtilityMutation, { data, loading, error }] = useCreateUtilityMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useCreateUtilityMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlCreateUtilityMutation,
+    GqlCreateUtilityMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlCreateUtilityMutation, GqlCreateUtilityMutationVariables>(
+    CreateUtilityDocument,
+    options,
+  );
+}
+export type CreateUtilityMutationHookResult = ReturnType<typeof useCreateUtilityMutation>;
+export type CreateUtilityMutationResult = Apollo.MutationResult<GqlCreateUtilityMutation>;
+export type CreateUtilityMutationOptions = Apollo.BaseMutationOptions<
+  GqlCreateUtilityMutation,
+  GqlCreateUtilityMutationVariables
+>;
 export const GetUtilitiesDocument = gql`
-  query GetUtilities {
-    utilities {
+  query GetUtilities($filter: UtilityFilterInput, $sort: UtilitySortInput, $first: Int) {
+    utilities(filter: $filter, sort: $sort, first: $first) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
       edges {
+        cursor
         node {
           id
           name
+          description
+          pointsRequired
+          requiredForOpportunities {
+            id
+            title
+            description
+            images
+            place {
+              id
+              name
+              address
+              latitude
+              longitude
+            }
+            feeRequired
+            category
+            publishStatus
+            requireApproval
+          }
         }
       }
-      totalCount
     }
   }
 `;
@@ -8564,6 +9134,9 @@ export const GetUtilitiesDocument = gql`
  * @example
  * const { data, loading, error } = useGetUtilitiesQuery({
  *   variables: {
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      first: // value for 'first'
  *   },
  * });
  */

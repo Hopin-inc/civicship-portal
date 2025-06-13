@@ -92,6 +92,7 @@ export default function ParticipationPage() {
             opportunityTitle: opportunity.title,
             category: opportunity.category,
             guest: dateTimeInfo.participantCount,
+            paidGuest: dateTimeInfo.paidParticipantCount,
             feeRequired: opportunity.feeRequired ?? 0,
             totalFee: dateTimeInfo.totalPrice,
             scheduledAt: dateTimeInfo.startTime,
@@ -152,6 +153,7 @@ export default function ParticipationPage() {
             startTime={dateTimeInfo.startTime}
             endTime={dateTimeInfo.endTime}
             participantCount={dateTimeInfo.participantCount}
+            paidParticipantCount={ dateTimeInfo.paidParticipantCount }
             totalPrice={dateTimeInfo.totalPrice}
             pricePerPerson={opportunityDetail.feeRequired ?? 0}
             location={opportunityDetail.place}

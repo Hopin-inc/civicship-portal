@@ -32,7 +32,7 @@ export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[]
     .filter((node): node is GqlOpportunity => !!node)
     .map(presenterActivityCard);
 
-export const presenterActivityCard = (node: GqlOpportunity): ActivityCard => {
+export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCard => {
   return {
     id: node?.id || "",
     title: node?.title || "",
@@ -127,6 +127,13 @@ export const presenterReservationDateTimeInfo = (
   const endDate = new Date(opportunitySlot.endsAt);
 
   const participantCount = reservation.participations?.length || 0;
+  const paidTicketIds =
+    reservation.participations
+      ?.map((p) => p.ticketStatusHistories?.map((h) => h.ticket?.id))
+      .flat()
+      .filter((ticketId) => ticketId !== undefined) ?? [];
+  const paidParticipantCount = participantCount - [...new Set(paidTicketIds)].length;
+  console.log("!!!", reservation.participations);
 
   return {
     formattedDate: startDate.toLocaleDateString("ja-JP", {
@@ -146,7 +153,8 @@ export const presenterReservationDateTimeInfo = (
       hour12: false,
     }),
     participantCount,
-    totalPrice: (opportunity.feeRequired ?? 0) * participantCount,
+    paidParticipantCount,
+    totalPrice: (opportunity.feeRequired ?? 0) * paidParticipantCount,
   };
 };
 
@@ -155,92 +163,13 @@ export const sliceActivitiesBySection = (
 ): {
   upcomingCards: ActivityCard[];
   featuredCards: ActivityCard[];
-  listCards: ActivityCard[];
 } => {
   const safe = <T>(cards: (T | undefined)[]): T[] => cards.filter((c): c is T => !!c);
-
-  const N = activityCards.length;
-
-  // Filter activities with images
   const hasImages = (card: ActivityCard) => card.images && card.images.length > 0;
 
-  if (N === 0) {
-    return { upcomingCards: [], featuredCards: [], listCards: [] };
-  }
+  const validCards = safe(activityCards.filter(hasImages));
+  const featuredCards = validCards.slice(0, 3);
+  const upcomingCards = validCards.slice(3);
 
-  const upcomingCardsWithImages: ActivityCard[] = [];
-  const upcomingCardsWithoutImages: ActivityCard[] = [];
-  const featuredCardsWithImages: ActivityCard[] = [];
-  const featuredCardsWithoutImages: ActivityCard[] = [];
-  const listCardsWithImages: ActivityCard[] = [];
-  const listCardsWithoutImages: ActivityCard[] = [];
-
-  if (N < 10) {
-    const maxUpcoming = N >= 6 ? 3 : 2;
-    const featuredHead = activityCards[0];
-
-    if (featuredHead && hasImages(featuredHead)) {
-      featuredCardsWithImages.push(featuredHead);
-    }
-
-    for (let i = 1; i <= maxUpcoming && i < N; i++) {
-      const card = activityCards[i];
-      if (card) {
-        if (hasImages(card)) {
-          upcomingCardsWithImages.push(card);
-        } else {
-          upcomingCardsWithoutImages.push(card);
-        }
-      }
-    }
-
-    for (let i = maxUpcoming + 1; i < N; i++) {
-      const card = activityCards[i];
-      if (card) {
-        if (hasImages(card)) {
-          listCardsWithImages.push(card);
-        } else {
-          listCardsWithoutImages.push(card);
-        }
-      }
-    }
-  } else {
-    const featuredHead = activityCards[0];
-
-    if (featuredHead && hasImages(featuredHead)) {
-      featuredCardsWithImages.push(featuredHead);
-    }
-
-    for (let i = 1; i < 6 && i < N; i++) {
-      const card = activityCards[i];
-      if (card) {
-        if (hasImages(card)) {
-          upcomingCardsWithImages.push(card);
-        } else {
-          upcomingCardsWithoutImages.push(card);
-        }
-      }
-    }
-
-    for (let i = 3; i < N; i++) {
-      const card = activityCards[i];
-      if (card) {
-        if (i >= 6 && i < 10 && hasImages(card)) {
-          featuredCardsWithImages.push(card);
-        } else {
-          if (hasImages(card)) {
-            listCardsWithImages.push(card);
-          } else {
-            listCardsWithoutImages.push(card);
-          }
-        }
-      }
-    }
-  }
-
-  const upcomingCards = safe([...upcomingCardsWithImages, ...upcomingCardsWithoutImages]);
-  const featuredCards = safe([...featuredCardsWithImages, ...featuredCardsWithoutImages]);
-  const listCards = safe([...listCardsWithImages, ...listCardsWithoutImages]);
-
-  return { upcomingCards, featuredCards, listCards };
+  return { featuredCards, upcomingCards };
 };

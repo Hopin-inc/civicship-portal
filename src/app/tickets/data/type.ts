@@ -6,10 +6,22 @@ export interface Ticket {
   hostImage: string;
   quantity: number;
   status: GqlTicketStatus;
-  utilityId?: string;
-  createdByUser?: {
+}
+
+export interface TicketClaimLink {
+  id: string;
+  status: string;
+  qty: number;
+  claimedAt?: Date | null;
+  createdAt?: Date | null;
+  hostName: string;
+  hostImage: string;
+  issuer?: {
     id: string;
-    name: string;
-    image: string | null;
+    owner?: {
+      id: string;
+      name: string;
+      image: string | null;
+    };
   };
-} 
+}   
