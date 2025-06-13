@@ -1,22 +1,39 @@
-import { GqlGetTicketsQuery } from "@/types/graphql";
-import { TTicket } from "@/app/tickets/data/type";
+"use client";
+
+import { Ticket, TicketClaimLink } from "@/app/tickets/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
-export const transformTickets = (data: GqlGetTicketsQuery | undefined): TTicket[] => {
-  const edges = data?.tickets.edges ?? [];
+export const transformTickets = (data: any): Ticket[] => {
+  return (
+    data?.user?.wallets?.edges?.[0]?.node?.tickets?.edges?.map((edge: any) => ({
+      id: edge?.node?.id,
+      status: edge?.node?.status,
+      hostName: edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser?.name || "不明",
+      hostImage:
+        edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser?.image ||
+        PLACEHOLDER_IMAGE,
+      quantity: 1,
+    })) || []
+  );
+};
 
-  return edges
-    .map((edge) => {
-      const node = edge?.node;
-      if (!node) return null;
-
+/**
+ * Transform TicketClaimLink data from GraphQL to display format
+ */
+export const transformTicketClaimLinks = (connection: any): TicketClaimLink[] => {
+  return (
+    connection?.edges?.map((edge: any) => {
+      const availableTickets = edge?.node?.tickets?.filter((ticket: any) => ticket.status === "AVAILABLE") || [];
       return {
-        id: node.id,
-        status: node.status,
-        hostName: node.claimLink?.issuer?.owner?.name || "不明",
-        hostImage: node.claimLink?.issuer?.owner?.image || PLACEHOLDER_IMAGE,
-        quantity: 1,
+        id: edge?.node?.id,
+        status: edge?.node?.status,
+        qty: availableTickets.length,
+        claimedAt: edge?.node?.claimedAt,
+        createdAt: edge?.node?.createdAt,
+        hostName: edge?.node?.issuer?.owner?.name || "不明",
+        hostImage: edge?.node?.issuer?.owner?.image || PLACEHOLDER_IMAGE,
+        issuer: edge?.node?.issuer,
       };
-    })
-    .filter((t): t is TTicket => t !== null); // null を除去
+    }) || []
+  );
 };

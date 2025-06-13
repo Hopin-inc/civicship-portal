@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef } from "react";
-import { useTickets } from "@/app/tickets/hooks/useTickets";
+import { useTicketClaimLinks } from "@/app/tickets/hooks/useTicketClaimLinks";
 import TicketContent from "@/app/tickets/components/TicketContent";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -18,13 +18,13 @@ export default function TicketsPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { tickets, loading, error, refetch } = useTickets();
+  const { ticketClaimLinks, loading, error, refetch, loadMoreRef, hasNextPage } = useTicketClaimLinks();
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  if (loading) {
+  if (loading && ticketClaimLinks.length === 0) {
     return <LoadingIndicator />;
   }
 
@@ -34,7 +34,12 @@ export default function TicketsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <TicketContent tickets={tickets} />
+      <TicketContent 
+        ticketClaimLinks={ticketClaimLinks} 
+        loadMoreRef={loadMoreRef} 
+        hasNextPage={hasNextPage} 
+        loading={loading} 
+      />
     </div>
   );
 }

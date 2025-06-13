@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Book, Check } from "lucide-react";
+import { Book, Ticket } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -39,14 +39,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
             )}
           >
             <Book size={24} />
-            <span className="text-xs mt-1">応募</span>
-          </Link>
-          <Link
-            href="/admin/slots"
-            className={cn(getLinkStyle("/admin/slots", "/admin/slots/*"), "flex-grow")}
-          >
-            <Check size={24} />
-            <span className="text-xs mt-1">出欠</span>
+            <span className="text-xs mt-1">予約管理</span>
           </Link>
           {/*<Link*/}
           {/*  href="/admin/settings"*/}
@@ -55,13 +48,13 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
           {/*  <Settings size={24} />*/}
           {/*  <span className="text-xs mt-1">設定</span>*/}
           {/*</Link>*/}
-          {/*<Link*/}
-          {/*  href="/admin/tickets"*/}
-          {/*  className={cn(getLinkStyle("/admin/tickets", "/admin/tickets/*"), "flex-grow")}*/}
-          {/*>*/}
-          {/*  <Ticket size={24} />*/}
-          {/*  <span className="text-xs mt-1">チケット</span>*/}
-          {/*</Link>*/}
+          <Link
+            href="/admin/tickets"
+            className={cn(getLinkStyle("/admin/tickets", "/admin/tickets/*"), "flex-grow")}
+          >
+            <Ticket size={24} />
+            <span className="text-xs mt-1">チケット発行</span>
+          </Link>
         </div>
       </div>
     </nav>

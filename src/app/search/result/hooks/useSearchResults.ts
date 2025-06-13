@@ -40,6 +40,7 @@ export const useSearchResults = (
     variables: {
       filter,
       first: 20,
+      includeSlot: true,
       slotFilter: { hostingStatus: GqlOpportunitySlotHostingStatus.Scheduled },
       slotSort: { startsAt: GqlSortDirection.Asc },
     },
@@ -82,7 +83,7 @@ export const useSearchResults = (
     if (error) {
       logger.info("Error fetching search results", {
         error: error.message || String(error),
-        component: "useSearchResults"
+        component: "useSearchResults",
       });
       toast.error("検索結果の取得に失敗しました");
     }

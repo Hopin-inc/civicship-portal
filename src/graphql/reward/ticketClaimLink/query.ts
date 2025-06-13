@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-export const VIEW_TICKET_CLAIM = gql(`
+export const VIEW_TICKET_CLAIM = gql`
   query ticketClaimLink($id: ID!) {
     ticketClaimLink(id: $id) {
       qty
@@ -15,6 +15,7 @@ export const VIEW_TICKET_CLAIM = gql(`
         }
         utility {
           name
+          description
         }
         qtyToBeIssued
       }
@@ -28,4 +29,4 @@ export const VIEW_TICKET_CLAIM = gql(`
       }
     }
   }
-`);
+`;
