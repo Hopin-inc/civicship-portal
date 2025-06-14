@@ -6,16 +6,28 @@ on:
       - feature/deploy-multi-communities
 
 jobs:
-  build-and-deploy:
+  read-communities:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
+      - name: Read community list from JSON
+        id: set-matrix
+        run: |
+          COMMUNITIES=$(jq -c '.communities' .github/config/community-list.json)
+          echo "matrix=$COMMUNITIES" >> $GITHUB_OUTPUT
+
+  build-and-deploy:
+    needs: read-communities
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        community:
-          - neo88
-          # 必要に応じて追加
+        community: ${{ fromJson(needs.read-communities.outputs.matrix) }}
     environment: kyoso-dev-${{ matrix.community }}
+    timeout-minutes: 30
 
     env:
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -23,8 +35,6 @@ jobs:
       ARTIFACT_REGISTRY: ${{ secrets.ARTIFACT_REGISTRY }}
       APPLICATION_NAME: ${{ secrets.APPLICATION_NAME }}
       NEXT_PUBLIC_COMMUNITY_ID: ${{ secrets.NEXT_PUBLIC_COMMUNITY_ID }}
-
-      # 以下もすべてクライアントごとに environment 経由で設定
       NEXT_PUBLIC_LIFF_ID: ${{ secrets.NEXT_PUBLIC_LIFF_ID }}
       NEXT_PUBLIC_LINE_CLIENT: ${{ secrets.NEXT_PUBLIC_LINE_CLIENT }}
       NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
@@ -64,7 +74,7 @@ jobs:
           gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }}
           gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
 
-      - name: Build Docker image with community id
+      - name: Build Docker image
         run: |
           docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}-${{ matrix.community }}:latest . \
             --build-arg NEXT_PUBLIC_LIFF_ID=${{ env.NEXT_PUBLIC_LIFF_ID }} \
