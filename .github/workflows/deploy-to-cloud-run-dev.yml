@@ -5,6 +5,7 @@ on:
     branches:
       - develop
       - hotfix/**
+      - fix/redirect_on_web_view  # TODO: Delete this after debug
 
 jobs:
   deploy:
