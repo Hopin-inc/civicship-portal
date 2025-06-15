@@ -40,10 +40,13 @@ export class AuthRedirectService {
   }
 
   /**
-   * 電話番号認証が必要なパスかどうかを判定
+   * ユーザー登録プロセスのパスかどうかを判定
    */
-  public isPhoneVerificationRequiredPath(pathname: string): boolean {
-    const phoneVerificationRequiredPaths = ["/sign-up"];
+  public isPathInSignUpFlow(pathname: string): boolean {
+    const phoneVerificationRequiredPaths = [
+      "/sign-up",
+      "/sign-up/phone-verification",
+    ];
     return matchPaths(pathname, ...phoneVerificationRequiredPaths);
   }
 
@@ -101,7 +104,7 @@ export class AuthRedirectService {
       }
     }
 
-    if (this.isPhoneVerificationRequiredPath(pathname)) {
+    if (this.isPathInSignUpFlow(pathname)) {
       switch (authState) {
         case "unauthenticated":
           return `/login${ nextParam }`;
