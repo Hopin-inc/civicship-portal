@@ -63,7 +63,7 @@ export class AuthRedirectService {
    */
   public getRedirectPath(pathname: string, next?: string | null): string | null {
     const authState = this.authStateManager.getState();
-    const nextParam = next ? `?next=${next}` : `?next=${pathname}`;
+    const nextParam = next ? `?next=${ next }` : `?next=${ pathname }`;
 
     if (authState === "loading") {
       return null;
@@ -89,13 +89,13 @@ export class AuthRedirectService {
     if (this.isProtectedPath(pathname)) {
       switch (authState) {
         case "unauthenticated":
-          return `/login${nextParam}`;
+          return `/login${ nextParam }`;
         case "line_authenticated":
         case "line_token_expired":
-          return `/sign-up/phone-verification${nextParam}`;
+          return `/sign-up/phone-verification${ nextParam }`;
         case "phone_authenticated":
         case "phone_token_expired":
-          return `/sign-up${nextParam}`;
+          return `/sign-up${ nextParam }`;
         default:
           return null;
       }
@@ -104,18 +104,18 @@ export class AuthRedirectService {
     if (this.isPhoneVerificationRequiredPath(pathname)) {
       switch (authState) {
         case "unauthenticated":
-          return `/login${nextParam}`;
+          return `/login${ nextParam }`;
 
         case "line_authenticated":
         case "line_token_expired":
           if (pathname !== "/sign-up/phone-verification") {
-            return `/sign-up/phone-verification${nextParam}`;
+            return `/sign-up/phone-verification${ nextParam }`;
           }
           return null; // stay here
 
         case "phone_authenticated":
           if (pathname !== "/sign-up") {
-            return `/sign-up${nextParam}`;
+            return `/sign-up${ nextParam }`;
           }
           return null; // stay here
 
@@ -130,7 +130,7 @@ export class AuthRedirectService {
 
     if (this.isAdminPath(pathname)) {
       if (authState !== "user_registered") {
-        return `/login${nextParam}`;
+        return `/login${ nextParam }`;
       }
     }
 
@@ -144,21 +144,21 @@ export class AuthRedirectService {
    */
   public getPostLineAuthRedirectPath(nextPath: string | null): string {
     const next = nextPath ? decodeURIComponent(nextPath) : null;
-    const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
+    const nextParam = next ? `?next=${ encodeURIComponent(next) }` : "";
 
     const authState = this.authStateManager.getState();
 
     switch (authState) {
       case "unauthenticated":
       case "line_token_expired":
-        return `/login${nextParam}`;
+        return `/login${ nextParam }`;
 
       case "line_authenticated":
       case "phone_token_expired":
-        return `/sign-up/phone-verification${nextParam}`;
+        return `/sign-up/phone-verification${ nextParam }`;
 
       case "phone_authenticated":
-        return `/sign-up${nextParam}`;
+        return `/sign-up${ nextParam }`;
 
       case "loading":
       case "user_registered":

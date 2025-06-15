@@ -54,14 +54,18 @@ export default function TicketReceivePage() {
   return (
     <div className="flex flex-col h-full min-h-0 px-6 py-12 justify-center overflow-y-auto">
       <TicketReceiveContent
-        user={user}
-        claimLinkData={claimLinkData!}
-        hasIssued={hasIssued}
-        isClaimLoading={isClaimLoading}
-        onClaimClick={claimTicket}
-        onLoginClick={() => setIsLoginModalOpen(true)}
+        user={ user }
+        claimLinkData={ claimLinkData! }
+        hasIssued={ hasIssued }
+        isClaimLoading={ isClaimLoading }
+        onClaimClick={ claimTicket }
+        onLoginClick={ () => setIsLoginModalOpen(true) }
       />
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      <LoginModal
+        isOpen={ isLoginModalOpen }
+        onClose={ () => setIsLoginModalOpen(false) }
+        nextPath={ window.location.pathname + window.location.search }
+      />
     </div>
   );
 }

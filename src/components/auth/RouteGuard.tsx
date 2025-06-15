@@ -46,7 +46,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       const isReturnFromLineAuth = urlParams.has("code") && urlParams.has("state") && urlParams.has("liffClientId");
       if (isReturnFromLineAuth) {
         logger.debug("RouteGuard: Skipping redirect for LINE auth return to homepage", {
-          component: "RouteGuard"
+          component: "RouteGuard",
         });
         setAuthorized(true);
         return;
@@ -54,7 +54,10 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     }
 
     const authCheck = () => {
-      const redirectPath = authRedirectService.getRedirectPath(pathname, nextParam);
+      const pathNameWithParams = searchParams.size > 0
+        ? `${ pathname }?${ searchParams.entries().map(([k, v]) => `${ k }=${ v }`).toArray().join("&") }`
+        : pathname;
+      const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, nextParam);
       if (redirectPath) {
         setAuthorized(false);
         router.replace(redirectPath);
@@ -63,12 +66,13 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       }
     };
     authCheck();
-    return () => {};
+    return () => {
+    };
   }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam]);
 
   if (loading || userLoading) {
     return <LoadingIndicator />;
   }
 
-  return authorized ? <>{children}</> : null;
+  return authorized ? <>{ children }</> : null;
 };
