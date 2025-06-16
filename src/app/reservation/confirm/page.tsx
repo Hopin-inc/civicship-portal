@@ -23,6 +23,7 @@ import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHori
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
+import { RawURIComponent } from "@/utils/path";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -68,7 +69,7 @@ export default function ConfirmPage() {
 
   if (loading) return <LoadingIndicator />;
   if (hasError)
-    return <ErrorState title="予約情報を読み込めませんでした" refetchRef={refetchRef} />;
+    return <ErrorState title="予約情報を読み込めませんでした" refetchRef={ refetchRef } />;
   if (!opportunity) return notFound();
 
   const handleConfirm = async () => {
@@ -108,19 +109,19 @@ export default function ConfirmPage() {
       reservation_id: result.reservation.id,
       guests: participationCount.toString(),
     });
-    router.push(`/reservation/complete?${query.toString()}`);
+    router.push(`/reservation/complete?${ query.toString() }`);
   };
   return (
     <>
       <main className="min-h-screen">
         <LoginModal
-          isOpen={ui.isLoginModalOpen}
-          onClose={() => ui.setIsLoginModalOpen(false)}
-          nextPath={window.location.pathname + window.location.search}
+          isOpen={ ui.isLoginModalOpen }
+          onClose={ () => ui.setIsLoginModalOpen(false) }
+          nextPath={ window.location.pathname + window.location.search as RawURIComponent }
         />
         <div className="px-6 py-4 mt-4">
           <OpportunityCardHorizontal
-            opportunity={{
+            opportunity={ {
               id: opportunity.id,
               title: opportunity.title,
               feeRequired: opportunity.feeRequired,
@@ -129,47 +130,47 @@ export default function ConfirmPage() {
               images: opportunity.images,
               location: opportunity.place.name,
               hasReservableTicket: false,
-            }}
-            withShadow={false}
+            } }
+            withShadow={ false }
           />
         </div>
         <div className="px-2">
           <ReservationDetailsCard
-            startDateTime={startDateTime}
-            endDateTime={endDateTime}
-            participantCount={participantCount}
-            location={{
+            startDateTime={ startDateTime }
+            endDateTime={ endDateTime }
+            participantCount={ participantCount }
+            location={ {
               name: opportunity?.place?.name || "",
               address: opportunity?.place?.address || "",
-            }}
-            onChange={setParticipantCount}
+            } }
+            onChange={ setParticipantCount }
           />
         </div>
-        {/*<div className="h-0.5 bg-border" />*/}
+        {/*<div className="h-0.5 bg-border" />*/ }
         <PaymentSection
-          ticketCount={ticketCounter.count}
-          onIncrement={ticketCounter.increment}
-          onDecrement={ticketCounter.decrement}
-          maxTickets={availableTickets}
-          pricePerPerson={opportunity?.feeRequired ?? null}
-          participantCount={participantCount}
-          useTickets={ui.useTickets}
-          setUseTickets={ui.setUseTickets}
+          ticketCount={ ticketCounter.count }
+          onIncrement={ ticketCounter.increment }
+          onDecrement={ ticketCounter.decrement }
+          maxTickets={ availableTickets }
+          pricePerPerson={ opportunity?.feeRequired ?? null }
+          participantCount={ participantCount }
+          useTickets={ ui.useTickets }
+          setUseTickets={ ui.setUseTickets }
         />
         <div className="mb-2" />
-        <ParticipationAge ageComment={ui.ageComment} setAgeComment={ui.setAgeComment} />
+        <ParticipationAge ageComment={ ui.ageComment } setAgeComment={ ui.setAgeComment } />
         <div className="mb-4 mt-2" />
         <NotesSection />
         <footer className="max-w-mobile-l w-full h-20 flex items-center px-4 py-6 justify-between mx-auto">
           <Button
             size="lg"
             className="mx-auto px-20"
-            onClick={handleConfirm}
+            onClick={ handleConfirm }
             disabled={
               creatingReservation || (ui.useTickets && ticketCounter.count > availableTickets)
             }
           >
-            {creatingReservation ? "申込処理中..." : "申し込みを確定"}
+            { creatingReservation ? "申込処理中..." : "申し込みを確定" }
           </Button>
         </footer>
       </main>

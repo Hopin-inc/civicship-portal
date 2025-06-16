@@ -21,8 +21,8 @@ export const matchPaths = (pathname: string, ...pathPatterns: string[]) => {
   return pathPatterns.some((path) => micromatch.isMatch(pathOnly, path));
 };
 
-export const extractSearchParamFromRelativePath = (relativePath: string, key: string): string | null => {
+export const extractSearchParamFromRelativePath = <T = string>(relativePath: string, key: string): T | null => {
   // ダミーの origin を付与して URL オブジェクトを作成
   const url = new URL(relativePath, "https://example.com");
-  return url.searchParams.get(key);
+  return url.searchParams.get(key) as T | null;
 }

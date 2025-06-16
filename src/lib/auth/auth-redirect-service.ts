@@ -151,28 +151,27 @@ export class AuthRedirectService {
    * @returns リダイレクト先のパス
    * @param nextPath
    */
-  public getPostLineAuthRedirectPath(nextPath: string | null): string {
-    const next = nextPath ? decodeURIComponent(nextPath) : null;
-    const nextParam = next ? `?next=${ encodeURIComponent(next) }` : "";
+  public getPostLineAuthRedirectPath(nextPath: RawURIComponent | null): RawURIComponent {
+    const nextParam = nextPath ? this.generateNextParam(nextPath) : "";
 
     const authState = this.authStateManager.getState();
 
     switch (authState) {
       case "unauthenticated":
       case "line_token_expired":
-        return `/login${ nextParam }`;
+        return `/login${ nextParam }` as RawURIComponent;
 
       case "line_authenticated":
       case "phone_token_expired":
-        return `/sign-up/phone-verification${ nextParam }`;
+        return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
 
       case "phone_authenticated":
-        return `/sign-up${ nextParam }`;
+        return `/sign-up${ nextParam }` as RawURIComponent;
 
       case "loading":
       case "user_registered":
       default:
-        return next ?? "/";
+        return nextPath ?? "/" as RawURIComponent;
     }
   }
 

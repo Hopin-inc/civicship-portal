@@ -10,7 +10,7 @@ import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection
 import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
-import { extractSearchParamFromRelativePath } from "@/utils/path";
+import { decodeURIComponentWithType, EncodedURIComponent, extractSearchParamFromRelativePath } from "@/utils/path";
 
 export default function HomePage() {
   const router = useRouter();
@@ -30,11 +30,11 @@ export default function HomePage() {
     const isReturnFromLineAuth = searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
 
     if (isReturnFromLineAuth) {
-      const liffState = searchParams.get("liff.state");
-      let nextPath = liffState ? decodeURIComponent(liffState) : null;
+      const liffState = searchParams.get("liff.state") as EncodedURIComponent | null;
+      let nextPath = decodeURIComponentWithType(liffState);
 
       if (nextPath?.includes("?next=")) {
-        nextPath = extractSearchParamFromRelativePath(nextPath, "next");
+        nextPath = decodeURIComponentWithType(extractSearchParamFromRelativePath<EncodedURIComponent>(nextPath, "next"));
       } else if (nextPath?.startsWith("/login")) {
         nextPath = null;
       }

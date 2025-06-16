@@ -15,10 +15,11 @@ import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { logger } from "@/lib/logging";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { decodeURIComponentWithType, EncodedURIComponent } from "@/utils/path";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") || "/";
+  const nextPath = decodeURIComponentWithType((searchParams.get("next") ?? "/") as EncodedURIComponent | null);
   const router = useRouter();
 
   const headerConfig = useMemo(

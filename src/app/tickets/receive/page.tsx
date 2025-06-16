@@ -10,6 +10,7 @@ import TicketReceiveContent from "@/app/tickets/receive/components/TicketReceive
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import ErrorState from "@/components/shared/ErrorState";
 import { toast } from "sonner";
+import { RawURIComponent } from "@/utils/path";
 
 export default function TicketReceivePage() {
   const searchParams = useSearchParams();
@@ -64,7 +65,7 @@ export default function TicketReceivePage() {
       <LoginModal
         isOpen={ isLoginModalOpen }
         onClose={ () => setIsLoginModalOpen(false) }
-        nextPath={ window.location.pathname + window.location.search }
+        nextPath={ window.location.pathname + window.location.search as RawURIComponent }
       />
     </div>
   );

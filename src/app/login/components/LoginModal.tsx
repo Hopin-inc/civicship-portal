@@ -10,11 +10,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { RawURIComponent } from "@/utils/path";
 
 type LoginModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  nextPath?: string;
+  nextPath?: RawURIComponent;
 };
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) => {
