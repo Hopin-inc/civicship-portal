@@ -3,12 +3,20 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { prefectureLabels } from "@/app/users/data/presenter";
 import { GqlCurrentPrefecture } from "@/types/graphql";
-import { Facebook, Home, Instagram, Twitter } from "lucide-react";
+import { Facebook, Home, Instagram, MoreHorizontal, Twitter } from "lucide-react";
 import { useReadMore } from "@/hooks/useReadMore";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/contexts/AuthProvider";
 
 interface UserProfileHeaderProps {
   id: string;
@@ -33,6 +41,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   isOwner,
   socialUrl,
 }) => {
+  const { logout } = useAuth();
   const socialButtonClasses =
     "rounded-full border border-input w-10 h-10 flex items-center justify-center";
 
@@ -41,27 +50,44 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
       <div className="flex flex-col items-center">
         {/* Profile Image */}
         <div className="flex items-center w-full mb-4">
-          <div className="relative w-24 h-24 rounded-full overflow-hidden">
-            <Image
-              src={image || PLACEHOLDER_IMAGE}
-              alt={name}
-              fill
-              placeholder={"blur"}
-              blurDataURL={PLACEHOLDER_IMAGE}
-              className="object-cover"
-              loading="lazy"
-              onError={(e) => {
-                const img = e.target as HTMLImageElement;
-                img.src = PLACEHOLDER_IMAGE;
-              }}
-            />
+          <div className="flex-grow">
+            <div className="relative w-24 h-24 rounded-full overflow-hidden">
+              <Image
+                src={ image || PLACEHOLDER_IMAGE }
+                alt={ name }
+                fill
+                placeholder={ "blur" }
+                blurDataURL={ PLACEHOLDER_IMAGE }
+                className="object-cover"
+                loading="lazy"
+                onError={ (e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.src = PLACEHOLDER_IMAGE;
+                } }
+              />
+            </div>
           </div>
-          {isOwner && (
-            <Link href="/users/me/edit" className="ml-auto">
-              <Button variant="secondary" size="md" className="px-6">
+          { isOwner && (
+            <div className="flex gap-2">
+              <Link
+                href="/users/me/edit"
+                className={ cn(buttonVariants({ variant: "secondary", size: "md" }), "ml-auto") }
+              >
                 編集
-              </Button>
-            </Link>
+              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="text" className="px-2">
+                    <MoreHorizontal />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="start">
+                  <DropdownMenuItem onClick={ logout }>
+                    ログアウト
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           )}
         </div>
 

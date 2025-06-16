@@ -8,6 +8,7 @@ import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
+import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
 
 /**
  * ルートガードコンポーネントのプロパティ
@@ -25,7 +26,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next");
+  const nextParam = searchParams.get("next") as EncodedURIComponent;
   const [authorized, setAuthorized] = useState(false);
 
   const { loading: userLoading } = useQuery(GET_CURRENT_USER, {
@@ -46,7 +47,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       const isReturnFromLineAuth = urlParams.has("code") && urlParams.has("state") && urlParams.has("liffClientId");
       if (isReturnFromLineAuth) {
         logger.debug("RouteGuard: Skipping redirect for LINE auth return to homepage", {
-          component: "RouteGuard"
+          component: "RouteGuard",
         });
         setAuthorized(true);
         return;
@@ -54,7 +55,10 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     }
 
     const authCheck = () => {
-      const redirectPath = authRedirectService.getRedirectPath(pathname, nextParam);
+      const pathNameWithParams = searchParams.size > 0
+        ? `${ pathname }?${ searchParams.entries().map(([k, v]) => `${ k }=${ v }`).toArray().join("&") }` as RawURIComponent
+        : pathname as RawURIComponent;
+      const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam));
       if (redirectPath) {
         setAuthorized(false);
         router.replace(redirectPath);
@@ -63,12 +67,14 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       }
     };
     authCheck();
-    return () => {};
-  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam]);
+    return () => {
+    };
+  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams]);
 
   if (loading || userLoading) {
     return <LoadingIndicator />;
   }
 
-  return authorized ? <>{children}</> : null;
+  // return authorized ? <>{ children }</> : null;
+  return <>{ children }</>;
 };
