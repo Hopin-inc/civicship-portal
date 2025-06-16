@@ -8,6 +8,7 @@ import retry from "retry";
 
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { logger } from "@/lib/logging";
+import { RawURIComponent } from "@/utils/path";
 
 /**
  * LIFF初期化状態の型定義
@@ -114,7 +115,7 @@ export class LiffService {
    * @param redirectPath リダイレクト先のパス（オプション）
    * @returns ログインが成功したかどうか
    */
-  public async login(redirectPath?: string): Promise<boolean> {
+  public async login(redirectPath?: RawURIComponent): Promise<boolean> {
     try {
       if (!this.state.isInitialized) {
         await this.initialize();
@@ -124,7 +125,7 @@ export class LiffService {
         this.state.isLoggedIn = true;
       } else {
         const redirectUri = typeof window !== "undefined"
-          ? redirectPath 
+          ? redirectPath
             ? window.location.origin + redirectPath
             : window.location.origin
           : undefined;
