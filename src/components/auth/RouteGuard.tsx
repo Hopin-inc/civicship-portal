@@ -8,6 +8,7 @@ import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
+import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
 
 /**
  * ルートガードコンポーネントのプロパティ
@@ -25,7 +26,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next");
+  const nextParam = searchParams.get("next") as EncodedURIComponent;
   const [authorized, setAuthorized] = useState(false);
 
   const { loading: userLoading } = useQuery(GET_CURRENT_USER, {
@@ -55,9 +56,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     const authCheck = () => {
       const pathNameWithParams = searchParams.size > 0
-        ? `${ pathname }?${ searchParams.entries().map(([k, v]) => `${ k }=${ v }`).toArray().join("&") }`
-        : pathname;
-      const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, nextParam);
+        ? `${ pathname }?${ searchParams.entries().map(([k, v]) => `${ k }=${ v }`).toArray().join("&") }` as RawURIComponent
+        : pathname as RawURIComponent;
+      const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam));
       if (redirectPath) {
         setAuthorized(false);
         router.replace(redirectPath);

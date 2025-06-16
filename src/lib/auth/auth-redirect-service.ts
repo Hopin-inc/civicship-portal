@@ -1,7 +1,7 @@
 import { AuthStateManager } from "./auth-state-manager";
 import { GqlRole } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { matchPaths } from "@/utils/path";
+import { encodeURIComponentWithType, matchPaths, RawURIComponent } from "@/utils/path";
 
 /**
  * 認証状態に基づくリダイレクト処理を一元管理するサービス
@@ -64,11 +64,11 @@ export class AuthRedirectService {
    * @param next リダイレクト後に戻るパス（オプション）
    * @returns リダイレクト先のパス、またはnull（リダイレクト不要の場合）
    */
-  public getRedirectPath(pathname: string, next?: string | null): string | null {
+  public getRedirectPath(pathname: RawURIComponent, next?: RawURIComponent | null): RawURIComponent | null {
     const authState = this.authStateManager.getState();
     const nextParam = next
-      ? `?next=${ encodeURIComponent(next) }`
-      : `?next=${ encodeURIComponent(pathname) }`;
+      ? this.generateNextParam(next)
+      : this.generateNextParam(pathname);
 
     if (authState === "loading") {
       return null;
@@ -86,21 +86,21 @@ export class AuthRedirectService {
         !next.startsWith("/login") &&
         !next.startsWith("/sign-up")
       ) {
-        return decodeURIComponent(next);
+        return next;
       }
-      return "/";
+      return "/" as RawURIComponent;
     }
 
     if (this.isProtectedPath(pathname)) {
       switch (authState) {
         case "unauthenticated":
-          return `/login${ nextParam }`;
+          return `/login${ nextParam }` as RawURIComponent;
         case "line_authenticated":
         case "line_token_expired":
-          return `/sign-up/phone-verification${ nextParam }`;
+          return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
         case "phone_authenticated":
         case "phone_token_expired":
-          return `/sign-up${ nextParam }`;
+          return `/sign-up${ nextParam }` as RawURIComponent;
         default:
           return null;
       }
@@ -109,18 +109,18 @@ export class AuthRedirectService {
     if (this.isPathInSignUpFlow(pathname)) {
       switch (authState) {
         case "unauthenticated":
-          return `/login${ nextParam }`;
+          return `/login${ nextParam }` as RawURIComponent;
 
         case "line_authenticated":
         case "line_token_expired":
           if (pathname !== "/sign-up/phone-verification") {
-            return `/sign-up/phone-verification${ nextParam }`;
+            return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
           }
           return null; // stay here
 
         case "phone_authenticated":
           if (pathname !== "/sign-up") {
-            return `/sign-up${ nextParam }`;
+            return `/sign-up${ nextParam }` as RawURIComponent;
           }
           return null; // stay here
 
@@ -129,17 +129,21 @@ export class AuthRedirectService {
           if (next && next.startsWith("/") && !next.startsWith("/sign-up")) {
             return next;
           }
-          return "/";
+          return "/" as RawURIComponent;
       }
     }
 
     if (this.isAdminPath(pathname)) {
       if (authState !== "user_registered") {
-        return `/login${ nextParam }`;
+        return `/login${ nextParam }` as RawURIComponent;
       }
     }
 
     return null;
+  }
+
+  private generateNextParam(nextPath: RawURIComponent): RawURIComponent {
+    return `?next=${ encodeURIComponentWithType(nextPath) }` as RawURIComponent;
   }
 
   /**
