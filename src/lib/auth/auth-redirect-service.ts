@@ -1,7 +1,12 @@
 import { AuthStateManager } from "./auth-state-manager";
 import { GqlRole } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { encodeURIComponentWithType, matchPaths, RawURIComponent } from "@/utils/path";
+import {
+  encodeURIComponentWithType,
+  extractSearchParamFromRelativePath,
+  matchPaths,
+  RawURIComponent,
+} from "@/utils/path";
 
 /**
  * 認証状態に基づくリダイレクト処理を一元管理するサービス
@@ -75,20 +80,21 @@ export class AuthRedirectService {
     }
 
     if (
-      (pathname === "/login" ||
-        pathname === "/sign-up/phone-verification" ||
-        pathname === "/sign-up") &&
-      authState === "user_registered"
+      ["/login", "/sign-up/phone-verification", "/sign-up"].includes(pathname)
+      && authState === "user_registered"
     ) {
       if (
-        next &&
-        next.startsWith("/") &&
-        !next.startsWith("/login") &&
-        !next.startsWith("/sign-up")
+        next?.startsWith("/")
+        && !next.startsWith("/login")
+        && !next.startsWith("/sign-up")
       ) {
         return next;
+      } else if (next) {
+        const nextRoute = extractSearchParamFromRelativePath(next, "next");
+        return (nextRoute ?? "/") as RawURIComponent;
+      } else {
+        return "/" as RawURIComponent;
       }
-      return "/" as RawURIComponent;
     }
 
     if (this.isProtectedPath(pathname)) {

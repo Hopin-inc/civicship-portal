@@ -41,7 +41,7 @@ export default function LoginPage() {
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticating && authenticationState === "line_authenticated") {
+    if (!isAuthenticating) {
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
       router.replace(redirectPath);
     }
