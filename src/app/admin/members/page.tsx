@@ -74,7 +74,7 @@ export default function MembersPage() {
   };
 
   useEffect(() => {
-    void fetchMembershipList({ variables: { first: 50 } });
+    void fetchMembershipList({ variables: { first: 100 } });
   }, [fetchMembershipList]);
 
   const [isLoading, setIsLoading] = useState(false);
