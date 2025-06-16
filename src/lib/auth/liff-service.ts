@@ -5,8 +5,6 @@ import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { categorizeFirebaseError, lineAuth } from "./firebase-config";
 import { AuthTokens, TokenManager } from "./token-manager";
 import retry from "retry";
-
-import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { logger } from "@/lib/logging";
 
 /**
@@ -123,11 +121,12 @@ export class LiffService {
       if (liff.isInClient()) {
         this.state.isLoggedIn = true;
       } else {
-        const redirectUri = typeof window !== "undefined"
-          ? redirectPath 
-            ? window.location.origin + redirectPath
-            : window.location.origin
-          : undefined;
+        const redirectUri =
+          typeof window !== "undefined"
+            ? redirectPath
+              ? window.location.origin + redirectPath
+              : window.location.origin
+            : undefined;
 
         liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない
@@ -223,11 +222,12 @@ export class LiffService {
         try {
           const attemptTimestamp = new Date().toISOString();
 
+          const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`,
             {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { "Content-Type": "application/json", "X-Community-Id": communityId ?? "" },
               body: JSON.stringify({ accessToken }),
             },
           );
