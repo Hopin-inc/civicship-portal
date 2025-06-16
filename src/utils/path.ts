@@ -13,7 +13,7 @@ export const encodeURIComponentWithType = <T extends RawURIComponent | null>(par
 
 export const decodeURIComponentWithType = <T extends EncodedURIComponent | null>(param: T): DecodeResult<T> => {
   if (param === null) return null as DecodeResult<T>;
-  return decodeURIComponentWithType(param) as DecodeResult<T>;
+  return decodeURIComponent(param) as DecodeResult<T>;
 };
 
 export const matchPaths = (pathname: string, ...pathPatterns: string[]) => {
