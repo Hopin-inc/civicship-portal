@@ -36,8 +36,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
     setError(null);
 
     try {
-      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath ?? null);
-      await loginWithLiff(redirectPath);
+      await loginWithLiff(nextPath);
       setIsLoading(false);
       onClose();
     } catch (err) {

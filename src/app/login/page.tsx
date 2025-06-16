@@ -58,13 +58,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
-      logger.debug("Using redirect path from AuthRedirectService", {
-        redirectPath,
-        component: "LoginPage",
-      });
-
-      const success = await loginWithLiff(redirectPath);
+      const success = await loginWithLiff(nextPath ?? undefined);
 
       if (success) {
         logger.debug("LINE authentication succeeded. Redirecting...", {
