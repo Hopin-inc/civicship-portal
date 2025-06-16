@@ -68,11 +68,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     authCheck();
     return () => {
     };
-  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam]);
+  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams]);
 
   if (loading || userLoading) {
     return <LoadingIndicator />;
   }
 
-  return authorized ? <>{ children }</> : null;
+  // return authorized ? <>{ children }</> : null;
+  return <>{ children }</>;
 };

@@ -66,7 +66,9 @@ export class AuthRedirectService {
    */
   public getRedirectPath(pathname: string, next?: string | null): string | null {
     const authState = this.authStateManager.getState();
-    const nextParam = next ? `?next=${ next }` : `?next=${ pathname }`;
+    const nextParam = next
+      ? `?next=${ encodeURIComponent(next) }`
+      : `?next=${ encodeURIComponent(pathname) }`;
 
     if (authState === "loading") {
       return null;
