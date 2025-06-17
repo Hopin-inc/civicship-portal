@@ -56,15 +56,13 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     const authCheck = () => {
       const pathNameWithParams = searchParams.size > 0
-        ? `${ pathname }?${ searchParams.entries().map(([k, v]) => `${ k }=${ v }`).toArray().join("&") }` as RawURIComponent
+        ? `${ pathname }?${ searchParams.toString() }` as RawURIComponent
         : pathname as RawURIComponent;
       const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam));
       if (redirectPath) {
-        setAuthorized(false);
         router.replace(redirectPath);
-      } else {
-        setAuthorized(true);
       }
+      setAuthorized(true);
     };
     authCheck();
     return () => {
@@ -75,6 +73,5 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     return <LoadingIndicator />;
   }
 
-  // return authorized ? <>{ children }</> : null;
-  return <>{ children }</>;
+  return authorized ? <>{ children }</> : null;
 };
