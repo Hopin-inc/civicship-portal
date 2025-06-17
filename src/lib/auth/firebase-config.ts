@@ -37,7 +37,20 @@ export const getFirebaseAnalytics = async (): Promise<Analytics | undefined> => 
   return analyticsInstance;
 };
 
-export const analytics = await getFirebaseAnalytics();
+// Initialize analytics as null initially
+export let analytics: Analytics | null = null;
+
+// Initialize analytics asynchronously but don't block
+(async () => {
+  try {
+    analytics = (await getFirebaseAnalytics()) || null;
+  } catch (error) {
+    logger.error("Failed to initialize analytics", {
+      component: "FirebaseConfig",
+      error,
+    });
+  }
+})();
 
 /**
  * Firebase認証エラーを分類する
