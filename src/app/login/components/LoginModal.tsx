@@ -24,7 +24,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { loginWithLiff, isAuthenticating } = useAuth();
-  const authRedirectService = AuthRedirectService.getInstance();
 
   const handleLogin = async () => {
     if (!agreedTerms || !agreedPrivacy) {
