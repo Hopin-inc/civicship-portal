@@ -301,7 +301,7 @@ export class AuthStateManager {
    */
   public async handlePhoneAuthStateChange(isVerified: boolean): Promise<void> {
     const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+    const hasValidLineToken = !!lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
     if (!hasValidLineToken && this.currentState !== "loading") {
       this.setState("unauthenticated");

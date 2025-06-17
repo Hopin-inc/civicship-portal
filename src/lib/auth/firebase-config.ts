@@ -37,8 +37,6 @@ export const getFirebaseAnalytics = async (): Promise<Analytics | undefined> => 
   return analyticsInstance;
 };
 
-export const analytics = await getFirebaseAnalytics();
-
 /**
  * Firebase認証エラーを分類する
  * @param error Firebaseから返されたエラー

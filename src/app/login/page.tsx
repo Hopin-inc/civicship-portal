@@ -15,10 +15,11 @@ import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { logger } from "@/lib/logging";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { decodeURIComponentWithType, EncodedURIComponent } from "@/utils/path";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") || "/";
+  const nextPath = decodeURIComponentWithType((searchParams.get("next") ?? "/") as EncodedURIComponent | null);
   const router = useRouter();
 
   const headerConfig = useMemo(
@@ -40,7 +41,7 @@ export default function LoginPage() {
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticating && authenticationState === "line_authenticated") {
+    if (!isAuthenticating && authenticationState !== "unauthenticated") {
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
       router.replace(redirectPath);
     }
@@ -57,13 +58,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
-      logger.debug("Using redirect path from AuthRedirectService", {
-        redirectPath,
-        component: "LoginPage",
-      });
-
-      const success = await loginWithLiff(redirectPath);
+      const success = await loginWithLiff(nextPath ?? undefined);
 
       if (success) {
         logger.debug("LINE authentication succeeded. Redirecting...", {

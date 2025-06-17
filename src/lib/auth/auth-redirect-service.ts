@@ -1,7 +1,12 @@
 import { AuthStateManager } from "./auth-state-manager";
 import { GqlRole } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { matchPaths } from "@/utils/path";
+import {
+  encodeURIComponentWithType,
+  extractSearchParamFromRelativePath,
+  matchPaths,
+  RawURIComponent,
+} from "@/utils/path";
 
 /**
  * 認証状態に基づくリダイレクト処理を一元管理するサービス
@@ -40,10 +45,13 @@ export class AuthRedirectService {
   }
 
   /**
-   * 電話番号認証が必要なパスかどうかを判定
+   * ユーザー登録プロセスのパスかどうかを判定
    */
-  public isPhoneVerificationRequiredPath(pathname: string): boolean {
-    const phoneVerificationRequiredPaths = ["/sign-up"];
+  public isPathInSignUpFlow(pathname: string): boolean {
+    const phoneVerificationRequiredPaths = [
+      "/sign-up",
+      "/sign-up/phone-verification",
+    ];
     return matchPaths(pathname, ...phoneVerificationRequiredPaths);
   }
 
@@ -61,61 +69,64 @@ export class AuthRedirectService {
    * @param next リダイレクト後に戻るパス（オプション）
    * @returns リダイレクト先のパス、またはnull（リダイレクト不要の場合）
    */
-  public getRedirectPath(pathname: string, next?: string | null): string | null {
+  public getRedirectPath(pathname: RawURIComponent, next?: RawURIComponent | null): RawURIComponent | null {
     const authState = this.authStateManager.getState();
-    const nextParam = next ? `?next=${next}` : `?next=${pathname}`;
+    const nextParam = next
+      ? this.generateNextParam(next)
+      : this.generateNextParam(pathname);
 
     if (authState === "loading") {
       return null;
     }
 
     if (
-      (pathname === "/login" ||
-        pathname === "/sign-up/phone-verification" ||
-        pathname === "/sign-up") &&
-      authState === "user_registered"
+      ["/login", "/sign-up/phone-verification", "/sign-up"].includes(pathname)
+      && authState === "user_registered"
     ) {
       if (
-        next &&
-        next.startsWith("/") &&
-        !next.startsWith("/login") &&
-        !next.startsWith("/sign-up")
+        next?.startsWith("/")
+        && !next.startsWith("/login")
+        && !next.startsWith("/sign-up")
       ) {
-        return decodeURIComponent(next);
+        return next;
+      } else if (next) {
+        const nextRoute = extractSearchParamFromRelativePath(next, "next");
+        return (nextRoute ?? "/") as RawURIComponent;
+      } else {
+        return "/" as RawURIComponent;
       }
-      return "/";
     }
 
     if (this.isProtectedPath(pathname)) {
       switch (authState) {
         case "unauthenticated":
-          return `/login${nextParam}`;
+          return `/login${ nextParam }` as RawURIComponent;
         case "line_authenticated":
         case "line_token_expired":
-          return `/sign-up/phone-verification${nextParam}`;
+          return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
         case "phone_authenticated":
         case "phone_token_expired":
-          return `/sign-up${nextParam}`;
+          return `/sign-up${ nextParam }` as RawURIComponent;
         default:
           return null;
       }
     }
 
-    if (this.isPhoneVerificationRequiredPath(pathname)) {
+    if (this.isPathInSignUpFlow(pathname)) {
       switch (authState) {
         case "unauthenticated":
-          return `/login${nextParam}`;
+          return `/login${ nextParam }` as RawURIComponent;
 
         case "line_authenticated":
         case "line_token_expired":
           if (pathname !== "/sign-up/phone-verification") {
-            return `/sign-up/phone-verification${nextParam}`;
+            return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
           }
           return null; // stay here
 
         case "phone_authenticated":
           if (pathname !== "/sign-up") {
-            return `/sign-up${nextParam}`;
+            return `/sign-up${ nextParam }` as RawURIComponent;
           }
           return null; // stay here
 
@@ -124,17 +135,21 @@ export class AuthRedirectService {
           if (next && next.startsWith("/") && !next.startsWith("/sign-up")) {
             return next;
           }
-          return "/";
+          return "/" as RawURIComponent;
       }
     }
 
     if (this.isAdminPath(pathname)) {
       if (authState !== "user_registered") {
-        return `/login${nextParam}`;
+        return `/login${ nextParam }` as RawURIComponent;
       }
     }
 
     return null;
+  }
+
+  private generateNextParam(nextPath: RawURIComponent): RawURIComponent {
+    return `?next=${ encodeURIComponentWithType(nextPath) }` as RawURIComponent;
   }
 
   /**
@@ -142,28 +157,27 @@ export class AuthRedirectService {
    * @returns リダイレクト先のパス
    * @param nextPath
    */
-  public getPostLineAuthRedirectPath(nextPath: string | null): string {
-    const next = nextPath ? decodeURIComponent(nextPath) : null;
-    const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
+  public getPostLineAuthRedirectPath(nextPath: RawURIComponent | null): RawURIComponent {
+    const nextParam = nextPath ? this.generateNextParam(nextPath) : "";
 
     const authState = this.authStateManager.getState();
 
     switch (authState) {
       case "unauthenticated":
       case "line_token_expired":
-        return `/login${nextParam}`;
+        return `/login${ nextParam }` as RawURIComponent;
 
       case "line_authenticated":
       case "phone_token_expired":
-        return `/sign-up/phone-verification${nextParam}`;
+        return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
 
       case "phone_authenticated":
-        return `/sign-up${nextParam}`;
+        return `/sign-up${ nextParam }` as RawURIComponent;
 
       case "loading":
       case "user_registered":
       default:
-        return next ?? "/";
+        return nextPath ?? "/" as RawURIComponent;
     }
   }
 
