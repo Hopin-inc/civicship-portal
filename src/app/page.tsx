@@ -10,7 +10,11 @@ import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection
 import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
-import { decodeURIComponentWithType, EncodedURIComponent, extractSearchParamFromRelativePath } from "@/utils/path";
+import {
+  decodeURIComponentWithType,
+  EncodedURIComponent,
+  extractSearchParamFromRelativePath,
+} from "@/utils/path";
 
 export default function HomePage() {
   const router = useRouter();
@@ -41,11 +45,6 @@ export default function HomePage() {
 
       const cleanedUrl = nextPath ? `${ window.location.pathname }?next=${ nextPath }` : window.location.pathname;
       router.replace(cleanedUrl);
-
-      if (isAuthenticated && authenticationState === "user_registered") {
-        const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
-        router.replace(redirectPath);
-      }
       return;
     }
 
