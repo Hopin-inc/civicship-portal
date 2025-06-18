@@ -91,6 +91,13 @@ GitHub Actionsのシークレットに新しいコミュニティIDを設定し�
 2. `NEXT_PUBLIC_COMMUNITY_ID`シークレットを追加または更新
 3. 該当のブランチ（`develop`、`master`など）にデプロイする際に、このシークレットが使用されます
 
+以下を対応することで、コミュニティ固有の環境をデプロイできます
+
+1. Github ActionsのEnvironmentを作成する
+ - Github ActionsのEnvironmentは、環境ごと（prod, dev） × コミュニティごとで作成します
+ - 例：kyoso-dev-neo88, kyoso-dev-community2, co-creation-dao-prod-neo88, co-creation-dao-prod-community2, ...
+2. `.github/config/community-list.json`にcommunityIdを追記する
+
 ### 5. コミュニティ固有の機能制御
 
 コミュニティによって機能を制御する場合は、以下のようにコードを記述します。
