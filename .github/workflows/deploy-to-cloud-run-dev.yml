@@ -3,8 +3,8 @@ name: Build and Deploy for all communities
 on:
   push:
     branches:
-      - feature/deploy-multi-communities
-
+      - develop
+      - hotfix/**
 jobs:
   read-communities:
     runs-on: ubuntu-latest
