@@ -28,6 +28,7 @@ import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 import { logger } from "@/lib/logging";
 import { maskPhoneNumber } from "@/lib/logging/client/utils";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
+import { RawURIComponent } from "@/utils/path";
 
 /**
  * 認証状態の型定義
@@ -61,7 +62,7 @@ interface AuthContextType {
   isAuthenticating: boolean;
   environment: AuthEnvironment;
 
-  loginWithLiff: (redirectPath?: string) => Promise<boolean>;
+  loginWithLiff: (redirectPath?: RawURIComponent) => Promise<boolean>;
   logout: () => Promise<void>;
 
   phoneAuth: {
@@ -170,7 +171,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * @param redirectPath リダイレクト先のパス（オプション）
    * @returns ログインが成功したかどうか
    */
-  const loginWithLiff = async (redirectPath?: string): Promise<boolean> => {
+  const loginWithLiff = async (redirectPath?: RawURIComponent): Promise<boolean> => {
     setState((prev) => ({ ...prev, isAuthenticating: true }));
 
     try {

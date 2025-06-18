@@ -127,10 +127,11 @@ export const presenterReservationDateTimeInfo = (
   const endDate = new Date(opportunitySlot.endsAt);
 
   const participantCount = reservation.participations?.length || 0;
-  const paidTicketIds = reservation.participations
-    ?.map((p => p.ticketStatusHistories?.map(h => h.ticket?.id)))
-    .flat()
-    .filter(ticketId => ticketId !== undefined) ?? [];
+  const paidTicketIds =
+    reservation.participations
+      ?.map((p) => p.ticketStatusHistories?.map((h) => h.ticket?.id))
+      .flat()
+      .filter((ticketId) => ticketId !== undefined) ?? [];
   const paidParticipantCount = participantCount - [...new Set(paidTicketIds)].length;
   console.log("!!!", reservation.participations);
 
@@ -164,20 +165,11 @@ export const sliceActivitiesBySection = (
   featuredCards: ActivityCard[];
 } => {
   const safe = <T>(cards: (T | undefined)[]): T[] => cards.filter((c): c is T => !!c);
-
-  const N = activityCards.length;
   const hasImages = (card: ActivityCard) => card.images && card.images.length > 0;
 
-  if (N === 0) {
-    return { upcomingCards: [], featuredCards: [] };
-  }
+  const validCards = safe(activityCards.filter(hasImages));
+  const featuredCards = validCards.slice(0, 3);
+  const upcomingCards = validCards.slice(3);
 
-  const featuredHead = activityCards[0];
-  const featuredCards = safe(hasImages(featuredHead) ? [featuredHead] : []);
-
-  const maxUpcoming = N >= 6 ? 3 : 2;
-  const upcomingRaw = activityCards.slice(1, 1 + maxUpcoming);
-  const upcomingCards = safe(upcomingRaw.filter(hasImages));
-
-  return { upcomingCards, featuredCards };
+  return { featuredCards, upcomingCards };
 };
