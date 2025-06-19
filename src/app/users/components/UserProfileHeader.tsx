@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthProvider";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 interface UserProfileHeaderProps {
   id: string;
@@ -53,25 +54,25 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           <div className="flex-grow">
             <div className="relative w-24 h-24 rounded-full overflow-hidden">
               <Image
-                src={ image || PLACEHOLDER_IMAGE }
-                alt={ name }
+                src={image || PLACEHOLDER_IMAGE}
+                alt={name}
                 fill
-                placeholder={ "blur" }
-                blurDataURL={ PLACEHOLDER_IMAGE }
+                placeholder={"blur"}
+                blurDataURL={PLACEHOLDER_IMAGE}
                 className="object-cover"
                 loading="lazy"
-                onError={ (e) => {
+                onError={(e) => {
                   const img = e.target as HTMLImageElement;
                   img.src = PLACEHOLDER_IMAGE;
-                } }
+                }}
               />
             </div>
           </div>
-          { isOwner && (
+          {isOwner && (
             <div className="flex gap-2">
               <Link
                 href="/users/me/edit"
-                className={ cn(buttonVariants({ variant: "secondary", size: "md" }), "ml-auto") }
+                className={cn(buttonVariants({ variant: "secondary", size: "md" }), "ml-auto")}
               >
                 編集
               </Link>
@@ -82,9 +83,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="start">
-                  <DropdownMenuItem onClick={ logout }>
-                    ログアウト
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout}>ログアウト</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -95,7 +94,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           <div>
             <h1 className="text-title-lg mb-2">{name}</h1>
 
-            {currentPrefecture && (
+            {currentCommunityConfig.enableFeatures.includes("prefectures") && currentPrefecture && (
               <div className="flex items-center text-label-md text-caption mb-3">
                 <Home className="w-4 h-4 mr-1" />
                 <span>{prefectureLabels[currentPrefecture] || "不明"}</span>

@@ -1,8 +1,17 @@
 import { Metadata } from "next";
 
+export type FeaturesType =
+  | "places"
+  | "opportunities"
+  | "points"
+  | "tickets"
+  | "articles"
+  | "prefectures";
+
 // コミュニティごとのベース設定
 interface CommunityBaseConfig {
   id: string;
+  tokenName: string;
   title: string;
   description: string;
   shortDescription?: string;
@@ -11,6 +20,8 @@ interface CommunityBaseConfig {
   logoPath: string;
   squareLogoPath: string;
   ogImagePath: string;
+  enableFeatures: FeaturesType[];
+  rootPath?: string;
 }
 
 // コミュニティごとのメタデータ型定義
@@ -47,6 +58,7 @@ export function getCommunityIdFromEnv(): string {
 const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
   neo88: {
     id: "neo88",
+    tokenName: "NEO88",
     title: "NEO四国88祭",
     description:
       "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。心が躍るさまざまな体験を通じて、新しい自分に出会う旅へ。地域の方々が用意する特別な体験がたくさん待っています。あなたのお気に入りを選んで、一期一会のオリジナルな旅を楽しんでみませんか？",
@@ -57,9 +69,27 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
+    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures"],
+    rootPath: "/activities",
+  },
+  kibotcha: {
+    id: "kibotcha",
+    tokenName: "KIBOTCHA",
+    title: "KIBOTCHA",
+    description: "",
+    shortDescription: "",
+    domain: "https://kibotcha.civicship.jp",
+    faviconPrefix: "/communities/kibotcha",
+    logoPath: "/communities/kibotcha/logo.jpg",
+    squareLogoPath: "/communities/kibotcha/logo-square.jpg",
+    ogImagePath:
+      "https://storage.googleapis.com/prod-civicship-storage-public/asset/kibotcha/ogp.jpg",
+    enableFeatures: ["points"],
+    rootPath: "/users/me",
   },
   default: {
     id: "default",
+    tokenName: "NEO88",
     title: "NEO四国88祭",
     description:
       "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。心が躍るさまざまな体験を通じて、新しい自分に出会う旅へ。地域の方々が用意する特別な体験がたくさん待っています。あなたのお気に入りを選んで、一期一会のオリジナルな旅を楽しんでみませんか？",
@@ -70,6 +100,8 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
+    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures"],
+    rootPath: "/activities",
   },
 };
 

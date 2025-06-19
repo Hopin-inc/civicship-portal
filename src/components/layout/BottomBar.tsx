@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 interface HeaderProps {
   className?: string;
@@ -22,6 +23,10 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const isLiff = env === AuthEnvironment.LIFF;
 
   const { isVisible } = useScrollDirection({ threshold: 20 });
+
+  if (currentCommunityConfig.enableFeatures.length < 2) {
+    return null;
+  }
 
   if (
     pathname.startsWith("/admin") ||
@@ -52,17 +57,21 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     >
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
-          <Link
-            href="/activities"
-            className={cn(getLinkStyle("/activities", "/activities/*", "/search/*"), "flex-grow")}
-          >
-            <Search size={24} />
-            <span className="text-xs mt-1">見つける</span>
-          </Link>
-          <Link href="/places" className={cn(getLinkStyle("/places", "/places/*"), "flex-grow")}>
-            <Globe size={24} />
-            <span className="text-xs mt-1">拠点</span>
-          </Link>
+          {currentCommunityConfig.enableFeatures.includes("opportunities") && (
+            <Link
+              href="/activities"
+              className={cn(getLinkStyle("/activities", "/activities/*", "/search/*"), "flex-grow")}
+            >
+              <Search size={24} />
+              <span className="text-xs mt-1">見つける</span>
+            </Link>
+          )}
+          {currentCommunityConfig.enableFeatures.includes("places") && (
+            <Link href="/places" className={cn(getLinkStyle("/places", "/places/*"), "flex-grow")}>
+              <Globe size={24} />
+              <span className="text-xs mt-1">拠点</span>
+            </Link>
+          )}
           <Link
             href="/users/me"
             className={cn(getLinkStyle("/users/me", "/users/me/*"), "flex-grow")}
