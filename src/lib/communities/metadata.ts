@@ -1,10 +1,17 @@
 import { Metadata } from "next";
 
-type FeaturesType = "places" | "opportunities" | "points" | "tickets" | "articles" | "prefectures";
+export type FeaturesType =
+  | "places"
+  | "opportunities"
+  | "points"
+  | "tickets"
+  | "articles"
+  | "prefectures";
 
 // コミュニティごとのベース設定
 interface CommunityBaseConfig {
   id: string;
+  tokenName: string;
   title: string;
   description: string;
   shortDescription?: string;
@@ -51,6 +58,7 @@ export function getCommunityIdFromEnv(): string {
 const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
   neo88: {
     id: "neo88",
+    tokenName: "NEO88",
     title: "NEO四国88祭",
     description:
       "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。心が躍るさまざまな体験を通じて、新しい自分に出会う旅へ。地域の方々が用意する特別な体験がたくさん待っています。あなたのお気に入りを選んで、一期一会のオリジナルな旅を楽しんでみませんか？",
@@ -66,6 +74,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
   },
   kibotcha: {
     id: "kibotcha",
+    tokenName: "KIBOTCHA",
     title: "KIBOTCHA",
     description: "",
     shortDescription: "",
@@ -80,6 +89,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
   },
   default: {
     id: "default",
+    tokenName: "NEO88",
     title: "NEO四国88祭",
     description:
       "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。心が躍るさまざまな体験を通じて、新しい自分に出会う旅へ。地域の方々が用意する特別な体験がたくさん待っています。あなたのお気に入りを選んで、一期一会のオリジナルな旅を楽しんでみませんか？",
