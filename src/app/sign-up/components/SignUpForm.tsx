@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { logger } from "@/lib/logging";
-import { currentCommunityConfig, getCurrentRegionName } from "@/lib/communities/metadata";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 const FormSchema = z.object({
   name: z.string({ required_error: "名前を入力してください。" }),

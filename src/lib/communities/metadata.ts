@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-type Features = "places" | "opportunities" | "points" | "tickets" | "articles" | "prefectures";
+type FeaturesType = "places" | "opportunities" | "points" | "tickets" | "articles" | "prefectures";
 
 // コミュニティごとのベース設定
 interface CommunityBaseConfig {
@@ -13,7 +13,7 @@ interface CommunityBaseConfig {
   logoPath: string;
   squareLogoPath: string;
   ogImagePath: string;
-  enableFeatures: Features[];
+  enableFeatures: FeaturesType[];
   rootPath?: string;
 }
 
