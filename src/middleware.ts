@@ -5,7 +5,7 @@ import { FeaturesType, currentCommunityConfig } from "@/lib/communities/metadata
 // Map features to their corresponding route paths
 const featureToRoutesMap: Record<string, string[]> = {
   places: ["/places"],
-  opportunities: ["/activities", "/search"],
+  opportunities: ["/", "/activities", "/search"],
   points: ["/wallets"],
   tickets: ["/tickets"],
   articles: ["/articles"],
