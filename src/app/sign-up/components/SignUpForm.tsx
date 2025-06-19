@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { logger } from "@/lib/logging";
-import { getCurrentRegionName } from "@/lib/communities/metadata";
+import { currentCommunityConfig, getCurrentRegionName } from "@/lib/communities/metadata";
 
 const FormSchema = z.object({
   name: z.string({ required_error: "名前を入力してください。" }),
@@ -107,7 +107,7 @@ export function SignUpForm() {
             )}
           />
 
-          {getCurrentRegionName() === "四国" && (
+          {currentCommunityConfig.enableFeatures.includes("prefectures") && (
             <FormField
               control={form.control}
               name="prefecture"
