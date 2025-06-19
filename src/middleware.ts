@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { FeaturesType, currentCommunityConfig } from "@/lib/communities/metadata";
 
 // Map features to their corresponding route paths
-const featureToRoutesMap: Record<string, string[]> = {
+const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
   places: ["/places"],
   opportunities: ["/", "/activities", "/search"],
   points: ["/wallets"],
