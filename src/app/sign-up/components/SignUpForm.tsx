@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { logger } from "@/lib/logging";
+import { getCurrentRegionName } from "@/lib/communities/metadata";
 
 const FormSchema = z.object({
   name: z.string({ required_error: "名前を入力してください。" }),
@@ -61,7 +62,7 @@ export function SignUpForm() {
     } catch (error) {
       logger.error("Sign up error", {
         error: error instanceof Error ? error.message : String(error),
-        component: "SignUpForm"
+        component: "SignUpForm",
       });
       toast.error("アカウント作成に失敗しました");
     } finally {
@@ -106,43 +107,45 @@ export function SignUpForm() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="prefecture"
-            render={({ field }) => (
-              <FormItem className="space-y-3">
-                <FormLabel className="text-base">住んでいるところ</FormLabel>
-                <FormControl>
-                  <ToggleGroup
-                    onValueChange={(val) => field.onChange(val as GqlCurrentPrefecture)}
-                    type="single"
-                    variant="outline"
-                    className="gap-2"
-                  >
-                    <ToggleGroupItem value={GqlCurrentPrefecture.Kagawa} className="flex-1">
-                      香川県
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value={GqlCurrentPrefecture.Tokushima} className="flex-1">
-                      徳島県
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value={GqlCurrentPrefecture.Ehime} className="flex-1">
-                      愛媛県
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value={GqlCurrentPrefecture.Kochi} className="flex-1">
-                      高知県
-                    </ToggleGroupItem>
-                    <ToggleGroupItem
-                      value={GqlCurrentPrefecture.OutsideShikoku}
-                      className="basis-full"
+          {getCurrentRegionName() === "四国" && (
+            <FormField
+              control={form.control}
+              name="prefecture"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel className="text-base">住んでいるところ</FormLabel>
+                  <FormControl>
+                    <ToggleGroup
+                      onValueChange={(val) => field.onChange(val as GqlCurrentPrefecture)}
+                      type="single"
+                      variant="outline"
+                      className="gap-2"
                     >
-                      四国以外
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                      <ToggleGroupItem value={GqlCurrentPrefecture.Kagawa} className="flex-1">
+                        香川県
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value={GqlCurrentPrefecture.Tokushima} className="flex-1">
+                        徳島県
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value={GqlCurrentPrefecture.Ehime} className="flex-1">
+                        愛媛県
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value={GqlCurrentPrefecture.Kochi} className="flex-1">
+                        高知県
+                      </ToggleGroupItem>
+                      <ToggleGroupItem
+                        value={GqlCurrentPrefecture.OutsideShikoku}
+                        className="basis-full"
+                      >
+                        四国以外
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <Button type="submit" className="w-full h-12 text-base" disabled={isLoading}>
             {isLoading ? "作成中..." : "アカウントを作成"}

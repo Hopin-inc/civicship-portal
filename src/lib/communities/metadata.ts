@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 
+type Features = "places" | "opportunities" | "points" | "tickets" | "articles" | "prefectures";
+
 // コミュニティごとのベース設定
 interface CommunityBaseConfig {
   id: string;
@@ -11,6 +13,8 @@ interface CommunityBaseConfig {
   logoPath: string;
   squareLogoPath: string;
   ogImagePath: string;
+  enableFeatures: Features[];
+  rootPath?: string;
 }
 
 // コミュニティごとのメタデータ型定義
@@ -57,6 +61,22 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
+    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures"],
+    rootPath: "/activities",
+  },
+  kibotcha: {
+    id: "kibotcha",
+    title: "KIBOTCHA",
+    description: "",
+    shortDescription: "",
+    domain: "https://kibotcha.civicship.jp",
+    faviconPrefix: "/communities/kibotcha",
+    logoPath: "/communities/kibotcha/logo.jpg",
+    squareLogoPath: "/communities/kibotcha/logo-square.jpg",
+    ogImagePath:
+      "https://storage.googleapis.com/prod-civicship-storage-public/asset/kibotcha/ogp.jpg",
+    enableFeatures: ["points"],
+    rootPath: "/users/me",
   },
   default: {
     id: "default",
@@ -70,6 +90,8 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
+    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures"],
+    rootPath: "/activities",
   },
 };
 
