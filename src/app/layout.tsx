@@ -74,6 +74,49 @@ const RootLayout = ({
           `,
       } }
     />
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `
+          window.addEventListener('error', function(event) {
+            fetch('/api/client-log', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                level: 'error',
+                message: 'Unhandled JavaScript error: ' + event.message,
+                meta: {
+                  filename: event.filename,
+                  lineno: event.lineno,
+                  colno: event.colno,
+                  stack: event.error?.stack,
+                  authType: 'general'
+                }
+              })
+            }).catch(function() {
+              console.warn('[CLIENT LOGGER] Failed to log unhandled error');
+            });
+          });
+          
+          window.addEventListener('unhandledrejection', function(event) {
+            fetch('/api/client-log', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                level: 'error',
+                message: 'Unhandled promise rejection: ' + (event.reason?.message || event.reason),
+                meta: {
+                  reason: event.reason,
+                  stack: event.reason?.stack,
+                  authType: 'general'
+                }
+              })
+            }).catch(function() {
+              console.warn('[CLIENT LOGGER] Failed to log unhandled rejection');
+            });
+          });
+        `,
+      }}
+    />
     <CookiesProvider>
       <ApolloProvider>
         <AuthProvider>
