@@ -2,18 +2,18 @@
 
 import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
 import { useSortedSlotsByStartsAt } from "@/app/activities/[id]/hooks/useSortedSlotsByStartsAt";
-import { ActivityCard, ActivityDetail } from "@/app/activities/data/type";
+import { OpportunityCard, OpportunityDetail } from "@/app/activities/data/type";
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
 import { useSameStateActivities } from "@/app/activities/[id]/hooks/useSameStateActivities";
 import { useAuth } from "@/contexts/AuthProvider";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { IOpportunitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { useFilterFutureSlots } from "./useFilterFutureSlots";
 
 interface UseActivityDetailsResult {
-  opportunity: ActivityDetail | null;
-  sameStateActivities: ActivityCard[];
+  opportunity: OpportunityDetail | null;
+  sameStateActivities: OpportunityCard[];
   availableTickets: number;
-  sortedSlots: ActivitySlot[];
+  sortedSlots: IOpportunitySlot[];
   isLoading: boolean;
   error: Error | null;
   refetch: () => void;
