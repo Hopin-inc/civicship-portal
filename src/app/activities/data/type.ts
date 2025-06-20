@@ -1,7 +1,7 @@
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { CommunityId } from "@/types";
 import { TArticleCard } from "@/app/articles/data/type";
-import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
+import { IOpportunitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 
 // ---------------------------------------------
 // 📦 Opportunity カード型（サマリ表示用）
@@ -29,23 +29,27 @@ export type OpportunityBaseCard = CommunityId & {
 // ---------------------------------------------
 // 📄 Opportunity 詳細型（個別ページ用）
 // ---------------------------------------------
-export type ActivityDetail = OpportunityDetail & {
+export type OpportunityDetail = ActivityDetail | QuestDetail;
+
+export type ActivityDetail = OpportunityBaseDetail & {
   feeRequired: number | null;
-  slots: ActivitySlot[];
+  slots: IOpportunitySlot[];
 
   reservableTickets: ReservableActivityTicket[];
   relatedActivities: ActivityCard[];
 };
 
-// ⚠️直近では使わない⚠️
-export type QuestDetail = OpportunityDetail & {
+export type QuestDetail = OpportunityBaseDetail & {
+  pointsToEarn: number | null;
   slots: QuestSlot[];
+
   relatedQuests: QuestCard[];
 };
 
-export type OpportunityDetail = CommunityId & {
+export type OpportunityBaseDetail = CommunityId & {
   id: string;
   title: string;
+  category: GqlOpportunityCategory;
   place: OpportunityPlace;
 
   requiredApproval: boolean;

@@ -5,6 +5,8 @@ export type ActivitySlotGroup = {
   slots: ActivitySlot[];
 };
 
+export type IOpportunitySlot = ActivitySlot | QuestSlot;
+
 export type ActivitySlot = OpportunitySlot & {
   feeRequired: number | null;
 };
