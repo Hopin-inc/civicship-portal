@@ -35,6 +35,7 @@ const requestLink = new ApolloLink((operation, forward) => {
       headers: {
         ...headers,
         "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+        "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
       },
     }));
     return forward(operation);
@@ -67,6 +68,7 @@ const requestLink = new ApolloLink((operation, forward) => {
             ...headers,
             Authorization: accessToken ? `Bearer ${accessToken}` : "",
             "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+            "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
           };
 
           const tokenRequiredOperations = ["userSignUp", "linkPhoneAuth", "storePhoneAuthToken"];
