@@ -2,11 +2,11 @@
 
 import React from "react";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/app/activities/data/type";
+import { OpportunityCard } from "@/app/activities/data/type";
 import OpportunitiesListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
 
 interface ActivitiesAllSectionProps {
-  opportunities: ActivityCard[];
+  opportunities: OpportunityCard[];
   isSectionLoading: boolean;
   isInitialLoading?: boolean;
 }
