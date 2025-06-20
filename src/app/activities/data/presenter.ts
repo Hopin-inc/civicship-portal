@@ -8,16 +8,21 @@ import {
   GqlUser,
   Maybe,
 } from "@/types/graphql";
-import { ActivityCard, ActivityDetail, OpportunityHost } from "@/app/activities/data/type";
+import {
+  OpportunityBaseDetail,
+  OpportunityCard,
+  OpportunityDetail,
+  OpportunityHost,
+} from "@/app/activities/data/type";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { addDays, isAfter } from "date-fns";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
-): ActivityCard[] => {
+): OpportunityCard[] => {
   if (!edges) return [];
 
   return edges
@@ -26,37 +31,53 @@ export const presenterActivityCards = (
     .map((node) => presenterActivityCard(node));
 };
 
-export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
+export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): OpportunityCard[] =>
   edges
     .map((edge) => edge.node)
     .filter((node): node is GqlOpportunity => !!node)
     .map(presenterActivityCard);
 
-export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCard => {
-  return {
+export const presenterActivityCard = (node: Partial<GqlOpportunity>): OpportunityCard => {
+  const base = {
     id: node?.id || "",
     title: node?.title || "",
     category: node?.category || GqlOpportunityCategory.Activity,
-    feeRequired: node?.feeRequired ?? null,
     location: node?.place?.name || "場所未定",
     images: node?.images || [],
     communityId: COMMUNITY_ID || "",
     hasReservableTicket: node?.isReservableWithTicket || false,
   };
-};
 
-export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail => {
-  const { images, place, slots, articles, createdByUser } = data;
-  const threshold = addDays(new Date(), 7);
-
-  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired);
-  const isReservable = activitySlots.some((slot) => slot.isReservable);
+  if (node?.category === GqlOpportunityCategory.Quest) {
+    return {
+      ...base,
+      pointsToEarn: node?.pointsToEarn ?? null,
+    };
+  }
 
   return {
+    ...base,
+    feeRequired: node?.feeRequired ?? null,
+  };
+};
+
+export const presenterActivityDetail = (data: GqlOpportunity): OpportunityDetail => {
+  const { images, place, slots, articles, createdByUser, category } = data;
+  const threshold = addDays(new Date(), 7);
+
+  const isReservable = (slots ?? []).some((slot) => {
+    const startsAt = slot?.startsAt ? new Date(slot.startsAt) : null;
+    return startsAt ? isAfter(startsAt, threshold) : false;
+  });
+
+  const base: OpportunityBaseDetail = {
     communityId: COMMUNITY_ID || "",
+
     id: data.id,
     title: data.title,
     description: data.description || "",
+    category,
+
     body: data.body || "",
     notes: "",
     images: images?.map((image) => image) || [],
@@ -64,15 +85,27 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
 
     requiredApproval: data.requireApproval,
     requiredTicket: data.requiredUtilities?.map((u) => u) || [],
-    feeRequired: data.feeRequired ?? null,
-
     isReservable,
 
     place: presenterPlace(place),
     host: presenterOpportunityHost(createdByUser, articles?.[0]),
-    slots: presenterActivitySlot(slots, threshold, data.feeRequired),
 
     recentOpportunities: [],
+  };
+
+  if (category === GqlOpportunityCategory.Quest) {
+    return {
+      ...base,
+      slots: presenterQuestSlots(slots, threshold, data.pointsToEarn),
+      pointsToEarn: data.pointsToEarn ?? null,
+      relatedQuests: [],
+    };
+  }
+
+  return {
+    ...base,
+    slots: presenterActivitySlots(slots, threshold, data.feeRequired),
+    feeRequired: data.feeRequired ?? null,
     reservableTickets: [],
     relatedActivities: [],
   };
@@ -91,29 +124,60 @@ export function presenterOpportunityHost(
   };
 }
 
-function presenterActivitySlot(
+function presenterQuestSlots(
   slots: Maybe<GqlOpportunitySlot[]> | undefined,
   threshold: Date,
-  feeRequired?: Maybe<number> | undefined,
+  pointsToEarn?: Maybe<number>,
+): QuestSlot[] {
+  return (
+    slots?.flatMap((slot): QuestSlot[] => {
+      if (!slot?.startsAt) return [];
+
+      const startsAtDate = new Date(slot.startsAt);
+      const isReservable = isAfter(startsAtDate, threshold);
+
+      return [
+        {
+          id: slot.id,
+          startsAt: startsAtDate.toISOString(),
+          endsAt: slot.endsAt ? new Date(slot.endsAt).toISOString() : "",
+          capacity: slot.capacity ?? 0,
+          remainingCapacity: slot.remainingCapacity ?? 0,
+          applicantCount: 1,
+          hostingStatus: slot.hostingStatus,
+          isReservable,
+          pointsToEarn: pointsToEarn ?? null,
+        },
+      ];
+    }) ?? []
+  );
+}
+
+function presenterActivitySlots(
+  slots: Maybe<GqlOpportunitySlot[]> | undefined,
+  threshold: Date,
+  feeRequired?: Maybe<number>,
 ): ActivitySlot[] {
   return (
-    slots?.map((slot): ActivitySlot => {
-      const startsAtDate = slot?.startsAt ? new Date(slot.startsAt) : null;
+    slots?.flatMap((slot): ActivitySlot[] => {
+      if (!slot?.startsAt) return [];
 
-      // 7日以内 → false、8日以降 → true
-      const isReservable = startsAtDate ? isAfter(startsAtDate, threshold) : false;
+      const startsAtDate = new Date(slot.startsAt);
+      const isReservable = isAfter(startsAtDate, threshold);
 
-      return {
-        id: slot?.id,
-        hostingStatus: slot?.hostingStatus,
-        startsAt: startsAtDate?.toISOString() || "",
-        endsAt: slot?.endsAt ? new Date(slot.endsAt).toISOString() : "",
-        capacity: slot?.capacity ?? 0,
-        remainingCapacity: slot?.remainingCapacity ?? 0,
-        feeRequired: feeRequired ?? null,
-        applicantCount: 1,
-        isReservable,
-      };
+      return [
+        {
+          id: slot.id,
+          startsAt: startsAtDate.toISOString(),
+          endsAt: slot.endsAt ? new Date(slot.endsAt).toISOString() : "",
+          capacity: slot.capacity ?? 0,
+          remainingCapacity: slot.remainingCapacity ?? 0,
+          applicantCount: 1,
+          hostingStatus: slot.hostingStatus,
+          isReservable,
+          feeRequired: feeRequired ?? null,
+        },
+      ];
     }) ?? []
   );
 }
@@ -133,7 +197,6 @@ export const presenterReservationDateTimeInfo = (
       .flat()
       .filter((ticketId) => ticketId !== undefined) ?? [];
   const paidParticipantCount = participantCount - [...new Set(paidTicketIds)].length;
-  console.log("!!!", reservation.participations);
 
   return {
     formattedDate: startDate.toLocaleDateString("ja-JP", {
@@ -159,13 +222,13 @@ export const presenterReservationDateTimeInfo = (
 };
 
 export const sliceActivitiesBySection = (
-  activityCards: ActivityCard[],
+  activityCards: OpportunityCard[],
 ): {
-  upcomingCards: ActivityCard[];
-  featuredCards: ActivityCard[];
+  upcomingCards: OpportunityCard[];
+  featuredCards: OpportunityCard[];
 } => {
   const safe = <T>(cards: (T | undefined)[]): T[] => cards.filter((c): c is T => !!c);
-  const hasImages = (card: ActivityCard) => card.images && card.images.length > 0;
+  const hasImages = (card: OpportunityCard) => card.images && card.images.length > 0;
 
   const validCards = safe(activityCards.filter(hasImages));
   const featuredCards = validCards.slice(0, 3);
