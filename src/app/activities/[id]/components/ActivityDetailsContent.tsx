@@ -6,13 +6,13 @@ import { AlertCircle, CalendarX } from "lucide-react";
 import SameStateActivities from "./SimilarActivitiesList";
 import ActivityScheduleCard from "./ActivityScheduleCard";
 import {
-  ActivityCard,
-  ActivityDetail,
+  OpportunityCard,
+  OpportunityDetail,
   OpportunityHost,
   OpportunityPlace,
 } from "@/app/activities/data/type";
 import ArticleCard from "@/app/articles/components/Card";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { IOpportunitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import IconWrapper from "@/components/shared/IconWrapper";
@@ -22,10 +22,10 @@ import { ActivityBodySection } from "@/app/activities/[id]/components/ActivityBo
 import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 
 interface ActivityDetailsContentProps {
-  opportunity: ActivityDetail;
+  opportunity: OpportunityDetail;
   availableTickets: number;
-  availableDates: ActivitySlot[];
-  sameStateActivities: ActivityCard[];
+  availableDates: IOpportunitySlot[];
+  sameStateActivities: OpportunityCard[];
   communityId?: string;
 }
 
@@ -127,7 +127,7 @@ const ScheduleSection = ({
   opportunityId,
   communityId,
 }: {
-  slots: ActivitySlot[];
+  slots: IOpportunitySlot[];
   opportunityId: string;
   communityId: string;
 }) => {

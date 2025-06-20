@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
 import { cn } from "@/lib/utils";
+import { OpportunityDetail } from "@/app/activities/data/type";
 
 export type DisableReasonType = "noSlots" | "reservationClosed" | "externalBooking";
 
 interface ActivityDetailsFooterProps {
-  opportunityId: string;
-  price: number | null;
+  opportunity: OpportunityDetail;
   communityId: string | undefined;
   disableReason?: DisableReasonType;
 }
@@ -23,25 +23,53 @@ const DISABLE_MESSAGES = {
 } as const;
 
 const ActivityDetailsFooter: React.FC<ActivityDetailsFooterProps> = ({
-  opportunityId,
-  price,
+  opportunity,
   communityId,
   disableReason,
 }) => {
   const query = new URLSearchParams({
-    id: opportunityId,
+    id: opportunity.id,
     community_id: communityId ?? COMMUNITY_ID,
   });
 
   const env = detectEnvironment();
   const isLiff = env === AuthEnvironment.LIFF;
 
+  const isActivity = "feeRequired" in opportunity;
+  const isQuest = "pointsToEarn" in opportunity;
+
+  const renderPriceText = () => {
+    if (isActivity) {
+      const isSpecified = opportunity.feeRequired != null;
+      return (
+        <>
+          <p className="text-body-sm text-muted-foreground">1人あたり</p>
+          <p className={cn("text-body-lg font-bold", !isSpecified && "text-muted-foreground/50")}>
+            {isSpecified ? `${opportunity.feeRequired?.toLocaleString()}円〜` : "料金未定"}
+          </p>
+        </>
+      );
+    }
+
+    if (isQuest) {
+      const isSpecified = opportunity.pointsToEarn != null;
+      return (
+        <>
+          <p className="text-body-sm text-muted-foreground">獲得ポイント</p>
+          <p className={cn("text-body-lg font-bold", !isSpecified && "text-muted-foreground/50")}>
+            {isSpecified ? `${opportunity.pointsToEarn?.toLocaleString()}pt` : "獲得pt未定"}
+          </p>
+        </>
+      );
+    }
+
+    return null;
+  };
+
   const renderActionElement = () => {
     if (disableReason && disableReason in DISABLE_MESSAGES) {
       return (
-        <p className="text-muted-foreground text-body-md">
-          {DISABLE_MESSAGES[disableReason as keyof typeof DISABLE_MESSAGES]}
-        </p>
+        <p className="text-muted-foreground text-body-md">{DISABLE_MESSAGES[disableReason]}</p>
       );
     }
 
@@ -62,12 +90,7 @@ const ActivityDetailsFooter: React.FC<ActivityDetailsFooterProps> = ({
           isLiff ? "h-28" : "h-20",
         )}
       >
-        <div>
-          <p className="text-body-sm text-muted-foreground">1人あたり</p>
-          <p className={cn("text-body-lg font-bold", price == null && "text-muted-foreground/50")}>
-            {price != null ? `${price.toLocaleString()}円〜` : "料金未定"}
-          </p>
-        </div>
+        <div>{renderPriceText()}</div>
         {renderActionElement()}
       </div>
     </footer>
