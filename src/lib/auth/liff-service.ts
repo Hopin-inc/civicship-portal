@@ -6,6 +6,7 @@ import { categorizeFirebaseError, lineAuth } from "./firebase-config";
 import { AuthTokens, TokenManager } from "./token-manager";
 import retry from "retry";
 import { logger } from "@/lib/logging";
+import { RawURIComponent } from "@/utils/path";
 
 /**
  * LIFF初期化状態の型定義
@@ -112,7 +113,7 @@ export class LiffService {
    * @param redirectPath リダイレクト先のパス（オプション）
    * @returns ログインが成功したかどうか
    */
-  public async login(redirectPath?: string): Promise<boolean> {
+  public async login(redirectPath?: RawURIComponent): Promise<boolean> {
     try {
       if (!this.state.isInitialized) {
         await this.initialize();
@@ -121,12 +122,11 @@ export class LiffService {
       if (liff.isInClient()) {
         this.state.isLoggedIn = true;
       } else {
-        const redirectUri =
-          typeof window !== "undefined"
-            ? redirectPath
-              ? window.location.origin + redirectPath
-              : window.location.origin
-            : undefined;
+        const redirectUri = typeof window !== "undefined"
+          ? redirectPath
+            ? window.location.origin + redirectPath
+            : window.location.origin
+          : undefined;
 
         liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない

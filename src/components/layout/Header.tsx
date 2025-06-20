@@ -73,7 +73,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           />
         </Link>
       )}
-      {config.showSearchForm && (
+      {currentCommunityConfig.enableFeatures.includes("opportunities") && config.showSearchForm && (
         <div className="flex-1 ml-4">
           <SearchBox
             location={config.searchParams?.location}
@@ -88,7 +88,6 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           <h1 className="text-title-md truncate max-w-[80vw] text-center">{config.title}</h1>
         </div>
       )}
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </header>
   );
 };

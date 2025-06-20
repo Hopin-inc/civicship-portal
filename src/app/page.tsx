@@ -10,11 +10,22 @@ import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection
 import OpportunitiesCarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import ListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import {
+  decodeURIComponentWithType,
+  EncodedURIComponent,
+  extractSearchParamFromRelativePath,
+} from "@/utils/path";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function HomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, isAuthenticating, authenticationState, loading: authLoading } = useAuth();
+  const {
+    isAuthenticated,
+    isAuthenticating,
+    authenticationState,
+    loading: authLoading,
+  } = useAuth();
   const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
   });
@@ -26,52 +37,52 @@ export default function HomePage() {
   useEffect(() => {
     if (authLoading || userLoading || isAuthenticating) return;
 
-    const isReturnFromLineAuth = searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
-    const nextPath = searchParams.get("liff.state");
+    const isReturnFromLineAuth =
+      searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
 
     if (isReturnFromLineAuth) {
-      let cleanedNextPath = nextPath;
-      
+      const liffState = searchParams.get("liff.state") as EncodedURIComponent | null;
+      let nextPath = decodeURIComponentWithType(liffState);
+
       if (nextPath?.includes("?next=")) {
-        try {
-          const url = new URL(`https://dummy.com${nextPath}`);
-          cleanedNextPath = url.searchParams.get("next");
-        } catch {
-          const nextMatch = nextPath.match(/[?&]next=([^&]*)/);
-          cleanedNextPath = nextMatch ? decodeURIComponent(nextMatch[1]) : null;
-        }
-      } else if (nextPath?.startsWith("/login?next=")) {
-        const urlParams = new URLSearchParams(nextPath.split("?")[1]);
-        cleanedNextPath = urlParams.get("next");
+        nextPath = decodeURIComponentWithType(
+          extractSearchParamFromRelativePath<EncodedURIComponent>(nextPath, "next"),
+        );
       } else if (nextPath?.startsWith("/login")) {
-        cleanedNextPath = null;
+        nextPath = null;
       }
 
-      const cleanedUrl = cleanedNextPath ? `${window.location.pathname}?next=${cleanedNextPath}` : window.location.pathname;
+      const cleanedUrl = nextPath
+        ? `${window.location.pathname}?next=${nextPath}`
+        : window.location.pathname;
       router.replace(cleanedUrl);
-
-      if (isAuthenticated && authenticationState === "user_registered") {
-        const redirectPath = authRedirectService.getPostLineAuthRedirectPath(cleanedNextPath);
-        router.replace(redirectPath);
-      }
       return;
     }
 
-    router.replace("/activities");
-  }, [authLoading, authRedirectService, authenticationState, isAuthenticated, isAuthenticating, router, searchParams, userLoading]);
+    router.replace(currentCommunityConfig.rootPath ?? "/activities");
+  }, [
+    authLoading,
+    authRedirectService,
+    authenticationState,
+    isAuthenticated,
+    isAuthenticating,
+    router,
+    searchParams,
+    userLoading,
+  ]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   if (isAuthenticating || authLoading) {
-    return <LoadingIndicator fullScreen={ true } />;
+    return <LoadingIndicator fullScreen={true} />;
   }
 
   return (
     <div className="min-h-screen pb-16">
       <FeaturedSectionSkeleton />
-      <OpportunitiesCarouselSectionSkeleton title={ "もうすぐ開催予定" } />
+      <OpportunitiesCarouselSectionSkeleton title={"もうすぐ開催予定"} />
       <ListSectionSkeleton />
     </div>
   );
