@@ -187,6 +187,7 @@ export const getStatusInfo = (status: GqlReservationStatus): ReservationStatus |
         statusSubText: "案内人の都合により中止となりました。",
         statusClass: "bg-red-50 border-red-200",
       };
+      // ケースが増える
     default:
       return null;
   }
