@@ -2,10 +2,10 @@
 
 import { useMemo } from "react";
 import { useGetUserWalletQuery } from "@/types/graphql";
-import { ActivityDetail } from "@/app/activities/data/type";
+import { type OpportunityDetail } from "@/app/activities/data/type";
 
 export const useAvailableTickets = (
-  opportunity: ActivityDetail | null,
+  opportunity: OpportunityDetail | null,
   userId: string | undefined,
 ): number => {
   const { data } = useGetUserWalletQuery({
