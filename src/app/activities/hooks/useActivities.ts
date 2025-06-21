@@ -4,7 +4,6 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import React from "react";
 import {
   GqlOpportunitiesConnection,
-  GqlOpportunityCategory,
   GqlPublishStatus,
   GqlSortDirection,
   useGetOpportunitiesQuery,
@@ -33,7 +32,7 @@ export const useActivities = (): UseActivitiesResult => {
   const { data, loading, error, fetchMore, refetch } = useGetOpportunitiesQuery({
     variables: {
       filter: {
-        category: GqlOpportunityCategory.Activity,
+        // category: GqlOpportunityCategory.Activity,
         publishStatus: [GqlPublishStatus.Public],
       },
       sort: {
@@ -56,7 +55,7 @@ export const useActivities = (): UseActivitiesResult => {
     await fetchMore({
       variables: {
         filter: {
-          category: GqlOpportunityCategory.Activity,
+          // category: GqlOpportunityCategory.Activity,
           publishStatus: [GqlPublishStatus.Public],
         },
         sort: {

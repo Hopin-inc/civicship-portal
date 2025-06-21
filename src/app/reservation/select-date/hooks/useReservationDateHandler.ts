@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { IOpportunitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { buildReservationParams } from "@/app/reservation/data/presenter/opportunitySlot";
 
 export const useReservationDateHandler = ({
@@ -19,7 +19,7 @@ export const useReservationDateHandler = ({
   const router = useRouter();
 
   const handleReservation = useCallback(
-    (slot: ActivitySlot) => {
+    (slot: IOpportunitySlot) => {
       if (!selectedDate) {
         const date = new Date(slot.startsAt);
         const dateLabel = date.toLocaleDateString("ja-JP", {
@@ -39,7 +39,7 @@ export const useReservationDateHandler = ({
 
   return {
     handleReservation,
-    isSlotAvailable: (slot: ActivitySlot) =>
+    isSlotAvailable: (slot: IOpportunitySlot) =>
       slot.remainingCapacity != null && slot.remainingCapacity >= selectedGuests,
   };
 };

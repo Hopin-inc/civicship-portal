@@ -12,7 +12,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
 import { notFound, useParams, useSearchParams } from "next/navigation";
 import ErrorState from "@/components/shared/ErrorState";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { IOpportunitySlot } from "@/app/reservation/data/type/opportunitySlot";
 
 export default function ActivityPage() {
   const headerConfig = useMemo(
@@ -62,7 +62,7 @@ export default function ActivityPage() {
   }
 
   const getDisableReason = (
-    slots: ActivitySlot[] | null | undefined,
+    slots: IOpportunitySlot[] | null | undefined,
     isExternalBooking: boolean,
     isReservable: boolean,
   ): DisableReasonType | undefined => {
@@ -87,13 +87,11 @@ export default function ActivityPage() {
             availableDates={sortedSlots}
             sameStateActivities={sameStateActivities}
             communityId={communityId}
-            // isExternalBooking={isExternalBooking}
           />
         </div>
       </main>
       <ActivityDetailsFooter
-        opportunityId={opportunity.id}
-        price={opportunity.feeRequired}
+        opportunity={opportunity}
         communityId={communityId}
         disableReason={getDisableReason(sortedSlots, isExternalBooking, opportunity.isReservable)}
       />

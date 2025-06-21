@@ -5,10 +5,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { IOpportunitySlot } from "@/app/reservation/data/type/opportunitySlot";
 
 interface ActivityScheduleCardProps {
-  slot: ActivitySlot;
+  slot: IOpportunitySlot;
   opportunityId: string;
   communityId: string;
 }
@@ -24,13 +24,22 @@ const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
     : renderAvailableSlotCard(slot, opportunityId, communityId);
 };
 
-const renderFullSlotCard = (slot: ActivitySlot) => {
+const renderFullSlotCard = (slot: IOpportunitySlot) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
 
-  const isFeeSpecified = slot.feeRequired != null;
-  const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
-  const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-gray-400" : "text-gray-400"}`;
+  const isActivity = "feeRequired" in slot;
+  const isQuest = "pointsToEarn" in slot;
+
+  const displayText = isQuest
+    ? slot.pointsToEarn != null
+      ? `${slot.pointsToEarn.toLocaleString()}pt獲得`
+      : "獲得pt未定"
+    : isActivity && slot.feeRequired != null
+      ? `${slot.feeRequired.toLocaleString()}円`
+      : "料金未定";
+
+  const feeClass = `text-body-md font-bold ${!isQuest && !slot.feeRequired ? "text-gray-400" : "text-gray-400"}`;
 
   return (
     <div className="bg-gray-100 border border-gray-200 rounded-xl px-6 py-6 w-[280px] flex flex-col">
@@ -46,8 +55,10 @@ const renderFullSlotCard = (slot: ActivitySlot) => {
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            <p className={feeClass}>{feeText}</p>
-            {isFeeSpecified && <p className="text-body-sm ml-1 text-gray-300">/ 人</p>}
+            <p className={feeClass}>{displayText}</p>
+            {isActivity && slot.feeRequired != null && (
+              <p className="text-body-sm ml-1 text-gray-300">/ 人</p>
+            )}
           </div>
         </div>
       </div>
@@ -61,7 +72,7 @@ const renderFullSlotCard = (slot: ActivitySlot) => {
 };
 
 const renderAvailableSlotCard = (
-  slot: ActivitySlot,
+  slot: IOpportunitySlot,
   opportunityId: string,
   communityId: string,
 ) => {
@@ -69,9 +80,20 @@ const renderAvailableSlotCard = (
   const endDate = new Date(slot.endsAt);
   const isReservable = slot.isReservable;
 
-  const isFeeSpecified = slot.feeRequired != null;
-  const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
-  const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-muted-foreground/50" : "text-caption"}`;
+  const isActivity = "feeRequired" in slot;
+  const isQuest = "pointsToEarn" in slot;
+
+  const displayText = isQuest
+    ? slot.pointsToEarn != null
+      ? `${slot.pointsToEarn.toLocaleString()}pt獲得`
+      : "獲得pt未定"
+    : isActivity && slot.feeRequired != null
+      ? `${slot.feeRequired.toLocaleString()}円`
+      : "料金未定";
+
+  const feeClass = `text-body-md font-bold ${
+    !isQuest && !slot.feeRequired ? "text-muted-foreground/50" : "text-caption"
+  }`;
 
   const query = new URLSearchParams({
     id: opportunityId,
@@ -96,8 +118,10 @@ const renderAvailableSlotCard = (
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            <p className={feeClass}>{feeText}</p>
-            {isFeeSpecified && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
+            <p className={feeClass}>{displayText}</p>
+            {isActivity && slot.feeRequired != null && (
+              <p className="text-body-sm ml-1 text-caption">/ 人</p>
+            )}
           </div>
         </div>
       </div>

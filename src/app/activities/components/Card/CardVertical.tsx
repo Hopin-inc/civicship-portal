@@ -4,20 +4,31 @@ import Image from "next/image";
 import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { ActivityCard } from "@/app/activities/data/type";
+import { OpportunityCard, QuestCard } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface OpportunityCardVerticalProps {
-  opportunity: ActivityCard;
+  opportunity: OpportunityCard;
   isCarousel?: boolean;
+}
+
+function isQuestCard(card: OpportunityCard): card is QuestCard {
+  return "pointsToEarn" in card;
 }
 
 export default function OpportunityCardVertical({
   opportunity,
   isCarousel = false,
 }: OpportunityCardVerticalProps) {
-  const { id, title, feeRequired, location, images, hasReservableTicket, communityId } =
-    opportunity;
+  const { id, title, location, images, hasReservableTicket, communityId } = opportunity;
+
+  const subText = isQuestCard(opportunity)
+    ? opportunity.pointsToEarn != null
+      ? `${opportunity.pointsToEarn.toLocaleString()}pt獲得`
+      : "獲得ポイント未定"
+    : opportunity.feeRequired != null
+      ? `1人あたり${opportunity.feeRequired.toLocaleString()}円から`
+      : "料金未定";
 
   return (
     <Link
@@ -36,7 +47,7 @@ export default function OpportunityCardVertical({
           width={400}
           height={400}
           sizes="164px"
-          placeholder={`blur`}
+          placeholder="blur"
           blurDataURL={PLACEHOLDER_IMAGE}
           loading="lazy"
           className="h-full w-full object-cover"
@@ -49,9 +60,7 @@ export default function OpportunityCardVertical({
       <div className="mt-3">
         <h3 className="text-title-sm text-foreground line-clamp-2">{title}</h3>
         <div className="mt-2 flex flex-col">
-          <p className="text-body-sm text-muted-foreground">
-            {feeRequired != null ? `1人あたり${feeRequired.toLocaleString()}円から` : "料金未定"}
-          </p>
+          <p className="text-body-sm text-muted-foreground">{subText}</p>
           <div className="flex items-center text-body-sm text-muted-foreground mt-1">
             <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
             <span className="line-clamp-1 break-words">{location}</span>

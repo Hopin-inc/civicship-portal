@@ -2,12 +2,12 @@
 
 import { useMemo } from "react";
 import { GqlWallet, useGetUserWalletQuery } from "@/types/graphql";
-import { ActivityDetail } from "@/app/activities/data/type";
+import { type OpportunityDetail } from "@/app/activities/data/type";
 import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
 import { useSlotDateRange } from "@/app/reservation/confirm/hooks/useSlotDateRange";
 
 export function useSlotAndTicketInfo(
-  opportunity: ActivityDetail | null,
+  opportunity: OpportunityDetail | null,
   userId?: string,
   slotId?: string,
 ) {

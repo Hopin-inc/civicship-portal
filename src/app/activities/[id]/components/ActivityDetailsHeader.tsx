@@ -2,12 +2,13 @@
 
 import React from "react";
 import { ChevronRight, MapPin, Ticket } from "lucide-react";
-import { ActivityDetail } from "@/app/activities/data/type";
+import { OpportunityDetail } from "@/app/activities/data/type";
 import ImagesCarousel from "@/components/ui/images-carousel";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { GqlOpportunityCategory } from "@/types/graphql";
 
 interface ActivityDetailsHeaderProps {
-  opportunity: ActivityDetail;
+  opportunity: OpportunityDetail;
   availableTickets: number;
 }
 
@@ -33,14 +34,17 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
         </div>
       </div>
 
-      {opportunity.reservableTickets.length > 0 && availableTickets > 0 && (
-        <div className="flex items-center gap-2 bg-primary-foreground text-primary rounded-lg px-4 py-3 mt-4 cursor-pointer hover:bg-primary-foreground/80">
-          <Ticket className="w-5 h-5" />
-          <p className="text-label-md">利用できるチケット</p>
-          <p className="text-label-md font-bold">{availableTickets}枚</p>
-          <ChevronRight className="w-4 h-4 ml-auto" />
-        </div>
-      )}
+      {"reservableTickets" in opportunity &&
+        opportunity.category === GqlOpportunityCategory.Activity &&
+        opportunity.reservableTickets.length > 0 &&
+        availableTickets > 0 && (
+          <div className="flex items-center gap-2 bg-primary-foreground text-primary rounded-lg px-4 py-3 mt-4 cursor-pointer hover:bg-primary-foreground/80">
+            <Ticket className="w-5 h-5" />
+            <p className="text-label-md">利用できるチケット</p>
+            <p className="text-label-md font-bold">{availableTickets}枚</p>
+            <ChevronRight className="w-4 h-4 ml-auto" />
+          </div>
+        )}
     </div>
   );
 };

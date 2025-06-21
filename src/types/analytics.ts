@@ -29,9 +29,12 @@ type ReservationEvent = {
   opportunityId: string;
 
   guest: number;
-  paidGuest: number;
-  feeRequired: number;
-  totalFee: number;
+  paidGuest: number | null;
+
+  feeRequired: number | null;
+  totalFee: number | null;
+  pointToEarn: number | null;
+
   scheduledAt: string;
 };
 

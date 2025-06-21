@@ -1,26 +1,31 @@
 import React, { useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
+import {
+  ActivitySlot,
+  ActivitySlotGroup,
+  IOpportunitySlot,
+  QuestSlot,
+} from "@/app/reservation/data/type/opportunitySlot";
 import { formatTimeRange } from "@/utils/date";
 import { addDays, isBefore } from "date-fns";
+import { GqlOpportunityCategory } from "@/types/graphql";
 
 interface TimeSlotListProps {
+  category: GqlOpportunityCategory;
   dateSections: ActivitySlotGroup[];
-  isSlotAvailable: (slot: ActivitySlot) => boolean;
-  onSelectSlot: (slot: ActivitySlot) => void;
+  isSlotAvailable: (slot: IOpportunitySlot) => boolean;
+  onSelectSlot: (slot: IOpportunitySlot) => void;
 }
 
 export const parseJapaneseDateLabel = (label: string) => {
   const match = label.match(/^(\d+)月(\d+)日（(.+)）$/);
   if (!match) return { month: "", day: "", weekday: "" };
-
   const [, month, day, weekday] = match;
   return { month, day, weekday };
 };
 
 const SectionHeader = ({ label }: { label: string }) => {
   const { month, day, weekday } = parseJapaneseDateLabel(label);
-
   return (
     <h2 className="flex items-baseline gap-1 mb-2">
       <span className="text-lg text-gray-500">{month}/</span>
@@ -31,16 +36,19 @@ const SectionHeader = ({ label }: { label: string }) => {
 };
 
 const TimeSlotList: React.FC<TimeSlotListProps> = ({
+  category,
   dateSections,
   isSlotAvailable,
   onSelectSlot,
 }) => {
   const handleSelectSlot = useCallback(
-    (slot: ActivitySlot) => () => onSelectSlot(slot),
+    (slot: IOpportunitySlot) => () => onSelectSlot(slot),
     [onSelectSlot],
   );
 
   const registrationCutoff = addDays(new Date(), 7);
+  const isActivity = category === GqlOpportunityCategory.Activity;
+  const isQuest = category === GqlOpportunityCategory.Quest;
 
   return (
     <div className="space-y-8">
@@ -52,10 +60,27 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
               const remainingCapacity = slot.remainingCapacity || 0;
               const isFull = remainingCapacity === 0;
               const isAvailable = isSlotAvailable(slot);
-              const isFeeSpecified = slot.feeRequired != null;
-
               const startsAtDate = new Date(slot.startsAt);
               const isRegistrationClosed = isBefore(startsAtDate, registrationCutoff);
+
+              let detailText = "";
+              let isDetailMuted = false;
+
+              if (isActivity) {
+                const activitySlot = slot as ActivitySlot;
+                const isSpecified = activitySlot.feeRequired != null;
+                detailText = isSpecified
+                  ? `${activitySlot.feeRequired?.toLocaleString()}円/人`
+                  : "料金未定";
+                isDetailMuted = isFull || isRegistrationClosed || !isSpecified;
+              } else if (isQuest) {
+                const questSlot = slot as QuestSlot;
+                const isSpecified = questSlot.pointsToEarn != null;
+                detailText = isSpecified
+                  ? `+${questSlot.pointsToEarn?.toLocaleString()}pt`
+                  : "獲得pt未定";
+                isDetailMuted = isFull || isRegistrationClosed || !isSpecified;
+              }
 
               return (
                 <div
@@ -75,12 +100,10 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                       </p>
                       <p
                         className={`text-md font-bold ${
-                          isFull || !isFeeSpecified || isRegistrationClosed
-                            ? "text-muted-foreground/50"
-                            : ""
+                          isDetailMuted ? "text-muted-foreground/50" : ""
                         }`}
                       >
-                        {isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円/人` : "料金未定"}
+                        {detailText}
                       </p>
                     </div>
 

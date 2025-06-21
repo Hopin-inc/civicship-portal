@@ -3,7 +3,6 @@ import {
   GetOpportunitiesDocument,
   GqlGetOpportunitiesQuery,
   GqlGetOpportunitiesQueryVariables,
-  GqlOpportunityCategory,
   GqlPublishStatus,
   GqlSortDirection,
 } from "@/types/graphql";
@@ -17,7 +16,7 @@ export async function fetchFeaturedAndCarousel() {
     query: GetOpportunitiesDocument,
     variables: {
       filter: {
-        category: GqlOpportunityCategory.Activity,
+        // category: GqlOpportunityCategory.Activity,
         publishStatus: [GqlPublishStatus.Public],
       },
       sort: {

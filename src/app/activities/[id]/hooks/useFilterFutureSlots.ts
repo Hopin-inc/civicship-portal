@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { IOpportunitySlot } from "@/app/reservation/data/type/opportunitySlot";
 
-export const useFilterFutureSlots = (slots: ActivitySlot[] | undefined): ActivitySlot[] => {
+export const useFilterFutureSlots = (slots: IOpportunitySlot[] | undefined): IOpportunitySlot[] => {
   return useMemo(() => {
     if (!slots) return [];
 

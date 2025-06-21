@@ -1,11 +1,19 @@
 "use client";
-import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
-import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
+import {
+  GqlOpportunityCategory,
+  GqlOpportunitySlot,
+  GqlOpportunitySlotEdge,
+} from "@/types/graphql";
+import {
+  ActivitySlot,
+  ActivitySlotGroup,
+  IOpportunitySlot,
+} from "@/app/reservation/data/type/opportunitySlot";
 import { addDays, isAfter } from "date-fns";
 
 export const presenterOpportunitySlots = (
   edges: (GqlOpportunitySlotEdge | null | undefined)[] | null | undefined,
-): ActivitySlot[] => {
+): IOpportunitySlot[] => {
   if (!edges) return [];
 
   return edges
@@ -15,33 +23,47 @@ export const presenterOpportunitySlots = (
 
       if (!node || !opportunity) return null;
 
-      return presenterOpportunitySlot(node, opportunity.feeRequired ?? null);
+      return presenterOpportunitySlot(
+        node,
+        opportunity.category,
+        opportunity.feeRequired ?? null,
+        opportunity.pointsToEarn ?? null,
+      );
     })
     .filter((slot): slot is ActivitySlot => slot !== null);
 };
 
 export const presenterOpportunitySlot = (
   slot: GqlOpportunitySlot,
+  category: GqlOpportunityCategory,
   feeRequired: number | null,
-): ActivitySlot => {
+  pointsToEarn: number | null,
+): IOpportunitySlot => {
   const startsAtDate = new Date(slot.startsAt);
   const threshold = addDays(new Date(), 7);
   const isReservable = isAfter(startsAtDate, threshold);
 
-  return {
+  const base = {
     id: slot.id,
     hostingStatus: slot.hostingStatus,
-    feeRequired,
-
     capacity: slot.capacity ?? 0,
     remainingCapacity: slot.remainingCapacity ?? 0,
-
     applicantCount: null,
-
     startsAt: startsAtDate.toISOString(),
     endsAt: new Date(slot.endsAt).toISOString(),
+    isReservable,
+  };
 
-    isReservable, // ✅ 追加
+  if (category === GqlOpportunityCategory.Quest) {
+    return {
+      ...base,
+      pointsToEarn: pointsToEarn ?? null,
+    };
+  }
+
+  return {
+    ...base,
+    feeRequired: feeRequired ?? null,
   };
 };
 
@@ -54,16 +76,8 @@ export const filterSlotGroupsBySelectedDate = (
   return groups.filter((group) => selectedDates.includes(group.dateLabel));
 };
 
-export const presenterActivitySlots = (
-  slots: GqlOpportunitySlot[] | null | undefined,
-  feeRequired: number,
-): ActivitySlot[] => {
-  if (!slots || slots.length === 0) return [];
-  return slots.map((slot) => presenterOpportunitySlot(slot, feeRequired));
-};
-
-export const groupActivitySlotsByDate = (slots: ActivitySlot[]): ActivitySlotGroup[] => {
-  const groups: Record<string, ActivitySlot[]> = {};
+export const groupActivitySlotsByDate = (slots: IOpportunitySlot[]): ActivitySlotGroup[] => {
+  const groups: Record<string, IOpportunitySlot[]> = {};
 
   for (const slot of slots) {
     const date = new Date(slot.startsAt);
@@ -90,15 +104,10 @@ export const groupActivitySlotsByDate = (slots: ActivitySlot[]): ActivitySlotGro
     );
 };
 
-export const isSlotAvailable = (slot: ActivitySlot, selectedGuests: number): boolean => {
-  const remainingCapacity = slot.remainingCapacity;
-  return remainingCapacity >= selectedGuests;
-};
-
 export const buildReservationParams = (
   opportunityId: string,
   communityId: string,
-  slot: ActivitySlot,
+  slot: IOpportunitySlot,
   selectedGuests: number,
 ): URLSearchParams => {
   return new URLSearchParams({
