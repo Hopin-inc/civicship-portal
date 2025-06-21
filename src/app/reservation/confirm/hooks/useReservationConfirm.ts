@@ -5,7 +5,7 @@ import { useGetOpportunityQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { presenterActivityDetail } from "@/app/activities/data/presenter";
 import { useSlotAndTicketInfo } from "@/app/reservation/confirm/hooks/useSlotAndTicket";
-import type { ActivityDetail } from "@/app/activities/data/type";
+import type { OpportunityDetail } from "@/app/activities/data/type";
 import { logger } from "@/lib/logging";
 
 export const useReservationConfirm = ({
@@ -32,7 +32,7 @@ export const useReservationConfirm = ({
     errorPolicy: "all",
   });
 
-  const opportunity: ActivityDetail | null = useMemo(() => {
+  const opportunity: OpportunityDetail | null = useMemo(() => {
     return data?.opportunity ? presenterActivityDetail(data.opportunity) : null;
   }, [data]);
 
