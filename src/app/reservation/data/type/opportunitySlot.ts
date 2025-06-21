@@ -2,7 +2,7 @@ import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 
 export type ActivitySlotGroup = {
   dateLabel: string;
-  slots: ActivitySlot[];
+  slots: IOpportunitySlot[];
 };
 
 export type IOpportunitySlot = ActivitySlot | QuestSlot;
