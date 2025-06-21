@@ -14,6 +14,7 @@ import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInf
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
 import ArticleCard from "@/app/articles/components/Card";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
+import { ActivityCard, OpportunityCard, QuestCard } from "@/app/activities/data/type";
 
 export default function CompletePage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -51,19 +52,22 @@ export default function CompletePage() {
   useEffect(() => {
     if (!reservation || !opportunity || !dateTimeInfo) return;
 
+    const trackParams = {
+      reservationId: reservation.id,
+      opportunityId: opportunity.id,
+      opportunityTitle: opportunity.title,
+      category: opportunity.category,
+      guest: dateTimeInfo.participantCount,
+      scheduledAt: dateTimeInfo.startTime,
+      paidGuest: isActivity(opportunity) ? dateTimeInfo.paidParticipantCount : null,
+      feeRequired: isActivity(opportunity) ? (opportunity.feeRequired ?? null) : null,
+      totalFee: isActivity(opportunity) ? dateTimeInfo.totalPrice : null,
+      pointToEarn: isQuest(opportunity) ? (opportunity.pointsToEarn ?? null) : null,
+    };
+
     track({
       name: "apply_opportunity",
-      params: {
-        reservationId: reservation.id,
-        opportunityId: opportunity.id,
-        opportunityTitle: opportunity.title,
-        category: opportunity.category,
-        guest: dateTimeInfo.participantCount,
-        paidGuest: dateTimeInfo.paidParticipantCount,
-        feeRequired: opportunity.feeRequired ?? 0,
-        totalFee: dateTimeInfo.totalPrice,
-        scheduledAt: dateTimeInfo.startTime,
-      },
+      params: trackParams,
     });
   }, [reservation, opportunity, dateTimeInfo, track]);
 
@@ -72,49 +76,58 @@ export default function CompletePage() {
 
   if (loading) return <LoadingIndicator fullScreen />;
   if (error || !reservation || !opportunity || !dateTimeInfo)
-    return <ErrorState title="申込完了ページを読み込めませんでした" refetchRef={ refetchRef } />;
+    return <ErrorState title="申込完了ページを読み込めませんでした" refetchRef={refetchRef} />;
 
   return (
     <main className="flex flex-col items-center">
       <CompletionHeader />
-      { oppotunityDetail && <OpportunityInfo opportunity={ oppotunityDetail } /> }
-      { dateTimeInfo && opportunity && (
+      {oppotunityDetail && <OpportunityInfo opportunity={oppotunityDetail} />}
+      {dateTimeInfo && opportunity && (
         <div className="px-6 w-full">
           <ReservationDetails
-            formattedDate={ dateTimeInfo.formattedDate }
-            startTime={ dateTimeInfo.startTime }
-            endTime={ dateTimeInfo.endTime }
-            participantCount={ dateTimeInfo.participantCount }
-            paidParticipantCount={ dateTimeInfo.paidParticipantCount }
-            totalPrice={ dateTimeInfo.totalPrice }
-            pricePerPerson={ opportunity.feeRequired ?? 0 }
-            location={ oppotunityDetail?.place }
-            phoneNumber={ reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber }
-            isReserved={ true }
+            formattedDate={dateTimeInfo.formattedDate}
+            startTime={dateTimeInfo.startTime}
+            endTime={dateTimeInfo.endTime}
+            participantCount={dateTimeInfo.participantCount}
+            paidParticipantCount={dateTimeInfo.paidParticipantCount}
+            totalPrice={dateTimeInfo.totalPrice}
+            pricePerPerson={isActivity(opportunity) ? (opportunity.feeRequired ?? null) : null}
+            pointsToEarn={isQuest(opportunity) ? (opportunity.pointsToEarn ?? null) : null}
+            location={oppotunityDetail?.place}
+            phoneNumber={reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber}
+            isReserved={true}
           />
         </div>
-      ) }
-      { articleCard ? (
+      )}
+      {articleCard ? (
         <>
           <div className="h-2 bg-border -mx-6 w-full" />
           <div className="px-6 w-full pt-6 pb-8 max-w-mobile-l mx-auto space-y-4">
             <h2 className="text-display-md mb-4">案内人の想い</h2>
-            <ArticleCard article={ articleCard } showUser />
+            <ArticleCard article={articleCard} showUser />
           </div>
         </>
-      ) : null }
-      { opportunityId && sameStateActivities.length > 0 && (
+      ) : null}
+      {opportunityId && sameStateActivities.length > 0 && (
         <>
           <div className="h-2 bg-border -mx-6 w-full" />
           <div className="px-6 w-full">
             <SameStateActivities
               header="近くでおすすめの関わり"
-              opportunities={ sameStateActivities }
-              currentOpportunityId={ opportunityId }
+              opportunities={sameStateActivities}
+              currentOpportunityId={opportunityId}
             />
           </div>
         </>
-      ) }
+      )}
     </main>
   );
+}
+
+function isQuest(opportunity: OpportunityCard): opportunity is QuestCard {
+  return opportunity.category === "QUEST";
+}
+
+function isActivity(opportunity: OpportunityCard): opportunity is ActivityCard {
+  return opportunity.category === "ACTIVITY";
 }
