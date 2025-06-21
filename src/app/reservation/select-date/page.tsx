@@ -84,6 +84,7 @@ export default function SelectDatePage() {
 
       <div className="py-6">
         <TimeSlotList
+          category={opportunity.category}
           dateSections={filteredDateSections}
           isSlotAvailable={isSlotAvailable}
           onSelectSlot={handleReservation}

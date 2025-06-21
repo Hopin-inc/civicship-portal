@@ -5,7 +5,7 @@ import {
   useGetOpportunitySlotsQuery,
 } from "@/types/graphql";
 import { ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
-import { ActivityDetail } from "@/app/activities/data/type";
+import { OpportunityDetail } from "@/app/activities/data/type";
 import {
   groupActivitySlotsByDate,
   presenterOpportunitySlots,
@@ -33,7 +33,7 @@ export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLo
     errorPolicy: "all",
   });
 
-  const opportunity: ActivityDetail | null = useMemo(() => {
+  const opportunity: OpportunityDetail | null = useMemo(() => {
     const raw = data?.opportunitySlots?.edges?.find((edge) => edge?.node?.opportunity != null)?.node
       ?.opportunity;
 
