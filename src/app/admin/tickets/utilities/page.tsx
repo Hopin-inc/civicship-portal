@@ -32,7 +32,7 @@ export default function UtilitiesPage() {
     variables: {
       filter: { communityIds: [COMMUNITY_ID], ownerIds: user?.id ? [user.id] : undefined },
       sort: { createdAt: GqlSortDirection.Desc },
-      first: 20,
+      first: 200,
     },
   });
 

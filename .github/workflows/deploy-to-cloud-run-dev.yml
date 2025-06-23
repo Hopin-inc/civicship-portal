@@ -1,28 +1,39 @@
-name: Deploy to Cloud Run
+name: Build and Deploy for all communities
 
 on:
   push:
     branches:
       - develop
       - hotfix/**
-
 jobs:
-  deploy:
+  read-communities:
     runs-on: ubuntu-latest
-    environment: kyoso-dev
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Read community list from JSON
+        id: set-matrix
+        run: |
+          COMMUNITIES=$(jq -c '.communities' .github/config/community-list.json)
+          echo "matrix=$COMMUNITIES" >> $GITHUB_OUTPUT
+
+  build-and-deploy:
+    needs: read-communities
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        community: ${{ fromJson(needs.read-communities.outputs.matrix) }}
+    environment: kyoso-dev-${{ matrix.community }}
     timeout-minutes: 30
 
     env:
-      # GCP settings
       GCP_REGION: ${{ secrets.GCP_REGION }}
-      # GCP service account credentials
       SERVICE_ACCOUNT_CREDENTIAL_JSON: ${{ secrets.SERVICE_ACCOUNT_CREDENTIAL_JSON }}
-      # application settings
       ARTIFACT_REGISTRY: ${{ secrets.ARTIFACT_REGISTRY }}
       APPLICATION_NAME: ${{ secrets.APPLICATION_NAME }}
-      LINE_SECRET: ${{ secrets.LINE_SECRET }}
-      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-      ENV: ${{ secrets. ENV }}
       NEXT_PUBLIC_COMMUNITY_ID: ${{ secrets.NEXT_PUBLIC_COMMUNITY_ID }}
       NEXT_PUBLIC_LIFF_ID: ${{ secrets.NEXT_PUBLIC_LIFF_ID }}
       NEXT_PUBLIC_LINE_CLIENT: ${{ secrets.NEXT_PUBLIC_LINE_CLIENT }}
@@ -35,6 +46,7 @@ jobs:
       NEXT_PUBLIC_API_ENDPOINT: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT }}
       NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT: ${{ secrets.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }}
       NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
 
     steps:
       - name: Checkout code
@@ -50,23 +62,21 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: |
-          pnpm install --no-frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ env.SERVICE_ACCOUNT_CREDENTIAL_JSON }}
 
-      - name: Configure Docker for GCP Artifact Registry
+      - name: Configure Docker for Artifact Registry
         run: |
           gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }}
           gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest . \
-            --build-arg NEXT_PUBLIC_COMMUNITY_ID=${{ env.NEXT_PUBLIC_COMMUNITY_ID }} \
+          docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}-${{ matrix.community }}:latest . \
             --build-arg NEXT_PUBLIC_LIFF_ID=${{ env.NEXT_PUBLIC_LIFF_ID }} \
             --build-arg NEXT_PUBLIC_LINE_CLIENT=${{ env.NEXT_PUBLIC_LINE_CLIENT }} \
             --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ env.NEXT_PUBLIC_FIREBASE_PROJECT_ID }} \
@@ -78,15 +88,15 @@ jobs:
             --build-arg NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }} \
             --build-arg NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT=${{ env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }} \
             --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }} \
+            --build-arg NEXT_PUBLIC_COMMUNITY_ID=${{ env.NEXT_PUBLIC_COMMUNITY_ID }}
 
-      - name: Push Docker image to Artifact Registry
+      - name: Push image to Artifact Registry
         run: |
-          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest
+          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}-${{ matrix.community }}:latest
 
       - name: Deploy to Cloud Run
-        id: "deploy"
-        uses: "google-github-actions/deploy-cloudrun@v2"
+        uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: ${{ env.APPLICATION_NAME }}
-          image: ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest
+          service: ${{ env.APPLICATION_NAME }}-${{ matrix.community }}
+          image: ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}-${{ matrix.community }}:latest
           region: ${{ env.GCP_REGION }}
