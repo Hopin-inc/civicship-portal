@@ -104,6 +104,7 @@ const requestLink = new ApolloLink((operation, forward) => {
             ...headers,
             Authorization: lineTokens.accessToken ? `Bearer ${lineTokens.accessToken}` : "",
             "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+            "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
           },
         }));
 
