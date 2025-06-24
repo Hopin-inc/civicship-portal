@@ -3470,6 +3470,40 @@ export type GqlGetArticleQuery = {
   };
 };
 
+export type GqlDidIssuanceRequestFieldsFragment = {
+  __typename?: "DidIssuanceRequest";
+  id: string;
+  status: GqlDidIssuanceStatus;
+  didValue?: string | null;
+  requestedAt?: Date | null;
+  processedAt?: Date | null;
+  completedAt?: Date | null;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+};
+
+export type GqlGetDidIssuanceRequestsQueryVariables = Exact<{
+  userId: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetDidIssuanceRequestsQuery = {
+  __typename?: "Query";
+  user?: {
+    __typename?: "User";
+    didIssuanceRequests?: Array<{
+      __typename?: "DidIssuanceRequest";
+      id: string;
+      status: GqlDidIssuanceStatus;
+      didValue?: string | null;
+      requestedAt?: Date | null;
+      processedAt?: Date | null;
+      completedAt?: Date | null;
+      createdAt?: Date | null;
+      updatedAt?: Date | null;
+    }> | null;
+  } | null;
+};
+
 export type GqlEvaluationBulkCreateMutationVariables = Exact<{
   input: GqlEvaluationBulkCreateInput;
   permission: GqlCheckCommunityPermissionInput;
@@ -5234,6 +5268,18 @@ export const ArticleFieldsFragmentDoc = gql`
     publishedAt
   }
 `;
+export const DidIssuanceRequestFieldsFragmentDoc = gql`
+  fragment DidIssuanceRequestFields on DidIssuanceRequest {
+    id
+    status
+    didValue
+    requestedAt
+    processedAt
+    completedAt
+    createdAt
+    updatedAt
+  }
+`;
 export const EvaluationFieldsFragmentDoc = gql`
   fragment EvaluationFields on Evaluation {
     id
@@ -6964,6 +7010,86 @@ export type GetArticleSuspenseQueryHookResult = ReturnType<typeof useGetArticleS
 export type GetArticleQueryResult = Apollo.QueryResult<
   GqlGetArticleQuery,
   GqlGetArticleQueryVariables
+>;
+export const GetDidIssuanceRequestsDocument = gql`
+  query GetDidIssuanceRequests($userId: ID!) {
+    user(id: $userId) {
+      didIssuanceRequests {
+        ...DidIssuanceRequestFields
+      }
+    }
+  }
+  ${DidIssuanceRequestFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetDidIssuanceRequestsQuery__
+ *
+ * To run a query within a React component, call `useGetDidIssuanceRequestsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDidIssuanceRequestsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDidIssuanceRequestsQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetDidIssuanceRequestsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetDidIssuanceRequestsQuery,
+    GqlGetDidIssuanceRequestsQueryVariables
+  > &
+    ({ variables: GqlGetDidIssuanceRequestsQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetDidIssuanceRequestsQuery, GqlGetDidIssuanceRequestsQueryVariables>(
+    GetDidIssuanceRequestsDocument,
+    options,
+  );
+}
+export function useGetDidIssuanceRequestsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetDidIssuanceRequestsQuery,
+    GqlGetDidIssuanceRequestsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetDidIssuanceRequestsQuery,
+    GqlGetDidIssuanceRequestsQueryVariables
+  >(GetDidIssuanceRequestsDocument, options);
+}
+export function useGetDidIssuanceRequestsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetDidIssuanceRequestsQuery,
+        GqlGetDidIssuanceRequestsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetDidIssuanceRequestsQuery,
+    GqlGetDidIssuanceRequestsQueryVariables
+  >(GetDidIssuanceRequestsDocument, options);
+}
+export type GetDidIssuanceRequestsQueryHookResult = ReturnType<
+  typeof useGetDidIssuanceRequestsQuery
+>;
+export type GetDidIssuanceRequestsLazyQueryHookResult = ReturnType<
+  typeof useGetDidIssuanceRequestsLazyQuery
+>;
+export type GetDidIssuanceRequestsSuspenseQueryHookResult = ReturnType<
+  typeof useGetDidIssuanceRequestsSuspenseQuery
+>;
+export type GetDidIssuanceRequestsQueryResult = Apollo.QueryResult<
+  GqlGetDidIssuanceRequestsQuery,
+  GqlGetDidIssuanceRequestsQueryVariables
 >;
 export const EvaluationBulkCreateDocument = gql`
   mutation EvaluationBulkCreate(

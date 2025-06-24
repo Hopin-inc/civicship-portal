@@ -1,8 +1,8 @@
 import React from "react";
 import { formatSlotRange } from "@/utils/date";
 import { Card } from "@/components/ui/card";
-import { ActivitySlotGroup } from "../../../types/opportunitySlot";
 import { Button } from "@/components/ui/button";
+import { ActivitySlotGroup } from "../types/opportunitySlot";
 
 interface TimeSlotListProps {
   dateSections: ActivitySlotGroup[];
@@ -29,7 +29,7 @@ return (
       {dateSections.map((section, sectionIndex) => (
         <div key={sectionIndex}>
           <div className="space-y-2">
-            {section.slots.map((slot, slotIndex) => {
+            {section.slots.map((slot: any, slotIndex: any) => {
               return (
                 <Card
                   key={slotIndex}

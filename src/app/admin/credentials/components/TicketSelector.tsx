@@ -8,9 +8,9 @@ import { useSelection } from "../context/SelectionContext";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import TimeSlotList from "@/app/admin/credentials/issue/[opportunityId]/components/TimeSlotList";
+import TimeSlotList from "@/app/admin/credentials/components/TimeSlotList";
 import { useReservationDateLoader } from "../hooks/useOpportunitySlotQuery";
-import UserSelector from "../issue/[opportunityId]/users/components/UserSelector";
+import UserSelector from "./UserSelector";
 
 // ウィザード形式の次のステップ用コンポーネント
 function NextStepComponent({ selectedTicketIds, onFinish }: { selectedTicketIds: string[], onFinish: () => void }) {

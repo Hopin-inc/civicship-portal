@@ -12,8 +12,8 @@ import { FormProvider } from "react-hook-form";
 import SearchForm from "@/app/search/components/SearchForm";
 import { useMemberSearch } from "@/app/admin/wallet/grant/hooks/useMemberSearch";
 import { Button } from "@/components/ui/button";
-import { useSelection } from "../../../../context/SelectionContext";
-import { useEvaluartionBulkCreate } from "../../../../hooks/useEvaluartionBulkCreate";
+import { useSelection } from "../context/SelectionContext";
+import { useEvaluartionBulkCreate } from "../hooks/useEvaluartionBulkCreate";
 
 export default function UserSelector() {
   const communityId = COMMUNITY_ID;
@@ -116,7 +116,9 @@ export default function UserSelector() {
       .filter((m): m is { user: GqlUser } => m !== null),
   );
 
-  console.log(filteredMembers);
+  filteredMembers.map(({ user }) => {
+    console.log(user.didIssuanceRequests?.map(({ status }) => status));
+  });
 
   useEffect(() => {
     void fetchMembershipList({ variables: { first: 50 } });
