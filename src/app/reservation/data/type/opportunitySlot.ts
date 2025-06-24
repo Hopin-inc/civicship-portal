@@ -19,7 +19,6 @@ type OpportunitySlot = {
   hostingStatus: GqlOpportunitySlotHostingStatus;
   capacity: number;
   remainingCapacity: number;
-  
   isReservable: boolean;
 
   applicantCount: number | null;

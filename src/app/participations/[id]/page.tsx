@@ -9,7 +9,7 @@ import ParticipationStatusNotification from "@/app/participations/[id]/component
 import ParticipationActions from "@/app/participations/[id]/components/ParticipationActions";
 import { toast } from "sonner";
 import { GqlReservationStatus } from "@/types/graphql";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { errorMessages } from "@/utils/errorMessage";
 import useCancelReservation from "@/app/participations/[id]/hooks/useCancelReservation";
 import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
@@ -49,7 +49,6 @@ export default function ParticipationPage() {
 
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
-
   const {
     participation,
     opportunity,
@@ -59,6 +58,7 @@ export default function ParticipationPage() {
     hasError,
     refetch,
   } = useParticipationPage(id ?? "");
+  
   // #NOTE: コンポーネントに必要な情報を取得するために、useCompletePageViewModel と useOpportunityDetail を使用しているがリクエストが重複するので、まとめたい
   const { dateTimeInfo } = useCompletePageViewModel(id ?? "", participation?.reservation?.id ?? "");
   const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityDetail(
