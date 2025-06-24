@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  GqlEvaluationStatus,
+  GqlOpportunity,
   GqlOpportunityCategory,
   GqlOpportunitySlotHostingStatus,
   GqlParticipation,
@@ -14,29 +16,53 @@ import {
   ParticipationOptionalInfo,
   QuestField,
 } from "@/app/participations/[id]/data/type";
-import { ReservationStatus } from "@/types/participationStatus";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { presenterOpportunityHost } from "@/app/activities/data/presenter";
 import { subDays } from "date-fns";
 
-export const presenterParticipation = (raw: GqlParticipation): ParticipationDetail => {
-  if (
-    !raw ||
-    !raw.reservation ||
-    !raw.reservation.opportunitySlot ||
-    !raw.reservation.opportunitySlot.opportunity
-  ) {
-    throw new Error("参加情報に必要なデータが不足しています");
+export type ReservationStatus = {
+  status: GqlReservationStatus | GqlEvaluationStatus;
+  statusText: string;
+  statusSubText: string;
+  statusClass: string;
+};
+
+interface PresenterParticipationProps {
+  raw: GqlParticipation;
+  status?: string | null;
+  opportunity?: GqlOpportunity;
+}
+
+export const presenterParticipation = ({
+  raw,
+  status,
+  opportunity: opportunityFromProps,
+}: PresenterParticipationProps): ParticipationDetail => {
+  // `PASSED` の場合は reservation がない可能性があるため、チェックをスキップ
+  if (status !== "passed") {
+    if (
+      !raw ||
+      !raw.reservation ||
+      !raw.reservation.opportunitySlot ||
+      !raw.reservation.opportunitySlot.opportunity
+    ) {
+      throw new Error("参加情報に必要なデータが不足しています");
+    }
   }
 
   const reservation = raw.reservation;
-  const slot = reservation.opportunitySlot;
-  const opportunity = slot?.opportunity;
+  const slot = reservation?.opportunitySlot;
+  const opportunity = reservation?.opportunitySlot?.opportunity ?? opportunityFromProps;
 
-  const category = opportunity?.category;
+  if (!opportunity) {
+    throw new Error("Opportunity データが見つかりません");
+  }
+
+  const category = opportunity.category;
   if (!category) throw new Error("Opportunity must have a category");
 
-  const participantsCount = reservation.participations?.length ?? 0;
+  // reservation がない場合は参加者を1として扱う
+  const participantsCount = reservation?.participations?.length ?? 1;
 
   const base: ParticipationInfo = {
     id: raw.id,
@@ -54,19 +80,19 @@ export const presenterParticipation = (raw: GqlParticipation): ParticipationDeta
     emergencyContactPhone: opportunity?.createdByUser?.phoneNumber ?? "",
 
     slot: {
-      id: slot?.id || "",
-      status: slot?.hostingStatus || GqlOpportunitySlotHostingStatus.Cancelled,
+      id: slot?.id ?? "",
+      status: slot?.hostingStatus ?? GqlOpportunitySlotHostingStatus.Completed,
       startsAt: new Date(slot?.startsAt ?? ""),
       endsAt: new Date(slot?.endsAt ?? ""),
     },
 
     reservation: {
-      id: reservation.id,
-      status: reservation.status as GqlReservationStatus,
+      id: reservation?.id ?? "",
+      status: (reservation?.status ?? GqlReservationStatus.Accepted) as GqlReservationStatus,
     },
 
-    images: raw.images ?? [],
-    totalImageCount: (raw.images ?? []).length,
+    images: opportunity.images ?? [],
+    totalImageCount: (opportunity.images ?? []).length,
     participantsCount,
     place: presenterPlace(opportunity.place),
   };
@@ -157,7 +183,9 @@ const presenterQuestFields = (
   };
 };
 
-export const getStatusInfo = (status: GqlReservationStatus): ReservationStatus | null => {
+export const getStatusInfo = (
+  status: GqlReservationStatus | GqlEvaluationStatus,
+): ReservationStatus | null => {
   switch (status) {
     case GqlReservationStatus.Applied:
       return {
@@ -187,7 +215,14 @@ export const getStatusInfo = (status: GqlReservationStatus): ReservationStatus |
         statusSubText: "案内人の都合により中止となりました。",
         statusClass: "bg-red-50 border-red-200",
       };
-      // ケースが増える
+    case GqlEvaluationStatus.Passed:
+      return {
+        status: GqlEvaluationStatus.Passed,
+        statusText: "証明書発行済み",
+        statusSubText: "",
+        statusClass: "bg-green-50 border-green-200",
+      } as ReservationStatus;
+    // ケースが増える
     default:
       return null;
   }

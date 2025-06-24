@@ -1,11 +1,12 @@
 "use client";
 import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
+import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 import { addDays, isAfter } from "date-fns";
-import { ActivitySlot, ActivitySlotGroup } from "../type/opportunitySlot";
+import { ActivitySlotGroupWithOpportunityId } from "../../types/opportunitySlot";
 
 export const presenterOpportunitySlots = (
   edges: (GqlOpportunitySlotEdge | null | undefined)[] | null | undefined,
-): ActivitySlot[] => {
+): (ActivitySlot & { opportunityId: string })[] => {
   if (!edges) return [];
 
   return edges
@@ -15,9 +16,12 @@ export const presenterOpportunitySlots = (
 
       if (!node || !opportunity) return null;
 
-      return presenterOpportunitySlot(node, opportunity.feeRequired ?? null);
+      return {
+        ...presenterOpportunitySlot(node, opportunity.feeRequired ?? null),
+        opportunityId: opportunity.id,
+      };
     })
-    .filter((slot): slot is ActivitySlot => slot !== null);
+    .filter((slot): slot is ActivitySlot & { opportunityId: string } => slot !== null);
 };
 
 export const presenterOpportunitySlot = (
@@ -46,9 +50,9 @@ export const presenterOpportunitySlot = (
 };
 
 export const filterSlotGroupsBySelectedDate = (
-  groups: ActivitySlotGroup[],
+  groups: ActivitySlotGroupWithOpportunityId[],
   selectedDates: string[],
-): ActivitySlotGroup[] => {
+): ActivitySlotGroupWithOpportunityId[] => {
   if (!selectedDates || selectedDates.length === 0) return groups;
 
   return groups.filter((group) => selectedDates.includes(group.dateLabel));
@@ -67,7 +71,7 @@ export const groupActivitySlotsByDate = (slots: ActivitySlot[]): ActivitySlotGro
 
   for (const slot of slots) {
     const date = new Date(slot.startsAt);
-
+    
     const month = date.getMonth() + 1;
     const day = date.getDate();
     const weekday = date.toLocaleDateString("ja-JP", { weekday: "narrow" }); // "水"

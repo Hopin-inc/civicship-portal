@@ -18,6 +18,8 @@ export default function MyProfilePage() {
     currentUser?.id,
   );
 
+  console.log(userData);
+
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;

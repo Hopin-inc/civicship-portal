@@ -5,23 +5,20 @@ import {
   useGetOpportunitySlotsLazyQuery,
   useGetOpportunitySlotsQuery,
 } from "@/types/graphql";
-import { ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 import { ActivityDetail } from "@/app/activities/data/type";
-import {
-  groupActivitySlotsByDate,
-  presenterOpportunitySlots,
-} from "@/app/reservation/data/presenter/opportunitySlot";
 import { presenterActivityDetail } from "@/app/activities/data/presenter";
+import { ActivitySlotGroupWithOpportunityId } from "../types/opportunitySlot";
+import { groupActivitySlotsByDate, presenterOpportunitySlots } from "../data/presenter/opportunitySlot";
 
 interface UseReservationDateLoaderProps {
-  opportunityId: string;
+  opportunityIds: string[];
 }
 
-export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLoaderProps) => {
+export const useReservationDateLoader = ({ opportunityIds }: UseReservationDateLoaderProps) => {
   const { data, loading, error, refetch } = useGetOpportunitySlotsQuery({
     variables: {
       filter: {
-        opportunityIds: [opportunityId],
+        opportunityIds: opportunityIds,
         hostingStatus: GqlOpportunitySlotHostingStatus.Scheduled,
       },
       sort: {
@@ -29,7 +26,7 @@ export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLo
       },
       first: 100, // TODO コネクションは見直す必要あり
     },
-    skip: !opportunityId,
+    skip: !opportunityIds,
     fetchPolicy: "network-only",
     errorPolicy: "all",
   });
@@ -41,9 +38,12 @@ export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLo
     return raw ? presenterActivityDetail(raw) : null;
   }, [data]);
 
-  const groupedSlots: ActivitySlotGroup[] = useMemo(() => {
+  const groupedSlots: ActivitySlotGroupWithOpportunityId[] = useMemo(() => {
     const slots = presenterOpportunitySlots(data?.opportunitySlots?.edges);
-    return groupActivitySlotsByDate(slots);
+    return groupActivitySlotsByDate(slots).map((group) => ({
+      ...group,
+      opportunityId: group.slots[0]?.opportunityId ?? "",
+    }));
   }, [data]);
 
   return {

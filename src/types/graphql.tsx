@@ -255,6 +255,26 @@ export type GqlDateTimeRangeFilter = {
   lte?: InputMaybe<Scalars["Datetime"]["input"]>;
 };
 
+export type GqlDidIssuanceRequest = {
+  __typename?: "DidIssuanceRequest";
+  completedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  didValue?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  processedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  requestedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  status: GqlDidIssuanceStatus;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export const GqlDidIssuanceStatus = {
+  Completed: "COMPLETED",
+  Failed: "FAILED",
+  Pending: "PENDING",
+  Processing: "PROCESSING",
+} as const;
+
+export type GqlDidIssuanceStatus = (typeof GqlDidIssuanceStatus)[keyof typeof GqlDidIssuanceStatus];
 export type GqlEdge = {
   cursor: Scalars["String"]["output"];
 };
@@ -1054,7 +1074,7 @@ export type GqlOpportunitySlotEdge = GqlEdge & {
 export type GqlOpportunitySlotFilterInput = {
   dateRange?: InputMaybe<GqlDateTimeRangeFilter>;
   hostingStatus?: InputMaybe<GqlOpportunitySlotHostingStatus>;
-  opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
+  opportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   ownerId?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
@@ -1162,6 +1182,7 @@ export type GqlParticipation = {
   evaluation?: Maybe<GqlEvaluation>;
   id: Scalars["ID"]["output"];
   images?: Maybe<Array<Scalars["String"]["output"]>>;
+  opportunitySlot?: Maybe<GqlOpportunitySlot>;
   reason: GqlParticipationStatusReason;
   reservation?: Maybe<GqlReservation>;
   source?: Maybe<GqlSource>;
@@ -1393,6 +1414,7 @@ export type GqlPortfolio = {
   __typename?: "Portfolio";
   category: GqlPortfolioCategory;
   date: Scalars["Datetime"]["output"];
+  evaluationStatus?: Maybe<GqlEvaluationStatus>;
   id: Scalars["ID"]["output"];
   participants?: Maybe<Array<GqlUser>>;
   place?: Maybe<GqlPlace>;
@@ -1468,6 +1490,8 @@ export type GqlQuery = {
   users: GqlUsersConnection;
   utilities: GqlUtilitiesConnection;
   utility?: Maybe<GqlUtility>;
+  vcIssuanceRequest?: Maybe<GqlVcIssuanceRequest>;
+  vcIssuanceRequests: GqlVcIssuanceRequestsConnection;
   wallet?: Maybe<GqlWallet>;
   wallets: GqlWalletsConnection;
 };
@@ -1691,6 +1715,17 @@ export type GqlQueryUtilitiesArgs = {
 export type GqlQueryUtilityArgs = {
   id: Scalars["ID"]["input"];
   permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlQueryVcIssuanceRequestArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryVcIssuanceRequestsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlVcIssuanceRequestFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlVcIssuanceRequestSortInput>;
 };
 
 export type GqlQueryWalletArgs = {
@@ -2191,6 +2226,7 @@ export type GqlUser = {
   bio?: Maybe<Scalars["String"]["output"]>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   currentPrefecture?: Maybe<GqlCurrentPrefecture>;
+  didIssuanceRequests?: Maybe<Array<GqlDidIssuanceRequest>>;
   evaluationCreatedByMe?: Maybe<Array<GqlEvaluationHistory>>;
   evaluations?: Maybe<Array<GqlEvaluation>>;
   id: Scalars["ID"]["output"];
@@ -2375,6 +2411,51 @@ export const GqlValueType = {
 } as const;
 
 export type GqlValueType = (typeof GqlValueType)[keyof typeof GqlValueType];
+export type GqlVcIssuanceRequest = {
+  __typename?: "VcIssuanceRequest";
+  completedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  evaluation?: Maybe<GqlEvaluation>;
+  id: Scalars["ID"]["output"];
+  processedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  requestedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  status: GqlVcIssuanceStatus;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  user?: Maybe<GqlUser>;
+};
+
+export type GqlVcIssuanceRequestEdge = GqlEdge & {
+  __typename?: "VcIssuanceRequestEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlVcIssuanceRequest>;
+};
+
+export type GqlVcIssuanceRequestFilterInput = {
+  evaluationId?: InputMaybe<Scalars["ID"]["input"]>;
+  status?: InputMaybe<GqlVcIssuanceStatus>;
+  userId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type GqlVcIssuanceRequestSortInput = {
+  createdAt?: InputMaybe<GqlSortDirection>;
+  updatedAt?: InputMaybe<GqlSortDirection>;
+};
+
+export type GqlVcIssuanceRequestsConnection = {
+  __typename?: "VcIssuanceRequestsConnection";
+  edges: Array<GqlVcIssuanceRequestEdge>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export const GqlVcIssuanceStatus = {
+  Completed: "COMPLETED",
+  Failed: "FAILED",
+  Pending: "PENDING",
+  Processing: "PROCESSING",
+} as const;
+
+export type GqlVcIssuanceStatus = (typeof GqlVcIssuanceStatus)[keyof typeof GqlVcIssuanceStatus];
 export type GqlWallet = {
   __typename?: "Wallet";
   accumulatedPointView?: Maybe<GqlAccumulatedPointView>;
@@ -2751,6 +2832,7 @@ export type GqlUserPortfolioFieldsFragment = {
   category: GqlPortfolioCategory;
   date: Date;
   reservationStatus?: GqlReservationStatus | null;
+  evaluationStatus?: GqlEvaluationStatus | null;
   place?: {
     __typename?: "Place";
     id: string;
@@ -2832,6 +2914,7 @@ export type GqlGetUserFlexibleQuery = {
       category: GqlPortfolioCategory;
       date: Date;
       reservationStatus?: GqlReservationStatus | null;
+      evaluationStatus?: GqlEvaluationStatus | null;
       place?: {
         __typename?: "Place";
         id: string;
@@ -4002,6 +4085,67 @@ export type GqlGetParticipationQuery = {
         } | null;
       } | null;
     } | null;
+    opportunitySlot?: {
+      __typename?: "OpportunitySlot";
+      id: string;
+      hostingStatus: GqlOpportunitySlotHostingStatus;
+      startsAt: Date;
+      endsAt: Date;
+      capacity?: number | null;
+      remainingCapacity?: number | null;
+      opportunity?: {
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        body?: string | null;
+        images?: Array<string> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        earliestReservableAt?: Date | null;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
+        } | null;
+        createdByUser?: {
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
+          urlFacebook?: string | null;
+          urlInstagram?: string | null;
+          urlX?: string | null;
+        } | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+          city?: {
+            __typename?: "City";
+            code: string;
+            name: string;
+            state?: {
+              __typename?: "State";
+              code: string;
+              countryCode: string;
+              name: string;
+            } | null;
+          } | null;
+        } | null;
+      } | null;
+    } | null;
     statusHistories?: Array<{
       __typename?: "ParticipationStatusHistory";
       id: string;
@@ -5058,6 +5202,7 @@ export const UserPortfolioFieldsFragmentDoc = gql`
     category
     date
     reservationStatus
+    evaluationStatus
     place {
       ...PlaceFields
     }
@@ -7766,6 +7911,21 @@ export const GetParticipationDocument = gql`
             place {
               ...PlaceFields
             }
+          }
+        }
+      }
+      opportunitySlot {
+        ...OpportunitySlotFields
+        opportunity {
+          ...OpportunityFields
+          community {
+            ...CommunityFields
+          }
+          createdByUser {
+            ...UserFields
+          }
+          place {
+            ...PlaceFields
           }
         }
       }

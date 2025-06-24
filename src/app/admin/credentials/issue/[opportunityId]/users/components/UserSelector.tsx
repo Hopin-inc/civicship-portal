@@ -12,22 +12,18 @@ import { FormProvider } from "react-hook-form";
 import SearchForm from "@/app/search/components/SearchForm";
 import { useMemberSearch } from "@/app/admin/wallet/grant/hooks/useMemberSearch";
 import { Button } from "@/components/ui/button";
-import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
-import { useSelection } from "../../../context/SelectionContext";
-import { useEvaluartionBulkCreate } from "../../../hooks/useEvaluartionBulkCreate";
-import { useAttendanceState } from "../../../../reservations/hooks/attendance/useAttendanceState";
+import { useSelection } from "../../../../context/SelectionContext";
+import { useEvaluartionBulkCreate } from "../../../../hooks/useEvaluartionBulkCreate";
 
 export default function UserSelector() {
   const communityId = COMMUNITY_ID;
   const { user: currentUser } = useAuth();
-  const { selectedDate } = useSelection();
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const { handleReservation, creatingReservation } = useReservationCommand();
-  const [participations, setParticipations] = useState<any[]>([]); // 型は適宜修正
-  const [createParticipation, { loading }] = useParticipationBulkCreateMutation({
+  const { selectedSlots, setSelectedSlots } = useSelection();
+  const [currentSlotIndex, setCurrentSlotIndex] = useState(0);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>(selectedSlots[0]?.userIds ?? []);
+  const [createParticipation] = useParticipationBulkCreateMutation({
     onCompleted: (response) => {
-      console.log(response);
-      setParticipations(response?.participationBulkCreate?.participations ?? []);
+      save(response?.participationBulkCreate?.participations ?? [], communityId);
       toast.success("参加者を追加しました");
     },
     onError: (error) => {
@@ -36,44 +32,55 @@ export default function UserSelector() {
     },
   });
 
-  const { save, loading: evaluationLoading } = useEvaluartionBulkCreate({
-    onSuccess: (res) => {
-      console.log("res", res);
-      toast.success("出欠情報を保存しました");
-    },
+  const { save } = useEvaluartionBulkCreate({
     onError: (error) => {
       toast.error(error.message);
     },
   });
 
-  const { attendanceData } = useAttendanceState(participations);
+  const currentSlot = selectedSlots[currentSlotIndex];
 
   const handleCheck = (userId: string) => {
-    setSelectedUserId(userId);
+    setSelectedUserIds(prev =>
+      prev.includes(userId)
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
+    setSelectedSlots(prev =>
+      prev.map((slot, idx) =>
+        idx === currentSlotIndex
+          ? {
+              ...slot,
+              userIds: slot.userIds.includes(userId)
+                ? slot.userIds.filter(id => id !== userId)
+                : [...slot.userIds, userId],
+            }
+          : slot
+      )
+    );
   };
 
   const handleConfirm = async () => {
-    console.log(selectedUserId, selectedDate);
-    if (selectedUserId && selectedDate) {
-      const { data } = await createParticipation({
+    if (selectedUserIds.length > 0 && selectedSlots.length > 0) {
+      const slot = selectedSlots[currentSlotIndex];
+      await createParticipation({
         variables: {
           input: {
-            userIds: [selectedUserId],
-            slotId: selectedDate ?? "",
+            userIds: slot.userIds,
+            slotId: slot.slotId,
           },
-          permission: {
-            communityId: communityId,
-          },
+          permission: { communityId },
         },
       });
+      if (currentSlotIndex < selectedSlots.length - 1) {
+        setCurrentSlotIndex(currentSlotIndex + 1);
+        setSelectedUserIds(selectedSlots[currentSlotIndex + 1]?.userIds ?? []);
+      } else {
+        alert("選択完了");
+        // 必要に応じて画面遷移やリセット処理を追加
+      }
     }
   };
-
-  useEffect(() => {
-    if (participations.length > 0 && attendanceData) {
-      save(participations, communityId, attendanceData);
-    }
-  }, [attendanceData]);
 
   const currentUserRole = currentUser?.memberships?.find(
     (m) => m.community?.id === communityId,
@@ -109,6 +116,8 @@ export default function UserSelector() {
       .filter((m): m is { user: GqlUser } => m !== null),
   );
 
+  console.log(filteredMembers);
+
   useEffect(() => {
     void fetchMembershipList({ variables: { first: 50 } });
   }, [fetchMembershipList]);
@@ -120,6 +129,7 @@ export default function UserSelector() {
       </form>
 
       <div className="flex flex-col gap-4 px-4">
+        <h1 className="text-2xl font-bold mb-2">参加者選択（{currentSlotIndex + 1}/{selectedSlots.length}）</h1>
         {filteredMembers.length === 0 && (
           <p className="text-sm text-muted-foreground">一致するメンバーが見つかりません</p>
         )}
@@ -135,22 +145,42 @@ export default function UserSelector() {
                 role={membership.role}
                 currentUserRole={currentUserRole}
                 onRoleChange={(newRole) => {
-                if (currentUserRole !== GqlRole.Owner) {
-                  toast.error("この操作を行う権限がありません");
-                  return;
-                }
-              }}
-              checked={selectedUserId === user.id}
+                  if (currentUserRole !== GqlRole.Owner) {
+                    toast.error("この操作を行う権限がありません");
+                    return;
+                  }
+                }}
+                checked={selectedUserIds.includes(user.id)}
                 onCheck={() => handleCheck(user.id)}
               />
 
             </div>
           );
         })}
-        {selectedUserId && (
-          <Button variant="primary" className="w-1/2 py-4 mt-4 mx-auto" onClick={handleConfirm}>
-            登録
+        {selectedUserIds.length > 0 && (
+          <div className="fixed bottom-0 left-0 w-full bg-white border-t flex justify-between px-6 py-4 z-10">
+          <Button
+            variant="secondary"
+            className="text-gray-500 font-bold"
+            onClick={() => {
+              setSelectedSlots([]);
+              // router.push("/admin/credentials");
+            }}
+          >
+            キャンセル
           </Button>
+          <Button
+            className={`rounded-full px-8 py-2 font-bold text-white ${selectedUserIds.length > 0 ? "bg-primary" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
+            disabled={selectedUserIds.length === 0}
+            onClick={() => {
+              if (selectedUserIds.length > 0) {
+                handleConfirm();
+              }
+            }}
+          >
+            次へ
+          </Button>
+        </div>
         )}
       </div>
     </FormProvider>

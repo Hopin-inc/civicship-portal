@@ -23,11 +23,11 @@ export const MemberRow = ({ user, role, currentUserRole, checked, onCheck }: Pro
   <div className="flex justify-between items-center rounded px-4 py-2">
     <div className="flex items-center gap-3">
         <Input
-            type="radio"
+            type="checkbox"
             checked={checked}
             onChange={onCheck}
             className="w-4 h-4"
-            name="user-select" // 複数のラジオボタンをグループ化
+            name="user-select"
         />
       <Image
         src={user.image ?? PLACEHOLDER_IMAGE}

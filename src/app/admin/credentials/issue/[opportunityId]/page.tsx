@@ -4,6 +4,6 @@ export default function CredentialsPage ({ params }: { params: { opportunityId: 
     const { opportunityId } = params;
 
     return (
-        <TimeSlot opportunityId={opportunityId} />
+        <TimeSlot opportunityId={opportunityId} onSelectDate={() => {}} />
     );
 }

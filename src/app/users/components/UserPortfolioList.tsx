@@ -9,7 +9,7 @@ import { ParticipantsList } from "@/components/shared/ParticipantsList";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
 import { ActivityCard } from "@/app/activities/data/type";
 import { AppPortfolio } from "@/app/users/data/type";
-import { GqlOpportunityCategory, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
+import { GqlEvaluationStatus, GqlOpportunityCategory, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getCurrentRegionName } from "@/lib/communities/metadata";
 
@@ -66,6 +66,16 @@ const getStatusStyles = (reservationStatus?: GqlReservationStatus | null): strin
   }
 };
 
+const getStatusStylesForPassed = (evaluationStatus?: GqlEvaluationStatus | null): string => {
+  if (!evaluationStatus) return "bg-primary-foreground text-primary";
+
+  switch (evaluationStatus) {
+    case GqlEvaluationStatus.Passed:
+      return "bg-primary-foreground text-green-700";
+    default:
+      return "bg-primary-foreground text-primary";
+  }
+};
 const ActiveOpportunities = ({ opportunities }: ActiveOpportunitiesProps) => {
   if (!opportunities.length) return null;
 
@@ -100,14 +110,18 @@ const PortfolioCard = ({
   lastRef: RefObject<HTMLDivElement>;
 }) => {
   const isPast = new Date(portfolio.date) < new Date();
-
+  const isPassed = portfolio.evaluationStatus === GqlEvaluationStatus.Passed;
+  console.log(portfolio.reservationStatus);
   const linkHref =
     portfolio.source === "ARTICLE"
       ? `/articles/${portfolio.id}`
-      : portfolio.source === "OPPORTUNITY"
-        ? `/participations/${portfolio.id}`
-        : "#";
-
+      : portfolio.source === "OPPORTUNITY" &&
+        portfolio.evaluationStatus === GqlEvaluationStatus.Passed
+        ? `/credentials/${portfolio.id}`
+        : portfolio.source === "OPPORTUNITY"
+          ? `/participations/${portfolio.id}`
+          : "#";
+  console.log(getCategoryLabel(portfolio.source, portfolio.reservationStatus));
   return (
     <Link href={linkHref} className="block w-full">
       <div
@@ -139,9 +153,16 @@ const PortfolioCard = ({
           ) : (
             <div className="absolute top-2 left-2 z-10">
               <div
-                className={`px-2 py-1 text-label-sm rounded-full font-bold ${getStatusStyles(portfolio.reservationStatus)}`}
+                className={
+                  `px-2 py-1 text-label-sm rounded-full font-bold 
+                  ${isPassed ? getStatusStylesForPassed(portfolio.evaluationStatus) : getStatusStyles(portfolio.reservationStatus)}
+                  `}
               >
-                {getCategoryLabel(portfolio.source, portfolio.reservationStatus)}
+                {
+                  isPassed
+                    ? "証明済み"
+                    : getCategoryLabel(portfolio.source, portfolio.reservationStatus)
+                }
               </div>
             </div>
           )}
@@ -163,7 +184,8 @@ const PortfolioCard = ({
                 {portfolio.source === "OPPORTUNITY" &&
                   !isPast &&
                   portfolio.reservationStatus !== GqlReservationStatus.Canceled &&
-                  portfolio.reservationStatus !== GqlReservationStatus.Rejected && (
+                  portfolio.reservationStatus !== GqlReservationStatus.Rejected &&
+                  portfolio.reservationStatus !== null && (
                     <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">予定</span>
                   )}
               </span>

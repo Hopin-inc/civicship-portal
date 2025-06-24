@@ -3,11 +3,11 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 type SelectionContextType = {
-  selectedTicketId: string | null;
-  selectedDate: string | null;
+  selectedTicketIds: string[];
+  selectedSlots: { opportunityId: string; slotId: string; userIds: string[] }[];
   selectedUsers: string[];
-  setSelectedTicketId: (id: string | null) => void;
-  setSelectedDate: (date: string | null) => void;
+  setSelectedTicketIds: (ids: string[]) => void;
+  setSelectedSlots: React.Dispatch<React.SetStateAction<{ opportunityId: string; slotId: string; userIds: string[] }[]>>;
   setSelectedUsers: (users: string[]) => void;
   resetSelection: () => void;
 };
@@ -15,24 +15,24 @@ type SelectionContextType = {
 const SelectionContext = createContext<SelectionContextType | undefined>(undefined);
 
 export function SelectionProvider({ children }: { children: ReactNode }) {
-  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
+  const [selectedSlots, setSelectedSlots] = useState<{ opportunityId: string; slotId: string; userIds: string[] }[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
   const resetSelection = () => {
-    setSelectedTicketId(null);
-    setSelectedDate(null);
+    setSelectedTicketIds([]);
+    setSelectedSlots([]);
     setSelectedUsers([]);
   };
 
   return (
     <SelectionContext.Provider
       value={{
-        selectedTicketId,
-        selectedDate,
+        selectedTicketIds,
+        selectedSlots,
         selectedUsers,
-        setSelectedTicketId,
-        setSelectedDate,
+        setSelectedTicketIds,
+        setSelectedSlots,
         setSelectedUsers,
         resetSelection,
       }}

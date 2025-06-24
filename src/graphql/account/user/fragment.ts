@@ -24,6 +24,7 @@ export const USER_PORTFOLIO_FRAGMENT = gql`
     category
     date
     reservationStatus
+    evaluationStatus
     place {
       ...PlaceFields
     }

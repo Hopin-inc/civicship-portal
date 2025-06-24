@@ -42,6 +42,21 @@ export const GetParticipationDocument = gql(`
           }
         }
       }
+      opportunitySlot {
+          ...OpportunitySlotFields
+          opportunity {
+            ...OpportunityFields
+            community {
+              ...CommunityFields
+            }
+            createdByUser {
+              ...UserFields
+            }
+            place {
+              ...PlaceFields
+            }
+          }
+        }
       statusHistories {
         id
         status

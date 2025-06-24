@@ -16,7 +16,6 @@ export const useEvaluartionBulkCreate = ({ onSuccess, onError }: UseEvaluartionB
   const save = async (
     participations: GqlParticipation[],
     communityId: string,
-    attendanceData: Record<string, GqlEvaluationStatus>,
   ) => {
 
     const evaluations = participations.map((p) => {

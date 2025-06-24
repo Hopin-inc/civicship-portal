@@ -16,7 +16,7 @@ export const useUserProfile = (userId?: string) => {
     skip: !userId,
     fetchPolicy: "cache-and-network",
   });
-
+  console.log("result.data", result.data);
   const userData = useMemo(() => {
     const user = result.data?.user;
     return user ? presenterManagerProfile(user) : null;
