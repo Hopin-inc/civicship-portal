@@ -38,8 +38,7 @@ export const presenterParticipation = ({
   status,
   opportunity: opportunityFromProps,
 }: PresenterParticipationProps): ParticipationDetail => {
-  // `PASSED` の場合は reservation がない可能性があるため、チェックをスキップ
-  if (status !== "passed") {
+  if (raw.reservation?.status !== null) {
     if (
       !raw ||
       !raw.reservation ||

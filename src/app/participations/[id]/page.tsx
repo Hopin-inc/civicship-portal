@@ -49,8 +49,7 @@ export default function ParticipationPage() {
 
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
-  const status = useSearchParams().get("status");
-  console.log(status);
+
   const {
     participation,
     opportunity,
@@ -59,7 +58,7 @@ export default function ParticipationPage() {
     loading,
     hasError,
     refetch,
-  } = useParticipationPage(id ?? "", status);
+  } = useParticipationPage(id ?? "");
   // #NOTE: コンポーネントに必要な情報を取得するために、useCompletePageViewModel と useOpportunityDetail を使用しているがリクエストが重複するので、まとめたい
   const { dateTimeInfo } = useCompletePageViewModel(id ?? "", participation?.reservation?.id ?? "");
   const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityDetail(
