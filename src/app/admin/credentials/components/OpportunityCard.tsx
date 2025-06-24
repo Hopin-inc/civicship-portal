@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 
-type TicketCardProps = {
+type OpportunityCardProps = {
   qty?: number;
   createdAt?: string;
   title?: string;
@@ -11,12 +11,12 @@ type TicketCardProps = {
   name?: string;
 };
 
-export function TicketCard({
+export function OpportunityCard({
   title,
   isSelected,
   onClick,
   name = "ticket",
-}: TicketCardProps) {
+}: OpportunityCardProps) {
   return (
     <Card
       className={`transition-colors p-4 flex items-center gap-2 ${

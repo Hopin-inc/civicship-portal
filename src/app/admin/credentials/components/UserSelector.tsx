@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
@@ -76,8 +74,7 @@ export default function UserSelector() {
         setCurrentSlotIndex(currentSlotIndex + 1);
         setSelectedUserIds(selectedSlots[currentSlotIndex + 1]?.userIds ?? []);
       } else {
-        alert("選択完了");
-        // 必要に応じて画面遷移やリセット処理を追加
+        toast.success("全ての登録が完了しました");
       }
     }
   };
@@ -115,10 +112,6 @@ export default function UserSelector() {
       .map(({ user }) => (user ? { user } : null))
       .filter((m): m is { user: GqlUser } => m !== null),
   );
-
-  filteredMembers.map(({ user }) => {
-    console.log(user.didIssuanceRequests?.map(({ status }) => status));
-  });
 
   useEffect(() => {
     void fetchMembershipList({ variables: { first: 50 } });
@@ -187,4 +180,4 @@ export default function UserSelector() {
       </div>
     </FormProvider>
   );
-}
+} 

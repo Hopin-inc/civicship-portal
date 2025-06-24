@@ -2,7 +2,6 @@ import Image from "next/image";
 import { GqlRole, GqlUser } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
 export const roleLabels: Record<GqlRole, string> = {
   OWNER: "管理者",
