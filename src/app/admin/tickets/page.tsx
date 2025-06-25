@@ -24,7 +24,7 @@ export default function TicketsPage() {
     variables: {
       filter: { communityIds: [COMMUNITY_ID], ownerIds: user?.id ? [user.id] : undefined },
       sort: { createdAt: GqlSortDirection.Desc },
-      first: 20,
+      first: 200,
     },
   });
 
@@ -32,7 +32,7 @@ export default function TicketsPage() {
     variables: {
       filter: { ownerId: user?.id ?? "" },
       sort: { createdAt: GqlSortDirection.Desc },
-      first: 20,
+      first: 200,
     },
   });
 

@@ -9,8 +9,13 @@ const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+};
+const firebaseConfigWithAppId = {
+  ...firebaseConfig,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
+
+export const defaultApp = initializeApp(firebaseConfigWithAppId);
 
 export const lineApp = initializeApp(firebaseConfig, "line-auth-app");
 export const lineAuth: Auth = getAuth(lineApp);
@@ -29,7 +34,7 @@ export const getFirebaseAnalytics = async (): Promise<Analytics | undefined> => 
   if (!analyticsInstance) {
     const supported = await isSupported();
     if (supported) {
-      analyticsInstance = getAnalytics(lineApp);
+      analyticsInstance = getAnalytics(defaultApp);
       logger.debug("Analytics initialized", { component: "FirebaseConfig" });
     }
   }

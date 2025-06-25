@@ -50,7 +50,7 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
         createdByUserIds: [user?.id ?? ""],
       },
       sort: { createdAt: GqlSortDirection.Desc },
-      first: 20,
+      first: 200,
     },
     skip: !user?.id,
   });
