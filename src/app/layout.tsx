@@ -11,6 +11,7 @@ import MainContent from "@/components/layout/MainContent";
 import React from "react";
 import { currentCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
+import Script from "next/script";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -40,10 +41,23 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="ja">
-    <body className={ font.className }>
-    <script
-      dangerouslySetInnerHTML={ {
-        __html: `
+      <body className={font.className}>
+        {/* ✅ Google Ads (gtag.js) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-17223693738"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'AW-17223693738');
+    `}
+        </Script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
             if (typeof window !== 'undefined' && !window.requestIdleCallback) {
               let lastId = 0;
               const timeouts = new Map();
@@ -72,11 +86,11 @@ const RootLayout = ({
               };
             }
           `,
-      } }
-    />
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
           window.addEventListener('error', function(event) {
             fetch('/api/client-log', {
               method: 'POST',
@@ -115,22 +129,22 @@ const RootLayout = ({
             });
           });
         `,
-      }}
-    />
-    <CookiesProvider>
-      <ApolloProvider>
-        <AuthProvider>
-          <HeaderProvider>
-            <LoadingProvider>
-              <AnalyticsProvider />
-              <MainContent>{ children }</MainContent>
-              <Toaster richColors className="mx-8" />
-            </LoadingProvider>
-          </HeaderProvider>
-        </AuthProvider>
-      </ApolloProvider>
-    </CookiesProvider>
-    </body>
+          }}
+        />
+        <CookiesProvider>
+          <ApolloProvider>
+            <AuthProvider>
+              <HeaderProvider>
+                <LoadingProvider>
+                  <AnalyticsProvider />
+                  <MainContent>{children}</MainContent>
+                  <Toaster richColors className="mx-8" />
+                </LoadingProvider>
+              </HeaderProvider>
+            </AuthProvider>
+          </ApolloProvider>
+        </CookiesProvider>
+      </body>
     </html>
   );
 };
