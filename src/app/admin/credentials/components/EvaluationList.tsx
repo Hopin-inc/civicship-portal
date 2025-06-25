@@ -3,8 +3,11 @@
 import Loading from "@/components/layout/Loading";
 import { Card } from "@/components/ui/card";
 import { GqlEvaluationStatus, useGetEvaluationsQuery } from "@/types/graphql";
+import { useRouter } from "next/navigation";
+import { AlertTriangle } from "lucide-react";
 
 export default function EvaluationList() {
+    const router = useRouter();
     const { data, loading, error } = useGetEvaluationsQuery();
     if (loading) return <Loading />;
     if (error) return <div>Error: {error.message}</div>;
@@ -42,6 +45,7 @@ export default function EvaluationList() {
                     const allRequests = evaluations.flatMap(ev => ev.node?.vcIssuanceRequest ?? []);
                     const denominator = allRequests.length;
                     const numerator = allRequests.filter(req => req?.status === "COMPLETED").length;
+                    const hasPending = allRequests.some(req => req?.status === "PENDING");
 
                     const node = representative.node;
                     const title = node?.participation?.opportunitySlot?.opportunity?.title ?? "";
@@ -58,7 +62,8 @@ export default function EvaluationList() {
                     return (
                         <Card
                             key={node?.id}
-                            className="rounded-xl border border-gray-200 p-4 flex flex-col"
+                            className="rounded-xl border border-gray-200 p-4 flex flex-col cursor-pointer"
+                            onClick={() => router.push(`/admin/credentials/${node?.id}`)}
                         >
                             <div className="flex-1">
                                 <div className="font-bold text-lg truncate" style={{ maxWidth: "100%" }}>
@@ -71,8 +76,12 @@ export default function EvaluationList() {
                                 </div>
                             </div>
                             <div className="flex justify-between items-end mt-4">
-                                <div className="text-gray-400 text-sm">
-                                    発行数 <span className="font-bold text-lg text-black">{numerator}</span>/{denominator}
+                                <div className="text-gray-400 text-sm flex items-center">
+                                    <span>発行数</span>
+                                    {hasPending && <AlertTriangle className="text-yellow-400 w-5 h-5 mx-1" />}
+                                    <span className="font-bold text-lg text-black mx-1">{numerator}</span>
+                                    <span>/</span>
+                                    <span>{denominator}</span>
                                 </div>
                                 <div className="text-gray-400 text-sm">{issuedAt}</div>
                             </div>

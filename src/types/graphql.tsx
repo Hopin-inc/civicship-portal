@@ -1060,6 +1060,7 @@ export type GqlOpportunitySlot = {
   reservations?: Maybe<Array<GqlReservation>>;
   startsAt: Scalars["Datetime"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  vcIssuanceRequests: Array<GqlVcIssuanceRequest>;
 };
 
 export type GqlOpportunitySlotCreateInput = {
@@ -3632,6 +3633,24 @@ export type GqlGetEvaluationQuery = {
       status: GqlVcIssuanceStatus;
       requestedAt?: Date | null;
       completedAt?: Date | null;
+      user?: { __typename?: "User"; id: string; name: string } | null;
+    } | null;
+    participation?: {
+      __typename?: "Participation";
+      opportunitySlot?: {
+        __typename?: "OpportunitySlot";
+        id: string;
+        startsAt: Date;
+        endsAt: Date;
+        capacity?: number | null;
+        opportunity?: {
+          __typename?: "Opportunity";
+          id: string;
+          title: string;
+          description: string;
+          createdByUser?: { __typename?: "User"; id: string; name: string } | null;
+        } | null;
+      } | null;
     } | null;
   } | null;
 };
@@ -7419,6 +7438,27 @@ export const GetEvaluationDocument = gql`
         status
         requestedAt
         completedAt
+        user {
+          id
+          name
+        }
+      }
+      participation {
+        opportunitySlot {
+          id
+          startsAt
+          endsAt
+          capacity
+          opportunity {
+            id
+            title
+            description
+            createdByUser {
+              id
+              name
+            }
+          }
+        }
       }
     }
   }

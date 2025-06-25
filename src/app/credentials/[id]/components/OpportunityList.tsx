@@ -9,10 +9,8 @@ interface OpportunityListProps {
 
 export default function OpportunityList(props: OpportunityListProps) {
     const { opportunity } = props;
-    console.log(opportunity?.participation?.opportunitySlot?.startsAt);
-    console.log(opportunity?.participation?.opportunitySlot?.endsAt);
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
             <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
                 <CardHeader className="flex flex-row items-center justify-between p-6">
                     {/* 左側 */}

@@ -42,7 +42,28 @@ export const GET_EVALUATION = gql`
         status
         requestedAt
         completedAt
+        user {
+          id
+          name
+        }
       }
+      participation {
+          opportunitySlot {
+            id
+            startsAt
+            endsAt
+            capacity
+            opportunity {
+              id
+              title
+              description
+              createdByUser {
+                id
+                name
+              }
+            }
+          }
+        }
     }
   }
 `;
