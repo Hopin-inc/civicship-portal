@@ -2,49 +2,42 @@ import { useSelection } from "../context/SelectionContext";
 import { useRouter } from "next/navigation";
 import TimeSlotList from "./TimeSlotList";
 import { useReservationDateLoader } from "../hooks/useOpportunitySlotQuery";
-import React, { useState } from "react";
+import React from "react";
 
 export default function DateWizard({ setStep }: { setStep: (step: number) => void }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const { selectedTicketIds, selectedSlots, setSelectedSlots } = useSelection();
+  const { selectedTicketId, selectedSlot, setSelectedSlot } = useSelection();
   const router = useRouter();
 
-  const currentId = selectedTicketIds[currentIndex];
-  const { groupedSlots } = useReservationDateLoader({ opportunityIds: selectedTicketIds });
+  const currentId = selectedTicketId;
+  const { groupedSlots } = useReservationDateLoader({ opportunityIds: currentId ? [currentId] : [] });
   const currentSections = groupedSlots.filter(section => section.opportunityId === currentId);
-  const selectedSlot = selectedSlots.find(item => item.opportunityId === currentId);
-  const selectedSlotId = selectedSlot ? selectedSlot.slotId : null;
+  const selectedSlotId = selectedSlot?.slotId ?? null;
 
   const handleDateSelect = (slotId: string) => {
-    setSelectedSlots(prev => {
-      const filtered = prev.filter(item => item.opportunityId !== currentId);
-      return [...filtered, { opportunityId: currentId, slotId, userIds: [] }];
-    });
+    setSelectedSlot({ opportunityId: currentId!, slotId, userIds: [] });
   };
 
   const canProceed = !!selectedSlotId;
 
   const handleNext = () => {
-    if (currentIndex < selectedTicketIds.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else {
-      setStep(3);
-    }
+    setStep(3);
   };
 
   const handleCancel = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    } else {
-      router.push("/admin/credentials");
-    }
+    router.push("/admin/credentials");
   };
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">
-        開催日を選ぶ（{currentIndex + 1}/{selectedTicketIds.length}）
-      </h1>
+      <div className="flex items-end gap-2 mb-6">
+        <h1 className="text-2xl font-bold">開催日を選ぶ</h1>
+        <span className="ml-1 flex items-end">
+          <span className="text-gray-400 text-base">(</span>
+          <span className="text-lg font-bold text-[#71717A] mx-1">2</span>
+          <span className="text-gray-400 text-base">/3</span>
+          <span className="text-gray-400 text-base">)</span>
+        </span>
+      </div>
       <TimeSlotList
         dateSections={currentSections}
         selectedDate={selectedSlotId}

@@ -1,44 +1,59 @@
 import Image from "next/image";
-import { GqlRole, GqlUser } from "@/types/graphql";
+import { GqlUser, useGetDidIssuanceRequestsQuery } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Input } from "@/components/ui/input";
 
-export const roleLabels: Record<GqlRole, string> = {
-  OWNER: "管理者",
-  MANAGER: "運用担当者",
-  MEMBER: "参加者",
-};
-
 interface Props {
   user: GqlUser;
-  role: GqlRole;
-  currentUserRole?: GqlRole;
-  onRoleChange: (newRole: GqlRole) => void;
   checked: boolean;
   onCheck: () => void;
+  isDisabled: boolean;
 }
 
-export const MemberRow = ({ user, role, currentUserRole, checked, onCheck }: Props) => (
-  <div className="flex justify-between items-center rounded px-4 py-2">
-    <div className="flex items-center gap-3">
-        <Input
-            type="checkbox"
-            checked={checked}
-            onChange={onCheck}
-            className="w-4 h-4"
-            name="user-select"
-        />
-      <Image
-        src={user.image ?? PLACEHOLDER_IMAGE}
-        alt={user.name ?? "要確認"}
-        width={40}
-        height={40}
-        className="rounded-full object-cover border"
-        style={{ aspectRatio: "1 / 1" }}
-      />
-      <div className="flex flex-col max-w-[160px] overflow-hidden">
-        <span className="text-body-sm font-bold truncate">{user.name}</span>
-      </div>
+export const MemberRow = ({ user, checked, onCheck, isDisabled }: Props) => {
+  const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
+    variables: {
+      userId: user.id,
+    },
+  });
+
+  const did = didIssuanceRequestsData?.user?.didIssuanceRequests?.[0]?.id;
+  const cardBgClass = !did || isDisabled ? "bg-zinc-200" : "bg-white";
+  
+  return (
+    <div className={`flex items-center border border-gray-200 rounded-xl px-4 py-3 w-full max-w-lg ${cardBgClass}`}>
+    {/* チェックボックス */}
+    <Input
+      type="checkbox"
+      checked={checked}
+      onChange={onCheck}
+      className="w-4 h-4 mr-4"
+      name="user-select"
+      disabled={!did || isDisabled}
+    />
+    {/* ユーザー画像 */}
+    <Image
+      src={user.image ?? PLACEHOLDER_IMAGE}
+      alt={user.name ?? "要確認"}
+      width={40}
+      height={40}
+      className="rounded-full object-cover border"
+      style={{ aspectRatio: "1 / 1" }}
+    />
+    {/* ユーザー情報 */}
+    <div className="flex flex-col ml-4 min-w-0">
+      {isDisabled && (
+        <span className="text-green-500 text-xs font-semibold mb-1">
+          指定された募集に申込済み
+        </span>
+      )}
+      <span className={`${did ? "font-bold text-base text-black" : "text-gray-400 text-base"}`}>
+        {user.name}
+      </span>
+      <span className="text-gray-400 text-sm truncate max-w-[160px]">
+        {did ? `did:key:${did}` : "did発行中"}
+      </span>
     </div>
   </div>
-);
+  );
+};

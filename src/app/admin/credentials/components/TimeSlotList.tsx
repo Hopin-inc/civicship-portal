@@ -25,24 +25,32 @@ const handleSelectSlot = (id: string) => {
 };
 
 return (
-    <div className="space-y-8">
+    <div className="space-y-3">
       {dateSections.map((section, sectionIndex) => (
         <div key={sectionIndex}>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {section.slots.map((slot: any, slotIndex: any) => {
+              const isSelected = selectedDate === slot.id;
               return (
                 <Card
                   key={slotIndex}
-                  className={`transition-colors p-4 flex items-center gap-2 ${selectedDate === slot.id ? "border-primary" : ""}`}
+                  onClick={() => handleSelectSlot(slot.id)}
+                  className={`flex items-center gap-3 rounded-xl border transition-colors px-4 py-3 cursor-pointer ${
+                    isSelected
+                      ? "border-primary ring-[1px] ring-primary bg-blue-50"
+                      : "border-gray-200 bg-white"
+                  }`}
                 >
                   <input
                     type="radio"
-                    name={`timeslot-${sectionIndex}`}
-                    checked={selectedDate === slot.id}
+                    name="timeslot"
+                    checked={isSelected}
                     onChange={() => handleSelectSlot(slot.id)}
-                    className="mr-2 cursor-pointer"
+                    className="mr-3 w-5 h-5 accent-blue-600"
+                    tabIndex={-1}
+                    readOnly
                   />
-                  <p className="text-body-md font-medium mt-2">{formatSlotRange(slot.startsAt, slot.endsAt)}</p>
+                  <p className="text-base font-medium">{formatSlotRange(slot.startsAt, slot.endsAt)}</p>
                 </Card>
               );
             })}
@@ -51,20 +59,16 @@ return (
       ))}
       <div className="fixed bottom-0 left-0 w-full bg-white border-t flex justify-between px-6 py-4 z-10">
         <Button
-          variant="secondary"
+          variant="text"
           className="text-gray-500 font-bold"
-          onClick={() => {
-            onCancel?.();
-          }}
+          onClick={onCancel}
         >
           キャンセル
         </Button>
         <Button
           className={`rounded-full px-8 py-2 font-bold text-white ${selectedDate ? "bg-primary" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
           disabled={!selectedDate}
-          onClick={() => {
-            onNext?.();
-          }}
+          onClick={onNext}
         >
           次へ
         </Button>

@@ -3,38 +3,49 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 type SelectionContextType = {
-  selectedTicketIds: string[];
-  selectedSlots: { opportunityId: string; slotId: string; userIds: string[] }[];
+  selectedTicketId: string | null;
+  selectedSlot: { opportunityId: string; slotId: string; userIds: string[] } | null;
   selectedUsers: string[];
-  setSelectedTicketIds: (ids: string[]) => void;
-  setSelectedSlots: React.Dispatch<React.SetStateAction<{ opportunityId: string; slotId: string; userIds: string[] }[]>>;
+  setSelectedTicketId: (id: string | null) => void;
+  setSelectedSlot: React.Dispatch<React.SetStateAction<{ opportunityId: string; slotId: string; userIds: string[] } | null>>;
   setSelectedUsers: (users: string[]) => void;
   resetSelection: () => void;
+  participatedUserIds: string[];
+  setParticipatedUserIds: React.Dispatch<React.SetStateAction<string[]>>;
+  participatedSlotIds: string;
+  setParticipatedSlotIds: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const SelectionContext = createContext<SelectionContextType | undefined>(undefined);
 
 export function SelectionProvider({ children }: { children: ReactNode }) {
-  const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
-  const [selectedSlots, setSelectedSlots] = useState<{ opportunityId: string; slotId: string; userIds: string[] }[]>([]);
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<{ opportunityId: string; slotId: string; userIds: string[] } | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-
+  const [participatedUserIds, setParticipatedUserIds] = useState<string[]>([]);
+  const [participatedSlotIds, setParticipatedSlotIds] = useState<string>("");
   const resetSelection = () => {
-    setSelectedTicketIds([]);
-    setSelectedSlots([]);
+    setSelectedTicketId(null);
+    setSelectedSlot(null);
     setSelectedUsers([]);
+    setParticipatedUserIds([]);
+    setParticipatedSlotIds("");
   };
 
   return (
     <SelectionContext.Provider
       value={{
-        selectedTicketIds,
-        selectedSlots,
+        selectedTicketId,
+        selectedSlot,
         selectedUsers,
-        setSelectedTicketIds,
-        setSelectedSlots,
+        setSelectedTicketId,
+        setSelectedSlot,
         setSelectedUsers,
         resetSelection,
+        participatedUserIds,
+        setParticipatedUserIds,
+        participatedSlotIds,
+        setParticipatedSlotIds,
       }}
     >
       {children}

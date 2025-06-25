@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
-import { GqlUser } from "@/types/graphql";
+import { useSearchParams } from "next/navigation";
+import { GqlUser, useGetSingleMembershipByNameQuery } from "@/types/graphql";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export type MemberSearchFormValues = {
   searchQuery: string;
@@ -19,17 +19,13 @@ export interface MemberSearchTarget {
 }
 
 export const useMemberSearch = (
-  members: MemberSearchTarget[],
   options?: {
     searchParamKey?: string;
     route?: string;
   },
 ) => {
   const searchParams = useSearchParams();
-  const router = useRouter();
-
   const searchKey = options?.searchParamKey || "q";
-  const route = options?.route || "/admin/wallet/grant";
   const initialQuery = searchParams.get(searchKey) || "";
 
   const form = useForm<MemberSearchFormValues>({
@@ -39,29 +35,20 @@ export const useMemberSearch = (
   });
 
   const searchQuery = form.watch("searchQuery");
+  console.log("searchQuery", searchQuery);
 
-  const filteredMembers = useMemo(() => {
-    const query = searchQuery.toLowerCase();
-    if (!query) return members;
-    return members.filter(({ user }) => user.name?.toLowerCase().includes(query));
-  }, [members, searchQuery]);
-
-  const onSubmit = useCallback(
-    (data: MemberSearchFormValues) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (data.searchQuery) {
-        params.set(searchKey, data.searchQuery);
-      } else {
-        params.delete(searchKey);
-      }
-      router.push(`${route}?${params.toString()}`);
+  const { data: singleMembershipData, loading, error } = useGetSingleMembershipByNameQuery({
+    variables: {
+      communityId: COMMUNITY_ID,
+      userName: searchQuery,
     },
-    [searchParams, router, searchKey, route],
-  );
+    skip: !searchQuery,
+  });
 
   return {
     form,
-    filteredMembers,
-    onSubmit,
+    singleMembershipData,
+    loading,
+    error,
   };
 };

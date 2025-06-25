@@ -17,13 +17,7 @@ export const useMembershipQueries = () => {
     },
     fetchPolicy: "network-only",
   });
-  const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
-    variables: {
-      userId: "cmbuuhrd5000fawk43l843voo",
-    },
-  });
-  // console.log(membershipListData);
-  console.log(didIssuanceRequestsData);
+
   return {
     fetchMembershipList,
     membershipListData,

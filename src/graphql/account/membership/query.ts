@@ -14,6 +14,20 @@ export const GET_SINGLE_MEMBERSHIP = gql`
   }
 `;
 
+export const GET_SINGLE_MEMBERSHIP_BY_NAME = gql`
+  query GetSingleMembershipByName($userName: String!, $communityId: ID!) {
+    membershipByName(userName: $userName, communityId: $communityId) {
+      ...MembershipFields
+      user {
+        ...UserFields
+      }
+      community {
+        ...CommunityFields
+      }
+    }
+  }
+`;
+
 export const GET_MEMBERSHIP_LIST = gql`
   query GetMembershipList(
     $first: Int

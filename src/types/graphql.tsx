@@ -326,6 +326,7 @@ export type GqlEvaluation = {
   participation?: Maybe<GqlParticipation>;
   status: GqlEvaluationStatus;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  vcIssuanceRequest?: Maybe<GqlVcIssuanceRequest>;
 };
 
 export type GqlEvaluationBulkCreateInput = {
@@ -478,6 +479,7 @@ export type GqlMembershipFilterInput = {
   role?: InputMaybe<GqlRole>;
   status?: InputMaybe<GqlMembershipStatus>;
   userId?: InputMaybe<Scalars["ID"]["input"]>;
+  userNames?: InputMaybe<Array<Scalars["String"]["input"]>>;
 };
 
 export type GqlMembershipHistory = {
@@ -1460,6 +1462,7 @@ export type GqlQuery = {
   evaluationHistory?: Maybe<GqlEvaluationHistory>;
   evaluations: GqlEvaluationsConnection;
   membership?: Maybe<GqlMembership>;
+  membershipByName?: Maybe<GqlMembership>;
   memberships: GqlMembershipsConnection;
   opportunities: GqlOpportunitiesConnection;
   opportunity?: Maybe<GqlOpportunity>;
@@ -1548,6 +1551,11 @@ export type GqlQueryEvaluationsArgs = {
 export type GqlQueryMembershipArgs = {
   communityId: Scalars["ID"]["input"];
   userId: Scalars["ID"]["input"];
+};
+
+export type GqlQueryMembershipByNameArgs = {
+  communityId: Scalars["ID"]["input"];
+  userName?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type GqlQueryMembershipsArgs = {
@@ -2758,6 +2766,41 @@ export type GqlGetSingleMembershipQuery = {
   } | null;
 };
 
+export type GqlGetSingleMembershipByNameQueryVariables = Exact<{
+  userName: Scalars["String"]["input"];
+  communityId: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetSingleMembershipByNameQuery = {
+  __typename?: "Query";
+  membershipByName?: {
+    __typename?: "Membership";
+    headline?: string | null;
+    bio?: string | null;
+    role: GqlRole;
+    status: GqlMembershipStatus;
+    reason: GqlMembershipStatusReason;
+    user?: {
+      __typename?: "User";
+      id: string;
+      name: string;
+      image?: string | null;
+      bio?: string | null;
+      currentPrefecture?: GqlCurrentPrefecture | null;
+      phoneNumber?: string | null;
+      urlFacebook?: string | null;
+      urlInstagram?: string | null;
+      urlX?: string | null;
+    } | null;
+    community?: {
+      __typename?: "Community";
+      id: string;
+      name?: string | null;
+      image?: string | null;
+    } | null;
+  } | null;
+};
+
 export type GqlGetMembershipListQueryVariables = Exact<{
   first?: InputMaybe<Scalars["Int"]["input"]>;
   cursor?: InputMaybe<GqlMembershipCursorInput>;
@@ -3546,7 +3589,30 @@ export type GqlGetEvaluationsQuery = {
     totalCount: number;
     edges: Array<{
       __typename?: "EvaluationEdge";
-      node?: { __typename?: "Evaluation"; id: string } | null;
+      node?: {
+        __typename?: "Evaluation";
+        id: string;
+        status: GqlEvaluationStatus;
+        createdAt?: Date | null;
+        vcIssuanceRequest?: {
+          __typename?: "VcIssuanceRequest";
+          id: string;
+          status: GqlVcIssuanceStatus;
+          requestedAt?: Date | null;
+          completedAt?: Date | null;
+        } | null;
+        participation?: {
+          __typename?: "Participation";
+          opportunitySlot?: {
+            __typename?: "OpportunitySlot";
+            id: string;
+            startsAt: Date;
+            endsAt: Date;
+            capacity?: number | null;
+            opportunity?: { __typename?: "Opportunity"; id: string; title: string } | null;
+          } | null;
+        } | null;
+      } | null;
     }>;
   };
 };
@@ -3557,7 +3623,17 @@ export type GqlGetEvaluationQueryVariables = Exact<{
 
 export type GqlGetEvaluationQuery = {
   __typename?: "Query";
-  evaluation?: { __typename?: "Evaluation"; id: string } | null;
+  evaluation?: {
+    __typename?: "Evaluation";
+    id: string;
+    vcIssuanceRequest?: {
+      __typename?: "VcIssuanceRequest";
+      id: string;
+      status: GqlVcIssuanceStatus;
+      requestedAt?: Date | null;
+      completedAt?: Date | null;
+    } | null;
+  } | null;
 };
 
 export type GqlOpportunityFieldsFragment = {
@@ -4024,7 +4100,9 @@ export type GqlParticipationFieldsFragment = {
   description?: string | null;
 };
 
-export type GqlGetParticipationsQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetParticipationsQueryVariables = Exact<{
+  filter?: InputMaybe<GqlParticipationFilterInput>;
+}>;
 
 export type GqlGetParticipationsQuery = {
   __typename?: "Query";
@@ -4033,7 +4111,12 @@ export type GqlGetParticipationsQuery = {
     totalCount: number;
     edges: Array<{
       __typename?: "ParticipationEdge";
-      node?: { __typename?: "Participation"; id: string } | null;
+      node?: {
+        __typename?: "Participation";
+        id: string;
+        user?: { __typename?: "User"; id: string } | null;
+        opportunitySlot?: { __typename?: "OpportunitySlot"; id: string } | null;
+      } | null;
     }>;
   };
 };
@@ -6083,6 +6166,93 @@ export type GetSingleMembershipQueryResult = Apollo.QueryResult<
   GqlGetSingleMembershipQuery,
   GqlGetSingleMembershipQueryVariables
 >;
+export const GetSingleMembershipByNameDocument = gql`
+  query GetSingleMembershipByName($userName: String!, $communityId: ID!) {
+    membershipByName(userName: $userName, communityId: $communityId) {
+      ...MembershipFields
+      user {
+        ...UserFields
+      }
+      community {
+        ...CommunityFields
+      }
+    }
+  }
+  ${MembershipFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetSingleMembershipByNameQuery__
+ *
+ * To run a query within a React component, call `useGetSingleMembershipByNameQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSingleMembershipByNameQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSingleMembershipByNameQuery({
+ *   variables: {
+ *      userName: // value for 'userName'
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useGetSingleMembershipByNameQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetSingleMembershipByNameQuery,
+    GqlGetSingleMembershipByNameQueryVariables
+  > &
+    ({ variables: GqlGetSingleMembershipByNameQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetSingleMembershipByNameQuery,
+    GqlGetSingleMembershipByNameQueryVariables
+  >(GetSingleMembershipByNameDocument, options);
+}
+export function useGetSingleMembershipByNameLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetSingleMembershipByNameQuery,
+    GqlGetSingleMembershipByNameQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetSingleMembershipByNameQuery,
+    GqlGetSingleMembershipByNameQueryVariables
+  >(GetSingleMembershipByNameDocument, options);
+}
+export function useGetSingleMembershipByNameSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetSingleMembershipByNameQuery,
+        GqlGetSingleMembershipByNameQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetSingleMembershipByNameQuery,
+    GqlGetSingleMembershipByNameQueryVariables
+  >(GetSingleMembershipByNameDocument, options);
+}
+export type GetSingleMembershipByNameQueryHookResult = ReturnType<
+  typeof useGetSingleMembershipByNameQuery
+>;
+export type GetSingleMembershipByNameLazyQueryHookResult = ReturnType<
+  typeof useGetSingleMembershipByNameLazyQuery
+>;
+export type GetSingleMembershipByNameSuspenseQueryHookResult = ReturnType<
+  typeof useGetSingleMembershipByNameSuspenseQuery
+>;
+export type GetSingleMembershipByNameQueryResult = Apollo.QueryResult<
+  GqlGetSingleMembershipByNameQuery,
+  GqlGetSingleMembershipByNameQueryVariables
+>;
 export const GetMembershipListDocument = gql`
   query GetMembershipList(
     $first: Int
@@ -7156,6 +7326,26 @@ export const GetEvaluationsDocument = gql`
       edges {
         node {
           id
+          status
+          createdAt
+          vcIssuanceRequest {
+            id
+            status
+            requestedAt
+            completedAt
+          }
+          participation {
+            opportunitySlot {
+              id
+              startsAt
+              endsAt
+              capacity
+              opportunity {
+                id
+                title
+              }
+            }
+          }
         }
       }
       totalCount
@@ -7224,6 +7414,12 @@ export const GetEvaluationDocument = gql`
   query GetEvaluation($id: ID!) {
     evaluation(id: $id) {
       id
+      vcIssuanceRequest {
+        id
+        status
+        requestedAt
+        completedAt
+      }
     }
   }
 `;
@@ -7943,11 +8139,17 @@ export type ParticipationBulkCreateMutationOptions = Apollo.BaseMutationOptions<
   GqlParticipationBulkCreateMutationVariables
 >;
 export const GetParticipationsDocument = gql`
-  query GetParticipations {
-    participations {
+  query GetParticipations($filter: ParticipationFilterInput) {
+    participations(filter: $filter) {
       edges {
         node {
           id
+          user {
+            id
+          }
+          opportunitySlot {
+            id
+          }
         }
       }
       totalCount
@@ -7967,6 +8169,7 @@ export const GetParticipationsDocument = gql`
  * @example
  * const { data, loading, error } = useGetParticipationsQuery({
  *   variables: {
+ *      filter: // value for 'filter'
  *   },
  * });
  */

@@ -58,8 +58,8 @@ export function formatSlotRange(startsAt: string, endsAt: string): string {
 
   const pad = (n: number) => n.toString().padStart(2, "0");
 
-  const startDate = `${start.getFullYear()}/${pad(start.getMonth() + 1)}/${pad(start.getDate())}`;
-  const endDate = `${end.getFullYear()}/${pad(end.getMonth() + 1)}/${pad(end.getDate())}`;
+  const startDate = `${start.getFullYear()}年${pad(start.getMonth() + 1)}月${pad(start.getDate())}日`;
+  const endDate = `${end.getFullYear()}年${pad(end.getMonth() + 1)}月${pad(end.getDate())}日`;
 
   const startTime = `${pad(start.getHours())}:${pad(start.getMinutes())}`;
   const endTime = `${pad(end.getHours())}:${pad(end.getMinutes())}`;
