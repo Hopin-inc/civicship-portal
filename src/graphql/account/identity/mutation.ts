@@ -31,3 +31,19 @@ export const LINK_PHONE_AUTH = gql(`
     }
   }
 `);
+
+export const IDENTITY_CHECK_PHONE_USER = gql(`
+  mutation identityCheckPhoneUser($input: IdentityCheckPhoneUserInput!) {
+    identityCheckPhoneUser(input: $input) {
+      status
+      user {
+        id
+        name
+      }
+      membership {
+        id
+        role
+      }
+    }
+  }
+`);

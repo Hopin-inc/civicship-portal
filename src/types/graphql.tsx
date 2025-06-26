@@ -433,6 +433,25 @@ export type GqlLinkPhoneAuthPayload = {
   user?: Maybe<GqlUser>;
 };
 
+export type GqlIdentityCheckPhoneUserInput = {
+  communityId: Scalars["ID"]["input"];
+};
+
+export type GqlIdentityCheckPhoneUserPayload = {
+  __typename?: "IdentityCheckPhoneUserPayload";
+  status: GqlPhoneUserStatus;
+  user?: Maybe<GqlUser>;
+  membership?: Maybe<GqlMembership>;
+};
+
+export const GqlPhoneUserStatus = {
+  NewUser: 'NEW_USER',
+  ExistingSameCommunity: 'EXISTING_SAME_COMMUNITY',
+  ExistingDifferentCommunity: 'EXISTING_DIFFERENT_COMMUNITY'
+} as const;
+
+export type GqlPhoneUserStatus = typeof GqlPhoneUserStatus[keyof typeof GqlPhoneUserStatus];
+
 export type GqlMembership = {
   __typename?: "Membership";
   bio?: Maybe<Scalars["String"]["output"]>;
@@ -637,6 +656,7 @@ export type GqlMutation = {
   reservationJoin?: Maybe<GqlReservationSetStatusPayload>;
   reservationReject?: Maybe<GqlReservationSetStatusPayload>;
   storePhoneAuthToken?: Maybe<GqlStorePhoneAuthTokenPayload>;
+  identityCheckPhoneUser?: Maybe<GqlIdentityCheckPhoneUserPayload>;
   ticketClaim?: Maybe<GqlTicketClaimPayload>;
   ticketIssue?: Maybe<GqlTicketIssuePayload>;
   ticketPurchase?: Maybe<GqlTicketPurchasePayload>;
@@ -687,6 +707,10 @@ export type GqlMutationEvaluationPassArgs = {
 export type GqlMutationLinkPhoneAuthArgs = {
   input: GqlLinkPhoneAuthInput;
   permission: GqlCheckIsSelfPermissionInput;
+};
+
+export type GqlMutationIdentityCheckPhoneUserArgs = {
+  input: GqlIdentityCheckPhoneUserInput;
 };
 
 export type GqlMutationMembershipAcceptMyInvitationArgs = {

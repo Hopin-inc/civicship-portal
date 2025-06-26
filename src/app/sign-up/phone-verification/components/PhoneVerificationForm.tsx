@@ -9,6 +9,10 @@ import { formatPhoneNumber } from "@/app/sign-up/phone-verification/utils";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import { useMutation } from "@apollo/client";
+import { IDENTITY_CHECK_PHONE_USER } from "@/graphql/account/identity/mutation";
+import { GqlPhoneUserStatus, GqlMutationIdentityCheckPhoneUserArgs, GqlIdentityCheckPhoneUserPayload } from "@/types/graphql";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -23,6 +27,11 @@ export function PhoneVerificationForm() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
+
+  const [identityCheckPhoneUser] = useMutation<
+    { identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload },
+    GqlMutationIdentityCheckPhoneUserArgs
+  >(IDENTITY_CHECK_PHONE_USER);
 
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
@@ -74,9 +83,37 @@ export function PhoneVerificationForm() {
     try {
       const success = await phoneAuth.verifyPhoneCode(verificationCode);
       if (success) {
-        toast.success("電話番号認証が完了しました");
-        const redirectPath = `/sign-up${nextParam}`;
-        router.push(redirectPath);
+        const { data } = await identityCheckPhoneUser({
+          variables: {
+            input: {
+              communityId: COMMUNITY_ID
+            }
+          }
+        });
+
+        const status = data?.identityCheckPhoneUser?.status;
+
+        switch (status) {
+          case GqlPhoneUserStatus.NewUser:
+            toast.success("電話番号認証が完了しました");
+            const redirectPath = `/sign-up${nextParam}`;
+            router.push(redirectPath);
+            break;
+
+          case GqlPhoneUserStatus.ExistingSameCommunity:
+            toast.error("このコミュニティには既に参加しています");
+            setIsCodeVerifying(false);
+            break;
+
+          case GqlPhoneUserStatus.ExistingDifferentCommunity:
+            toast.success("メンバーシップが追加されました");
+            router.push("/");
+            break;
+
+          default:
+            toast.error("認証処理でエラーが発生しました");
+            setIsCodeVerifying(false);
+        }
       } else {
         toast.error("認証コードが無効です");
         setIsCodeVerifying(false);
