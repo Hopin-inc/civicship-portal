@@ -16,15 +16,15 @@ export const useAvailableTickets = (
   return useMemo(() => {
     const tickets = data?.user?.wallets?.[0]?.tickets || [];
 
-    if (!opportunity?.requiredTicket.length) {
+    if (!opportunity?.targetUtilities.length) {
       return tickets.length;
     }
 
-    const requiredUtilityIds = new Set(opportunity.requiredTicket.map((u) => u.id));
+    const requiredUtilityIds = new Set(opportunity.targetUtilities.map((u) => u.id));
 
     return tickets.filter((edge) => {
       const utilityId = edge?.utility?.id;
       return utilityId && requiredUtilityIds.has(utilityId);
     }).length;
-  }, [opportunity?.requiredTicket, data]);
+  }, [opportunity?.targetUtilities, data]);
 };

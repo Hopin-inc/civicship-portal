@@ -102,6 +102,10 @@ export const GET_OPPORTUNITY = gql`
           }
         }
       }
+      requireApproval
+      requiredUtilities {
+        id
+      }
     }
   }
   ${OPPORTUNITY_FRAGMENT}

@@ -62,8 +62,8 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
     images: images?.map((image) => image) || [],
     totalImageCount: images?.length || 0,
 
-    requiredApproval: data.requireApproval,
-    requiredTicket: data.requiredUtilities?.map((u) => u) || [],
+    requireApproval: data.requireApproval,
+    targetUtilities: data.requiredUtilities?.map((u) => u) ?? [],
     feeRequired: data.feeRequired ?? null,
 
     isReservable,
