@@ -41,7 +41,7 @@ export function SignUpForm() {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: "",
-      prefecture: undefined,
+      prefecture: GqlCurrentPrefecture.Unknown,
     },
   });
 
