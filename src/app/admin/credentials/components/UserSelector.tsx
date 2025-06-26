@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { GqlUser, useParticipationBulkCreateMutation } from "@/types/graphql";
+import { GqlUser, useParticipationBulkCreateMutation, GqlParticipationStatusReason } from "@/types/graphql";
 import { toast } from "sonner";
 import { MemberRow } from "./Member";
 import { useMembershipQueries } from "@/app/admin/members/hooks/useMembershipQueries";
@@ -13,10 +13,11 @@ import { useEvaluartionBulkCreate } from "../hooks/useEvaluartionBulkCreate";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/layout/Loading";
 import SearchForm from "./SearchForm";
+import { logger } from "@/lib/logging";
 
 export default function UserSelector() {
   const communityId = COMMUNITY_ID;
-  const { selectedSlot, setSelectedSlot, participatedUserIds, participatedSlotIds } = useSelection();
+  const { selectedSlot, setSelectedSlot, participatedUsers } = useSelection();
   const router = useRouter();
   const { fetchMembershipList, membershipListData } = useMembershipQueries();
   const { form, singleMembershipData, loading, error } = useMemberSearch();
@@ -25,12 +26,14 @@ export default function UserSelector() {
   const [createParticipation] = useParticipationBulkCreateMutation({
     onCompleted: (response) => {
       save(response?.participationBulkCreate?.participations ?? [], communityId);
-      toast.success("参加者を追加しました");
+      toast.success("登録が完了しました");
       router.push("/admin/credentials");
     },
     onError: (error) => {
-      console.log(error);
-      toast.error(error.message);
+      logger.error("登録に失敗しました", {
+        error: error.message,
+      });
+      toast.error("登録に失敗しました");
     },
   });
 
@@ -50,6 +53,13 @@ export default function UserSelector() {
   );
   useHeaderConfig(headerConfig);
 
+  const DISABLED_REASONS: GqlParticipationStatusReason[] = [
+    GqlParticipationStatusReason.ReservationAccepted,
+    GqlParticipationStatusReason.PersonalRecord,
+  ];
+
+  const getParticipatedReason = (userId: string) =>
+    participatedUsers.find(u => u.userId === userId && u.slotId === selectedSlot?.slotId)?.reason;
 
   const members = useMemo(() => {
     return (
@@ -61,7 +71,6 @@ export default function UserSelector() {
         .filter((member): member is { user: GqlUser } => member !== null) ?? []
     );
   }, [membershipListData]);
-
 
   useEffect(() => {
     void fetchMembershipList({ variables: { first: 50 } });
@@ -100,20 +109,31 @@ export default function UserSelector() {
           permission: { communityId },
         },
       });
-      toast.success("登録が完了しました");
     }
   };
 
   // 並び替え用の配列を作成
   const sortedMembers = [...members].sort((a, b) => {
-    const aIsParticipated = participatedUserIds && participatedUserIds.includes(a.user.id);
-    const aIsParticipatedSlot = selectedSlot?.slotId && selectedSlot?.slotId === participatedSlotIds;
-    const bIsParticipated = participatedUserIds && participatedUserIds.includes(b.user.id);
-    const bIsParticipatedSlot = selectedSlot?.slotId && selectedSlot?.slotId === participatedSlotIds;
-    if (aIsParticipated && aIsParticipatedSlot && !(bIsParticipated && bIsParticipatedSlot)) return -1;
-    if (!(aIsParticipated && aIsParticipatedSlot) && (bIsParticipated && bIsParticipatedSlot)) return 1;
+    const aParticipated = participatedUsers.find(
+      (u) => u.userId === a.user.id && u.slotId === selectedSlot?.slotId
+    );
+    const bParticipated = participatedUsers.find(
+      (u) => u.userId === b.user.id && u.slotId === selectedSlot?.slotId
+    );
+    // isCreatedByUserがtrueのユーザーを最優先で上に
+    if (aParticipated?.isCreatedByUser && !bParticipated?.isCreatedByUser) return -1;
+    if (!aParticipated?.isCreatedByUser && bParticipated?.isCreatedByUser) return 1;
+    // 以降は従来の並び替え
+    const aIsParticipated = !!aParticipated;
+    const bIsParticipated = !!bParticipated;
+    if (aIsParticipated && !bIsParticipated) return -1;
+    if (!aIsParticipated && bIsParticipated) return 1;
     return 0;
   });
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <FormProvider {...form}>
@@ -136,23 +156,30 @@ export default function UserSelector() {
             user={singleMembershipData.membershipByName.user}
             checked={selectedUserIds.includes(singleMembershipData.membershipByName.user?.id ?? "")}
             onCheck={() => singleMembershipData.membershipByName?.user?.id && handleCheck(singleMembershipData.membershipByName.user.id)}
-            isDisabled={!!(selectedSlot?.slotId && selectedSlot?.slotId === participatedSlotIds && participatedUserIds.includes(singleMembershipData.membershipByName.user?.id ?? ""))}
+            isDisabled={getParticipatedReason(singleMembershipData.membershipByName.user?.id ?? "") !== undefined && DISABLED_REASONS.includes(getParticipatedReason(singleMembershipData.membershipByName.user?.id ?? "") as GqlParticipationStatusReason)}
+            reason={getParticipatedReason(singleMembershipData.membershipByName.user?.id ?? "")}
           />
         ) : (
           <>
             {sortedMembers.length === 0 && (
               <p className="text-sm text-muted-foreground">一致するメンバーが見つかりません</p>
             )}
-            {sortedMembers.map(({ user }) => (
-              <div key={user.id} className="flex flex-col gap-4">
-                <MemberRow
-                  user={user}
-                  checked={selectedUserIds.includes(user.id)}
-                  onCheck={() => handleCheck(user.id)}
-                  isDisabled={!!(selectedSlot?.slotId && selectedSlot?.slotId === participatedSlotIds && participatedUserIds.includes(user.id))}
-                />
-              </div>
-            ))}
+            {sortedMembers.map(({ user }) => {
+              const reason = getParticipatedReason(user.id);
+              const isDisabled = reason !== undefined && DISABLED_REASONS.includes(reason as GqlParticipationStatusReason);
+
+              return (
+                <div key={user.id} className="flex flex-col gap-4">
+                  <MemberRow
+                    user={user}
+                    checked={selectedUserIds.includes(user.id)}
+                    onCheck={() => handleCheck(user.id)}
+                    isDisabled={isDisabled}
+                    reason={reason}
+                  />
+                </div>
+              );
+            })}
           </>
         )}
         <div className="fixed bottom-0 left-0 w-full bg-white border-t flex justify-between px-6 py-4 z-10">

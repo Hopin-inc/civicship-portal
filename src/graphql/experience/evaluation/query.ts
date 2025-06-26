@@ -13,6 +13,10 @@ export const GET_EVALUATIONS = gql`
             status
             requestedAt
             completedAt
+            user {
+              id
+              name
+            }
           }
           participation {
             opportunitySlot {
@@ -23,6 +27,14 @@ export const GET_EVALUATIONS = gql`
               opportunity {
                 id
                 title
+                description
+                community {
+                  id
+                }
+                createdByUser {
+                  id
+                  name
+                }
               }
             }
           }

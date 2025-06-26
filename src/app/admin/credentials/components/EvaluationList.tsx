@@ -46,6 +46,7 @@ export default function EvaluationList() {
                     const denominator = allRequests.length;
                     const numerator = allRequests.filter(req => req?.status === "COMPLETED").length;
                     const hasPending = allRequests.some(req => req?.status === "PENDING");
+                    const hasFailed = allRequests.some(req => req?.status === "FAILED");
 
                     const node = representative.node;
                     const title = node?.participation?.opportunitySlot?.opportunity?.title ?? "";
@@ -78,7 +79,7 @@ export default function EvaluationList() {
                             <div className="flex justify-between items-end mt-4">
                                 <div className="text-gray-400 text-sm flex items-center">
                                     <span>発行数</span>
-                                    {hasPending && <AlertTriangle className="text-yellow-400 w-5 h-5 mx-1" />}
+                                    {hasFailed ? <AlertTriangle className="text-red-400 w-5 h-5 mx-1" />  : hasPending && <AlertTriangle className="text-yellow-400 w-5 h-5 mx-1" />}
                                     <span className="font-bold text-lg text-black mx-1">{numerator}</span>
                                     <span>/</span>
                                     <span>{denominator}</span>

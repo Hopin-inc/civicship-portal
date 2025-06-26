@@ -8,13 +8,12 @@ export default function DateWizard({ setStep }: { setStep: (step: number) => voi
   const { selectedTicketId, selectedSlot, setSelectedSlot } = useSelection();
   const router = useRouter();
 
-  const currentId = selectedTicketId;
-  const { groupedSlots } = useReservationDateLoader({ opportunityIds: currentId ? [currentId] : [] });
-  const currentSections = groupedSlots.filter(section => section.opportunityId === currentId);
+  const { groupedSlots } = useReservationDateLoader({ opportunityIds: selectedSlot?.opportunityId ? [selectedSlot?.opportunityId] : [] });
+  const currentSections = groupedSlots.filter(section => section.opportunityId === selectedSlot?.opportunityId);
   const selectedSlotId = selectedSlot?.slotId ?? null;
-
+  
   const handleDateSelect = (slotId: string) => {
-    setSelectedSlot({ opportunityId: currentId!, slotId, userIds: [] });
+    setSelectedSlot({ opportunityId: selectedSlot?.opportunityId!, slotId, userIds: [] });
   };
 
   const canProceed = !!selectedSlotId;

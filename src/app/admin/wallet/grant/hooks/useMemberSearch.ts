@@ -35,7 +35,6 @@ export const useMemberSearch = (
   });
 
   const searchQuery = form.watch("searchQuery");
-  console.log("searchQuery", searchQuery);
 
   const { data: singleMembershipData, loading, error } = useGetSingleMembershipByNameQuery({
     variables: {

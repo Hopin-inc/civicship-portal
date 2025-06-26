@@ -111,7 +111,6 @@ const PortfolioCard = ({
 }) => {
   const isPast = new Date(portfolio.date) < new Date();
   const isPassed = portfolio.evaluationStatus === GqlEvaluationStatus.Passed;
-  console.log(portfolio.reservationStatus);
   const linkHref =
     portfolio.source === "ARTICLE"
       ? `/articles/${portfolio.id}`
@@ -121,7 +120,6 @@ const PortfolioCard = ({
         : portfolio.source === "OPPORTUNITY"
           ? `/participations/${portfolio.id}`
           : "#";
-  console.log(getCategoryLabel(portfolio.source, portfolio.reservationStatus));
   return (
     <Link href={linkHref} className="block w-full">
       <div

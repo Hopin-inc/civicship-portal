@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { useGetParticipationsQuery } from "@/types/graphql";
+import { useGetParticipationsQuery, GqlParticipationStatusReason } from "@/types/graphql";
 import { useSelection } from "../context/SelectionContext";
 
 type OpportunityCardProps = {
@@ -21,23 +21,37 @@ export function OpportunityCard({
   name = "ticket",
   opportunityId,
 }: OpportunityCardProps) {
-  const { data, loading, error } = useGetParticipationsQuery({
-    variables: {
-      filter: { opportunityId }
-    },
+  const { data } = useGetParticipationsQuery({
+    variables: { filter: { opportunityId } },
     skip: !opportunityId,
   });
-  const { setParticipatedUserIds, setParticipatedSlotIds } = useSelection();
+  const { setParticipatedUsers } = useSelection();
 
   const handleSelect = () => {
-    const userIds = data?.participations.edges.map((e) => e?.node?.user?.id).filter((id): id is string => !!id);
-    const slotId = data?.participations.edges.map((e) => e?.node?.opportunitySlot?.id).filter((id): id is string => !!id);
-  if (userIds) {
-    setParticipatedUserIds(userIds); // ← これだけでOK
-  }
-  if (slotId) {
-    setParticipatedSlotIds(slotId[0]); // ← これだけでOK
-  }
+    const users =
+      data?.participations.edges
+        .map((e) => {
+          const userId = e?.node?.user?.id;
+          console.log("userId:", userId);
+          const slotId =
+            e?.node?.opportunitySlot?.id ??
+            e?.node?.reservation?.opportunitySlot?.id;
+          const reason = e?.node?.reason as GqlParticipationStatusReason | undefined;
+          const reservations =
+            e?.node?.opportunitySlot?.reservations ??
+            e?.node?.reservation?.opportunitySlot?.reservations ??
+            [];
+          console.log("reservations:", reservations);
+          const isCreatedByUser = Array.isArray(reservations)
+            ? reservations.some(r => r?.createdByUser?.id === userId)
+            : false;
+          if (typeof userId === "string" && typeof slotId === "string") {
+            return { userId, slotId, reason, isCreatedByUser };
+          }
+          return null;
+        })
+        .filter((u): u is { userId: string; slotId: string; reason: GqlParticipationStatusReason | undefined; isCreatedByUser: boolean } => !!u);
+    setParticipatedUsers(users ?? []);
     if (onClick) onClick();
   };
 

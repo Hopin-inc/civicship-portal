@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import {
+  GqlOpportunitySlotEdge,
   GqlOpportunitySlotHostingStatus,
   GqlSortDirection,
-  useGetOpportunitySlotsLazyQuery,
   useGetOpportunitySlotsQuery,
 } from "@/types/graphql";
 import { ActivityDetail } from "@/app/activities/data/type";
@@ -39,7 +39,7 @@ export const useReservationDateLoader = ({ opportunityIds }: UseReservationDateL
   }, [data]);
 
   const groupedSlots: ActivitySlotGroupWithOpportunityId[] = useMemo(() => {
-    const slots = presenterOpportunitySlots(data?.opportunitySlots?.edges);
+    const slots = presenterOpportunitySlots(data?.opportunitySlots?.edges as GqlOpportunitySlotEdge[]);
     return groupActivitySlotsByDate(slots).map((group) => ({
       ...group,
       opportunityId: group.slots[0]?.opportunityId ?? "",

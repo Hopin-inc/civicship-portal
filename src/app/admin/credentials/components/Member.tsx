@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { GqlUser, useGetDidIssuanceRequestsQuery } from "@/types/graphql";
+import { GqlUser, useGetDidIssuanceRequestsQuery, GqlParticipationStatusReason } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Input } from "@/components/ui/input";
 
@@ -8,9 +8,10 @@ interface Props {
   checked: boolean;
   onCheck: () => void;
   isDisabled: boolean;
+  reason?: GqlParticipationStatusReason;
 }
 
-export const MemberRow = ({ user, checked, onCheck, isDisabled }: Props) => {
+export const MemberRow = ({ user, checked, onCheck, isDisabled, reason }: Props) => {
   const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
     variables: {
       userId: user.id,
@@ -42,9 +43,14 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled }: Props) => {
     />
     {/* ユーザー情報 */}
     <div className="flex flex-col ml-4 min-w-0">
-      {isDisabled && (
-        <span className="text-green-500 text-xs font-semibold mb-1">
+      {isDisabled && reason === GqlParticipationStatusReason.ReservationAccepted && (
+         <span className="text-green-500 text-xs font-semibold mb-1">
           指定された募集に申込済み
+        </span>
+      )}
+      {isDisabled && reason === GqlParticipationStatusReason.PersonalRecord && (
+        <span className="text-green-500 text-xs font-semibold mb-1">
+          指定された募集で証明書発行済み
         </span>
       )}
       <span className={`${did ? "font-bold text-base text-black" : "text-gray-400 text-base"}`}>

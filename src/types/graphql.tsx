@@ -3601,6 +3601,7 @@ export type GqlGetEvaluationsQuery = {
           status: GqlVcIssuanceStatus;
           requestedAt?: Date | null;
           completedAt?: Date | null;
+          user?: { __typename?: "User"; id: string; name: string } | null;
         } | null;
         participation?: {
           __typename?: "Participation";
@@ -3610,7 +3611,14 @@ export type GqlGetEvaluationsQuery = {
             startsAt: Date;
             endsAt: Date;
             capacity?: number | null;
-            opportunity?: { __typename?: "Opportunity"; id: string; title: string } | null;
+            opportunity?: {
+              __typename?: "Opportunity";
+              id: string;
+              title: string;
+              description: string;
+              community?: { __typename?: "Community"; id: string } | null;
+              createdByUser?: { __typename?: "User"; id: string; name: string } | null;
+            } | null;
           } | null;
         } | null;
       } | null;
@@ -4133,8 +4141,27 @@ export type GqlGetParticipationsQuery = {
       node?: {
         __typename?: "Participation";
         id: string;
+        reason: GqlParticipationStatusReason;
         user?: { __typename?: "User"; id: string } | null;
-        opportunitySlot?: { __typename?: "OpportunitySlot"; id: string } | null;
+        reservation?: {
+          __typename?: "Reservation";
+          opportunitySlot?: {
+            __typename?: "OpportunitySlot";
+            id: string;
+            reservations?: Array<{
+              __typename?: "Reservation";
+              createdByUser?: { __typename?: "User"; id: string } | null;
+            }> | null;
+          } | null;
+        } | null;
+        opportunitySlot?: {
+          __typename?: "OpportunitySlot";
+          id: string;
+          reservations?: Array<{
+            __typename?: "Reservation";
+            createdByUser?: { __typename?: "User"; id: string } | null;
+          }> | null;
+        } | null;
       } | null;
     }>;
   };
@@ -7352,6 +7379,10 @@ export const GetEvaluationsDocument = gql`
             status
             requestedAt
             completedAt
+            user {
+              id
+              name
+            }
           }
           participation {
             opportunitySlot {
@@ -7362,6 +7393,14 @@ export const GetEvaluationsDocument = gql`
               opportunity {
                 id
                 title
+                description
+                community {
+                  id
+                }
+                createdByUser {
+                  id
+                  name
+                }
               }
             }
           }
@@ -8184,11 +8223,27 @@ export const GetParticipationsDocument = gql`
       edges {
         node {
           id
+          reason
           user {
             id
           }
+          reservation {
+            opportunitySlot {
+              id
+              reservations {
+                createdByUser {
+                  id
+                }
+              }
+            }
+          }
           opportunitySlot {
             id
+            reservations {
+              createdByUser {
+                id
+              }
+            }
           }
         }
       }

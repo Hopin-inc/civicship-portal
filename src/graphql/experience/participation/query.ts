@@ -14,11 +14,27 @@ export const GET_PARTICIPATIONS = gql`
       edges {
         node {
           id
+          reason
           user {
             id
           }
+          reservation {
+            opportunitySlot {
+              id
+              reservations {
+                createdByUser {
+                  id
+                }
+              }
+            }
+          }
           opportunitySlot {
             id
+            reservations {
+              createdByUser {
+                id
+              }
+            }
           }
           # 必要なら他のフィールドもここに追加
         }

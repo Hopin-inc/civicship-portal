@@ -3,7 +3,6 @@ import {
   GqlParticipation,
   useEvaluationBulkCreateMutation,
 } from "@/types/graphql";
-import { toast } from "sonner";
 
 type UseEvaluartionBulkCreateArgs = {
   onSuccess?: (response: any) => void;
@@ -32,11 +31,8 @@ export const useEvaluartionBulkCreate = ({ onSuccess, onError }: UseEvaluartionB
           permission: { communityId },
         },
       });
-      console.log("response", response);
-      toast.success("出欠情報を保存しました");
       onSuccess?.(response);
     } catch (e: any) {
-      toast.error(`出欠情報の保存に失敗しました: ${e.message}`);
       onError?.(e);
     }
   };

@@ -9,7 +9,7 @@ import React from "react";
 
 export default function OpportunityList({ setStep }: { setStep: (step: number) => void }) {
   const { user } = useAuth();
-  const { selectedTicketId, setSelectedTicketId } = useSelection();
+  const { selectedSlot,setSelectedSlot } = useSelection();
   const router = useRouter();
 
   const { data: opportunityData } = useGetOpportunitiesQuery({
@@ -25,10 +25,9 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
   });
 
   const opportunityList = opportunityData?.opportunities?.edges?.map((e) => e?.node) ?? [];
-
   const handleSelectTicket = (opportunityId: string) => {
-    setSelectedTicketId(opportunityId);
-  };
+    setSelectedSlot({ opportunityId, slotId: "", userIds: [] });
+  }
 
   return (
     <div className="space-y-6 flex flex-col min-h-screen mt-2">
@@ -48,7 +47,7 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
               key={opportunity?.id}
               title={opportunity?.title ?? "名称未設定のチケット"}
               qty={opportunity?.slots?.length ?? 0}
-              isSelected={selectedTicketId === opportunity?.id}
+              isSelected={selectedSlot?.opportunityId === opportunity?.id}
               onClick={() => handleSelectTicket(opportunity?.id ?? "")}
               opportunityId={opportunity?.id ?? ""}
             />
@@ -60,17 +59,17 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
           variant="text"
           className="text-gray-500"
           onClick={() => {
-            setSelectedTicketId(null);
+            setSelectedSlot(null);
             router.push("/admin/credentials");
           }}
         >
           キャンセル
         </Button>
         <Button
-          className={`rounded-full px-8 py-2 font-bold text-white ${selectedTicketId ? "bg-primary" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
-          disabled={!selectedTicketId}
+          className={`rounded-full px-8 py-2 font-bold text-white ${selectedSlot?.opportunityId ? "bg-primary" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
+          disabled={!selectedSlot?.opportunityId}
           onClick={() => {
-            if (selectedTicketId) {
+            if (selectedSlot?.opportunityId) {
               setStep(2); // ステップを進める
             }
           }}
