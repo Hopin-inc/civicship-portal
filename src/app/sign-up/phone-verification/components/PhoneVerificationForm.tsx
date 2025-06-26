@@ -13,14 +13,13 @@ import { useMutation } from "@apollo/client";
 import { IDENTITY_CHECK_PHONE_USER } from "@/graphql/account/identity/mutation";
 import { GqlPhoneUserStatus, GqlMutationIdentityCheckPhoneUserArgs, GqlIdentityCheckPhoneUserPayload } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { RawURIComponent } from "@/utils/path";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
   const nextParam = next ? `?next=${ encodeURIComponent(next) }` : "";
-
-  const authRedirectService = AuthRedirectService.getInstance();
 
   // ==================================
   const { phoneAuth, isAuthenticated, loading, authenticationState } = useAuth();
@@ -32,6 +31,8 @@ export function PhoneVerificationForm() {
     { identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload },
     GqlMutationIdentityCheckPhoneUserArgs
   >(IDENTITY_CHECK_PHONE_USER);
+
+  const authRedirectService = AuthRedirectService.getInstance();
 
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
@@ -101,13 +102,15 @@ export function PhoneVerificationForm() {
             break;
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
-            toast.error("このコミュニティには既に参加しています");
-            setIsCodeVerifying(false);
+            toast.success("ログインしました");
+            const homeRedirectPath = authRedirectService.getRedirectPath("/" as RawURIComponent, nextParam as RawURIComponent);
+            router.push(homeRedirectPath || "/");
             break;
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
             toast.success("メンバーシップが追加されました");
-            router.push("/");
+            const crossCommunityRedirectPath = authRedirectService.getRedirectPath("/" as RawURIComponent, nextParam as RawURIComponent);
+            router.push(crossCommunityRedirectPath || "/");
             break;
 
           default:
