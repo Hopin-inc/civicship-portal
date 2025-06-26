@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useGetUserWalletQuery } from "@/types/graphql";
+import { GqlTicketStatus, useGetUserWalletQuery } from "@/types/graphql";
 import { ActivityDetail } from "@/app/activities/data/type";
 
 export const useAvailableTickets = (
@@ -22,9 +22,9 @@ export const useAvailableTickets = (
 
     const requiredUtilityIds = new Set(opportunity.targetUtilities.map((u) => u.id));
 
-    return tickets.filter((edge) => {
-      const utilityId = edge?.utility?.id;
-      return utilityId && requiredUtilityIds.has(utilityId);
+    return tickets.filter((t) => {
+      const utilityId = t?.utility?.id;
+      return utilityId && requiredUtilityIds.has(utilityId) && t.status === GqlTicketStatus.Available;
     }).length;
   }, [opportunity?.targetUtilities, data]);
 };
