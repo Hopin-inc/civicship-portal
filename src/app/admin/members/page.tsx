@@ -55,11 +55,14 @@ export default function MembersPage() {
     );
   }, [membershipListData]);
 
-  const { form, filteredMembers } = useMemberSearch(
-    members
-      .map(({ user }) => (user ? { user } : null))
-      .filter((m): m is { user: GqlUser } => m !== null),
-  );
+  const { form, singleMembershipData } = useMemberSearch();
+
+  const filteredMembers = useMemo(() => {
+    if (singleMembershipData?.membership?.user) {
+      return [singleMembershipData.membership.user];
+    }
+    return members.map(m => m.user);
+  }, [singleMembershipData, members]);
 
   const [pendingRoleChange, setPendingRoleChange] = useState<{
     userId: string;
@@ -114,7 +117,7 @@ export default function MembersPage() {
           <p className="text-sm text-muted-foreground">一致するメンバーが見つかりません</p>
         )}
 
-        {filteredMembers.map(({ user }) => {
+        {filteredMembers.map((user) => {
           const membership = members.find((m) => m?.user.id === user.id);
           if (!membership) return null;
 

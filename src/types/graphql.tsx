@@ -1463,7 +1463,6 @@ export type GqlQuery = {
   evaluationHistory?: Maybe<GqlEvaluationHistory>;
   evaluations: GqlEvaluationsConnection;
   membership?: Maybe<GqlMembership>;
-  membershipByName?: Maybe<GqlMembership>;
   memberships: GqlMembershipsConnection;
   opportunities: GqlOpportunitiesConnection;
   opportunity?: Maybe<GqlOpportunity>;
@@ -1551,12 +1550,7 @@ export type GqlQueryEvaluationsArgs = {
 
 export type GqlQueryMembershipArgs = {
   communityId: Scalars["ID"]["input"];
-  userId: Scalars["ID"]["input"];
-};
-
-export type GqlQueryMembershipByNameArgs = {
-  communityId: Scalars["ID"]["input"];
-  userName?: InputMaybe<Scalars["String"]["input"]>;
+  userKey: Scalars["String"]["input"];
 };
 
 export type GqlQueryMembershipsArgs = {
@@ -2734,47 +2728,12 @@ export type GqlAssignMemberMutation = {
 
 export type GqlGetSingleMembershipQueryVariables = Exact<{
   communityId: Scalars["ID"]["input"];
-  userId: Scalars["ID"]["input"];
+  userKey: Scalars["String"]["input"];
 }>;
 
 export type GqlGetSingleMembershipQuery = {
   __typename?: "Query";
   membership?: {
-    __typename?: "Membership";
-    headline?: string | null;
-    bio?: string | null;
-    role: GqlRole;
-    status: GqlMembershipStatus;
-    reason: GqlMembershipStatusReason;
-    user?: {
-      __typename?: "User";
-      id: string;
-      name: string;
-      image?: string | null;
-      bio?: string | null;
-      currentPrefecture?: GqlCurrentPrefecture | null;
-      phoneNumber?: string | null;
-      urlFacebook?: string | null;
-      urlInstagram?: string | null;
-      urlX?: string | null;
-    } | null;
-    community?: {
-      __typename?: "Community";
-      id: string;
-      name?: string | null;
-      image?: string | null;
-    } | null;
-  } | null;
-};
-
-export type GqlGetSingleMembershipByNameQueryVariables = Exact<{
-  userName: Scalars["String"]["input"];
-  communityId: Scalars["ID"]["input"];
-}>;
-
-export type GqlGetSingleMembershipByNameQuery = {
-  __typename?: "Query";
-  membershipByName?: {
     __typename?: "Membership";
     headline?: string | null;
     bio?: string | null;
@@ -6128,8 +6087,8 @@ export type AssignMemberMutationOptions = Apollo.BaseMutationOptions<
   GqlAssignMemberMutationVariables
 >;
 export const GetSingleMembershipDocument = gql`
-  query GetSingleMembership($communityId: ID!, $userId: ID!) {
-    membership(communityId: $communityId, userId: $userId) {
+  query GetSingleMembership($communityId: ID!, $userKey: String!) {
+    membership(communityId: $communityId, userKey: $userKey) {
       ...MembershipFields
       user {
         ...UserFields
@@ -6157,7 +6116,7 @@ export const GetSingleMembershipDocument = gql`
  * const { data, loading, error } = useGetSingleMembershipQuery({
  *   variables: {
  *      communityId: // value for 'communityId'
- *      userId: // value for 'userId'
+ *      userKey: // value for 'userKey'
  *   },
  * });
  */
@@ -6211,93 +6170,6 @@ export type GetSingleMembershipSuspenseQueryHookResult = ReturnType<
 export type GetSingleMembershipQueryResult = Apollo.QueryResult<
   GqlGetSingleMembershipQuery,
   GqlGetSingleMembershipQueryVariables
->;
-export const GetSingleMembershipByNameDocument = gql`
-  query GetSingleMembershipByName($userName: String!, $communityId: ID!) {
-    membershipByName(userName: $userName, communityId: $communityId) {
-      ...MembershipFields
-      user {
-        ...UserFields
-      }
-      community {
-        ...CommunityFields
-      }
-    }
-  }
-  ${MembershipFieldsFragmentDoc}
-  ${UserFieldsFragmentDoc}
-  ${CommunityFieldsFragmentDoc}
-`;
-
-/**
- * __useGetSingleMembershipByNameQuery__
- *
- * To run a query within a React component, call `useGetSingleMembershipByNameQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetSingleMembershipByNameQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetSingleMembershipByNameQuery({
- *   variables: {
- *      userName: // value for 'userName'
- *      communityId: // value for 'communityId'
- *   },
- * });
- */
-export function useGetSingleMembershipByNameQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GqlGetSingleMembershipByNameQuery,
-    GqlGetSingleMembershipByNameQueryVariables
-  > &
-    ({ variables: GqlGetSingleMembershipByNameQueryVariables; skip?: boolean } | { skip: boolean }),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GqlGetSingleMembershipByNameQuery,
-    GqlGetSingleMembershipByNameQueryVariables
-  >(GetSingleMembershipByNameDocument, options);
-}
-export function useGetSingleMembershipByNameLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetSingleMembershipByNameQuery,
-    GqlGetSingleMembershipByNameQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GqlGetSingleMembershipByNameQuery,
-    GqlGetSingleMembershipByNameQueryVariables
-  >(GetSingleMembershipByNameDocument, options);
-}
-export function useGetSingleMembershipByNameSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GqlGetSingleMembershipByNameQuery,
-        GqlGetSingleMembershipByNameQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GqlGetSingleMembershipByNameQuery,
-    GqlGetSingleMembershipByNameQueryVariables
-  >(GetSingleMembershipByNameDocument, options);
-}
-export type GetSingleMembershipByNameQueryHookResult = ReturnType<
-  typeof useGetSingleMembershipByNameQuery
->;
-export type GetSingleMembershipByNameLazyQueryHookResult = ReturnType<
-  typeof useGetSingleMembershipByNameLazyQuery
->;
-export type GetSingleMembershipByNameSuspenseQueryHookResult = ReturnType<
-  typeof useGetSingleMembershipByNameSuspenseQuery
->;
-export type GetSingleMembershipByNameQueryResult = Apollo.QueryResult<
-  GqlGetSingleMembershipByNameQuery,
-  GqlGetSingleMembershipByNameQueryVariables
 >;
 export const GetMembershipListDocument = gql`
   query GetMembershipList(

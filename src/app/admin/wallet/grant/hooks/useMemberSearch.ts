@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
-import { GqlUser, useGetSingleMembershipByNameQuery } from "@/types/graphql";
+import { GqlUser, useGetSingleMembershipQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export type MemberSearchFormValues = {
@@ -36,10 +36,10 @@ export const useMemberSearch = (
 
   const searchQuery = form.watch("searchQuery");
 
-  const { data: singleMembershipData, loading, error } = useGetSingleMembershipByNameQuery({
+  const { data: singleMembershipData, loading, error } = useGetSingleMembershipQuery({
     variables: {
       communityId: COMMUNITY_ID,
-      userName: searchQuery,
+      userKey: searchQuery,
     },
     skip: !searchQuery,
   });

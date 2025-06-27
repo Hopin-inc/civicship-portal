@@ -173,13 +173,13 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
       </form>
 
       <div className="flex flex-col gap-4 px-4">
-        {form.watch("searchQuery") && singleMembershipData?.membershipByName?.user ? (
+        {form.watch("searchQuery") && singleMembershipData?.membership?.user ? (
           <MemberRow
-            user={singleMembershipData.membershipByName.user}
-            checked={selectedUserIds.includes(singleMembershipData.membershipByName.user?.id ?? "")}
-            onCheck={() => singleMembershipData.membershipByName?.user?.id && handleCheck(singleMembershipData.membershipByName.user.id)}
-            isDisabled={getParticipatedReason(singleMembershipData.membershipByName.user?.id ?? "") !== undefined && DISABLED_REASONS.includes(getParticipatedReason(singleMembershipData.membershipByName.user?.id ?? "") as GqlParticipationStatusReason)}
-            reason={getParticipatedReason(singleMembershipData.membershipByName.user?.id ?? "")}
+            user={singleMembershipData.membership.user}
+            checked={selectedUserIds.includes(singleMembershipData.membership.user?.id ?? "")}
+            onCheck={() => singleMembershipData.membership?.user?.id && handleCheck(singleMembershipData.membership.user.id)}
+            isDisabled={getParticipatedReason(singleMembershipData.membership?.user?.id ?? "") !== undefined && DISABLED_REASONS.includes(getParticipatedReason(singleMembershipData.membership?.user?.id ?? "") as GqlParticipationStatusReason)}
+            reason={getParticipatedReason(singleMembershipData.membership?.user?.id ?? "")}
           />
         ) : (
           <>
