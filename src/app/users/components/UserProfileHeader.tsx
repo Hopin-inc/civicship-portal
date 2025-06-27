@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { prefectureLabels } from "@/app/users/data/presenter";
@@ -18,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthProvider";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface UserProfileHeaderProps {
   id: string;
@@ -53,19 +53,10 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
         <div className="flex items-center w-full mb-4">
           <div className="flex-grow">
             <div className="relative w-24 h-24 rounded-full overflow-hidden">
-              <Image
-                src={image || PLACEHOLDER_IMAGE}
-                alt={name}
-                fill
-                placeholder={"blur"}
-                blurDataURL={PLACEHOLDER_IMAGE}
-                className="object-cover"
-                loading="lazy"
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  img.src = PLACEHOLDER_IMAGE;
-                }}
-              />
+              <Avatar>
+                <AvatarImage src={image || PLACEHOLDER_IMAGE} alt={name} />
+                <AvatarFallback>{name?.charAt(0) || "U"}</AvatarFallback>
+              </Avatar>
             </div>
           </div>
           {isOwner && (
