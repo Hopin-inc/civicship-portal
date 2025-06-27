@@ -122,11 +122,12 @@ export class LiffService {
       if (liff.isInClient()) {
         this.state.isLoggedIn = true;
       } else {
-        const redirectUri = typeof window !== "undefined"
-          ? redirectPath
-            ? window.location.origin + redirectPath
-            : window.location.origin
-          : undefined;
+        const redirectUri =
+          typeof window !== "undefined"
+            ? redirectPath
+              ? window.location.origin + redirectPath
+              : window.location.origin
+            : undefined;
 
         liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない
@@ -223,6 +224,10 @@ export class LiffService {
           const attemptTimestamp = new Date().toISOString();
 
           const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+          logger.debug("Sending LIFF login API request", {
+            url: `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`,
+            accessToken,
+          });
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`,
             {
@@ -231,22 +236,39 @@ export class LiffService {
               body: JSON.stringify({ accessToken }),
             },
           );
+          logger.debug("Received LIFF login API response", {
+            status: response.status,
+            ok: response.ok,
+            headers: Object.fromEntries(response.headers.entries()),
+          });
 
           if (!response.ok) {
-            throw new Error(`LIFF authentication failed: ${response.status}`);
+            logger.error(`LIFF authentication failed: ${response.status}`);
           }
-          const { customToken, profile } = await response.json();
+          const body = await response.json();
+          logger.debug("Parsed LIFF login response", { body });
+          const { customToken, profile } = body;
 
+          logger.debug("Signing in with Firebase custom token", { customToken });
           const userCredential = await signInWithCustomToken(lineAuth, customToken);
+          logger.debug("Signed in successfully", { uid: userCredential.user.uid });
 
+          logger.debug("Updating user profile", {
+            displayName: profile.displayName,
+            photoURL: profile.pictureUrl,
+          });
           await updateProfile(userCredential.user, {
             displayName: profile.displayName,
             photoURL: profile.pictureUrl,
           });
+          logger.debug("Profile update complete");
 
           const idToken = await userCredential.user.getIdToken();
-          const refreshToken = userCredential.user.refreshToken;
           const tokenResult = await userCredential.user.getIdTokenResult();
+          logger.debug("Retrieved ID token", {
+            expiresAt: tokenResult.expirationTime,
+          });
+          const refreshToken = userCredential.user.refreshToken;
           const expirationTime = new Date(tokenResult.expirationTime).getTime();
 
           const tokens: AuthTokens = {
