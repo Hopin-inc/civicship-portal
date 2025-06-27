@@ -14,6 +14,9 @@ export const GET_USER_FLEXIBLE = gql`
       }
       wallets @include(if: $withWallets) {
         ...WalletFields
+        community {
+          ...CommunityFields
+        }
         tickets {
           ...TicketFields
         }
