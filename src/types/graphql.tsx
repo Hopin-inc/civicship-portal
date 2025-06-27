@@ -2900,6 +2900,12 @@ export type GqlGetUserFlexibleQuery = {
       __typename?: "Wallet";
       id: string;
       type: GqlWalletType;
+      community?: {
+        __typename?: "Community";
+        id: string;
+        name?: string | null;
+        image?: string | null;
+      } | null;
       tickets?: Array<{
         __typename?: "Ticket";
         id: string;
@@ -6149,6 +6155,9 @@ export const GetUserFlexibleDocument = gql`
       }
       wallets @include(if: $withWallets) {
         ...WalletFields
+        community {
+          ...CommunityFields
+        }
         tickets {
           ...TicketFields
         }
@@ -6167,9 +6176,9 @@ export const GetUserFlexibleDocument = gql`
   ${UserFieldsFragmentDoc}
   ${UserPortfolioFieldsFragmentDoc}
   ${WalletFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
   ${TicketFieldsFragmentDoc}
   ${OpportunityFieldsFragmentDoc}
-  ${CommunityFieldsFragmentDoc}
   ${PlaceFieldsFragmentDoc}
 `;
 
