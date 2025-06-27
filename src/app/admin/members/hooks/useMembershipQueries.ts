@@ -1,24 +1,24 @@
-import {
-  GqlMembershipStatus,
-  GqlSortDirection,
-  useGetMembershipListLazyQuery,
-} from "@/types/graphql";
+import { GqlMembershipStatus, GqlSortDirection, useGetMembershipListQuery } from "@/types/graphql";
 
-export const useMembershipQueries = () => {
-  const [fetchMembershipList, { data: membershipListData }] = useGetMembershipListLazyQuery({
+export const useMembershipQueries = (communityId: string) => {
+  const { data, loading, error, refetch } = useGetMembershipListQuery({
     variables: {
       filter: {
+        communityId,
         status: GqlMembershipStatus.Joined,
       },
       sort: {
         createdAt: GqlSortDirection.Asc,
       },
+      first: 500,
     },
     fetchPolicy: "network-only",
   });
 
   return {
-    fetchMembershipList,
-    membershipListData,
+    membershipListData: data,
+    loading,
+    error,
+    refetch,
   };
 };

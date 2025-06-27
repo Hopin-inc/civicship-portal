@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlRole, GqlUser } from "@/types/graphql";
@@ -22,6 +22,8 @@ import { Button } from "@/components/ui/button";
 import { FormProvider } from "react-hook-form";
 import SearchForm from "@/app/search/components/SearchForm";
 import { useMemberSearch } from "@/app/admin/wallet/grant/hooks/useMemberSearch";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import ErrorState from "@/components/shared/ErrorState";
 
 export default function MembersPage() {
   const communityId = COMMUNITY_ID;
@@ -40,7 +42,7 @@ export default function MembersPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { fetchMembershipList, membershipListData } = useMembershipQueries();
+  const { membershipListData, loading, error, refetch } = useMembershipQueries(communityId);
   const { assignOwner, assignManager, assignMember } = useMembershipCommand();
 
   const members = useMemo(() => {
@@ -73,10 +75,6 @@ export default function MembersPage() {
     MEMBER: assignMember,
   };
 
-  useEffect(() => {
-    void fetchMembershipList({ variables: { first: 200 } });
-  }, [fetchMembershipList]);
-
   const [isLoading, setIsLoading] = useState(false);
 
   const handleMutation = useCallback(
@@ -98,6 +96,14 @@ export default function MembersPage() {
     },
     [communityId],
   );
+
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
+
+  if (loading) return <LoadingIndicator fullScreen />;
+  if (error) return <ErrorState title={"メンバー"} refetchRef={refetchRef} />;
 
   return (
     <FormProvider {...form}>
