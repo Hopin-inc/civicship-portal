@@ -71,7 +71,7 @@ const requestLink = new ApolloLink((operation, forward) => {
             "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
           };
 
-          const tokenRequiredOperations = ["userSignUp", "linkPhoneAuth", "storePhoneAuthToken"];
+          const tokenRequiredOperations = ["userSignUp", "linkPhoneAuth", "storePhoneAuthToken", "identityCheckPhoneUser"];
 
           if (tokenRequiredOperations.includes(operation.operationName || "")) {
             const requestHeaders = {
