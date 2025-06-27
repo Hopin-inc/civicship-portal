@@ -22,7 +22,7 @@ export function PhoneVerificationForm() {
   const nextParam = next ? `?next=${ encodeURIComponent(next) }` : "";
 
   // ==================================
-  const { phoneAuth, isAuthenticated, loading, authenticationState } = useAuth();
+  const { phoneAuth, isAuthenticated, loading, authenticationState, updateAuthState } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -109,6 +109,7 @@ export function PhoneVerificationForm() {
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
             toast.success("メンバーシップが追加されました");
+            updateAuthState();
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath("/" as RawURIComponent, nextParam as RawURIComponent);
             router.push(crossCommunityRedirectPath || "/");
             break;
@@ -123,6 +124,7 @@ export function PhoneVerificationForm() {
       }
     } catch (error) {
       toast.error("電話番号からやり直して下さい");
+      console.log(error);
       setIsCodeVerifying(false);
     }
   };

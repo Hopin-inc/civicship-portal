@@ -78,6 +78,7 @@ interface AuthContextType {
     prefecture: GqlCurrentPrefecture,
     phoneUid: string | null,
   ) => Promise<User | null>;
+  updateAuthState: () => Promise<void>;
 
   loading: boolean;
 }
@@ -331,6 +332,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       phoneUid: phoneAuthService.getState().phoneUid,
     },
     createUser,
+    updateAuthState: async () => {
+      await refetchUser();
+    },
     loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
   };
 
