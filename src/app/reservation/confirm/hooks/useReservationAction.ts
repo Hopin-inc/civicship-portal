@@ -48,13 +48,12 @@ export const useReservationCommand = () => {
         return { success: false, code: GqlErrorCode.ValidationError };
 
       const count = ticketCounter.count;
-      const ticketIds = useTickets ? getTicketIds(wallets, opportunity.requiredTicket, count) : [];
+      const ticketIds = useTickets ? getTicketIds(wallets, opportunity.targetUtilities, count) : [];
 
       if (useTickets && ticketIds.length < count) {
         return { success: false, code: GqlErrorCode.TicketParticipantMismatch };
       }
 
-      // TODO チケット機能リリース時は、チケット数と参加者数が異なっても良い状態にする
       try {
         const res = await createReservation({
           variables: {

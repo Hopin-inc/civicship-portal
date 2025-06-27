@@ -48,8 +48,8 @@ export type OpportunityDetail = CommunityId & {
   title: string;
   place: OpportunityPlace;
 
-  requiredApproval: boolean;
-  requiredTicket: RequiredUtility[];
+  requireApproval: boolean;
+  targetUtilities: RequiredUtility[];
 
   isReservable: boolean;
 
