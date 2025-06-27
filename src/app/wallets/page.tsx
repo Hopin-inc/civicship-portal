@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useWallet } from "@/app/wallets/hooks/useWallet";
 import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -52,7 +52,7 @@ export default function UserWalletPage() {
       } catch (err) {
         logger.error("Refetch failed on focus", {
           error: err instanceof Error ? err.message : String(err),
-          component: "UserWalletPage"
+          component: "UserWalletPage",
         });
       }
     };
@@ -60,8 +60,13 @@ export default function UserWalletPage() {
     return () => window.removeEventListener("focus", handleFocus);
   }, [refetchWallet, refetchTransactions]);
 
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetchWallet;
+  }, [refetchWallet]);
+
   if (isLoading) return <LoadingIndicator />;
-  if (error) return <ErrorState title={"ウォレット"} />;
+  if (error) return <ErrorState title={"ウォレット"} refetchRef={refetchRef} />;
 
   return (
     <div className="space-y-6 max-w-xl mx-auto mt-8  px-4">
