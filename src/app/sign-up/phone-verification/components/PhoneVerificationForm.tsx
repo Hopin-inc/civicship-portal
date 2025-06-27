@@ -9,6 +9,11 @@ import { formatPhoneNumber } from "@/app/sign-up/phone-verification/utils";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import { useMutation } from "@apollo/client";
+import { IDENTITY_CHECK_PHONE_USER } from "@/graphql/account/identity/mutation";
+import { GqlPhoneUserStatus, GqlMutationIdentityCheckPhoneUserArgs, GqlIdentityCheckPhoneUserPayload } from "@/types/graphql";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { RawURIComponent } from "@/utils/path";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -16,13 +21,18 @@ export function PhoneVerificationForm() {
   const next = searchParams.get("next");
   const nextParam = next ? `?next=${ encodeURIComponent(next) }` : "";
 
-  const authRedirectService = AuthRedirectService.getInstance();
-
   // ==================================
-  const { phoneAuth, isAuthenticated, loading, authenticationState } = useAuth();
+  const { phoneAuth, isAuthenticated, loading, authenticationState, updateAuthState } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
+
+  const [identityCheckPhoneUser] = useMutation<
+    { identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload },
+    GqlMutationIdentityCheckPhoneUserArgs
+  >(IDENTITY_CHECK_PHONE_USER);
+
+  const authRedirectService = AuthRedirectService.getInstance();
 
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
@@ -74,15 +84,47 @@ export function PhoneVerificationForm() {
     try {
       const success = await phoneAuth.verifyPhoneCode(verificationCode);
       if (success) {
-        toast.success("電話番号認証が完了しました");
-        const redirectPath = `/sign-up${nextParam}`;
-        router.push(redirectPath);
+        const { data } = await identityCheckPhoneUser({
+          variables: {
+            input: {
+              communityId: COMMUNITY_ID
+            }
+          }
+        });
+
+        const status = data?.identityCheckPhoneUser?.status;
+
+        switch (status) {
+          case GqlPhoneUserStatus.NewUser:
+            toast.success("電話番号認証が完了しました");
+            const redirectPath = `/sign-up${nextParam}`;
+            router.push(redirectPath);
+            break;
+
+          case GqlPhoneUserStatus.ExistingSameCommunity:
+            toast.success("ログインしました");
+            const homeRedirectPath = authRedirectService.getRedirectPath("/" as RawURIComponent, nextParam as RawURIComponent);
+            router.push(homeRedirectPath || "/");
+            break;
+
+          case GqlPhoneUserStatus.ExistingDifferentCommunity:
+            toast.success("メンバーシップが追加されました");
+            updateAuthState();
+            const crossCommunityRedirectPath = authRedirectService.getRedirectPath("/" as RawURIComponent, nextParam as RawURIComponent);
+            router.push(crossCommunityRedirectPath || "/");
+            break;
+
+          default:
+            toast.error("認証処理でエラーが発生しました");
+            setIsCodeVerifying(false);
+        }
       } else {
         toast.error("認証コードが無効です");
         setIsCodeVerifying(false);
       }
     } catch (error) {
       toast.error("電話番号からやり直して下さい");
+      console.log(error);
       setIsCodeVerifying(false);
     }
   };

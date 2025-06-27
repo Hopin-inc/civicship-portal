@@ -64,7 +64,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。心が躍るさまざまな体験を通じて、新しい自分に出会う旅へ。地域の方々が用意する特別な体験がたくさん待っています。あなたのお気に入りを選んで、一期一会のオリジナルな旅を楽しんでみませんか？",
     shortDescription:
       "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。",
-    domain: "https://www.neo88.app",
+    domain: "https://www.neo88.app",  // TODO: 環境によってドメインが変わるので、環境変数化する必要あり
     faviconPrefix: "/communities/neo88",
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
@@ -78,7 +78,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     title: "KIBOTCHA",
     description: "",
     shortDescription: "",
-    domain: "https://kibotcha.civicship.jp",
+    domain: "https://kibotcha.civicship.jp",  // TODO: 環境によってドメインが変わるので、環境変数化する必要あり
     faviconPrefix: "/communities/kibotcha",
     logoPath: "/communities/kibotcha/logo.jpg",
     squareLogoPath: "/communities/kibotcha/logo-square.jpg",
@@ -95,7 +95,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。心が躍るさまざまな体験を通じて、新しい自分に出会う旅へ。地域の方々が用意する特別な体験がたくさん待っています。あなたのお気に入りを選んで、一期一会のオリジナルな旅を楽しんでみませんか？",
     shortDescription:
       "四国にふれる。わたし、ふるえる。雄大な景色、独自の文化、そして暖かな人々との出会い。",
-    domain: "https://www.neo88.app",
+    domain: "https://www.neo88.app",  // TODO: 環境によってドメインが変わるので、環境変数化する必要あり
     faviconPrefix: "/communities/neo88",
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
