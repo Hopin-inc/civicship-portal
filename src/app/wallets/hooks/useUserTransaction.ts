@@ -1,5 +1,6 @@
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { GqlTransactionsConnection, useGetTransactionsQuery } from "@/types/graphql";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export interface UseMyTransactionsResult {
   connection: GqlTransactionsConnection;
@@ -24,6 +25,7 @@ const useUserTransactions = (userId: string): UseMyTransactionsResult => {
   const { data, loading, error, fetchMore, refetch } = useGetTransactionsQuery({
     variables: {
       filter: {
+        communityId: COMMUNITY_ID,
         or: [{ fromUserId: userId }, { toUserId: userId }],
       },
       first: 20,
@@ -42,6 +44,7 @@ const useUserTransactions = (userId: string): UseMyTransactionsResult => {
     await fetchMore({
       variables: {
         filter: {
+          communityId: COMMUNITY_ID,
           or: [{ fromUserId: userId }, { toUserId: userId }],
         },
         after: endCursor,
