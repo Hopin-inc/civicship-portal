@@ -103,7 +103,7 @@ export default function MembersPage() {
   }, [refetch]);
 
   if (loading) return <LoadingIndicator fullScreen />;
-  if (error) return <ErrorState title={"メンバー"} refetchRef={refetchRef} />;
+  if (error) return <ErrorState title={"メンバーを読み込めませんでした"} refetchRef={refetchRef} />;
 
   return (
     <FormProvider {...form}>
