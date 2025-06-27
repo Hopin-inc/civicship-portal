@@ -5,66 +5,72 @@ import { Card } from "@/components/ui/card";
 import { GqlEvaluationStatus, useGetEvaluationsQuery } from "@/types/graphql";
 import { useRouter } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
+import { useMemo } from "react";
 
-export default function EvaluationList() {
+export default function CredentialList() {
     const router = useRouter();
     const { data, loading, error } = useGetEvaluationsQuery();
+    
+    const evaluationList = useMemo(() => {
+        if (!data?.evaluations.edges) return [];
+        
+        return data.evaluations.edges
+            .filter((evaluation) => evaluation.node?.status === GqlEvaluationStatus.Passed)
+            .sort((a, b) => {
+                const aDate = a.node?.createdAt ? new Date(a.node.createdAt).getTime() : 0;
+                const bDate = b.node?.createdAt ? new Date(b.node.createdAt).getTime() : 0;
+                return bDate - aDate; 
+            });
+    }, [data?.evaluations.edges]);
+
+    const slotEvaluationsMap = useMemo(() => {
+        return evaluationList.reduce((acc, evaluation) => {
+            const slotId = evaluation.node?.participation?.opportunitySlot?.id;
+            if (!slotId) return acc;
+            if (!acc[slotId]) acc[slotId] = [];
+            acc[slotId].push(evaluation);
+            return acc;
+        }, {} as Record<string, typeof evaluationList>);
+    }, [evaluationList]);
+
+    const uniqueSlotEvaluations = useMemo(() => {
+        return Object.entries(slotEvaluationsMap).map(([slotId, evaluations]) => ({
+            slotId,
+            evaluations,
+            representative: evaluations[0],
+        }));
+    }, [slotEvaluationsMap]);
+
     if (loading) return <Loading />;
     if (error) return <div>Error: {error.message}</div>;
-    const evaluationList = data?.evaluations.edges
-        ?.filter((evaluation) => evaluation.node?.status === GqlEvaluationStatus.Passed)
-        .sort((a, b) => {
-            const aDate = a.node?.createdAt ? new Date(a.node.createdAt).getTime() : 0;
-            const bDate = b.node?.createdAt ? new Date(b.node.createdAt).getTime() : 0;
-            return bDate - aDate; // 降順（新しい順）
-        });
-
-    // slotIdごとにevaluationをグループ化
-    const slotEvaluationsMap = evaluationList
-      ? evaluationList.reduce((acc, evaluation) => {
-          const slotId = evaluation.node?.participation?.opportunitySlot?.id;
-          if (!slotId) return acc;
-          if (!acc[slotId]) acc[slotId] = [];
-          acc[slotId].push(evaluation);
-          return acc;
-        }, {} as Record<string, typeof evaluationList>)
-      : {};
-
-    // slotIdごとに1つだけ表示（代表evaluationを使う）
-    const uniqueSlotEvaluations = Object.entries(slotEvaluationsMap).map(([slotId, evaluations]) => ({
-      slotId,
-      evaluations,
-      representative: evaluations[0], // 代表として1つだけ使う
-    }));
-
+    
     return (
         <div className="space-y-4">
             {uniqueSlotEvaluations.length === 0 ? <div className="text-[#71717A]">証明書はまだありません</div> :
                 uniqueSlotEvaluations.map(({ slotId, evaluations, representative }) => {
-                    // すべてのvcIssuanceRequestをまとめて配列化
                     const allRequests = evaluations.flatMap(ev => ev.node?.vcIssuanceRequest ?? []);
                     const denominator = allRequests.length;
                     const numerator = allRequests.filter(req => req?.status === "COMPLETED").length;
                     const hasPending = allRequests.some(req => req?.status === "PENDING");
                     const hasFailed = allRequests.some(req => req?.status === "FAILED");
 
-                    const node = representative.node;
-                    const title = node?.participation?.opportunitySlot?.opportunity?.title ?? "";
-                    const start = node?.participation?.opportunitySlot?.startsAt
-                        ? new Date(node.participation.opportunitySlot.startsAt)
+                    const evaluationData = representative.node;
+                    const title = evaluationData?.participation?.opportunitySlot?.opportunity?.title ?? "";
+                    const start = evaluationData?.participation?.opportunitySlot?.startsAt
+                        ? new Date(evaluationData.participation.opportunitySlot.startsAt)
                         : null;
-                    const end = node?.participation?.opportunitySlot?.endsAt
-                        ? new Date(node.participation.opportunitySlot.endsAt)
+                    const end = evaluationData?.participation?.opportunitySlot?.endsAt
+                        ? new Date(evaluationData.participation.opportunitySlot.endsAt)
                         : null;
-                    const issuedAt = node?.createdAt
-                        ? new Date(node.createdAt).toLocaleDateString("ja-JP", { year: "numeric", month: "numeric", day: "numeric" })
+                    const issuedAt = evaluationData?.createdAt
+                        ? new Date(evaluationData.createdAt).toLocaleDateString("ja-JP", { year: "numeric", month: "numeric", day: "numeric" })
                         : "";
 
                     return (
                         <Card
-                            key={node?.id}
+                            key={evaluationData?.id}
                             className="rounded-xl border border-gray-200 p-4 flex flex-col cursor-pointer"
-                            onClick={() => router.push(`/admin/credentials/${node?.id}`)}
+                            onClick={() => router.push(`/admin/credentials/${evaluationData?.id}`)}
                         >
                             <div className="flex-1">
                                 <div className="font-bold text-lg truncate" style={{ maxWidth: "100%" }}>

@@ -1,27 +1,72 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlUser, useParticipationBulkCreateMutation, GqlParticipationStatusReason } from "@/types/graphql";
 import { toast } from "sonner";
-import { MemberRow } from "./Member";
 import { useMembershipQueries } from "@/app/admin/members/hooks/useMembershipQueries";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { FormProvider } from "react-hook-form";
 import { useMemberSearch } from "@/app/admin/wallet/grant/hooks/useMemberSearch";
 import { Button } from "@/components/ui/button";
-import { useSelection } from "../context/SelectionContext";
-import { useEvaluartionBulkCreate } from "../hooks/useEvaluartionBulkCreate";
+import { useSelection } from "../../context/SelectionContext";
+import { useEvaluationBulkCreate } from "../../hooks/useEvaluationBulkCreate";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/layout/Loading";
-import SearchForm from "./SearchForm";
 import { logger } from "@/lib/logging";
+import SearchForm from "./SearchForm";
+import { MemberRow } from "./Member";
 
-export default function UserSelector() {
+// 定数定義
+const STEP_COLORS = {
+  PRIMARY: "#71717A",
+  GRAY: "text-gray-400",
+} as const;
+
+const STEP_NUMBERS = {
+  CURRENT: 3,
+  TOTAL: 3,
+} as const;
+
+const DISABLED_REASONS: GqlParticipationStatusReason[] = [
+  GqlParticipationStatusReason.ReservationAccepted,
+  GqlParticipationStatusReason.PersonalRecord,
+];
+
+// ソートロジックを関数として分離
+const sortMembersByParticipation = (
+  members: { user: GqlUser }[],
+  participatedUsers: Array<{ userId: string; slotId: string; isCreatedByUser: boolean }>,
+  selectedSlotId: string | undefined
+) => {
+  return [...members].sort((a, b) => {
+    const aParticipated = participatedUsers.find(
+      (u) => u.userId === a.user.id && u.slotId === selectedSlotId
+    );
+    const bParticipated = participatedUsers.find(
+      (u) => u.userId === b.user.id && u.slotId === selectedSlotId
+    );
+
+    // isCreatedByUserがtrueのユーザーを最優先で上に
+    if (aParticipated?.isCreatedByUser && !bParticipated?.isCreatedByUser) return -1;
+    if (!aParticipated?.isCreatedByUser && bParticipated?.isCreatedByUser) return 1;
+
+    // 参加済みユーザーを上に
+    const aIsParticipated = !!aParticipated;
+    const bIsParticipated = !!bParticipated;
+    if (aIsParticipated && !bIsParticipated) return -1;
+    if (!aIsParticipated && bIsParticipated) return 1;
+
+    return 0;
+  });
+};
+
+export default function CredentialRecipientSelector({ setStep }: { setStep: (step: number) => void }) {
   const communityId = COMMUNITY_ID;
   const { selectedSlot, setSelectedSlot, participatedUsers } = useSelection();
   const router = useRouter();
   const { fetchMembershipList, membershipListData } = useMembershipQueries();
   const { form, singleMembershipData, loading, error } = useMemberSearch();
-  const [selectedUserIds, setSelectedUserIds] = useState<string[]>(selectedSlot?.userIds ?? []);
+
+  const selectedUserIds = selectedSlot?.userIds ?? [];
 
   const [createParticipation] = useParticipationBulkCreateMutation({
     onCompleted: (response) => {
@@ -37,7 +82,7 @@ export default function UserSelector() {
     },
   });
 
-  const { save } = useEvaluartionBulkCreate({
+  const { save } = useEvaluationBulkCreate({
     onError: (error) => {
       toast.error(error.message);
     },
@@ -53,11 +98,6 @@ export default function UserSelector() {
   );
   useHeaderConfig(headerConfig);
 
-  const DISABLED_REASONS: GqlParticipationStatusReason[] = [
-    GqlParticipationStatusReason.ReservationAccepted,
-    GqlParticipationStatusReason.PersonalRecord,
-  ];
-
   const getParticipatedReason = (userId: string) =>
     participatedUsers.find(u => u.userId === userId && u.slotId === selectedSlot?.slotId)?.reason;
 
@@ -72,6 +112,11 @@ export default function UserSelector() {
     );
   }, [membershipListData]);
 
+  // 並び替え用の配列を作成
+  const sortedMembers = useMemo(() => {
+    return sortMembersByParticipation(members, participatedUsers, selectedSlot?.slotId);
+  }, [members, participatedUsers, selectedSlot?.slotId]);
+
   useEffect(() => {
     void fetchMembershipList({ variables: { first: 50 } });
   }, [fetchMembershipList]);
@@ -81,11 +126,6 @@ export default function UserSelector() {
   }
 
   const handleCheck = (userId: string) => {
-    setSelectedUserIds(prev =>
-      prev.includes(userId)
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
-    );
     setSelectedSlot(prev =>
       prev
         ? {
@@ -112,25 +152,6 @@ export default function UserSelector() {
     }
   };
 
-  // 並び替え用の配列を作成
-  const sortedMembers = [...members].sort((a, b) => {
-    const aParticipated = participatedUsers.find(
-      (u) => u.userId === a.user.id && u.slotId === selectedSlot?.slotId
-    );
-    const bParticipated = participatedUsers.find(
-      (u) => u.userId === b.user.id && u.slotId === selectedSlot?.slotId
-    );
-    // isCreatedByUserがtrueのユーザーを最優先で上に
-    if (aParticipated?.isCreatedByUser && !bParticipated?.isCreatedByUser) return -1;
-    if (!aParticipated?.isCreatedByUser && bParticipated?.isCreatedByUser) return 1;
-    // 以降は従来の並び替え
-    const aIsParticipated = !!aParticipated;
-    const bIsParticipated = !!bParticipated;
-    if (aIsParticipated && !bIsParticipated) return -1;
-    if (!aIsParticipated && bIsParticipated) return 1;
-    return 0;
-  });
-
   if (loading) {
     return <Loading />;
   }
@@ -140,10 +161,11 @@ export default function UserSelector() {
       <div className="flex items-end gap-2 mt-2">
         <h1 className="text-2xl font-bold">発行先を選ぶ</h1>
         <span className="ml-1 flex items-end mb-1">
-          <span className="text-gray-400 text-base">(</span>
-          <span className="text-lg font-bold text-[#71717A] mx-1">3</span>
-          <span className="text-gray-400 text-base">/3</span>
-          <span className="text-gray-400 text-base">)</span>
+          <span className={`${STEP_COLORS.GRAY} text-base`}>(</span>
+          <span className={`text-lg font-bold mx-1`} style={{ color: STEP_COLORS.PRIMARY }}>{STEP_NUMBERS.CURRENT}</span>
+          <span className={`${STEP_COLORS.GRAY} text-base`}>/</span>
+          <span className={`${STEP_COLORS.GRAY} text-base`}>{STEP_NUMBERS.TOTAL}</span>
+          <span className={`${STEP_COLORS.GRAY} text-base`}>)</span>
         </span>
       </div>
       <form onSubmit={form.handleSubmit(() => {})} className="px-4 mb-4 pt-4">
@@ -182,13 +204,13 @@ export default function UserSelector() {
             })}
           </>
         )}
-        <div className="fixed bottom-0 left-0 w-full bg-white border-t flex justify-between px-6 py-4 z-10">
+        <div className="fixed bottom-0 left-0 w-full bg-white z-10">
+        <div className="w-full max-w-sm mx-auto flex justify-between px-4 py-4 border-t">
           <Button
             variant="text"
             className="text-gray-500"
             onClick={() => {
-              setSelectedSlot(null);
-              router.push("/admin/credentials");
+              setStep(2);
             }}
           >
             キャンセル
@@ -205,6 +227,7 @@ export default function UserSelector() {
             次へ
           </Button>
         </div>
+      </div>
       </div>
     </FormProvider>
   );

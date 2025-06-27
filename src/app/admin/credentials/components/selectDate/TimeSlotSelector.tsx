@@ -1,12 +1,10 @@
-import { useSelection } from "../context/SelectionContext";
-import { useRouter } from "next/navigation";
-import TimeSlotList from "./TimeSlotList";
-import { useReservationDateLoader } from "../hooks/useOpportunitySlotQuery";
+import { useSelection } from "../../context/SelectionContext";
+import { useReservationDateLoader } from "../../hooks/useOpportunitySlotQuery";
 import React from "react";
+import TimeSlotList from "./TimeSlotList";
 
-export default function DateWizard({ setStep }: { setStep: (step: number) => void }) {
-  const { selectedTicketId, selectedSlot, setSelectedSlot } = useSelection();
-  const router = useRouter();
+export default function TimeSlotSelector({ setStep }: { setStep: (step: number) => void }) {
+  const {selectedSlot, setSelectedSlot } = useSelection();
 
   const { groupedSlots } = useReservationDateLoader({ opportunityIds: selectedSlot?.opportunityId ? [selectedSlot?.opportunityId] : [] });
   const currentSections = groupedSlots.filter(section => section.opportunityId === selectedSlot?.opportunityId);
@@ -23,7 +21,7 @@ export default function DateWizard({ setStep }: { setStep: (step: number) => voi
   };
 
   const handleCancel = () => {
-    router.push("/admin/credentials");
+    setStep(1);
   };
 
   return (

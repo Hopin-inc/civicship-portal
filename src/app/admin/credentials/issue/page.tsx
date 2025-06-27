@@ -1,4 +1,4 @@
-import OpportunitySelector from "../components/OpportunitySelector";
+import OpportunitySelector from "../components/CredentialIssuanceWizard";
 
 export default function SelectOpportunity() {
     return (

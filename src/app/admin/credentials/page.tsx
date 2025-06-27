@@ -1,5 +1,5 @@
 import CreateOpportunitySheet from "./components/CreateOpportunity";
-import EvaluationList from "./components/EvaluationList";
+import CredentialList from "./components/CredentialList";
 
 export default function CredentialsPage() {
     return (
@@ -9,7 +9,7 @@ export default function CredentialsPage() {
                     <h1 className="text-2xl font-bold">証明書一覧</h1>
                     <CreateOpportunitySheet />
                 </div>
-                <EvaluationList />
+                <CredentialList />
             </div>
         </div>
     );

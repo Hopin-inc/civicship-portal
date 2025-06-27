@@ -4,12 +4,12 @@ import {
   useEvaluationBulkCreateMutation,
 } from "@/types/graphql";
 
-type UseEvaluartionBulkCreateArgs = {
+type UseEvaluationBulkCreateArgs = {
   onSuccess?: (response: any) => void;
   onError?: (e: Error) => void;
 };
 
-export const useEvaluartionBulkCreate = ({ onSuccess, onError }: UseEvaluartionBulkCreateArgs = {}) => {
+export const useEvaluationBulkCreate = ({ onSuccess, onError }: UseEvaluationBulkCreateArgs = {}) => {
   const [mutate, { loading }] = useEvaluationBulkCreateMutation();
 
   const save = async (
