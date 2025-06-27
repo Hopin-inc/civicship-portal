@@ -220,8 +220,6 @@ export class LiffService {
     return new Promise((resolve) => {
       operation.attempt(async (currentAttempt) => {
         try {
-          const attemptTimestamp = new Date().toISOString();
-
           const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`,
