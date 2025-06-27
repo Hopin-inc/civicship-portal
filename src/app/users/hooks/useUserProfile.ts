@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useGetUserFlexibleQuery } from "@/types/graphql";
 import { presenterManagerProfile } from "@/app/users/data/presenter";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export const useUserProfile = (userId?: string) => {
   const result = useGetUserFlexibleQuery({
@@ -19,7 +20,7 @@ export const useUserProfile = (userId?: string) => {
 
   const userData = useMemo(() => {
     const user = result.data?.user;
-    return user ? presenterManagerProfile(user) : null;
+    return user ? presenterManagerProfile(user, COMMUNITY_ID) : null;
   }, [result.data]);
 
   const selfOpportunities =

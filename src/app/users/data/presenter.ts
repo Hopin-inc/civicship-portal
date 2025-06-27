@@ -29,10 +29,10 @@ export const presenterAppUserSelf = (gqlUser: GqlUser): AppUserSelf => {
   };
 };
 
-export const presenterManagerProfile = (gqlUser: GqlUser): ManagerProfile => {
+export const presenterManagerProfile = (gqlUser: GqlUser, communityId: string): ManagerProfile => {
   return {
     ...presenterAppUser(gqlUser),
-    asset: presenterUserAsset(gqlUser.wallets?.[0]),
+    asset: presenterUserAsset(gqlUser.wallets?.find((w) => w.community?.id === communityId)),
     currentlyHiringOpportunities: (gqlUser.opportunitiesCreatedByMe ?? []).map(
       presenterActivityCard,
     ),
