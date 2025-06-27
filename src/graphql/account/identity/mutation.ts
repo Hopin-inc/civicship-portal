@@ -41,7 +41,6 @@ export const IDENTITY_CHECK_PHONE_USER = gql(`
         name
       }
       membership {
-        id
         role
       }
     }

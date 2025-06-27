@@ -410,6 +410,17 @@ export type GqlIdentity = {
   user?: Maybe<GqlUser>;
 };
 
+export type GqlIdentityCheckPhoneUserInput = {
+  communityId: Scalars["ID"]["input"];
+};
+
+export type GqlIdentityCheckPhoneUserPayload = {
+  __typename?: "IdentityCheckPhoneUserPayload";
+  membership?: Maybe<GqlMembership>;
+  status: GqlPhoneUserStatus;
+  user?: Maybe<GqlUser>;
+};
+
 export const GqlIdentityPlatform = {
   Facebook: "FACEBOOK",
   Line: "LINE",
@@ -432,25 +443,6 @@ export type GqlLinkPhoneAuthPayload = {
   success: Scalars["Boolean"]["output"];
   user?: Maybe<GqlUser>;
 };
-
-export type GqlIdentityCheckPhoneUserInput = {
-  communityId: Scalars["ID"]["input"];
-};
-
-export type GqlIdentityCheckPhoneUserPayload = {
-  __typename?: "IdentityCheckPhoneUserPayload";
-  status: GqlPhoneUserStatus;
-  user?: Maybe<GqlUser>;
-  membership?: Maybe<GqlMembership>;
-};
-
-export const GqlPhoneUserStatus = {
-  NewUser: 'NEW_USER',
-  ExistingSameCommunity: 'EXISTING_SAME_COMMUNITY',
-  ExistingDifferentCommunity: 'EXISTING_DIFFERENT_COMMUNITY'
-} as const;
-
-export type GqlPhoneUserStatus = typeof GqlPhoneUserStatus[keyof typeof GqlPhoneUserStatus];
 
 export type GqlMembership = {
   __typename?: "Membership";
@@ -628,6 +620,7 @@ export type GqlMutation = {
   evaluationBulkCreate?: Maybe<GqlEvaluationBulkCreatePayload>;
   evaluationFail?: Maybe<GqlEvaluationCreatePayload>;
   evaluationPass?: Maybe<GqlEvaluationCreatePayload>;
+  identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload;
   linkPhoneAuth?: Maybe<GqlLinkPhoneAuthPayload>;
   membershipAcceptMyInvitation?: Maybe<GqlMembershipSetInvitationStatusPayload>;
   membershipAssignManager?: Maybe<GqlMembershipSetRolePayload>;
@@ -656,7 +649,6 @@ export type GqlMutation = {
   reservationJoin?: Maybe<GqlReservationSetStatusPayload>;
   reservationReject?: Maybe<GqlReservationSetStatusPayload>;
   storePhoneAuthToken?: Maybe<GqlStorePhoneAuthTokenPayload>;
-  identityCheckPhoneUser?: Maybe<GqlIdentityCheckPhoneUserPayload>;
   ticketClaim?: Maybe<GqlTicketClaimPayload>;
   ticketIssue?: Maybe<GqlTicketIssuePayload>;
   ticketPurchase?: Maybe<GqlTicketPurchasePayload>;
@@ -704,13 +696,13 @@ export type GqlMutationEvaluationPassArgs = {
   permission: GqlCheckCommunityPermissionInput;
 };
 
+export type GqlMutationIdentityCheckPhoneUserArgs = {
+  input: GqlIdentityCheckPhoneUserInput;
+};
+
 export type GqlMutationLinkPhoneAuthArgs = {
   input: GqlLinkPhoneAuthInput;
   permission: GqlCheckIsSelfPermissionInput;
-};
-
-export type GqlMutationIdentityCheckPhoneUserArgs = {
-  input: GqlIdentityCheckPhoneUserInput;
 };
 
 export type GqlMutationMembershipAcceptMyInvitationArgs = {
@@ -1324,6 +1316,13 @@ export type GqlParticipationsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export const GqlPhoneUserStatus = {
+  ExistingDifferentCommunity: "EXISTING_DIFFERENT_COMMUNITY",
+  ExistingSameCommunity: "EXISTING_SAME_COMMUNITY",
+  NewUser: "NEW_USER",
+} as const;
+
+export type GqlPhoneUserStatus = (typeof GqlPhoneUserStatus)[keyof typeof GqlPhoneUserStatus];
 export type GqlPlace = {
   __typename?: "Place";
   accumulatedParticipants?: Maybe<Scalars["Int"]["output"]>;
@@ -2557,6 +2556,20 @@ export type GqlLinkPhoneAuthMutation = {
     success: boolean;
     user?: { __typename?: "User"; id: string; name: string } | null;
   } | null;
+};
+
+export type GqlIdentityCheckPhoneUserMutationVariables = Exact<{
+  input: GqlIdentityCheckPhoneUserInput;
+}>;
+
+export type GqlIdentityCheckPhoneUserMutation = {
+  __typename?: "Mutation";
+  identityCheckPhoneUser: {
+    __typename?: "IdentityCheckPhoneUserPayload";
+    status: GqlPhoneUserStatus;
+    user?: { __typename?: "User"; id: string; name: string } | null;
+    membership?: { __typename?: "Membership"; role: GqlRole } | null;
+  };
 };
 
 export type GqlCurrentUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -5611,6 +5624,63 @@ export type LinkPhoneAuthMutationResult = Apollo.MutationResult<GqlLinkPhoneAuth
 export type LinkPhoneAuthMutationOptions = Apollo.BaseMutationOptions<
   GqlLinkPhoneAuthMutation,
   GqlLinkPhoneAuthMutationVariables
+>;
+export const IdentityCheckPhoneUserDocument = gql`
+  mutation identityCheckPhoneUser($input: IdentityCheckPhoneUserInput!) {
+    identityCheckPhoneUser(input: $input) {
+      status
+      user {
+        id
+        name
+      }
+      membership {
+        role
+      }
+    }
+  }
+`;
+export type GqlIdentityCheckPhoneUserMutationFn = Apollo.MutationFunction<
+  GqlIdentityCheckPhoneUserMutation,
+  GqlIdentityCheckPhoneUserMutationVariables
+>;
+
+/**
+ * __useIdentityCheckPhoneUserMutation__
+ *
+ * To run a mutation, you first call `useIdentityCheckPhoneUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useIdentityCheckPhoneUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [identityCheckPhoneUserMutation, { data, loading, error }] = useIdentityCheckPhoneUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useIdentityCheckPhoneUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlIdentityCheckPhoneUserMutation,
+    GqlIdentityCheckPhoneUserMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlIdentityCheckPhoneUserMutation,
+    GqlIdentityCheckPhoneUserMutationVariables
+  >(IdentityCheckPhoneUserDocument, options);
+}
+export type IdentityCheckPhoneUserMutationHookResult = ReturnType<
+  typeof useIdentityCheckPhoneUserMutation
+>;
+export type IdentityCheckPhoneUserMutationResult =
+  Apollo.MutationResult<GqlIdentityCheckPhoneUserMutation>;
+export type IdentityCheckPhoneUserMutationOptions = Apollo.BaseMutationOptions<
+  GqlIdentityCheckPhoneUserMutation,
+  GqlIdentityCheckPhoneUserMutationVariables
 >;
 export const CurrentUserDocument = gql`
   query currentUser {
