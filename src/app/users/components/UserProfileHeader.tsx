@@ -52,12 +52,10 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
         {/* Profile Image */}
         <div className="flex items-center w-full mb-4">
           <div className="flex-grow">
-            <div className="relative w-24 h-24 rounded-full overflow-hidden">
-              <Avatar>
-                <AvatarImage src={image || PLACEHOLDER_IMAGE} alt={name} />
-                <AvatarFallback>{name?.charAt(0) || "U"}</AvatarFallback>
-              </Avatar>
-            </div>
+            <Avatar className="w-24 h-24">
+              <AvatarImage src={image || PLACEHOLDER_IMAGE} alt={name} />
+              <AvatarFallback>{name?.charAt(0) || "U"}</AvatarFallback>
+            </Avatar>
           </div>
           {isOwner && (
             <div className="flex gap-2">
