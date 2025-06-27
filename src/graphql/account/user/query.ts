@@ -2,9 +2,9 @@ import { gql } from "@apollo/client";
 
 export const GET_USER_FLEXIBLE = gql`
   query GetUserFlexible(
-    $id: ID!,
-    $withPortfolios: Boolean! = false,
-    $withWallets: Boolean! = false,
+    $id: ID!
+    $withPortfolios: Boolean! = false
+    $withWallets: Boolean! = false
     $withOpportunities: Boolean! = false
   ) {
     user(id: $id) {
@@ -28,7 +28,7 @@ export const GET_USER_FLEXIBLE = gql`
         }
       }
     }
-  } 
+  }
 `;
 
 export const GET_USER_WALLET = gql`
@@ -37,6 +37,9 @@ export const GET_USER_WALLET = gql`
       ...UserFields
       wallets {
         ...WalletFields
+        community {
+          ...CommunityFields
+        }
         transactions {
           ...TransactionFields
           fromWallet {

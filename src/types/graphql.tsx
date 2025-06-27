@@ -2967,6 +2967,12 @@ export type GqlGetUserWalletQuery = {
       __typename?: "Wallet";
       id: string;
       type: GqlWalletType;
+      community?: {
+        __typename?: "Community";
+        id: string;
+        name?: string | null;
+        image?: string | null;
+      } | null;
       transactions?: Array<{
         __typename?: "Transaction";
         id: string;
@@ -3455,50 +3461,6 @@ export type GqlEvaluationFieldsFragment = {
   createdAt?: Date | null;
   updatedAt?: Date | null;
   issuedAt?: Date | null;
-};
-
-export type GqlEvaluationPassMutationVariables = Exact<{
-  input: GqlEvaluationCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-}>;
-
-export type GqlEvaluationPassMutation = {
-  __typename?: "Mutation";
-  evaluationPass?: {
-    __typename?: "EvaluationCreateSuccess";
-    evaluation: {
-      __typename?: "Evaluation";
-      id: string;
-      comment?: string | null;
-      credentialUrl?: string | null;
-      status: GqlEvaluationStatus;
-      createdAt?: Date | null;
-      updatedAt?: Date | null;
-      issuedAt?: Date | null;
-    };
-  } | null;
-};
-
-export type GqlEvaluationFailMutationVariables = Exact<{
-  input: GqlEvaluationCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-}>;
-
-export type GqlEvaluationFailMutation = {
-  __typename?: "Mutation";
-  evaluationFail?: {
-    __typename?: "EvaluationCreateSuccess";
-    evaluation: {
-      __typename?: "Evaluation";
-      id: string;
-      comment?: string | null;
-      credentialUrl?: string | null;
-      status: GqlEvaluationStatus;
-      createdAt?: Date | null;
-      updatedAt?: Date | null;
-      issuedAt?: Date | null;
-    };
-  } | null;
 };
 
 export type GqlGetEvaluationsQueryVariables = Exact<{ [key: string]: never }>;
@@ -6279,6 +6241,9 @@ export const GetUserWalletDocument = gql`
       ...UserFields
       wallets {
         ...WalletFields
+        community {
+          ...CommunityFields
+        }
         transactions {
           ...TransactionFields
           fromWallet {
@@ -6311,8 +6276,8 @@ export const GetUserWalletDocument = gql`
   }
   ${UserFieldsFragmentDoc}
   ${WalletFieldsFragmentDoc}
-  ${TransactionFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
+  ${TransactionFieldsFragmentDoc}
   ${TicketFieldsFragmentDoc}
   ${UtilityFieldsFragmentDoc}
 `;
@@ -6995,118 +6960,6 @@ export type EvaluationBulkCreateMutationResult =
 export type EvaluationBulkCreateMutationOptions = Apollo.BaseMutationOptions<
   GqlEvaluationBulkCreateMutation,
   GqlEvaluationBulkCreateMutationVariables
->;
-export const EvaluationPassDocument = gql`
-  mutation EvaluationPass(
-    $input: EvaluationCreateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    evaluationPass(input: $input, permission: $permission) {
-      ... on EvaluationCreateSuccess {
-        evaluation {
-          ...EvaluationFields
-        }
-      }
-    }
-  }
-  ${EvaluationFieldsFragmentDoc}
-`;
-export type GqlEvaluationPassMutationFn = Apollo.MutationFunction<
-  GqlEvaluationPassMutation,
-  GqlEvaluationPassMutationVariables
->;
-
-/**
- * __useEvaluationPassMutation__
- *
- * To run a mutation, you first call `useEvaluationPassMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useEvaluationPassMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [evaluationPassMutation, { data, loading, error }] = useEvaluationPassMutation({
- *   variables: {
- *      input: // value for 'input'
- *      permission: // value for 'permission'
- *   },
- * });
- */
-export function useEvaluationPassMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    GqlEvaluationPassMutation,
-    GqlEvaluationPassMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<GqlEvaluationPassMutation, GqlEvaluationPassMutationVariables>(
-    EvaluationPassDocument,
-    options,
-  );
-}
-export type EvaluationPassMutationHookResult = ReturnType<typeof useEvaluationPassMutation>;
-export type EvaluationPassMutationResult = Apollo.MutationResult<GqlEvaluationPassMutation>;
-export type EvaluationPassMutationOptions = Apollo.BaseMutationOptions<
-  GqlEvaluationPassMutation,
-  GqlEvaluationPassMutationVariables
->;
-export const EvaluationFailDocument = gql`
-  mutation EvaluationFail(
-    $input: EvaluationCreateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    evaluationFail(input: $input, permission: $permission) {
-      ... on EvaluationCreateSuccess {
-        evaluation {
-          ...EvaluationFields
-        }
-      }
-    }
-  }
-  ${EvaluationFieldsFragmentDoc}
-`;
-export type GqlEvaluationFailMutationFn = Apollo.MutationFunction<
-  GqlEvaluationFailMutation,
-  GqlEvaluationFailMutationVariables
->;
-
-/**
- * __useEvaluationFailMutation__
- *
- * To run a mutation, you first call `useEvaluationFailMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useEvaluationFailMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [evaluationFailMutation, { data, loading, error }] = useEvaluationFailMutation({
- *   variables: {
- *      input: // value for 'input'
- *      permission: // value for 'permission'
- *   },
- * });
- */
-export function useEvaluationFailMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    GqlEvaluationFailMutation,
-    GqlEvaluationFailMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<GqlEvaluationFailMutation, GqlEvaluationFailMutationVariables>(
-    EvaluationFailDocument,
-    options,
-  );
-}
-export type EvaluationFailMutationHookResult = ReturnType<typeof useEvaluationFailMutation>;
-export type EvaluationFailMutationResult = Apollo.MutationResult<GqlEvaluationFailMutation>;
-export type EvaluationFailMutationOptions = Apollo.BaseMutationOptions<
-  GqlEvaluationFailMutation,
-  GqlEvaluationFailMutationVariables
 >;
 export const GetEvaluationsDocument = gql`
   query GetEvaluations {
