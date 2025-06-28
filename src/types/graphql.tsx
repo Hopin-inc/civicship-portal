@@ -3183,7 +3183,9 @@ export type GqlGetWalletsWithTicketQuery = {
   };
 };
 
-export type GqlGetCommunityWalletQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetCommunityWalletQueryVariables = Exact<{
+  communityId: Scalars["ID"]["input"];
+}>;
 
 export type GqlGetCommunityWalletQuery = {
   __typename?: "Query";
@@ -3204,6 +3206,12 @@ export type GqlGetCommunityWalletQuery = {
         __typename?: "Wallet";
         id: string;
         type: GqlWalletType;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
+        } | null;
         currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
       } | null;
     } | null> | null;
@@ -6551,8 +6559,8 @@ export type GetWalletsWithTicketQueryResult = Apollo.QueryResult<
   GqlGetWalletsWithTicketQueryVariables
 >;
 export const GetCommunityWalletDocument = gql`
-  query GetCommunityWallet {
-    wallets(filter: { type: COMMUNITY }) {
+  query GetCommunityWallet($communityId: ID!) {
+    wallets(filter: { type: COMMUNITY, communityId: $communityId }) {
       pageInfo {
         hasNextPage
         hasPreviousPage
@@ -6564,11 +6572,15 @@ export const GetCommunityWalletDocument = gql`
         cursor
         node {
           ...WalletFields
+          community {
+            ...CommunityFields
+          }
         }
       }
     }
   }
   ${WalletFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
 `;
 
 /**
@@ -6583,14 +6595,16 @@ export const GetCommunityWalletDocument = gql`
  * @example
  * const { data, loading, error } = useGetCommunityWalletQuery({
  *   variables: {
+ *      communityId: // value for 'communityId'
  *   },
  * });
  */
 export function useGetCommunityWalletQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     GqlGetCommunityWalletQuery,
     GqlGetCommunityWalletQueryVariables
-  >,
+  > &
+    ({ variables: GqlGetCommunityWalletQueryVariables; skip?: boolean } | { skip: boolean }),
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<GqlGetCommunityWalletQuery, GqlGetCommunityWalletQueryVariables>(

@@ -62,8 +62,8 @@ export const GET_WALLETS_WITH_TICKET = gql`
 `;
 
 export const GET_COMMUNITY_WALLET = gql`
-  query GetCommunityWallet {
-    wallets(filter: { type: COMMUNITY }) {
+  query GetCommunityWallet($communityId: ID!) {
+    wallets(filter: { type: COMMUNITY, communityId: $communityId }) {
       pageInfo {
         hasNextPage
         hasPreviousPage
@@ -75,6 +75,9 @@ export const GET_COMMUNITY_WALLET = gql`
         cursor
         node {
           ...WalletFields
+          community {
+            ...CommunityFields
+          }
         }
       }
     }
