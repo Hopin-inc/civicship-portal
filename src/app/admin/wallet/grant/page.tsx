@@ -70,7 +70,7 @@ export default function GrantPointStepperPage() {
         });
 
         toast.success(`+${amount.toLocaleString()} pt を渡しました`);
-        router.push("/admin/wallet");
+        router.push("/admin/wallet?refresh=true");
       } else {
         toast.error(`助成失敗: ${res.code}`);
       }

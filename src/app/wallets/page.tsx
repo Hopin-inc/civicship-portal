@@ -106,6 +106,7 @@ export default function UserWalletPage() {
             toast.error("再読み込みに失敗しました");
           }
         }}
+        showRefreshButton={!shouldRefresh} // 自動更新時は再読み込みボタンを非表示
       />
 
       <div className="flex justify-center">

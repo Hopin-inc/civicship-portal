@@ -9,7 +9,7 @@ import WalletCard from "@/app/wallets/components/WalletCard";
 import { GqlMembership, GqlRole, useGetCommunityWalletQuery } from "@/types/graphql";
 import { Coins, Gift } from "lucide-react";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { presenterTransaction } from "@/app/wallets/data/presenter";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
@@ -21,6 +21,9 @@ export default function WalletPage() {
   const currentUserRole = currentUser?.memberships?.find(
     (m: GqlMembership) => m.community?.id === communityId,
   )?.role;
+
+  const searchParams = useSearchParams();
+  const shouldRefresh = searchParams.get("refresh") === "true";
 
   const headerConfig = useMemo(
     () => ({
@@ -51,6 +54,28 @@ export default function WalletPage() {
   const currentPoint = walletData?.wallets.edges?.[0]?.node?.currentPointView?.currentPoint ?? 0;
 
   const { connection, loadMoreRef, refetch: refetchTransactions } = useCommunityTransactions();
+
+  // 操作完了後のリダイレクトでrefreshパラメータがある場合、データを更新
+  useEffect(() => {
+    if (shouldRefresh) {
+      const refreshData = async () => {
+        try {
+          await refetchWallet();
+          refetchTransactions();
+          // URLからrefreshパラメータを削除（履歴に残さない）
+          const url = new URL(window.location.href);
+          url.searchParams.delete("refresh");
+          window.history.replaceState({}, "", url);
+        } catch (err) {
+          logger.error("Refresh failed after redirect", {
+            error: err instanceof Error ? err.message : String(err),
+            component: "WalletPage",
+          });
+        }
+      };
+      refreshData();
+    }
+  }, [shouldRefresh, refetchWallet, refetchTransactions]);
 
   useEffect(() => {
     const handleFocus = async () => {
