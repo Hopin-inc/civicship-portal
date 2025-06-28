@@ -41,7 +41,11 @@ export default function WalletPage() {
     data: walletData,
     loading: loadingWallet,
     refetch: refetchWallet,
-  } = useGetCommunityWalletQuery();
+  } = useGetCommunityWalletQuery({
+    variables: {
+      communityId: COMMUNITY_ID,
+    },
+  });
 
   const walletId = walletData?.wallets.edges?.[0]?.node?.id ?? "";
   const currentPoint = walletData?.wallets.edges?.[0]?.node?.currentPointView?.currentPoint ?? 0;
