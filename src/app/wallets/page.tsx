@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Gift } from "lucide-react";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
 import { presenterTransaction } from "@/app/wallets/data/presenter";
@@ -19,6 +19,8 @@ import { logger } from "@/lib/logging";
 export default function UserWalletPage() {
   const { user: currentUser } = useAuth();
   const userId = currentUser?.id;
+  const searchParams = useSearchParams();
+  const shouldRefresh = searchParams.get("refresh") === "true";
 
   const headerConfig = useMemo(
     () => ({
@@ -43,6 +45,27 @@ export default function UserWalletPage() {
 
   const walletId = userAsset.points.walletId;
   const currentPoint = userAsset.points.currentPoint;
+
+  // 操作完了後のリダイレクトでrefreshパラメータがある場合、データを更新
+  useEffect(() => {
+    if (shouldRefresh) {
+      const refreshData = async () => {
+        try {
+          await Promise.all([refetchWallet(), refetchTransactions()]);
+          // URLからrefreshパラメータを削除（履歴に残さない）
+          const url = new URL(window.location.href);
+          url.searchParams.delete("refresh");
+          window.history.replaceState({}, "", url);
+        } catch (err) {
+          logger.error("Refresh failed after redirect", {
+            error: err instanceof Error ? err.message : String(err),
+            component: "UserWalletPage",
+          });
+        }
+      };
+      refreshData();
+    }
+  }, [shouldRefresh, refetchWallet, refetchTransactions]);
 
   useEffect(() => {
     const handleFocus = async () => {
@@ -82,6 +105,7 @@ export default function UserWalletPage() {
             toast.error("再読み込みに失敗しました");
           }
         }}
+        showRefreshButton={!shouldRefresh} // 自動更新時は再読み込みボタンを非表示
       />
 
       <div className="flex justify-center">

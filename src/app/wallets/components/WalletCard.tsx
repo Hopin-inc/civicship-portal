@@ -10,9 +10,15 @@ interface WalletCardProps {
   currentPoint: number;
   isLoading: boolean;
   onRefetch?: () => void | Promise<void>;
+  showRefreshButton?: boolean;
 }
 
-const WalletCard: React.FC<WalletCardProps> = ({ currentPoint, isLoading, onRefetch }) => {
+const WalletCard: React.FC<WalletCardProps> = ({
+  currentPoint,
+  isLoading,
+  onRefetch,
+  showRefreshButton = true,
+}) => {
   return (
     <div className="bg-background rounded-[32px] px-12 py-8 shadow-[0_2px_20px_rgba(0,0,0,0.08)] mt-8 mb-8">
       <div className="flex flex-col items-center mb-12">
@@ -37,7 +43,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ currentPoint, isLoading, onRefe
           height={24}
           className="opacity-60"
         />
-        {onRefetch && (
+        {onRefetch && showRefreshButton && (
           <Button
             onClick={onRefetch}
             variant="tertiary"

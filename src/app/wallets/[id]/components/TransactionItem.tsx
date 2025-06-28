@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import React from "react";
 import { formatCurrency } from "@/app/wallets/data/presenter";
 import { AppTransaction } from "@/app/wallets/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Card } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface TransactionItemProps {
   transaction: AppTransaction;
@@ -32,14 +32,10 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image })
     <Card className="flex items-center justify-between px-4 py-3">
       {/* 左: アイコンと説明 */}
       <div className="flex items-center gap-3 flex-grow min-w-0">
-        <Image
-          src={image ?? PLACEHOLDER_IMAGE}
-          alt="user"
-          width={40}
-          height={40}
-          className="rounded-full object-cover border"
-          style={{ aspectRatio: "1 / 1" }}
-        />
+        <Avatar className="h-10 w-10">
+          <AvatarImage src={image ?? PLACEHOLDER_IMAGE} alt="user" />
+          <AvatarFallback>U</AvatarFallback>
+        </Avatar>
         <div className="flex flex-col text-left min-w-0 flex-1">
           <span className="text-body-sm truncate whitespace-nowrap overflow-hidden block">
             {transaction.description}
