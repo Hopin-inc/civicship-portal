@@ -51,8 +51,7 @@ export default function UserWalletPage() {
     if (shouldRefresh) {
       const refreshData = async () => {
         try {
-          await refetchWallet();
-          refetchTransactions();
+          await Promise.all([refetchWallet(), refetchTransactions()]);
           // URLからrefreshパラメータを削除（履歴に残さない）
           const url = new URL(window.location.href);
           url.searchParams.delete("refresh");
