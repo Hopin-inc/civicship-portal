@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { COMMUNITY_ID, getCommunityIdFromEnv } from "@/lib/communities/metadata";
 import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
@@ -47,8 +47,9 @@ export default function WalletPage() {
     },
   });
 
-  const walletId = walletData?.wallets.edges?.[0]?.node?.id ?? "";
-  const currentPoint = walletData?.wallets.edges?.[0]?.node?.currentPointView?.currentPoint ?? 0;
+  const wallet = walletData?.wallets.edges?.find(w => w?.node?.community?.id === getCommunityIdFromEnv())?.node;
+  const walletId = wallet?.id ?? "";
+  const currentPoint = wallet?.currentPointView?.currentPoint ?? 0;
 
   const { connection, loadMoreRef, refetch: refetchTransactions } = useCommunityTransactions();
 

@@ -12,6 +12,7 @@ import { presenterUserAsset } from "@/app/wallets/data/presenter";
 import { Participant } from "@/types/utils";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 
 export const presenterAppUser = (gqlUser: GqlUser): AppUser => {
   return {
@@ -24,7 +25,7 @@ export const presenterAppUser = (gqlUser: GqlUser): AppUser => {
 export const presenterAppUserSelf = (gqlUser: GqlUser): AppUserSelf => {
   return {
     ...presenterAppUser(gqlUser),
-    asset: presenterUserAsset(gqlUser.wallets?.[0]),
+    asset: presenterUserAsset(gqlUser.wallets?.find(w => w.community?.id === getCommunityIdFromEnv())),
     portfolios: (gqlUser.portfolios ?? []).map(presenterPortfolio),
   };
 };

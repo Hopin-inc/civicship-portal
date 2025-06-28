@@ -16,6 +16,7 @@ import {
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { presenterOpportunityHost } from "@/app/activities/data/presenter";
+import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 
 export const getTicketIds = (
   wallets: GqlWallet[] | null,
@@ -23,7 +24,7 @@ export const getTicketIds = (
   ticketCount: number,
 ) => {
   return (
-    wallets?.[0]?.tickets
+    wallets?.find(w => w.community?.id === getCommunityIdFromEnv())?.tickets
       ?.filter((edge: GqlTicket) => {
         if (!requiredUtilities?.length) return true;
         const utilityId = edge?.utility?.id;
