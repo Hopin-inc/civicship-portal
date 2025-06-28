@@ -16,7 +16,6 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
     variables: {
       filter: {
         communityIds: [COMMUNITY_ID],
-        createdByUserIds: [user?.id ?? ""],
       },
       sort: { createdAt: GqlSortDirection.Desc },
       first: 20,
