@@ -3588,6 +3588,7 @@ export type GqlGetOpportunityQuery = {
   __typename?: "Query";
   opportunity?: {
     __typename?: "Opportunity";
+    requireApproval: boolean;
     id: string;
     title: string;
     description: string;
@@ -3596,7 +3597,6 @@ export type GqlGetOpportunityQuery = {
     category: GqlOpportunityCategory;
     publishStatus: GqlPublishStatus;
     isReservableWithTicket?: boolean | null;
-    requireApproval: boolean;
     feeRequired?: number | null;
     pointsToEarn?: number | null;
     earliestReservableAt?: Date | null;
@@ -3747,6 +3747,7 @@ export type GqlGetOpportunityQuery = {
         }> | null;
       }> | null;
     } | null;
+    requiredUtilities?: Array<{ __typename?: "Utility"; id: string }> | null;
   } | null;
 };
 
@@ -7276,6 +7277,10 @@ export const GetOpportunityDocument = gql`
             }
           }
         }
+      }
+      requireApproval
+      requiredUtilities {
+        id
       }
     }
   }
