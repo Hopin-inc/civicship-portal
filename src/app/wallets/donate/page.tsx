@@ -87,7 +87,7 @@ export default function DonatePointPage() {
         });
 
         toast.success(`+${amount.toLocaleString()} pt をあげました`);
-        router.push("/wallets");
+        router.push("/wallets?refresh=true");
       } else {
         toast.error(`送信失敗: ${res.code}`);
       }
