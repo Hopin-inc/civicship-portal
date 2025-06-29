@@ -7,6 +7,16 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import React from "react";
 
+const STEP_NUMBERS = {
+  CURRENT: 1,
+  TOTAL: 3,
+} as const;
+
+const STEP_COLORS = {
+  PRIMARY: "#71717A",
+  GRAY: "text-gray-400",
+} as const;
+
 export default function OpportunityList({ setStep }: { setStep: (step: number) => void }) {
   const { user } = useAuth();
   const { selectedSlot,setSelectedSlot } = useSelection();
@@ -32,11 +42,17 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
     <div className="space-y-6 flex flex-col min-h-screen mt-2">
       <div className="flex items-end gap-2">
         <h1 className="text-2xl font-bold">募集を選ぶ</h1>
-        <span className="ml-1 flex items-end mb-1">
-          <span className="text-gray-400 text-base">(</span>
-          <span className="text-lg font-bold text-[#71717A] mx-1">1</span>
-          <span className="text-gray-400 text-base">/3</span>
-          <span className="text-gray-400 text-base">)</span>
+        <span className="ml-1 flex mb-1 items-baseline">
+          <span className={`${STEP_COLORS.GRAY} text-base`}>(</span>
+          <span
+            className="text-xl font-bold ml-1"
+            style={{ color: STEP_COLORS.PRIMARY }}
+          >
+            {STEP_NUMBERS.CURRENT}
+          </span>
+          <span className={`${STEP_COLORS.GRAY} text-base`}>/</span>
+          <span className={`${STEP_COLORS.GRAY} text-base mr-1`}>{STEP_NUMBERS.TOTAL}</span>
+          <span className={`${STEP_COLORS.GRAY} text-base`}>)</span>
         </span>
       </div>
       <div className="flex-1">

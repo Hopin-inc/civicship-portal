@@ -11,6 +11,14 @@ interface Props {
   reason?: GqlParticipationStatusReason;
 }
 
+const truncateDid = (did: string | undefined | null, length: number = 20): string => {
+  if (!did) return "";
+  if (did.length <= length) return did;
+  const start = did.substring(0, length);
+  const end = did.substring(did.length - 10);
+  return `${start}...${end}`;
+};
+
 export const MemberRow = ({ user, checked, onCheck, isDisabled, reason }: Props) => {
   const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
     variables: {
@@ -18,7 +26,7 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason }: Props)
     },
   });
 
-  const did = didIssuanceRequestsData?.users?.edges?.[0]?.node?.didIssuanceRequests?.[0]?.id;
+  const did = didIssuanceRequestsData?.users?.edges?.[0]?.node?.didIssuanceRequests?.[0]?.didValue;
   const cardBgClass = !did || isDisabled ? "bg-zinc-200" : "bg-white";
   
   return (
@@ -56,8 +64,8 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason }: Props)
       <span className={`${did ? "font-bold text-base text-black" : "text-gray-400 text-base"}`}>
         {user.name}
       </span>
-      <span className="text-gray-400 text-sm truncate max-w-[160px]">
-        {did ? `did:key:${did}` : "did発行中"}
+      <span className="text-gray-400 text-sm max-w-[160px]">
+        {did ? truncateDid(did,20) : "did発行中"}
       </span>
     </div>
   </div>

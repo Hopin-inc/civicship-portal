@@ -93,9 +93,15 @@ export default function CredentialList() {
                                     {title}
                                 </div>
                                 <div className="text-gray-500 text-sm mt-1">
-                                    {start && end
-                                        ? `${start.getFullYear()}年${start.getMonth() + 1}月${start.getDate()}日~${end.getMonth() + 1}月${end.getDate()}日`
-                                        : ""}
+                                    {start && end ? (
+                                        start.getFullYear() === end.getFullYear() &&
+                                        start.getMonth() === end.getMonth() &&
+                                        start.getDate() === end.getDate() ? (
+                                            `${start.getFullYear()}年${start.getMonth() + 1}月${start.getDate()}日 ${start.getHours()}:${String(start.getMinutes()).padStart(2, '0')}~${end.getHours()}:${String(end.getMinutes()).padStart(2, '0')}`
+                                        ) : (
+                                            `${start.getFullYear()}年${start.getMonth() + 1}月${start.getDate()}日~${end.getMonth() + 1}月${end.getDate()}日`
+                                        )
+                                    ) : ""}
                                 </div>
                             </div>
                             <div className="flex justify-between items-end mt-4">

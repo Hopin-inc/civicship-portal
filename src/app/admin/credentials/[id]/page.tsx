@@ -3,10 +3,11 @@ import { Card, CardHeader } from "@/components/ui/card";
 import { GqlVcIssuanceStatus, useGetDidIssuanceRequestsQuery, useGetEvaluationsQuery } from "@/types/graphql";
 import { formatDateTime } from "@/utils/date";
 import { Copy, ExternalLink } from "lucide-react";
-import { use } from "react";
+import { use, useMemo } from "react";
 import { renderStatusCard, statusStyle } from "./data/presenter";
 import { toast } from "sonner";
 import Link from "next/link";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 // DIDを省略表示する関数
 const truncateDid = (did: string | undefined | null, length: number = 20): string => {
@@ -32,6 +33,15 @@ function getDidValueByUserId(
 export default function CredentialsDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const { data: evaluationsData } = useGetEvaluationsQuery();
+    const headerConfig = useMemo(
+      () => ({
+        title: "証明書詳細",
+        showLogo: false,
+        showBackButton: true,
+      }),
+      [],
+    );
+    useHeaderConfig(headerConfig);
     const matchedEvaluation = evaluationsData?.evaluations.edges.find(
       (edge) => edge.node?.id === id
     );
@@ -98,7 +108,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="text-gray-400 text-base min-w-fit whitespace-nowrap">開始日時</div>
                 <div className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
-                {formatDateTime(matchedEvaluation?.node?.participation?.opportunitySlot?.startsAt ?? new Date(), "yyyy/MM/dd HH:mm")}
+                {formatDateTime(matchedEvaluation?.node?.participation?.opportunitySlot?.startsAt ?? new Date(), "yyyy年MM月dd日 HH:mm")}
                 </div>
             </CardHeader>
         </Card>
@@ -106,7 +116,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="text-gray-400 text-base min-w-fit whitespace-nowrap">終了日時</div>
                 <div className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
-                    {formatDateTime(matchedEvaluation?.node?.participation?.opportunitySlot?.endsAt ?? new Date(), "yyyy/MM/dd HH:mm")}
+                    {formatDateTime(matchedEvaluation?.node?.participation?.opportunitySlot?.endsAt ?? new Date(), "yyyy年MM月dd日 HH:mm")}
                 </div>
             </CardHeader>
         </Card>

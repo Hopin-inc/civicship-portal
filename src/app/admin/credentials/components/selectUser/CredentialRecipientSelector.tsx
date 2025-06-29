@@ -160,11 +160,16 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
     <FormProvider {...form}>
       <div className="flex items-end gap-2 mt-2">
         <h1 className="text-2xl font-bold">発行先を選ぶ</h1>
-        <span className="ml-1 flex items-end mb-1">
+        <span className="ml-1 flex mb-1 items-baseline">
           <span className={`${STEP_COLORS.GRAY} text-base`}>(</span>
-          <span className={`text-lg font-bold mx-1`} style={{ color: STEP_COLORS.PRIMARY }}>{STEP_NUMBERS.CURRENT}</span>
+          <span
+            className="text-xl font-bold ml-1"
+            style={{ color: STEP_COLORS.PRIMARY }}
+          >
+            {STEP_NUMBERS.CURRENT}
+          </span>
           <span className={`${STEP_COLORS.GRAY} text-base`}>/</span>
-          <span className={`${STEP_COLORS.GRAY} text-base`}>{STEP_NUMBERS.TOTAL}</span>
+          <span className={`${STEP_COLORS.GRAY} text-base mr-1`}>{STEP_NUMBERS.TOTAL}</span>
           <span className={`${STEP_COLORS.GRAY} text-base`}>)</span>
         </span>
       </div>
@@ -224,7 +229,7 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
               }
             }}
           >
-            次へ
+            発行
           </Button>
         </div>
       </div>

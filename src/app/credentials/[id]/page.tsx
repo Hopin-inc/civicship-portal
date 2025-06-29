@@ -32,7 +32,7 @@ export default function CredentialsPage(props: {params: Promise<{id: string}>}) 
             />
         </div>
         <div className="mt-6 p-4">
-            <CredentialList opportunity={data} />
+            <CredentialList data={data} />
         </div>
       </div>
     </>

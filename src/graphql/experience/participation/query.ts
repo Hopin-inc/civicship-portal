@@ -81,6 +81,9 @@ export const GetParticipationDocument = gql(`
           }
         }
       }
+      evaluation {
+        id
+      }
       statusHistories {
         id
         status
