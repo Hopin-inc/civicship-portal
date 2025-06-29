@@ -1,23 +1,21 @@
 "use client";
 
-import { Card, CardHeader } from "@/components/ui/card";
 import CredentialHeader from "./components/CredentialHeader";
 import Image from "next/image";
-import { Copy } from "lucide-react";
-import { useParams } from "next/navigation";
 import { use } from "react";
 import { useGetParticipationQuery } from "@/types/graphql";
 import CredentialList from "./components/CredentialList";
 import NotFound from "@/app/not-found";
-
+import Loading from "@/components/layout/Loading";
 export default function CredentialsPage(props: {params: Promise<{id: string}>}) {
     const { id } = use(props.params)
-    const { data, loading, error, refetch } = useGetParticipationQuery({
+    const { data, loading } = useGetParticipationQuery({
         variables: { id: id },
         skip: !id,
         fetchPolicy: "network-only",
       });
     if(!data) return <NotFound />
+    if(loading) return <Loading />
   return (
     <>
       <CredentialHeader />
