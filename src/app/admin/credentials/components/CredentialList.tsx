@@ -2,14 +2,35 @@
 
 import Loading from "@/components/layout/Loading";
 import { Card } from "@/components/ui/card";
-import { GqlEvaluationStatus, useGetEvaluationsQuery } from "@/types/graphql";
+import { GqlEvaluationStatus, GqlVcIssuanceStatus, useGetEvaluationsQuery } from "@/types/graphql";
 import { useRouter } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
+
+function getIssuanceStats(evaluations: any[]) {
+  const allRequests = evaluations.flatMap(ev => {
+    const req = ev.node?.vcIssuanceRequest;
+    if (!req) return [];
+    return Array.isArray(req) ? req : [req];
+  });
+  const denominator = allRequests.length;
+  const numerator = allRequests.filter(req => req?.status === GqlVcIssuanceStatus.Completed).length;
+  const hasPending = allRequests.some(req => req?.status === GqlVcIssuanceStatus.Pending || req?.status === GqlVcIssuanceStatus.Processing);
+  const hasFailed = allRequests.some(req => req?.status === GqlVcIssuanceStatus.Failed);
+  return { denominator, numerator, hasPending, hasFailed };
+}
 
 export default function CredentialList() {
     const router = useRouter();
-    const { data, loading, error } = useGetEvaluationsQuery();
+    const { data, loading, error,refetch } = useGetEvaluationsQuery();
+
+    // 遷移よりデータ作成の方が遅いため遅延後に再取得
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+          refetch();
+        }, 1000);
+        return () => clearTimeout(timeout);
+      }, []);
     
     const evaluationList = useMemo(() => {
         if (!data?.evaluations.edges) return [];
@@ -41,19 +62,14 @@ export default function CredentialList() {
         }));
     }, [slotEvaluationsMap]);
 
-    if (loading) return <Loading />;
+    if (loading || !data?.evaluations.edges) return <Loading />;
     if (error) return <div>Error: {error.message}</div>;
     
     return (
         <div className="space-y-4">
             {uniqueSlotEvaluations.length === 0 ? <div className="text-[#71717A]">証明書はまだありません</div> :
                 uniqueSlotEvaluations.map(({ slotId, evaluations, representative }) => {
-                    const allRequests = evaluations.flatMap(ev => ev.node?.vcIssuanceRequest ?? []);
-                    const denominator = allRequests.length;
-                    const numerator = allRequests.filter(req => req?.status === "COMPLETED").length;
-                    const hasPending = allRequests.some(req => req?.status === "PENDING");
-                    const hasFailed = allRequests.some(req => req?.status === "FAILED");
-
+                    const { denominator, numerator, hasPending, hasFailed } = getIssuanceStats(evaluations);
                     const evaluationData = representative.node;
                     const title = evaluationData?.participation?.opportunitySlot?.opportunity?.title ?? "";
                     const start = evaluationData?.participation?.opportunitySlot?.startsAt

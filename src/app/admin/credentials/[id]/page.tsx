@@ -1,13 +1,33 @@
 "use client";
 import { Card, CardHeader } from "@/components/ui/card";
-import { useGetDidIssuanceRequestsQuery, useGetEvaluationsQuery } from "@/types/graphql";
+import { GqlVcIssuanceStatus, useGetDidIssuanceRequestsQuery, useGetEvaluationsQuery } from "@/types/graphql";
 import { formatDateTime } from "@/utils/date";
 import { Copy, ExternalLink } from "lucide-react";
 import { use } from "react";
 import { renderStatusCard, statusStyle } from "./data/presenter";
-import { VCIssuanceStatus } from "./types";
 import { toast } from "sonner";
 import Link from "next/link";
+
+// DIDを省略表示する関数
+const truncateDid = (did: string | undefined | null, length: number = 20): string => {
+  if (!did) return "";
+  if (did.length <= length) return did;
+  const start = did.substring(0, length);
+  const end = did.substring(did.length - 10);
+  return `${start}...${end}`;
+};
+
+// userIdからDIDを取得する関数
+function getDidValueByUserId(
+  didIssuanceRequestsData: any,
+  userId: string | undefined | null
+): string {
+  if (!userId || !didIssuanceRequestsData?.users?.edges) return "";
+  const userEdge = didIssuanceRequestsData.users.edges.find(
+    (edge: any) => edge?.node?.id === userId
+  );
+  return userEdge?.node?.didIssuanceRequests?.[0]?.didValue ?? "";
+}
 
 export default function CredentialsDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
@@ -15,15 +35,28 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
     const matchedEvaluation = evaluationsData?.evaluations.edges.find(
       (edge) => edge.node?.id === id
     );
-    const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
-        variables: {
-          userId: matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.createdByUser?.id ?? "",
-        },
-      });
     const slotId = matchedEvaluation?.node?.participation?.opportunitySlot?.id;
     const sameSlotEvaluations = evaluationsData?.evaluations.edges.filter(
       (edge) => edge.node?.participation?.opportunitySlot?.id === slotId
     ) ?? [];
+
+    const organizerId = matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.createdByUser?.id;
+    const participantIds = sameSlotEvaluations
+      .map(ev => ev?.node?.vcIssuanceRequest?.user?.id)
+      .filter((id): id is string => !!id);
+
+    const userIds = [
+      ...(organizerId ? [organizerId] : []),
+      ...participantIds,
+    ];
+
+    const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
+        variables: {
+          userIds: userIds,
+        },
+      });
+
+    const organizerDidValue = getDidValueByUserId(didIssuanceRequestsData, organizerId);
 
   return( 
     <div className="p-4 space-y-3 max-w-2xl mx-auto">
@@ -35,11 +68,10 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
                 <div className="text-lg font-bold text-black">{matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.createdByUser?.name}</div>
                     <div className="flex items-center text-gray-400 text-sm mt-1">
                         <Copy className="w-4 h-4 mr-1 cursor-pointer" onClick={() => {
-                            const didKey = didIssuanceRequestsData?.user?.didIssuanceRequests?.[0]?.id ?? "";
-                            navigator.clipboard.writeText(didKey);
+                            navigator.clipboard.writeText(organizerDidValue);
                             toast.success("コピーしました");
                         }} />
-                        <span>did:key:{didIssuanceRequestsData?.user?.didIssuanceRequests?.[0]?.id}</span>
+                        <span>{truncateDid(organizerDidValue)}</span>
                     </div>
                 </div>
             </CardHeader>
@@ -47,7 +79,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
         <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="text-gray-400 text-base min-w-fit whitespace-nowrap">概要</div>
-                <div className="flex items-center flex-1 min-w-0 ml-2">
+                <div className="flex items-center flex-1 min-w-0 ml-8">
                     <span className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm flex-1">
                         {matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.description}
                     </span>
@@ -78,12 +110,14 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
                 </div>
             </CardHeader>
         </Card>
-        <h1 className="text-2xl font-bold">証明書の発行先</h1>
+        <h1 className="text-2xl font-bold pt-6">証明書の発行先</h1>
         {sameSlotEvaluations.map((evaluation) => {
+          const userId = evaluation?.node?.vcIssuanceRequest?.user?.id;
+          const didValue = getDidValueByUserId(didIssuanceRequestsData, userId);
           const rawStatus = evaluation?.node?.vcIssuanceRequest?.status?.trim();
-          const status = Object.values(VCIssuanceStatus).includes(rawStatus as VCIssuanceStatus)
-            ? (rawStatus as VCIssuanceStatus)
-            : VCIssuanceStatus.PENDING;
+          const status = Object.values(GqlVcIssuanceStatus).includes(rawStatus as GqlVcIssuanceStatus)
+            ? (rawStatus as GqlVcIssuanceStatus)
+            : GqlVcIssuanceStatus.Pending;
           const style = statusStyle[status];
 
           return (
@@ -100,16 +134,15 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center text-gray-400 text-sm mt-1">
+                  <div className="flex items-center text-gray-400 text-sm mt-2">
                     <Copy
                       className="w-4 h-4 mr-1 cursor-pointer"
                       onClick={() => {
-                        const didKey = evaluation?.node?.vcIssuanceRequest?.id ?? "";
-                        navigator.clipboard.writeText(didKey);
+                        navigator.clipboard.writeText(didValue);
                         toast.success("コピーしました");
                       }}
                     />
-                    <span>did:key:{evaluation?.node?.vcIssuanceRequest?.id}</span>
+                    <span>{truncateDid(didValue,25)}</span>
                   </div>
                 </div>
               </CardHeader>

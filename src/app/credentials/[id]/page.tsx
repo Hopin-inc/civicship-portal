@@ -7,7 +7,7 @@ import { Copy } from "lucide-react";
 import { useParams } from "next/navigation";
 import { use } from "react";
 import { useGetParticipationQuery } from "@/types/graphql";
-import OpportunityList from "./components/OpportunityList";
+import CredentialList from "./components/CredentialList";
 import NotFound from "@/app/not-found";
 
 export default function CredentialsPage(props: {params: Promise<{id: string}>}) {
@@ -32,7 +32,7 @@ export default function CredentialsPage(props: {params: Promise<{id: string}>}) 
             />
         </div>
         <div className="mt-6 p-4">
-            <OpportunityList opportunity={data} />
+            <CredentialList opportunity={data} />
         </div>
       </div>
     </>

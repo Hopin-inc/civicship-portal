@@ -476,10 +476,10 @@ export type GqlMembershipEdge = GqlEdge & {
 
 export type GqlMembershipFilterInput = {
   communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
   role?: InputMaybe<GqlRole>;
   status?: InputMaybe<GqlMembershipStatus>;
   userId?: InputMaybe<Scalars["ID"]["input"]>;
-  userNames?: InputMaybe<Array<Scalars["String"]["input"]>>;
 };
 
 export type GqlMembershipHistory = {
@@ -1060,7 +1060,7 @@ export type GqlOpportunitySlot = {
   reservations?: Maybe<Array<GqlReservation>>;
   startsAt: Scalars["Datetime"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
-  vcIssuanceRequests: Array<GqlVcIssuanceRequest>;
+  vcIssuanceRequests?: Maybe<Array<GqlVcIssuanceRequest>>;
 };
 
 export type GqlOpportunitySlotCreateInput = {
@@ -1550,7 +1550,7 @@ export type GqlQueryEvaluationsArgs = {
 
 export type GqlQueryMembershipArgs = {
   communityId: Scalars["ID"]["input"];
-  userKey: Scalars["String"]["input"];
+  userId: Scalars["ID"]["input"];
 };
 
 export type GqlQueryMembershipsArgs = {
@@ -2270,7 +2270,8 @@ export type GqlUserEdge = GqlEdge & {
 };
 
 export type GqlUserFilterInput = {
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
+  ids?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  keywords?: InputMaybe<Array<Scalars["String"]["input"]>>;
   sysRole?: InputMaybe<GqlSysRole>;
 };
 
@@ -2728,7 +2729,7 @@ export type GqlAssignMemberMutation = {
 
 export type GqlGetSingleMembershipQueryVariables = Exact<{
   communityId: Scalars["ID"]["input"];
-  userKey: Scalars["String"]["input"];
+  userId: Scalars["ID"]["input"];
 }>;
 
 export type GqlGetSingleMembershipQuery = {
@@ -3486,25 +3487,32 @@ export type GqlDidIssuanceRequestFieldsFragment = {
 };
 
 export type GqlGetDidIssuanceRequestsQueryVariables = Exact<{
-  userId: Scalars["ID"]["input"];
+  userIds: Array<Scalars["ID"]["input"]> | Scalars["ID"]["input"];
 }>;
 
 export type GqlGetDidIssuanceRequestsQuery = {
   __typename?: "Query";
-  user?: {
-    __typename?: "User";
-    didIssuanceRequests?: Array<{
-      __typename?: "DidIssuanceRequest";
-      id: string;
-      status: GqlDidIssuanceStatus;
-      didValue?: string | null;
-      requestedAt?: Date | null;
-      processedAt?: Date | null;
-      completedAt?: Date | null;
-      createdAt?: Date | null;
-      updatedAt?: Date | null;
-    }> | null;
-  } | null;
+  users: {
+    __typename?: "UsersConnection";
+    edges?: Array<{
+      __typename?: "UserEdge";
+      node?: {
+        __typename?: "User";
+        id: string;
+        didIssuanceRequests?: Array<{
+          __typename?: "DidIssuanceRequest";
+          id: string;
+          status: GqlDidIssuanceStatus;
+          didValue?: string | null;
+          requestedAt?: Date | null;
+          processedAt?: Date | null;
+          completedAt?: Date | null;
+          createdAt?: Date | null;
+          updatedAt?: Date | null;
+        }> | null;
+      } | null;
+    } | null> | null;
+  };
 };
 
 export type GqlEvaluationBulkCreateMutationVariables = Exact<{
@@ -6087,8 +6095,8 @@ export type AssignMemberMutationOptions = Apollo.BaseMutationOptions<
   GqlAssignMemberMutationVariables
 >;
 export const GetSingleMembershipDocument = gql`
-  query GetSingleMembership($communityId: ID!, $userKey: String!) {
-    membership(communityId: $communityId, userKey: $userKey) {
+  query GetSingleMembership($communityId: ID!, $userId: ID!) {
+    membership(communityId: $communityId, userId: $userId) {
       ...MembershipFields
       user {
         ...UserFields
@@ -6116,7 +6124,7 @@ export const GetSingleMembershipDocument = gql`
  * const { data, loading, error } = useGetSingleMembershipQuery({
  *   variables: {
  *      communityId: // value for 'communityId'
- *      userKey: // value for 'userKey'
+ *      userId: // value for 'userId'
  *   },
  * });
  */
@@ -7100,10 +7108,15 @@ export type GetArticleQueryResult = Apollo.QueryResult<
   GqlGetArticleQueryVariables
 >;
 export const GetDidIssuanceRequestsDocument = gql`
-  query GetDidIssuanceRequests($userId: ID!) {
-    user(id: $userId) {
-      didIssuanceRequests {
-        ...DidIssuanceRequestFields
+  query GetDidIssuanceRequests($userIds: [ID!]!) {
+    users(filter: { ids: $userIds }) {
+      edges {
+        node {
+          id
+          didIssuanceRequests {
+            ...DidIssuanceRequestFields
+          }
+        }
       }
     }
   }
@@ -7122,7 +7135,7 @@ export const GetDidIssuanceRequestsDocument = gql`
  * @example
  * const { data, loading, error } = useGetDidIssuanceRequestsQuery({
  *   variables: {
- *      userId: // value for 'userId'
+ *      userIds: // value for 'userIds'
  *   },
  * });
  */

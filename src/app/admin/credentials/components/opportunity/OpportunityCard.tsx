@@ -95,7 +95,7 @@ export function OpportunityCard({
           tabIndex={-1}
         />
         <div className="flex-1 min-w-0">
-          <p className="text-base font-bold truncate">{title ?? "チケット"}</p>
+          <p className="text-base font-bold truncate max-w-xs">{title ?? "チケット"}</p>
           <p className="text-gray-500 text-sm mt-1">参加者数: {data?.participations.totalCount ?? 0}</p>
         </div>
       </div>

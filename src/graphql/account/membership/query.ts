@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_SINGLE_MEMBERSHIP = gql`
-  query GetSingleMembership($communityId: ID!, $userKey: String!) {
-    membership(communityId: $communityId, userKey: $userKey) {
+  query GetSingleMembership($communityId: ID!, $userId: ID!) {
+    membership(communityId: $communityId, userId: $userId) {
       ...MembershipFields
       user { ...UserFields }
       community { ...CommunityFields }

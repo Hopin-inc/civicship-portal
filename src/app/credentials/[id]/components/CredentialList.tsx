@@ -9,27 +9,31 @@ interface OpportunityListProps {
     opportunity: GqlGetParticipationQuery | undefined
 }
 
-export default function OpportunityList(props: OpportunityListProps) {
+const truncateDid = (did: string | undefined | null, length: number = 20): string => {
+    if (!did) return "";
+    if (did.length <= length) return did;
+    const start = did.substring(0, length);
+    const end = did.substring(did.length - 10);
+    return `${start}...${end}`;
+};
+
+export default function CredentialList(props: OpportunityListProps) {
     const { opportunity } = props;
-    
-    // 主催者のDIDを取得
-    const { data: organizerDidData } = useGetDidIssuanceRequestsQuery({
-        variables: {
-          userId: opportunity?.participation?.opportunitySlot?.opportunity?.createdByUser?.id ?? "",
-        },
-        skip: !opportunity?.participation?.opportunitySlot?.opportunity?.createdByUser?.id,
+    const organizerId = opportunity?.participation?.opportunitySlot?.opportunity?.createdByUser?.id;
+    const participantId = opportunity?.participation?.user?.id;
+
+    const userIds = [
+        ...(organizerId ? [organizerId] : []),
+        ...(participantId ? [participantId] : []),
+    ];
+
+    const { data: didData } = useGetDidIssuanceRequestsQuery({
+        variables: { userIds },
+        skip: userIds.length === 0,
     });
 
-    // 参加者のDIDを取得
-    const { data: participantDidData } = useGetDidIssuanceRequestsQuery({
-        variables: {
-          userId: opportunity?.participation?.user?.id ?? "",
-        },
-        skip: !opportunity?.participation?.user?.id,
-    });
-
-    const organizerDid = organizerDidData?.user?.didIssuanceRequests?.[0]?.id;
-    const participantDid = participantDidData?.user?.didIssuanceRequests?.[0]?.id;
+    const organizerDid = didData?.users?.edges?.find(edge => edge?.node?.id === organizerId)?.node?.didIssuanceRequests?.[0]?.didValue;
+    const participantDid = didData?.users?.edges?.find(edge => edge?.node?.id === participantId)?.node?.didIssuanceRequests?.[0]?.didValue;
 
     return (
         <div className="grid grid-cols-1 gap-4">
@@ -48,7 +52,7 @@ export default function OpportunityList(props: OpportunityListProps) {
                                     toast.success("コピーしました");
                                 }}
                             />
-                            <span>did:key:{organizerDid}</span>
+                            <span>{truncateDid(organizerDid,15)}</span>
                         </div>
                     </div>
                 </CardHeader>
@@ -56,7 +60,7 @@ export default function OpportunityList(props: OpportunityListProps) {
             <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="text-gray-400 text-base min-w-fit whitespace-nowrap">概要</div>
-                <div className="flex items-center flex-1 min-w-0 ml-2">
+                <div className="flex items-center flex-1 min-w-0 ml-8">
                     <span className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm flex-1">
                         {opportunity?.participation?.opportunitySlot?.opportunity?.description}
                     </span>
@@ -84,7 +88,7 @@ export default function OpportunityList(props: OpportunityListProps) {
                                     toast.success("コピーしました");
                                 }}
                             />
-                            <span>did:key:{participantDid}</span>
+                            <span>{truncateDid(participantDid,15)}</span>
                         </div>
                     </div>
                 </CardHeader>

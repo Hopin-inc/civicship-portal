@@ -114,8 +114,7 @@ const PortfolioCard = ({
   const linkHref =
     portfolio.source === "ARTICLE"
       ? `/articles/${portfolio.id}`
-      : portfolio.source === "OPPORTUNITY" &&
-        portfolio.evaluationStatus === GqlEvaluationStatus.Passed
+      : portfolio.source === "OPPORTUNITY" && isPassed
         ? `/credentials/${portfolio.id}`
         : portfolio.source === "OPPORTUNITY"
           ? `/participations/${portfolio.id}`

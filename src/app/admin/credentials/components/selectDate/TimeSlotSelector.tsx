@@ -7,7 +7,14 @@ export default function TimeSlotSelector({ setStep }: { setStep: (step: number) 
   const {selectedSlot, setSelectedSlot } = useSelection();
 
   const { groupedSlots } = useReservationDateLoader({ opportunityIds: selectedSlot?.opportunityId ? [selectedSlot?.opportunityId] : [] });
-  const currentSections = groupedSlots.filter(section => section.opportunityId === selectedSlot?.opportunityId);
+  const now = new Date();
+  const currentSections = groupedSlots
+    .filter(section => section.opportunityId === selectedSlot?.opportunityId)
+    .map(section => ({
+      ...section,
+      slots: section.slots.filter(slot => new Date(slot.startsAt) <= now)
+    }))
+    .filter(section => section.slots.length > 0);
   const selectedSlotId = selectedSlot?.slotId ?? null;
   
   const handleDateSelect = (slotId: string) => {

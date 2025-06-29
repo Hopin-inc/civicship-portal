@@ -14,11 +14,11 @@ interface Props {
 export const MemberRow = ({ user, checked, onCheck, isDisabled, reason }: Props) => {
   const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
     variables: {
-      userId: user.id,
+      userIds: [user.id],
     },
   });
 
-  const did = didIssuanceRequestsData?.user?.didIssuanceRequests?.[0]?.id;
+  const did = didIssuanceRequestsData?.users?.edges?.[0]?.node?.didIssuanceRequests?.[0]?.id;
   const cardBgClass = !did || isDisabled ? "bg-zinc-200" : "bg-white";
   
   return (
