@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import LoginModal from "@/app/login/components/LoginModal";
@@ -30,8 +30,14 @@ export default function TicketReceivePage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { user } = useAuth();
+  const { user, authenticationState, isAuthenticating } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticating && authenticationState !== "unauthenticated") {
+      setIsLoginModalOpen(false);
+    }
+  }, [authenticationState, isAuthenticating]);
 
   const { claimLinkData, hasIssued, isClaimLoading, claimTicket, viewLoading, viewError } =
     useTicketClaim(ticketClaimLinkId);

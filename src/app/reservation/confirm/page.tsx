@@ -35,7 +35,7 @@ export default function ConfirmPage() {
     [],
   );
   useHeaderConfig(headerConfig);
-  const { user } = useAuth();
+  const { user, authenticationState, isAuthenticating } = useAuth();
   const router = useRouter();
 
   const {
@@ -66,6 +66,12 @@ export default function ConfirmPage() {
   const ticketCounter = useTicketCounter(availableTickets);
   const ui = useReservationUIState();
   const { handleReservation, creatingReservation } = useReservationCommand();
+
+  useEffect(() => {
+    if (!isAuthenticating && authenticationState !== "unauthenticated") {
+      ui.setIsLoginModalOpen(false);
+    }
+  }, [authenticationState, isAuthenticating, ui]);
 
   if (loading) return <LoadingIndicator />;
   if (hasError)
