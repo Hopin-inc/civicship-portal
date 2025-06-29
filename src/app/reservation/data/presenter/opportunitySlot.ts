@@ -41,7 +41,7 @@ export const presenterOpportunitySlot = (
     startsAt: startsAtDate.toISOString(),
     endsAt: new Date(slot.endsAt).toISOString(),
 
-    isReservable, // ✅ 追加
+    isReservable,
   };
 };
 
