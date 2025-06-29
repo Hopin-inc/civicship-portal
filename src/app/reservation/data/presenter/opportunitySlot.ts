@@ -25,7 +25,7 @@ export const presenterOpportunitySlot = (
   feeRequired: number | null,
 ): ActivitySlot => {
   const startsAtDate = new Date(slot.startsAt);
-  const threshold = addDays(new Date(), 7);
+  const threshold = addDays(new Date(), 1);
   const isReservable = isAfter(startsAtDate, threshold);
 
   return {
