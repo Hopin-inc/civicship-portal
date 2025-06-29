@@ -62,8 +62,8 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
     images: images?.map((image) => image) || [],
     totalImageCount: images?.length || 0,
 
-    requiredApproval: data.requireApproval,
-    requiredTicket: data.requiredUtilities?.map((u) => u) || [],
+    requireApproval: data.requireApproval,
+    targetUtilities: data.requiredUtilities?.map((u) => u) ?? [],
     feeRequired: data.feeRequired ?? null,
 
     isReservable,
@@ -96,12 +96,20 @@ function presenterActivitySlot(
   threshold: Date,
   feeRequired?: Maybe<number> | undefined,
 ): ActivitySlot[] {
+  const SLOT_IDS_TO_FORCE_RESERVABLE = ["cmc07ao5c0005s60nnc8ravvk"];
+
   return (
     slots?.map((slot): ActivitySlot => {
       const startsAtDate = slot?.startsAt ? new Date(slot.startsAt) : null;
 
-      // 7日以内 → false、8日以降 → true
-      const isReservable = startsAtDate ? isAfter(startsAtDate, threshold) : false;
+      const isForceReservable = slot?.id && SLOT_IDS_TO_FORCE_RESERVABLE.includes(slot.id);
+
+      // 通常の条件 or 強制フラグ
+      const isReservable = isForceReservable
+        ? true
+        : startsAtDate
+          ? isAfter(startsAtDate, threshold)
+          : false;
 
       return {
         id: slot?.id,

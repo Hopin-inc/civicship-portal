@@ -5,8 +5,6 @@ import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { categorizeFirebaseError, lineAuth } from "./firebase-config";
 import { AuthTokens, TokenManager } from "./token-manager";
 import retry from "retry";
-
-import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
 
@@ -222,13 +220,12 @@ export class LiffService {
     return new Promise((resolve) => {
       operation.attempt(async (currentAttempt) => {
         try {
-          const attemptTimestamp = new Date().toISOString();
-
+          const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`,
             {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { "Content-Type": "application/json", "X-Community-Id": communityId ?? "" },
               body: JSON.stringify({ accessToken }),
             },
           );

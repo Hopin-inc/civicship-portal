@@ -1,5 +1,9 @@
 import { Metadata } from "next";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import {
+  COMMUNITY_ID,
+  fallbackMetadata,
+  currentCommunityMetadata,
+} from "@/lib/communities/metadata";
 import {
   GetOpportunityDocument,
   GqlGetOpportunityQuery,
@@ -7,7 +11,6 @@ import {
   GqlOpportunity,
 } from "@/types/graphql";
 import { apolloClient } from "@/lib/apollo";
-import { fallbackMetadata, currentCommunityMetadata } from "@/lib/communities/metadata";
 import React from "react";
 
 type Props = {
@@ -25,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `${res.title} | ${communityMetadata.title}`;
 
-  const openGraph = communityMetadata.openGraph ?? DEFAULT_COMMUNITY_METADATA.openGraph;
+  const openGraph = communityMetadata.openGraph;
   const baseUrl = openGraph?.url ?? "https://portal.civicship.jp";
   const siteName = openGraph?.siteName ?? communityMetadata.title;
   const locale = openGraph?.locale ?? "ja_JP";

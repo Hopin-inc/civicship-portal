@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import { useGetUserWalletQuery } from "@/types/graphql";
+import { GqlTicketStatus, useGetUserWalletQuery } from "@/types/graphql";
 import { ActivityDetail } from "@/app/activities/data/type";
+import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 
 export const useAvailableTickets = (
   opportunity: ActivityDetail | null,
@@ -14,17 +15,17 @@ export const useAvailableTickets = (
   });
 
   return useMemo(() => {
-    const tickets = data?.user?.wallets?.[0]?.tickets || [];
+    const tickets = data?.user?.wallets?.find(w => w.community?.id === getCommunityIdFromEnv())?.tickets || [];
 
-    if (!opportunity?.requiredTicket.length) {
+    if (!opportunity?.targetUtilities.length) {
       return tickets.length;
     }
 
-    const requiredUtilityIds = new Set(opportunity.requiredTicket.map((u) => u.id));
+    const requiredUtilityIds = new Set(opportunity.targetUtilities.map((u) => u.id));
 
-    return tickets.filter((edge) => {
-      const utilityId = edge?.utility?.id;
-      return utilityId && requiredUtilityIds.has(utilityId);
+    return tickets.filter((t) => {
+      const utilityId = t?.utility?.id;
+      return utilityId && requiredUtilityIds.has(utilityId) && t.status === GqlTicketStatus.Available;
     }).length;
-  }, [opportunity?.requiredTicket, data]);
+  }, [opportunity?.targetUtilities, data]);
 };

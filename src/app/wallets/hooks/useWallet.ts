@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { useGetUserWalletQuery } from "@/types/graphql";
 import { presenterUserAsset } from "@/app/wallets/data/presenter";
 import { UserAsset } from "@/app/wallets/data/type";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export const useWallet = (userId?: string) => {
   const { user: authUser } = useAuth();
@@ -24,10 +25,13 @@ export const useWallet = (userId?: string) => {
     fetchPolicy: "cache-and-network",
   });
 
+  //TODO コミュニティウォレットをid指定で取得した方が安全になる
   useEffect(() => {
-    if (data?.user?.wallets?.[0]) {
-      const walletData = data.user.wallets[0];
-      setUserAsset(presenterUserAsset(walletData));
+    if (data?.user?.wallets) {
+      const walletData = data.user.wallets.find((w) => w.community?.id === COMMUNITY_ID);
+      if (walletData) {
+        setUserAsset(presenterUserAsset(walletData));
+      }
     }
   }, [data]);
 

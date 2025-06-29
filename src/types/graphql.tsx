@@ -424,6 +424,17 @@ export type GqlIdentity = {
   user?: Maybe<GqlUser>;
 };
 
+export type GqlIdentityCheckPhoneUserInput = {
+  communityId: Scalars["ID"]["input"];
+};
+
+export type GqlIdentityCheckPhoneUserPayload = {
+  __typename?: "IdentityCheckPhoneUserPayload";
+  membership?: Maybe<GqlMembership>;
+  status: GqlPhoneUserStatus;
+  user?: Maybe<GqlUser>;
+};
+
 export const GqlIdentityPlatform = {
   Facebook: "FACEBOOK",
   Line: "LINE",
@@ -622,6 +633,9 @@ export type GqlMutation = {
   communityDelete?: Maybe<GqlCommunityDeletePayload>;
   communityUpdateProfile?: Maybe<GqlCommunityUpdateProfilePayload>;
   evaluationBulkCreate?: Maybe<GqlEvaluationBulkCreatePayload>;
+  evaluationFail?: Maybe<GqlEvaluationCreatePayload>;
+  evaluationPass?: Maybe<GqlEvaluationCreatePayload>;
+  identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload;
   linkPhoneAuth?: Maybe<GqlLinkPhoneAuthPayload>;
   membershipAcceptMyInvitation?: Maybe<GqlMembershipSetInvitationStatusPayload>;
   membershipAssignManager?: Maybe<GqlMembershipSetRolePayload>;
@@ -686,6 +700,20 @@ export type GqlMutationCommunityUpdateProfileArgs = {
 export type GqlMutationEvaluationBulkCreateArgs = {
   input: GqlEvaluationBulkCreateInput;
   permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationEvaluationFailArgs = {
+  input: GqlEvaluationCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationEvaluationPassArgs = {
+  input: GqlEvaluationCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationIdentityCheckPhoneUserArgs = {
+  input: GqlIdentityCheckPhoneUserInput;
 };
 
 export type GqlMutationLinkPhoneAuthArgs = {
@@ -1324,6 +1352,13 @@ export type GqlParticipationsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export const GqlPhoneUserStatus = {
+  ExistingDifferentCommunity: "EXISTING_DIFFERENT_COMMUNITY",
+  ExistingSameCommunity: "EXISTING_SAME_COMMUNITY",
+  NewUser: "NEW_USER",
+} as const;
+
+export type GqlPhoneUserStatus = (typeof GqlPhoneUserStatus)[keyof typeof GqlPhoneUserStatus];
 export type GqlPlace = {
   __typename?: "Place";
   accumulatedParticipants?: Maybe<Scalars["Int"]["output"]>;
@@ -2620,6 +2655,20 @@ export type GqlLinkPhoneAuthMutation = {
   } | null;
 };
 
+export type GqlIdentityCheckPhoneUserMutationVariables = Exact<{
+  input: GqlIdentityCheckPhoneUserInput;
+}>;
+
+export type GqlIdentityCheckPhoneUserMutation = {
+  __typename?: "Mutation";
+  identityCheckPhoneUser: {
+    __typename?: "IdentityCheckPhoneUserPayload";
+    status: GqlPhoneUserStatus;
+    user?: { __typename?: "User"; id: string; name: string } | null;
+    membership?: { __typename?: "Membership"; role: GqlRole } | null;
+  };
+};
+
 export type GqlCurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GqlCurrentUserQuery = {
@@ -2950,6 +2999,12 @@ export type GqlGetUserFlexibleQuery = {
       __typename?: "Wallet";
       id: string;
       type: GqlWalletType;
+      community?: {
+        __typename?: "Community";
+        id: string;
+        name?: string | null;
+        image?: string | null;
+      } | null;
       tickets?: Array<{
         __typename?: "Ticket";
         id: string;
@@ -3017,6 +3072,12 @@ export type GqlGetUserWalletQuery = {
       __typename?: "Wallet";
       id: string;
       type: GqlWalletType;
+      community?: {
+        __typename?: "Community";
+        id: string;
+        name?: string | null;
+        image?: string | null;
+      } | null;
       transactions?: Array<{
         __typename?: "Transaction";
         id: string;
@@ -3221,7 +3282,9 @@ export type GqlGetWalletsWithTicketQuery = {
   };
 };
 
-export type GqlGetCommunityWalletQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetCommunityWalletQueryVariables = Exact<{
+  communityId: Scalars["ID"]["input"];
+}>;
 
 export type GqlGetCommunityWalletQuery = {
   __typename?: "Query";
@@ -3242,6 +3305,12 @@ export type GqlGetCommunityWalletQuery = {
         __typename?: "Wallet";
         id: string;
         type: GqlWalletType;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
+        } | null;
         currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
       } | null;
     } | null> | null;
@@ -3718,6 +3787,7 @@ export type GqlGetOpportunityQuery = {
   __typename?: "Query";
   opportunity?: {
     __typename?: "Opportunity";
+    requireApproval: boolean;
     id: string;
     title: string;
     description: string;
@@ -3726,7 +3796,6 @@ export type GqlGetOpportunityQuery = {
     category: GqlOpportunityCategory;
     publishStatus: GqlPublishStatus;
     isReservableWithTicket?: boolean | null;
-    requireApproval: boolean;
     feeRequired?: number | null;
     pointsToEarn?: number | null;
     earliestReservableAt?: Date | null;
@@ -3877,6 +3946,7 @@ export type GqlGetOpportunityQuery = {
         }> | null;
       }> | null;
     } | null;
+    requiredUtilities?: Array<{ __typename?: "Utility"; id: string }> | null;
   } | null;
 };
 
@@ -5883,6 +5953,63 @@ export type LinkPhoneAuthMutationOptions = Apollo.BaseMutationOptions<
   GqlLinkPhoneAuthMutation,
   GqlLinkPhoneAuthMutationVariables
 >;
+export const IdentityCheckPhoneUserDocument = gql`
+  mutation identityCheckPhoneUser($input: IdentityCheckPhoneUserInput!) {
+    identityCheckPhoneUser(input: $input) {
+      status
+      user {
+        id
+        name
+      }
+      membership {
+        role
+      }
+    }
+  }
+`;
+export type GqlIdentityCheckPhoneUserMutationFn = Apollo.MutationFunction<
+  GqlIdentityCheckPhoneUserMutation,
+  GqlIdentityCheckPhoneUserMutationVariables
+>;
+
+/**
+ * __useIdentityCheckPhoneUserMutation__
+ *
+ * To run a mutation, you first call `useIdentityCheckPhoneUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useIdentityCheckPhoneUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [identityCheckPhoneUserMutation, { data, loading, error }] = useIdentityCheckPhoneUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useIdentityCheckPhoneUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlIdentityCheckPhoneUserMutation,
+    GqlIdentityCheckPhoneUserMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlIdentityCheckPhoneUserMutation,
+    GqlIdentityCheckPhoneUserMutationVariables
+  >(IdentityCheckPhoneUserDocument, options);
+}
+export type IdentityCheckPhoneUserMutationHookResult = ReturnType<
+  typeof useIdentityCheckPhoneUserMutation
+>;
+export type IdentityCheckPhoneUserMutationResult =
+  Apollo.MutationResult<GqlIdentityCheckPhoneUserMutation>;
+export type IdentityCheckPhoneUserMutationOptions = Apollo.BaseMutationOptions<
+  GqlIdentityCheckPhoneUserMutation,
+  GqlIdentityCheckPhoneUserMutationVariables
+>;
 export const CurrentUserDocument = gql`
   query currentUser {
     currentUser {
@@ -6388,6 +6515,9 @@ export const GetUserFlexibleDocument = gql`
       }
       wallets @include(if: $withWallets) {
         ...WalletFields
+        community {
+          ...CommunityFields
+        }
         tickets {
           ...TicketFields
         }
@@ -6406,9 +6536,9 @@ export const GetUserFlexibleDocument = gql`
   ${UserFieldsFragmentDoc}
   ${UserPortfolioFieldsFragmentDoc}
   ${WalletFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
   ${TicketFieldsFragmentDoc}
   ${OpportunityFieldsFragmentDoc}
-  ${CommunityFieldsFragmentDoc}
   ${PlaceFieldsFragmentDoc}
 `;
 
@@ -6480,6 +6610,9 @@ export const GetUserWalletDocument = gql`
       ...UserFields
       wallets {
         ...WalletFields
+        community {
+          ...CommunityFields
+        }
         transactions {
           ...TransactionFields
           fromWallet {
@@ -6512,8 +6645,8 @@ export const GetUserWalletDocument = gql`
   }
   ${UserFieldsFragmentDoc}
   ${WalletFieldsFragmentDoc}
-  ${TransactionFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
+  ${TransactionFieldsFragmentDoc}
   ${TicketFieldsFragmentDoc}
   ${UtilityFieldsFragmentDoc}
 `;
@@ -6778,8 +6911,8 @@ export type GetWalletsWithTicketQueryResult = Apollo.QueryResult<
   GqlGetWalletsWithTicketQueryVariables
 >;
 export const GetCommunityWalletDocument = gql`
-  query GetCommunityWallet {
-    wallets(filter: { type: COMMUNITY }) {
+  query GetCommunityWallet($communityId: ID!) {
+    wallets(filter: { type: COMMUNITY, communityId: $communityId }) {
       pageInfo {
         hasNextPage
         hasPreviousPage
@@ -6791,11 +6924,15 @@ export const GetCommunityWalletDocument = gql`
         cursor
         node {
           ...WalletFields
+          community {
+            ...CommunityFields
+          }
         }
       }
     }
   }
   ${WalletFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
 `;
 
 /**
@@ -6810,14 +6947,16 @@ export const GetCommunityWalletDocument = gql`
  * @example
  * const { data, loading, error } = useGetCommunityWalletQuery({
  *   variables: {
+ *      communityId: // value for 'communityId'
  *   },
  * });
  */
 export function useGetCommunityWalletQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     GqlGetCommunityWalletQuery,
     GqlGetCommunityWalletQueryVariables
-  >,
+  > &
+    ({ variables: GqlGetCommunityWalletQueryVariables; skip?: boolean } | { skip: boolean }),
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<GqlGetCommunityWalletQuery, GqlGetCommunityWalletQueryVariables>(
@@ -7633,6 +7772,10 @@ export const GetOpportunityDocument = gql`
             }
           }
         }
+      }
+      requireApproval
+      requiredUtilities {
+        id
       }
     }
   }

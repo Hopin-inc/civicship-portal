@@ -77,7 +77,7 @@ export default function IssuePointPage() {
           params: { amount },
         });
         toast.success("ポイントを発行しました");
-        router.push("/admin/wallet");
+        router.push("/admin/wallet?refresh=true");
       }
     } catch (err) {
       toast.error;

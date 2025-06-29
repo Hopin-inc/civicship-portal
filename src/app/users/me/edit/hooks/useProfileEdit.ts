@@ -70,13 +70,13 @@ const useProfileEdit = () => {
     setProfile((prev) => ({
       ...prev,
       image: file,
-      imagePreviewUrl: imageUrl
+      imagePreviewUrl: imageUrl,
     }));
   };
 
   useEffect(() => {
     return () => {
-      if (profile.imagePreviewUrl && profile.imagePreviewUrl.startsWith('blob:')) {
+      if (profile.imagePreviewUrl && profile.imagePreviewUrl.startsWith("blob:")) {
         URL.revokeObjectURL(profile.imagePreviewUrl);
       }
     };
@@ -94,8 +94,10 @@ const useProfileEdit = () => {
         variables: {
           input: {
             name: profile.name,
-            image: profile.image instanceof File && profile.image.size > 0 ?
-              { file: profile.image } : undefined,
+            image:
+              profile.image instanceof File && profile.image.size > 0
+                ? { file: profile.image }
+                : undefined,
             bio: profile.bio ?? "",
             currentPrefecture: profile.currentPrefecture,
             urlFacebook: profile.urlFacebook ?? "",
@@ -109,12 +111,12 @@ const useProfileEdit = () => {
         },
       });
       toast.success("プロフィールを更新しました");
-      router.push(`/users/${userId}`);
+      router.push(`/users/me`);
     } catch (err) {
       logger.error("Failed to update profile", {
         error: err instanceof Error ? err.message : String(err),
         component: "useProfileEdit",
-        userId
+        userId,
       });
       toast.error("プロフィールの更新に失敗しました");
     }
@@ -134,7 +136,7 @@ const useProfileEdit = () => {
       logger.error("Error fetching user profile", {
         error: userError.message || String(userError),
         component: "useProfileEdit",
-        userId
+        userId,
       });
       toast.error("プロフィールの取得に失敗しました");
     }
@@ -142,7 +144,7 @@ const useProfileEdit = () => {
   }, [userError]);
 
   return {
-    profileImage: profile.imagePreviewUrl || (data?.user?.image || null),
+    profileImage: profile.imagePreviewUrl || data?.user?.image || null,
     displayName: profile.name,
     location: profile.currentPrefecture,
     bio: profile.bio ?? "",

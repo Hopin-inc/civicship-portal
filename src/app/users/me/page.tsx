@@ -9,6 +9,7 @@ import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import ErrorState from "@/components/shared/ErrorState";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
@@ -52,8 +53,8 @@ export default function MyProfilePage() {
         userAsset={userData.asset}
         isOwner={true}
       />
-      {selfOpportunities.length > 0 && (
-        <>
+      <>
+        {selfOpportunities.length > 0 && (
           <section className="py-6 mt-0">
             <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
               主催中の体験
@@ -68,18 +69,18 @@ export default function MyProfilePage() {
               ))}
             </div>
           </section>
-        </>
-      )}
-      <UserPortfolioList
-        userId={currentUser?.id ?? ""}
-        isOwner={true}
-        portfolios={userData.portfolios}
-        isLoadingMore={false}
-        hasMore={false}
-        lastPortfolioRef={lastPortfolioRef}
-        isSysAdmin={false}
-        activeOpportunities={userData.currentlyHiringOpportunities}
-      />
+        )}
+        <UserPortfolioList
+          userId={currentUser?.id ?? ""}
+          isOwner={true}
+          portfolios={userData.portfolios}
+          isLoadingMore={false}
+          hasMore={false}
+          lastPortfolioRef={lastPortfolioRef}
+          isSysAdmin={false}
+          activeOpportunities={userData.currentlyHiringOpportunities}
+        />
+      </>
     </div>
   );
 }
