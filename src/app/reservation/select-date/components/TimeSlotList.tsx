@@ -2,7 +2,8 @@ import React, { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 import { formatTimeRange } from "@/utils/date";
-import { addDays, isBefore } from "date-fns";
+import { isBefore } from "date-fns";
+import { getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
 
 interface TimeSlotListProps {
   dateSections: ActivitySlotGroup[];
@@ -40,7 +41,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
     [onSelectSlot],
   );
 
-  const registrationCutoff = addDays(new Date(), 1);
+  const registrationCutoff = getReservationThreshold();
 
   return (
     <div className="space-y-8">

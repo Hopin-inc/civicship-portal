@@ -3,6 +3,25 @@ import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
 import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 import { addDays, isAfter } from "date-fns";
 
+/**
+ * 予約可能判定のための閾値（現在時刻から何日後まで予約可能か）を返す
+ * @returns 予約可能判定のための閾値
+ */
+export const getReservationThreshold = (): Date => {
+  return addDays(new Date(), 1);
+};
+
+/**
+ * 指定された日時が予約可能かどうかを判定する
+ * @param date 判定対象の日時
+ * @returns 予約可能かどうか
+ */
+export const isDateReservable = (date: Date | string): boolean => {
+  const targetDate = typeof date === "string" ? new Date(date) : date;
+  const threshold = getReservationThreshold();
+  return isAfter(targetDate, threshold);
+};
+
 export const presenterOpportunitySlots = (
   edges: (GqlOpportunitySlotEdge | null | undefined)[] | null | undefined,
 ): ActivitySlot[] => {
@@ -25,8 +44,7 @@ export const presenterOpportunitySlot = (
   feeRequired: number | null,
 ): ActivitySlot => {
   const startsAtDate = new Date(slot.startsAt);
-  const threshold = addDays(new Date(), 1);
-  const isReservable = isAfter(startsAtDate, threshold);
+  const isReservable = isDateReservable(startsAtDate);
 
   return {
     id: slot.id,
