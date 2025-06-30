@@ -39,7 +39,7 @@ export const useMemberSearch = (
   const { data: singleMembershipData, loading, error } = useGetSingleMembershipQuery({
     variables: {
       communityId: COMMUNITY_ID,
-      userKey: searchQuery,
+      userId: searchQuery,
     },
     skip: !searchQuery,
   });

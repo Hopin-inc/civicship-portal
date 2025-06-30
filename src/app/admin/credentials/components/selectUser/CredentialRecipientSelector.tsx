@@ -1,11 +1,9 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlUser, useParticipationBulkCreateMutation, GqlParticipationStatusReason } from "@/types/graphql";
 import { toast } from "sonner";
 import { useMembershipQueries } from "@/app/admin/members/hooks/useMembershipQueries";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { FormProvider } from "react-hook-form";
-import { useMemberSearch } from "@/app/admin/wallet/grant/hooks/useMemberSearch";
 import { Button } from "@/components/ui/button";
 import { useSelection } from "../../context/SelectionContext";
 import { useEvaluationBulkCreate } from "../../hooks/useEvaluationBulkCreate";
@@ -13,7 +11,8 @@ import { useRouter } from "next/navigation";
 import Loading from "@/components/layout/Loading";
 import { logger } from "@/lib/logging";
 import SearchForm from "./SearchForm";
-import { MemberRow } from "./Member";
+import { useMemberSearch } from "../../hooks/useMemberSearch";
+import SearchResultList from "./SearchResultList";
 
 // 定数定義
 const STEP_COLORS = {
@@ -63,9 +62,10 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
   const communityId = COMMUNITY_ID;
   const { selectedSlot, setSelectedSlot, participatedUsers } = useSelection();
   const router = useRouter();
-  const { fetchMembershipList, membershipListData } = useMembershipQueries();
-  const { form, singleMembershipData, loading, error } = useMemberSearch();
-
+  const [input, setInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const { singleMembershipData, loading, error } = useMemberSearch({ searchQuery });
+  const { membershipListData, refetch } = useMembershipQueries(communityId);
   const selectedUserIds = selectedSlot?.userIds ?? [];
 
   const [createParticipation] = useParticipationBulkCreateMutation({
@@ -117,10 +117,6 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
     return sortMembersByParticipation(members, participatedUsers, selectedSlot?.slotId);
   }, [members, participatedUsers, selectedSlot?.slotId]);
 
-  useEffect(() => {
-    void fetchMembershipList({ variables: { first: 50 } });
-  }, [fetchMembershipList]);
-
   if (!selectedSlot) {
     return <div>スロットが選択されていません</div>;
   }
@@ -157,7 +153,7 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
   }
 
   return (
-    <FormProvider {...form}>
+    <>
       <div className="flex items-end gap-2 mt-2">
         <h1 className="text-2xl font-bold">発行先を選ぶ</h1>
         <span className="ml-1 flex mb-1 items-baseline">
@@ -173,67 +169,44 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
           <span className={`${STEP_COLORS.GRAY} text-base`}>)</span>
         </span>
       </div>
-      <form onSubmit={form.handleSubmit(() => {})} className="px-4 mb-4 pt-4">
-        <SearchForm name="searchQuery" />
-      </form>
-
+      <div className="px-4 mb-4 pt-4">
+        <SearchForm value={input} onInputChange={setInput} onSearch={setSearchQuery} />
+      </div>
       <div className="flex flex-col gap-4 px-4">
-        {form.watch("searchQuery") && singleMembershipData?.membership?.user ? (
-          <MemberRow
-            user={singleMembershipData.membership.user}
-            checked={selectedUserIds.includes(singleMembershipData.membership.user?.id ?? "")}
-            onCheck={() => singleMembershipData.membership?.user?.id && handleCheck(singleMembershipData.membership.user.id)}
-            isDisabled={getParticipatedReason(singleMembershipData.membership?.user?.id ?? "") !== undefined && DISABLED_REASONS.includes(getParticipatedReason(singleMembershipData.membership?.user?.id ?? "") as GqlParticipationStatusReason)}
-            reason={getParticipatedReason(singleMembershipData.membership?.user?.id ?? "")}
-          />
-        ) : (
-          <>
-            {sortedMembers.length === 0 && (
-              <p className="text-sm text-muted-foreground">一致するメンバーが見つかりません</p>
-            )}
-            {sortedMembers.map(({ user }) => {
-              const reason = getParticipatedReason(user.id);
-              const isDisabled = reason !== undefined && DISABLED_REASONS.includes(reason as GqlParticipationStatusReason);
-
-              return (
-                <div key={user.id} className="flex flex-col gap-4">
-                  <MemberRow
-                    user={user}
-                    checked={selectedUserIds.includes(user.id)}
-                    onCheck={() => handleCheck(user.id)}
-                    isDisabled={isDisabled}
-                    reason={reason}
-                  />
-                </div>
-              );
-            })}
-          </>
-        )}
+        <SearchResultList
+          searchQuery={searchQuery}
+          singleMembershipData={singleMembershipData}
+          sortedMembers={sortedMembers}
+          selectedUserIds={selectedUserIds}
+          handleCheck={handleCheck}
+          getParticipatedReason={getParticipatedReason}
+          DISABLED_REASONS={DISABLED_REASONS}
+        />
         <div className="fixed bottom-0 left-0 w-full bg-white z-10">
-        <div className="w-full max-w-sm mx-auto flex justify-between px-4 py-4 border-t">
-          <Button
-            variant="text"
-            className="text-gray-500"
-            onClick={() => {
-              setStep(2);
-            }}
-          >
-            キャンセル
-          </Button>
-          <Button
-            className={`rounded-full px-8 py-2 font-bold text-white ${selectedUserIds.length > 0 ? "bg-primary" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
-            disabled={selectedUserIds.length === 0}
-            onClick={() => {
-              if (selectedUserIds.length > 0) {
-                handleConfirm();
-              }
-            }}
-          >
-            発行
-          </Button>
+          <div className="w-full max-w-sm mx-auto flex justify-between px-4 py-4 border-t">
+            <Button
+              variant="text"
+              className="text-gray-500"
+              onClick={() => {
+                setStep(2);
+              }}
+            >
+              キャンセル
+            </Button>
+            <Button
+              className={`rounded-full px-8 py-2 font-bold text-white ${selectedUserIds.length > 0 ? "bg-primary" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
+              disabled={selectedUserIds.length === 0}
+              onClick={() => {
+                if (selectedUserIds.length > 0) {
+                  handleConfirm();
+                }
+              }}
+            >
+              発行
+            </Button>
+          </div>
         </div>
       </div>
-      </div>
-    </FormProvider>
+    </>
   );
 } 
