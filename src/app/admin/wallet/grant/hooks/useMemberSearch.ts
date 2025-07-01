@@ -2,8 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
-import { GqlUser, useGetSingleMembershipQuery } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { GqlUser } from "@/types/graphql";
 
 export type MemberSearchFormValues = {
   searchQuery: string;
@@ -19,6 +18,7 @@ export interface MemberSearchTarget {
 }
 
 export const useMemberSearch = (
+  members: MemberSearchTarget[] = [],
   options?: {
     searchParamKey?: string;
     route?: string;
@@ -34,20 +34,14 @@ export const useMemberSearch = (
     },
   });
 
-  const searchQuery = form.watch("searchQuery");
+  const searchQuery = form.watch("searchQuery")?.toLowerCase() ?? "";
 
-  const { data: singleMembershipData, loading, error } = useGetSingleMembershipQuery({
-    variables: {
-      communityId: COMMUNITY_ID,
-      userId: searchQuery,
-    },
-    skip: !searchQuery,
-  });
+  const filteredMembers = members.filter(({ user }) =>
+    user.name?.toLowerCase().includes(searchQuery)
+  );
 
   return {
     form,
-    singleMembershipData,
-    loading,
-    error,
+    filteredMembers,
   };
 };
