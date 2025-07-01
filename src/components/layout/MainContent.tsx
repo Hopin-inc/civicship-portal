@@ -19,9 +19,9 @@ const MainContent: React.FC<MainContentProps> = ({ children }) => {
     setIsClient(true);
   }, []);
   
-  const mainClassName = isClient 
-    ? `w-full flex-grow ${!config?.hideHeader ? "pt-16" : ""} pb-16 overflow-y-auto`
-    : "w-full flex-grow pt-16 pb-16 overflow-y-auto";
+  const baseClassName = "w-full flex-grow pb-16 overflow-y-auto";
+  const paddingTop = isClient && config?.hideHeader ? "" : "pt-16";
+  const mainClassName = `${baseClassName} ${paddingTop}`;
 
   return (
     <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full">
