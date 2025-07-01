@@ -15,7 +15,7 @@ const truncateDid = (did: string | undefined | null, length: number = 20): strin
   };
 
 export default function AccountSection() {
-  const { user: currentUser, isAuthenticated } = useAuth();
+  const { user: currentUser, isAuthenticated,isPhoneVerified } = useAuth();
   const { data: didIssuanceRequests } = useGetDidIssuanceRequestsQuery({
     variables: {
       userIds: [currentUser?.id ?? ""],
@@ -64,7 +64,7 @@ export default function AccountSection() {
             <PhoneIcon className="w-4 h-4" />
             <span className="font-bold text-sm">電話番号</span>
           </div>
-          <span className="text-gray-400">{isAuthenticated ? "連携済み" : "未連携"}</span>
+          <span className="text-gray-400">{isPhoneVerified ? "連携済み" : "未連携"}</span>
         </div>
         {/* JUST DAO IT */}
         <div className="flex items-center justify-between py-4 px-4">
