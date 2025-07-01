@@ -24,7 +24,7 @@ interface AdminGuardProps {
  * 管理者権限を持つユーザーのみアクセスを許可する
  */
 export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, authLoading } = useAuth();
   const router = useRouter();
 
   const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {

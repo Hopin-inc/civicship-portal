@@ -55,7 +55,6 @@ export type AuthState = {
     | "user_registered" // S3: ユーザ情報登録済み
     | "loading"; // L0: 状態チェック中
   environment: AuthEnvironment;
-  isAuthenticating: boolean;
 };
 
 /**
@@ -69,7 +68,6 @@ interface AuthContextType {
   isPhoneVerified: boolean;
   isUserRegistered: boolean;
   authenticationState: AuthState["authenticationState"];
-  isAuthenticating: boolean;
   environment: AuthEnvironment;
 
   loginWithLiff: (redirectPath?: RawURIComponent) => Promise<boolean>;
@@ -90,7 +88,7 @@ interface AuthContextType {
   ) => Promise<User | null>;
   updateAuthState: () => Promise<void>;
 
-  loading: boolean;
+  authLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -340,7 +338,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isPhoneVerified: ["phone_authenticated", "user_registered"].includes(state.authentication),
     isUserRegistered: state.authentication === "user_registered",
     authenticationState: getDisplayAuthenticationState(state),
-    isAuthenticating: state.loading.isLoading,
     environment: environment,
     loginWithLiff,
     logout,
@@ -355,7 +352,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: state.loading.isLoading || userLoading,
+    authLoading: state.loading.isLoading || userLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -22,7 +22,7 @@ export function PhoneVerificationForm() {
   const nextParam = next ? `?next=${ encodeURIComponent(next) }` : "";
 
   // ==================================
-  const { phoneAuth, isAuthenticated, loading, authenticationState, updateAuthState } = useAuth();
+  const { phoneAuth, isAuthenticated, authLoading, authenticationState, updateAuthState } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -133,7 +133,7 @@ export function PhoneVerificationForm() {
     setVerificationCode(value);
   };
 
-  if (loading) {
+  if (authLoading) {
     return <LoadingIndicator fullScreen={true} />;
   }
 

@@ -32,7 +32,7 @@ export default function LoginPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { loginWithLiff, isAuthenticating, authenticationState, loading } = useAuth();
+  const { loginWithLiff, authenticationState, authLoading } = useAuth();
   const authRedirectService = AuthRedirectService.getInstance();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -41,11 +41,11 @@ export default function LoginPage() {
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticating && authenticationState !== "unauthenticated") {
+    if (!authLoading && authenticationState !== "unauthenticated") {
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
       router.replace(redirectPath);
     }
-  }, [authenticationState, router, nextPath, authRedirectService, isAuthenticating]);
+  }, [authenticationState, router, nextPath, authRedirectService, authLoading]);
 
   // 📦 ログイン処理
   const handleLogin = async () => {
@@ -82,8 +82,7 @@ export default function LoginPage() {
   }, []);
 
   if (
-    loading ||
-    isAuthenticating ||
+    authLoading ||
     authenticationState === "line_authenticated" ||
     authenticationState === "loading"
   ) {
@@ -104,7 +103,7 @@ export default function LoginPage() {
                 id="agree-terms"
                 checked={agreedTerms}
                 className="w-5 h-5"
-                disabled={isLoading || isAuthenticating}
+                disabled={isLoading || authLoading}
                 onCheckedChange={(checked) => setAgreedTerms(!!checked)}
               />
               <Label htmlFor="agree-terms" className="text-label-md text-muted-foreground">
@@ -120,7 +119,7 @@ export default function LoginPage() {
                 id="agree-privacy"
                 checked={agreedPrivacy}
                 className="w-5 h-5"
-                disabled={isLoading || isAuthenticating}
+                disabled={isLoading || authLoading}
                 onCheckedChange={(checked) => setAgreedPrivacy(!!checked)}
               />
               <Label htmlFor="agree-privacy" className="text-label-md text-muted-foreground">
@@ -137,11 +136,11 @@ export default function LoginPage() {
 
         <Button
           onClick={handleLogin}
-          disabled={isLoading || isAuthenticating}
+          disabled={isLoading || authLoading}
           className="w-full bg-[#06C755] hover:bg-[#05B74B] text-white rounded-full h-14 flex items-center justify-center gap-2"
         >
           <Image src="/images/line-icon.png" alt="LINE" width={24} height={24} priority />
-          {isLoading || isAuthenticating ? "ログイン中..." : "LINEでログイン"}
+          {isLoading || authLoading ? "ログイン中..." : "LINEでログイン"}
         </Button>
       </div>
     </div>

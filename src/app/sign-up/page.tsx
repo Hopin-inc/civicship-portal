@@ -5,9 +5,9 @@ import { SignUpForm } from "@/app/sign-up/components/SignUpForm";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export default function RegisterAccount() {
-  const { loading, authenticationState } = useAuth();
+  const { authLoading, authenticationState } = useAuth();
 
-  if (loading) {
+  if (authLoading) {
     return <LoadingIndicator />;
   }
 

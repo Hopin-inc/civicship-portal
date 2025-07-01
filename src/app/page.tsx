@@ -22,9 +22,8 @@ export default function HomePage() {
   const searchParams = useSearchParams();
   const {
     isAuthenticated,
-    isAuthenticating,
     authenticationState,
-    loading: authLoading,
+    authLoading,
   } = useAuth();
   const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
@@ -35,7 +34,7 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (authLoading || isAuthenticating) return;
+    if (authLoading) return;
 
     const isReturnFromLineAuth =
       searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
@@ -65,7 +64,6 @@ export default function HomePage() {
     authRedirectService,
     authenticationState,
     isAuthenticated,
-    isAuthenticating,
     router,
     searchParams,
     userLoading,
@@ -75,7 +73,7 @@ export default function HomePage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  if (isAuthenticating || authLoading) {
+  if (authLoading) {
     return <LoadingIndicator fullScreen={true} />;
   }
 

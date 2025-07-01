@@ -14,7 +14,7 @@ import { currentCommunityConfig } from "@/lib/communities/metadata";
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
 
-  const { user: currentUser, isAuthenticating } = useAuth();
+  const { user: currentUser, authLoading } = useAuth();
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
     currentUser?.id,
   );
@@ -25,7 +25,7 @@ export default function MyProfilePage() {
   }, [refetch]);
 
   // 認証中 or リダイレクト待ち → ローディング表示
-  if (isAuthenticating || !currentUser) {
+  if (authLoading || !currentUser) {
     return <LoadingIndicator />;
   }
 

@@ -33,7 +33,7 @@ const FormSchema = z.object({
 type FormValues = z.infer<typeof FormSchema>;
 
 export function SignUpForm() {
-  const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
+  const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
@@ -70,7 +70,7 @@ export function SignUpForm() {
     }
   };
 
-  if (loading) {
+  if (authLoading) {
     return <LoadingIndicator />;
   }
 
