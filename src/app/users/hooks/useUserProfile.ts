@@ -24,7 +24,9 @@ export const useUserProfile = (userId?: string) => {
   }, [result.data]);
 
   const selfOpportunities =
-    result.data?.user?.opportunitiesCreatedByMe?.map(presenterActivityCard) ?? [];
+    result.data?.user?.opportunitiesCreatedByMe
+      ?.filter((opportunity) => opportunity?.community?.id === COMMUNITY_ID)
+      ?.map(presenterActivityCard) ?? [];
 
   return {
     userData,
