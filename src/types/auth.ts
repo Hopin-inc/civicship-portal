@@ -40,12 +40,3 @@ export type AuthState = {
 }
 
 export type AuthStateChangeListener = (state: AuthState) => void;
-
-export type LegacyAuthenticationState = 
-  | "unauthenticated" 
-  | "line_authenticated" 
-  | "line_token_expired" 
-  | "phone_authenticated" 
-  | "phone_token_expired" 
-  | "user_registered"
-  | "loading";

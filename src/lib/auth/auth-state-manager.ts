@@ -8,8 +8,7 @@ import {
   LoadingState, 
   TokenStatus, 
   AuthError, 
-  AuthStateChangeListener,
-  LegacyAuthenticationState 
+  AuthStateChangeListener
 } from "@/types/auth";
 
 /**
@@ -55,23 +54,6 @@ export class AuthStateManager {
     return { ...this.state };
   }
 
-  public getLegacyState(): LegacyAuthenticationState {
-    const { authentication, tokenStatus, loading } = this.state;
-    
-    if (loading.isLoading) {
-      return "loading";
-    }
-    
-    if (tokenStatus.lineTokenExpired && authentication === "line_authenticated") {
-      return "line_token_expired";
-    }
-    
-    if (tokenStatus.phoneTokenExpired && authentication === "phone_authenticated") {
-      return "phone_token_expired";
-    }
-    
-    return authentication as LegacyAuthenticationState;
-  }
 
   /**
    * 現在のセッションIDを取得
@@ -164,37 +146,6 @@ export class AuthStateManager {
     });
   }
 
-  public setState(state: LegacyAuthenticationState): void {
-    logger.debug("AuthStateManager.setState (legacy)", {
-      from: this.getLegacyState(),
-      to: state,
-      component: "AuthStateManager",
-    });
-    
-    switch (state) {
-      case "loading":
-        this.setLoading(true, "initializing");
-        break;
-      case "unauthenticated":
-        this.setStateInternal({ authentication: "unauthenticated", loading: { isLoading: false, phase: "idle" } });
-        break;
-      case "line_authenticated":
-        this.setStateInternal({ authentication: "line_authenticated", tokenStatus: { ...this.state.tokenStatus, lineTokenExpired: false } });
-        break;
-      case "line_token_expired":
-        this.setStateInternal({ tokenStatus: { ...this.state.tokenStatus, lineTokenExpired: true } });
-        break;
-      case "phone_authenticated":
-        this.setStateInternal({ authentication: "phone_authenticated", tokenStatus: { ...this.state.tokenStatus, phoneTokenExpired: false } });
-        break;
-      case "phone_token_expired":
-        this.setStateInternal({ tokenStatus: { ...this.state.tokenStatus, phoneTokenExpired: true } });
-        break;
-      case "user_registered":
-        this.setStateInternal({ authentication: "user_registered" });
-        break;
-    }
-  }
 
   /**
    * 認証状態の変更を通知

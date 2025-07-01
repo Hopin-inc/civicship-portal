@@ -16,10 +16,29 @@ import {
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState as NewAuthState } from "@/types/auth";
+import { AuthState as AuthStateManagerState } from "@/types/auth";
 import { logger } from "@/lib/logging";
 import { maskPhoneNumber } from "@/lib/logging/client/utils";
 import { RawURIComponent } from "@/utils/path";
+
+/**
+ * 新しいAuthStateから表示用の認証状態文字列を取得
+ */
+function getDisplayAuthenticationState(authState: AuthStateManagerState): AuthState["authenticationState"] {
+  if (authState.loading.isLoading) {
+    return "loading";
+  }
+  
+  if (authState.tokenStatus.lineTokenExpired && authState.authentication === "line_authenticated") {
+    return "line_token_expired";
+  }
+  
+  if (authState.tokenStatus.phoneTokenExpired && authState.authentication === "phone_authenticated") {
+    return "phone_token_expired";
+  }
+  
+  return authState.authentication as AuthState["authenticationState"];
+}
 
 /**
  * 認証状態の型定義
@@ -97,25 +116,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return AuthStateManager.getInstance();
   }, []);
 
-  const [state, setState] = useState<AuthState>(() => {
+  const [newState, setNewState] = useState<AuthStateManagerState>(() => {
     if (authStateManager) {
-      const currentState = authStateManager.getState();
-      return {
-        firebaseUser: currentState.firebaseUser,
-        currentUser: currentState.currentUser,
-        authenticationState: authStateManager.getLegacyState(),
-        environment: currentState.environment || environment,
-        isAuthenticating: currentState.loading.isLoading,
-      };
+      return authStateManager.getState();
     }
     return {
+      authentication: "unauthenticated",
+      tokenStatus: { lineTokenExpired: false, phoneTokenExpired: false },
+      loading: { isLoading: true, phase: "initializing" },
       firebaseUser: null,
       currentUser: null,
-      authenticationState: "loading" as const,
-      environment,
-      isAuthenticating: false,
+      environment: environment === "liff" ? "liff" : "browser",
+      error: null,
     };
   });
+
+  const [legacyState, setLegacyState] = useState<AuthState>(() => ({
+    firebaseUser: newState.firebaseUser,
+    currentUser: newState.currentUser,
+    authenticationState: getDisplayAuthenticationState(newState),
+    environment: environment,
+    isAuthenticating: newState.loading.isLoading,
+  }));
 
   const [userSignUp] = useUserSignUpMutation();
 
@@ -125,7 +147,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refetch: refetchUser,
   } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
-      state.authenticationState,
+      newState.authentication,
     ),
     fetchPolicy: "network-only",
   });
@@ -143,11 +165,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       TokenManager.clearAllTokens();
 
-      setState((prev: AuthState) => ({
+      setLegacyState((prev: AuthState) => ({
         ...prev,
         firebaseUser: null,
         currentUser: null,
         authenticationState: "unauthenticated",
+        isAuthenticating: false,
       }));
     } catch (error) {
       logger.error("Logout failed", {
@@ -160,15 +183,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     if (!authStateManager) return;
 
-    const handleStateChange = (newState: NewAuthState) => {
-      setState((prev: AuthState) => ({
-        ...prev,
-        firebaseUser: newState.firebaseUser,
-        currentUser: newState.currentUser,
-        authenticationState: authStateManager.getLegacyState(),
-        environment: newState.environment || prev.environment,
-        isAuthenticating: newState.loading.isLoading,
-      }));
+    const handleStateChange = (newAuthState: AuthStateManagerState) => {
+      setNewState(newAuthState);
+      setLegacyState({
+        firebaseUser: newAuthState.firebaseUser,
+        currentUser: newAuthState.currentUser,
+        authenticationState: getDisplayAuthenticationState(newAuthState),
+        environment: environment,
+        isAuthenticating: newAuthState.loading.isLoading,
+      });
     };
 
     const unsubscribe = authStateManager.subscribe(handleStateChange);
@@ -176,14 +199,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authStateManager.initialize();
 
     return unsubscribe;
-  }, [authStateManager]);
+  }, [authStateManager, environment]);
 
   useEffect(() => {
     if (userData?.currentUser?.user && authStateManager) {
-      authStateManager.updateUserData(state.firebaseUser, userData.currentUser.user);
+      authStateManager.updateUserData(legacyState.firebaseUser, userData.currentUser.user);
       authStateManager.handleUserRegistrationStateChange(true);
     }
-  }, [userData, authStateManager, state.firebaseUser]);
+  }, [userData, authStateManager, legacyState.firebaseUser]);
 
 
   /**
@@ -192,7 +215,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * @returns ログインが成功したかどうか
    */
   const loginWithLiff = async (redirectPath?: RawURIComponent): Promise<boolean> => {
-    setState((prev: AuthState) => ({ ...prev, isAuthenticating: true }));
+    setLegacyState((prev: AuthState) => ({ ...prev, isAuthenticating: true }));
 
     try {
       await liffService.initialize();
@@ -217,7 +240,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       return false;
     } finally {
-      setState((prev: AuthState) => ({ ...prev, isAuthenticating: false }));
+      setLegacyState((prev: AuthState) => ({ ...prev, isAuthenticating: false }));
     }
   };
 
@@ -235,7 +258,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const success = await phoneAuthService.verifyPhoneCode(verificationCode);
 
     if (success) {
-      setState((prev: AuthState) => ({
+      setLegacyState((prev: AuthState) => ({
         ...prev,
         authenticationState: "phone_authenticated",
       }));
@@ -273,7 +296,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     phoneUid: string | null,
   ): Promise<User | null> => {
     try {
-      if (!state.firebaseUser) {
+      if (!legacyState.firebaseUser) {
         toast.error("LINE認証が完了していません");
         return null;
       }
@@ -312,7 +335,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (data?.userSignUp?.user) {
         await refetchUser();
         toast.success("アカウントを作成しました");
-        return state.firebaseUser;
+        return legacyState.firebaseUser;
       } else {
         toast.error("アカウント作成に失敗しました");
         return null;
@@ -330,17 +353,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const value: AuthContextType = {
-    user: state.currentUser,
-    firebaseUser: state.firebaseUser,
-    uid: state.firebaseUser?.uid || null,
+    user: legacyState.currentUser,
+    firebaseUser: legacyState.firebaseUser,
+    uid: legacyState.firebaseUser?.uid || null,
     isAuthenticated: ["line_authenticated", "phone_authenticated", "user_registered"].includes(
-      state.authenticationState,
+      newState.authentication,
     ),
-    isPhoneVerified: ["phone_authenticated", "user_registered"].includes(state.authenticationState),
-    isUserRegistered: state.authenticationState === "user_registered",
-    authenticationState: state.authenticationState,
-    isAuthenticating: state.isAuthenticating,
-    environment: state.environment,
+    isPhoneVerified: ["phone_authenticated", "user_registered"].includes(newState.authentication),
+    isUserRegistered: newState.authentication === "user_registered",
+    authenticationState: legacyState.authenticationState,
+    isAuthenticating: legacyState.isAuthenticating,
+    environment: legacyState.environment,
     loginWithLiff,
     logout,
     phoneAuth: {
@@ -354,7 +377,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: state.isAuthenticating || userLoading,
+    loading: newState.loading.isLoading || userLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

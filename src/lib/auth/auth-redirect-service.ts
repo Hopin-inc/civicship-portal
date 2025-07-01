@@ -1,4 +1,5 @@
 import { AuthStateManager } from "./auth-state-manager";
+import { AuthState } from "@/types/auth";
 import { GqlRole } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
@@ -7,6 +8,25 @@ import {
   matchPaths,
   RawURIComponent,
 } from "@/utils/path";
+
+/**
+ * 新しいAuthStateから表示用の認証状態を取得
+ */
+function getAuthStateForRedirect(authState: AuthState): string {
+  if (authState.loading.isLoading) {
+    return "loading";
+  }
+  
+  if (authState.tokenStatus.lineTokenExpired && authState.authentication === "line_authenticated") {
+    return "line_token_expired";
+  }
+  
+  if (authState.tokenStatus.phoneTokenExpired && authState.authentication === "phone_authenticated") {
+    return "phone_token_expired";
+  }
+  
+  return authState.authentication;
+}
 
 /**
  * 認証状態に基づくリダイレクト処理を一元管理するサービス
@@ -70,7 +90,8 @@ export class AuthRedirectService {
    * @returns リダイレクト先のパス、またはnull（リダイレクト不要の場合）
    */
   public getRedirectPath(pathname: RawURIComponent, next?: RawURIComponent | null): RawURIComponent | null {
-    const authState = this.authStateManager.getState();
+    const fullAuthState = this.authStateManager.getState();
+    const authState = getAuthStateForRedirect(fullAuthState);
     const nextParam = next
       ? this.generateNextParam(next)
       : this.generateNextParam(pathname);
@@ -160,7 +181,8 @@ export class AuthRedirectService {
   public getPostLineAuthRedirectPath(nextPath: RawURIComponent | null): RawURIComponent {
     const nextParam = nextPath ? this.generateNextParam(nextPath) : "";
 
-    const authState = this.authStateManager.getState();
+    const fullAuthState = this.authStateManager.getState();
+    const authState = getAuthStateForRedirect(fullAuthState);
 
     switch (authState) {
       case "unauthenticated":
