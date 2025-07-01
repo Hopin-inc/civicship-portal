@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useHeader } from "@/components/providers/HeaderProvider";
 import Header from "@/components/layout/Header";
 import BottomBar from "@/components/layout/BottomBar";
@@ -13,12 +13,20 @@ interface MainContentProps {
 
 const MainContent: React.FC<MainContentProps> = ({ children }) => {
   const { config } = useHeader();
-  const showHeader = !config?.hideHeader;
+  const [isClient, setIsClient] = useState(false);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
+  const baseClassName = "w-full flex-grow pb-16 overflow-y-auto";
+  const paddingTop = isClient && config?.hideHeader ? "" : "pt-16";
+  const mainClassName = `${baseClassName} ${paddingTop}`;
 
   return (
     <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full">
       <Header />
-      <main className={`w-full flex-grow ${showHeader ? "pt-16" : ""} pb-16 overflow-y-auto`}>
+      <main className={mainClassName}>
         <RouteGuard>
           {children}
         </RouteGuard>

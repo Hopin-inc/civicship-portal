@@ -15,10 +15,10 @@ export const useAnalyticsView = () => {
 // ---------------- ユーザー属性のバインディング ----------------
 
 const useAnalyticsUserBinding = () => {
-  const { user, isPhoneVerified, isAuthenticating } = useAuth();
+  const { user, isPhoneVerified, authLoading } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticating) return;
+    if (authLoading) return;
 
     getFirebaseAnalytics().then((analytics) => {
       if (user?.id && analytics) {
@@ -29,7 +29,7 @@ const useAnalyticsUserBinding = () => {
         });
       }
     });
-  }, [user, isAuthenticating, isPhoneVerified]);
+  }, [user, authLoading, isPhoneVerified]);
 };
 
 // ---------------- ページビューの自動送信 ----------------

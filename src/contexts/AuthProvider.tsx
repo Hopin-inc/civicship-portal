@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
@@ -16,19 +16,29 @@ import {
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { useAuthStateManagerInitialization } from "@/hooks/auth/useAuthStateManagerInitialization";
-import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
-import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
-import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
-import { usePhoneAuthState } from "@/hooks/auth/usePhoneAuthState";
-import { useUserRegistrationState } from "@/hooks/auth/useUserRegistrationState";
-import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
-import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
-import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
+import { AuthState as AuthStateManagerState } from "@/types/auth";
 import { logger } from "@/lib/logging";
 import { maskPhoneNumber } from "@/lib/logging/client/utils";
-import useAutoLogin from "@/hooks/auth/useAutoLogin";
 import { RawURIComponent } from "@/utils/path";
+
+/**
+ * 新しいAuthStateから表示用の認証状態文字列を取得
+ */
+function getDisplayAuthenticationState(authState: AuthStateManagerState): AuthState["authenticationState"] {
+  if (authState.loading.isLoading) {
+    return "loading";
+  }
+  
+  if (authState.tokenStatus.lineTokenExpired && authState.authentication === "line_authenticated") {
+    return "line_token_expired";
+  }
+  
+  if (authState.tokenStatus.phoneTokenExpired && authState.authentication === "phone_authenticated") {
+    return "phone_token_expired";
+  }
+  
+  return authState.authentication as AuthState["authenticationState"];
+}
 
 /**
  * 認証状態の型定義
@@ -45,7 +55,6 @@ export type AuthState = {
     | "user_registered" // S3: ユーザ情報登録済み
     | "loading"; // L0: 状態チェック中
   environment: AuthEnvironment;
-  isAuthenticating: boolean;
 };
 
 /**
@@ -59,7 +68,6 @@ interface AuthContextType {
   isPhoneVerified: boolean;
   isUserRegistered: boolean;
   authenticationState: AuthState["authenticationState"];
-  isAuthenticating: boolean;
   environment: AuthEnvironment;
 
   loginWithLiff: (redirectPath?: RawURIComponent) => Promise<boolean>;
@@ -80,7 +88,7 @@ interface AuthContextType {
   ) => Promise<User | null>;
   updateAuthState: () => Promise<void>;
 
-  loading: boolean;
+  authLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -97,18 +105,28 @@ interface AuthProviderProps {
  */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const environment = detectEnvironment();
-
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
   const liffService = LiffService.getInstance(liffId);
-
   const phoneAuthService = PhoneAuthService.getInstance();
 
-  const [state, setState] = useState<AuthState>({
-    firebaseUser: null,
-    currentUser: null,
-    authenticationState: "loading",
-    environment,
-    isAuthenticating: false,
+  const authStateManager = React.useMemo(() => {
+    if (typeof window === "undefined") return null;
+    return AuthStateManager.getInstance();
+  }, []);
+
+  const [state, setState] = useState<AuthStateManagerState>(() => {
+    if (authStateManager) {
+      return authStateManager.getState();
+    }
+    return {
+      authentication: "unauthenticated",
+      tokenStatus: { lineTokenExpired: false, phoneTokenExpired: false },
+      loading: { isLoading: true, phase: "initializing" },
+      firebaseUser: null,
+      currentUser: null,
+      environment: environment === "liff" ? "liff" : "browser",
+      error: null,
+    };
   });
 
   const [userSignUp] = useUserSignUpMutation();
@@ -119,15 +137,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refetch: refetchUser,
   } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
-      state.authenticationState,
+      state.authentication,
     ),
     fetchPolicy: "network-only",
   });
-
-  const authStateManager = React.useMemo(() => {
-    if (typeof window === "undefined") return null;
-    return AuthStateManager.getInstance();
-  }, []);
 
   /**
    * ログアウト
@@ -142,12 +155,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       TokenManager.clearAllTokens();
 
-      setState((prev) => ({
-        ...prev,
-        firebaseUser: null,
-        currentUser: null,
-        authenticationState: "unauthenticated",
-      }));
+      if (authStateManager) {
+        authStateManager.reset();
+      }
     } catch (error) {
       logger.error("Logout failed", {
         error: error instanceof Error ? error.message : String(error),
@@ -156,16 +166,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [liffService, phoneAuthService]);
 
-  useAuthStateManagerInitialization(authStateManager);
-  useAuthStateChangeListener({ authStateManager, setState });
-  useTokenExpirationHandler({ state, setState, logout });
-  useFirebaseAuthState({ authStateManager, state, setState });
-  usePhoneAuthState({ authStateManager, phoneAuthService, setState });
-  useUserRegistrationState({ authStateManager, userData, setState });
-  useLiffInitialization({ environment, liffService });
-  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
-  useAutoLogin({ environment, state, liffService, setState, refetchUser });
+  useEffect(() => {
+    if (!authStateManager) return;
+
+    const handleStateChange = (newAuthState: AuthStateManagerState) => {
+      setState(newAuthState);
+    };
+
+    const unsubscribe = authStateManager.subscribe(handleStateChange);
+    
+    authStateManager.initialize();
+
+    return unsubscribe;
+  }, [authStateManager]);
+
+  useEffect(() => {
+    if (userData?.currentUser?.user && authStateManager) {
+      authStateManager.updateUserData(state.firebaseUser, userData.currentUser.user);
+      authStateManager.handleUserRegistrationStateChange(true);
+    }
+  }, [userData, authStateManager, state.firebaseUser]);
+
 
   /**
    * LIFFでログイン
@@ -173,7 +194,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * @returns ログインが成功したかどうか
    */
   const loginWithLiff = async (redirectPath?: RawURIComponent): Promise<boolean> => {
-    setState((prev) => ({ ...prev, isAuthenticating: true }));
+    if (authStateManager) {
+      authStateManager.setLoadingState(true, "checking_line");
+    }
 
     try {
       await liffService.initialize();
@@ -198,7 +221,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       return false;
     } finally {
-      setState((prev) => ({ ...prev, isAuthenticating: false }));
+      if (authStateManager) {
+        authStateManager.setLoadingState(false, "idle");
+      }
     }
   };
 
@@ -215,30 +240,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const verifyPhoneCode = async (verificationCode: string): Promise<boolean> => {
     const success = await phoneAuthService.verifyPhoneCode(verificationCode);
 
-    if (success) {
-      setState((prev) => ({
-        ...prev,
-        authenticationState: "phone_authenticated",
-      }));
-
-      if (authStateManager) {
-        try {
-          const timestamp = new Date().toISOString();
-          logger.debug("Updating phone auth state in verifyPhoneCode", {
-            timestamp,
-            component: "AuthProvider",
-          });
-          await authStateManager.handlePhoneAuthStateChange(true);
-          logger.debug("AuthStateManager phone state updated successfully in verifyPhoneCode", {
-            timestamp,
-            component: "AuthProvider",
-          });
-        } catch (error) {
-          logger.error("Failed to update AuthStateManager phone state in verifyPhoneCode", {
-            error: error instanceof Error ? error.message : String(error),
-            component: "AuthProvider",
-          });
-        }
+    if (success && authStateManager) {
+      try {
+        const timestamp = new Date().toISOString();
+        logger.debug("Updating phone auth state in verifyPhoneCode", {
+          timestamp,
+          component: "AuthProvider",
+        });
+        await authStateManager.handlePhoneAuthStateChange(true);
+        logger.debug("AuthStateManager phone state updated successfully in verifyPhoneCode", {
+          timestamp,
+          component: "AuthProvider",
+        });
+      } catch (error) {
+        logger.error("Failed to update AuthStateManager phone state in verifyPhoneCode", {
+          error: error instanceof Error ? error.message : String(error),
+          component: "AuthProvider",
+        });
       }
     }
 
@@ -315,13 +333,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     firebaseUser: state.firebaseUser,
     uid: state.firebaseUser?.uid || null,
     isAuthenticated: ["line_authenticated", "phone_authenticated", "user_registered"].includes(
-      state.authenticationState,
+      state.authentication,
     ),
-    isPhoneVerified: ["phone_authenticated", "user_registered"].includes(state.authenticationState),
-    isUserRegistered: state.authenticationState === "user_registered",
-    authenticationState: state.authenticationState,
-    isAuthenticating: state.isAuthenticating,
-    environment: state.environment,
+    isPhoneVerified: ["phone_authenticated", "user_registered"].includes(state.authentication),
+    isUserRegistered: state.authentication === "user_registered",
+    authenticationState: getDisplayAuthenticationState(state),
+    environment: environment,
     loginWithLiff,
     logout,
     phoneAuth: {
@@ -335,7 +352,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
+    authLoading: state.loading.isLoading || userLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

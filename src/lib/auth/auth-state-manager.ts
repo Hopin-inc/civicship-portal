@@ -1,17 +1,15 @@
 import { TokenManager } from "./token-manager";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
-
 import { logger } from "@/lib/logging";
-
-export type AuthenticationState =
-  | "unauthenticated"
-  | "line_authenticated"
-  | "line_token_expired"
-  | "phone_authenticated"
-  | "phone_token_expired"
-  | "user_registered"
-  | "loading";
+import { 
+  AuthState, 
+  AuthenticationState, 
+  LoadingState, 
+  TokenStatus, 
+  AuthError, 
+  AuthStateChangeListener
+} from "@/types/auth";
 
 /**
  * 認証状態の管理を担当するクラス
@@ -19,8 +17,16 @@ export type AuthenticationState =
  */
 export class AuthStateManager {
   private static instance: AuthStateManager;
-  private currentState: AuthenticationState = "loading";
-  private stateChangeListeners: ((state: AuthenticationState) => void)[] = [];
+  private state: AuthState = {
+    authentication: "unauthenticated",
+    tokenStatus: { lineTokenExpired: false, phoneTokenExpired: false },
+    loading: { isLoading: false, phase: "idle" },
+    firebaseUser: null,
+    currentUser: null,
+    environment: null,
+    error: null
+  };
+  private stateChangeListeners: AuthStateChangeListener[] = [];
   private readonly sessionId: string;
 
   private constructor() {
@@ -44,9 +50,10 @@ export class AuthStateManager {
   /**
    * 現在の認証状態を取得
    */
-  public getState(): AuthenticationState {
-    return this.currentState;
+  public getState(): AuthState {
+    return { ...this.state };
   }
+
 
   /**
    * 現在のセッションIDを取得
@@ -99,38 +106,74 @@ export class AuthStateManager {
   /**
    * 認証状態の変更を監視するリスナーを追加
    */
-  public addStateChangeListener(listener: (state: AuthenticationState) => void): void {
+  public addStateChangeListener(listener: AuthStateChangeListener): void {
     this.stateChangeListeners.push(listener);
   }
 
   /**
    * 認証状態の変更を監視するリスナーを削除
    */
-  public removeStateChangeListener(listener: (state: AuthenticationState) => void): void {
+  public removeStateChangeListener(listener: AuthStateChangeListener): void {
     this.stateChangeListeners = this.stateChangeListeners.filter((l) => l !== listener);
   }
 
-  /**
-   * 認証状態を更新
-   */
-  public setState(state: AuthenticationState): void {
-    logger.debug("AuthStateManager.setState", {
-      from: this.currentState,
-      to: state,
-      component: "AuthStateManager",
+  public subscribe(listener: AuthStateChangeListener): () => void {
+    this.stateChangeListeners.push(listener);
+    return () => {
+      this.stateChangeListeners = this.stateChangeListeners.filter(l => l !== listener);
+    };
+  }
+
+  public updateUserData(firebaseUser: any, currentUser: any): void {
+    this.setStateInternal({
+      firebaseUser,
+      currentUser
     });
-    if (this.currentState !== state) {
-      this.currentState = state;
+  }
+
+  /**
+   * 認証状態をリセット（ログアウト時に使用）
+   */
+  public reset(): void {
+    this.setStateInternal({
+      authentication: "unauthenticated",
+      tokenStatus: { lineTokenExpired: false, phoneTokenExpired: false },
+      loading: { isLoading: false, phase: "idle" },
+      firebaseUser: null,
+      currentUser: null,
+      error: null
+    });
+  }
+
+  private setStateInternal(newState: Partial<AuthState>): void {
+    const prevState = { ...this.state };
+    this.state = { ...this.state, ...newState };
+    
+    if (JSON.stringify(prevState) !== JSON.stringify(this.state)) {
       this.notifyStateChange();
     }
   }
+
+  private setLoading(isLoading: boolean, phase: LoadingState["phase"]): void {
+    this.setStateInternal({
+      loading: { isLoading, phase }
+    });
+  }
+
+  /**
+   * ローディング状態を設定（外部から使用可能）
+   */
+  public setLoadingState(isLoading: boolean, phase: LoadingState["phase"]): void {
+    this.setLoading(isLoading, phase);
+  }
+
 
   /**
    * 認証状態の変更を通知
    */
   private notifyStateChange(): void {
     this.stateChangeListeners.forEach((listener) => {
-      listener(this.currentState);
+      listener(this.getState());
     });
   }
 
@@ -138,30 +181,52 @@ export class AuthStateManager {
    * 認証状態を初期化
    */
   public async initialize(): Promise<void> {
-    this.setState("loading");
+    this.setLoading(true, "initializing");
 
-    const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+    try {
+      this.setLoading(true, "checking_line");
+      const lineTokens = TokenManager.getLineTokens();
+      const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
-    if (!hasValidLineToken) {
-      this.setState("unauthenticated");
-      return;
-    } else {
+      if (!hasValidLineToken) {
+        this.setStateInternal({ authentication: "unauthenticated" });
+        return;
+      }
+
+      this.setLoading(true, "checking_user");
       const isUserRegistered = await this.checkUserRegistration();
 
       if (isUserRegistered) {
-        this.setState("user_registered");
-      } else {
-        const phoneTokens = TokenManager.getPhoneTokens();
-        const hasValidPhoneToken =
-          phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
-
-        if (hasValidPhoneToken) {
-          this.setState("phone_authenticated");
-        } else {
-          this.setState("line_authenticated");
-        }
+        this.setStateInternal({ authentication: "user_registered" });
+        return;
       }
+
+      this.setLoading(true, "checking_phone");
+      const phoneTokens = TokenManager.getPhoneTokens();
+      const hasValidPhoneToken = phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
+
+      if (hasValidPhoneToken) {
+        this.setStateInternal({ authentication: "phone_authenticated" });
+      } else {
+        this.setStateInternal({ authentication: "line_authenticated" });
+      }
+
+    } catch (error) {
+      logger.error("Authentication initialization failed", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "AuthStateManager",
+      });
+      this.setStateInternal({ 
+        authentication: "unauthenticated",
+        error: {
+          type: "auth_failed",
+          source: "line",
+          message: error instanceof Error ? error.message : "Unknown error",
+          recoverable: true
+        }
+      });
+    } finally {
+      this.setLoading(false, "idle");
     }
   }
 
@@ -224,24 +289,28 @@ export class AuthStateManager {
    */
   private async handleLineTokenRenewal(event: Event): Promise<void> {
     try {
+      this.setStateInternal({ tokenStatus: { ...this.state.tokenStatus, lineTokenExpired: true } });
+      
       const renewed = await TokenManager.renewLineToken();
 
-      if (renewed && this.currentState === "line_token_expired") {
+      if (renewed) {
+        this.setStateInternal({ tokenStatus: { ...this.state.tokenStatus, lineTokenExpired: false } });
+        
         const isUserRegistered = await this.checkUserRegistration();
         if (isUserRegistered) {
-          this.setState("user_registered");
+          this.setStateInternal({ authentication: "user_registered" });
         } else {
-          this.setState("line_authenticated");
+          this.setStateInternal({ authentication: "line_authenticated" });
         }
-      } else if (!renewed) {
-        this.setState("unauthenticated");
+      } else {
+        this.setStateInternal({ authentication: "unauthenticated" });
       }
     } catch (error) {
       logger.info("Failed to renew LINE token", {
         error: error instanceof Error ? error.message : String(error),
         component: "AuthStateManager",
       });
-      this.setState("unauthenticated");
+      this.setStateInternal({ authentication: "unauthenticated" });
     }
   }
 
@@ -250,19 +319,21 @@ export class AuthStateManager {
    */
   private async handlePhoneTokenRenewal(event: Event): Promise<void> {
     try {
+      this.setStateInternal({ tokenStatus: { ...this.state.tokenStatus, phoneTokenExpired: true } });
+      
       const renewed = await TokenManager.renewPhoneToken();
       const lineTokens = TokenManager.getLineTokens();
-      const hasValidLineToken =
-        lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+      const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
-      if (renewed && this.currentState === "phone_token_expired") {
-        this.setState("phone_authenticated");
-      } else if (!renewed) {
-        if (!hasValidLineToken) {
-          this.setState("unauthenticated");
-        } else {
-          this.setState("line_authenticated");
-        }
+      if (renewed) {
+        this.setStateInternal({ 
+          tokenStatus: { ...this.state.tokenStatus, phoneTokenExpired: false },
+          authentication: "phone_authenticated"
+        });
+      } else if (!hasValidLineToken) {
+        this.setStateInternal({ authentication: "unauthenticated" });
+      } else {
+        this.setStateInternal({ authentication: "line_authenticated" });
       }
     } catch (error) {
       logger.info("Failed to renew phone token", {
@@ -272,14 +343,11 @@ export class AuthStateManager {
       });
 
       const lineTokens = TokenManager.getLineTokens();
-      const hasValidLineToken =
-        lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
-
-      if (!hasValidLineToken) {
-        this.setState("unauthenticated");
-      } else {
-        this.setState("line_authenticated");
-      }
+      const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+      
+      this.setStateInternal({ 
+        authentication: hasValidLineToken ? "line_authenticated" : "unauthenticated"
+      });
     }
   }
 
@@ -288,11 +356,11 @@ export class AuthStateManager {
    */
   public async handleLineAuthStateChange(isAuthenticated: boolean): Promise<void> {
     if (isAuthenticated) {
-      if (this.currentState === "unauthenticated" || this.currentState === "loading") {
-        this.setState("line_authenticated");
+      if (this.state.authentication === "unauthenticated" || this.state.loading.isLoading) {
+        this.setStateInternal({ authentication: "line_authenticated" });
       }
     } else {
-      this.setState("unauthenticated");
+      this.setStateInternal({ authentication: "unauthenticated" });
     }
   }
 
@@ -303,21 +371,21 @@ export class AuthStateManager {
     const lineTokens = TokenManager.getLineTokens();
     const hasValidLineToken = !!lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
-    if (!hasValidLineToken && this.currentState !== "loading") {
-      this.setState("unauthenticated");
+    if (!hasValidLineToken && !this.state.loading.isLoading) {
+      this.setStateInternal({ authentication: "unauthenticated" });
       return;
     }
 
     if (isVerified) {
       if (
-        this.currentState === "line_authenticated" ||
-        this.currentState === "line_token_expired"
+        this.state.authentication === "line_authenticated" ||
+        this.state.tokenStatus.lineTokenExpired
       ) {
-        this.setState("phone_authenticated");
+        this.setStateInternal({ authentication: "phone_authenticated" });
       }
     } else {
-      if (this.currentState !== "unauthenticated" && this.currentState !== "loading") {
-        this.setState("line_authenticated");
+      if (this.state.authentication !== "unauthenticated" && !this.state.loading.isLoading) {
+        this.setStateInternal({ authentication: "line_authenticated" });
       }
     }
   }
@@ -330,12 +398,12 @@ export class AuthStateManager {
     const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
     if (!hasValidLineToken) {
-      this.setState("unauthenticated");
+      this.setStateInternal({ authentication: "unauthenticated" });
       return;
     }
 
     if (isRegistered) {
-      this.setState("user_registered");
+      this.setStateInternal({ authentication: "user_registered" });
       logger.debug(
         "User is registered - setting state to user_registered regardless of phone token status",
         {
@@ -348,9 +416,9 @@ export class AuthStateManager {
         phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
 
       if (hasValidPhoneToken) {
-        this.setState("phone_authenticated");
+        this.setStateInternal({ authentication: "phone_authenticated" });
       } else {
-        this.setState("line_authenticated");
+        this.setStateInternal({ authentication: "line_authenticated" });
       }
     }
   }
