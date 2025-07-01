@@ -131,6 +131,20 @@ export class AuthStateManager {
     });
   }
 
+  /**
+   * 認証状態をリセット（ログアウト時に使用）
+   */
+  public reset(): void {
+    this.setStateInternal({
+      authentication: "unauthenticated",
+      tokenStatus: { lineTokenExpired: false, phoneTokenExpired: false },
+      loading: { isLoading: false, phase: "idle" },
+      firebaseUser: null,
+      currentUser: null,
+      error: null
+    });
+  }
+
   private setStateInternal(newState: Partial<AuthState>): void {
     const prevState = { ...this.state };
     this.state = { ...this.state, ...newState };
@@ -144,6 +158,13 @@ export class AuthStateManager {
     this.setStateInternal({
       loading: { isLoading, phase }
     });
+  }
+
+  /**
+   * ローディング状態を設定（外部から使用可能）
+   */
+  public setLoadingState(isLoading: boolean, phase: LoadingState["phase"]): void {
+    this.setLoading(isLoading, phase);
   }
 
 

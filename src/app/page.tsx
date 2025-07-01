@@ -35,7 +35,7 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (authLoading || userLoading || isAuthenticating) return;
+    if (authLoading || isAuthenticating) return;
 
     const isReturnFromLineAuth =
       searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
