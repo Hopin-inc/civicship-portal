@@ -19,12 +19,14 @@ const MainContent: React.FC<MainContentProps> = ({ children }) => {
     setIsClient(true);
   }, []);
   
-  const showHeader = isClient ? !config?.hideHeader : true;
+  const mainClassName = isClient 
+    ? `w-full flex-grow ${!config?.hideHeader ? "pt-16" : ""} pb-16 overflow-y-auto`
+    : "w-full flex-grow pt-16 pb-16 overflow-y-auto";
 
   return (
     <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full">
       <Header />
-      <main className={`w-full flex-grow ${showHeader ? "pt-16" : ""} pb-16 overflow-y-auto`}>
+      <main className={mainClassName}>
         <RouteGuard>
           {children}
         </RouteGuard>
