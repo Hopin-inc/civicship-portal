@@ -9,7 +9,6 @@ import { Facebook, Home, Instagram, Twitter } from "lucide-react";
 import { useReadMore } from "@/hooks/useReadMore";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthProvider";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -36,7 +35,6 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   isOwner,
   socialUrl,
 }) => {
-  const { logout } = useAuth();
   const socialButtonClasses =
     "rounded-full border border-input w-10 h-10 flex items-center justify-center";
 
