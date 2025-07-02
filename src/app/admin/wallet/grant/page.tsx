@@ -20,7 +20,7 @@ export default function GrantPointStepperPage() {
   const currentPoint = Number(searchParams.get("currentPoint") ?? "0");
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
-    variables: { filter: { communityId: COMMUNITY_ID } },
+    variables: { filter: { communityId: COMMUNITY_ID }, first: 500 },
     fetchPolicy: "network-only",
   });
 
@@ -32,6 +32,7 @@ export default function GrantPointStepperPage() {
       await fetchMore({
         variables: {
           filter: { communityId: COMMUNITY_ID },
+          first: 500,
           after: endCursor,
         },
       });

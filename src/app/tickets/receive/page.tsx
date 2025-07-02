@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import LoginModal from "@/app/login/components/LoginModal";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -10,7 +10,7 @@ import TicketReceiveContent from "@/app/tickets/receive/components/TicketReceive
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import ErrorState from "@/components/shared/ErrorState";
 import { toast } from "sonner";
-import { RawURIComponent } from "@/utils/path";
+import { encodeURIComponentWithType, RawURIComponent } from "@/utils/path";
 
 export default function TicketReceivePage() {
   const searchParams = useSearchParams();
@@ -65,7 +65,7 @@ export default function TicketReceivePage() {
       <LoginModal
         isOpen={ isLoginModalOpen }
         onClose={ () => setIsLoginModalOpen(false) }
-        nextPath={ window.location.pathname + window.location.search as RawURIComponent }
+        nextPath={ `/login?next=${ encodeURIComponentWithType(window.location.pathname + window.location.search as RawURIComponent) }` as RawURIComponent }
       />
     </div>
   );
