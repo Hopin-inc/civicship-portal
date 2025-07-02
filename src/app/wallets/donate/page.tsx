@@ -22,7 +22,7 @@ export default function DonatePointPage() {
   const currentPoint = Number(searchParams.get("currentPoint") ?? "0");
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
-    variables: { filter: { communityId: COMMUNITY_ID } },
+    variables: { filter: { communityId: COMMUNITY_ID }, first: 500 },
     fetchPolicy: "network-only",
   });
 
