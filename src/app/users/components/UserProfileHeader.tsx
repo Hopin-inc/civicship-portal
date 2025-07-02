@@ -57,7 +57,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
                 href="/users/me/setting"
                 className={cn(buttonVariants({ variant: "tertiary", size: "md" }), "ml-auto text-black")}
               >
-                編集
+                設定
               </Link>
             </div>
           )}
