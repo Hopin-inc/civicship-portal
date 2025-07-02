@@ -12,14 +12,18 @@ export default function DangerSection() {
     <>
       <Card className="w-full max-w-md mx-auto">
         <CardContent className="p-0">
-            <div className="flex items-center justify-between py-4 px-4 border-b" onClick={() => setOpen(true)}>
-                <div className="flex items-center gap-2">
-                    <LogOut className="w-5 h-5" />
-                    <span className="font-bold text-sm flex items-center gap-2">
-                        サインアウト
-                    </span>
-                </div>
-            </div>
+            <button
+              type="button"
+              className="flex items-center justify-between py-4 px-4 border-b w-full text-left"
+              onClick={() => setOpen(true)}
+            >
+              <span className="flex items-center gap-2">
+                <LogOut className="w-5 h-5" />
+                <span className="font-bold text-sm flex items-center gap-2">
+                  サインアウト
+                </span>
+              </span>
+            </button>
           <div className="flex items-center gap-3 py-4 px-4 border-b">
             <XCircle className="w-5 h-5" />
             <span className="font-bold text-sm text-gray-400">このアカウントを削除する</span>
