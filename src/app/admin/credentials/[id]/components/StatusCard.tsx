@@ -19,7 +19,7 @@ export const ErrorCard = () => (
       <span className="text-lg font-bold">証明書発行失敗</span>
     </div>
     <div className="text-gray-400 text-base font-normal">
-      指定されたユーザーに証明書を発行できませんでした。お手数ですが再度ユーザーを確認・選択のうえ、発行をお試しください。
+      指定されたユーザーに証明書を発行できませんでした。お手数ですが再度ユーザーを確認のうえ、発行をお試しください。
     </div>
   </div>
 );

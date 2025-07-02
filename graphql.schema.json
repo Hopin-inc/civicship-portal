@@ -9213,9 +9213,17 @@
             "name": "hostingStatus",
             "description": null,
             "type": {
-              "kind": "ENUM",
-              "name": "OpportunitySlotHostingStatus",
-              "ofType": null
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "OpportunitySlotHostingStatus",
+                  "ofType": null
+                }
+              }
             },
             "defaultValue": null,
             "isDeprecated": false,

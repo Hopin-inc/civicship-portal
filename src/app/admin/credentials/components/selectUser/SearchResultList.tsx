@@ -22,12 +22,12 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
   DISABLED_REASONS,
 }) => {
   if (searchQuery && singleMembershipData?.memberships?.edges.length > 0) {
-    const user = singleMembershipData.memberships.edges[0].node.user;
-    const reason = getParticipatedReason(user.id);
-    const isDisabled = reason !== undefined && DISABLED_REASONS.includes(reason as GqlParticipationStatusReason);
     return (
       <>
         {singleMembershipData.memberships.edges.map((edge:GqlMembershipEdge) => {
+          const reason = getParticipatedReason(edge.node?.user?.id ?? "");
+          const isDisabled = reason !== undefined && DISABLED_REASONS.includes(reason as GqlParticipationStatusReason);
+
           const user = edge.node?.user;
           if (!user) return null;
           return (

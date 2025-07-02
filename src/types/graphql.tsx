@@ -1104,7 +1104,7 @@ export type GqlOpportunitySlotEdge = GqlEdge & {
 
 export type GqlOpportunitySlotFilterInput = {
   dateRange?: InputMaybe<GqlDateTimeRangeFilter>;
-  hostingStatus?: InputMaybe<GqlOpportunitySlotHostingStatus>;
+  hostingStatus?: InputMaybe<Array<GqlOpportunitySlotHostingStatus>>;
   opportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   ownerId?: InputMaybe<Scalars["ID"]["input"]>;
 };
@@ -4694,13 +4694,6 @@ export type GqlGetReservationQuery = {
   } | null;
 };
 
-export type GqlVcIssuanceRequestFieldsFragment = {
-  __typename?: "VcIssuanceRequest";
-  id: string;
-  status: GqlVcIssuanceStatus;
-  completedAt?: Date | null;
-};
-
 export type GqlGetVcIssuanceRequestByEvaluationQueryVariables = Exact<{
   evaluationId: Scalars["ID"]["input"];
 }>;
@@ -4713,6 +4706,38 @@ export type GqlGetVcIssuanceRequestByEvaluationQuery = {
     edges: Array<{
       __typename?: "VcIssuanceRequestEdge";
       node?: { __typename?: "VcIssuanceRequest"; id: string; completedAt?: Date | null } | null;
+    }>;
+  };
+};
+
+export type GqlGetVcIssuanceRequestsByUserQueryVariables = Exact<{
+  userId: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetVcIssuanceRequestsByUserQuery = {
+  __typename?: "Query";
+  vcIssuanceRequests: {
+    __typename?: "VcIssuanceRequestsConnection";
+    totalCount: number;
+    edges: Array<{
+      __typename?: "VcIssuanceRequestEdge";
+      node?: {
+        __typename?: "VcIssuanceRequest";
+        id: string;
+        status: GqlVcIssuanceStatus;
+        completedAt?: Date | null;
+        createdAt?: Date | null;
+        evaluation?: {
+          __typename?: "Evaluation";
+          id: string;
+          status: GqlEvaluationStatus;
+          participation?: {
+            __typename?: "Participation";
+            id: string;
+            opportunitySlot?: { __typename?: "OpportunitySlot"; id: string } | null;
+          } | null;
+        } | null;
+      } | null;
     }>;
   };
 };
@@ -5522,13 +5547,6 @@ export const ReservationFieldsFragmentDoc = gql`
     id
     status
     comment
-  }
-`;
-export const VcIssuanceRequestFieldsFragmentDoc = gql`
-  fragment VcIssuanceRequestFields on VcIssuanceRequest {
-    id
-    status
-    completedAt
   }
 `;
 export const TicketFieldsFragmentDoc = gql`
@@ -9052,6 +9070,104 @@ export type GetVcIssuanceRequestByEvaluationSuspenseQueryHookResult = ReturnType
 export type GetVcIssuanceRequestByEvaluationQueryResult = Apollo.QueryResult<
   GqlGetVcIssuanceRequestByEvaluationQuery,
   GqlGetVcIssuanceRequestByEvaluationQueryVariables
+>;
+export const GetVcIssuanceRequestsByUserDocument = gql`
+  query GetVcIssuanceRequestsByUser($userId: ID!) {
+    vcIssuanceRequests(filter: { userId: $userId }) {
+      edges {
+        node {
+          id
+          status
+          completedAt
+          createdAt
+          evaluation {
+            id
+            status
+            participation {
+              id
+              opportunitySlot {
+                id
+              }
+            }
+          }
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetVcIssuanceRequestsByUserQuery__
+ *
+ * To run a query within a React component, call `useGetVcIssuanceRequestsByUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetVcIssuanceRequestsByUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetVcIssuanceRequestsByUserQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetVcIssuanceRequestsByUserQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetVcIssuanceRequestsByUserQuery,
+    GqlGetVcIssuanceRequestsByUserQueryVariables
+  > &
+    (
+      | { variables: GqlGetVcIssuanceRequestsByUserQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetVcIssuanceRequestsByUserQuery,
+    GqlGetVcIssuanceRequestsByUserQueryVariables
+  >(GetVcIssuanceRequestsByUserDocument, options);
+}
+export function useGetVcIssuanceRequestsByUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetVcIssuanceRequestsByUserQuery,
+    GqlGetVcIssuanceRequestsByUserQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetVcIssuanceRequestsByUserQuery,
+    GqlGetVcIssuanceRequestsByUserQueryVariables
+  >(GetVcIssuanceRequestsByUserDocument, options);
+}
+export function useGetVcIssuanceRequestsByUserSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetVcIssuanceRequestsByUserQuery,
+        GqlGetVcIssuanceRequestsByUserQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetVcIssuanceRequestsByUserQuery,
+    GqlGetVcIssuanceRequestsByUserQueryVariables
+  >(GetVcIssuanceRequestsByUserDocument, options);
+}
+export type GetVcIssuanceRequestsByUserQueryHookResult = ReturnType<
+  typeof useGetVcIssuanceRequestsByUserQuery
+>;
+export type GetVcIssuanceRequestsByUserLazyQueryHookResult = ReturnType<
+  typeof useGetVcIssuanceRequestsByUserLazyQuery
+>;
+export type GetVcIssuanceRequestsByUserSuspenseQueryHookResult = ReturnType<
+  typeof useGetVcIssuanceRequestsByUserSuspenseQuery
+>;
+export type GetVcIssuanceRequestsByUserQueryResult = Apollo.QueryResult<
+  GqlGetVcIssuanceRequestsByUserQuery,
+  GqlGetVcIssuanceRequestsByUserQueryVariables
 >;
 export const GetPlacesDocument = gql`
   query GetPlaces(

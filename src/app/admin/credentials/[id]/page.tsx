@@ -1,13 +1,15 @@
 "use client";
 import { Card, CardHeader } from "@/components/ui/card";
-import { GqlVcIssuanceStatus, useGetDidIssuanceRequestsQuery, useGetEvaluationsQuery } from "@/types/graphql";
+import { GqlGetDidIssuanceRequestsQuery, GqlVcIssuanceStatus, useGetDidIssuanceRequestsQuery, useGetEvaluationsQuery } from "@/types/graphql";
 import { formatDateTime } from "@/utils/date";
 import { Copy, ExternalLink } from "lucide-react";
-import { use, useMemo } from "react";
+import { use, useEffect, useMemo, useRef } from "react";
 import { renderStatusCard, statusStyle } from "./data/presenter";
 import { toast } from "sonner";
 import Link from "next/link";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import ErrorState from "@/components/shared/ErrorState";
 
 // DIDを省略表示する関数
 const truncateDid = (did: string | undefined | null, length: number = 20): string => {
@@ -20,19 +22,21 @@ const truncateDid = (did: string | undefined | null, length: number = 20): strin
 
 // userIdからDIDを取得する関数
 function getDidValueByUserId(
-  didIssuanceRequestsData: any,
+  didIssuanceRequestsData: GqlGetDidIssuanceRequestsQuery | undefined,
   userId: string | undefined | null
 ): string {
   if (!userId || !didIssuanceRequestsData?.users?.edges) return "";
   const userEdge = didIssuanceRequestsData.users.edges.find(
-    (edge: any) => edge?.node?.id === userId
+    (edge) => edge?.node?.id === userId
   );
-  return userEdge?.node?.didIssuanceRequests?.[0]?.didValue ?? "";
+  const didValue =
+    userEdge?.node?.didIssuanceRequests?.find(req => req.status === "COMPLETED")?.didValue ?? "";
+  return didValue;
 }
 
 export default function CredentialsDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
-    const { data: evaluationsData } = useGetEvaluationsQuery();
+    const { data: evaluationsData, loading, error, refetch } = useGetEvaluationsQuery();
     const headerConfig = useMemo(
       () => ({
         title: "証明書詳細",
@@ -60,13 +64,28 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
       ...participantIds,
     ];
 
-    const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
+    const { 
+      data: didIssuanceRequestsData, 
+      loading: didIssuanceRequestsLoading, 
+      error: didIssuanceRequestsError, 
+    } = useGetDidIssuanceRequestsQuery({
         variables: {
           userIds: userIds,
         },
       });
 
     const organizerDidValue = getDidValueByUserId(didIssuanceRequestsData, organizerId);
+
+    const refetchRef = useRef<(() => void) | null>(null);
+    useEffect(() => {
+      refetchRef.current = refetch;
+    }, [refetch]);
+
+    if (loading || didIssuanceRequestsLoading) return <LoadingIndicator />;
+
+    if (error || didIssuanceRequestsError) {
+      return <ErrorState title="証明書詳細ページを読み込めませんでした" refetchRef={refetchRef} />;
+    }
 
   return( 
     <div className="p-4 space-y-3 max-w-2xl mx-auto">
@@ -91,7 +110,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
                 <div className="text-gray-400 text-base min-w-fit whitespace-nowrap">概要</div>
                 <div className="flex items-center flex-1 min-w-0 ml-8">
                     <span className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm flex-1">
-                        {matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.description}
+                        {matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.title}
                     </span>
                     <Link
                         href={`/activities/${matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.id}?community_id=${matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.community?.id}`}

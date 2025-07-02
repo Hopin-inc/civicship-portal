@@ -60,7 +60,7 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
           {opportunityList?.map((opportunity) => (
             <OpportunityCard
               key={opportunity?.id}
-              title={opportunity?.title ?? "名称未設定のチケット"}
+              title={opportunity?.title}
               qty={opportunity?.slots?.length ?? 0}
               isSelected={selectedSlot?.opportunityId === opportunity?.id}
               onClick={() => handleSelectTicket(opportunity?.id ?? "")}

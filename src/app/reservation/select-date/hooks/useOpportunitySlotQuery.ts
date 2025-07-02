@@ -22,7 +22,7 @@ export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLo
     variables: {
       filter: {
         opportunityIds: [opportunityId],
-        hostingStatus: GqlOpportunitySlotHostingStatus.Scheduled,
+        hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled],
       },
       sort: {
         startsAt: GqlSortDirection.Desc,

@@ -1,7 +1,9 @@
 import Image from "next/image";
-import { GqlUser, useGetDidIssuanceRequestsQuery, GqlParticipationStatusReason } from "@/types/graphql";
+import { GqlUser, useGetDidIssuanceRequestsQuery, GqlParticipationStatusReason, useGetVcIssuanceRequestsByUserQuery, GqlVcIssuanceStatus, GqlDidIssuanceStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Input } from "@/components/ui/input";
+import { useSelection } from "../../context/SelectionContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Props {
   user: GqlUser;
@@ -20,13 +22,28 @@ const truncateDid = (did: string | undefined | null, length: number = 20): strin
 };
 
 export const MemberRow = ({ user, checked, onCheck, isDisabled, reason }: Props) => {
+  const { selectedSlot } = useSelection();
   const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
     variables: {
       userIds: [user.id],
     },
   });
 
-  const did = didIssuanceRequestsData?.users?.edges?.[0]?.node?.didIssuanceRequests?.[0]?.didValue;
+  const { data } = useGetVcIssuanceRequestsByUserQuery({
+    variables: {
+      userId: user.id,
+    },
+  });
+  const hasCompletedVcIssuanceRequest =
+    !!data?.vcIssuanceRequests.edges.find(
+      (edge) =>
+        edge.node?.evaluation?.participation?.opportunitySlot?.id === selectedSlot?.slotId &&
+        edge.node?.status === GqlVcIssuanceStatus.Completed
+    );
+
+  const did = didIssuanceRequestsData?.users?.edges?.[0]?.node?.didIssuanceRequests?.find(
+    (request) => request.status === GqlDidIssuanceStatus.Completed
+  )?.didValue;
   const cardBgClass = !did || isDisabled ? "bg-zinc-200" : "bg-white";
   
   return (
@@ -38,17 +55,15 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason }: Props)
       onChange={onCheck}
       className="w-4 h-4 mr-4"
       name="user-select"
-      disabled={!did || isDisabled}
+      disabled={!did || isDisabled || hasCompletedVcIssuanceRequest}
     />
     {/* ユーザー画像 */}
-    <Image
-      src={user.image ?? PLACEHOLDER_IMAGE}
-      alt={user.name ?? "要確認"}
-      width={40}
-      height={40}
-      className="rounded-full object-cover border"
-      style={{ aspectRatio: "1 / 1" }}
-    />
+    <Avatar>
+      <AvatarImage src={user.image ?? PLACEHOLDER_IMAGE} />
+      <AvatarFallback>
+        {user.name?.[0] ?? "U"}
+      </AvatarFallback>
+    </Avatar>
     {/* ユーザー情報 */}
     <div className="flex flex-col ml-4 min-w-0">
       {isDisabled && reason === GqlParticipationStatusReason.ReservationAccepted && (
@@ -56,7 +71,7 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason }: Props)
           指定された募集に申込済み
         </span>
       )}
-      {isDisabled && reason === GqlParticipationStatusReason.PersonalRecord && (
+      {isDisabled && hasCompletedVcIssuanceRequest && reason === GqlParticipationStatusReason.PersonalRecord && (
         <span className="text-green-500 text-xs font-semibold mb-1">
           指定された募集で証明書発行済み
         </span>

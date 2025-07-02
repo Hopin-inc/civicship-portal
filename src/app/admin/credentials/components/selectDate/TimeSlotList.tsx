@@ -2,7 +2,7 @@ import React from "react";
 import { formatSlotRange } from "@/utils/date";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ActivitySlotGroup } from "../../types/opportunitySlot";
+import { ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 
 interface TimeSlotListProps {
   dateSections: ActivitySlotGroup[];

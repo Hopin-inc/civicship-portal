@@ -118,7 +118,7 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
   }, [members, participatedUsers, selectedSlot?.slotId]);
 
   if (!selectedSlot) {
-    return <div>スロットが選択されていません</div>;
+    return <div>開催枠が設定されていません</div>;
   }
 
   const handleCheck = (userId: string) => {
