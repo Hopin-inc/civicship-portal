@@ -7,15 +7,15 @@ import SettingSection from "./components/SettingSection";
 export default function SettingPage() {
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">
-      <h1 className="text-sm mb-2 font-bold">アカウント</h1>
+      <h2 className="text-sm mb-2 font-bold">アカウント</h2>
       <AccountSection />
-      <h1 className="text-sm mb-2 font-bold mt-6">設定</h1>
+      <h2 className="text-sm mb-2 font-bold mt-6">設定</h2>
       <SettingSection />
-      <h1 className="text-sm mb-2 font-bold mt-6">ヘルプ</h1>
+      <h2 className="text-sm mb-2 font-bold mt-6">ヘルプ</h2>
       <HelpSection />
-      <h1 className="text-sm mb-2 font-bold mt-6">利用にあたっての約束</h1>
+      <h2 className="text-sm mb-2 font-bold mt-6">利用にあたっての約束</h2>
       <PromiseSection />
-      <h1 className="text-sm mb-2 font-bold mt-6">ご注意して操作して下さい</h1>
+      <h2 className="text-sm mb-2 font-bold mt-6">ご注意して操作して下さい</h2>
       <DangerSection />
     </div>
   );
