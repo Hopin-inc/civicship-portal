@@ -2,14 +2,14 @@
 
 import React, { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { COMMUNITY_ID, getCommunityIdFromEnv } from "@/lib/communities/metadata";
 import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
 import { GqlMembership, GqlRole, useGetCommunityWalletQuery } from "@/types/graphql";
 import { Coins, Gift } from "lucide-react";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { presenterTransaction } from "@/app/wallets/data/presenter";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
@@ -21,6 +21,9 @@ export default function WalletPage() {
   const currentUserRole = currentUser?.memberships?.find(
     (m: GqlMembership) => m.community?.id === communityId,
   )?.role;
+
+  const searchParams = useSearchParams();
+  const shouldRefresh = searchParams.get("refresh") === "true";
 
   const headerConfig = useMemo(
     () => ({
@@ -41,12 +44,38 @@ export default function WalletPage() {
     data: walletData,
     loading: loadingWallet,
     refetch: refetchWallet,
-  } = useGetCommunityWalletQuery();
+  } = useGetCommunityWalletQuery({
+    variables: {
+      communityId: COMMUNITY_ID,
+    },
+  });
 
-  const walletId = walletData?.wallets.edges?.[0]?.node?.id ?? "";
-  const currentPoint = walletData?.wallets.edges?.[0]?.node?.currentPointView?.currentPoint ?? 0;
+  const wallet = walletData?.wallets.edges?.find(w => w?.node?.community?.id === getCommunityIdFromEnv())?.node;
+  const walletId = wallet?.id ?? "";
+  const currentPoint = wallet?.currentPointView?.currentPoint ?? 0;
 
   const { connection, loadMoreRef, refetch: refetchTransactions } = useCommunityTransactions();
+
+  // 操作完了後のリダイレクトでrefreshパラメータがある場合、データを更新
+  useEffect(() => {
+    if (shouldRefresh) {
+      const refreshData = async () => {
+        try {
+          await Promise.all([refetchWallet(), refetchTransactions()]);
+          // URLからrefreshパラメータを削除（履歴に残さない）
+          const url = new URL(window.location.href);
+          url.searchParams.delete("refresh");
+          window.history.replaceState({}, "", url);
+        } catch (err) {
+          logger.error("Refresh failed after redirect", {
+            error: err instanceof Error ? err.message : String(err),
+            component: "WalletPage",
+          });
+        }
+      };
+      refreshData();
+    }
+  }, [shouldRefresh, refetchWallet, refetchTransactions]);
 
   useEffect(() => {
     const handleFocus = async () => {

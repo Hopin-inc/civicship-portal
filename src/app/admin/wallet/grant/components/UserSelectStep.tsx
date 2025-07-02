@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import React, { useEffect, useMemo, useRef } from "react";
 import { GqlUser } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
@@ -9,13 +8,14 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import SearchForm from "@/app/search/components/SearchForm";
 import { useMemberSearch } from "@/app/admin/wallet/grant/hooks/useMemberSearch";
 import { FormProvider } from "react-hook-form";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Props {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: number } } }[];
   onSelect: (user: GqlUser) => void;
   onLoadMore?: () => void;
   hasNextPage?: boolean;
-  title?: string; // ← 追加
+  title?: string;
 }
 
 function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title }: Props) {
@@ -31,7 +31,7 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title }: P
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  const { form, filteredMembers } = useMemberSearch(members); // ← 検索ロジック
+  const { form, filteredMembers } = useMemberSearch(members);
 
   useEffect(() => {
     if (!hasNextPage || !onLoadMore) return;
@@ -68,14 +68,10 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title }: P
             className="cursor-pointer hover:bg-background-hover transition"
           >
             <CardHeader className="flex flex-row items-center gap-3 p-4">
-              <Image
-                src={user.image ?? PLACEHOLDER_IMAGE}
-                alt={user.name ?? "要確認"}
-                width={40}
-                height={40}
-                className="rounded-full object-cover border"
-                style={{ aspectRatio: "1 / 1" }}
-              />
+              <Avatar>
+                <AvatarImage src={user.image || ""} />
+                <AvatarFallback>{user.name?.[0] || "U"}</AvatarFallback>
+              </Avatar>
               <div className="flex flex-col text-left">
                 <CardTitle className="text-base font-medium truncate max-w-[160px]">
                   {user.name}

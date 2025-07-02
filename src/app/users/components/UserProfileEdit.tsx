@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +9,8 @@ import { Facebook, Instagram, Twitter } from "lucide-react";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface UserProfileEditProps {
   profileImage: string | null;
@@ -58,19 +59,10 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
         <div className="flex items-center gap-3">
           <div className="w-24 h-24 rounded-full overflow-hidden bg-muted">
             {profileImage ? (
-              <Image
-                src={profileImage ?? PLACEHOLDER_IMAGE}
-                alt="Profile"
-                width={96}
-                height={96}
-                placeholder={"blur"}
-                blurDataURL={PLACEHOLDER_IMAGE}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  img.src = PLACEHOLDER_IMAGE;
-                }}
-              />
+              <Avatar className="w-96 h-96">
+                <AvatarImage src={profileImage || PLACEHOLDER_IMAGE} alt={displayName} />
+                <AvatarFallback>{displayName.charAt(0) || "U"}</AvatarFallback>
+              </Avatar>
             ) : (
               <div className="w-full h-full bg-muted" />
             )}
@@ -112,37 +104,39 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
         </span>
       </div>
 
-      <div>
-        <Label className="mb-2 flex items-center gap-x-2">
-          住んでいるところ
-          <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">
-            必須
-          </span>
-        </Label>
-        <ToggleGroup
-          value={location}
-          onValueChange={(val) => setLocation(val as GqlCurrentPrefecture)}
-          type="single"
-          variant="outline"
-          className="gap-2"
-        >
-          <ToggleGroupItem value={GqlCurrentPrefecture.Kagawa} className="flex-1">
-            香川県
-          </ToggleGroupItem>
-          <ToggleGroupItem value={GqlCurrentPrefecture.Tokushima} className="flex-1">
-            徳島県
-          </ToggleGroupItem>
-          <ToggleGroupItem value={GqlCurrentPrefecture.Ehime} className="flex-1">
-            愛媛県
-          </ToggleGroupItem>
-          <ToggleGroupItem value={GqlCurrentPrefecture.Kochi} className="flex-1">
-            高知県
-          </ToggleGroupItem>
-          <ToggleGroupItem value={GqlCurrentPrefecture.OutsideShikoku} className="basis-full">
-            四国以外
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
+      {currentCommunityConfig.enableFeatures.includes("prefectures") && (
+        <div>
+          <Label className="mb-2 flex items-center gap-x-2">
+            住んでいるところ
+            <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">
+              必須
+            </span>
+          </Label>
+          <ToggleGroup
+            value={location}
+            onValueChange={(val) => setLocation(val as GqlCurrentPrefecture)}
+            type="single"
+            variant="outline"
+            className="gap-2"
+          >
+            <ToggleGroupItem value={GqlCurrentPrefecture.Kagawa} className="flex-1">
+              香川県
+            </ToggleGroupItem>
+            <ToggleGroupItem value={GqlCurrentPrefecture.Tokushima} className="flex-1">
+              徳島県
+            </ToggleGroupItem>
+            <ToggleGroupItem value={GqlCurrentPrefecture.Ehime} className="flex-1">
+              愛媛県
+            </ToggleGroupItem>
+            <ToggleGroupItem value={GqlCurrentPrefecture.Kochi} className="flex-1">
+              高知県
+            </ToggleGroupItem>
+            <ToggleGroupItem value={GqlCurrentPrefecture.OutsideShikoku} className="basis-full">
+              四国以外
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+      )}
 
       <div>
         <Label className="block mb-2">自己紹介</Label>

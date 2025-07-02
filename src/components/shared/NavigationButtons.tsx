@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import { ArrowLeft, Share2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
-import { logger } from "@/lib/logging";
 
 interface NavigationButtonsProps {
   title: string;
@@ -13,19 +12,21 @@ interface NavigationButtonsProps {
 const NavigationButtons: React.FC<NavigationButtonsProps> = ({ title }) => {
   const { navigateBack } = useHierarchicalNavigation();
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator
-        .share({
-          title: title,
-          url: window.location.href,
-        })
-        .catch((err) => logger.error("共有に失敗しました", {
-          error: err instanceof Error ? err.message : String(err),
-          component: "NavigationButtons"
-        }));
-    }
-  };
+  // const handleShare = () => {
+  //   if (navigator.share) {
+  //     navigator
+  //       .share({
+  //         title: title,
+  //         url: window.location.href,
+  //       })
+  //       .catch((err) =>
+  //         logger.error("共有に失敗しました", {
+  //           error: err instanceof Error ? err.message : String(err),
+  //           component: "NavigationButtons",
+  //         }),
+  //       );
+  //   }
+  // };
 
   return (
     <>
@@ -40,11 +41,11 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({ title }) => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
       </div>
-      <div className="absolute top-6 right-4 z-50">
-        <Button onClick={handleShare} variant="icon-only" size="icon" aria-label="シェア">
-          <Share2 className="h-5 w-5 text-white" />
-        </Button>
-      </div>
+      {/*<div className="absolute top-6 right-4 z-50">*/}
+      {/*  <Button onClick={handleShare} variant="icon-only" size="icon" aria-label="シェア">*/}
+      {/*    <Share2 className="h-5 w-5 text-white" />*/}
+      {/*  </Button>*/}
+      {/*</div>*/}
     </>
   );
 };

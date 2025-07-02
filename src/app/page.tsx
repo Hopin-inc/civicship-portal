@@ -15,11 +15,17 @@ import {
   EncodedURIComponent,
   extractSearchParamFromRelativePath,
 } from "@/utils/path";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function HomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, isAuthenticating, authenticationState, loading: authLoading } = useAuth();
+  const {
+    isAuthenticated,
+    isAuthenticating,
+    authenticationState,
+    loading: authLoading,
+  } = useAuth();
   const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
   });
@@ -29,40 +35,21 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (authLoading || userLoading || isAuthenticating) return;
-
-    const isReturnFromLineAuth = searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
-
-    if (isReturnFromLineAuth) {
-      const liffState = searchParams.get("liff.state") as EncodedURIComponent | null;
-      let nextPath = decodeURIComponentWithType(liffState);
-
-      if (nextPath?.includes("?next=")) {
-        nextPath = decodeURIComponentWithType(extractSearchParamFromRelativePath<EncodedURIComponent>(nextPath, "next"));
-      } else if (nextPath?.startsWith("/login")) {
-        nextPath = null;
-      }
-
-      const cleanedUrl = nextPath ? `${ window.location.pathname }?next=${ nextPath }` : window.location.pathname;
-      router.replace(cleanedUrl);
-      return;
-    }
-
-    router.replace("/activities");
-  }, [authLoading, authRedirectService, authenticationState, isAuthenticated, isAuthenticating, router, searchParams, userLoading]);
+    router.replace(currentCommunityConfig.rootPath ?? "/activities");
+  }, [router]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   if (isAuthenticating || authLoading) {
-    return <LoadingIndicator fullScreen={ true } />;
+    return <LoadingIndicator fullScreen={true} />;
   }
 
   return (
     <div className="min-h-screen pb-16">
       <FeaturedSectionSkeleton />
-      <OpportunitiesCarouselSectionSkeleton title={ "もうすぐ開催予定" } />
+      <OpportunitiesCarouselSectionSkeleton title={"もうすぐ開催予定"} />
       <ListSectionSkeleton />
     </div>
   );

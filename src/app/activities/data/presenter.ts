@@ -145,7 +145,6 @@ export const presenterReservationDateTimeInfo = (
       .flat()
       .filter((ticketId) => ticketId !== undefined) ?? [];
   const paidParticipantCount = participantCount - [...new Set(paidTicketIds)].length;
-  console.log("!!!", reservation.participations);
 
   return {
     formattedDate: startDate.toLocaleDateString("ja-JP", {

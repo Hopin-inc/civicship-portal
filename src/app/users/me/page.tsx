@@ -9,6 +9,7 @@ import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import ErrorState from "@/components/shared/ErrorState";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
@@ -52,34 +53,38 @@ export default function MyProfilePage() {
         userAsset={userData.asset}
         isOwner={true}
       />
-      {selfOpportunities.length > 0 && (
-        <>
-          <section className="py-6 mt-0">
-            <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
-              主催中の体験
-            </h2>
-            <div className="mt-4 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-              {selfOpportunities.map((opportunity) => (
-                <OpportunityCardVertical
-                  key={opportunity.id}
-                  opportunity={opportunity}
-                  isCarousel
-                />
-              ))}
-            </div>
-          </section>
-        </>
-      )}
-      <UserPortfolioList
-        userId={currentUser?.id ?? ""}
-        isOwner={true}
-        portfolios={userData.portfolios}
-        isLoadingMore={false}
-        hasMore={false}
-        lastPortfolioRef={lastPortfolioRef}
-        isSysAdmin={false}
-        activeOpportunities={userData.currentlyHiringOpportunities}
-      />
+      <>
+        {currentCommunityConfig.enableFeatures.includes("opportunities") && (
+          <>
+            {selfOpportunities.length > 0 && (
+              <section className="py-6 mt-0">
+                <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
+                  主催中の体験
+                </h2>
+                <div className="mt-4 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                  {selfOpportunities.map((opportunity) => (
+                    <OpportunityCardVertical
+                      key={opportunity.id}
+                      opportunity={opportunity}
+                      isCarousel
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+            <UserPortfolioList
+              userId={currentUser?.id ?? ""}
+              isOwner={true}
+              portfolios={userData.portfolios}
+              isLoadingMore={false}
+              hasMore={false}
+              lastPortfolioRef={lastPortfolioRef}
+              isSysAdmin={false}
+              activeOpportunities={userData.currentlyHiringOpportunities}
+            />
+          </>
+        )}
+      </>
     </div>
   );
 }

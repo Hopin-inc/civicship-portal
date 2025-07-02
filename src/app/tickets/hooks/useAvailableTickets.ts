@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { GqlTicketStatus, useGetUserWalletQuery } from "@/types/graphql";
 import { ActivityDetail } from "@/app/activities/data/type";
+import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 
 export const useAvailableTickets = (
   opportunity: ActivityDetail | null,
@@ -14,7 +15,7 @@ export const useAvailableTickets = (
   });
 
   return useMemo(() => {
-    const tickets = data?.user?.wallets?.[0]?.tickets || [];
+    const tickets = data?.user?.wallets?.find(w => w.community?.id === getCommunityIdFromEnv())?.tickets || [];
 
     if (!opportunity?.targetUtilities.length) {
       return tickets.length;

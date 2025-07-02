@@ -3,6 +3,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import AsymmetricImageGrid from "@/components/ui/asymmetric-image-grid";
+import { currentCommunityConfig, getCurrentRegionName } from "@/lib/communities/metadata";
 
 const emptyImages = [
   {
@@ -33,7 +34,7 @@ export default function EmptyStateWithSearch({
   title = "チケットはありません",
   description = (
     <>
-      四国の素敵な88人と関わって
+      {getCurrentRegionName()}の素敵な人と関わって
       <br />
       チケットをもらおう
     </>
@@ -64,9 +65,17 @@ export default function EmptyStateWithSearch({
       </div>
 
       {!hideActionButton && (
-        <Button variant="primary" size="lg" className="px-16" onClick={onAction}>
-          {actionLabel}
-        </Button>
+        <>
+          {currentCommunityConfig.enableFeatures.includes("opportunities") ? (
+            <Button variant="primary" size="lg" className="px-16" onClick={onAction}>
+              {actionLabel}
+            </Button>
+          ) : (
+            <Button variant="tertiary" disabled size="lg" className="px-16" onClick={onAction}>
+              🚧 開発中です
+            </Button>
+          )}
+        </>
       )}
     </div>
   );

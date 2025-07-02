@@ -6,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { GqlRole, GqlUser } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
@@ -25,14 +26,10 @@ interface Props {
 export const MemberRow = ({ user, role, currentUserRole, onRoleChange }: Props) => (
   <div className="flex justify-between items-center rounded px-4 py-2">
     <div className="flex items-center gap-3">
-      <Image
-        src={user.image ?? PLACEHOLDER_IMAGE}
-        alt={user.name ?? "要確認"}
-        width={40}
-        height={40}
-        className="rounded-full object-cover border"
-        style={{ aspectRatio: "1 / 1" }}
-      />
+      <Avatar className="h-10 w-10">
+        <AvatarImage src={user.image ?? PLACEHOLDER_IMAGE} alt={user.name ?? "要確認"} />
+        <AvatarFallback>{user.name?.[0] ?? "?"}</AvatarFallback>
+      </Avatar>
       <div className="flex flex-col max-w-[160px] overflow-hidden">
         <span className="text-body-sm font-bold truncate">{user.name}</span>
         <span className="text-muted-foreground text-label-xs">
