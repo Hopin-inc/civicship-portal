@@ -41,6 +41,13 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason }: Props)
         edge.node?.status === GqlVcIssuanceStatus.Completed
     );
 
+  const hasProcessingVcIssuanceRequest =
+    !!data?.vcIssuanceRequests.edges.find(
+      (edge) =>
+        edge.node?.evaluation?.participation?.opportunitySlot?.id === selectedSlot?.slotId &&
+        edge.node?.status === GqlVcIssuanceStatus.Processing
+    );
+
   const did = didIssuanceRequestsData?.users?.edges?.[0]?.node?.didIssuanceRequests?.find(
     (request) => request.status === GqlDidIssuanceStatus.Completed
   )?.didValue;
@@ -55,7 +62,7 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason }: Props)
       onChange={onCheck}
       className="w-4 h-4 mr-4"
       name="user-select"
-      disabled={!did || isDisabled || hasCompletedVcIssuanceRequest}
+      disabled={!did || isDisabled || hasCompletedVcIssuanceRequest || hasProcessingVcIssuanceRequest}
     />
     {/* ユーザー画像 */}
     <Avatar>
@@ -74,6 +81,11 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason }: Props)
       {isDisabled && hasCompletedVcIssuanceRequest && reason === GqlParticipationStatusReason.PersonalRecord && (
         <span className="text-green-500 text-xs font-semibold mb-1">
           指定された募集で証明書発行済み
+        </span>
+      )}
+      {isDisabled && hasProcessingVcIssuanceRequest && reason === GqlParticipationStatusReason.PersonalRecord && (
+        <span className="text-warning text-xs font-semibold mb-1">
+          指定された募集で証明書発行中
         </span>
       )}
       <span className={`${did ? "font-bold text-base text-black" : "text-gray-400 text-base"}`}>
