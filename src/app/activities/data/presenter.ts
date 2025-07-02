@@ -12,8 +12,12 @@ import { ActivityCard, ActivityDetail, OpportunityHost } from "@/app/activities/
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
-import { addDays, isAfter } from "date-fns";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import {
+  getReservationThreshold,
+  isDateReservable,
+} from "@/app/reservation/data/presenter/opportunitySlot";
+import { isAfter } from "date-fns";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
@@ -47,7 +51,7 @@ export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCa
 
 export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail => {
   const { images, place, slots, articles, createdByUser } = data;
-  const threshold = addDays(new Date(), 7);
+  const threshold = getReservationThreshold();
 
   const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired);
   const isReservable = activitySlots.some((slot) => slot.isReservable);

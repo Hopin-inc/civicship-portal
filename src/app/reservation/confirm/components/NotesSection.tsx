@@ -33,7 +33,7 @@ const NotesSection = () => {
           <IconWrapper color="warning">
             <AlertCircle size={18} strokeWidth={1.5} />
           </IconWrapper>
-          <p className="text-body-md flex-1">キャンセルは開催日の7日前まで可能です。</p>
+          <p className="text-body-md flex-1">キャンセルは開催日の前日まで可能です。</p>
         </div>
       </div>
     </div>

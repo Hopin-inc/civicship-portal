@@ -194,5 +194,5 @@ export const getStatusInfo = (status: GqlReservationStatus): ReservationStatus |
 
 export const calculateCancellationDeadline = (startTime?: Date): Date | null => {
   if (!startTime) return null;
-  return subDays(startTime, 7); // ← 7日前
+  return subDays(startTime, 1); // ← 前日まで
 };
