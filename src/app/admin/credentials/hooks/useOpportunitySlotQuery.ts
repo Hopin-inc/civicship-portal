@@ -30,7 +30,6 @@ export const useReservationDateLoader = ({ opportunityIds }: UseReservationDateL
     fetchPolicy: "network-only",
     errorPolicy: "all",
   });
-  console.log("useGetOpportunitySlotsQuery", data);
   const opportunity: ActivityDetail | null = useMemo(() => {
     const raw = data?.opportunitySlots?.edges?.find((edge) => edge?.node?.opportunity != null)?.node
       ?.opportunity;
