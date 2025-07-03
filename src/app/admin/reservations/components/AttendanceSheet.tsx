@@ -46,49 +46,43 @@ const AttendanceList: React.FC<AttendanceListProps> = ({
         <p className="text-center text-muted-foreground py-8">参加者が見つかりません</p>
       ) : (
         <div className="rounded-xl border overflow-hidden">
-          {participations.map((p, idx) => {
-            if (!p.user) return null;
-
-            return (
-              <Card
-                key={p.id}
-                className={cn(
-                  "transition-colors",
-                  idx !== participations.length - 1 && "border-b rounded-none",
-                )}
-              >
-                <CardHeader className="flex items-center justify-between p-4 gap-3">
-                  <div className="flex items-center gap-3 flex-grow min-w-0">
-                    <Avatar>
-                      <AvatarImage src={p.user.image || ""} />
-                      <AvatarFallback>{p.user.name?.[0] || "U"}</AvatarFallback>
-                    </Avatar>
-                    <CardTitle className="text-base truncate">{p.user.name || "未設定"}</CardTitle>
-                  </div>
-                  <ToggleGroup
-                    type="single"
-                    value={attendanceData[p.id] ?? GqlEvaluationStatus.Pending}
-                    onValueChange={(v) =>
-                      v && handleAttendanceChange(p.id, v as GqlEvaluationStatus)
-                    }
-                    disabled={isSaved || isSaving || batchLoading || Boolean(p.evaluation?.status)}
-                    className="flex-shrink-0"
+          {participations.map((p, idx) => (
+            <Card
+              key={p.id}
+              className={cn(
+                "transition-colors",
+                idx !== participations.length - 1 && "border-b rounded-none",
+              )}
+            >
+              <CardHeader className="flex items-center justify-between p-4 gap-3">
+                <div className="flex items-center gap-3 flex-grow min-w-0">
+                  <Avatar>
+                    <AvatarImage src={p.user?.image || ""} />
+                    <AvatarFallback>{p.user?.name?.[0] || "U"}</AvatarFallback>
+                  </Avatar>
+                  <CardTitle className="text-base truncate">{p.user?.name || "未設定"}</CardTitle>
+                </div>
+                <ToggleGroup
+                  type="single"
+                  value={attendanceData[p.id] ?? GqlEvaluationStatus.Pending}
+                  onValueChange={(v) => v && handleAttendanceChange(p.id, v as GqlEvaluationStatus)}
+                  disabled={isSaved || isSaving || batchLoading || Boolean(p.evaluation?.status)}
+                  className="flex-shrink-0"
+                >
+                  <ToggleGroupItem value={GqlEvaluationStatus.Passed} aria-label="参加">
+                    参加
+                  </ToggleGroupItem>
+                  <ToggleGroupItem
+                    value={GqlEvaluationStatus.Failed}
+                    color="danger"
+                    aria-label="不参加"
                   >
-                    <ToggleGroupItem value={GqlEvaluationStatus.Passed} aria-label="参加">
-                      参加
-                    </ToggleGroupItem>
-                    <ToggleGroupItem
-                      value={GqlEvaluationStatus.Failed}
-                      color="danger"
-                      aria-label="不参加"
-                    >
-                      不参加
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-                </CardHeader>
-              </Card>
-            );
-          })}
+                    不参加
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </CardHeader>
+            </Card>
+          ))}
 
           <Sheet open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
             <SheetTrigger asChild>
