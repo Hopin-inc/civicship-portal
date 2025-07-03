@@ -4,16 +4,15 @@ import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opp
 import { addDays, isAfter } from "date-fns";
 
 /**
- * 予約可能日数（現在時刻から何日後まで予約可能か）
- */
-export const RESERVATION_THRESHOLD_DAYS = 1;
-
-/**
- * 予約可能判定のための閾値（現在時刻から何日後まで予約可能か）を返す
+ * 予約可能判定のための閾値（前日23:59 JSTまで予約可能）を返す
  * @returns 予約可能判定のための閾値
  */
 export const getReservationThreshold = (): Date => {
-  return addDays(new Date(), RESERVATION_THRESHOLD_DAYS);
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0); // 翌日の00:00:00に設定（JSTで前日の23:59まで予約可能）
+  return tomorrow;
 };
 
 /**

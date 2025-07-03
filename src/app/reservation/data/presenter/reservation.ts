@@ -24,8 +24,9 @@ export const getTicketIds = (
   ticketCount: number,
 ) => {
   return (
-    wallets?.find(w => w.community?.id === getCommunityIdFromEnv())?.tickets
-      ?.filter((edge: GqlTicket) => {
+    wallets
+      ?.find((w) => w.community?.id === getCommunityIdFromEnv())
+      ?.tickets?.filter((edge: GqlTicket) => {
         if (!requiredUtilities?.length) return true;
         const utilityId = edge?.utility?.id;
         return utilityId && requiredUtilities.some((u) => u.id === utilityId);
@@ -101,14 +102,22 @@ const getIsCancelable = (startsAt?: Date | null): boolean => {
   if (!startsAt) return false;
 
   const now = new Date();
-  const diff = startsAt.getTime() - now.getTime();
-  return diff >= 24 * 60 * 60 * 1000; // 24時間以上あるか
+
+  // 開催日の0時0分0秒を取得（前日23:59:59までキャンセル可能）
+  const cancelDeadline = new Date(startsAt);
+  cancelDeadline.setHours(0, 0, 0, 0);
+
+  return now < cancelDeadline;
 };
 
 const getCancelDue = (startsAt?: Date | null): string | undefined => {
   if (!startsAt) return undefined;
 
-  const cancelDate = new Date(startsAt.getTime() - 24 * 60 * 60 * 1000);
+  // 開催日の前日23:59:59を計算
+  const cancelDate = new Date(startsAt);
+  cancelDate.setHours(0, 0, 0, 0); // 開催日の0時0分0秒
+  cancelDate.setMilliseconds(-1); // 1ミリ秒前 = 前日の23:59:59.999
+
   return cancelDate.toISOString();
 };
 
