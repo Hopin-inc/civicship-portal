@@ -104,6 +104,7 @@ export default function DonatePointPage() {
       await fetchMore({
         variables: {
           filter: { communityId: COMMUNITY_ID },
+          first: 500,
           after: endCursor,
         },
       });
