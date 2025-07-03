@@ -129,11 +129,28 @@ export type GqlCheckOpportunityPermissionInput = {
   opportunityId: Scalars["ID"]["input"];
 };
 
+export type GqlCitiesConnection = {
+  __typename?: "CitiesConnection";
+  edges: Array<GqlCityEdge>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlCitiesInput = {
+  name?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type GqlCity = {
   __typename?: "City";
   code: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
   state?: Maybe<GqlState>;
+};
+
+export type GqlCityEdge = GqlEdge & {
+  __typename?: "CityEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlCity>;
 };
 
 export const GqlClaimLinkStatus = {
@@ -633,8 +650,6 @@ export type GqlMutation = {
   communityDelete?: Maybe<GqlCommunityDeletePayload>;
   communityUpdateProfile?: Maybe<GqlCommunityUpdateProfilePayload>;
   evaluationBulkCreate?: Maybe<GqlEvaluationBulkCreatePayload>;
-  evaluationFail?: Maybe<GqlEvaluationCreatePayload>;
-  evaluationPass?: Maybe<GqlEvaluationCreatePayload>;
   identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload;
   linkPhoneAuth?: Maybe<GqlLinkPhoneAuthPayload>;
   membershipAcceptMyInvitation?: Maybe<GqlMembershipSetInvitationStatusPayload>;
@@ -699,16 +714,6 @@ export type GqlMutationCommunityUpdateProfileArgs = {
 
 export type GqlMutationEvaluationBulkCreateArgs = {
   input: GqlEvaluationBulkCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-};
-
-export type GqlMutationEvaluationFailArgs = {
-  input: GqlEvaluationCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-};
-
-export type GqlMutationEvaluationPassArgs = {
-  input: GqlEvaluationCreateInput;
   permission: GqlCheckCommunityPermissionInput;
 };
 
@@ -1006,19 +1011,18 @@ export type GqlOpportunityCategory =
   (typeof GqlOpportunityCategory)[keyof typeof GqlOpportunityCategory];
 export type GqlOpportunityCreateInput = {
   body?: InputMaybe<Scalars["String"]["input"]>;
-  capacity?: InputMaybe<Scalars["Int"]["input"]>;
   category: GqlOpportunityCategory;
-  communityId: Scalars["ID"]["input"];
+  createdBy?: InputMaybe<Scalars["ID"]["input"]>;
   description: Scalars["String"]["input"];
-  endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
   images?: InputMaybe<Array<GqlImageInput>>;
-  place?: InputMaybe<GqlNestedPlaceConnectOrCreateInput>;
+  placeId?: InputMaybe<Scalars["ID"]["input"]>;
   pointsToEarn?: InputMaybe<Scalars["Int"]["input"]>;
   publishStatus: GqlPublishStatus;
+  relatedArticleIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   requireApproval: Scalars["Boolean"]["input"];
   requiredUtilityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  slots?: InputMaybe<Array<GqlOpportunitySlotCreateInput>>;
   title: Scalars["String"]["input"];
 };
 
@@ -1092,6 +1096,7 @@ export type GqlOpportunitySlot = {
 };
 
 export type GqlOpportunitySlotCreateInput = {
+  capacity: Scalars["Int"]["input"];
   endsAt: Scalars["Datetime"]["input"];
   startsAt: Scalars["Datetime"]["input"];
 };
@@ -1488,7 +1493,7 @@ export type GqlQuery = {
   __typename?: "Query";
   article?: Maybe<GqlArticle>;
   articles: GqlArticlesConnection;
-  cities: Array<GqlCity>;
+  cities: GqlCitiesConnection;
   communities: GqlCommunitiesConnection;
   community?: Maybe<GqlCommunity>;
   currentUser?: Maybe<GqlCurrentUserPayload>;
@@ -1513,7 +1518,7 @@ export type GqlQuery = {
   reservationHistories: GqlReservationHistoriesConnection;
   reservationHistory?: Maybe<GqlReservationHistory>;
   reservations: GqlReservationsConnection;
-  states: Array<GqlState>;
+  states: GqlStatesConnection;
   ticket?: Maybe<GqlTicket>;
   ticketClaimLink?: Maybe<GqlTicketClaimLink>;
   ticketClaimLinks: GqlTicketClaimLinksConnection;
@@ -1547,7 +1552,9 @@ export type GqlQueryArticlesArgs = {
 };
 
 export type GqlQueryCitiesArgs = {
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlCitiesInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type GqlQueryCommunitiesArgs = {
@@ -1674,7 +1681,9 @@ export type GqlQueryReservationsArgs = {
 };
 
 export type GqlQueryStatesArgs = {
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlStatesInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type GqlQueryTicketArgs = {
@@ -1925,6 +1934,23 @@ export type GqlState = {
   code: Scalars["ID"]["output"];
   countryCode: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
+};
+
+export type GqlStateEdge = GqlEdge & {
+  __typename?: "StateEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlState>;
+};
+
+export type GqlStatesConnection = {
+  __typename?: "StatesConnection";
+  edges: Array<GqlStateEdge>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlStatesInput = {
+  name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type GqlStorePhoneAuthTokenInput = {

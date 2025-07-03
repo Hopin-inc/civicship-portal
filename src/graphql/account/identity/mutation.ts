@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const USER_SIGN_UP = gql(`
   mutation userSignUp($input: UserSignUpInput!) {
@@ -32,17 +32,17 @@ export const LINK_PHONE_AUTH = gql(`
   }
 `);
 
-// export const IDENTITY_CHECK_PHONE_USER = gql(`
-//   mutation identityCheckPhoneUser($input: IdentityCheckPhoneUserInput!) {
-//     identityCheckPhoneUser(input: $input) {
-//       status
-//       user {
-//         id
-//         name
-//       }
-//       membership {
-//         role
-//       }
-//     }
-//   }
-// `);
+export const IDENTITY_CHECK_PHONE_USER = gql(`
+  mutation identityCheckPhoneUser($input: IdentityCheckPhoneUserInput!) {
+    identityCheckPhoneUser(input: $input) {
+      status
+      user {
+        id
+        name
+      }
+      membership {
+        role
+      }
+    }
+  }
+`);
