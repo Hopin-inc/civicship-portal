@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { GqlUser, useParticipationBulkCreateMutation, GqlParticipationStatusReason } from "@/types/graphql";
+import { GqlUser, useParticipationBulkCreateMutation, GqlParticipationStatusReason, useGetEvaluationsQuery, GetEvaluationsDocument } from "@/types/graphql";
 import { toast } from "sonner";
 import { useMembershipQueries } from "@/app/admin/members/hooks/useMembershipQueries";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -68,23 +68,25 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
   const { membershipListData, refetch } = useMembershipQueries(communityId);
   const selectedUserIds = selectedSlot?.userIds ?? [];
 
+  const { save } = useEvaluationBulkCreate({
+    onSuccess: () => {
+      router.push("/admin/credentials");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const [createParticipation] = useParticipationBulkCreateMutation({
     onCompleted: (response) => {
       save(response?.participationBulkCreate?.participations ?? [], communityId);
       toast.success("登録が完了しました");
-      router.push("/admin/credentials");
     },
     onError: (error) => {
       logger.error("登録に失敗しました", {
         error: error.message,
       });
       toast.error("登録に失敗しました");
-    },
-  });
-
-  const { save } = useEvaluationBulkCreate({
-    onError: (error) => {
-      toast.error(error.message);
     },
   });
 

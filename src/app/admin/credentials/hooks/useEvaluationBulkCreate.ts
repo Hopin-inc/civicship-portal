@@ -2,6 +2,7 @@ import {
   GqlEvaluationStatus,
   GqlParticipation,
   useEvaluationBulkCreateMutation,
+  GetEvaluationsDocument,
 } from "@/types/graphql";
 
 type UseEvaluationBulkCreateArgs = {
@@ -10,7 +11,10 @@ type UseEvaluationBulkCreateArgs = {
 };
 
 export const useEvaluationBulkCreate = ({ onSuccess, onError }: UseEvaluationBulkCreateArgs = {}) => {
-  const [mutate, { loading }] = useEvaluationBulkCreateMutation();
+  const [mutate, { loading }] = useEvaluationBulkCreateMutation({
+    refetchQueries: [{ query: GetEvaluationsDocument }],
+    awaitRefetchQueries: true,
+  });
 
   const save = async (
     participations: GqlParticipation[],
