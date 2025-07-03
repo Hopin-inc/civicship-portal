@@ -22,7 +22,7 @@ export const useMemberSearch = (
 ) => {
   const searchQuery = options?.searchQuery ?? "";
 
-  const { data: singleMembershipData, loading, error } = useGetMembershipListQuery({
+  const { data: searchMembershipData, loading, error } = useGetMembershipListQuery({
     variables: {
       filter: {
         keyword: searchQuery,
@@ -31,7 +31,7 @@ export const useMemberSearch = (
     skip: !searchQuery,
   });
   return {
-    singleMembershipData,
+    searchMembershipData,
     loading,
     error,
   };

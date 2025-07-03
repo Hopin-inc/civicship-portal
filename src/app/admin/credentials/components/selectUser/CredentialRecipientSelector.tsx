@@ -64,7 +64,7 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
   const router = useRouter();
   const [input, setInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const { singleMembershipData, loading, error } = useMemberSearch({ searchQuery });
+  const { searchMembershipData, loading, error } = useMemberSearch({ searchQuery });
   const { membershipListData, refetch } = useMembershipQueries(communityId);
   const selectedUserIds = selectedSlot?.userIds ?? [];
 
@@ -177,7 +177,7 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
       <div className="flex flex-col gap-4 px-4">
         <SearchResultList
           searchQuery={searchQuery}
-          singleMembershipData={singleMembershipData}
+          searchMembershipData={searchMembershipData}
           sortedMembers={sortedMembers}
           selectedUserIds={selectedUserIds}
           handleCheck={handleCheck}
