@@ -127,7 +127,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="text-gray-400 text-base min-w-fit whitespace-nowrap">開始日時</div>
                 <div className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
-                {formatDateTime(matchedEvaluation?.node?.participation?.opportunitySlot?.startsAt ?? new Date(), "yyyy年MM月dd日 HH:mm")}
+                {formatDateTime(matchedEvaluation?.node?.participation?.opportunitySlot?.startsAt ?? null, "yyyy年MM月dd日 HH:mm")}
                 </div>
             </CardHeader>
         </Card>
@@ -135,7 +135,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="text-gray-400 text-base min-w-fit whitespace-nowrap">終了日時</div>
                 <div className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
-                    {formatDateTime(matchedEvaluation?.node?.participation?.opportunitySlot?.endsAt ?? new Date(), "yyyy年MM月dd日 HH:mm")}
+                    {formatDateTime(matchedEvaluation?.node?.participation?.opportunitySlot?.endsAt ?? null, "yyyy年MM月dd日 HH:mm")}
                 </div>
             </CardHeader>
         </Card>
