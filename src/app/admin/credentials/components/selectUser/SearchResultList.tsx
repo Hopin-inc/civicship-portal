@@ -4,7 +4,7 @@ import { GqlUser, GqlParticipationStatusReason, GqlMembershipEdge, useGetDidIssu
 
 interface SearchResultListProps {
   searchQuery: string;
-  singleMembershipData: any;
+  searchMembershipData: any;
   sortedMembers: { user: GqlUser }[];
   selectedUserIds: string[];
   handleCheck: (userId: string) => void;
@@ -14,7 +14,7 @@ interface SearchResultListProps {
 
 const SearchResultList: React.FC<SearchResultListProps> = ({
   searchQuery,
-  singleMembershipData,
+  searchMembershipData,
   sortedMembers,
   selectedUserIds,
   handleCheck,
@@ -23,8 +23,8 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
 }) => {
   const visibleUserIds = useMemo(() => {
     const userIds: string[] = [];
-    if (searchQuery && singleMembershipData?.memberships?.edges.length > 0) {
-      singleMembershipData.memberships.edges.forEach((edge: GqlMembershipEdge) => {
+    if (searchQuery && searchMembershipData?.memberships?.edges.length > 0) {
+      searchMembershipData.memberships.edges.forEach((edge: GqlMembershipEdge) => {
         if (edge.node?.user?.id) {
           userIds.push(edge.node.user.id);
         }
@@ -36,7 +36,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
     }
     
     return userIds;
-  }, [searchQuery, singleMembershipData, sortedMembers]);
+  }, [searchQuery, searchMembershipData, sortedMembers]);
   // DID発行リクエストを一括取得
   const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
     variables: {
@@ -52,10 +52,10 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
     skip: visibleUserIds.length === 0,
   });
 
-  if (searchQuery && singleMembershipData?.memberships?.edges.length > 0) {
+  if (searchQuery && searchMembershipData?.memberships?.edges.length > 0) {
     return (
       <>
-        {singleMembershipData.memberships.edges.map((edge:GqlMembershipEdge) => {
+        {searchMembershipData.memberships.edges.map((edge:GqlMembershipEdge) => {
           const reason = getParticipatedReason(edge.node?.user?.id ?? "");
           const isDisabled = reason !== undefined && DISABLED_REASONS.includes(reason as GqlParticipationStatusReason);
 
