@@ -15,8 +15,8 @@ export const GET_VC_ISSUANCE_REQUEST_BY_EVALUATION = gql`
 `;
 
 export const GET_VC_ISSUANCE_REQUESTS_BY_USER = gql`
-  query GetVcIssuanceRequestsByUser($userId: ID!) {
-    vcIssuanceRequests(filter: { userId: $userId }) {
+  query GetVcIssuanceRequestsByUser($userIds: [ID!]!) {
+    vcIssuanceRequests(filter: { userIds: $userIds }) {
       edges {
         node {
           id

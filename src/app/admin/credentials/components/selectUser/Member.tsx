@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { GqlUser, useGetDidIssuanceRequestsQuery, GqlParticipationStatusReason, useGetVcIssuanceRequestsByUserQuery, GqlVcIssuanceStatus, GqlDidIssuanceStatus } from "@/types/graphql";
+import { GqlUser, GqlParticipationStatusReason, GqlVcIssuanceStatus, GqlDidIssuanceStatus, GqlGetDidIssuanceRequestsQuery, GqlGetVcIssuanceRequestsByUserQuery } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Input } from "@/components/ui/input";
 import { useSelection } from "../../context/SelectionContext";
@@ -11,6 +11,8 @@ interface Props {
   onCheck: () => void;
   isDisabled: boolean;
   reason?: GqlParticipationStatusReason;
+  didIssuanceRequestsData?: GqlGetDidIssuanceRequestsQuery;
+  vcIssuanceRequestsData?: GqlGetVcIssuanceRequestsByUserQuery;
 }
 
 const truncateDid = (did: string | undefined | null, length: number = 20): string => {
@@ -21,36 +23,31 @@ const truncateDid = (did: string | undefined | null, length: number = 20): strin
   return `${start}...${end}`;
 };
 
-export const MemberRow = ({ user, checked, onCheck, isDisabled, reason }: Props) => {
+export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didIssuanceRequestsData, vcIssuanceRequestsData }: Props) => {
   const { selectedSlot } = useSelection();
-  const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
-    variables: {
-      userIds: [user.id],
-    },
-  });
 
-  const { data } = useGetVcIssuanceRequestsByUserQuery({
-    variables: {
-      userId: user.id,
-    },
-  });
+  // 特定のユーザーのDID発行リクエストを取得
+  const userDidIssuanceRequest = didIssuanceRequestsData?.users?.edges?.find(
+    (edge) => edge?.node?.id === user.id
+  )?.node?.didIssuanceRequests?.find(
+    (request) => request.status === GqlDidIssuanceStatus.Completed
+  );
+
   const hasCompletedVcIssuanceRequest =
-    !!data?.vcIssuanceRequests.edges.find(
-      (edge) =>
+    !!vcIssuanceRequestsData?.vcIssuanceRequests.edges.find(
+      (edge: any) =>
         edge.node?.evaluation?.participation?.opportunitySlot?.id === selectedSlot?.slotId &&
         edge.node?.status === GqlVcIssuanceStatus.Completed
     );
 
   const hasProcessingVcIssuanceRequest =
-    !!data?.vcIssuanceRequests.edges.find(
-      (edge) =>
+    !!vcIssuanceRequestsData?.vcIssuanceRequests.edges.find(
+      (edge: any) =>
         edge.node?.evaluation?.participation?.opportunitySlot?.id === selectedSlot?.slotId &&
         edge.node?.status === GqlVcIssuanceStatus.Processing
     );
 
-  const did = didIssuanceRequestsData?.users?.edges?.[0]?.node?.didIssuanceRequests?.find(
-    (request) => request.status === GqlDidIssuanceStatus.Completed
-  )?.didValue;
+  const did = userDidIssuanceRequest?.didValue;
   const cardBgClass = !did || isDisabled ? "bg-zinc-200" : "bg-white";
   
   return (
