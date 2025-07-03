@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { GqlUser } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,8 @@ import SearchForm from "@/app/search/components/SearchForm";
 import { useMemberSearch } from "@/app/admin/wallet/grant/hooks/useMemberSearch";
 import { FormProvider } from "react-hook-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs as TabsEnum } from "../types/tabs";
 
 interface Props {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: number } } }[];
@@ -16,9 +18,12 @@ interface Props {
   onLoadMore?: () => void;
   hasNextPage?: boolean;
   title?: string;
+  activeTab: TabsEnum;
+  setActiveTab: React.Dispatch<React.SetStateAction<TabsEnum>>
 }
 
-function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title }: Props) {
+function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title, activeTab, setActiveTab }: Props) {
+
   const headerConfig = useMemo(
     () => ({
       title: title ?? "支給相手を選ぶ",
@@ -59,7 +64,34 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title }: P
       <form onSubmit={form.handleSubmit(() => {})} className="px-4">
         <SearchForm name="searchQuery" />
       </form>
-
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabsEnum)}>
+        <TabsList className="gap-2 w-3/5 pl-4">
+          <TabsTrigger
+            value={TabsEnum.History}
+            className={`
+              rounded-full px-6 py-2 font-bold text-sm
+              ${activeTab === TabsEnum.History
+                ? "!bg-blue-600 !text-white border border-blue-600"
+                : "bg-white text-black border border-gray-300"
+              }
+            `}
+          >
+            履歴
+          </TabsTrigger>
+          <TabsTrigger
+            value={TabsEnum.Grant}
+            className={`
+              rounded-full px-6 py-2 font-bold text-sm
+              ${activeTab === TabsEnum.Grant
+                ? "!bg-blue-600 !text-white border border-blue-600 shadow"
+                : "bg-white text-black border border-gray-300"
+              }
+            `}
+          >
+            メンバー
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
       <div className="space-y-3 px-4">
         {filteredMembers.map(({ user, wallet }) => (
           <Card
