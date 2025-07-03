@@ -22,15 +22,7 @@ function getIssuanceStats(evaluations: any[]) {
 
 export default function CredentialList() {
     const router = useRouter();
-    const { data, loading, error,refetch } = useGetEvaluationsQuery();
-
-    // 遷移よりデータ作成の方が遅いため遅延後に再取得
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-          refetch();
-        }, 1000);
-        return () => clearTimeout(timeout);
-      }, []);
+    const { data, loading, error } = useGetEvaluationsQuery();
     
     const evaluationList = useMemo(() => {
         if (!data?.evaluations.edges) return [];
