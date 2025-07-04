@@ -3738,7 +3738,9 @@ export type GqlEvaluationFieldsFragment = {
   issuedAt?: Date | null;
 };
 
-export type GqlGetEvaluationsQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetEvaluationsQueryVariables = Exact<{
+  withDidIssuanceRequests?: Scalars["Boolean"]["input"];
+}>;
 
 export type GqlGetEvaluationsQuery = {
   __typename?: "Query";
@@ -3762,6 +3764,20 @@ export type GqlGetEvaluationsQuery = {
         } | null;
         participation?: {
           __typename?: "Participation";
+          user?: {
+            __typename?: "User";
+            didIssuanceRequests?: Array<{
+              __typename?: "DidIssuanceRequest";
+              id: string;
+              status: GqlDidIssuanceStatus;
+              didValue?: string | null;
+              requestedAt?: Date | null;
+              processedAt?: Date | null;
+              completedAt?: Date | null;
+              createdAt?: Date | null;
+              updatedAt?: Date | null;
+            }> | null;
+          } | null;
           opportunitySlot?: {
             __typename?: "OpportunitySlot";
             id: string;
@@ -3774,7 +3790,22 @@ export type GqlGetEvaluationsQuery = {
               title: string;
               description: string;
               community?: { __typename?: "Community"; id: string } | null;
-              createdByUser?: { __typename?: "User"; id: string; name: string } | null;
+              createdByUser?: {
+                __typename?: "User";
+                id: string;
+                name: string;
+                didIssuanceRequests?: Array<{
+                  __typename?: "DidIssuanceRequest";
+                  id: string;
+                  status: GqlDidIssuanceStatus;
+                  didValue?: string | null;
+                  requestedAt?: Date | null;
+                  processedAt?: Date | null;
+                  completedAt?: Date | null;
+                  createdAt?: Date | null;
+                  updatedAt?: Date | null;
+                }> | null;
+              } | null;
             } | null;
           } | null;
         } | null;
@@ -4327,6 +4358,7 @@ export type GqlGetParticipationsQuery = {
 
 export type GqlGetParticipationQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
+  withDidIssuanceRequests?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetParticipationQuery = {
@@ -4445,6 +4477,17 @@ export type GqlGetParticipationQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          didIssuanceRequests?: Array<{
+            __typename?: "DidIssuanceRequest";
+            id: string;
+            status: GqlDidIssuanceStatus;
+            didValue?: string | null;
+            requestedAt?: Date | null;
+            processedAt?: Date | null;
+            completedAt?: Date | null;
+            createdAt?: Date | null;
+            updatedAt?: Date | null;
+          }> | null;
         } | null;
         place?: {
           __typename?: "Place";
@@ -4467,7 +4510,27 @@ export type GqlGetParticipationQuery = {
         } | null;
       } | null;
     } | null;
-    evaluation?: { __typename?: "Evaluation"; id: string } | null;
+    evaluation?: {
+      __typename?: "Evaluation";
+      id: string;
+      participation?: {
+        __typename?: "Participation";
+        user?: {
+          __typename?: "User";
+          didIssuanceRequests?: Array<{
+            __typename?: "DidIssuanceRequest";
+            id: string;
+            status: GqlDidIssuanceStatus;
+            didValue?: string | null;
+            requestedAt?: Date | null;
+            processedAt?: Date | null;
+            completedAt?: Date | null;
+            createdAt?: Date | null;
+            updatedAt?: Date | null;
+          }> | null;
+        } | null;
+      } | null;
+    } | null;
     statusHistories?: Array<{
       __typename?: "ParticipationStatusHistory";
       id: string;
@@ -4827,7 +4890,12 @@ export type GqlGetVcIssuanceRequestByEvaluationQuery = {
     totalCount: number;
     edges: Array<{
       __typename?: "VcIssuanceRequestEdge";
-      node?: { __typename?: "VcIssuanceRequest"; id: string; completedAt?: Date | null } | null;
+      node?: {
+        __typename?: "VcIssuanceRequest";
+        id: string;
+        completedAt?: Date | null;
+        status: GqlVcIssuanceStatus;
+      } | null;
     }>;
   };
 };
@@ -7602,7 +7670,7 @@ export type EvaluationBulkCreateMutationOptions = Apollo.BaseMutationOptions<
   GqlEvaluationBulkCreateMutationVariables
 >;
 export const GetEvaluationsDocument = gql`
-  query GetEvaluations {
+  query GetEvaluations($withDidIssuanceRequests: Boolean! = false) {
     evaluations {
       edges {
         node {
@@ -7620,6 +7688,11 @@ export const GetEvaluationsDocument = gql`
             }
           }
           participation {
+            user {
+              didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+                ...DidIssuanceRequestFields
+              }
+            }
             opportunitySlot {
               id
               startsAt
@@ -7635,6 +7708,9 @@ export const GetEvaluationsDocument = gql`
                 createdByUser {
                   id
                   name
+                  didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+                    ...DidIssuanceRequestFields
+                  }
                 }
               }
             }
@@ -7644,6 +7720,7 @@ export const GetEvaluationsDocument = gql`
       totalCount
     }
   }
+  ${DidIssuanceRequestFieldsFragmentDoc}
 `;
 
 /**
@@ -7658,6 +7735,7 @@ export const GetEvaluationsDocument = gql`
  * @example
  * const { data, loading, error } = useGetEvaluationsQuery({
  *   variables: {
+ *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
  */
@@ -8556,7 +8634,7 @@ export type GetParticipationsQueryResult = Apollo.QueryResult<
   GqlGetParticipationsQueryVariables
 >;
 export const GetParticipationDocument = gql`
-  query GetParticipation($id: ID!) {
+  query GetParticipation($id: ID!, $withDidIssuanceRequests: Boolean! = false) {
     participation(id: $id) {
       ...ParticipationFields
       reservation {
@@ -8586,6 +8664,9 @@ export const GetParticipationDocument = gql`
           }
           createdByUser {
             ...UserFields
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              ...DidIssuanceRequestFields
+            }
           }
           place {
             ...PlaceFields
@@ -8594,6 +8675,13 @@ export const GetParticipationDocument = gql`
       }
       evaluation {
         id
+        participation {
+          user {
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              ...DidIssuanceRequestFields
+            }
+          }
+        }
       }
       statusHistories {
         id
@@ -8616,6 +8704,7 @@ export const GetParticipationDocument = gql`
   ${CommunityFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
   ${PlaceFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
 `;
 
 /**
@@ -8631,6 +8720,7 @@ export const GetParticipationDocument = gql`
  * const { data, loading, error } = useGetParticipationQuery({
  *   variables: {
  *      id: // value for 'id'
+ *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
  */
@@ -9158,6 +9248,7 @@ export const GetVcIssuanceRequestByEvaluationDocument = gql`
         node {
           id
           completedAt
+          status
         }
       }
       totalCount

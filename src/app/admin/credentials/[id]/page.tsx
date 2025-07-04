@@ -1,6 +1,6 @@
 "use client";
 import { Card, CardHeader } from "@/components/ui/card";
-import { GqlGetDidIssuanceRequestsQuery, GqlVcIssuanceStatus, useGetDidIssuanceRequestsQuery, useGetEvaluationsQuery } from "@/types/graphql";
+import { GqlDidIssuanceRequest, GqlVcIssuanceStatus, useGetEvaluationsQuery } from "@/types/graphql";
 import { formatDateTime } from "@/utils/date";
 import { Copy, ExternalLink } from "lucide-react";
 import { use, useEffect, useMemo, useRef } from "react";
@@ -10,6 +10,7 @@ import Link from "next/link";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
+import { CredentialRole } from "./data/presenter";
 
 // DIDを省略表示する関数
 const truncateDid = (did: string | undefined | null, length: number = 20): string => {
@@ -22,21 +23,20 @@ const truncateDid = (did: string | undefined | null, length: number = 20): strin
 
 // userIdからDIDを取得する関数
 function getDidValueByUserId(
-  didIssuanceRequestsData: GqlGetDidIssuanceRequestsQuery | undefined,
+  didIssuanceRequests: GqlDidIssuanceRequest[] | undefined,
   userId: string | undefined | null
 ): string {
-  if (!userId || !didIssuanceRequestsData?.users?.edges) return "";
-  const userEdge = didIssuanceRequestsData.users.edges.find(
-    (edge) => edge?.node?.id === userId
-  );
-  const didValue =
-    userEdge?.node?.didIssuanceRequests?.find(req => req.status === "COMPLETED")?.didValue ?? "";
-  return didValue;
+  if (!userId || !didIssuanceRequests) return "";
+  return didIssuanceRequests.find(req => req.status === "COMPLETED")?.didValue ?? "";
 }
 
 export default function CredentialsDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
-    const { data: evaluationsData, loading, error, refetch } = useGetEvaluationsQuery();
+    const { data: evaluationsData, loading, error, refetch } = useGetEvaluationsQuery({
+      variables: {
+        withDidIssuanceRequests: true,
+      },
+    });
     const headerConfig = useMemo(
       () => ({
         title: "証明書詳細",
@@ -55,46 +55,27 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
     ) ?? [];
 
     const organizerId = matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.createdByUser?.id;
-    const participantIds = sameSlotEvaluations
-      .map(ev => ev?.node?.vcIssuanceRequest?.user?.id)
-      .filter((id): id is string => !!id);
-
-    const userIds = [
-      ...(organizerId ? [organizerId] : []),
-      ...participantIds,
-    ];
-
-    const { 
-      data: didIssuanceRequestsData, 
-      loading: didIssuanceRequestsLoading, 
-      error: didIssuanceRequestsError, 
-    } = useGetDidIssuanceRequestsQuery({
-        variables: {
-          userIds: userIds,
-        },
-      });
-
-    const organizerDidValue = getDidValueByUserId(didIssuanceRequestsData, organizerId);
+    const organizerDidValue = getDidValueByUserId(matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.createdByUser?.didIssuanceRequests ?? [], organizerId);
 
     const refetchRef = useRef<(() => void) | null>(null);
     useEffect(() => {
       refetchRef.current = refetch;
     }, [refetch]);
 
-    if (loading || didIssuanceRequestsLoading) return <LoadingIndicator />;
+    if (loading) return <LoadingIndicator />;
 
-    if (error || didIssuanceRequestsError) {
+    if (error) {
       return <ErrorState title="証明書詳細ページを読み込めませんでした" refetchRef={refetchRef} />;
     }
 
   return( 
     <div className="p-4 space-y-3 max-w-2xl mx-auto">
-        {renderStatusCard(matchedEvaluation?.node?.vcIssuanceRequest?.status ?? "PENDING")}
+        {renderStatusCard(matchedEvaluation?.node?.vcIssuanceRequest?.status ?? "PENDING", CredentialRole.manager)}
         <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="text-gray-400 text-base">主催者</div>
                 <div className="flex flex-col items-end">
-                <div className="text-lg font-bold text-black">{matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.createdByUser?.name}</div>
+                <div className="text-sm font-bold text-black">{matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.createdByUser?.name}</div>
                     <div className="flex items-center text-gray-400 text-sm mt-1">
                         <Copy className="w-4 h-4 mr-1 cursor-pointer" onClick={() => {
                             navigator.clipboard.writeText(organizerDidValue);
@@ -142,7 +123,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
         <h1 className="text-2xl font-bold pt-6">証明書の発行先</h1>
         {sameSlotEvaluations.map((evaluation) => {
           const userId = evaluation?.node?.vcIssuanceRequest?.user?.id;
-          const didValue = getDidValueByUserId(didIssuanceRequestsData, userId);
+          const didValue = getDidValueByUserId(evaluation?.node?.participation?.user?.didIssuanceRequests ?? [], userId);
           const rawStatus = evaluation?.node?.vcIssuanceRequest?.status?.trim();
           const status = Object.values(GqlVcIssuanceStatus).includes(rawStatus as GqlVcIssuanceStatus)
             ? (rawStatus as GqlVcIssuanceStatus)

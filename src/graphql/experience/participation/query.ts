@@ -45,7 +45,7 @@ export const GET_PARTICIPATIONS = gql`
 `;
 
 export const GetParticipationDocument = gql(`
-  query GetParticipation($id: ID!) {
+  query GetParticipation($id: ID!, $withDidIssuanceRequests: Boolean! = false) {
     participation(id: $id) {
       ...ParticipationFields
       reservation {
@@ -75,6 +75,9 @@ export const GetParticipationDocument = gql(`
           }
           createdByUser {
             ...UserFields
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              ...DidIssuanceRequestFields
+            }
           }
           place {
             ...PlaceFields
@@ -83,6 +86,13 @@ export const GetParticipationDocument = gql(`
       }
       evaluation {
         id
+        participation {
+          user {
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              ...DidIssuanceRequestFields
+            }
+          }
+        }
       }
       statusHistories {
         id
