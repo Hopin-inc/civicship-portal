@@ -33,7 +33,13 @@ export default function GrantPointStepperPage() {
   });
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
-    variables: { filter: { communityId: COMMUNITY_ID }, first: 500 },
+    variables: { 
+      filter: {
+        communityId: COMMUNITY_ID,
+      },
+      first: 500,
+      withDidIssuanceRequests: true,
+    },
     fetchPolicy: "network-only",
   });
 

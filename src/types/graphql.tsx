@@ -2260,6 +2260,7 @@ export type GqlTicketsConnection = {
 export type GqlTransaction = {
   __typename?: "Transaction";
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  createdByUser?: Maybe<GqlUser>;
   fromPointChange?: Maybe<Scalars["Int"]["output"]>;
   fromWallet?: Maybe<GqlWallet>;
   id: Scalars["ID"]["output"];
@@ -2912,6 +2913,7 @@ export type GqlGetMembershipListQueryVariables = Exact<{
   cursor?: InputMaybe<GqlMembershipCursorInput>;
   filter?: InputMaybe<GqlMembershipFilterInput>;
   sort?: InputMaybe<GqlMembershipSortInput>;
+  withDidIssuanceRequests?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetMembershipListQuery = {
@@ -2947,6 +2949,17 @@ export type GqlGetMembershipListQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          didIssuanceRequests?: Array<{
+            __typename?: "DidIssuanceRequest";
+            id: string;
+            status: GqlDidIssuanceStatus;
+            didValue?: string | null;
+            requestedAt?: Date | null;
+            processedAt?: Date | null;
+            completedAt?: Date | null;
+            createdAt?: Date | null;
+            updatedAt?: Date | null;
+          }> | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -3417,6 +3430,7 @@ export type GqlGetMemberWalletsQueryVariables = Exact<{
   filter?: InputMaybe<GqlWalletFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
+  withDidIssuanceRequests?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetMemberWalletsQuery = {
@@ -3449,6 +3463,17 @@ export type GqlGetMemberWalletsQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          didIssuanceRequests?: Array<{
+            __typename?: "DidIssuanceRequest";
+            id: string;
+            status: GqlDidIssuanceStatus;
+            didValue?: string | null;
+            requestedAt?: Date | null;
+            processedAt?: Date | null;
+            completedAt?: Date | null;
+            createdAt?: Date | null;
+            updatedAt?: Date | null;
+          }> | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -5386,6 +5411,7 @@ export type GqlGetTransactionsQueryVariables = Exact<{
   sort?: InputMaybe<GqlTransactionSortInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
+  withDidIssuanceRequests?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type GqlGetTransactionsQuery = {
@@ -5425,6 +5451,17 @@ export type GqlGetTransactionsQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            didIssuanceRequests?: Array<{
+              __typename?: "DidIssuanceRequest";
+              id: string;
+              status: GqlDidIssuanceStatus;
+              didValue?: string | null;
+              requestedAt?: Date | null;
+              processedAt?: Date | null;
+              completedAt?: Date | null;
+              createdAt?: Date | null;
+              updatedAt?: Date | null;
+            }> | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -5449,6 +5486,17 @@ export type GqlGetTransactionsQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            didIssuanceRequests?: Array<{
+              __typename?: "DidIssuanceRequest";
+              id: string;
+              status: GqlDidIssuanceStatus;
+              didValue?: string | null;
+              requestedAt?: Date | null;
+              processedAt?: Date | null;
+              completedAt?: Date | null;
+              createdAt?: Date | null;
+              updatedAt?: Date | null;
+            }> | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -6459,6 +6507,7 @@ export const GetMembershipListDocument = gql`
     $cursor: MembershipCursorInput
     $filter: MembershipFilterInput
     $sort: MembershipSortInput
+    $withDidIssuanceRequests: Boolean! = false
   ) {
     memberships(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
       pageInfo {
@@ -6474,6 +6523,9 @@ export const GetMembershipListDocument = gql`
           ...MembershipFields
           user {
             ...UserFields
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              ...DidIssuanceRequestFields
+            }
           }
           community {
             ...CommunityFields
@@ -6484,6 +6536,7 @@ export const GetMembershipListDocument = gql`
   }
   ${MembershipFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
 
@@ -6503,6 +6556,7 @@ export const GetMembershipListDocument = gql`
  *      cursor: // value for 'cursor'
  *      filter: // value for 'filter'
  *      sort: // value for 'sort'
+ *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
  */
@@ -7119,7 +7173,12 @@ export type GetCommunityWalletQueryResult = Apollo.QueryResult<
   GqlGetCommunityWalletQueryVariables
 >;
 export const GetMemberWalletsDocument = gql`
-  query GetMemberWallets($filter: WalletFilterInput, $first: Int, $cursor: String) {
+  query GetMemberWallets(
+    $filter: WalletFilterInput
+    $first: Int
+    $cursor: String
+    $withDidIssuanceRequests: Boolean! = false
+  ) {
     wallets(filter: $filter, first: $first, cursor: $cursor) {
       pageInfo {
         hasNextPage
@@ -7134,6 +7193,9 @@ export const GetMemberWalletsDocument = gql`
           ...WalletFields
           user {
             ...UserFields
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              ...DidIssuanceRequestFields
+            }
           }
           community {
             ...CommunityFields
@@ -7144,6 +7206,7 @@ export const GetMemberWalletsDocument = gql`
   }
   ${WalletFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
 
@@ -7162,6 +7225,7 @@ export const GetMemberWalletsDocument = gql`
  *      filter: // value for 'filter'
  *      first: // value for 'first'
  *      cursor: // value for 'cursor'
+ *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
  */
@@ -10219,6 +10283,7 @@ export const GetTransactionsDocument = gql`
     $sort: TransactionSortInput
     $first: Int
     $cursor: String
+    $withDidIssuanceRequests: Boolean = false
   ) {
     transactions(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
       pageInfo {
@@ -10235,6 +10300,9 @@ export const GetTransactionsDocument = gql`
           fromWallet {
             ...WalletFields
             user {
+              didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+                ...DidIssuanceRequestFields
+              }
               ...UserFields
             }
             community {
@@ -10244,6 +10312,9 @@ export const GetTransactionsDocument = gql`
           toWallet {
             ...WalletFields
             user {
+              didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+                ...DidIssuanceRequestFields
+              }
               ...UserFields
             }
             community {
@@ -10256,6 +10327,7 @@ export const GetTransactionsDocument = gql`
   }
   ${TransactionFieldsFragmentDoc}
   ${WalletFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
@@ -10276,6 +10348,7 @@ export const GetTransactionsDocument = gql`
  *      sort: // value for 'sort'
  *      first: // value for 'first'
  *      cursor: // value for 'cursor'
+ *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
  */

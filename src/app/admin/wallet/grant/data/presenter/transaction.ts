@@ -1,4 +1,4 @@
-import { GqlUser, GqlTransaction, GqlDidIssuanceStatus, GqlGetDidIssuanceRequestsQuery } from "@/types/graphql";
+import { GqlUser, GqlTransaction, GqlDidIssuanceStatus, GqlDidIssuanceRequest } from "@/types/graphql";
 
 const truncateDid = (did: string | undefined | null, length: number = 20): string => {
     if (!did) return "";
@@ -50,7 +50,7 @@ export function presentTransaction({
 }: {
   transaction: GqlTransaction;
   currentUserId: string | undefined;
-  didIssuanceRequests: GqlGetDidIssuanceRequestsQuery;
+  didIssuanceRequests: GqlDidIssuanceRequest[];
   listType: "donate" | "grant";
 }) {
   const isReceive = transaction.toWallet?.user?.id === currentUserId;
@@ -61,11 +61,7 @@ export function presentTransaction({
   const pointColor = isReceive ? "text-green-500" : "";
   const label = getTransactionLabel({ listType, otherUserName: otherUser?.name, isReceive });
 
-  const didValue = didIssuanceRequests?.users?.edges
-    ?.find((edge) => edge?.node?.id === otherUser?.id)
-    ?.node?.didIssuanceRequests
-    ?.find((request) => request?.status === GqlDidIssuanceStatus.Completed)
-    ?.didValue;
+  const didValue = didIssuanceRequests.find((request) => request.status === GqlDidIssuanceStatus.Completed)?.didValue;
 
   return {
     isReceive,

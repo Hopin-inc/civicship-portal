@@ -5,6 +5,7 @@ import { GqlUser } from "@/types/graphql";
 import UserInfoCard from "./UserInfoCard";
 import { useWalletsAndDidIssuanceRequests } from "../hooks/useWalletsAndDidIssuanceRequests";
 import { useAuth } from "@/contexts/AuthProvider";
+import Loading from "@/components/layout/Loading";
 
 interface HistoryTabProps {
   listType: "donate" | "grant";
@@ -16,8 +17,8 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
   const { user } = useAuth();
   const {
     error,
-    loading,
     presentedTransactions,
+    loading,
   } = useWalletsAndDidIssuanceRequests({ 
     userId: user?.id, 
     listType, 
@@ -34,16 +35,6 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
     );
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-muted-foreground pt-4">
-          読み込み中...
-        </p>
-      </div>
-    );
-  }
-
   if (presentedTransactions.length === 0) {
     return (
       <div className="space-y-3 px-4">
@@ -53,6 +44,8 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
       </div>
     );
   }
+
+  if (loading) <Loading />
 
   return (
     <div className="space-y-3 px-4">

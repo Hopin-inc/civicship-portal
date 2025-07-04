@@ -18678,6 +18678,18 @@
             "deprecationReason": null
           },
           {
+            "name": "createdByUser",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "User",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "fromPointChange",
             "description": null,
             "args": [],

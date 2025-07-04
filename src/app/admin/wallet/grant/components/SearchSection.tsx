@@ -11,12 +11,10 @@ export function SearchSection({ onSearch }: SearchSectionProps) {
   const [input, setInput] = useState("");
 
   return (
-    <form className="px-4">
-      <SearchForm 
-        value={input} 
-        onInputChange={setInput} 
-        onSearch={onSearch} 
-      />
-    </form>
+    <SearchForm 
+      value={input} 
+      onInputChange={setInput} 
+      onSearch={onSearch} 
+    />
   );
 } 

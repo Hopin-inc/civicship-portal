@@ -112,7 +112,7 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
         .filter((member): member is { user: GqlUser } => member !== null) ?? []
     );
   }, [membershipListData]);
-  const { data: searchMembershipData, loading, error } = useMemberWithDidSearch(allMembers, { searchQuery });
+  const { data: searchMembershipData, loading, error } = useMemberWithDidSearch(communityId, allMembers, { searchQuery });
 
   // 並び替え用の配列を作成
   const sortedMembers = useMemo(() => {
