@@ -4467,7 +4467,7 @@ export type GqlGetParticipationQuery = {
         } | null;
       } | null;
     } | null;
-    evaluation?: { __typename?: "Evaluation"; id: string } | null;
+    evaluation?: { __typename?: "Evaluation"; id: string; status: GqlEvaluationStatus } | null;
     statusHistories?: Array<{
       __typename?: "ParticipationStatusHistory";
       id: string;
@@ -8594,6 +8594,7 @@ export const GetParticipationDocument = gql`
       }
       evaluation {
         id
+        status
       }
       statusHistories {
         id
