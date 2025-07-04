@@ -6,7 +6,7 @@ import React from "react";
 
 interface Props {
   otherUser: GqlUser | undefined;
-  label?: string;
+  label?: string | { text: string; smallText: string };
   point?: number;
   sign?: string;
   pointColor?: string;
@@ -44,9 +44,18 @@ const UserInfoCard = ({
       <AvatarFallback>{otherUser?.name?.[0] || "U"}</AvatarFallback>
     </Avatar>
     <div className="flex-1 ml-4 min-w-0">
-      <div className="flex justify-between items-start">
-        <span className="font-bold text-base">
-          {showLabel ? label : otherUser?.name ? `{{ ${otherUser.name} }}` : ""}
+      <div className="flex justify-between items-center min-w-0">
+        <span className="font-bold text-sm truncate max-w-[140px]">
+          {showLabel ? (
+            typeof label === "string" ? (
+              label
+            ) : label && (
+              <span className="transaction-label flex items-center min-w-0">
+                <span className="truncate">{label.text.replace(label.smallText, "")}</span>
+                <span className="text-xs flex-shrink-0">{label.smallText}</span>
+              </span>
+            )
+          ) : otherUser?.name ? `{{ ${otherUser.name} }}` : ""}
         </span>
         {showPoint && point !== undefined && (
           <span className={`font-bold text-xs ${pointColor ?? ""}`}>

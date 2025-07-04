@@ -70,8 +70,6 @@ export function useWalletsAndDidIssuanceRequests({ userId, listType, keyword }: 
   presentedTransactions: PresentedTransaction[];
   loading: boolean;
 } {
-
-
   const { data, error, refetch, fetchMore } = useGetTransactionsQuery({
     variables: { 
       filter: createSearchFilter(userId, keyword),

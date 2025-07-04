@@ -11,18 +11,34 @@ const truncateDid = (did: string | undefined | null, length: number = 20): strin
 function getTransactionLabel({
   listType,
   otherUserName,
+  isReceive,
 }: {
   listType?: "donate" | "grant";
   otherUserName?: string;
   isReceive: boolean;
 }) {
+  if(isReceive) {
+    return {
+      text: `${otherUserName ?? ""}から受取`,
+      smallText: "から受取"
+    };
+  }
   switch (listType) {
     case "donate":
-      return `${otherUserName ?? ""}に譲渡`;
+      return {
+        text: `${otherUserName ?? ""}に譲渡`,
+        smallText: "に譲渡"
+      };
     case "grant":
-      return `${otherUserName ?? ""}に支給`;
+      return {
+        text: `${otherUserName ?? ""}に支給`,
+        smallText: "に支給"
+      };
     default:
-      return ""
+      return {
+        text: "",
+        smallText: ""
+      };
   }
 }
 
@@ -43,9 +59,7 @@ export function presentTransaction({
   const point = isReceive ? transaction.toPointChange ?? 0 : Math.abs(transaction.fromPointChange ?? 0);
   const sign = isReceive ? "+" : "-";
   const pointColor = isReceive ? "text-green-500" : "";
-  const label = isReceive
-    ? `${otherUser?.name ?? ""}から受取`
-    : getTransactionLabel({ listType, otherUserName: otherUser?.name, isReceive });
+  const label = getTransactionLabel({ listType, otherUserName: otherUser?.name, isReceive });
 
   const didValue = didIssuanceRequests?.users?.edges
     ?.find((edge) => edge?.node?.id === otherUser?.id)
