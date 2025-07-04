@@ -32,20 +32,6 @@ const createSearchFilter = (userId: string | undefined, keyword: string | undefi
           { fromUserName: keyword }
         ]
       },
-      // 自分が送信者で、相手のIDで検索
-      {
-        and: [
-          { fromUserId: userId },
-          { toUserId: keyword }
-        ]
-      },
-      // 自分が受信者で、相手のIDで検索
-      {
-        and: [
-          { toUserId: userId },
-          { fromUserId: keyword }
-        ]
-      },
       // 自分が送信者で、相手のDIDで検索
       {
         and: [
