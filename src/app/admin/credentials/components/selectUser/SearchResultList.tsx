@@ -1,11 +1,10 @@
 import React, { useMemo } from "react";
 import { MemberRow } from "./Member";
-import { GqlUser, GqlParticipationStatusReason, GqlMembershipEdge, useGetDidIssuanceRequestsQuery, useGetVcIssuanceRequestsByUserQuery } from "@/types/graphql";
+import { GqlUser, GqlParticipationStatusReason, GqlMembershipEdge, useGetDidIssuanceRequestsQuery, useGetVcIssuanceRequestsByUserQuery, GqlDidIssuanceRequest } from "@/types/graphql";
 
 interface SearchResultListProps {
   searchQuery: string;
-  searchMembershipData: any;
-  sortedMembers: { user: GqlUser }[];
+  searchMembershipData: (GqlUser & { didInfo?: GqlDidIssuanceRequest })[];
   selectedUserIds: string[];
   handleCheck: (userId: string) => void;
   getParticipatedReason: (userId: string) => GqlParticipationStatusReason | undefined;
@@ -15,7 +14,6 @@ interface SearchResultListProps {
 const SearchResultList: React.FC<SearchResultListProps> = ({
   searchQuery,
   searchMembershipData,
-  sortedMembers,
   selectedUserIds,
   handleCheck,
   getParticipatedReason,
@@ -23,27 +21,13 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
 }) => {
   const visibleUserIds = useMemo(() => {
     const userIds: string[] = [];
-    if (searchQuery && searchMembershipData?.memberships?.edges.length > 0) {
-      searchMembershipData.memberships.edges.forEach((edge: GqlMembershipEdge) => {
-        if (edge.node?.user?.id) {
-          userIds.push(edge.node.user.id);
-        }
-      });
-    } else {
-      sortedMembers.forEach(({ user }) => {
-        userIds.push(user.id);
-      });
-    }
-    
+      searchMembershipData.forEach(({ id, ...user }) => {
+        if (user) {
+          userIds.push(id);
+      }
+    });
     return userIds;
-  }, [searchQuery, searchMembershipData, sortedMembers]);
-  // DID発行リクエストを一括取得
-  const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
-    variables: {
-      userIds: visibleUserIds,
-    },
-    skip: visibleUserIds.length === 0,
-  });
+  }, [searchQuery, searchMembershipData]);
   // VC発行リクエストを一括取得
   const { data: vcIssuanceRequestsData } = useGetVcIssuanceRequestsByUserQuery({
     variables: {
@@ -51,39 +35,12 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
     },
     skip: visibleUserIds.length === 0,
   });
-
-  if (searchQuery && searchMembershipData?.memberships?.edges.length > 0) {
-    return (
-      <>
-        {searchMembershipData.memberships.edges.map((edge:GqlMembershipEdge) => {
-          const reason = getParticipatedReason(edge.node?.user?.id ?? "");
-          const isDisabled = reason !== undefined && DISABLED_REASONS.includes(reason as GqlParticipationStatusReason);
-
-          const user = edge.node?.user;
-          if (!user) return null;
-          return (
-            <MemberRow
-              key={user.id}
-              user={user}
-              checked={selectedUserIds.includes(user.id)}
-              onCheck={() => handleCheck(user.id)}
-              isDisabled={isDisabled}
-              reason={reason}
-              didIssuanceRequestsData={didIssuanceRequestsData}
-              vcIssuanceRequestsData={vcIssuanceRequestsData}
-            />
-          );
-        })}
-      </>
-    );
-  }
-
   return (
     <>
-      {sortedMembers.length === 0 && (
+      {searchMembershipData.length === 0 && (
         <p className="text-sm text-muted-foreground">一致するメンバーが見つかりません</p>
       )}
-      {sortedMembers.map(({ user }) => {
+      {searchMembershipData.map(({ didInfo, ...user }) => {
         const reason = getParticipatedReason(user.id);
         const isDisabled = reason !== undefined && DISABLED_REASONS.includes(reason as GqlParticipationStatusReason);
         return (
@@ -94,7 +51,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
               onCheck={() => handleCheck(user.id)}
               isDisabled={isDisabled}
               reason={reason}
-              didIssuanceRequestsData={didIssuanceRequestsData}
+              didInfo={didInfo}
               vcIssuanceRequestsData={vcIssuanceRequestsData}
             />
           </div>

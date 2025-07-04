@@ -2,15 +2,17 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { GqlUser } from "@/types/graphql";
-import { PLACEHOLDER_IMAGE } from "@/utils";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import SearchForm from "@/app/search/components/SearchForm";
-import { useMemberSearch } from "@/app/admin/wallet/grant/hooks/useMemberSearch";
-import { FormProvider } from "react-hook-form";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Tabs as TabsEnum } from "../types/tabs";
+import { useAuth } from "@/contexts/AuthProvider";
+import UserInfoCard from "./UserInfoCard";
+import { useWalletsAndDidIssuanceRequests } from "../hooks/useWalletsAndDidIssuanceRequests";
+import SearchForm from "@/app/admin/credentials/components/selectUser/SearchForm";
+import Loading from "@/components/layout/Loading";
+import ErrorState from "@/components/shared/ErrorState";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Props {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: number } } }[];
@@ -20,9 +22,35 @@ interface Props {
   title?: string;
   activeTab: TabsEnum;
   setActiveTab: React.Dispatch<React.SetStateAction<TabsEnum>>
+  listType: "donate" | "grant";
 }
 
-function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title, activeTab, setActiveTab }: Props) {
+function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title, activeTab, setActiveTab, listType }: Props) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const { user } = useAuth();
+  const {
+    error,
+    loading: historyLoading,
+    presentedTransactions,
+  } = useWalletsAndDidIssuanceRequests({ userId: user?.id, listType, keyword: searchQuery });
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "history" || tabParam === "member") {
+      setActiveTab(tabParam as TabsEnum);
+    }
+  }, [searchParams, setActiveTab]);
+
+  const handleTabChange = (value: string) => {
+    const newTab = value as TabsEnum;
+    setActiveTab(newTab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", newTab);
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
 
   const headerConfig = useMemo(
     () => ({
@@ -35,9 +63,9 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title, act
   useHeaderConfig(headerConfig);
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const { data: searchMembershipData, loading: searchLoading, error: searchError } = useMemberSearchFromCredentials(members, { searchQuery });
 
-  const { form, filteredMembers } = useMemberSearch(members);
-
+  const [input, setInput] = useState("");
   useEffect(() => {
     if (!hasNextPage || !onLoadMore) return;
 
@@ -59,12 +87,20 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title, act
     };
   }, [hasNextPage, onLoadMore]);
 
+  if (error || searchError) {
+    return <ErrorState title="支給履歴またはメンバーを読み込めませんでした" />;
+  }
+
+  if (historyLoading || searchLoading) {
+    return <Loading />
+  }
+
   return (
-    <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(() => {})} className="px-4">
-        <SearchForm name="searchQuery" />
+    <>
+      <form className="px-4">
+        <SearchForm value={input} onInputChange={setInput} onSearch={setSearchQuery} />
       </form>
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabsEnum)}>
+      <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value)}>
         <TabsList className="gap-2 w-3/5 pl-4">
           <TabsTrigger
             value={TabsEnum.History}
@@ -79,10 +115,10 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title, act
             履歴
           </TabsTrigger>
           <TabsTrigger
-            value={TabsEnum.Grant}
+            value={TabsEnum.Member}
             className={`
               rounded-full px-6 py-2 font-bold text-sm
-              ${activeTab === TabsEnum.Grant
+              ${activeTab === TabsEnum.Member
                 ? "!bg-blue-600 !text-white border border-blue-600 shadow"
                 : "bg-white text-black border border-gray-300"
               }
@@ -93,38 +129,50 @@ function UserSelectStep({ members, onSelect, onLoadMore, hasNextPage, title, act
         </TabsList>
       </Tabs>
       <div className="space-y-3 px-4">
-        {filteredMembers.map(({ user, wallet }) => (
-          <Card
-            key={user.id}
-            onClick={() => onSelect(user)}
-            className="cursor-pointer hover:bg-background-hover transition"
-          >
-            <CardHeader className="flex flex-row items-center gap-3 p-4">
-              <Avatar>
-                <AvatarImage src={user.image || ""} />
-                <AvatarFallback>{user.name?.[0] || "U"}</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col text-left">
-                <CardTitle className="text-base font-medium truncate max-w-[160px]">
-                  {user.name}
-                </CardTitle>
-                <CardDescription>
-                  {wallet?.currentPointView?.currentPoint?.toLocaleString() ?? 0}pt 保有
-                </CardDescription>
-              </div>
-            </CardHeader>
-          </Card>
-        ))}
-
-        {filteredMembers.length === 0 && (
+        {activeTab === TabsEnum.History && presentedTransactions.length === 0 ? (
+          <p className="text-sm text-center text-muted-foreground pt-4">
+            支給履歴がありません
+          </p>
+        ) : (
+          activeTab === TabsEnum.History &&presentedTransactions.map((tx,index) => {
+            return (
+              <UserInfoCard
+                key={`${tx.otherUser?.id}-${index}`}
+                otherUser={tx.otherUser}
+                label={tx.label}
+                point={tx.point}
+              sign={tx.sign}
+              pointColor={tx.pointColor}
+              didValue={tx.didValue ?? "did取得中"}
+              createdAt={tx.createdAt}
+              onClick={() => {
+                if (tx.otherUser) onSelect(tx.otherUser);
+              }}
+            />
+          );
+        }))}
+        {activeTab === TabsEnum.Member && searchMembershipData.length === 0 ? (
           <p className="text-sm text-center text-muted-foreground pt-4">
             一致するメンバーが見つかりません
           </p>
+        ) : (
+          activeTab === TabsEnum.Member && searchMembershipData?.map((m) => {
+            return (
+              <UserInfoCard
+                key={m.id}
+                otherUser={m}
+                label={m.name}
+                showPoint={false}
+                showDate={false}
+                didValue={m.didInfo?.didValue ?? "did取得中"}
+                onClick={() => onSelect(m)}
+              />
+            );
+          })
         )}
-
         {hasNextPage && <div ref={loadMoreRef} className="h-10" />}
       </div>
-    </FormProvider>
+      </>
   );
 }
 

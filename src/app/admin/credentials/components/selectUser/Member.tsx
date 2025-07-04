@@ -12,12 +12,12 @@ import { useSelection } from "../../context/SelectionContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Props {
-  user: GqlUser;
+  user: GqlUser & { didInfo?: GqlDidIssuanceRequest };
   checked: boolean;
   onCheck: () => void;
   isDisabled: boolean;
   reason?: GqlParticipationStatusReason;
-  didIssuanceRequestsData?: GqlGetDidIssuanceRequestsQuery;
+  didInfo?: GqlDidIssuanceRequest | undefined ;
   vcIssuanceRequestsData?: GqlGetVcIssuanceRequestsByUserQuery;
 }
 
@@ -29,31 +29,25 @@ const truncateDid = (did: string | undefined | null, length: number = 20): strin
   return `${start}...${end}`;
 };
 
-export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didIssuanceRequestsData, vcIssuanceRequestsData }: Props) => {
+export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didInfo, vcIssuanceRequestsData }: Props) => {
   const { selectedSlot } = useSelection();
-
-  // 特定のユーザーのDID発行リクエストを取得
-  const userDidIssuanceRequest = didIssuanceRequestsData?.users?.edges?.find(
-    (edge) => edge?.node?.id === user.id
-  )?.node?.didIssuanceRequests?.find(
-    (request) => request.status === GqlDidIssuanceStatus.Completed
-  );
-
+  const did = didInfo?.didValue;
   const hasCompletedVcIssuanceRequest =
     !!vcIssuanceRequestsData?.vcIssuanceRequests.edges.find(
       (edge: any) =>
         edge.node?.evaluation?.participation?.opportunitySlot?.id === selectedSlot?.slotId &&
-        edge.node?.status === GqlVcIssuanceStatus.Completed
+        edge.node?.status === GqlVcIssuanceStatus.Completed &&
+        edge.node?.user?.id === user.id
     );
 
   const hasProcessingVcIssuanceRequest =
     !!vcIssuanceRequestsData?.vcIssuanceRequests.edges.find(
       (edge: any) =>
         edge.node?.evaluation?.participation?.opportunitySlot?.id === selectedSlot?.slotId &&
-        edge.node?.status === GqlVcIssuanceStatus.Processing
+        edge.node?.status === GqlVcIssuanceStatus.Processing &&
+        edge.node?.user?.id === user.id
     );
 
-  const did = userDidIssuanceRequest?.didValue;
   const cardBgClass = !did || isDisabled ? "bg-zinc-200" : "bg-white";
 
   return (

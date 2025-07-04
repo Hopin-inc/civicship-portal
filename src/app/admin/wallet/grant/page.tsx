@@ -115,6 +115,7 @@ export default function GrantPointStepperPage() {
           hasNextPage={data?.wallets?.pageInfo?.hasNextPage}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          listType="grant"
         />
       ) : (
         <TransferInputStep
