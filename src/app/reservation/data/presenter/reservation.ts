@@ -17,6 +17,7 @@ import { TArticleWithAuthor } from "@/app/articles/data/type";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { presenterOpportunityHost } from "@/app/activities/data/presenter";
 import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
+import { getStartOfDayInJST } from "@/utils/date";
 
 export const getTicketIds = (
   wallets: GqlWallet[] | null,
@@ -104,8 +105,7 @@ const getIsCancelable = (startsAt?: Date | null): boolean => {
   const now = new Date();
 
   // 開催日の0時0分0秒を取得（前日23:59:59までキャンセル可能）
-  const cancelDeadline = new Date(startsAt);
-  cancelDeadline.setHours(0, 0, 0, 0);
+  const cancelDeadline = getStartOfDayInJST(startsAt);
 
   return now < cancelDeadline;
 };
@@ -113,10 +113,9 @@ const getIsCancelable = (startsAt?: Date | null): boolean => {
 const getCancelDue = (startsAt?: Date | null): string | undefined => {
   if (!startsAt) return undefined;
 
-  // 開催日の前日23:59:59を計算
-  const cancelDate = new Date(startsAt);
-  cancelDate.setHours(0, 0, 0, 0); // 開催日の0時0分0秒
-  cancelDate.setMilliseconds(-1); // 1ミリ秒前 = 前日の23:59:59.999
+  // 開催日の前日23:59:59をJSTで計算
+  const startOfEventDay = getStartOfDayInJST(startsAt);
+  const cancelDate = new Date(startOfEventDay.getTime() - 1);
 
   return cancelDate.toISOString();
 };

@@ -1,19 +1,7 @@
 "use client";
 import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
 import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
-import { addDays, isAfter } from "date-fns";
-
-/**
- * 予約可能判定のための閾値（前日23:59 JSTまで予約可能）を返す
- * @returns 予約可能判定のための閾値
- */
-export const getReservationThreshold = (): Date => {
-  const now = new Date();
-  const tomorrow = new Date(now);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0); // 翌日の00:00:00に設定（JSTで前日の23:59まで予約可能）
-  return tomorrow;
-};
+import { getTomorrowStartInJST, toJST, formatInJST, isAfterInJST } from "@/utils/date";
 
 /**
  * 指定された日時が予約可能かどうかを判定する
@@ -22,8 +10,8 @@ export const getReservationThreshold = (): Date => {
  */
 export const isDateReservable = (date: Date | string): boolean => {
   const targetDate = typeof date === "string" ? new Date(date) : date;
-  const threshold = getReservationThreshold();
-  return isAfter(targetDate, threshold);
+  const threshold = getTomorrowStartInJST();
+  return isAfterInJST(targetDate, threshold);
 };
 
 export const presenterOpportunitySlots = (
@@ -47,7 +35,7 @@ export const presenterOpportunitySlot = (
   slot: GqlOpportunitySlot,
   feeRequired: number | null,
 ): ActivitySlot => {
-  const startsAtDate = new Date(slot.startsAt);
+  const startsAtDate = toJST(new Date(slot.startsAt));
   const isReservable = isDateReservable(startsAtDate);
 
   return {
@@ -60,8 +48,8 @@ export const presenterOpportunitySlot = (
 
     applicantCount: null,
 
-    startsAt: startsAtDate.toISOString(),
-    endsAt: new Date(slot.endsAt).toISOString(),
+    startsAt: formatInJST(new Date(slot.startsAt), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
+    endsAt: formatInJST(new Date(slot.endsAt), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
 
     isReservable,
   };
@@ -88,7 +76,7 @@ export const groupActivitySlotsByDate = (slots: ActivitySlot[]): ActivitySlotGro
   const groups: Record<string, ActivitySlot[]> = {};
 
   for (const slot of slots) {
-    const date = new Date(slot.startsAt);
+    const date = toJST(new Date(slot.startsAt));
 
     const month = date.getMonth() + 1;
     const day = date.getDate();

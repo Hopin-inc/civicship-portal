@@ -18,6 +18,7 @@ import { ReservationStatus } from "@/types/participationStatus";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { presenterOpportunityHost } from "@/app/activities/data/presenter";
 import { subDays } from "date-fns";
+import { getStartOfDayInJST } from "@/utils/date";
 
 export const presenterParticipation = (raw: GqlParticipation): ParticipationDetail => {
   if (
@@ -115,17 +116,20 @@ export const presenterParticipation = (raw: GqlParticipation): ParticipationDeta
 const getIsCancelable = (startsAt?: Date | string | null): boolean => {
   if (!startsAt) return false;
 
-  const startDate = typeof startsAt === "string" ? new Date(startsAt) : startsAt;
   const now = new Date();
-  const diff = startDate.getTime() - now.getTime();
-  return diff >= 24 * 60 * 60 * 1000; // 24時間以上あるか
+
+  const startDate = typeof startsAt === "string" ? new Date(startsAt) : startsAt;
+  const cancelDeadline = getStartOfDayInJST(startDate);
+
+  return now < cancelDeadline;
 };
 
 const getCancelDue = (startsAt?: Date | string | null): string | undefined => {
   if (!startsAt) return undefined;
-
+  // 開催日の前日23:59:59をJSTで計算
   const startDate = typeof startsAt === "string" ? new Date(startsAt) : startsAt;
-  const cancelDate = new Date(startDate.getTime() - 24 * 60 * 60 * 1000);
+  const startOfEventDay = getStartOfDayInJST(startDate);
+  const cancelDate = new Date(startOfEventDay.getTime() - 1);
   return cancelDate.toISOString();
 };
 
