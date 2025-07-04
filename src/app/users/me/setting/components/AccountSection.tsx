@@ -1,6 +1,6 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Copy, Info, LinkIcon, PhoneIcon } from "lucide-react";
+import { Copy, FileKey, Info, LinkIcon, PhoneIcon } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { useAccountData } from "../hooks/useAccountData";
@@ -34,9 +34,9 @@ export default function AccountSection() {
         {/* 共創ID */}
         <div className="flex items-center justify-between py-4 px-4 border-b">
           <div className="flex items-center gap-2">
-            <Image src="/icons/key.svg" alt="DID" width={20} height={20} />
-              <span className="font-bold text-sm flex items-center gap-2">
-                共創ID
+            <FileKey className="w-5 h-5" />
+            <span className="font-bold text-sm flex items-center gap-2">
+              共創ID
               </span>
           </div>
           <div className="flex items-center gap-2 text-gray-400">
