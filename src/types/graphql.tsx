@@ -8682,6 +8682,7 @@ export const GetParticipationDocument = gql`
             }
           }
         }
+        status
       }
       statusHistories {
         id
