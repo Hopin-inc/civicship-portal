@@ -35,12 +35,16 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didInfo,
   const hasCompletedVcIssuanceRequest =
     !!vcIssuanceRequestsData?.vcIssuanceRequests.edges.find(
       (edge: any) =>
+    !!vcIssuanceRequestsData?.vcIssuanceRequests.edges.find(
+      (edge: any) =>
         edge.node?.evaluation?.participation?.opportunitySlot?.id === selectedSlot?.slotId &&
         edge.node?.status === GqlVcIssuanceStatus.Completed &&
         edge.node?.user?.id === user.id
     );
 
   const hasProcessingVcIssuanceRequest =
+    !!vcIssuanceRequestsData?.vcIssuanceRequests.edges.find(
+      (edge: any) =>
     !!vcIssuanceRequestsData?.vcIssuanceRequests.edges.find(
       (edge: any) =>
         edge.node?.evaluation?.participation?.opportunitySlot?.id === selectedSlot?.slotId &&
