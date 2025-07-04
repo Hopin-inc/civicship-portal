@@ -31,7 +31,7 @@ const useParticipationPage = (id: string): UseParticipationPageResult => {
   });
   const rawParticipation = data?.participation;
   const rawOpportunity = rawParticipation?.reservation?.opportunitySlot?.opportunity;
-  const participation = rawParticipation ? presenterParticipation({ raw: rawParticipation, opportunity: rawOpportunity ?? undefined }) : null;
+  const participation = rawParticipation ? presenterParticipation(rawParticipation) : null;
   const opportunity = rawOpportunity ? presenterActivityCard(rawOpportunity) : null;
 
   const { currentStatus } = useParticipationState({ participation });
@@ -47,7 +47,7 @@ const useParticipationPage = (id: string): UseParticipationPageResult => {
       logger.error("Participation query error", {
         error: error.message || String(error),
         participationId: id,
-        component: "useParticipationPage"
+        component: "useParticipationPage",
       });
     }
   }, [error, id]);
