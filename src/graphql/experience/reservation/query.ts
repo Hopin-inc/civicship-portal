@@ -47,6 +47,10 @@ export const GET_RESERVATIONS = gql`
             id
             status
             reason
+            user {
+              id
+              name
+            }
             evaluation {
               id
               status
