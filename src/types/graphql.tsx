@@ -699,8 +699,6 @@ export type GqlMutation = {
   communityDelete?: Maybe<GqlCommunityDeletePayload>;
   communityUpdateProfile?: Maybe<GqlCommunityUpdateProfilePayload>;
   evaluationBulkCreate?: Maybe<GqlEvaluationBulkCreatePayload>;
-  evaluationFail?: Maybe<GqlEvaluationCreatePayload>;
-  evaluationPass?: Maybe<GqlEvaluationCreatePayload>;
   identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload;
   linkPhoneAuth?: Maybe<GqlLinkPhoneAuthPayload>;
   membershipAcceptMyInvitation?: Maybe<GqlMembershipSetInvitationStatusPayload>;
@@ -781,16 +779,6 @@ export type GqlMutationCommunityUpdateProfileArgs = {
 
 export type GqlMutationEvaluationBulkCreateArgs = {
   input: GqlEvaluationBulkCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-};
-
-export type GqlMutationEvaluationFailArgs = {
-  input: GqlEvaluationCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-};
-
-export type GqlMutationEvaluationPassArgs = {
-  input: GqlEvaluationCreateInput;
   permission: GqlCheckCommunityPermissionInput;
 };
 
@@ -2305,13 +2293,17 @@ export type GqlTransactionEdge = GqlEdge & {
 export type GqlTransactionFilterInput = {
   and?: InputMaybe<Array<GqlTransactionFilterInput>>;
   communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  fromDidValue?: InputMaybe<Scalars["String"]["input"]>;
   fromUserId?: InputMaybe<Scalars["ID"]["input"]>;
+  fromUserName?: InputMaybe<Scalars["String"]["input"]>;
   fromWalletId?: InputMaybe<Scalars["ID"]["input"]>;
   fromWalletType?: InputMaybe<GqlWalletType>;
   not?: InputMaybe<GqlTransactionFilterInput>;
   or?: InputMaybe<Array<GqlTransactionFilterInput>>;
   reason?: InputMaybe<GqlTransactionReason>;
+  toDidValue?: InputMaybe<Scalars["String"]["input"]>;
   toUserId?: InputMaybe<Scalars["ID"]["input"]>;
+  toUserName?: InputMaybe<Scalars["String"]["input"]>;
   toWalletId?: InputMaybe<Scalars["ID"]["input"]>;
   toWalletType?: InputMaybe<GqlWalletType>;
 };
@@ -2576,7 +2568,7 @@ export type GqlVcIssuanceRequestEdge = GqlEdge & {
 export type GqlVcIssuanceRequestFilterInput = {
   evaluationId?: InputMaybe<Scalars["ID"]["input"]>;
   status?: InputMaybe<GqlVcIssuanceStatus>;
-  userId?: InputMaybe<Scalars["ID"]["input"]>;
+  userIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
 export type GqlVcIssuanceRequestSortInput = {
@@ -4816,7 +4808,7 @@ export type GqlGetVcIssuanceRequestByEvaluationQuery = {
 };
 
 export type GqlGetVcIssuanceRequestsByUserQueryVariables = Exact<{
-  userId: Scalars["ID"]["input"];
+  userIds: Array<Scalars["ID"]["input"]> | Scalars["ID"]["input"];
 }>;
 
 export type GqlGetVcIssuanceRequestsByUserQuery = {
@@ -4842,6 +4834,7 @@ export type GqlGetVcIssuanceRequestsByUserQuery = {
             opportunitySlot?: { __typename?: "OpportunitySlot"; id: string } | null;
           } | null;
         } | null;
+        user?: { __typename?: "User"; id: string } | null;
       } | null;
     }>;
   };
@@ -9181,8 +9174,8 @@ export type GetVcIssuanceRequestByEvaluationQueryResult = Apollo.QueryResult<
   GqlGetVcIssuanceRequestByEvaluationQueryVariables
 >;
 export const GetVcIssuanceRequestsByUserDocument = gql`
-  query GetVcIssuanceRequestsByUser($userId: ID!) {
-    vcIssuanceRequests(filter: { userId: $userId }) {
+  query GetVcIssuanceRequestsByUser($userIds: [ID!]!) {
+    vcIssuanceRequests(filter: { userIds: $userIds }) {
       edges {
         node {
           id
@@ -9198,6 +9191,9 @@ export const GetVcIssuanceRequestsByUserDocument = gql`
                 id
               }
             }
+          }
+          user {
+            id
           }
         }
       }
@@ -9218,7 +9214,7 @@ export const GetVcIssuanceRequestsByUserDocument = gql`
  * @example
  * const { data, loading, error } = useGetVcIssuanceRequestsByUserQuery({
  *   variables: {
- *      userId: // value for 'userId'
+ *      userIds: // value for 'userIds'
  *   },
  * });
  */

@@ -33,6 +33,9 @@ export const GET_VC_ISSUANCE_REQUESTS_BY_USER = gql`
               }
             }
           }
+          user {
+            id
+          }
         }
       }
       totalCount

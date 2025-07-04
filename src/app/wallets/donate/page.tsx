@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
 import UserSelectStep from "@/app/admin/wallet/grant/components/UserSelectStep";
+import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 export default function DonatePointPage() {
@@ -20,6 +21,8 @@ export default function DonatePointPage() {
 
   const searchParams = useSearchParams();
   const currentPoint = Number(searchParams.get("currentPoint") ?? "0");
+  const tab = searchParams.get("tab") ?? "";
+  const [activeTab, setActiveTab] = useState<Tabs>(tab as Tabs);
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
     variables: { filter: { communityId: COMMUNITY_ID }, first: 500 },
@@ -121,11 +124,14 @@ export default function DonatePointPage() {
     <div className="max-w-xl mx-auto mt-6 space-y-4">
       {!selectedUser ? (
         <UserSelectStep
-          title="送り先を選ぶ"
+          title="譲渡先を選ぶ"
           members={members}
           onSelect={(user) => setSelectedUserId(user.id)}
           onLoadMore={handleLoadMore}
           hasNextPage={hasNextPage}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          listType="donate"
         />
       ) : (
         <TransferInputStep

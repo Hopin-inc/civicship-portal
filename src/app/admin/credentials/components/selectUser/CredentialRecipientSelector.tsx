@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { GqlUser, useParticipationBulkCreateMutation, GqlParticipationStatusReason, useGetEvaluationsQuery, GetEvaluationsDocument } from "@/types/graphql";
+import { GqlUser, useParticipationBulkCreateMutation, GqlParticipationStatusReason, useGetEvaluationsQuery, GetEvaluationsDocument, GqlDidIssuanceRequest } from "@/types/graphql";
 import { toast } from "sonner";
 import { useMembershipQueries } from "@/app/admin/members/hooks/useMembershipQueries";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import Loading from "@/components/layout/Loading";
 import { logger } from "@/lib/logging";
 import SearchForm from "./SearchForm";
-import { useMemberSearch } from "../../hooks/useMemberSearch";
+import { useMemberWithDidSearch } from "../../hooks/useMemberWithDidSearch";
 import SearchResultList from "./SearchResultList";
 
 // 定数定義
@@ -32,7 +32,7 @@ const DISABLED_REASONS: GqlParticipationStatusReason[] = [
 
 // ソートロジックを関数として分離
 const sortMembersByParticipation = (
-  members: { user: GqlUser }[],
+  members: { user: GqlUser & { didInfo?: GqlDidIssuanceRequest | undefined } }[],
   participatedUsers: Array<{ userId: string; slotId: string; isCreatedByUser: boolean }>,
   selectedSlotId: string | undefined
 ) => {
@@ -64,7 +64,6 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
   const router = useRouter();
   const [input, setInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const { searchMembershipData, loading, error } = useMemberSearch({ searchQuery });
   const { membershipListData, refetch } = useMembershipQueries(communityId);
   const selectedUserIds = selectedSlot?.userIds ?? [];
 
@@ -103,7 +102,7 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
   const getParticipatedReason = (userId: string) =>
     participatedUsers.find(u => u.userId === userId && u.slotId === selectedSlot?.slotId)?.reason;
 
-  const members = useMemo(() => {
+  const allMembers = useMemo(() => {
     return (
       membershipListData?.memberships?.edges
         ?.map((edge) => {
@@ -113,11 +112,17 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
         .filter((member): member is { user: GqlUser } => member !== null) ?? []
     );
   }, [membershipListData]);
+  const { data: searchMembershipData, loading, error } = useMemberWithDidSearch(allMembers, { searchQuery });
 
   // 並び替え用の配列を作成
   const sortedMembers = useMemo(() => {
-    return sortMembersByParticipation(members, participatedUsers, selectedSlot?.slotId);
-  }, [members, participatedUsers, selectedSlot?.slotId]);
+    return sortMembersByParticipation(
+      searchMembershipData.map(user => ({ user })),
+      participatedUsers,
+      selectedSlot?.slotId
+    );
+  }, [searchMembershipData, participatedUsers, selectedSlot?.slotId]);
+  const formattedMembers = sortedMembers.map(({ user }) => user)
 
   if (!selectedSlot) {
     return <div>開催枠が設定されていません</div>;
@@ -177,8 +182,7 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
       <div className="flex flex-col gap-4 px-4">
         <SearchResultList
           searchQuery={searchQuery}
-          searchMembershipData={searchMembershipData}
-          sortedMembers={sortedMembers}
+          searchMembershipData={formattedMembers}
           selectedUserIds={selectedUserIds}
           handleCheck={handleCheck}
           getParticipatedReason={getParticipatedReason}
