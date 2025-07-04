@@ -24,10 +24,11 @@ export default function DangerSection() {
                 </span>
               </span>
             </button>
-          <div className="flex items-center gap-3 py-4 px-4 border-b">
+          {/* TODO : 表示可能になるまでコメントアウト */}
+          {/* <div className="flex items-center gap-3 py-4 px-4 border-b">
             <XCircle className="w-5 h-5" />
             <span className="font-bold text-sm text-gray-400">このアカウントを削除する</span>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
       {open && (

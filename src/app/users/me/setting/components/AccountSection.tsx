@@ -1,10 +1,10 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { useAuth } from "@/contexts/AuthProvider";
-import { useGetDidIssuanceRequestsQuery } from "@/types/graphql";
 import { Copy, Info, LinkIcon, PhoneIcon } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
+import { useAccountData } from "../hooks/useAccountData";
+import Loading from "@/components/layout/Loading";
 
 const truncateDid = (did: string | undefined | null, length: number = 20): string => {
     if (!did) return "";
@@ -15,14 +15,18 @@ const truncateDid = (did: string | undefined | null, length: number = 20): strin
   };
 
 export default function AccountSection() {
-  const { user: currentUser, isAuthenticated,isPhoneVerified } = useAuth();
-  const { data: didIssuanceRequests } = useGetDidIssuanceRequestsQuery({
-    variables: {
-      userIds: [currentUser?.id ?? ""],
-    },
-    skip: !currentUser,
-  });
-  const didValue = didIssuanceRequests?.users.edges?.[0]?.node?.didIssuanceRequests?.[0]?.didValue;
+  const {
+    isAuthenticated,
+    isPhoneVerified,
+    isAuthenticating,
+    didValue,
+    isNftWalletLinked,
+    loading
+  } = useAccountData();
+
+  if (loading) {
+    return <Loading />
+  }
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -56,7 +60,7 @@ export default function AccountSection() {
             <Image src="/images/line-icon.png" alt="LINE" width={20} height={20} />
             <span className="font-bold text-sm">LINEアカウント</span>
           </div>
-          <span className="text-gray-400">{isAuthenticated ? "連携済み" : "未連携"}</span>
+          <span className="text-gray-400">{isAuthenticated ? "連携済み" : isAuthenticating ? "読込中" : "未連携"}</span>
         </div>
         {/* 電話番号 */}
         <div className="flex items-center justify-between py-4 px-4 border-b">
@@ -64,7 +68,7 @@ export default function AccountSection() {
             <PhoneIcon className="w-4 h-4" />
             <span className="font-bold text-sm">電話番号</span>
           </div>
-          <span className="text-gray-400">{isPhoneVerified ? "連携済み" : "未連携"}</span>
+          <span className="text-gray-400">{isPhoneVerified ? "連携済み" : isAuthenticating ? "読込中" : "未連携"}</span>
         </div>
         {/* JUST DAO IT */}
         <div className="flex items-center justify-between py-4 px-4">
@@ -80,7 +84,7 @@ export default function AccountSection() {
               </span>
             </span>
           </div>
-          <span className="text-gray-400">連携済み</span>
+          <span className="text-gray-400">{isNftWalletLinked ? "連携済み" : "未連携"}</span>
         </div>
       </CardContent>
     </Card>

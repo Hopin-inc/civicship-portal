@@ -129,11 +129,28 @@ export type GqlCheckOpportunityPermissionInput = {
   opportunityId: Scalars["ID"]["input"];
 };
 
+export type GqlCitiesConnection = {
+  __typename?: "CitiesConnection";
+  edges: Array<GqlCityEdge>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlCitiesInput = {
+  name?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type GqlCity = {
   __typename?: "City";
   code: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
   state?: Maybe<GqlState>;
+};
+
+export type GqlCityEdge = GqlEdge & {
+  __typename?: "CityEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlCity>;
 };
 
 export const GqlClaimLinkStatus = {
@@ -633,8 +650,6 @@ export type GqlMutation = {
   communityDelete?: Maybe<GqlCommunityDeletePayload>;
   communityUpdateProfile?: Maybe<GqlCommunityUpdateProfilePayload>;
   evaluationBulkCreate?: Maybe<GqlEvaluationBulkCreatePayload>;
-  evaluationFail?: Maybe<GqlEvaluationCreatePayload>;
-  evaluationPass?: Maybe<GqlEvaluationCreatePayload>;
   identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload;
   linkPhoneAuth?: Maybe<GqlLinkPhoneAuthPayload>;
   membershipAcceptMyInvitation?: Maybe<GqlMembershipSetInvitationStatusPayload>;
@@ -699,16 +714,6 @@ export type GqlMutationCommunityUpdateProfileArgs = {
 
 export type GqlMutationEvaluationBulkCreateArgs = {
   input: GqlEvaluationBulkCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-};
-
-export type GqlMutationEvaluationFailArgs = {
-  input: GqlEvaluationCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-};
-
-export type GqlMutationEvaluationPassArgs = {
-  input: GqlEvaluationCreateInput;
   permission: GqlCheckCommunityPermissionInput;
 };
 
@@ -959,6 +964,14 @@ export type GqlNestedPlacesBulkUpdateInput = {
   disconnect?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
+export type GqlNftWallet = {
+  __typename?: "NftWallet";
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  id: Scalars["ID"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  walletAddress: Scalars["String"]["output"];
+};
+
 export type GqlOpportunitiesConnection = {
   __typename?: "OpportunitiesConnection";
   edges: Array<GqlOpportunityEdge>;
@@ -1006,19 +1019,18 @@ export type GqlOpportunityCategory =
   (typeof GqlOpportunityCategory)[keyof typeof GqlOpportunityCategory];
 export type GqlOpportunityCreateInput = {
   body?: InputMaybe<Scalars["String"]["input"]>;
-  capacity?: InputMaybe<Scalars["Int"]["input"]>;
   category: GqlOpportunityCategory;
-  communityId: Scalars["ID"]["input"];
+  createdBy?: InputMaybe<Scalars["ID"]["input"]>;
   description: Scalars["String"]["input"];
-  endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
   images?: InputMaybe<Array<GqlImageInput>>;
-  place?: InputMaybe<GqlNestedPlaceConnectOrCreateInput>;
+  placeId?: InputMaybe<Scalars["ID"]["input"]>;
   pointsToEarn?: InputMaybe<Scalars["Int"]["input"]>;
   publishStatus: GqlPublishStatus;
+  relatedArticleIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   requireApproval: Scalars["Boolean"]["input"];
   requiredUtilityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  slots?: InputMaybe<Array<GqlOpportunitySlotCreateInput>>;
   title: Scalars["String"]["input"];
 };
 
@@ -1092,6 +1104,7 @@ export type GqlOpportunitySlot = {
 };
 
 export type GqlOpportunitySlotCreateInput = {
+  capacity: Scalars["Int"]["input"];
   endsAt: Scalars["Datetime"]["input"];
   startsAt: Scalars["Datetime"]["input"];
 };
@@ -1104,7 +1117,7 @@ export type GqlOpportunitySlotEdge = GqlEdge & {
 
 export type GqlOpportunitySlotFilterInput = {
   dateRange?: InputMaybe<GqlDateTimeRangeFilter>;
-  hostingStatus?: InputMaybe<GqlOpportunitySlotHostingStatus>;
+  hostingStatus?: InputMaybe<Array<GqlOpportunitySlotHostingStatus>>;
   opportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   ownerId?: InputMaybe<Scalars["ID"]["input"]>;
 };
@@ -1488,7 +1501,7 @@ export type GqlQuery = {
   __typename?: "Query";
   article?: Maybe<GqlArticle>;
   articles: GqlArticlesConnection;
-  cities: Array<GqlCity>;
+  cities: GqlCitiesConnection;
   communities: GqlCommunitiesConnection;
   community?: Maybe<GqlCommunity>;
   currentUser?: Maybe<GqlCurrentUserPayload>;
@@ -1513,7 +1526,7 @@ export type GqlQuery = {
   reservationHistories: GqlReservationHistoriesConnection;
   reservationHistory?: Maybe<GqlReservationHistory>;
   reservations: GqlReservationsConnection;
-  states: Array<GqlState>;
+  states: GqlStatesConnection;
   ticket?: Maybe<GqlTicket>;
   ticketClaimLink?: Maybe<GqlTicketClaimLink>;
   ticketClaimLinks: GqlTicketClaimLinksConnection;
@@ -1547,7 +1560,9 @@ export type GqlQueryArticlesArgs = {
 };
 
 export type GqlQueryCitiesArgs = {
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlCitiesInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type GqlQueryCommunitiesArgs = {
@@ -1674,7 +1689,9 @@ export type GqlQueryReservationsArgs = {
 };
 
 export type GqlQueryStatesArgs = {
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlStatesInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type GqlQueryTicketArgs = {
@@ -1925,6 +1942,23 @@ export type GqlState = {
   code: Scalars["ID"]["output"];
   countryCode: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
+};
+
+export type GqlStateEdge = GqlEdge & {
+  __typename?: "StateEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlState>;
+};
+
+export type GqlStatesConnection = {
+  __typename?: "StatesConnection";
+  edges: Array<GqlStateEdge>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlStatesInput = {
+  name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type GqlStorePhoneAuthTokenInput = {
@@ -2273,6 +2307,7 @@ export type GqlUser = {
   membershipChangedByMe?: Maybe<Array<GqlMembershipHistory>>;
   memberships?: Maybe<Array<GqlMembership>>;
   name: Scalars["String"]["output"];
+  nftWallet?: Maybe<GqlNftWallet>;
   opportunitiesCreatedByMe?: Maybe<Array<GqlOpportunity>>;
   participationStatusChangedByMe?: Maybe<Array<GqlParticipationStatusHistory>>;
   participations?: Maybe<Array<GqlParticipation>>;
@@ -2472,7 +2507,7 @@ export type GqlVcIssuanceRequestEdge = GqlEdge & {
 export type GqlVcIssuanceRequestFilterInput = {
   evaluationId?: InputMaybe<Scalars["ID"]["input"]>;
   status?: InputMaybe<GqlVcIssuanceStatus>;
-  userId?: InputMaybe<Scalars["ID"]["input"]>;
+  userIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
 export type GqlVcIssuanceRequestSortInput = {
@@ -2801,6 +2836,7 @@ export type GqlGetSingleMembershipQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string } | null;
     } | null;
     community?: {
       __typename?: "Community";
@@ -2851,6 +2887,7 @@ export type GqlGetMembershipListQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -2874,6 +2911,7 @@ export type GqlUserFieldsFragment = {
   urlFacebook?: string | null;
   urlInstagram?: string | null;
   urlX?: string | null;
+  nftWallet?: { __typename?: "NftWallet"; id: string } | null;
 };
 
 export type GqlUserPortfolioFieldsFragment = {
@@ -2911,6 +2949,7 @@ export type GqlUserPortfolioFieldsFragment = {
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
+    nftWallet?: { __typename?: "NftWallet"; id: string } | null;
   }> | null;
 };
 
@@ -2993,6 +3032,7 @@ export type GqlGetUserFlexibleQuery = {
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
+        nftWallet?: { __typename?: "NftWallet"; id: string } | null;
       }> | null;
     }> | null;
     wallets?: Array<{
@@ -3048,6 +3088,7 @@ export type GqlGetUserFlexibleQuery = {
         } | null;
       } | null;
     }> | null;
+    nftWallet?: { __typename?: "NftWallet"; id: string } | null;
   } | null;
 };
 
@@ -3100,6 +3141,7 @@ export type GqlGetUserWalletQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -3124,6 +3166,7 @@ export type GqlGetUserWalletQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -3151,6 +3194,7 @@ export type GqlGetUserWalletQuery = {
       }> | null;
       currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
     }> | null;
+    nftWallet?: { __typename?: "NftWallet"; id: string } | null;
   } | null;
 };
 
@@ -3208,6 +3252,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
+              nftWallet?: { __typename?: "NftWallet"; id: string } | null;
             } | null;
             currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
           } | null;
@@ -3226,6 +3271,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
+              nftWallet?: { __typename?: "NftWallet"; id: string } | null;
             } | null;
             currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
           } | null;
@@ -3353,6 +3399,7 @@ export type GqlGetMemberWalletsQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -3421,6 +3468,7 @@ export type GqlGetArticlesQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
         }> | null;
       } | null;
     } | null> | null;
@@ -3489,6 +3537,7 @@ export type GqlGetArticleQuery = {
           } | null;
         } | null;
       }> | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string } | null;
     }> | null;
     authors?: Array<{
       __typename?: "User";
@@ -3501,6 +3550,7 @@ export type GqlGetArticleQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string } | null;
     }> | null;
   } | null;
   articles: {
@@ -3537,6 +3587,7 @@ export type GqlGetArticleQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
         }> | null;
       } | null;
     } | null> | null;
@@ -3851,6 +3902,7 @@ export type GqlGetOpportunityQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
           } | null;
         }> | null;
       }> | null;
@@ -3940,11 +3992,13 @@ export type GqlGetOpportunityQuery = {
                 urlFacebook?: string | null;
                 urlInstagram?: string | null;
                 urlX?: string | null;
+                nftWallet?: { __typename?: "NftWallet"; id: string } | null;
               } | null;
             }> | null;
           }> | null;
         }> | null;
       }> | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string } | null;
     } | null;
     requiredUtilities?: Array<{ __typename?: "Utility"; id: string }> | null;
   } | null;
@@ -4126,6 +4180,7 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
         } | null;
         evaluation?: { __typename?: "Evaluation"; id: string; status: GqlEvaluationStatus } | null;
       }> | null;
@@ -4262,6 +4317,7 @@ export type GqlGetParticipationQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
           } | null;
           place?: {
             __typename?: "Place";
@@ -4324,6 +4380,7 @@ export type GqlGetParticipationQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
         } | null;
         place?: {
           __typename?: "Place";
@@ -4364,6 +4421,7 @@ export type GqlGetParticipationQuery = {
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
+        nftWallet?: { __typename?: "NftWallet"; id: string } | null;
       } | null;
     }> | null;
     user?: {
@@ -4377,6 +4435,7 @@ export type GqlGetParticipationQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string } | null;
     } | null;
   } | null;
 };
@@ -4504,6 +4563,7 @@ export type GqlGetReservationsQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
         } | null;
         opportunitySlot?: {
           __typename?: "OpportunitySlot";
@@ -4560,6 +4620,7 @@ export type GqlGetReservationQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string } | null;
     } | null;
     opportunitySlot?: {
       __typename?: "OpportunitySlot";
@@ -4626,6 +4687,7 @@ export type GqlGetReservationQuery = {
             publishStatus: GqlPublishStatus;
             publishedAt?: Date | null;
           }> | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
         } | null;
         place?: {
           __typename?: "Place";
@@ -4667,6 +4729,7 @@ export type GqlGetReservationQuery = {
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
+        nftWallet?: { __typename?: "NftWallet"; id: string } | null;
       } | null;
       evaluation?: {
         __typename?: "Evaluation";
@@ -4692,13 +4755,6 @@ export type GqlGetReservationQuery = {
       }> | null;
     }> | null;
   } | null;
-};
-
-export type GqlVcIssuanceRequestFieldsFragment = {
-  __typename?: "VcIssuanceRequest";
-  id: string;
-  status: GqlVcIssuanceStatus;
-  completedAt?: Date | null;
 };
 
 export type GqlGetVcIssuanceRequestByEvaluationQueryVariables = Exact<{
@@ -4789,6 +4845,7 @@ export type GqlGetPlacesQuery = {
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
+              nftWallet?: { __typename?: "NftWallet"; id: string } | null;
             }> | null;
           }> | null;
           createdByUser?: {
@@ -4876,6 +4933,7 @@ export type GqlGetPlaceQuery = {
           publishStatus: GqlPublishStatus;
           publishedAt?: Date | null;
         }> | null;
+        nftWallet?: { __typename?: "NftWallet"; id: string } | null;
       } | null;
       articles?: Array<{
         __typename?: "Article";
@@ -4898,6 +4956,7 @@ export type GqlGetPlaceQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
         }> | null;
       }> | null;
     }> | null;
@@ -5010,6 +5069,7 @@ export type GqlGetTicketsQuery = {
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
+              nftWallet?: { __typename?: "NftWallet"; id: string } | null;
             } | null;
           } | null;
         } | null;
@@ -5302,6 +5362,7 @@ export type GqlGetTransactionsQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -5326,6 +5387,7 @@ export type GqlGetTransactionsQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -5412,6 +5474,9 @@ export const UserFieldsFragmentDoc = gql`
     bio
     currentPrefecture
     phoneNumber
+    nftWallet {
+      id
+    }
     urlFacebook
     urlInstagram
     urlX
@@ -5522,13 +5587,6 @@ export const ReservationFieldsFragmentDoc = gql`
     id
     status
     comment
-  }
-`;
-export const VcIssuanceRequestFieldsFragmentDoc = gql`
-  fragment VcIssuanceRequestFields on VcIssuanceRequest {
-    id
-    status
-    completedAt
   }
 `;
 export const TicketFieldsFragmentDoc = gql`

@@ -11,8 +11,9 @@ export default function SettingPage() {
       <AccountSection />
       <h2 className="text-sm mb-2 font-bold mt-6">設定</h2>
       <SettingSection />
-      <h2 className="text-sm mb-2 font-bold mt-6">ヘルプ</h2>
-      <HelpSection />
+      {/* TODO : 表示可能になるまでコメントアウト */}
+      {/* <h2 className="text-sm mb-2 font-bold mt-6">ヘルプ</h2>
+      <HelpSection /> */}
       <h2 className="text-sm mb-2 font-bold mt-6">利用にあたっての約束</h2>
       <PromiseSection />
       <h2 className="text-sm mb-2 font-bold mt-6">ご注意して操作して下さい</h2>
