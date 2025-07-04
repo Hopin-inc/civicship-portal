@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { MemberRow } from "./Member";
-import { GqlUser, GqlParticipationStatusReason, GqlMembershipEdge } from "@/types/graphql";
+import { GqlUser, GqlParticipationStatusReason, GqlMembershipEdge, useGetDidIssuanceRequestsQuery, useGetVcIssuanceRequestsByUserQuery } from "@/types/graphql";
 
 interface SearchResultListProps {
   searchQuery: string;
@@ -21,6 +21,37 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
   getParticipatedReason,
   DISABLED_REASONS,
 }) => {
+  const visibleUserIds = useMemo(() => {
+    const userIds: string[] = [];
+    if (searchQuery && singleMembershipData?.memberships?.edges.length > 0) {
+      singleMembershipData.memberships.edges.forEach((edge: GqlMembershipEdge) => {
+        if (edge.node?.user?.id) {
+          userIds.push(edge.node.user.id);
+        }
+      });
+    } else {
+      sortedMembers.forEach(({ user }) => {
+        userIds.push(user.id);
+      });
+    }
+    
+    return userIds;
+  }, [searchQuery, singleMembershipData, sortedMembers]);
+  // DID発行リクエストを一括取得
+  const { data: didIssuanceRequestsData } = useGetDidIssuanceRequestsQuery({
+    variables: {
+      userIds: visibleUserIds,
+    },
+    skip: visibleUserIds.length === 0,
+  });
+  // VC発行リクエストを一括取得
+  const { data: vcIssuanceRequestsData } = useGetVcIssuanceRequestsByUserQuery({
+    variables: {
+      userIds: visibleUserIds,
+    },
+    skip: visibleUserIds.length === 0,
+  });
+
   if (searchQuery && singleMembershipData?.memberships?.edges.length > 0) {
     return (
       <>
@@ -38,6 +69,8 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
               onCheck={() => handleCheck(user.id)}
               isDisabled={isDisabled}
               reason={reason}
+              didIssuanceRequestsData={didIssuanceRequestsData}
+              vcIssuanceRequestsData={vcIssuanceRequestsData}
             />
           );
         })}
@@ -61,6 +94,8 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
               onCheck={() => handleCheck(user.id)}
               isDisabled={isDisabled}
               reason={reason}
+              didIssuanceRequestsData={didIssuanceRequestsData}
+              vcIssuanceRequestsData={vcIssuanceRequestsData}
             />
           </div>
         );
