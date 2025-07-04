@@ -7,6 +7,7 @@ export type ActivitySlotGroup = {
 
 export type ActivitySlot = OpportunitySlot & {
   feeRequired: number | null;
+  opportunityId: string;
 };
 
 export type QuestSlot = OpportunitySlot & {
@@ -18,7 +19,6 @@ type OpportunitySlot = {
   hostingStatus: GqlOpportunitySlotHostingStatus;
   capacity: number;
   remainingCapacity: number;
-
   isReservable: boolean;
 
   applicantCount: number | null;

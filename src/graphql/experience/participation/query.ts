@@ -7,12 +7,36 @@ import { COMMUNITY_FRAGMENT } from "@/graphql/account/community/fragment";
 import { PLACE_FRAGMENT } from "@/graphql/location/place/fragment";
 import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
 
+// ★ filter引数を追加
 export const GET_PARTICIPATIONS = gql`
-  query GetParticipations {
-    participations {
+  query GetParticipations($filter: ParticipationFilterInput) {
+    participations(filter: $filter) {
       edges {
         node {
           id
+          reason
+          user {
+            id
+          }
+          reservation {
+            opportunitySlot {
+              id
+              reservations {
+                createdByUser {
+                  id
+                }
+              }
+            }
+          }
+          opportunitySlot {
+            id
+            reservations {
+              createdByUser {
+                id
+              }
+            }
+          }
+          # 必要なら他のフィールドもここに追加
         }
       }
       totalCount
@@ -41,6 +65,24 @@ export const GetParticipationDocument = gql(`
             }
           }
         }
+      }
+      opportunitySlot {
+        ...OpportunitySlotFields
+        opportunity {
+          ...OpportunityFields
+          community {
+            ...CommunityFields
+          }
+          createdByUser {
+            ...UserFields
+          }
+          place {
+            ...PlaceFields
+          }
+        }
+      }
+      evaluation {
+        id
       }
       statusHistories {
         id

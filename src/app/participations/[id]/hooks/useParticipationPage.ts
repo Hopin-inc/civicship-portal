@@ -29,11 +29,9 @@ const useParticipationPage = (id: string): UseParticipationPageResult => {
     skip: !id,
     fetchPolicy: "network-only",
   });
-
   const rawParticipation = data?.participation;
   const rawOpportunity = rawParticipation?.reservation?.opportunitySlot?.opportunity;
-
-  const participation = rawParticipation ? presenterParticipation(rawParticipation) : null;
+  const participation = rawParticipation ? presenterParticipation({ raw: rawParticipation, opportunity: rawOpportunity ?? undefined }) : null;
   const opportunity = rawOpportunity ? presenterActivityCard(rawOpportunity) : null;
 
   const { currentStatus } = useParticipationState({ participation });

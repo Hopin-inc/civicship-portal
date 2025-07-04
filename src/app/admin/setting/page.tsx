@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { Ticket, Users, Wallet } from "lucide-react";
+import { Ticket, Users, Wallet, ClipboardList } from "lucide-react";
 
 const adminSettings = [
   {
@@ -16,6 +16,11 @@ const adminSettings = [
     title: "ウォレット管理",
     href: "/admin/wallet",
     icon: Wallet,
+  },
+  {
+    title: "証明書一覧",
+    href: "/admin/credentials",
+    icon: ClipboardList,
   },
 ];
 

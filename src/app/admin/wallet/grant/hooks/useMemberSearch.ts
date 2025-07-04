@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { GqlUser } from "@/types/graphql";
 
 export type MemberSearchFormValues = {
@@ -19,17 +18,14 @@ export interface MemberSearchTarget {
 }
 
 export const useMemberSearch = (
-  members: MemberSearchTarget[],
+  members: MemberSearchTarget[] = [],
   options?: {
     searchParamKey?: string;
     route?: string;
   },
 ) => {
   const searchParams = useSearchParams();
-  const router = useRouter();
-
   const searchKey = options?.searchParamKey || "q";
-  const route = options?.route || "/admin/wallet/grant";
   const initialQuery = searchParams.get(searchKey) || "";
 
   const form = useForm<MemberSearchFormValues>({
@@ -38,30 +34,14 @@ export const useMemberSearch = (
     },
   });
 
-  const searchQuery = form.watch("searchQuery");
+  const searchQuery = form.watch("searchQuery")?.toLowerCase() ?? "";
 
-  const filteredMembers = useMemo(() => {
-    const query = searchQuery.toLowerCase();
-    if (!query) return members;
-    return members.filter(({ user }) => user.name?.toLowerCase().includes(query));
-  }, [members, searchQuery]);
-
-  const onSubmit = useCallback(
-    (data: MemberSearchFormValues) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (data.searchQuery) {
-        params.set(searchKey, data.searchQuery);
-      } else {
-        params.delete(searchKey);
-      }
-      router.push(`${route}?${params.toString()}`);
-    },
-    [searchParams, router, searchKey, route],
+  const filteredMembers = members.filter(({ user }) =>
+    user.name?.toLowerCase().includes(searchQuery)
   );
 
   return {
     form,
     filteredMembers,
-    onSubmit,
   };
 };

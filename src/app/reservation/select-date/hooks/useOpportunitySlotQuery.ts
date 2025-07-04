@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import {
   GqlOpportunitySlotHostingStatus,
   GqlSortDirection,
+  useGetOpportunitySlotsLazyQuery,
   useGetOpportunitySlotsQuery,
 } from "@/types/graphql";
 import { ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
@@ -20,8 +21,8 @@ export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLo
   const { data, loading, error, refetch } = useGetOpportunitySlotsQuery({
     variables: {
       filter: {
-        opportunityId,
-        hostingStatus: GqlOpportunitySlotHostingStatus.Scheduled,
+        opportunityIds: [opportunityId],
+        hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled],
       },
       sort: {
         startsAt: GqlSortDirection.Desc,

@@ -1,0 +1,38 @@
+"use client";
+
+import CredentialHeader from "./components/CredentialHeader";
+import Image from "next/image";
+import { use } from "react";
+import { useGetParticipationQuery } from "@/types/graphql";
+import CredentialList from "./components/CredentialList";
+import NotFound from "@/app/not-found";
+import Loading from "@/components/layout/Loading";
+export default function CredentialsPage(props: {params: Promise<{id: string}>}) {
+    const { id } = use(props.params)
+    const { data, loading } = useGetParticipationQuery({
+        variables: { id: id },
+        skip: !id,
+        fetchPolicy: "network-only",
+      });
+    if(!data) return <NotFound />
+    if(loading) return <Loading />
+  return (
+    <>
+      <CredentialHeader />
+      <div>
+        <div className="w-full h-auto mt-4">
+        <Image
+            src="/images/credentials/organizer-Info-logo.png"
+            alt="証明書"
+            width={400}
+            height={400}
+            className="w-full h-auto object-cover border-none shadow-none"
+            />
+        </div>
+        <div className="mt-6 p-4">
+            <CredentialList data={data} />
+        </div>
+      </div>
+    </>
+  );
+}

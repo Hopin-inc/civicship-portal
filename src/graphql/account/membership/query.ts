@@ -4,12 +4,8 @@ export const GET_SINGLE_MEMBERSHIP = gql`
   query GetSingleMembership($communityId: ID!, $userId: ID!) {
     membership(communityId: $communityId, userId: $userId) {
       ...MembershipFields
-      user {
-        ...UserFields
-      }
-      community {
-        ...CommunityFields
-      }
+      user { ...UserFields }
+      community { ...CommunityFields }
     }
   }
 `;
