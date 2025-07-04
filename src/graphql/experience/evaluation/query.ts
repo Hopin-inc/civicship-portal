@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 export const GET_EVALUATIONS = gql`
-  query GetEvaluations {
+  query GetEvaluations ($withDidIssuanceRequests: Boolean! = false) {
     evaluations {
       edges {
         node {
@@ -19,6 +19,11 @@ export const GET_EVALUATIONS = gql`
             }
           }
           participation {
+            user {
+              didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+                ...DidIssuanceRequestFields
+              }
+            }
             opportunitySlot {
               id
               startsAt
@@ -34,6 +39,9 @@ export const GET_EVALUATIONS = gql`
                 createdByUser {
                   id
                   name
+                  didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+                    ...DidIssuanceRequestFields
+                  }
                 }
               }
             }

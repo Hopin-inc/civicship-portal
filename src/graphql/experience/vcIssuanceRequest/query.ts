@@ -7,6 +7,7 @@ export const GET_VC_ISSUANCE_REQUEST_BY_EVALUATION = gql`
         node {
           id
           completedAt
+          status
         }
       }
       totalCount

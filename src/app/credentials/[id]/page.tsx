@@ -10,7 +10,7 @@ import Loading from "@/components/layout/Loading";
 export default function CredentialsPage(props: {params: Promise<{id: string}>}) {
     const { id } = use(props.params)
     const { data, loading } = useGetParticipationQuery({
-        variables: { id: id },
+        variables: { id: id, withDidIssuanceRequests: true },
         skip: !id,
         fetchPolicy: "network-only",
       });
@@ -18,20 +18,9 @@ export default function CredentialsPage(props: {params: Promise<{id: string}>}) 
     if(loading) return <Loading />
   return (
     <>
-      <CredentialHeader />
       <div>
-        <div className="w-full h-auto mt-4">
-        <Image
-            src="/images/credentials/organizer-Info-logo.png"
-            alt="証明書"
-            width={400}
-            height={400}
-            className="w-full h-auto object-cover border-none shadow-none"
-            />
-        </div>
-        <div className="mt-6 p-4">
-            <CredentialList data={data} />
-        </div>
+      <CredentialHeader />
+      <CredentialList data={data} />
       </div>
     </>
   );
