@@ -18,6 +18,7 @@ export interface MemberSearchTarget {
 
 //TODO: credentials配下ではなく、共通化する場所に移動する
 export const useMemberWithDidSearch = (
+  communityId: string,
   members: MemberSearchTarget[] = [],
   options?: {
     searchQuery?: string;
@@ -33,7 +34,9 @@ export const useMemberWithDidSearch = (
     variables: {
       filter: {
         keyword: searchQuery,
+        communityId,
       },
+      withDidIssuanceRequests: true,
     },
     skip: !searchQuery,
   });
@@ -44,20 +47,8 @@ export const useMemberWithDidSearch = (
         .filter((user): user is GqlUser => !!user)
     : members.map((member) => member.user);
 
-  const userIds = users?.map((user) => user.id);
-
-  const { data: didIssuanceRequests } = useGetDidIssuanceRequestsQuery({
-    variables: { userIds: userIds ?? [] },
-    skip: !userIds,
-    fetchPolicy: "network-only",
-  });
-
   const usersWithDid = users?.map(user => {
-    const didInfo = didIssuanceRequests?.users?.edges
-      ?.find(edge => edge?.node?.id === user.id)
-      ?.node?.didIssuanceRequests
-      ?.find(request => request?.status === GqlDidIssuanceStatus.Completed);
-
+    const didInfo = user.didIssuanceRequests?.find(request => request?.status === GqlDidIssuanceStatus.Completed);
     return {
       ...user,
       didInfo,

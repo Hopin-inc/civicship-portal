@@ -54,32 +54,16 @@ export function useWalletsAndDidIssuanceRequests({ userId, listType, keyword }: 
   error: ApolloError | undefined;
   allTransactions: any[];
   presentedTransactions: PresentedTransaction[];
-  loading: boolean;
 } {
   const { data, error, refetch, fetchMore } = useGetTransactionsQuery({
     variables: { 
       filter: createSearchFilter(userId, keyword),
-      first: 500 
+      first: 500, 
+      withDidIssuanceRequests: true
     },
     fetchPolicy: "network-only",
   });
 
-  const userIds = useMemo(() => {
-    const ids =
-      data?.transactions?.edges
-        ?.flatMap(edge => edge?.node)
-        .flatMap(t => [
-          t?.fromWallet?.user?.id,
-          t?.toWallet?.user?.id
-        ])
-        .filter((id): id is string => !!id) ?? [];
-    return Array.from(new Set(ids));
-  }, [data]);
-
-  const { data: walletDidIssuanceRequests, loading: walletDidIssuanceRequestsLoading } = useGetDidIssuanceRequestsQuery({
-    variables: { userIds },
-    fetchPolicy: "network-only",
-  });
 
   const allTransactions = useMemo<GqlTransaction[]>(() => {
     return (
@@ -100,15 +84,14 @@ export function useWalletsAndDidIssuanceRequests({ userId, listType, keyword }: 
       presentTransaction({
         transaction: t,
         currentUserId: userId,
-        didIssuanceRequests: walletDidIssuanceRequests ?? { users: { edges: [] } },
+        didIssuanceRequests: t.fromWallet?.user?.didIssuanceRequests ?? [],
         listType,
       })
     );
-  }, [allTransactions, userId, walletDidIssuanceRequests, listType]);
+  }, [allTransactions, userId, listType]);
 
   return {
     error,
-    loading: walletDidIssuanceRequestsLoading,
     allTransactions,
     presentedTransactions,
   };

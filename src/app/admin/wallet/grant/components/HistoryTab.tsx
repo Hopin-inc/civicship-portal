@@ -16,7 +16,6 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
   const { user } = useAuth();
   const {
     error,
-    loading,
     presentedTransactions,
   } = useWalletsAndDidIssuanceRequests({ 
     userId: user?.id, 
@@ -29,16 +28,6 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
       <div className="space-y-3 px-4">
         <p className="text-sm text-center text-red-500 pt-4">
           履歴の読み込みに失敗しました
-        </p>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-muted-foreground pt-4">
-          読み込み中...
         </p>
       </div>
     );

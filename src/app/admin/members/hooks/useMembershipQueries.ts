@@ -11,6 +11,7 @@ export const useMembershipQueries = (communityId: string) => {
         createdAt: GqlSortDirection.Asc,
       },
       first: 500,
+      withDidIssuanceRequests: true,
     },
     fetchPolicy: "network-only",
   });

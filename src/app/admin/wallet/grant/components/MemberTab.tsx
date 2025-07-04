@@ -4,6 +4,7 @@ import React, { useRef, useEffect } from "react";
 import { GqlUser } from "@/types/graphql";
 import UserInfoCard from "./UserInfoCard";
 import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface MemberTabProps {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: number } } }[];
@@ -20,9 +21,9 @@ export function MemberTab({
   onLoadMore, 
   hasNextPage 
 }: MemberTabProps) {
-  const { data: searchMembershipData, loading, error } = useMemberSearchFromCredentials(members, { searchQuery });
+  const communityId = COMMUNITY_ID;
+  const { data: searchMembershipData, loading, error } = useMemberSearchFromCredentials(communityId, members, { searchQuery });
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-
   useEffect(() => {
     if (!hasNextPage || !onLoadMore) return;
 

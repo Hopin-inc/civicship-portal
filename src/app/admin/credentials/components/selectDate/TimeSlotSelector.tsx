@@ -1,7 +1,8 @@
 import { useSelection } from "../../context/SelectionContext";
 import { useReservationDateLoader } from "../../hooks/useOpportunitySlotQuery";
-import React from "react";
+import React, { useMemo } from "react";
 import TimeSlotList from "./TimeSlotList";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 const STEP_NUMBERS = {
   CURRENT: 2,
@@ -15,6 +16,16 @@ const STEP_COLORS = {
 
 export default function TimeSlotSelector({ setStep }: { setStep: (step: number) => void }) {
   const {selectedSlot, setSelectedSlot } = useSelection();
+
+  const headerConfig = useMemo(
+    () => ({
+      title: "証明書発行",
+      showLogo: false,
+      showBackButton: true,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
 
   const { groupedSlots } = useReservationDateLoader({ opportunityIds: selectedSlot?.opportunityId ? [selectedSlot?.opportunityId] : [] });
   const now = new Date();
