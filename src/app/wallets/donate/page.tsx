@@ -124,7 +124,7 @@ export default function DonatePointPage() {
     <div className="max-w-xl mx-auto mt-6 space-y-4">
       {!selectedUser ? (
         <UserSelectStep
-          title="送り先を選ぶ"
+          title="譲渡先を選ぶ"
           members={members}
           onSelect={(user) => setSelectedUserId(user.id)}
           onLoadMore={handleLoadMore}
