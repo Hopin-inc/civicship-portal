@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { GqlWalletType, useGetDidIssuanceRequestsQuery, GqlTransaction, useGetTransactionsQuery } from "@/types/graphql";
+import { GqlWalletType, GqlTransaction, useGetTransactionsQuery, GqlDidIssuanceRequest } from "@/types/graphql";
 import { ApolloError } from "@apollo/client";
 import { presentTransaction } from "../data/presenter/transaction";
 
@@ -50,6 +50,20 @@ const createSearchFilter = (userId: string | undefined, keyword: string | undefi
   };
 };
 
+const getDidIssuanceRequests = (userID: string, GqlTransaction: GqlTransaction) => {
+  const fromUser = GqlTransaction.fromWallet?.user;
+  const toUser = GqlTransaction.toWallet?.user;
+
+  let targetRequests: GqlDidIssuanceRequest[] = [];
+  if (fromUser && fromUser.id !== userID) {
+    targetRequests = fromUser.didIssuanceRequests ?? [];
+  } else if (toUser && toUser.id !== userID) {
+    targetRequests = toUser.didIssuanceRequests ?? [];
+  }
+
+  return targetRequests;
+};
+
 export function useWalletsAndDidIssuanceRequests({ userId, listType, keyword }: UseWalletsAndDidIssuanceRequestsProps): {
   loading: boolean;
   error: ApolloError | undefined;
@@ -85,7 +99,7 @@ export function useWalletsAndDidIssuanceRequests({ userId, listType, keyword }: 
       presentTransaction({
         transaction: t,
         currentUserId: userId,
-        didIssuanceRequests: t.fromWallet?.user?.didIssuanceRequests ?? [],
+        didIssuanceRequests: getDidIssuanceRequests(userId ?? "", t),
         listType,
       })
     );
