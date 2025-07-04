@@ -41,7 +41,7 @@ const UserInfoCard = ({
   >
     <Avatar className="mt-1">
       <AvatarImage src={otherUser?.image || ""} />
-      <AvatarFallback>{otherUser?.name?.[0] || "U"}</AvatarFallback>
+      <AvatarFallback>{otherUser?.name || "U"}</AvatarFallback>
     </Avatar>
     <div className="flex-1 ml-4 min-w-0">
       <div className="flex justify-between items-center min-w-0">
