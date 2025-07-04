@@ -76,15 +76,6 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
     },
   });
 
-  const { save } = useEvaluationBulkCreate({
-    onSuccess: () => {
-      router.push("/admin/credentials");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
   const [createParticipation] = useParticipationBulkCreateMutation({
     onCompleted: (response) => {
       save(response?.participationBulkCreate?.participations ?? [], communityId);
