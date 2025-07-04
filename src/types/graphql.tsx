@@ -2982,6 +2982,7 @@ export type GqlGetUserFlexibleQueryVariables = Exact<{
   withPortfolios?: Scalars["Boolean"]["input"];
   withWallets?: Scalars["Boolean"]["input"];
   withOpportunities?: Scalars["Boolean"]["input"];
+  withDidIssuanceRequests?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetUserFlexibleQuery = {
@@ -3034,6 +3035,17 @@ export type GqlGetUserFlexibleQuery = {
         urlX?: string | null;
         nftWallet?: { __typename?: "NftWallet"; id: string } | null;
       }> | null;
+    }> | null;
+    didIssuanceRequests?: Array<{
+      __typename?: "DidIssuanceRequest";
+      id: string;
+      status: GqlDidIssuanceStatus;
+      didValue?: string | null;
+      requestedAt?: Date | null;
+      processedAt?: Date | null;
+      completedAt?: Date | null;
+      createdAt?: Date | null;
+      updatedAt?: Date | null;
     }> | null;
     wallets?: Array<{
       __typename?: "Wallet";
@@ -6565,11 +6577,15 @@ export const GetUserFlexibleDocument = gql`
     $withPortfolios: Boolean! = false
     $withWallets: Boolean! = false
     $withOpportunities: Boolean! = false
+    $withDidIssuanceRequests: Boolean! = false
   ) {
     user(id: $id) {
       ...UserFields
       portfolios @include(if: $withPortfolios) {
         ...UserPortfolioFields
+      }
+      didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+        ...DidIssuanceRequestFields
       }
       wallets @include(if: $withWallets) {
         ...WalletFields
@@ -6593,6 +6609,7 @@ export const GetUserFlexibleDocument = gql`
   }
   ${UserFieldsFragmentDoc}
   ${UserPortfolioFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
   ${WalletFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
   ${TicketFieldsFragmentDoc}
@@ -6616,6 +6633,7 @@ export const GetUserFlexibleDocument = gql`
  *      withPortfolios: // value for 'withPortfolios'
  *      withWallets: // value for 'withWallets'
  *      withOpportunities: // value for 'withOpportunities'
+ *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
  */

@@ -1,7 +1,6 @@
 import { useAuth } from "@/contexts/AuthProvider";
 import { 
   GqlDidIssuanceStatus, 
-  useGetDidIssuanceRequestsQuery, 
   useGetUserFlexibleQuery 
 } from "@/types/graphql";
 
@@ -11,20 +10,12 @@ export function useAccountData() {
   const { data: userData, loading: userLoading } = useGetUserFlexibleQuery({
     variables: {
       id: currentUser?.id ?? "",
-    },
-    skip: !currentUser,
-  });
-  // DID発行リクエストデータ
-  const { data: didIssuanceRequests, loading: didLoading } = useGetDidIssuanceRequestsQuery({
-    variables: {
-      userIds: [currentUser?.id ?? ""],
+      withDidIssuanceRequests: true,
     },
     skip: !currentUser,
   });
   // DID値を取得
-  const didValue = didIssuanceRequests?.users?.edges
-    ?.find(edge => edge?.node?.id === currentUser?.id)
-    ?.node?.didIssuanceRequests
+  const didValue = userData?.user?.didIssuanceRequests
     ?.find(req => req?.status === GqlDidIssuanceStatus.Completed)
     ?.didValue;
   // NFTウォレット連携状態
@@ -37,6 +28,6 @@ export function useAccountData() {
     isAuthenticating,
     didValue,
     isNftWalletLinked,
-    loading: userLoading || didLoading,
+    loading: userLoading,
   };
 } 
