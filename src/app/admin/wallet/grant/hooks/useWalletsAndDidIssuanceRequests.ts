@@ -51,11 +51,12 @@ const createSearchFilter = (userId: string | undefined, keyword: string | undefi
 };
 
 export function useWalletsAndDidIssuanceRequests({ userId, listType, keyword }: UseWalletsAndDidIssuanceRequestsProps): {
+  loading: boolean;
   error: ApolloError | undefined;
   allTransactions: any[];
   presentedTransactions: PresentedTransaction[];
 } {
-  const { data, error, refetch, fetchMore } = useGetTransactionsQuery({
+  const { data, error, loading,refetch, fetchMore } = useGetTransactionsQuery({
     variables: { 
       filter: createSearchFilter(userId, keyword),
       first: 500, 
@@ -91,6 +92,7 @@ export function useWalletsAndDidIssuanceRequests({ userId, listType, keyword }: 
   }, [allTransactions, userId, listType]);
 
   return {
+    loading,
     error,
     allTransactions,
     presentedTransactions,
