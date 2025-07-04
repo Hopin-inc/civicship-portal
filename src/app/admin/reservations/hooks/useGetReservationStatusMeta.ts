@@ -1,4 +1,5 @@
 import {
+  GqlEvaluationStatus,
   GqlOpportunitySlotHostingStatus,
   GqlParticipationStatus,
   GqlReservation,
@@ -27,12 +28,16 @@ const getReservationStatusMeta = (reservation: GqlReservation): StatusMeta => {
   const isFuture = startsAt ? startsAt.getTime() > now.getTime() : false;
   const isPast = startsAt ? startsAt.getTime() <= now.getTime() : false;
 
-  const participating =
+  const participated =
     reservation.participations?.filter(
-      (p) => p.user !== null && p.status === GqlParticipationStatus.Participating,
+      (p) => p.user !== null && p.status === GqlParticipationStatus.Participated,
     ) ?? [];
 
-  const isFullyEvaluated = participating.length > 0 && participating.every((p) => !!p.evaluation);
+  const isFullyEvaluated =
+    participated.length > 0 &&
+    participated.every(
+      (p) => p.evaluation?.status != null && p.evaluation.status !== GqlEvaluationStatus.Pending,
+    );
 
   // --- 判定ロジック ---
 
@@ -52,12 +57,12 @@ const getReservationStatusMeta = (reservation: GqlReservation): StatusMeta => {
     return { step: "cancellation", label: "承認済み", variant: "secondary" };
   }
 
-  if (isAccepted && isPast && !isFullyEvaluated) {
-    return { step: "attendance", label: "出欠未入力", variant: "outline" };
-  }
-
-  if (isAccepted && isPast && isFullyEvaluated) {
-    return { step: "attendance", label: "対応済み", variant: "success" };
+  if (isAccepted && isCompleted && isPast) {
+    if (isFullyEvaluated) {
+      return { step: "attendance", label: "対応済み", variant: "success" };
+    } else {
+      return { step: "attendance", label: "出欠未入力", variant: "outline" };
+    }
   }
 
   // 予期しないパターンへのフォールバック（例：不正データ・未定義状態）
