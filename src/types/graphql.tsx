@@ -45,7 +45,7 @@ export type GqlArticle = {
   publishStatus: GqlPublishStatus;
   publishedAt?: Maybe<Scalars["Datetime"]["output"]>;
   relatedUsers?: Maybe<Array<GqlUser>>;
-  thumbnail?: Maybe<Scalars["JSON"]["output"]>;
+  thumbnail?: Maybe<Scalars["String"]["output"]>;
   title: Scalars["String"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
 };
@@ -56,6 +56,32 @@ export const GqlArticleCategory = {
 } as const;
 
 export type GqlArticleCategory = (typeof GqlArticleCategory)[keyof typeof GqlArticleCategory];
+export type GqlArticleCreateInput = {
+  authorIds: Array<Scalars["ID"]["input"]>;
+  body?: InputMaybe<Scalars["String"]["input"]>;
+  category: GqlArticleCategory;
+  introduction: Scalars["String"]["input"];
+  publishStatus: GqlPublishStatus;
+  relatedOpportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  relatedUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  thumbnail?: InputMaybe<GqlImageInput>;
+  title: Scalars["String"]["input"];
+};
+
+export type GqlArticleCreatePayload = GqlArticleCreateSuccess;
+
+export type GqlArticleCreateSuccess = {
+  __typename?: "ArticleCreateSuccess";
+  article: GqlArticle;
+};
+
+export type GqlArticleDeletePayload = GqlArticleDeleteSuccess;
+
+export type GqlArticleDeleteSuccess = {
+  __typename?: "ArticleDeleteSuccess";
+  articleId: Scalars["ID"]["output"];
+};
+
 export type GqlArticleEdge = GqlEdge & {
   __typename?: "ArticleEdge";
   cursor: Scalars["String"]["output"];
@@ -82,6 +108,26 @@ export type GqlArticleSortInput = {
   createdAt?: InputMaybe<GqlSortDirection>;
   publishedAt?: InputMaybe<GqlSortDirection>;
   startsAt?: InputMaybe<GqlSortDirection>;
+};
+
+export type GqlArticleUpdateContentInput = {
+  authorIds: Array<Scalars["ID"]["input"]>;
+  body?: InputMaybe<Scalars["String"]["input"]>;
+  category: GqlArticleCategory;
+  introduction: Scalars["String"]["input"];
+  publishStatus: GqlPublishStatus;
+  publishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  relatedOpportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  relatedUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  thumbnail?: InputMaybe<GqlImageInput>;
+  title: Scalars["String"]["input"];
+};
+
+export type GqlArticleUpdateContentPayload = GqlArticleUpdateContentSuccess;
+
+export type GqlArticleUpdateContentSuccess = {
+  __typename?: "ArticleUpdateContentSuccess";
+  article: GqlArticle;
 };
 
 export type GqlArticlesConnection = {
@@ -129,11 +175,28 @@ export type GqlCheckOpportunityPermissionInput = {
   opportunityId: Scalars["ID"]["input"];
 };
 
+export type GqlCitiesConnection = {
+  __typename?: "CitiesConnection";
+  edges: Array<GqlCityEdge>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlCitiesInput = {
+  name?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type GqlCity = {
   __typename?: "City";
   code: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
   state?: Maybe<GqlState>;
+};
+
+export type GqlCityEdge = GqlEdge & {
+  __typename?: "CityEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlCity>;
 };
 
 export const GqlClaimLinkStatus = {
@@ -614,6 +677,9 @@ export type GqlMembershipsConnection = {
 
 export type GqlMutation = {
   __typename?: "Mutation";
+  articleCreate?: Maybe<GqlArticleCreatePayload>;
+  articleDelete?: Maybe<GqlArticleDeletePayload>;
+  articleUpdateContent?: Maybe<GqlArticleUpdateContentPayload>;
   communityCreate?: Maybe<GqlCommunityCreatePayload>;
   communityDelete?: Maybe<GqlCommunityDeletePayload>;
   communityUpdateProfile?: Maybe<GqlCommunityUpdateProfilePayload>;
@@ -664,6 +730,22 @@ export type GqlMutation = {
   utilityDelete?: Maybe<GqlUtilityDeletePayload>;
   utilitySetPublishStatus?: Maybe<GqlUtilitySetPublishStatusPayload>;
   utilityUpdateInfo?: Maybe<GqlUtilityUpdateInfoPayload>;
+};
+
+export type GqlMutationArticleCreateArgs = {
+  input: GqlArticleCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationArticleDeleteArgs = {
+  id: Scalars["ID"]["input"];
+  permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationArticleUpdateContentArgs = {
+  id: Scalars["ID"]["input"];
+  input: GqlArticleUpdateContentInput;
+  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationCommunityCreateArgs = {
@@ -985,19 +1067,18 @@ export type GqlOpportunityCategory =
   (typeof GqlOpportunityCategory)[keyof typeof GqlOpportunityCategory];
 export type GqlOpportunityCreateInput = {
   body?: InputMaybe<Scalars["String"]["input"]>;
-  capacity?: InputMaybe<Scalars["Int"]["input"]>;
   category: GqlOpportunityCategory;
-  communityId: Scalars["ID"]["input"];
+  createdBy?: InputMaybe<Scalars["ID"]["input"]>;
   description: Scalars["String"]["input"];
-  endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
   images?: InputMaybe<Array<GqlImageInput>>;
-  place?: InputMaybe<GqlNestedPlaceConnectOrCreateInput>;
+  placeId?: InputMaybe<Scalars["ID"]["input"]>;
   pointsToEarn?: InputMaybe<Scalars["Int"]["input"]>;
   publishStatus: GqlPublishStatus;
+  relatedArticleIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   requireApproval: Scalars["Boolean"]["input"];
   requiredUtilityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  slots?: InputMaybe<Array<GqlOpportunitySlotCreateInput>>;
   title: Scalars["String"]["input"];
 };
 
@@ -1070,6 +1151,7 @@ export type GqlOpportunitySlot = {
 };
 
 export type GqlOpportunitySlotCreateInput = {
+  capacity: Scalars["Int"]["input"];
   endsAt: Scalars["Datetime"]["input"];
   startsAt: Scalars["Datetime"]["input"];
 };
@@ -1097,6 +1179,7 @@ export type GqlOpportunitySlotHostingStatus =
   (typeof GqlOpportunitySlotHostingStatus)[keyof typeof GqlOpportunitySlotHostingStatus];
 export type GqlOpportunitySlotSetHostingStatusInput = {
   comment?: InputMaybe<Scalars["String"]["input"]>;
+  createdBy?: InputMaybe<Scalars["ID"]["input"]>;
   status: GqlOpportunitySlotHostingStatus;
 };
 
@@ -1451,7 +1534,7 @@ export type GqlQuery = {
   __typename?: "Query";
   article?: Maybe<GqlArticle>;
   articles: GqlArticlesConnection;
-  cities: Array<GqlCity>;
+  cities: GqlCitiesConnection;
   communities: GqlCommunitiesConnection;
   community?: Maybe<GqlCommunity>;
   currentUser?: Maybe<GqlCurrentUserPayload>;
@@ -1476,7 +1559,7 @@ export type GqlQuery = {
   reservationHistories: GqlReservationHistoriesConnection;
   reservationHistory?: Maybe<GqlReservationHistory>;
   reservations: GqlReservationsConnection;
-  states: Array<GqlState>;
+  states: GqlStatesConnection;
   ticket?: Maybe<GqlTicket>;
   ticketClaimLink?: Maybe<GqlTicketClaimLink>;
   ticketClaimLinks: GqlTicketClaimLinksConnection;
@@ -1508,7 +1591,9 @@ export type GqlQueryArticlesArgs = {
 };
 
 export type GqlQueryCitiesArgs = {
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlCitiesInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type GqlQueryCommunitiesArgs = {
@@ -1635,7 +1720,9 @@ export type GqlQueryReservationsArgs = {
 };
 
 export type GqlQueryStatesArgs = {
-  name?: InputMaybe<Scalars["String"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlStatesInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type GqlQueryTicketArgs = {
@@ -1875,6 +1962,23 @@ export type GqlState = {
   code: Scalars["ID"]["output"];
   countryCode: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
+};
+
+export type GqlStateEdge = GqlEdge & {
+  __typename?: "StateEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlState>;
+};
+
+export type GqlStatesConnection = {
+  __typename?: "StatesConnection";
+  edges: Array<GqlStateEdge>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlStatesInput = {
+  name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type GqlStorePhoneAuthTokenInput = {
@@ -3273,7 +3377,7 @@ export type GqlArticleFieldsFragment = {
   title: string;
   body?: string | null;
   introduction: string;
-  thumbnail?: any | null;
+  thumbnail?: string | null;
   category: GqlArticleCategory;
   publishStatus: GqlPublishStatus;
   publishedAt?: Date | null;
@@ -3307,7 +3411,7 @@ export type GqlGetArticlesQuery = {
         title: string;
         body?: string | null;
         introduction: string;
-        thumbnail?: any | null;
+        thumbnail?: string | null;
         category: GqlArticleCategory;
         publishStatus: GqlPublishStatus;
         publishedAt?: Date | null;
@@ -3341,7 +3445,7 @@ export type GqlGetArticleQuery = {
     title: string;
     body?: string | null;
     introduction: string;
-    thumbnail?: any | null;
+    thumbnail?: string | null;
     category: GqlArticleCategory;
     publishStatus: GqlPublishStatus;
     publishedAt?: Date | null;
@@ -3423,7 +3527,7 @@ export type GqlGetArticleQuery = {
         title: string;
         body?: string | null;
         introduction: string;
-        thumbnail?: any | null;
+        thumbnail?: string | null;
         category: GqlArticleCategory;
         publishStatus: GqlPublishStatus;
         publishedAt?: Date | null;
@@ -3662,7 +3766,7 @@ export type GqlGetOpportunityQuery = {
       title: string;
       body?: string | null;
       introduction: string;
-      thumbnail?: any | null;
+      thumbnail?: string | null;
       category: GqlArticleCategory;
       publishStatus: GqlPublishStatus;
       publishedAt?: Date | null;
@@ -3684,7 +3788,7 @@ export type GqlGetOpportunityQuery = {
         title: string;
         body?: string | null;
         introduction: string;
-        thumbnail?: any | null;
+        thumbnail?: string | null;
         category: GqlArticleCategory;
         publishStatus: GqlPublishStatus;
         publishedAt?: Date | null;
@@ -4218,6 +4322,7 @@ export type GqlGetReservationsQuery = {
           id: string;
           status: GqlParticipationStatus;
           reason: GqlParticipationStatusReason;
+          user?: { __typename?: "User"; id: string; name: string } | null;
           evaluation?: {
             __typename?: "Evaluation";
             id: string;
@@ -4313,7 +4418,7 @@ export type GqlGetReservationQuery = {
             title: string;
             body?: string | null;
             introduction: string;
-            thumbnail?: any | null;
+            thumbnail?: string | null;
             category: GqlArticleCategory;
             publishStatus: GqlPublishStatus;
             publishedAt?: Date | null;
@@ -4443,7 +4548,7 @@ export type GqlGetPlacesQuery = {
             title: string;
             body?: string | null;
             introduction: string;
-            thumbnail?: any | null;
+            thumbnail?: string | null;
             category: GqlArticleCategory;
             publishStatus: GqlPublishStatus;
             publishedAt?: Date | null;
@@ -4467,7 +4572,7 @@ export type GqlGetPlacesQuery = {
               __typename?: "Article";
               title: string;
               introduction: string;
-              thumbnail?: any | null;
+              thumbnail?: string | null;
             }> | null;
           } | null;
         }> | null;
@@ -4540,7 +4645,7 @@ export type GqlGetPlaceQuery = {
           title: string;
           body?: string | null;
           introduction: string;
-          thumbnail?: any | null;
+          thumbnail?: string | null;
           category: GqlArticleCategory;
           publishStatus: GqlPublishStatus;
           publishedAt?: Date | null;
@@ -4552,7 +4657,7 @@ export type GqlGetPlaceQuery = {
         title: string;
         body?: string | null;
         introduction: string;
-        thumbnail?: any | null;
+        thumbnail?: string | null;
         category: GqlArticleCategory;
         publishStatus: GqlPublishStatus;
         publishedAt?: Date | null;
@@ -8172,6 +8277,10 @@ export const GetReservationsDocument = gql`
             id
             status
             reason
+            user {
+              id
+              name
+            }
             evaluation {
               id
               status
