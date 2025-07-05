@@ -11,10 +11,8 @@ type ParticipatedUser = {
 };
 
 type SelectionContextType = {
-  selectedTicketId: string | null;
   selectedSlot: { opportunityId: string; slotId: string; userIds: string[] } | null;
   selectedUsers: string[];
-  setSelectedTicketId: (id: string | null) => void;
   setSelectedSlot: React.Dispatch<React.SetStateAction<{ opportunityId: string; slotId: string; userIds: string[] } | null>>;
   setSelectedUsers: (users: string[]) => void;
   resetSelection: () => void;
@@ -25,12 +23,10 @@ type SelectionContextType = {
 const SelectionContext = createContext<SelectionContextType | undefined>(undefined);
 
 export function SelectionProvider({ children }: { children: ReactNode }) {
-  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<{ opportunityId: string; slotId: string; userIds: string[] } | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [participatedUsers, setParticipatedUsers] = useState<ParticipatedUser[]>([]);
   const resetSelection = () => {
-    setSelectedTicketId(null);
     setSelectedSlot(null);
     setSelectedUsers([]);
     setParticipatedUsers([]);
@@ -39,10 +35,8 @@ export function SelectionProvider({ children }: { children: ReactNode }) {
   return (
     <SelectionContext.Provider
       value={{
-        selectedTicketId,
         selectedSlot,
         selectedUsers,
-        setSelectedTicketId,
         setSelectedSlot,
         setSelectedUsers,
         resetSelection,

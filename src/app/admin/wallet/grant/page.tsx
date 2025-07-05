@@ -11,6 +11,12 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
+import { Tabs } from "./types/tabs";
+
+const DEFAULT_TAB: Tabs = Tabs.History;
+const isValidTab = (tab: string): tab is Tabs => {
+  return Object.values(Tabs).includes(tab as Tabs);
+};
 
 export default function GrantPointStepperPage() {
   const router = useRouter();
@@ -18,9 +24,22 @@ export default function GrantPointStepperPage() {
 
   const searchParams = useSearchParams();
   const currentPoint = Number(searchParams.get("currentPoint") ?? "0");
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<Tabs>(() => {
+    if (tabParam && isValidTab(tabParam)) {
+      return tabParam;
+    }
+    return DEFAULT_TAB;
+  });
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
-    variables: { filter: { communityId: COMMUNITY_ID } },
+    variables: { 
+      filter: {
+        communityId: COMMUNITY_ID,
+      },
+      first: 500,
+      withDidIssuanceRequests: true,
+    },
     fetchPolicy: "network-only",
   });
 
@@ -32,6 +51,7 @@ export default function GrantPointStepperPage() {
       await fetchMore({
         variables: {
           filter: { communityId: COMMUNITY_ID },
+          first: 500,
           after: endCursor,
         },
       });
@@ -102,12 +122,16 @@ export default function GrantPointStepperPage() {
 
   return (
     <div className="max-w-xl mx-auto mt-6 space-y-4">
+
       {!selectedUser ? (
         <UserSelectStep
           members={members}
           onSelect={setSelectedUser}
           onLoadMore={handleLoadMore}
           hasNextPage={data?.wallets?.pageInfo?.hasNextPage}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          listType="grant"
         />
       ) : (
         <TransferInputStep

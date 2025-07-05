@@ -16,7 +16,7 @@ export const errorMessages: Record<GqlErrorCode, string> = {
   [GqlErrorCode.ReservationFull]: "予約枠が満員です。",
   [GqlErrorCode.AlreadyStartedReservation]: "イベントは終了しました。",
   [GqlErrorCode.ReservationCancellationTimeout]: "キャンセル期限を過ぎています。",
-  [GqlErrorCode.ReservationAdvanceBookingRequired]: "開催より7日前までの予約が必要です。",
+  [GqlErrorCode.ReservationAdvanceBookingRequired]: "開催より前日までの予約が必要です。",
   [GqlErrorCode.ReservationNotAccepted]: "申し込みがまだ承認されていません。",
   [GqlErrorCode.SlotNotScheduled]: "予約枠は開催が予定されていません。",
   [GqlErrorCode.TicketParticipantMismatch]: "チケットと人数が一致しません。",

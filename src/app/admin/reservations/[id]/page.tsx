@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { useGetReservationQuery } from "@/types/graphql";
+import { GqlParticipation, useGetReservationQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
@@ -69,8 +69,11 @@ export default function ReservationPage() {
 
   const reservation = data?.reservation;
   const opportunity = reservation?.opportunitySlot?.opportunity;
-  const participations = reservation?.participations ?? [];
   const slot = reservation?.opportunitySlot;
+
+  const participations = (reservation?.participations ?? []).filter(
+    (p): p is GqlParticipation & { user: NonNullable<GqlParticipation["user"]> } => !!p.user,
+  );
 
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);

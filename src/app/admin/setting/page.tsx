@@ -18,7 +18,7 @@ const adminSettings = [
     icon: Wallet,
   },
   {
-    title: "募集を選ぶ",
+    title: "証明書一覧",
     href: "/admin/credentials",
     icon: ClipboardList,
   },

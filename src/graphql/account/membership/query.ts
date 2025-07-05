@@ -16,6 +16,7 @@ export const GET_MEMBERSHIP_LIST = gql`
     $cursor: MembershipCursorInput
     $filter: MembershipFilterInput
     $sort: MembershipSortInput
+    $withDidIssuanceRequests: Boolean! = false
   ) {
     memberships(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
       pageInfo {
@@ -31,6 +32,9 @@ export const GET_MEMBERSHIP_LIST = gql`
           ...MembershipFields
           user {
             ...UserFields
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              ...DidIssuanceRequestFields
+            }
           }
           community {
             ...CommunityFields

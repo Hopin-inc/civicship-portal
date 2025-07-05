@@ -11,8 +11,15 @@ interface SearchFormProps {
 }
 
 const SearchForm: React.FC<SearchFormProps> = ({ value, onInputChange, onSearch }) => {
-  const handleBlur = () => {
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.preventDefault();
     onSearch(value);
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      onSearch(value);
+    }
   };
   return (
     <div className="relative">
@@ -20,6 +27,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ value, onInputChange, onSearch 
         value={value}
         onChange={e => onInputChange(e.target.value)}
         onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
         placeholder="名前・DIDで検索"
         className="pl-12 py-6 text-body-md rounded-xl text-base min-h-[48px]"
       />

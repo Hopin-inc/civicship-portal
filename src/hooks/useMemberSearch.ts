@@ -1,8 +1,6 @@
-"use client";
-
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
-import { GqlDidIssuanceStatus, GqlUser, useGetDidIssuanceRequestsQuery } from "@/types/graphql";
+import { GqlUser } from "@/types/graphql";
 
 export type MemberSearchFormValues = {
   searchQuery: string;
@@ -21,7 +19,6 @@ export const useMemberSearch = (
   members: MemberSearchTarget[] = [],
   options?: {
     searchParamKey?: string;
-    route?: string;
   },
 ) => {
   const searchParams = useSearchParams();
@@ -40,27 +37,8 @@ export const useMemberSearch = (
     user.name?.toLowerCase().includes(searchQuery)
   );
 
-  const userIds = filteredMembers.map(({ user }) => user.id);
-
-  const { data: didIssuanceRequests } = useGetDidIssuanceRequestsQuery({
-    variables: { userIds },
-    fetchPolicy: "network-only",
-  });
-
-  const filteredMembersWithDid = filteredMembers.map(member => {
-    const didInfo = didIssuanceRequests?.users?.edges
-      ?.find(edge => edge?.node?.id === member.user.id)
-      ?.node?.didIssuanceRequests
-      ?.find(request => request?.status === GqlDidIssuanceStatus.Completed);
-  
-    return {
-      ...member,
-      didInfo,
-    };
-  });
-
   return {
     form,
-    filteredMembers: filteredMembersWithDid,
+    filteredMembers,
   };
-};
+}; 

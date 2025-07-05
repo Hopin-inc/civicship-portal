@@ -2,7 +2,6 @@
 import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
 import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 import { addDays, isAfter } from "date-fns";
-import { ActivitySlotGroupWithOpportunityId } from "../../types/opportunitySlot";
 
 export const presenterOpportunitySlots = (
   edges: (GqlOpportunitySlotEdge | null | undefined)[] | null | undefined,
@@ -49,23 +48,6 @@ export const presenterOpportunitySlot = (
   };
 };
 
-export const filterSlotGroupsBySelectedDate = (
-  groups: ActivitySlotGroupWithOpportunityId[],
-  selectedDates: string[],
-): ActivitySlotGroupWithOpportunityId[] => {
-  if (!selectedDates || selectedDates.length === 0) return groups;
-
-  return groups.filter((group) => selectedDates.includes(group.dateLabel));
-};
-
-export const presenterActivitySlots = (
-  slots: GqlOpportunitySlot[] | null | undefined,
-  feeRequired: number,
-): ActivitySlot[] => {
-  if (!slots || slots.length === 0) return [];
-  return slots.map((slot) => presenterOpportunitySlot(slot, feeRequired));
-};
-
 export const groupActivitySlotsByDate = (slots: ActivitySlot[]): ActivitySlotGroup[] => {
   const groups: Record<string, ActivitySlot[]> = {};
 
@@ -92,23 +74,4 @@ export const groupActivitySlotsByDate = (slots: ActivitySlot[]): ActivitySlotGro
     .sort(
       (a, b) => new Date(a.slots[0].startsAt).getTime() - new Date(b.slots[0].startsAt).getTime(),
     );
-};
-
-export const isSlotAvailable = (slot: ActivitySlot, selectedGuests: number): boolean => {
-  const remainingCapacity = slot.remainingCapacity;
-  return remainingCapacity >= selectedGuests;
-};
-
-export const buildReservationParams = (
-  opportunityId: string,
-  communityId: string,
-  slot: ActivitySlot,
-  selectedGuests: number,
-): URLSearchParams => {
-  return new URLSearchParams({
-    id: opportunityId,
-    community_id: communityId,
-    slot_id: slot.id,
-    guests: selectedGuests.toString(),
-  });
 };

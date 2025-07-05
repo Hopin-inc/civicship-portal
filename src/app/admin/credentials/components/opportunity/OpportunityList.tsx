@@ -5,7 +5,8 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useSelection } from "../../context/SelectionContext";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useMemo } from "react";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 const STEP_NUMBERS = {
   CURRENT: 1,
@@ -21,6 +22,16 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
   const { user } = useAuth();
   const { selectedSlot,setSelectedSlot } = useSelection();
   const router = useRouter();
+
+  const headerConfig = useMemo(
+    () => ({
+      title: "証明書発行",
+      showLogo: false,
+      showBackButton: true,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
 
   const { data: opportunityData } = useGetOpportunitiesQuery({
     variables: {
@@ -60,7 +71,7 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
           {opportunityList?.map((opportunity) => (
             <OpportunityCard
               key={opportunity?.id}
-              title={opportunity?.title ?? "名称未設定のチケット"}
+              title={opportunity?.title}
               qty={opportunity?.slots?.length ?? 0}
               isSelected={selectedSlot?.opportunityId === opportunity?.id}
               onClick={() => handleSelectTicket(opportunity?.id ?? "")}

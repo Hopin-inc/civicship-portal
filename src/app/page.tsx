@@ -35,41 +35,8 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (authLoading || userLoading || isAuthenticating) return;
-
-    const isReturnFromLineAuth =
-      searchParams.has("code") && searchParams.has("state") && searchParams.has("liffClientId");
-
-    if (isReturnFromLineAuth) {
-      const liffState = searchParams.get("liff.state") as EncodedURIComponent | null;
-      let nextPath = decodeURIComponentWithType(liffState);
-
-      if (nextPath?.includes("?next=")) {
-        nextPath = decodeURIComponentWithType(
-          extractSearchParamFromRelativePath<EncodedURIComponent>(nextPath, "next"),
-        );
-      } else if (nextPath?.startsWith("/login")) {
-        nextPath = null;
-      }
-
-      const cleanedUrl = nextPath
-        ? `${window.location.pathname}?next=${nextPath}`
-        : window.location.pathname;
-      router.replace(cleanedUrl);
-      return;
-    }
-
     router.replace(currentCommunityConfig.rootPath ?? "/activities");
-  }, [
-    authLoading,
-    authRedirectService,
-    authenticationState,
-    isAuthenticated,
-    isAuthenticating,
-    router,
-    searchParams,
-    userLoading,
-  ]);
+  }, [router]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
