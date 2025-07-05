@@ -22,7 +22,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ value, onInputChange, onSearch 
     }
   };
   return (
-    <div className="relative">
+    <div className="relative mx-4">
       <Input
         value={value}
         onChange={e => onInputChange(e.target.value)}

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { GqlWalletType, GqlTransaction, useGetTransactionsQuery, GqlDidIssuanceRequest } from "@/types/graphql";
 import { ApolloError } from "@apollo/client";
 import { presentTransaction } from "../data/presenter/transaction";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 type PresentedTransaction = ReturnType<typeof presentTransaction>;
 
@@ -10,45 +11,6 @@ interface UseWalletsAndDidIssuanceRequestsProps {
   listType: "donate" | "grant";
   keyword?: string;
 }
-  // 検索条件を生成する関数
-const createSearchFilter = (userId: string | undefined, keyword: string | undefined) => {
-  if (!userId || !keyword) {
-    return { or: [{ fromUserId: userId }, { toUserId: userId }] };
-  }
-
-  return {
-    or: [
-      // 自分が送信者で、相手の名前で検索
-      {
-        and: [
-          { fromUserId: userId },
-          { toUserName: keyword }
-        ]
-      },
-      // 自分が受信者で、相手の名前で検索
-      {
-        and: [
-          { toUserId: userId },
-          { fromUserName: keyword }
-        ]
-      },
-      // 自分が送信者で、相手のDIDで検索
-      {
-        and: [
-          { fromUserId: userId },
-          { toDidValue: keyword }
-        ]
-      },
-      // 自分が受信者で、相手のDIDで検索
-      {
-        and: [
-          { toUserId: userId },
-          { fromDidValue: keyword }
-        ]
-      }
-    ]
-  };
-};
 
 const getDidIssuanceRequests = (userID: string, GqlTransaction: GqlTransaction) => {
   const fromUser = GqlTransaction.fromWallet?.user;
@@ -70,13 +32,49 @@ export function useWalletsAndDidIssuanceRequests({ userId, listType, keyword }: 
   allTransactions: any[];
   presentedTransactions: PresentedTransaction[];
 } {
+
+  const walletTypeFilter =
+    listType === "grant"
+      ? {
+          or: [
+            { fromWalletType: GqlWalletType.Community },
+            { toWalletType: GqlWalletType.Community },
+          ],
+        }
+      : {
+          and: [
+            { fromWalletType: GqlWalletType.Member },
+            { toWalletType: GqlWalletType.Member },
+          ],
+        };
+
   const { data, error, loading,refetch, fetchMore } = useGetTransactionsQuery({
     variables: { 
-      filter: createSearchFilter(userId, keyword),
+      filter: {
+        communityId: COMMUNITY_ID,
+        ...walletTypeFilter,
+        and: [
+         {
+          or: [
+            { fromUserName: keyword },
+            { toUserName: keyword },
+            { fromDidValue: keyword },
+            { toDidValue: keyword },
+          ]
+         }
+        ],
+        not: {
+          and: [
+            { fromUserId: userId },
+            { toUserId: userId }
+          ]
+        }
+      },
       first: 500, 
       withDidIssuanceRequests: true
     },
     fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
   });
 
 
@@ -87,10 +85,10 @@ export function useWalletsAndDidIssuanceRequests({ userId, listType, keyword }: 
         .filter(
           (t): t is GqlTransaction =>
             !!t &&
-            t.fromWallet !== null &&
+              t.fromWallet !== null &&
             t.fromWallet?.type !== GqlWalletType.Community &&
             t.toWallet?.type !== GqlWalletType.Community
-        ) ?? []
+          ) ?? []
     );
   }, [data]);
 

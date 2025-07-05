@@ -34,7 +34,7 @@ export default function DonatePointPage() {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const { donatePoint } = useTransactionMutations();
@@ -56,8 +56,6 @@ export default function DonatePointPage() {
       user: GqlUser;
       wallet: { currentPointView?: { currentPoint: number } };
     }[]) ?? [];
-
-  const selectedUser = members.find((m) => m?.user.id === selectedUserId)?.user;
 
   const handleDonate = async (amount: number) => {
     if (!selectedUser) return;
@@ -126,7 +124,7 @@ export default function DonatePointPage() {
         <UserSelectStep
           title="譲渡先を選ぶ"
           members={members}
-          onSelect={(user) => setSelectedUserId(user.id)}
+          onSelect={(user) => setSelectedUser(user)}
           onLoadMore={handleLoadMore}
           hasNextPage={hasNextPage}
           activeTab={activeTab}
@@ -137,7 +135,7 @@ export default function DonatePointPage() {
         <TransferInputStep
           user={selectedUser}
           isLoading={isLoading}
-          onBack={() => setSelectedUserId(null)}
+          onBack={() => setSelectedUser(null)}
           onSubmit={handleDonate}
           currentPoint={currentPoint} // ← ここ追加
           title="ポイントをあげる"
