@@ -32,8 +32,8 @@ export default function CredentialList(props: OpportunityListProps) {
     return (
         <>
         <div className="w-full h-auto mt-4">
-        <div className="flex justify-center mt-6">
-        {renderStatusCard(vcData?.vcIssuanceRequests.edges[0]?.node?.status ?? "PENDING", CredentialRole.member)}
+        <div className="flex justify-center mt-6 px-4">
+        {renderStatusCard(vcData?.vcIssuanceRequests.edges[0]?.node?.status, CredentialRole.member)}
         </div>
         <Image
             src="/images/credentials/organizer-Info-logo.png"
@@ -53,6 +53,7 @@ export default function CredentialList(props: OpportunityListProps) {
                     {/* 右側 */}
                     <div className="flex flex-col items-end">
                     <div className="text-sm font-bold text-black">{data?.participation?.opportunitySlot?.opportunity?.createdByUser?.name}</div>
+                        {organizerDid ? (
                         <div className="flex items-center text-gray-400 text-sm mt-1">
                             <Copy 
                                 className="w-4 h-4 mr-1" 
@@ -63,15 +64,20 @@ export default function CredentialList(props: OpportunityListProps) {
                             />
                             <span>{truncateDid(organizerDid ?? "",15)}</span>
                         </div>
+                        ):(
+                            <div className="text-gray-400 text-sm mt-1">
+                                did発行中
+                            </div>
+                        )}
                     </div>
                 </CardHeader>
             </Card>
             <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
-                <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
+                <CardHeader className="flex flex-row justify-between p-4 px-6">
                     <div className="flex items-center h-8 text-gray-400 text-xs min-w-fit whitespace-nowrap">
                         概要
                     </div>
-                    <div className="flex items-center flex-1 min-w-0 ml-8 h-8">
+                    <div className="flex flex-1 min-w-0 ml-8 h-6">
                         <span className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm flex-1">
                             {data?.participation?.opportunitySlot?.opportunity?.title}
                         </span>
@@ -79,7 +85,7 @@ export default function CredentialList(props: OpportunityListProps) {
                             href={`/activities/${data?.participation?.opportunitySlot?.opportunity?.id}?community_id=${data?.participation?.opportunitySlot?.opportunity?.community?.id}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="ml-2"
+                            className="ml-2 flex items-center"
                         >
                             <ExternalLink className="w-4 h-4 text-gray-400" />
                         </Link>
@@ -87,10 +93,11 @@ export default function CredentialList(props: OpportunityListProps) {
                 </CardHeader>
             </Card>
             <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
-                <CardHeader className="flex flex-row items-center justify-between p-6">
+                <CardHeader className="flex flex-row items-center justify-between p-4">
                     <div className="text-gray-400 text-xs font-bold min-w-fit whitespace-nowrap">参加者</div>
                     <div className="flex flex-col items-end">
                     <div className="text-sm font-bold text-black">{data?.participation?.user?.name}</div>
+                    {participantDid ? (
                         <div className="flex items-center text-gray-400 text-sm mt-1">
                             <Copy 
                                 className="w-4 h-4 mr-1" 
@@ -101,21 +108,30 @@ export default function CredentialList(props: OpportunityListProps) {
                             />
                             <span>{truncateDid(participantDid ?? "",15)}</span>
                         </div>
+                    ):(
+                        <div className="text-gray-400 text-sm mt-1">
+                            did発行中
+                        </div>
+                    )}
                     </div>
                 </CardHeader>
             </Card>
             <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
-                <CardHeader className="flex flex-row items-center justify-between p-6">
-                    <div className="text-gray-400 text-xs font-bold min-w-fit whitespace-nowrap">開始日時</div>
-                    <div className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
-                    {formatDateTime(data?.participation?.opportunitySlot?.startsAt ?? new Date(), "yyyy年MM月dd日 HH:mm")}
+                <CardHeader className="flex flex-row items-center justify-between p-5">
+                    <div className="flex items-center h-8 text-gray-400 text-xs font-bold min-w-fit whitespace-nowrap">
+                        開始日時
+                    </div>
+                    <div className="flex items-center h-8 font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
+                        {formatDateTime(data?.participation?.opportunitySlot?.startsAt ?? new Date(), "yyyy年MM月dd日 HH:mm")}
                     </div>
                 </CardHeader>
             </Card>
             <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
-                <CardHeader className="flex flex-row items-center justify-between p-6">
-                    <div className="text-gray-400 text-xs font-bold min-w-fit whitespace-nowrap">終了日時</div>
-                    <div className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
+                <CardHeader className="flex flex-row items-center justify-between p-5">
+                    <div className="flex items-center h-8 text-gray-400 text-xs font-bold min-w-fit whitespace-nowrap">
+                        終了日時
+                    </div>
+                    <div className="flex items-center h-8 font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
                         {formatDateTime(data?.participation?.opportunitySlot?.endsAt ?? new Date(), "yyyy年MM月dd日 HH:mm")}
                     </div>
                 </CardHeader>

@@ -6,7 +6,10 @@ export enum CredentialRole {
     member = "member"
 };
 
-export const renderStatusCard = (status: string,role: CredentialRole) => {
+export const renderStatusCard = (status: string | undefined,role: CredentialRole) => {
+    if (!status) {
+        return <div></div>;
+    }
     switch (status) {
       case GqlVcIssuanceStatus.Pending:
         return <PendingCard description={getStatusDescription(status,role)} />;
