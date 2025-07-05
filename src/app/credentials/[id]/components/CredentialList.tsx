@@ -122,7 +122,7 @@ export default function CredentialList(props: OpportunityListProps) {
                         開始日時
                     </div>
                     <div className="flex items-center h-8 font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
-                        {formatDateTime(data?.participation?.opportunitySlot?.startsAt ?? new Date(), "yyyy年MM月dd日 HH:mm")}
+                        {formatDateTime(data?.participation?.opportunitySlot?.startsAt ?? null, "yyyy年MM月dd日 HH:mm")}
                     </div>
                 </CardHeader>
             </Card>
@@ -132,7 +132,7 @@ export default function CredentialList(props: OpportunityListProps) {
                         終了日時
                     </div>
                     <div className="flex items-center h-8 font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
-                        {formatDateTime(data?.participation?.opportunitySlot?.endsAt ?? new Date(), "yyyy年MM月dd日 HH:mm")}
+                        {formatDateTime(data?.participation?.opportunitySlot?.endsAt ?? null, "yyyy年MM月dd日 HH:mm")}
                     </div>
                 </CardHeader>
             </Card>

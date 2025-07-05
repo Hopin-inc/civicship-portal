@@ -8,7 +8,7 @@ export enum CredentialRole {
 
 export const renderStatusCard = (status: string | undefined,role: CredentialRole) => {
     if (!status) {
-        return <div></div>;
+        return null;
     }
     switch (status) {
       case GqlVcIssuanceStatus.Pending:
@@ -18,7 +18,7 @@ export const renderStatusCard = (status: string | undefined,role: CredentialRole
       case GqlVcIssuanceStatus.Failed:
         return <ErrorCard description={getStatusDescription(status,role)} />;
       default:
-        return <div></div>;
+        return null;
     }
   }
 const getStatusDescription = (status: string, role: CredentialRole) => {
