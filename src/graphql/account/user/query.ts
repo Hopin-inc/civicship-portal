@@ -6,11 +6,15 @@ export const GET_USER_FLEXIBLE = gql`
     $withPortfolios: Boolean! = false
     $withWallets: Boolean! = false
     $withOpportunities: Boolean! = false
+    $withDidIssuanceRequests: Boolean! = false
   ) {
     user(id: $id) {
       ...UserFields
       portfolios @include(if: $withPortfolios) {
         ...UserPortfolioFields
+      }
+      didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+        ...DidIssuanceRequestFields
       }
       wallets @include(if: $withWallets) {
         ...WalletFields

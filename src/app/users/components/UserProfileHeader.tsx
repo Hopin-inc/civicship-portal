@@ -5,17 +5,10 @@ import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { prefectureLabels } from "@/app/users/data/presenter";
 import { GqlCurrentPrefecture } from "@/types/graphql";
-import { Facebook, Home, Instagram, MoreHorizontal, Twitter } from "lucide-react";
+import { Facebook, Home, Instagram, Twitter } from "lucide-react";
 import { useReadMore } from "@/hooks/useReadMore";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useAuth } from "@/contexts/AuthProvider";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -42,7 +35,6 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   isOwner,
   socialUrl,
 }) => {
-  const { logout } = useAuth();
   const socialButtonClasses =
     "rounded-full border border-input w-10 h-10 flex items-center justify-center";
 
@@ -60,21 +52,11 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           {isOwner && (
             <div className="flex gap-2">
               <Link
-                href="/users/me/edit"
-                className={cn(buttonVariants({ variant: "secondary", size: "md" }), "ml-auto")}
+                href="/users/me/setting"
+                className={cn(buttonVariants({ variant: "tertiary", size: "md" }), "ml-auto text-black")}
               >
-                編集
+                設定
               </Link>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="text" className="px-2">
-                    <MoreHorizontal />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="start">
-                  <DropdownMenuItem onClick={logout}>ログアウト</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           )}
         </div>
