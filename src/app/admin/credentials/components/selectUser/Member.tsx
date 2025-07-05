@@ -43,7 +43,7 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didInfo,
     !!vcIssuanceRequestsData?.vcIssuanceRequests.edges.find(
       (edge: any) =>
         edge.node?.evaluation?.participation?.opportunitySlot?.id === selectedSlot?.slotId &&
-        edge.node?.status === GqlVcIssuanceStatus.Processing &&
+        (edge.node?.status === GqlVcIssuanceStatus.Processing || edge.node?.status === GqlVcIssuanceStatus.Pending) &&
         edge.node?.user?.id === user.id
     );
 
