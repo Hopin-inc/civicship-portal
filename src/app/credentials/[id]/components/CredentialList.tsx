@@ -6,6 +6,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import Image from "next/image";
 import { CredentialRole, renderStatusCard } from "@/app/admin/credentials/[id]/data/presenter";
+import { DidDisplayCard } from "./DidDisplayCard";
 
 interface OpportunityListProps {
     data: GqlGetParticipationQuery | undefined
@@ -46,32 +47,12 @@ export default function CredentialList(props: OpportunityListProps) {
         <div className="mt-6 p-4">
 
         <div className="grid grid-cols-1 gap-4 relative">
-            <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
-                <CardHeader className="flex flex-row items-center justify-between p-6">
-                    {/* 左側 */}
-                    <div className="text-gray-400 text-xs font-bold">主催者</div>
-                    {/* 右側 */}
-                    <div className="flex flex-col items-end">
-                    <div className="text-sm font-bold text-black">{data?.participation?.opportunitySlot?.opportunity?.createdByUser?.name}</div>
-                        {organizerDid ? (
-                        <div className="flex items-center text-gray-400 text-sm mt-1">
-                            <Copy 
-                                className="w-4 h-4 mr-1" 
-                                onClick={() => {
-                                    navigator.clipboard.writeText(organizerDid ?? "");
-                                    toast.success("コピーしました");
-                                }}
-                            />
-                            <span>{truncateDid(organizerDid ?? "",15)}</span>
-                        </div>
-                        ):(
-                            <div className="text-gray-400 text-sm mt-1">
-                                did発行中
-                            </div>
-                        )}
-                    </div>
-                </CardHeader>
-            </Card>
+            <DidDisplayCard
+                label="主催者"
+                name={data?.participation?.opportunitySlot?.opportunity?.createdByUser?.name}
+                did={organizerDid}
+                truncateDid={truncateDid}
+            />
             <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
                 <CardHeader className="flex flex-row justify-between p-4 px-6">
                     <div className="flex items-center h-8 text-gray-400 text-xs min-w-fit whitespace-nowrap">
@@ -92,30 +73,12 @@ export default function CredentialList(props: OpportunityListProps) {
                     </div>
                 </CardHeader>
             </Card>
-            <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
-                <CardHeader className="flex flex-row items-center justify-between p-4">
-                    <div className="text-gray-400 text-xs font-bold min-w-fit whitespace-nowrap">参加者</div>
-                    <div className="flex flex-col items-end">
-                    <div className="text-sm font-bold text-black">{data?.participation?.user?.name}</div>
-                    {participantDid ? (
-                        <div className="flex items-center text-gray-400 text-sm mt-1">
-                            <Copy 
-                                className="w-4 h-4 mr-1" 
-                                onClick={() => {
-                                    navigator.clipboard.writeText(participantDid ?? "");
-                                    toast.success("コピーしました");
-                                }}
-                            />
-                            <span>{truncateDid(participantDid ?? "",15)}</span>
-                        </div>
-                    ):(
-                        <div className="text-gray-400 text-sm mt-1">
-                            did発行中
-                        </div>
-                    )}
-                    </div>
-                </CardHeader>
-            </Card>
+            <DidDisplayCard
+                label="参加者"
+                name={data?.participation?.user?.name}
+                did={participantDid}
+                truncateDid={truncateDid}
+            />
             <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
                 <CardHeader className="flex flex-row items-center justify-between p-5">
                     <div className="flex items-center h-8 text-gray-400 text-xs font-bold min-w-fit whitespace-nowrap">
