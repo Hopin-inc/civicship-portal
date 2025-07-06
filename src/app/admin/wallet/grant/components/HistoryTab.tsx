@@ -15,22 +15,16 @@ interface HistoryTabProps {
 
 export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps) {
   const { user } = useAuth();
-  const {
-    error,
-    presentedTransactions,
-    loading,
-  } = useWalletsAndDidIssuanceRequests({ 
-    userId: user?.id, 
-    listType, 
-    keyword: searchQuery 
+  const { error, presentedTransactions, loading } = useWalletsAndDidIssuanceRequests({
+    currentUserId: user?.id,
+    listType,
+    keyword: searchQuery,
   });
 
   if (error) {
     return (
       <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-red-500 pt-4">
-          履歴の読み込みに失敗しました
-        </p>
+        <p className="text-sm text-center text-red-500 pt-4">履歴の読み込みに失敗しました</p>
       </div>
     );
   }
@@ -38,14 +32,12 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
   if (presentedTransactions.length === 0) {
     return (
       <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-muted-foreground pt-4">
-          支給履歴がありません
-        </p>
+        <p className="text-sm text-center text-muted-foreground pt-4">支給履歴がありません</p>
       </div>
     );
   }
 
-  if (loading) <Loading />
+  if (loading) return <Loading />;
 
   return (
     <div className="space-y-3 px-4">
@@ -66,4 +58,4 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
       ))}
     </div>
   );
-} 
+}

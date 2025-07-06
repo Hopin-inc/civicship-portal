@@ -1,5 +1,12 @@
 import { useMemo } from "react";
-import { GqlWalletType, GqlTransaction, useGetTransactionsQuery, GqlDidIssuanceRequest } from "@/types/graphql";
+import {
+  GqlDidIssuanceRequest,
+  GqlTransaction,
+  GqlTransactionFilterInput,
+  GqlTransactionReason,
+  GqlWalletType,
+  useGetTransactionsQuery,
+} from "@/types/graphql";
 import { ApolloError } from "@apollo/client";
 import { presentTransaction } from "../data/presenter/transaction";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
@@ -7,7 +14,7 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 type PresentedTransaction = ReturnType<typeof presentTransaction>;
 
 interface UseWalletsAndDidIssuanceRequestsProps {
-  userId?: string;
+  currentUserId?: string;
   listType: "donate" | "grant";
   keyword?: string;
 }
@@ -26,82 +33,94 @@ const getDidIssuanceRequests = (userID: string, GqlTransaction: GqlTransaction) 
   return targetRequests;
 };
 
-export function useWalletsAndDidIssuanceRequests({ userId, listType, keyword }: UseWalletsAndDidIssuanceRequestsProps): {
+export function useWalletsAndDidIssuanceRequests({
+  currentUserId,
+  listType,
+  keyword,
+}: UseWalletsAndDidIssuanceRequestsProps): {
   loading: boolean;
   error: ApolloError | undefined;
   allTransactions: any[];
   presentedTransactions: PresentedTransaction[];
 } {
-
-  const walletTypeFilter =
+  const walletTypeFilter: GqlTransactionFilterInput =
     listType === "grant"
       ? {
-          or: [
-            { fromWalletType: GqlWalletType.Community },
-            { toWalletType: GqlWalletType.Community },
+          and: [
+            {
+              or: [
+                { fromWalletType: GqlWalletType.Community },
+                { toWalletType: GqlWalletType.Community },
+              ],
+            },
+            {
+              not: {
+                reason: GqlTransactionReason.PointIssued,
+              },
+            },
           ],
         }
       : {
           and: [
-            { fromWalletType: GqlWalletType.Member },
-            { toWalletType: GqlWalletType.Member },
+            {
+              or: [{ fromUserId: currentUserId }, { toUserId: currentUserId }],
+            },
+            {
+              and: [
+                { fromWalletType: GqlWalletType.Member },
+                { toWalletType: GqlWalletType.Member },
+              ],
+            },
           ],
         };
 
-  const { data, error, loading,refetch, fetchMore } = useGetTransactionsQuery({
-    variables: { 
+  const keywordFilter: GqlTransactionFilterInput | undefined = keyword
+    ? {
+        or: [
+          { fromUserName: keyword },
+          { toUserName: keyword },
+          { fromDidValue: keyword },
+          { toDidValue: keyword },
+        ],
+      }
+    : undefined;
+
+  const { data, error, loading } = useGetTransactionsQuery({
+    variables: {
       filter: {
         communityId: COMMUNITY_ID,
         ...walletTypeFilter,
-        and: [
-         {
-          or: [
-            { fromUserName: keyword },
-            { toUserName: keyword },
-            { fromDidValue: keyword },
-            { toDidValue: keyword },
-          ]
-         }
-        ],
-        not: {
-          and: [
-            { fromUserId: userId },
-            { toUserId: userId }
-          ]
-        }
+        ...(keywordFilter ? { and: [keywordFilter] } : {}),
       },
-      first: 500, 
-      withDidIssuanceRequests: true
+      first: 100,
+      withDidIssuanceRequests: true,
     },
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
-
 
   const allTransactions = useMemo<GqlTransaction[]>(() => {
     return (
       data?.transactions?.edges
-        ?.flatMap(edge => edge?.node)
+        ?.flatMap((edge) => edge?.node)
         .filter(
-          (t): t is GqlTransaction =>
-            !!t &&
-              t.fromWallet !== null &&
-            t.fromWallet?.type !== GqlWalletType.Community &&
-            t.toWallet?.type !== GqlWalletType.Community
-          ) ?? []
+          (t): t is GqlTransaction => !!t && t.fromWallet !== null,
+          // t.fromWallet?.type !== GqlWalletType.Community &&
+          // t.toWallet?.type !== GqlWalletType.Community
+        ) ?? []
     );
   }, [data]);
 
   const presentedTransactions = useMemo<PresentedTransaction[]>(() => {
-    return allTransactions.map( t =>
+    return allTransactions.map((transaction) =>
       presentTransaction({
-        transaction: t,
-        currentUserId: userId,
-        didIssuanceRequests: getDidIssuanceRequests(userId ?? "", t),
+        transaction,
+        currentUserId,
+        didIssuanceRequests: getDidIssuanceRequests(currentUserId ?? "", transaction),
         listType,
-      })
+      }),
     );
-  }, [allTransactions, userId, listType]);
+  }, [allTransactions, currentUserId, listType]);
 
   return {
     loading,

@@ -33,11 +33,11 @@ export default function GrantPointStepperPage() {
   });
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
-    variables: { 
+    variables: {
       filter: {
         communityId: COMMUNITY_ID,
       },
-      first: 500,
+      first: 100,
       withDidIssuanceRequests: true,
     },
     fetchPolicy: "network-only",
@@ -122,7 +122,6 @@ export default function GrantPointStepperPage() {
 
   return (
     <div className="max-w-xl mx-auto mt-6 space-y-4">
-
       {!selectedUser ? (
         <UserSelectStep
           members={members}

@@ -5,7 +5,7 @@ import { formatDateTime } from "@/utils/date";
 import React from "react";
 
 interface Props {
-  otherUser: GqlUser | undefined;
+  otherUser: GqlUser | undefined | null;
   label?: string | { text: string; smallText: string };
   point?: number;
   sign?: string;
@@ -35,27 +35,26 @@ const UserInfoCard = ({
   onClick,
   children,
 }: Props) => (
-  <Card
-    className="rounded-2xl border border-gray-200 flex items-start px-4 py-3"
-    onClick={onClick}
-  >
+  <Card className="rounded-2xl border border-gray-200 flex items-start px-4 py-3" onClick={onClick}>
     <Avatar className="mt-1">
       <AvatarImage src={otherUser?.image || ""} />
-      <AvatarFallback>{otherUser?.name || "U"}</AvatarFallback>
+      <AvatarFallback>{otherUser?.name?.[0] || "U"}</AvatarFallback>
     </Avatar>
     <div className="flex-1 ml-4 min-w-0">
       <div className="flex justify-between items-center min-w-0">
         <span className="font-bold text-sm truncate max-w-[140px]">
-          {showLabel ? (
-            typeof label === "string" ? (
-              label
-            ) : label && (
-              <span className="transaction-label flex items-center min-w-0">
-                <span className="truncate">{label.text.replace(label.smallText, "")}</span>
-                <span className="text-xs flex-shrink-0">{label.smallText}</span>
-              </span>
-            )
-          ) : otherUser?.name ? `{{ ${otherUser.name} }}` : ""}
+          {showLabel
+            ? typeof label === "string"
+              ? label
+              : label && (
+                  <span className="transaction-label flex items-center min-w-0">
+                    <span className="truncate">{label.text.replace(label.smallText, "")}</span>
+                    <span className="text-xs flex-shrink-0">{label.smallText}</span>
+                  </span>
+                )
+            : otherUser?.name
+              ? `{{ ${otherUser.name} }}`
+              : ""}
         </span>
         {showPoint && point !== undefined && (
           <span className={`font-bold text-xs ${pointColor ?? ""}`}>
@@ -64,11 +63,7 @@ const UserInfoCard = ({
           </span>
         )}
       </div>
-      {showDid && (
-        <div className="text-gray-400 text-sm truncate mt-1">
-          {didValue}
-        </div>
-      )}
+      {showDid && <div className="text-gray-400 text-sm truncate mt-1">{didValue}</div>}
       {showDate && (
         <div className="text-gray-400 text-sm">
           {formatDateTime(createdAt ?? null, "yyyy年MM月dd日 HH時mm分")}
