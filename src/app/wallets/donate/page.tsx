@@ -25,7 +25,7 @@ export default function DonatePointPage() {
   const [activeTab, setActiveTab] = useState<Tabs>(tab as Tabs);
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
-    variables: { filter: { communityId: COMMUNITY_ID }, first: 500 },
+    variables: { filter: { communityId: COMMUNITY_ID }, first: 100 },
     fetchPolicy: "network-only",
   });
 
@@ -105,7 +105,7 @@ export default function DonatePointPage() {
       await fetchMore({
         variables: {
           filter: { communityId: COMMUNITY_ID },
-          first: 500,
+          first: 100,
           after: endCursor,
         },
       });
