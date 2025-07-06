@@ -33,7 +33,8 @@ export default function UserWalletPage() {
   useHeaderConfig(headerConfig);
 
   const router = useRouter();
-  const handleNavigateToGive = () => router.push(`/wallets/donate?currentPoint=${currentPoint}&tab=history`);
+  const handleNavigateToGive = () =>
+    router.push(`/wallets/donate?currentPoint=${currentPoint}&tab=history`);
 
   const { userAsset, isLoading, error, refetch: refetchWallet } = useWallet(userId);
 

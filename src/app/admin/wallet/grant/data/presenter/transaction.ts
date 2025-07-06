@@ -1,12 +1,18 @@
-import { GqlUser, GqlTransaction, GqlDidIssuanceStatus, GqlDidIssuanceRequest } from "@/types/graphql";
+import {
+  GqlDidIssuanceRequest,
+  GqlDidIssuanceStatus,
+  GqlTransaction,
+  GqlWalletType,
+  Maybe,
+} from "@/types/graphql";
 
 const truncateDid = (did: string | undefined | null, length: number = 20): string => {
-    if (!did) return "";
-    if (did.length <= length) return did;
-    const start = did.substring(0, length);
-    const end = did.substring(did.length - 10);
-    return `${start}...${end}`;
-  };
+  if (!did) return "";
+  if (did.length <= length) return did;
+  const start = did.substring(0, length);
+  const end = did.substring(did.length - 10);
+  return `${start}...${end}`;
+};
 
 function getTransactionLabel({
   listType,
@@ -14,30 +20,30 @@ function getTransactionLabel({
   isReceive,
 }: {
   listType?: "donate" | "grant";
-  otherUserName?: string;
+  otherUserName?: Maybe<string> | undefined;
   isReceive: boolean;
 }) {
-  if(isReceive) {
+  if (isReceive) {
     return {
       text: `${otherUserName ?? ""}から受取`,
-      smallText: "から受取"
+      smallText: "から受取",
     };
   }
   switch (listType) {
     case "donate":
       return {
         text: `${otherUserName ?? ""}に譲渡`,
-        smallText: "に譲渡"
+        smallText: "に譲渡",
       };
     case "grant":
       return {
         text: `${otherUserName ?? ""}に支給`,
-        smallText: "に支給"
+        smallText: "に支給",
       };
     default:
       return {
         text: "",
-        smallText: ""
+        smallText: "",
       };
   }
 }
@@ -49,19 +55,47 @@ export function presentTransaction({
   listType,
 }: {
   transaction: GqlTransaction;
-  currentUserId: string | undefined;
+  currentUserId?: string;
   didIssuanceRequests: GqlDidIssuanceRequest[];
   listType: "donate" | "grant";
 }) {
-  const isReceive = transaction.toWallet?.user?.id === currentUserId;
-  const otherUser: GqlUser | undefined =
-    (isReceive ? transaction.fromWallet?.user : transaction.toWallet?.user) || undefined;
-  const point = isReceive ? transaction.toPointChange ?? 0 : Math.abs(transaction.fromPointChange ?? 0);
+  const fromUser = transaction.fromWallet?.user;
+  const toUser = transaction.toWallet?.user;
+  const fromWallet = transaction.fromWallet;
+  const toWallet = transaction.toWallet;
+
+  const isReceive =
+    listType === "grant"
+      ? fromWallet?.type !== GqlWalletType.Community
+      : toWallet?.user?.id === currentUserId;
+
+  const otherName = isReceive
+    ? fromWallet?.community?.name
+    : (toWallet?.user?.name ?? toWallet?.community?.name);
+
+  const otherUser =
+    listType === "grant"
+      ? isReceive
+        ? undefined // コミュニティはユーザーなし
+        : toUser
+      : isReceive
+        ? fromUser
+        : toUser;
+
+  const rawPoint = isReceive ? transaction.toPointChange : transaction.fromPointChange;
+  const point = Math.abs(rawPoint ?? 0);
   const sign = isReceive ? "+" : "-";
   const pointColor = isReceive ? "text-green-500" : "";
-  const label = getTransactionLabel({ listType, otherUserName: otherUser?.name, isReceive });
 
-  const didValue = didIssuanceRequests.find((request) => request.status === GqlDidIssuanceStatus.Completed)?.didValue;
+  const label = getTransactionLabel({
+    listType,
+    otherUserName: otherName,
+    isReceive,
+  });
+
+  const didValue = didIssuanceRequests.find(
+    (req) => req.status === GqlDidIssuanceStatus.Completed,
+  )?.didValue;
 
   return {
     isReceive,

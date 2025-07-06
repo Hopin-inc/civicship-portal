@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { GqlUser } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Tabs as TabsEnum } from "../types/tabs";
@@ -16,19 +16,19 @@ interface Props {
   hasNextPage?: boolean;
   title?: string;
   activeTab: TabsEnum;
-  setActiveTab: React.Dispatch<React.SetStateAction<TabsEnum>>
+  setActiveTab: React.Dispatch<React.SetStateAction<TabsEnum>>;
   listType: "donate" | "grant";
 }
 
-function UserSelectStep({ 
-  members, 
-  onSelect, 
-  onLoadMore, 
-  hasNextPage, 
-  title, 
-  activeTab, 
-  setActiveTab, 
-  listType 
+function UserSelectStep({
+  members,
+  onSelect,
+  onLoadMore,
+  hasNextPage,
+  title,
+  activeTab,
+  setActiveTab,
+  listType,
 }: Props) {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -37,8 +37,9 @@ function UserSelectStep({
       title: title ?? "支給相手を選ぶ",
       showLogo: false,
       showBackButton: true,
+      backTo: listType === "grant" ? "/admin/wallet" : "/wallets",
     }),
-    [title],
+    [title, listType],
   );
   useHeaderConfig(headerConfig);
 
@@ -46,17 +47,13 @@ function UserSelectStep({
     <>
       <SearchSection onSearch={setSearchQuery} />
       <TabManager activeTab={activeTab} setActiveTab={setActiveTab} />
-      
+
       {activeTab === TabsEnum.History && (
-        <HistoryTab 
-          listType={listType}
-          searchQuery={searchQuery}
-          onSelect={onSelect}
-        />
+        <HistoryTab listType={listType} searchQuery={searchQuery} onSelect={onSelect} />
       )}
-      
+
       {activeTab === TabsEnum.Member && (
-        <MemberTab 
+        <MemberTab
           members={members}
           searchQuery={searchQuery}
           onSelect={onSelect}
