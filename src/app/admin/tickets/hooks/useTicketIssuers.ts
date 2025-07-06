@@ -3,14 +3,16 @@
 import { useInfiniteScrollQuery } from "@/hooks/useInfiniteScrollQuery";
 import {
   GqlSortDirection,
+  GqlTicketIssuerEdge,
 } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
 import { GET_TICKET_ISSUERS } from "@/graphql/reward/ticketIssuer/query";
+import { ApolloError } from "@apollo/client";
 
 export interface UseTicketIssuersResult {
-  ticketIssuers: any[];
+  ticketIssuers: (GqlTicketIssuerEdge | null)[];
   loading: boolean;
-  error: any;
+  error: ApolloError | undefined;
   loadMoreRef: React.RefObject<HTMLDivElement>;
   refetch: () => void;
   hasNextPage: boolean;
@@ -39,7 +41,7 @@ export const useTicketIssuers = (): UseTicketIssuersResult => {
   });
 
   return {
-    ticketIssuers,
+    ticketIssuers: ticketIssuers.filter((issuer): issuer is GqlTicketIssuerEdge => issuer !== null),
     loading,
     error,
     loadMoreRef,

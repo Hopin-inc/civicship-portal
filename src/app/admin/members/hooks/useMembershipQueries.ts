@@ -27,9 +27,13 @@ export const useMembershipQueries = (communityId: string) => {
 
   const handleFetchMore = async () => {
     if (!hasNextPage || isLoadingMore || !endCursor) return;
+    if (typeof endCursor !== "string" || !endCursor.includes("_") || endCursor.split("_").length !== 2) {
+      console.warn("endCursor format is invalid:", endCursor);
+      return;
+    }
     setIsLoadingMore(true);
     try {
-      const [userId, communityId] = (endCursor ?? "").split("_");
+      const [userId, communityId] = endCursor.split("_");
       await fetchMore({
         variables: {
           cursor: { userId, communityId },
