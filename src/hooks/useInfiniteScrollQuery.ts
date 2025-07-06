@@ -2,13 +2,13 @@
 
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import React, { useState } from "react";
-import { useQuery, DocumentNode, QueryHookOptions } from "@apollo/client";
+import { useQuery, DocumentNode, QueryHookOptions, ApolloError } from "@apollo/client";
 import { toast } from "sonner";
 
 export interface UseInfiniteScrollQueryResult<TData, TEdge> {
   data: TData | undefined;
   loading: boolean;
-  error: any;
+  error: ApolloError | undefined;
   loadMoreRef: React.RefObject<HTMLDivElement>;
   refetch: () => void;
   hasNextPage: boolean;
