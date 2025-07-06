@@ -91,7 +91,7 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didInfo,
               指定された募集で証明書発行中
             </span>
           )}
-        <span className={`${did ? "font-bold text-base text-black" : "text-gray-400 text-base"}`}>
+        <span className={`${did ? "font-bold text-base text-black" : "text-gray-400 text-base"} truncate max-w-[160px]`}>
           {user.name}
         </span>
         <span className="text-gray-400 text-sm max-w-[160px]">
