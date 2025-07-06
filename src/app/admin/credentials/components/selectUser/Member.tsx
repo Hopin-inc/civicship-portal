@@ -33,7 +33,7 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didInfo,
   const did = didInfo?.didValue;
   const hasCompletedVcIssuanceRequest =
     !!vcIssuanceRequestsData?.vcIssuanceRequests.edges.find(
-      (edge: any) =>
+      (edge) =>
         edge.node?.evaluation?.participation?.opportunitySlot?.id === selectedSlot?.slotId &&
         edge.node?.status === GqlVcIssuanceStatus.Completed &&
         edge.node?.user?.id === user.id
@@ -41,7 +41,7 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didInfo,
 
   const hasProcessingVcIssuanceRequest =
     !!vcIssuanceRequestsData?.vcIssuanceRequests.edges.find(
-      (edge: any) =>
+      (edge) =>
         edge.node?.evaluation?.participation?.opportunitySlot?.id === selectedSlot?.slotId &&
         (edge.node?.status === GqlVcIssuanceStatus.Processing || edge.node?.status === GqlVcIssuanceStatus.Pending) &&
         edge.node?.user?.id === user.id
