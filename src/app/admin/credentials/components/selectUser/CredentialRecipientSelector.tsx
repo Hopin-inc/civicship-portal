@@ -183,10 +183,10 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
           <span className={`${STEP_COLORS.GRAY} text-base`}>)</span>
         </span>
       </div>
-      <div className="px-4 mb-4 pt-4">
+      <div className="mb-4 pt-4">
         <SearchForm value={input} onInputChange={setInput} onSearch={setSearchQuery} />
       </div>
-      <div className="flex flex-col gap-4 px-4">
+      <div className="flex flex-col gap-4">
         <SearchResultList
           searchQuery={searchQuery}
           searchMembershipData={formattedMembers}

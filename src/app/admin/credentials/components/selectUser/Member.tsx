@@ -9,6 +9,7 @@ import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Input } from "@/components/ui/input";
 import { useSelection } from "../../context/SelectionContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
 
 interface Props {
   user: GqlUser & { didInfo?: GqlDidIssuanceRequest };
@@ -50,8 +51,8 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didInfo,
   const cardBgClass = !did || isDisabled ? "bg-zinc-200" : "bg-white";
 
   return (
-    <div
-      className={`flex items-center border border-gray-200 rounded-xl px-4 py-3 w-full max-w-lg ${cardBgClass}`}
+    <Card
+      className={`flex items-center gap-3 rounded-xl border transition-colors px-4 py-3 cursor-pointer ${cardBgClass}`}
     >
       {/* チェックボックス */}
       <Input
@@ -71,7 +72,7 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didInfo,
       </Avatar>
       {/* ユーザー情報 */}
       {/* isDisabledはタップ不可になる可能性のフラグ*/}
-      <div className="flex flex-col ml-4 min-w-0">
+      <div className="flex flex-col ml-4">
         {isDisabled && reason === GqlParticipationStatusReason.ReservationAccepted && (
           <span className="text-green-500 text-xs font-semibold mb-1">
             指定された募集に申込済み
@@ -94,10 +95,10 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didInfo,
         <span className={`${did ? "font-bold text-base text-black" : "text-gray-400 text-base"} truncate max-w-[160px]`}>
           {user.name}
         </span>
-        <span className="text-gray-400 text-sm max-w-[160px]">
+        <span className="text-gray-400 text-sm max-w-[200px]">
           {did ? truncateDid(did, 20) : "did発行中"}
         </span>
       </div>
-    </div>
+    </Card>
   );
 };
