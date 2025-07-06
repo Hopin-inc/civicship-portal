@@ -69,24 +69,21 @@ export default function TicketsPage() {
             <p className="text-muted-foreground">発行リンクがありません</p>
           ) : (
             <>
-              {ticketList.map((ticket, index) => {
+              {ticketList.map((ticket) => {
                 const qty = ticket?.qtyToBeIssued;
-                const createdAt = ticket?.createdAt instanceof Date
-                  ? ticket.createdAt.getTime()
-                  : (ticket?.createdAt ? new Date(ticket.createdAt).getTime() : index);
                 
                 return (
                   <TicketIssueCard
-                    key={ `${ ticket?.id }-${ createdAt }-${ index }` }
-                    title={ ticket?.utility?.name ?? "名称未設定のチケット" }
-                    qty={ qty }
+                    key={ticket?.id}
+                    title={ticket?.utility?.name ?? "名称未設定のチケット"}
+                    qty={qty}
                     createdAt={
                       ticket?.createdAt instanceof Date
                         ? ticket.createdAt.toISOString()
                         : (ticket?.createdAt ?? "")
                     }
-                    href={ `/admin/tickets/${ ticket?.claimLink?.id }` }
-                    status={ ticket?.claimLink?.status }
+                    href={`/admin/tickets/${ticket?.claimLink?.id}`}
+                    status={ticket?.claimLink?.status}
                   />
                 );
               })}
