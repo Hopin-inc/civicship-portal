@@ -4513,6 +4513,7 @@ export type GqlGetParticipationQuery = {
     evaluation?: {
       __typename?: "Evaluation";
       id: string;
+      status: GqlEvaluationStatus;
       participation?: {
         __typename?: "Participation";
         user?: {
@@ -5286,6 +5287,7 @@ export type GqlTicketClaimLinkQuery = {
 export type GqlGetTicketIssuersQueryVariables = Exact<{
   filter?: InputMaybe<GqlTicketIssuerFilterInput>;
   sort?: InputMaybe<GqlTicketIssuerSortInput>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
@@ -9964,9 +9966,10 @@ export const GetTicketIssuersDocument = gql`
   query GetTicketIssuers(
     $filter: TicketIssuerFilterInput
     $sort: TicketIssuerSortInput
+    $cursor: String
     $first: Int
   ) {
-    ticketIssuers(filter: $filter, sort: $sort, first: $first) {
+    ticketIssuers(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
       pageInfo {
         startCursor
         endCursor
@@ -10013,6 +10016,7 @@ export const GetTicketIssuersDocument = gql`
  *   variables: {
  *      filter: // value for 'filter'
  *      sort: // value for 'sort'
+ *      cursor: // value for 'cursor'
  *      first: // value for 'first'
  *   },
  * });

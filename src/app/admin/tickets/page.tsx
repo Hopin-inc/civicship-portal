@@ -5,7 +5,6 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import {
   GqlSortDirection,
-  useGetTicketIssuersQuery,
   useGetUtilitiesQuery,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
@@ -14,6 +13,7 @@ import { TicketIssueCard } from "@/app/admin/tickets/components/IssuerCard";
 import CreateUtilitySheet from "@/app/admin/tickets/utilities/components/CreateUtilitySheet";
 import CreateTicketSheet from "@/app/admin/tickets/components/CreateTicketSheet";
 import Link from "next/link";
+import { useTicketIssuers } from "./hooks/useTicketIssuers";
 
 export default function TicketsPage() {
   const headerConfig = useMemo(() => ({ title: "チケット管理", showLogo: false }), []);
@@ -27,17 +27,9 @@ export default function TicketsPage() {
       first: 200,
     },
   });
-
-  const { data: ticketData, refetch: refetchTickets } = useGetTicketIssuersQuery({
-    variables: {
-      filter: { ownerId: user?.id ?? "" },
-      sort: { createdAt: GqlSortDirection.Desc },
-      first: 200,
-    },
-  });
-
+  const { ticketIssuers, refetch: refetchTickets, loadMoreRef, hasNextPage, isLoadingMore } = useTicketIssuers();
   const utilityList = utilityData?.utilities?.edges?.map((e) => e?.node) ?? [];
-  const ticketList = ticketData?.ticketIssuers?.edges?.map((e) => e?.node) ?? [];
+  const ticketList = ticketIssuers.map((e) => e?.node).filter(Boolean);
 
   if (utilitiesLoading) {
     return <LoadingIndicator />;
@@ -76,23 +68,41 @@ export default function TicketsPage() {
           { ticketList.length === 0 ? (
             <p className="text-muted-foreground">発行リンクがありません</p>
           ) : (
-            ticketList.map((ticket) => {
-              const qty = ticket?.qtyToBeIssued;
-              return (
-                <TicketIssueCard
-                  key={ `${ ticket?.id }-${ ticket?.claimLink?.id ?? "no-claimLink" }` }
-                  title={ ticket?.utility?.name ?? "名称未設定のチケット" }
-                  qty={ qty }
-                  createdAt={
-                    ticket?.createdAt instanceof Date
-                      ? ticket.createdAt.toISOString()
-                      : (ticket?.createdAt ?? "")
-                  }
-                  href={ `/admin/tickets/${ ticket?.claimLink?.id }` }
-                  status={ ticket?.claimLink?.status }
-                />
-              );
-            })) }
+            <>
+              {ticketList.map((ticket, index) => {
+                const qty = ticket?.qtyToBeIssued;
+                const createdAt = ticket?.createdAt instanceof Date
+                  ? ticket.createdAt.getTime()
+                  : (ticket?.createdAt ? new Date(ticket.createdAt).getTime() : index);
+                
+                return (
+                  <TicketIssueCard
+                    key={ `${ ticket?.id }-${ createdAt }-${ index }` }
+                    title={ ticket?.utility?.name ?? "名称未設定のチケット" }
+                    qty={ qty }
+                    createdAt={
+                      ticket?.createdAt instanceof Date
+                        ? ticket.createdAt.toISOString()
+                        : (ticket?.createdAt ?? "")
+                    }
+                    href={ `/admin/tickets/${ ticket?.claimLink?.id }` }
+                    status={ ticket?.claimLink?.status }
+                  />
+                );
+              })}
+              {hasNextPage && (
+                <div ref={loadMoreRef} className="py-4 text-center mt-4">
+                  {isLoadingMore ? (
+                    <div className="py-2">
+                      <LoadingIndicator fullScreen={false} />
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground text-sm">スクロールしてさらに読み込み...</p>
+                  )}
+                </div>
+              )}
+            </>
+          ) }
         </div>
       </div>
     </div>

@@ -1,13 +1,20 @@
-import { GqlMembershipStatus, GqlSortDirection, useGetMembershipListQuery } from "@/types/graphql";
-import { useState } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { GET_MEMBERSHIP_LIST } from "@/graphql/account/membership/query";
+import { useQuery } from "@apollo/client";
+import { GqlMembershipStatus, GqlSortDirection, GqlUser, GqlRole } from "@/types/graphql";
+import React from "react";
 
-export const useMembershipQueries = (communityId: string) => {
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const { data, loading, error, refetch, fetchMore } = useGetMembershipListQuery({
+export const useInfiniteMembers = (communityId: string) => {
+  const {
+    data,
+    loading,
+    error,
+    fetchMore,
+    refetch,
+  } = useQuery(GET_MEMBERSHIP_LIST, {
     variables: {
       filter: {
-        communityId,
+        communityIds: [communityId],
         status: GqlMembershipStatus.Joined,
       },
       sort: {
@@ -21,20 +28,20 @@ export const useMembershipQueries = (communityId: string) => {
   });
 
   const connection = data?.memberships ?? { edges: [], pageInfo: {} };
-  const pageInfo = connection.pageInfo && "endCursor" in connection.pageInfo ? connection.pageInfo : { endCursor: undefined, hasNextPage: false };
-  const endCursor = pageInfo.endCursor;
-  const hasNextPage = pageInfo.hasNextPage ?? false;
+  const endCursor = connection.pageInfo?.endCursor;
+  const hasNextPage = connection.pageInfo?.hasNextPage ?? false;
+
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
 
   const handleFetchMore = async () => {
-    if (!hasNextPage || isLoadingMore || !endCursor) return;
+    if (!hasNextPage || isLoadingMore) return;
     setIsLoadingMore(true);
     try {
-      const [userId, communityId] = (endCursor ?? "").split("_");
       await fetchMore({
         variables: {
-          cursor: { userId, communityId },
+          cursor: { endCursor },
         },
-        updateQuery: (prev, { fetchMoreResult }) => {
+        updateQuery: (prev: any, { fetchMoreResult }: any) => {
           if (!fetchMoreResult) return prev;
           return {
             ...prev,
@@ -60,14 +67,21 @@ export const useMembershipQueries = (communityId: string) => {
     onLoadMore: handleFetchMore,
   });
 
+  const members = (connection.edges ?? [])
+    .map((edge: any) => {
+      const user = edge?.node?.user;
+      const role = edge?.node?.role;
+      return user && role ? { user, role } : null;
+    })
+    .filter((member: any): member is { user: GqlUser; role: GqlRole } => member !== null);
+
   return {
-    membershipListData: data,
+    members,
     loading,
     error,
+    loadMoreRef,
     refetch,
     hasNextPage,
     isLoadingMore,
-    handleFetchMore,
-    loadMoreRef,
   };
-};
+}; 
