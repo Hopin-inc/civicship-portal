@@ -89,8 +89,11 @@ export function useWalletsAndDidIssuanceRequests({
     variables: {
       filter: {
         communityId: COMMUNITY_ID,
-        ...walletTypeFilter,
-        ...(keywordFilter ? { and: [keywordFilter] } : {}),
+        and: [
+          walletTypeFilter,
+          ...(keywordFilter ? [keywordFilter] : []),
+        ],
+      },
       },
       first: 100,
       withDidIssuanceRequests: true,
