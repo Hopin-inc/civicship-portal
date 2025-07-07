@@ -22,7 +22,7 @@ const adminSettings = [
     requiredFeature: "points" as FeaturesType,
   },
   {
-    title: "証明書一覧",
+    title: "証明書管理",
     href: "/admin/credentials",
     icon: ClipboardList,
     requiredFeature: "credentials" as FeaturesType,
