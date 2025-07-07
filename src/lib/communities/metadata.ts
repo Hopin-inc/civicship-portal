@@ -7,7 +7,8 @@ export type FeaturesType =
   | "tickets"
   | "articles"
   | "prefectures"
-  | "credentials";
+  | "credentials"
+  | "justDaoIt";
 
 // コミュニティごとのベース設定
 interface CommunityBaseConfig {
@@ -23,6 +24,7 @@ interface CommunityBaseConfig {
   ogImagePath: string;
   enableFeatures: FeaturesType[];
   rootPath?: string;
+  adminRootPath?: string;
 }
 
 // コミュニティごとのメタデータ型定義
@@ -72,6 +74,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
     enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures"],
     rootPath: "/activities",
+    adminRootPath: "/admin/reservations",
   },
   kibotcha: {
     id: "kibotcha",
@@ -85,8 +88,9 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     squareLogoPath: "/communities/kibotcha/logo-square.jpg",
     ogImagePath:
       "https://storage.googleapis.com/prod-civicship-storage-public/asset/kibotcha/ogp.jpg",
-    enableFeatures: ["points"],
+    enableFeatures: ["points", "justDaoIt"],
     rootPath: "/users/me",
+    adminRootPath: "/admin/wallet",
   },
   dais: {
     id: "dais",
@@ -101,6 +105,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/dais/ogp.jpg",
     enableFeatures: ["credentials"],
     rootPath: "/users/me",
+    adminRootPath: "/admin/credentials",
   },
   default: {
     id: "default",
