@@ -89,11 +89,7 @@ export function useWalletsAndDidIssuanceRequests({
     variables: {
       filter: {
         communityId: COMMUNITY_ID,
-        and: [
-          walletTypeFilter,
-          ...(keywordFilter ? [keywordFilter] : []),
-        ],
-      },
+        and: [walletTypeFilter, ...(keywordFilter ? [keywordFilter] : [])],
       },
       first: 100,
       withDidIssuanceRequests: true,
@@ -106,11 +102,7 @@ export function useWalletsAndDidIssuanceRequests({
     return (
       data?.transactions?.edges
         ?.flatMap((edge) => edge?.node)
-        .filter(
-          (t): t is GqlTransaction => !!t && t.fromWallet !== null,
-          // t.fromWallet?.type !== GqlWalletType.Community &&
-          // t.toWallet?.type !== GqlWalletType.Community
-        ) ?? []
+        .filter((t): t is GqlTransaction => !!t && t.fromWallet !== null) ?? []
     );
   }, [data]);
 
