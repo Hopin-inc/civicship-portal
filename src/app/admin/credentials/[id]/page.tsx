@@ -71,12 +71,12 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
   return( 
     <div className="p-4 space-y-3 max-w-2xl mx-auto">
         {renderStatusCard(matchedEvaluation?.node?.vcIssuanceRequest?.status ?? "PENDING", CredentialRole.manager)}
-        <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
+        <Card className="rounded-2xl border border-zinc-200 bg-card shadow-none ">
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="text-zinc-500 text-xs">主催者</div>
                 <div className="flex flex-col items-end">
                 <div className="text-sm font-bold text-black">{matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.createdByUser?.name}</div>
-                    <div className="flex items-center text-gray-400 text-sm mt-1">
+                    <div className="flex items-center text-zinc-400 text-sm mt-1">
                       {organizerDidValue && (
                         <>
                           <Copy className="w-4 h-4 mr-1 cursor-pointer" onClick={() => {
@@ -90,7 +90,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
                 </div>
             </CardHeader>
         </Card>
-        <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
+        <Card className="rounded-2xl border border-zinc-200 bg-card shadow-none ">
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="text-zinc-500 text-xs min-w-fit whitespace-nowrap">概要</div>
                 <div className="flex items-center flex-1 min-w-0 ml-8">
@@ -108,7 +108,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
                 </div>
             </CardHeader>
         </Card>
-        <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
+        <Card className="rounded-2xl border border-zinc-200 bg-card shadow-none ">
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="text-zinc-500 text-xs min-w-fit whitespace-nowrap">開始日時</div>
                 <div className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
@@ -116,7 +116,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
                 </div>
             </CardHeader>
         </Card>
-        <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
+        <Card className="rounded-2xl border border-zinc-200 bg-card shadow-none ">
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="text-zinc-500 text-xs min-w-fit whitespace-nowrap">終了日時</div>
                 <div className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
@@ -135,7 +135,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
           const style = statusStyle[status];
 
           return (
-            <Card key={evaluation?.node?.id} className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none">
+            <Card key={evaluation?.node?.id} className="rounded-2xl border border-zinc-200 bg-card shadow-none">
               <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="flex flex-col items-start w-full">
                   <div className="flex items-center justify-between w-full">
@@ -148,7 +148,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center text-gray-400 text-sm mt-2">
+                  <div className="flex items-center text-zinc-400 text-sm mt-2">
                     {didValue && (
                       <>
                         <Copy
