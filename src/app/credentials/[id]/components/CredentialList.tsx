@@ -64,26 +64,28 @@ export default function CredentialList(props: OpportunityListProps) {
             did={organizerDid}
             truncateDid={truncateDid}
           />
-          <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
-            <CardHeader className="flex flex-row justify-between p-4 px-6">
-              <div className="flex items-center h-8 text-gray-400 text-xs min-w-fit whitespace-nowrap">
-                概要
-              </div>
-              <div className="flex flex-1 min-w-0 ml-8 h-6">
-                <span className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm flex-1">
+          <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none">
+            <CardHeader className="flex flex-row items-center p-4 px-6 h-[56px]">
+              {/* 左側ラベル（固定幅） */}
+              <div className="w-24 text-gray-400 text-xs">概要</div>
+
+              {/* タイトルとアイコン */}
+              <div className="flex flex-1 items-center justify-end gap-2 min-w-0">
+                <span className="text-sm font-bold text-black truncate text-right">
                   {data?.participation?.opportunitySlot?.opportunity?.title}
                 </span>
                 <Link
                   href={`/activities/${data?.participation?.opportunitySlot?.opportunity?.id}?community_id=${data?.participation?.opportunitySlot?.opportunity?.community?.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ml-2 flex items-center"
+                  className="flex-shrink-0"
                 >
                   <ExternalLink className="w-4 h-4 text-gray-400" />
                 </Link>
               </div>
             </CardHeader>
           </Card>
+
           <DidDisplayCard
             label="参加者"
             name={data?.participation?.user?.name}
