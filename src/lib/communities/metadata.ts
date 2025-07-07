@@ -6,7 +6,8 @@ export type FeaturesType =
   | "points"
   | "tickets"
   | "articles"
-  | "prefectures";
+  | "prefectures"
+  | "credentials";
 
 // コミュニティごとのベース設定
 interface CommunityBaseConfig {
@@ -87,6 +88,20 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     enableFeatures: ["points"],
     rootPath: "/users/me",
   },
+  dais: {
+    id: "dais",
+    tokenName: "DAIS",
+    title: "DAIS",
+    description: "",
+    shortDescription: "",
+    domain: "https://dais.civicship.jp", // TODO: 環境によってドメインが変わるので、環境変数化する必要あり
+    faviconPrefix: "/communities/dais",
+    logoPath: "/communities/dais/logo.jpg",
+    squareLogoPath: "/communities/dais/logo-square.jpg",
+    ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/dais/ogp.jpg",
+    enableFeatures: ["credentials"],
+    rootPath: "/users/me",
+  },
   default: {
     id: "default",
     tokenName: "NEO88",
@@ -110,6 +125,7 @@ export const COMMUNITY_ID = getCommunityIdFromEnv();
 export function getCurrentRegionName(): string {
   if (COMMUNITY_ID === "neo88") return "四国";
   if (COMMUNITY_ID === "kibotcha") return "東松島";
+  if (COMMUNITY_ID === "dais") return "四国";
   return "地域";
 }
 
