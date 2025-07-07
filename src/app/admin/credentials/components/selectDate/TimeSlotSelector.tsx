@@ -3,6 +3,8 @@ import { useReservationDateLoader } from "../../hooks/useOpportunitySlotQuery";
 import React, { useMemo } from "react";
 import TimeSlotList from "./TimeSlotList";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { STEPS } from "../CredentialIssuanceWizard";
+import { useRouter } from "next/navigation";
 
 const STEP_NUMBERS = {
   CURRENT: 2,
@@ -16,6 +18,7 @@ const STEP_COLORS = {
 
 export default function TimeSlotSelector({ setStep }: { setStep: (step: number) => void }) {
   const {selectedSlot, setSelectedSlot } = useSelection();
+  const router = useRouter();
 
   const headerConfig = useMemo(
     () => ({
@@ -45,11 +48,7 @@ export default function TimeSlotSelector({ setStep }: { setStep: (step: number) 
   const canProceed = !!selectedSlotId;
 
   const handleNext = () => {
-    setStep(3);
-  };
-
-  const handleCancel = () => {
-    setStep(1);
+    setStep(STEPS.SELECT_CREDENTIAL_RECIPIENT);
   };
 
   return (
@@ -74,7 +73,7 @@ export default function TimeSlotSelector({ setStep }: { setStep: (step: number) 
         selectedDate={selectedSlotId}
         onSelectDate={handleDateSelect}
         onNext={canProceed ? handleNext : undefined}
-        onCancel={handleCancel}
+        onCancel={() => router.push("/admin/credentials")}
       />
     </div>
   );

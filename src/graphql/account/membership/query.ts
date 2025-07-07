@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { MEMBERSHIP_FRAGMENT } from "./fragment";
 
 export const GET_SINGLE_MEMBERSHIP = gql`
   query GetSingleMembership($communityId: ID!, $userId: ID!) {
@@ -43,4 +44,5 @@ export const GET_MEMBERSHIP_LIST = gql`
       }
     }
   }
+  ${MEMBERSHIP_FRAGMENT}
 `;

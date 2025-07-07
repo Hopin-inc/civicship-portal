@@ -19,15 +19,16 @@ import { useMembershipQueries } from "@/app/admin/members/hooks/useMembershipQue
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useMembershipCommand } from "@/app/admin/members/hooks/useMembershipMutations";
 import { Button } from "@/components/ui/button";
-import { FormProvider } from "react-hook-form";
-import SearchForm from "@/app/search/components/SearchForm";
-import { useMemberSearch } from "@/app/admin/wallet/grant/hooks/useMemberSearch";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
+import { useMemberWithDidSearch } from "../credentials/hooks/useMemberWithDidSearch";
+import SearchForm from "../credentials/components/selectUser/SearchForm";
 
 export default function MembersPage() {
   const communityId = COMMUNITY_ID;
   const { user: currentUser } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [input, setInput] = useState("");
   const currentUserRole = currentUser?.memberships?.find(
     (m) => m.community?.id === communityId,
   )?.role;
@@ -42,7 +43,8 @@ export default function MembersPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { membershipListData, loading, error, refetch } = useMembershipQueries(communityId);
+  const { membershipListData, error, refetch, loading, hasNextPage, isLoadingMore, loadMoreRef } =
+    useMembershipQueries(communityId);
   const { assignOwner, assignManager, assignMember } = useMembershipCommand();
 
   const members = useMemo(() => {
@@ -57,14 +59,9 @@ export default function MembersPage() {
     );
   }, [membershipListData]);
 
-  const { form, singleMembershipData } = useMemberSearch();
-
-  const filteredMembers = useMemo(() => {
-    if (singleMembershipData?.membership?.user) {
-      return [singleMembershipData.membership.user];
-    }
-    return members.map(m => m.user);
-  }, [singleMembershipData, members]);
+  const { data: searchMembershipData } = useMemberWithDidSearch(communityId, members, {
+    searchQuery,
+  });
 
   const [pendingRoleChange, setPendingRoleChange] = useState<{
     userId: string;
@@ -109,22 +106,19 @@ export default function MembersPage() {
   if (error) return <ErrorState title={"メンバーを読み込めませんでした"} refetchRef={refetchRef} />;
 
   return (
-    <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(() => {})} className="px-4 mb-4 pt-6">
-        <SearchForm name="searchQuery" />
-      </form>
-
-      <div className="flex flex-col gap-4 px-4">
-        <span className="text-muted-foreground text-label-xs">
+    <div className="py-4">
+      <SearchForm value={input} onInputChange={setInput} onSearch={setSearchQuery} />
+      <div className="flex flex-col gap-4 mt-4">
+        <span className="text-muted-foreground text-label-xs ml-4">
           操作を行うには管理者権限が必要です
         </span>
 
-        {filteredMembers.length === 0 && (
+        {searchMembershipData?.length === 0 && (
           <p className="text-sm text-muted-foreground">一致するメンバーが見つかりません</p>
         )}
 
-        {filteredMembers.map((user) => {
-          const membership = members.find((m) => m?.user.id === user.id);
+        {searchMembershipData?.map((user) => {
+          const membership = members.find((m: any) => m?.user.id === user.id);
           if (!membership) return null;
 
           return (
@@ -143,6 +137,17 @@ export default function MembersPage() {
             />
           );
         })}
+        {hasNextPage && (
+          <div ref={loadMoreRef} className="py-4 text-center mt-4">
+            {isLoadingMore ? (
+              <div className="py-2">
+                <LoadingIndicator fullScreen={false} />
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-sm">スクロールしてさらに読み込み...</p>
+            )}
+          </div>
+        )}
       </div>
 
       {pendingRoleChange && (
@@ -181,6 +186,6 @@ export default function MembersPage() {
           </DialogContent>
         </Dialog>
       )}
-    </FormProvider>
+    </div>
   );
 }

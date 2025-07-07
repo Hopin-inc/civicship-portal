@@ -8,8 +8,9 @@ export const USER_FRAGMENT = gql`
     bio
     currentPrefecture
     phoneNumber
-    nftWallet{
+    nftWallet {
       id
+      walletAddress
     }
     urlFacebook
     urlInstagram
