@@ -24,10 +24,10 @@ export default function TicketsPage() {
     variables: {
       filter: { communityIds: [COMMUNITY_ID], ownerIds: user?.id ? [user.id] : undefined },
       sort: { createdAt: GqlSortDirection.Desc },
-      first: 200,
+      first: 20,
     },
   });
-  const { ticketIssuers, refetch: refetchTickets, loadMoreRef, hasNextPage, isLoadingMore } = useTicketIssuers();
+  const { ticketIssuers, refetch: refetchTickets, loadMoreRef, hasNextPage,loading } = useTicketIssuers();
   const utilityList = utilityData?.utilities?.edges?.map((e) => e?.node) ?? [];
   const ticketList = ticketIssuers.map((e) => e?.node).filter(Boolean);
 
@@ -89,7 +89,7 @@ export default function TicketsPage() {
               })}
               {hasNextPage && (
                 <div ref={loadMoreRef} className="py-4 text-center mt-4">
-                  {isLoadingMore ? (
+                  {loading ? (
                     <div className="py-2">
                       <LoadingIndicator fullScreen={false} />
                     </div>
