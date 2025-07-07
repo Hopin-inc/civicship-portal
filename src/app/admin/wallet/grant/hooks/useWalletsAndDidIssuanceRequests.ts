@@ -102,9 +102,12 @@ export function useWalletsAndDidIssuanceRequests({
     return (
       data?.transactions?.edges
         ?.flatMap((edge) => edge?.node)
-        .filter((t): t is GqlTransaction => !!t && t.fromWallet !== null) ?? []
+        .filter(
+          (t): t is GqlTransaction =>
+            !!t && t.fromWallet !== null && !shouldExcludeSelfTransaction(t, currentUserId),
+        ) ?? []
     );
-  }, [data]);
+  }, [data, currentUserId]);
 
   const presentedTransactions = useMemo<PresentedTransaction[]>(() => {
     return allTransactions.map((transaction) =>
@@ -123,4 +126,14 @@ export function useWalletsAndDidIssuanceRequests({
     allTransactions,
     presentedTransactions,
   };
+}
+
+function shouldExcludeSelfTransaction(
+  transaction: GqlTransaction,
+  currentUserId?: string,
+): boolean {
+  const fromUserId = transaction.fromWallet?.user?.id;
+  const toUserId = transaction.toWallet?.user?.id;
+
+  return currentUserId != null && fromUserId === currentUserId && toUserId === currentUserId;
 }
