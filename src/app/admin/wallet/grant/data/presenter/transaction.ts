@@ -70,7 +70,7 @@ export function presentTransaction({
       : toWallet?.user?.id === currentUserId;
 
   const otherName = isReceive
-    ? fromWallet?.community?.name
+    ? fromUser?.name
     : (toWallet?.user?.name ?? toWallet?.community?.name);
 
   const otherUser =
