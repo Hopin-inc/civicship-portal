@@ -43,14 +43,8 @@ export default function MembersPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const {
-    membershipListData,
-    error,
-    refetch,
-    hasNextPage,
-    isLoadingMore,
-    loadMoreRef,
-  } = useMembershipQueries(communityId);
+  const { membershipListData, error, refetch, loading, hasNextPage, isLoadingMore, loadMoreRef } =
+    useMembershipQueries(communityId);
   const { assignOwner, assignManager, assignMember } = useMembershipCommand();
 
   const members = useMemo(() => {
@@ -65,7 +59,9 @@ export default function MembersPage() {
     );
   }, [membershipListData]);
 
-  const { data: searchMembershipData} = useMemberWithDidSearch(communityId, members, { searchQuery });
+  const { data: searchMembershipData } = useMemberWithDidSearch(communityId, members, {
+    searchQuery,
+  });
 
   const [pendingRoleChange, setPendingRoleChange] = useState<{
     userId: string;
@@ -106,6 +102,7 @@ export default function MembersPage() {
     refetchRef.current = refetch;
   }, [refetch]);
 
+  if (loading) return <LoadingIndicator fullScreen />;
   if (error) return <ErrorState title={"メンバーを読み込めませんでした"} refetchRef={refetchRef} />;
 
   return (
@@ -189,6 +186,6 @@ export default function MembersPage() {
           </DialogContent>
         </Dialog>
       )}
-      </div>
+    </div>
   );
 }
