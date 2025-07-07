@@ -2,100 +2,14 @@
 
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import React from "react";
-import { gql, useQuery } from "@apollo/client";
 import { transformTicketClaimLinks } from "@/app/tickets/data/presenter";
 import { TicketClaimLink } from "@/app/tickets/data/type";
 import {
-  GqlClaimLinkStatus,
   GqlSortDirection,
-  GqlPageInfo
+  GqlTicketClaimLinksQuery,
+  useTicketClaimLinksQuery
 } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
-
-export type GqlTicketClaimLinksQueryVariables = {
-  filter?: {
-    status?: GqlClaimLinkStatus;
-    issuerId?: string;
-    issuedTo?: string;
-    hasAvailableTickets?: boolean;
-  };
-  sort?: {
-    createdAt?: GqlSortDirection;
-    status?: GqlSortDirection;
-  };
-  cursor?: string;
-  first?: number;
-};
-
-export type GqlTicketClaimLinksQuery = {
-  ticketClaimLinks: {
-    edges: Array<{
-      node: {
-        id: string;
-        status: GqlClaimLinkStatus;
-        qty: number;
-        claimedAt?: Date | null;
-        createdAt?: Date | null;
-        issuer?: {
-          id: string;
-          owner?: {
-            id: string;
-            name: string;
-            image: string | null;
-          };
-        };
-      };
-      cursor: string;
-    }>;
-    pageInfo: GqlPageInfo;
-    totalCount: number;
-  };
-};
-
-const TICKET_CLAIM_LINKS_QUERY = gql`
-  query ticketClaimLinks(
-    $filter: TicketClaimLinkFilterInput
-    $sort: TicketClaimLinkSortInput
-    $cursor: String
-    $first: Int
-  ) {
-    ticketClaimLinks(
-      filter: $filter
-      sort: $sort
-      cursor: $cursor
-      first: $first
-    ) {
-      edges {
-        node {
-          id
-          status
-          qty
-          claimedAt
-          createdAt
-          issuer {
-            id
-            owner {
-              id
-              name
-              image
-            }
-          }
-          tickets {
-            status
-          }
-        }
-        cursor
-      }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-      }
-      totalCount
-    }
-  }
-`;
 
 export interface UseTicketClaimLinksResult {
   ticketClaimLinks: TicketClaimLink[];
@@ -119,20 +33,18 @@ const fallbackConnection = {
 
 export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
   const { user } = useAuth();
-  const { data, loading, error, fetchMore, refetch } = useQuery<
-    GqlTicketClaimLinksQuery,
-    GqlTicketClaimLinksQueryVariables
-  >(TICKET_CLAIM_LINKS_QUERY, {
+  const { data, loading, error, fetchMore, refetch } = useTicketClaimLinksQuery({
     variables: {
       filter: {
         hasAvailableTickets: true,
         issuedTo: user?.id ?? undefined,
       },
       sort: {
-        createdAt: "desc" as GqlSortDirection,
+        createdAt: GqlSortDirection.Desc,
       },
       first: 20,
     },
+    skip: !user,
     fetchPolicy: "cache-first",
     nextFetchPolicy: "cache-first",
     notifyOnNetworkStatusChange: true,
@@ -151,7 +63,7 @@ export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
           hasAvailableTickets: true,
         },
         sort: {
-          createdAt: "desc",
+          createdAt: GqlSortDirection.Desc,
         },
         cursor: endCursor,
         first: 20,
@@ -165,7 +77,13 @@ export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
           ...prev,
           ticketClaimLinks: {
             ...prev.ticketClaimLinks,
-            edges: [...prev.ticketClaimLinks.edges, ...fetchMoreResult.ticketClaimLinks.edges],
+            edges: [
+              ...new Map(
+                [...(prev.ticketClaimLinks.edges ?? []), ...(fetchMoreResult.ticketClaimLinks.edges ?? [])].map(
+                  (edge) => [edge?.node?.id, edge],
+                ),
+              ).values(),
+            ],
             pageInfo: fetchMoreResult.ticketClaimLinks.pageInfo,
           },
         };
