@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import serverLogger from "@/lib/logging/server";
 
 export async function POST(request: NextRequest) {
+  if (process.env.ENV === "LOCAL") {
+    return NextResponse.json({ status: "skipped (local env)" });
+  }
+
   try {
     const body = await request.json();
     const { level = "info", message, meta = {} } = body;
