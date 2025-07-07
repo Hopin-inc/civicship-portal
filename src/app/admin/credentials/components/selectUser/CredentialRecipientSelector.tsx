@@ -44,16 +44,23 @@ const sortMembersByParticipation = (
       (u) => u.userId === b.user.id && u.slotId === selectedSlotId
     );
 
-    // isCreatedByUserがtrueのユーザーを最優先で上に
+    // 1. isCreatedByUserがtrueのユーザーを最優先
     if (aParticipated?.isCreatedByUser && !bParticipated?.isCreatedByUser) return -1;
     if (!aParticipated?.isCreatedByUser && bParticipated?.isCreatedByUser) return 1;
 
-    // 参加済みユーザーを上に
+    // 2. 参加済みユーザーを上に
     const aIsParticipated = !!aParticipated;
     const bIsParticipated = !!bParticipated;
     if (aIsParticipated && !bIsParticipated) return -1;
     if (!aIsParticipated && bIsParticipated) return 1;
 
+    // 3. didデータがある人を上に
+    const aHasDid = !!a.user.didInfo?.didValue;
+    const bHasDid = !!b.user.didInfo?.didValue;
+    if (aHasDid && !bHasDid) return -1;
+    if (!aHasDid && bHasDid) return 1;
+
+    // 4. それ以外は順不同
     return 0;
   });
 };
@@ -176,10 +183,10 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
           <span className={`${STEP_COLORS.GRAY} text-base`}>)</span>
         </span>
       </div>
-      <div className="px-4 mb-4 pt-4">
+      <div className="mb-4 pt-4">
         <SearchForm value={input} onInputChange={setInput} onSearch={setSearchQuery} />
       </div>
-      <div className="flex flex-col gap-4 px-4">
+      <div className="flex flex-col gap-4">
         <SearchResultList
           searchQuery={searchQuery}
           searchMembershipData={formattedMembers}
@@ -194,13 +201,14 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
               variant="text"
               className="text-gray-500"
               onClick={() => {
-                setStep(2);
+                router.push("/admin/credentials");
               }}
             >
               キャンセル
             </Button>
             <Button
               className={`rounded-full px-8 py-2 font-bold text-white ${selectedUserIds.length > 0 ? "bg-primary" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
+              size="lg"
               disabled={selectedUserIds.length === 0}
               onClick={() => {
                 if (selectedUserIds.length > 0) {

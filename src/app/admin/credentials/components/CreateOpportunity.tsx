@@ -8,7 +8,7 @@ export default function CreateOpportunitySheet() {
   const router = useRouter();
 
   const handleClick = () => {
-      router.push("/admin/credentials/issue");
+      router.push("/admin/credentials/issue?step=1");
   }
 
   return (

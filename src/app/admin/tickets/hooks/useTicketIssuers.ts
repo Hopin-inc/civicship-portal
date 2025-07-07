@@ -2,19 +2,18 @@
 
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import React from "react";
-import { transformTicketClaimLinks } from "@/app/tickets/data/presenter";
-import { TicketClaimLink } from "@/app/tickets/data/type";
 import {
   GqlSortDirection,
-  GqlTicketClaimLinksQuery,
-  useTicketClaimLinksQuery
+  GqlTicketIssuerEdge,
+  useGetTicketIssuersQuery,
 } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
+import { ApolloError } from "@apollo/client";
 
-export interface UseTicketClaimLinksResult {
-  ticketClaimLinks: TicketClaimLink[];
+export interface UseTicketIssuersResult {
+  ticketIssuers: (GqlTicketIssuerEdge | null)[];
   loading: boolean;
-  error: any;
+  error: ApolloError | undefined;
   loadMoreRef: React.RefObject<HTMLDivElement>;
   refetch: () => void;
   hasNextPage: boolean;
@@ -31,18 +30,14 @@ const fallbackConnection = {
   totalCount: 0,
 };
 
-export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
+export const useTicketIssuers = (): UseTicketIssuersResult => {
   const { user } = useAuth();
-  const { data, loading, error, fetchMore, refetch } = useTicketClaimLinksQuery({
+  
+  const { data, loading, error, fetchMore, refetch } = useGetTicketIssuersQuery({
     variables: {
-      filter: {
-        hasAvailableTickets: true,
-        issuedTo: user?.id ?? undefined,
-      },
-      sort: {
-        createdAt: GqlSortDirection.Desc,
-      },
-      first: 20,
+      filter: { ownerId: user?.id ?? "" },
+      sort: { createdAt: GqlSortDirection.Desc },
+      first: 10,
     },
     skip: !user,
     fetchPolicy: "cache-first",
@@ -50,7 +45,7 @@ export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
     notifyOnNetworkStatusChange: true,
   });
 
-  const connection = data?.ticketClaimLinks ?? fallbackConnection;
+  const connection = data?.ticketIssuers ?? fallbackConnection;
   const endCursor = connection.pageInfo?.endCursor;
   const hasNextPage = connection.pageInfo?.hasNextPage ?? false;
 
@@ -59,32 +54,28 @@ export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
 
     await fetchMore({
       variables: {
-        filter: {
-          hasAvailableTickets: true,
-        },
-        sort: {
-          createdAt: GqlSortDirection.Desc,
-        },
+        filter: { ownerId: user?.id ?? "" },
+        sort: { createdAt: GqlSortDirection.Desc },
         cursor: endCursor,
-        first: 20,
+        first: 10,
       },
-      updateQuery: (prev: GqlTicketClaimLinksQuery, { fetchMoreResult }: { fetchMoreResult: GqlTicketClaimLinksQuery }) => {
-        if (!fetchMoreResult || !prev.ticketClaimLinks || !fetchMoreResult.ticketClaimLinks) {
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult || !prev.ticketIssuers || !fetchMoreResult.ticketIssuers) {
           return prev;
         }
 
         return {
           ...prev,
-          ticketClaimLinks: {
-            ...prev.ticketClaimLinks,
+          ticketIssuers: {
+            ...prev.ticketIssuers,
             edges: [
               ...new Map(
-                [...(prev.ticketClaimLinks.edges ?? []), ...(fetchMoreResult.ticketClaimLinks.edges ?? [])].map(
+                [...(prev.ticketIssuers.edges ?? []), ...(fetchMoreResult.ticketIssuers.edges ?? [])].map(
                   (edge) => [edge?.node?.id, edge],
                 ),
               ).values(),
             ],
-            pageInfo: fetchMoreResult.ticketClaimLinks.pageInfo,
+            pageInfo: fetchMoreResult.ticketIssuers.pageInfo,
           },
         };
       },
@@ -97,14 +88,12 @@ export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
     onLoadMore: handleFetchMore,
   });
 
-  const ticketClaimLinks = transformTicketClaimLinks(connection);
-
   return {
-    ticketClaimLinks,
+    ticketIssuers: (connection.edges ?? []).filter((edge): edge is GqlTicketIssuerEdge => edge !== null),
     loading,
     error,
     loadMoreRef,
     refetch,
     hasNextPage,
   };
-};
+}; 
