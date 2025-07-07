@@ -95,7 +95,7 @@ export function useWalletsAndDidIssuanceRequests({
       first: 100,
       withDidIssuanceRequests: true,
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   });
 
