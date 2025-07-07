@@ -96,7 +96,7 @@ export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didInfo,
           {user.name}
         </span>
         <span className="text-gray-400 text-sm max-w-[200px]">
-          {did ? truncateDid(did, 20) : "did発行中"}
+          {did ? truncateDid(did, 10) : "did発行中"}
         </span>
       </div>
     </Card>

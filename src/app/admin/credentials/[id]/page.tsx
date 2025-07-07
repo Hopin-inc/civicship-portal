@@ -73,22 +73,26 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
         {renderStatusCard(matchedEvaluation?.node?.vcIssuanceRequest?.status ?? "PENDING", CredentialRole.manager)}
         <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
-                <div className="text-gray-400 text-base">主催者</div>
+                <div className="text-zinc-500 text-xs">主催者</div>
                 <div className="flex flex-col items-end">
                 <div className="text-sm font-bold text-black">{matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.createdByUser?.name}</div>
                     <div className="flex items-center text-gray-400 text-sm mt-1">
-                        <Copy className="w-4 h-4 mr-1 cursor-pointer" onClick={() => {
+                      {organizerDidValue && (
+                        <>
+                          <Copy className="w-4 h-4 mr-1 cursor-pointer" onClick={() => {
                             navigator.clipboard.writeText(organizerDidValue);
                             toast.success("コピーしました");
-                        }} />
-                        <span>{truncateDid(organizerDidValue)}</span>
+                          }} />
+                          <span>{truncateDid(organizerDidValue)}</span>
+                        </>
+                      )}
                     </div>
                 </div>
             </CardHeader>
         </Card>
         <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
-                <div className="text-gray-400 text-base min-w-fit whitespace-nowrap">概要</div>
+                <div className="text-zinc-500 text-xs min-w-fit whitespace-nowrap">概要</div>
                 <div className="flex items-center flex-1 min-w-0 ml-8">
                     <span className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm flex-1">
                         {matchedEvaluation?.node?.participation?.opportunitySlot?.opportunity?.title}
@@ -106,7 +110,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
         </Card>
         <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
-                <div className="text-gray-400 text-base min-w-fit whitespace-nowrap">開始日時</div>
+                <div className="text-zinc-500 text-xs min-w-fit whitespace-nowrap">開始日時</div>
                 <div className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
                 {formatDateTime(matchedEvaluation?.node?.participation?.opportunitySlot?.startsAt ?? null, "yyyy年MM月dd日 HH:mm")}
                 </div>
@@ -114,13 +118,13 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
         </Card>
         <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none ">
             <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
-                <div className="text-gray-400 text-base min-w-fit whitespace-nowrap">終了日時</div>
+                <div className="text-zinc-500 text-xs min-w-fit whitespace-nowrap">終了日時</div>
                 <div className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
                     {formatDateTime(matchedEvaluation?.node?.participation?.opportunitySlot?.endsAt ?? null, "yyyy年MM月dd日 HH:mm")}
                 </div>
             </CardHeader>
         </Card>
-        <h1 className="text-2xl font-bold pt-6">証明書の発行先</h1>
+        <h1 className="text-base font-bold pt-6">証明書の発行先</h1>
         {sameSlotEvaluations.map((evaluation) => {
           const userId = evaluation?.node?.vcIssuanceRequest?.user?.id;
           const didValue = getDidValueByUserId(evaluation?.node?.participation?.user?.didIssuanceRequests ?? [], userId);
@@ -135,7 +139,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
               <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
                 <div className="flex flex-col items-start w-full">
                   <div className="flex items-center justify-between w-full">
-                    <span className="text-base font-bold">
+                    <span className="text-sm font-bold">
                       {evaluation?.node?.vcIssuanceRequest?.user?.name}
                     </span>
                     {style && (
@@ -145,14 +149,18 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
                     )}
                   </div>
                   <div className="flex items-center text-gray-400 text-sm mt-2">
-                    <Copy
-                      className="w-4 h-4 mr-1 cursor-pointer"
-                      onClick={() => {
-                        navigator.clipboard.writeText(didValue);
-                        toast.success("コピーしました");
-                      }}
-                    />
-                    <span>{truncateDid(didValue,25)}</span>
+                    {didValue && (
+                      <>
+                        <Copy
+                          className="w-4 h-4 mr-1 cursor-pointer"
+                          onClick={() => {
+                            navigator.clipboard.writeText(didValue);
+                            toast.success("コピーしました");
+                          }}
+                        />
+                        <span>{truncateDid(didValue,25)}</span>
+                      </>
+                    )}
                   </div>
                 </div>
               </CardHeader>
