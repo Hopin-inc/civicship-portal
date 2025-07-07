@@ -93,8 +93,9 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
             キャンセル
           </Button>
           <Button
-            className={`rounded-full px-8 py-2 font-bold text-white ${selectedSlot?.opportunityId ? "bg-primary" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
+            className={`rounded-full font-bold text-white ${selectedSlot?.opportunityId ? "bg-primary" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
             disabled={!selectedSlot?.opportunityId}
+            size="lg"
             onClick={() => {
               if (selectedSlot?.opportunityId) {
                 setStep(2); // ステップを進める
