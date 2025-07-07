@@ -201,7 +201,7 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
               variant="text"
               className="text-gray-500"
               onClick={() => {
-                setStep(2);
+                router.push("/admin/credentials");
               }}
             >
               キャンセル

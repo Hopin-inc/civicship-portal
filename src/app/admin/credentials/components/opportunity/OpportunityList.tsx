@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import React, { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { STEPS } from "../CredentialIssuanceWizard";
 
 const STEP_NUMBERS = {
   CURRENT: 1,
@@ -98,7 +99,7 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
             size="lg"
             onClick={() => {
               if (selectedSlot?.opportunityId) {
-                setStep(2); // ステップを進める
+                setStep(STEPS.SELECT_TIME_SLOT);
               }
             }}
           >
