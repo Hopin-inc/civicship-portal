@@ -11,6 +11,9 @@ import { toast } from "sonner";
 import Image from "next/image";
 import { CredentialRole, renderStatusCard } from "@/app/admin/credentials/[id]/data/presenter";
 import { getLogoPath } from "@/lib/communities/metadata";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import React, { useEffect, useRef } from "react";
+import ErrorState from "@/components/shared/ErrorState";
 
 interface OpportunityListProps {
   data: GqlGetParticipationQuery | undefined;
@@ -26,10 +29,26 @@ const truncateDid = (did: string | undefined | null, length: number = 20): strin
 
 export default function CredentialList(props: OpportunityListProps) {
   const { data } = props;
-  const { data: vcData } = useGetVcIssuanceRequestByEvaluationQuery({
+  const {
+    data: vcData,
+    loading,
+    error,
+    refetch,
+  } = useGetVcIssuanceRequestByEvaluationQuery({
     variables: { evaluationId: data?.participation?.evaluation?.id ?? "" },
     skip: !data?.participation?.evaluation?.id,
   });
+
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
+
+  if (loading) return <LoadingIndicator />;
+
+  if (error) {
+    return <ErrorState title={"証明書を読み込めませんでした"} refetchRef={refetchRef} />;
+  }
 
   const organizerDid =
     data?.participation?.opportunitySlot?.opportunity?.createdByUser?.didIssuanceRequests?.find(
@@ -51,13 +70,15 @@ export default function CredentialList(props: OpportunityListProps) {
             CredentialRole.member,
           )}
         </div>
-        <Image
-          src={logoPath}
-          alt="証明書"
-          width={400}
-          height={400}
-          className="w-full h-auto object-cover border-none shadow-none mt-6"
-        />
+        <div className="flex justify-center mt-6">
+          <Image
+            src={logoPath}
+            alt="証明書"
+            width={240}
+            height={100}
+            className="object-contain border-none shadow-none"
+          />
+        </div>
       </div>
       <div className="mt-6 p-4">
         <div className="grid grid-cols-1 gap-4 relative">
