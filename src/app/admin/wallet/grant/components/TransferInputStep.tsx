@@ -24,6 +24,7 @@ interface Props {
 }
 
 const DEFAULT_PRESET_AMOUNTS = [100000, 300000, 500000, 1000000];
+const INT_LIMIT = 2000000000;
 
 function TransferInputStep({
   user,
@@ -74,6 +75,10 @@ function TransferInputStep({
     } else {
       if (num > currentPoint) {
         toast.error("保有ポイントを超えています");
+        return;
+      }
+      if (num > INT_LIMIT) {
+        toast.error("20億以下を指定して下さい");
         return;
       }
       setAmount(num);
