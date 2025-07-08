@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
-import { formatTimeRange } from "@/utils/date";
+import { formatTimeRange, getDayDiffLabel } from "@/utils/date";
 import { isBefore } from "date-fns";
 import { getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
 
@@ -77,6 +77,9 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                         }`}
                       >
                         {formatTimeRange(slot.startsAt, slot.endsAt)}
+                        {getDayDiffLabel(startsAtDate) && (
+                          <span className={`text-sm text-caption ${isFull || isRegistrationClosed ? "text-muted-foreground/50" : ""}`}>（{getDayDiffLabel(startsAtDate)}）</span>
+                        )}
                       </p>
                       <p
                         className={`text-md font-bold ${
