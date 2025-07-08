@@ -30,14 +30,15 @@ const getApprovalText = (requireApproval: boolean | undefined) => {
 };
 
 const CompletionHeader: React.FC<CompletionHeaderProps> = ({ requireApproval }) => {
+  const approvalText = getApprovalText(requireApproval);
   return (
     <div className="flex flex-col items-center pt-10 pb-6 max-w-mobile-l mx-auto w-full gap-y-2 px-6">
       <div className="flex items-center justify-center">
         <CheckCircle className="w-16 h-16 md:w-24 md:h-24 text-primary" strokeWidth={1.5} />
       </div>
-      <h2 className="text-display-md">{ getApprovalText(requireApproval).title }</h2>
+      <h2 className="text-display-md">{ approvalText.title }</h2>
       <p className="text-body-md text-caption whitespace-pre-line">
-        { getApprovalText(requireApproval).description }
+        { approvalText.description }
       </p>
     </div>
   );
