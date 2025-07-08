@@ -1,6 +1,11 @@
 "use client";
 
-import { GqlUser, useGetMembershipListQuery, GqlDidIssuanceStatus, useGetDidIssuanceRequestsQuery, GqlDidIssuanceRequest } from "@/types/graphql";
+import {
+  GqlDidIssuanceRequest,
+  GqlDidIssuanceStatus,
+  GqlUser,
+  useGetMembershipListQuery,
+} from "@/types/graphql";
 import { ApolloError } from "@apollo/client";
 
 export type MemberSearchFormValues = {
@@ -11,7 +16,7 @@ export interface MemberSearchTarget {
   user: GqlUser;
   wallet?: {
     currentPointView?: {
-      currentPoint: number;
+      currentPoint: bigint;
     };
   };
 }
@@ -29,8 +34,12 @@ export const useMemberWithDidSearch = (
   error: ApolloError | undefined;
 } => {
   const searchQuery = options?.searchQuery ?? "";
-  
-  const { data: searchMembershipData, loading, error } = useGetMembershipListQuery({
+
+  const {
+    data: searchMembershipData,
+    loading,
+    error,
+  } = useGetMembershipListQuery({
     variables: {
       filter: {
         keyword: searchQuery,
@@ -47,8 +56,10 @@ export const useMemberWithDidSearch = (
         .filter((user): user is GqlUser => !!user)
     : members.map((member) => member.user);
 
-  const usersWithDid = users?.map(user => {
-    const didInfo = user.didIssuanceRequests?.find(request => request?.status === GqlDidIssuanceStatus.Completed);
+  const usersWithDid = users?.map((user) => {
+    const didInfo = user.didIssuanceRequests?.find(
+      (request) => request?.status === GqlDidIssuanceStatus.Completed,
+    );
     return {
       ...user,
       didInfo,
