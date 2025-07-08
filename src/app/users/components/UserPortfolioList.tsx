@@ -298,9 +298,13 @@ const UserPortfolioList = ({
           <h2 className="text-display-sm font-semibold text-foreground">
             これまでの関わり
           </h2>
-          <div className="text-sm border-b-[1px] border-black cursor-pointer" onClick={() => router.push("/users/me/portfolios?tab=future")}>
-            すべて見る  
-          </div>
+          <button
+            type="button"
+            className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
+            onClick={() => router.push("/users/me/portfolios?tab=future")}
+          >
+            すべて見る
+          </button>
           {/*{isOwner && (*/}
           {/*  <DropdownMenu>*/}
           {/*    <DropdownMenuTrigger asChild>*/}
