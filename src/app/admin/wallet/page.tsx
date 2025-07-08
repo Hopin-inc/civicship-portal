@@ -6,7 +6,7 @@ import { COMMUNITY_ID, getCommunityIdFromEnv } from "@/lib/communities/metadata"
 import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
-import { GqlMembership, GqlRole, useGetCommunityWalletQuery } from "@/types/graphql";
+import { GqlMembership, GqlRole, GqlWallet, useGetCommunityWalletQuery } from "@/types/graphql";
 import { Coins, Gift } from "lucide-react";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -50,9 +50,12 @@ export default function WalletPage() {
     },
   });
 
-  const wallet = walletData?.wallets.edges?.find(w => w?.node?.community?.id === getCommunityIdFromEnv())?.node;
+  const wallet: GqlWallet | undefined | null = walletData?.wallets.edges?.find(
+    (w) => w?.node?.community?.id === getCommunityIdFromEnv(),
+  )?.node;
   const walletId = wallet?.id ?? "";
-  const currentPoint = wallet?.currentPointView?.currentPoint ?? 0;
+  const currentPointView = wallet?.currentPointView;
+  const currentPoint = BigInt(currentPointView?.currentPoint ?? "0");
 
   const { connection, loadMoreRef, refetch: refetchTransactions } = useCommunityTransactions();
 

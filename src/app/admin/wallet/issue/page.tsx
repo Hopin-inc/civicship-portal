@@ -11,6 +11,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 const PRESET_AMOUNTS = [1000000, 3000000, 5000000, 10000000, 30000000, 50000000];
+const INT_LIMIT = 2000000000;
 
 export default function IssuePointPage() {
   const communityId = COMMUNITY_ID;
@@ -52,10 +53,18 @@ export default function IssuePointPage() {
     if (isNaN(num)) {
       setAmount(null);
       setDisplayValue("");
-    } else {
-      setAmount(num);
-      setDisplayValue(formatWithComma(raw));
+      return;
     }
+    if (num < 0) {
+      toast.error("0以上を指定して下さい");
+      return;
+    }
+    if (num > INT_LIMIT) {
+      toast.error("20億以下を指定して下さい");
+      return;
+    }
+    setAmount(num);
+    setDisplayValue(formatWithComma(num.toString()));
   };
 
   const handlePresetClick = (value: number) => {
@@ -124,7 +133,7 @@ export default function IssuePointPage() {
           size="lg"
           className="w-full max-w-xl"
           onClick={handleIssuePoint}
-          disabled={!amount || amount <= 0}
+          disabled={!amount || amount <= 0 || amount > INT_LIMIT}
         >
           発行
         </Button>

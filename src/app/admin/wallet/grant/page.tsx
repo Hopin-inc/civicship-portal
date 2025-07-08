@@ -17,7 +17,7 @@ export default function GrantPointStepperPage() {
   const track = useAnalytics();
 
   const searchParams = useSearchParams();
-  const currentPoint = Number(searchParams.get("currentPoint") ?? "0");
+  const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
     variables: { filter: { communityId: COMMUNITY_ID }, first: 500 },
@@ -82,16 +82,30 @@ export default function GrantPointStepperPage() {
     }
   };
 
-  const members = data?.wallets?.edges
-    ?.map((edge) => {
+  const members = (data?.wallets?.edges ?? [])
+    .map((edge) => {
       const wallet = edge?.node;
       const user = wallet?.user;
-      return user && wallet ? { user, wallet } : null;
+      const pointStr = wallet?.currentPointView?.currentPoint;
+      const currentPoint = pointStr ? BigInt(pointStr) : BigInt(0);
+
+      return {
+        user,
+        wallet: {
+          currentPointView: {
+            currentPoint,
+          },
+        },
+      };
     })
-    .filter(Boolean) as {
-    user: GqlUser;
-    wallet: { currentPointView?: { currentPoint: number } };
-  }[];
+    .filter(
+      (
+        member,
+      ): member is {
+        user: GqlUser;
+        wallet: { currentPointView: { currentPoint: bigint } };
+      } => !!member && !!member.user,
+    );
 
   if (loading) {
     return <LoadingIndicator />;
