@@ -12,6 +12,7 @@ import { AppPortfolio } from "@/app/users/data/type";
 import { GqlEvaluationStatus, GqlOpportunityCategory, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getCurrentRegionName } from "@/lib/communities/metadata";
+import { useRouter } from "next/navigation";
 
 type Props = {
   userId: string;
@@ -100,7 +101,7 @@ const ActiveOpportunities = ({ opportunities }: ActiveOpportunitiesProps) => {
   );
 };
 
-const PortfolioCard = ({
+export const PortfolioCard = ({
   portfolio,
   isLast,
   lastRef,
@@ -200,7 +201,7 @@ const PortfolioCard = ({
   );
 };
 
-const PortfolioGrid = ({
+export const PortfolioGrid = ({
   portfolios,
   isLoadingMore,
   hasMore,
@@ -271,7 +272,7 @@ const UserPortfolioList = ({
   lastPortfolioRef,
 }: Props) => {
   const showEmptyState = enableDummyPortfolios ? false : portfolios.length === 0;
-
+  const router = useRouter();
   const emptyStateProps = {
     title: `${getCurrentRegionName()}にふれよう`,
     description: isOwner
@@ -293,10 +294,13 @@ const UserPortfolioList = ({
             }
           />
         )}
-        <div className="flex items-center justify-between">
-          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
+        <div className="flex justify-between items-center pt-4 pb-1">
+          <h2 className="text-display-sm font-semibold text-foreground">
             これまでの関わり
           </h2>
+          <div className="text-sm border-b-[1px] border-black cursor-pointer" onClick={() => router.push("/users/me/portfolios?tab=future")}>
+            すべて見る  
+          </div>
           {/*{isOwner && (*/}
           {/*  <DropdownMenu>*/}
           {/*    <DropdownMenuTrigger asChild>*/}

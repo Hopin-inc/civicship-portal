@@ -1550,12 +1550,35 @@ export const GqlPortfolioCategory = {
 } as const;
 
 export type GqlPortfolioCategory = (typeof GqlPortfolioCategory)[keyof typeof GqlPortfolioCategory];
+export type GqlPortfolioEdge = GqlEdge & {
+  __typename?: "PortfolioEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlPortfolio>;
+};
+
+export type GqlPortfolioFilterInput = {
+  communityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  dateRange?: InputMaybe<GqlDateTimeRangeFilter>;
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type GqlPortfolioSortInput = {
+  date?: InputMaybe<GqlSortDirection>;
+};
+
 export const GqlPortfolioSource = {
   Article: "ARTICLE",
   Opportunity: "OPPORTUNITY",
 } as const;
 
 export type GqlPortfolioSource = (typeof GqlPortfolioSource)[keyof typeof GqlPortfolioSource];
+export type GqlPortfoliosConnection = {
+  __typename?: "PortfoliosConnection";
+  edges: Array<GqlPortfolioEdge>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
 export const GqlPublishStatus = {
   CommunityInternal: "COMMUNITY_INTERNAL",
   Private: "PRIVATE",
@@ -1588,6 +1611,7 @@ export type GqlQuery = {
   participations: GqlParticipationsConnection;
   place?: Maybe<GqlPlace>;
   places: GqlPlacesConnection;
+  portfolios?: Maybe<Array<GqlPortfolio>>;
   reservation?: Maybe<GqlReservation>;
   reservationHistories: GqlReservationHistoriesConnection;
   reservationHistory?: Maybe<GqlReservationHistory>;
@@ -1730,6 +1754,12 @@ export type GqlQueryPlacesArgs = {
   filter?: InputMaybe<GqlPlaceFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<GqlPlaceSortInput>;
+};
+
+export type GqlQueryPortfoliosArgs = {
+  filter?: InputMaybe<GqlPortfolioFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlPortfolioSortInput>;
 };
 
 export type GqlQueryReservationArgs = {
@@ -2399,6 +2429,13 @@ export type GqlUser = {
   wallets?: Maybe<Array<GqlWallet>>;
 };
 
+export type GqlUserPortfoliosArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlPortfolioFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlPortfolioSortInput>;
+};
+
 export type GqlUserDeletePayload = {
   __typename?: "UserDeletePayload";
   userId?: Maybe<Scalars["ID"]["output"]>;
@@ -2959,7 +2996,6 @@ export type GqlGetMembershipListQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
           didIssuanceRequests?: Array<{
             __typename?: "DidIssuanceRequest";
             id: string;
@@ -2971,6 +3007,7 @@ export type GqlGetMembershipListQuery = {
             createdAt?: Date | null;
             updatedAt?: Date | null;
           }> | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -3063,6 +3100,9 @@ export type GqlUpdateMyProfileMutation = {
 export type GqlGetUserFlexibleQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   withPortfolios?: Scalars["Boolean"]["input"];
+  portfolioFilter?: InputMaybe<GqlPortfolioFilterInput>;
+  portfolioSort?: InputMaybe<GqlPortfolioSortInput>;
+  portfolioFirst?: InputMaybe<Scalars["Int"]["input"]>;
   withWallets?: Scalars["Boolean"]["input"];
   withOpportunities?: Scalars["Boolean"]["input"];
   withDidIssuanceRequests?: Scalars["Boolean"]["input"];
@@ -3495,7 +3535,6 @@ export type GqlGetMemberWalletsQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
           didIssuanceRequests?: Array<{
             __typename?: "DidIssuanceRequest";
             id: string;
@@ -3507,6 +3546,7 @@ export type GqlGetMemberWalletsQuery = {
             createdAt?: Date | null;
             updatedAt?: Date | null;
           }> | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -4519,7 +4559,6 @@ export type GqlGetParticipationQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
           didIssuanceRequests?: Array<{
             __typename?: "DidIssuanceRequest";
             id: string;
@@ -4531,6 +4570,7 @@ export type GqlGetParticipationQuery = {
             createdAt?: Date | null;
             updatedAt?: Date | null;
           }> | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
         } | null;
         place?: {
           __typename?: "Place";
@@ -4556,6 +4596,7 @@ export type GqlGetParticipationQuery = {
     evaluation?: {
       __typename?: "Evaluation";
       id: string;
+      status: GqlEvaluationStatus;
       participation?: {
         __typename?: "Participation";
         user?: {
@@ -5572,7 +5613,6 @@ export type GqlGetTransactionsQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
-            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
             didIssuanceRequests?: Array<{
               __typename?: "DidIssuanceRequest";
               id: string;
@@ -5584,6 +5624,7 @@ export type GqlGetTransactionsQuery = {
               createdAt?: Date | null;
               updatedAt?: Date | null;
             }> | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -5608,7 +5649,6 @@ export type GqlGetTransactionsQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
-            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
             didIssuanceRequests?: Array<{
               __typename?: "DidIssuanceRequest";
               id: string;
@@ -5620,6 +5660,7 @@ export type GqlGetTransactionsQuery = {
               createdAt?: Date | null;
               updatedAt?: Date | null;
             }> | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -6801,13 +6842,17 @@ export const GetUserFlexibleDocument = gql`
   query GetUserFlexible(
     $id: ID!
     $withPortfolios: Boolean! = false
+    $portfolioFilter: PortfolioFilterInput
+    $portfolioSort: PortfolioSortInput
+    $portfolioFirst: Int
     $withWallets: Boolean! = false
     $withOpportunities: Boolean! = false
     $withDidIssuanceRequests: Boolean! = false
   ) {
     user(id: $id) {
       ...UserFields
-      portfolios @include(if: $withPortfolios) {
+      portfolios(filter: $portfolioFilter, sort: $portfolioSort, first: $portfolioFirst)
+        @include(if: $withPortfolios) {
         ...UserPortfolioFields
       }
       didIssuanceRequests @include(if: $withDidIssuanceRequests) {
@@ -6857,6 +6902,9 @@ export const GetUserFlexibleDocument = gql`
  *   variables: {
  *      id: // value for 'id'
  *      withPortfolios: // value for 'withPortfolios'
+ *      portfolioFilter: // value for 'portfolioFilter'
+ *      portfolioSort: // value for 'portfolioSort'
+ *      portfolioFirst: // value for 'portfolioFirst'
  *      withWallets: // value for 'withWallets'
  *      withOpportunities: // value for 'withOpportunities'
  *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
