@@ -1,28 +1,32 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { GqlUser } from "@/types/graphql";
 import UserInfoCard from "./UserInfoCard";
 import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface MemberTabProps {
-  members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: number } } }[];
+  members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: bigint } } }[];
   searchQuery: string;
   onSelect: (user: GqlUser) => void;
   onLoadMore?: () => void;
   hasNextPage?: boolean;
 }
 
-export function MemberTab({ 
-  members, 
-  searchQuery, 
-  onSelect, 
-  onLoadMore, 
-  hasNextPage 
+export function MemberTab({
+  members,
+  searchQuery,
+  onSelect,
+  onLoadMore,
+  hasNextPage,
 }: MemberTabProps) {
   const communityId = COMMUNITY_ID;
-  const { data: searchMembershipData, loading, error } = useMemberSearchFromCredentials(communityId, members, { searchQuery });
+  const {
+    data: searchMembershipData,
+    loading,
+    error,
+  } = useMemberSearchFromCredentials(communityId, members, { searchQuery });
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (!hasNextPage || !onLoadMore) return;
@@ -48,9 +52,7 @@ export function MemberTab({
   if (error) {
     return (
       <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-red-500 pt-4">
-          メンバーの読み込みに失敗しました
-        </p>
+        <p className="text-sm text-center text-red-500 pt-4">メンバーの読み込みに失敗しました</p>
       </div>
     );
   }
@@ -58,9 +60,7 @@ export function MemberTab({
   if (loading) {
     return (
       <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-muted-foreground pt-4">
-          読み込み中...
-        </p>
+        <p className="text-sm text-center text-muted-foreground pt-4">読み込み中...</p>
       </div>
     );
   }
@@ -91,4 +91,4 @@ export function MemberTab({
       {hasNextPage && <div ref={loadMoreRef} className="h-10" />}
     </div>
   );
-} 
+}

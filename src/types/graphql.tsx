@@ -19,6 +19,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
+  BigInt: { input: any; output: any };
   DateTime: { input: any; output: any };
   Datetime: { input: Date; output: Date };
   Decimal: { input: any; output: any };
@@ -28,7 +29,7 @@ export type Scalars = {
 
 export type GqlAccumulatedPointView = {
   __typename?: "AccumulatedPointView";
-  accumulatedPoint: Scalars["Int"]["output"];
+  accumulatedPoint: Scalars["BigInt"]["output"];
   walletId?: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -292,7 +293,7 @@ export type GqlCommunityUpdateProfileSuccess = {
 
 export type GqlCurrentPointView = {
   __typename?: "CurrentPointView";
-  currentPoint: Scalars["Int"]["output"];
+  currentPoint: Scalars["BigInt"]["output"];
   walletId?: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -2681,46 +2682,6 @@ export type GqlWalletsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
-export type GqlTicketClaimLinksQueryVariables = Exact<{
-  filter?: InputMaybe<GqlTicketClaimLinkFilterInput>;
-  sort?: InputMaybe<GqlTicketClaimLinkSortInput>;
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-}>;
-
-export type GqlTicketClaimLinksQuery = {
-  __typename?: "Query";
-  ticketClaimLinks: {
-    __typename?: "TicketClaimLinksConnection";
-    totalCount: number;
-    edges?: Array<{
-      __typename?: "TicketClaimLinkEdge";
-      cursor: string;
-      node?: {
-        __typename?: "TicketClaimLink";
-        id: string;
-        status: GqlClaimLinkStatus;
-        qty: number;
-        claimedAt?: Date | null;
-        createdAt?: Date | null;
-        issuer?: {
-          __typename?: "TicketIssuer";
-          id: string;
-          owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
-        } | null;
-        tickets?: Array<{ __typename?: "Ticket"; status: GqlTicketStatus }> | null;
-      } | null;
-    } | null> | null;
-    pageInfo: {
-      __typename?: "PageInfo";
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-      startCursor?: string | null;
-      endCursor?: string | null;
-    };
-  };
-};
-
 export type GqlCommunityFieldsFragment = {
   __typename?: "Community";
   id: string;
@@ -2944,7 +2905,7 @@ export type GqlGetSingleMembershipQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
-      nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     } | null;
     community?: {
       __typename?: "Community";
@@ -3007,7 +2968,7 @@ export type GqlGetMembershipListQuery = {
             createdAt?: Date | null;
             updatedAt?: Date | null;
           }> | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -3031,7 +2992,7 @@ export type GqlUserFieldsFragment = {
   urlFacebook?: string | null;
   urlInstagram?: string | null;
   urlX?: string | null;
-  nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+  nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
 };
 
 export type GqlUserPortfolioFieldsFragment = {
@@ -3069,7 +3030,7 @@ export type GqlUserPortfolioFieldsFragment = {
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
-    nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+    nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
   }> | null;
 };
 
@@ -3156,7 +3117,7 @@ export type GqlGetUserFlexibleQuery = {
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
-        nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+        nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
       }> | null;
     }> | null;
     didIssuanceRequests?: Array<{
@@ -3186,7 +3147,7 @@ export type GqlGetUserFlexibleQuery = {
         reason: GqlTicketStatusReason;
         status: GqlTicketStatus;
       }> | null;
-      currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+      currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
     }> | null;
     opportunitiesCreatedByMe?: Array<{
       __typename?: "Opportunity";
@@ -3223,7 +3184,7 @@ export type GqlGetUserFlexibleQuery = {
         } | null;
       } | null;
     }> | null;
-    nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+    nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
   } | null;
 };
 
@@ -3276,7 +3237,7 @@ export type GqlGetUserWalletQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
-            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -3284,7 +3245,7 @@ export type GqlGetUserWalletQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
         toWallet?: {
           __typename?: "Wallet";
@@ -3301,7 +3262,7 @@ export type GqlGetUserWalletQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
-            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -3309,7 +3270,7 @@ export type GqlGetUserWalletQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
       }> | null;
       tickets?: Array<{
@@ -3327,9 +3288,9 @@ export type GqlGetUserWalletQuery = {
           pointsRequired: number;
         } | null;
       }> | null;
-      currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+      currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
     }> | null;
-    nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+    nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
   } | null;
 };
 
@@ -3337,7 +3298,7 @@ export type GqlWalletFieldsFragment = {
   __typename?: "Wallet";
   id: string;
   type: GqlWalletType;
-  currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+  currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
 };
 
 export type GqlGetWalletsWithTransactionQueryVariables = Exact<{
@@ -3387,9 +3348,9 @@ export type GqlGetWalletsWithTransactionQuery = {
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
-              nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+              nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
             } | null;
-            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
           } | null;
           toWallet?: {
             __typename?: "Wallet";
@@ -3406,12 +3367,12 @@ export type GqlGetWalletsWithTransactionQuery = {
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
-              nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+              nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
             } | null;
-            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
           } | null;
         }> | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -3457,7 +3418,7 @@ export type GqlGetWalletsWithTicketQuery = {
             pointsRequired: number;
           } | null;
         }> | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -3492,7 +3453,7 @@ export type GqlGetCommunityWalletQuery = {
           name?: string | null;
           image?: string | null;
         } | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -3546,7 +3507,7 @@ export type GqlGetMemberWalletsQuery = {
             createdAt?: Date | null;
             updatedAt?: Date | null;
           }> | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -3554,7 +3515,7 @@ export type GqlGetMemberWalletsQuery = {
           name?: string | null;
           image?: string | null;
         } | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -3615,7 +3576,7 @@ export type GqlGetArticlesQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         }> | null;
       } | null;
     } | null> | null;
@@ -3684,7 +3645,7 @@ export type GqlGetArticleQuery = {
           } | null;
         } | null;
       }> | null;
-      nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     }> | null;
     authors?: Array<{
       __typename?: "User";
@@ -3697,7 +3658,7 @@ export type GqlGetArticleQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
-      nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     }> | null;
   } | null;
   articles: {
@@ -3734,7 +3695,7 @@ export type GqlGetArticleQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         }> | null;
       } | null;
     } | null> | null;
@@ -4080,7 +4041,7 @@ export type GqlGetOpportunityQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
-            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
         }> | null;
       }> | null;
@@ -4170,13 +4131,13 @@ export type GqlGetOpportunityQuery = {
                 urlFacebook?: string | null;
                 urlInstagram?: string | null;
                 urlX?: string | null;
-                nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+                nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
               } | null;
             }> | null;
           }> | null;
         }> | null;
       }> | null;
-      nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     } | null;
     requiredUtilities?: Array<{ __typename?: "Utility"; id: string }> | null;
   } | null;
@@ -4358,7 +4319,7 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         evaluation?: { __typename?: "Evaluation"; id: string; status: GqlEvaluationStatus } | null;
       }> | null;
@@ -4496,7 +4457,7 @@ export type GqlGetParticipationQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
-            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           place?: {
             __typename?: "Place";
@@ -4570,7 +4531,7 @@ export type GqlGetParticipationQuery = {
             createdAt?: Date | null;
             updatedAt?: Date | null;
           }> | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         place?: {
           __typename?: "Place";
@@ -4632,7 +4593,7 @@ export type GqlGetParticipationQuery = {
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
-        nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+        nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
       } | null;
     }> | null;
     user?: {
@@ -4646,7 +4607,7 @@ export type GqlGetParticipationQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
-      nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     } | null;
   } | null;
 };
@@ -4774,7 +4735,7 @@ export type GqlGetReservationsQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         opportunitySlot?: {
           __typename?: "OpportunitySlot";
@@ -4832,7 +4793,7 @@ export type GqlGetReservationQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
-      nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     } | null;
     opportunitySlot?: {
       __typename?: "OpportunitySlot";
@@ -4899,7 +4860,7 @@ export type GqlGetReservationQuery = {
             publishStatus: GqlPublishStatus;
             publishedAt?: Date | null;
           }> | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         place?: {
           __typename?: "Place";
@@ -4941,7 +4902,7 @@ export type GqlGetReservationQuery = {
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
-        nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+        nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
       } | null;
       evaluation?: {
         __typename?: "Evaluation";
@@ -5095,7 +5056,7 @@ export type GqlGetPlacesQuery = {
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
-              nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+              nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
             }> | null;
           }> | null;
           createdByUser?: {
@@ -5183,7 +5144,7 @@ export type GqlGetPlaceQuery = {
           publishStatus: GqlPublishStatus;
           publishedAt?: Date | null;
         }> | null;
-        nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+        nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
       } | null;
       articles?: Array<{
         __typename?: "Article";
@@ -5206,7 +5167,7 @@ export type GqlGetPlaceQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         }> | null;
       }> | null;
     }> | null;
@@ -5319,7 +5280,7 @@ export type GqlGetTicketsQuery = {
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
-              nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+              nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
             } | null;
           } | null;
         } | null;
@@ -5377,9 +5338,50 @@ export type GqlTicketClaimLinkQuery = {
   } | null;
 };
 
+export type GqlTicketClaimLinksQueryVariables = Exact<{
+  filter?: InputMaybe<GqlTicketClaimLinkFilterInput>;
+  sort?: InputMaybe<GqlTicketClaimLinkSortInput>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlTicketClaimLinksQuery = {
+  __typename?: "Query";
+  ticketClaimLinks: {
+    __typename?: "TicketClaimLinksConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "TicketClaimLinkEdge";
+      cursor: string;
+      node?: {
+        __typename?: "TicketClaimLink";
+        id: string;
+        status: GqlClaimLinkStatus;
+        qty: number;
+        claimedAt?: Date | null;
+        createdAt?: Date | null;
+        issuer?: {
+          __typename?: "TicketIssuer";
+          id: string;
+          owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+        } | null;
+        tickets?: Array<{ __typename?: "Ticket"; status: GqlTicketStatus }> | null;
+      } | null;
+    } | null> | null;
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
+  };
+};
+
 export type GqlGetTicketIssuersQueryVariables = Exact<{
   filter?: InputMaybe<GqlTicketIssuerFilterInput>;
   sort?: InputMaybe<GqlTicketIssuerSortInput>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
@@ -5624,7 +5626,7 @@ export type GqlGetTransactionsQuery = {
               createdAt?: Date | null;
               updatedAt?: Date | null;
             }> | null;
-            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -5632,7 +5634,7 @@ export type GqlGetTransactionsQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
         toWallet?: {
           __typename?: "Wallet";
@@ -5660,7 +5662,7 @@ export type GqlGetTransactionsQuery = {
               createdAt?: Date | null;
               updatedAt?: Date | null;
             }> | null;
-            nftWallet?: { __typename?: "NftWallet"; id: string } | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -5668,7 +5670,7 @@ export type GqlGetTransactionsQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
       } | null;
     } | null> | null;
@@ -5749,6 +5751,7 @@ export const UserFieldsFragmentDoc = gql`
     phoneNumber
     nftWallet {
       id
+      walletAddress
     }
     urlFacebook
     urlInstagram
@@ -5896,110 +5899,6 @@ export const TransactionFieldsFragmentDoc = gql`
     createdAt
   }
 `;
-export const TicketClaimLinksDocument = gql`
-  query ticketClaimLinks(
-    $filter: TicketClaimLinkFilterInput
-    $sort: TicketClaimLinkSortInput
-    $cursor: String
-    $first: Int
-  ) {
-    ticketClaimLinks(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
-      edges {
-        node {
-          id
-          status
-          qty
-          claimedAt
-          createdAt
-          issuer {
-            id
-            owner {
-              id
-              name
-              image
-            }
-          }
-          tickets {
-            status
-          }
-        }
-        cursor
-      }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-      }
-      totalCount
-    }
-  }
-`;
-
-/**
- * __useTicketClaimLinksQuery__
- *
- * To run a query within a React component, call `useTicketClaimLinksQuery` and pass it any options that fit your needs.
- * When your component renders, `useTicketClaimLinksQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useTicketClaimLinksQuery({
- *   variables: {
- *      filter: // value for 'filter'
- *      sort: // value for 'sort'
- *      cursor: // value for 'cursor'
- *      first: // value for 'first'
- *   },
- * });
- */
-export function useTicketClaimLinksQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GqlTicketClaimLinksQuery,
-    GqlTicketClaimLinksQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
-    TicketClaimLinksDocument,
-    options,
-  );
-}
-export function useTicketClaimLinksLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlTicketClaimLinksQuery,
-    GqlTicketClaimLinksQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
-    TicketClaimLinksDocument,
-    options,
-  );
-}
-export function useTicketClaimLinksSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
-    TicketClaimLinksDocument,
-    options,
-  );
-}
-export type TicketClaimLinksQueryHookResult = ReturnType<typeof useTicketClaimLinksQuery>;
-export type TicketClaimLinksLazyQueryHookResult = ReturnType<typeof useTicketClaimLinksLazyQuery>;
-export type TicketClaimLinksSuspenseQueryHookResult = ReturnType<
-  typeof useTicketClaimLinksSuspenseQuery
->;
-export type TicketClaimLinksQueryResult = Apollo.QueryResult<
-  GqlTicketClaimLinksQuery,
-  GqlTicketClaimLinksQueryVariables
->;
 export const GetCommunitiesDocument = gql`
   query GetCommunities {
     communities {
@@ -10072,13 +9971,118 @@ export type TicketClaimLinkQueryResult = Apollo.QueryResult<
   GqlTicketClaimLinkQuery,
   GqlTicketClaimLinkQueryVariables
 >;
+export const TicketClaimLinksDocument = gql`
+  query TicketClaimLinks(
+    $filter: TicketClaimLinkFilterInput
+    $sort: TicketClaimLinkSortInput
+    $cursor: String
+    $first: Int
+  ) {
+    ticketClaimLinks(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
+      edges {
+        node {
+          id
+          status
+          qty
+          claimedAt
+          createdAt
+          issuer {
+            id
+            owner {
+              id
+              name
+              image
+            }
+          }
+          tickets {
+            status
+          }
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useTicketClaimLinksQuery__
+ *
+ * To run a query within a React component, call `useTicketClaimLinksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTicketClaimLinksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTicketClaimLinksQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useTicketClaimLinksQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlTicketClaimLinksQuery,
+    GqlTicketClaimLinksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
+    TicketClaimLinksDocument,
+    options,
+  );
+}
+export function useTicketClaimLinksLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlTicketClaimLinksQuery,
+    GqlTicketClaimLinksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
+    TicketClaimLinksDocument,
+    options,
+  );
+}
+export function useTicketClaimLinksSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
+    TicketClaimLinksDocument,
+    options,
+  );
+}
+export type TicketClaimLinksQueryHookResult = ReturnType<typeof useTicketClaimLinksQuery>;
+export type TicketClaimLinksLazyQueryHookResult = ReturnType<typeof useTicketClaimLinksLazyQuery>;
+export type TicketClaimLinksSuspenseQueryHookResult = ReturnType<
+  typeof useTicketClaimLinksSuspenseQuery
+>;
+export type TicketClaimLinksQueryResult = Apollo.QueryResult<
+  GqlTicketClaimLinksQuery,
+  GqlTicketClaimLinksQueryVariables
+>;
 export const GetTicketIssuersDocument = gql`
   query GetTicketIssuers(
     $filter: TicketIssuerFilterInput
     $sort: TicketIssuerSortInput
+    $cursor: String
     $first: Int
   ) {
-    ticketIssuers(filter: $filter, sort: $sort, first: $first) {
+    ticketIssuers(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
       pageInfo {
         startCursor
         endCursor
@@ -10125,6 +10129,7 @@ export const GetTicketIssuersDocument = gql`
  *   variables: {
  *      filter: // value for 'filter'
  *      sort: // value for 'sort'
+ *      cursor: // value for 'cursor'
  *      first: // value for 'first'
  *   },
  * });

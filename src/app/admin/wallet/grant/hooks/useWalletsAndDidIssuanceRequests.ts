@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import {
-  GqlDidIssuanceRequest,
   GqlTransaction,
   GqlTransactionFilterInput,
   GqlTransactionReason,
@@ -19,20 +18,6 @@ interface UseWalletsAndDidIssuanceRequestsProps {
   keyword?: string;
 }
 
-const getDidIssuanceRequests = (userID: string, GqlTransaction: GqlTransaction) => {
-  const fromUser = GqlTransaction.fromWallet?.user;
-  const toUser = GqlTransaction.toWallet?.user;
-
-  let targetRequests: GqlDidIssuanceRequest[] = [];
-  if (fromUser && fromUser.id !== userID) {
-    targetRequests = fromUser.didIssuanceRequests ?? [];
-  } else if (toUser && toUser.id !== userID) {
-    targetRequests = toUser.didIssuanceRequests ?? [];
-  }
-
-  return targetRequests;
-};
-
 export function useWalletsAndDidIssuanceRequests({
   currentUserId,
   listType,
@@ -40,7 +25,7 @@ export function useWalletsAndDidIssuanceRequests({
 }: UseWalletsAndDidIssuanceRequestsProps): {
   loading: boolean;
   error: ApolloError | undefined;
-  allTransactions: any[];
+  allTransactions: GqlTransaction[];
   presentedTransactions: PresentedTransaction[];
 } {
   const walletTypeFilter: GqlTransactionFilterInput =
@@ -89,11 +74,7 @@ export function useWalletsAndDidIssuanceRequests({
     variables: {
       filter: {
         communityId: COMMUNITY_ID,
-        and: [
-          walletTypeFilter,
-          ...(keywordFilter ? [keywordFilter] : []),
-        ],
-      },
+        and: [walletTypeFilter, ...(keywordFilter ? [keywordFilter] : [])],
       },
       first: 100,
       withDidIssuanceRequests: true,
@@ -107,19 +88,17 @@ export function useWalletsAndDidIssuanceRequests({
       data?.transactions?.edges
         ?.flatMap((edge) => edge?.node)
         .filter(
-          (t): t is GqlTransaction => !!t && t.fromWallet !== null,
-          // t.fromWallet?.type !== GqlWalletType.Community &&
-          // t.toWallet?.type !== GqlWalletType.Community
+          (t): t is GqlTransaction =>
+            !!t && t.fromWallet !== null && !shouldExcludeSelfTransaction(t, currentUserId),
         ) ?? []
     );
-  }, [data]);
+  }, [data, currentUserId]);
 
   const presentedTransactions = useMemo<PresentedTransaction[]>(() => {
     return allTransactions.map((transaction) =>
       presentTransaction({
         transaction,
         currentUserId,
-        didIssuanceRequests: getDidIssuanceRequests(currentUserId ?? "", transaction),
         listType,
       }),
     );
@@ -131,4 +110,14 @@ export function useWalletsAndDidIssuanceRequests({
     allTransactions,
     presentedTransactions,
   };
+}
+
+function shouldExcludeSelfTransaction(
+  transaction: GqlTransaction,
+  currentUserId?: string,
+): boolean {
+  const fromUserId = transaction.fromWallet?.user?.id;
+  const toUserId = transaction.toWallet?.user?.id;
+
+  return currentUserId != null && fromUserId === currentUserId && toUserId === currentUserId;
 }

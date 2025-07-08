@@ -9,7 +9,7 @@ import { ParticipantsList } from "@/components/shared/ParticipantsList";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
 import { ActivityCard } from "@/app/activities/data/type";
 import { AppPortfolio } from "@/app/users/data/type";
-import { GqlEvaluationStatus, GqlOpportunityCategory, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
+import { GqlEvaluationStatus, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getCurrentRegionName } from "@/lib/communities/metadata";
 import { useRouter } from "next/navigation";
@@ -151,16 +151,13 @@ export const PortfolioCard = ({
           ) : (
             <div className="absolute top-2 left-2 z-10">
               <div
-                className={
-                  `px-2 py-1 text-label-sm rounded-full font-bold 
+                className={`px-2 py-1 text-label-sm rounded-full font-bold 
                   ${isPassed ? getStatusStylesForPassed(portfolio.evaluationStatus) : getStatusStyles(portfolio.reservationStatus)}
                   `}
               >
-                {
-                  isPassed
-                    ? "証明済み"
-                    : getCategoryLabel(portfolio.source, portfolio.reservationStatus)
-                }
+                {isPassed
+                  ? "証明済み"
+                  : getCategoryLabel(portfolio.source, portfolio.reservationStatus)}
               </div>
             </div>
           )}
@@ -258,10 +255,6 @@ const PhotoGallery = () => {
   );
 };
 
-// TODO: dummy 関連のコード削除する
-const enableDummyPortfolios = false;
-const enableDummyActiveOpportunities = false;
-
 const UserPortfolioList = ({
   isSysAdmin,
   activeOpportunities = [],
@@ -271,7 +264,7 @@ const UserPortfolioList = ({
   hasMore,
   lastPortfolioRef,
 }: Props) => {
-  const showEmptyState = enableDummyPortfolios ? false : portfolios.length === 0;
+  const showEmptyState = portfolios.length === 0;
   const router = useRouter();
   const emptyStateProps = {
     title: `${getCurrentRegionName()}にふれよう`,
@@ -287,15 +280,9 @@ const UserPortfolioList = ({
   return (
     <section className="py-6 mt-0">
       <div className="space-y-4">
-        {isSysAdmin && (
-          <ActiveOpportunities
-            opportunities={
-              enableDummyActiveOpportunities ? dummyActivityCards : activeOpportunities
-            }
-          />
-        )}
-        <div className="flex justify-between items-center pt-4 pb-1">
-          <h2 className="text-display-sm font-semibold text-foreground">
+        {isSysAdmin && <ActiveOpportunities opportunities={activeOpportunities} />}
+        <div className="flex items-center justify-between">
+          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
             これまでの関わり
           </h2>
           <button
@@ -334,9 +321,9 @@ const UserPortfolioList = ({
           <EmptyStateWithSearch {...emptyStateProps} />
         ) : (
           <PortfolioGrid
-            portfolios={enableDummyPortfolios ? dummyPortfolios : portfolios}
-            isLoadingMore={enableDummyPortfolios ? false : isLoadingMore}
-            hasMore={enableDummyPortfolios ? false : hasMore}
+            portfolios={portfolios}
+            isLoadingMore={isLoadingMore}
+            hasMore={hasMore}
             lastPortfolioRef={lastPortfolioRef}
           />
         )}
@@ -346,99 +333,3 @@ const UserPortfolioList = ({
 };
 
 export default UserPortfolioList;
-
-// #NOTE: スタイル確認用に作成、後ほど削除する
-const dummyPortfolios: AppPortfolio[] = [
-  {
-    id: "1",
-    source: "OPPORTUNITY",
-    category: "EVENT",
-    reservationStatus: "ACCEPTED",
-    title: "体験のタイトル",
-    image: "/images/activities/activity-placeholder-1.jpg",
-    date: "2025-05-15",
-    location: "四国",
-    participants: [
-      { id: "1", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "2", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "3", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "4", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "5", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-    ],
-  },
-  {
-    id: "2",
-    source: "OPPORTUNITY",
-    category: "QUEST",
-    reservationStatus: "APPLIED",
-    title: "体験のタイトル",
-    image: "/images/activities/activity-placeholder-2.jpg",
-    date: "2025-05-25",
-    location: "四国",
-    participants: [
-      { id: "1", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "2", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "3", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "4", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "5", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-    ],
-  },
-  {
-    id: "9",
-    source: "OPPORTUNITY",
-    category: "QUEST",
-    reservationStatus: "ACCEPTED",
-    title: "体験のタイトル",
-    image: "/images/activities/activity-placeholder-2.jpg",
-    date: "2025-05-25",
-    location: "四国",
-    participants: [
-      { id: "1", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "2", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "3", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "4", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "5", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-    ],
-  },
-  {
-    id: "3",
-    source: "OPPORTUNITY",
-    category: "QUEST",
-    reservationStatus: "CANCELED",
-    title: "体験のタイトル",
-    image: "/images/activities/activity-placeholder-2.jpg",
-    date: "2025-05-15",
-    location: "四国",
-    participants: [
-      { id: "1", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "2", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "3", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-    ],
-  },
-  {
-    id: "4",
-    source: "OPPORTUNITY",
-    category: "EVENT",
-    reservationStatus: "REJECTED",
-    title: "体験のタイトル",
-    image: "/images/activities/activity-placeholder-2.jpg",
-    date: "2025-05-25",
-    location: "四国",
-    participants: [
-      { id: "1", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-      { id: "2", name: "ユーザー名", image: PLACEHOLDER_IMAGE },
-    ],
-  },
-];
-
-const dummyActivityCards: ActivityCard[] = dummyPortfolios.map((portfolio) => ({
-  id: portfolio.id,
-  category:
-    portfolio.category === "EVENT" ? GqlOpportunityCategory.Event : GqlOpportunityCategory.Quest,
-  title: portfolio.title,
-  images: [portfolio.image || PLACEHOLDER_IMAGE],
-  location: portfolio.location || "",
-  hasReservableTicket: true,
-  feeRequired: 200,
-  communityId: "neo-88",
-}));

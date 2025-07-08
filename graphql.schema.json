@@ -25,7 +25,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "Int",
+                "name": "BigInt",
                 "ofType": null
               }
             },
@@ -1345,6 +1345,17 @@
       },
       {
         "kind": "SCALAR",
+        "name": "BigInt",
+        "description": "Custom scalar for bigint (serialized as string)",
+        "isOneOf": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "SCALAR",
         "name": "Boolean",
         "description": "The `Boolean` scalar type represents `true` or `false`.",
         "isOneOf": null,
@@ -2510,7 +2521,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "Int",
+                "name": "BigInt",
                 "ofType": null
               }
             },
@@ -2692,7 +2703,7 @@
       {
         "kind": "SCALAR",
         "name": "Decimal",
-        "description": null,
+        "description": "Custom scalar for high-precision decimal (serialized as string)",
         "isOneOf": null,
         "fields": null,
         "inputFields": null,
@@ -19805,7 +19816,7 @@
       {
         "kind": "SCALAR",
         "name": "Upload",
-        "description": null,
+        "description": "The `Upload` scalar type represents a file upload.",
         "isOneOf": null,
         "fields": null,
         "inputFields": null,

@@ -1,21 +1,37 @@
 "use client";
 
-import { useState } from "react";
 import OpportunityList from "./opportunity/OpportunityList";
 import TimeSlotSelector from "./selectDate/TimeSlotSelector";
 import CredentialRecipientSelector from "./selectUser/CredentialRecipientSelector";
+import { useSearchParams, useRouter } from "next/navigation";
+
+export const STEPS = {
+  SELECT_OPPORTUNITY: 1,
+  SELECT_TIME_SLOT: 2,
+  SELECT_CREDENTIAL_RECIPIENT: 3,
+};
 
 export default function CredentialIssuanceWizard() {
-  const [step, setStep] = useState(1);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-  if (step === 1) {
-    return <OpportunityList setStep={setStep} />;
+  const stepParam = Number(searchParams.get("step") ?? "1");
+
+  const goToStep = (nextStep: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("step", String(nextStep));
+    router.push(`?${params.toString()}`);
+  };
+
+  if (stepParam === STEPS.SELECT_OPPORTUNITY) {
+    return <OpportunityList setStep={goToStep} />;
   }
-  if (step === 2) {
-    return <TimeSlotSelector setStep={setStep} />;
+  if (stepParam === STEPS.SELECT_TIME_SLOT) {
+    return <TimeSlotSelector setStep={goToStep} />;
   }
-  if (step === 3) {
-    return <CredentialRecipientSelector setStep={setStep} />;
+  if (stepParam === STEPS.SELECT_CREDENTIAL_RECIPIENT) {
+    return <CredentialRecipientSelector setStep={goToStep} />;
   }
+
   return null;
 }
