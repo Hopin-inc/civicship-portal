@@ -20,13 +20,13 @@ export default function DonatePointPage() {
   const track = useAnalytics();
 
   const searchParams = useSearchParams();
-  const currentPoint = Number(searchParams.get("currentPoint") ?? "0");
+  const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");
   const tab = searchParams.get("tab") ?? "";
   const [activeTab, setActiveTab] = useState<Tabs>(tab as Tabs);
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
-    variables: { 
-      filter: { communityId: COMMUNITY_ID }, 
+    variables: {
+      filter: { communityId: COMMUNITY_ID },
       first: 100,
       withDidIssuanceRequests: true,
     },
@@ -43,23 +43,31 @@ export default function DonatePointPage() {
 
   const { donatePoint } = useTransactionMutations();
 
-  const members =
-    (data?.wallets?.edges
-      ?.map((edge) => {
-        const wallet = edge?.node;
-        const user = wallet?.user;
-        const currentPoint = wallet?.currentPointView?.currentPoint;
-        return user?.id !== currentUser?.id && user
-          ? {
-              user,
-              wallet: currentPoint != null ? { currentPointView: { currentPoint } } : {},
-            }
-          : null;
-      })
-      .filter(Boolean) as {
-      user: GqlUser;
-      wallet: { currentPointView?: { currentPoint: number } };
-    }[]) ?? [];
+  const members = (data?.wallets?.edges ?? [])
+    .map((edge) => {
+      const wallet = edge?.node;
+      const user = wallet?.user;
+      const pointStr = wallet?.currentPointView?.currentPoint;
+      if (!user || user.id === currentUser?.id) return null;
+      const currentPoint = pointStr ? BigInt(pointStr) : BigInt(0);
+
+      return {
+        user,
+        wallet: {
+          currentPointView: {
+            currentPoint,
+          },
+        },
+      };
+    })
+    .filter(
+      (
+        member,
+      ): member is {
+        user: GqlUser;
+        wallet: { currentPointView: { currentPoint: bigint } };
+      } => !!member,
+    );
 
   const handleDonate = async (amount: number) => {
     if (!selectedUser) return;
