@@ -19,6 +19,7 @@ generates:
       enumsAsConst: true
       scalars:
         Datetime: Date
+        BigInt: bigint
   ./graphql.schema.json:
     plugins:
       - introspection
