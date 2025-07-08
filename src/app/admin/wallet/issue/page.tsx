@@ -11,6 +11,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 const PRESET_AMOUNTS = [1000000, 3000000, 5000000, 10000000, 30000000, 50000000];
+const INT_LIMIT = 2000000000;
 
 export default function IssuePointPage() {
   const communityId = COMMUNITY_ID;
@@ -49,6 +50,10 @@ export default function IssuePointPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/,/g, "");
     const num = Number(raw);
+    if (num > INT_LIMIT) {
+      toast.error("20億以下を指定して下さい");
+      return;
+    }
     if (isNaN(num)) {
       setAmount(null);
       setDisplayValue("");
