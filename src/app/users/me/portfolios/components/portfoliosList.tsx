@@ -7,14 +7,14 @@ import FutureTab from "./FutureTab";
 import PastTab from "./PastTab";
 import { useAuth } from "@/contexts/AuthProvider";
 
-export const groupByDate = (portfolios: any[]) => {
-  if (!portfolios) return {};
-  return portfolios.reduce((acc, p) => {
-    const date = p.date;
+export function groupByDate<T extends { date: string }>(items: T[]): Record<string, T[]> {
+  if (!items) return {};
+  return items.reduce((acc, item) => {
+    const date = item.date;
     if (!acc[date]) acc[date] = [];
-    acc[date].push(p);
+    acc[date].push(item);
     return acc;
-  }, {});
+  }, {} as Record<string, T[]>);
 }
 
 export default function PortfoliosList() {
