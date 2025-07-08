@@ -7,7 +7,7 @@ import { TicketClaimLink } from "@/app/tickets/data/type";
 import {
   GqlSortDirection,
   GqlTicketClaimLinksQuery,
-  useTicketClaimLinksQuery
+  useTicketClaimLinksQuery,
 } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
 
@@ -68,7 +68,10 @@ export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
         cursor: endCursor,
         first: 20,
       },
-      updateQuery: (prev: GqlTicketClaimLinksQuery, { fetchMoreResult }: { fetchMoreResult: GqlTicketClaimLinksQuery }) => {
+      updateQuery: (
+        prev: GqlTicketClaimLinksQuery,
+        { fetchMoreResult }: { fetchMoreResult: GqlTicketClaimLinksQuery },
+      ) => {
         if (!fetchMoreResult || !prev.ticketClaimLinks || !fetchMoreResult.ticketClaimLinks) {
           return prev;
         }
@@ -79,9 +82,10 @@ export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
             ...prev.ticketClaimLinks,
             edges: [
               ...new Map(
-                [...(prev.ticketClaimLinks.edges ?? []), ...(fetchMoreResult.ticketClaimLinks.edges ?? [])].map(
-                  (edge) => [edge?.node?.id, edge],
-                ),
+                [
+                  ...(prev.ticketClaimLinks.edges ?? []),
+                  ...(fetchMoreResult.ticketClaimLinks.edges ?? []),
+                ].map((edge) => [edge?.node?.id, edge]),
               ).values(),
             ],
             pageInfo: fetchMoreResult.ticketClaimLinks.pageInfo,
