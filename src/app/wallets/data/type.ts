@@ -17,7 +17,7 @@ export type AvailableTicket = {
 
 export type AvailablePoint = {
   walletId: string;
-  currentPoint: number;
+  currentPoint: bigint;
 };
 
 export type AppTransaction = {

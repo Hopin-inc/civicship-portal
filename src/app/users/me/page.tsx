@@ -44,6 +44,11 @@ export default function MyProfilePage() {
     return notFound();
   }
 
+  const targetFeatures = ["opportunities", "credentials"] as const;
+  const shouldShowOpportunities = targetFeatures.some((feature) =>
+    currentCommunityConfig.enableFeatures.includes(feature),
+  );
+
   // 正常表示
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">
@@ -54,7 +59,7 @@ export default function MyProfilePage() {
         isOwner={true}
       />
       <>
-        {currentCommunityConfig.enableFeatures.includes("opportunities") && (
+        {shouldShowOpportunities && (
           <>
             {selfOpportunities.length > 0 && (
               <section className="py-6 mt-0">

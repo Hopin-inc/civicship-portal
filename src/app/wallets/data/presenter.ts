@@ -5,7 +5,8 @@ import { AppTransaction, AvailableTicket, UserAsset } from "@/app/wallets/data/t
 
 export const presenterUserAsset = (wallet: GqlWallet | undefined | null): UserAsset => {
   const walletId = wallet?.id ?? "";
-  const currentPoint = wallet?.currentPointView?.currentPoint ?? 0;
+  const currentPointView = wallet?.currentPointView;
+  const currentPoint = BigInt(currentPointView?.currentPoint ?? "0");
 
   const tickets: AvailableTicket[] = (wallet?.tickets ?? []).map((ticket) => ({
     id: ticket.id,

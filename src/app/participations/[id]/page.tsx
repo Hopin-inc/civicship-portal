@@ -58,7 +58,7 @@ export default function ParticipationPage() {
     hasError,
     refetch,
   } = useParticipationPage(id ?? "");
-
+  
   // #NOTE: コンポーネントに必要な情報を取得するために、useCompletePageViewModel と useOpportunityDetail を使用しているがリクエストが重複するので、まとめたい
   const { dateTimeInfo } = useCompletePageViewModel(id ?? "", participation?.reservation?.id ?? "");
   const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityDetail(
