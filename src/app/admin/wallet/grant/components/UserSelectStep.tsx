@@ -10,7 +10,7 @@ import { HistoryTab } from "./HistoryTab";
 import { MemberTab } from "./MemberTab";
 
 interface Props {
-  members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: number } } }[];
+  members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: bigint } } }[];
   onSelect: (user: GqlUser) => void;
   onLoadMore?: () => void;
   hasNextPage?: boolean;
