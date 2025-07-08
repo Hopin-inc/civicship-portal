@@ -19,6 +19,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
+  BigInt: { input: any; output: any };
   DateTime: { input: any; output: any };
   Datetime: { input: Date; output: Date };
   Decimal: { input: any; output: any };
@@ -28,7 +29,7 @@ export type Scalars = {
 
 export type GqlAccumulatedPointView = {
   __typename?: "AccumulatedPointView";
-  accumulatedPoint: Scalars["Int"]["output"];
+  accumulatedPoint: Scalars["BigInt"]["output"];
   walletId?: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -292,7 +293,7 @@ export type GqlCommunityUpdateProfileSuccess = {
 
 export type GqlCurrentPointView = {
   __typename?: "CurrentPointView";
-  currentPoint: Scalars["Int"]["output"];
+  currentPoint: Scalars["BigInt"]["output"];
   walletId?: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -2222,6 +2223,7 @@ export type GqlTicketsConnection = {
 export type GqlTransaction = {
   __typename?: "Transaction";
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  createdByUser?: Maybe<GqlUser>;
   fromPointChange?: Maybe<Scalars["Int"]["output"]>;
   fromWallet?: Maybe<GqlWallet>;
   id: Scalars["ID"]["output"];
@@ -2543,46 +2545,6 @@ export type GqlWalletsConnection = {
   edges?: Maybe<Array<Maybe<GqlWalletEdge>>>;
   pageInfo: GqlPageInfo;
   totalCount: Scalars["Int"]["output"];
-};
-
-export type GqlTicketClaimLinksQueryVariables = Exact<{
-  filter?: InputMaybe<GqlTicketClaimLinkFilterInput>;
-  sort?: InputMaybe<GqlTicketClaimLinkSortInput>;
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-}>;
-
-export type GqlTicketClaimLinksQuery = {
-  __typename?: "Query";
-  ticketClaimLinks: {
-    __typename?: "TicketClaimLinksConnection";
-    totalCount: number;
-    edges?: Array<{
-      __typename?: "TicketClaimLinkEdge";
-      cursor: string;
-      node?: {
-        __typename?: "TicketClaimLink";
-        id: string;
-        status: GqlClaimLinkStatus;
-        qty: number;
-        claimedAt?: Date | null;
-        createdAt?: Date | null;
-        issuer?: {
-          __typename?: "TicketIssuer";
-          id: string;
-          owner?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
-        } | null;
-        tickets?: Array<{ __typename?: "Ticket"; status: GqlTicketStatus }> | null;
-      } | null;
-    } | null> | null;
-    pageInfo: {
-      __typename?: "PageInfo";
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-      startCursor?: string | null;
-      endCursor?: string | null;
-    };
-  };
 };
 
 export type GqlCommunityFieldsFragment = {
@@ -3016,7 +2978,7 @@ export type GqlGetUserFlexibleQuery = {
         reason: GqlTicketStatusReason;
         status: GqlTicketStatus;
       }> | null;
-      currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+      currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
     }> | null;
     opportunitiesCreatedByMe?: Array<{
       __typename?: "Opportunity";
@@ -3112,7 +3074,7 @@ export type GqlGetUserWalletQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
         toWallet?: {
           __typename?: "Wallet";
@@ -3136,7 +3098,7 @@ export type GqlGetUserWalletQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
       }> | null;
       tickets?: Array<{
@@ -3154,7 +3116,7 @@ export type GqlGetUserWalletQuery = {
           pointsRequired: number;
         } | null;
       }> | null;
-      currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+      currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
     }> | null;
   } | null;
 };
@@ -3163,7 +3125,7 @@ export type GqlWalletFieldsFragment = {
   __typename?: "Wallet";
   id: string;
   type: GqlWalletType;
-  currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+  currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
 };
 
 export type GqlGetWalletsWithTransactionQueryVariables = Exact<{
@@ -3214,7 +3176,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               urlInstagram?: string | null;
               urlX?: string | null;
             } | null;
-            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
           } | null;
           toWallet?: {
             __typename?: "Wallet";
@@ -3232,10 +3194,10 @@ export type GqlGetWalletsWithTransactionQuery = {
               urlInstagram?: string | null;
               urlX?: string | null;
             } | null;
-            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
           } | null;
         }> | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -3281,7 +3243,7 @@ export type GqlGetWalletsWithTicketQuery = {
             pointsRequired: number;
           } | null;
         }> | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -3316,7 +3278,7 @@ export type GqlGetCommunityWalletQuery = {
           name?: string | null;
           image?: string | null;
         } | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -3365,7 +3327,7 @@ export type GqlGetMemberWalletsQuery = {
           name?: string | null;
           image?: string | null;
         } | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -5123,7 +5085,7 @@ export type GqlGetTransactionsQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
         toWallet?: {
           __typename?: "Wallet";
@@ -5147,7 +5109,7 @@ export type GqlGetTransactionsQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
       } | null;
     } | null> | null;
@@ -5359,110 +5321,6 @@ export const TransactionFieldsFragmentDoc = gql`
     createdAt
   }
 `;
-export const TicketClaimLinksDocument = gql`
-  query ticketClaimLinks(
-    $filter: TicketClaimLinkFilterInput
-    $sort: TicketClaimLinkSortInput
-    $cursor: String
-    $first: Int
-  ) {
-    ticketClaimLinks(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
-      edges {
-        node {
-          id
-          status
-          qty
-          claimedAt
-          createdAt
-          issuer {
-            id
-            owner {
-              id
-              name
-              image
-            }
-          }
-          tickets {
-            status
-          }
-        }
-        cursor
-      }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-      }
-      totalCount
-    }
-  }
-`;
-
-/**
- * __useTicketClaimLinksQuery__
- *
- * To run a query within a React component, call `useTicketClaimLinksQuery` and pass it any options that fit your needs.
- * When your component renders, `useTicketClaimLinksQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useTicketClaimLinksQuery({
- *   variables: {
- *      filter: // value for 'filter'
- *      sort: // value for 'sort'
- *      cursor: // value for 'cursor'
- *      first: // value for 'first'
- *   },
- * });
- */
-export function useTicketClaimLinksQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GqlTicketClaimLinksQuery,
-    GqlTicketClaimLinksQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
-    TicketClaimLinksDocument,
-    options,
-  );
-}
-export function useTicketClaimLinksLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlTicketClaimLinksQuery,
-    GqlTicketClaimLinksQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
-    TicketClaimLinksDocument,
-    options,
-  );
-}
-export function useTicketClaimLinksSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlTicketClaimLinksQuery, GqlTicketClaimLinksQueryVariables>(
-    TicketClaimLinksDocument,
-    options,
-  );
-}
-export type TicketClaimLinksQueryHookResult = ReturnType<typeof useTicketClaimLinksQuery>;
-export type TicketClaimLinksLazyQueryHookResult = ReturnType<typeof useTicketClaimLinksLazyQuery>;
-export type TicketClaimLinksSuspenseQueryHookResult = ReturnType<
-  typeof useTicketClaimLinksSuspenseQuery
->;
-export type TicketClaimLinksQueryResult = Apollo.QueryResult<
-  GqlTicketClaimLinksQuery,
-  GqlTicketClaimLinksQueryVariables
->;
 export const GetCommunitiesDocument = gql`
   query GetCommunities {
     communities {
