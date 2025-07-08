@@ -49,18 +49,28 @@ export default function IssuePointPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/,/g, "");
+    if (raw === "") {
+      setAmount(null);
+      setDisplayValue("");
+      return;
+    }
+
     const num = Number(raw);
+    if (isNaN(num)) {
+      setAmount(null);
+      setDisplayValue("");
+      return;
+    }
+    if (num < 0) {
+      toast.error("0以上を指定して下さい");
+      return;
+    }
     if (num > INT_LIMIT) {
       toast.error("20億以下を指定して下さい");
       return;
     }
-    if (isNaN(num)) {
-      setAmount(null);
-      setDisplayValue("");
-    } else {
-      setAmount(num);
-      setDisplayValue(formatWithComma(raw));
-    }
+    setAmount(num);
+    setDisplayValue(formatWithComma(num.toString()));
   };
 
   const handlePresetClick = (value: number) => {
