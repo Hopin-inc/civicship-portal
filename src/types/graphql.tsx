@@ -19,6 +19,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
+  BigInt: { input: any; output: any };
   DateTime: { input: any; output: any };
   Datetime: { input: Date; output: Date };
   Decimal: { input: any; output: any };
@@ -28,7 +29,7 @@ export type Scalars = {
 
 export type GqlAccumulatedPointView = {
   __typename?: "AccumulatedPointView";
-  accumulatedPoint: Scalars["Int"]["output"];
+  accumulatedPoint: Scalars["BigInt"]["output"];
   walletId?: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -292,7 +293,7 @@ export type GqlCommunityUpdateProfileSuccess = {
 
 export type GqlCurrentPointView = {
   __typename?: "CurrentPointView";
-  currentPoint: Scalars["Int"]["output"];
+  currentPoint: Scalars["BigInt"]["output"];
   walletId?: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -2222,6 +2223,7 @@ export type GqlTicketsConnection = {
 export type GqlTransaction = {
   __typename?: "Transaction";
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  createdByUser?: Maybe<GqlUser>;
   fromPointChange?: Maybe<Scalars["Int"]["output"]>;
   fromWallet?: Maybe<GqlWallet>;
   id: Scalars["ID"]["output"];
@@ -3016,7 +3018,7 @@ export type GqlGetUserFlexibleQuery = {
         reason: GqlTicketStatusReason;
         status: GqlTicketStatus;
       }> | null;
-      currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+      currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
     }> | null;
     opportunitiesCreatedByMe?: Array<{
       __typename?: "Opportunity";
@@ -3112,7 +3114,7 @@ export type GqlGetUserWalletQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
         toWallet?: {
           __typename?: "Wallet";
@@ -3136,7 +3138,7 @@ export type GqlGetUserWalletQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
       }> | null;
       tickets?: Array<{
@@ -3154,7 +3156,7 @@ export type GqlGetUserWalletQuery = {
           pointsRequired: number;
         } | null;
       }> | null;
-      currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+      currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
     }> | null;
   } | null;
 };
@@ -3163,7 +3165,7 @@ export type GqlWalletFieldsFragment = {
   __typename?: "Wallet";
   id: string;
   type: GqlWalletType;
-  currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+  currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
 };
 
 export type GqlGetWalletsWithTransactionQueryVariables = Exact<{
@@ -3214,7 +3216,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               urlInstagram?: string | null;
               urlX?: string | null;
             } | null;
-            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
           } | null;
           toWallet?: {
             __typename?: "Wallet";
@@ -3232,10 +3234,10 @@ export type GqlGetWalletsWithTransactionQuery = {
               urlInstagram?: string | null;
               urlX?: string | null;
             } | null;
-            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
           } | null;
         }> | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -3281,7 +3283,7 @@ export type GqlGetWalletsWithTicketQuery = {
             pointsRequired: number;
           } | null;
         }> | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -3316,7 +3318,7 @@ export type GqlGetCommunityWalletQuery = {
           name?: string | null;
           image?: string | null;
         } | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -3365,7 +3367,7 @@ export type GqlGetMemberWalletsQuery = {
           name?: string | null;
           image?: string | null;
         } | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -5083,7 +5085,7 @@ export type GqlGetTransactionsQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
         toWallet?: {
           __typename?: "Wallet";
@@ -5107,7 +5109,7 @@ export type GqlGetTransactionsQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: number } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
       } | null;
     } | null> | null;
