@@ -1346,7 +1346,7 @@
       {
         "kind": "SCALAR",
         "name": "BigInt",
-        "description": null,
+        "description": "Custom scalar for bigint (serialized as string)",
         "isOneOf": null,
         "fields": null,
         "inputFields": null,
@@ -2703,7 +2703,7 @@
       {
         "kind": "SCALAR",
         "name": "Decimal",
-        "description": null,
+        "description": "Custom scalar for high-precision decimal (serialized as string)",
         "isOneOf": null,
         "fields": null,
         "inputFields": null,
@@ -19816,7 +19816,7 @@
       {
         "kind": "SCALAR",
         "name": "Upload",
-        "description": null,
+        "description": "The `Upload` scalar type represents a file upload.",
         "isOneOf": null,
         "fields": null,
         "inputFields": null,
