@@ -123,7 +123,7 @@ export default function GrantPointStepperPage() {
       ): member is {
         user: GqlUser;
         wallet: { currentPointView: { currentPoint: bigint } };
-      } => !!member,
+      } => !!member && !!member.user,
     );
 
   if (loading) {

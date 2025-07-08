@@ -66,7 +66,7 @@ export default function DonatePointPage() {
       ): member is {
         user: GqlUser;
         wallet: { currentPointView: { currentPoint: bigint } };
-      } => !!member,
+      } => !!member && !!member.user,
     );
 
   const handleDonate = async (amount: number) => {
