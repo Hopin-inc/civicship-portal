@@ -151,7 +151,9 @@ function TransferInputStep({
         <div className="flex flex-col gap-2">
           <Button
             onClick={() => amount && amount > 0 && amount <= currentPoint && onSubmit(amount)}
-            disabled={!amount || amount <= 0 || amount > currentPoint || isLoading}
+            disabled={
+              !amount || amount <= 0 || amount > currentPoint || isLoading || amount > INT_LIMIT
+            }
             className="w-full"
           >
             {submitLabel}

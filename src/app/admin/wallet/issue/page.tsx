@@ -139,7 +139,7 @@ export default function IssuePointPage() {
           size="lg"
           className="w-full max-w-xl"
           onClick={handleIssuePoint}
-          disabled={!amount || amount <= 0}
+          disabled={!amount || amount <= 0 || amount > INT_LIMIT}
         >
           発行
         </Button>
