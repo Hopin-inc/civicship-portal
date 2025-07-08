@@ -89,12 +89,5 @@ export const getDayDiffLabel = (startDate: Date) => {
 export const getDayDiffLabelFromString = (startDateStr: string) => {
   const targetDate = parse(startDateStr, "yyyy年M月d日EEEE", new Date(), { locale: ja });
   if (isNaN(targetDate.getTime())) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const diffDays = differenceInDays(targetDate, today);
-  if (diffDays === 0) return "当日";
-  if (diffDays === 1) return "翌日";
-  if (diffDays === 2) return "翌々日";
-  if (diffDays >= 3) return `${diffDays}日後`;
-  return null;
+  return getDayDiffLabel(targetDate);
 };
