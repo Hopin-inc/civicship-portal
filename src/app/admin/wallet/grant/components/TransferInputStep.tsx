@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 interface Props {
   user: GqlUser;
-  currentPoint: number;
+  currentPoint: bigint;
   isLoading: boolean;
   onBack: () => void;
   onSubmit: (amount: number) => void;

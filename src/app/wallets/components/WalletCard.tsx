@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 interface WalletCardProps {
-  currentPoint: number;
+  currentPoint: bigint;
   isLoading: boolean;
   onRefetch?: () => void | Promise<void>;
   showRefreshButton?: boolean;

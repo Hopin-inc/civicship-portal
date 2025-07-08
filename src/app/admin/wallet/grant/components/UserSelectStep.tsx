@@ -11,7 +11,7 @@ import { FormProvider } from "react-hook-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Props {
-  members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: number } } }[];
+  members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: bigint } } }[];
   onSelect: (user: GqlUser) => void;
   onLoadMore?: () => void;
   hasNextPage?: boolean;
