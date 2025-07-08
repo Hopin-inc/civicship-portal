@@ -319,6 +319,26 @@ export type GqlDateTimeRangeFilter = {
   lte?: InputMaybe<Scalars["Datetime"]["input"]>;
 };
 
+export type GqlDidIssuanceRequest = {
+  __typename?: "DidIssuanceRequest";
+  completedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  didValue?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  processedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  requestedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  status: GqlDidIssuanceStatus;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export const GqlDidIssuanceStatus = {
+  Completed: "COMPLETED",
+  Failed: "FAILED",
+  Pending: "PENDING",
+  Processing: "PROCESSING",
+} as const;
+
+export type GqlDidIssuanceStatus = (typeof GqlDidIssuanceStatus)[keyof typeof GqlDidIssuanceStatus];
 export type GqlEdge = {
   cursor: Scalars["String"]["output"];
 };
@@ -370,6 +390,7 @@ export type GqlEvaluation = {
   participation?: Maybe<GqlParticipation>;
   status: GqlEvaluationStatus;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  vcIssuanceRequest?: Maybe<GqlVcIssuanceRequest>;
 };
 
 export type GqlEvaluationBulkCreateInput = {
@@ -386,13 +407,6 @@ export type GqlEvaluationBulkCreateSuccess = {
 export type GqlEvaluationCreateInput = {
   comment?: InputMaybe<Scalars["String"]["input"]>;
   participationId: Scalars["ID"]["input"];
-};
-
-export type GqlEvaluationCreatePayload = GqlEvaluationCreateSuccess;
-
-export type GqlEvaluationCreateSuccess = {
-  __typename?: "EvaluationCreateSuccess";
-  evaluation: GqlEvaluation;
 };
 
 export type GqlEvaluationEdge = GqlEdge & {
@@ -537,6 +551,7 @@ export type GqlMembershipEdge = GqlEdge & {
 
 export type GqlMembershipFilterInput = {
   communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
   role?: InputMaybe<GqlRole>;
   status?: InputMaybe<GqlMembershipStatus>;
   userId?: InputMaybe<Scalars["ID"]["input"]>;
@@ -685,8 +700,6 @@ export type GqlMutation = {
   communityDelete?: Maybe<GqlCommunityDeletePayload>;
   communityUpdateProfile?: Maybe<GqlCommunityUpdateProfilePayload>;
   evaluationBulkCreate?: Maybe<GqlEvaluationBulkCreatePayload>;
-  evaluationFail?: Maybe<GqlEvaluationCreatePayload>;
-  evaluationPass?: Maybe<GqlEvaluationCreatePayload>;
   identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload;
   linkPhoneAuth?: Maybe<GqlLinkPhoneAuthPayload>;
   membershipAcceptMyInvitation?: Maybe<GqlMembershipSetInvitationStatusPayload>;
@@ -705,6 +718,7 @@ export type GqlMutation = {
   opportunitySlotSetHostingStatus?: Maybe<GqlOpportunitySlotSetHostingStatusPayload>;
   opportunitySlotsBulkUpdate?: Maybe<GqlOpportunitySlotsBulkUpdatePayload>;
   opportunityUpdateContent?: Maybe<GqlOpportunityUpdateContentPayload>;
+  participationBulkCreate?: Maybe<GqlParticipationBulkCreatePayload>;
   participationCreatePersonalRecord?: Maybe<GqlParticipationCreatePersonalRecordPayload>;
   participationDeletePersonalRecord?: Maybe<GqlParticipationDeletePayload>;
   placeCreate?: Maybe<GqlPlaceCreatePayload>;
@@ -766,16 +780,6 @@ export type GqlMutationCommunityUpdateProfileArgs = {
 
 export type GqlMutationEvaluationBulkCreateArgs = {
   input: GqlEvaluationBulkCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-};
-
-export type GqlMutationEvaluationFailArgs = {
-  input: GqlEvaluationCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-};
-
-export type GqlMutationEvaluationPassArgs = {
-  input: GqlEvaluationCreateInput;
   permission: GqlCheckCommunityPermissionInput;
 };
 
@@ -863,6 +867,11 @@ export type GqlMutationOpportunitySlotsBulkUpdateArgs = {
 export type GqlMutationOpportunityUpdateContentArgs = {
   id: Scalars["ID"]["input"];
   input: GqlOpportunityUpdateContentInput;
+  permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationParticipationBulkCreateArgs = {
+  input: GqlParticipationBulkCreateInput;
   permission: GqlCheckCommunityPermissionInput;
 };
 
@@ -1021,6 +1030,14 @@ export type GqlNestedPlacesBulkUpdateInput = {
   disconnect?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
+export type GqlNftWallet = {
+  __typename?: "NftWallet";
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  id: Scalars["ID"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  walletAddress: Scalars["String"]["output"];
+};
+
 export type GqlOpportunitiesConnection = {
   __typename?: "OpportunitiesConnection";
   edges: Array<GqlOpportunityEdge>;
@@ -1149,6 +1166,7 @@ export type GqlOpportunitySlot = {
   reservations?: Maybe<Array<GqlReservation>>;
   startsAt: Scalars["Datetime"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  vcIssuanceRequests?: Maybe<Array<GqlVcIssuanceRequest>>;
 };
 
 export type GqlOpportunitySlotCreateInput = {
@@ -1165,8 +1183,8 @@ export type GqlOpportunitySlotEdge = GqlEdge & {
 
 export type GqlOpportunitySlotFilterInput = {
   dateRange?: InputMaybe<GqlDateTimeRangeFilter>;
-  hostingStatus?: InputMaybe<GqlOpportunitySlotHostingStatus>;
-  opportunityId?: InputMaybe<Scalars["ID"]["input"]>;
+  hostingStatus?: InputMaybe<Array<GqlOpportunitySlotHostingStatus>>;
+  opportunityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   ownerId?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
@@ -1275,6 +1293,7 @@ export type GqlParticipation = {
   evaluation?: Maybe<GqlEvaluation>;
   id: Scalars["ID"]["output"];
   images?: Maybe<Array<Scalars["String"]["output"]>>;
+  opportunitySlot?: Maybe<GqlOpportunitySlot>;
   reason: GqlParticipationStatusReason;
   reservation?: Maybe<GqlReservation>;
   source?: Maybe<GqlSource>;
@@ -1284,6 +1303,19 @@ export type GqlParticipation = {
   transactions?: Maybe<Array<GqlTransaction>>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
   user?: Maybe<GqlUser>;
+};
+
+export type GqlParticipationBulkCreateInput = {
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  slotId: Scalars["ID"]["input"];
+  userIds: Array<Scalars["ID"]["input"]>;
+};
+
+export type GqlParticipationBulkCreatePayload = GqlParticipationBulkCreateSuccess;
+
+export type GqlParticipationBulkCreateSuccess = {
+  __typename?: "ParticipationBulkCreateSuccess";
+  participations: Array<GqlParticipation>;
 };
 
 export type GqlParticipationCreatePersonalRecordInput = {
@@ -1500,6 +1532,7 @@ export type GqlPortfolio = {
   __typename?: "Portfolio";
   category: GqlPortfolioCategory;
   date: Scalars["Datetime"]["output"];
+  evaluationStatus?: Maybe<GqlEvaluationStatus>;
   id: Scalars["ID"]["output"];
   participants?: Maybe<Array<GqlUser>>;
   place?: Maybe<GqlPlace>;
@@ -1518,12 +1551,35 @@ export const GqlPortfolioCategory = {
 } as const;
 
 export type GqlPortfolioCategory = (typeof GqlPortfolioCategory)[keyof typeof GqlPortfolioCategory];
+export type GqlPortfolioEdge = GqlEdge & {
+  __typename?: "PortfolioEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlPortfolio>;
+};
+
+export type GqlPortfolioFilterInput = {
+  communityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  dateRange?: InputMaybe<GqlDateTimeRangeFilter>;
+  keyword?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type GqlPortfolioSortInput = {
+  date?: InputMaybe<GqlSortDirection>;
+};
+
 export const GqlPortfolioSource = {
   Article: "ARTICLE",
   Opportunity: "OPPORTUNITY",
 } as const;
 
 export type GqlPortfolioSource = (typeof GqlPortfolioSource)[keyof typeof GqlPortfolioSource];
+export type GqlPortfoliosConnection = {
+  __typename?: "PortfoliosConnection";
+  edges: Array<GqlPortfolioEdge>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
 export const GqlPublishStatus = {
   CommunityInternal: "COMMUNITY_INTERNAL",
   Private: "PRIVATE",
@@ -1556,6 +1612,7 @@ export type GqlQuery = {
   participations: GqlParticipationsConnection;
   place?: Maybe<GqlPlace>;
   places: GqlPlacesConnection;
+  portfolios?: Maybe<Array<GqlPortfolio>>;
   reservation?: Maybe<GqlReservation>;
   reservationHistories: GqlReservationHistoriesConnection;
   reservationHistory?: Maybe<GqlReservationHistory>;
@@ -1575,6 +1632,8 @@ export type GqlQuery = {
   users: GqlUsersConnection;
   utilities: GqlUtilitiesConnection;
   utility?: Maybe<GqlUtility>;
+  vcIssuanceRequest?: Maybe<GqlVcIssuanceRequest>;
+  vcIssuanceRequests: GqlVcIssuanceRequestsConnection;
   wallet?: Maybe<GqlWallet>;
   wallets: GqlWalletsConnection;
 };
@@ -1698,6 +1757,12 @@ export type GqlQueryPlacesArgs = {
   sort?: InputMaybe<GqlPlaceSortInput>;
 };
 
+export type GqlQueryPortfoliosArgs = {
+  filter?: InputMaybe<GqlPortfolioFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlPortfolioSortInput>;
+};
+
 export type GqlQueryReservationArgs = {
   id: Scalars["ID"]["input"];
 };
@@ -1802,6 +1867,17 @@ export type GqlQueryUtilitiesArgs = {
 export type GqlQueryUtilityArgs = {
   id: Scalars["ID"]["input"];
   permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlQueryVcIssuanceRequestArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryVcIssuanceRequestsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlVcIssuanceRequestFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlVcIssuanceRequestSortInput>;
 };
 
 export type GqlQueryWalletArgs = {
@@ -2257,13 +2333,17 @@ export type GqlTransactionEdge = GqlEdge & {
 export type GqlTransactionFilterInput = {
   and?: InputMaybe<Array<GqlTransactionFilterInput>>;
   communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  fromDidValue?: InputMaybe<Scalars["String"]["input"]>;
   fromUserId?: InputMaybe<Scalars["ID"]["input"]>;
+  fromUserName?: InputMaybe<Scalars["String"]["input"]>;
   fromWalletId?: InputMaybe<Scalars["ID"]["input"]>;
   fromWalletType?: InputMaybe<GqlWalletType>;
   not?: InputMaybe<GqlTransactionFilterInput>;
   or?: InputMaybe<Array<GqlTransactionFilterInput>>;
   reason?: InputMaybe<GqlTransactionReason>;
+  toDidValue?: InputMaybe<Scalars["String"]["input"]>;
   toUserId?: InputMaybe<Scalars["ID"]["input"]>;
+  toUserName?: InputMaybe<Scalars["String"]["input"]>;
   toWalletId?: InputMaybe<Scalars["ID"]["input"]>;
   toWalletType?: InputMaybe<GqlWalletType>;
 };
@@ -2320,6 +2400,7 @@ export type GqlUser = {
   bio?: Maybe<Scalars["String"]["output"]>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   currentPrefecture?: Maybe<GqlCurrentPrefecture>;
+  didIssuanceRequests?: Maybe<Array<GqlDidIssuanceRequest>>;
   evaluationCreatedByMe?: Maybe<Array<GqlEvaluationHistory>>;
   evaluations?: Maybe<Array<GqlEvaluation>>;
   id: Scalars["ID"]["output"];
@@ -2328,6 +2409,7 @@ export type GqlUser = {
   membershipChangedByMe?: Maybe<Array<GqlMembershipHistory>>;
   memberships?: Maybe<Array<GqlMembership>>;
   name: Scalars["String"]["output"];
+  nftWallet?: Maybe<GqlNftWallet>;
   opportunitiesCreatedByMe?: Maybe<Array<GqlOpportunity>>;
   participationStatusChangedByMe?: Maybe<Array<GqlParticipationStatusHistory>>;
   participations?: Maybe<Array<GqlParticipation>>;
@@ -2348,6 +2430,13 @@ export type GqlUser = {
   wallets?: Maybe<Array<GqlWallet>>;
 };
 
+export type GqlUserPortfoliosArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlPortfolioFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlPortfolioSortInput>;
+};
+
 export type GqlUserDeletePayload = {
   __typename?: "UserDeletePayload";
   userId?: Maybe<Scalars["ID"]["output"]>;
@@ -2360,7 +2449,8 @@ export type GqlUserEdge = GqlEdge & {
 };
 
 export type GqlUserFilterInput = {
-  keyword?: InputMaybe<Scalars["String"]["input"]>;
+  ids?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  keywords?: InputMaybe<Array<Scalars["String"]["input"]>>;
   sysRole?: InputMaybe<GqlSysRole>;
 };
 
@@ -2504,6 +2594,51 @@ export const GqlValueType = {
 } as const;
 
 export type GqlValueType = (typeof GqlValueType)[keyof typeof GqlValueType];
+export type GqlVcIssuanceRequest = {
+  __typename?: "VcIssuanceRequest";
+  completedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  evaluation?: Maybe<GqlEvaluation>;
+  id: Scalars["ID"]["output"];
+  processedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  requestedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  status: GqlVcIssuanceStatus;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  user?: Maybe<GqlUser>;
+};
+
+export type GqlVcIssuanceRequestEdge = GqlEdge & {
+  __typename?: "VcIssuanceRequestEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlVcIssuanceRequest>;
+};
+
+export type GqlVcIssuanceRequestFilterInput = {
+  evaluationId?: InputMaybe<Scalars["ID"]["input"]>;
+  status?: InputMaybe<GqlVcIssuanceStatus>;
+  userIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+};
+
+export type GqlVcIssuanceRequestSortInput = {
+  createdAt?: InputMaybe<GqlSortDirection>;
+  updatedAt?: InputMaybe<GqlSortDirection>;
+};
+
+export type GqlVcIssuanceRequestsConnection = {
+  __typename?: "VcIssuanceRequestsConnection";
+  edges: Array<GqlVcIssuanceRequestEdge>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export const GqlVcIssuanceStatus = {
+  Completed: "COMPLETED",
+  Failed: "FAILED",
+  Pending: "PENDING",
+  Processing: "PROCESSING",
+} as const;
+
+export type GqlVcIssuanceStatus = (typeof GqlVcIssuanceStatus)[keyof typeof GqlVcIssuanceStatus];
 export type GqlWallet = {
   __typename?: "Wallet";
   accumulatedPointView?: Maybe<GqlAccumulatedPointView>;
@@ -2770,6 +2905,7 @@ export type GqlGetSingleMembershipQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     } | null;
     community?: {
       __typename?: "Community";
@@ -2785,6 +2921,7 @@ export type GqlGetMembershipListQueryVariables = Exact<{
   cursor?: InputMaybe<GqlMembershipCursorInput>;
   filter?: InputMaybe<GqlMembershipFilterInput>;
   sort?: InputMaybe<GqlMembershipSortInput>;
+  withDidIssuanceRequests?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetMembershipListQuery = {
@@ -2820,6 +2957,18 @@ export type GqlGetMembershipListQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          didIssuanceRequests?: Array<{
+            __typename?: "DidIssuanceRequest";
+            id: string;
+            status: GqlDidIssuanceStatus;
+            didValue?: string | null;
+            requestedAt?: Date | null;
+            processedAt?: Date | null;
+            completedAt?: Date | null;
+            createdAt?: Date | null;
+            updatedAt?: Date | null;
+          }> | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -2843,6 +2992,7 @@ export type GqlUserFieldsFragment = {
   urlFacebook?: string | null;
   urlInstagram?: string | null;
   urlX?: string | null;
+  nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
 };
 
 export type GqlUserPortfolioFieldsFragment = {
@@ -2854,6 +3004,7 @@ export type GqlUserPortfolioFieldsFragment = {
   category: GqlPortfolioCategory;
   date: Date;
   reservationStatus?: GqlReservationStatus | null;
+  evaluationStatus?: GqlEvaluationStatus | null;
   place?: {
     __typename?: "Place";
     id: string;
@@ -2879,6 +3030,7 @@ export type GqlUserPortfolioFieldsFragment = {
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
+    nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
   }> | null;
 };
 
@@ -2911,6 +3063,7 @@ export type GqlGetUserFlexibleQueryVariables = Exact<{
   withPortfolios?: Scalars["Boolean"]["input"];
   withWallets?: Scalars["Boolean"]["input"];
   withOpportunities?: Scalars["Boolean"]["input"];
+  withDidIssuanceRequests?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetUserFlexibleQuery = {
@@ -2935,6 +3088,7 @@ export type GqlGetUserFlexibleQuery = {
       category: GqlPortfolioCategory;
       date: Date;
       reservationStatus?: GqlReservationStatus | null;
+      evaluationStatus?: GqlEvaluationStatus | null;
       place?: {
         __typename?: "Place";
         id: string;
@@ -2960,7 +3114,19 @@ export type GqlGetUserFlexibleQuery = {
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
+        nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
       }> | null;
+    }> | null;
+    didIssuanceRequests?: Array<{
+      __typename?: "DidIssuanceRequest";
+      id: string;
+      status: GqlDidIssuanceStatus;
+      didValue?: string | null;
+      requestedAt?: Date | null;
+      processedAt?: Date | null;
+      completedAt?: Date | null;
+      createdAt?: Date | null;
+      updatedAt?: Date | null;
     }> | null;
     wallets?: Array<{
       __typename?: "Wallet";
@@ -3015,6 +3181,7 @@ export type GqlGetUserFlexibleQuery = {
         } | null;
       } | null;
     }> | null;
+    nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
   } | null;
 };
 
@@ -3067,6 +3234,7 @@ export type GqlGetUserWalletQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -3091,6 +3259,7 @@ export type GqlGetUserWalletQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -3118,6 +3287,7 @@ export type GqlGetUserWalletQuery = {
       }> | null;
       currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
     }> | null;
+    nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
   } | null;
 };
 
@@ -3175,6 +3345,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
+              nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
             } | null;
             currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
           } | null;
@@ -3193,6 +3364,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
+              nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
             } | null;
             currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
           } | null;
@@ -3288,6 +3460,7 @@ export type GqlGetMemberWalletsQueryVariables = Exact<{
   filter?: InputMaybe<GqlWalletFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
+  withDidIssuanceRequests?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetMemberWalletsQuery = {
@@ -3320,6 +3493,18 @@ export type GqlGetMemberWalletsQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          didIssuanceRequests?: Array<{
+            __typename?: "DidIssuanceRequest";
+            id: string;
+            status: GqlDidIssuanceStatus;
+            didValue?: string | null;
+            requestedAt?: Date | null;
+            processedAt?: Date | null;
+            completedAt?: Date | null;
+            createdAt?: Date | null;
+            updatedAt?: Date | null;
+          }> | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -3388,6 +3573,7 @@ export type GqlGetArticlesQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         }> | null;
       } | null;
     } | null> | null;
@@ -3456,6 +3642,7 @@ export type GqlGetArticleQuery = {
           } | null;
         } | null;
       }> | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     }> | null;
     authors?: Array<{
       __typename?: "User";
@@ -3468,6 +3655,7 @@ export type GqlGetArticleQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     }> | null;
   } | null;
   articles: {
@@ -3504,6 +3692,48 @@ export type GqlGetArticleQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
+        }> | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
+export type GqlDidIssuanceRequestFieldsFragment = {
+  __typename?: "DidIssuanceRequest";
+  id: string;
+  status: GqlDidIssuanceStatus;
+  didValue?: string | null;
+  requestedAt?: Date | null;
+  processedAt?: Date | null;
+  completedAt?: Date | null;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+};
+
+export type GqlGetDidIssuanceRequestsQueryVariables = Exact<{
+  userIds: Array<Scalars["ID"]["input"]> | Scalars["ID"]["input"];
+}>;
+
+export type GqlGetDidIssuanceRequestsQuery = {
+  __typename?: "Query";
+  users: {
+    __typename?: "UsersConnection";
+    edges?: Array<{
+      __typename?: "UserEdge";
+      node?: {
+        __typename?: "User";
+        id: string;
+        didIssuanceRequests?: Array<{
+          __typename?: "DidIssuanceRequest";
+          id: string;
+          status: GqlDidIssuanceStatus;
+          didValue?: string | null;
+          requestedAt?: Date | null;
+          processedAt?: Date | null;
+          completedAt?: Date | null;
+          createdAt?: Date | null;
+          updatedAt?: Date | null;
         }> | null;
       } | null;
     } | null> | null;
@@ -3543,7 +3773,9 @@ export type GqlEvaluationFieldsFragment = {
   issuedAt?: Date | null;
 };
 
-export type GqlGetEvaluationsQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetEvaluationsQueryVariables = Exact<{
+  withDidIssuanceRequests?: Scalars["Boolean"]["input"];
+}>;
 
 export type GqlGetEvaluationsQuery = {
   __typename?: "Query";
@@ -3552,7 +3784,67 @@ export type GqlGetEvaluationsQuery = {
     totalCount: number;
     edges: Array<{
       __typename?: "EvaluationEdge";
-      node?: { __typename?: "Evaluation"; id: string } | null;
+      node?: {
+        __typename?: "Evaluation";
+        id: string;
+        status: GqlEvaluationStatus;
+        createdAt?: Date | null;
+        vcIssuanceRequest?: {
+          __typename?: "VcIssuanceRequest";
+          id: string;
+          status: GqlVcIssuanceStatus;
+          requestedAt?: Date | null;
+          completedAt?: Date | null;
+          user?: { __typename?: "User"; id: string; name: string } | null;
+        } | null;
+        participation?: {
+          __typename?: "Participation";
+          user?: {
+            __typename?: "User";
+            didIssuanceRequests?: Array<{
+              __typename?: "DidIssuanceRequest";
+              id: string;
+              status: GqlDidIssuanceStatus;
+              didValue?: string | null;
+              requestedAt?: Date | null;
+              processedAt?: Date | null;
+              completedAt?: Date | null;
+              createdAt?: Date | null;
+              updatedAt?: Date | null;
+            }> | null;
+          } | null;
+          opportunitySlot?: {
+            __typename?: "OpportunitySlot";
+            id: string;
+            startsAt: Date;
+            endsAt: Date;
+            capacity?: number | null;
+            opportunity?: {
+              __typename?: "Opportunity";
+              id: string;
+              title: string;
+              description: string;
+              community?: { __typename?: "Community"; id: string } | null;
+              createdByUser?: {
+                __typename?: "User";
+                id: string;
+                name: string;
+                didIssuanceRequests?: Array<{
+                  __typename?: "DidIssuanceRequest";
+                  id: string;
+                  status: GqlDidIssuanceStatus;
+                  didValue?: string | null;
+                  requestedAt?: Date | null;
+                  processedAt?: Date | null;
+                  completedAt?: Date | null;
+                  createdAt?: Date | null;
+                  updatedAt?: Date | null;
+                }> | null;
+              } | null;
+            } | null;
+          } | null;
+        } | null;
+      } | null;
     }>;
   };
 };
@@ -3563,7 +3855,35 @@ export type GqlGetEvaluationQueryVariables = Exact<{
 
 export type GqlGetEvaluationQuery = {
   __typename?: "Query";
-  evaluation?: { __typename?: "Evaluation"; id: string } | null;
+  evaluation?: {
+    __typename?: "Evaluation";
+    id: string;
+    vcIssuanceRequest?: {
+      __typename?: "VcIssuanceRequest";
+      id: string;
+      status: GqlVcIssuanceStatus;
+      requestedAt?: Date | null;
+      completedAt?: Date | null;
+      user?: { __typename?: "User"; id: string; name: string } | null;
+    } | null;
+    participation?: {
+      __typename?: "Participation";
+      opportunitySlot?: {
+        __typename?: "OpportunitySlot";
+        id: string;
+        startsAt: Date;
+        endsAt: Date;
+        capacity?: number | null;
+        opportunity?: {
+          __typename?: "Opportunity";
+          id: string;
+          title: string;
+          description: string;
+          createdByUser?: { __typename?: "User"; id: string; name: string } | null;
+        } | null;
+      } | null;
+    } | null;
+  } | null;
 };
 
 export type GqlOpportunityFieldsFragment = {
@@ -3718,6 +4038,7 @@ export type GqlGetOpportunityQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
         }> | null;
       }> | null;
@@ -3807,11 +4128,13 @@ export type GqlGetOpportunityQuery = {
                 urlFacebook?: string | null;
                 urlInstagram?: string | null;
                 urlX?: string | null;
+                nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
               } | null;
             }> | null;
           }> | null;
         }> | null;
       }> | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     } | null;
     requiredUtilities?: Array<{ __typename?: "Utility"; id: string }> | null;
   } | null;
@@ -3993,10 +4316,32 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         evaluation?: { __typename?: "Evaluation"; id: string; status: GqlEvaluationStatus } | null;
       }> | null;
     }> | null;
+  } | null;
+};
+
+export type GqlParticipationBulkCreateMutationVariables = Exact<{
+  input: GqlParticipationBulkCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlParticipationBulkCreateMutation = {
+  __typename?: "Mutation";
+  participationBulkCreate?: {
+    __typename?: "ParticipationBulkCreateSuccess";
+    participations: Array<{
+      __typename?: "Participation";
+      id: string;
+      source?: GqlSource | null;
+      status: GqlParticipationStatus;
+      reason: GqlParticipationStatusReason;
+      images?: Array<string> | null;
+      description?: string | null;
+    }>;
   } | null;
 };
 
@@ -4010,7 +4355,9 @@ export type GqlParticipationFieldsFragment = {
   description?: string | null;
 };
 
-export type GqlGetParticipationsQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetParticipationsQueryVariables = Exact<{
+  filter?: InputMaybe<GqlParticipationFilterInput>;
+}>;
 
 export type GqlGetParticipationsQuery = {
   __typename?: "Query";
@@ -4019,13 +4366,38 @@ export type GqlGetParticipationsQuery = {
     totalCount: number;
     edges: Array<{
       __typename?: "ParticipationEdge";
-      node?: { __typename?: "Participation"; id: string } | null;
+      node?: {
+        __typename?: "Participation";
+        id: string;
+        reason: GqlParticipationStatusReason;
+        user?: { __typename?: "User"; id: string } | null;
+        reservation?: {
+          __typename?: "Reservation";
+          opportunitySlot?: {
+            __typename?: "OpportunitySlot";
+            id: string;
+            reservations?: Array<{
+              __typename?: "Reservation";
+              createdByUser?: { __typename?: "User"; id: string } | null;
+            }> | null;
+          } | null;
+        } | null;
+        opportunitySlot?: {
+          __typename?: "OpportunitySlot";
+          id: string;
+          reservations?: Array<{
+            __typename?: "Reservation";
+            createdByUser?: { __typename?: "User"; id: string } | null;
+          }> | null;
+        } | null;
+      } | null;
     }>;
   };
 };
 
 export type GqlGetParticipationQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
+  withDidIssuanceRequests?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetParticipationQuery = {
@@ -4082,6 +4454,7 @@ export type GqlGetParticipationQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           place?: {
             __typename?: "Place";
@@ -4105,6 +4478,101 @@ export type GqlGetParticipationQuery = {
         } | null;
       } | null;
     } | null;
+    opportunitySlot?: {
+      __typename?: "OpportunitySlot";
+      id: string;
+      hostingStatus: GqlOpportunitySlotHostingStatus;
+      startsAt: Date;
+      endsAt: Date;
+      capacity?: number | null;
+      remainingCapacity?: number | null;
+      opportunity?: {
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        body?: string | null;
+        images?: Array<string> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        earliestReservableAt?: Date | null;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
+        } | null;
+        createdByUser?: {
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
+          urlFacebook?: string | null;
+          urlInstagram?: string | null;
+          urlX?: string | null;
+          didIssuanceRequests?: Array<{
+            __typename?: "DidIssuanceRequest";
+            id: string;
+            status: GqlDidIssuanceStatus;
+            didValue?: string | null;
+            requestedAt?: Date | null;
+            processedAt?: Date | null;
+            completedAt?: Date | null;
+            createdAt?: Date | null;
+            updatedAt?: Date | null;
+          }> | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
+        } | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+          city?: {
+            __typename?: "City";
+            code: string;
+            name: string;
+            state?: {
+              __typename?: "State";
+              code: string;
+              countryCode: string;
+              name: string;
+            } | null;
+          } | null;
+        } | null;
+      } | null;
+    } | null;
+    evaluation?: {
+      __typename?: "Evaluation";
+      id: string;
+      status: GqlEvaluationStatus;
+      participation?: {
+        __typename?: "Participation";
+        user?: {
+          __typename?: "User";
+          didIssuanceRequests?: Array<{
+            __typename?: "DidIssuanceRequest";
+            id: string;
+            status: GqlDidIssuanceStatus;
+            didValue?: string | null;
+            requestedAt?: Date | null;
+            processedAt?: Date | null;
+            completedAt?: Date | null;
+            createdAt?: Date | null;
+            updatedAt?: Date | null;
+          }> | null;
+        } | null;
+      } | null;
+    } | null;
     statusHistories?: Array<{
       __typename?: "ParticipationStatusHistory";
       id: string;
@@ -4122,6 +4590,7 @@ export type GqlGetParticipationQuery = {
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
+        nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
       } | null;
     }> | null;
     user?: {
@@ -4135,6 +4604,7 @@ export type GqlGetParticipationQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     } | null;
   } | null;
 };
@@ -4262,6 +4732,7 @@ export type GqlGetReservationsQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         opportunitySlot?: {
           __typename?: "OpportunitySlot";
@@ -4319,6 +4790,7 @@ export type GqlGetReservationQuery = {
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     } | null;
     opportunitySlot?: {
       __typename?: "OpportunitySlot";
@@ -4385,6 +4857,7 @@ export type GqlGetReservationQuery = {
             publishStatus: GqlPublishStatus;
             publishedAt?: Date | null;
           }> | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         place?: {
           __typename?: "Place";
@@ -4426,6 +4899,7 @@ export type GqlGetReservationQuery = {
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
+        nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
       } | null;
       evaluation?: {
         __typename?: "Evaluation";
@@ -4451,6 +4925,60 @@ export type GqlGetReservationQuery = {
       }> | null;
     }> | null;
   } | null;
+};
+
+export type GqlGetVcIssuanceRequestByEvaluationQueryVariables = Exact<{
+  evaluationId: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetVcIssuanceRequestByEvaluationQuery = {
+  __typename?: "Query";
+  vcIssuanceRequests: {
+    __typename?: "VcIssuanceRequestsConnection";
+    totalCount: number;
+    edges: Array<{
+      __typename?: "VcIssuanceRequestEdge";
+      node?: {
+        __typename?: "VcIssuanceRequest";
+        id: string;
+        completedAt?: Date | null;
+        status: GqlVcIssuanceStatus;
+      } | null;
+    }>;
+  };
+};
+
+export type GqlGetVcIssuanceRequestsByUserQueryVariables = Exact<{
+  userIds: Array<Scalars["ID"]["input"]> | Scalars["ID"]["input"];
+}>;
+
+export type GqlGetVcIssuanceRequestsByUserQuery = {
+  __typename?: "Query";
+  vcIssuanceRequests: {
+    __typename?: "VcIssuanceRequestsConnection";
+    totalCount: number;
+    edges: Array<{
+      __typename?: "VcIssuanceRequestEdge";
+      node?: {
+        __typename?: "VcIssuanceRequest";
+        id: string;
+        status: GqlVcIssuanceStatus;
+        completedAt?: Date | null;
+        createdAt?: Date | null;
+        evaluation?: {
+          __typename?: "Evaluation";
+          id: string;
+          status: GqlEvaluationStatus;
+          participation?: {
+            __typename?: "Participation";
+            id: string;
+            opportunitySlot?: { __typename?: "OpportunitySlot"; id: string } | null;
+          } | null;
+        } | null;
+        user?: { __typename?: "User"; id: string } | null;
+      } | null;
+    }>;
+  };
 };
 
 export type GqlPlaceFieldsFragment = {
@@ -4525,6 +5053,7 @@ export type GqlGetPlacesQuery = {
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
+              nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
             }> | null;
           }> | null;
           createdByUser?: {
@@ -4612,6 +5141,7 @@ export type GqlGetPlaceQuery = {
           publishStatus: GqlPublishStatus;
           publishedAt?: Date | null;
         }> | null;
+        nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
       } | null;
       articles?: Array<{
         __typename?: "Article";
@@ -4634,6 +5164,7 @@ export type GqlGetPlaceQuery = {
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         }> | null;
       }> | null;
     }> | null;
@@ -4746,6 +5277,7 @@ export type GqlGetTicketsQuery = {
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
+              nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
             } | null;
           } | null;
         } | null;
@@ -4846,6 +5378,7 @@ export type GqlTicketClaimLinksQuery = {
 export type GqlGetTicketIssuersQueryVariables = Exact<{
   filter?: InputMaybe<GqlTicketIssuerFilterInput>;
   sort?: InputMaybe<GqlTicketIssuerSortInput>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
@@ -5039,6 +5572,7 @@ export type GqlGetTransactionsQueryVariables = Exact<{
   sort?: InputMaybe<GqlTransactionSortInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
+  withDidIssuanceRequests?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type GqlGetTransactionsQuery = {
@@ -5078,6 +5612,18 @@ export type GqlGetTransactionsQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            didIssuanceRequests?: Array<{
+              __typename?: "DidIssuanceRequest";
+              id: string;
+              status: GqlDidIssuanceStatus;
+              didValue?: string | null;
+              requestedAt?: Date | null;
+              processedAt?: Date | null;
+              completedAt?: Date | null;
+              createdAt?: Date | null;
+              updatedAt?: Date | null;
+            }> | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -5102,6 +5648,18 @@ export type GqlGetTransactionsQuery = {
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
+            didIssuanceRequests?: Array<{
+              __typename?: "DidIssuanceRequest";
+              id: string;
+              status: GqlDidIssuanceStatus;
+              didValue?: string | null;
+              requestedAt?: Date | null;
+              processedAt?: Date | null;
+              completedAt?: Date | null;
+              createdAt?: Date | null;
+              updatedAt?: Date | null;
+            }> | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -5188,6 +5746,10 @@ export const UserFieldsFragmentDoc = gql`
     bio
     currentPrefecture
     phoneNumber
+    nftWallet {
+      id
+      walletAddress
+    }
     urlFacebook
     urlInstagram
     urlX
@@ -5202,6 +5764,7 @@ export const UserPortfolioFieldsFragmentDoc = gql`
     category
     date
     reservationStatus
+    evaluationStatus
     place {
       ...PlaceFields
     }
@@ -5231,6 +5794,18 @@ export const ArticleFieldsFragmentDoc = gql`
     category
     publishStatus
     publishedAt
+  }
+`;
+export const DidIssuanceRequestFieldsFragmentDoc = gql`
+  fragment DidIssuanceRequestFields on DidIssuanceRequest {
+    id
+    status
+    didValue
+    requestedAt
+    processedAt
+    completedAt
+    createdAt
+    updatedAt
   }
 `;
 export const EvaluationFieldsFragmentDoc = gql`
@@ -5995,6 +6570,7 @@ export const GetMembershipListDocument = gql`
     $cursor: MembershipCursorInput
     $filter: MembershipFilterInput
     $sort: MembershipSortInput
+    $withDidIssuanceRequests: Boolean! = false
   ) {
     memberships(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
       pageInfo {
@@ -6010,6 +6586,9 @@ export const GetMembershipListDocument = gql`
           ...MembershipFields
           user {
             ...UserFields
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              ...DidIssuanceRequestFields
+            }
           }
           community {
             ...CommunityFields
@@ -6020,6 +6599,7 @@ export const GetMembershipListDocument = gql`
   }
   ${MembershipFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
 
@@ -6039,6 +6619,7 @@ export const GetMembershipListDocument = gql`
  *      cursor: // value for 'cursor'
  *      filter: // value for 'filter'
  *      sort: // value for 'sort'
+ *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
  */
@@ -6159,11 +6740,15 @@ export const GetUserFlexibleDocument = gql`
     $withPortfolios: Boolean! = false
     $withWallets: Boolean! = false
     $withOpportunities: Boolean! = false
+    $withDidIssuanceRequests: Boolean! = false
   ) {
     user(id: $id) {
       ...UserFields
       portfolios @include(if: $withPortfolios) {
         ...UserPortfolioFields
+      }
+      didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+        ...DidIssuanceRequestFields
       }
       wallets @include(if: $withWallets) {
         ...WalletFields
@@ -6187,6 +6772,7 @@ export const GetUserFlexibleDocument = gql`
   }
   ${UserFieldsFragmentDoc}
   ${UserPortfolioFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
   ${WalletFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
   ${TicketFieldsFragmentDoc}
@@ -6210,6 +6796,7 @@ export const GetUserFlexibleDocument = gql`
  *      withPortfolios: // value for 'withPortfolios'
  *      withWallets: // value for 'withWallets'
  *      withOpportunities: // value for 'withOpportunities'
+ *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
  */
@@ -6655,7 +7242,12 @@ export type GetCommunityWalletQueryResult = Apollo.QueryResult<
   GqlGetCommunityWalletQueryVariables
 >;
 export const GetMemberWalletsDocument = gql`
-  query GetMemberWallets($filter: WalletFilterInput, $first: Int, $cursor: String) {
+  query GetMemberWallets(
+    $filter: WalletFilterInput
+    $first: Int
+    $cursor: String
+    $withDidIssuanceRequests: Boolean! = false
+  ) {
     wallets(filter: $filter, first: $first, cursor: $cursor) {
       pageInfo {
         hasNextPage
@@ -6670,6 +7262,9 @@ export const GetMemberWalletsDocument = gql`
           ...WalletFields
           user {
             ...UserFields
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              ...DidIssuanceRequestFields
+            }
           }
           community {
             ...CommunityFields
@@ -6680,6 +7275,7 @@ export const GetMemberWalletsDocument = gql`
   }
   ${WalletFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
 
@@ -6698,6 +7294,7 @@ export const GetMemberWalletsDocument = gql`
  *      filter: // value for 'filter'
  *      first: // value for 'first'
  *      cursor: // value for 'cursor'
+ *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
  */
@@ -6929,6 +7526,91 @@ export type GetArticleQueryResult = Apollo.QueryResult<
   GqlGetArticleQuery,
   GqlGetArticleQueryVariables
 >;
+export const GetDidIssuanceRequestsDocument = gql`
+  query GetDidIssuanceRequests($userIds: [ID!]!) {
+    users(filter: { ids: $userIds }) {
+      edges {
+        node {
+          id
+          didIssuanceRequests {
+            ...DidIssuanceRequestFields
+          }
+        }
+      }
+    }
+  }
+  ${DidIssuanceRequestFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetDidIssuanceRequestsQuery__
+ *
+ * To run a query within a React component, call `useGetDidIssuanceRequestsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDidIssuanceRequestsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDidIssuanceRequestsQuery({
+ *   variables: {
+ *      userIds: // value for 'userIds'
+ *   },
+ * });
+ */
+export function useGetDidIssuanceRequestsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetDidIssuanceRequestsQuery,
+    GqlGetDidIssuanceRequestsQueryVariables
+  > &
+    ({ variables: GqlGetDidIssuanceRequestsQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetDidIssuanceRequestsQuery, GqlGetDidIssuanceRequestsQueryVariables>(
+    GetDidIssuanceRequestsDocument,
+    options,
+  );
+}
+export function useGetDidIssuanceRequestsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetDidIssuanceRequestsQuery,
+    GqlGetDidIssuanceRequestsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetDidIssuanceRequestsQuery,
+    GqlGetDidIssuanceRequestsQueryVariables
+  >(GetDidIssuanceRequestsDocument, options);
+}
+export function useGetDidIssuanceRequestsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetDidIssuanceRequestsQuery,
+        GqlGetDidIssuanceRequestsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetDidIssuanceRequestsQuery,
+    GqlGetDidIssuanceRequestsQueryVariables
+  >(GetDidIssuanceRequestsDocument, options);
+}
+export type GetDidIssuanceRequestsQueryHookResult = ReturnType<
+  typeof useGetDidIssuanceRequestsQuery
+>;
+export type GetDidIssuanceRequestsLazyQueryHookResult = ReturnType<
+  typeof useGetDidIssuanceRequestsLazyQuery
+>;
+export type GetDidIssuanceRequestsSuspenseQueryHookResult = ReturnType<
+  typeof useGetDidIssuanceRequestsSuspenseQuery
+>;
+export type GetDidIssuanceRequestsQueryResult = Apollo.QueryResult<
+  GqlGetDidIssuanceRequestsQuery,
+  GqlGetDidIssuanceRequestsQueryVariables
+>;
 export const EvaluationBulkCreateDocument = gql`
   mutation EvaluationBulkCreate(
     $input: EvaluationBulkCreateInput!
@@ -6989,16 +7671,57 @@ export type EvaluationBulkCreateMutationOptions = Apollo.BaseMutationOptions<
   GqlEvaluationBulkCreateMutationVariables
 >;
 export const GetEvaluationsDocument = gql`
-  query GetEvaluations {
+  query GetEvaluations($withDidIssuanceRequests: Boolean! = false) {
     evaluations {
       edges {
         node {
           id
+          status
+          createdAt
+          vcIssuanceRequest {
+            id
+            status
+            requestedAt
+            completedAt
+            user {
+              id
+              name
+            }
+          }
+          participation {
+            user {
+              didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+                ...DidIssuanceRequestFields
+              }
+            }
+            opportunitySlot {
+              id
+              startsAt
+              endsAt
+              capacity
+              opportunity {
+                id
+                title
+                description
+                community {
+                  id
+                }
+                createdByUser {
+                  id
+                  name
+                  didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+                    ...DidIssuanceRequestFields
+                  }
+                }
+              }
+            }
+          }
         }
       }
       totalCount
     }
   }
+  ${DidIssuanceRequestFieldsFragmentDoc}
 `;
 
 /**
@@ -7013,6 +7736,7 @@ export const GetEvaluationsDocument = gql`
  * @example
  * const { data, loading, error } = useGetEvaluationsQuery({
  *   variables: {
+ *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
  */
@@ -7062,6 +7786,33 @@ export const GetEvaluationDocument = gql`
   query GetEvaluation($id: ID!) {
     evaluation(id: $id) {
       id
+      vcIssuanceRequest {
+        id
+        status
+        requestedAt
+        completedAt
+        user {
+          id
+          name
+        }
+      }
+      participation {
+        opportunitySlot {
+          id
+          startsAt
+          endsAt
+          capacity
+          opportunity {
+            id
+            title
+            description
+            createdByUser {
+              id
+              name
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -7725,12 +8476,93 @@ export type GetOpportunitySlotWithParticipationsQueryResult = Apollo.QueryResult
   GqlGetOpportunitySlotWithParticipationsQuery,
   GqlGetOpportunitySlotWithParticipationsQueryVariables
 >;
+export const ParticipationBulkCreateDocument = gql`
+  mutation ParticipationBulkCreate(
+    $input: ParticipationBulkCreateInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    participationBulkCreate(input: $input, permission: $permission) {
+      ... on ParticipationBulkCreateSuccess {
+        participations {
+          ...ParticipationFields
+        }
+      }
+    }
+  }
+  ${ParticipationFieldsFragmentDoc}
+`;
+export type GqlParticipationBulkCreateMutationFn = Apollo.MutationFunction<
+  GqlParticipationBulkCreateMutation,
+  GqlParticipationBulkCreateMutationVariables
+>;
+
+/**
+ * __useParticipationBulkCreateMutation__
+ *
+ * To run a mutation, you first call `useParticipationBulkCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useParticipationBulkCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [participationBulkCreateMutation, { data, loading, error }] = useParticipationBulkCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useParticipationBulkCreateMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlParticipationBulkCreateMutation,
+    GqlParticipationBulkCreateMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlParticipationBulkCreateMutation,
+    GqlParticipationBulkCreateMutationVariables
+  >(ParticipationBulkCreateDocument, options);
+}
+export type ParticipationBulkCreateMutationHookResult = ReturnType<
+  typeof useParticipationBulkCreateMutation
+>;
+export type ParticipationBulkCreateMutationResult =
+  Apollo.MutationResult<GqlParticipationBulkCreateMutation>;
+export type ParticipationBulkCreateMutationOptions = Apollo.BaseMutationOptions<
+  GqlParticipationBulkCreateMutation,
+  GqlParticipationBulkCreateMutationVariables
+>;
 export const GetParticipationsDocument = gql`
-  query GetParticipations {
-    participations {
+  query GetParticipations($filter: ParticipationFilterInput) {
+    participations(filter: $filter) {
       edges {
         node {
           id
+          reason
+          user {
+            id
+          }
+          reservation {
+            opportunitySlot {
+              id
+              reservations {
+                createdByUser {
+                  id
+                }
+              }
+            }
+          }
+          opportunitySlot {
+            id
+            reservations {
+              createdByUser {
+                id
+              }
+            }
+          }
         }
       }
       totalCount
@@ -7750,6 +8582,7 @@ export const GetParticipationsDocument = gql`
  * @example
  * const { data, loading, error } = useGetParticipationsQuery({
  *   variables: {
+ *      filter: // value for 'filter'
  *   },
  * });
  */
@@ -7802,7 +8635,7 @@ export type GetParticipationsQueryResult = Apollo.QueryResult<
   GqlGetParticipationsQueryVariables
 >;
 export const GetParticipationDocument = gql`
-  query GetParticipation($id: ID!) {
+  query GetParticipation($id: ID!, $withDidIssuanceRequests: Boolean! = false) {
     participation(id: $id) {
       ...ParticipationFields
       reservation {
@@ -7822,6 +8655,35 @@ export const GetParticipationDocument = gql`
             }
           }
         }
+      }
+      opportunitySlot {
+        ...OpportunitySlotFields
+        opportunity {
+          ...OpportunityFields
+          community {
+            ...CommunityFields
+          }
+          createdByUser {
+            ...UserFields
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              ...DidIssuanceRequestFields
+            }
+          }
+          place {
+            ...PlaceFields
+          }
+        }
+      }
+      evaluation {
+        id
+        participation {
+          user {
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              ...DidIssuanceRequestFields
+            }
+          }
+        }
+        status
       }
       statusHistories {
         id
@@ -7844,6 +8706,7 @@ export const GetParticipationDocument = gql`
   ${CommunityFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
   ${PlaceFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
 `;
 
 /**
@@ -7859,6 +8722,7 @@ export const GetParticipationDocument = gql`
  * const { data, loading, error } = useGetParticipationQuery({
  *   variables: {
  *      id: // value for 'id'
+ *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
  */
@@ -8378,6 +9242,194 @@ export type GetReservationSuspenseQueryHookResult = ReturnType<
 export type GetReservationQueryResult = Apollo.QueryResult<
   GqlGetReservationQuery,
   GqlGetReservationQueryVariables
+>;
+export const GetVcIssuanceRequestByEvaluationDocument = gql`
+  query GetVcIssuanceRequestByEvaluation($evaluationId: ID!) {
+    vcIssuanceRequests(filter: { evaluationId: $evaluationId }) {
+      edges {
+        node {
+          id
+          completedAt
+          status
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetVcIssuanceRequestByEvaluationQuery__
+ *
+ * To run a query within a React component, call `useGetVcIssuanceRequestByEvaluationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetVcIssuanceRequestByEvaluationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetVcIssuanceRequestByEvaluationQuery({
+ *   variables: {
+ *      evaluationId: // value for 'evaluationId'
+ *   },
+ * });
+ */
+export function useGetVcIssuanceRequestByEvaluationQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetVcIssuanceRequestByEvaluationQuery,
+    GqlGetVcIssuanceRequestByEvaluationQueryVariables
+  > &
+    (
+      | { variables: GqlGetVcIssuanceRequestByEvaluationQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetVcIssuanceRequestByEvaluationQuery,
+    GqlGetVcIssuanceRequestByEvaluationQueryVariables
+  >(GetVcIssuanceRequestByEvaluationDocument, options);
+}
+export function useGetVcIssuanceRequestByEvaluationLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetVcIssuanceRequestByEvaluationQuery,
+    GqlGetVcIssuanceRequestByEvaluationQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetVcIssuanceRequestByEvaluationQuery,
+    GqlGetVcIssuanceRequestByEvaluationQueryVariables
+  >(GetVcIssuanceRequestByEvaluationDocument, options);
+}
+export function useGetVcIssuanceRequestByEvaluationSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetVcIssuanceRequestByEvaluationQuery,
+        GqlGetVcIssuanceRequestByEvaluationQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetVcIssuanceRequestByEvaluationQuery,
+    GqlGetVcIssuanceRequestByEvaluationQueryVariables
+  >(GetVcIssuanceRequestByEvaluationDocument, options);
+}
+export type GetVcIssuanceRequestByEvaluationQueryHookResult = ReturnType<
+  typeof useGetVcIssuanceRequestByEvaluationQuery
+>;
+export type GetVcIssuanceRequestByEvaluationLazyQueryHookResult = ReturnType<
+  typeof useGetVcIssuanceRequestByEvaluationLazyQuery
+>;
+export type GetVcIssuanceRequestByEvaluationSuspenseQueryHookResult = ReturnType<
+  typeof useGetVcIssuanceRequestByEvaluationSuspenseQuery
+>;
+export type GetVcIssuanceRequestByEvaluationQueryResult = Apollo.QueryResult<
+  GqlGetVcIssuanceRequestByEvaluationQuery,
+  GqlGetVcIssuanceRequestByEvaluationQueryVariables
+>;
+export const GetVcIssuanceRequestsByUserDocument = gql`
+  query GetVcIssuanceRequestsByUser($userIds: [ID!]!) {
+    vcIssuanceRequests(filter: { userIds: $userIds }) {
+      edges {
+        node {
+          id
+          status
+          completedAt
+          createdAt
+          evaluation {
+            id
+            status
+            participation {
+              id
+              opportunitySlot {
+                id
+              }
+            }
+          }
+          user {
+            id
+          }
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetVcIssuanceRequestsByUserQuery__
+ *
+ * To run a query within a React component, call `useGetVcIssuanceRequestsByUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetVcIssuanceRequestsByUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetVcIssuanceRequestsByUserQuery({
+ *   variables: {
+ *      userIds: // value for 'userIds'
+ *   },
+ * });
+ */
+export function useGetVcIssuanceRequestsByUserQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetVcIssuanceRequestsByUserQuery,
+    GqlGetVcIssuanceRequestsByUserQueryVariables
+  > &
+    (
+      | { variables: GqlGetVcIssuanceRequestsByUserQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetVcIssuanceRequestsByUserQuery,
+    GqlGetVcIssuanceRequestsByUserQueryVariables
+  >(GetVcIssuanceRequestsByUserDocument, options);
+}
+export function useGetVcIssuanceRequestsByUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetVcIssuanceRequestsByUserQuery,
+    GqlGetVcIssuanceRequestsByUserQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetVcIssuanceRequestsByUserQuery,
+    GqlGetVcIssuanceRequestsByUserQueryVariables
+  >(GetVcIssuanceRequestsByUserDocument, options);
+}
+export function useGetVcIssuanceRequestsByUserSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetVcIssuanceRequestsByUserQuery,
+        GqlGetVcIssuanceRequestsByUserQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetVcIssuanceRequestsByUserQuery,
+    GqlGetVcIssuanceRequestsByUserQueryVariables
+  >(GetVcIssuanceRequestsByUserDocument, options);
+}
+export type GetVcIssuanceRequestsByUserQueryHookResult = ReturnType<
+  typeof useGetVcIssuanceRequestsByUserQuery
+>;
+export type GetVcIssuanceRequestsByUserLazyQueryHookResult = ReturnType<
+  typeof useGetVcIssuanceRequestsByUserLazyQuery
+>;
+export type GetVcIssuanceRequestsByUserSuspenseQueryHookResult = ReturnType<
+  typeof useGetVcIssuanceRequestsByUserSuspenseQuery
+>;
+export type GetVcIssuanceRequestsByUserQueryResult = Apollo.QueryResult<
+  GqlGetVcIssuanceRequestsByUserQuery,
+  GqlGetVcIssuanceRequestsByUserQueryVariables
 >;
 export const GetPlacesDocument = gql`
   query GetPlaces(
@@ -9017,9 +10069,10 @@ export const GetTicketIssuersDocument = gql`
   query GetTicketIssuers(
     $filter: TicketIssuerFilterInput
     $sort: TicketIssuerSortInput
+    $cursor: String
     $first: Int
   ) {
-    ticketIssuers(filter: $filter, sort: $sort, first: $first) {
+    ticketIssuers(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
       pageInfo {
         startCursor
         endCursor
@@ -9066,6 +10119,7 @@ export const GetTicketIssuersDocument = gql`
  *   variables: {
  *      filter: // value for 'filter'
  *      sort: // value for 'sort'
+ *      cursor: // value for 'cursor'
  *      first: // value for 'first'
  *   },
  * });
@@ -9428,6 +10482,7 @@ export const GetTransactionsDocument = gql`
     $sort: TransactionSortInput
     $first: Int
     $cursor: String
+    $withDidIssuanceRequests: Boolean = false
   ) {
     transactions(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
       pageInfo {
@@ -9444,6 +10499,9 @@ export const GetTransactionsDocument = gql`
           fromWallet {
             ...WalletFields
             user {
+              didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+                ...DidIssuanceRequestFields
+              }
               ...UserFields
             }
             community {
@@ -9453,6 +10511,9 @@ export const GetTransactionsDocument = gql`
           toWallet {
             ...WalletFields
             user {
+              didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+                ...DidIssuanceRequestFields
+              }
               ...UserFields
             }
             community {
@@ -9465,6 +10526,7 @@ export const GetTransactionsDocument = gql`
   }
   ${TransactionFieldsFragmentDoc}
   ${WalletFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
@@ -9485,6 +10547,7 @@ export const GetTransactionsDocument = gql`
  *      sort: // value for 'sort'
  *      first: // value for 'first'
  *      cursor: // value for 'cursor'
+ *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
  */

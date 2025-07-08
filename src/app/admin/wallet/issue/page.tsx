@@ -49,6 +49,12 @@ export default function IssuePointPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/,/g, "");
+    if (raw === "") {
+      setAmount(null);
+      setDisplayValue("");
+      return;
+    }
+
     const num = Number(raw);
     if (isNaN(num)) {
       setAmount(null);
