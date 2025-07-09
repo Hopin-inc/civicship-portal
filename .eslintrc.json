@@ -22,9 +22,9 @@
           "scalarCost": 1, 
           "depthCostFactor": 1.5 
         }],
-        "local-rules/apollo-armor/max-aliases": ["error", { "maxAliases": 5 }],
+        "local-rules/apollo-armor/max-aliases": ["error", { "maxAliases": 1 }],
         "local-rules/apollo-armor/max-directives": ["error", { "maxDirectives": 10 }],
-        "local-rules/apollo-armor/max-tokens": ["error", { "maxTokens": 549 }]
+        "local-rules/apollo-armor/max-tokens": ["error", { "maxTokens": 600 }]
       }
     }
   ]

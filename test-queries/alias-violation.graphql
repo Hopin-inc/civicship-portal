@@ -1,13 +1,8 @@
-# Query designed to exceed alias limit of 5
-# Contains 6+ aliases to trigger the rule
+# Query designed to exceed alias limit of 1
+# Contains 2+ aliases to trigger the rule
 query AliasViolationTest {
   user(id: "test") {
     userId: id
     userName: name
-    userEmail: email
-    userWallets: wallets {
-      walletId: id
-      walletBalance: balance
-    }
   }
 }
