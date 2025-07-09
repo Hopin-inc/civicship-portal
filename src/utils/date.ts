@@ -74,13 +74,6 @@ export function formatSlotRange(startsAt: string, endsAt: string): string {
   }
 }
 
-export const getDayDiffLabelFromString = (startDateStr: string, endDateStr: string) => {
-  const startDate = parse(startDateStr, "yyyy年M月d日EEEE", new Date(), { locale: ja });
-  const endDate = parse(endDateStr, "yyyy年M月d日EEEE", new Date(), { locale: ja });
-  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return null;
-  return getCrossDayLabel(startDate, endDate);
-};
-
 export const getCrossDayLabel = (startDate: Date, endDate: Date) => {
   const diff = differenceInCalendarDays(endDate, startDate);
   if (diff === 0) return null;
