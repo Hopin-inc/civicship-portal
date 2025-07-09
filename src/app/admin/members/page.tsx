@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import { useMemberWithDidSearch } from "../credentials/hooks/useMemberWithDidSearch";
-import SearchForm from "../credentials/components/selectUser/SearchForm";
+import SearchForm from "@/components/shared/SearchForm";
 
 export default function MembersPage() {
   const communityId = COMMUNITY_ID;
@@ -107,7 +107,7 @@ export default function MembersPage() {
 
   return (
     <div className="py-4">
-      <SearchForm value={input} onInputChange={setInput} onSearch={setSearchQuery} />
+      <SearchForm value={input} onInputChange={setInput} onSearch={setSearchQuery} placeholder={"名前・DIDで検索"} />
       <div className="flex flex-col gap-4 mt-4">
         <span className="text-muted-foreground text-label-xs ml-4">
           操作を行うには管理者権限が必要です
