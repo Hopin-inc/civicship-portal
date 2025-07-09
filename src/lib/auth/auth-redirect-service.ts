@@ -158,21 +158,22 @@ export class AuthRedirectService {
    * @param nextPath
    */
   public getPostLineAuthRedirectPath(nextPath: RawURIComponent | null): RawURIComponent {
-    const nextParam = nextPath ? this.generateNextParam(nextPath) : "";
-
     const authState = this.authStateManager.getState();
 
     switch (authState) {
       case "unauthenticated":
       case "line_token_expired":
+        const nextParam = nextPath ? this.generateNextParam(nextPath) : "";
         return `/login${ nextParam }` as RawURIComponent;
 
       case "line_authenticated":
       case "phone_token_expired":
-        return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
+        const phoneVerificationNextParam = nextPath ? this.generateNextParam(nextPath) : "";
+        return `/sign-up/phone-verification${ phoneVerificationNextParam }` as RawURIComponent;
 
       case "phone_authenticated":
-        return `/sign-up${ nextParam }` as RawURIComponent;
+        const signUpNextParam = nextPath ? this.generateNextParam(nextPath) : "";
+        return `/sign-up${ signUpNextParam }` as RawURIComponent;
 
       case "loading":
       case "user_registered":
