@@ -31,6 +31,8 @@ const ReservationDetailsCard: React.FC<ReservationDetailsCardProps> = ({
 
   if (!startDateTime || !endDateTime) return null;
 
+  const crossDayLabel = getCrossDayLabel(startDateTime, endDateTime);
+
   return (
     <div className="py-6 px-4 mb-6 space-y-3">
       <h2 className="text-display-sm">申込内容</h2>
@@ -43,8 +45,8 @@ const ReservationDetailsCard: React.FC<ReservationDetailsCardProps> = ({
             </span>
             <span className="text-body-sm text-caption">
               {formatDateTime(startDateTime, "HH:mm")}-{formatDateTime(endDateTime, "HH:mm")}
-              {getCrossDayLabel(startDateTime, endDateTime) && (
-                <span className="text-sm text-caption">（{getCrossDayLabel(startDateTime, endDateTime)}）</span>
+              {crossDayLabel && (
+                <span className="text-sm text-caption">（{crossDayLabel}）</span>
               )}
             </span>
           </div>
