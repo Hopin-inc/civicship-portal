@@ -1,8 +1,0 @@
-# Query designed to exceed alias limit of 1
-# Contains 2+ aliases to trigger the rule
-query AliasViolationTest {
-  user(id: "test") {
-    userId: id
-    userName: name
-  }
-}
