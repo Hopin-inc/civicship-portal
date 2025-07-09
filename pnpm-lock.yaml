@@ -237,6 +237,9 @@ importers:
       '@graphql-codegen/typescript':
         specifier: ^4.1.6
         version: 4.1.6(graphql@16.11.0)
+      '@graphql-eslint/eslint-plugin':
+        specifier: ^4.4.0
+        version: 4.4.0(@types/node@20.17.52)(eslint@8.57.1)(graphql@16.11.0)(typescript@5.8.3)
       '@graphql-typed-document-node/core':
         specifier: ^3.2.0
         version: 3.2.0(graphql@16.11.0)
@@ -1452,6 +1455,20 @@ packages:
     engines: {node: '>=16'}
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+
+  '@graphql-eslint/eslint-plugin@4.4.0':
+    resolution: {integrity: sha512-dhW6fpk3Souuaphhc38uMAGCcgKMgtCJWFygIKODw/Kns43wiQqRPVay0aNFY1JBx3aevn4KPT/BCOdm6HNncA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@apollo/subgraph': ^2
+      eslint: '>=8.44.0'
+      graphql: ^16
+      json-schema-to-ts: ^3
+    peerDependenciesMeta:
+      '@apollo/subgraph':
+        optional: true
+      json-schema-to-ts:
+        optional: true
 
   '@graphql-hive/signal@1.0.0':
     resolution: {integrity: sha512-RiwLMc89lTjvyLEivZ/qxAC5nBHoS2CtsWFSOsN35sxG9zoo5Z+JsFHM8MlvmO9yt+MJNIyC5MLE1rsbOphlag==}
@@ -3361,6 +3378,10 @@ packages:
     resolution: {integrity: sha512-BNoCY6SXXPQ7gF2opIP4GBE+Xw7U+pHMYKuzjgCN3GwiaIR09UUeKfheyIry77QtrCBlC0KK0q5/TER/tYh3PQ==}
     engines: {node: '>= 0.4'}
 
+  arrify@1.0.1:
+    resolution: {integrity: sha512-3CYzex9M9FGQjCGMGyi6/31c8GJbgb0qGyrx5HWxPd0aCwh4cB2YjMb2Xf9UuoogrMrlO9cTqnB5rI5GHZTcUA==}
+    engines: {node: '>=0.10.0'}
+
   arrify@2.0.1:
     resolution: {integrity: sha512-3duEwti880xqi4eAMN8AyR4a0ByT90zoYdLlevfrvU43vb0YZwZVfxOgxWrLXXXpyugL0hNZc9G6BiB5B3nUug==}
     engines: {node: '>=8'}
@@ -4450,6 +4471,12 @@ packages:
       cosmiconfig-toml-loader:
         optional: true
 
+  graphql-depth-limit@1.1.0:
+    resolution: {integrity: sha512-+3B2BaG8qQ8E18kzk9yiSdAa75i/hnnOwgSeAxVJctGQPvmeiLtqKOYF6HETCyRjiF7Xfsyal0HbLlxCQkgkrw==}
+    engines: {node: '>=6.0.0'}
+    peerDependencies:
+      graphql: '*'
+
   graphql-request@6.1.0:
     resolution: {integrity: sha512-p+XPfS4q7aIpKVcgmnZKhMNqhltk20hfXtkaIkTfjjmiKMJ5xrt5c743cL03y/K7y1rg3WrIC49xGiEQ4mxdNw==}
     peerDependencies:
@@ -4952,6 +4979,9 @@ packages:
 
   lodash.isplainobject@4.0.6:
     resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
+
+  lodash.lowercase@4.3.0:
+    resolution: {integrity: sha512-UcvP1IZYyDKyEL64mmrwoA1AbFu5ahojhTtkOUr1K9dbuxzS9ev8i4TxMMGCqRC9TE8uDaSoufNAXxRPNTseVA==}
 
   lodash.mapvalues@4.6.0:
     resolution: {integrity: sha512-JPFqXFeZQ7BfS00H58kClY7SPVeHertPE0lNuCyZ26/XlN8TvakYD7b9bGyNmXbT/D3BbtPAAmq90gPWqLkxlQ==}
@@ -8351,6 +8381,29 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
+  '@graphql-eslint/eslint-plugin@4.4.0(@types/node@20.17.52)(eslint@8.57.1)(graphql@16.11.0)(typescript@5.8.3)':
+    dependencies:
+      '@graphql-tools/code-file-loader': 8.1.20(graphql@16.11.0)
+      '@graphql-tools/graphql-tag-pluck': 8.3.19(graphql@16.11.0)
+      '@graphql-tools/utils': 10.8.6(graphql@16.11.0)
+      debug: 4.4.1
+      eslint: 8.57.1
+      fast-glob: 3.3.3
+      graphql: 16.11.0
+      graphql-config: 5.1.5(@types/node@20.17.52)(graphql@16.11.0)(typescript@5.8.3)
+      graphql-depth-limit: 1.1.0(graphql@16.11.0)
+      lodash.lowercase: 4.3.0
+    transitivePeerDependencies:
+      - '@fastify/websocket'
+      - '@types/node'
+      - bufferutil
+      - cosmiconfig-toml-loader
+      - crossws
+      - supports-color
+      - typescript
+      - uWebSockets.js
+      - utf-8-validate
+
   '@graphql-hive/signal@1.0.0': {}
 
   '@graphql-tools/apollo-engine-loader@8.0.20(graphql@16.11.0)':
@@ -10642,6 +10695,8 @@ snapshots:
       get-intrinsic: 1.3.0
       is-array-buffer: 3.0.5
 
+  arrify@1.0.1: {}
+
   arrify@2.0.1: {}
 
   asap@2.0.6: {}
@@ -12080,6 +12135,11 @@ snapshots:
       - uWebSockets.js
       - utf-8-validate
 
+  graphql-depth-limit@1.1.0(graphql@16.11.0):
+    dependencies:
+      arrify: 1.0.1
+      graphql: 16.11.0
+
   graphql-request@6.1.0(graphql@16.11.0):
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.11.0)
@@ -12586,6 +12646,8 @@ snapshots:
   lodash.escape@4.0.1: {}
 
   lodash.isplainobject@4.0.6: {}
+
+  lodash.lowercase@4.3.0: {}
 
   lodash.mapvalues@4.6.0: {}
 

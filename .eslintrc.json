@@ -1,7 +1,22 @@
 {
-  "extends": [
-    "next/core-web-vitals",
-    "plugin:import/warnings",
-    "prettier"
+  "root": true,
+  "overrides": [
+    {
+      "files": ["src/**/*.ts", "src/**/*.tsx"],
+      "processor": "@graphql-eslint/graphql",
+      "extends": [
+        "next/core-web-vitals",
+        "plugin:import/warnings",
+        "prettier"
+      ]
+    },
+    {
+      "files": ["**/*.graphql"],
+      "parser": "@graphql-eslint/eslint-plugin",
+      "plugins": ["@graphql-eslint"],
+      "rules": {
+        "@graphql-eslint/selection-set-depth": ["error", { "maxDepth": 7 }]
+      }
+    }
   ]
 }

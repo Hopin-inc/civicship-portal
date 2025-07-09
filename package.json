@@ -9,6 +9,7 @@
     "start": "next start -p 8000",
     "lint": "next lint --dir src",
     "lint:fix": "yarn lint --fix",
+    "lint:graphql": "eslint 'src/**/*.{ts,tsx}' --no-eslintrc --config .eslintrc.json",
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json}'",
     "gql:generate": "export NODE_TLS_REJECT_UNAUTHORIZED=0 && graphql-codegen --config codegen.yaml"
   },
@@ -91,6 +92,7 @@
     "@graphql-codegen/introspection": "4.0.3",
     "@graphql-codegen/typed-document-node": "^5.1.1",
     "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-eslint/eslint-plugin": "^4.4.0",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/typography": "^0.5.16",
