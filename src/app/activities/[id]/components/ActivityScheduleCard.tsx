@@ -20,6 +20,9 @@ const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
   communityId,
 }) => {
   const isFull = slot.remainingCapacity === 0;
+  const startDate = new Date(slot.startsAt);
+  const endDate = new Date(slot.endsAt);
+  
   return isFull
     ? renderFullSlotCard(slot)
     : renderAvailableSlotCard(slot, opportunityId, communityId);
@@ -33,6 +36,8 @@ const renderFullSlotCard = (slot: ActivitySlot) => {
   const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
   const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-gray-400" : "text-gray-400"}`;
 
+  const crossDayLabel = getCrossDayLabel(startDate, endDate);
+
   return (
     <div className="bg-gray-100 border border-gray-200 rounded-xl px-6 py-6 w-[280px] flex flex-col">
       <div className="flex-1">
@@ -44,8 +49,8 @@ const renderFullSlotCard = (slot: ActivitySlot) => {
         </h3>
         <p className="text-body-md text-gray-400 mb-4">
           {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
-          {getCrossDayLabel(startDate, endDate) && (
-            <span className="text-label-sm text-gray-400">（{getCrossDayLabel(startDate, endDate)}）</span>
+          {crossDayLabel && (
+            <span className="text-label-sm text-gray-400">（{crossDayLabel}）</span>
           )}
         </p>
         <div className="space-y-2">
@@ -86,6 +91,8 @@ const renderAvailableSlotCard = (
 
   const href = `/reservation/confirm?${query.toString()}`;
 
+  const crossDayLabel = getCrossDayLabel(startDate, endDate);
+
   return (
     <div className="bg-background rounded-xl border px-6 py-6 w-[280px] flex flex-col">
       <div className="flex-1">
@@ -97,8 +104,8 @@ const renderAvailableSlotCard = (
         </h3>
         <p className="text-body-md text-foreground mb-4">
           {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
-          {getCrossDayLabel(startDate, endDate) && (
-            <span className="text-label-sm text-caption">（{getCrossDayLabel(startDate, endDate)}）</span>
+          {crossDayLabel && (
+            <span className="text-label-sm text-caption">（{crossDayLabel}）</span>
           )}
         </p>
         <div className="space-y-2">
