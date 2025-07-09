@@ -63,6 +63,8 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
               const isRegistrationClosed =
                 !isForceReservable && isBefore(startsAtDate, registrationCutoff);
 
+              const crossDayLabel = getCrossDayLabel(startsAtDate, endsAtDate);
+
               return (
                 <div
                   key={slotIndex}
@@ -78,8 +80,8 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                         }`}
                       >
                         {formatTimeRange(slot.startsAt, slot.endsAt)}
-                        {getCrossDayLabel(startsAtDate, endsAtDate) && (
-                          <span className={`text-sm text-caption ${isFull || isRegistrationClosed ? "text-muted-foreground/50" : ""}`}>（{getCrossDayLabel(startsAtDate, endsAtDate)}）</span>
+                        {crossDayLabel && (
+                          <span className={`text-sm text-caption ${isFull || isRegistrationClosed ? "text-muted-foreground/50" : ""}`}>（{crossDayLabel}）</span>
                         )}
                       </p>
                       <p
