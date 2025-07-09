@@ -1,4 +1,4 @@
-import { differenceInDays, format, parse } from "date-fns";
+import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import type { Locale } from "date-fns";
 import { logger } from "@/lib/logging";
@@ -72,22 +72,3 @@ export function formatSlotRange(startsAt: string, endsAt: string): string {
     return `${startDate}~${endDate}`;
   }
 }
-
-export const getDayDiffLabel = (startDate: Date) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const targetDate = new Date(startDate);
-  targetDate.setHours(0, 0, 0, 0);
-  const diffDays = differenceInDays(targetDate, today);
-  if (diffDays === 0) return "当日";
-  if (diffDays === 1) return "翌日";
-  if (diffDays === 2) return "翌々日";
-  if (diffDays >= 3) return `${diffDays}日後`;
-  return null;
-};
-
-export const getDayDiffLabelFromString = (startDateStr: string) => {
-  const targetDate = parse(startDateStr, "yyyy年M月d日EEEE", new Date(), { locale: ja });
-  if (isNaN(targetDate.getTime())) return null;
-  return getDayDiffLabel(targetDate);
-};
