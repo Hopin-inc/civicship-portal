@@ -17,8 +17,9 @@ import {
   getReservationThreshold,
   isDateReservable,
 } from "@/app/reservation/data/presenter/opportunitySlot";
-import { isAfter } from "date-fns";
+import { format, isAfter } from "date-fns";
 import { getCrossDayLabel } from "@/utils/date";
+import { ja } from "date-fns/locale";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
@@ -148,12 +149,7 @@ export const presenterReservationDateTimeInfo = (
   const paidParticipantCount = participantCount - [...new Set(paidTicketIds)].length;
 
   return {
-    formattedDate: startDate.toLocaleDateString("ja-JP", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "long",
-    }),
+    formattedDate: format(startDate, "yyyy年M月d日(E)", { locale: ja }),
     startTime: startDate.toLocaleTimeString("ja-JP", {
       hour: "2-digit",
       minute: "2-digit",
