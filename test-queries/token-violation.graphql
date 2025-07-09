@@ -1,0 +1,63 @@
+# Query designed to exceed token limit of 15000
+# Contains very long field names and many nested selections to increase token count
+query TokenViolationTestWithVeryLongQueryNameThatShouldContributeToTokenCount {
+  userWithVeryLongFieldNameThatContributesToTokenCount: user(id: "test") {
+    userIdFieldWithVeryLongNameThatContributesToTokenCount: id
+    userNameFieldWithVeryLongNameThatContributesToTokenCount: name
+    userEmailFieldWithVeryLongNameThatContributesToTokenCount: email
+    userWalletsFieldWithVeryLongNameThatContributesToTokenCount: wallets {
+      walletIdFieldWithVeryLongNameThatContributesToTokenCount: id
+      walletBalanceFieldWithVeryLongNameThatContributesToTokenCount: balance
+      walletCommunityFieldWithVeryLongNameThatContributesToTokenCount: community {
+        communityIdFieldWithVeryLongNameThatContributesToTokenCount: id
+        communityNameFieldWithVeryLongNameThatContributesToTokenCount: name
+        communityDescriptionFieldWithVeryLongNameThatContributesToTokenCount: description
+        communityCreatedAtFieldWithVeryLongNameThatContributesToTokenCount: createdAt
+        communityUpdatedAtFieldWithVeryLongNameThatContributesToTokenCount: updatedAt
+      }
+      walletTransactionsFieldWithVeryLongNameThatContributesToTokenCount: transactions {
+        transactionIdFieldWithVeryLongNameThatContributesToTokenCount: id
+        transactionAmountFieldWithVeryLongNameThatContributesToTokenCount: amount
+        transactionCreatedAtFieldWithVeryLongNameThatContributesToTokenCount: createdAt
+        transactionUpdatedAtFieldWithVeryLongNameThatContributesToTokenCount: updatedAt
+        transactionFromWalletFieldWithVeryLongNameThatContributesToTokenCount: fromWallet {
+          fromWalletIdFieldWithVeryLongNameThatContributesToTokenCount: id
+          fromWalletBalanceFieldWithVeryLongNameThatContributesToTokenCount: balance
+          fromWalletCommunityFieldWithVeryLongNameThatContributesToTokenCount: community {
+            fromWalletCommunityIdFieldWithVeryLongNameThatContributesToTokenCount: id
+            fromWalletCommunityNameFieldWithVeryLongNameThatContributesToTokenCount: name
+          }
+        }
+        transactionToWalletFieldWithVeryLongNameThatContributesToTokenCount: toWallet {
+          toWalletIdFieldWithVeryLongNameThatContributesToTokenCount: id
+          toWalletBalanceFieldWithVeryLongNameThatContributesToTokenCount: balance
+          toWalletCommunityFieldWithVeryLongNameThatContributesToTokenCount: community {
+            toWalletCommunityIdFieldWithVeryLongNameThatContributesToTokenCount: id
+            toWalletCommunityNameFieldWithVeryLongNameThatContributesToTokenCount: name
+          }
+        }
+      }
+    }
+    userOpportunitiesFieldWithVeryLongNameThatContributesToTokenCount: opportunities {
+      opportunityIdFieldWithVeryLongNameThatContributesToTokenCount: id
+      opportunityTitleFieldWithVeryLongNameThatContributesToTokenCount: title
+      opportunityDescriptionFieldWithVeryLongNameThatContributesToTokenCount: description
+      opportunityCreatedAtFieldWithVeryLongNameThatContributesToTokenCount: createdAt
+      opportunityUpdatedAtFieldWithVeryLongNameThatContributesToTokenCount: updatedAt
+      opportunityPlaceFieldWithVeryLongNameThatContributesToTokenCount: place {
+        placeIdFieldWithVeryLongNameThatContributesToTokenCount: id
+        placeNameFieldWithVeryLongNameThatContributesToTokenCount: name
+        placeAddressFieldWithVeryLongNameThatContributesToTokenCount: address
+        placeCreatedAtFieldWithVeryLongNameThatContributesToTokenCount: createdAt
+        placeUpdatedAtFieldWithVeryLongNameThatContributesToTokenCount: updatedAt
+      }
+      opportunityCreatedByUserFieldWithVeryLongNameThatContributesToTokenCount: createdByUser {
+        createdByUserIdFieldWithVeryLongNameThatContributesToTokenCount: id
+        createdByUserNameFieldWithVeryLongNameThatContributesToTokenCount: name
+        createdByUserEmailFieldWithVeryLongNameThatContributesToTokenCount: email
+        createdByUserCreatedAtFieldWithVeryLongNameThatContributesToTokenCount: createdAt
+        createdByUserUpdatedAtFieldWithVeryLongNameThatContributesToTokenCount: updatedAt
+      }
+    }
+  }
+}

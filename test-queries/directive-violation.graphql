@@ -1,0 +1,46 @@
+# Query designed to exceed directive limit of 50
+# Contains 60+ directives to trigger the rule
+query DirectiveViolationTest($includeUser: Boolean!, $skipWallets: Boolean!, $includeTransactions: Boolean!) {
+  user(id: "test") @include(if: $includeUser) {
+    id @include(if: true)
+    name @include(if: true)
+    email @include(if: true)
+    wallets @skip(if: $skipWallets) @include(if: true) {
+      id @include(if: true)
+      balance @include(if: true)
+      community @include(if: true) {
+        id @include(if: true)
+        name @include(if: true)
+        description @include(if: true)
+      }
+      transactions @include(if: $includeTransactions) @skip(if: false) {
+        id @include(if: true)
+        amount @include(if: true)
+        createdAt @include(if: true)
+        fromWallet @include(if: true) {
+          id @include(if: true)
+          balance @include(if: true)
+        }
+        toWallet @include(if: true) {
+          id @include(if: true)
+          balance @include(if: true)
+        }
+      }
+    }
+    opportunities @include(if: true) @skip(if: false) {
+      id @include(if: true)
+      title @include(if: true)
+      description @include(if: true)
+      place @include(if: true) {
+        id @include(if: true)
+        name @include(if: true)
+        address @include(if: true)
+      }
+      createdByUser @include(if: true) {
+        id @include(if: true)
+        name @include(if: true)
+        email @include(if: true)
+      }
+    }
+  }
+}
