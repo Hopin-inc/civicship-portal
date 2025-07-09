@@ -8,6 +8,7 @@ import { getDayDiffLabelFromString } from "@/utils/date";
 
 interface ReservationDetailsProps {
   formattedDate: string;
+  dateDiffLabel: string | null;
   startTime: string;
   endTime: string;
   participantCount: number;
@@ -24,6 +25,7 @@ interface ReservationDetailsProps {
 
 const ReservationDetails: React.FC<ReservationDetailsProps> = ({
   formattedDate,
+  dateDiffLabel,
   startTime,
   endTime,
   participantCount,
@@ -45,8 +47,8 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
           <span className="text-body-md">{ format(parse(formattedDate, "yyyy年M月d日EEEE", new Date(), { locale: ja }), "yyyy年M月d日(E)", { locale: ja }) }</span>
           <span className="text-body-md text-caption">
             { startTime }-{ endTime }
-            { getDayDiffLabelFromString(formattedDate) && (
-              <span className="text-sm text-caption">（{getDayDiffLabelFromString(formattedDate)}）</span>
+            { dateDiffLabel && (
+              <span className="text-sm text-caption">（{dateDiffLabel}）</span>
             )}
           </span>
         </div>

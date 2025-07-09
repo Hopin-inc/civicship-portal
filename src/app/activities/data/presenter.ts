@@ -18,6 +18,7 @@ import {
   isDateReservable,
 } from "@/app/reservation/data/presenter/opportunitySlot";
 import { isAfter } from "date-fns";
+import { getCrossDayLabel } from "@/utils/date";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
@@ -163,6 +164,7 @@ export const presenterReservationDateTimeInfo = (
       minute: "2-digit",
       hour12: false,
     }),
+    dateDiffLabel: getCrossDayLabel(startDate, endDate),
     participantCount,
     paidParticipantCount,
     totalPrice: (opportunity.feeRequired ?? 0) * paidParticipantCount,

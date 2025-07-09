@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
-import { formatTimeRange, getDayDiffLabel } from "@/utils/date";
+import { formatTimeRange, getCrossDayLabel } from "@/utils/date";
 import { isBefore } from "date-fns";
 import { getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
 
@@ -56,6 +56,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
               const isFeeSpecified = slot.feeRequired != null;
 
               const startsAtDate = new Date(slot.startsAt);
+              const endsAtDate = new Date(slot.endsAt);
 
               const FORCE_RESERVABLE_SLOT_IDS = ["cmc07ao5c0005s60nnc8ravvk"];
               const isForceReservable = FORCE_RESERVABLE_SLOT_IDS.includes(slot.id);
@@ -77,8 +78,8 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                         }`}
                       >
                         {formatTimeRange(slot.startsAt, slot.endsAt)}
-                        {getDayDiffLabel(startsAtDate) && (
-                          <span className={`text-sm text-caption ${isFull || isRegistrationClosed ? "text-muted-foreground/50" : ""}`}>（{getDayDiffLabel(startsAtDate)}）</span>
+                        {getCrossDayLabel(startsAtDate, endsAtDate) && (
+                          <span className={`text-sm text-caption ${isFull || isRegistrationClosed ? "text-muted-foreground/50" : ""}`}>（{getCrossDayLabel(startsAtDate, endsAtDate)}）</span>
                         )}
                       </p>
                       <p

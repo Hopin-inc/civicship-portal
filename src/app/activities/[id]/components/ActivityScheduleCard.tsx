@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
-import { getDayDiffLabel } from "@/utils/date";
+import { getCrossDayLabel } from "@/utils/date";
 
 interface ActivityScheduleCardProps {
   slot: ActivitySlot;
@@ -43,8 +43,9 @@ const renderFullSlotCard = (slot: ActivitySlot) => {
           </span>
         </h3>
         <p className="text-body-md text-gray-400 mb-4">
-          {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")} {getDayDiffLabel(startDate) && (
-            <span className="text-label-sm text-gray-400">（{getDayDiffLabel(startDate)}）</span>
+          {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
+          {getCrossDayLabel(startDate, endDate) && (
+            <span className="text-label-sm text-gray-400">（{getCrossDayLabel(startDate, endDate)}）</span>
           )}
         </p>
         <div className="space-y-2">
@@ -95,8 +96,9 @@ const renderAvailableSlotCard = (
           </span>
         </h3>
         <p className="text-body-md text-foreground mb-4">
-          {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")} {getDayDiffLabel(startDate) && (
-            <span className="text-label-sm text-caption">（{getDayDiffLabel(startDate)}）</span>
+          {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
+          {getCrossDayLabel(startDate, endDate) && (
+            <span className="text-label-sm text-caption">（{getCrossDayLabel(startDate, endDate)}）</span>
           )}
         </p>
         <div className="space-y-2">

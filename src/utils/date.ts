@@ -1,7 +1,8 @@
-import { differenceInDays, format, parse } from "date-fns";
+import { format, parse } from "date-fns";
 import { ja } from "date-fns/locale";
 import type { Locale } from "date-fns";
 import { logger } from "@/lib/logging";
+import { differenceInCalendarDays } from "date-fns";
 
 export const parseDateTime = (dateTimeStr: string | null | undefined): Date | null => {
   if (!dateTimeStr) return null;
@@ -73,21 +74,18 @@ export function formatSlotRange(startsAt: string, endsAt: string): string {
   }
 }
 
-export const getDayDiffLabel = (startDate: Date) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const targetDate = new Date(startDate);
-  targetDate.setHours(0, 0, 0, 0);
-  const diffDays = differenceInDays(targetDate, today);
-  if (diffDays === 0) return "当日";
-  if (diffDays === 1) return "翌日";
-  if (diffDays === 2) return "翌々日";
-  if (diffDays >= 3) return `${diffDays}日後`;
-  return null;
+export const getDayDiffLabelFromString = (startDateStr: string, endDateStr: string) => {
+  const startDate = parse(startDateStr, "yyyy年M月d日EEEE", new Date(), { locale: ja });
+  const endDate = parse(endDateStr, "yyyy年M月d日EEEE", new Date(), { locale: ja });
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return null;
+  return getCrossDayLabel(startDate, endDate);
 };
 
-export const getDayDiffLabelFromString = (startDateStr: string) => {
-  const targetDate = parse(startDateStr, "yyyy年M月d日EEEE", new Date(), { locale: ja });
-  if (isNaN(targetDate.getTime())) return null;
-  return getDayDiffLabel(targetDate);
+export const getCrossDayLabel = (startDate: Date, endDate: Date) => {
+  const diff = differenceInCalendarDays(endDate, startDate);
+  if (diff === 0) return null;
+  if (diff === 1) return "翌日";
+  if (diff === 2) return "翌々日";
+  if (diff >= 3) return `${diff}日後`;
+  return null;
 };
