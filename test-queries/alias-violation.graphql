@@ -1,0 +1,39 @@
+# Query designed to exceed alias limit of 15
+# Contains 20+ aliases to trigger the rule
+query AliasViolationTest {
+  user(id: "test") {
+    userId: id
+    userName: name
+    userEmail: email
+    userWallets: wallets {
+      walletId: id
+      walletBalance: balance
+      walletCommunity: community {
+        communityId: id
+        communityName: name
+        communityDescription: description
+      }
+      walletTransactions: transactions {
+        transactionId: id
+        transactionAmount: amount
+        transactionDate: createdAt
+        fromWalletId: fromWallet {
+          fromWalletUserId: id
+        }
+        toWalletId: toWallet {
+          toWalletUserId: id
+        }
+      }
+    }
+    userOpportunities: opportunities {
+      opportunityId: id
+      opportunityTitle: title
+      opportunityDescription: description
+      opportunityPlace: place {
+        placeId: id
+        placeName: name
+        placeAddress: address
+      }
+    }
+  }
+}

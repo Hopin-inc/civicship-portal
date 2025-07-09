@@ -1,0 +1,16 @@
+{
+  "root": true,
+  "parser": "@graphql-eslint/eslint-plugin",
+  "plugins": ["@graphql-eslint", "local-rules"],
+  "rules": {
+    "local-rules/apollo-armor/cost-limit": ["error", { 
+      "maxCost": 5000, 
+      "objectCost": 2, 
+      "scalarCost": 1, 
+      "depthCostFactor": 1.5 
+    }],
+    "local-rules/apollo-armor/max-aliases": ["error", { "maxAliases": 15 }],
+    "local-rules/apollo-armor/max-directives": ["error", { "maxDirectives": 50 }],
+    "local-rules/apollo-armor/max-tokens": ["error", { "maxTokens": 15000 }]
+  }
+}
