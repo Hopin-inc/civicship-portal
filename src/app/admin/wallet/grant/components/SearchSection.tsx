@@ -17,4 +17,4 @@ export function SearchSection({ onSearch }: SearchSectionProps) {
       onSearch={onSearch} 
       placeholder={"名前・DIDで検索"}    />
   );
-} 
+}
