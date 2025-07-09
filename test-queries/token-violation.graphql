@@ -1,4 +1,4 @@
-# Query designed to exceed token limit of 15000
+# Query designed to exceed token limit of 549
 # Contains very long field names and many nested selections to increase token count
 query TokenViolationTestWithVeryLongQueryNameThatShouldContributeToTokenCount {
   userWithVeryLongFieldNameThatContributesToTokenCount: user(id: "test") {
