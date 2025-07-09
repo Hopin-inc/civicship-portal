@@ -4,7 +4,6 @@ import React from "react";
 import { Calendar, JapaneseYen, MapPin, Phone, Users } from "lucide-react";
 import { parse, format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { getDayDiffLabelFromString } from "@/utils/date";
 
 interface ReservationDetailsProps {
   formattedDate: string;
