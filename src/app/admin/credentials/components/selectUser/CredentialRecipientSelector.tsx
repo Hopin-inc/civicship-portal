@@ -10,9 +10,9 @@ import { useEvaluationBulkCreate } from "../../hooks/useEvaluationBulkCreate";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/layout/Loading";
 import { logger } from "@/lib/logging";
-import SearchForm from "./SearchForm";
 import { useMemberWithDidSearch } from "../../hooks/useMemberWithDidSearch";
 import SearchResultList from "./SearchResultList";
+import SearchForm from "@/components/shared/SearchForm";
 
 // 定数定義
 const STEP_COLORS = {
@@ -183,8 +183,8 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
           <span className={`${STEP_COLORS.GRAY} text-base`}>)</span>
         </span>
       </div>
-      <div className="mb-4 pt-4">
-        <SearchForm value={input} onInputChange={setInput} onSearch={setSearchQuery} />
+      <div className="px-4 mb-4 pt-4">
+        <SearchForm value={input} onInputChange={setInput} onSearch={setSearchQuery} placeholder="名前・DIDで検索" />
       </div>
       <div className="flex flex-col gap-4">
         <SearchResultList

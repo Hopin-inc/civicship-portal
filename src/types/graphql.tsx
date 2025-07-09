@@ -3061,6 +3061,9 @@ export type GqlUpdateMyProfileMutation = {
 export type GqlGetUserFlexibleQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   withPortfolios?: Scalars["Boolean"]["input"];
+  portfolioFilter?: InputMaybe<GqlPortfolioFilterInput>;
+  portfolioSort?: InputMaybe<GqlPortfolioSortInput>;
+  portfolioFirst?: InputMaybe<Scalars["Int"]["input"]>;
   withWallets?: Scalars["Boolean"]["input"];
   withOpportunities?: Scalars["Boolean"]["input"];
   withDidIssuanceRequests?: Scalars["Boolean"]["input"];
@@ -6738,13 +6741,17 @@ export const GetUserFlexibleDocument = gql`
   query GetUserFlexible(
     $id: ID!
     $withPortfolios: Boolean! = false
+    $portfolioFilter: PortfolioFilterInput
+    $portfolioSort: PortfolioSortInput
+    $portfolioFirst: Int
     $withWallets: Boolean! = false
     $withOpportunities: Boolean! = false
     $withDidIssuanceRequests: Boolean! = false
   ) {
     user(id: $id) {
       ...UserFields
-      portfolios @include(if: $withPortfolios) {
+      portfolios(filter: $portfolioFilter, sort: $portfolioSort, first: $portfolioFirst)
+        @include(if: $withPortfolios) {
         ...UserPortfolioFields
       }
       didIssuanceRequests @include(if: $withDidIssuanceRequests) {
@@ -6794,6 +6801,9 @@ export const GetUserFlexibleDocument = gql`
  *   variables: {
  *      id: // value for 'id'
  *      withPortfolios: // value for 'withPortfolios'
+ *      portfolioFilter: // value for 'portfolioFilter'
+ *      portfolioSort: // value for 'portfolioSort'
+ *      portfolioFirst: // value for 'portfolioFirst'
  *      withWallets: // value for 'withWallets'
  *      withOpportunities: // value for 'withOpportunities'
  *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'

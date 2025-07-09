@@ -12,6 +12,7 @@ import { AppPortfolio } from "@/app/users/data/type";
 import { GqlEvaluationStatus, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getCurrentRegionName } from "@/lib/communities/metadata";
+import { useRouter } from "next/navigation";
 
 type Props = {
   userId: string;
@@ -100,7 +101,7 @@ const ActiveOpportunities = ({ opportunities }: ActiveOpportunitiesProps) => {
   );
 };
 
-const PortfolioCard = ({
+export const PortfolioCard = ({
   portfolio,
   isLast,
   lastRef,
@@ -197,7 +198,7 @@ const PortfolioCard = ({
   );
 };
 
-const PortfolioGrid = ({
+export const PortfolioGrid = ({
   portfolios,
   isLoadingMore,
   hasMore,
@@ -264,7 +265,7 @@ const UserPortfolioList = ({
   lastPortfolioRef,
 }: Props) => {
   const showEmptyState = portfolios.length === 0;
-
+  const router = useRouter();
   const emptyStateProps = {
     title: `${getCurrentRegionName()}にふれよう`,
     description: isOwner
@@ -284,6 +285,13 @@ const UserPortfolioList = ({
           <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
             これまでの関わり
           </h2>
+          <button
+            type="button"
+            className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
+            onClick={() => router.push("/users/me/portfolios?tab=future")}
+          >
+            すべて見る
+          </button>
           {/*{isOwner && (*/}
           {/*  <DropdownMenu>*/}
           {/*    <DropdownMenuTrigger asChild>*/}
