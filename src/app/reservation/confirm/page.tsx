@@ -117,7 +117,6 @@ export default function ConfirmPage() {
         <LoginModal
           isOpen={ ui.isLoginModalOpen }
           onClose={ () => ui.setIsLoginModalOpen(false) }
-          nextPath={ `/login?next=${ encodeURIComponentWithType(window.location.pathname + window.location.search as RawURIComponent) }` as RawURIComponent }
         />
         <div className="px-6 py-4 mt-4">
           <OpportunityCardHorizontal
