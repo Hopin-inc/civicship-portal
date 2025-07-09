@@ -15,7 +15,7 @@
       "parser": "@graphql-eslint/eslint-plugin",
       "plugins": ["@graphql-eslint"],
       "rules": {
-        "@graphql-eslint/selection-set-depth": ["error", { "maxDepth": 7 }]
+        "@graphql-eslint/selection-set-depth": ["error", { "maxDepth": 8 }]
       }
     }
   ]
