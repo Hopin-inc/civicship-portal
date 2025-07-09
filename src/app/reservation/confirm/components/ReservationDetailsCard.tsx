@@ -6,7 +6,6 @@ import { formatDateTime } from "@/utils/date";
 import { ja } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import SelectionSheet from "@/app/reservation/select-date/components/SelectionSheet";
-import { getDayDiffLabel } from "@/utils/date";
 
 interface ReservationDetailsCardProps {
   startDateTime: Date | null;
@@ -44,9 +43,6 @@ const ReservationDetailsCard: React.FC<ReservationDetailsCardProps> = ({
             </span>
             <span className="text-body-sm text-caption">
               {formatDateTime(startDateTime, "HH:mm")}-{formatDateTime(endDateTime, "HH:mm")}
-              {getDayDiffLabel(startDateTime) && (
-                <span className="text-sm text-caption">（{getDayDiffLabel(startDateTime)}）</span>
-              )}
             </span>
           </div>
         </div>

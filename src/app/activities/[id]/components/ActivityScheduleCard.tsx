@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
-import { getDayDiffLabel } from "@/utils/date";
 
 interface ActivityScheduleCardProps {
   slot: ActivitySlot;
@@ -43,9 +42,7 @@ const renderFullSlotCard = (slot: ActivitySlot) => {
           </span>
         </h3>
         <p className="text-body-md text-gray-400 mb-4">
-          {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")} {getDayDiffLabel(startDate) && (
-            <span className="text-label-sm text-gray-400">（{getDayDiffLabel(startDate)}）</span>
-          )}
+          {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
@@ -95,9 +92,7 @@ const renderAvailableSlotCard = (
           </span>
         </h3>
         <p className="text-body-md text-foreground mb-4">
-          {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")} {getDayDiffLabel(startDate) && (
-            <span className="text-label-sm text-caption">（{getDayDiffLabel(startDate)}）</span>
-          )}
+          {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
