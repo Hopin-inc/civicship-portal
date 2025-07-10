@@ -1,7 +1,7 @@
 "use client";
 
+import SearchForm from "@/components/shared/SearchForm";
 import React, { useState } from "react";
-import SearchForm from "@/app/admin/credentials/components/selectUser/SearchForm";
 
 interface SearchSectionProps {
   onSearch: (query: string) => void;
@@ -15,6 +15,7 @@ export function SearchSection({ onSearch }: SearchSectionProps) {
       value={input} 
       onInputChange={setInput} 
       onSearch={onSearch} 
+      placeholder="名前・DIDを入力してください"
     />
   );
 } 

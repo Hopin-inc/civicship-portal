@@ -1,11 +1,11 @@
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/app/activities/data/type";
 import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
 import HeroHeader from "@/app/activities/components/FeaturedSection/HeroHeader";
 import OpportunityImageSSR from "@/app/activities/components/FeaturedSection/ImageSSR";
 import ActivitiesFeaturedSliderWrapper from "@/app/activities/components/FeaturedSection/FeaturedSlideWrapper";
 
 interface Props {
-  opportunities: ActivityCard[];
+  opportunities: (ActivityCard | QuestCard)[];
   isInitialLoading?: boolean;
 }
 

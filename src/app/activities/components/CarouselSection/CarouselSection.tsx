@@ -2,12 +2,12 @@
 
 import React from "react";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/app/activities/data/type";
 import CarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 
 interface ActivitiesCarouselSectionProps {
   title: string;
-  opportunities: ActivityCard[];
+  opportunities: (ActivityCard | QuestCard)[];
   isInitialLoading?: boolean;
   isSearchResult?: boolean;
 }

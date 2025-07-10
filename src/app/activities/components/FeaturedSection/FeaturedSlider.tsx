@@ -1,6 +1,6 @@
 "use client";
 
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/app/activities/data/type";
 import { useCallback, useEffect, useState } from "react";
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import useEmblaCarousel from "embla-carousel-react";
@@ -10,7 +10,7 @@ import OpportunityImageSlider from "@/app/activities/components/FeaturedSection/
 export default function ActivitiesFeaturedSlider({
   opportunities,
 }: {
-  opportunities: ActivityCard[];
+  opportunities: (ActivityCard | QuestCard)[];
 }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });

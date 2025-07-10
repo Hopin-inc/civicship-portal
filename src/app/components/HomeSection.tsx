@@ -4,17 +4,11 @@ import ActivitiesCarouselSection from "../activities/components/CarouselSection/
 import ActivitiesPageClient from "../activities/components/ActivitiesPageClient";
 import { useAuth } from "@/contexts/AuthProvider";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ActivityCard } from "../activities/data/type";
+import { fetchFeaturedAndCarousel } from "../activities/data/fetchActivities";
 
-interface HomeSectionProps {
-  featuredCards: ActivityCard[];
-  upcomingCards: ActivityCard[];
-  loading: boolean;
-}
-
-export default function HomeSection({ featuredCards, upcomingCards, loading }: HomeSectionProps) {
+export default function HomeSection() {
   const { isAuthenticating, loading: authLoading } = useAuth();
-
+  const { featuredCards, upcomingCards, loading } = fetchFeaturedAndCarousel();
   if (isAuthenticating || authLoading) {
     return <LoadingIndicator fullScreen={true} />;
   }

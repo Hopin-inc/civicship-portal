@@ -10,6 +10,7 @@ export type OpportunityCard = ActivityCard | QuestCard;
 
 export type ActivityCard = OpportunityBaseCard & {
   feeRequired: number | null;
+  pointsToRequired: boolean | null;
 };
 
 export type QuestCard = OpportunityBaseCard & {

@@ -2,11 +2,11 @@
 
 import React from "react";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/app/activities/data/type";
 import OpportunitiesListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
 
 interface ActivitiesAllSectionProps {
-  opportunities: ActivityCard[];
+  opportunities: (ActivityCard|QuestCard)[];
   isSectionLoading: boolean;
   isInitialLoading?: boolean;
   isTitle?: boolean;
@@ -29,7 +29,7 @@ const ActivitiesListSection: React.FC<ActivitiesAllSectionProps> = ({
           <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} />
         ))}
       </div>
-      <div className="h-20" aria-hidden="true"></div>
+      <div className="h-10" aria-hidden="true"></div>
       {/*<div ref={loadMoreRef} className="h-10" aria-hidden="true" />*/}
       {isSectionLoading && (
         <div className="py-6 flex items-center justify-center">
