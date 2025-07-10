@@ -120,7 +120,7 @@ export default function ParticipationPage() {
     if (isNaN(eventDate.getTime())) {
       logger.warn("Invalid date string for participation check", {
         relevantDateString,
-        component: "ParticipationPage"
+        component: "ParticipationPage",
       });
       return false;
     }
@@ -153,12 +153,14 @@ export default function ParticipationPage() {
             startTime={dateTimeInfo.startTime}
             endTime={dateTimeInfo.endTime}
             participantCount={dateTimeInfo.participantCount}
-            paidParticipantCount={ dateTimeInfo.paidParticipantCount }
+            paidParticipantCount={dateTimeInfo.paidParticipantCount}
             totalPrice={dateTimeInfo.totalPrice}
             pricePerPerson={opportunityDetail.feeRequired ?? 0}
             location={opportunityDetail.place}
             phoneNumber={participation.emergencyContactPhone}
             isReserved={true}
+            opportunityId={opportunityDetail.id}
+            opportunityTitle={opportunityDetail.title}
           />
         </div>
       )}

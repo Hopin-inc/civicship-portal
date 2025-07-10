@@ -72,49 +72,51 @@ export default function CompletePage() {
 
   if (loading) return <LoadingIndicator fullScreen />;
   if (error || !reservation || !opportunity || !dateTimeInfo)
-    return <ErrorState title="申込完了ページを読み込めませんでした" refetchRef={ refetchRef } />;
+    return <ErrorState title="申込完了ページを読み込めませんでした" refetchRef={refetchRef} />;
 
   return (
     <main className="flex flex-col items-center">
       <CompletionHeader />
-      { oppotunityDetail && <OpportunityInfo opportunity={ oppotunityDetail } /> }
-      { dateTimeInfo && opportunity && (
+      {oppotunityDetail && <OpportunityInfo opportunity={oppotunityDetail} />}
+      {dateTimeInfo && opportunity && (
         <div className="px-6 w-full">
           <ReservationDetails
-            formattedDate={ dateTimeInfo.formattedDate }
-            startTime={ dateTimeInfo.startTime }
-            endTime={ dateTimeInfo.endTime }
-            participantCount={ dateTimeInfo.participantCount }
-            paidParticipantCount={ dateTimeInfo.paidParticipantCount }
-            totalPrice={ dateTimeInfo.totalPrice }
-            pricePerPerson={ opportunity.feeRequired ?? 0 }
-            location={ oppotunityDetail?.place }
-            phoneNumber={ reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber }
-            isReserved={ true }
+            formattedDate={dateTimeInfo.formattedDate}
+            startTime={dateTimeInfo.startTime}
+            endTime={dateTimeInfo.endTime}
+            participantCount={dateTimeInfo.participantCount}
+            paidParticipantCount={dateTimeInfo.paidParticipantCount}
+            totalPrice={dateTimeInfo.totalPrice}
+            pricePerPerson={opportunity.feeRequired ?? 0}
+            location={oppotunityDetail?.place}
+            phoneNumber={reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber}
+            isReserved={true}
+            opportunityId={opportunity.id}
+            opportunityTitle={opportunity.title}
           />
         </div>
-      ) }
-      { articleCard ? (
+      )}
+      {articleCard ? (
         <>
           <div className="h-2 bg-border -mx-6 w-full" />
           <div className="px-6 w-full pt-6 pb-8 max-w-mobile-l mx-auto space-y-4">
             <h2 className="text-display-md mb-4">案内人の想い</h2>
-            <ArticleCard article={ articleCard } showUser />
+            <ArticleCard article={articleCard} showUser />
           </div>
         </>
-      ) : null }
-      { opportunityId && sameStateActivities.length > 0 && (
+      ) : null}
+      {opportunityId && sameStateActivities.length > 0 && (
         <>
           <div className="h-2 bg-border -mx-6 w-full" />
           <div className="px-6 w-full">
             <SameStateActivities
               header="近くでおすすめの関わり"
-              opportunities={ sameStateActivities }
-              currentOpportunityId={ opportunityId }
+              opportunities={sameStateActivities}
+              currentOpportunityId={opportunityId}
             />
           </div>
         </>
-      ) }
+      )}
     </main>
   );
 }
