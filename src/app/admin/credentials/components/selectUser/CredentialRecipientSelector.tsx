@@ -1,6 +1,11 @@
 import React, { useMemo, useState } from "react";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { GqlUser, useParticipationBulkCreateMutation, GqlParticipationStatusReason, useGetEvaluationsQuery, GetEvaluationsDocument, GqlDidIssuanceRequest } from "@/types/graphql";
+import {
+  GqlDidIssuanceRequest,
+  GqlParticipationStatusReason,
+  GqlUser,
+  useParticipationBulkCreateMutation,
+} from "@/types/graphql";
 import { toast } from "sonner";
 import { useMembershipQueries } from "@/app/admin/members/hooks/useMembershipQueries";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -8,11 +13,11 @@ import { Button } from "@/components/ui/button";
 import { useSelection } from "../../context/SelectionContext";
 import { useEvaluationBulkCreate } from "../../hooks/useEvaluationBulkCreate";
 import { useRouter } from "next/navigation";
-import Loading from "@/components/layout/Loading";
 import { logger } from "@/lib/logging";
 import { useMemberWithDidSearch } from "../../hooks/useMemberWithDidSearch";
 import SearchResultList from "./SearchResultList";
 import SearchForm from "@/components/shared/SearchForm";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 // 定数定義
 const STEP_COLORS = {
@@ -34,14 +39,14 @@ const DISABLED_REASONS: GqlParticipationStatusReason[] = [
 const sortMembersByParticipation = (
   members: { user: GqlUser & { didInfo?: GqlDidIssuanceRequest | undefined } }[],
   participatedUsers: Array<{ userId: string; slotId: string; isCreatedByUser: boolean }>,
-  selectedSlotId: string | undefined
+  selectedSlotId: string | undefined,
 ) => {
   return [...members].sort((a, b) => {
     const aParticipated = participatedUsers.find(
-      (u) => u.userId === a.user.id && u.slotId === selectedSlotId
+      (u) => u.userId === a.user.id && u.slotId === selectedSlotId,
     );
     const bParticipated = participatedUsers.find(
-      (u) => u.userId === b.user.id && u.slotId === selectedSlotId
+      (u) => u.userId === b.user.id && u.slotId === selectedSlotId,
     );
 
     // 1. isCreatedByUserがtrueのユーザーを最優先
@@ -65,13 +70,22 @@ const sortMembersByParticipation = (
   });
 };
 
-export default function CredentialRecipientSelector({ setStep }: { setStep: (step: number) => void }) {
+export default function CredentialRecipientSelector({
+  setStep,
+}: {
+  setStep: (step: number) => void;
+}) {
   const communityId = COMMUNITY_ID;
   const { selectedSlot, setSelectedSlot, participatedUsers } = useSelection();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const [input, setInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const { membershipListData, refetch } = useMembershipQueries(communityId);
+  const {
+    membershipListData,
+    refetch,
+    loading: membershipLoading,
+  } = useMembershipQueries(communityId);
   const selectedUserIds = selectedSlot?.userIds ?? [];
 
   const { save } = useEvaluationBulkCreate({
@@ -107,7 +121,7 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
   useHeaderConfig(headerConfig);
 
   const getParticipatedReason = (userId: string) =>
-    participatedUsers.find(u => u.userId === userId && u.slotId === selectedSlot?.slotId)?.reason;
+    participatedUsers.find((u) => u.userId === userId && u.slotId === selectedSlot?.slotId)?.reason;
 
   const allMembers = useMemo(() => {
     return (
@@ -119,52 +133,59 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
         .filter((member): member is { user: GqlUser } => member !== null) ?? []
     );
   }, [membershipListData]);
-  const { data: searchMembershipData, loading, error } = useMemberWithDidSearch(communityId, allMembers, { searchQuery });
+  const {
+    data: searchMembershipData,
+    loading,
+    error,
+  } = useMemberWithDidSearch(communityId, allMembers, { searchQuery });
 
   // 並び替え用の配列を作成
   const sortedMembers = useMemo(() => {
     return sortMembersByParticipation(
-      searchMembershipData.map(user => ({ user })),
+      searchMembershipData.map((user) => ({ user })),
       participatedUsers,
-      selectedSlot?.slotId
+      selectedSlot?.slotId,
     );
   }, [searchMembershipData, participatedUsers, selectedSlot?.slotId]);
-  const formattedMembers = sortedMembers.map(({ user }) => user)
+  const formattedMembers = sortedMembers.map(({ user }) => user);
 
   if (!selectedSlot) {
     return <div>開催枠が設定されていません</div>;
   }
 
   const handleCheck = (userId: string) => {
-    setSelectedSlot(prev =>
+    setSelectedSlot((prev) =>
       prev
         ? {
             ...prev,
             userIds: prev.userIds.includes(userId)
-              ? prev.userIds.filter(id => id !== userId)
+              ? prev.userIds.filter((id) => id !== userId)
               : [...prev.userIds, userId],
           }
-        : null
+        : null,
     );
   };
 
   const handleConfirm = async () => {
     if (selectedUserIds.length > 0 && selectedSlot) {
-      await createParticipation({
-        variables: {
-          input: {
-            userIds: selectedSlot.userIds,
-            slotId: selectedSlot.slotId,
+      try {
+        setIsSubmitting(true);
+        await createParticipation({
+          variables: {
+            input: {
+              userIds: selectedSlot.userIds,
+              slotId: selectedSlot.slotId,
+            },
+            permission: { communityId },
           },
-          permission: { communityId },
-        },
-      });
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
-  if (loading) {
-    return <Loading />;
-  }
+  if (loading || membershipLoading) return <LoadingIndicator fullScreen={true} />;
 
   return (
     <>
@@ -172,10 +193,7 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
         <h1 className="text-2xl font-bold">発行先を選ぶ</h1>
         <span className="ml-1 flex mb-1 items-baseline">
           <span className={`${STEP_COLORS.GRAY} text-base`}>(</span>
-          <span
-            className="text-xl font-bold ml-1"
-            style={{ color: STEP_COLORS.PRIMARY }}
-          >
+          <span className="text-xl font-bold ml-1" style={{ color: STEP_COLORS.PRIMARY }}>
             {STEP_NUMBERS.CURRENT}
           </span>
           <span className={`${STEP_COLORS.GRAY} text-base`}>/</span>
@@ -184,7 +202,12 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
         </span>
       </div>
       <div className="px-4 mb-4 pt-4">
-        <SearchForm value={input} onInputChange={setInput} onSearch={setSearchQuery} placeholder="名前・DIDで検索" />
+        <SearchForm
+          value={input}
+          onInputChange={setInput}
+          onSearch={setSearchQuery}
+          placeholder="名前・DIDで検索"
+        />
       </div>
       <div className="flex flex-col gap-4">
         <SearchResultList
@@ -207,20 +230,24 @@ export default function CredentialRecipientSelector({ setStep }: { setStep: (ste
               キャンセル
             </Button>
             <Button
-              className={`rounded-full px-8 py-2 font-bold text-white ${selectedUserIds.length > 0 ? "bg-primary" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
+              className={`rounded-full px-8 py-2 font-bold text-white ${
+                selectedUserIds.length > 0 && !isSubmitting
+                  ? "bg-primary"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
               size="lg"
-              disabled={selectedUserIds.length === 0}
+              disabled={selectedUserIds.length === 0 || isSubmitting}
               onClick={() => {
                 if (selectedUserIds.length > 0) {
                   handleConfirm();
                 }
               }}
             >
-              発行
+              {isSubmitting ? "発行中..." : "発行"}
             </Button>
           </div>
         </div>
       </div>
     </>
   );
-} 
+}
