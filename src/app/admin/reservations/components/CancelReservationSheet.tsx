@@ -48,7 +48,7 @@ const CancelReservationSheet: React.FC<CancelReservationSheetProps> = ({
                 {cancelLoading ? "処理中..." : "開催中止"}
               </Button>
               <p className="text-sm text-muted-foreground text-center">
-                開催の24時間前まで、アプリから中止操作が可能です。
+                開催前日の23:59まで、アプリから中止操作が可能です。
               </p>
             </div>
           </SheetTrigger>
