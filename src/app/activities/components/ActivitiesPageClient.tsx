@@ -7,21 +7,16 @@ import { mapOpportunityCards } from "../data/presenter";
 import ErrorState from "@/components/shared/ErrorState";
 import EmptyState from "@/components/shared/EmptyState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { Coins } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 export default function ActivitiesPageClient() {
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
-  const router = useRouter();
+
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  const allCards = mapOpportunityCards(opportunities.edges ?? []);
-  const firstFour = allCards.slice(0, 4);
-  const afterFour = allCards.slice(4);
+  const listCards = mapOpportunityCards(opportunities.edges ?? []);
   const isFirstLoaded = !loading && opportunities?.edges?.length > 0;
   const isEmpty = !loading && opportunities?.edges?.length === 0;
 
@@ -51,40 +46,11 @@ export default function ActivitiesPageClient() {
   }
 
   return (
-    <div className="min-h-screen ">
-      {/* 最初の4件 */}
+    <div className="min-h-screen">
       <ActivitiesListSection
-        opportunities={firstFour}
+        opportunities={listCards}
         isInitialLoading={false}
         isSectionLoading={loading}
-      />
-      {/* バナー */}
-      <div className="px-6">
-        <button
-          className="w-full flex bg-blue-50 rounded-lg p-4 appearance-none border-none focus:outline-none"
-          style={{ boxSizing: 'border-box' }}
-          onClick={() => {
-            router.push("/quests");
-          }}
-        >
-          <div>
-            <Coins className="w-8 h-8 text-primary" />
-          </div>
-          <div className="ml-2">
-            <div className="flex justify-between">
-              <p className="text-base font-bold text-left">ポイントを獲得すると、<br/>無料で体験に参加できます。</p>
-              <Image src={"icons/arrow.svg"} alt="arrow" width={32} height={32} className="mt-6 ml-4"/>
-            </div>
-            <span className="text-xs">ポイントがもらえるお手伝いを探してみましょう</span>
-          </div>
-        </button>
-      </div>
-      {/* 5件目以降 */}
-      <ActivitiesListSection
-        opportunities={afterFour}
-        isInitialLoading={false}
-        isSectionLoading={loading}
-        isTitle={false}
       />
       <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
     </div>
