@@ -1,7 +1,31 @@
 {
-  "extends": [
-    "next/core-web-vitals",
-    "plugin:import/warnings",
-    "prettier"
+  "root": true,
+  "overrides": [
+    {
+      "files": ["src/**/*.ts", "src/**/*.tsx"],
+      "processor": "@graphql-eslint/graphql",
+      "extends": [
+        "next/core-web-vitals",
+        "plugin:import/warnings",
+        "prettier"
+      ]
+    },
+    {
+      "files": ["**/*.graphql"],
+      "parser": "@graphql-eslint/eslint-plugin",
+      "plugins": ["@graphql-eslint", "local-rules"],
+      "rules": {
+        "@graphql-eslint/selection-set-depth": ["error", { "maxDepth": 9 }],
+        "local-rules/apollo-armor/cost-limit": ["error", { 
+          "maxCost": 200, 
+          "objectCost": 2, 
+          "scalarCost": 1, 
+          "depthCostFactor": 1.5 
+        }],
+        "local-rules/apollo-armor/max-aliases": ["error", { "maxAliases": 1 }],
+        "local-rules/apollo-armor/max-directives": ["error", { "maxDirectives": 10 }],
+        "local-rules/apollo-armor/max-tokens": ["error", { "maxTokens": 600 }]
+      }
+    }
   ]
 }
