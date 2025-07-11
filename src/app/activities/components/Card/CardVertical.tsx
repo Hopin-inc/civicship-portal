@@ -4,37 +4,20 @@ import Image from "next/image";
 import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { ActivityCard, QuestCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { GqlOpportunityCategory } from "@/types/graphql";
 
 interface OpportunityCardVerticalProps {
-  opportunity: ActivityCard | QuestCard;
+  opportunity: ActivityCard;
   isCarousel?: boolean;
-}
-
-const selectBadge = (hasReservableTicket: boolean | null, pointsToRequired: boolean | null) => {
-  switch (true) {
-    case hasReservableTicket && pointsToRequired:
-      return "チケット利用可";
-    case hasReservableTicket:
-      return "チケット利用可";
-    case pointsToRequired:
-      return "ポイントが使える";
-    default:
-      return null;
-  }
 }
 
 export default function OpportunityCardVertical({
   opportunity,
   isCarousel = false,
 }: OpportunityCardVerticalProps) {
-  const { id, title, location, images, hasReservableTicket, communityId,category} = opportunity;
-  
-  const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
-  const pointsToRequired = 'pointsToRequired' in opportunity ? opportunity.pointsToRequired : null;
-  const pointsToEarn = 'pointsToEarn' in opportunity ? opportunity.pointsToEarn : null;
+  const { id, title, feeRequired, location, images, hasReservableTicket, communityId } =
+    opportunity;
 
   return (
     <Link
@@ -42,9 +25,9 @@ export default function OpportunityCardVertical({
       className={`relative w-full flex-shrink-0 ${isCarousel ? "max-w-[150px] sm:max-w-[164px]" : ""}`}
     >
       <Card className="w-full h-[205px] overflow-hidden relative">
-        {(hasReservableTicket || pointsToRequired) && (
+        {hasReservableTicket && (
           <div className="absolute top-2 left-2 bg-primary-foreground text-primary px-2.5 py-1 rounded-xl text-label-xs font-bold z-10">
-            {selectBadge(hasReservableTicket, pointsToRequired)}
+            チケット利用可
           </div>
         )}
         <Image
@@ -73,14 +56,6 @@ export default function OpportunityCardVertical({
             <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
             <span className="line-clamp-1 break-words">{location}</span>
           </div>
-          {pointsToEarn != null && pointsToEarn > 0 && category === GqlOpportunityCategory.Quest && (
-            <div className="flex items-center gap-1 pt-1">
-              <p className="bg-primary text-[11px] p-1 rounded-full w-4 h-4 flex items-center justify-center pt-[6px] font-bold text-white">P</p>
-              <p className="text-sm font-bold">
-                  {pointsToEarn}ptもらえる
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </Link>
