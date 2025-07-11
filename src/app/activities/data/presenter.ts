@@ -8,7 +8,7 @@ import {
   GqlUser,
   Maybe,
 } from "@/types/graphql";
-import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard } from "@/app/activities/data/type";
+import { ActivityCard, ActivityDetail, OpportunityHost } from "@/app/activities/data/type";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
@@ -17,11 +17,12 @@ import {
   getReservationThreshold,
   isDateReservable,
 } from "@/app/reservation/data/presenter/opportunitySlot";
-import { isAfter } from "date-fns";
+import { format, isAfter } from "date-fns";
+import { ja } from "date-fns/locale";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
-): (ActivityCard | QuestCard)[] => {
+): ActivityCard[] => {
   if (!edges) return [];
 
   return edges
@@ -30,25 +31,13 @@ export const presenterActivityCards = (
     .map((node) => presenterActivityCard(node));
 };
 
-export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): (ActivityCard | QuestCard)[] =>
+export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
   edges
     .map((edge) => edge.node)
     .filter((node): node is GqlOpportunity => !!node)
     .map(presenterActivityCard);
 
-export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCard | QuestCard => {
-  if (node?.category === "QUEST") {
-    return {
-      id: node?.id || "",
-      title: node?.title || "",
-      category: node?.category || GqlOpportunityCategory.Quest,
-      images: node?.images || [],
-      location: node?.place?.name || "場所未定",
-      communityId: COMMUNITY_ID || "",
-      hasReservableTicket: node?.isReservableWithTicket || false,
-      pointsToEarn: node?.pointsToEarn ?? null,
-    } as QuestCard;
-  }
+export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCard => {
   return {
     id: node?.id || "",
     title: node?.title || "",
@@ -58,15 +47,15 @@ export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCa
     images: node?.images || [],
     communityId: COMMUNITY_ID || "",
     hasReservableTicket: node?.isReservableWithTicket || false,
-    pointsToRequired: node?.pointsToRequired ?? false,
-  } as ActivityCard;
+    pointsToRequired: node?.pointsToRequired ?? null,
+  };
 };
 
 export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail => {
   const { images, place, slots, articles, createdByUser } = data;
   const threshold = getReservationThreshold();
 
-  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired, data.id);
+  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
@@ -87,7 +76,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
 
     place: presenterPlace(place),
     host: presenterOpportunityHost(createdByUser, articles?.[0]),
-    slots: activitySlots,
+    slots: presenterActivitySlot(slots, threshold, data.feeRequired),
 
     recentOpportunities: [],
     reservableTickets: [],
@@ -112,7 +101,6 @@ function presenterActivitySlot(
   slots: Maybe<GqlOpportunitySlot[]> | undefined,
   threshold: Date,
   feeRequired?: Maybe<number> | undefined,
-  opportunityId?: string
 ): ActivitySlot[] {
   const SLOT_IDS_TO_FORCE_RESERVABLE = ["cmc07ao5c0005s60nnc8ravvk"];
 
@@ -139,7 +127,7 @@ function presenterActivitySlot(
         feeRequired: feeRequired ?? null,
         applicantCount: 1,
         isReservable,
-        opportunityId: opportunityId || "",
+        opportunityId: slot?.opportunity?.id || "",
       };
     }) ?? []
   );
@@ -162,12 +150,7 @@ export const presenterReservationDateTimeInfo = (
   const paidParticipantCount = participantCount - [...new Set(paidTicketIds)].length;
 
   return {
-    formattedDate: startDate.toLocaleDateString("ja-JP", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "long",
-    }),
+    formattedDate: format(startDate, "yyyy年M月d日(E)", { locale: ja }),
     startTime: startDate.toLocaleTimeString("ja-JP", {
       hour: "2-digit",
       minute: "2-digit",
@@ -185,13 +168,13 @@ export const presenterReservationDateTimeInfo = (
 };
 
 export const sliceActivitiesBySection = (
-  activityCards: (ActivityCard | QuestCard)[]
+  activityCards: ActivityCard[],
 ): {
-  upcomingCards: (ActivityCard | QuestCard)[];
-  featuredCards: (ActivityCard | QuestCard)[];
+  upcomingCards: ActivityCard[];
+  featuredCards: ActivityCard[];
 } => {
   const safe = <T>(cards: (T | undefined)[]): T[] => cards.filter((c): c is T => !!c);
-  const hasImages = (card: ActivityCard | QuestCard) => card.images && card.images.length > 0;
+  const hasImages = (card: ActivityCard) => card.images && card.images.length > 0;
 
   const validCards = safe(activityCards.filter(hasImages));
   const featuredCards = validCards.slice(0, 3);
