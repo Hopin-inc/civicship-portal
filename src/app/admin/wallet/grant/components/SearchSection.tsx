@@ -11,6 +11,10 @@ export function SearchSection({ onSearch }: SearchSectionProps) {
   const [input, setInput] = useState("");
 
   return (
-    <SearchForm value={input} onInputChange={setInput} onSearch={onSearch} placeholder={"名前・DIDで検索"} />
+    <SearchForm 
+      value={input}
+      onInputChange={setInput}
+      onSearch={onSearch} 
+      placeholder={"名前・DIDで検索"}    />
   );
 }
