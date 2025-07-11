@@ -1,25 +1,24 @@
+import { apolloClient } from "@/lib/apollo";
 import {
+  GetOpportunitiesDocument,
+  GqlGetOpportunitiesQuery,
+  GqlGetOpportunitiesQueryVariables,
   GqlOpportunityCategory,
   GqlPublishStatus,
   GqlSortDirection,
-  useGetOpportunitiesQuery,
 } from "@/types/graphql";
 import { mapOpportunityCards, sliceActivitiesBySection } from "./presenter";
 
-export function fetchFeaturedAndCarousel() {
-  const { data, loading } = useGetOpportunitiesQuery({
+export async function fetchFeaturedAndCarousel() {
+  const { data, loading } = await apolloClient.query<
+    GqlGetOpportunitiesQuery,
+    GqlGetOpportunitiesQueryVariables
+  >({
+    query: GetOpportunitiesDocument,
     variables: {
       filter: {
-        or: [
-          {
-            category: GqlOpportunityCategory.Activity,
-            publishStatus: [GqlPublishStatus.Public],
-          },
-          {
-            category: GqlOpportunityCategory.Quest,
-            publishStatus: [GqlPublishStatus.Public],
-          },
-        ],
+        category: GqlOpportunityCategory.Activity,
+        publishStatus: [GqlPublishStatus.Public],
       },
       sort: {
         earliestSlotStartsAt: GqlSortDirection.Asc,
@@ -28,7 +27,7 @@ export function fetchFeaturedAndCarousel() {
     },
     fetchPolicy: "cache-first",
   });
-  const activityCards = mapOpportunityCards(data?.opportunities.edges ?? []);
+  const activityCards = mapOpportunityCards(data.opportunities.edges ?? []);
   const { featuredCards, upcomingCards } = sliceActivitiesBySection(activityCards);
   return { featuredCards, upcomingCards, loading };
 }
