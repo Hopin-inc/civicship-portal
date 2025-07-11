@@ -33,16 +33,8 @@ export const useActivities = (): UseActivitiesResult => {
   const { data, loading, error, fetchMore, refetch } = useGetOpportunitiesQuery({
     variables: {
       filter: {
-        or: [
-          {
-            category: GqlOpportunityCategory.Activity,
-            publishStatus: [GqlPublishStatus.Public],
-          },
-          {
-            category: GqlOpportunityCategory.Quest,
-            publishStatus: [GqlPublishStatus.Public],
-          },
-        ],
+        category: GqlOpportunityCategory.Activity,
+        publishStatus: [GqlPublishStatus.Public],
       },
       sort: {
         earliestSlotStartsAt: GqlSortDirection.Asc,
@@ -64,16 +56,8 @@ export const useActivities = (): UseActivitiesResult => {
     await fetchMore({
       variables: {
         filter: {
-          or: [
-            {
-              category: GqlOpportunityCategory.Activity,
-              publishStatus: [GqlPublishStatus.Public],
-            },
-            {
-              category: GqlOpportunityCategory.Quest,
-              publishStatus: [GqlPublishStatus.Public],
-            },
-          ],
+          category: GqlOpportunityCategory.Activity,
+          publishStatus: [GqlPublishStatus.Public],
         },
         sort: {
           earliestSlotStartsAt: GqlSortDirection.Asc,
