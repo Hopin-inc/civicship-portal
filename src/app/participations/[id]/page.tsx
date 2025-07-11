@@ -159,8 +159,6 @@ export default function ParticipationPage() {
             location={opportunityDetail.place}
             phoneNumber={participation.emergencyContactPhone}
             isReserved={true}
-            opportunityId={opportunityDetail.id}
-            opportunityTitle={opportunityDetail.title}
           />
         </div>
       )}

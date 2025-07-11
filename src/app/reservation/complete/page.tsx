@@ -91,8 +91,6 @@ export default function CompletePage() {
             location={oppotunityDetail?.place}
             phoneNumber={reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber}
             isReserved={true}
-            opportunityId={opportunity.id}
-            opportunityTitle={opportunity.title}
           />
         </div>
       )}

@@ -20,8 +20,8 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity }) => {
         <div className="flex items-center gap-4 flex-1">
           <div className="relative w-[108px] h-[108px] rounded-lg overflow-hidden flex-shrink-0">
             <Image
-              src={opportunity?.images?.[0] || PLACEHOLDER_IMAGE}
-              alt={opportunity?.title ?? ""}
+              src={opportunity.images?.[0] || PLACEHOLDER_IMAGE}
+              alt={opportunity.title}
               fill
               placeholder={"blur"}
               blurDataURL={PLACEHOLDER_IMAGE}
@@ -30,7 +30,7 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity }) => {
           </div>
           <div className="flex-1">
             <h1 className="text-title-md font-bold leading-tight mb-4 line-clamp-3 break-words group-hover:text-primary transition-colors">
-              {opportunity?.title ?? ""}
+              {opportunity.title}
             </h1>
           </div>
         </div>

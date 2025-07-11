@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { Calendar, JapaneseYen, MapPin, Phone, Users, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { Calendar, JapaneseYen, MapPin, Phone, Users } from "lucide-react";
 
 interface ReservationDetailsProps {
   formattedDate: string;
@@ -18,8 +17,6 @@ interface ReservationDetailsProps {
   };
   phoneNumber?: string | null | undefined;
   isReserved?: boolean;
-  opportunityId?: string;
-  opportunityTitle?: string;
 }
 
 const ReservationDetails: React.FC<ReservationDetailsProps> = ({
@@ -36,8 +33,6 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
   },
   phoneNumber,
   isReserved = false,
-  opportunityId,
-  opportunityTitle,
 }) => {
   return (
     <div className="bg-card rounded-lg py-6 px-4 mb-6 space-y-6 w-full">
