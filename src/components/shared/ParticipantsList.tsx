@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { Participant } from "@/types/utils";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const MAX_DISPLAY_PARTICIPANTS = 4;
 
@@ -27,20 +27,13 @@ export const ParticipantsList = ({ participants, size = "sm" }: ParticipantsList
           }
 
           return (
-            <div key={`${participant.id}-${index}`} className={`${avatarSize} relative`}>
-              <Image
-                src={participant.image ?? PLACEHOLDER_IMAGE}
-                alt={participant.name}
-                fill
-                placeholder={"blur"}
-                blurDataURL={PLACEHOLDER_IMAGE}
-                className="rounded-full border-2 border-background"
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  img.src = PLACEHOLDER_IMAGE;
-                }}
-              />
-            </div>
+            <Avatar
+              key={`${participant.id}-${index}`}
+              className={`${avatarSize} border-2 border-background`}
+            >
+              <AvatarImage src={participant.image ?? PLACEHOLDER_IMAGE} alt={participant.name} />
+              <AvatarFallback>{participant.name?.[0] ?? "U"}</AvatarFallback>
+            </Avatar>
           );
         })}
 

@@ -6,7 +6,9 @@ export type FeaturesType =
   | "points"
   | "tickets"
   | "articles"
-  | "prefectures";
+  | "prefectures"
+  | "credentials"
+  | "justDaoIt";
 
 // コミュニティごとのベース設定
 interface CommunityBaseConfig {
@@ -22,6 +24,7 @@ interface CommunityBaseConfig {
   ogImagePath: string;
   enableFeatures: FeaturesType[];
   rootPath?: string;
+  adminRootPath?: string;
 }
 
 // コミュニティごとのメタデータ型定義
@@ -71,6 +74,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
     enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures"],
     rootPath: "/activities",
+    adminRootPath: "/admin/reservations",
   },
   kibotcha: {
     id: "kibotcha",
@@ -84,8 +88,24 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     squareLogoPath: "/communities/kibotcha/logo-square.jpg",
     ogImagePath:
       "https://storage.googleapis.com/prod-civicship-storage-public/asset/kibotcha/ogp.jpg",
-    enableFeatures: ["points"],
+    enableFeatures: ["points", "justDaoIt"],
     rootPath: "/users/me",
+    adminRootPath: "/admin/wallet",
+  },
+  dais: {
+    id: "dais",
+    tokenName: "DAIS",
+    title: "DAIS",
+    description: "",
+    shortDescription: "",
+    domain: "https://dais.civicship.jp", // TODO: 環境によってドメインが変わるので、環境変数化する必要あり
+    faviconPrefix: "/communities/dais",
+    logoPath: "/communities/dais/logo.jpg",
+    squareLogoPath: "/communities/dais/logo-square.jpg",
+    ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/dais/ogp.jpg",
+    enableFeatures: ["credentials"],
+    rootPath: "/users/me",
+    adminRootPath: "/admin/credentials",
   },
   default: {
     id: "default",
@@ -110,6 +130,7 @@ export const COMMUNITY_ID = getCommunityIdFromEnv();
 export function getCurrentRegionName(): string {
   if (COMMUNITY_ID === "neo88") return "四国";
   if (COMMUNITY_ID === "kibotcha") return "東松島";
+  if (COMMUNITY_ID === "dais") return "四国";
   return "地域";
 }
 

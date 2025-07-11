@@ -76,7 +76,7 @@ export default function CompletePage() {
 
   return (
     <main className="flex flex-col items-center">
-      <CompletionHeader />
+      <CompletionHeader requireApproval={ oppotunityDetail?.requireApproval } />
       { oppotunityDetail && <OpportunityInfo opportunity={ oppotunityDetail } /> }
       { dateTimeInfo && opportunity && (
         <div className="px-6 w-full">

@@ -1,5 +1,6 @@
 import {
   GqlCurrentPrefecture,
+  GqlEvaluationStatus,
   GqlPortfolioCategory,
   GqlPortfolioSource,
   GqlReservationStatus,
@@ -56,7 +57,7 @@ export type AppPortfolio = {
   category: GqlPortfolioCategory;
 
   reservationStatus?: GqlReservationStatus | null;
-
+  evaluationStatus?: GqlEvaluationStatus | null;
   title: string;
   image: string | null;
   date: string;

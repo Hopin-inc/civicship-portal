@@ -4,13 +4,24 @@ export const GET_USER_FLEXIBLE = gql`
   query GetUserFlexible(
     $id: ID!
     $withPortfolios: Boolean! = false
+    $portfolioFilter: PortfolioFilterInput
+    $portfolioSort: PortfolioSortInput
+    $portfolioFirst: Int
     $withWallets: Boolean! = false
     $withOpportunities: Boolean! = false
+    $withDidIssuanceRequests: Boolean! = false
   ) {
     user(id: $id) {
       ...UserFields
-      portfolios @include(if: $withPortfolios) {
+      portfolios(
+        filter: $portfolioFilter
+        sort: $portfolioSort
+        first: $portfolioFirst
+      ) @include(if: $withPortfolios) {
         ...UserPortfolioFields
+      }
+      didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+        ...DidIssuanceRequestFields
       }
       wallets @include(if: $withWallets) {
         ...WalletFields

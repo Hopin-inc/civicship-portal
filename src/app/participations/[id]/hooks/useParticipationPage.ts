@@ -29,10 +29,8 @@ const useParticipationPage = (id: string): UseParticipationPageResult => {
     skip: !id,
     fetchPolicy: "network-only",
   });
-
   const rawParticipation = data?.participation;
   const rawOpportunity = rawParticipation?.reservation?.opportunitySlot?.opportunity;
-
   const participation = rawParticipation ? presenterParticipation(rawParticipation) : null;
   const opportunity = rawOpportunity ? presenterActivityCard(rawOpportunity) : null;
 
@@ -49,7 +47,7 @@ const useParticipationPage = (id: string): UseParticipationPageResult => {
       logger.error("Participation query error", {
         error: error.message || String(error),
         participationId: id,
-        component: "useParticipationPage"
+        component: "useParticipationPage",
       });
     }
   }, [error, id]);

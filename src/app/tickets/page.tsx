@@ -40,6 +40,17 @@ export default function TicketsPage() {
         hasNextPage={hasNextPage} 
         loading={loading} 
       />
+      {hasNextPage && (
+        <div ref={loadMoreRef} className="py-4 text-center mt-4">
+          {loading ? (
+            <div className="py-2">
+              <LoadingIndicator fullScreen={false} />
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-sm">スクロールしてさらに読み込み...</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

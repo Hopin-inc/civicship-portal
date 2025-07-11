@@ -61,6 +61,7 @@ export const presenterPortfolio = (gqlPortfolio: GqlPortfolio): AppPortfolio => 
     source: gqlPortfolio.source,
     category: gqlPortfolio.category,
     reservationStatus: gqlPortfolio.reservationStatus ?? null,
+    evaluationStatus: gqlPortfolio.evaluationStatus ?? null,
     title: gqlPortfolio.title,
     image: gqlPortfolio.thumbnailUrl ?? PLACEHOLDER_IMAGE,
     date: dateObj.toLocaleDateString("ja-JP", {

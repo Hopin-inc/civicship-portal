@@ -20,23 +20,23 @@ import { presenterOpportunityHost } from "@/app/activities/data/presenter";
 import { subDays } from "date-fns";
 
 export const presenterParticipation = (raw: GqlParticipation): ParticipationDetail => {
-  if (
-    !raw ||
-    !raw.reservation ||
-    !raw.reservation.opportunitySlot ||
-    !raw.reservation.opportunitySlot.opportunity
-  ) {
-    throw new Error("参加情報に必要なデータが不足しています");
-  }
+  // if (
+  //   !raw ||
+  //   !raw.reservation ||
+  //   !raw.reservation.opportunitySlot ||
+  //   !raw.reservation.opportunitySlot.opportunity
+  // ) {
+  //   throw new Error("参加情報に必要なデータが不足しています");
+  // }
 
   const reservation = raw.reservation;
-  const slot = reservation.opportunitySlot;
+  const slot = reservation?.opportunitySlot;
   const opportunity = slot?.opportunity;
 
   const category = opportunity?.category;
   if (!category) throw new Error("Opportunity must have a category");
 
-  const participantsCount = reservation.participations?.length ?? 0;
+  const participantsCount = reservation?.participations?.length ?? 0;
 
   const base: ParticipationInfo = {
     id: raw.id,
@@ -61,8 +61,8 @@ export const presenterParticipation = (raw: GqlParticipation): ParticipationDeta
     },
 
     reservation: {
-      id: reservation.id,
-      status: reservation.status as GqlReservationStatus,
+      id: reservation?.id ?? "",
+      status: reservation?.status as GqlReservationStatus,
     },
 
     images: raw.images ?? [],

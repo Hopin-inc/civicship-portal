@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
-import { GqlUser } from "@/types/graphql";
+import { useSearchParams } from "next/navigation";
+import { GqlDidIssuanceStatus, GqlUser, useGetDidIssuanceRequestsQuery, useGetMembershipListQuery } from "@/types/graphql";
 
 export type MemberSearchFormValues = {
   searchQuery: string;
@@ -19,17 +18,15 @@ export interface MemberSearchTarget {
 }
 
 export const useMemberSearch = (
-  members: MemberSearchTarget[],
+  members: MemberSearchTarget[] = [],
   options?: {
     searchParamKey?: string;
     route?: string;
+    communityId?: string;
   },
 ) => {
   const searchParams = useSearchParams();
-  const router = useRouter();
-
   const searchKey = options?.searchParamKey || "q";
-  const route = options?.route || "/admin/wallet/grant";
   const initialQuery = searchParams.get(searchKey) || "";
 
   const form = useForm<MemberSearchFormValues>({
@@ -38,30 +35,45 @@ export const useMemberSearch = (
     },
   });
 
-  const searchQuery = form.watch("searchQuery");
+  const searchQuery = form.watch("searchQuery")?.toLowerCase() ?? "";
 
-  const filteredMembers = useMemo(() => {
-    const query = searchQuery.toLowerCase();
-    if (!query) return members;
-    return members.filter(({ user }) => user.name?.toLowerCase().includes(query));
-  }, [members, searchQuery]);
-
-  const onSubmit = useCallback(
-    (data: MemberSearchFormValues) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (data.searchQuery) {
-        params.set(searchKey, data.searchQuery);
-      } else {
-        params.delete(searchKey);
-      }
-      router.push(`${route}?${params.toString()}`);
+  const { data: singleMembershipData } = useGetMembershipListQuery({
+    variables: {
+      filter: {
+        communityId: options?.communityId ?? "",
+      },
+      first: 1,
+      withDidIssuanceRequests: true,
     },
-    [searchParams, router, searchKey, route],
+    skip: !searchQuery || !options?.communityId,
+  });
+
+  const filteredMembers = members.filter(({ user }) =>
+    user.name?.toLowerCase().includes(searchQuery)
   );
+
+  const userIds = filteredMembers.map(({ user }) => user.id);
+
+  const { data: didIssuanceRequests } = useGetDidIssuanceRequestsQuery({
+    variables: { userIds },
+    fetchPolicy: "network-only",
+  });
+
+  const filteredMembersWithDid = filteredMembers.map(member => {
+    const didInfo = didIssuanceRequests?.users?.edges
+      ?.find(edge => edge?.node?.id === member.user.id)
+      ?.node?.didIssuanceRequests
+      ?.find(request => request?.status === GqlDidIssuanceStatus.Completed);
+  
+    return {
+      ...member,
+      didInfo,
+    };
+  });
 
   return {
     form,
-    filteredMembers,
-    onSubmit,
+    filteredMembers: filteredMembersWithDid,
+    singleMembershipData,
   };
 };

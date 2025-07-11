@@ -8,7 +8,10 @@ export const USER_FRAGMENT = gql`
     bio
     currentPrefecture
     phoneNumber
-
+    nftWallet {
+      id
+      walletAddress
+    }
     urlFacebook
     urlInstagram
     urlX
@@ -24,6 +27,7 @@ export const USER_PORTFOLIO_FRAGMENT = gql`
     category
     date
     reservationStatus
+    evaluationStatus
     place {
       ...PlaceFields
     }

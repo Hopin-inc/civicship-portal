@@ -6,6 +6,7 @@ export const GET_TRANSACTIONS = gql`
     $sort: TransactionSortInput
     $first: Int
     $cursor: String
+    $withDidIssuanceRequests: Boolean = false
   ) {
     transactions(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
       pageInfo {
@@ -22,6 +23,9 @@ export const GET_TRANSACTIONS = gql`
           fromWallet {
             ...WalletFields
             user {
+              didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+                ...DidIssuanceRequestFields
+              }
               ...UserFields
             }
             community {
@@ -31,6 +35,9 @@ export const GET_TRANSACTIONS = gql`
           toWallet {
             ...WalletFields
             user {
+              didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+                ...DidIssuanceRequestFields
+              }
               ...UserFields
             }
             community {

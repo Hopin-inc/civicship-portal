@@ -37,6 +37,11 @@ export default function UserPage() {
     return notFound();
   }
 
+  const targetFeatures = ["opportunities", "credentials"] as const;
+  const shouldShowOpportunities = targetFeatures.some((feature) =>
+    currentCommunityConfig.enableFeatures.includes(feature),
+  );
+
   return (
     <div className="container mx-auto py-6 max-w-3xl">
       <UserProfileSection
@@ -45,7 +50,7 @@ export default function UserPage() {
         userAsset={userData.asset}
         isOwner={isOwner}
       />
-      {currentCommunityConfig.enableFeatures.includes("opportunities") && (
+      {shouldShowOpportunities && (
         <>
           {selfOpportunities.length > 0 && (
             <section className="py-6 mt-0">

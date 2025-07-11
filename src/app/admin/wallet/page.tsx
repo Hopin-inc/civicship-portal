@@ -38,7 +38,7 @@ export default function WalletPage() {
   const router = useRouter();
   const handleNavigateToIssue = () => router.push("/admin/wallet/issue");
   const handleNavigateToGrant = () =>
-    router.push(`/admin/wallet/grant?currentPoint=${currentPoint}`);
+    router.push(`/admin/wallet/grant?currentPoint=${currentPoint}&tab=history`);
 
   const {
     data: walletData,

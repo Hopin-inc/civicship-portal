@@ -11,6 +11,7 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlRole } from "@/types/graphql";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
+import { AdminRoleContext } from "@/app/admin/context/AdminRoleContext";
 
 /**
  * 管理者ガードコンポーネントのプロパティ
@@ -85,26 +86,20 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     return null;
   }
 
-  const checkSyncAdminAccess = () => {
-    if (!currentUser?.memberships || currentUser.memberships.length === 0) {
-      return false;
-    }
+  const targetMembership = currentUser.memberships.find(
+    (m: any) => m.community?.id === COMMUNITY_ID,
+  );
+  if (!targetMembership) {
+    logger.debug("No membership found for community", { component: "AdminGuard" });
+    return null;
+  }
+  const role = targetMembership.role;
 
-    const targetMembership = currentUser.memberships.find(
-      (m: any) => m.community?.id === COMMUNITY_ID,
-    );
-    return (
-      targetMembership &&
-      (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager)
-    );
-  };
-
-  if (!checkSyncAdminAccess()) {
+  if (!(role === GqlRole.Owner || role === GqlRole.Manager)) {
     logger.debug("Unauthorized role. No UI rendered", { component: "AdminGuard" });
     return null;
   }
-
-  return <>{children}</>;
+  return <AdminRoleContext.Provider value={role}>{children}</AdminRoleContext.Provider>;
 };
 
 export default AdminGuard;

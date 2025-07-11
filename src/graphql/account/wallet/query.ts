@@ -85,7 +85,7 @@ export const GET_COMMUNITY_WALLET = gql`
 `;
 
 export const GET_MEMBER_WALLETS = gql`
-  query GetMemberWallets($filter: WalletFilterInput, $first: Int, $cursor: String) {
+  query GetMemberWallets($filter: WalletFilterInput, $first: Int, $cursor: String, $withDidIssuanceRequests: Boolean! = false) {
     wallets(filter: $filter, first: $first, cursor: $cursor) {
       pageInfo {
         hasNextPage
@@ -100,6 +100,9 @@ export const GET_MEMBER_WALLETS = gql`
           ...WalletFields
           user {
             ...UserFields
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              ...DidIssuanceRequestFields
+            }
           }
           community {
             ...CommunityFields

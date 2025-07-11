@@ -17,7 +17,7 @@ type PublicParticipationInfo = {
 
   opportunity: ParticipationOpportunity;
   slot: ParticipationSlot;
-  reservation: ParticipationReservation;
+  reservation: ParticipationReservation | null;
 
   images: string[];
   totalImageCount: number;
