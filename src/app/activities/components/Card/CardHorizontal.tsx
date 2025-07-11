@@ -1,15 +1,14 @@
 "use client";
 
-import { ActivityCard, QuestCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/app/activities/data/type";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
 import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { GqlOpportunityCategory } from "@/types/graphql";
 
 type Props = {
-  opportunity: ActivityCard | QuestCard;
+  opportunity: ActivityCard;
   withShadow?: boolean;
 };
 
@@ -42,13 +41,11 @@ function OpportunityCardHorizontal({ opportunity, withShadow = true }: Props) {
           </div>
           <div className="flex-1 px-4 py-3">
             <h2 className="text-title-sm text-foreground line-clamp-1">{opportunity.title}</h2>
-            {opportunity.category === GqlOpportunityCategory.Activity && 'feeRequired' in opportunity && (
-              <p className="mt-1 text-body-sm text-muted-foreground">
-                {opportunity.feeRequired
-                  ? `1人あたり${opportunity.feeRequired.toLocaleString()}円から`
-                  : "料金未定"}
-              </p>
-            )}
+            <p className="mt-1 text-body-sm text-muted-foreground">
+              {opportunity.feeRequired
+                ? `1人あたり${opportunity.feeRequired.toLocaleString()}円から`
+                : "料金未定"}
+            </p>
             <div className="mt-1 flex items-center text-muted-foreground text-body-sm">
               <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
               <span className="line-clamp-1 break-words">{opportunity.location}</span>
