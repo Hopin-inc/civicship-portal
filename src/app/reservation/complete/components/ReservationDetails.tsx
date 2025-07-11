@@ -5,6 +5,7 @@ import { Calendar, JapaneseYen, MapPin, Phone, Users } from "lucide-react";
 
 interface ReservationDetailsProps {
   formattedDate: string;
+  dateDiffLabel: string | null;
   startTime: string;
   endTime: string;
   participantCount: number;
@@ -20,20 +21,21 @@ interface ReservationDetailsProps {
 }
 
 const ReservationDetails: React.FC<ReservationDetailsProps> = ({
-                                                                 formattedDate,
-                                                                 startTime,
-                                                                 endTime,
-                                                                 participantCount,
-                                                                 paidParticipantCount,
-                                                                 totalPrice,
-                                                                 pricePerPerson,
-                                                                 location = {
-                                                                   name: "高松市役所",
-                                                                   address: "香川県高松市番町1丁目8-15",
-                                                                 },
-                                                                 phoneNumber,
-                                                                 isReserved = false,
-                                                               }) => {
+  formattedDate,
+  dateDiffLabel,
+  startTime,
+  endTime,
+  participantCount,
+  paidParticipantCount,
+  totalPrice,
+  pricePerPerson,
+  location = {
+    name: "高松市役所",
+    address: "香川県高松市番町1丁目8-15",
+  },
+  phoneNumber,
+  isReserved = false,
+}) => {
   return (
     <div className="bg-card rounded-lg py-6 px-4 mb-6 space-y-6 w-full">
       <div className="flex items-start gap-x-2">
@@ -42,6 +44,9 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
           <span className="text-body-md">{ formattedDate }</span>
           <span className="text-body-md text-caption">
             { startTime }-{ endTime }
+            { dateDiffLabel && (
+              <span className="text-sm text-caption">（{dateDiffLabel}）</span>
+            )}
           </span>
         </div>
       </div>

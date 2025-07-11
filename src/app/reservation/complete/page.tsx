@@ -82,6 +82,7 @@ export default function CompletePage() {
         <div className="px-6 w-full">
           <ReservationDetails
             formattedDate={ dateTimeInfo.formattedDate }
+            dateDiffLabel={ dateTimeInfo.dateDiffLabel }
             startTime={ dateTimeInfo.startTime }
             endTime={ dateTimeInfo.endTime }
             participantCount={ dateTimeInfo.participantCount }
