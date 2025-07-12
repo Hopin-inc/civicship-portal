@@ -41,11 +41,19 @@ export const presenterQuestCards = (
     .filter((node): node is GqlOpportunity => !!node)
     .map((node) => presenterQuestCard(node));
 };
-export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
+export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): (ActivityCard | QuestCard)[] =>
   edges
     .map((edge) => edge.node)
     .filter((node): node is GqlOpportunity => !!node)
-    .map(presenterActivityCard);
+    .map((node) => {
+      if (node.category === GqlOpportunityCategory.Activity) {
+        return presenterActivityCard(node);
+      } else if (node.category === GqlOpportunityCategory.Quest) {
+        return presenterQuestCard(node);
+      }
+      return null;
+    })
+    .filter((v): v is ActivityCard | QuestCard => v !== null);
 
 export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCard => {
   return {
@@ -259,15 +267,15 @@ export const presenterReservationDateTimeInfo = (
 };
 
 export const sliceActivitiesBySection = (
-  activityCards: ActivityCard[],
+  cards: (ActivityCard | QuestCard)[],
 ): {
-  upcomingCards: ActivityCard[];
-  featuredCards: ActivityCard[];
+  upcomingCards: (ActivityCard | QuestCard)[];
+  featuredCards: (ActivityCard | QuestCard)[];
 } => {
   const safe = <T>(cards: (T | undefined)[]): T[] => cards.filter((c): c is T => !!c);
-  const hasImages = (card: ActivityCard) => card.images && card.images.length > 0;
+  const hasImages = (card: ActivityCard | QuestCard) => card.images && card.images.length > 0;
 
-  const validCards = safe(activityCards.filter(hasImages));
+  const validCards = safe(cards.filter(hasImages));
   const featuredCards = validCards.slice(0, 3);
   const upcomingCards = validCards.slice(3);
 

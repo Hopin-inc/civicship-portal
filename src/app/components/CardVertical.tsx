@@ -87,7 +87,9 @@ export default function OpportunityCardVertical({
           </div>
           {pointsToEarn != null && pointsToEarn > 0 && category === GqlOpportunityCategory.Quest && (
             <div className="flex items-center gap-1 pt-1">
-              <p className="bg-primary text-[11px] p-1 rounded-full w-4 h-4 flex items-center justify-center pt-[6px] font-bold text-white">P</p>
+              <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+                P
+              </p>
               <p className="text-sm font-bold">
                   {pointsToEarn}ptもらえる
               </p>

@@ -2,26 +2,28 @@
 
 import React from "react";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/app/activities/data/type";
 import OpportunitiesListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
 
 interface ActivitiesAllSectionProps {
-  opportunities: ActivityCard[];
+  opportunities: (ActivityCard | QuestCard)[];
   isSectionLoading: boolean;
   isInitialLoading?: boolean;
+  isTitle?: boolean;
 }
 
 const ActivitiesListSection: React.FC<ActivitiesAllSectionProps> = ({
   opportunities,
   isInitialLoading,
   isSectionLoading,
+  isTitle = true,
 }) => {
   if (isInitialLoading) return <OpportunitiesListSectionSkeleton />;
   if (opportunities.length === 0) return null;
 
   return (
     <section className="mt-6 px-6">
-      <h2 className="text-display-md">すべての体験</h2>
+      {isTitle && <h2 className="text-display-md">すべての体験</h2>}
       <div className="mt-6 grid grid-cols-2 gap-4">
         {opportunities.map((opportunity) => (
           <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} />

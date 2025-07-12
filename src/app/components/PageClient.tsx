@@ -84,6 +84,7 @@ export default function PageClient() {
         opportunities={afterFour}
         isInitialLoading={false}
         isSectionLoading={loading}
+        isTitle={false}
       />
       <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
     </div>
