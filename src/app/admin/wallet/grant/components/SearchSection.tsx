@@ -2,6 +2,7 @@
 
 import SearchForm from "@/components/shared/SearchForm";
 import React, { useState } from "react";
+import SearchForm from "@/components/shared/SearchForm";
 
 interface SearchSectionProps {
   onSearch: (query: string) => void;
@@ -18,4 +19,4 @@ export function SearchSection({ onSearch }: SearchSectionProps) {
       placeholder="名前・DIDを入力してください"
     />
   );
-} 
+}

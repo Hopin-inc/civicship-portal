@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import React, { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { STEPS } from "../CredentialIssuanceWizard";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 const STEP_NUMBERS = {
   CURRENT: 1,
@@ -21,7 +22,7 @@ const STEP_COLORS = {
 
 export default function OpportunityList({ setStep }: { setStep: (step: number) => void }) {
   const { user } = useAuth();
-  const { selectedSlot,setSelectedSlot } = useSelection();
+  const { selectedSlot, setSelectedSlot } = useSelection();
   const router = useRouter();
 
   const headerConfig = useMemo(
@@ -34,7 +35,7 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
   );
   useHeaderConfig(headerConfig);
 
-  const { data: opportunityData } = useGetOpportunitiesQuery({
+  const { data: opportunityData, loading } = useGetOpportunitiesQuery({
     variables: {
       filter: {
         communityIds: [COMMUNITY_ID],
@@ -48,7 +49,9 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
   const opportunityList = opportunityData?.opportunities?.edges?.map((e) => e?.node) ?? [];
   const handleSelectTicket = (opportunityId: string) => {
     setSelectedSlot({ opportunityId, slotId: "", userIds: [] });
-  }
+  };
+
+  if (loading) return <LoadingIndicator fullScreen={true} />;
 
   return (
     <div className="space-y-6 flex flex-col min-h-screen mt-2">
@@ -56,10 +59,7 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
         <h1 className="text-2xl font-bold">募集を選ぶ</h1>
         <span className="ml-1 flex mb-1 items-baseline">
           <span className={`${STEP_COLORS.GRAY} text-base`}>(</span>
-          <span
-            className="text-xl font-bold ml-1"
-            style={{ color: STEP_COLORS.PRIMARY }}
-          >
+          <span className="text-xl font-bold ml-1" style={{ color: STEP_COLORS.PRIMARY }}>
             {STEP_NUMBERS.CURRENT}
           </span>
           <span className={`${STEP_COLORS.GRAY} text-base`}>/</span>
@@ -109,4 +109,4 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
       </div>
     </div>
   );
-} 
+}
