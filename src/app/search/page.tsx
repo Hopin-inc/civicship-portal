@@ -29,6 +29,9 @@ export default function SearchPage() {
   useHeaderConfig(headerConfig);
 
   const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") || "/search/result";
+  const typeParam = searchParams.get("type");
+  const type = typeParam === "quest" ? "quest" : "activity";
 
   // Initialize form with search parameters from URL
   const methods = useForm({
@@ -81,6 +84,8 @@ export default function SearchPage() {
               formatDateRange={formatDateRange}
               prefectureLabels={visiblePrefectureLabels}
               router={router}
+              redirectTo={redirectTo}
+              type={type}
             />
           </FormProvider>
         </div>
@@ -96,6 +101,8 @@ function SearchPageContent({
   formatDateRange,
   prefectureLabels,
   router,
+  redirectTo,
+  type,
 }: {
   activeForm: SearchFilterType;
   setActiveForm: (f: SearchFilterType) => void;
@@ -103,12 +110,15 @@ function SearchPageContent({
   formatDateRange: (r: DateRange | undefined) => string;
   prefectureLabels: Record<string, string>;
   router: ReturnType<typeof useRouter>;
+  redirectTo: string;
+  type: "activity" | "quest";
 }) {
   const {
     location,
     dateRange,
     guests,
     useTicket,
+    usePoints,
     getValues,
     setValue,
     handleClear,
@@ -130,10 +140,11 @@ function SearchPageContent({
       values.dateRange,
       values.guests,
       values.useTicket,
-      "activity",
+      values.usePoints,
+      type,
       // selectedTab,
     );
-    router.push(`/search/result?${params.toString()}`);
+    router.push(`${redirectTo}?${params.toString()}`);
   };
 
   return (
@@ -147,6 +158,7 @@ function SearchPageContent({
         dateRange={dateRange}
         guests={guests}
         useTicket={useTicket}
+        usePoints={usePoints}
       />
       <SearchFilterSheets
         activeForm={activeForm}
@@ -159,6 +171,8 @@ function SearchPageContent({
         setGuests={(val) => setValue("guests", val)}
         useTicket={useTicket}
         setUseTicket={(val) => setValue("useTicket", val)}
+        usePoints={usePoints}
+        setUsePoints={(val) => setValue("usePoints", val)}
         clearActiveFilter={clearActiveFilter}
         getSheetHeight={() => "90vh"}
         prefectures={Object.entries(prefectureLabels).map(([id, name]) => ({ id, name }))}

@@ -8,9 +8,9 @@ import {
   GqlUser,
   Maybe,
 } from "@/types/graphql";
-import { ActivityCard, ActivityDetail, OpportunityHost } from "@/app/activities/data/type";
+import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard, QuestDetail } from "@/app/activities/data/type";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
@@ -31,6 +31,16 @@ export const presenterActivityCards = (
     .map((node) => presenterActivityCard(node));
 };
 
+export const presenterQuestCards = (
+  edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
+): QuestCard[] => {
+  if (!edges) return [];
+
+  return edges
+    .map((edge) => edge?.node)
+    .filter((node): node is GqlOpportunity => !!node)
+    .map((node) => presenterQuestCard(node));
+};
 export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
   edges
     .map((edge) => edge.node)
@@ -48,6 +58,21 @@ export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCa
     communityId: COMMUNITY_ID || "",
     hasReservableTicket: node?.isReservableWithTicket || false,
     pointsToRequired: node?.pointsToRequired ?? null,
+    slots: node?.slots ?? [],
+  };
+};
+
+export const presenterQuestCard = (node: Partial<GqlOpportunity>): QuestCard => {
+  return {
+    id: node?.id || "",
+    title: node?.title || "",
+    category: node?.category || GqlOpportunityCategory.Quest,
+    location: node?.place?.name || "場所未定",
+    images: node?.images || [],
+    communityId: COMMUNITY_ID || "",
+    hasReservableTicket: node?.isReservableWithTicket || false,
+    pointsToEarn: node?.pointsToEarn ?? 0,
+    slots: node?.slots ?? [],
   };
 };
 
@@ -67,7 +92,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
     notes: "",
     images: images?.map((image) => image) || [],
     totalImageCount: images?.length || 0,
-
+    category: data.category,
     requireApproval: data.requireApproval,
     targetUtilities: data.requiredUtilities?.map((u) => u) ?? [],
     feeRequired: data.feeRequired ?? null,
@@ -81,6 +106,37 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
     recentOpportunities: [],
     reservableTickets: [],
     relatedActivities: [],
+  };
+};
+
+export const presenterQuestDetail = (data: GqlOpportunity): QuestDetail => {
+  const { images, place, slots, articles, createdByUser } = data;
+  const threshold = getReservationThreshold();
+
+  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired);
+  const isReservable = activitySlots.some((slot) => slot.isReservable);
+
+  return {
+    communityId: COMMUNITY_ID || "",
+    id: data.id,
+    title: data.title,
+    description: data.description || "",
+    body: data.body || "",
+    notes: "",
+    images: images?.map((image) => image) || [],
+    totalImageCount: images?.length || 0,
+    category: data.category,
+    requireApproval: data.requireApproval,
+    targetUtilities: data.requiredUtilities?.map((u) => u) ?? [],
+    isReservable,
+
+    place: presenterPlace(place),
+    host: presenterOpportunityHost(createdByUser, articles?.[0]),
+    slots: presenterQuestSlot(slots, threshold),
+
+    pointsToEarn: 0,
+    relatedQuests: [],
+    recentOpportunities: [],
   };
 };
 
@@ -128,6 +184,41 @@ function presenterActivitySlot(
         applicantCount: 1,
         isReservable,
         opportunityId: slot?.opportunity?.id || "",
+      };
+    }) ?? []
+  );
+}
+
+function presenterQuestSlot(
+  slots: Maybe<GqlOpportunitySlot[]> | undefined,
+  threshold: Date,
+  feeRequired?: Maybe<number> | undefined,
+): QuestSlot[] {
+  const SLOT_IDS_TO_FORCE_RESERVABLE = ["cmc07ao5c0005s60nnc8ravvk"];
+
+  return (
+    slots?.map((slot): QuestSlot => {
+      const startsAtDate = slot?.startsAt ? new Date(slot.startsAt) : null;
+
+      const isForceReservable = slot?.id && SLOT_IDS_TO_FORCE_RESERVABLE.includes(slot.id);
+
+      // 通常の条件 or 強制フラグ
+      const isReservable = isForceReservable
+        ? true
+        : startsAtDate
+          ? isAfter(startsAtDate, threshold)
+          : false;
+
+      return {
+        id: slot?.id,
+        hostingStatus: slot?.hostingStatus,
+        startsAt: startsAtDate?.toISOString() || "",
+        endsAt: slot?.endsAt ? new Date(slot.endsAt).toISOString() : "",
+        capacity: slot?.capacity ?? 0,
+        remainingCapacity: slot?.remainingCapacity ?? 0,
+        applicantCount: 1,
+        isReservable,
+        pointsToEarn: 0,
       };
     }) ?? []
   );

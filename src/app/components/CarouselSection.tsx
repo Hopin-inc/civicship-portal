@@ -1,22 +1,24 @@
 "use client";
 
 import React from "react";
-import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/app/activities/data/type";
 import CarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
+import OpportunityCardVertical from "./CardVertical";
+import { ActivityCard, QuestCard } from "@/app/activities/data/type";
 
 interface ActivitiesCarouselSectionProps {
   title: string;
-  opportunities: ActivityCard[];
+  opportunities: (ActivityCard | QuestCard)[];
   isInitialLoading?: boolean;
   isSearchResult?: boolean;
+  isVertical?: boolean;
 }
 
-const ActivitiesCarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
+export const CarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
   title,
   opportunities,
   isInitialLoading = false,
   isSearchResult = false,
+  isVertical = true,
 }) => {
   if (isInitialLoading) return <CarouselSectionSkeleton title={title} />;
   if (opportunities.length === 0) return null;
@@ -35,12 +37,12 @@ const ActivitiesCarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
       ) : (
         <h2 className="text-display-md">{title}</h2>
       )}
-      <div className="mt-4 grid grid-cols-2 gap-4">
+      <div className={`mt-4 ${isVertical ? "grid grid-cols-2 gap-4" : "flex gap-4 overflow-x-auto pb-4 scrollbar-hide"}`}>
         {opportunities.map((opportunity, index) => (
           <OpportunityCardVertical
             key={`${opportunity.id}_${index}`}
             opportunity={opportunity}
-            isCarousel={false}
+            isCarousel
           />
         ))}
       </div>
@@ -48,4 +50,3 @@ const ActivitiesCarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
   );
 };
 
-export default ActivitiesCarouselSection;

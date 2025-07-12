@@ -1133,6 +1133,7 @@ export type GqlOpportunityFilterInput = {
   not?: InputMaybe<GqlOpportunityFilterInput>;
   or?: InputMaybe<Array<GqlOpportunityFilterInput>>;
   placeIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  pointsToRequired?: InputMaybe<Scalars["Boolean"]["input"]>;
   publishStatus?: InputMaybe<Array<GqlPublishStatus>>;
   requiredUtilityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   slotDateRange?: InputMaybe<GqlDateTimeRangeFilter>;
@@ -4144,7 +4145,12 @@ export type GqlGetOpportunityQuery = {
       }> | null;
       nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     } | null;
-    requiredUtilities?: Array<{ __typename?: "Utility"; id: string }> | null;
+    requiredUtilities?: Array<{
+      __typename?: "Utility";
+      id: string;
+      pointsRequired: number;
+      publishStatus: GqlPublishStatus;
+    }> | null;
   } | null;
 };
 
@@ -8057,6 +8063,8 @@ export const GetOpportunityDocument = gql`
       requireApproval
       requiredUtilities {
         id
+        pointsRequired
+        publishStatus
       }
     }
   }

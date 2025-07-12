@@ -11,6 +11,7 @@ export function useSearchForm() {
   const dateRange = watch("dateRange") as DateRange | undefined;
   const guests = watch("guests") as number;
   const useTicket = watch("useTicket") as boolean;
+  const usePoints = watch("usePoints") as boolean;
 
   const handleClear = () => {
     setValue("location", "");
@@ -41,6 +42,7 @@ export function useSearchForm() {
     dateRange,
     guests,
     useTicket,
+    usePoints,
     handleClear,
     baseClearActiveFilter,
     getValues,

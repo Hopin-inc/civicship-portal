@@ -1,10 +1,10 @@
 "use client";
-import ActivitiesFeaturedSection from "../activities/components/FeaturedSection/FeaturedSection";
-import ActivitiesCarouselSection from "../activities/components/CarouselSection/CarouselSection";
-import ActivitiesPageClient from "../activities/components/ActivitiesPageClient";
 import { useAuth } from "@/contexts/AuthProvider";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { fetchFeaturedAndCarousel } from "../activities/data/fetchActivities";
+import FeaturedSection from "./FeaturedSection";
+import { CarouselSection } from "./CarouselSection";
+import PageClient from "./PageClient";
+import { fetchFeaturedAndCarousel } from "../data/fetchActivities";
 
 export default function HomeSection() {
   const { isAuthenticating, loading: authLoading } = useAuth();
@@ -12,16 +12,16 @@ export default function HomeSection() {
   if (isAuthenticating || authLoading) {
     return <LoadingIndicator fullScreen={true} />;
   }
-
   return (
     <div className="min-h-screen">
-      <ActivitiesFeaturedSection opportunities={featuredCards} isInitialLoading={loading} />
-      <ActivitiesCarouselSection
+      <FeaturedSection opportunities={featuredCards} isInitialLoading={loading} />
+      <CarouselSection
         title="もうすぐ開催予定"
         opportunities={upcomingCards}
         isInitialLoading={loading}
+        isVertical={false}
       />
-      <ActivitiesPageClient />
+      <PageClient />
     </div>
   );
 }

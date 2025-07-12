@@ -72,3 +72,20 @@ export function formatSlotRange(startsAt: string, endsAt: string): string {
     return `${startDate}~${endDate}`;
   }
 }
+
+export function formatJapaneseDateTime(startDateTime: string, endDateTime: string): string {
+  const start = new Date(startDateTime);
+  const end = new Date(endDateTime);
+
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  
+  // 曜日の配列
+  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+  const weekday = weekdays[start.getDay()];
+
+  const date = `${start.getFullYear()}年${pad(start.getMonth() + 1)}月${pad(start.getDate())}日(${weekday})`;
+  const startTime = `${pad(start.getHours())}:${pad(start.getMinutes())}`;
+  const endTime = `${pad(end.getHours())}:${pad(end.getMinutes())}`;
+
+  return `${date} ${startTime}~${endTime}`;
+}

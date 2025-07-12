@@ -1,4 +1,4 @@
-import { GqlOpportunityCategory } from "@/types/graphql";
+import { GqlOpportunityCategory, GqlOpportunitySlot } from "@/types/graphql";
 import { CommunityId } from "@/types";
 import { TArticleCard } from "@/app/articles/data/type";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
@@ -11,10 +11,12 @@ export type OpportunityCard = ActivityCard | QuestCard;
 export type ActivityCard = OpportunityBaseCard & {
   feeRequired: number | null;
   pointsToRequired: boolean | null;
+  slots: GqlOpportunitySlot[];
 };
 
 export type QuestCard = OpportunityBaseCard & {
   pointsToEarn: number | null;
+  slots:GqlOpportunitySlot[]
 };
 
 export type OpportunityBaseCard = CommunityId & {
@@ -41,7 +43,9 @@ export type ActivityDetail = OpportunityDetail & {
 // ⚠️直近では使わない⚠️
 export type QuestDetail = OpportunityDetail & {
   slots: QuestSlot[];
+  category: GqlOpportunityCategory;
   relatedQuests: QuestCard[];
+  pointsToEarn: number;
 };
 
 export type OpportunityDetail = CommunityId & {
@@ -58,6 +62,7 @@ export type OpportunityDetail = CommunityId & {
   body: string;
   images: string[];
   totalImageCount: number;
+  category: GqlOpportunityCategory;
 
   host: OpportunityHost;
   recentOpportunities: OpportunityCard[];
