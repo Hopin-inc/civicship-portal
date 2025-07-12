@@ -11,19 +11,22 @@ import {
   GqlSortDirection,
   useGetOpportunitiesQuery,
 } from "@/types/graphql";
-import { groupOpportunitiesByDate, SearchParams } from "@/app/search/data/presenter";
+import { groupCardsByDate, SearchParams } from "@/app/search/data/presenter";
 import { toast } from "sonner";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/app/activities/data/type";
 import { presenterActivityCards } from "@/app/activities/data/presenter";
+import { presenterQuestCards } from "@/app/activities/data/presenter";
 import { IPrefectureCodeMap } from "@/app/search/data/type";
 import { logger } from "@/lib/logging";
+
+type CardType = ActivityCard | QuestCard;
 
 export const useSearchResults = (
   searchParams: SearchParams = {},
 ): {
   opportunities: GqlOpportunitiesConnection;
-  recommendedOpportunities: ActivityCard[];
-  groupedOpportunities: { [key: string]: ActivityCard[] };
+  recommendedOpportunities: CardType[];
+  groupedOpportunities: { [key: string]: CardType[] };
   loading: boolean;
   error: Error | null;
   hasResults: boolean;
@@ -41,7 +44,7 @@ export const useSearchResults = (
       filter,
       first: 100,
       includeSlot: true,
-      slotFilter: { hostingStatus: GqlOpportunitySlotHostingStatus.Scheduled },
+      slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
       slotSort: { startsAt: GqlSortDirection.Asc },
     },
     fetchPolicy: "network-only",
@@ -63,18 +66,23 @@ export const useSearchResults = (
     [data],
   );
 
-  const recommendedOpportunities = useMemo(
-    () => presenterActivityCards(opportunities.edges),
-    [opportunities],
-  );
-
+  const recommendedOpportunities = useMemo(() => {
+    if (searchParams.type === "quest") {
+      return presenterQuestCards(opportunities.edges);
+    }
+    return presenterActivityCards(opportunities.edges);
+  }, [opportunities, searchParams.type]);
+  
   const groupedOpportunities = useMemo(
     () =>
-      groupOpportunitiesByDate(opportunities, {
-        gte: filter.slotDateRange?.gte,
-        lte: filter.slotDateRange?.lte,
-      }),
-    [opportunities, filter.slotDateRange],
+      groupCardsByDate(
+        recommendedOpportunities,
+        {
+          gte: filter.slotDateRange?.gte,
+          lte: filter.slotDateRange?.lte,
+        }
+      ),
+    [recommendedOpportunities, filter.slotDateRange],
   );
 
   const hasResults = recommendedOpportunities.length > 0;
@@ -147,6 +155,10 @@ function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
 
   if (searchParams.ticket === "true") {
     filter.isReservableWithTicket = true;
+  }
+
+  if (searchParams.points === "1") {
+    filter.pointsToRequired = true;
   }
 
   if (searchParams.q) {

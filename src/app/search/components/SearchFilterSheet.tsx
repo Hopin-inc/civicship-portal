@@ -5,12 +5,11 @@ import { Minus, Plus } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { DateRange } from "react-day-picker";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { IPrefecture } from "@/app/search/data/type";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface FilterSheetsProps {
   activeForm: SearchFilterType;
@@ -23,6 +22,8 @@ interface FilterSheetsProps {
   setGuests: (guests: number) => void;
   useTicket: boolean;
   setUseTicket: (useTicket: boolean) => void;
+  usePoints: boolean;
+  setUsePoints: (usePoints: boolean) => void;
   clearActiveFilter: () => void;
   getSheetHeight: () => string;
   prefectures: IPrefecture[];
@@ -39,6 +40,8 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
   setGuests,
   useTicket,
   setUseTicket,
+  usePoints,
+  setUsePoints,
   clearActiveFilter,
   getSheetHeight,
   prefectures,
@@ -141,14 +144,37 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
   const renderOtherContent = () => (
     <div className="h-full pb-20 relative">
       <SheetHeader className="text-left pb-6">
-        <SheetTitle>その他の条件</SheetTitle>
+        <SheetTitle>その他の条件を設定</SheetTitle>
       </SheetHeader>
       <div className="space-y-4">
-        <div className="flex items-center gap-x-2">
-          <Switch id="use-ticket" checked={useTicket} onCheckedChange={setUseTicket} />
-          <Label htmlFor="use-ticket" className="text-label-md">
-            チケットを使って参加する
-          </Label>
+        <p className="text-label-md font-bold">決済手段</p>
+        <div className="rounded-xl border px-4 py-3">
+          <div className="flex items-start gap-x-2">
+            <Checkbox id="use-ticket" checked={useTicket} onCheckedChange={setUseTicket} />
+            <div>
+              <Label htmlFor="use-ticket" className="text-label-md font-bold">
+                チケット利用可
+              </Label>
+              <p className="text-muted-foreground text-sm mt-1 leading-tight">
+                主催者からもらったチケットを使って、<br />
+                無料で参加することができます。
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-xl border px-4 py-3">
+          <div className="flex items-start gap-x-2">
+            <Checkbox id="use-points" checked={usePoints} onCheckedChange={setUsePoints} />
+            <div>
+              <Label htmlFor="use-points" className="text-label-md font-bold">
+                ポイント利用可
+              </Label>
+              <p className="text-muted-foreground text-sm mt-1 leading-tight">
+              お手伝いでもらったポイントを使って、<br />
+              無料で参加することができます。
+              </p>
+            </div>
+          </div>
         </div>
       </div>
       {renderFooterButtons()}

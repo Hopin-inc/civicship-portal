@@ -14,11 +14,11 @@ import { apolloClient } from "@/lib/apollo";
 import React from "react";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const id = params.id;
+  const { id } = await params;
   const communityId = COMMUNITY_ID;
   const res = await fetchOpportunity(id, communityId);
   const communityMetadata = currentCommunityMetadata;

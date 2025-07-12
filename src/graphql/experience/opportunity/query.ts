@@ -105,6 +105,8 @@ export const GET_OPPORTUNITY = gql`
       requireApproval
       requiredUtilities {
         id
+        pointsRequired
+        publishStatus
       }
     }
   }
