@@ -33,7 +33,7 @@ export default function QuestsList() {
     const isEmpty =
     recommendedOpportunities.length === 0 && Object.keys(groupedOpportunities).length === 0;
 
-  if (isEmpty) {
+  if (!loading && isEmpty) {
     return <EmptySearchResults searchQuery={queryParams.q} />;
   }
 
