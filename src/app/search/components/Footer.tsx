@@ -5,9 +5,10 @@ import { Search } from "lucide-react";
 interface SearchFooterProps {
   onClear: () => void;
   onSearch: () => void;
+  isNoCondition?: boolean;
 }
 
-const SearchFooter: React.FC<SearchFooterProps> = ({ onClear, onSearch }) => {
+const SearchFooter: React.FC<SearchFooterProps> = ({ onClear, onSearch, isNoCondition }) => {
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border max-w-mobile-l w-full h-16 flex items-center px-4 justify-between mx-auto">
         <Button

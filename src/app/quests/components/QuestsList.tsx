@@ -20,7 +20,6 @@ export default function QuestsList() {
         ticket: searchParams.get("ticket") ?? undefined,
         points: searchParams.get("points") ?? undefined,
         q: searchParams.get("q") ?? undefined,
-        redirectTo: "/quests",
       }),
       [searchParams],
     );

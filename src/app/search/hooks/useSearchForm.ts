@@ -18,6 +18,8 @@ export function useSearchForm() {
     setValue("dateRange", undefined);
     setValue("guests", 1);
     setValue("useTicket", false);
+    setValue("usePoints", false);
+    setValue("type", "activity");
   };
 
   const baseClearActiveFilter = (activeForm: SearchFilterType) => {
