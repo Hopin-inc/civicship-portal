@@ -55,4 +55,4 @@ export default function ActivitiesPageClient() {
       <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
     </div>
   );
- }
+}
