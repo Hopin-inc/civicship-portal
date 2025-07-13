@@ -16,7 +16,8 @@ export type ActivityCard = OpportunityBaseCard & {
 
 export type QuestCard = OpportunityBaseCard & {
   pointsToEarn: number | null;
-  slots:GqlOpportunitySlot[]
+  slots: GqlOpportunitySlot[];
+  pointsToRequired: boolean | null;
 };
 
 export type OpportunityBaseCard = CommunityId & {

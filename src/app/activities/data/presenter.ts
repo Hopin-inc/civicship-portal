@@ -81,6 +81,7 @@ export const presenterQuestCard = (node: Partial<GqlOpportunity>): QuestCard => 
     hasReservableTicket: node?.isReservableWithTicket || false,
     pointsToEarn: node?.pointsToEarn ?? 0,
     slots: node?.slots ?? [],
+    pointsToRequired: node?.pointsToRequired ?? null,
   };
 };
 
