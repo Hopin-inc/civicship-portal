@@ -153,7 +153,7 @@ function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
     }
   }
 
-  if (searchParams.ticket === "true") {
+  if (searchParams.ticket === "1") {
     filter.isReservableWithTicket = true;
   }
 
