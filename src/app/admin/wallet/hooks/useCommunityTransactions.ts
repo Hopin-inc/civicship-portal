@@ -53,7 +53,7 @@ const useCommunityTransactions = (): UseCommunityTransactionsResult => {
             { toWalletType: GqlWalletType.Community },
           ],
         },
-        after: endCursor,
+        cursor: endCursor,
         first: 10,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
