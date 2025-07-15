@@ -47,7 +47,7 @@ const useUserTransactions = (userId: string): UseMyTransactionsResult => {
           communityId: COMMUNITY_ID,
           or: [{ fromUserId: userId }, { toUserId: userId }],
         },
-        after: endCursor,
+        cursor: endCursor,
         first: 10,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
