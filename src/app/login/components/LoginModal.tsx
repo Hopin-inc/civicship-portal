@@ -24,7 +24,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { loginWithLiff, isAuthenticating, isAuthenticated, isUserRegistered } = useAuth();
+  const { loginWithLiff, isAuthenticating, isAuthenticated } = useAuth();
 
   const handleLogin = async () => {
     if (!agreedTerms || !agreedPrivacy) {
@@ -61,7 +61,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
         <SheetTitle className={"text-body-md mb-4"}>
           <div className="text-body-md mb-6">
             <strong className="font-bold">{currentCommunityConfig.title}</strong>
-            { isUserRegistered ? "を利用するにはLINEでログインして下さい" : "を利用するにはユーザー登録してください" }
+            { !isAuthenticated ? "を利用するにはLINEでログインして下さい" : "を利用するにはユーザー登録してください" }
           </div>
         </SheetTitle>
         <div className="flex flex-col items-start space-y-8">
@@ -101,7 +101,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
 
           {error && <p className="text-sm text-red-500 mb-4 text-center">{error}</p>}
 
-          { isUserRegistered ?
+          { !isAuthenticated ?
             <Button
               onClick={ handleLogin }
               disabled={ isLoading || isAuthenticating }
