@@ -1,23 +1,29 @@
 "use client";
 
 import { useMemo } from "react";
-import { useGetUserFlexibleQuery } from "@/types/graphql";
+import { GqlPortfolioFilterInput, GqlPortfolioSortInput, InputMaybe, useGetUserFlexibleQuery } from "@/types/graphql";
 import { presenterManagerProfile } from "@/app/users/data/presenter";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
-export const useUserProfile = (userId?: string) => {
+export const useUserProfile = (
+  userId?: string,
+  portfolioFilter?: InputMaybe<GqlPortfolioFilterInput>,
+  portfolioSort?: InputMaybe<GqlPortfolioSortInput>,
+) => {
   const result = useGetUserFlexibleQuery({
     variables: {
-      id: userId ?? "", // 空文字でもOK
+      id: userId ?? "",
       withPortfolios: true,
       withOpportunities: true,
       withWallets: true,
+      ...(portfolioFilter ? { portfolioFilter } : {}),
+      ...(portfolioSort ? { portfolioSort } : {}),
     },
     skip: !userId,
     fetchPolicy: "cache-and-network",
   });
-
+  
   const userData = useMemo(() => {
     const user = result.data?.user;
     return user ? presenterManagerProfile(user, COMMUNITY_ID) : null;

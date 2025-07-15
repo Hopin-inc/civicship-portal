@@ -28,7 +28,7 @@ const useUserTransactions = (userId: string): UseMyTransactionsResult => {
         communityId: COMMUNITY_ID,
         or: [{ fromUserId: userId }, { toUserId: userId }],
       },
-      first: 20,
+      first: 100,
     },
     fetchPolicy: "network-only",
     nextFetchPolicy: "network-only",
@@ -47,8 +47,8 @@ const useUserTransactions = (userId: string): UseMyTransactionsResult => {
           communityId: COMMUNITY_ID,
           or: [{ fromUserId: userId }, { toUserId: userId }],
         },
-        cursor: endCursor,
-        first: 10,
+        after: endCursor,
+        first: 100,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult || !prev.transactions) return prev;

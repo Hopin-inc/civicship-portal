@@ -31,7 +31,7 @@ const useCommunityTransactions = (): UseCommunityTransactionsResult => {
           { toWalletType: GqlWalletType.Community },
         ],
       },
-      first: 20,
+      first: 100,
     },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
@@ -53,8 +53,8 @@ const useCommunityTransactions = (): UseCommunityTransactionsResult => {
             { toWalletType: GqlWalletType.Community },
           ],
         },
-        cursor: endCursor,
-        first: 10,
+        after: endCursor,
+        first: 100,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult || !prev.transactions) return prev;
