@@ -77,17 +77,21 @@ export function MemberTab({
 
   return (
     <div className="space-y-3 px-4">
-      {searchMembershipData?.map((m) => (
-        <UserInfoCard
-          key={m.id}
-          otherUser={m}
-          label={m.name}
-          showPoint={false}
-          showDate={false}
-          didValue={m.didInfo?.didValue ?? "did取得中"}
-          onClick={() => onSelect(m)}
-        />
-      ))}
+      {searchMembershipData?.map((m) => {
+        return (
+          <UserInfoCard
+            key={m.id}
+            otherUser={m}
+            label={m.name}
+            point={Number(m.wallet?.currentPointView?.currentPoint) ?? 0}
+            showPoint={true}
+            showDate={false}
+            didValue={m.didInfo?.didValue ?? "did取得中"}
+            onClick={() => onSelect(m)}
+          />
+        );
+      })}
+
       {hasNextPage && <div ref={loadMoreRef} className="h-10" />}
     </div>
   );
