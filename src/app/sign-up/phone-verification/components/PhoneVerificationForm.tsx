@@ -11,15 +11,20 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { useMutation } from "@apollo/client";
 import { IDENTITY_CHECK_PHONE_USER } from "@/graphql/account/identity/mutation";
-import { GqlPhoneUserStatus, GqlMutationIdentityCheckPhoneUserArgs, GqlIdentityCheckPhoneUserPayload } from "@/types/graphql";
+import {
+  GqlIdentityCheckPhoneUserPayload,
+  GqlMutationIdentityCheckPhoneUserArgs,
+  GqlPhoneUserStatus,
+} from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { RawURIComponent } from "@/utils/path";
+import { categorizeFirebaseError } from "@/lib/auth/firebase-config";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
-  const nextParam = next ? `?next=${ encodeURIComponent(next) }` : "";
+  const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
 
   // ==================================
   const { phoneAuth, isAuthenticated, loading, authenticationState, updateAuthState } = useAuth();
@@ -41,6 +46,7 @@ export function PhoneVerificationForm() {
   const [isReloading, setIsReloading] = useState(false);
   const [isPhoneSubmitting, setIsSubmitting] = useState(false);
   const [isCodeVerifying, setIsCodeVerifying] = useState(false);
+  const [isRateLimited, setIsRateLimited] = useState(false);
   // ==================================
 
   const formattedPhone = formatPhoneNumber(phoneNumber);
@@ -55,11 +61,13 @@ export function PhoneVerificationForm() {
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!isRecaptchaReady) {
       toast.error("認証コード送信を準備中です");
       return;
     }
-    if (isPhoneSubmitting) return;
+
+    if (isPhoneSubmitting || isRateLimited) return;
     setIsSubmitting(true);
 
     try {
@@ -69,7 +77,13 @@ export function PhoneVerificationForm() {
         setStep("code");
       }
     } catch (error) {
-      toast.error("認証コードの送信に失敗しました");
+      const categorized = categorizeFirebaseError(error);
+      toast.error(categorized.message);
+
+      if (categorized.type === "rate-limit") {
+        setIsRateLimited(true);
+        setTimeout(() => setIsRateLimited(false), 60 * 1000); // 60秒後に解除
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -87,9 +101,9 @@ export function PhoneVerificationForm() {
         const { data } = await identityCheckPhoneUser({
           variables: {
             input: {
-              communityId: COMMUNITY_ID
-            }
-          }
+              communityId: COMMUNITY_ID,
+            },
+          },
         });
 
         const status = data?.identityCheckPhoneUser?.status;
@@ -103,14 +117,20 @@ export function PhoneVerificationForm() {
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
             toast.success("ログインしました");
-            const homeRedirectPath = authRedirectService.getRedirectPath("/" as RawURIComponent, nextParam as RawURIComponent);
+            const homeRedirectPath = authRedirectService.getRedirectPath(
+              "/" as RawURIComponent,
+              nextParam as RawURIComponent,
+            );
             router.push(homeRedirectPath || "/");
             break;
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
             toast.success("メンバーシップが追加されました");
             updateAuthState();
-            const crossCommunityRedirectPath = authRedirectService.getRedirectPath("/" as RawURIComponent, nextParam as RawURIComponent);
+            const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
+              "/" as RawURIComponent,
+              nextParam as RawURIComponent,
+            );
             router.push(crossCommunityRedirectPath || "/");
             break;
 
@@ -179,10 +199,18 @@ export function PhoneVerificationForm() {
                 type="submit"
                 className="w-full h-12 bg-primary text-white rounded-md"
                 disabled={
-                  isPhoneSubmitting || phoneAuth.isVerifying || !isPhoneValid || isReloading
+                  isPhoneSubmitting ||
+                  phoneAuth.isVerifying ||
+                  !isPhoneValid ||
+                  isReloading ||
+                  isRateLimited
                 }
               >
-                {isPhoneSubmitting || phoneAuth.isVerifying ? "送信中..." : "認証コードを送信"}
+                {isPhoneSubmitting || phoneAuth.isVerifying
+                  ? "送信中..."
+                  : isRateLimited
+                    ? "制限中..."
+                    : "認証コードを送信"}{" "}
               </Button>
               <Button
                 type="button"
