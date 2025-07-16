@@ -89,6 +89,32 @@ export function PhoneVerificationForm() {
         setStep("code");
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      
+      if (errorMessage.includes('reCAPTCHA has already been rendered')) {
+        toast.info("認証システムを再初期化しています...");
+        
+        if (phoneAuth?.clearRecaptcha) {
+          phoneAuth.clearRecaptcha();
+          
+          await new Promise((resolve) => setTimeout(resolve, 200));
+          
+          try {
+            const result = await phoneAuth.startPhoneVerification(phoneNumber);
+            if (result) {
+              setStep("code");
+              return;
+            }
+          } catch (retryError) {
+            toast.error("認証システムの初期化に失敗しました。ページを再読み込みしてください。");
+            return;
+          }
+        } else {
+          toast.error("認証システムの初期化に失敗しました。ページを再読み込みしてください。");
+          return;
+        }
+      }
+      
       const categorizedError = categorizeFirebaseError(error);
       
       if (categorizedError.type === "rate_limit") {
