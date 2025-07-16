@@ -32,7 +32,9 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
   if (presentedTransactions.length === 0) {
     return (
       <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-muted-foreground pt-4">支給履歴がありません</p>
+        <p className="text-sm text-center text-muted-foreground pt-4">
+          {listType === "grant" ? "支給履歴がありません" : "譲渡履歴がありません"}
+        </p>
       </div>
     );
   }
