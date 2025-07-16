@@ -85,6 +85,14 @@ export const categorizeFirebaseError = (
       };
     }
 
+    if (code === "auth/too-many-requests") {
+      return {
+        type: "rate_limit",
+        message: "認証コードの送信回数が上限に達しました。しばらく時間をおいてから再度お試しください。",
+        retryable: true,
+      };
+    }
+
     if (code === "auth/invalid-verification-code") {
       return {
         type: "verification",

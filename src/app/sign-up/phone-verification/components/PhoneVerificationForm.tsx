@@ -14,6 +14,7 @@ import { IDENTITY_CHECK_PHONE_USER } from "@/graphql/account/identity/mutation";
 import { GqlPhoneUserStatus, GqlMutationIdentityCheckPhoneUserArgs, GqlIdentityCheckPhoneUserPayload } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { RawURIComponent } from "@/utils/path";
+import { categorizeFirebaseError } from "@/lib/auth/firebase-config";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -41,6 +42,7 @@ export function PhoneVerificationForm() {
   const [isReloading, setIsReloading] = useState(false);
   const [isPhoneSubmitting, setIsSubmitting] = useState(false);
   const [isCodeVerifying, setIsCodeVerifying] = useState(false);
+  const [isRateLimited, setIsRateLimited] = useState(false);
   // ==================================
 
   const formattedPhone = formatPhoneNumber(phoneNumber);
@@ -50,6 +52,24 @@ export function PhoneVerificationForm() {
   useEffect(() => {
     if (recaptchaContainerRef.current) {
       setIsRecaptchaReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const rateLimitEndTime = localStorage.getItem('phoneVerificationRateLimit');
+    if (rateLimitEndTime) {
+      const endTime = parseInt(rateLimitEndTime);
+      const now = Date.now();
+      
+      if (now < endTime) {
+        setIsRateLimited(true);
+        setTimeout(() => {
+          setIsRateLimited(false);
+          localStorage.removeItem('phoneVerificationRateLimit');
+        }, endTime - now);
+      } else {
+        localStorage.removeItem('phoneVerificationRateLimit');
+      }
     }
   }, []);
 
@@ -69,7 +89,22 @@ export function PhoneVerificationForm() {
         setStep("code");
       }
     } catch (error) {
-      toast.error("認証コードの送信に失敗しました");
+      const categorizedError = categorizeFirebaseError(error);
+      
+      if (categorizedError.type === "rate_limit") {
+        toast.error(categorizedError.message);
+        setIsRateLimited(true);
+        
+        const endTime = Date.now() + 300000; // 5分後
+        localStorage.setItem('phoneVerificationRateLimit', endTime.toString());
+        
+        setTimeout(() => {
+          setIsRateLimited(false);
+          localStorage.removeItem('phoneVerificationRateLimit');
+        }, 300000);
+      } else {
+        toast.error("認証コードの送信に失敗しました");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -179,10 +214,12 @@ export function PhoneVerificationForm() {
                 type="submit"
                 className="w-full h-12 bg-primary text-white rounded-md"
                 disabled={
-                  isPhoneSubmitting || phoneAuth.isVerifying || !isPhoneValid || isReloading
+                  isPhoneSubmitting || phoneAuth.isVerifying || !isPhoneValid || isReloading || isRateLimited
                 }
               >
-                {isPhoneSubmitting || phoneAuth.isVerifying ? "送信中..." : "認証コードを送信"}
+                {isRateLimited 
+                  ? "送信制限中（しばらくお待ちください）"
+                  : isPhoneSubmitting || phoneAuth.isVerifying ? "送信中..." : "認証コードを送信"}
               </Button>
               <Button
                 type="button"
