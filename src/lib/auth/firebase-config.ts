@@ -93,6 +93,14 @@ export const categorizeFirebaseError = (
       };
     }
 
+    if (code === "auth/too-many-requests") {
+      return {
+        type: "rate-limit",
+        message: "短時間に大量のリクエストが発生しました。しばらく待ってから再試行してください。",
+        retryable: false,
+      };
+    }
+
     if (code === "auth/code-expired") {
       return {
         type: "verification",
