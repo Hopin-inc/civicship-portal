@@ -5,8 +5,12 @@ export const GET_SINGLE_MEMBERSHIP = gql`
   query GetSingleMembership($communityId: ID!, $userId: ID!) {
     membership(communityId: $communityId, userId: $userId) {
       ...MembershipFields
-      user { ...UserFields }
-      community { ...CommunityFields }
+      user {
+        ...UserFields
+      }
+      community {
+        ...CommunityFields
+      }
     }
   }
 `;
@@ -17,6 +21,7 @@ export const GET_MEMBERSHIP_LIST = gql`
     $cursor: MembershipCursorInput
     $filter: MembershipFilterInput
     $sort: MembershipSortInput
+    $withWallets: Boolean! = false
     $withDidIssuanceRequests: Boolean! = false
   ) {
     memberships(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
@@ -35,6 +40,12 @@ export const GET_MEMBERSHIP_LIST = gql`
             ...UserFields
             didIssuanceRequests @include(if: $withDidIssuanceRequests) {
               ...DidIssuanceRequestFields
+            }
+            wallets @include(if: $withWallets) {
+              ...WalletFields
+              community {
+                ...CommunityFields
+              }
             }
           }
           community {
