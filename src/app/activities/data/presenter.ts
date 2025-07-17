@@ -143,7 +143,7 @@ export const presenterQuestDetail = (data: GqlOpportunity): QuestDetail => {
     host: presenterOpportunityHost(createdByUser, articles?.[0]),
     slots: presenterQuestSlot(slots, threshold),
 
-    pointsToEarn: 0,
+    pointsToEarn: data.pointsToEarn ?? 0,
     relatedQuests: [],
     recentOpportunities: [],
   };

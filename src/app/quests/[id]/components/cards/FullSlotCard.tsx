@@ -1,15 +1,11 @@
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 
-export const FullSlotCard = ({ slot }: { slot: ActivitySlot }) => {
+export const FullSlotCard = ({ slot, pointsToEarn }: { slot: QuestSlot, pointsToEarn: number }) => {
     const startDate = new Date(slot.startsAt);
     const endDate = new Date(slot.endsAt);
-  
-    const isFeeSpecified = slot.feeRequired != null;
-    const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
-    const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-gray-400" : "text-gray-400"}`;
   
     return (
       <div className="bg-gray-100 border border-gray-200 rounded-xl px-6 py-6 w-[280px] flex flex-col">
@@ -23,11 +19,13 @@ export const FullSlotCard = ({ slot }: { slot: ActivitySlot }) => {
           <p className="text-body-md text-gray-400 mb-4">
             {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
           </p>
-          <div className="space-y-2">
-            <div className="flex items-baseline">
-              <p className={feeClass}>{feeText}</p>
-              {isFeeSpecified && <p className="text-body-sm ml-1 text-gray-300">/ 人</p>}
-            </div>
+          <div className="flex items-center gap-1 pt-1">
+              <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+                P
+              </p>
+              <p className="text-sm font-bold">
+                  {pointsToEarn}ptもらえる
+              </p>
           </div>
         </div>
         <div className="flex justify-center mt-6">

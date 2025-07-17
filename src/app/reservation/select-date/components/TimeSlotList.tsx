@@ -9,6 +9,7 @@ interface TimeSlotListProps {
   dateSections: ActivitySlotGroup[];
   isSlotAvailable: (slot: ActivitySlot) => boolean;
   onSelectSlot: (slot: ActivitySlot) => void;
+  pointsToEarn: number;
 }
 
 export const parseJapaneseDateLabel = (label: string) => {
@@ -35,6 +36,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
   dateSections,
   isSlotAvailable,
   onSelectSlot,
+  pointsToEarn,
 }) => {
   const handleSelectSlot = useCallback(
     (slot: ActivitySlot) => () => onSelectSlot(slot),
@@ -87,6 +89,14 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                       >
                         {isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円/人` : "料金未定"}
                       </p>
+                      <div className="flex items-center gap-1 pt-1">
+                          <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+                            P
+                          </p>
+                          <p className="text-sm font-bold">
+                              {pointsToEarn}ptもらえる
+                          </p>
+                      </div>
                     </div>
 
                     {isFull ? (

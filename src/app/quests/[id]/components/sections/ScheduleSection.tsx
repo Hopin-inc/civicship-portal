@@ -1,4 +1,4 @@
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 import { Link, CalendarX } from "lucide-react";
 import { useMemo } from "react";
@@ -9,10 +9,12 @@ export const ScheduleSection = ({
     slots,
     opportunityId,
     communityId,
+    pointsToEarn,
   }: {
-    slots: ActivitySlot[];
+    slots: QuestSlot[];
     opportunityId: string;
     communityId: string;
+    pointsToEarn: number;
   }) => {
     const query = new URLSearchParams({
       id: opportunityId,
@@ -45,6 +47,7 @@ export const ScheduleSection = ({
                       slot={slot}
                       opportunityId={opportunityId}
                       communityId={communityId}
+                      pointsToEarn={pointsToEarn}
                     />
                   </div>
                 ))}

@@ -6,10 +6,12 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
 import { notFound, useParams, useSearchParams } from "next/navigation";
 import ErrorState from "@/components/shared/ErrorState";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Content, Footer, Header } from "./components";
 import { DisableReasonType } from "./types";
 import { useActivityDetails } from "@/app/activities/[id]/hooks/useActivityDetails";
+import { GqlOpportunityCategory } from "@/types/graphql";
+import { QuestCard, QuestDetail } from "@/app/activities/data/type";
 
 export default function ActivityPage() {
   const headerConfig = useMemo(
@@ -54,12 +56,21 @@ export default function ActivityPage() {
     return <ErrorState title="募集ページを読み込めませんでした" refetchRef={refetchRef} />;
   }
 
-  if (!opportunity) {
+  const isQuestDetail = (opportunity: any): opportunity is QuestDetail => {
+    return opportunity?.category === GqlOpportunityCategory.Quest;
+  };
+
+  if (!opportunity || !isQuestDetail(opportunity)) {
     return notFound();
   }
 
+  console.log("opportunity", opportunity);
+
+  const questSlots = sortedSlots?.filter((slot): slot is QuestSlot => "pointsToEarn" in slot) ?? [];
+  const questQuests = sameStateActivities?.filter((quest): quest is QuestCard => "pointsToEarn" in quest && !("feeRequired" in quest)) ?? [];
+
   const getDisableReason = (
-    slots: ActivitySlot[] | null | undefined,
+    slots: QuestSlot[] | null | undefined,
     isExternalBooking: boolean,
     isReservable: boolean,
   ): DisableReasonType | undefined => {
@@ -81,8 +92,8 @@ export default function ActivityPage() {
           <Content
             opportunity={opportunity}
             availableTickets={availableTickets}
-            availableDates={sortedSlots}
-            sameStateActivities={sameStateActivities}
+            availableDates={questSlots}
+            sameStateActivities={questQuests}
             communityId={communityId}
             // isExternalBooking={isExternalBooking}
           />
@@ -90,9 +101,9 @@ export default function ActivityPage() {
       </main>
       <Footer
         opportunityId={opportunity.id}
-        price={opportunity.feeRequired}
+        point={opportunity.pointsToEarn}
         communityId={communityId}
-        disableReason={getDisableReason(sortedSlots, isExternalBooking, opportunity.isReservable)}
+        disableReason={getDisableReason(questSlots, isExternalBooking, opportunity.isReservable)}
       />
     </>
   );

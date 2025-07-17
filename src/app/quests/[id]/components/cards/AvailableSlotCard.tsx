@@ -1,4 +1,4 @@
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
@@ -8,18 +8,16 @@ export const AvailableSlotCard = ({
     slot,
     opportunityId,
     communityId,
+    pointsToEarn,
   }: {
-    slot: ActivitySlot;
+    slot: QuestSlot;
     opportunityId: string;
     communityId: string;
+    pointsToEarn: number;
   }) => {
     const startDate = new Date(slot.startsAt);
     const endDate = new Date(slot.endsAt);
     const isReservable = slot.isReservable;
-  
-    const isFeeSpecified = slot.feeRequired != null;
-    const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
-    const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-muted-foreground/50" : "text-caption"}`;
   
     const query = new URLSearchParams({
       id: opportunityId,
@@ -39,16 +37,18 @@ export const AvailableSlotCard = ({
               （{format(startDate, "E", { locale: ja })}）
             </span>
           </h3>
-          <p className="text-body-md text-foreground mb-4">
+          <p className="text-body-md text-foreground mb-2">
             {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
           </p>
-          <div className="space-y-2">
-            <div className="flex items-baseline">
-              <p className={feeClass}>{feeText}</p>
-              {isFeeSpecified && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
+            <div className="flex items-center gap-1 pt-1">
+                <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+                  P
+                </p>
+                <p className="text-sm font-bold">
+                    {pointsToEarn}ptもらえる
+                </p>
             </div>
           </div>
-        </div>
         <div className="flex justify-center mt-6 flex-col gap-2 items-center">
           {isReservable ? (
             <>

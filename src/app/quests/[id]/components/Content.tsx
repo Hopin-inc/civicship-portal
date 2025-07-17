@@ -2,16 +2,16 @@
 
 import React from "react";
 import SameStateActivities from "./SimilarActivitiesList";
-import { ActivityCard, ActivityDetail } from "@/app/activities/data/type";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivityCard, QuestCard, QuestDetail } from "@/app/activities/data/type";
+import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { BodySection } from "@/app/quests/[id]/components/BodySection";
 import { HostInfoSection, NoticeSection, PlaceSection, ScheduleSection } from "./sections";
 
 interface ActivityDetailsContentProps {
-  opportunity: ActivityDetail;
+  opportunity: QuestDetail;
   availableTickets: number;
-  availableDates: ActivitySlot[];
-  sameStateActivities: ActivityCard[];
+  availableDates: QuestSlot[];
+  sameStateActivities: QuestCard[];
   communityId?: string;
 }
 
@@ -31,6 +31,7 @@ export const Content = ({
         slots={availableDates}
         opportunityId={opportunity.id}
         communityId={communityId}
+        pointsToEarn={opportunity.pointsToEarn}
       />
       <NoticeSection />
       <SameStateActivities

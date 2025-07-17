@@ -2,11 +2,11 @@
 
 import { useMemo } from "react";
 import { GqlTicketStatus, useGetUserWalletQuery } from "@/types/graphql";
-import { ActivityDetail } from "@/app/activities/data/type";
+import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 
 export const useAvailableTickets = (
-  opportunity: ActivityDetail | null,
+  opportunity: ActivityDetail | QuestDetail | null,
   userId: string | undefined,
 ): number => {
   const { data } = useGetUserWalletQuery({

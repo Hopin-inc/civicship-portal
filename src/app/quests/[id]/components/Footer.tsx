@@ -12,14 +12,14 @@ import { DISABLE_MESSAGES } from "../constants";
 
 interface FooterProps {
   opportunityId: string;
-  price: number | null;
+  point: number | null;
   communityId: string | undefined;
   disableReason?: DisableReasonType;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   opportunityId,
-  price,
+  point,
   communityId,
   disableReason,
 }) => {
@@ -59,8 +59,8 @@ export const Footer: React.FC<FooterProps> = ({
       >
         <div>
           <p className="text-body-sm text-muted-foreground">1人あたり</p>
-          <p className={cn("text-body-lg font-bold", price == null && "text-muted-foreground/50")}>
-            {price != null ? `${price.toLocaleString()}円〜` : "料金未定"}
+          <p className={cn("text-body-lg font-bold", point == null && "text-muted-foreground/50")}>
+            {point != null ? `${point.toLocaleString()}ptもらえる` : "ポイント未定"}
           </p>
         </div>
         {renderActionElement()}
