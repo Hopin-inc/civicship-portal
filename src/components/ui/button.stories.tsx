@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Button } from "./button";
+import { Search } from "lucide-react";
 
 const meta: Meta<typeof Button> = {
   title: "Shared/UI/Button",
@@ -51,7 +52,7 @@ export const IconOnly: Story = {
   args: {
     variant: "icon-only",
     size: "icon",
-    children: "🔍",
+    children: <Search />,
     "aria-label": "Search",
   },
 };
