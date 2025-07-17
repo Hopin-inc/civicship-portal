@@ -159,6 +159,7 @@ export default function ParticipationPage() {
             location={opportunityDetail.place}
             phoneNumber={participation.emergencyContactPhone}
             isReserved={true}
+            dateDiffLabel={dateTimeInfo.dateDiffLabel}
           />
         </div>
       )}

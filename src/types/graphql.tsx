@@ -416,6 +416,7 @@ export type GqlEvaluationEdge = GqlEdge & {
 };
 
 export type GqlEvaluationFilterInput = {
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
   evaluatorId?: InputMaybe<Scalars["ID"]["input"]>;
   participationId?: InputMaybe<Scalars["ID"]["input"]>;
   status?: InputMaybe<GqlEvaluationStatus>;
@@ -1249,18 +1250,16 @@ export type GqlOpportunitySortInput = {
 
 export type GqlOpportunityUpdateContentInput = {
   body?: InputMaybe<Scalars["String"]["input"]>;
-  capacity?: InputMaybe<Scalars["Int"]["input"]>;
   category: GqlOpportunityCategory;
   description: Scalars["String"]["input"];
-  endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
   images?: InputMaybe<Array<GqlImageInput>>;
-  place?: InputMaybe<GqlNestedPlaceConnectOrCreateInput>;
+  placeId?: InputMaybe<Scalars["ID"]["input"]>;
   pointsToEarn?: InputMaybe<Scalars["Int"]["input"]>;
   publishStatus: GqlPublishStatus;
+  relatedArticleIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   requireApproval: Scalars["Boolean"]["input"];
   requiredUtilityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   title: Scalars["String"]["input"];
 };
 
@@ -3777,6 +3776,7 @@ export type GqlEvaluationFieldsFragment = {
 };
 
 export type GqlGetEvaluationsQueryVariables = Exact<{
+  filter?: InputMaybe<GqlEvaluationFilterInput>;
   withDidIssuanceRequests?: Scalars["Boolean"]["input"];
 }>;
 
@@ -7681,8 +7681,8 @@ export type EvaluationBulkCreateMutationOptions = Apollo.BaseMutationOptions<
   GqlEvaluationBulkCreateMutationVariables
 >;
 export const GetEvaluationsDocument = gql`
-  query GetEvaluations($withDidIssuanceRequests: Boolean! = false) {
-    evaluations {
+  query GetEvaluations($filter: EvaluationFilterInput, $withDidIssuanceRequests: Boolean! = false) {
+    evaluations(filter: $filter) {
       edges {
         node {
           id
@@ -7746,6 +7746,7 @@ export const GetEvaluationsDocument = gql`
  * @example
  * const { data, loading, error } = useGetEvaluationsQuery({
  *   variables: {
+ *      filter: // value for 'filter'
  *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });

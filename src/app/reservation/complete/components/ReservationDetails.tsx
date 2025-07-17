@@ -5,6 +5,7 @@ import { Calendar, JapaneseYen, MapPin, Phone, Users } from "lucide-react";
 
 interface ReservationDetailsProps {
   formattedDate: string;
+  dateDiffLabel: string | null;
   startTime: string;
   endTime: string;
   participantCount: number;
@@ -21,6 +22,7 @@ interface ReservationDetailsProps {
 
 const ReservationDetails: React.FC<ReservationDetailsProps> = ({
   formattedDate,
+  dateDiffLabel,
   startTime,
   endTime,
   participantCount,
@@ -41,7 +43,10 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
         <div className="flex flex-col">
           <span className="text-body-md">{formattedDate}</span>
           <span className="text-body-md text-caption">
-            {startTime}-{endTime}
+            { startTime }-{ endTime }
+            { dateDiffLabel && (
+              <span className="text-sm text-caption">（{dateDiffLabel}）</span>
+            )}
           </span>
         </div>
       </div>

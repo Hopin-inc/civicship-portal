@@ -81,16 +81,17 @@ export default function CompletePage() {
       { dateTimeInfo && opportunity && (
         <div className="px-6 w-full">
           <ReservationDetails
-            formattedDate={dateTimeInfo.formattedDate}
-            startTime={dateTimeInfo.startTime}
-            endTime={dateTimeInfo.endTime}
-            participantCount={dateTimeInfo.participantCount}
-            paidParticipantCount={dateTimeInfo.paidParticipantCount}
-            totalPrice={dateTimeInfo.totalPrice}
-            pricePerPerson={opportunity.feeRequired ?? 0}
-            location={oppotunityDetail?.place}
-            phoneNumber={reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber}
-            isReserved={true}
+            formattedDate={ dateTimeInfo.formattedDate }
+            dateDiffLabel={ dateTimeInfo.dateDiffLabel }
+            startTime={ dateTimeInfo.startTime }
+            endTime={ dateTimeInfo.endTime }
+            participantCount={ dateTimeInfo.participantCount }
+            paidParticipantCount={ dateTimeInfo.paidParticipantCount }
+            totalPrice={ dateTimeInfo.totalPrice }
+            pricePerPerson={ opportunity.feeRequired ?? 0 }
+            location={ oppotunityDetail?.place }
+            phoneNumber={ reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber }
+            isReserved={ true }
           />
         </div>
       )}
