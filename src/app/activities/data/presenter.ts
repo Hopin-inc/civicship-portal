@@ -8,16 +8,17 @@ import {
   GqlUser,
   Maybe,
 } from "@/types/graphql";
-import { ActivityCard, ActivityDetail, OpportunityHost } from "@/app/activities/data/type";
+import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard, QuestDetail } from "@/app/activities/data/type";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   getReservationThreshold,
   isDateReservable,
 } from "@/app/reservation/data/presenter/opportunitySlot";
-import { isAfter } from "date-fns";
+import { format, isAfter } from "date-fns";
+import { ja } from "date-fns/locale";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
@@ -30,11 +31,29 @@ export const presenterActivityCards = (
     .map((node) => presenterActivityCard(node));
 };
 
-export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): ActivityCard[] =>
+export const presenterQuestCards = (
+  edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
+): QuestCard[] => {
+  if (!edges) return [];
+
+  return edges
+    .map((edge) => edge?.node)
+    .filter((node): node is GqlOpportunity => !!node)
+    .map((node) => presenterQuestCard(node));
+};
+export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): (ActivityCard | QuestCard)[] =>
   edges
     .map((edge) => edge.node)
     .filter((node): node is GqlOpportunity => !!node)
-    .map(presenterActivityCard);
+    .map((node) => {
+      if (node.category === GqlOpportunityCategory.Activity) {
+        return presenterActivityCard(node);
+      } else if (node.category === GqlOpportunityCategory.Quest) {
+        return presenterQuestCard(node);
+      }
+      return null;
+    })
+    .filter((v): v is ActivityCard | QuestCard => v !== null);
 
 export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCard => {
   return {
@@ -46,6 +65,23 @@ export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCa
     images: node?.images || [],
     communityId: COMMUNITY_ID || "",
     hasReservableTicket: node?.isReservableWithTicket || false,
+    pointsToRequired: node?.pointsToRequired ?? null,
+    slots: node?.slots ?? [],
+  };
+};
+
+export const presenterQuestCard = (node: Partial<GqlOpportunity>): QuestCard => {
+  return {
+    id: node?.id || "",
+    title: node?.title || "",
+    category: node?.category || GqlOpportunityCategory.Quest,
+    location: node?.place?.name || "場所未定",
+    images: node?.images || [],
+    communityId: COMMUNITY_ID || "",
+    hasReservableTicket: node?.isReservableWithTicket || false,
+    pointsToEarn: node?.pointsToEarn ?? 0,
+    slots: node?.slots ?? [],
+    pointsToRequired: node?.pointsToRequired ?? null,
   };
 };
 
@@ -65,7 +101,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
     notes: "",
     images: images?.map((image) => image) || [],
     totalImageCount: images?.length || 0,
-
+    category: data.category,
     requireApproval: data.requireApproval,
     targetUtilities: data.requiredUtilities?.map((u) => u) ?? [],
     feeRequired: data.feeRequired ?? null,
@@ -79,6 +115,37 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
     recentOpportunities: [],
     reservableTickets: [],
     relatedActivities: [],
+  };
+};
+
+export const presenterQuestDetail = (data: GqlOpportunity): QuestDetail => {
+  const { images, place, slots, articles, createdByUser } = data;
+  const threshold = getReservationThreshold();
+
+  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired);
+  const isReservable = activitySlots.some((slot) => slot.isReservable);
+
+  return {
+    communityId: COMMUNITY_ID || "",
+    id: data.id,
+    title: data.title,
+    description: data.description || "",
+    body: data.body || "",
+    notes: "",
+    images: images?.map((image) => image) || [],
+    totalImageCount: images?.length || 0,
+    category: data.category,
+    requireApproval: data.requireApproval,
+    targetUtilities: data.requiredUtilities?.map((u) => u) ?? [],
+    isReservable,
+
+    place: presenterPlace(place),
+    host: presenterOpportunityHost(createdByUser, articles?.[0]),
+    slots: presenterQuestSlot(slots, threshold),
+
+    pointsToEarn: 0,
+    relatedQuests: [],
+    recentOpportunities: [],
   };
 };
 
@@ -125,6 +192,42 @@ function presenterActivitySlot(
         feeRequired: feeRequired ?? null,
         applicantCount: 1,
         isReservable,
+        opportunityId: slot?.opportunity?.id || "",
+      };
+    }) ?? []
+  );
+}
+
+function presenterQuestSlot(
+  slots: Maybe<GqlOpportunitySlot[]> | undefined,
+  threshold: Date,
+  feeRequired?: Maybe<number> | undefined,
+): QuestSlot[] {
+  const SLOT_IDS_TO_FORCE_RESERVABLE = ["cmc07ao5c0005s60nnc8ravvk"];
+
+  return (
+    slots?.map((slot): QuestSlot => {
+      const startsAtDate = slot?.startsAt ? new Date(slot.startsAt) : null;
+
+      const isForceReservable = slot?.id && SLOT_IDS_TO_FORCE_RESERVABLE.includes(slot.id);
+
+      // 通常の条件 or 強制フラグ
+      const isReservable = isForceReservable
+        ? true
+        : startsAtDate
+          ? isAfter(startsAtDate, threshold)
+          : false;
+
+      return {
+        id: slot?.id,
+        hostingStatus: slot?.hostingStatus,
+        startsAt: startsAtDate?.toISOString() || "",
+        endsAt: slot?.endsAt ? new Date(slot.endsAt).toISOString() : "",
+        capacity: slot?.capacity ?? 0,
+        remainingCapacity: slot?.remainingCapacity ?? 0,
+        applicantCount: 1,
+        isReservable,
+        pointsToEarn: 0,
       };
     }) ?? []
   );
@@ -147,12 +250,7 @@ export const presenterReservationDateTimeInfo = (
   const paidParticipantCount = participantCount - [...new Set(paidTicketIds)].length;
 
   return {
-    formattedDate: startDate.toLocaleDateString("ja-JP", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "long",
-    }),
+    formattedDate: format(startDate, "yyyy年M月d日(E)", { locale: ja }),
     startTime: startDate.toLocaleTimeString("ja-JP", {
       hour: "2-digit",
       minute: "2-digit",
@@ -170,15 +268,15 @@ export const presenterReservationDateTimeInfo = (
 };
 
 export const sliceActivitiesBySection = (
-  activityCards: ActivityCard[],
+  cards: (ActivityCard | QuestCard)[],
 ): {
-  upcomingCards: ActivityCard[];
-  featuredCards: ActivityCard[];
+  upcomingCards: (ActivityCard | QuestCard)[];
+  featuredCards: (ActivityCard | QuestCard)[];
 } => {
   const safe = <T>(cards: (T | undefined)[]): T[] => cards.filter((c): c is T => !!c);
-  const hasImages = (card: ActivityCard) => card.images && card.images.length > 0;
+  const hasImages = (card: ActivityCard | QuestCard) => card.images && card.images.length > 0;
 
-  const validCards = safe(activityCards.filter(hasImages));
+  const validCards = safe(cards.filter(hasImages));
   const featuredCards = validCards.slice(0, 3);
   const upcomingCards = validCards.slice(3);
 

@@ -1,4 +1,3 @@
-/*
 "use client";
 
 import React from "react";
@@ -39,4 +38,3 @@ const SearchTabs: React.FC<SearchTabsProps> = ({ selectedTab, onTabChange }) => 
 };
 
 export default SearchTabs;
-*/
