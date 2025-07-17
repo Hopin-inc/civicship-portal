@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -69,34 +69,13 @@ export default function SearchPage() {
     },
   });
 
-  // isNoConditionをここで定義
-  const values = methods.getValues();
-  // isNoConditionのusePointsを除外
-  const isNoCondition =
-    !values.searchQuery &&
-    !values.location &&
-    !values.dateRange &&
-    !values.guests &&
-    !values.useTicket;
-
-  // 初期表示や「条件をクリア」時のみ自動でタブを切り替える
-  useEffect(() => {
-    if (isNoCondition && selectedTab !== "quest") {
-      setSelectedTab("quest");
-    }
-  }, [isNoCondition]);
-
   const router = useRouter();
-  // const [selectedTab, setSelectedTab] = useState<SearchTabType>("activity");
-  // const [activeForm, setActiveForm] = useState<SearchFilterType>(null);
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-auto">
         <div className="container px-4 py-2">
-          {/* 常に上部にタブを表示（条件ありの場合） */}
           <FormProvider {...methods}>
-            {!isNoCondition && (
             <SearchTabs
               selectedTab={selectedTab}
               onTabChange={(tab: SearchTabType) => {
@@ -107,17 +86,10 @@ export default function SearchPage() {
                 window.history.replaceState(null, "", `?${params.toString()}`);
               }}
             />
-            )}
             <SearchPageContent
               activeForm={activeForm}
               setActiveForm={setActiveForm}
               selectedTab={selectedTab}
-              onTabChange={(tab) => {
-                setSelectedTab(tab);
-                const params = new URLSearchParams(searchParams.toString());
-                params.set("type", tab);
-                window.history.replaceState(null, "", `?${params.toString()}`);
-              }}
               formatDateRange={formatDateRange}
               prefectureLabels={visiblePrefectureLabels}
               router={router}
@@ -134,16 +106,13 @@ function SearchPageContent({
   activeForm,
   setActiveForm,
   selectedTab,
-  onTabChange,
   formatDateRange,
   prefectureLabels,
   router,
-  type,
 }: {
   activeForm: SearchFilterType;
   setActiveForm: (f: SearchFilterType) => void;
   selectedTab: SearchTabType;
-  onTabChange: (tab: SearchTabType) => void;
   formatDateRange: (r: DateRange | undefined) => string;
   prefectureLabels: Record<string, string>;
   router: ReturnType<typeof useRouter>;
@@ -224,14 +193,6 @@ function SearchPageContent({
         getSheetHeight={() => "90vh"}
         prefectures={Object.entries(prefectureLabels).map(([id, name]) => ({ id, name }))}
       />
-      {/* isNoConditionのときだけタブをfooterの上に表示 */}
-      {isNoCondition && (
-        <div className="fixed bottom-10 left-0 right-0 z-50 bg-background flex justify-center">
-          <div className="w-full max-w-mobile-l mx-auto">
-            <SearchTabs selectedTab={selectedTab} onTabChange={onTabChange} />
-          </div>
-        </div>
-      )}
       <SearchFooter onClear={handleClear} onSearch={handleSearch} isNoCondition={isNoCondition} />
     </div>
   );
