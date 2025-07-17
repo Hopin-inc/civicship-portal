@@ -17,7 +17,7 @@ import {
 import { ReservationStatus } from "@/types/participationStatus";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { presenterOpportunityHost } from "@/app/activities/data/presenter";
-import { subDays } from "date-fns";
+import { getReservationDeadline } from "@/app/activities/data/reservationConfig";
 
 export const presenterParticipation = (raw: GqlParticipation): ParticipationDetail => {
   // if (
@@ -192,7 +192,10 @@ export const getStatusInfo = (status: GqlReservationStatus): ReservationStatus |
   }
 };
 
-export const calculateCancellationDeadline = (startTime?: Date): Date | null => {
+export const calculateCancellationDeadline = (startTime?: Date, slotId?: string): Date | null => {
   if (!startTime) return null;
-  return subDays(startTime, 7); // ← 7日前
+
+  // 予約締切と同じロジックを使用してキャンセル期限を計算
+  // これにより、スロットごとに異なるキャンセル期限を設定できる
+  return getReservationDeadline(slotId, startTime);
 };

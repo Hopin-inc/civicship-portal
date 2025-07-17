@@ -2,7 +2,8 @@ import React, { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 import { formatTimeRange } from "@/utils/date";
-import { addDays, isBefore } from "date-fns";
+import { isBefore } from "date-fns";
+import { getReservationDeadline } from "../../../activities/data/reservationConfig";
 
 interface TimeSlotListProps {
   dateSections: ActivitySlotGroup[];
@@ -40,8 +41,6 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
     [onSelectSlot],
   );
 
-  const registrationCutoff = addDays(new Date(), 7);
-
   return (
     <div className="space-y-8">
       {dateSections.map((section, sectionIndex) => (
@@ -56,10 +55,9 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
 
               const startsAtDate = new Date(slot.startsAt);
 
-              const FORCE_RESERVABLE_SLOT_IDS = ["cmc07ao5c0005s60nnc8ravvk"];
-              const isForceReservable = FORCE_RESERVABLE_SLOT_IDS.includes(slot.id);
-              const isRegistrationClosed =
-                !isForceReservable && isBefore(startsAtDate, registrationCutoff);
+              // 予約締切日時を取得して現在時刻と比較
+              const reservationDeadline = getReservationDeadline(slot.id, startsAtDate);
+              const isRegistrationClosed = isBefore(new Date(), reservationDeadline);
 
               return (
                 <div
