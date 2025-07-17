@@ -12,19 +12,20 @@ export const FullSlotCard = ({ slot, pointsToEarn }: { slot: QuestSlot, pointsTo
         <div className="flex-1">
           <h3 className="text-title-md text-gray-500 font-bold mb-1">
             {format(startDate, "M月d日", { locale: ja })}
-            <span className="text-label-sm text-gray-400">
-              （{format(startDate, "E", { locale: ja })}）
+            <span>
+              ({format(startDate, "E", { locale: ja })})
             </span>
           </h3>
-          <p className="text-body-md text-gray-400 mb-4">
+          <p className="text-body-md text-gray-400 mb-2">
             {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
           </p>
-          <div className="flex items-center gap-1 pt-1">
-              <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+          <div className="flex items-center">
+              <p className="bg-ring text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
                 P
               </p>
-              <p className="text-sm font-bold">
-                  {pointsToEarn}ptもらえる
+              <p className="text-caption ml-1">
+                <span className="font-bold text-body-md">{pointsToEarn.toLocaleString()}pt</span>
+                <span className="text-sm">もらえる</span>
               </p>
           </div>
         </div>

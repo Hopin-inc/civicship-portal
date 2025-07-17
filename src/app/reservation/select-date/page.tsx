@@ -90,6 +90,7 @@ export default function SelectDatePage() {
           isSlotAvailable={isSlotAvailable}
           onSelectSlot={handleReservation}
           pointsToEarn={pointsToEarn}
+          category={opportunity.category}
         />
       </div>
 

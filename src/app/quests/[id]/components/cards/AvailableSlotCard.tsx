@@ -31,10 +31,10 @@ export const AvailableSlotCard = ({
     return (
       <div className="bg-background rounded-xl border px-6 py-6 w-[280px] flex flex-col">
         <div className="flex-1">
-          <h3 className="text-title-md font-bold mb-1">
+          <h3 className="text-title-md font-bold mb-1 justify-start">
             {format(startDate, "M月d日", { locale: ja })}
-            <span className="text-label-sm text-caption">
-              （{format(startDate, "E", { locale: ja })}）
+            <span>
+              ({format(startDate, "E", { locale: ja })})
             </span>
           </h3>
           <p className="text-body-md text-foreground mb-2">
@@ -44,8 +44,9 @@ export const AvailableSlotCard = ({
                 <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
                   P
                 </p>
-                <p className="text-sm font-bold">
-                    {pointsToEarn}ptもらえる
+                <p>
+                  <span className="font-bold text-body-md">{pointsToEarn.toLocaleString()}pt</span>
+                  <span className="text-sm font-body-sm">もらえる</span>
                 </p>
             </div>
           </div>

@@ -58,10 +58,14 @@ export const Footer: React.FC<FooterProps> = ({
         )}
       >
         <div>
-          <p className="text-body-sm text-muted-foreground">1人あたり</p>
-          <p className={cn("text-body-lg font-bold", point == null && "text-muted-foreground/50")}>
-            {point != null ? `${point.toLocaleString()}ptもらえる` : "ポイント未定"}
-          </p>
+          <p className="text-body-sm">1人あたり</p>
+            {
+              point != null ? 
+              <p>
+                <span className="font-bold text-lg">{point.toLocaleString()}pt</span>
+                <span className="text-sm font-normal">もらえる</span>
+              </p> : "ポイント未定"
+            }
         </div>
         {renderActionElement()}
       </div>
