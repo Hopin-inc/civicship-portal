@@ -1,12 +1,14 @@
 import { gql } from "@apollo/client";
+import { TICKET_CLAIM_LINK_FRAGMENT } from "../ticketClaimLink/fragment";
 
 export const GET_TICKET_ISSUERS = gql`
   query GetTicketIssuers(
     $filter: TicketIssuerFilterInput
     $sort: TicketIssuerSortInput
+    $cursor: String
     $first: Int
   ) {
-    ticketIssuers(filter: $filter, sort: $sort, first: $first) {
+    ticketIssuers(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
       pageInfo {
         startCursor
         endCursor
@@ -36,4 +38,5 @@ export const GET_TICKET_ISSUERS = gql`
       }
     }
   }
+  ${TICKET_CLAIM_LINK_FRAGMENT}
 `;

@@ -1,7 +1,7 @@
 "use client";
 import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
-import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 import { addDays, isAfter } from "date-fns";
+import { ActivitySlot, ActivitySlotGroup } from "../type/opportunitySlot";
 
 /**
  * 予約可能日数（現在時刻から何日後まで予約可能か）
@@ -55,7 +55,7 @@ export const presenterOpportunitySlot = (
     id: slot.id,
     hostingStatus: slot.hostingStatus,
     feeRequired,
-
+    opportunityId: slot.opportunity?.id ?? "",
     capacity: slot.capacity ?? 0,
     remainingCapacity: slot.remainingCapacity ?? 0,
 

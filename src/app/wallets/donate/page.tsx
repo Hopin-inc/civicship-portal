@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
 import UserSelectStep from "@/app/admin/wallet/grant/components/UserSelectStep";
+import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 export default function DonatePointPage() {
@@ -19,10 +20,16 @@ export default function DonatePointPage() {
   const track = useAnalytics();
 
   const searchParams = useSearchParams();
-  const currentPoint = Number(searchParams.get("currentPoint") ?? "0");
+  const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");
+  const tab = searchParams.get("tab") ?? "";
+  const [activeTab, setActiveTab] = useState<Tabs>(tab as Tabs);
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
-    variables: { filter: { communityId: COMMUNITY_ID }, first: 500 },
+    variables: {
+      filter: { communityId: COMMUNITY_ID },
+      first: 100,
+      withDidIssuanceRequests: true,
+    },
     fetchPolicy: "network-only",
   });
 
@@ -31,30 +38,36 @@ export default function DonatePointPage() {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const { donatePoint } = useTransactionMutations();
 
-  const members =
-    (data?.wallets?.edges
-      ?.map((edge) => {
-        const wallet = edge?.node;
-        const user = wallet?.user;
-        const currentPoint = wallet?.currentPointView?.currentPoint;
-        return user?.id !== currentUser?.id && user
-          ? {
-              user,
-              wallet: currentPoint != null ? { currentPointView: { currentPoint } } : {},
-            }
-          : null;
-      })
-      .filter(Boolean) as {
-      user: GqlUser;
-      wallet: { currentPointView?: { currentPoint: number } };
-    }[]) ?? [];
+  const members = (data?.wallets?.edges ?? [])
+    .map((edge) => {
+      const wallet = edge?.node;
+      const user = wallet?.user;
+      const pointStr = wallet?.currentPointView?.currentPoint;
+      if (!user || user.id === currentUser?.id) return null;
+      const currentPoint = pointStr ? BigInt(pointStr) : BigInt(0);
 
-  const selectedUser = members.find((m) => m?.user.id === selectedUserId)?.user;
+      return {
+        user,
+        wallet: {
+          currentPointView: {
+            currentPoint,
+          },
+        },
+      };
+    })
+    .filter(
+      (
+        member,
+      ): member is {
+        user: GqlUser;
+        wallet: { currentPointView: { currentPoint: bigint } };
+      } => !!member && !!member.user,
+    );
 
   const handleDonate = async (amount: number) => {
     if (!selectedUser) return;
@@ -86,7 +99,7 @@ export default function DonatePointPage() {
           },
         });
 
-        toast.success(`+${amount.toLocaleString()} pt をあげました`);
+        toast.success(`${amount.toLocaleString()} pt をあげました`);
         router.push("/wallets?refresh=true");
       } else {
         toast.error(`送信失敗: ${res.code}`);
@@ -104,7 +117,7 @@ export default function DonatePointPage() {
       await fetchMore({
         variables: {
           filter: { communityId: COMMUNITY_ID },
-          first: 500,
+          first: 100,
           after: endCursor,
         },
       });
@@ -123,15 +136,18 @@ export default function DonatePointPage() {
         <UserSelectStep
           title="送り先を選ぶ"
           members={members}
-          onSelect={(user) => setSelectedUserId(user.id)}
+          onSelect={(user) => setSelectedUser(user)}
           onLoadMore={handleLoadMore}
           hasNextPage={hasNextPage}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          listType="donate"
         />
       ) : (
         <TransferInputStep
           user={selectedUser}
           isLoading={isLoading}
-          onBack={() => setSelectedUserId(null)}
+          onBack={() => setSelectedUser(null)}
           onSubmit={handleDonate}
           currentPoint={currentPoint} // ← ここ追加
           title="ポイントをあげる"

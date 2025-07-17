@@ -23,7 +23,7 @@ import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHori
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
-import { encodeURIComponentWithType, RawURIComponent } from "@/utils/path";
+import { RawURIComponent } from "@/utils/path";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -117,7 +117,7 @@ export default function ConfirmPage() {
         <LoginModal
           isOpen={ ui.isLoginModalOpen }
           onClose={ () => ui.setIsLoginModalOpen(false) }
-          nextPath={ `/login?next=${ encodeURIComponentWithType(window.location.pathname + window.location.search as RawURIComponent) }` as RawURIComponent }
+          nextPath={ window.location.pathname + window.location.search as RawURIComponent }
         />
         <div className="px-6 py-4 mt-4">
           <OpportunityCardHorizontal
