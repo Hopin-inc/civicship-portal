@@ -12,8 +12,9 @@ import { ActivityCard, ActivityDetail, OpportunityHost } from "@/app/activities/
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
-import { addDays, isAfter } from "date-fns";
+import { addDays, isBefore } from "date-fns";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { getReservationDeadline } from "./reservationConfig";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
@@ -49,7 +50,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
   const { images, place, slots, articles, createdByUser } = data;
   const threshold = addDays(new Date(), 7);
 
-  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired);
+  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired, data.id);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
@@ -70,7 +71,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
 
     place: presenterPlace(place),
     host: presenterOpportunityHost(createdByUser, articles?.[0]),
-    slots: presenterActivitySlot(slots, threshold, data.feeRequired),
+    slots: presenterActivitySlot(slots, threshold, data.feeRequired, data.id),
 
     recentOpportunities: [],
     reservableTickets: [],
@@ -95,21 +96,16 @@ function presenterActivitySlot(
   slots: Maybe<GqlOpportunitySlot[]> | undefined,
   threshold: Date,
   feeRequired?: Maybe<number> | undefined,
+  opportunityId?: string,
 ): ActivitySlot[] {
-  const SLOT_IDS_TO_FORCE_RESERVABLE = ["cmc07ao5c0005s60nnc8ravvk"];
-
   return (
     slots?.map((slot): ActivitySlot => {
       const startsAtDate = slot?.startsAt ? new Date(slot.startsAt) : null;
 
-      const isForceReservable = slot?.id && SLOT_IDS_TO_FORCE_RESERVABLE.includes(slot.id);
-
-      // 通常の条件 or 強制フラグ
-      const isReservable = isForceReservable
-        ? true
-        : startsAtDate
-          ? isAfter(startsAtDate, threshold)
-          : false;
+      // 予約締切日時を取得して現在時刻と比較
+      const isReservable = startsAtDate
+        ? !isBefore(new Date(), getReservationDeadline(slot?.id, startsAtDate))
+        : false;
 
       return {
         id: slot?.id,
@@ -121,6 +117,7 @@ function presenterActivitySlot(
         feeRequired: feeRequired ?? null,
         applicantCount: 1,
         isReservable,
+        opportunityId: opportunityId || "",
       };
     }) ?? []
   );
