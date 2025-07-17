@@ -1,17 +1,18 @@
 import { useMemo } from "react";
 import {
+  GqlOpportunityCategory,
   GqlOpportunitySlotHostingStatus,
   GqlSortDirection,
   useGetOpportunitySlotsLazyQuery,
   useGetOpportunitySlotsQuery,
 } from "@/types/graphql";
 import { ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
-import { ActivityDetail } from "@/app/activities/data/type";
+import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import {
   groupActivitySlotsByDate,
   presenterOpportunitySlots,
 } from "@/app/reservation/data/presenter/opportunitySlot";
-import { presenterActivityDetail } from "@/app/activities/data/presenter";
+import { presenterActivityDetail, presenterQuestDetail } from "@/app/activities/data/presenter";
 
 interface UseReservationDateLoaderProps {
   opportunityId: string;
@@ -34,11 +35,17 @@ export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLo
     errorPolicy: "all",
   });
 
-  const opportunity: ActivityDetail | null = useMemo(() => {
+  const opportunity: ActivityDetail | QuestDetail | null = useMemo(() => {
     const raw = data?.opportunitySlots?.edges?.find((edge) => edge?.node?.opportunity != null)?.node
       ?.opportunity;
 
-    return raw ? presenterActivityDetail(raw) : null;
+    if (raw?.category === GqlOpportunityCategory.Activity) {
+      return presenterActivityDetail(raw);
+    } else if (raw?.category === GqlOpportunityCategory.Quest) {
+      return presenterQuestDetail(raw);
+    }
+
+    return null;
   }, [data]);
 
   const groupedSlots: ActivitySlotGroup[] = useMemo(() => {
