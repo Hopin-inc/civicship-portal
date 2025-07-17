@@ -39,9 +39,9 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
   return (
     <div className="bg-card rounded-lg py-6 px-4 mb-6 space-y-6 w-full">
       <div className="flex items-start gap-x-2">
-        <Calendar size={ 18 } strokeWidth={ 1.5 } className="text-caption w-6 h-6 mt-0.5" />
+        <Calendar size={18} strokeWidth={1.5} className="text-caption w-6 h-6 mt-0.5" />
         <div className="flex flex-col">
-          <span className="text-body-md">{ formattedDate }</span>
+          <span className="text-body-md">{formattedDate}</span>
           <span className="text-body-md text-caption">
             { startTime }-{ endTime }
             { dateDiffLabel && (
@@ -51,37 +51,37 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
         </div>
       </div>
       <div className="flex items-start gap-x-2">
-        <MapPin size={ 18 } strokeWidth={ 1.5 } className="text-caption w-6 h-6 mt-0.5" />
+        <MapPin size={18} strokeWidth={1.5} className="text-caption w-6 h-6 mt-0.5" />
         <div className="flex flex-col">
-          <span className="text-body-md">{ location.name }</span>
-          <span className="text-body-sm text-caption">{ location.address }</span>
+          <span className="text-body-md">{location.name}</span>
+          <span className="text-body-sm text-caption">{location.address}</span>
         </div>
       </div>
       <div className="flex items-center gap-x-2">
-        <Users size={ 18 } strokeWidth={ 1.5 } className="text-caption w-6 h-6 mt-0.5" />
-        <span>{ participantCount }人</span>
+        <Users size={18} strokeWidth={1.5} className="text-caption w-6 h-6 mt-0.5" />
+        <span>{participantCount}人</span>
       </div>
       <div className="flex items-center gap-x-2">
-        <JapaneseYen size={ 18 } strokeWidth={ 1.5 } className="text-caption w-6 h-6 mt-0.5" />
+        <JapaneseYen size={18} strokeWidth={1.5} className="text-caption w-6 h-6 mt-0.5" />
         <div className="flex flex-row gap-x-2 items-center">
-          <span className="text-foreground text-body-md">{ totalPrice.toLocaleString() }円</span>
+          <span className="text-foreground text-body-md">{totalPrice.toLocaleString()}円</span>
           <span className="text-caption text-body-sm">
-            （{ pricePerPerson.toLocaleString() }円 × { paidParticipantCount.toLocaleString() }
+            （{pricePerPerson.toLocaleString()}円 × {paidParticipantCount.toLocaleString()}
             人）
           </span>
         </div>
       </div>
       <div className="flex items-center gap-x-2">
-        { isReserved ? (
+        {isReserved ? (
           phoneNumber ? (
             <>
-              <Phone size={ 18 } strokeWidth={ 1.5 } className="text-caption w-6 h-6 mt-0.5" />
+              <Phone size={18} strokeWidth={1.5} className="text-caption w-6 h-6 mt-0.5" />
               <div className="flex flex-row gap-x-2 items-center">
                 <a
-                  href={ `tel:${ phoneNumber }` }
+                  href={`tel:${phoneNumber}`}
                   className="text-body-md text-primary hover:underline"
                 >
-                  { phoneNumber }
+                  {phoneNumber}
                 </a>
                 <span className="text-caption text-body-sm">（緊急連絡先）</span>
               </div>
@@ -91,7 +91,7 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
               緊急時は公式LINEからお問い合わせください。
             </span>
           )
-        ) : null }
+        ) : null}
       </div>
     </div>
   );
