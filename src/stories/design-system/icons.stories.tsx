@@ -434,79 +434,81 @@ export const UsageExamples: Story = {
 
 export const AllIcons: Story = {
   name: "Complete Icon Library",
-  render: () => (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-title-lg mb-4">Complete Icon Library</h2>
-        <p className="text-body-md text-muted-foreground mb-6">
-          All 75+ Lucide React icons used throughout the Civicship Portal application.
-        </p>
-        <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-3">
-          <IconDisplay icon={ArrowLeft} name="ArrowLeft" size={20} />
-          <IconDisplay icon={ChevronLeft} name="ChevronLeft" size={20} />
-          <IconDisplay icon={ChevronRight} name="ChevronRight" size={20} />
-          <IconDisplay icon={ChevronDown} name="ChevronDown" size={20} />
-          <IconDisplay icon={ChevronUp} name="ChevronUp" size={20} />
-          <IconDisplay icon={Search} name="Search" size={20} />
-          <IconDisplay icon={Plus} name="Plus" size={20} />
-          <IconDisplay icon={Minus} name="Minus" size={20} />
-          <IconDisplay icon={X} name="X" size={20} />
-          <IconDisplay icon={Check} name="Check" size={20} />
-          <IconDisplay icon={MoreHorizontal} name="MoreHorizontal" size={20} />
-          <IconDisplay icon={Home} name="Home" size={20} />
-          <IconDisplay icon={User} name="User" size={20} />
-          <IconDisplay icon={Users} name="Users" size={20} />
-          <IconDisplay icon={Settings} name="Settings" size={20} />
-          <IconDisplay icon={LogOut} name="LogOut" size={20} />
-          <IconDisplay icon={Mail} name="Mail" size={20} />
-          <IconDisplay icon={MessageSquare} name="MessageSquare" size={20} />
-          <IconDisplay icon={MessageSquareText} name="MessageSquareText" size={20} />
-          <IconDisplay icon={PlusCircle} name="PlusCircle" size={20} />
-          <IconDisplay icon={UserPlus} name="UserPlus" size={20} />
-          <IconDisplay icon={Github} name="Github" size={20} />
-          <IconDisplay icon={LifeBuoy} name="LifeBuoy" size={20} />
-          <IconDisplay icon={Cloud} name="Cloud" size={20} />
-          <IconDisplay icon={Keyboard} name="Keyboard" size={20} />
-          <IconDisplay icon={AlertCircle} name="AlertCircle" size={20} />
-          <IconDisplay icon={CheckCircle} name="CheckCircle" size={20} />
-          <IconDisplay icon={AlertTriangle} name="AlertTriangle" size={20} />
-          <IconDisplay icon={Info} name="Info" size={20} />
-          <IconDisplay icon={Calendar} name="Calendar" size={20} />
-          <IconDisplay icon={CalendarIcon} name="CalendarIcon" size={20} />
-          <IconDisplay icon={MapPin} name="MapPin" size={20} />
-          <IconDisplay icon={Banknote} name="Banknote" size={20} />
-          <IconDisplay icon={JapaneseYen} name="JapaneseYen" size={20} />
-          <IconDisplay icon={Phone} name="Phone" size={20} />
-          <IconDisplay icon={Globe} name="Globe" size={20} />
-          <IconDisplay icon={Book} name="Book" size={20} />
-          <IconDisplay icon={ClipboardList} name="ClipboardList" size={20} />
-          <IconDisplay icon={Ticket} name="Ticket" size={20} />
-          <IconDisplay icon={Tickets} name="Tickets" size={20} />
-          <IconDisplay icon={Wallet} name="Wallet" size={20} />
-          <IconDisplay icon={Coins} name="Coins" size={20} />
-          <IconDisplay icon={Gift} name="Gift" size={20} />
-          <IconDisplay icon={Copy} name="Copy" size={20} />
-          <IconDisplay icon={ExternalLink} name="ExternalLink" size={20} />
-          <IconDisplay icon={Bold} name="Bold" size={20} />
-          <IconDisplay icon={Italic} name="Italic" size={20} />
-          <IconDisplay icon={Underline} name="Underline" size={20} />
-          <IconDisplay icon={AlignLeft} name="AlignLeft" size={20} />
-          <IconDisplay icon={AlignCenter} name="AlignCenter" size={20} />
-          <IconDisplay icon={AlignRight} name="AlignRight" size={20} />
-          <IconDisplay icon={ImagePlus} name="ImagePlus" size={20} />
-          <IconDisplay icon={Loader2} name="Loader2" size={20} />
-          <IconDisplay icon={RefreshCcw} name="RefreshCcw" size={20} />
-          <IconDisplay icon={Flag} name="Flag" size={20} />
-          <IconDisplay icon={HelpCircleIcon} name="HelpCircleIcon" size={20} />
-          <IconDisplay icon={TrashIcon} name="TrashIcon" size={20} />
-          <IconDisplay icon={FileIcon} name="FileIcon" size={20} />
-          <IconDisplay icon={XCircle} name="XCircle" size={20} />
-          <IconDisplay icon={Link} name="Link" size={20} />
-          <IconDisplay icon={Dot} name="Dot" size={20} />
-          <IconDisplay icon={Circle} name="Circle" size={20} />
-          <IconDisplay icon={Bookmark} name="Bookmark" size={20} />
+  render: () => {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-title-lg mb-4">Complete Icon Library</h2>
+          <p className="text-body-md text-muted-foreground mb-6">
+            All 75+ Lucide React icons used throughout the Civicship Portal application.
+          </p>
+          <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-3">
+            <IconDisplay icon={ArrowLeft} name="ArrowLeft" size={20} />
+            <IconDisplay icon={ChevronLeft} name="ChevronLeft" size={20} />
+            <IconDisplay icon={ChevronRight} name="ChevronRight" size={20} />
+            <IconDisplay icon={ChevronDown} name="ChevronDown" size={20} />
+            <IconDisplay icon={ChevronUp} name="ChevronUp" size={20} />
+            <IconDisplay icon={Search} name="Search" size={20} />
+            <IconDisplay icon={Plus} name="Plus" size={20} />
+            <IconDisplay icon={Minus} name="Minus" size={20} />
+            <IconDisplay icon={X} name="X" size={20} />
+            <IconDisplay icon={Check} name="Check" size={20} />
+            <IconDisplay icon={MoreHorizontal} name="MoreHorizontal" size={20} />
+            <IconDisplay icon={Home} name="Home" size={20} />
+            <IconDisplay icon={User} name="User" size={20} />
+            <IconDisplay icon={Users} name="Users" size={20} />
+            <IconDisplay icon={Settings} name="Settings" size={20} />
+            <IconDisplay icon={LogOut} name="LogOut" size={20} />
+            <IconDisplay icon={Mail} name="Mail" size={20} />
+            <IconDisplay icon={MessageSquare} name="MessageSquare" size={20} />
+            <IconDisplay icon={MessageSquareText} name="MessageSquareText" size={20} />
+            <IconDisplay icon={PlusCircle} name="PlusCircle" size={20} />
+            <IconDisplay icon={UserPlus} name="UserPlus" size={20} />
+            <IconDisplay icon={Github} name="Github" size={20} />
+            <IconDisplay icon={LifeBuoy} name="LifeBuoy" size={20} />
+            <IconDisplay icon={Cloud} name="Cloud" size={20} />
+            <IconDisplay icon={Keyboard} name="Keyboard" size={20} />
+            <IconDisplay icon={AlertCircle} name="AlertCircle" size={20} />
+            <IconDisplay icon={CheckCircle} name="CheckCircle" size={20} />
+            <IconDisplay icon={AlertTriangle} name="AlertTriangle" size={20} />
+            <IconDisplay icon={Info} name="Info" size={20} />
+            <IconDisplay icon={Calendar} name="Calendar" size={20} />
+            <IconDisplay icon={CalendarIcon} name="CalendarIcon" size={20} />
+            <IconDisplay icon={MapPin} name="MapPin" size={20} />
+            <IconDisplay icon={Banknote} name="Banknote" size={20} />
+            <IconDisplay icon={JapaneseYen} name="JapaneseYen" size={20} />
+            <IconDisplay icon={Phone} name="Phone" size={20} />
+            <IconDisplay icon={Globe} name="Globe" size={20} />
+            <IconDisplay icon={Book} name="Book" size={20} />
+            <IconDisplay icon={ClipboardList} name="ClipboardList" size={20} />
+            <IconDisplay icon={Ticket} name="Ticket" size={20} />
+            <IconDisplay icon={Tickets} name="Tickets" size={20} />
+            <IconDisplay icon={Wallet} name="Wallet" size={20} />
+            <IconDisplay icon={Coins} name="Coins" size={20} />
+            <IconDisplay icon={Gift} name="Gift" size={20} />
+            <IconDisplay icon={Copy} name="Copy" size={20} />
+            <IconDisplay icon={ExternalLink} name="ExternalLink" size={20} />
+            <IconDisplay icon={Bold} name="Bold" size={20} />
+            <IconDisplay icon={Italic} name="Italic" size={20} />
+            <IconDisplay icon={Underline} name="Underline" size={20} />
+            <IconDisplay icon={AlignLeft} name="AlignLeft" size={20} />
+            <IconDisplay icon={AlignCenter} name="AlignCenter" size={20} />
+            <IconDisplay icon={AlignRight} name="AlignRight" size={20} />
+            <IconDisplay icon={ImagePlus} name="ImagePlus" size={20} />
+            <IconDisplay icon={Loader2} name="Loader2" size={20} />
+            <IconDisplay icon={RefreshCcw} name="RefreshCcw" size={20} />
+            <IconDisplay icon={Flag} name="Flag" size={20} />
+            <IconDisplay icon={HelpCircleIcon} name="HelpCircleIcon" size={20} />
+            <IconDisplay icon={TrashIcon} name="TrashIcon" size={20} />
+            <IconDisplay icon={FileIcon} name="FileIcon" size={20} />
+            <IconDisplay icon={XCircle} name="XCircle" size={20} />
+            <IconDisplay icon={Link} name="Link" size={20} />
+            <IconDisplay icon={Dot} name="Dot" size={20} />
+            <IconDisplay icon={Circle} name="Circle" size={20} />
+            <IconDisplay icon={Bookmark} name="Bookmark" size={20} />
+          </div>
         </div>
       </div>
-    </div>
-  ),
+    );
+  },
 };
