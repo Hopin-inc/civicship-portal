@@ -321,7 +321,7 @@ export const UsageExamples: Story = {
 
           {/* Modal Example */}
           <div className="space-y-4">
-            <h3 className="text-title-md">Modal & Overlay</h3>
+            <h3 className="text-title-md">Modal &amp; Overlay</h3>
             <div className="relative bg-gray-100 p-8 rounded-lg">
               <div className="absolute inset-0 bg-black bg-opacity-25 rounded-lg"></div>
               <div className="relative bg-white p-6 rounded-lg shadow-2xl max-w-md mx-auto">
