@@ -3,8 +3,9 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const meta: Meta<typeof Tabs> = {
-  title: "Components/Tabs",
+  title: "Shared/UI/Tabs",
   component: Tabs,
+  tags: ["autodocs"],
 };
 
 export default meta;
