@@ -3561,6 +3561,18 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "communityId",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "evaluatorId",
             "description": null,
             "type": {
@@ -10542,18 +10554,6 @@
             "deprecationReason": null
           },
           {
-            "name": "capacity",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "category",
             "description": null,
             "type": {
@@ -10580,18 +10580,6 @@
                 "name": "String",
                 "ofType": null
               }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "endsAt",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Datetime",
-              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,
@@ -10630,11 +10618,11 @@
             "deprecationReason": null
           },
           {
-            "name": "place",
+            "name": "placeId",
             "description": null,
             "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NestedPlaceConnectOrCreateInput",
+              "kind": "SCALAR",
+              "name": "ID",
               "ofType": null
             },
             "defaultValue": null,
@@ -10663,6 +10651,26 @@
                 "kind": "ENUM",
                 "name": "PublishStatus",
                 "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "relatedArticleIds",
+            "description": null,
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
               }
             },
             "defaultValue": null,
@@ -10700,18 +10708,6 @@
                   "ofType": null
                 }
               }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "startsAt",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "Datetime",
-              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,
