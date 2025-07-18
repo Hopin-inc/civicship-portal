@@ -73,12 +73,9 @@ const mockActivityCards: ActivityCard[] = [
     hasReservableTicket: true,
   },
 ];
-    hasReservableTicket: true,
-  },
-];
 
 const MockOpportunityCard = ({ opportunity, isCarousel = false }: { opportunity: ActivityCard; isCarousel?: boolean }) => {
-  const { id, title, feeRequired, location, images, hasReservableTicket, communityId } = opportunity;
+  const { title, feeRequired, location, images, hasReservableTicket } = opportunity;
 
   return (
     <div className={`relative w-full flex-shrink-0 ${isCarousel ? "max-w-[150px] sm:max-w-[164px]" : ""}`}>
