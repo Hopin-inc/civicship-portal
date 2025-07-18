@@ -83,7 +83,7 @@ export function MemberTab({
             key={m.id}
             otherUser={m}
             label={m.name}
-            point={Number(m.wallet?.currentPointView?.currentPoint) ?? 0}
+            point={m.wallet?.currentPointView?.currentPoint ?? BigInt(0)}
             showPoint={true}
             showDate={false}
             didValue={m.didInfo?.didValue ?? "did取得中"}

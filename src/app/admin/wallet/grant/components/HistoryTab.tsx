@@ -48,7 +48,7 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
           key={`${tx.otherUser?.id}-${index}`}
           otherUser={tx.otherUser}
           label={tx.label}
-          point={tx.point}
+          point={BigInt(tx.point)}
           sign={tx.sign}
           pointColor={tx.pointColor}
           didValue={tx.didValue ?? "did取得中"}
