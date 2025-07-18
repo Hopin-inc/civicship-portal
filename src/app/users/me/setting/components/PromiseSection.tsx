@@ -54,6 +54,24 @@ export default function PromiseSection() {
                     </div>
                   </div>
                 </a>
+                
+                <a href="/communities/kibotcha/operating-regulations.pdf" target="_blank" rel="noopener noreferrer">
+                  <div className="flex items-center justify-between py-4 px-4 border-b">
+                    <div className="flex items-center gap-2">
+                      <FileIcon className="w-5 h-5" />
+                      <span className="font-bold text-sm">運営規程 (PDF)</span>
+                    </div>
+                  </div>
+                </a>
+                
+                <a href="/communities/kibotcha/bylaws.pdf" target="_blank" rel="noopener noreferrer">
+                  <div className="flex items-center justify-between py-4 px-4 border-b">
+                    <div className="flex items-center gap-2">
+                      <FileIcon className="w-5 h-5" />
+                      <span className="font-bold text-sm">定款 (PDF)</span>
+                    </div>
+                  </div>
+                </a>
               </>
             )}
             {/* TODO : 表示可能になるまでコメントアウト */}
