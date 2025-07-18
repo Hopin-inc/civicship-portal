@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
-import MainContent from "@/components/layout/MainContent";
 import { ActivityDetail } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
@@ -16,40 +15,37 @@ const MockImage = ({ src, alt, ...props }: any) => (
 const mockOpportunity: ActivityDetail = {
   id: "activity-1",
   title: "高松市の歴史を学ぶウォーキングツアー",
-  description: "高松市の歴史的な場所を巡りながら、地域の文化と歴史について学ぶガイド付きツアーです。",
-  images: [
-    "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&h=300&fit=crop",
-  ],
-  location: {
+  feeRequired: 2000,
+  slots: [],
+  reservableTickets: [],
+  relatedActivities: [],
+  place: {
+    id: "place-1",
     name: "高松市役所",
+    description: "高松市の中心部に位置する市役所",
     address: "香川県高松市番町1丁目8-15",
     latitude: 34.3401,
     longitude: 134.0437,
   },
-  organizer: {
-    id: "organizer-1",
+  requireApproval: false,
+  targetUtilities: [],
+  isReservable: true,
+  description: "高松市の歴史的な場所を巡りながら、地域の文化と歴史について学ぶガイド付きツアーです。",
+  body: "詳細な説明文がここに入ります。",
+  images: [
+    "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&h=300&fit=crop",
+  ],
+  totalImageCount: 2,
+  host: {
+    id: "host-1",
     name: "高松観光ガイド協会",
-    profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+    bio: "地域の歴史と文化を愛する観光ガイド協会です。",
   },
-  category: {
-    id: "culture",
-    name: "文化・歴史",
-    color: "#8B5CF6",
-  },
-  tags: ["ウォーキング", "歴史", "文化", "ガイド付き"],
-  difficulty: "初級",
-  duration: 120,
-  maxParticipants: 15,
-  minParticipants: 3,
-  priceRange: {
-    min: 1500,
-    max: 2000,
-  },
-  createdAt: "2024-07-01T00:00:00Z",
-  updatedAt: "2024-07-15T00:00:00Z",
-  status: "published",
-  featured: false,
+  recentOpportunities: [],
+  notes: "特別な注意事項はありません。",
+  communityId: "takamatsu",
 };
 
 const meta: Meta<typeof OpportunityInfo> = {
@@ -63,7 +59,6 @@ const meta: Meta<typeof OpportunityInfo> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
@@ -74,11 +69,7 @@ const meta: Meta<typeof OpportunityInfo> = {
         (window as any).Image = MockImage;
       }
       
-      return (
-        <MainContent>
-          <Story />
-        </MainContent>
-      );
+      return <Story />;
     },
   ],
 };
@@ -130,12 +121,6 @@ export const CookingActivity: Story = {
       images: [
         "https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&h=300&fit=crop",
       ],
-      category: {
-        id: "cooking",
-        name: "料理・グルメ",
-        color: "#F59E0B",
-      },
-      tags: ["料理", "うどん", "体験", "讃岐"],
     },
   },
 };
@@ -150,12 +135,6 @@ export const OutdoorActivity: Story = {
       images: [
         "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop",
       ],
-      category: {
-        id: "outdoor",
-        name: "アウトドア",
-        color: "#10B981",
-      },
-      tags: ["カヤック", "海", "アウトドア", "体験"],
     },
   },
 };

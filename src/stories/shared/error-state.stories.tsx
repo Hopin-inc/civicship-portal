@@ -13,7 +13,9 @@ const meta: Meta<typeof ErrorState> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
+    nextjs: {
+      appDirectory: true,
+    },
   },
 };
 

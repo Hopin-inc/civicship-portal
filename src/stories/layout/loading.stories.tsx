@@ -17,7 +17,9 @@ const meta: Meta<typeof MockLoading> = {
   component: MockLoading,
   tags: ["autodocs"],
   parameters: {
-    layout: "fullscreen",
+    nextjs: {
+      appDirectory: true,
+    },
   },
 };
 

@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import { MemberTab } from "@/app/admin/wallet/grant/components/MemberTab";
 import { GqlUser } from "@/types/graphql";
-import MainContent from "@/components/layout/MainContent";
 
 const mockUsers: GqlUser[] = [
   {
@@ -51,16 +50,15 @@ const meta: Meta<typeof MemberTab> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
   },
   decorators: [
     (Story) => (
-      <MainContent>
+      <div className="p-4">
         <Story />
-      </MainContent>
+      </div>
     ),
   ],
 };

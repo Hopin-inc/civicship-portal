@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import UserInfoCard from "@/app/admin/wallet/grant/components/UserInfoCard";
 import { GqlUser } from "@/types/graphql";
-import MainContent from "@/components/layout/MainContent";
 
 const MockImage = ({ src, alt, ...props }: any) => (
   <img 
@@ -71,7 +70,6 @@ const meta: Meta<typeof UserInfoCard> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
@@ -83,11 +81,9 @@ const meta: Meta<typeof UserInfoCard> = {
       }
       
       return (
-        <MainContent>
-          <div className="p-4">
-            <Story />
-          </div>
-        </MainContent>
+        <div className="p-4">
+          <Story />
+        </div>
       );
     },
   ],

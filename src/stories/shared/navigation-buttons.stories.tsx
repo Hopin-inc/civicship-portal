@@ -42,7 +42,9 @@ const meta: Meta<typeof MockNavigationButtons> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
+    nextjs: {
+      appDirectory: true,
+    },
   },
 };
 

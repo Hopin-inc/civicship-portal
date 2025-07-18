@@ -111,7 +111,9 @@ const meta: Meta<typeof MockHeader> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
+    nextjs: {
+      appDirectory: true,
+    },
   },
   decorators: [
     (Story) => (

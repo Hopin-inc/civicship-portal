@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import WalletCard from "@/app/wallets/components/WalletCard";
-import MainContent from "@/components/layout/MainContent";
 
 const MockImage = ({ src, alt, width, height, ...props }: any) => (
   <img 
@@ -32,7 +31,6 @@ const meta: Meta<typeof WalletCard> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
@@ -44,11 +42,9 @@ const meta: Meta<typeof WalletCard> = {
       }
       
       return (
-        <MainContent>
-          <div className="p-4">
-            <Story />
-          </div>
-        </MainContent>
+        <div className="p-4">
+          <Story />
+        </div>
       );
     },
   ],

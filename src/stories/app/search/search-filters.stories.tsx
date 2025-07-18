@@ -3,7 +3,6 @@ import React from "react";
 import SearchFilters from "@/app/search/components/SearchFilters";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { DateRange } from "react-day-picker";
-import MainContent from "@/components/layout/MainContent";
 import { FormProvider, useForm } from "react-hook-form";
 
 const mockPrefectureLabels: Record<string, string> = {
@@ -82,18 +81,15 @@ const meta: Meta<typeof SearchFiltersWrapper> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
   },
   decorators: [
     (Story) => (
-      <MainContent>
-        <div className="p-4">
-          <Story />
-        </div>
-      </MainContent>
+      <div className="p-4">
+        <Story />
+      </div>
     ),
   ],
 };

@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import ArticleCard from "@/app/articles/components/Card";
 import { TArticleWithAuthor, TArticleCard } from "@/app/articles/data/type";
-import MainContent from "@/components/layout/MainContent";
 
 const MockImage = ({ src, alt, fill, width, height, ...props }: any) => (
   <img 
@@ -62,7 +61,6 @@ const meta: Meta<typeof ArticleCard> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
@@ -75,11 +73,9 @@ const meta: Meta<typeof ArticleCard> = {
       }
       
       return (
-        <MainContent>
-          <div className="p-4">
-            <Story />
-          </div>
-        </MainContent>
+        <div className="p-4">
+          <Story />
+        </div>
       );
     },
   ],
@@ -146,36 +142,34 @@ export const MinimalCard: Story = {
 
 export const DifferentCategories: Story = {
   render: () => (
-    <MainContent>
-      <div className="p-4 space-y-4">
-        <ArticleCard 
-          article={{
-            ...mockArticleCard,
-            category: "ACTIVITY_REPORT",
-            title: "地域イベント情報",
-          }}
-          showCategory={true}
-          showUser={false}
-        />
-        <ArticleCard 
-          article={{
-            ...mockArticleCard,
-            category: "INTERVIEW",
-            title: "地域ニュース",
-          }}
-          showCategory={true}
-          showUser={false}
-        />
-        <ArticleCard 
-          article={{
-            ...mockArticleCard,
-            category: "ACTIVITY_REPORT",
-            title: "ワークショップ案内",
-          }}
-          showCategory={true}
-          showUser={false}
-        />
-      </div>
-    </MainContent>
+    <div className="p-4 space-y-4">
+      <ArticleCard 
+        article={{
+          ...mockArticleCard,
+          category: "ACTIVITY_REPORT",
+          title: "地域イベント情報",
+        }}
+        showCategory={true}
+        showUser={false}
+      />
+      <ArticleCard 
+        article={{
+          ...mockArticleCard,
+          category: "INTERVIEW",
+          title: "地域ニュース",
+        }}
+        showCategory={true}
+        showUser={false}
+      />
+      <ArticleCard 
+        article={{
+          ...mockArticleCard,
+          category: "ACTIVITY_REPORT",
+          title: "ワークショップ案内",
+        }}
+        showCategory={true}
+        showUser={false}
+      />
+    </div>
   ),
 };

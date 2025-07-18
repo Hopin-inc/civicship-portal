@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React, { useState } from "react";
 import { TabManager } from "@/app/admin/wallet/grant/components/TabManager";
 import { Tabs as TabsEnum } from "@/app/admin/wallet/grant/types/tabs";
-import MainContent from "@/components/layout/MainContent";
 
 const TabManagerWrapper = ({
   initialTab = TabsEnum.Member,
@@ -35,18 +34,15 @@ const meta: Meta<typeof TabManagerWrapper> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
   },
   decorators: [
     (Story) => (
-      <MainContent>
-        <div className="p-4">
-          <Story />
-        </div>
-      </MainContent>
+      <div className="p-4">
+        <Story />
+      </div>
     ),
   ],
 };

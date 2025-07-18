@@ -116,7 +116,9 @@ const meta: Meta<typeof MockLoginModal> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
+    nextjs: {
+      appDirectory: true,
+    },
   },
   decorators: [
     (Story) => (

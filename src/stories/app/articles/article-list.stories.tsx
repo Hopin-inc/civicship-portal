@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import ArticleList from "@/app/articles/components/ArticleList";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
-import MainContent from "@/components/layout/MainContent";
 import { FormProvider, useForm } from "react-hook-form";
 
 const MockImage = ({ src, alt, fill, width, height, ...props }: any) => (
@@ -98,7 +97,6 @@ const meta: Meta<typeof ArticleListWrapper> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
@@ -111,11 +109,9 @@ const meta: Meta<typeof ArticleListWrapper> = {
       }
       
       return (
-        <MainContent>
-          <div className="p-4">
-            <Story />
-          </div>
-        </MainContent>
+        <div className="p-4">
+          <Story />
+        </div>
       );
     },
   ],

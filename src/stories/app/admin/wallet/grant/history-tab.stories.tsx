@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import { HistoryTab } from "@/app/admin/wallet/grant/components/HistoryTab";
 import { GqlUser } from "@/types/graphql";
-import MainContent from "@/components/layout/MainContent";
 
 const meta: Meta<typeof HistoryTab> = {
   title: "App/Admin/Wallet/Grant/HistoryTab",
@@ -20,16 +19,15 @@ const meta: Meta<typeof HistoryTab> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
   },
   decorators: [
     (Story) => (
-      <MainContent>
+      <div className="p-4">
         <Story />
-      </MainContent>
+      </div>
     ),
   ],
 };

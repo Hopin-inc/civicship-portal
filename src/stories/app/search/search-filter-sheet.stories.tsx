@@ -4,7 +4,6 @@ import SearchFilterSheets from "@/app/search/components/SearchFilterSheet";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { IPrefecture } from "@/app/search/data/type";
 import { DateRange } from "react-day-picker";
-import MainContent from "@/components/layout/MainContent";
 
 const mockPrefectures: IPrefecture[] = [
   { id: "kagawa", name: "香川県" },
@@ -149,16 +148,15 @@ const meta: Meta<typeof SearchFilterSheetsWrapper> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
   },
   decorators: [
     (Story) => (
-      <MainContent>
+      <div className="p-4">
         <Story />
-      </MainContent>
+      </div>
     ),
   ],
 };

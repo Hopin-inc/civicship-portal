@@ -17,7 +17,9 @@ const meta: Meta<typeof EmptyState> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
+    nextjs: {
+      appDirectory: true,
+    },
   },
 };
 

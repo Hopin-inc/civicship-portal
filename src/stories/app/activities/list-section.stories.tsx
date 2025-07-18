@@ -109,7 +109,6 @@ const meta: Meta<typeof ActivitiesListSection> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },

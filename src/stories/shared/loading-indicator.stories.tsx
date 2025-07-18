@@ -22,9 +22,6 @@ export const FullScreen: Story = {
   args: {
     fullScreen: true,
   },
-  parameters: {
-    layout: "fullscreen",
-  },
 };
 
 export const Inline: Story = {

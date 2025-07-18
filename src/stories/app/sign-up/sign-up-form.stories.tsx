@@ -123,7 +123,9 @@ const meta: Meta<typeof MockSignUpForm> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
+    nextjs: {
+      appDirectory: true,
+    },
   },
   decorators: [
     (Story) => (

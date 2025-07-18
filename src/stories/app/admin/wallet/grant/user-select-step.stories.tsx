@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import UserSelectStep from "@/app/admin/wallet/grant/components/UserSelectStep";
 import { GqlUser } from "@/types/graphql";
 import { Tabs as TabsEnum } from "@/app/admin/wallet/grant/types/tabs";
-import MainContent from "@/components/layout/MainContent";
 
 const mockUsers: GqlUser[] = [
   {
@@ -97,16 +96,15 @@ const meta: Meta<typeof UserSelectStepWrapper> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
   },
   decorators: [
     (Story) => (
-      <MainContent>
+      <div className="p-4">
         <Story />
-      </MainContent>
+      </div>
     ),
   ],
 };

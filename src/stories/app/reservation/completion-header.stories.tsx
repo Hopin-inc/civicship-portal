@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import CompletionHeader from "@/app/reservation/complete/components/CompletionHeader";
-import MainContent from "@/components/layout/MainContent";
 
 const meta: Meta<typeof CompletionHeader> = {
   title: "App/Reservation/CompletionHeader",
@@ -15,18 +14,10 @@ const meta: Meta<typeof CompletionHeader> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
   },
-  decorators: [
-    (Story) => (
-      <MainContent>
-        <Story />
-      </MainContent>
-    ),
-  ],
 };
 
 export default meta;

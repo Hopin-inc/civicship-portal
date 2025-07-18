@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import GuestCounterSelector from "@/app/reservation/confirm/components/GuestCounterSelector";
-import MainContent from "@/components/layout/MainContent";
 
 const meta: Meta<typeof GuestCounterSelector> = {
   title: "App/Reservation/GuestCounterSelector",
@@ -14,18 +13,10 @@ const meta: Meta<typeof GuestCounterSelector> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
   },
-  decorators: [
-    (Story) => (
-      <MainContent>
-        <Story />
-      </MainContent>
-    ),
-  ],
 };
 
 export default meta;

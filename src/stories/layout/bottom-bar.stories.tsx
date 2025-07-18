@@ -103,7 +103,9 @@ const meta: Meta<typeof MockBottomBar> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
+    nextjs: {
+      appDirectory: true,
+    },
   },
   decorators: [
     (Story) => (

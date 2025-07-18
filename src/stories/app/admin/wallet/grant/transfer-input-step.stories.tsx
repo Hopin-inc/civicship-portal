@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
 import { GqlUser } from "@/types/graphql";
-import MainContent from "@/components/layout/MainContent";
 
 const MockImage = ({ src, alt, width, height, ...props }: any) => (
   <img 
@@ -63,7 +62,6 @@ const meta: Meta<typeof TransferInputStep> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },

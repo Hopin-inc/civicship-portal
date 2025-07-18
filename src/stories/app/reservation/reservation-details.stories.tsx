@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
-import MainContent from "@/components/layout/MainContent";
 
 const meta: Meta<typeof ReservationDetails> = {
   title: "App/Reservation/ReservationDetails",
@@ -50,18 +49,15 @@ const meta: Meta<typeof ReservationDetails> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
   },
   decorators: [
     (Story) => (
-      <MainContent>
-        <div className="p-4">
-          <Story />
-        </div>
-      </MainContent>
+      <div className="p-4">
+        <Story />
+      </div>
     ),
   ],
 };

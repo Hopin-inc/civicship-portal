@@ -82,7 +82,9 @@ const meta: Meta<typeof MockAdminBottomBar> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
+    nextjs: {
+      appDirectory: true,
+    },
   },
   decorators: [
     (Story) => (

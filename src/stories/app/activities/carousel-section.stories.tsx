@@ -86,7 +86,6 @@ const meta: Meta<typeof ActivitiesCarouselSection> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },

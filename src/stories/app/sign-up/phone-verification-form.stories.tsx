@@ -238,7 +238,9 @@ const meta: Meta<typeof MockPhoneVerificationForm> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
+    nextjs: {
+      appDirectory: true,
+    },
   },
 };
 

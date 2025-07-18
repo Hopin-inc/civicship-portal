@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import SelectionSheet from "@/app/reservation/select-date/components/SelectionSheet";
-import MainContent from "@/components/layout/MainContent";
 import { ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 
 const mockDateSections: ActivitySlotGroup[] = [
@@ -74,18 +73,15 @@ const meta: Meta<typeof SelectionSheet> = {
     },
   },
   parameters: {
-    layout: "fullscreen",
     nextjs: {
       appDirectory: true,
     },
   },
   decorators: [
     (Story) => (
-      <MainContent>
-        <div className="h-screen">
-          <Story />
-        </div>
-      </MainContent>
+      <div className="h-screen">
+        <Story />
+      </div>
     ),
   ],
 };
