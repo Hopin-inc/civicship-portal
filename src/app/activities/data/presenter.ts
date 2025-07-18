@@ -14,6 +14,13 @@ import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { addDays, isAfter } from "date-fns";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import {
+  getReservationThreshold,
+  isDateReservable,
+} from "@/app/reservation/data/presenter/opportunitySlot";
+import { format, isAfter } from "date-fns";
+import { getCrossDayLabel } from "@/utils/date";
+import { ja } from "date-fns/locale";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
@@ -143,12 +150,7 @@ export const presenterReservationDateTimeInfo = (
   const paidParticipantCount = participantCount - [...new Set(paidTicketIds)].length;
 
   return {
-    formattedDate: startDate.toLocaleDateString("ja-JP", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "long",
-    }),
+    formattedDate: format(startDate, "yyyy年M月d日(E)", { locale: ja }),
     startTime: startDate.toLocaleTimeString("ja-JP", {
       hour: "2-digit",
       minute: "2-digit",
@@ -159,6 +161,7 @@ export const presenterReservationDateTimeInfo = (
       minute: "2-digit",
       hour12: false,
     }),
+    dateDiffLabel: getCrossDayLabel(startDate, endDate),
     participantCount,
     paidParticipantCount,
     totalPrice: (opportunity.feeRequired ?? 0) * paidParticipantCount,

@@ -1,14 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GqlUser } from "@/types/graphql";
-import { PLACEHOLDER_IMAGE } from "@/utils";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { HeaderConfig } from "@/contexts/HeaderContext";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Props {
   user: GqlUser;
@@ -103,14 +102,10 @@ function TransferInputStep({
       <main className="pb-32 min-h-screen flex items-center justify-center px-4">
         <div className="flex flex-col items-center space-y-6 max-w-xl w-full">
           <div className="flex items-center gap-3 w-full">
-            <Image
-              src={user.image ?? PLACEHOLDER_IMAGE}
-              alt={user.name ?? "要確認"}
-              width={40}
-              height={40}
-              className="rounded-full object-cover border"
-              style={{ aspectRatio: "1 / 1" }}
-            />
+            <Avatar className="w-10 h-10 rounded-full border object-cover">
+              <AvatarImage src={user.image || ""} alt={user.name ?? "要確認"} />
+              <AvatarFallback>{user.name?.[0] ?? "U"}</AvatarFallback>
+            </Avatar>
             <div className="flex flex-col">
               <span className="text-muted-foreground text-sm">{recipientLabel}</span>
               <span className="text-base font-medium">{user.name}</span>
