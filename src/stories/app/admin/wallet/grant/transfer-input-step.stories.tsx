@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
-import { TransferInputStep } from "@/app/admin/wallet/grant/components/TransferInputStep";
+import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
 import { GqlUser } from "@/types/graphql";
 import MainContent from "@/components/layout/MainContent";
 
@@ -85,19 +85,15 @@ export default meta;
 type Story = StoryObj<typeof TransferInputStep>;
 
 export const Default: Story = {
-  args: {
-    user: mockUser,
-    currentPoint: 1000000,
-    isLoading: false,
-    title: "ポイントを支給する",
-    recipientLabel: "支給する相手",
-    submitLabel: "支給",
-    backLabel: "支給先を選び直す",
-  },
-  render: (args) => (
+  render: () => (
     <TransferInputStep
-      {...args}
-      currentPoint={BigInt(args.currentPoint || 0)}
+      user={mockUser}
+      currentPoint={BigInt(1000000)}
+      isLoading={false}
+      title="ポイントを支給する"
+      recipientLabel="支給する相手"
+      submitLabel="支給"
+      backLabel="支給先を選び直す"
       onBack={() => console.log("Back clicked")}
       onSubmit={(amount) => console.log("Submit clicked with amount:", amount)}
     />
@@ -105,19 +101,15 @@ export const Default: Story = {
 };
 
 export const Loading: Story = {
-  args: {
-    user: mockUser,
-    currentPoint: 1000000,
-    isLoading: true,
-    title: "ポイントを支給する",
-    recipientLabel: "支給する相手",
-    submitLabel: "支給中...",
-    backLabel: "支給先を選び直す",
-  },
-  render: (args) => (
+  render: () => (
     <TransferInputStep
-      {...args}
-      currentPoint={BigInt(args.currentPoint || 0)}
+      user={mockUser}
+      currentPoint={BigInt(1000000)}
+      isLoading={true}
+      title="ポイントを支給する"
+      recipientLabel="支給する相手"
+      submitLabel="支給中..."
+      backLabel="支給先を選び直す"
       onBack={() => console.log("Back clicked")}
       onSubmit={(amount) => console.log("Submit clicked with amount:", amount)}
     />
@@ -125,19 +117,15 @@ export const Loading: Story = {
 };
 
 export const LowBalance: Story = {
-  args: {
-    user: mockUser,
-    currentPoint: 50000,
-    isLoading: false,
-    title: "ポイントを支給する",
-    recipientLabel: "支給する相手",
-    submitLabel: "支給",
-    backLabel: "支給先を選び直す",
-  },
-  render: (args) => (
+  render: () => (
     <TransferInputStep
-      {...args}
-      currentPoint={BigInt(args.currentPoint || 0)}
+      user={mockUser}
+      currentPoint={BigInt(50000)}
+      isLoading={false}
+      title="ポイントを支給する"
+      recipientLabel="支給する相手"
+      submitLabel="支給"
+      backLabel="支給先を選び直す"
       onBack={() => console.log("Back clicked")}
       onSubmit={(amount) => console.log("Submit clicked with amount:", amount)}
     />
@@ -145,19 +133,15 @@ export const LowBalance: Story = {
 };
 
 export const CustomLabels: Story = {
-  args: {
-    user: mockUser,
-    currentPoint: 2000000,
-    isLoading: false,
-    title: "ポイント寄付",
-    recipientLabel: "寄付先",
-    submitLabel: "寄付する",
-    backLabel: "寄付先を変更",
-  },
-  render: (args) => (
+  render: () => (
     <TransferInputStep
-      {...args}
-      currentPoint={BigInt(args.currentPoint || 0)}
+      user={mockUser}
+      currentPoint={BigInt(2000000)}
+      isLoading={false}
+      title="ポイント寄付"
+      recipientLabel="寄付先"
+      submitLabel="寄付する"
+      backLabel="寄付先を変更"
       onBack={() => console.log("Back clicked")}
       onSubmit={(amount) => console.log("Submit clicked with amount:", amount)}
     />
@@ -165,20 +149,16 @@ export const CustomLabels: Story = {
 };
 
 export const CustomPresetAmounts: Story = {
-  args: {
-    user: mockUser,
-    currentPoint: 5000000,
-    isLoading: false,
-    title: "ポイントを支給する",
-    recipientLabel: "支給する相手",
-    submitLabel: "支給",
-    backLabel: "支給先を選び直す",
-    presetAmounts: [50000, 100000, 200000, 500000],
-  },
-  render: (args) => (
+  render: () => (
     <TransferInputStep
-      {...args}
-      currentPoint={BigInt(args.currentPoint || 0)}
+      user={mockUser}
+      currentPoint={BigInt(5000000)}
+      isLoading={false}
+      title="ポイントを支給する"
+      recipientLabel="支給する相手"
+      submitLabel="支給"
+      backLabel="支給先を選び直す"
+      presetAmounts={[50000, 100000, 200000, 500000]}
       onBack={() => console.log("Back clicked")}
       onSubmit={(amount) => console.log("Submit clicked with amount:", amount)}
     />
@@ -186,22 +166,18 @@ export const CustomPresetAmounts: Story = {
 };
 
 export const UserWithoutImage: Story = {
-  args: {
-    user: {
-      ...mockUser,
-      image: null,
-    },
-    currentPoint: 1000000,
-    isLoading: false,
-    title: "ポイントを支給する",
-    recipientLabel: "支給する相手",
-    submitLabel: "支給",
-    backLabel: "支給先を選び直す",
-  },
-  render: (args) => (
+  render: () => (
     <TransferInputStep
-      {...args}
-      currentPoint={BigInt(args.currentPoint || 0)}
+      user={{
+        ...mockUser,
+        image: null,
+      }}
+      currentPoint={BigInt(1000000)}
+      isLoading={false}
+      title="ポイントを支給する"
+      recipientLabel="支給する相手"
+      submitLabel="支給"
+      backLabel="支給先を選び直す"
       onBack={() => console.log("Back clicked")}
       onSubmit={(amount) => console.log("Submit clicked with amount:", amount)}
     />

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
-import { UserInfoCard } from "@/app/admin/wallet/grant/components/UserInfoCard";
+import UserInfoCard from "@/app/admin/wallet/grant/components/UserInfoCard";
 import { GqlUser } from "@/types/graphql";
 import MainContent from "@/components/layout/MainContent";
 
