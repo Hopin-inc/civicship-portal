@@ -160,6 +160,7 @@ export default function ConfirmPage() {
         </div>
         <div className="mx-6 border-b border-gray-200 my-6"></div>
         {isActivity && (
+          <>
           <PaymentSection
             ticketCount={ ticketCounter.count }
             onIncrement={ ticketCounter.increment }
@@ -177,8 +178,9 @@ export default function ConfirmPage() {
             onPointCountChange={setSelectedPointCount}
             onTicketCountChange={setSelectedTicketCount}
           />
+          <div className="border-b border-gray-200 my-6"></div>
+          </>
         )}
-        <div className="mx-6 border-b border-gray-200 my-6"></div>
         <div className="mb-2" />
         {/* <NotesSection /> */}
         <CommentInput
