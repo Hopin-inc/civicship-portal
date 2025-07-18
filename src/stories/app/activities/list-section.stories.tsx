@@ -1,25 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
-import { MapPin } from "lucide-react";
+import ActivitiesListSection from "@/app/activities/components/ListSection/ListSection";
+import { ActivityCard } from "@/app/activities/data/type";
+import { GqlOpportunityCategory } from "@/types/graphql";
 
-const GqlOpportunityCategory = {
-  Activity: "ACTIVITY",
-  Event: "EVENT",
-  Quest: "QUEST",
-} as const;
+const MockImage = ({ src, alt, width, height, ...props }: any) => (
+  <img src={src} alt={alt} width={width} height={height} {...props} />
+);
 
-type GqlOpportunityCategory = (typeof GqlOpportunityCategory)[keyof typeof GqlOpportunityCategory];
-
-interface ActivityCard {
-  id: string;
-  communityId: string;
-  category: GqlOpportunityCategory;
-  title: string;
-  images: string[];
-  location: string;
-  feeRequired: number | null;
-  hasReservableTicket: boolean;
-}
+const PLACEHOLDER_IMAGE = "https://via.placeholder.com/400x300?text=No+Image";
 
 const mockActivityCards: ActivityCard[] = [
   {
@@ -104,121 +93,15 @@ const mockActivityCards: ActivityCard[] = [
   },
 ];
 
-const MockOpportunityCard = ({ opportunity }: { opportunity: ActivityCard }) => {
-  const { id, title, feeRequired, location, images, hasReservableTicket, communityId } = opportunity;
 
-  return (
-    <div className="relative w-full">
-      <div className="w-full h-[205px] overflow-hidden relative bg-gray-200 rounded-lg">
-        {hasReservableTicket && (
-          <div className="absolute top-2 left-2 bg-white text-blue-600 px-2.5 py-1 rounded-xl text-xs font-bold z-10">
-            チケット利用可
-          </div>
-        )}
-        <img
-          src={images?.[0] || "https://via.placeholder.com/400x300?text=No+Image"}
-          alt={title}
-          className="h-full w-full object-cover"
-        />
-      </div>
-      <div className="mt-3">
-        <h3 className="text-sm font-medium text-gray-900 line-clamp-2">{title}</h3>
-        <div className="mt-2 flex flex-col">
-          <p className="text-sm text-gray-600">
-            {feeRequired != null ? `1人あたり${feeRequired.toLocaleString()}円から` : "料金未定"}
-          </p>
-          <div className="flex items-center text-sm text-gray-600 mt-1">
-            <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
-            <span className="line-clamp-1 break-words">{location}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const MockListSection = ({
-  opportunities = mockActivityCards,
-  isLoading = false,
-  isInitialLoading = false,
-}: {
-  opportunities?: ActivityCard[];
-  isLoading?: boolean;
-  isInitialLoading?: boolean;
-}) => {
-  if (isInitialLoading) {
-    return (
-      <section className="py-6">
-        <div className="px-4">
-          <div className="h-6 bg-gray-200 rounded w-32 mb-4 animate-pulse"></div>
-          <div className="grid grid-cols-2 gap-4">
-            {Array.from({ length: 6 }, (_, i) => (
-              <div key={i} className="w-full">
-                <div className="h-[205px] bg-gray-200 rounded-lg animate-pulse"></div>
-                <div className="mt-3 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (opportunities.length === 0) {
-    return null;
-  }
-
-  return (
-    <section className="py-6">
-      <div className="px-4">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">すべてのアクティビティ</h2>
-        <div className="grid grid-cols-2 gap-4">
-          {opportunities.map((opportunity) => (
-            <MockOpportunityCard
-              key={opportunity.id}
-              opportunity={opportunity}
-            />
-          ))}
-          {isLoading && (
-            <>
-              <div className="w-full">
-                <div className="h-[205px] bg-gray-200 rounded-lg animate-pulse"></div>
-                <div className="mt-3 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                </div>
-              </div>
-              <div className="w-full">
-                <div className="h-[205px] bg-gray-200 rounded-lg animate-pulse"></div>
-                <div className="mt-3 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const meta: Meta<typeof MockListSection> = {
+const meta: Meta<typeof ActivitiesListSection> = {
   title: "App/Activities/ListSection",
-  component: MockListSection,
+  component: ActivitiesListSection,
   tags: ["autodocs"],
   argTypes: {
     opportunities: {
       control: "object",
       description: "Array of activity cards to display",
-    },
-    isLoading: {
-      control: "boolean",
-      description: "Whether additional content is loading",
     },
     isInitialLoading: {
       control: "boolean",
@@ -227,34 +110,35 @@ const meta: Meta<typeof MockListSection> = {
   },
   parameters: {
     layout: "fullscreen",
+    nextjs: {
+      appDirectory: true,
+    },
   },
   decorators: [
-    (Story) => (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-screen-xl mx-auto">
-          <Story />
+    (Story) => {
+      if (typeof window !== 'undefined') {
+        (window as any).Image = MockImage;
+        (window as any).PLACEHOLDER_IMAGE = PLACEHOLDER_IMAGE;
+      }
+      
+      return (
+        <div className="min-h-screen bg-gray-50">
+          <div className="max-w-screen-xl mx-auto">
+            <Story />
+          </div>
         </div>
-      </div>
-    ),
+      );
+    },
   ],
 };
 
 export default meta;
 
-type Story = StoryObj<typeof MockListSection>;
+type Story = StoryObj<typeof ActivitiesListSection>;
 
 export const Default: Story = {
   args: {
     opportunities: mockActivityCards,
-    isLoading: false,
-    isInitialLoading: false,
-  },
-};
-
-export const Loading: Story = {
-  args: {
-    opportunities: mockActivityCards.slice(0, 4),
-    isLoading: true,
     isInitialLoading: false,
   },
 };
@@ -262,23 +146,13 @@ export const Loading: Story = {
 export const InitialLoading: Story = {
   args: {
     opportunities: [],
-    isLoading: false,
     isInitialLoading: true,
-  },
-};
-
-export const FewActivities: Story = {
-  args: {
-    opportunities: mockActivityCards.slice(0, 3),
-    isLoading: false,
-    isInitialLoading: false,
   },
 };
 
 export const SingleActivity: Story = {
   args: {
     opportunities: [mockActivityCards[0]],
-    isLoading: false,
     isInitialLoading: false,
   },
 };
@@ -286,7 +160,6 @@ export const SingleActivity: Story = {
 export const EmptyState: Story = {
   args: {
     opportunities: [],
-    isLoading: false,
     isInitialLoading: false,
   },
 };
@@ -294,7 +167,6 @@ export const EmptyState: Story = {
 export const FreeActivities: Story = {
   args: {
     opportunities: mockActivityCards.filter(activity => activity.feeRequired === null),
-    isLoading: false,
     isInitialLoading: false,
   },
 };
@@ -302,7 +174,6 @@ export const FreeActivities: Story = {
 export const TicketActivities: Story = {
   args: {
     opportunities: mockActivityCards.filter(activity => activity.hasReservableTicket),
-    isLoading: false,
     isInitialLoading: false,
   },
 };
@@ -313,11 +184,10 @@ export const ManyActivities: Story = {
       ...mockActivityCards,
       ...mockActivityCards.map(activity => ({
         ...activity,
-        id: activity.id + "_duplicate",
+        id: activity.id + "_extra",
         title: activity.title + " (追加)",
       })),
     ],
-    isLoading: false,
     isInitialLoading: false,
   },
 };

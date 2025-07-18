@@ -1,25 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
-import { MapPin } from "lucide-react";
+import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
+import { ActivityCard } from "@/app/activities/data/type";
+import { GqlOpportunityCategory } from "@/types/graphql";
 
-const GqlOpportunityCategory = {
-  Activity: "ACTIVITY",
-  Event: "EVENT",
-  Quest: "QUEST",
-} as const;
+const MockImage = ({ src, alt, width, height, ...props }: any) => (
+  <img src={src} alt={alt} width={width} height={height} {...props} />
+);
 
-type GqlOpportunityCategory = (typeof GqlOpportunityCategory)[keyof typeof GqlOpportunityCategory];
-
-interface ActivityCard {
-  id: string;
-  communityId: string;
-  category: GqlOpportunityCategory;
-  title: string;
-  images: string[];
-  location: string;
-  feeRequired: number | null;
-  hasReservableTicket: boolean;
-}
+const PLACEHOLDER_IMAGE = "https://via.placeholder.com/400x300?text=No+Image";
 
 const mockActivityCards: ActivityCard[] = [
   {
@@ -74,110 +63,9 @@ const mockActivityCards: ActivityCard[] = [
   },
 ];
 
-const MockOpportunityCard = ({ opportunity, isCarousel = false }: { opportunity: ActivityCard; isCarousel?: boolean }) => {
-  const { title, feeRequired, location, images, hasReservableTicket } = opportunity;
-
-  return (
-    <div className={`relative w-full flex-shrink-0 ${isCarousel ? "max-w-[150px] sm:max-w-[164px]" : ""}`}>
-      <div className="w-full h-[205px] overflow-hidden relative bg-gray-200 rounded-lg">
-        {hasReservableTicket && (
-          <div className="absolute top-2 left-2 bg-white text-blue-600 px-2.5 py-1 rounded-xl text-xs font-bold z-10">
-            チケット利用可
-          </div>
-        )}
-        <img
-          src={images?.[0] || "https://via.placeholder.com/400x300?text=No+Image"}
-          alt={title}
-          className="h-full w-full object-cover"
-        />
-      </div>
-      <div className="mt-3">
-        <h3 className="text-sm font-medium text-gray-900 line-clamp-2">{title}</h3>
-        <div className="mt-2 flex flex-col">
-          <p className="text-sm text-gray-600">
-            {feeRequired != null ? `1人あたり${feeRequired.toLocaleString()}円から` : "料金未定"}
-          </p>
-          <div className="flex items-center text-sm text-gray-600 mt-1">
-            <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
-            <span className="line-clamp-1 break-words">{location}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const MockCarouselSection = ({
-  title = "おすすめアクティビティ",
-  opportunities = mockActivityCards,
-  isLoading = false,
-  isInitialLoading = false,
-  searchFormat = false,
-}: {
-  title?: string;
-  opportunities?: ActivityCard[];
-  isLoading?: boolean;
-  isInitialLoading?: boolean;
-  searchFormat?: boolean;
-}) => {
-  if (isInitialLoading) {
-    return (
-      <section className="py-6">
-        <div className="px-4">
-          <div className="h-6 bg-gray-200 rounded w-48 mb-4 animate-pulse"></div>
-          <div className="flex space-x-4 overflow-x-auto">
-            {Array.from({ length: 3 }, (_, i) => (
-              <div key={i} className="flex-shrink-0 w-[164px]">
-                <div className="h-[205px] bg-gray-200 rounded-lg animate-pulse"></div>
-                <div className="mt-3 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (opportunities.length === 0) {
-    return null;
-  }
-
-  const displayTitle = searchFormat ? `${title} (${opportunities.length}件)` : title;
-
-  return (
-    <section className="py-6">
-      <div className="px-4">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">{displayTitle}</h2>
-        <div className="flex space-x-4 overflow-x-auto pb-2">
-          {opportunities.map((opportunity) => (
-            <MockOpportunityCard
-              key={opportunity.id}
-              opportunity={opportunity}
-              isCarousel={true}
-            />
-          ))}
-          {isLoading && (
-            <div className="flex-shrink-0 w-[164px]">
-              <div className="h-[205px] bg-gray-200 rounded-lg animate-pulse"></div>
-              <div className="mt-3 space-y-2">
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const meta: Meta<typeof MockCarouselSection> = {
+const meta: Meta<typeof ActivitiesCarouselSection> = {
   title: "App/Activities/CarouselSection",
-  component: MockCarouselSection,
+  component: ActivitiesCarouselSection,
   tags: ["autodocs"],
   argTypes: {
     title: {
@@ -188,64 +76,58 @@ const meta: Meta<typeof MockCarouselSection> = {
       control: "object",
       description: "Array of activity cards to display",
     },
-    isLoading: {
-      control: "boolean",
-      description: "Whether additional content is loading",
-    },
     isInitialLoading: {
       control: "boolean",
       description: "Whether initial content is loading",
     },
-    searchFormat: {
+    isSearchResult: {
       control: "boolean",
-      description: "Whether to show count in title (search results format)",
+      description: "Whether this is a search result with date parsing",
     },
   },
   parameters: {
     layout: "fullscreen",
+    nextjs: {
+      appDirectory: true,
+    },
   },
   decorators: [
-    (Story) => (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-screen-xl mx-auto">
-          <Story />
+    (Story) => {
+      if (typeof window !== 'undefined') {
+        (window as any).Image = MockImage;
+        (window as any).PLACEHOLDER_IMAGE = PLACEHOLDER_IMAGE;
+      }
+      
+      return (
+        <div className="min-h-screen bg-gray-50">
+          <div className="max-w-screen-xl mx-auto">
+            <Story />
+          </div>
         </div>
-      </div>
-    ),
+      );
+    },
   ],
 };
 
 export default meta;
 
-type Story = StoryObj<typeof MockCarouselSection>;
+type Story = StoryObj<typeof ActivitiesCarouselSection>;
 
 export const Default: Story = {
   args: {
     title: "おすすめアクティビティ",
     opportunities: mockActivityCards,
-    isLoading: false,
     isInitialLoading: false,
-    searchFormat: false,
+    isSearchResult: false,
   },
 };
 
 export const SearchResults: Story = {
   args: {
-    title: "検索結果",
+    title: "7/25(木)",
     opportunities: mockActivityCards.slice(0, 3),
-    isLoading: false,
     isInitialLoading: false,
-    searchFormat: true,
-  },
-};
-
-export const Loading: Story = {
-  args: {
-    title: "おすすめアクティビティ",
-    opportunities: mockActivityCards.slice(0, 2),
-    isLoading: true,
-    isInitialLoading: false,
-    searchFormat: false,
+    isSearchResult: true,
   },
 };
 
@@ -253,9 +135,8 @@ export const InitialLoading: Story = {
   args: {
     title: "おすすめアクティビティ",
     opportunities: [],
-    isLoading: false,
     isInitialLoading: true,
-    searchFormat: false,
+    isSearchResult: false,
   },
 };
 
@@ -263,9 +144,8 @@ export const SingleActivity: Story = {
   args: {
     title: "特集アクティビティ",
     opportunities: [mockActivityCards[0]],
-    isLoading: false,
     isInitialLoading: false,
-    searchFormat: false,
+    isSearchResult: false,
   },
 };
 
@@ -273,9 +153,8 @@ export const EmptyState: Story = {
   args: {
     title: "関連アクティビティ",
     opportunities: [],
-    isLoading: false,
     isInitialLoading: false,
-    searchFormat: false,
+    isSearchResult: false,
   },
 };
 
@@ -283,9 +162,8 @@ export const FreeActivities: Story = {
   args: {
     title: "無料アクティビティ",
     opportunities: mockActivityCards.filter(activity => activity.feeRequired === null),
-    isLoading: false,
     isInitialLoading: false,
-    searchFormat: true,
+    isSearchResult: false,
   },
 };
 
@@ -293,9 +171,8 @@ export const TicketActivities: Story = {
   args: {
     title: "チケット利用可能",
     opportunities: mockActivityCards.filter(activity => activity.hasReservableTicket),
-    isLoading: false,
     isInitialLoading: false,
-    searchFormat: false,
+    isSearchResult: false,
   },
 };
 
@@ -303,8 +180,7 @@ export const LongTitle: Story = {
   args: {
     title: "四国地域の伝統文化体験とコミュニティ活動",
     opportunities: mockActivityCards.slice(0, 4),
-    isLoading: false,
     isInitialLoading: false,
-    searchFormat: false,
+    isSearchResult: false,
   },
 };

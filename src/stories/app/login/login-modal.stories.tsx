@@ -1,132 +1,96 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 
-const MockAuthProvider = ({ 
-  isAuthenticated = false, 
-  isPhoneVerified = false, 
-  isUserRegistered = false,
-  children 
+const MockLoginModal = ({ 
+  isOpen, 
+  onClose, 
+  nextPath,
+  mockAuthState = "unauthenticated"
 }: { 
-  isAuthenticated?: boolean;
-  isPhoneVerified?: boolean; 
-  isUserRegistered?: boolean;
-  children: React.ReactNode;
+  isOpen: boolean;
+  onClose: () => void;
+  nextPath?: string;
+  mockAuthState?: "unauthenticated" | "authenticated" | "authenticating";
 }) => {
-  return <div>{children}</div>;
-};
+  const [agreedTerms, setAgreedTerms] = React.useState(false);
+  const [agreedPrivacy, setAgreedPrivacy] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
-const MockLoginModal = ({
-  isAuthenticated = false,
-  isPhoneVerified = false,
-  isUserRegistered = false,
-  isLoading = false,
-  hasError = false,
-  termsAgreed = false,
-  privacyAgreed = false,
-}: {
-  isAuthenticated?: boolean;
-  isPhoneVerified?: boolean;
-  isUserRegistered?: boolean;
-  isLoading?: boolean;
-  hasError?: boolean;
-  termsAgreed?: boolean;
-  privacyAgreed?: boolean;
-}) => {
-  const handleLineLogin = () => {
-    console.log("LINE login clicked");
+  const handleLogin = () => {
+    if (!agreedTerms || !agreedPrivacy) {
+      setError("すべての同意が必要です");
+      return;
+    }
+    console.log("Mock login with LIFF called");
+    onClose();
   };
 
-  const handleTermsChange = (checked: boolean) => {
-    console.log("Terms agreement changed:", checked);
-  };
-
-  const handlePrivacyChange = (checked: boolean) => {
-    console.log("Privacy agreement changed:", checked);
-  };
-
-  const handleUserRegistration = () => {
-    console.log("User registration clicked");
-  };
-
-  if (isUserRegistered) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-          <h2 className="text-xl font-bold mb-4 text-center">ユーザー登録</h2>
-          <p className="text-gray-600 mb-6 text-center">
-            アカウントが作成されました。ユーザー情報を登録してください。
-          </p>
-          <button
-            onClick={handleUserRegistration}
-            className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors"
-          >
-            ユーザー登録を開始
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h2 className="text-xl font-bold mb-6 text-center">ログイン</h2>
-        
-        <div className="space-y-4 mb-6">
-          <label className="flex items-start space-x-3">
-            <input
-              type="checkbox"
-              checked={termsAgreed}
-              onChange={(e) => handleTermsChange(e.target.checked)}
-              className="mt-1"
-            />
-            <span className="text-sm text-gray-600">
-              <a href="#" className="text-blue-600 underline">利用規約</a>に同意します
-            </span>
-          </label>
-          
-          <label className="flex items-start space-x-3">
-            <input
-              type="checkbox"
-              checked={privacyAgreed}
-              onChange={(e) => handlePrivacyChange(e.target.checked)}
-              className="mt-1"
-            />
-            <span className="text-sm text-gray-600">
-              <a href="#" className="text-blue-600 underline">プライバシーポリシー</a>に同意します
-            </span>
-          </label>
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-end">
+      <div className="w-full max-w-mobile-l mx-auto bg-white rounded-t-2xl p-12 min-h-[240px] max-h-[90dvh] overflow-y-auto">
+        <div className="text-body-md mb-6">
+          <strong className="font-bold">NEO88</strong>
+          {mockAuthState === "authenticated" 
+            ? "を利用するにはユーザー登録してください" 
+            : "を利用するにはLINEでログインして下さい"
+          }
         </div>
+        
+        <div className="flex flex-col items-start space-y-8">
+          <div className="space-y-3">
+            <div className="flex items-center space-x-4">
+              <input
+                type="checkbox"
+                id="agree-terms"
+                checked={agreedTerms}
+                onChange={(e) => setAgreedTerms(e.target.checked)}
+                className="w-5 h-5"
+                disabled={mockAuthState === "authenticating"}
+              />
+              <label htmlFor="agree-terms" className="text-label-md text-muted-foreground">
+                <a href="/terms" className="underline">利用規約</a>
+                <span className="text-label-sm">に同意する</span>
+              </label>
+            </div>
 
-        {hasError && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">
-              ログインに失敗しました。もう一度お試しください。
-            </p>
+            <div className="flex items-center space-x-4">
+              <input
+                type="checkbox"
+                id="agree-privacy"
+                checked={agreedPrivacy}
+                onChange={(e) => setAgreedPrivacy(e.target.checked)}
+                className="w-5 h-5"
+                disabled={mockAuthState === "authenticating"}
+              />
+              <label htmlFor="agree-privacy" className="text-label-md text-muted-foreground">
+                <a href="/privacy" className="underline">プライバシーポリシー</a>
+                <span className="text-label-sm">に同意する</span>
+              </label>
+            </div>
           </div>
-        )}
 
-        <button
-          onClick={handleLineLogin}
-          disabled={!termsAgreed || !privacyAgreed || isLoading}
-          className="w-full bg-green-500 text-white py-3 rounded-lg font-medium hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-        >
-          {isLoading ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              <span>ログイン中...</span>
-            </>
+          {error && <p className="text-sm text-red-500 mb-4 text-center">{error}</p>}
+
+          {mockAuthState !== "authenticated" ? (
+            <button
+              onClick={handleLogin}
+              disabled={mockAuthState === "authenticating"}
+              className="w-full bg-[#06C755] hover:bg-[#05B74B] text-white rounded-full h-14 flex items-center justify-center gap-2"
+            >
+              <img src="/images/line-icon.png" alt="LINE" width={24} height={24} />
+              {mockAuthState === "authenticating" ? "ログイン中..." : "LINEでログイン"}
+            </button>
           ) : (
-            <>
-              <span>🟢</span>
-              <span>LINEでログイン</span>
-            </>
+            <a
+              href={`/sign-up/phone-verification?next=${nextPath || ""}`}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full h-14 flex items-center justify-center"
+            >
+              ユーザー登録に進む
+            </a>
           )}
-        </button>
-
-        <p className="text-xs text-gray-500 mt-4 text-center">
-          ログインすることで、利用規約とプライバシーポリシーに同意したものとみなされます。
-        </p>
+        </div>
       </div>
     </div>
   );
@@ -137,53 +101,28 @@ const meta: Meta<typeof MockLoginModal> = {
   component: MockLoginModal,
   tags: ["autodocs"],
   argTypes: {
-    isAuthenticated: {
+    isOpen: {
       control: "boolean",
-      description: "Whether user is authenticated with LINE",
+      description: "Whether the modal is open",
     },
-    isPhoneVerified: {
-      control: "boolean",
-      description: "Whether user has verified their phone number",
+    nextPath: {
+      control: "text",
+      description: "Path to redirect to after login",
     },
-    isUserRegistered: {
-      control: "boolean",
-      description: "Whether user has completed registration",
-    },
-    isLoading: {
-      control: "boolean",
-      description: "Whether login is in progress",
-    },
-    hasError: {
-      control: "boolean",
-      description: "Whether there is a login error",
-    },
-    termsAgreed: {
-      control: "boolean",
-      description: "Whether user has agreed to terms",
-    },
-    privacyAgreed: {
-      control: "boolean",
-      description: "Whether user has agreed to privacy policy",
+    mockAuthState: {
+      control: "select",
+      options: ["unauthenticated", "authenticated", "authenticating"],
+      description: "Mock authentication state",
     },
   },
   parameters: {
     layout: "fullscreen",
   },
   decorators: [
-    (Story, { args }) => (
-      <MockAuthProvider
-        isAuthenticated={args.isAuthenticated}
-        isPhoneVerified={args.isPhoneVerified}
-        isUserRegistered={args.isUserRegistered}
-      >
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Background Page</h1>
-            <p className="text-gray-600">This is the background content behind the modal</p>
-          </div>
-          <Story />
-        </div>
-      </MockAuthProvider>
+    (Story) => (
+      <div className="min-h-screen bg-gray-50">
+        <Story />
+      </div>
     ),
   ],
 };
@@ -194,72 +133,68 @@ type Story = StoryObj<typeof MockLoginModal>;
 
 export const Default: Story = {
   args: {
-    isAuthenticated: false,
-    isPhoneVerified: false,
-    isUserRegistered: false,
-    isLoading: false,
-    hasError: false,
-    termsAgreed: false,
-    privacyAgreed: false,
+    isOpen: true,
+    onClose: () => console.log("Modal closed"),
+    nextPath: "/",
+    mockAuthState: "unauthenticated",
   },
 };
 
-export const WithAgreements: Story = {
+export const WithNextPath: Story = {
   args: {
-    isAuthenticated: false,
-    isPhoneVerified: false,
-    isUserRegistered: false,
-    isLoading: false,
-    hasError: false,
-    termsAgreed: true,
-    privacyAgreed: true,
+    isOpen: true,
+    onClose: () => console.log("Modal closed"),
+    nextPath: "/activities",
+    mockAuthState: "unauthenticated",
   },
 };
 
-export const Loading: Story = {
+export const AlreadyAuthenticated: Story = {
   args: {
-    isAuthenticated: false,
-    isPhoneVerified: false,
-    isUserRegistered: false,
-    isLoading: true,
-    hasError: false,
-    termsAgreed: true,
-    privacyAgreed: true,
+    isOpen: true,
+    onClose: () => console.log("Modal closed"),
+    nextPath: "/",
+    mockAuthState: "authenticated",
   },
 };
 
-export const WithError: Story = {
+export const Authenticating: Story = {
   args: {
-    isAuthenticated: false,
-    isPhoneVerified: false,
-    isUserRegistered: false,
-    isLoading: false,
-    hasError: true,
-    termsAgreed: true,
-    privacyAgreed: true,
+    isOpen: true,
+    onClose: () => console.log("Modal closed"),
+    nextPath: "/",
+    mockAuthState: "authenticating",
   },
 };
 
-export const UserRegistrationPrompt: Story = {
+export const Closed: Story = {
   args: {
-    isAuthenticated: true,
-    isPhoneVerified: true,
-    isUserRegistered: true,
-    isLoading: false,
-    hasError: false,
-    termsAgreed: true,
-    privacyAgreed: true,
+    isOpen: false,
+    onClose: () => console.log("Modal closed"),
+    nextPath: "/",
+    mockAuthState: "unauthenticated",
   },
 };
 
-export const PartialAgreement: Story = {
-  args: {
-    isAuthenticated: false,
-    isPhoneVerified: false,
-    isUserRegistered: false,
-    isLoading: false,
-    hasError: false,
-    termsAgreed: true,
-    privacyAgreed: false,
+export const Interactive: Story = {
+  render: () => {
+    const [isOpen, setIsOpen] = React.useState(false);
+
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          ログインモーダルを開く
+        </button>
+        <MockLoginModal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          nextPath="/activities"
+          mockAuthState="unauthenticated"
+        />
+      </div>
+    );
   },
 };
