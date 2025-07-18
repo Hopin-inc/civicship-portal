@@ -2920,6 +2920,7 @@ export type GqlGetMembershipListQueryVariables = Exact<{
   cursor?: InputMaybe<GqlMembershipCursorInput>;
   filter?: InputMaybe<GqlMembershipFilterInput>;
   sort?: InputMaybe<GqlMembershipSortInput>;
+  withWallets?: Scalars["Boolean"]["input"];
   withDidIssuanceRequests?: Scalars["Boolean"]["input"];
 }>;
 
@@ -2966,6 +2967,18 @@ export type GqlGetMembershipListQuery = {
             completedAt?: Date | null;
             createdAt?: Date | null;
             updatedAt?: Date | null;
+          }> | null;
+          wallets?: Array<{
+            __typename?: "Wallet";
+            id: string;
+            type: GqlWalletType;
+            community?: {
+              __typename?: "Community";
+              id: string;
+              name?: string | null;
+              image?: string | null;
+            } | null;
+            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
           }> | null;
           nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
@@ -6573,6 +6586,7 @@ export const GetMembershipListDocument = gql`
     $cursor: MembershipCursorInput
     $filter: MembershipFilterInput
     $sort: MembershipSortInput
+    $withWallets: Boolean! = false
     $withDidIssuanceRequests: Boolean! = false
   ) {
     memberships(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
@@ -6592,6 +6606,12 @@ export const GetMembershipListDocument = gql`
             didIssuanceRequests @include(if: $withDidIssuanceRequests) {
               ...DidIssuanceRequestFields
             }
+            wallets @include(if: $withWallets) {
+              ...WalletFields
+              community {
+                ...CommunityFields
+              }
+            }
           }
           community {
             ...CommunityFields
@@ -6603,6 +6623,7 @@ export const GetMembershipListDocument = gql`
   ${MembershipFieldsFragmentDoc}
   ${UserFieldsFragmentDoc}
   ${DidIssuanceRequestFieldsFragmentDoc}
+  ${WalletFieldsFragmentDoc}
   ${CommunityFieldsFragmentDoc}
 `;
 
@@ -6622,6 +6643,7 @@ export const GetMembershipListDocument = gql`
  *      cursor: // value for 'cursor'
  *      filter: // value for 'filter'
  *      sort: // value for 'sort'
+ *      withWallets: // value for 'withWallets'
  *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
