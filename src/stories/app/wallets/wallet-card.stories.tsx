@@ -56,7 +56,11 @@ const meta: Meta<typeof WalletCard> = {
 
 export default meta;
 
-type Story = StoryObj<typeof WalletCard>;
+type Story = StoryObj<{
+  currentPoint: number;
+  isLoading: boolean;
+  showRefreshButton: boolean;
+}>;
 
 export const Default: Story = {
   args: {

@@ -28,10 +28,9 @@ const mockArticles: TArticleWithAuthor[] = [
     title: "地域活性化のための新しい取り組み",
     introduction: "香川県では地域コミュニティの活性化を目指し、住民参加型のプロジェクトが始動しています。",
     thumbnail: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop",
-    category: "community",
+    category: "ACTIVITY_REPORT",
     publishedAt: "2024-01-15T10:00:00Z",
     author: {
-      id: "author1",
       name: "田中太郎",
       image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
     },
@@ -41,10 +40,9 @@ const mockArticles: TArticleWithAuthor[] = [
     title: "四国の伝統工芸を学ぶワークショップ",
     introduction: "讃岐うどんの製麺技術から陶芸まで、四国の伝統工芸を体験できるワークショップが開催されます。",
     thumbnail: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-    category: "workshop",
+    category: "INTERVIEW",
     publishedAt: "2024-01-20T14:30:00Z",
     author: {
-      id: "author2",
       name: "佐藤花子",
       image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
     },
@@ -54,10 +52,9 @@ const mockArticles: TArticleWithAuthor[] = [
     title: "地域清掃ボランティア活動報告",
     introduction: "先月実施された地域清掃ボランティア活動の成果と参加者の声をお届けします。",
     thumbnail: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
-    category: "volunteer",
+    category: "ACTIVITY_REPORT",
     publishedAt: "2024-01-25T09:15:00Z",
     author: {
-      id: "author3",
       name: "山田次郎",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
     },
@@ -67,10 +64,9 @@ const mockArticles: TArticleWithAuthor[] = [
     title: "地域イベント「秋祭り」開催のお知らせ",
     introduction: "今年も地域の秋祭りが開催されます。伝統的な催し物から新しい企画まで盛りだくさんです。",
     thumbnail: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=400&h=300&fit=crop",
-    category: "event",
+    category: "INTERVIEW",
     publishedAt: "2024-01-30T16:45:00Z",
     author: {
-      id: "author4",
       name: "鈴木美咲",
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
     },
@@ -164,7 +160,7 @@ export const ArticlesWithoutThumbnails: Story = {
   args: {
     articles: mockArticles.map(article => ({
       ...article,
-      thumbnail: null,
+      thumbnail: "",
     })),
   },
 };

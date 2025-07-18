@@ -26,10 +26,9 @@ const mockArticleWithAuthor: TArticleWithAuthor = {
   title: "地域活性化のための新しい取り組み",
   introduction: "香川県では地域コミュニティの活性化を目指し、住民参加型のプロジェクトが始動しています。",
   thumbnail: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop",
-  category: "community",
+  category: "ACTIVITY_REPORT",
   publishedAt: "2024-01-15T10:00:00Z",
   author: {
-    id: "author1",
     name: "田中太郎",
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
   },
@@ -40,7 +39,7 @@ const mockArticleCard: TArticleCard = {
   title: "四国の伝統工芸を学ぶワークショップ",
   introduction: "讃岐うどんの製麺技術から陶芸まで、四国の伝統工芸を体験できるワークショップが開催されます。",
   thumbnail: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-  category: "workshop",
+  category: "INTERVIEW",
   publishedAt: "2024-01-20T14:30:00Z",
 };
 
@@ -118,7 +117,7 @@ export const NoThumbnail: Story = {
   args: {
     article: {
       ...mockArticleWithAuthor,
-      thumbnail: null,
+      thumbnail: "",
     },
     showCategory: true,
     showUser: true,
@@ -152,7 +151,7 @@ export const DifferentCategories: Story = {
         <ArticleCard 
           article={{
             ...mockArticleCard,
-            category: "event",
+            category: "ACTIVITY_REPORT",
             title: "地域イベント情報",
           }}
           showCategory={true}
@@ -161,7 +160,7 @@ export const DifferentCategories: Story = {
         <ArticleCard 
           article={{
             ...mockArticleCard,
-            category: "news",
+            category: "INTERVIEW",
             title: "地域ニュース",
           }}
           showCategory={true}
@@ -170,7 +169,7 @@ export const DifferentCategories: Story = {
         <ArticleCard 
           article={{
             ...mockArticleCard,
-            category: "workshop",
+            category: "ACTIVITY_REPORT",
             title: "ワークショップ案内",
           }}
           showCategory={true}

@@ -10,25 +10,16 @@ const mockUsers: GqlUser[] = [
     id: "user1",
     name: "田中太郎",
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
-    didInfo: {
-      didValue: "did:example:123456789abcdef",
-    },
   },
   {
     id: "user2",
     name: "佐藤花子",
     image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-    didInfo: {
-      didValue: "did:example:987654321fedcba",
-    },
   },
   {
     id: "user3",
     name: "山田次郎",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-    didInfo: {
-      didValue: "did:example:456789123abcdef",
-    },
   },
 ];
 
