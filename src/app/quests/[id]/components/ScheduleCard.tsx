@@ -2,23 +2,25 @@
 
 import React from "react";
 import { AvailableSlotCard, FullSlotCard } from "./cards";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 
 interface ActivityScheduleCardProps {
-  slot: ActivitySlot;
+  slot: QuestSlot;
   opportunityId: string;
   communityId: string;
+  pointsToEarn: number;
 }
 
 export const ScheduleCard: React.FC<ActivityScheduleCardProps> = ({
   slot,
   opportunityId,
   communityId,
+  pointsToEarn,
 }) => {
   const isFull = slot.remainingCapacity === 0;
   return isFull
-    ? <FullSlotCard slot={slot} />
-    : <AvailableSlotCard slot={slot} opportunityId={opportunityId} communityId={communityId} />
+    ? <FullSlotCard slot={slot} pointsToEarn={pointsToEarn} />
+    : <AvailableSlotCard slot={slot} opportunityId={opportunityId} communityId={communityId} pointsToEarn={pointsToEarn} />
 };
 
 

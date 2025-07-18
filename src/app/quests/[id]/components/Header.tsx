@@ -2,12 +2,12 @@
 
 import React from "react";
 import { MapPin } from "lucide-react";
-import { ActivityDetail } from "@/app/activities/data/type";
+import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import ImagesCarousel from "@/components/ui/images-carousel";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface HeaderProps {
-  opportunity: ActivityDetail;
+  opportunity: QuestDetail;
 }
 
 export const Header: React.FC<HeaderProps> = ({

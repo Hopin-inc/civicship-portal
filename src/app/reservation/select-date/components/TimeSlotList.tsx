@@ -4,11 +4,14 @@ import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opp
 import { formatTimeRange } from "@/utils/date";
 import { isBefore } from "date-fns";
 import { getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
+import { GqlOpportunityCategory } from "@/types/graphql";
 
 interface TimeSlotListProps {
   dateSections: ActivitySlotGroup[];
   isSlotAvailable: (slot: ActivitySlot) => boolean;
   onSelectSlot: (slot: ActivitySlot) => void;
+  pointsToEarn: number;
+  category: GqlOpportunityCategory;
 }
 
 export const parseJapaneseDateLabel = (label: string) => {
@@ -35,6 +38,8 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
   dateSections,
   isSlotAvailable,
   onSelectSlot,
+  pointsToEarn,
+  category,
 }) => {
   const handleSelectSlot = useCallback(
     (slot: ActivitySlot) => () => onSelectSlot(slot),
@@ -78,15 +83,26 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                       >
                         {formatTimeRange(slot.startsAt, slot.endsAt)}
                       </p>
-                      <p
-                        className={`text-md font-bold ${
-                          isFull || !isFeeSpecified || isRegistrationClosed
-                            ? "text-muted-foreground/50"
-                            : ""
-                        }`}
-                      >
-                        {isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円/人` : "料金未定"}
-                      </p>
+                      {category === GqlOpportunityCategory.Activity && (
+                        <p
+                          className={`text-md font-bold ${
+                            isFull || !isFeeSpecified || isRegistrationClosed
+                              ? "text-muted-foreground/50"
+                              : ""
+                          }`}
+                        >
+                          {isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円/人` : "料金未定"}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-1 pt-1">
+                          <p className={`${isFull || isRegistrationClosed ? "bg-ring" : "bg-primary"} text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none`}>
+                            P
+                          </p>
+                          <p className={`${isFull || isRegistrationClosed ? "text-caption" : ""}`}>
+                            <span className="font-bold text-body-md">{pointsToEarn.toLocaleString()}pt</span>
+                            <span className="text-sm font-sm">もらえる</span>
+                          </p>
+                      </div>
                     </div>
 
                     {isFull ? (
