@@ -2,7 +2,6 @@
 
 import SearchForm from "@/components/shared/SearchForm";
 import React, { useState } from "react";
-import SearchForm from "@/components/shared/SearchForm";
 
 interface SearchSectionProps {
   onSearch: (query: string) => void;

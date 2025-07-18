@@ -10,14 +10,14 @@ export type OpportunityCard = ActivityCard | QuestCard;
 
 export type ActivityCard = OpportunityBaseCard & {
   feeRequired: number | null;
-  pointsToRequired: boolean | null;
+  pointsRequired: number | null;
   slots: GqlOpportunitySlot[];
 };
 
 export type QuestCard = OpportunityBaseCard & {
   pointsToEarn: number | null;
   slots: GqlOpportunitySlot[];
-  pointsToRequired: boolean | null;
+  pointsRequired: number | null;
 };
 
 export type OpportunityBaseCard = CommunityId & {
@@ -47,6 +47,7 @@ export type QuestDetail = OpportunityDetail & {
   category: GqlOpportunityCategory;
   relatedQuests: QuestCard[];
   pointsToEarn: number;
+  pointsRequired: number;
 };
 
 export type OpportunityDetail = CommunityId & {
@@ -56,7 +57,7 @@ export type OpportunityDetail = CommunityId & {
 
   requireApproval: boolean;
   targetUtilities: RequiredUtility[];
-
+  pointsRequired: number;
   isReservable: boolean;
 
   description: string;
