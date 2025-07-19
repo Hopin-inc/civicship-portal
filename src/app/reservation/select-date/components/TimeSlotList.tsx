@@ -94,6 +94,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                           {isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円/人` : "料金未定"}
                         </p>
                       )}
+                      {category === GqlOpportunityCategory.Quest && (
                       <div className="flex items-center gap-1 pt-1">
                           <p className={`${isFull || isRegistrationClosed ? "bg-ring" : "bg-primary"} text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none`}>
                             P
@@ -103,6 +104,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                             <span className="text-sm font-sm">もらえる</span>
                           </p>
                       </div>
+                      )}
                     </div>
 
                     {isFull ? (
