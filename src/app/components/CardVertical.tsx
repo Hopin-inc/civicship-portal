@@ -13,13 +13,13 @@ interface OpportunityCardVerticalProps {
   isCarousel?: boolean;
 }
 
-const selectBadge = (hasReservableTicket: boolean | null, pointsToRequired: boolean | null) => {
+const selectBadge = (hasReservableTicket: boolean | null, pointsRequired: number | null) => {
   switch (true) {
-    case hasReservableTicket && pointsToRequired:
+    case hasReservableTicket && pointsRequired !== null && pointsRequired > 0:
       return "チケット利用可";
     case hasReservableTicket:
       return "チケット利用可";
-    case pointsToRequired:
+    case pointsRequired !== null && pointsRequired > 0:
       return "ポイントが使える";
     default:
       return null;
@@ -41,7 +41,7 @@ export default function OpportunityCardVertical({
 }: OpportunityCardVerticalProps) {
   const { id, title, location, images, hasReservableTicket, communityId,category} = opportunity;
   const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
-  const pointsToRequired = 'pointsToRequired' in opportunity ? opportunity.pointsToRequired : null;
+  const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired : null;
   const pointsToEarn = 'pointsToEarn' in opportunity ? opportunity.pointsToEarn : null;
   return (
     <Link
@@ -49,9 +49,9 @@ export default function OpportunityCardVertical({
       className={`relative w-full flex-shrink-0 ${isCarousel ? "max-w-[150px] sm:max-w-[164px]" : ""}`}
     >
       <Card className="w-full h-[205px] overflow-hidden relative">
-        {(hasReservableTicket || pointsToRequired) && category === GqlOpportunityCategory.Activity && (
+        {(hasReservableTicket || pointsRequired !== null) && category === GqlOpportunityCategory.Activity && (
           <div className="absolute top-2 left-2 bg-primary-foreground text-primary px-2.5 py-1 rounded-xl text-label-xs font-bold z-10">
-            {selectBadge(hasReservableTicket, pointsToRequired)}
+            {selectBadge(hasReservableTicket, pointsRequired)}
           </div>
         )}
         <Image

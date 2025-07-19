@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
 import { ActivityCard, QuestCard } from "@/app/activities/data/type";
 import OpportunitiesListSectionSkeleton from "@/app/activities/components/ListSection/ListSectionSkeleton";
+import CardVertical from "@/app/components/CardVertical";
 
 interface ActivitiesAllSectionProps {
   opportunities: (ActivityCard | QuestCard)[];
@@ -26,7 +26,7 @@ const ActivitiesListSection: React.FC<ActivitiesAllSectionProps> = ({
       {isTitle && <h2 className="text-display-md">すべての体験</h2>}
       <div className="mt-6 grid grid-cols-2 gap-4">
         {opportunities.map((opportunity) => (
-          <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} />
+          <CardVertical key={opportunity.id} opportunity={opportunity} />
         ))}
       </div>
       <div className="h-10" aria-hidden="true"></div>

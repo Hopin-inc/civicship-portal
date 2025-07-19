@@ -1,13 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
-import { GqlWallet, useGetUserWalletQuery } from "@/types/graphql";
-import { ActivityDetail } from "@/app/activities/data/type";
+import { GqlOpportunityCategory, GqlWallet, useGetUserWalletQuery } from "@/types/graphql";
+import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
 import { useSlotDateRange } from "@/app/reservation/confirm/hooks/useSlotDateRange";
 
 export function useSlotAndTicketInfo(
-  opportunity: ActivityDetail | null,
+  opportunity: ActivityDetail | QuestDetail | null,
   userId?: string,
   slotId?: string,
 ) {
@@ -24,6 +24,10 @@ export function useSlotAndTicketInfo(
     if (!opportunity || !slotId) return null;
     return opportunity.slots.find((slot) => slot.id === slotId) ?? null;
   }, [opportunity, slotId]);
+
+  const isActivity = (opportunity: any): opportunity is ActivityDetail => {
+    return opportunity?.category === GqlOpportunityCategory.Activity;
+  };
 
   // --- チケットと日付情報 ---
   const availableTickets = useAvailableTickets(opportunity, userId);

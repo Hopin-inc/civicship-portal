@@ -158,7 +158,7 @@ function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
   }
 
   if (searchParams.points === "1") {
-    filter.pointsToRequired = true;
+    filter.pointsRequired = 1;
   }
 
   if (searchParams.q) {

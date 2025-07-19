@@ -59,7 +59,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
         <div className="flex justify-around items-center">
           {currentCommunityConfig.enableFeatures.includes("opportunities") && (
             <Link
-              href="/activities"
+              href="/"
               className={cn(getLinkStyle("/activities", "/activities/*", "/search/*"), "flex-grow")}
             >
               <Search size={24} />
