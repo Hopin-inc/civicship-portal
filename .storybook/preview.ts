@@ -1,11 +1,5 @@
 import type { Preview } from "@storybook/nextjs-vite";
 import React from "react";
-import { MockedProvider } from "@apollo/client/testing";
-import {
-  GetTransactionsDocument,
-  GetMembershipListDocument,
-  GetDidIssuanceRequestsDocument,
-} from "../src/types/graphql";
 import "../src/app/globals.css";
 
 const mockAuthValue = {
@@ -32,9 +26,9 @@ const mockAuthValue = {
   loading: false,
 };
 
-
 const MockAuthProvider = ({ children }: { children: React.ReactNode }) => {
-  return children;
+  const AuthContext = React.createContext(mockAuthValue);
+  return React.createElement(AuthContext.Provider, { value: mockAuthValue }, children);
 };
 
 const MockHeaderProvider = ({ children }: { children: React.ReactNode }) => {
@@ -55,87 +49,13 @@ const MockHeaderProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const MockApolloProvider = ({ children }: { children: React.ReactNode }) => {
-  const mocks = [
-    {
-      request: {
-        query: GetTransactionsDocument,
-      },
-      result: {
-        data: {
-          transactions: {
-            edges: [],
-            pageInfo: {
-              hasNextPage: false,
-              hasPreviousPage: false,
-              startCursor: null,
-              endCursor: null,
-            },
-            totalCount: 0,
-          },
-        },
-      },
-    },
-    {
-      request: {
-        query: GetMembershipListDocument,
-      },
-      result: {
-        data: {
-          memberships: {
-            edges: [],
-            pageInfo: {
-              hasNextPage: false,
-              hasPreviousPage: false,
-              startCursor: null,
-              endCursor: null,
-            },
-            totalCount: 0,
-          },
-        },
-      },
-    },
-    {
-      request: {
-        query: GetDidIssuanceRequestsDocument,
-      },
-      result: {
-        data: {
-          users: {
-            edges: [],
-          },
-        },
-      },
-    },
-  ];
-
-  return React.createElement(
-    MockedProvider,
-    { mocks, addTypename: false },
-    children
-  );
-};
-
 const MockProviders = ({ children }: { children: React.ReactNode }) => {
   return React.createElement(
-    MockApolloProvider,
+    MockAuthProvider,
     null,
-    React.createElement(
-      MockAuthProvider,
-      null,
-      React.createElement(MockHeaderProvider, null, children)
-    )
+    React.createElement(MockHeaderProvider, null, children)
   );
 };
-
-if (typeof window !== 'undefined') {
-  const mockLogger = {
-    info: () => {},
-    warn: () => {},
-    error: () => {},
-    debug: () => {},
-  };
-}
 
 const preview: Preview = {
   parameters: {
