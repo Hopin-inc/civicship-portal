@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
-import { CommentInput } from "./components/ParticipationAge";
+import { CommentTextarea } from "./components/ParticipationAge";
 import { errorMessages } from "@/utils/errorMessage";
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
 import { GqlOpportunityCategory, GqlWalletType, useGetMemberWalletsQuery } from "@/types/graphql";
@@ -36,7 +36,7 @@ export default function ConfirmPage() {
     [],
   );
   useHeaderConfig(headerConfig);
-  const { user } = useAuth();
+  const { user,isAuthenticated } = useAuth();
   const router = useRouter();
 
   const {
@@ -183,7 +183,7 @@ export default function ConfirmPage() {
         )}
         <div className="mb-2" />
         {/* <NotesSection /> */}
-        <CommentInput
+        <CommentTextarea
           title={"主催者への伝言"}
           description={"案内人の事前準備が変わる場合があるため、参加者の年齢等の記入にご協力ください"} 
           placeholder="1歳、５歳、５１歳"
@@ -212,7 +212,8 @@ export default function ConfirmPage() {
             <div className="border-b border-gray-200 my-6"></div>
           </div>
         )}
-        <footer className="max-w-mobile-l w-full h-20 flex items-center px-4 py-6 justify-between mx-auto">
+        <footer className="max-w-mobile-l w-full h-20 flex items-center px-4 py-4 justify-between mx-auto">
+          {isAuthenticated ? (
           <Button
             size="lg"
             className="mx-auto px-20"
@@ -223,6 +224,20 @@ export default function ConfirmPage() {
           >
             { creatingReservation ? "申込処理中..." : "申し込みを確定" }
           </Button>
+        ) : (
+          <Button
+            size="lg"
+            variant="secondary"
+            className="mx-auto px-20"
+            onClick={ () => ui.setIsLoginModalOpen(true) }
+          >
+            <p className="whitespace-pre-line">
+              <span className="text-label-md font-bold">LINEログインして</span>
+              <br />
+              <span className="text-label-lg pt-1 font-bold">申し込む</span>
+            </p>
+          </Button>
+        )}
         </footer>
       </main>
     </>

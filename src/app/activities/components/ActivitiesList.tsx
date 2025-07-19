@@ -32,9 +32,9 @@ export default function ActivitiesList() {
     const isEmpty =
     recommendedOpportunities.length === 0 && Object.keys(groupedOpportunities).length === 0;
 
-  if (isEmpty) {
-    return <EmptySearchResults searchQuery={queryParams.q} />;
-  }
+    if (!loading && isEmpty) {
+      return <EmptySearchResults searchQuery={queryParams.q} />;
+    }
   
   return (
     <>
