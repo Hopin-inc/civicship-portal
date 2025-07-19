@@ -34,10 +34,10 @@ const config: StorybookConfig = {
     config.plugins.push({
       name: 'mock-auth-provider',
       transform(code: string, id: string) {
-        if (id.includes('RouteGuard') || id.includes('MainContent')) {
+        if (id.includes('RouteGuard') || id.includes('MainContent') || id.includes('HistoryTab') || id.includes('MemberTab') || id.includes('UserSelectStep')) {
           return code.replace(
             /import\s*{\s*useAuth\s*}\s*from\s*['"]@\/contexts\/AuthProvider['"]/g,
-            'const useAuth = () => ({ user: null, firebaseUser: null, uid: null, isAuthenticated: false, isPhoneVerified: false, isUserRegistered: false, authenticationState: "unauthenticated", isAuthenticating: false, environment: "development", loginWithLiff: async () => false, logout: async () => {}, phoneAuth: { startPhoneVerification: async () => null, verifyPhoneCode: async () => false, clearRecaptcha: () => {}, isVerifying: false, phoneUid: null }, createUser: async () => null, updateAuthState: async () => {}, loading: false })'
+            'const useAuth = () => ({ user: { id: "mock-user-id", name: "Mock User" }, firebaseUser: null, uid: "mock-uid", isAuthenticated: true, isPhoneVerified: true, isUserRegistered: true, authenticationState: "user_registered", isAuthenticating: false, environment: "development", loginWithLiff: async () => false, logout: async () => {}, phoneAuth: { startPhoneVerification: async () => null, verifyPhoneCode: async () => false, clearRecaptcha: () => {}, isVerifying: false, phoneUid: null }, createUser: async () => null, updateAuthState: async () => {}, loading: false })'
           );
         }
         return null;
