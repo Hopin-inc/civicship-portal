@@ -13,7 +13,7 @@ interface PaymentSummaryProps {
 export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
   ({ pricePerPerson, participantCount, useTickets, ticketCount, usePoints, pointCount, pointsRequired }) => {
     const totalAmount = pricePerPerson != null ? pricePerPerson * participantCount : null;
-    const discount = useTickets || usePoints ? (pointCount * (pointsRequired ?? 0))+(ticketCount * (pricePerPerson ?? 0)) : 0;
+    const discount = useTickets || usePoints ? (pointCount * (pricePerPerson ?? 0))+(ticketCount * (pricePerPerson ?? 0)) : 0;
     const summaryAmount = totalAmount != null ? totalAmount - discount : null;
     return (
       <>
@@ -56,11 +56,11 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
               <div className="flex justify-between text-body-sm text-muted-foreground">
                 <span>ポイント利用</span>
                 <div>
-                  <span>{pointsRequired?.toLocaleString()}円</span>
+                  <span>{pricePerPerson?.toLocaleString()}円</span>
                   <span className="mx-2">×</span>
                   <span>{pointCount}名</span>
                   <span className="mx-2">=</span>
-                  <span>{(pointCount * (pointsRequired ?? 0)).toLocaleString()}円</span>
+                  <span>{(pointCount * (pricePerPerson ?? 0)).toLocaleString()}円</span>
                 </div>
               </div>
             {/* )} */}
