@@ -64,6 +64,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Run GraphQL depth limit check
+        run: pnpm run lint:graphql
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:

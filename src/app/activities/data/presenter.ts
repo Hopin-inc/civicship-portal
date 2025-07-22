@@ -15,9 +15,9 @@ import { presenterPlace } from "@/app/places/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   getReservationThreshold,
-  isDateReservable,
 } from "@/app/reservation/data/presenter/opportunitySlot";
 import { format, isAfter } from "date-fns";
+import { getCrossDayLabel } from "@/utils/date";
 import { ja } from "date-fns/locale";
 
 export const presenterActivityCards = (
@@ -167,7 +167,7 @@ function presenterActivitySlot(
   threshold: Date,
   feeRequired?: Maybe<number> | undefined,
 ): ActivitySlot[] {
-  const SLOT_IDS_TO_FORCE_RESERVABLE = ["cmc07ao5c0005s60nnc8ravvk"];
+  const SLOT_IDS_TO_FORCE_RESERVABLE = ["cmc07ao5c0005s60nnc8ravvk","cmajo3nfj001es60nltawe4a6"];
 
   return (
     slots?.map((slot): ActivitySlot => {
@@ -261,6 +261,7 @@ export const presenterReservationDateTimeInfo = (
       minute: "2-digit",
       hour12: false,
     }),
+    dateDiffLabel: getCrossDayLabel(startDate, endDate),
     participantCount,
     paidParticipantCount,
     totalPrice: (opportunity.feeRequired ?? 0) * paidParticipantCount,

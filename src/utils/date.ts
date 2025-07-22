@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import type { Locale } from "date-fns";
 import { logger } from "@/lib/logging";
+import { differenceInCalendarDays } from "date-fns";
 
 export const parseDateTime = (dateTimeStr: string | null | undefined): Date | null => {
   if (!dateTimeStr) return null;
@@ -78,7 +79,7 @@ export function formatJapaneseDateTime(startDateTime: string, endDateTime: strin
   const end = new Date(endDateTime);
 
   const pad = (n: number) => n.toString().padStart(2, "0");
-  
+
   // 曜日の配列
   const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
   const weekday = weekdays[start.getDay()];
@@ -89,3 +90,12 @@ export function formatJapaneseDateTime(startDateTime: string, endDateTime: strin
 
   return `${date} ${startTime}~${endTime}`;
 }
+
+export const getCrossDayLabel = (startDate: Date, endDate: Date) => {
+  const diff = differenceInCalendarDays(endDate, startDate);
+  if (diff === 0) return null;
+  if (diff === 1) return "翌日";
+  if (diff === 2) return "翌々日";
+  if (diff >= 3) return `${diff}日後`;
+  return null;
+};
