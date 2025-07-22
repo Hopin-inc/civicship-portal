@@ -103,7 +103,7 @@ function presenterActivitySlot(
   threshold: Date,
   feeRequired?: Maybe<number> | undefined,
 ): ActivitySlot[] {
-  const SLOT_IDS_TO_FORCE_RESERVABLE = ["cmc07ao5c0005s60nnc8ravvk"];
+  const SLOT_IDS_TO_FORCE_RESERVABLE = ["cmc07ao5c0005s60nnc8ravvk","cmajo3nfj001es60nltawe4a6"];
 
   return (
     slots?.map((slot): ActivitySlot => {
