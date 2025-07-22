@@ -7,7 +7,7 @@ import React from "react";
 interface Props {
   otherUser: GqlUser | undefined | null;
   label?: string | { text: string; smallText: string };
-  point?: number;
+  point?: bigint;
   sign?: string;
   pointColor?: string;
   didValue?: string;

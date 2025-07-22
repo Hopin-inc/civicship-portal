@@ -5,9 +5,10 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useSelection } from "../../context/SelectionContext";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { STEPS } from "../CredentialIssuanceWizard";
+import SearchForm from "@/components/shared/SearchForm";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 const STEP_NUMBERS = {
@@ -22,7 +23,9 @@ const STEP_COLORS = {
 
 export default function OpportunityList({ setStep }: { setStep: (step: number) => void }) {
   const { user } = useAuth();
-  const { selectedSlot, setSelectedSlot } = useSelection();
+  const { selectedSlot,setSelectedSlot } = useSelection();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [input, setInput] = useState("");
   const router = useRouter();
 
   const headerConfig = useMemo(
@@ -39,6 +42,7 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
     variables: {
       filter: {
         communityIds: [COMMUNITY_ID],
+        keyword: searchQuery,
       },
       sort: { createdAt: GqlSortDirection.Desc },
       first: 20,
@@ -67,6 +71,14 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
           <span className={`${STEP_COLORS.GRAY} text-base`}>)</span>
         </span>
       </div>
+      <div>
+          <SearchForm
+            placeholder="募集を検索"
+            onSearch={setSearchQuery}
+            value={input}
+            onInputChange={setInput}
+          />
+        </div>
       <div className="flex-1">
         <div className="grid gap-4">
           {opportunityList?.map((opportunity) => (

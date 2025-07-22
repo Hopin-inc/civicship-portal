@@ -1,8 +1,8 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const GET_EVALUATIONS = gql`
-  query GetEvaluations ($withDidIssuanceRequests: Boolean! = false) {
-    evaluations {
+  query GetEvaluations($filter: EvaluationFilterInput, $withDidIssuanceRequests: Boolean! = false) {
+    evaluations(filter: $filter) {
       edges {
         node {
           id
@@ -68,22 +68,22 @@ export const GET_EVALUATION = gql`
         }
       }
       participation {
-          opportunitySlot {
+        opportunitySlot {
+          id
+          startsAt
+          endsAt
+          capacity
+          opportunity {
             id
-            startsAt
-            endsAt
-            capacity
-            opportunity {
+            title
+            description
+            createdByUser {
               id
-              title
-              description
-              createdByUser {
-                id
-                name
-              }
+              name
             }
           }
         }
+      }
     }
   }
 `;
