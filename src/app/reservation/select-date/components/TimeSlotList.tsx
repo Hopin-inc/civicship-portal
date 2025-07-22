@@ -41,7 +41,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
     [onSelectSlot],
   );
 
-  const registrationCutoff = addDays(new Date(), 7);
+  const registrationCutoff = getReservationThreshold();
 
   return (
     <div className="space-y-8">
