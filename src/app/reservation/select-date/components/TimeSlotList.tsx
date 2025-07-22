@@ -58,7 +58,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
               const startsAtDate = new Date(slot.startsAt);
               const endsAtDate = new Date(slot.endsAt);
 
-              const FORCE_RESERVABLE_SLOT_IDS = ["cmc07ao5c0005s60nnc8ravvk"];
+              const FORCE_RESERVABLE_SLOT_IDS = ["cmc07ao5c0005s60nnc8ravvk", "cmajo3nfj001es60nltawe4a6"];
               const isForceReservable = FORCE_RESERVABLE_SLOT_IDS.includes(slot.id);
               const isRegistrationClosed =
                 !isForceReservable && isBefore(startsAtDate, registrationCutoff);
