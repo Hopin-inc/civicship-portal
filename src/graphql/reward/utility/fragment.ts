@@ -7,7 +7,21 @@ export const UTILITY_FRAGMENT = gql`
     description
     images
     publishStatus
-    
     pointsRequired
+  }
+`;
+
+export const UTILITY_WITH_OWNER_FRAGMENT = gql`
+  fragment UtilityWithOwnerFields on Utility {
+    id
+    name
+    description
+    images
+    publishStatus
+    pointsRequired
+    owner {
+      id
+      name
+    }
   }
 `; 
