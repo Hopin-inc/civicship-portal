@@ -1,5 +1,6 @@
 "use client";
 
+import SearchForm from "@/components/shared/SearchForm";
 import React, { useState } from "react";
 
 interface SearchSectionProps {

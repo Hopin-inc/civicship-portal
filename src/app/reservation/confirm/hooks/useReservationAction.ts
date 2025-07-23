@@ -25,6 +25,8 @@ interface ReservationParams {
   ticketCounter: UseTicketCounterReturn;
   participantCount: number;
   useTickets: boolean;
+  usePoints: boolean;
+  selectedPointCount: number;
   comment?: string;
 }
 
@@ -41,6 +43,8 @@ export const useReservationCommand = () => {
       useTickets,
       comment,
       participantCount,
+      usePoints,
+      selectedPointCount
     }: ReservationParams): Promise<Result> => {
       if (loading) return { success: false, code: GqlErrorCode.Unknown };
       if (!user) return { success: false, code: GqlErrorCode.Unauthenticated };
@@ -63,6 +67,7 @@ export const useReservationCommand = () => {
               paymentMethod: useTickets ? "TICKET" : "FEE",
               ticketIdsIfNeed: useTickets ? ticketIds : undefined,
               comment: comment ?? undefined,
+              participantCountWithPoints: usePoints ? selectedPointCount : undefined,
             },
           },
         });

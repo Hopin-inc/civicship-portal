@@ -94,6 +94,8 @@ export default function ConfirmPage() {
       participantCount,
       useTickets: ui.useTickets,
       comment: ui.ageComment ?? undefined,
+      usePoints: ui.usePoints,
+      selectedPointCount: selectedPointCount,
     });
 
     if (creatingReservation) {
