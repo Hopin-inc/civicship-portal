@@ -16,7 +16,7 @@ export const useOpportunityDetail = (id: string) => {
       id,
       permission: { communityId: COMMUNITY_ID },
       slotSort: { startsAt: GqlSortDirection.Asc },
-      slotFilter: { hostingStatus: GqlOpportunitySlotHostingStatus.Scheduled },
+      slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
     },
     skip: !id,
     fetchPolicy: "network-only",
