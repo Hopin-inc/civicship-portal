@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo } from "react";
-import Image from "next/image";
 import { AlertCircle, CalendarX } from "lucide-react";
 import SameStateActivities from "./SimilarActivitiesList";
 import ActivityScheduleCard from "./ActivityScheduleCard";
@@ -17,9 +16,10 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import IconWrapper from "@/components/shared/IconWrapper";
 import AddressMap from "@/components/shared/AddressMap";
-import { PLACEHOLDER_IMAGE } from "@/utils";
 import { ActivityBodySection } from "@/app/activities/[id]/components/ActivityBodySection";
 import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
@@ -40,7 +40,9 @@ const ActivityDetailsContent = ({
     <>
       <ActivityBodySection body={opportunity.description + "\n\n" + opportunity.body} />
       <HostInfoSection host={opportunity.host} />
-      <PlaceSection place={opportunity.place} />
+      {opportunity.place?.name && opportunity.place?.address && (
+        <PlaceSection place={opportunity.place} />
+      )}
       <ScheduleSection
         slots={availableDates}
         opportunityId={opportunity.id}
@@ -65,25 +67,18 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
       <div className="rounded-xl flex flex-col gap-4">
         <div className="flex items-center gap-4">
           {host.id ? (
-            <Link
-              href={`/users/${host.id}`}
-              className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0"
-            >
-              <Image
-                src={host.image || PLACEHOLDER_IMAGE}
-                alt={host.name || "案内者"}
-                fill
-                className="object-cover"
-              />
+            <Link href={`/users/${host.id}`} className="flex-shrink-0">
+              <Avatar className="w-16 h-16 mt-1">
+                <AvatarImage src={host.image ?? PLACEHOLDER_IMAGE} alt={host.name || "案内人"} />
+                <AvatarFallback>{host.name?.[0] || "U"}</AvatarFallback>
+              </Avatar>
             </Link>
           ) : (
-            <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-              <Image
-                src={host.image || PLACEHOLDER_IMAGE}
-                alt={host.name || "案内者"}
-                fill
-                className="object-cover"
-              />
+            <div className="flex-shrink-0">
+              <Avatar className="w-16 h-16 mt-1">
+                <AvatarImage src={host.image ?? PLACEHOLDER_IMAGE} alt={host.name || "案内人"} />
+                <AvatarFallback>{host.name?.[0] || "U"}</AvatarFallback>
+              </Avatar>
             </div>
           )}
           <div>
@@ -100,6 +95,8 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
 };
 
 const PlaceSection = ({ place }: { place: OpportunityPlace }) => {
+  if (!place) return null;
+
   return (
     <section className="pt-6 pb-8 mt-0">
       <h2 className="text-display-md text-foreground mb-4">集合場所</h2>
