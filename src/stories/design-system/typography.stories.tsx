@@ -152,7 +152,7 @@ export const BodySizes: Story = {
             lineHeight="--line-height-md (160%)"
             description="Standard body text for most content"
           >
-            Body MD - This is the standard body text used throughout the application. It's the default choice for paragraphs, descriptions, and general content that users will read regularly.
+            Body MD - This is the standard body text used throughout the application. It&apos;s the default choice for paragraphs, descriptions, and general content that users will read regularly.
           </TypographyExample>
           
           <TypographyExample 
@@ -161,7 +161,7 @@ export const BodySizes: Story = {
             lineHeight="--line-height-md (160%)"
             description="Small body text for secondary content"
           >
-            Body SM - This is small body text used for secondary information, captions, and content that supports the main text. It's still readable but takes up less visual space.
+            Body SM - This is small body text used for secondary information, captions, and content that supports the main text. It&apos;s still readable but takes up less visual space.
           </TypographyExample>
           
           <TypographyExample 
@@ -170,7 +170,7 @@ export const BodySizes: Story = {
             lineHeight="--line-height-md (160%)"
             description="Extra small body text for fine print and metadata"
           >
-            Body XS - This is extra small body text used for fine print, metadata, timestamps, and other supporting information that doesn't need to be prominent.
+            Body XS - This is extra small body text used for fine print, metadata, timestamps, and other supporting information that doesn&apos;t need to be prominent.
           </TypographyExample>
         </div>
       </div>
@@ -179,7 +179,6 @@ export const BodySizes: Story = {
 };
 
 export const LabelSizes: Story = {
-  name: "Label Text",
   render: () => (
     <div className="space-y-6">
       <div>
@@ -227,7 +226,6 @@ export const LabelSizes: Story = {
 };
 
 export const FontWeights: Story = {
-  name: "Font Weights",
   render: () => (
     <div className="space-y-6">
       <div>
@@ -274,7 +272,6 @@ export const FontWeights: Story = {
 };
 
 export const LineHeights: Story = {
-  name: "Line Heights",
   render: () => (
     <div className="space-y-6">
       <div>
@@ -310,7 +307,6 @@ export const LineHeights: Story = {
 };
 
 export const TypographyScale: Story = {
-  name: "Complete Typography Scale",
   render: () => (
     <div className="space-y-8">
       <div className="text-center">
@@ -347,7 +343,6 @@ export const TypographyScale: Story = {
 };
 
 export const UsageExamples: Story = {
-  name: "Usage Examples",
   render: () => (
     <div className="space-y-8">
       <div>
@@ -363,7 +358,7 @@ export const UsageExamples: Story = {
               Join us for an exciting summer festival featuring local artists, food vendors, and family-friendly activities.
             </p>
             <p className="text-body-md mb-4">
-              This year's festival will take place at Central Park and will feature over 50 local vendors, live music performances, and interactive workshops for all ages. The event is designed to bring our community together and celebrate local culture.
+              This year&apos;s festival will take place at Central Park and will feature over 50 local vendors, live music performances, and interactive workshops for all ages. The event is designed to bring our community together and celebrate local culture.
             </p>
             <div className="text-label-sm text-muted-foreground">
               Tags: Community, Events, Summer, Festival
@@ -392,7 +387,7 @@ export const UsageExamples: Story = {
                   Enter your email
                 </div>
                 <p className="text-body-xs text-muted-foreground mt-1">
-                  We'll use this to send you event updates
+                  We&apos;ll use this to send you event updates
                 </p>
               </div>
             </div>

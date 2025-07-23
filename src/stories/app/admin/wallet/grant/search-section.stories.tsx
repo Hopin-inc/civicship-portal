@@ -9,7 +9,7 @@ const SearchSectionWrapper = () => {
     <div className="space-y-4">
       <div className="p-4 bg-gray-100 rounded">
         <p className="text-sm text-gray-600">
-          検索クエリ: "{searchQuery}"
+          検索クエリ: &quot;{searchQuery}&quot;
         </p>
       </div>
       <SearchSection onSearch={setSearchQuery} />
