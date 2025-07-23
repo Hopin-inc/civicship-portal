@@ -131,7 +131,7 @@ export default function ConfirmPage() {
         <LoginModal
           isOpen={ ui.isLoginModalOpen }
           onClose={ () => ui.setIsLoginModalOpen(false) }
-          nextPath={ `/login?next=${ encodeURIComponentWithType(window.location.pathname + window.location.search as RawURIComponent) }` as RawURIComponent }
+          nextPath={ window.location.pathname + window.location.search as RawURIComponent }
         />
         <div className="px-6 py-4">
           <NoticeCard title="申し込みは未確定です。" description="最後までご確認いただき確定させて下さい" />

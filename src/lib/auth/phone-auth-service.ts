@@ -157,7 +157,7 @@ export class PhoneAuthService {
         phoneNumber: maskPhoneNumber(phoneNumber),
       });
       this.state.error = error as Error;
-      return null;
+      throw error;
     } finally {
       this.state.isVerifying = false;
     }

@@ -71,7 +71,7 @@ export default function CompletePage() {
 
   if (loading) return <LoadingIndicator fullScreen />;
   if (error || !reservation || !opportunity || !dateTimeInfo)
-    return <ErrorState title="申込完了ページを読み込めませんでした" refetchRef={ refetchRef } />;
+    return <ErrorState title="申込完了ページを読み込めませんでした" refetchRef={refetchRef} />;
 
   return (
     <main className="flex flex-col items-center">
@@ -92,12 +92,12 @@ export default function CompletePage() {
           <div className="px-6 w-full">
             <SameStateActivities
               header="近くでおすすめの関わり"
-              opportunities={ sameStateActivities }
-              currentOpportunityId={ opportunityId }
+              opportunities={sameStateActivities}
+              currentOpportunityId={opportunityId}
             />
           </div>
         </>
-      ) }
+      )}
     </main>
   );
 }

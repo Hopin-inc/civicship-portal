@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from "react";
 import { Calendar, MapPin, User } from "lucide-react";
-import { formatDateTime } from "@/utils/date";
+import { formatDateTime, getCrossDayLabel } from "@/utils/date";
 import { ja } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import SelectionSheet from "@/app/reservation/select-date/components/SelectionSheet";
@@ -31,6 +31,8 @@ const ReservationDetailsCard: React.FC<ReservationDetailsCardProps> = ({
 
   if (!startDateTime || !endDateTime) return null;
 
+  const crossDayLabel = getCrossDayLabel(startDateTime, endDateTime);
+
   return (
     <div className="py-6 px-4 mb-6 space-y-3">
       <h2 className="text-display-sm">申込内容</h2>
@@ -43,6 +45,9 @@ const ReservationDetailsCard: React.FC<ReservationDetailsCardProps> = ({
             </span>
             <span className="text-body-sm text-caption">
               {formatDateTime(startDateTime, "HH:mm")}-{formatDateTime(endDateTime, "HH:mm")}
+              {crossDayLabel && (
+                <span className="text-sm text-caption">（{crossDayLabel}）</span>
+              )}
             </span>
           </div>
         </div>

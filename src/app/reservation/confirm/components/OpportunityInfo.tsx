@@ -6,6 +6,8 @@ import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { formatDateTimeFromISO } from "@/utils/date";
 import { GqlOpportunityCategory, GqlReservation } from "@/types/graphql";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 interface OpportunityInfoProps {
   opportunity: ActivityDetail | QuestDetail | null;
@@ -60,6 +62,7 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity, dateTime
             {opportunity?.title ?? ""}
           </h1>
         </div>
+        <ArrowRight size={20} className="text-primary flex-shrink-0" />
       </div>
       { dateTimeInfo && (
         <dl className="flex justify-between py-5 mt-2 border-b border-foreground-caption items-center">
