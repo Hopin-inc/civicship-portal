@@ -125,6 +125,8 @@ export default function ConfirmPage() {
   };
   const isActivity = opportunity.category === GqlOpportunityCategory.Activity;
   const isQuest = opportunity.category === GqlOpportunityCategory.Quest;
+  const maxTickets = availableTickets.reduce((sum, ticket) => sum + ticket.count, 0);
+  const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired:0;
   return (
     <>
       <main className="min-h-screen">
@@ -159,13 +161,13 @@ export default function ConfirmPage() {
           />
         </div>
         <div className="mx-6 border-b border-gray-200 my-6"></div>
-        {isActivity && (
+        {isActivity && userWallet && userWallet > 0 && userWallet > pointsRequired && maxTickets > 0 && (
           <>
           <PaymentSection
             ticketCount={ ticketCounter.count }
             onIncrement={ ticketCounter.increment }
             onDecrement={ ticketCounter.decrement }
-            maxTickets={ availableTickets.reduce((sum, ticket) => sum + ticket.count, 0) }
+            maxTickets={ maxTickets }
             availableTickets={ availableTickets }
             pricePerPerson={ 'feeRequired' in opportunity ? opportunity.feeRequired : null }
             participantCount={ participantCount }
@@ -194,7 +196,9 @@ export default function ConfirmPage() {
         <div className="mx-6 border-b border-gray-200 my-6"></div>
         {isQuest && (
           <>
-            <ExpectedPoints points={"pointsToEarn" in opportunity ? opportunity.pointsToEarn*participantCount : null} />
+            <ExpectedPoints 
+              points={"pointsToEarn" in opportunity ? opportunity.pointsToEarn * participantCount : null}
+              participantCount={participantCount} />
             <div className="border-b border-gray-200 my-6"></div>
           </>
         )}
@@ -207,7 +211,7 @@ export default function ConfirmPage() {
               ticketCount={ selectedTicketCount }
               usePoints={ ui.usePoints }
               pointCount={ selectedPointCount }
-              pointsRequired={ 'pointsRequired' in opportunity ? opportunity.pointsRequired : null }
+              pointsRequired={pointsRequired ? opportunity.pointsRequired : null }
             />
             <div className="border-b border-gray-200 my-6"></div>
           </div>
