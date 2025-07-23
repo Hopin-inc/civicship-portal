@@ -76,16 +76,18 @@ export default function SearchPage() {
       <div className="flex-1 overflow-auto">
         <div className="container px-4 py-2">
           <FormProvider {...methods}>
-            <SearchTabs
-              selectedTab={selectedTab}
-              onTabChange={(tab: SearchTabType) => {
-                setSelectedTab(tab);
-                // typeパラメータも切り替え
-                const params = new URLSearchParams(searchParams.toString());
-                params.set("type", tab);
-                window.history.replaceState(null, "", `?${params.toString()}`);
-              }}
-            />
+            <div className="mt-2">
+              <SearchTabs
+                selectedTab={selectedTab}
+                onTabChange={(tab: SearchTabType) => {
+                  setSelectedTab(tab);
+                  // typeパラメータも切り替え
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.set("type", tab);
+                  window.history.replaceState(null, "", `?${params.toString()}`);
+                }}
+              />
+            </div>
             <SearchPageContent
               activeForm={activeForm}
               setActiveForm={setActiveForm}

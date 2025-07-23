@@ -18,6 +18,7 @@ export default function ActivitiesList() {
         guests: searchParams.get("guests") ?? undefined,
         type: "activity" as "activity" | undefined,
         ticket: searchParams.get("ticket") ?? undefined,
+        points: searchParams.get("points") ?? undefined,
         q: searchParams.get("q") ?? undefined,
         redirectTo: "/activities",
       }),
@@ -32,9 +33,9 @@ export default function ActivitiesList() {
     const isEmpty =
     recommendedOpportunities.length === 0 && Object.keys(groupedOpportunities).length === 0;
 
-  if (isEmpty) {
-    return <EmptySearchResults searchQuery={queryParams.q} />;
-  }
+    if (!loading && isEmpty) {
+      return <EmptySearchResults searchQuery={queryParams.q} />;
+    }
   
   return (
     <>

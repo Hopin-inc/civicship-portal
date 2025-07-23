@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { UTILITY_WITH_OWNER_FRAGMENT } from "@/graphql/reward/utility/fragment";
 
 export const GET_USER_FLEXIBLE = gql`
   query GetUserFlexible(
@@ -78,10 +79,11 @@ export const GET_USER_WALLET = gql`
         tickets {
           ...TicketFields
           utility {
-            ...UtilityFields
+            ...UtilityWithOwnerFields
           }
         }
       }
     }
   }
+  ${UTILITY_WITH_OWNER_FRAGMENT}
 `;

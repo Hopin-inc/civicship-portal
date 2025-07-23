@@ -91,6 +91,34 @@ export function formatJapaneseDateTime(startDateTime: string, endDateTime: strin
   return `${date} ${startTime}~${endTime}`;
 }
 
+export function formatDateTimeFromParts(formattedDate: string, startTime: string, endTime: string, endDate?: string): string {
+  if (endDate && endDate !== formattedDate) {
+    // 日を跨ぐ場合
+    return `${formattedDate} ${startTime}〜\n${endDate} ${endTime}`;
+  } else {
+    // 同じ日の場合
+    return `${formattedDate} ${startTime}~${endTime}`;
+  }
+}
+
+export function formatDateTimeFromISO(startsAt: string, endsAt: string): string {
+  const start = new Date(startsAt);
+  const end = new Date(endsAt);
+
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  
+  // 曜日の配列
+  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+  
+  const startDate = `${start.getFullYear()}年${pad(start.getMonth() + 1)}月${pad(start.getDate())}日(${weekdays[start.getDay()]})`;
+  const endDate = `${end.getFullYear()}年${pad(end.getMonth() + 1)}月${pad(end.getDate())}日(${weekdays[end.getDay()]})`;
+  
+  const startTime = `${pad(start.getHours())}:${pad(start.getMinutes())}`;
+  const endTime = `${pad(end.getHours())}:${pad(end.getMinutes())}`;
+
+  return formatDateTimeFromParts(startDate, startTime, endTime, startDate === endDate ? undefined : endDate);
+}
+
 export const getCrossDayLabel = (startDate: Date, endDate: Date) => {
   const diff = differenceInCalendarDays(endDate, startDate);
   if (diff === 0) return null;

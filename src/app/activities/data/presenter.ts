@@ -65,7 +65,7 @@ export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCa
     images: node?.images || [],
     communityId: COMMUNITY_ID || "",
     hasReservableTicket: node?.isReservableWithTicket || false,
-    pointsToRequired: node?.pointsToRequired ?? null,
+    pointsRequired: node?.pointsRequired ?? null,
     slots: node?.slots ?? [],
   };
 };
@@ -81,7 +81,7 @@ export const presenterQuestCard = (node: Partial<GqlOpportunity>): QuestCard => 
     hasReservableTicket: node?.isReservableWithTicket || false,
     pointsToEarn: node?.pointsToEarn ?? 0,
     slots: node?.slots ?? [],
-    pointsToRequired: node?.pointsToRequired ?? null,
+    pointsRequired: node?.pointsRequired ?? null,
   };
 };
 
@@ -107,7 +107,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
     feeRequired: data.feeRequired ?? null,
 
     isReservable,
-
+    pointsRequired: data.pointsRequired ?? 0,
     place: presenterPlace(place),
     host: presenterOpportunityHost(createdByUser, articles?.[0]),
     slots: presenterActivitySlot(slots, threshold, data.feeRequired),
@@ -144,6 +144,7 @@ export const presenterQuestDetail = (data: GqlOpportunity): QuestDetail => {
     slots: presenterQuestSlot(slots, threshold),
 
     pointsToEarn: data.pointsToEarn ?? 0,
+    pointsRequired: data.pointsRequired ?? 0,
     relatedQuests: [],
     recentOpportunities: [],
   };
