@@ -23,6 +23,10 @@ export function middleware(request: NextRequest) {
   for (const [feature, routes] of Object.entries(featureToRoutesMap)) {
     if (!enabledFeatures.includes(feature as FeaturesType)) {
       for (const route of routes) {
+        if (feature === "opportunities" && pathname.startsWith("/activities/") && pathname !== "/activities") {
+          continue;
+        }
+        
         if (pathname === route || pathname.startsWith(`${route}/`)) {
           console.log(`Redirecting from disabled feature path: ${pathname} to ${rootPath}`);
           return NextResponse.redirect(new URL(rootPath, request.url));
