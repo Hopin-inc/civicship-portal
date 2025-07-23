@@ -9,7 +9,7 @@ const noopLogger: ILogger = {
 };
 
 const isLocalEnv = process.env.ENV === "LOCAL";
-const isStorybookEnv = process.env.ENV === "STORYBOOK" || typeof window !== "undefined";
+const isStorybookEnv = process.env.ENV === "STORYBOOK";
 
 let logger: ILogger;
 
