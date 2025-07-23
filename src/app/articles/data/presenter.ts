@@ -23,7 +23,7 @@ export const presenterArticleCard = (node?: GqlArticle): TArticleCard => ({
   category: node?.category || GqlArticleCategory.Interview,
   title: node?.title || "",
   introduction: node?.introduction || "",
-  thumbnail: node?.thumbnail || null,
+  thumbnail: node?.thumbnail || "",
   publishedAt: node?.publishedAt ? new Date(node.publishedAt).toISOString() : "",
 });
 
