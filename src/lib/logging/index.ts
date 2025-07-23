@@ -9,10 +9,11 @@ const noopLogger: ILogger = {
 };
 
 const isLocalEnv = process.env.ENV === "LOCAL";
+const isStorybookEnv = process.env.ENV === "STORYBOOK";
 
 let logger: ILogger;
 
-if (isLocalEnv) {
+if (isLocalEnv || isStorybookEnv) {
   logger = noopLogger;
 } else if (typeof window === "undefined") {
   logger = require("./server").default;
