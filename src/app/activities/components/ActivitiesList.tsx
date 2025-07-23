@@ -18,6 +18,7 @@ export default function ActivitiesList() {
         guests: searchParams.get("guests") ?? undefined,
         type: "activity" as "activity" | undefined,
         ticket: searchParams.get("ticket") ?? undefined,
+        points: searchParams.get("points") ?? undefined,
         q: searchParams.get("q") ?? undefined,
         redirectTo: "/activities",
       }),

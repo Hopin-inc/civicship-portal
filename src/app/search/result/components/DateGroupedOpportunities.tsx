@@ -4,7 +4,6 @@ import React from "react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { ActivityCard, QuestCard } from "@/app/activities/data/type";
-import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { CarouselSection } from "@/app/components/CarouselSection";
 
@@ -28,7 +27,7 @@ const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({
         const first = opportunities[0];
         if (first.category === GqlOpportunityCategory.Activity) {
           return (
-            <ActivitiesCarouselSection
+            <CarouselSection
               key={dateKey}
               title={format(new Date(dateKey), "M/d(E)", { locale: ja })}
               opportunities={opportunities as ActivityCard[]}
