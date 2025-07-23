@@ -175,7 +175,6 @@ export const BrandColors: Story = {
 };
 
 export const StatusColors: Story = {
-  name: "Status Colors",
   render: () => (
     <div className="space-y-6">
       <div>
