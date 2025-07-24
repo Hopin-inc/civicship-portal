@@ -102,20 +102,13 @@ export const presenterActivitySlot = (
   feeRequired?: Maybe<number> | undefined,
   opportunityId?: string,
 ): ActivitySlot[] => {
-  const SLOT_IDS_TO_FORCE_RESERVABLE = ["cmc07ao5c0005s60nnc8ravvk","cmajo3nfj001es60nltawe4a6"];
-
   return (
     slots?.map((slot): ActivitySlot => {
       const startsAtDate = slot?.startsAt ? new Date(slot.startsAt) : null;
 
-      const isForceReservable = slot?.id && SLOT_IDS_TO_FORCE_RESERVABLE.includes(slot.id);
-
-      // 通常の条件 or 強制フラグ
-      const isReservable = isForceReservable
-        ? true
-        : startsAtDate
-          ? isAfter(startsAtDate, threshold)
-          : false;
+      const isReservable = startsAtDate
+        ? isAfter(startsAtDate, threshold)
+        : false;
 
       return {
         id: slot?.id,
