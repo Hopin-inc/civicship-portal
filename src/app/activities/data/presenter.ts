@@ -15,7 +15,6 @@ import { presenterPlace } from "@/app/places/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   getReservationThreshold,
-  isDateReservable,
 } from "@/app/reservation/data/presenter/opportunitySlot";
 import { format, isAfter } from "date-fns";
 import { getCrossDayLabel } from "@/utils/date";
@@ -55,7 +54,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
   const { images, place, slots, articles, createdByUser } = data;
   const threshold = getReservationThreshold();
 
-  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired);
+  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired, data.id);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
@@ -76,7 +75,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
 
     place: presenterPlace(place),
     host: presenterOpportunityHost(createdByUser, articles?.[0]),
-    slots: presenterActivitySlot(slots, threshold, data.feeRequired),
+    slots: presenterActivitySlot(slots, threshold, data.feeRequired, data.id),
 
     recentOpportunities: [],
     reservableTickets: [],
@@ -97,11 +96,12 @@ export function presenterOpportunityHost(
   };
 }
 
-function presenterActivitySlot(
+export const presenterActivitySlot = (
   slots: Maybe<GqlOpportunitySlot[]> | undefined,
   threshold: Date,
   feeRequired?: Maybe<number> | undefined,
-): ActivitySlot[] {
+  opportunityId?: string,
+): ActivitySlot[] => {
   const SLOT_IDS_TO_FORCE_RESERVABLE = ["cmc07ao5c0005s60nnc8ravvk","cmajo3nfj001es60nltawe4a6"];
 
   return (
@@ -127,6 +127,7 @@ function presenterActivitySlot(
         feeRequired: feeRequired ?? null,
         applicantCount: 1,
         isReservable,
+        opportunityId: opportunityId || "",
       };
     }) ?? []
   );
