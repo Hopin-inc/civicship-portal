@@ -1917,6 +1917,7 @@ export type GqlReservation = {
   histories?: Maybe<Array<GqlReservationHistory>>;
   id: Scalars["ID"]["output"];
   opportunitySlot?: Maybe<GqlOpportunitySlot>;
+  participantCountWithPoints?: Maybe<Scalars["Int"]["output"]>;
   participations?: Maybe<Array<GqlParticipation>>;
   status: GqlReservationStatus;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
@@ -2324,6 +2325,7 @@ export type GqlTransaction = {
   id: Scalars["ID"]["output"];
   participation?: Maybe<GqlParticipation>;
   reason: GqlTransactionReason;
+  reservation?: Maybe<GqlReservation>;
   ticketStatusHistories?: Maybe<Array<GqlTicketStatusHistory>>;
   toPointChange?: Maybe<Scalars["Int"]["output"]>;
   toWallet?: Maybe<GqlWallet>;
@@ -2394,6 +2396,9 @@ export const GqlTransactionReason = {
   Donation: "DONATION",
   Grant: "GRANT",
   Onboarding: "ONBOARDING",
+  OpportunityReservationCanceled: "OPPORTUNITY_RESERVATION_CANCELED",
+  OpportunityReservationCreated: "OPPORTUNITY_RESERVATION_CREATED",
+  OpportunityReservationRejected: "OPPORTUNITY_RESERVATION_REJECTED",
   PointIssued: "POINT_ISSUED",
   PointReward: "POINT_REWARD",
   TicketPurchased: "TICKET_PURCHASED",

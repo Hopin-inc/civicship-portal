@@ -15983,6 +15983,18 @@
             "deprecationReason": null
           },
           {
+            "name": "participantCountWithPoints",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "participations",
             "description": null,
             "args": [],
@@ -19267,6 +19279,18 @@
             "deprecationReason": null
           },
           {
+            "name": "reservation",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Reservation",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "ticketStatusHistories",
             "description": null,
             "args": [],
@@ -19872,6 +19896,24 @@
           },
           {
             "name": "ONBOARDING",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "OPPORTUNITY_RESERVATION_CANCELED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "OPPORTUNITY_RESERVATION_CREATED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "OPPORTUNITY_RESERVATION_REJECTED",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
