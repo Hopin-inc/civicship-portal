@@ -22,6 +22,14 @@ export const getReservationThreshold = (activityId?: string): Date => {
  */
 export const isDateReservable = (date: Date | string, activityId?: string): boolean => {
   const targetDate = typeof date === "string" ? new Date(date) : date;
+  const advanceBookingDays = getAdvanceBookingDays(activityId);
+  
+  // 設定値が0の場合は、開催時刻の直前まで予約可能
+  if (advanceBookingDays === 0) {
+    return isAfter(targetDate, new Date());
+  }
+  
+  // それ以外の場合は従来通りの判定
   const threshold = getReservationThreshold(activityId);
   return isAfter(targetDate, threshold);
 };
