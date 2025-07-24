@@ -52,7 +52,7 @@ export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCa
 
 export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail => {
   const { images, place, slots, articles, createdByUser } = data;
-  const threshold = getReservationThreshold();
+  const threshold = getReservationThreshold(data.id);
 
   const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired, data.id);
   const isReservable = activitySlots.some((slot) => slot.isReservable);

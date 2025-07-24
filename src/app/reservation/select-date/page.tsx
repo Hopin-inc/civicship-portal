@@ -87,6 +87,7 @@ export default function SelectDatePage() {
           dateSections={filteredDateSections}
           isSlotAvailable={isSlotAvailable}
           onSelectSlot={handleReservation}
+          activityId={opportunityId ?? undefined}
         />
       </div>
 
