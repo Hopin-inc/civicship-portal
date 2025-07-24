@@ -716,6 +716,7 @@ export type GqlMutation = {
   opportunityCreate?: Maybe<GqlOpportunityCreatePayload>;
   opportunityDelete?: Maybe<GqlOpportunityDeletePayload>;
   opportunitySetPublishStatus?: Maybe<GqlOpportunitySetPublishStatusPayload>;
+  opportunitySlotCreate?: Maybe<GqlOpportunitySlotCreatePayload>;
   opportunitySlotSetHostingStatus?: Maybe<GqlOpportunitySlotSetHostingStatusPayload>;
   opportunitySlotsBulkUpdate?: Maybe<GqlOpportunitySlotsBulkUpdatePayload>;
   opportunityUpdateContent?: Maybe<GqlOpportunityUpdateContentPayload>;
@@ -852,6 +853,12 @@ export type GqlMutationOpportunitySetPublishStatusArgs = {
   id: Scalars["ID"]["input"];
   input: GqlOpportunitySetPublishStatusInput;
   permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationOpportunitySlotCreateArgs = {
+  input: GqlOpportunitySlotCreateInput;
+  opportunityId: Scalars["ID"]["input"];
+  permission: GqlCheckOpportunityPermissionInput;
 };
 
 export type GqlMutationOpportunitySlotSetHostingStatusArgs = {
@@ -1178,6 +1185,13 @@ export type GqlOpportunitySlotCreateInput = {
   startsAt: Scalars["Datetime"]["input"];
 };
 
+export type GqlOpportunitySlotCreatePayload = GqlOpportunitySlotCreateSuccess;
+
+export type GqlOpportunitySlotCreateSuccess = {
+  __typename?: "OpportunitySlotCreateSuccess";
+  slot: GqlOpportunitySlot;
+};
+
 export type GqlOpportunitySlotEdge = GqlEdge & {
   __typename?: "OpportunitySlotEdge";
   cursor: Scalars["String"]["output"];
@@ -1200,8 +1214,11 @@ export const GqlOpportunitySlotHostingStatus = {
 export type GqlOpportunitySlotHostingStatus =
   (typeof GqlOpportunitySlotHostingStatus)[keyof typeof GqlOpportunitySlotHostingStatus];
 export type GqlOpportunitySlotSetHostingStatusInput = {
+  capacity?: InputMaybe<Scalars["Int"]["input"]>;
   comment?: InputMaybe<Scalars["String"]["input"]>;
   createdBy?: InputMaybe<Scalars["ID"]["input"]>;
+  endsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
+  startsAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   status: GqlOpportunitySlotHostingStatus;
 };
 
@@ -1914,6 +1931,7 @@ export type GqlReservationCreateInput = {
   comment?: InputMaybe<Scalars["String"]["input"]>;
   opportunitySlotId: Scalars["ID"]["input"];
   otherUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  participantCountWithPoints?: InputMaybe<Scalars["Int"]["input"]>;
   paymentMethod: GqlReservationPaymentMethod;
   ticketIdsIfNeed?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   totalParticipantCount: Scalars["Int"]["input"];
