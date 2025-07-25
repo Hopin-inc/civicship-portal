@@ -6,13 +6,20 @@ export interface ActivityBookingConfig {
   [activityId: string]: number;
 }
 
+// NOTE: 現在はハードコーディングで管理しているが、将来的にカスタムすることが多ければデータベースで管理することを検討
+// TODO: BE にも設定ファイルがあるため、あわせて更新が必要
+// - civicship-api/src/application/domain/experience/reservation/config.ts
+
 export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = {
   // Add activity-specific configurations here
   // Example configurations:
   // "activity-urgent-123": 1,         // 1 day advance booking
   // "activity-workshop-456": 14,      // 14 days advance booking
-  // "activity-special-789": 3,        // 3 days advance booking
-  "cmddfyrc301nh2fddhizez1vk": 1,
+  // "activity-special-789": 3,  
+  // --- dev 環境での確認用 
+  "cmcak8udp019l8zwh4jvmuomp": 0, // 当日開催直前まで受付
+  "cmcak4qt600lu8zwhdzcuynre": 1, // 1日前まで受付可能
+  "cmcakai1a01jm8zwh7323vpzn": 2, // 2日前まで受付可能
 };
 
 /**
