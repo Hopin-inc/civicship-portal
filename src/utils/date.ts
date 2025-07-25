@@ -94,6 +94,32 @@ export function formatJapaneseDateTime(startDateTime: string, endDateTime: strin
 export function formatDateTimeFromParts(formattedDate: string, startTime: string, endTime: string, endDate?: string): string {
   if (endDate && endDate !== formattedDate) {
     // 日を跨ぐ場合
+    // 開始日と終了日から年を抽出
+    const startYearMatch = formattedDate.match(/(\d{4})年/);
+    const endYearMatch = endDate.match(/(\d{4})年/);
+    
+    if (startYearMatch && endYearMatch && startYearMatch[1] === endYearMatch[1]) {
+      // 同じ年の場合は簡潔な形式
+      const startDateMatch = formattedDate.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+      const endDateMatch = endDate.match(/(\d{1,2})月(\d{1,2})日/);
+      
+      if (startDateMatch && endDateMatch) {
+        const startMonth = parseInt(startDateMatch[2]);
+        const endMonth = parseInt(endDateMatch[1]);
+        const startDay = parseInt(startDateMatch[3]);
+        const endDay = parseInt(endDateMatch[2]);
+        
+        // 同じ月の場合は日のみ表示
+        if (startMonth === endMonth) {
+          return `${startDateMatch[1]}年${startMonth}月${startDay}日${startTime}~${endDay}日${endTime}`;
+        } else {
+          // 月が異なる場合は月も表示
+          return `${startDateMatch[1]}年${startMonth}月${startDay}日${startTime}~${endMonth}月${endDay}日${endTime}`;
+        }
+      }
+    }
+    
+    // 年が異なる場合やマッチしない場合は元の形式
     return `${formattedDate} ${startTime}〜\n${endDate} ${endTime}`;
   } else {
     // 同じ日の場合

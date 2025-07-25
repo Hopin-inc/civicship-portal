@@ -52,30 +52,24 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
             </div>
 
             {/* ポイント利用 */}
-            {/* {usePoints && pointCount > 0 && ( */}
+            {usePoints && pointCount > 0 && (
               <div className="flex justify-between text-body-sm text-muted-foreground">
                 <span>ポイント利用</span>
                 <div>
-                  <span>{pricePerPerson?.toLocaleString()}円</span>
+                  <span>{pointsRequired?.toLocaleString()}pt</span>
                   <span className="mx-2">×</span>
                   <span>{pointCount}名</span>
                   <span className="mx-2">=</span>
-                  <span>{(pointCount * (pricePerPerson ?? 0)).toLocaleString()}円</span>
+                  <span>{(pointsRequired ?? 0) * pointCount}pt</span>
                 </div>
               </div>
-            {/* )} */}
+            )}
 
             {/* チケット利用 */}
             {/* {useTickets && ticketCount > 0 && ( */}
               <div className="flex justify-between text-body-sm text-muted-foreground">
                 <span>チケット利用</span>
-                <div>
-                  <span>{pricePerPerson?.toLocaleString()}円</span>
-                  <span className="mx-2">×</span>
-                  <span>{ticketCount}枚</span>
-                  <span className="mx-2">=</span>
-                  <span>{(ticketCount * (pricePerPerson ?? 0)).toLocaleString()}円</span>
-                </div>
+                <span>{ticketCount}名分</span>
               </div>
             {/* )} */}
           </div>

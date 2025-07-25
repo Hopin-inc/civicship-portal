@@ -27,7 +27,7 @@ interface OpportunityInfoProps {
 const getPointOrFee = (
   opportunity: ActivityDetail | QuestDetail | null,
   totalPrice?: number,
-  usedPoints?: number,
+  pointsRequired?: number,
   participantCountWithPoint?: number,
   participantCount?: number,
   ticketCount?: number
@@ -59,15 +59,15 @@ const getPointOrFee = (
               </div>
 
               {/* ポイント利用 */}
-              { usedPoints && usedPoints > 0 && participantCountWithPoint && participantCountWithPoint > 0 && (
+              { pointsRequired && pointsRequired > 0 && participantCountWithPoint && participantCountWithPoint > 0 && (
               <div className="flex justify-between text-body-xs text-muted-foreground">
                 <span>ポイント利用</span>
                 <div>
-                  <span>{ usedPoints?.toLocaleString() }pt</span>
+                  <span>{ pointsRequired?.toLocaleString() }pt</span>
                   <span className="mx-2">×</span>
                   <span>{ participantCountWithPoint }名</span>
                   <span className="mx-2">=</span>
-                  <span className="font-bold">{ (usedPoints ?? 0) * (participantCountWithPoint ?? 0) }pt</span>
+                  <span className="font-bold">{ (pointsRequired ?? 0) * (participantCountWithPoint ?? 0) }pt</span>
                   </div>
                 </div>
               ) }
@@ -140,7 +140,7 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
       { getPointOrFee(
           opportunity,
           totalPrice,
-          dateTimeInfo?.usedPoints,
+          opportunity?.pointsRequired,
           dateTimeInfo?.participantCountWithPoint,
           participationCount,
           ticketCount
