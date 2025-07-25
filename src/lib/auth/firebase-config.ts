@@ -5,30 +5,6 @@ import { Auth, getAuth } from "firebase/auth";
 import { Analytics, getAnalytics, isSupported } from "firebase/analytics";
 import { logger } from "@/lib/logging";
 
-const validateFirebaseConfig = () => {
-  const requiredVars = [
-    'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
-    'NEXT_PUBLIC_FIREBASE_API_KEY', 
-    'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
-    'NEXT_PUBLIC_FIREBASE_APP_ID'
-  ];
-
-  const missingVars = requiredVars.filter(varName => !process.env[varName]);
-  
-  if (missingVars.length > 0) {
-    logger.error("Firebase configuration error: Required environment variables are undefined", {
-      component: "FirebaseConfig",
-      errorCategory: "config",
-      missingVariables: missingVars,
-      retryable: false,
-      expected: false
-    });
-    throw new Error(`Missing Firebase environment variables: ${missingVars.join(', ')}`);
-  }
-};
-
-validateFirebaseConfig();
-
 const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -76,14 +52,6 @@ export const categorizeFirebaseError = (
 ): { type: string; message: string; retryable: boolean } => {
   if (error?.code) {
     const code = error.code as string;
-
-    if (code === "auth/unauthorized-domain" || code === "auth/invalid-api-key") {
-      return {
-        type: "config",
-        message: "Firebase設定エラー: 承認済みドメインまたはAPIキーの設定を確認してください。",
-        retryable: false,
-      };
-    }
 
     if (code === "auth/network-request-failed") {
       return {
