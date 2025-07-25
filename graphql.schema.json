@@ -15983,7 +15983,7 @@
             "deprecationReason": null
           },
           {
-            "name": "participantCountWithPoints",
+            "name": "participantCountWithPoint",
             "description": null,
             "args": [],
             "type": {
@@ -16152,7 +16152,7 @@
             "deprecationReason": null
           },
           {
-            "name": "participantCountWithPoints",
+            "name": "participantCountWithPoint",
             "description": null,
             "type": {
               "kind": "SCALAR",

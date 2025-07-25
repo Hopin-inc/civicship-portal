@@ -5,8 +5,7 @@ import Image from "next/image";
 import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { formatDateTimeFromISO } from "@/utils/date";
-import { GqlOpportunityCategory, GqlReservation } from "@/types/graphql";
-import Link from "next/link";
+import { GqlOpportunityCategory } from "@/types/graphql";
 import { ArrowRight } from "lucide-react";
 
 interface OpportunityInfoProps {
@@ -15,20 +14,74 @@ interface OpportunityInfoProps {
     formattedDate: string;
     startTime: string;
     endTime: string;
+    participantCountWithPoint: number;
+    usedPoints: number;
   };
   participationCount?: number;
   phoneNumber?: string | null | undefined;
   comment?: string | null | undefined;
   totalPrice?: number;
+  ticketCount?: number;
 }
 
-const getPointOrFee = (opportunity: ActivityDetail | QuestDetail | null, totalPrice?: number) => {
+const getPointOrFee = (
+  opportunity: ActivityDetail | QuestDetail | null,
+  totalPrice?: number,
+  usedPoints?: number,
+  participantCountWithPoint?: number,
+  participantCount?: number,
+  ticketCount?: number
+) => {
   if(opportunity?.category === GqlOpportunityCategory.Activity) {
+    const feeRequired = "feeRequired" in opportunity ? opportunity.feeRequired : 0;
     return(
-      <dl className="flex justify-between py-5 mt-2 border-b border-foreground-caption items-center">
-        <dt className="text-label-sm font-bold">当日お支払い金額</dt>
-        <dd className="text-body-sm">{ totalPrice?.toLocaleString() }円</dd>
-      </dl>
+      <div className="border-b border-foreground-caption pb-4">
+        <dl className="flex justify-between py-2 mt-2 items-center">
+          <div>
+            <dt className="text-label-sm font-bold">当日お支払い金額</dt>
+            <p className="text-body-xs text-caption pt-1">料金は現地でお支払いください</p>
+          </div>
+          <dd className="text-body-sm">{ totalPrice?.toLocaleString() }円</dd>
+        </dl>
+        <div className="bg-muted rounded-lg p-4 mt-2">
+            <div className="space-y-2">
+              <h2 className="text-body-xs text-caption font-bold">内訳</h2>
+              {/* 通常申し込み */}
+              <div className="flex justify-between text-body-xs text-muted-foreground mt-1 border-b border-foreground-caption pb-2">
+                <span className="">通常申し込み</span>
+                <div>
+                  <span>{ feeRequired?.toLocaleString() }円</span>
+                  <span className="mx-2">×</span>
+                  <span>{ participantCount }名</span>
+                  <span className="mx-2">=</span>
+                  <span className="font-bold">{ (feeRequired ?? 0) * (participantCount ?? 0) }円</span>
+                </div>
+              </div>
+
+              {/* ポイント利用 */}
+              { usedPoints && usedPoints > 0 && participantCountWithPoint && participantCountWithPoint > 0 && (
+              <div className="flex justify-between text-body-xs text-muted-foreground">
+                <span>ポイント利用</span>
+                <div>
+                  <span>{ usedPoints?.toLocaleString() }pt</span>
+                  <span className="mx-2">×</span>
+                  <span>{ participantCountWithPoint }名</span>
+                  <span className="mx-2">=</span>
+                  <span className="font-bold">{ (usedPoints ?? 0) * (participantCountWithPoint ?? 0) }pt</span>
+                  </div>
+                </div>
+              ) }
+
+              {/* チケット利用 */}
+              <div className="flex justify-between text-body-xs text-muted-foreground">
+                <span>チケット利用</span>
+                <div>
+                  <span>{ ticketCount }名分</span>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
     )
   } else {
     const quest = opportunity as QuestDetail;
@@ -41,9 +94,17 @@ const getPointOrFee = (opportunity: ActivityDetail | QuestDetail | null, totalPr
   }
 };
 
-const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity, dateTimeInfo, participationCount, phoneNumber, comment, totalPrice }) => {
+const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
+   opportunity, 
+   dateTimeInfo, 
+   participationCount, 
+   phoneNumber, 
+   comment, 
+   totalPrice,
+   ticketCount
+ }) => {
   const slotDateTime = formatDateTimeFromISO(opportunity?.slots[0]?.startsAt ?? "", opportunity?.slots[0]?.endsAt ?? "");
-  console.log(totalPrice);
+
   return (
     <div className="mx-6 my-6 border border-foreground-caption rounded-lg p-4">
       <div className="flex justify-between items-center gap-4">
@@ -66,7 +127,7 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity, dateTime
       </div>
       { dateTimeInfo && (
         <dl className="flex justify-between py-5 mt-2 border-b border-foreground-caption items-center">
-          <dt className="text-label-sm font-bold">日時</dt>
+          <dt className="text-label-sm font-bold w-24">日時</dt>
           <dd className="text-body-sm">{ slotDateTime }</dd>
         </dl>
       ) } 
@@ -76,7 +137,14 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity, dateTime
           <dd className="text-body-sm">{ participationCount }人</dd>
         </dl>
       ) }
-      { getPointOrFee(opportunity, totalPrice) }
+      { getPointOrFee(
+          opportunity,
+          totalPrice,
+          dateTimeInfo?.usedPoints,
+          dateTimeInfo?.participantCountWithPoint,
+          participationCount,
+          ticketCount
+        ) }
       { phoneNumber && (
       <dl className={`flex justify-between py-5 mt-2 items-center ${comment ? "border-b border-foreground-caption" : ""}`}>
         <div className="flex flex-col gap-y-2">
