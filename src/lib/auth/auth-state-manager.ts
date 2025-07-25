@@ -114,11 +114,6 @@ export class AuthStateManager {
    * 認証状態を更新
    */
   public setState(state: AuthenticationState): void {
-    logger.debug("AuthStateManager.setState", {
-      from: this.currentState,
-      to: state,
-      component: "AuthStateManager",
-    });
     if (this.currentState !== state) {
       this.currentState = state;
       this.notifyStateChange();
@@ -173,9 +168,6 @@ export class AuthStateManager {
     try {
       const { lineAuth } = await import("./firebase-config");
       if (!lineAuth.currentUser) {
-        logger.debug("No Firebase Auth user found", {
-          component: "AuthStateManager",
-        });
         return false;
       }
 
@@ -201,14 +193,6 @@ export class AuthStateManager {
       });
 
       const isRegistered = data?.currentUser?.user != null;
-      logger.debug("User registration check result", {
-        hasFirebaseUser: !!lineAuth.currentUser,
-        hasAccessToken: !!accessToken,
-        isRegistered,
-        userId: data?.currentUser?.user?.id || null,
-        component: "AuthStateManager",
-      });
-
       return isRegistered;
     } catch (error) {
       logger.info("Failed to check user registration", {
@@ -336,12 +320,6 @@ export class AuthStateManager {
 
     if (isRegistered) {
       this.setState("user_registered");
-      logger.debug(
-        "User is registered - setting state to user_registered regardless of phone token status",
-        {
-          component: "AuthStateManager",
-        },
-      );
     } else {
       const phoneTokens = TokenManager.getPhoneTokens();
       const hasValidPhoneToken =

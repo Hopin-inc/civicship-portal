@@ -60,16 +60,9 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
     const { isInitialized, isLoggedIn } = currentLiffState;
 
     if (isInitialized && !isLoggedIn) {
-      logger.debug("LIFF initialized but user not logged in - skipping redirect logic", { component: "useLineAuthRedirectDetection" });
       setShouldProcessRedirect(false);
       return;
     }
-
-    const timestamp = new Date().toISOString();
-    logger.debug("Detected LINE authentication redirect", {
-      timestamp,
-      component: "useLineAuthRedirectDetection"
-    });
 
     setShouldProcessRedirect(true);
   }, [state.authenticationState, state.isAuthenticating, liffService]);

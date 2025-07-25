@@ -53,20 +53,7 @@ export class PhoneAuthService {
       this.state.phoneUid = savedTokens.phoneUid;
       this.state.phoneNumber = savedTokens.phoneNumber;
 
-      logger.debug("Phone verification state initialized from saved tokens", {
-        isVerified: this.state.isVerified,
-        phoneUid: this.state.phoneUid ? "exists" : "missing",
-        phoneNumber: this.state.phoneNumber ? "exists" : "missing",
-        accessToken: savedTokens.accessToken ? "exists" : "missing",
-        component: "PhoneAuthService",
-      });
     } else {
-      logger.debug("Phone verification not initialized - incomplete saved tokens", {
-        phoneUid: savedTokens.phoneUid ? "exists" : "missing",
-        phoneNumber: savedTokens.phoneNumber ? "exists" : "missing",
-        accessToken: savedTokens.accessToken ? "exists" : "missing",
-        component: "PhoneAuthService",
-      });
     }
   }
 
@@ -150,15 +137,32 @@ export class PhoneAuthService {
 
       return confirmationResult.verificationId;
     } catch (error) {
-      logger.info("Phone verification failed", {
-        authType: "phone",
-        error: error instanceof Error ? error.message : String(error),
-        component: "PhoneAuthService",
-        phoneNumber: maskPhoneNumber(phoneNumber),
-      });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isUserInputError = errorMessage.includes("invalid") ||
+                              errorMessage.includes("format") ||
+                              errorMessage.includes("number");
+      
+      if (isUserInputError) {
+        logger.info("Phone verification user input error", {
+          authType: "phone",
+          error: errorMessage,
+          component: "PhoneAuthService",
+          phoneNumber: maskPhoneNumber(phoneNumber),
+          errorCategory: "user_input",
+        });
+      } else {
+        logger.warn("Phone verification process failed", {
+          authType: "phone",
+          error: errorMessage,
+          component: "PhoneAuthService",
+          phoneNumber: maskPhoneNumber(phoneNumber),
+          errorCategory: "verification_temporary",
+          retryable: true,
+        });
+      }
       this.state.error = error as Error;
       throw error;
-    } finally {
+    }finally {
       this.state.isVerifying = false;
     }
   }
@@ -185,17 +189,11 @@ export class PhoneAuthService {
           this.state.verificationId,
           verificationCode,
         );
-        logger.debug("Successfully created phone credential", {
-          component: "PhoneAuthService",
-        });
 
         let verificationSuccessful = false;
 
         try {
           const userCredential = await signInWithCredential(phoneAuth, credential);
-          logger.debug("Phone sign-in successful with credential", {
-            component: "PhoneAuthService",
-          });
 
           if (userCredential.user) {
             this.state.phoneUid = userCredential.user.uid;
@@ -222,27 +220,33 @@ export class PhoneAuthService {
           }
 
           await phoneAuth.signOut();
-          logger.debug("Signed out of phone auth", {
-            component: "PhoneAuthService",
-          });
         } catch (signInError) {
-          logger.info("Could not sign in with phone credential", {
-            authType: "phone",
-            error: signInError instanceof Error ? signInError.message : String(signInError),
-            component: "PhoneAuthService",
-          });
-          logger.debug("Verification failed - invalid code", {
-            component: "PhoneAuthService",
-          });
+          const errorMessage = signInError instanceof Error ? signInError.message : String(signInError);
+          const isUserInputError = errorMessage.includes("invalid") ||
+                                  errorMessage.includes("wrong") ||
+                                  errorMessage.includes("incorrect");
+          
+          if (isUserInputError) {
+            logger.info("Phone verification invalid code", {
+              authType: "phone",
+              error: errorMessage,
+              component: "PhoneAuthService",
+              errorCategory: "user_input",
+            });
+          } else {
+            logger.warn("Phone credential sign-in failed", {
+              authType: "phone",
+              error: errorMessage,
+              component: "PhoneAuthService",
+              errorCategory: "auth_temporary",
+              retryable: true,
+            });
+          }
           return false;
         }
 
         if (verificationSuccessful) {
           this.state.isVerified = true;
-          logger.debug("Phone verification state set to verified", {
-            isVerified: this.state.isVerified,
-            component: "PhoneAuthService",
-          });
           return true;
         } else {
           return false;
@@ -253,18 +257,21 @@ export class PhoneAuthService {
           error:
             credentialError instanceof Error ? credentialError.message : String(credentialError),
           component: "PhoneAuthService",
+          errorCategory: "user_input",
         });
         return false;
       }
     } catch (error) {
-      logger.info("Code verification failed", {
+      logger.warn("Code verification process failed", {
         authType: "phone",
         error: error instanceof Error ? error.message : String(error),
         component: "PhoneAuthService",
+        errorCategory: "verification_temporary",
+        retryable: true,
       });
       this.state.error = error as Error;
       return false;
-    } finally {
+    }finally {
       this.state.isVerifying = false;
     }
   }

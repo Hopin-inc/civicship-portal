@@ -149,9 +149,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         authenticationState: "unauthenticated",
       }));
     } catch (error) {
-      logger.error("Logout failed", {
+      logger.warn("Logout process failed", {
         error: error instanceof Error ? error.message : String(error),
         component: "AuthProvider",
+        errorCategory: "user_environment",
+        retryable: true,
       });
     }
   }, [liffService, phoneAuthService]);
@@ -191,13 +193,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return success;
     } catch (error) {
-      logger.info("Login with LIFF failed", {
-        authType: "liff",
-        error: error instanceof Error ? error.message : String(error),
-        component: "AuthProvider",
-      });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
+                                     errorMessage.includes("LINE") ||
+                                     errorMessage.includes("Load failed");
+      
+      if (isEnvironmentConstraint) {
+        logger.warn("LIFF environment limitation", {
+          authType: "liff",
+          error: errorMessage,
+          component: "AuthProvider",
+          errorCategory: "environment_constraint",
+          expected: true,
+        });
+      } else {
+        logger.info("LIFF login process failed", {
+          authType: "liff",
+          error: errorMessage,
+          component: "AuthProvider",
+          errorCategory: "auth_temporary",
+        });
+      }
       return false;
-    } finally {
+    }finally {
       setState((prev) => ({ ...prev, isAuthenticating: false }));
     }
   };
@@ -234,9 +252,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             component: "AuthProvider",
           });
         } catch (error) {
-          logger.error("Failed to update AuthStateManager phone state in verifyPhoneCode", {
+          logger.warn("Failed to update AuthStateManager phone state in verifyPhoneCode", {
             error: error instanceof Error ? error.message : String(error),
             component: "AuthProvider",
+            errorCategory: "state_management",
+            retryable: true,
           });
         }
       }
@@ -299,10 +319,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return null;
       }
     } catch (error) {
-      logger.error("User creation failed", {
-        error: error instanceof Error ? error.message : String(error),
-        component: "AuthProvider",
-      });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isValidationError = errorMessage.includes("validation") ||
+                               errorMessage.includes("invalid") ||
+                               errorMessage.includes("required");
+      
+      if (isValidationError) {
+        logger.info("User creation validation error", {
+          error: errorMessage,
+          component: "AuthProvider",
+          errorCategory: "validation_error",
+        });
+      } else {
+        logger.error("User creation system error", {
+          error: errorMessage,
+          component: "AuthProvider",
+          errorCategory: "system_error",
+        });
+      }
+      
       toast.error("アカウント作成に失敗しました", {
         description: error instanceof Error ? error.message : "不明なエラーが発生しました",
       });
