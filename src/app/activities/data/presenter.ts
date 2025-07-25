@@ -13,9 +13,7 @@ import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import {
-  getReservationThreshold,
-} from "@/app/reservation/data/presenter/opportunitySlot";
+import { getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
 import { format, isAfter } from "date-fns";
 import { getCrossDayLabel } from "@/utils/date";
 import { ja } from "date-fns/locale";
@@ -87,12 +85,14 @@ export function presenterOpportunityHost(
   host?: Maybe<GqlUser> | undefined,
   interview?: GqlArticle,
 ): OpportunityHost {
+  const selectedInterview = interview ?? host?.articlesAboutMe?.[0];
+
   return {
     id: host?.id || "",
     name: host?.name || "",
     image: host?.image || "",
     bio: host?.bio || "",
-    interview: presenterArticleCard(interview || host?.articlesAboutMe?.[0]),
+    interview: selectedInterview ? presenterArticleCard(selectedInterview) : undefined,
   };
 }
 
@@ -112,6 +112,7 @@ export const presenterActivitySlot = (
 
       return {
         id: slot?.id,
+        opportunityId: slot.opportunity?.id || "",
         hostingStatus: slot?.hostingStatus,
         startsAt: startsAtDate?.toISOString() || "",
         endsAt: slot?.endsAt ? new Date(slot.endsAt).toISOString() : "",
