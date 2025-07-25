@@ -43,15 +43,18 @@ export const useAvailableTickets = (
 
     const groupedTickets = Array.from(ticketGroups.entries()).map(([utilityId, ticketList]) => {
       const firstTicket = ticketList[0];
+      // AVAILABLEステータスのチケットのみをカウント
+      const availableTickets = ticketList.filter(ticket => ticket.status === GqlTicketStatus.Available);
+      
       return {
-        id: utilityId, // firstTicket.idからutilityIdに変更
+        id: utilityId,
         utility: firstTicket.utility ? {
           id: firstTicket.utility.id,
           name: firstTicket.utility.name ?? null,
           owner: firstTicket.utility.owner ?? null
         } : null,
-        status: firstTicket.status,
-        count: ticketList.length
+        status: availableTickets.length > 0 ? GqlTicketStatus.Available : firstTicket.status,
+        count: availableTickets.length // AVAILABLEステータスのチケット数
       };
     });
     
@@ -61,9 +64,14 @@ export const useAvailableTickets = (
 
     const requiredUtilityIds = new Set(opportunity.targetUtilities.map((u) => u.id));
 
-    return groupedTickets.filter((t) => {
+    const filteredTickets = groupedTickets.filter((t) => {
       const utilityId = t?.utility?.id;
-      return utilityId && requiredUtilityIds.has(utilityId) && t.status === GqlTicketStatus.Available;
+      const hasRequiredUtility = utilityId && requiredUtilityIds.has(utilityId);
+      const isAvailable = t.status === GqlTicketStatus.Available;
+      
+      return hasRequiredUtility && isAvailable;
     });
+    
+    return filteredTickets;
   }, [opportunity?.targetUtilities, data]);
 };

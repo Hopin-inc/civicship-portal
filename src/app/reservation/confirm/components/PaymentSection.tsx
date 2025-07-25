@@ -21,15 +21,12 @@ interface PaymentSectionProps {
   pointsRequired: number;
   onPointCountChange?: (count: number) => void;
   onTicketCountChange?: (count: number) => void;
+  onSelectedTicketsChange?: (selectedTickets: { [ticketId: string]: number }) => void;
 }
 
 const PaymentSection: React.FC<PaymentSectionProps> = memo(
   ({
-    ticketCount,
-    onIncrement,
-    onDecrement,
     maxTickets,
-    pricePerPerson,
     participantCount,
     useTickets,
     setUseTickets,
@@ -40,6 +37,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
     availableTickets,
     onPointCountChange,
     onTicketCountChange,
+    onSelectedTicketsChange,
   }) => {
     const [selectedTicketCount, setSelectedTicketCount] = useState(0);
     const [selectedPointCount, setSelectedPointCount] = useState(0);
@@ -72,6 +70,12 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
       }
     }, [onPointCountChange]);
 
+    const handleSelectedTicketsChange = useCallback((tickets: { [ticketId: string]: number }) => {
+      if (onSelectedTicketsChange) {
+        onSelectedTicketsChange(tickets);
+      }
+    }, [onSelectedTicketsChange]);
+
     return (
       <div className="rounded-lg px-6">
         <h3 className="text-display-sm mb-4">ポイント・チケットを利用</h3>
@@ -86,6 +90,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
             selectedTicketCount={selectedTicketCount}
             remainingSlots={remainingSlots}
             allDisabled={allDisabled}
+            onSelectedTicketsChange={handleSelectedTicketsChange}
           />
         )}
         {userWallet && userWallet > 0 && userWallet > pointsRequired && (

@@ -2,7 +2,6 @@
 
 import SameStateActivities from "@/app/activities/[id]/components/SimilarActivitiesList";
 import CompletionHeader from "@/app/reservation/complete/components/CompletionHeader";
-import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
 import React, { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useSearchParams } from "next/navigation";
@@ -84,6 +83,7 @@ export default function CompletePage() {
           phoneNumber={ reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber }
           comment={ reservation.comment }
           totalPrice={ dateTimeInfo.totalPrice }
+          ticketCount={ dateTimeInfo.ticketCount }
         />
       ) }
       { opportunityId && sameStateActivities.length > 0 && (

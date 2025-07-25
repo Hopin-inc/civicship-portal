@@ -6,8 +6,7 @@ import Image from "next/image";
 import React, { useCallback, useState } from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { GqlOpportunityCategory } from "@/types/graphql";
-import { formatDateTime } from "@/utils/date";
-import { ja } from "date-fns/locale";
+import { formatDateTimeFromISO } from "@/utils/date";
 import { Button } from "@/components/ui/button";
 import SelectionSheet from "../reservation/select-date/components/SelectionSheet";
 
@@ -60,8 +59,7 @@ export const CardHorizontal = ({ opportunity, withShadow = true, category, start
           <div>
             <h2 className="text-label-sm font-bold pt-10">日時</h2>
             <p className="text-body-sm text-foreground pt-1">
-              {formatDateTime(startDateTime, "yyyy年M月d日(E) ", { locale: ja })}
-              {formatDateTime(startDateTime, "HH:mm")}-{formatDateTime(endDateTime, "HH:mm")}
+              {formatDateTimeFromISO(startDateTime?.toISOString() ?? "", endDateTime?.toISOString() ?? "")}
             </p>
           </div>
           <div className="border-b border-gray-200 my-4"></div>

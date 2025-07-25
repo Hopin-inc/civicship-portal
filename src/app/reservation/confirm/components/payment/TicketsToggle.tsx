@@ -10,13 +10,14 @@ interface TicketsToggleProps {
   availableTickets: AvailableTicket[];
   participantCount: number;
   onTicketCountChange: (count: number) => void;
+  onSelectedTicketsChange?: (selectedTickets: { [ticketId: string]: number }) => void;
   selectedTicketCount: number;
   remainingSlots: number;
   allDisabled: boolean;
 }
 
 export const TicketsToggle: React.FC<TicketsToggleProps> = memo(
-  ({ useTickets, setUseTickets, maxTickets, availableTickets, onTicketCountChange, remainingSlots, participantCount, allDisabled }) => {
+  ({ useTickets, setUseTickets, maxTickets, availableTickets, onTicketCountChange, onSelectedTicketsChange, remainingSlots, participantCount, allDisabled }) => {
     const [ticketCounts, setTicketCounts] = useState<{ [key: string]: number }>({});
 
     const toggleUseTickets = useCallback(() => {
@@ -30,14 +31,6 @@ export const TicketsToggle: React.FC<TicketsToggleProps> = memo(
       if (!ticket) return;
       
       const currentCount = ticketCounts[ticketId] || 0;
-      
-      console.log('TicketsToggle handleIncrement:', {
-        ticketId,
-        currentCount,
-        ticketCount: ticket.count,
-        allDisabled,
-        canIncrement: currentCount < ticket.count && !allDisabled
-      });
       
       // チケットの枚数制限とallDisabledの制限をチェック
       if (currentCount < ticket.count && !allDisabled) {
@@ -61,6 +54,13 @@ export const TicketsToggle: React.FC<TicketsToggleProps> = memo(
     useEffect(() => {
       onTicketCountChange(totalSelectedTickets);
     }, [totalSelectedTickets, onTicketCountChange]);
+
+    // 選択されたチケットの詳細情報を親コンポーネントに通知
+    useEffect(() => {
+      if (onSelectedTicketsChange) {
+        onSelectedTicketsChange(ticketCounts);
+      }
+    }, [ticketCounts, onSelectedTicketsChange]);
 
     return (
       <div className="rounded-2xl border border-input bg-background mb-6 overflow-hidden">
@@ -91,15 +91,6 @@ export const TicketsToggle: React.FC<TicketsToggleProps> = memo(
                 const currentCount = ticketCounts[ticket.id] || 0;
                 const canIncrement = currentCount < ticket.count;
                 const isLast = index === availableTickets.length - 1;
-                
-                console.log('Ticket debug:', {
-                  ticketId: ticket.id,
-                  currentCount,
-                  ticketCount: ticket.count,
-                  canIncrement,
-                  allDisabled,
-                  buttonDisabled: !canIncrement || allDisabled
-                });
                 
                 return (
                   <div key={ticket.id} className={`p-3 bg-white ${!isLast ? 'border-b border-gray-200' : ''}`}>

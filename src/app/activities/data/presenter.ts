@@ -243,6 +243,7 @@ export const presenterReservationDateTimeInfo = (
   const endDate = new Date(opportunitySlot.endsAt);
 
   const participantCount = reservation.participations?.length || 0;
+  const discountToPoints = reservation.participantCountWithPoint ? reservation.participantCountWithPoint * (opportunity.feeRequired ?? 0) : 0;
   const paidTicketIds =
     reservation.participations
       ?.map((p) => p.ticketStatusHistories?.map((h) => h.ticket?.id))
@@ -265,7 +266,10 @@ export const presenterReservationDateTimeInfo = (
     dateDiffLabel: getCrossDayLabel(startDate, endDate),
     participantCount,
     paidParticipantCount,
-    totalPrice: (opportunity.feeRequired ?? 0) * paidParticipantCount,
+    totalPrice: (opportunity.feeRequired ?? 0) * paidParticipantCount - discountToPoints,
+    usedPoints: reservation.participantCountWithPoint ? reservation.participantCountWithPoint * (opportunity.pointsRequired ?? 0) : 0,
+    participantCountWithPoint: reservation.participantCountWithPoint ?? 0,
+    ticketCount: paidTicketIds.length,
   };
 };
 
