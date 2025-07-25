@@ -47,5 +47,5 @@ export const getAdvanceBookingDays = (activityId?: string): number => {
  */
 export const getAdvanceBookingText = (activityId?: string): string => {
   const days = getAdvanceBookingDays(activityId);
-  return `${days}日前`;
+  return days === 0 ? "当日" : `${days}日前`;
 };
