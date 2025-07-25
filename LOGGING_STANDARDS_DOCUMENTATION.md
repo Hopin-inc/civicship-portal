@@ -7,15 +7,36 @@
 - アプリケーションコードのバグ
 - データベース接続障害（サーバー側）
 - 認証システム基盤の障害
+- **設定・環境変数の誤り**
 - 予期しないシステム例外
 
 **例**:
 ```typescript
+// データベース接続障害
 logger.error("Database connection failed", {
   component: "UserService",
   errorCategory: "system",
   retryable: false,
   error: error.message
+});
+
+// Firebase承認済みドメイン設定誤り
+logger.error("Firebase authentication failed: unauthorized domain", {
+  component: "FirebaseAuth",
+  errorCategory: "config",
+  retryable: false,
+  expected: false,
+  domain: window.location.hostname,
+  error: "auth/unauthorized-domain"
+});
+
+// 環境変数未設定エラー
+logger.error("Firebase project ID is undefined", {
+  component: "FirebaseConfig", 
+  errorCategory: "config",
+  retryable: false,
+  expected: false,
+  missingEnvVar: "FIREBASE_PROJECT_ID"
 });
 ```
 
@@ -90,6 +111,7 @@ ISO形式のタイムスタンプ（自動生成）
 ```typescript
 errorCategory: 
   | "system"              // システム内部エラー
+  | "config"              // 設定・環境変数エラー
   | "network"             // ネットワーク関連
   | "auth_temporary"      // 一時的認証エラー
   | "user_input"          // ユーザー入力エラー
@@ -227,10 +249,18 @@ const shouldThrottle = (message: string, level: string): boolean => {
 ### ERROR レベルチェック
 - [ ] アプリケーションコードのバグか？
 - [ ] システム内部の障害か？
+- [ ] **設定・環境変数の誤りか？**
 - [ ] 即座に開発者の対応が必要か？
 - [ ] ユーザーが何をしても解決できない問題か？
 
 **すべて「はい」の場合のみERROR**
+
+#### 🔥 特に重要：設定関連エラーの判定
+- [ ] **Firebase承認済みドメイン設定誤り** → ERROR（設定修正で即座に解決）
+- [ ] **環境変数未設定・誤設定** → ERROR（デプロイ設定で解決可能）
+- [ ] **API キー・認証情報の設定誤り** → ERROR（設定修正で解決可能）
+
+これらは外部要因ではなく、**システム設定の問題**のため確実にERRORレベルです。
 
 ### WARN レベルチェック
 - [ ] 外部要因（ネットワーク、プラットフォーム）による問題か？
