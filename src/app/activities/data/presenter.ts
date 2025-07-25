@@ -73,7 +73,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
 
     place: presenterPlace(place),
     host: presenterOpportunityHost(createdByUser, articles?.[0]),
-    slots: presenterActivitySlot(slots, threshold, data.feeRequired, data.id),
+    slots: activitySlots,
 
     recentOpportunities: [],
     reservableTickets: [],
