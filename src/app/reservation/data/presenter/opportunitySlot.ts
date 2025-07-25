@@ -30,7 +30,7 @@ export const isDateReservable = (date: Date | string, activityId?: string): bool
   }
   
   // それ以外の場合は従来通りの判定
-  const threshold = getReservationThreshold(activityId);
+  const threshold = addDays(new Date(), advanceBookingDays);
   return isAfter(targetDate, threshold);
 };
 
