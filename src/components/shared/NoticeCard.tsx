@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import IconWrapper from "./IconWrapper";
 import { AlertCircle } from "lucide-react";
 
@@ -21,7 +21,6 @@ export const NoticeCard = ({ title, description }: NoticeCardProps) => {
           </p>
         </div>
       </div>
-      
     </Card>
   );
 };

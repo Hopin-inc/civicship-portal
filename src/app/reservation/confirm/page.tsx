@@ -23,7 +23,7 @@ import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHori
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
-import { encodeURIComponentWithType, RawURIComponent } from "@/utils/path";
+import { RawURIComponent } from "@/utils/path";
 import { NoticeCard } from "@/components/shared/NoticeCard";
 
 export default function ConfirmPage() {
