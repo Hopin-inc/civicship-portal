@@ -24,6 +24,7 @@ import { GqlOpportunityCategory } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
+import { NoticeCard } from "@/components/shared/NoticeCard";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -119,7 +120,10 @@ export default function ConfirmPage() {
           onClose={ () => ui.setIsLoginModalOpen(false) }
           nextPath={ window.location.pathname + window.location.search as RawURIComponent }
         />
-        <div className="px-6 py-4 mt-4">
+        <div className="px-6 py-4">
+          <NoticeCard title="申し込みは未確定です。" description="最後までご確認いただき、申し込みください。" />
+        </div>
+        <div className="px-6 py-4 mt-2">
           <OpportunityCardHorizontal
             opportunity={ {
               id: opportunity.id,
@@ -170,7 +174,7 @@ export default function ConfirmPage() {
               creatingReservation || (ui.useTickets && ticketCounter.count > availableTickets)
             }
           >
-            { creatingReservation ? "申込処理中..." : "申し込みを確定" }
+            { creatingReservation ? "申込処理中..." : "申し込みをする" }
           </Button>
         </footer>
       </main>
