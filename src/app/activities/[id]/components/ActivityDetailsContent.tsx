@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import { AlertCircle, CalendarX } from "lucide-react";
 import SameStateActivities from "./SimilarActivitiesList";
+import { getAdvanceBookingText } from "@/config/activityBookingConfig";
 import ActivityScheduleCard from "./ActivityScheduleCard";
 import {
   ActivityCard,
@@ -48,7 +49,7 @@ const ActivityDetailsContent = ({
         opportunityId={opportunity.id}
         communityId={communityId}
       />
-      <NoticeSection />
+      <NoticeSection opportunityId={opportunity.id} />
       <SameStateActivities
         header={"近くでおすすめの体験"}
         opportunities={sameStateActivities}
@@ -150,7 +151,7 @@ const ScheduleSection = ({
         {hasSchedule ? (
           <>
             <p className="text-muted-foreground font-bold mb-4 px-1">
-              ※予約は各日程の前日まで受付中{" "}
+              ※予約は各日程の{getAdvanceBookingText(opportunityId)}まで受付中{" "}
             </p>
             <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
               {slots.map((slot, index) => (
@@ -187,7 +188,7 @@ const ScheduleSection = ({
   );
 };
 
-const NoticeSection: React.FC = () => {
+const NoticeSection: React.FC<{ opportunityId: string }> = ({ opportunityId }) => {
   return (
     <section className="pt-6 pb-8 mt-0 bg-background-hover -mx-4 px-4">
       <h2 className="text-display-md text-foreground mb-4">注意事項</h2>
@@ -216,7 +217,7 @@ const NoticeSection: React.FC = () => {
           <IconWrapper color="warning">
             <AlertCircle size={20} strokeWidth={2.5} />
           </IconWrapper>
-          <p className="text-body-md flex-1">キャンセルは開催日の前日まで可能です。</p>
+          <p className="text-body-md flex-1">キャンセルは開催日の{getAdvanceBookingText(opportunityId)}まで可能です。</p>
         </div>
       </div>
     </section>
