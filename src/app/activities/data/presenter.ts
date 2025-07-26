@@ -52,7 +52,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
   const { images, place, slots, articles, createdByUser } = data;
   const threshold = getReservationThreshold(data.id);
 
-  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired, data.id);
+  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
@@ -100,7 +100,6 @@ export const presenterActivitySlot = (
   slots: Maybe<GqlOpportunitySlot[]> | undefined,
   threshold: Date,
   feeRequired?: Maybe<number> | undefined,
-  opportunityId?: string,
 ): ActivitySlot[] => {
   return (
     slots?.map((slot): ActivitySlot => {
@@ -121,7 +120,6 @@ export const presenterActivitySlot = (
         feeRequired: feeRequired ?? null,
         applicantCount: 1,
         isReservable,
-        opportunityId: opportunityId || "",
       };
     }) ?? []
   );
