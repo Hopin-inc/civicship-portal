@@ -6,21 +6,24 @@ export interface ActivityBookingConfig {
   [activityId: string]: number;
 }
 
-// NOTE: 現在はハードコーディングで管理しているが、将来的にカスタムすることが多ければデータベースで管理することを検討
+// NOTE: 将来的にデータベースで管理するまでは環境変数で設定を管理
 // TODO: BE にも設定ファイルがあるため、あわせて更新が必要
 // - civicship-api/src/application/domain/experience/reservation/config.ts
 
-export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = {
-  // Add activity-specific configurations here
-  // Example configurations:
-  // "activity-urgent-123": 1,         // 1 day advance booking
-  // "activity-workshop-456": 14,      // 14 days advance booking
-  // "activity-special-789": 3,  
-  // --- dev 環境での確認用 
-  "cmcak8udp019l8zwh4jvmuomp": 0, // 当日開催直前まで受付
-  "cmcak4qt600lu8zwhdzcuynre": 1, // 1日前まで受付可能
-  "cmcakai1a01jm8zwh7323vpzn": 2, // 2日前まで受付可能
-};
+// 環境変数からの設定を読み込む
+// 環境変数のJSON形式例: {"activity-id-1":0,"activity-id-2":1,"activity-id-3":7}
+let configFromEnv: ActivityBookingConfig = {};
+try {
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG) {
+    configFromEnv = JSON.parse(process.env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG);
+    console.log('Loaded activity advance booking days config from environment variable');
+  }
+} catch (error) {
+  console.error('Error parsing NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG environment variable:', error);
+}
+
+// 環境変数からの設定のみを使用
+export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = configFromEnv;
 
 /**
  * Default advance booking days for activities without specific configuration
