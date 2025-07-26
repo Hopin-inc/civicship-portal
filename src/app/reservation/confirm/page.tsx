@@ -121,7 +121,7 @@ export default function ConfirmPage() {
           nextPath={ window.location.pathname + window.location.search as RawURIComponent }
         />
         <div className="px-6 py-4">
-          <NoticeCard title="申し込みは未確定です。" description="最後までご確認いただき確定させて下さい" />
+          <NoticeCard title="申し込みは未確定です。" description="最後までご確認いただき、申し込みください。" />
         </div>
         <div className="px-6 py-4 mt-2">
           <OpportunityCardHorizontal
@@ -174,7 +174,7 @@ export default function ConfirmPage() {
               creatingReservation || (ui.useTickets && ticketCounter.count > availableTickets)
             }
           >
-            { creatingReservation ? "申込処理中..." : "申し込みを確定" }
+            { creatingReservation ? "申込処理中..." : "申し込みをする" }
           </Button>
         </footer>
       </main>
