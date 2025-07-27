@@ -3,12 +3,24 @@
 import React from "react";
 import { AlertCircle } from "lucide-react";
 import IconWrapper from "@/components/shared/IconWrapper";
+import { useAuth } from "@/contexts/AuthProvider";
 
 const NotesSection = () => {
+  const { isAuthenticated } = useAuth();
   return (
     <div className="rounded-lg p-6 mb-6">
       <h3 className="text-display-sm mb-6">注意事項</h3>
       <div className="space-y-4">
+        {!isAuthenticated && (
+          <div className="flex items-start gap-3">
+            <IconWrapper color="warning">
+              <AlertCircle size={18} strokeWidth={1.5} />
+            </IconWrapper>
+            <p className="text-body-md flex-1 font-bold">
+              この先はログインが必要です。ボタンを押し、ログインしてから再度お申し込みください。
+            </p>
+          </div>
+        )}
         <div className="flex items-start gap-3">
           <IconWrapper color="warning">
             <AlertCircle size={18} strokeWidth={1.5} />
