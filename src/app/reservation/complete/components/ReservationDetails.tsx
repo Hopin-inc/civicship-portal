@@ -48,6 +48,7 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
   category,
   pointsToEarn,
 }) => {
+  const normalParticipantCount = participantCount - ticketCount - (points?.participantCountWithPoint ?? 0);
   return (
     <div className="bg-card rounded-lg py-6 px-4 mb-6 space-y-6 w-full">
       <div className="flex items-start gap-x-2">
@@ -93,9 +94,9 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
                 <div>
                   <span>{ pricePerPerson?.toLocaleString() }円</span>
                   <span className="mx-2">×</span>
-                  <span>{ participantCount }名</span>
+                  <span>{ normalParticipantCount }名</span>
                   <span className="mx-2">=</span>
-                  <span className="font-bold">{ (pricePerPerson ?? 0) * (participantCount ?? 0) }円</span>
+                  <span className="font-bold">{ (pricePerPerson ?? 0) * normalParticipantCount }円</span>
                 </div>
               </div>
 
