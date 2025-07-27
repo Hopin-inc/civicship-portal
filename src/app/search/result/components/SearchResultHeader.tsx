@@ -27,6 +27,7 @@ const useSearchResultHeader = (searchParams: SearchParams) => {
           q: searchParams.q,
           points: searchParams.points,
           ticket: searchParams.ticket,
+          type: searchParams.type,
         },
         showLogo: false,
         showBackButton: false,

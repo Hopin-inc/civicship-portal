@@ -3,6 +3,12 @@ import { ja } from "date-fns/locale";
 import type { Locale } from "date-fns";
 import { logger } from "@/lib/logging";
 import { differenceInCalendarDays } from "date-fns";
+import dayjs from "dayjs";
+
+const YEAR_FMT = "YYYY年";
+const MONTH_DATE_FMT = "M月D日(ddd)";
+const TIME_FMT = "H:mm";
+const FULL_FMT = `${YEAR_FMT}${MONTH_DATE_FMT} ${TIME_FMT}`;
 
 export const parseDateTime = (dateTimeStr: string | null | undefined): Date | null => {
   if (!dateTimeStr) return null;
@@ -74,77 +80,6 @@ export function formatSlotRange(startsAt: string, endsAt: string): string {
   }
 }
 
-export function formatJapaneseDateTime(startDateTime: string, endDateTime: string): string {
-  const start = new Date(startDateTime);
-  const end = new Date(endDateTime);
-
-  const pad = (n: number) => n.toString().padStart(2, "0");
-
-  // 曜日の配列
-  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-  const weekday = weekdays[start.getDay()];
-
-  const date = `${start.getFullYear()}年${pad(start.getMonth() + 1)}月${pad(start.getDate())}日(${weekday})`;
-  const startTime = `${pad(start.getHours())}:${pad(start.getMinutes())}`;
-  const endTime = `${pad(end.getHours())}:${pad(end.getMinutes())}`;
-
-  return `${date} ${startTime}~${endTime}`;
-}
-
-export function formatDateTimeFromParts(formattedDate: string, startTime: string, endTime: string, endDate?: string): string {
-  if (endDate && endDate !== formattedDate) {
-    // 日を跨ぐ場合
-    // 開始日と終了日から年を抽出
-    const startYearMatch = formattedDate.match(/(\d{4})年/);
-    const endYearMatch = endDate.match(/(\d{4})年/);
-    
-    if (startYearMatch && endYearMatch && startYearMatch[1] === endYearMatch[1]) {
-      // 同じ年の場合は簡潔な形式
-      const startDateMatch = formattedDate.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
-      const endDateMatch = endDate.match(/(\d{1,2})月(\d{1,2})日/);
-      
-      if (startDateMatch && endDateMatch) {
-        const startMonth = parseInt(startDateMatch[2]);
-        const endMonth = parseInt(endDateMatch[1]);
-        const startDay = parseInt(startDateMatch[3]);
-        const endDay = parseInt(endDateMatch[2]);
-        
-        // 同じ月の場合は日のみ表示
-        if (startMonth === endMonth) {
-          return `${startDateMatch[1]}年${startMonth}月${startDay}日${startTime}~${endDay}日${endTime}`;
-        } else {
-          // 月が異なる場合は月も表示
-          return `${startDateMatch[1]}年${startMonth}月${startDay}日${startTime}~${endMonth}月${endDay}日${endTime}`;
-        }
-      }
-    }
-    
-    // 年が異なる場合やマッチしない場合は元の形式
-    return `${formattedDate} ${startTime}〜\n${endDate} ${endTime}`;
-  } else {
-    // 同じ日の場合
-    return `${formattedDate} ${startTime}~${endTime}`;
-  }
-}
-
-export function formatDateTimeFromISO(startsAt: string, endsAt: string): string {
-  const start = new Date(startsAt);
-  const end = new Date(endsAt);
-
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  
-  // 曜日の配列
-  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-  
-  const startDate = `${start.getFullYear()}年${pad(start.getMonth() + 1)}月${pad(start.getDate())}日(${weekdays[start.getDay()]})`;
-  const endDate = `${end.getFullYear()}年${pad(end.getMonth() + 1)}月${pad(end.getDate())}日(${weekdays[end.getDay()]})`;
-  
-  const startTime = `${pad(start.getHours())}:${pad(start.getMinutes())}`;
-  const endTime = `${pad(end.getHours())}:${pad(end.getMinutes())}`;
-
-  return formatDateTimeFromParts(startDate, startTime, endTime, startDate === endDate ? undefined : endDate);
-}
-
 export const getCrossDayLabel = (startDate: Date, endDate: Date) => {
   const diff = differenceInCalendarDays(endDate, startDate);
   if (diff === 0) return null;
@@ -152,4 +87,22 @@ export const getCrossDayLabel = (startDate: Date, endDate: Date) => {
   if (diff === 2) return "翌々日";
   if (diff >= 3) return `${diff}日後`;
   return null;
+};
+
+export const displayDatetime = (date: Date | string | null | undefined, format: string = FULL_FMT, nullString: string = "未設定") => {
+  if (!date) return nullString;
+  return dayjs(date).format(format);
+};
+
+export const displayDuration = (start: Date | string, end?: Date | string) => {
+  const dStart = dayjs(start);
+  const dEnd = dayjs(end);
+  if (!end) return displayDatetime(start, FULL_FMT);
+  if (dStart.isSame(dEnd, "date")) {
+    return `${dStart.format(FULL_FMT)}〜${dEnd.format(TIME_FMT)}`;
+  } else if (dStart.isSame(dEnd, "year")) {
+    return `${dStart.format(FULL_FMT)} 〜 ${dEnd.format(`${MONTH_DATE_FMT} ${TIME_FMT}`)}`;
+  } else {
+    return `${dStart.format(FULL_FMT)} 〜 ${dEnd.format(FULL_FMT)}`;
+  }
 };

@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { formatDateTimeFromISO } from "@/utils/date";
+import { displayDuration } from "@/utils/date";
 import { ArrowRight } from "lucide-react";
 
 interface OpportunityInfoProps {
@@ -23,7 +23,7 @@ interface OpportunityInfoProps {
 }
 
 const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity, dateTimeInfo, participationCount, phoneNumber, comment, totalPrice }) => {
-  const slotDateTime = formatDateTimeFromISO(opportunity?.slots[0]?.startsAt ?? "", opportunity?.slots[0]?.endsAt ?? "");
+  const slotDateTime = displayDuration(opportunity?.slots[0]?.startsAt ?? "", opportunity?.slots[0]?.endsAt ?? "");
   return (
     <div className="mx-6 my-6 rounded-lg">
       <div className="flex justify-between items-center gap-4">

@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { formatDateTimeFromISO } from "@/utils/date";
+import { displayDuration } from "@/utils/date";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { ArrowRight } from "lucide-react";
 
@@ -104,7 +104,7 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
    totalPrice,
    ticketCount
  }) => {
-  const slotDateTime = formatDateTimeFromISO(opportunity?.slots[0]?.startsAt ?? "", opportunity?.slots[0]?.endsAt ?? "");
+  const slotDateTime = displayDuration(opportunity?.slots[0]?.startsAt ?? "", opportunity?.slots[0]?.endsAt ?? "");
 
   return (
     <div className="mx-6 my-6 border border-foreground-caption rounded-lg p-4">

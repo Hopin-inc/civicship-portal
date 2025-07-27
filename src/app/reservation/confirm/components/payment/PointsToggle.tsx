@@ -115,7 +115,7 @@ export const PointsToggle: React.FC<PointsToggleProps> = memo(
             </div>
             
             <p className="text-xs text-caption text-center">
-              ({pointCount * (pointsRequired ?? 0)}pt消費されます)
+              ({(pointCount * (pointsRequired ?? 0)).toLocaleString()}pt消費されます)
             </p>
           </div>
         </div>
