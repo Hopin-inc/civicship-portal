@@ -88,7 +88,7 @@ const getPointOrFee = (
     return(
       <dl className="flex justify-between py-5 mt-2 border-b border-foreground-caption items-center">
         <dt className="text-label-sm font-bold">獲得予定ポイント数</dt>
-        <dd className="text-body-sm">{ quest.pointsToEarn?.toLocaleString() }pt</dd>
+        <dd className="text-body-sm">{( (quest.pointsToEarn ?? 0) * (participantCount ?? 0)).toLocaleString() }pt</dd>
       </dl>
     )
   }
