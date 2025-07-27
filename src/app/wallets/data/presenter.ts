@@ -81,11 +81,11 @@ const formatTransactionDescription = (
       return `初回ボーナス`;
 
     case GqlTransactionReason.OpportunityReservationCreated:
-      return `${toUserName}さんに支払い`;
+      return toUserName ? `${toUserName}さんに支払い` : "支払い";
 
     case GqlTransactionReason.OpportunityReservationCanceled:
     case GqlTransactionReason.OpportunityReservationRejected:
-      return `${fromUserName}さんから返品`;
+      return fromUserName ? `${fromUserName}さんから返金` : "返金";
 
     default:
       return `ポイント移動`;
