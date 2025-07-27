@@ -67,7 +67,7 @@ export const PointsToggle: React.FC<PointsToggleProps> = memo(
                 ポイントを利用する
               </span>
               <p className={`text-body-sm ${disabled ? 'text-gray-400' : ''}`}>
-                保有しているポイント: {maxPoints.toLocaleString()}pt
+                保有しているポイント: {Number(maxPoints).toLocaleString()}pt
               </p>
               {disabled && (
                 <p className="text-xs text-gray-500 mt-1">
