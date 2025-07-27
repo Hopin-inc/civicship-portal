@@ -34,6 +34,7 @@ const getPointOrFee = (
 ) => {
   if(opportunity?.category === GqlOpportunityCategory.Activity) {
     const feeRequired = "feeRequired" in opportunity ? opportunity.feeRequired : 0;
+    const normalParticipantCount = (participantCount ?? 0) - (ticketCount ?? 0) - (participantCountWithPoint ?? 0);
     return(
       <div className="border-b border-foreground-caption pb-4">
         <dl className="flex justify-between py-2 mt-2 items-center">
@@ -43,7 +44,7 @@ const getPointOrFee = (
           </div>
           <dd className="text-body-sm">{ totalPrice?.toLocaleString() }円</dd>
         </dl>
-        <div className="bg-muted rounded-lg p-4 mt-2">
+        <div className="bg-muted rounded-lg p-4">
             <div className="space-y-2">
               <h2 className="text-body-xs text-caption font-bold">内訳</h2>
               {/* 通常申し込み */}
@@ -52,9 +53,9 @@ const getPointOrFee = (
                 <div>
                   <span>{ feeRequired?.toLocaleString() }円</span>
                   <span className="mx-2">×</span>
-                  <span>{ participantCount }名</span>
+                  <span>{ normalParticipantCount }名</span>
                   <span className="mx-2">=</span>
-                  <span className="font-bold">{ (feeRequired ?? 0) * (participantCount ?? 0) }円</span>
+                  <span className="font-bold">{ (feeRequired ?? 0) * normalParticipantCount }円</span>
                 </div>
               </div>
 
