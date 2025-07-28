@@ -37,10 +37,11 @@ const useParticipationPage = (id: string): UseParticipationPageResult => {
   const { currentStatus } = useParticipationState({ participation });
 
   const { startsAt } = participation?.slot ?? {};
+  const activityId = opportunity?.id;
 
   const cancellationDeadline = useMemo(() => {
-    return calculateCancellationDeadline(startsAt);
-  }, [startsAt]);
+    return calculateCancellationDeadline(startsAt, opportunity?.id);
+  }, [startsAt, activityId]);
 
   useEffect(() => {
     if (error) {
