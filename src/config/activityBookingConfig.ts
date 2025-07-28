@@ -8,9 +8,8 @@ export interface ActivityBookingConfig {
   [activityId: string]: number;
 }
 
-// NOTE: 将来的にデータベースで管理するまでは環境変数で設定を管理
-// TODO: BE にも設定ファイルがあるため、あわせて更新が必要
-// - civicship-api/src/application/domain/experience/reservation/config.ts
+// NOTE: 現段階では、どこまで日程受付の日数カスタムニーズあるか読めないので、データベースではなく環境変数経由で設定・参照している
+// NOTE: BE では同じ値を CloudRun にて ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG という環境変数に設定する
 
 // 環境変数からの設定を読み込む
 // 環境変数のJSON形式例: {"activity-id-1":0,"activity-id-2":1,"activity-id-3":7}
