@@ -13,23 +13,20 @@ export function useFetchFeaturedAndCarousel() {
   const { data, loading } = useGetOpportunitiesQuery({
     variables: {
       filter: {
-        or: shouldShowQuests
-          ? [
-              {
-                category: GqlOpportunityCategory.Activity,
-                publishStatus: [GqlPublishStatus.Public],
-              },
-              {
-                category: GqlOpportunityCategory.Quest,
-                publishStatus: [GqlPublishStatus.Public],
-              },
-            ]
-          : [
-              {
-                category: GqlOpportunityCategory.Activity,
-                publishStatus: [GqlPublishStatus.Public],
-              },
-            ],
+        or: [
+          {
+            category: GqlOpportunityCategory.Activity,
+            publishStatus: [GqlPublishStatus.Public],
+          },
+          ...(shouldShowQuests
+            ? [
+                {
+                  category: GqlOpportunityCategory.Quest,
+                  publishStatus: [GqlPublishStatus.Public],
+                },
+              ]
+            : []),
+        ],
       },
       sort: {
         earliestSlotStartsAt: GqlSortDirection.Asc,
