@@ -5,21 +5,31 @@ import {
   useGetOpportunitiesQuery,
 } from "@/types/graphql";
 import { mapOpportunityCards, sliceActivitiesBySection } from "../activities/data/presenter";
+import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 
 export function useFetchFeaturedAndCarousel() {
+  const shouldShowQuests = useFeatureCheck(["quests"] as const);
+
   const { data, loading } = useGetOpportunitiesQuery({
     variables: {
       filter: {
-        or: [
-          {
-            category: GqlOpportunityCategory.Activity,
-            publishStatus: [GqlPublishStatus.Public],
-          },
-          {
-            category: GqlOpportunityCategory.Quest,
-            publishStatus: [GqlPublishStatus.Public],
-          },
-        ],
+        or: shouldShowQuests
+          ? [
+              {
+                category: GqlOpportunityCategory.Activity,
+                publishStatus: [GqlPublishStatus.Public],
+              },
+              {
+                category: GqlOpportunityCategory.Quest,
+                publishStatus: [GqlPublishStatus.Public],
+              },
+            ]
+          : [
+              {
+                category: GqlOpportunityCategory.Activity,
+                publishStatus: [GqlPublishStatus.Public],
+              },
+            ],
       },
       sort: {
         earliestSlotStartsAt: GqlSortDirection.Asc,

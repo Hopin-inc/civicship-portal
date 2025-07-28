@@ -8,7 +8,8 @@ export type FeaturesType =
   | "articles"
   | "prefectures"
   | "credentials"
-  | "justDaoIt";
+  | "justDaoIt"
+  | "quests";
 
 // コミュニティごとのベース設定
 interface CommunityBaseConfig {
@@ -120,7 +121,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
-    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures"],
+    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures", "quests"],
     rootPath: "/activities",
   },
 };
