@@ -1,3 +1,5 @@
+import { logger } from "@/lib/logging";
+
 /**
  * Activity booking configuration
  * Maps activity IDs to their advance booking requirements (in days)
@@ -16,10 +18,10 @@ let configFromEnv: ActivityBookingConfig = {};
 try {
   if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG) {
     configFromEnv = JSON.parse(process.env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG);
-    console.log('Loaded activity advance booking days config from environment variable');
+    logger.info('Loaded activity advance booking days config from environment variable');
   }
 } catch (error) {
-  console.error('Error parsing NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG environment variable:', error);
+  logger.error('Error parsing NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG environment variable:', error);
 }
 
 // 環境変数からの設定のみを使用
