@@ -4,11 +4,11 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import FeaturedSection from "./FeaturedSection";
 import { CarouselSection } from "./CarouselSection";
 import PageClient from "./PageClient";
-import { fetchFeaturedAndCarousel } from "../data/fetchActivities";
+import { useFetchFeaturedAndCarousel } from "../data/fetchActivities";
 
 export default function HomeSection() {
   const { isAuthenticating, loading: authLoading } = useAuth();
-  const { featuredCards, upcomingCards, loading } = fetchFeaturedAndCarousel();
+  const { featuredCards, upcomingCards, loading } = useFetchFeaturedAndCarousel();
   if (isAuthenticating || authLoading) {
     return <LoadingIndicator fullScreen={true} />;
   }

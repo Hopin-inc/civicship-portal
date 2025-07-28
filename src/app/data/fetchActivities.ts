@@ -6,7 +6,7 @@ import {
 } from "@/types/graphql";
 import { mapOpportunityCards, sliceActivitiesBySection } from "../activities/data/presenter";
 
-export function fetchFeaturedAndCarousel() {
+export function useFetchFeaturedAndCarousel() {
   const { data, loading } = useGetOpportunitiesQuery({
     variables: {
       filter: {
