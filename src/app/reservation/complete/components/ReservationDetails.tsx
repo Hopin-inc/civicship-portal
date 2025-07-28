@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Calendar, JapaneseYen, MapPin, Phone, Users } from "lucide-react";
+import { GqlOpportunityCategory } from "@/types/graphql";
 
 interface ReservationDetailsProps {
   formattedDate: string;
@@ -11,13 +12,20 @@ interface ReservationDetailsProps {
   participantCount: number;
   paidParticipantCount: number;
   totalPrice: number;
-  pricePerPerson: number;
+  pricePerPerson: number | null;
   location?: {
     name: string;
     address: string;
   };
   phoneNumber?: string | null | undefined;
   isReserved?: boolean;
+  points?: {
+    usedPoints: number;
+    participantCountWithPoint: number;
+  } | null;
+  ticketCount: number;
+  category: GqlOpportunityCategory;
+  pointsToEarn: number;
 }
 
 const ReservationDetails: React.FC<ReservationDetailsProps> = ({
@@ -35,7 +43,12 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
   },
   phoneNumber,
   isReserved = false,
+  points,
+  ticketCount,
+  category,
+  pointsToEarn,
 }) => {
+  const normalParticipantCount = participantCount - ticketCount - (points?.participantCountWithPoint ?? 0);
   return (
     <div className="bg-card rounded-lg py-6 px-4 mb-6 space-y-6 w-full">
       <div className="flex items-start gap-x-2">
@@ -61,16 +74,68 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
         <Users size={18} strokeWidth={1.5} className="text-caption w-6 h-6 mt-0.5" />
         <span>{participantCount}人</span>
       </div>
+      { category === GqlOpportunityCategory.Activity && (
       <div className="flex items-center gap-x-2">
-        <JapaneseYen size={18} strokeWidth={1.5} className="text-caption w-6 h-6 mt-0.5" />
-        <div className="flex flex-row gap-x-2 items-center">
-          <span className="text-foreground text-body-md">{totalPrice.toLocaleString()}円</span>
-          <span className="text-caption text-body-sm">
-            （{pricePerPerson.toLocaleString()}円 × {paidParticipantCount.toLocaleString()}
-            人）
-          </span>
+        <div className="flex flex-col w-full">
+          <div className="flex items-center gap-x-2">
+            <JapaneseYen size={18} strokeWidth={1.5} className="text-caption w-6 h-6 mt-0.5" />
+            <div className="flex justify-between items-center">
+              <span className="text-foreground text-body-md">{ totalPrice?.toLocaleString() }円</span>
+            </div>
+          </div>
+          
+          {/* 内訳セクション */}
+          <div className="bg-muted rounded-lg p-4 ml-12 mt-2">
+            <div className="space-y-2">
+              <h2 className="text-body-xs text-caption font-bold">内訳</h2>
+              {/* 通常申し込み */}
+              <div className="flex justify-between text-body-xs text-muted-foreground mt-1 border-b border-foreground-caption pb-2">
+                <span className="">通常申し込み</span>
+                <div>
+                  <span>{ pricePerPerson?.toLocaleString() }円</span>
+                  <span className="mx-2">×</span>
+                  <span>{ normalParticipantCount }名</span>
+                  <span className="mx-2">=</span>
+                  <span className="font-bold">{ (pricePerPerson ?? 0) * normalParticipantCount }円</span>
+                </div>
+              </div>
+
+              {/* ポイント利用 */}
+              { points && points.usedPoints > 0 && points.participantCountWithPoint > 0 && (
+              <div className="flex justify-between text-body-xs text-muted-foreground">
+                <span>ポイント利用</span>
+                <div>
+                  <span>{ points?.usedPoints?.toLocaleString() }pt</span>
+                  <span className="mx-2">×</span>
+                  <span>{ points?.participantCountWithPoint }名</span>
+                  <span className="mx-2">=</span>
+                  <span className="font-bold">{ (points?.usedPoints ?? 0) * (points?.participantCountWithPoint ?? 0) }pt</span>
+                  </div>
+                </div>
+              ) }
+
+              {/* チケット利用 */}
+              <div className="flex justify-between text-body-xs text-muted-foreground">
+                <span>チケット利用</span>
+                <div>
+                  <span>{ ticketCount }名分</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      ) }
+      { category === GqlOpportunityCategory.Quest && (
+        <div className="flex items-center gap-1 pt-1">
+        <p className="bg-primary text-[11px] rounded-full w-5 h-5 flex items-center justify-center font-bold text-white leading-none">
+          P
+        </p>
+        <p className="text-body-md font-bold">
+            +{pointsToEarn.toLocaleString()}ポイント
+        </p>
+      </div>
+      )}
       <div className="flex items-center gap-x-2">
         {isReserved ? (
           phoneNumber ? (

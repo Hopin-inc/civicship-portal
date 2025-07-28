@@ -1917,7 +1917,7 @@ export type GqlReservation = {
   histories?: Maybe<Array<GqlReservationHistory>>;
   id: Scalars["ID"]["output"];
   opportunitySlot?: Maybe<GqlOpportunitySlot>;
-  participantCountWithPoints?: Maybe<Scalars["Int"]["output"]>;
+  participantCountWithPoint?: Maybe<Scalars["Int"]["output"]>;
   participations?: Maybe<Array<GqlParticipation>>;
   status: GqlReservationStatus;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
@@ -1932,7 +1932,7 @@ export type GqlReservationCreateInput = {
   comment?: InputMaybe<Scalars["String"]["input"]>;
   opportunitySlotId: Scalars["ID"]["input"];
   otherUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
-  participantCountWithPoints?: InputMaybe<Scalars["Int"]["input"]>;
+  participantCountWithPoint?: InputMaybe<Scalars["Int"]["input"]>;
   paymentMethod: GqlReservationPaymentMethod;
   ticketIdsIfNeed?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   totalParticipantCount: Scalars["Int"]["input"];
@@ -4067,6 +4067,7 @@ export type GqlGetOpportunityQuery = {
         id: string;
         status: GqlReservationStatus;
         comment?: string | null;
+        participantCountWithPoint?: number | null;
         participations?: Array<{
           __typename?: "Participation";
           id: string;
@@ -4158,6 +4159,7 @@ export type GqlGetOpportunityQuery = {
             id: string;
             status: GqlReservationStatus;
             comment?: string | null;
+            participantCountWithPoint?: number | null;
             participations?: Array<{
               __typename?: "Participation";
               id: string;
@@ -4280,6 +4282,7 @@ export type GqlGetOpportunitySlotsQuery = {
           id: string;
           status: GqlReservationStatus;
           comment?: string | null;
+          participantCountWithPoint?: number | null;
           participations?: Array<{
             __typename?: "Participation";
             id: string;
@@ -4353,6 +4356,7 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
       id: string;
       status: GqlReservationStatus;
       comment?: string | null;
+      participantCountWithPoint?: number | null;
       participations?: Array<{
         __typename?: "Participation";
         id: string;
@@ -4471,6 +4475,7 @@ export type GqlGetParticipationQuery = {
       id: string;
       status: GqlReservationStatus;
       comment?: string | null;
+      participantCountWithPoint?: number | null;
       opportunitySlot?: {
         __typename?: "OpportunitySlot";
         id: string;
@@ -4672,6 +4677,7 @@ export type GqlReservationFieldsFragment = {
   id: string;
   status: GqlReservationStatus;
   comment?: string | null;
+  participantCountWithPoint?: number | null;
 };
 
 export type GqlCreateReservationMutationVariables = Exact<{
@@ -4687,6 +4693,7 @@ export type GqlCreateReservationMutation = {
       id: string;
       status: GqlReservationStatus;
       comment?: string | null;
+      participantCountWithPoint?: number | null;
       participations?: Array<{
         __typename?: "Participation";
         id: string;
@@ -4715,6 +4722,7 @@ export type GqlCancelReservationMutation = {
       id: string;
       status: GqlReservationStatus;
       comment?: string | null;
+      participantCountWithPoint?: number | null;
     };
   } | null;
 };
@@ -4779,6 +4787,7 @@ export type GqlGetReservationsQuery = {
         id: string;
         status: GqlReservationStatus;
         comment?: string | null;
+        participantCountWithPoint?: number | null;
         createdByUser?: {
           __typename?: "User";
           id: string;
@@ -4837,6 +4846,7 @@ export type GqlGetReservationQuery = {
     id: string;
     status: GqlReservationStatus;
     comment?: string | null;
+    participantCountWithPoint?: number | null;
     createdByUser?: {
       __typename?: "User";
       id: string;
@@ -5932,6 +5942,7 @@ export const ReservationFieldsFragmentDoc = gql`
     id
     status
     comment
+    participantCountWithPoint
   }
 `;
 export const TicketFieldsFragmentDoc = gql`

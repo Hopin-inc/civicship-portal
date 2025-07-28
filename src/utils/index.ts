@@ -9,30 +9,6 @@ dayjs.extend(relativeTime);
 
 export const PLACEHOLDER_IMAGE = `/communities/${COMMUNITY_ID}/placeholder.jpg`;
 
-
-const YEAR_FMT = "YYYY年";
-const MONTH_DATE_FMT = "M月D日(ddd)";
-const TIME_FMT = "H:mm";
-const FULL_FMT = `${YEAR_FMT}${MONTH_DATE_FMT} ${TIME_FMT}`;
-
-export const displayDatetime = (date: Date | string | null | undefined, format: string = FULL_FMT, nullString: string = "未設定") => {
-  if (!date) return nullString;
-  return dayjs(date).format(format);
-};
-
-export const displayDuration = (start: Date | string, end?: Date | string) => {
-  const dStart = dayjs(start);
-  const dEnd = dayjs(end);
-  if (!end) return displayDatetime(start, FULL_FMT);
-  if (dStart.isSame(dEnd, "date")) {
-    return `${dStart.format(FULL_FMT)}〜${dEnd.format(TIME_FMT)}`;
-  } else if (dStart.isSame(dEnd, "year")) {
-    return `${dStart.format(FULL_FMT)} 〜 ${dEnd.format(`${MONTH_DATE_FMT} ${TIME_FMT}`)}`;
-  } else {
-    return `${dStart.format(FULL_FMT)} 〜 ${dEnd.format(FULL_FMT)}`;
-  }
-};
-
 export const displayRelativeTime = (date: Date | string) => {
   return dayjs(date).fromNow();
 };

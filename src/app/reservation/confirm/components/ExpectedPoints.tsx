@@ -3,6 +3,15 @@ interface ExpectedPointsProps {
   participantCount: number;
 }
 
+const getPointsSharingMessage = (participantCount:number) :string => {
+  if(participantCount > 1) {
+    return "必要に応じて、一緒に参加する人にポイントを送ってあげてください。";
+  } else {
+    return "";
+  }
+}
+ 
+
 export const ExpectedPoints = ({points, participantCount}: ExpectedPointsProps) => {
   return (
     <div>
@@ -13,7 +22,7 @@ export const ExpectedPoints = ({points, participantCount}: ExpectedPointsProps) 
             </p>
         </div>
         <p className="text-body-sm text-caption px-6 mt-2 leading-1.6">参加後、予約者であるあなたのウォレットに上記の{participantCount}人分のポイントが付与されます。<br/>
-        必要に応じて、一緒に参加する人にポイントを送ってあげてください。</p>
+        {getPointsSharingMessage(participantCount)}</p>
     </div>
   );
 };

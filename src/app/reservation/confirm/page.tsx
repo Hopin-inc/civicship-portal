@@ -20,7 +20,7 @@ import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReserv
 import { GqlOpportunityCategory, GqlWalletType, useGetMemberWalletsQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
-import { encodeURIComponentWithType, RawURIComponent } from "@/utils/path";
+import { RawURIComponent } from "@/utils/path";
 import { NoticeCard } from "@/components/shared/NoticeCard";
 import { CardHorizontal } from "@/app/components/CardHorizontal";
 import { ExpectedPoints } from "./components/ExpectedPoints";
@@ -49,6 +49,7 @@ export default function ConfirmPage() {
   const [participantCount, setParticipantCount] = useState<number>(initialParticipantCount);
   const [selectedPointCount, setSelectedPointCount] = useState(0);
   const [selectedTicketCount, setSelectedTicketCount] = useState(0);
+  const [selectedTickets, setSelectedTickets] = useState<{ [ticketId: string]: number }>({});
   const {
     opportunity,
     selectedSlot,
@@ -96,6 +97,8 @@ export default function ConfirmPage() {
       comment: ui.ageComment ?? undefined,
       usePoints: ui.usePoints,
       selectedPointCount: selectedPointCount,
+      selectedTicketCount: selectedTicketCount,
+      selectedTickets: selectedTickets,
     });
 
     if (creatingReservation) {
@@ -181,6 +184,7 @@ export default function ConfirmPage() {
             pointsRequired={ 'pointsRequired' in opportunity ? opportunity.pointsRequired : 0 }
             onPointCountChange={setSelectedPointCount}
             onTicketCountChange={setSelectedTicketCount}
+            onSelectedTicketsChange={setSelectedTickets}
           />
           <div className="border-b border-gray-200 my-6"></div>
           </>

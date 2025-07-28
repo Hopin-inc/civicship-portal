@@ -41,7 +41,7 @@ export default function QuestsList() {
     <div className="min-h-screen">
       <main>
         <CarouselSection
-          title="おすすめの体験"
+          title="おすすめのお手伝い"
           opportunities={recommendedOpportunities}
           isVertical={false}
         />
