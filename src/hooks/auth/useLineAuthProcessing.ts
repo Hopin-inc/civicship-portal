@@ -42,17 +42,8 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         }
 
         const { isLoggedIn, profile } = liffServiceRef.current.getState();
-        logger.debug("LIFF State", {
-          isInitialized: true,
-          isLoggedIn,
-          userId: profile?.userId || "none",
-          component: "useLineAuthProcessing"
-        });
 
         if (!isLoggedIn) {
-          logger.debug("User not logged in via LIFF", {
-            component: "useLineAuthProcessing"
-          });
           return;
         }
 
@@ -65,9 +56,6 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
           return;
         }
 
-        logger.debug("LINE auth successful. Refetching user", {
-          component: "useLineAuthProcessing"
-        });
         await refetchUserRef.current();
       } catch (err) {
         logger.info("Error during LINE auth", {
