@@ -25,7 +25,7 @@ export default function PageClient() {
   const afterFour = allCards.slice(4);
   const isFirstLoaded = !loading && opportunities?.edges?.length > 0;
   const isEmpty = !loading && opportunities?.edges?.length === 0;
-  const shouldShowQuests = useFeatureCheck(["quests"] as const);
+  const shouldShowQuests = useFeatureCheck("quests");
 
   // if (!isFirstLoaded && loading) {
   //   return (

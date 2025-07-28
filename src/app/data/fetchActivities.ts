@@ -8,7 +8,7 @@ import { mapOpportunityCards, sliceActivitiesBySection } from "../activities/dat
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 
 export function useFetchFeaturedAndCarousel() {
-  const shouldShowQuests = useFeatureCheck(["quests"] as const);
+  const shouldShowQuests = useFeatureCheck("quests");
 
   const { data, loading } = useGetOpportunitiesQuery({
     variables: {
