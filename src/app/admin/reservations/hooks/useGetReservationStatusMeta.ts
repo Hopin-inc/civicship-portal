@@ -21,7 +21,8 @@ const getReservationStatusMeta = (reservation: GqlReservation): StatusMeta => {
 
   const isApplied = status === GqlReservationStatus.Applied;
   const isRejected = status === GqlReservationStatus.Rejected;
-  const isCancelled = hostingStatus === GqlOpportunitySlotHostingStatus.Cancelled;
+  const isReservationCancelled = status === GqlReservationStatus.Canceled;
+  const isSlotCancelled = hostingStatus === GqlOpportunitySlotHostingStatus.Cancelled;
   const isAccepted = status === GqlReservationStatus.Accepted;
   const isScheduled = hostingStatus === GqlOpportunitySlotHostingStatus.Scheduled;
   const isCompleted = hostingStatus === GqlOpportunitySlotHostingStatus.Completed;
@@ -49,7 +50,11 @@ const getReservationStatusMeta = (reservation: GqlReservation): StatusMeta => {
     return { step: "approval", label: "却下済み", variant: "destructive" };
   }
 
-  if (isCancelled) {
+  if (isReservationCancelled) {
+    return { step: "cancellation", label: "キャンセル済み", variant: "outline" };
+  }
+
+  if (isSlotCancelled) {
     return { step: "cancellation", label: "開催中止", variant: "warning" };
   }
 
