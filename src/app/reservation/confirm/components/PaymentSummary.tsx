@@ -51,7 +51,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
             </div>
 
             {/* ポイント利用 */}
-            {usePoints && pointCount > 0 && (
+            {usePoints && pointCount > 0 ? (
               <div className="flex justify-between text-body-sm text-muted-foreground">
                 <span>ポイント利用</span>
                 <div>
@@ -62,15 +62,15 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
                   <span className="font-bold">{((pointsRequired ?? 0) * pointCount).toLocaleString()}pt</span>
                 </div>
               </div>
-            )}
+            ) : null }
 
             {/* チケット利用 */}
-            {/* {useTickets && ticketCount > 0 && ( */}
+            {useTickets && ticketCount > 0 ? (
               <div className="flex justify-between text-body-sm text-muted-foreground">
                 <span>チケット利用</span>
                 <span>{ticketCount}名分</span>
               </div>
-            {/* )} */}
+            ) : null }
           </div>
         </div>
       </>

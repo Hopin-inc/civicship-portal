@@ -9,6 +9,7 @@ const YEAR_FMT = "YYYY年";
 const MONTH_DATE_FMT = "M月D日(ddd)";
 const TIME_FMT = "H:mm";
 const FULL_FMT = `${YEAR_FMT}${MONTH_DATE_FMT} ${TIME_FMT}`;
+const DATE_FMT = `${YEAR_FMT}${MONTH_DATE_FMT}`;
 
 export const parseDateTime = (dateTimeStr: string | null | undefined): Date | null => {
   if (!dateTimeStr) return null;
@@ -94,15 +95,29 @@ export const displayDatetime = (date: Date | string | null | undefined, format: 
   return dayjs(date).format(format);
 };
 
-export const displayDuration = (start: Date | string, end?: Date | string) => {
+export const displayDuration = (start: Date | string, end?: Date | string, multiline: boolean = false) => {
   const dStart = dayjs(start);
   const dEnd = dayjs(end);
+  
   if (!end) return displayDatetime(start, FULL_FMT);
-  if (dStart.isSame(dEnd, "date")) {
-    return `${dStart.format(FULL_FMT)}〜${dEnd.format(TIME_FMT)}`;
-  } else if (dStart.isSame(dEnd, "year")) {
-    return `${dStart.format(FULL_FMT)} 〜 ${dEnd.format(`${MONTH_DATE_FMT} ${TIME_FMT}`)}`;
+  
+  if (multiline) {
+    // 2行表示: 日付と時間を分けて表示
+    if (dStart.isSame(dEnd, "date")) {
+      return `${dStart.format(DATE_FMT)}\n${dStart.format(TIME_FMT)}〜${dEnd.format(TIME_FMT)}`;
+    } else if (dStart.isSame(dEnd, "year")) {
+      return `${dStart.format(DATE_FMT)} 〜 ${dEnd.format(MONTH_DATE_FMT)}\n${dStart.format(TIME_FMT)} 〜 ${dEnd.format(TIME_FMT)}`;
+    } else {
+      return `${dStart.format(DATE_FMT)} 〜 ${dEnd.format(DATE_FMT)}\n${dStart.format(TIME_FMT)} 〜 ${dEnd.format(TIME_FMT)}`;
+    }
   } else {
-    return `${dStart.format(FULL_FMT)} 〜 ${dEnd.format(FULL_FMT)}`;
+    // 1行表示: 従来通りの表示
+    if (dStart.isSame(dEnd, "date")) {
+      return `${dStart.format(FULL_FMT)}〜${dEnd.format(TIME_FMT)}`;
+    } else if (dStart.isSame(dEnd, "year")) {
+      return `${dStart.format(FULL_FMT)} 〜 ${dEnd.format(`${MONTH_DATE_FMT} ${TIME_FMT}`)}`;
+    } else {
+      return `${dStart.format(FULL_FMT)} 〜 ${dEnd.format(FULL_FMT)}`;
+    }
   }
 };

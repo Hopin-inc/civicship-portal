@@ -64,8 +64,6 @@ export default function ActivityPage() {
     return notFound();
   }
 
-  console.log("opportunity", opportunity);
-
   const questSlots = sortedSlots?.filter((slot): slot is QuestSlot => "pointsToEarn" in slot) ?? [];
   const questQuests = sameStateActivities?.filter((quest): quest is QuestCard => "pointsToEarn" in quest && !("feeRequired" in quest)) ?? [];
 

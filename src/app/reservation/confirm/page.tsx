@@ -166,7 +166,7 @@ export default function ConfirmPage() {
           />
         </div>
         <div className="mx-6 border-b border-gray-200 my-6"></div>
-        {isActivity && ((userWallet && userWallet > pointsRequired) || maxTickets > 0) && (
+        {isActivity && ((userWallet && userWallet > pointsRequired) || maxTickets > 0) && pointsRequired > 0 ? (
           <>
           <PaymentSection
             ticketCount={ ticketCounter.count }
@@ -188,7 +188,7 @@ export default function ConfirmPage() {
           />
           <div className="border-b border-gray-200 my-6"></div>
           </>
-        )}
+        ) : null }
         <div className="mb-2" />
         {/* <NotesSection /> */}
         <CommentTextarea

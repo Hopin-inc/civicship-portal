@@ -24,11 +24,12 @@ export const CardHorizontal = ({ opportunity, withShadow = true, category, start
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const handleOpen = useCallback(() => setIsSheetOpen(true), []);
   const handleClose = useCallback(() => setIsSheetOpen(false), []);
+  const link = category === GqlOpportunityCategory.Quest ? `/quests/${opportunity.id}?community_id=${opportunity.communityId}` : `/activities/${opportunity.id}?community_id=${opportunity.communityId}`;
 
   return (
     <>
       <Link
-        href={`/activities/${opportunity.id}?community_id=${opportunity.communityId}`}
+        href={link}
         className="block"
       >
         <div className="mx-auto max-w-md">
@@ -58,8 +59,8 @@ export const CardHorizontal = ({ opportunity, withShadow = true, category, start
           </div>
           <div>
             <h2 className="text-label-sm font-bold pt-10">日時</h2>
-            <p className="text-body-sm text-foreground pt-1">
-              {displayDuration(startDateTime?.toISOString() ?? "", endDateTime?.toISOString() ?? "")}
+            <p className="text-body-sm text-foreground pt-1 whitespace-pre-wrap">
+              {displayDuration(startDateTime?.toISOString() ?? "", endDateTime?.toISOString() ?? "", true)}
             </p>
           </div>
           <div className="border-b border-gray-200 my-4"></div>
