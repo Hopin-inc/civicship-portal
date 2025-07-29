@@ -189,7 +189,7 @@ export function PhoneVerificationForm() {
                 type="tel"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="09012345678"
+                placeholder="例）09012345678"
                 className="w-full h-12 px-3 border rounded-md"
                 required
               />
