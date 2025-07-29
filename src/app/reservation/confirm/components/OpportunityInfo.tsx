@@ -6,6 +6,7 @@ import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { GqlOpportunityCategory } from "@/types/graphql";
+import Link from "next/link";
 
 interface OpportunityInfoProps {
   opportunity: ActivityDetail | QuestDetail;
