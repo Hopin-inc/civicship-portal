@@ -32,6 +32,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     pathname.startsWith("/admin") ||
     (pathname.startsWith("/reservation") && !pathname.includes("/complete")) ||
     pathname.startsWith("/activities/") ||
+    pathname.startsWith("/quests/") ||
     pathname.startsWith("/participations/") ||
     pathname.startsWith("/sign-up") ||
     pathname === "/users/me/edit" ||

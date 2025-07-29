@@ -76,7 +76,7 @@ export default function PageClient() {
           <div className="ml-2">
             <div className="flex justify-between">
               <p className="text-base font-bold text-left">ポイントを獲得すると、<br/>無料で体験に参加できます。</p>
-              <Image src={"icons/arrow.svg"} alt="arrow" width={32} height={32} className="mt-6 ml-4"/>
+              <Image src="/icons/arrow.svg" alt="arrow" width={32} height={32} className="mt-6 ml-4"/>
             </div>
             <span className="text-xs">ポイントがもらえるお手伝いを探してみましょう</span>
             </div>
