@@ -5,8 +5,34 @@ import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/ut
 
 const cachedSessionId = generateSessionId();
 
+const logThrottle = new Map<string, number>();
+const THROTTLE_DURATION = 5 * 60 * 1000;
+
+const shouldThrottle = (message: string, level: string): boolean => {
+  const key = `${level}:${message}`;
+  const now = Date.now();
+  const lastLogged = logThrottle.get(key);
+  
+  if (lastLogged && (now - lastLogged) < THROTTLE_DURATION) {
+    return true;
+  }
+  
+  logThrottle.set(key, now);
+  return false;
+};
+
 const forwardLogToServer = async (level: string, message: string, meta?: Record<string, any>) => {
   const { authType = "general", ...restMeta } = meta ?? {};
+  
+  const isBrowserIssue = message.includes("IndexedDB") || 
+                        message.includes("Database server lost") ||
+                        message.includes("Connection to Indexed Database server lost") ||
+                        message.includes("storage");
+  
+  if (isBrowserIssue && shouldThrottle(message, level)) {
+    return;
+  }
+  
   const enrichedMeta = createAuthLogContext(cachedSessionId, authType, restMeta);
 
   try {

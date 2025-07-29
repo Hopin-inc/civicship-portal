@@ -35,7 +35,7 @@ export const getFirebaseAnalytics = async (): Promise<Analytics | undefined> => 
     const supported = await isSupported();
     if (supported) {
       analyticsInstance = getAnalytics(defaultApp);
-      logger.debug("Analytics initialized", { component: "FirebaseConfig" });
+      logger.info("Analytics initialized", { component: "FirebaseConfig" });
     }
   }
 

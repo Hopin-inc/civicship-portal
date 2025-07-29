@@ -151,11 +151,27 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
         operation: operation.operationName,
       });
     } else {
-      logger.error("Network error", {
-        error: networkError.message || String(networkError),
-        component: "ApolloErrorLink",
-        operation: operation.operationName,
-      });
+      const errorMessage = networkError.message || String(networkError);
+      const isTemporaryNetworkIssue = errorMessage.includes("Failed to fetch") || 
+                                     errorMessage.includes("Load failed") || 
+                                     errorMessage.includes("Network request failed");
+      
+      if (isTemporaryNetworkIssue) {
+        logger.warn("Network connectivity issue", {
+          error: errorMessage,
+          component: "ApolloErrorLink",
+          operation: operation.operationName,
+          errorCategory: "network_temporary",
+          retryable: true,
+        });
+      } else {
+        logger.error("Network system error", {
+          error: errorMessage,
+          component: "ApolloErrorLink",
+          operation: operation.operationName,
+          errorCategory: "system_error",
+        });
+      }
     }
 
     if ("statusCode" in networkError && networkError.statusCode === 401) {
