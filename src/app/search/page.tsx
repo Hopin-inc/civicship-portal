@@ -33,9 +33,7 @@ export default function SearchPage() {
   const typeParam = searchParams.get("type");
   const shouldShowQuests = useFeatureCheck("quests");
 
-  const defaultTab: SearchTabType = shouldShowQuests 
-    ? (typeParam === "quest" ? "quest" : "activity")
-    : "activity";
+  const defaultTab: SearchTabType = shouldShowQuests && typeParam === "quest" ? "quest" : "activity";
 
   // タブの状態をuseStateで管理
   const [selectedTab, setSelectedTab] = useState<SearchTabType>(defaultTab);
