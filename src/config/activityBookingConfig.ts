@@ -32,6 +32,11 @@ export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = configFromEnv;
 export const DEFAULT_ADVANCE_BOOKING_DAYS = 7;
 
 /**
+ * Default cancellation deadline days before activity start
+ */
+export const DEFAULT_CANCELLATION_DEADLINE_DAYS = 1;
+
+/**
  * Get the advance booking days for a specific activity
  * @param activityId The activity ID to get booking lead time for
  * @returns Number of days in advance booking is required
