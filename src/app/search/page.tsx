@@ -15,6 +15,7 @@ import SearchFilters from "@/app/search/components/SearchFilters";
 import SearchFooter from "@/app/search/components/Footer";
 import SearchFilterSheets from "@/app/search/components/SearchFilterSheet";
 import { logger } from "@/lib/logging";
+import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 
 export default function SearchPage() {
   const headerConfig = useMemo(
@@ -30,9 +31,14 @@ export default function SearchPage() {
 
   const searchParams = useSearchParams();
   const typeParam = searchParams.get("type");
+  const shouldShowQuests = useFeatureCheck("quests");
+
+  const defaultTab: SearchTabType = shouldShowQuests 
+    ? (typeParam === "quest" ? "quest" : "activity")
+    : "activity";
 
   // タブの状態をuseStateで管理
-  const [selectedTab, setSelectedTab] = useState<SearchTabType>(typeParam === "quest" ? "quest" : "activity");
+  const [selectedTab, setSelectedTab] = useState<SearchTabType>(defaultTab);
   const [activeForm, setActiveForm] = useState<SearchFilterType>(null);
 
   // Initialize form with search parameters from URL
@@ -77,16 +83,18 @@ export default function SearchPage() {
         <div className="container px-4 py-2">
           <FormProvider {...methods}>
             <div className="mt-2">
-              <SearchTabs
-                selectedTab={selectedTab}
-                onTabChange={(tab: SearchTabType) => {
-                  setSelectedTab(tab);
-                  // typeパラメータも切り替え
-                  const params = new URLSearchParams(searchParams.toString());
-                  params.set("type", tab);
-                  window.history.replaceState(null, "", `?${params.toString()}`);
-                }}
-              />
+              {shouldShowQuests && (
+                <SearchTabs
+                  selectedTab={selectedTab}
+                  onTabChange={(tab: SearchTabType) => {
+                    setSelectedTab(tab);
+                    // typeパラメータも切り替え
+                    const params = new URLSearchParams(searchParams.toString());
+                    params.set("type", tab);
+                    window.history.replaceState(null, "", `?${params.toString()}`);
+                  }}
+                />
+              )}
             </div>
             <SearchPageContent
               activeForm={activeForm}
