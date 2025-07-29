@@ -5,8 +5,11 @@ import {
   useGetOpportunitiesQuery,
 } from "@/types/graphql";
 import { mapOpportunityCards, sliceActivitiesBySection } from "../activities/data/presenter";
+import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 
 export function useFetchFeaturedAndCarousel() {
+  const shouldShowQuests = useFeatureCheck("quests");
+
   const { data, loading } = useGetOpportunitiesQuery({
     variables: {
       filter: {
@@ -15,10 +18,14 @@ export function useFetchFeaturedAndCarousel() {
             category: GqlOpportunityCategory.Activity,
             publishStatus: [GqlPublishStatus.Public],
           },
-          {
-            category: GqlOpportunityCategory.Quest,
-            publishStatus: [GqlPublishStatus.Public],
-          },
+          ...(shouldShowQuests
+            ? [
+                {
+                  category: GqlOpportunityCategory.Quest,
+                  publishStatus: [GqlPublishStatus.Public],
+                },
+              ]
+            : []),
         ],
       },
       sort: {

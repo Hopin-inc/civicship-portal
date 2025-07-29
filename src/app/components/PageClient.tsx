@@ -10,6 +10,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Coins } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 
 export default function PageClient() {
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
@@ -24,6 +25,7 @@ export default function PageClient() {
   const afterFour = allCards.slice(4);
   const isFirstLoaded = !loading && opportunities?.edges?.length > 0;
   const isEmpty = !loading && opportunities?.edges?.length === 0;
+  const shouldShowQuests = useFeatureCheck("quests");
 
   // if (!isFirstLoaded && loading) {
   //   return (
@@ -59,6 +61,7 @@ export default function PageClient() {
         isSectionLoading={loading}
       />
       {/* バナー */}
+      {shouldShowQuests && (
       <div className="px-6">
         <button
           className="w-full flex bg-blue-50 rounded-lg p-4 appearance-none border-none focus:outline-none"
@@ -76,9 +79,10 @@ export default function PageClient() {
               <Image src={"icons/arrow.svg"} alt="arrow" width={32} height={32} className="mt-6 ml-4"/>
             </div>
             <span className="text-xs">ポイントがもらえるお手伝いを探してみましょう</span>
-          </div>
-        </button>
-      </div>
+            </div>
+          </button>
+        </div>
+      )}
       {/* 5件目以降 */}
       <ActivitiesListSection
         opportunities={afterFour}
