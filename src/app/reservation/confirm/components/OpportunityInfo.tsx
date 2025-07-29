@@ -6,7 +6,6 @@ import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { GqlOpportunityCategory } from "@/types/graphql";
-import { ArrowRight } from "lucide-react";
 
 interface OpportunityInfoProps {
   opportunity: ActivityDetail | QuestDetail | null;
@@ -119,12 +118,11 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
             className="object-cover"
           />
         </div>
-        <div>
-          <h1 className="text-title-md font-bold leading-tight mb-4 line-clamp-3 break-words">
+        <div className="flex items-center">
+          <h1 className="text-body-sm font-bold mb-4 line-clamp-4 break-words leading-6">
             {opportunity?.title ?? ""}
           </h1>
         </div>
-        <ArrowRight size={20} className="text-primary flex-shrink-0" />
       </div>
       { dateTimeInfo && (
         <dl className="flex justify-between py-5 mt-2 border-b border-foreground-caption items-center">
@@ -148,9 +146,9 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
         ) }
       { phoneNumber && (
       <dl className={`flex justify-between py-5 mt-2 items-center ${comment ? "border-b border-foreground-caption" : ""}`}>
-        <div className="flex flex-col gap-y-2">
+        <div className="flex flex-col gap-y-1">
           <dt className="text-label-sm font-bold">緊急連絡先</dt>
-          <dt className="text-label-sm font-bold">主催者の電話番号</dt>
+          <dt className="text-body-xs">主催者の電話番号</dt>
         </div>
         <div className="flex flex-col gap-y-2">
           <a
