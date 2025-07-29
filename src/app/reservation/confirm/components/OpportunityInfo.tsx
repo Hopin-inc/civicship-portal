@@ -10,7 +10,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface OpportunityInfoProps {
-  opportunity: ActivityDetail | QuestDetail | null;
+  opportunity: ActivityDetail | QuestDetail;
   dateTimeInfo?: {
     formattedDate: string;
     startTime: string;
@@ -108,7 +108,9 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
    ticketCount
  }) => {
   const slotDateTime = displayDuration(opportunity?.slots[0]?.startsAt ?? "", opportunity?.slots[0]?.endsAt ?? "", true);
-  const link = opportunity?.category === GqlOpportunityCategory.Quest ? `/quests/${opportunity?.id}?community_id=${opportunity?.communityId}` : `/activities/${opportunity?.id}?community_id=${opportunity?.communityId}`;
+  const link = opportunity.category === GqlOpportunityCategory.Quest
+     ? `/quests/${opportunity.id}?community_id=${opportunity.communityId}`
+    : `/activities/${opportunity.id}?community_id=${opportunity.communityId}`;
 
   return (
     <div className="mx-6 my-6 border border-foreground-caption rounded-lg p-4">
@@ -116,8 +118,8 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
         <div className="flex justify-between items-center gap-4">
           <div className="relative w-[120px] h-[120px] rounded-lg overflow-hidden flex-shrink-0">
             <Image
-              src={opportunity?.images?.[0] || PLACEHOLDER_IMAGE}
-              alt={opportunity?.title ?? ""}
+              src={opportunity.images?.[0] || PLACEHOLDER_IMAGE}
+              alt={opportunity.title ?? ""}
               fill
               placeholder={"blur"}
               blurDataURL={PLACEHOLDER_IMAGE}
