@@ -166,7 +166,7 @@ export default function ConfirmPage() {
           />
         </div>
         <div className="mx-6 border-b border-gray-200 my-6"></div>
-        {isActivity && ((userWallet && userWallet > pointsRequired) || maxTickets > 0) && pointsRequired > 0 ? (
+        {isActivity && ((userWallet && userWallet >= pointsRequired && pointsRequired > 0) || maxTickets > 0) ? (
           <>
           <PaymentSection
             ticketCount={ ticketCounter.count }
