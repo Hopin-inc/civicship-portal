@@ -49,7 +49,7 @@ export default function OpportunityCardVertical({
       className={`relative w-full flex-shrink-0 ${isCarousel ? "max-w-[150px] sm:max-w-[164px]" : ""}`}
     >
       <Card className="w-full h-[205px] overflow-hidden relative">
-        {(hasReservableTicket || pointsRequired !== null && pointsRequired > 0) && category === GqlOpportunityCategory.Activity && (
+        {(hasReservableTicket || (pointsRequired ?? 0) > 0) && category === GqlOpportunityCategory.Activity && (
           <div className="absolute top-2 left-2 bg-primary-foreground text-primary px-2.5 py-1 rounded-xl text-label-xs font-bold z-10">
             {selectBadge(hasReservableTicket, pointsRequired)}
           </div>
