@@ -54,7 +54,7 @@ export const CardHorizontal = ({ opportunity, withShadow = true, category, start
               />
             </div>
             <div className="flex-1 px-4 py-3">
-              <h2 className="text-title-sm text-foreground line-clamp-4">{opportunity.title}</h2>
+              <h2 className="text-body-sm text-foreground line-clamp-4 font-bold leading-6">{opportunity.title}</h2>
             </div>
           </div>
           <div>
