@@ -9,6 +9,7 @@ interface TimeSlotListProps {
   dateSections: ActivitySlotGroup[];
   isSlotAvailable: (slot: ActivitySlot) => boolean;
   onSelectSlot: (slot: ActivitySlot) => void;
+  activityId?: string;
 }
 
 export const parseJapaneseDateLabel = (label: string) => {
@@ -35,13 +36,14 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
   dateSections,
   isSlotAvailable,
   onSelectSlot,
+  activityId,
 }) => {
   const handleSelectSlot = useCallback(
     (slot: ActivitySlot) => () => onSelectSlot(slot),
     [onSelectSlot],
   );
 
-  const registrationCutoff = getReservationThreshold();
+  const registrationCutoff = getReservationThreshold(activityId);
 
   return (
     <div className="space-y-8">
@@ -58,10 +60,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
               const startsAtDate = new Date(slot.startsAt);
               const endsAtDate = new Date(slot.endsAt);
 
-              const FORCE_RESERVABLE_SLOT_IDS = ["cmc07ao5c0005s60nnc8ravvk", "cmajo3nfj001es60nltawe4a6"];
-              const isForceReservable = FORCE_RESERVABLE_SLOT_IDS.includes(slot.id);
-              const isRegistrationClosed =
-                !isForceReservable && isBefore(startsAtDate, registrationCutoff);
+              const isRegistrationClosed = isBefore(startsAtDate, registrationCutoff);
 
               const crossDayLabel = getCrossDayLabel(startsAtDate, endsAtDate);
 
