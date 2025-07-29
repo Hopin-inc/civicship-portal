@@ -5,7 +5,7 @@ on:
     branches:
       - develop
       - hotfix/**
-      - epic/*
+      - epic/**
 jobs:
   read-communities:
     runs-on: ubuntu-latest
