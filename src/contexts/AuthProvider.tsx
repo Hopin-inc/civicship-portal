@@ -16,7 +16,7 @@ import {
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { useAuthStateManagerInitialization } from "@/hooks/auth/useAuthStateManagerInitialization";
+import { useAuthInitialization } from "@/hooks/auth/useAuthInitialization";
 import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
 import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
 import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
@@ -29,6 +29,8 @@ import { logger } from "@/lib/logging";
 import { maskPhoneNumber } from "@/lib/logging/client/utils";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
 import { RawURIComponent } from "@/utils/path";
+import AuthInitializationScreen from "@/components/auth/AuthInitializationScreen";
+import AuthInitializationError from "@/components/auth/AuthInitializationError";
 
 /**
  * 認証状態の型定義
@@ -158,7 +160,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [liffService, phoneAuthService]);
 
-  useAuthStateManagerInitialization(authStateManager);
+  const { 
+    initializationContext, 
+    isInitialized, 
+    isInitializing, 
+    hasFailed, 
+    retryInitialization 
+  } = useAuthInitialization(authStateManager);
   useAuthStateChangeListener({ authStateManager, setState });
   useTokenExpirationHandler({ state, setState, logout });
   useFirebaseAuthState({ authStateManager, state, setState });
@@ -372,6 +380,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     },
     loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
   };
+
+  if (hasFailed) {
+    return (
+      <AuthInitializationError 
+        initializationContext={initializationContext}
+        onRetry={retryInitialization}
+      />
+    );
+  }
+
+  if (isInitializing) {
+    return <AuthInitializationScreen initializationContext={initializationContext} />;
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

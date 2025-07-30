@@ -1,6 +1,7 @@
 import { TokenManager } from "./token-manager";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
+import { AuthInitializationState, AuthInitializationContext } from "@/types/auth";
 
 import { logger } from "@/lib/logging";
 
@@ -22,6 +23,13 @@ export class AuthStateManager {
   private currentState: AuthenticationState = "loading";
   private stateChangeListeners: ((state: AuthenticationState) => void)[] = [];
   private readonly sessionId: string;
+  private initializationState: AuthInitializationState = "not_started";
+  private initializationListeners: ((context: AuthInitializationContext) => void)[] = [];
+  private initializationContext: AuthInitializationContext = {
+    state: "not_started",
+    progress: 0,
+    retryCount: 0
+  };
 
   private constructor() {
     this.sessionId = this.initializeSessionId();
@@ -111,6 +119,27 @@ export class AuthStateManager {
   }
 
   /**
+   * 初期化状態の変更を監視するリスナーを追加
+   */
+  public addInitializationListener(listener: (context: AuthInitializationContext) => void): void {
+    this.initializationListeners.push(listener);
+  }
+
+  /**
+   * 初期化状態の変更を監視するリスナーを削除
+   */
+  public removeInitializationListener(listener: (context: AuthInitializationContext) => void): void {
+    this.initializationListeners = this.initializationListeners.filter((l) => l !== listener);
+  }
+
+  /**
+   * 初期化コンテキストを取得
+   */
+  public getInitializationContext(): AuthInitializationContext {
+    return { ...this.initializationContext };
+  }
+
+  /**
    * 認証状態を更新
    */
   public setState(state: AuthenticationState): void {
@@ -130,19 +159,58 @@ export class AuthStateManager {
   }
 
   /**
-   * 認証状態を初期化
+   * 初期化状態を更新
+   */
+  private updateInitializationState(state: AuthInitializationState, progress: number, error?: string): void {
+    this.initializationContext = {
+      ...this.initializationContext,
+      state,
+      progress,
+      error
+    };
+    this.initializationState = state;
+    this.notifyInitializationChange();
+  }
+
+  /**
+   * 初期化状態の変更を通知
+   */
+  private notifyInitializationChange(): void {
+    this.initializationListeners.forEach((listener) => {
+      listener(this.initializationContext);
+    });
+  }
+
+  /**
+   * 認証状態を初期化（段階的初期化システム）
    */
   public async initialize(): Promise<void> {
-    this.setState("loading");
+    try {
+      this.updateInitializationState("checking_tokens", 10);
+      this.setState("loading");
 
-    const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+      await this.delay(100);
 
-    if (!hasValidLineToken) {
-      this.setState("unauthenticated");
-      return;
-    } else {
+      const lineTokens = TokenManager.getLineTokens();
+      const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+
+      this.updateInitializationState("checking_tokens", 30);
+
+      if (!hasValidLineToken) {
+        this.updateInitializationState("hydrating", 80);
+        await this.delay(200);
+        this.setState("unauthenticated");
+        this.updateInitializationState("completed", 100);
+        return;
+      }
+
+      this.updateInitializationState("checking_user", 50);
+      await this.delay(100);
+
       const isUserRegistered = await this.checkUserRegistration();
+
+      this.updateInitializationState("hydrating", 80);
+      await this.delay(200);
 
       if (isUserRegistered) {
         this.setState("user_registered");
@@ -157,7 +225,36 @@ export class AuthStateManager {
           this.setState("line_authenticated");
         }
       }
+
+      this.updateInitializationState("completed", 100);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error("Auth initialization failed", {
+        error: errorMessage,
+        component: "AuthStateManager",
+        retryCount: this.initializationContext.retryCount
+      });
+
+      this.initializationContext.retryCount++;
+      this.updateInitializationState("failed", this.initializationContext.progress, errorMessage);
     }
+  }
+
+  /**
+   * 初期化を再試行
+   */
+  public async retryInitialization(): Promise<void> {
+    if (this.initializationContext.retryCount < 3) {
+      this.updateInitializationState("not_started", 0);
+      await this.initialize();
+    }
+  }
+
+  /**
+   * 遅延処理（UI の滑らかな遷移のため）
+   */
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /**
