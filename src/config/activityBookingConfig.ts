@@ -16,11 +16,19 @@ export interface ActivityBookingConfig {
 let configFromEnv: ActivityBookingConfig = {};
 try {
   if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG) {
-    configFromEnv = JSON.parse(process.env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG);
-    logger.info('Loaded activity advance booking days config from environment variable');
+    const configValue = process.env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG.trim();
+    // 空の値や無効な値の場合は空のオブジェクトを使用
+    if (configValue && configValue !== 'undefined' && configValue !== 'null') {
+      try {
+        configFromEnv = JSON.parse(configValue) as ActivityBookingConfig;
+        logger.info('Loaded activity advance booking days config from environment variable');
+      } catch (parseError) {
+        logger.error(`Invalid JSON in NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG: ${configValue.substring(0, 20)}...`, { error: parseError });
+      }
+    }
   }
 } catch (error) {
-  logger.error('Error parsing NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG environment variable:', error);
+  logger.error('Error accessing NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG environment variable:', error as Error);
 }
 
 // 環境変数からの設定のみを使用
