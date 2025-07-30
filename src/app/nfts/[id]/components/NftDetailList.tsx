@@ -31,7 +31,7 @@ export const NftDetailList = (props: NftDetailListProps) => {
       <div>
         <Image
             src={props.imageUrl ?? ""}
-            alt="証明書"
+            alt={props.instanceName ?? "証明書"}
             width={120}
             height={120}
             className="object-cover border-none shadow-none mx-auto rounded-sm"
