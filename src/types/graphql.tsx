@@ -1097,11 +1097,70 @@ export type GqlNestedPlacesBulkUpdateInput = {
   disconnect?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
+export type GqlNftInstance = {
+  __typename?: "NftInstance";
+  createdAt: Scalars["Datetime"]["output"];
+  description?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  imageUrl?: Maybe<Scalars["String"]["output"]>;
+  instanceId: Scalars["String"]["output"];
+  json?: Maybe<Scalars["JSON"]["output"]>;
+  name?: Maybe<Scalars["String"]["output"]>;
+  nftToken?: Maybe<GqlNftToken>;
+  nftWallet: GqlNftWallet;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type GqlNftInstanceEdge = GqlEdge & {
+  __typename?: "NftInstanceEdge";
+  cursor: Scalars["String"]["output"];
+  node: GqlNftInstance;
+};
+
+export type GqlNftInstanceFilterInput = {
+  and?: InputMaybe<Array<GqlNftInstanceFilterInput>>;
+  hasDescription?: InputMaybe<Scalars["Boolean"]["input"]>;
+  hasImage?: InputMaybe<Scalars["Boolean"]["input"]>;
+  hasName?: InputMaybe<Scalars["Boolean"]["input"]>;
+  nftTokenAddress?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  nftTokenType?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  nftWalletId?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  not?: InputMaybe<GqlNftInstanceFilterInput>;
+  or?: InputMaybe<Array<GqlNftInstanceFilterInput>>;
+  userId?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+};
+
+export type GqlNftInstanceSortInput = {
+  createdAt?: InputMaybe<GqlSortDirection>;
+  instanceId?: InputMaybe<GqlSortDirection>;
+  name?: InputMaybe<GqlSortDirection>;
+};
+
+export type GqlNftInstancesConnection = {
+  __typename?: "NftInstancesConnection";
+  edges: Array<GqlNftInstanceEdge>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlNftToken = {
+  __typename?: "NftToken";
+  address: Scalars["String"]["output"];
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  json?: Maybe<Scalars["JSON"]["output"]>;
+  name?: Maybe<Scalars["String"]["output"]>;
+  symbol?: Maybe<Scalars["String"]["output"]>;
+  type: Scalars["String"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
 export type GqlNftWallet = {
   __typename?: "NftWallet";
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   id: Scalars["ID"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  user: GqlUser;
   walletAddress: Scalars["String"]["output"];
 };
 
@@ -1677,6 +1736,8 @@ export type GqlQuery = {
   evaluations: GqlEvaluationsConnection;
   membership?: Maybe<GqlMembership>;
   memberships: GqlMembershipsConnection;
+  nftInstance?: Maybe<GqlNftInstance>;
+  nftInstances: GqlNftInstancesConnection;
   opportunities: GqlOpportunitiesConnection;
   opportunity?: Maybe<GqlOpportunity>;
   opportunitySlot?: Maybe<GqlOpportunitySlot>;
@@ -1774,6 +1835,17 @@ export type GqlQueryMembershipsArgs = {
   filter?: InputMaybe<GqlMembershipFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<GqlMembershipSortInput>;
+};
+
+export type GqlQueryNftInstanceArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryNftInstancesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlNftInstanceFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlNftInstanceSortInput>;
 };
 
 export type GqlQueryOpportunitiesArgs = {
@@ -2484,6 +2556,7 @@ export type GqlUser = {
   membershipChangedByMe?: Maybe<Array<GqlMembershipHistory>>;
   memberships?: Maybe<Array<GqlMembership>>;
   name: Scalars["String"]["output"];
+  nftInstances?: Maybe<GqlNftInstancesConnection>;
   nftWallet?: Maybe<GqlNftWallet>;
   opportunitiesCreatedByMe?: Maybe<Array<GqlOpportunity>>;
   participationStatusChangedByMe?: Maybe<Array<GqlParticipationStatusHistory>>;
@@ -2503,6 +2576,13 @@ export type GqlUser = {
   urlX?: Maybe<Scalars["String"]["output"]>;
   urlYoutube?: Maybe<Scalars["String"]["output"]>;
   wallets?: Maybe<Array<GqlWallet>>;
+};
+
+export type GqlUserNftInstancesArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlNftInstanceFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlNftInstanceSortInput>;
 };
 
 export type GqlUserPortfoliosArgs = {
@@ -3067,6 +3147,110 @@ export type GqlGetMembershipListQuery = {
       } | null;
     } | null> | null;
   };
+};
+
+export type GqlGetNftInstancesQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlNftInstanceFilterInput>;
+}>;
+
+export type GqlGetNftInstancesQuery = {
+  __typename?: "Query";
+  nftInstances: {
+    __typename?: "NftInstancesConnection";
+    totalCount: number;
+    edges: Array<{
+      __typename?: "NftInstanceEdge";
+      cursor: string;
+      node: {
+        __typename?: "NftInstance";
+        id: string;
+        instanceId: string;
+        name?: string | null;
+        createdAt: Date;
+        description?: string | null;
+        imageUrl?: string | null;
+        nftWallet: {
+          __typename?: "NftWallet";
+          id: string;
+          walletAddress: string;
+          user: {
+            __typename?: "User";
+            id: string;
+            name: string;
+            didIssuanceRequests?: Array<{
+              __typename?: "DidIssuanceRequest";
+              id: string;
+              status: GqlDidIssuanceStatus;
+              didValue?: string | null;
+              requestedAt?: Date | null;
+              completedAt?: Date | null;
+            }> | null;
+          };
+        };
+        nftToken?: {
+          __typename?: "NftToken";
+          id: string;
+          address: string;
+          name?: string | null;
+          symbol?: string | null;
+          type: string;
+          createdAt: Date;
+        } | null;
+      };
+    }>;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
+};
+
+export type GqlGetNftInstanceWithDidQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetNftInstanceWithDidQuery = {
+  __typename?: "Query";
+  nftInstance?: {
+    __typename?: "NftInstance";
+    id: string;
+    instanceId: string;
+    name?: string | null;
+    description?: string | null;
+    imageUrl?: string | null;
+    json?: any | null;
+    createdAt: Date;
+    updatedAt?: Date | null;
+    nftToken?: {
+      __typename?: "NftToken";
+      id: string;
+      address: string;
+      name?: string | null;
+      symbol?: string | null;
+      type: string;
+      json?: any | null;
+    } | null;
+    nftWallet: {
+      __typename?: "NftWallet";
+      id: string;
+      walletAddress: string;
+      user: {
+        __typename?: "User";
+        id: string;
+        name: string;
+        didIssuanceRequests?: Array<{
+          __typename?: "DidIssuanceRequest";
+          id: string;
+          status: GqlDidIssuanceStatus;
+          didValue?: string | null;
+          requestedAt?: Date | null;
+          processedAt?: Date | null;
+          completedAt?: Date | null;
+          createdAt?: Date | null;
+          updatedAt?: Date | null;
+        }> | null;
+      };
+    };
+  } | null;
 };
 
 export type GqlUserFieldsFragment = {
@@ -6776,6 +6960,220 @@ export type GetMembershipListSuspenseQueryHookResult = ReturnType<
 export type GetMembershipListQueryResult = Apollo.QueryResult<
   GqlGetMembershipListQuery,
   GqlGetMembershipListQueryVariables
+>;
+export const GetNftInstancesDocument = gql`
+  query GetNftInstances($first: Int, $cursor: String, $filter: NftInstanceFilterInput) {
+    nftInstances(first: $first, cursor: $cursor, filter: $filter) {
+      edges {
+        cursor
+        node {
+          id
+          instanceId
+          name
+          createdAt
+          nftWallet {
+            id
+            walletAddress
+            user {
+              id
+              name
+              didIssuanceRequests {
+                id
+                status
+                didValue
+                requestedAt
+                completedAt
+              }
+            }
+          }
+          description
+          imageUrl
+          nftToken {
+            id
+            address
+            name
+            symbol
+            type
+            createdAt
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useGetNftInstancesQuery__
+ *
+ * To run a query within a React component, call `useGetNftInstancesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetNftInstancesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetNftInstancesQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useGetNftInstancesQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetNftInstancesQuery, GqlGetNftInstancesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetNftInstancesQuery, GqlGetNftInstancesQueryVariables>(
+    GetNftInstancesDocument,
+    options,
+  );
+}
+export function useGetNftInstancesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetNftInstancesQuery,
+    GqlGetNftInstancesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetNftInstancesQuery, GqlGetNftInstancesQueryVariables>(
+    GetNftInstancesDocument,
+    options,
+  );
+}
+export function useGetNftInstancesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetNftInstancesQuery, GqlGetNftInstancesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetNftInstancesQuery, GqlGetNftInstancesQueryVariables>(
+    GetNftInstancesDocument,
+    options,
+  );
+}
+export type GetNftInstancesQueryHookResult = ReturnType<typeof useGetNftInstancesQuery>;
+export type GetNftInstancesLazyQueryHookResult = ReturnType<typeof useGetNftInstancesLazyQuery>;
+export type GetNftInstancesSuspenseQueryHookResult = ReturnType<
+  typeof useGetNftInstancesSuspenseQuery
+>;
+export type GetNftInstancesQueryResult = Apollo.QueryResult<
+  GqlGetNftInstancesQuery,
+  GqlGetNftInstancesQueryVariables
+>;
+export const GetNftInstanceWithDidDocument = gql`
+  query GetNftInstanceWithDid($id: ID!) {
+    nftInstance(id: $id) {
+      id
+      instanceId
+      name
+      description
+      imageUrl
+      json
+      createdAt
+      updatedAt
+      nftToken {
+        id
+        address
+        name
+        symbol
+        type
+        json
+      }
+      nftWallet {
+        id
+        walletAddress
+        user {
+          id
+          name
+          didIssuanceRequests {
+            id
+            status
+            didValue
+            requestedAt
+            processedAt
+            completedAt
+            createdAt
+            updatedAt
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetNftInstanceWithDidQuery__
+ *
+ * To run a query within a React component, call `useGetNftInstanceWithDidQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetNftInstanceWithDidQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetNftInstanceWithDidQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetNftInstanceWithDidQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetNftInstanceWithDidQuery,
+    GqlGetNftInstanceWithDidQueryVariables
+  > &
+    ({ variables: GqlGetNftInstanceWithDidQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetNftInstanceWithDidQuery, GqlGetNftInstanceWithDidQueryVariables>(
+    GetNftInstanceWithDidDocument,
+    options,
+  );
+}
+export function useGetNftInstanceWithDidLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetNftInstanceWithDidQuery,
+    GqlGetNftInstanceWithDidQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetNftInstanceWithDidQuery, GqlGetNftInstanceWithDidQueryVariables>(
+    GetNftInstanceWithDidDocument,
+    options,
+  );
+}
+export function useGetNftInstanceWithDidSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetNftInstanceWithDidQuery,
+        GqlGetNftInstanceWithDidQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetNftInstanceWithDidQuery,
+    GqlGetNftInstanceWithDidQueryVariables
+  >(GetNftInstanceWithDidDocument, options);
+}
+export type GetNftInstanceWithDidQueryHookResult = ReturnType<typeof useGetNftInstanceWithDidQuery>;
+export type GetNftInstanceWithDidLazyQueryHookResult = ReturnType<
+  typeof useGetNftInstanceWithDidLazyQuery
+>;
+export type GetNftInstanceWithDidSuspenseQueryHookResult = ReturnType<
+  typeof useGetNftInstanceWithDidSuspenseQuery
+>;
+export type GetNftInstanceWithDidQueryResult = Apollo.QueryResult<
+  GqlGetNftInstanceWithDidQuery,
+  GqlGetNftInstanceWithDidQueryVariables
 >;
 export const UpdateMyProfileDocument = gql`
   mutation UpdateMyProfile(
