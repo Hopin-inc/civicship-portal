@@ -18,6 +18,7 @@ try {
   if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG) {
     configFromEnv = JSON.parse(process.env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG);
     logger.info('Loaded activity advance booking days config from environment variable');
+    logger.info('Activity advance booking days config:', configFromEnv);
   }
 } catch (error) {
   logger.error('Error parsing NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG environment variable:', error);
