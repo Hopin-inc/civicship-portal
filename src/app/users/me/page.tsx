@@ -70,7 +70,7 @@ export default function MyProfilePage() {
             {nftInstances.map((nftInstance) => (
               <UserNftList
                 key={nftInstance.id}
-                nftInstances={nftInstance}
+                nftInstance={nftInstance}
                 isCarousel={true}
               />
             ))}
