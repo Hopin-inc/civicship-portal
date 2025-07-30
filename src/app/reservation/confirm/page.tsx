@@ -50,6 +50,17 @@ export default function ConfirmPage() {
   const [selectedPointCount, setSelectedPointCount] = useState(0);
   const [selectedTicketCount, setSelectedTicketCount] = useState(0);
   const [selectedTickets, setSelectedTickets] = useState<{ [ticketId: string]: number }>({});
+
+  const getButtonText = () => {
+    if (creatingReservation) {
+      return "申込処理中...";
+    }
+    if (user) {
+      return "申し込みをする";
+    }
+    return "LINEで登録に進む";
+  };
+
   const {
     opportunity,
     selectedSlot,
@@ -232,7 +243,7 @@ export default function ConfirmPage() {
               creatingReservation || (ui.useTickets && ticketCounter.count > availableTickets.length)
             }
           >
-            { creatingReservation ? "申込処理中..." : "申し込みを確定" }
+            { getButtonText() }
           </Button>
         ) : (
           <Button

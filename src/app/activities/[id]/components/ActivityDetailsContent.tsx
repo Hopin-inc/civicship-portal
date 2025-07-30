@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useMemo } from "react";
-import Image from "next/image";
 import { AlertCircle, CalendarX } from "lucide-react";
 import SameStateActivities from "./SimilarActivitiesList";
+import { getAdvanceBookingText } from "@/config/activityBookingConfig";
 import ActivityScheduleCard from "./ActivityScheduleCard";
 import {
   ActivityCard,
@@ -17,9 +17,10 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import IconWrapper from "@/components/shared/IconWrapper";
 import AddressMap from "@/components/shared/AddressMap";
-import { PLACEHOLDER_IMAGE } from "@/utils";
 import { ActivityBodySection } from "@/app/activities/[id]/components/ActivityBodySection";
 import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface ActivityDetailsContentProps {
   opportunity: ActivityDetail;
@@ -40,13 +41,15 @@ const ActivityDetailsContent = ({
     <>
       <ActivityBodySection body={opportunity.description + "\n\n" + opportunity.body} />
       <HostInfoSection host={opportunity.host} />
-      <PlaceSection place={opportunity.place} />
+      {opportunity.place?.name && opportunity.place?.address && (
+        <PlaceSection place={opportunity.place} />
+      )}
       <ScheduleSection
         slots={availableDates}
         opportunityId={opportunity.id}
         communityId={communityId}
       />
-      <NoticeSection />
+      <NoticeSection opportunityId={opportunity.id} />
       <SameStateActivities
         header={"近くでおすすめの体験"}
         opportunities={sameStateActivities}
@@ -65,25 +68,18 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
       <div className="rounded-xl flex flex-col gap-4">
         <div className="flex items-center gap-4">
           {host.id ? (
-            <Link
-              href={`/users/${host.id}`}
-              className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0"
-            >
-              <Image
-                src={host.image || PLACEHOLDER_IMAGE}
-                alt={host.name || "案内者"}
-                fill
-                className="object-cover"
-              />
+            <Link href={`/users/${host.id}`} className="flex-shrink-0">
+              <Avatar className="w-16 h-16 mt-1">
+                <AvatarImage src={host.image ?? PLACEHOLDER_IMAGE} alt={host.name || "案内人"} />
+                <AvatarFallback>{host.name?.[0] || "U"}</AvatarFallback>
+              </Avatar>
             </Link>
           ) : (
-            <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-              <Image
-                src={host.image || PLACEHOLDER_IMAGE}
-                alt={host.name || "案内者"}
-                fill
-                className="object-cover"
-              />
+            <div className="flex-shrink-0">
+              <Avatar className="w-16 h-16 mt-1">
+                <AvatarImage src={host.image ?? PLACEHOLDER_IMAGE} alt={host.name || "案内人"} />
+                <AvatarFallback>{host.name?.[0] || "U"}</AvatarFallback>
+              </Avatar>
             </div>
           )}
           <div>
@@ -100,6 +96,8 @@ const HostInfoSection = ({ host }: { host: OpportunityHost }) => {
 };
 
 const PlaceSection = ({ place }: { place: OpportunityPlace }) => {
+  if (!place) return null;
+
   return (
     <section className="pt-6 pb-8 mt-0">
       <h2 className="text-display-md text-foreground mb-4">集合場所</h2>
@@ -153,7 +151,7 @@ const ScheduleSection = ({
         {hasSchedule ? (
           <>
             <p className="text-muted-foreground font-bold mb-4 px-1">
-              ※予約は各日程の前日まで受付中{" "}
+              ※予約は各日程の{getAdvanceBookingText(opportunityId)}まで受付中{" "}
             </p>
             <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
               {slots.map((slot, index) => (
@@ -190,7 +188,7 @@ const ScheduleSection = ({
   );
 };
 
-const NoticeSection: React.FC = () => {
+const NoticeSection: React.FC<{ opportunityId: string }> = ({ opportunityId }) => {
   return (
     <section className="pt-6 pb-8 mt-0 bg-background-hover -mx-4 px-4">
       <h2 className="text-display-md text-foreground mb-4">注意事項</h2>
@@ -219,7 +217,7 @@ const NoticeSection: React.FC = () => {
           <IconWrapper color="warning">
             <AlertCircle size={20} strokeWidth={2.5} />
           </IconWrapper>
-          <p className="text-body-md flex-1">キャンセルは開催日の前日まで可能です。</p>
+          <p className="text-body-md flex-1">キャンセルは開催日の{getAdvanceBookingText(opportunityId)}まで可能です。</p>
         </div>
       </div>
     </section>

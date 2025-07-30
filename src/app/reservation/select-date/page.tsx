@@ -91,6 +91,7 @@ export default function SelectDatePage() {
           onSelectSlot={handleReservation}
           pointsToEarn={pointsToEarn}
           category={opportunity.category}
+          activityId={opportunityId ?? undefined}
         />
       </div>
 

@@ -11,7 +11,9 @@
     "lint:fix": "yarn lint --fix",
     "lint:graphql": "eslint 'src/**/*.{ts,tsx}' --no-eslintrc --config .eslintrc.json",
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json}'",
-    "gql:generate": "export NODE_TLS_REJECT_UNAUTHORIZED=0 && graphql-codegen --config codegen.yaml"
+    "gql:generate": "export NODE_TLS_REJECT_UNAUTHORIZED=0 && graphql-codegen --config codegen.yaml",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
@@ -87,6 +89,7 @@
     "zod": "^3.25.32"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^4.0.1",
     "@graphql-codegen/cli": "5.0.2",
     "@graphql-codegen/client-preset": "4.3.3",
     "@graphql-codegen/introspection": "4.0.3",
@@ -94,6 +97,9 @@
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-eslint/eslint-plugin": "^4.4.0",
     "@graphql-typed-document-node/core": "^3.2.0",
+    "@storybook/addon-a11y": "^9.0.17",
+    "@storybook/addon-docs": "^9.0.17",
+    "@storybook/addon-vitest": "^9.0.17",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/apollo-upload-client": "^18.0.0",
@@ -108,12 +114,19 @@
     "eslint-config-next": "14.2.5",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-local-rules": "^3.0.2",
+    "eslint-plugin-storybook": "^9.0.17",
     "graphql-cost-analysis": "^1.0.3",
     "graphql-query-complexity": "^1.1.0",
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
     "sass": "^1.89.0",
+    "storybook": "^9.0.17",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "@storybook/nextjs-vite": "^9.0.17",
+    "vitest": "^3.2.4",
+    "@vitest/browser": "^3.2.4",
+    "playwright": "^1.54.1",
+    "@vitest/coverage-v8": "^3.2.4"
   }
 }

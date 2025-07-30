@@ -21,7 +21,6 @@ export const NoticeCard = ({ title, description }: NoticeCardProps) => {
           </p>
         </div>
       </div>
-      
     </Card>
   );
 };

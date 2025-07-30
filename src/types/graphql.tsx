@@ -218,6 +218,7 @@ export type GqlCommunity = {
   __typename?: "Community";
   articles?: Maybe<Array<GqlArticle>>;
   bio?: Maybe<Scalars["String"]["output"]>;
+  config?: Maybe<GqlCommunityConfig>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   establishedAt?: Maybe<Scalars["Datetime"]["output"]>;
   id: Scalars["ID"]["output"];
@@ -234,12 +235,25 @@ export type GqlCommunity = {
   website?: Maybe<Scalars["String"]["output"]>;
 };
 
+export type GqlCommunityConfig = {
+  __typename?: "CommunityConfig";
+  firebaseConfig?: Maybe<GqlCommunityFirebaseConfig>;
+  lineConfig?: Maybe<GqlCommunityLineConfig>;
+};
+
+export type GqlCommunityConfigInput = {
+  firebaseConfig?: InputMaybe<GqlCommunityFirebaseConfigInput>;
+  lineConfig?: InputMaybe<GqlCommunityLineConfigInput>;
+};
+
 export type GqlCommunityCreateInput = {
   bio?: InputMaybe<Scalars["String"]["input"]>;
+  config?: InputMaybe<GqlCommunityConfigInput>;
+  createdBy?: InputMaybe<Scalars["ID"]["input"]>;
   establishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   image?: InputMaybe<GqlImageInput>;
   name: Scalars["String"]["input"];
-  places?: InputMaybe<Array<GqlNestedPlaceCreateInput>>;
+  originalId?: InputMaybe<Scalars["String"]["input"]>;
   pointName: Scalars["String"]["input"];
   website?: InputMaybe<Scalars["String"]["input"]>;
 };
@@ -270,6 +284,45 @@ export type GqlCommunityFilterInput = {
   placeIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
+export type GqlCommunityFirebaseConfig = {
+  __typename?: "CommunityFirebaseConfig";
+  tenantId?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type GqlCommunityFirebaseConfigInput = {
+  tenantId: Scalars["String"]["input"];
+};
+
+export type GqlCommunityLineConfig = {
+  __typename?: "CommunityLineConfig";
+  accessToken?: Maybe<Scalars["String"]["output"]>;
+  channelId?: Maybe<Scalars["String"]["output"]>;
+  channelSecret?: Maybe<Scalars["String"]["output"]>;
+  liffBaseUrl?: Maybe<Scalars["String"]["output"]>;
+  liffId?: Maybe<Scalars["String"]["output"]>;
+  richMenus?: Maybe<Array<GqlCommunityLineRichMenuConfig>>;
+};
+
+export type GqlCommunityLineConfigInput = {
+  accessToken: Scalars["String"]["input"];
+  channelId: Scalars["String"]["input"];
+  channelSecret: Scalars["String"]["input"];
+  liffBaseUrl: Scalars["String"]["input"];
+  liffId: Scalars["String"]["input"];
+  richMenus: Array<GqlCommunityLineRichMenuConfigInput>;
+};
+
+export type GqlCommunityLineRichMenuConfig = {
+  __typename?: "CommunityLineRichMenuConfig";
+  richMenuId: Scalars["String"]["output"];
+  type: GqlLineRichMenuType;
+};
+
+export type GqlCommunityLineRichMenuConfigInput = {
+  richMenuId: Scalars["String"]["input"];
+  type: GqlLineRichMenuType;
+};
+
 export type GqlCommunitySortInput = {
   createdAt?: InputMaybe<GqlSortDirection>;
 };
@@ -279,7 +332,6 @@ export type GqlCommunityUpdateProfileInput = {
   establishedAt?: InputMaybe<Scalars["Datetime"]["input"]>;
   image?: InputMaybe<GqlImageInput>;
   name: Scalars["String"]["input"];
-  places: GqlNestedPlacesBulkUpdateInput;
   pointName: Scalars["String"]["input"];
   website?: InputMaybe<Scalars["String"]["input"]>;
 };
@@ -513,6 +565,13 @@ export type GqlImageInput = {
   file: Scalars["Upload"]["input"];
 };
 
+export const GqlLineRichMenuType = {
+  Admin: "ADMIN",
+  Public: "PUBLIC",
+  User: "USER",
+} as const;
+
+export type GqlLineRichMenuType = (typeof GqlLineRichMenuType)[keyof typeof GqlLineRichMenuType];
 export type GqlLinkPhoneAuthInput = {
   phoneUid: Scalars["String"]["input"];
 };
