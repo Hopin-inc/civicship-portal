@@ -6,9 +6,10 @@ import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { GqlOpportunityCategory } from "@/types/graphql";
+import Link from "next/link";
 
 interface OpportunityInfoProps {
-  opportunity: ActivityDetail | QuestDetail | null;
+  opportunity: ActivityDetail | QuestDetail;
   dateTimeInfo?: {
     formattedDate: string;
     startTime: string;
@@ -59,26 +60,28 @@ const getPointOrFee = (
               </div>
 
               {/* ポイント利用 */}
-              { pointsRequired && pointsRequired > 0 && participantCountWithPoint && participantCountWithPoint > 0 && (
+              { pointsRequired && pointsRequired > 0 && participantCountWithPoint && participantCountWithPoint > 0 ? (
               <div className="flex justify-between text-body-xs text-muted-foreground">
                 <span>ポイント利用</span>
-                <div>
-                  <span>{ pointsRequired?.toLocaleString() }pt</span>
-                  <span className="mx-2">×</span>
-                  <span>{ participantCountWithPoint }名</span>
-                  <span className="mx-2">=</span>
-                  <span className="font-bold">{ (pointsRequired ?? 0) * (participantCountWithPoint ?? 0) }pt</span>
+                  <div>
+                    <span>{ pointsRequired?.toLocaleString() }pt</span>
+                    <span className="mx-2">×</span>
+                    <span>{ participantCountWithPoint }名</span>
+                    <span className="mx-2">=</span>
+                    <span className="font-bold">{ pointsRequired * participantCountWithPoint }pt</span>
                   </div>
                 </div>
-              ) }
+              ) : null }
 
               {/* チケット利用 */}
+              { ticketCount && ticketCount > 0 ? (
               <div className="flex justify-between text-body-xs text-muted-foreground">
                 <span>チケット利用</span>
                 <div>
                   <span>{ ticketCount }名分</span>
                 </div>
               </div>
+              ) : null }
             </div>
           </div>
       </div>
@@ -103,31 +106,36 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
    totalPrice,
    ticketCount
  }) => {
-  const slotDateTime = displayDuration(opportunity?.slots[0]?.startsAt ?? "", opportunity?.slots[0]?.endsAt ?? "");
+  const slotDateTime = displayDuration(opportunity?.slots[0]?.startsAt ?? "", opportunity?.slots[0]?.endsAt ?? "", true);
+  const link = opportunity.category === GqlOpportunityCategory.Quest
+     ? `/quests/${opportunity.id}?community_id=${opportunity.communityId}`
+    : `/activities/${opportunity.id}?community_id=${opportunity.communityId}`;
 
   return (
     <div className="mx-6 my-6 border border-foreground-caption rounded-lg p-4">
-      <div className="flex justify-between items-center gap-4">
-        <div className="relative w-[120px] h-[120px] rounded-lg overflow-hidden flex-shrink-0">
-          <Image
-            src={opportunity?.images?.[0] || PLACEHOLDER_IMAGE}
-            alt={opportunity?.title ?? ""}
-            fill
-            placeholder={"blur"}
-            blurDataURL={PLACEHOLDER_IMAGE}
-            className="object-cover"
-          />
+      <Link href={link}>
+        <div className="flex justify-between items-center gap-4">
+          <div className="relative w-[120px] h-[120px] rounded-lg overflow-hidden flex-shrink-0">
+            <Image
+              src={opportunity.images?.[0] || PLACEHOLDER_IMAGE}
+              alt={opportunity.title ?? ""}
+              fill
+              placeholder={"blur"}
+              blurDataURL={PLACEHOLDER_IMAGE}
+              className="object-cover"
+            />
+          </div>
+          <div className="flex items-center">
+            <h1 className="text-body-sm font-bold mb-4 line-clamp-4 break-words leading-6">
+              {opportunity.title ?? ""}
+            </h1>
+          </div>
         </div>
-        <div className="flex items-center">
-          <h1 className="text-body-sm font-bold mb-4 line-clamp-4 break-words leading-6">
-            {opportunity?.title ?? ""}
-          </h1>
-        </div>
-      </div>
+      </Link>
       { dateTimeInfo && (
         <dl className="flex justify-between py-5 mt-2 border-b border-foreground-caption items-center">
           <dt className="text-label-sm font-bold w-24">日時</dt>
-          <dd className="text-body-sm">{ slotDateTime }</dd>
+          <dd className="text-body-sm whitespace-pre-wrap">{ slotDateTime }</dd>
         </dl>
       ) } 
       { participationCount && (

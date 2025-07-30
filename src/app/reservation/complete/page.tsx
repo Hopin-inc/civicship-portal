@@ -69,7 +69,7 @@ export default function CompletePage() {
   const { opportunity: oppotunityDetail } = useOpportunityDetail(opportunityId ?? "");
 
   if (loading) return <LoadingIndicator fullScreen />;
-  if (error || !reservation || !opportunity || !dateTimeInfo)
+  if (error || !reservation || !opportunity || !dateTimeInfo || !oppotunityDetail)
     return <ErrorState title="申込完了ページを読み込めませんでした" refetchRef={refetchRef} />;
 
   return (

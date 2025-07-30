@@ -6,9 +6,11 @@ import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { ArrowRight } from "lucide-react";
+import { GqlOpportunityCategory } from "@/types/graphql";
+import Link from "next/link";
 
 interface OpportunityInfoProps {
-  opportunity: ActivityDetail | QuestDetail | null;
+  opportunity: ActivityDetail | QuestDetail;
   dateTimeInfo?: {
     formattedDate: string;
     startTime: string;
@@ -23,14 +25,18 @@ interface OpportunityInfoProps {
 }
 
 const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity, dateTimeInfo, participationCount, phoneNumber, comment, totalPrice }) => {
-  const slotDateTime = displayDuration(opportunity?.slots[0]?.startsAt ?? "", opportunity?.slots[0]?.endsAt ?? "");
+  const slotDateTime = displayDuration(opportunity.slots[0]?.startsAt ?? "", opportunity.slots[0]?.endsAt ?? "");
+  const link = opportunity.category === GqlOpportunityCategory.Quest 
+    ? `/quests/${opportunity.id}?community_id=${opportunity.communityId}` 
+    : `/activities/${opportunity.id}?community_id=${opportunity.communityId}`;
+
   return (
     <div className="mx-6 my-6 rounded-lg">
-      <div className="flex justify-between items-center gap-4">
+      <Link href={link} className="flex justify-between items-center gap-4">
         <div className="relative w-[80px] h-[80px] rounded-lg overflow-hidden flex-shrink-0">
           <Image
-            src={opportunity?.images?.[0] || PLACEHOLDER_IMAGE}
-            alt={opportunity?.title ?? ""}
+            src={opportunity.images?.[0] || PLACEHOLDER_IMAGE}
+            alt={opportunity.title ?? ""}
             fill
             placeholder={"blur"}
             blurDataURL={PLACEHOLDER_IMAGE}
@@ -39,11 +45,11 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({ opportunity, dateTime
         </div>
         <div>
           <h1 className="text-title-md font-bold leading-tight mb-4 line-clamp-3 break-words">
-            {opportunity?.title ?? ""}
+            {opportunity.title ?? ""}
           </h1>
         </div>
         <ArrowRight size={20} className="text-primary flex-shrink-0" />
-      </div>
+      </Link>
       { dateTimeInfo && (
         <dl className="flex justify-between py-5 mt-2 border-b border-foreground-caption items-center">
           <dt className="text-label-sm font-bold w-24">日時</dt>

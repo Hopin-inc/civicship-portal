@@ -75,10 +75,18 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
         onSelectedTicketsChange(tickets);
       }
     }, [onSelectedTicketsChange]);
-
+    const getTitle = () => {
+      if (maxTickets > 0 && userWallet && userWallet > 0 && pointsRequired > 0 && userWallet >= pointsRequired) {
+        return "ポイント・チケットを利用";
+      } else if((userWallet ?? 0) >= pointsRequired && pointsRequired > 0) {
+        return "ポイントを利用";
+      }else{
+        return "チケットを利用";
+      }
+    }
     return (
       <div className="rounded-lg px-6">
-        <h3 className="text-display-sm mb-4">ポイント・チケットを利用</h3>
+        <h3 className="text-display-sm mb-4">{getTitle()}</h3>
         {maxTickets > 0 && (
           <TicketsToggle
             useTickets={useTickets}
@@ -93,7 +101,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
             onSelectedTicketsChange={handleSelectedTicketsChange}
           />
         )}
-        {userWallet && userWallet > 0 && userWallet > pointsRequired && (
+        {userWallet && userWallet > 0 && pointsRequired > 0 && userWallet >= pointsRequired && (
           <PointsToggle
             usePoints={usePoints}
             setUsePoints={setUsePoints}

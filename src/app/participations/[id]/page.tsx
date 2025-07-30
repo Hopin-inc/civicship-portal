@@ -128,7 +128,7 @@ export default function ParticipationPage() {
   }, [currentStatus, dateTimeInfo]);
 
   if (loading || opportunityLoading) return <LoadingIndicator />;
-  if (hasError || !reservationId || !opportunity || !participation) {
+  if (hasError || !reservationId || !opportunity || !participation || !opportunityDetail) {
     return <ErrorState title="Could not load reservation page" refetchRef={refetchRef} />;
   }
 

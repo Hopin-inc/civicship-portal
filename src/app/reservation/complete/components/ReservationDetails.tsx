@@ -74,7 +74,7 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
         <Users size={18} strokeWidth={1.5} className="text-caption w-6 h-6 mt-0.5" />
         <span>{participantCount}人</span>
       </div>
-      { category === GqlOpportunityCategory.Activity && (
+      { category === GqlOpportunityCategory.Activity ? (
       <div className="flex items-center gap-x-2">
         <div className="flex flex-col w-full">
           <div className="flex items-center gap-x-2">
@@ -85,7 +85,7 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
           </div>
           
           {/* 内訳セクション */}
-          <div className="bg-muted rounded-lg p-4 ml-12 mt-2">
+          <div className="bg-muted rounded-lg p-4 mt-2">
             <div className="space-y-2">
               <h2 className="text-body-xs text-caption font-bold">内訳</h2>
               {/* 通常申し込み */}
@@ -101,7 +101,7 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
               </div>
 
               {/* ポイント利用 */}
-              { points && points.usedPoints > 0 && points.participantCountWithPoint > 0 && (
+              { points && points.usedPoints > 0 && points.participantCountWithPoint > 0 ? (
               <div className="flex justify-between text-body-xs text-muted-foreground">
                 <span>ポイント利用</span>
                 <div>
@@ -112,21 +112,23 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
                   <span className="font-bold">{ (points?.usedPoints ?? 0) * (points?.participantCountWithPoint ?? 0) }pt</span>
                   </div>
                 </div>
-              ) }
+              ) : null }
 
               {/* チケット利用 */}
+              { ticketCount > 0 ? (
               <div className="flex justify-between text-body-xs text-muted-foreground">
                 <span>チケット利用</span>
                 <div>
                   <span>{ ticketCount }名分</span>
                 </div>
               </div>
+              ) : null }
             </div>
           </div>
         </div>
       </div>
-      ) }
-      { category === GqlOpportunityCategory.Quest && (
+      ) : null }
+      { category === GqlOpportunityCategory.Quest ? (
         <div className="flex items-center gap-1 pt-1">
         <p className="bg-primary text-[11px] rounded-full w-5 h-5 flex items-center justify-center font-bold text-white leading-none">
           P
@@ -135,7 +137,7 @@ const ReservationDetails: React.FC<ReservationDetailsProps> = ({
             +{pointsToEarn.toLocaleString()}ポイント
         </p>
       </div>
-      )}
+      ) : null }
       <div className="flex items-center gap-x-2">
         {isReserved ? (
           phoneNumber ? (

@@ -14,6 +14,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
   ({ pricePerPerson, participantCount, useTickets, ticketCount, usePoints, pointCount, pointsRequired }) => {
     const totalAmount = pricePerPerson != null ? pricePerPerson * (participantCount - ticketCount - pointCount) : null;
     const summaryAmount = totalAmount != null ? totalAmount : null;
+    const hasPaymentMethod = usePoints && pointCount > 0 || useTickets && ticketCount > 0;
     return (
       <>
         <div className="mb-[6px] flex justify-between items-center">
@@ -33,7 +34,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
             <h2 className="text-body-sm text-caption font-bold">内訳</h2>
             
             {/* 通常申し込み */}
-            <div className="flex justify-between text-body-sm text-muted-foreground border-b border-foreground-caption pb-2">
+            <div className={`flex justify-between text-body-sm text-muted-foreground  pb-2 ${hasPaymentMethod ? "border-b border-foreground-caption" : "border-none"}`}>
               <span>通常申し込み</span>
               <div>
                 {pricePerPerson != null ? (
@@ -51,7 +52,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
             </div>
 
             {/* ポイント利用 */}
-            {usePoints && pointCount > 0 && (
+            {usePoints && pointCount > 0 ? (
               <div className="flex justify-between text-body-sm text-muted-foreground">
                 <span>ポイント利用</span>
                 <div>
@@ -62,15 +63,15 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
                   <span className="font-bold">{((pointsRequired ?? 0) * pointCount).toLocaleString()}pt</span>
                 </div>
               </div>
-            )}
+            ) : null }
 
             {/* チケット利用 */}
-            {/* {useTickets && ticketCount > 0 && ( */}
+            {useTickets && ticketCount > 0 ? (
               <div className="flex justify-between text-body-sm text-muted-foreground">
                 <span>チケット利用</span>
                 <span>{ticketCount}名分</span>
               </div>
-            {/* )} */}
+            ) : null }
           </div>
         </div>
       </>

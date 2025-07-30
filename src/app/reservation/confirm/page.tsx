@@ -166,7 +166,7 @@ export default function ConfirmPage() {
           />
         </div>
         <div className="mx-6 border-b border-gray-200 my-6"></div>
-        {isActivity && ((userWallet && userWallet > pointsRequired) || maxTickets > 0) && (
+        {isActivity && ((userWallet && userWallet >= pointsRequired && pointsRequired > 0) || maxTickets > 0) ? (
           <>
           <PaymentSection
             ticketCount={ ticketCounter.count }
@@ -188,13 +188,13 @@ export default function ConfirmPage() {
           />
           <div className="border-b border-gray-200 my-6"></div>
           </>
-        )}
+        ) : null }
         <div className="mb-2" />
         {/* <NotesSection /> */}
         <CommentTextarea
           title={"主催者への伝言"}
           description={"案内人の事前準備が変わる場合があるため、参加者の年齢等の記入にご協力ください"} 
-          placeholder="1歳、５歳、５１歳"
+          placeholder="例）51歳、5歳で参加します"
           value={ui.ageComment}
           onChange={ui.setAgeComment}
         />
