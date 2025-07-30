@@ -102,15 +102,17 @@ export const displayDuration = (start: Date | string, end?: Date | string, multi
   if (!end) return displayDatetime(start, FULL_FMT);
   
   if (dStart.isSame(dEnd, "date")) {
-    // 同じ日付の場合は常に1行表示
-    return `${dStart.format(FULL_FMT)}〜${dEnd.format(TIME_FMT)}`;
+    // 同じ日付の場合
+    if (multiline) {
+      // 同じ日付でmultilineがtrueの場合は2行表示
+      return `${dStart.format(DATE_FMT)}\n${dStart.format(TIME_FMT)} 〜 ${dEnd.format(TIME_FMT)}`;
+    } else {
+      // 同じ日付でmultilineがfalseの場合は1行表示
+      return `${dStart.format(FULL_FMT)}〜${dEnd.format(TIME_FMT)}`;
+    }
   } else if (multiline) {
     // 日付を跨ぐ場合でmultilineがtrueの場合は2行表示
-    if (dStart.isSame(dEnd, "year")) {
-      return `${dStart.format(DATE_FMT)} 〜 ${dEnd.format(MONTH_DATE_FMT)}\n${dStart.format(TIME_FMT)} 〜 ${dEnd.format(TIME_FMT)}`;
-    } else {
-      return `${dStart.format(DATE_FMT)} 〜 ${dEnd.format(DATE_FMT)}\n${dStart.format(TIME_FMT)} 〜 ${dEnd.format(TIME_FMT)}`;
-    }
+    return `${dStart.format(FULL_FMT)} 〜\n${dEnd.format(FULL_FMT)}`;
   } else {
     // 日付を跨ぐ場合でmultilineがfalseの場合は1行表示
     if (dStart.isSame(dEnd, "year")) {
