@@ -78,6 +78,12 @@ jobs:
           gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }}
           gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
 
+      - name: Create JSON config file
+        run: |
+          printf '%s' '${{ env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG }}' > activity_booking_config.json
+          echo "Created JSON config file with content:"
+          cat activity_booking_config.json
+
       - name: Build Docker image
         run: |
           docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}-${{ matrix.community }}:latest . \
@@ -93,7 +99,7 @@ jobs:
             --build-arg NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }} \
             --build-arg NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT=${{ env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }} \
             --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }} \
-            --build-arg NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG=${{ env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG }}
+            --build-arg NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG="$(cat activity_booking_config.json)"
 
       - name: Push image to Artifact Registry
         run: |
