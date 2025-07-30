@@ -3,6 +3,7 @@ import { Copy } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { truncateDid } from "../page";
+
 interface NftDetailListProps {
     didValue: string;
     instanceId: string;
@@ -12,6 +13,16 @@ interface NftDetailListProps {
     instanceName: string;
     username: string;
 }
+
+const copyToClipboard = async (text: string, label: string) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast.success("コピーしました");
+  } catch (error) {
+    console.error('Failed to copy to clipboard:', error);
+    toast.error("コピーに失敗しました");
+  }
+};
 
 export const NftDetailList = (props: NftDetailListProps) => {
   return (
@@ -38,13 +49,13 @@ export const NftDetailList = (props: NftDetailListProps) => {
             <div className="flex flex-col items-end">
               <div className="text-sm font-bold text-black">{props.username}</div>
               <div className="flex items-center text-gray-400 text-sm mt-1">
-                <Copy
-                  className="w-4 h-4 mr-1"
-                  onClick={() => {
-                    navigator.clipboard.writeText(props.didValue ?? "");
-                    toast.success("コピーしました");
-                  }}
-                />
+                <button
+                  onClick={() => copyToClipboard(props.didValue ?? "", "DID")}
+                  className="flex items-center hover:opacity-70 transition-opacity"
+                  aria-label="DIDをコピー"
+                >
+                  <Copy className="w-4 h-4 mr-1" />
+                </button>
                 <span>{truncateDid(props.didValue, 15)}</span>
               </div>
             </div>
@@ -57,13 +68,13 @@ export const NftDetailList = (props: NftDetailListProps) => {
               証明書ID
             </div>
             <div className="flex items-center text-gray-400 text-sm mt-1">
-                <Copy
-                  className="w-4 h-4 mr-1"
-                  onClick={() => {
-                    navigator.clipboard.writeText(props.instanceId ?? "");
-                    toast.success("コピーしました");
-                  }}
-                />
+                <button
+                  onClick={() => copyToClipboard(props.instanceId ?? "", "証明書ID")}
+                  className="flex items-center hover:opacity-70 transition-opacity"
+                  aria-label="証明書IDをコピー"
+                >
+                  <Copy className="w-4 h-4 mr-1" />
+                </button>
                 <span>{truncateDid(props.instanceId, 15)}</span>
               </div>
           </CardHeader>
@@ -75,13 +86,13 @@ export const NftDetailList = (props: NftDetailListProps) => {
               コントラクト<br/>アドレス
             </div>
             <div className="flex items-center text-gray-400 text-sm mt-1">
-                <Copy
-                  className="w-4 h-4 mr-1"
-                  onClick={() => {
-                    navigator.clipboard.writeText(props.contractAddress ?? "");
-                    toast.success("コピーしました");
-                  }}
-                />
+                <button
+                  onClick={() => copyToClipboard(props.contractAddress ?? "", "コントラクトアドレス")}
+                  className="flex items-center hover:opacity-70 transition-opacity"
+                  aria-label="コントラクトアドレスをコピー"
+                >
+                  <Copy className="w-4 h-4 mr-1" />
+                </button>
                 <span>{truncateDid(props.contractAddress, 15)}</span>
               </div>
           </CardHeader>
