@@ -19,16 +19,31 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
     [],
   );
   useHeaderConfig(headerConfig);
+
   if (!nftInstanceWithDid?.nftInstance) {
     return <ErrorState title="NFTが見つかりません" />
   }
-  const didValue = nftInstanceWithDid?.nftInstance?.nftWallet?.user?.didIssuanceRequests?.find(request => request.status === GqlDidIssuanceStatus.Completed)?.didValue;
-  const instanceId = nftInstanceWithDid?.nftInstance?.instanceId;
-  const contractAddress = nftInstanceWithDid?.nftInstance?.nftToken?.address;
-  const tokenType = nftInstanceWithDid?.nftInstance?.nftToken?.type;
-  const imageUrl = nftInstanceWithDid?.nftInstance?.imageUrl;
-  const instanceName = nftInstanceWithDid?.nftInstance?.name;
-  const username = nftInstanceWithDid?.nftInstance?.nftWallet?.user?.name;
+
+  const nftInstance = nftInstanceWithDid.nftInstance;
+  const { 
+    instanceId, 
+    imageUrl, 
+    name: instanceName 
+  } = nftInstance;
+  
+  const { 
+    address: contractAddress, 
+    type: tokenType 
+  } = nftInstance.nftToken ?? {};
+  
+  const { 
+    name: username 
+  } = nftInstance.nftWallet?.user ?? {};
+  
+  const didValue = nftInstance.nftWallet?.user?.didIssuanceRequests?.find(
+    request => request.status === GqlDidIssuanceStatus.Completed
+  )?.didValue;
+
   return (
     <NftDetailList
       didValue={didValue ?? ""}
