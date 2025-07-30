@@ -5,14 +5,6 @@ import { NftDetailList } from "./components/NftDetailList";
 import ErrorState from "@/components/shared/ErrorState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 
-export const truncateDid = (did: string | undefined | null, length: number = 20): string => {
-  if (!did) return "";
-  if (did.length <= length) return did;
-  const start = did.substring(0, length);
-  const end = did.substring(did.length - 10);
-  return `${start}...${end}`;
-};
-
 export default function NftPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { data: nftInstanceWithDid } = useGetNftInstanceWithDidQuery({

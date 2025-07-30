@@ -2,7 +2,7 @@ import { Card, CardHeader } from "@/components/ui/card";
 import { Copy } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
-import { truncateDid } from "../page";
+import { truncateText } from "@/utils/stringUtils";
 
 interface NftDetailListProps {
     didValue: string;
@@ -56,7 +56,7 @@ export const NftDetailList = (props: NftDetailListProps) => {
                 >
                   <Copy className="w-4 h-4 mr-1" />
                 </button>
-                <span>{truncateDid(props.didValue, 15)}</span>
+                <span>{truncateText(props.didValue, 15)}</span>
               </div>
             </div>
           </CardHeader>
@@ -75,7 +75,7 @@ export const NftDetailList = (props: NftDetailListProps) => {
                 >
                   <Copy className="w-4 h-4 mr-1" />
                 </button>
-                <span>{truncateDid(props.instanceId, 15)}</span>
+                <span>{truncateText(props.instanceId, 15)}</span>
               </div>
           </CardHeader>
         </Card>
@@ -93,7 +93,7 @@ export const NftDetailList = (props: NftDetailListProps) => {
                 >
                   <Copy className="w-4 h-4 mr-1" />
                 </button>
-                <span>{truncateDid(props.contractAddress, 15)}</span>
+                <span>{truncateText(props.contractAddress, 15)}</span>
               </div>
           </CardHeader>
         </Card>
