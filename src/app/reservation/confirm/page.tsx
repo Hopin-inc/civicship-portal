@@ -194,7 +194,7 @@ export default function ConfirmPage() {
         <CommentTextarea
           title={"主催者への伝言"}
           description={"案内人の事前準備が変わる場合があるため、参加者の年齢等の記入にご協力ください"} 
-          placeholder="1歳、５歳、５１歳"
+          placeholder="例）51歳、5歳で参加します"
           value={ui.ageComment}
           onChange={ui.setAgeComment}
         />
