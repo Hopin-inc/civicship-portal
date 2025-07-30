@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GqlClaimLinkStatus, useTicketClaimLinkQuery } from "@/types/graphql";
 import { Input } from "@/components/ui/input";
-import { displayDatetime, displayMultipleUsers } from "@/utils";
+import { displayMultipleUsers } from "@/utils";
+import { displayDatetime } from "@/utils/date";
 
 const QRCode = dynamic(() => import("react-qr-code"), { ssr: false });
 
