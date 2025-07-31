@@ -5,5 +5,6 @@ export const RESERVATION_FRAGMENT = gql`
     id
     status
     comment
+    participantCountWithPoint
   }
 `;

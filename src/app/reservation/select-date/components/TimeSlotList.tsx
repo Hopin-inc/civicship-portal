@@ -4,11 +4,15 @@ import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opp
 import { formatTimeRange, getCrossDayLabel } from "@/utils/date";
 import { isBefore } from "date-fns";
 import { getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
+import { GqlOpportunityCategory } from "@/types/graphql";
 
 interface TimeSlotListProps {
   dateSections: ActivitySlotGroup[];
   isSlotAvailable: (slot: ActivitySlot) => boolean;
   onSelectSlot: (slot: ActivitySlot) => void;
+  pointsToEarn: number;
+  category: GqlOpportunityCategory;
+  activityId?: string;
 }
 
 export const parseJapaneseDateLabel = (label: string) => {
@@ -35,13 +39,16 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
   dateSections,
   isSlotAvailable,
   onSelectSlot,
+  pointsToEarn,
+  category,
+  activityId,
 }) => {
   const handleSelectSlot = useCallback(
     (slot: ActivitySlot) => () => onSelectSlot(slot),
     [onSelectSlot],
   );
 
-  const registrationCutoff = getReservationThreshold();
+  const registrationCutoff = getReservationThreshold(activityId);
 
   return (
     <div className="space-y-8">
@@ -58,10 +65,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
               const startsAtDate = new Date(slot.startsAt);
               const endsAtDate = new Date(slot.endsAt);
 
-              const FORCE_RESERVABLE_SLOT_IDS = ["cmc07ao5c0005s60nnc8ravvk", "cmajo3nfj001es60nltawe4a6"];
-              const isForceReservable = FORCE_RESERVABLE_SLOT_IDS.includes(slot.id);
-              const isRegistrationClosed =
-                !isForceReservable && isBefore(startsAtDate, registrationCutoff);
+              const isRegistrationClosed = isBefore(startsAtDate, registrationCutoff);
 
               const crossDayLabel = getCrossDayLabel(startsAtDate, endsAtDate);
 
@@ -84,15 +88,28 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                           <span className={`text-sm text-caption ${isFull || isRegistrationClosed ? "text-muted-foreground/50" : ""}`}>（{crossDayLabel}）</span>
                         )}
                       </p>
-                      <p
-                        className={`text-md font-bold ${
-                          isFull || !isFeeSpecified || isRegistrationClosed
-                            ? "text-muted-foreground/50"
-                            : ""
-                        }`}
-                      >
-                        {isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円/人` : "料金未定"}
-                      </p>
+                      {category === GqlOpportunityCategory.Activity && (
+                        <p
+                          className={`text-md font-bold ${
+                            isFull || !isFeeSpecified || isRegistrationClosed
+                              ? "text-muted-foreground/50"
+                              : ""
+                          }`}
+                        >
+                          {isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円/人` : "料金未定"}
+                        </p>
+                      )}
+                      {category === GqlOpportunityCategory.Quest && (
+                      <div className="flex items-center gap-1 pt-1">
+                          <p className={`${isFull || isRegistrationClosed ? "bg-ring" : "bg-primary"} text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none`}>
+                            P
+                          </p>
+                          <p className={`${isFull || isRegistrationClosed ? "text-caption" : ""}`}>
+                            <span className="font-bold text-body-md">{pointsToEarn.toLocaleString()}pt</span>
+                            <span className="text-sm font-sm">もらえる</span>
+                          </p>
+                      </div>
+                      )}
                     </div>
 
                     {isFull ? (

@@ -228,33 +228,6 @@ export const PortfolioGrid = ({
   );
 };
 
-const PhotoGallery = () => {
-  const images = [
-    "/images/activities/activity-placeholder-1.jpg",
-    "/images/activities/activity-placeholder-2.jpg",
-    "/images/activities/activity-placeholder-3.jpg",
-  ];
-
-  return (
-    <div className="flex flex-row gap-2 mt-4 w-72 h-64">
-      <div className="w-3/5 h-full relative">
-        <div className="w-full h-full rounded-lg overflow-hidden">
-          <img src={images[0]} alt={"体験のイメージ画像1"} className="w-full h-full object-cover" />
-        </div>
-      </div>
-
-      <div className="w-2/5 h-full flex flex-col gap-2">
-        <div className="h-1/2 rounded-lg overflow-hidden">
-          <img src={images[1]} alt="体験のイメージ画像2" className="w-full h-full object-cover" />
-        </div>
-        <div className="h-1/2 rounded-lg overflow-hidden">
-          <img src={images[2]} alt="体験のイメージ画像3" className="w-full h-full object-cover" />
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const UserPortfolioList = ({
   isSysAdmin,
   activeOpportunities = [],
@@ -267,14 +240,14 @@ const UserPortfolioList = ({
   const showEmptyState = portfolios.length === 0;
   const router = useRouter();
   const emptyStateProps = {
-    title: `${getCurrentRegionName()}にふれよう`,
+    // title: `${getCurrentRegionName()}にふれよう`,
     description: isOwner
       ? `${getCurrentRegionName()}の素敵な人との\n関わりを探してみましょう`
       : "体験に参加すると、タイムラインが作成されます",
     actionLabel: isOwner ? "関わりを探す" : undefined,
     onAction: isOwner ? () => (window.location.href = "/") : undefined,
     hideActionButton: !isOwner,
-    icon: <PhotoGallery />,
+    // icon: <PhotoGallery />,
   };
 
   return (

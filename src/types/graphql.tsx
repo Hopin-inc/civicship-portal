@@ -1187,6 +1187,7 @@ export type GqlOpportunity = {
   images?: Maybe<Array<Scalars["String"]["output"]>>;
   isReservableWithTicket?: Maybe<Scalars["Boolean"]["output"]>;
   place?: Maybe<GqlPlace>;
+  pointsRequired?: Maybe<Scalars["Int"]["output"]>;
   pointsToEarn?: Maybe<Scalars["Int"]["output"]>;
   publishStatus: GqlPublishStatus;
   requireApproval: Scalars["Boolean"]["output"];
@@ -1253,6 +1254,7 @@ export type GqlOpportunityFilterInput = {
   cityCodes?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   communityIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   createdByUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  isReservableWithPoint?: InputMaybe<Scalars["Boolean"]["input"]>;
   isReservableWithTicket?: InputMaybe<Scalars["Boolean"]["input"]>;
   keyword?: InputMaybe<Scalars["String"]["input"]>;
   not?: InputMaybe<GqlOpportunityFilterInput>;
@@ -2046,6 +2048,7 @@ export type GqlReservation = {
   histories?: Maybe<Array<GqlReservationHistory>>;
   id: Scalars["ID"]["output"];
   opportunitySlot?: Maybe<GqlOpportunitySlot>;
+  participantCountWithPoint?: Maybe<Scalars["Int"]["output"]>;
   participations?: Maybe<Array<GqlParticipation>>;
   status: GqlReservationStatus;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
@@ -2060,6 +2063,7 @@ export type GqlReservationCreateInput = {
   comment?: InputMaybe<Scalars["String"]["input"]>;
   opportunitySlotId: Scalars["ID"]["input"];
   otherUserIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  participantCountWithPoint?: InputMaybe<Scalars["Int"]["input"]>;
   paymentMethod: GqlReservationPaymentMethod;
   ticketIdsIfNeed?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   totalParticipantCount: Scalars["Int"]["input"];
@@ -2452,6 +2456,7 @@ export type GqlTransaction = {
   id: Scalars["ID"]["output"];
   participation?: Maybe<GqlParticipation>;
   reason: GqlTransactionReason;
+  reservation?: Maybe<GqlReservation>;
   ticketStatusHistories?: Maybe<Array<GqlTicketStatusHistory>>;
   toPointChange?: Maybe<Scalars["Int"]["output"]>;
   toWallet?: Maybe<GqlWallet>;
@@ -2522,6 +2527,9 @@ export const GqlTransactionReason = {
   Donation: "DONATION",
   Grant: "GRANT",
   Onboarding: "ONBOARDING",
+  OpportunityReservationCanceled: "OPPORTUNITY_RESERVATION_CANCELED",
+  OpportunityReservationCreated: "OPPORTUNITY_RESERVATION_CREATED",
+  OpportunityReservationRejected: "OPPORTUNITY_RESERVATION_REJECTED",
   PointIssued: "POINT_ISSUED",
   PointReward: "POINT_REWARD",
   TicketPurchased: "TICKET_PURCHASED",
@@ -2668,6 +2676,7 @@ export type GqlUtility = {
   id: Scalars["ID"]["output"];
   images?: Maybe<Array<Scalars["String"]["output"]>>;
   name?: Maybe<Scalars["String"]["output"]>;
+  owner?: Maybe<GqlUser>;
   pointsRequired: Scalars["Int"]["output"];
   publishStatus: GqlPublishStatus;
   requiredForOpportunities?: Maybe<Array<GqlOpportunity>>;
@@ -3434,6 +3443,7 @@ export type GqlGetUserFlexibleQuery = {
       requireApproval: boolean;
       feeRequired?: number | null;
       pointsToEarn?: number | null;
+      pointsRequired?: number | null;
       earliestReservableAt?: Date | null;
       community?: {
         __typename?: "Community";
@@ -3558,6 +3568,7 @@ export type GqlGetUserWalletQuery = {
           images?: Array<string> | null;
           publishStatus: GqlPublishStatus;
           pointsRequired: number;
+          owner?: { __typename?: "User"; id: string; name: string } | null;
         } | null;
       }> | null;
       currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
@@ -3896,6 +3907,7 @@ export type GqlGetArticleQuery = {
         requireApproval: boolean;
         feeRequired?: number | null;
         pointsToEarn?: number | null;
+        pointsRequired?: number | null;
         earliestReservableAt?: Date | null;
         place?: {
           __typename?: "Place";
@@ -4175,6 +4187,7 @@ export type GqlOpportunityFieldsFragment = {
   requireApproval: boolean;
   feeRequired?: number | null;
   pointsToEarn?: number | null;
+  pointsRequired?: number | null;
   earliestReservableAt?: Date | null;
 };
 
@@ -4216,6 +4229,7 @@ export type GqlGetOpportunitiesQuery = {
         requireApproval: boolean;
         feeRequired?: number | null;
         pointsToEarn?: number | null;
+        pointsRequired?: number | null;
         earliestReservableAt?: Date | null;
         place?: {
           __typename?: "Place";
@@ -4261,6 +4275,7 @@ export type GqlGetOpportunityQuery = {
     isReservableWithTicket?: boolean | null;
     feeRequired?: number | null;
     pointsToEarn?: number | null;
+    pointsRequired?: number | null;
     earliestReservableAt?: Date | null;
     community?: {
       __typename?: "Community";
@@ -4295,6 +4310,7 @@ export type GqlGetOpportunityQuery = {
         id: string;
         status: GqlReservationStatus;
         comment?: string | null;
+        participantCountWithPoint?: number | null;
         participations?: Array<{
           __typename?: "Participation";
           id: string;
@@ -4365,6 +4381,7 @@ export type GqlGetOpportunityQuery = {
         requireApproval: boolean;
         feeRequired?: number | null;
         pointsToEarn?: number | null;
+        pointsRequired?: number | null;
         earliestReservableAt?: Date | null;
         community?: {
           __typename?: "Community";
@@ -4385,6 +4402,7 @@ export type GqlGetOpportunityQuery = {
             id: string;
             status: GqlReservationStatus;
             comment?: string | null;
+            participantCountWithPoint?: number | null;
             participations?: Array<{
               __typename?: "Participation";
               id: string;
@@ -4499,6 +4517,7 @@ export type GqlGetOpportunitySlotsQuery = {
           requireApproval: boolean;
           feeRequired?: number | null;
           pointsToEarn?: number | null;
+          pointsRequired?: number | null;
           earliestReservableAt?: Date | null;
         } | null;
         reservations?: Array<{
@@ -4506,6 +4525,7 @@ export type GqlGetOpportunitySlotsQuery = {
           id: string;
           status: GqlReservationStatus;
           comment?: string | null;
+          participantCountWithPoint?: number | null;
           participations?: Array<{
             __typename?: "Participation";
             id: string;
@@ -4565,6 +4585,7 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
       requireApproval: boolean;
       feeRequired?: number | null;
       pointsToEarn?: number | null;
+      pointsRequired?: number | null;
       earliestReservableAt?: Date | null;
       community?: {
         __typename?: "Community";
@@ -4578,6 +4599,7 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
       id: string;
       status: GqlReservationStatus;
       comment?: string | null;
+      participantCountWithPoint?: number | null;
       participations?: Array<{
         __typename?: "Participation";
         id: string;
@@ -4696,6 +4718,7 @@ export type GqlGetParticipationQuery = {
       id: string;
       status: GqlReservationStatus;
       comment?: string | null;
+      participantCountWithPoint?: number | null;
       opportunitySlot?: {
         __typename?: "OpportunitySlot";
         id: string;
@@ -4717,6 +4740,7 @@ export type GqlGetParticipationQuery = {
           requireApproval: boolean;
           feeRequired?: number | null;
           pointsToEarn?: number | null;
+          pointsRequired?: number | null;
           earliestReservableAt?: Date | null;
           community?: {
             __typename?: "Community";
@@ -4780,6 +4804,7 @@ export type GqlGetParticipationQuery = {
         requireApproval: boolean;
         feeRequired?: number | null;
         pointsToEarn?: number | null;
+        pointsRequired?: number | null;
         earliestReservableAt?: Date | null;
         community?: {
           __typename?: "Community";
@@ -4895,6 +4920,7 @@ export type GqlReservationFieldsFragment = {
   id: string;
   status: GqlReservationStatus;
   comment?: string | null;
+  participantCountWithPoint?: number | null;
 };
 
 export type GqlCreateReservationMutationVariables = Exact<{
@@ -4910,6 +4936,7 @@ export type GqlCreateReservationMutation = {
       id: string;
       status: GqlReservationStatus;
       comment?: string | null;
+      participantCountWithPoint?: number | null;
       participations?: Array<{
         __typename?: "Participation";
         id: string;
@@ -4938,6 +4965,7 @@ export type GqlCancelReservationMutation = {
       id: string;
       status: GqlReservationStatus;
       comment?: string | null;
+      participantCountWithPoint?: number | null;
     };
   } | null;
 };
@@ -5002,6 +5030,7 @@ export type GqlGetReservationsQuery = {
         id: string;
         status: GqlReservationStatus;
         comment?: string | null;
+        participantCountWithPoint?: number | null;
         createdByUser?: {
           __typename?: "User";
           id: string;
@@ -5060,6 +5089,7 @@ export type GqlGetReservationQuery = {
     id: string;
     status: GqlReservationStatus;
     comment?: string | null;
+    participantCountWithPoint?: number | null;
     createdByUser?: {
       __typename?: "User";
       id: string;
@@ -5097,6 +5127,7 @@ export type GqlGetReservationQuery = {
         requireApproval: boolean;
         feeRequired?: number | null;
         pointsToEarn?: number | null;
+        pointsRequired?: number | null;
         earliestReservableAt?: Date | null;
         slots?: Array<{
           __typename?: "OpportunitySlot";
@@ -5385,6 +5416,7 @@ export type GqlGetPlaceQuery = {
       requireApproval: boolean;
       feeRequired?: number | null;
       pointsToEarn?: number | null;
+      pointsRequired?: number | null;
       earliestReservableAt?: Date | null;
       place?: {
         __typename?: "Place";
@@ -5705,6 +5737,17 @@ export type GqlUtilityFieldsFragment = {
   images?: Array<string> | null;
   publishStatus: GqlPublishStatus;
   pointsRequired: number;
+};
+
+export type GqlUtilityWithOwnerFieldsFragment = {
+  __typename?: "Utility";
+  id: string;
+  name?: string | null;
+  description?: string | null;
+  images?: Array<string> | null;
+  publishStatus: GqlPublishStatus;
+  pointsRequired: number;
+  owner?: { __typename?: "User"; id: string; name: string } | null;
 };
 
 export type GqlCreateUtilityMutationVariables = Exact<{
@@ -6113,6 +6156,7 @@ export const OpportunityFieldsFragmentDoc = gql`
     requireApproval
     feeRequired
     pointsToEarn
+    pointsRequired
     earliestReservableAt
   }
 `;
@@ -6141,6 +6185,7 @@ export const ReservationFieldsFragmentDoc = gql`
     id
     status
     comment
+    participantCountWithPoint
   }
 `;
 export const TicketFieldsFragmentDoc = gql`
@@ -6166,6 +6211,20 @@ export const UtilityFieldsFragmentDoc = gql`
     images
     publishStatus
     pointsRequired
+  }
+`;
+export const UtilityWithOwnerFieldsFragmentDoc = gql`
+  fragment UtilityWithOwnerFields on Utility {
+    id
+    name
+    description
+    images
+    publishStatus
+    pointsRequired
+    owner {
+      id
+      name
+    }
   }
 `;
 export const TransactionFieldsFragmentDoc = gql`
@@ -7387,7 +7446,7 @@ export const GetUserWalletDocument = gql`
         tickets {
           ...TicketFields
           utility {
-            ...UtilityFields
+            ...UtilityWithOwnerFields
           }
         }
       }
@@ -7398,7 +7457,7 @@ export const GetUserWalletDocument = gql`
   ${CommunityFieldsFragmentDoc}
   ${TransactionFieldsFragmentDoc}
   ${TicketFieldsFragmentDoc}
-  ${UtilityFieldsFragmentDoc}
+  ${UtilityWithOwnerFieldsFragmentDoc}
 `;
 
 /**

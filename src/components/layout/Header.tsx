@@ -13,7 +13,6 @@ import { cn } from "@/lib/utils";
 import SearchBox from "@/app/search/components/SearchBox";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
-
 interface HeaderProps {
   className?: string;
 }
@@ -34,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     } else if (pathname === "/search/result") {
       // When on search results page, preserve all search parameters when going back to search page
       const params = new URLSearchParams(searchParams);
-      router.push(`/search?${params.toString()}`);
+      router.push(`${config.searchParams?.redirectTo ?? "/search"}?${params.toString()}`);
     } else {
       navigateBack();
     }
@@ -80,6 +79,11 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             from={config.searchParams?.from}
             to={config.searchParams?.to}
             guests={config.searchParams?.guests?.toString()}
+            q={config.searchParams?.q}
+            type={config.searchParams?.type}
+            ticket={config.searchParams?.ticket}
+            points={config.searchParams?.points}
+            redirectTo={config.searchParams?.redirectTo}
           />
         </div>
       )}

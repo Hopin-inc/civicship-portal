@@ -1,8 +1,15 @@
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import type { Locale } from "date-fns";
 import { logger } from "@/lib/logging";
 import { differenceInCalendarDays } from "date-fns";
+import dayjs from "dayjs";
+
+const YEAR_FMT = "YYYY年";
+const MONTH_DATE_FMT = "M月D日(ddd)";
+const TIME_FMT = "H:mm";
+const FULL_FMT = `${YEAR_FMT}${MONTH_DATE_FMT} ${TIME_FMT}`;
+const DATE_FMT = `${YEAR_FMT}${MONTH_DATE_FMT}`;
 
 export const parseDateTime = (dateTimeStr: string | null | undefined): Date | null => {
   if (!dateTimeStr) return null;
@@ -81,4 +88,37 @@ export const getCrossDayLabel = (startDate: Date, endDate: Date) => {
   if (diff === 2) return "翌々日";
   if (diff >= 3) return `${diff}日後`;
   return null;
+};
+
+export const displayDatetime = (date: Date | string | null | undefined, format: string = FULL_FMT, nullString: string = "未設定") => {
+  if (!date) return nullString;
+  return dayjs(date).format(format);
+};
+
+export const displayDuration = (start: Date | string, end?: Date | string, multiline: boolean = false) => {
+  const dStart = dayjs(start);
+  const dEnd = dayjs(end);
+  
+  if (!end) return displayDatetime(start, FULL_FMT);
+  
+  if (dStart.isSame(dEnd, "date")) {
+    // 同じ日付の場合
+    if (multiline) {
+      // 同じ日付でmultilineがtrueの場合は2行表示
+      return `${dStart.format(DATE_FMT)}\n${dStart.format(TIME_FMT)} 〜 ${dEnd.format(TIME_FMT)}`;
+    } else {
+      // 同じ日付でmultilineがfalseの場合は1行表示
+      return `${dStart.format(FULL_FMT)}〜${dEnd.format(TIME_FMT)}`;
+    }
+  } else if (multiline) {
+    // 日付を跨ぐ場合でmultilineがtrueの場合は2行表示
+    return `${dStart.format(FULL_FMT)} 〜\n${dEnd.format(FULL_FMT)}`;
+  } else {
+    // 日付を跨ぐ場合でmultilineがfalseの場合は1行表示
+    if (dStart.isSame(dEnd, "year")) {
+      return `${dStart.format(FULL_FMT)} 〜 ${dEnd.format(`${MONTH_DATE_FMT} ${TIME_FMT}`)}`;
+    } else {
+      return `${dStart.format(FULL_FMT)} 〜 ${dEnd.format(FULL_FMT)}`;
+    }
+  }
 };

@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useGetOpportunityQuery } from "@/types/graphql";
+import { GqlGetOpportunityQuery, GqlOpportunityCategory, useGetOpportunityQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { presenterActivityDetail } from "@/app/activities/data/presenter";
+import { presenterActivityDetail, presenterQuestDetail } from "@/app/activities/data/presenter";
 import { useSlotAndTicketInfo } from "@/app/reservation/confirm/hooks/useSlotAndTicket";
-import type { ActivityDetail } from "@/app/activities/data/type";
+import type { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import { logger } from "@/lib/logging";
 
 export const useReservationConfirm = ({
@@ -32,8 +32,14 @@ export const useReservationConfirm = ({
     errorPolicy: "all",
   });
 
-  const opportunity: ActivityDetail | null = useMemo(() => {
-    return data?.opportunity ? presenterActivityDetail(data.opportunity) : null;
+  const opportunity: ActivityDetail | QuestDetail | null = useMemo(() => {
+    if (data?.opportunity?.category === GqlOpportunityCategory.Activity) {
+      return presenterActivityDetail(data.opportunity);
+    }
+    if (data?.opportunity?.category === GqlOpportunityCategory.Quest) {
+      return presenterQuestDetail(data.opportunity);
+    }
+    return null;
   }, [data]);
 
   const {

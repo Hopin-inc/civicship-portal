@@ -8,10 +8,10 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import ErrorState from "@/components/shared/ErrorState";
-import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import UserNftList from "../components/UserNftList";
 import { useUserNft } from "../hooks/useUserNft";
+import CardVertical from "@/app/components/CardVertical";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
@@ -89,7 +89,7 @@ export default function MyProfilePage() {
                 </h2>
                 <div className="mt-4 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                   {selfOpportunities.map((opportunity) => (
-                    <OpportunityCardVertical
+                    <CardVertical
                       key={opportunity.id}
                       opportunity={opportunity}
                       isCarousel

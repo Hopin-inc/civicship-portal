@@ -35,7 +35,7 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
         </div>
       </div>
 
-      {opportunity.reservableTickets.length > 0 && availableTickets > 0 && (
+      {opportunity.reservableTickets && opportunity.reservableTickets.length > 0 && availableTickets > 0 && (
         <div className="flex items-center gap-2 bg-primary-foreground text-primary rounded-lg px-4 py-3 mt-4 cursor-pointer hover:bg-primary-foreground/80">
           <Ticket className="w-5 h-5" />
           <p className="text-label-md">利用できるチケット</p>

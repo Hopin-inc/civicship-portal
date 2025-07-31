@@ -14,18 +14,36 @@ const getApprovalText = (requireApproval: boolean | undefined) => {
   if (requireApproval === true) {
     return {
       title: "申し込み完了",
-      description: "案内人が承認すると、予約が確定します｡ 予約確定時にはLINEにてお知らせします｡"
+      description: (
+        <>
+          <span className="font-bold">案内人が承認すると、予約が確定します｡</span>
+          <br />
+          <span className="text-body-sm">予約確定時にはLINEにてお知らせします｡</span>
+        </>
+      )
     };
   }
   if (requireApproval === false) {
     return {
       title: "予約完了",
-      description: "承認なしで参加できる募集のため、予約が確定しました。\nキャンセルをご希望の際は、マイページよりお手続きいただけます。"
+      description: (
+        <>
+          承認なしで参加できる募集のため、予約が確定しました。
+          <br />
+          キャンセルをご希望の際は、マイページよりお手続きいただけます。
+        </>
+      )
     };
   }
   return {
     title: "案内人による承認が必要です",
-    description: "案内人が承認すると、予約が確定します｡ 予約確定時にはLINEにてお知らせします｡"
+    description: (
+      <>
+        <strong>案内人が承認すると、予約が確定します｡</strong>
+        <br />
+        予約確定時にはLINEにてお知らせします｡
+      </>
+    )
   };
 };
 
@@ -37,7 +55,7 @@ const CompletionHeader: React.FC<CompletionHeaderProps> = ({ requireApproval }) 
         <CheckCircle className="w-16 h-16 md:w-24 md:h-24 text-primary" strokeWidth={1.5} />
       </div>
       <h2 className="text-display-md">{ approvalText.title }</h2>
-      <p className="text-body-md text-caption whitespace-pre-line">
+      <p className="text-body-md text-caption text-center">
         { approvalText.description }
       </p>
     </div>

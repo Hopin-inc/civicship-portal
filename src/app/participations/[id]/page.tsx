@@ -12,7 +12,7 @@ import { GqlReservationStatus } from "@/types/graphql";
 import { useParams } from "next/navigation";
 import { errorMessages } from "@/utils/errorMessage";
 import useCancelReservation from "@/app/participations/[id]/hooks/useCancelReservation";
-import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
+import OpportunityInfo from "./components/OpportunityInfo";
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
 import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
@@ -128,7 +128,7 @@ export default function ParticipationPage() {
   }, [currentStatus, dateTimeInfo]);
 
   if (loading || opportunityLoading) return <LoadingIndicator />;
-  if (hasError || !reservationId || !opportunity || !participation) {
+  if (hasError || !reservationId || !opportunity || !participation || !opportunityDetail) {
     return <ErrorState title="Could not load reservation page" refetchRef={refetchRef} />;
   }
 
@@ -155,11 +155,18 @@ export default function ParticipationPage() {
             participantCount={dateTimeInfo.participantCount}
             paidParticipantCount={dateTimeInfo.paidParticipantCount}
             totalPrice={dateTimeInfo.totalPrice}
-            pricePerPerson={opportunityDetail.feeRequired ?? 0}
+            pricePerPerson={"feeRequired" in opportunityDetail ? opportunityDetail.feeRequired : 0}
             location={opportunityDetail.place}
             phoneNumber={participation.emergencyContactPhone}
             isReserved={true}
             dateDiffLabel={dateTimeInfo.dateDiffLabel}
+            points={{
+              usedPoints: dateTimeInfo.usedPoints,
+              participantCountWithPoint: dateTimeInfo.participantCountWithPoint,
+            }}
+            ticketCount={dateTimeInfo.ticketCount}
+            category={opportunityDetail.category}
+            pointsToEarn={"pointsToEarn" in opportunityDetail ? opportunityDetail.pointsToEarn : 0}
           />
         </div>
       )}

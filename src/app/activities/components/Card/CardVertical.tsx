@@ -4,11 +4,11 @@ import Image from "next/image";
 import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface OpportunityCardVerticalProps {
-  opportunity: ActivityCard;
+  opportunity: ActivityCard | QuestCard;
   isCarousel?: boolean;
 }
 
@@ -16,8 +16,8 @@ export default function OpportunityCardVertical({
   opportunity,
   isCarousel = false,
 }: OpportunityCardVerticalProps) {
-  const { id, title, feeRequired, location, images, hasReservableTicket, communityId } =
-    opportunity;
+  const { id, title, location, images, hasReservableTicket, communityId } = opportunity;
+  const feeRequired = "feeRequired" in opportunity ? opportunity.feeRequired : null;
 
   return (
     <Link
