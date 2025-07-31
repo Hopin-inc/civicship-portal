@@ -13,7 +13,7 @@ import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
+import { getReservationThreshold, isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
 import { format } from "date-fns";
 import { getCrossDayLabel } from "@/utils/date";
 import { ja } from "date-fns/locale";
