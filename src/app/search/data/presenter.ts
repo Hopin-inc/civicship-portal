@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { GqlOpportunity as GraphQLOpportunity, GqlOpportunityEdge } from "@/types/graphql";
 import { ActivityCard } from "@/app/activities/data/type";
+import { QuestCard } from "@/app/activities/data/type";
 
 export interface SearchParams {
   location?: string;
@@ -13,7 +14,9 @@ export interface SearchParams {
   guests?: string;
   type?: "activity" | "quest";
   ticket?: string;
+  points?: string;
   q?: string;
+  redirectTo?: string;
 }
 
 export const formatDateRange = (range: DateRange | undefined): string => {
@@ -28,6 +31,7 @@ export function buildSearchResultParams(
   dateRange: DateRange | undefined,
   guests: number,
   useTicket: boolean,
+  usePoints: boolean,
   type: "activity" | "quest",
 ): URLSearchParams {
   const params = new URLSearchParams();
@@ -38,6 +42,7 @@ export function buildSearchResultParams(
   if (dateRange?.to) params.set("to", formatDateToJST(dateRange.to));
   if (guests > 0) params.set("guests", guests.toString());
   if (useTicket) params.set("ticket", "1");
+  if (usePoints) params.set("points", "1");
   params.set("type", type);
 
   return params;
@@ -57,6 +62,8 @@ export const mapNodeToCardProps = (node: GraphQLOpportunity): ActivityCard => ({
   images: node.images || [],
   communityId: node.community?.id || "",
   hasReservableTicket: node.isReservableWithTicket || false,
+  pointsRequired: node.pointsRequired ?? null,
+  slots: node.slots || [],
 });
 
 export const groupOpportunitiesByDate = (
@@ -86,6 +93,33 @@ export const groupOpportunitiesByDate = (
       }
     });
 
+    return acc;
+  }, {});
+};
+
+// ActivityCard | QuestCard[] を受け取り、各カードのslotから日付ごとにグループ化
+export const groupCardsByDate = (
+  cards: (ActivityCard | QuestCard)[],
+  dateRange?: { gte?: Date; lte?: Date },
+): { [key: string]: (ActivityCard | QuestCard)[] } => {
+  return cards.reduce((acc: { [key: string]: (ActivityCard | QuestCard)[] }, card) => {
+    // QuestCard/ActivityCardともにslotsプロパティがある前提
+    // slotsがなければスキップ
+    // @ts-ignore
+    const slots = card.slots || [];
+    if (!slots.length) return acc;
+
+    slots.forEach((slot: any) => {
+      const start = new Date(slot.startsAt);
+      if (dateRange?.gte && start < dateRange.gte) return;
+      if (dateRange?.lte && start > dateRange.lte) return;
+      const dateKey = format(new Date(slot.startsAt), "yyyy-MM-dd");
+      if (!acc[dateKey]) acc[dateKey] = [];
+      // 同じidのカードが既に入っていればスキップ
+      if (!acc[dateKey].some((c) => c.id === card.id)) {
+        acc[dateKey].push(card);
+      }
+    });
     return acc;
   }, {});
 };

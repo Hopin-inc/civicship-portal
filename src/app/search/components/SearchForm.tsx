@@ -5,19 +5,29 @@ import { Input } from "@/components/ui/input";
 import { FormField, FormItem, FormControl } from "@/components/ui/form";
 import { useFormContext } from "react-hook-form";
 import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface SearchFormProps {
   name?: string;
   onSearch?: () => void;
+  redirectTo?: string;
 }
 
-const SearchForm: React.FC<SearchFormProps> = ({ name = "searchQuery", onSearch }) => {
-  const { control } = useFormContext();
+const SearchForm: React.FC<SearchFormProps> = ({ name = "searchQuery", onSearch, redirectTo }) => {
+  const { control, getValues } = useFormContext();
+  const router = useRouter();
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter" && onSearch) {
+    if (event.key === "Enter") {
       event.preventDefault();
-      onSearch();
+      if (onSearch) {
+        onSearch();
+      } else if (redirectTo) {
+        const value = getValues(name);
+        const params = new URLSearchParams();
+        if (value) params.set(name, value);
+        router.push(`${redirectTo}?${params.toString()}`);
+      }
     }
   };
 

@@ -2,7 +2,6 @@
 
 import SameStateActivities from "@/app/activities/[id]/components/SimilarActivitiesList";
 import CompletionHeader from "@/app/reservation/complete/components/CompletionHeader";
-import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
 import React, { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useSearchParams } from "next/navigation";
@@ -12,7 +11,6 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
-import ArticleCard from "@/app/articles/components/Card";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 
 export default function CompletePage() {
@@ -71,40 +69,24 @@ export default function CompletePage() {
   const { opportunity: oppotunityDetail } = useOpportunityDetail(opportunityId ?? "");
 
   if (loading) return <LoadingIndicator fullScreen />;
-  if (error || !reservation || !opportunity || !dateTimeInfo)
+  if (error || !reservation || !opportunity || !dateTimeInfo || !oppotunityDetail)
     return <ErrorState title="申込完了ページを読み込めませんでした" refetchRef={refetchRef} />;
 
   return (
     <main className="flex flex-col items-center">
       <CompletionHeader requireApproval={ oppotunityDetail?.requireApproval } />
-      { oppotunityDetail && <OpportunityInfo opportunity={ oppotunityDetail } /> }
-      { dateTimeInfo && opportunity && (
-        <div className="px-6 w-full">
-          <ReservationDetails
-            formattedDate={ dateTimeInfo.formattedDate }
-            dateDiffLabel={ dateTimeInfo.dateDiffLabel }
-            startTime={ dateTimeInfo.startTime }
-            endTime={ dateTimeInfo.endTime }
-            participantCount={ dateTimeInfo.participantCount }
-            paidParticipantCount={ dateTimeInfo.paidParticipantCount }
-            totalPrice={ dateTimeInfo.totalPrice }
-            pricePerPerson={ opportunity.feeRequired ?? 0 }
-            location={ oppotunityDetail?.place }
-            phoneNumber={ reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber }
-            isReserved={ true }
-          />
-        </div>
-      )}
-      {articleCard ? (
-        <>
-          <div className="h-2 bg-border -mx-6 w-full" />
-          <div className="px-6 w-full pt-6 pb-8 max-w-mobile-l mx-auto space-y-4">
-            <h2 className="text-display-md mb-4">案内人の想い</h2>
-            <ArticleCard article={articleCard} showUser />
-          </div>
-        </>
-      ) : null}
-      {opportunityId && sameStateActivities.length > 0 && (
+      { oppotunityDetail && (
+        <OpportunityInfo
+          opportunity={ oppotunityDetail }
+          dateTimeInfo={ dateTimeInfo }
+          participationCount={ participationCount }
+          phoneNumber={ reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber }
+          comment={ reservation.comment }
+          totalPrice={ dateTimeInfo.totalPrice }
+          ticketCount={ dateTimeInfo.ticketCount }
+        />
+      ) }
+      { opportunityId && sameStateActivities.length > 0 && (
         <>
           <div className="h-2 bg-border -mx-6 w-full" />
           <div className="px-6 w-full">

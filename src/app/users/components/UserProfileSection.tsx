@@ -40,7 +40,7 @@ const UserProfileSection: React.FC<UserProfileSectionProps> = ({
       {isOwner && (
         <UserTicketsAndPoints
           ticketCount={userAsset.tickets.filter(t => t.status === GqlTicketStatus.Available).length || 0}
-          pointCount={userAsset.points.currentPoint || 0}
+          pointCount={Number(userAsset.points.currentPoint) || 0}
         />
       )}
 

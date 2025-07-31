@@ -5,7 +5,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
-// import SearchTabs, { SearchTabType } from "@/app/search/components/Tabs";
+import SearchTabs, { SearchTabType } from "@/app/search/components/Tabs";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
 import { visiblePrefectureLabels } from "@/app/users/data/presenter";
 import { DateRange } from "react-day-picker";
@@ -15,6 +15,7 @@ import SearchFilters from "@/app/search/components/SearchFilters";
 import SearchFooter from "@/app/search/components/Footer";
 import SearchFilterSheets from "@/app/search/components/SearchFilterSheet";
 import { logger } from "@/lib/logging";
+import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 
 export default function SearchPage() {
   const headerConfig = useMemo(
@@ -29,6 +30,14 @@ export default function SearchPage() {
   useHeaderConfig(headerConfig);
 
   const searchParams = useSearchParams();
+  const typeParam = searchParams.get("type");
+  const shouldShowQuests = useFeatureCheck("quests");
+
+  const defaultTab: SearchTabType = shouldShowQuests && typeParam === "quest" ? "quest" : "activity";
+
+  // タブの状態をuseStateで管理
+  const [selectedTab, setSelectedTab] = useState<SearchTabType>(defaultTab);
+  const [activeForm, setActiveForm] = useState<SearchFilterType>(null);
 
   // Initialize form with search parameters from URL
   const methods = useForm({
@@ -65,22 +74,34 @@ export default function SearchPage() {
   });
 
   const router = useRouter();
-  // const [selectedTab, setSelectedTab] = useState<SearchTabType>("activity");
-  const [activeForm, setActiveForm] = useState<SearchFilterType>(null);
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-auto">
         <div className="container px-4 py-2">
-          {/*<SearchTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />*/}
           <FormProvider {...methods}>
+            <div className="mt-2">
+              {shouldShowQuests && (
+                <SearchTabs
+                  selectedTab={selectedTab}
+                  onTabChange={(tab: SearchTabType) => {
+                    setSelectedTab(tab);
+                    // typeパラメータも切り替え
+                    const params = new URLSearchParams(searchParams.toString());
+                    params.set("type", tab);
+                    window.history.replaceState(null, "", `?${params.toString()}`);
+                  }}
+                />
+              )}
+            </div>
             <SearchPageContent
               activeForm={activeForm}
               setActiveForm={setActiveForm}
-              // selectedTab={selectedTab}
+              selectedTab={selectedTab}
               formatDateRange={formatDateRange}
               prefectureLabels={visiblePrefectureLabels}
               router={router}
+              type={selectedTab}
             />
           </FormProvider>
         </div>
@@ -92,23 +113,25 @@ export default function SearchPage() {
 function SearchPageContent({
   activeForm,
   setActiveForm,
-  // selectedTab,
+  selectedTab,
   formatDateRange,
   prefectureLabels,
   router,
 }: {
   activeForm: SearchFilterType;
   setActiveForm: (f: SearchFilterType) => void;
-  // selectedTab: SearchTabType;
+  selectedTab: SearchTabType;
   formatDateRange: (r: DateRange | undefined) => string;
   prefectureLabels: Record<string, string>;
   router: ReturnType<typeof useRouter>;
+  type: "activity" | "quest";
 }) {
   const {
     location,
     dateRange,
     guests,
     useTicket,
+    usePoints,
     getValues,
     setValue,
     handleClear,
@@ -124,17 +147,29 @@ function SearchPageContent({
 
   const handleSearch = () => {
     const values = getValues();
+    const type = selectedTab === "quest" ? "quest" : "activity";
+    // typeによって遷移先を切り替え
+    const nextPath = type === "activity" ? "/activities" : "/quests";
     const params = buildSearchResultParams(
       values.searchQuery,
       values.location,
       values.dateRange,
       values.guests,
       values.useTicket,
-      "activity",
-      // selectedTab,
+      values.usePoints,
+      type,
     );
-    router.push(`/search/result?${params.toString()}`);
+    router.push(`${nextPath}?${params.toString()}`);
   };
+
+  const values = getValues();
+  const isNoCondition =
+    !values.searchQuery &&
+    !values.location &&
+    !values.dateRange &&
+    !values.guests &&
+    !values.useTicket &&
+    !values.usePoints;
 
   return (
     <div className="space-y-6 pt-4">
@@ -147,6 +182,7 @@ function SearchPageContent({
         dateRange={dateRange}
         guests={guests}
         useTicket={useTicket}
+        usePoints={usePoints}
       />
       <SearchFilterSheets
         activeForm={activeForm}
@@ -159,11 +195,13 @@ function SearchPageContent({
         setGuests={(val) => setValue("guests", val)}
         useTicket={useTicket}
         setUseTicket={(val) => setValue("useTicket", val)}
+        usePoints={usePoints}
+        setUsePoints={(val) => setValue("usePoints", val)}
         clearActiveFilter={clearActiveFilter}
         getSheetHeight={() => "90vh"}
         prefectures={Object.entries(prefectureLabels).map(([id, name]) => ({ id, name }))}
       />
-      <SearchFooter onClear={handleClear} onSearch={handleSearch} />
+      <SearchFooter onClear={handleClear} onSearch={handleSearch} isNoCondition={isNoCondition} />
     </div>
   );
 }

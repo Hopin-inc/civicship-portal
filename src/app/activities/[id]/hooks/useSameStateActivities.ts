@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlOpportunity, useGetOpportunitiesQuery } from "@/types/graphql";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/app/activities/data/type";
 
 export const useSameStateActivities = (opportunityId: string, stateCode: string) => {
   const { data, loading, error, refetch } = useGetOpportunitiesQuery({
@@ -19,7 +19,7 @@ export const useSameStateActivities = (opportunityId: string, stateCode: string)
     fetchPolicy: "cache-first",
   });
 
-  const sameStateActivities: ActivityCard[] = useMemo(() => {
+  const sameStateActivities: ActivityCard[] | QuestCard[] = useMemo(() => {
     return (data?.opportunities.edges ?? [])
       .map((edge) => edge.node)
       .filter((node): node is GqlOpportunity => !!node)

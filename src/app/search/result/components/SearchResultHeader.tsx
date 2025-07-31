@@ -13,7 +13,8 @@ const useSearchResultHeader = (searchParams: SearchParams) => {
       previousSearchParams.location !== searchParams.location ||
       previousSearchParams.from !== searchParams.from ||
       previousSearchParams.to !== searchParams.to ||
-      previousSearchParams.guests !== searchParams.guests
+      previousSearchParams.guests !== searchParams.guests ||
+      previousSearchParams.q !== searchParams.q
     ) {
       updateConfig({
         showSearchForm: true,
@@ -22,9 +23,14 @@ const useSearchResultHeader = (searchParams: SearchParams) => {
           from: searchParams.from,
           to: searchParams.to,
           guests: searchParams.guests && !isNaN(parseInt(searchParams.guests, 10)) ? parseInt(searchParams.guests, 10) : undefined,
+          redirectTo: searchParams.redirectTo,
+          q: searchParams.q,
+          points: searchParams.points,
+          ticket: searchParams.ticket,
+          type: searchParams.type,
         },
         showLogo: false,
-        showBackButton: true,
+        showBackButton: false,
       });
 
       setPreviousSearchParams(searchParams);

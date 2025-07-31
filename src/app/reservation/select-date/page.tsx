@@ -68,6 +68,8 @@ export default function SelectDatePage() {
     return <EmptyState title="予約枠" />;
   }
 
+  const pointsToEarn = "pointsToEarn" in opportunity ? opportunity.pointsToEarn : 0;
+
   return (
     <main className="px-6">
       <div className="space-y-4 py-6">
@@ -87,6 +89,8 @@ export default function SelectDatePage() {
           dateSections={filteredDateSections}
           isSlotAvailable={isSlotAvailable}
           onSelectSlot={handleReservation}
+          pointsToEarn={pointsToEarn}
+          category={opportunity.category}
           activityId={opportunityId ?? undefined}
         />
       </div>

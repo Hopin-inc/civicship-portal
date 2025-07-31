@@ -8,7 +8,8 @@ import ErrorState from "@/components/shared/ErrorState";
 import useReservations from "@/app/admin/reservations/hooks/useReservations";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { displayDuration, displayRelativeTime } from "@/utils";
+import { displayRelativeTime } from "@/utils";
+import { displayDuration } from "@/utils/date";
 import { Bookmark, CalendarIcon } from "lucide-react";
 import {
   GqlOpportunitySlotHostingStatus,

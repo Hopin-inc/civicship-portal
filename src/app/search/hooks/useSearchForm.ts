@@ -11,12 +11,15 @@ export function useSearchForm() {
   const dateRange = watch("dateRange") as DateRange | undefined;
   const guests = watch("guests") as number;
   const useTicket = watch("useTicket") as boolean;
+  const usePoints = watch("usePoints") as boolean;
 
   const handleClear = () => {
     setValue("location", "");
     setValue("dateRange", undefined);
     setValue("guests", 1);
     setValue("useTicket", false);
+    setValue("usePoints", false);
+    setValue("type", "activity");
   };
 
   const baseClearActiveFilter = (activeForm: SearchFilterType) => {
@@ -41,6 +44,7 @@ export function useSearchForm() {
     dateRange,
     guests,
     useTicket,
+    usePoints,
     handleClear,
     baseClearActiveFilter,
     getValues,
