@@ -1,9 +1,11 @@
-name: Deploy to Cloud Run
-
+name: Build and Deploy for all communities (Prd)
 on:
   push:
     branches:
       - master
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   read-communities:
@@ -28,6 +30,7 @@ jobs:
         community: ${{ fromJson(needs.read-communities.outputs.matrix) }}
     environment: co-creation-dao-prod-${{ matrix.community }}
     timeout-minutes: 30
+    continue-on-error: true
 
     env:
       GCP_REGION: ${{ secrets.GCP_REGION }}

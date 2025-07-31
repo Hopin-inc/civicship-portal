@@ -1,11 +1,14 @@
-name: Build and Deploy for all communities
-
+name: Build and Deploy for all communities (Dev)
 on:
   push:
     branches:
       - develop
       - hotfix/**
       - epic/**
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   read-communities:
     runs-on: ubuntu-latest
@@ -29,6 +32,7 @@ jobs:
         community: ${{ fromJson(needs.read-communities.outputs.matrix) }}
     environment: kyoso-dev-${{ matrix.community }}
     timeout-minutes: 30
+    continue-on-error: true
 
     env:
       GCP_REGION: ${{ secrets.GCP_REGION }}
