@@ -9,8 +9,8 @@ import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import ErrorState from "@/components/shared/ErrorState";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
-import UserNftList from "../components/UserNftList";
-import { useUserNft } from "../hooks/useUserNft";
+import UserNftList from "@/app/users/components/UserNftList";
+import { useUserNft } from "@/app/users/hooks/useUserNft";
 import CardVertical from "@/app/components/CardVertical";
 
 export default function MyProfilePage() {
