@@ -1,5 +1,3 @@
-import { logger } from "@/lib/logging";
-
 /**
  * Activity booking configuration
  * Maps activity IDs to their advance booking requirements (in days)
@@ -8,23 +6,29 @@ export interface ActivityBookingConfig {
   [activityId: string]: number;
 }
 
-// NOTE: 現段階では、どこまで日程受付の日数カスタムニーズあるか読めないので、データベースではなく環境変数経由で設定・参照している
-// NOTE: BE では同じ値を CloudRun にて ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG という環境変数に設定する
+// NOTE: 環境変数だと JSON がうまく渡らず、コードで直接定義している
+// NOTE: BE では同じ値を CloudRun にて ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG という環境変数に設定している
 
-// 環境変数からの設定を読み込む
-// 環境変数のJSON形式例: {"activity-id-1":0,"activity-id-2":1,"activity-id-3":7}
-let configFromEnv: ActivityBookingConfig = {};
-try {
-  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG) {
-    configFromEnv = JSON.parse(process.env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG);
-    logger.info('Loaded activity advance booking days config from environment variable');
-  }
-} catch (error) {
-  logger.error('Error parsing NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG environment variable:', error);
-}
-
-// 環境変数からの設定のみを使用
-export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = configFromEnv;
+/**
+ * Activity booking configuration
+ * Directly defined in code instead of using environment variables
+ * Format: { "activity-id": days }
+ */
+export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = {
+  // 例: 当日予約可能なアクティビティ
+  // "activity-workshop-456": 0,
+  // 例: 3日前までの予約が必要なアクティビティ
+  // "activity-workshop-456": 3,
+  // 例: 14日前までの予約が必要なアクティビティ
+  // "activity-special-789": 14,
+  // === for production ===
+  "cmahtdrqu0036s60nag2bvzzu": 1, // ［８５］ちいさなデザイナーの1日体験
+  "cmaw8y9om00o0s60nexftxrz9": 1, // ［７］安心素材で備える未来のごはん
+  // === for development ===
+  "cmdoet4xa002ds60e7f5akwcb": 0,
+  "cmdoesowc002bs60eytbbxkxe": 1,
+  "cmdoerhjc0029s60efbb4ub0m": 2
+};
 
 /**
  * Default advance booking days for activities without specific configuration
