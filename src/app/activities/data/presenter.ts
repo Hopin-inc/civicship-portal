@@ -13,10 +13,11 @@ import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
-import { format, isAfter } from "date-fns";
+import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
+import { format } from "date-fns";
 import { getCrossDayLabel } from "@/utils/date";
 import { ja } from "date-fns/locale";
+import { logger } from "@/lib/logging";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
@@ -104,14 +105,19 @@ export const presenterActivitySlot = (
   return (
     slots?.map((slot): ActivitySlot => {
       const startsAtDate = slot?.startsAt ? new Date(slot.startsAt) : null;
+      const opportunityId = slot.opportunity?.id || "";
 
+      // アクティビティIDごとの設定を使用して予約可能かどうかを判定
       const isReservable = startsAtDate
-        ? isAfter(startsAtDate, threshold)
+        ? isDateReservable(startsAtDate, opportunityId)
         : false;
+
+      // デバッグ用ログ
+      logger.info(`Activity slot ${slot?.id} for activity ${opportunityId}: isReservable=${isReservable}`);
 
       return {
         id: slot?.id,
-        opportunityId: slot.opportunity?.id || "",
+        opportunityId,
         hostingStatus: slot?.hostingStatus,
         startsAt: startsAtDate?.toISOString() || "",
         endsAt: slot?.endsAt ? new Date(slot.endsAt).toISOString() : "",

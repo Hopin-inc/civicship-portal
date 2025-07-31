@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { AlertCircle, CalendarX } from "lucide-react";
+import { logger } from "@/lib/logging";
 import SameStateActivities from "./SimilarActivitiesList";
 import { getAdvanceBookingText } from "@/config/activityBookingConfig";
 import ActivityScheduleCard from "./ActivityScheduleCard";
@@ -151,7 +152,13 @@ const ScheduleSection = ({
         {hasSchedule ? (
           <>
             <p className="text-muted-foreground font-bold mb-4 px-1">
-              ※予約は各日程の{getAdvanceBookingText(opportunityId)}まで受付中{" "}
+              {(() => {
+                // デバッグ用ログ
+                const bookingText = getAdvanceBookingText(opportunityId);
+                const days = opportunityId ? process.env.NEXT_PUBLIC_ACTIVITY_ADVANCE_BOOKING_DAYS_CONFIG : 'undefined';
+                logger.info(`ActivityDetailsContent: opportunityId=${opportunityId}, bookingText=${bookingText}, env=${days}`);
+                return <>※予約は各日程の{bookingText}まで受付中{" "}</>;
+              })()} 
             </p>
             <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
               {slots.map((slot, index) => (
