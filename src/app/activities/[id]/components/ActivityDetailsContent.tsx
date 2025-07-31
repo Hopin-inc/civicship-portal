@@ -217,7 +217,7 @@ const NoticeSection: React.FC<{ opportunityId: string }> = ({ opportunityId }) =
           <IconWrapper color="warning">
             <AlertCircle size={20} strokeWidth={2.5} />
           </IconWrapper>
-          <p className="text-body-md flex-1">キャンセルは開催日の{getAdvanceBookingText(opportunityId)}まで可能です。</p>
+          <p className="text-body-md flex-1">キャンセルは開催日の前日まで可能です。</p>
         </div>
       </div>
     </section>
