@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
@@ -16,7 +16,8 @@ import {
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { useAuthInitialization } from "@/hooks/auth/useAuthInitialization";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import ErrorState from "@/components/shared/ErrorState";
 import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
 import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
 import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
@@ -29,8 +30,6 @@ import { logger } from "@/lib/logging";
 import { maskPhoneNumber } from "@/lib/logging/client/utils";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
 import { RawURIComponent } from "@/utils/path";
-import AuthInitializationScreen from "@/components/auth/AuthInitializationScreen";
-import AuthInitializationError from "@/components/auth/AuthInitializationError";
 
 /**
  * 認証状態の型定義
@@ -160,13 +159,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [liffService, phoneAuthService]);
 
-  const { 
-    initializationContext, 
-    isInitialized, 
-    isInitializing, 
-    hasFailed, 
-    retryInitialization 
-  } = useAuthInitialization(authStateManager);
+  const [isAuthInitialized, setIsAuthInitialized] = useState(false);
+  const [authInitError, setAuthInitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!authStateManager) return;
+
+    const initializeAuth = async () => {
+      try {
+        await authStateManager.initialize();
+        setIsAuthInitialized(true);
+        setAuthInitError(null);
+        const currentState = authStateManager.getState();
+        setState((prev) => ({ ...prev, authenticationState: currentState }));
+      } catch (error) {
+        setAuthInitError(error instanceof Error ? error.message : "認証の初期化に失敗しました");
+        setIsAuthInitialized(false);
+      }
+    };
+
+    if (!isAuthInitialized && !authInitError) {
+      initializeAuth();
+    }
+  }, [authStateManager, isAuthInitialized, authInitError]);
+
   useAuthStateChangeListener({ authStateManager, setState });
   useTokenExpirationHandler({ state, setState, logout });
   useFirebaseAuthState({ authStateManager, state, setState });
@@ -381,17 +397,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
   };
 
-  if (hasFailed) {
-    return (
-      <AuthInitializationError 
-        initializationContext={initializationContext}
-        onRetry={retryInitialization}
-      />
-    );
-  }
-
-  if (isInitializing) {
-    return <AuthInitializationScreen initializationContext={initializationContext} />;
+  if (!isAuthInitialized) {
+    if (authInitError) {
+      const refetchRef = { 
+        current: () => {
+          setAuthInitError(null);
+          setIsAuthInitialized(false);
+        }
+      };
+      return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
+    }
+    
+    return <LoadingIndicator fullScreen={true} />;
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

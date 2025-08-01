@@ -39,13 +39,10 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (isInitialRender) {
-      const timer = setTimeout(() => {
-        setIsInitialRender(false);
-      }, 300);
-      return () => clearTimeout(timer);
+    if (!loading) {
+      setIsInitialRender(false);
     }
-  }, [isInitialRender]);
+  }, [loading]);
 
   useEffect(() => {
     if (loading || userLoading || isInitialRender) {
