@@ -52,7 +52,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
         path: pathname,
         component: "AdminGuard"
       });
-      router.replace("/admin/not-found");
+      router.replace("/not-found");
       return;
     }
 
