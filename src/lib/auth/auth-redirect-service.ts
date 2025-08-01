@@ -7,7 +7,6 @@ import {
   matchPaths,
   RawURIComponent,
 } from "@/utils/path";
-import { AdminPathManager } from "./admin-path-manager";
 import { logger } from "@/lib/logging";
 
 /**
@@ -16,11 +15,9 @@ import { logger } from "@/lib/logging";
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
   private authStateManager: AuthStateManager;
-  private adminPathManager: AdminPathManager;
 
   private constructor() {
     this.authStateManager = AuthStateManager.getInstance();
-    this.adminPathManager = AdminPathManager.getInstance();
   }
 
   /**
@@ -144,13 +141,6 @@ export class AuthRedirectService {
     }
 
     if (this.isAdminPath(pathname)) {
-      if (!this.adminPathManager.isValidAdminPath(pathname)) {
-        logger.debug("Invalid admin path detected", {
-          path: pathname,
-          component: "AuthRedirectService"
-        });
-        return "/admin/not-found" as RawURIComponent;
-      }
       if (authState !== "user_registered") {
         return `/login${ nextParam }` as RawURIComponent;
       }

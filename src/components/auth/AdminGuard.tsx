@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useQuery } from "@apollo/client";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
@@ -10,7 +10,6 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlRole } from "@/types/graphql";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
-import { AdminPathManager } from "@/lib/auth/admin-path-manager";
 import { logger } from "@/lib/logging";
 import { AdminRoleContext } from "@/app/admin/context/AdminRoleContext";
 
@@ -28,8 +27,6 @@ interface AdminGuardProps {
 export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
-  const adminPathManager = React.useMemo(() => AdminPathManager.getInstance(), []);
 
   const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
@@ -44,15 +41,6 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
 
   useEffect(() => {
     if (loading) {
-      return;
-    }
-
-    if (!adminPathManager.isValidAdminPath(pathname)) {
-      logger.debug("AdminGuard: Invalid admin path, redirecting to not-found", {
-        path: pathname,
-        component: "AdminGuard"
-      });
-      router.replace("/not-found");
       return;
     }
 
@@ -87,7 +75,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     };
 
     checkAdminAccess();
-  }, [currentUser, isAuthenticated, loading, router, authRedirectService, pathname, adminPathManager]);
+  }, [currentUser, isAuthenticated, loading, router, authRedirectService]);
 
   if (loading) {
     return <LoadingIndicator />;
