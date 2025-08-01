@@ -15,16 +15,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "storage.googleapis.com",
-        pathname: "/prod-civicship-storage-public/**",
-      },
-      {
-        protocol: "https",
-        hostname: "plus.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "**",
       },
     ],
     domains: ["storage.googleapis.com", "plus.unsplash.com", "images.unsplash.com"],
