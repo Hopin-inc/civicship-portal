@@ -28,6 +28,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next") as EncodedURIComponent;
   const [authorized, setAuthorized] = useState(false);
+  const [isInitialRender, setIsInitialRender] = useState(true);
 
   const { loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
@@ -38,7 +39,13 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (loading || userLoading) {
+    if (!loading) {
+      setIsInitialRender(false);
+    }
+  }, [loading]);
+
+  useEffect(() => {
+    if (loading || userLoading || isInitialRender) {
       return;
     }
 
@@ -67,9 +74,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     authCheck();
     return () => {
     };
-  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams]);
+  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams, isInitialRender]);
 
-  if (loading || userLoading) {
+  if (loading || userLoading || isInitialRender) {
     return <LoadingIndicator />;
   }
 
