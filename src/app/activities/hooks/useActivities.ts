@@ -9,6 +9,7 @@ import {
   GqlSortDirection,
   useGetOpportunitiesQuery,
 } from "@/types/graphql";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export interface UseActivitiesResult {
   opportunities: GqlOpportunitiesConnection;
@@ -33,6 +34,7 @@ export const useActivities = (): UseActivitiesResult => {
   const { data, loading, error, fetchMore, refetch } = useGetOpportunitiesQuery({
     variables: {
       filter: {
+        communityIds: [COMMUNITY_ID],
         category: GqlOpportunityCategory.Activity,
         publishStatus: [GqlPublishStatus.Public],
       },
@@ -56,6 +58,7 @@ export const useActivities = (): UseActivitiesResult => {
     await fetchMore({
       variables: {
         filter: {
+          communityIds: [COMMUNITY_ID],
           category: GqlOpportunityCategory.Activity,
           publishStatus: [GqlPublishStatus.Public],
         },

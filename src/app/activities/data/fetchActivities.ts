@@ -8,6 +8,7 @@ import {
   GqlSortDirection,
 } from "@/types/graphql";
 import { mapOpportunityCards, sliceActivitiesBySection } from "./presenter";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export async function fetchFeaturedAndCarousel() {
   const { data, loading } = await apolloClient.query<
@@ -17,6 +18,7 @@ export async function fetchFeaturedAndCarousel() {
     query: GetOpportunitiesDocument,
     variables: {
       filter: {
+        communityIds: [COMMUNITY_ID],
         category: GqlOpportunityCategory.Activity,
         publishStatus: [GqlPublishStatus.Public],
       },

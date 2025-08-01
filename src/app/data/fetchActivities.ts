@@ -6,6 +6,7 @@ import {
 } from "@/types/graphql";
 import { mapOpportunityCards, sliceActivitiesBySection } from "../activities/data/presenter";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export function useFetchFeaturedAndCarousel() {
   const shouldShowQuests = useFeatureCheck("quests");
@@ -13,6 +14,7 @@ export function useFetchFeaturedAndCarousel() {
   const { data, loading } = useGetOpportunitiesQuery({
     variables: {
       filter: {
+        communityIds: [COMMUNITY_ID],
         or: [
           {
             category: GqlOpportunityCategory.Activity,
