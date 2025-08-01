@@ -28,6 +28,7 @@ export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = {
   "cmd5ein2s000ls60esmi6mg94": 0, // 電動アシスト付きe-bikeでうどん屋巡り！うどんタクシードライバーがおすすめする穴場うどん店を紹介！
   "cmd5eczx5000hs60et7bqvo3t": 0, // :beers:酔いどれ社長と行く！琴平まちなかバルホッピングツアー
   "cmd5e86b9000fs60ektp6snb6": 0, // うどんタクシー“格さん”と行く！讃岐うどん食べ歩き＆うどん打ち体験スペシャルツアー
+  "cmajlrsq4000ds60n8kr7d6rx": 1, // ［１７］ほたるの里で味わう夏の川遊び体験
   // === for development ===
   "cmdoet4xa002ds60e7f5akwcb": 0,
   "cmdoesowc002bs60eytbbxkxe": 1,
