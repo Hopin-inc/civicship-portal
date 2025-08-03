@@ -5,13 +5,22 @@ import FeaturedSection from "./FeaturedSection";
 import { CarouselSection } from "./CarouselSection";
 import PageClient from "./PageClient";
 import { useFetchFeaturedAndCarousel } from "../data/fetchActivities";
+import FeaturedSectionSkeleton from "@/components/skeletons/FeaturedSectionSkeleton";
+import CarouselSectionSkeleton from "@/components/skeletons/CarouselSectionSkeleton";
 
 export default function HomeSection() {
   const { isAuthenticating, loading: authLoading } = useAuth();
   const { featuredCards, upcomingCards, loading } = useFetchFeaturedAndCarousel();
+  
   if (isAuthenticating || authLoading) {
-    return <LoadingIndicator fullScreen={true} />;
+    return (
+      <div className="min-h-screen">
+        <FeaturedSectionSkeleton />
+        <CarouselSectionSkeleton />
+      </div>
+    );
   }
+  
   return (
     <div className="min-h-screen">
       <FeaturedSection opportunities={featuredCards} isInitialLoading={loading} />

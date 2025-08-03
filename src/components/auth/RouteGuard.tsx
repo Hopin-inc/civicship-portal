@@ -29,16 +29,13 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const nextParam = searchParams.get("next") as EncodedURIComponent;
   const [authorized, setAuthorized] = useState(false);
 
-  const { loading: userLoading } = useQuery(GET_CURRENT_USER, {
-    skip: !isAuthenticated,
-  });
 
   const authRedirectService = React.useMemo(() => {
     return AuthRedirectService.getInstance();
   }, []);
 
   useEffect(() => {
-    if (loading || userLoading) {
+    if (loading) {
       return;
     }
 
@@ -67,9 +64,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     authCheck();
     return () => {
     };
-  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams]);
+  }, [pathname, authenticationState, loading, router, authRedirectService, nextParam, searchParams]);
 
-  if (loading || userLoading) {
+  if (loading) {
     return <LoadingIndicator />;
   }
 

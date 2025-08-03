@@ -25,15 +25,10 @@ interface AdminGuardProps {
  * 管理者権限を持つユーザーのみアクセスを許可する
  */
 export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, user: currentUser } = useAuth();
   const router = useRouter();
 
-  const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
-    skip: !isAuthenticated,
-  });
-
-  const loading = authLoading || userLoading;
-  const currentUser = userData?.currentUser?.user;
+  const loading = authLoading;
 
   const authRedirectService = React.useMemo(() => {
     return AuthRedirectService.getInstance();
@@ -86,7 +81,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     return null;
   }
 
-  const targetMembership = currentUser.memberships.find(
+  const targetMembership = currentUser?.memberships?.find(
     (m: any) => m.community?.id === COMMUNITY_ID,
   );
   if (!targetMembership) {

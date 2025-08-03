@@ -21,7 +21,8 @@ export const useUserProfile = (
       ...(portfolioSort ? { portfolioSort } : {}),
     },
     skip: !userId,
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-first",
+    notifyOnNetworkStatusChange: true,
   });
   
   const userData = useMemo(() => {

@@ -121,7 +121,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
       state.authenticationState,
     ),
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-first",
+    errorPolicy: "all",
   });
 
   const authStateManager = React.useMemo(() => {
