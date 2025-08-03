@@ -1,7 +1,7 @@
 "use client";
 import { use, useMemo } from "react";
 import { GqlDidIssuanceStatus, useGetNftInstanceWithDidQuery } from "@/types/graphql";
-import { NftDetailList } from "./components/NftDetailList";
+import { NftDetailList } from "@/components/domains/nfts/components";
 import ErrorState from "@/components/shared/ErrorState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 
@@ -47,11 +47,11 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
   return (
     <NftDetailList
       didValue={didValue ?? ""}
-      instanceId={instanceId ?? ""}
+      instanceId={instanceId}
       contractAddress={contractAddress ?? ""}
       tokenType={tokenType ?? ""}
-      imageUrl={imageUrl ?? ""}
-      instanceName={instanceName ?? ""}
+      imageUrl={imageUrl}
+      instanceName={instanceName}
       username={username ?? ""}
     />
   );

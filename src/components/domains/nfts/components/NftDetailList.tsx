@@ -3,15 +3,20 @@ import { Copy, Info } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { truncateText } from "@/utils/stringUtils";
+import { GqlDidIssuanceRequest, GqlGetNftInstanceWithDidQuery } from "@/types/graphql";
+
+type NftInstanceData = NonNullable<GqlGetNftInstanceWithDidQuery["nftInstance"]>;
+type NftTokenData = NonNullable<NftInstanceData["nftToken"]>;
+type NftWalletData = NonNullable<NftInstanceData["nftWallet"]>;
 
 interface NftDetailListProps {
-    didValue: string;
-    instanceId: string;
-    contractAddress: string;
-    tokenType: string;
-    imageUrl: string;
-    instanceName: string;
-    username: string;
+    didValue?: GqlDidIssuanceRequest["didValue"];
+    instanceId: NftInstanceData["instanceId"];
+    contractAddress: NftTokenData["address"];
+    tokenType: NftTokenData["type"];
+    imageUrl: NftInstanceData["imageUrl"];
+    instanceName: NftInstanceData["name"];
+    username: NftWalletData["user"]["name"];
 }
 
 const copyToClipboard = async (text: string, label: string) => {
