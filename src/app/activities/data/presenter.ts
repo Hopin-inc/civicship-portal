@@ -8,13 +8,12 @@ import {
   GqlUser,
   Maybe,
 } from "@/types/graphql";
-import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
 import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard, QuestDetail } from "@/app/activities/data/type";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
+import { isDateReservable, getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
 import { format, isAfter } from "date-fns";
 import { getCrossDayLabel } from "@/utils/date";
 import { ja } from "date-fns/locale";
@@ -279,8 +278,7 @@ export const sliceActivitiesBySection = (
   // Helper function to check if an activity has at least one reservable slot
   const isBookable = (card: ActivityCard | QuestCard) => {
     return card.slots?.some(slot => {
-      const startsAtDate = new Date(slot.startsAt);
-      return isDateReservable(startsAtDate, card.id);
+      return isDateReservable(slot.startsAt, card.id);
     }) ?? false;
   };
 
@@ -289,22 +287,11 @@ export const sliceActivitiesBySection = (
   // Filter to only include bookable cards
   const bookableCards = validCards.filter(isBookable);
   
-  let featuredCards: (ActivityCard | QuestCard)[] = [];
-  let upcomingCards: (ActivityCard | QuestCard)[] = [];
+  // Take up to 3 cards for featured section
+  const featuredCards = bookableCards.slice(0, 3);
   
-  // If we have bookable cards, use them for both featured and upcoming sections
-  if (bookableCards.length > 0) {
-    // Take up to 3 cards for featured section
-    featuredCards = bookableCards.slice(0, 3);
-    
-    // Remaining bookable cards go to upcoming section
-    upcomingCards = bookableCards.slice(3);
-  } else {
-    // If no bookable cards available, use the original logic but show empty sections
-    // This is an edge case that should rarely happen if activities are properly configured
-    featuredCards = [];
-    upcomingCards = [];
-  }
+  // Remaining bookable cards go to upcoming section
+  const upcomingCards = bookableCards.slice(3);
 
   return { featuredCards, upcomingCards };
 };
