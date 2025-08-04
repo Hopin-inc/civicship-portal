@@ -110,6 +110,7 @@ export class AuthStateManager {
     this.stateChangeListeners = this.stateChangeListeners.filter((l) => l !== listener);
   }
 
+
   /**
    * 認証状態を更新
    */
@@ -129,19 +130,22 @@ export class AuthStateManager {
     });
   }
 
+
   /**
    * 認証状態を初期化
    */
   public async initialize(): Promise<void> {
-    this.setState("loading");
+    try {
+      this.setState("loading");
 
-    const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+      const lineTokens = TokenManager.getLineTokens();
+      const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
-    if (!hasValidLineToken) {
-      this.setState("unauthenticated");
-      return;
-    } else {
+      if (!hasValidLineToken) {
+        this.setState("unauthenticated");
+        return;
+      }
+
       const isUserRegistered = await this.checkUserRegistration();
 
       if (isUserRegistered) {
@@ -157,8 +161,16 @@ export class AuthStateManager {
           this.setState("line_authenticated");
         }
       }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error("Auth initialization failed", {
+        error: errorMessage,
+        component: "AuthStateManager"
+      });
+      throw error;
     }
   }
+
 
   /**
    * ユーザー情報の登録状態を確認
