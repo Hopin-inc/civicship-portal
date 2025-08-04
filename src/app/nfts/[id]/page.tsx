@@ -1,9 +1,11 @@
 "use client";
 import { use, useMemo } from "react";
 import { GqlDidIssuanceStatus, useGetNftInstanceWithDidQuery } from "@/types/graphql";
-import { NftDetailList } from "@/components/domains/nfts/components";
+import { InfoCard } from "@/components/shared/InfoCard";
+import { InfoCardProps } from "@/types";
 import ErrorState from "@/components/shared/ErrorState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import Image from "next/image";
 
 export default function NftPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -44,15 +46,60 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
     request => request.status === GqlDidIssuanceStatus.Completed
   )?.didValue;
 
+  const infoCards: InfoCardProps[] = [
+    {
+      label: "保有者",
+      value: username,
+      secondaryValue: didValue || "",
+      secondaryLabel: "DID",
+      isWarning: !didValue,
+      warningText: "did発行準備中",
+      showCopy: !!didValue,
+      copyData: didValue ?? "",
+    },
+    {
+      label: "証明書ID",
+      value: instanceId,
+      showCopy: true,
+      copyData: instanceId,
+    },
+    {
+      label: "コントラクト\nアドレス",
+      value: contractAddress,
+      showCopy: true,
+      copyData: contractAddress,
+    },
+    {
+      label: "チェーン",
+      value: "Ethereum",
+    },
+    {
+      label: "規格",
+      value: tokenType,
+    },
+  ];
+
   return (
-    <NftDetailList
-      didValue={didValue ?? ""}
-      instanceId={instanceId}
-      contractAddress={contractAddress ?? ""}
-      tokenType={tokenType ?? ""}
-      imageUrl={imageUrl}
-      instanceName={instanceName}
-      username={username ?? ""}
-    />
+    <>
+      <div className="flex justify-center mt-10">
+        <div>
+          <Image
+              src={imageUrl ?? ""}
+              alt={instanceName ?? "証明書"}
+              width={120}
+              height={120}
+              className="object-cover border-none shadow-none mx-auto rounded-sm"
+          />
+          <h1 className="text-title-sm font-bold w-[70%] mx-auto mt-4 text-center">{instanceName}</h1>
+        </div>
+      </div>
+      <div className="mt-6 p-4">
+        <div className="grid grid-cols-1 gap-1 relative">
+          {infoCards.map((card, index) => (
+            <InfoCard key={index} {...card} />
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
