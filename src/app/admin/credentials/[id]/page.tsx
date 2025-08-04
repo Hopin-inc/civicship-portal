@@ -15,15 +15,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import ErrorState from "@/components/shared/ErrorState";
 import { InfoCard } from "@/components/shared/InfoCard";
 import { InfoCardProps } from "@/types";
-
-// DIDを省略表示する関数
-const truncateDid = (did: string | undefined | null, length: number = 20): string => {
-  if (!did) return "";
-  if (did.length <= length) return did;
-  const start = did.substring(0, length);
-  const end = did.substring(did.length - 10);
-  return `${start}...${end}`;
-};
+import { truncateText } from "@/utils/stringUtils";
 
 // userIdからDIDを取得する関数
 function getDidValueByUserId(
@@ -164,7 +156,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
                           toast.success("コピーしました");
                         }}
                       />
-                      <span>{truncateDid(didValue, 25)}</span>
+                      <span>{truncateText(didValue, 25)}</span>
                     </>
                   )}
                 </div>
