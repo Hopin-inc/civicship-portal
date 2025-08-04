@@ -8,6 +8,7 @@ import {
   GqlUser,
   Maybe,
 } from "@/types/graphql";
+import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
 import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard, QuestDetail } from "@/app/activities/data/type";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
@@ -187,7 +188,6 @@ export const presenterActivitySlot = (
         feeRequired: feeRequired ?? null,
         applicantCount: 1,
         isReservable,
-        opportunityId: slot?.opportunity?.id || "",
       };
     }) ?? []
   );
@@ -276,9 +276,35 @@ export const sliceActivitiesBySection = (
   const safe = <T>(cards: (T | undefined)[]): T[] => cards.filter((c): c is T => !!c);
   const hasImages = (card: ActivityCard | QuestCard) => card.images && card.images.length > 0;
 
+  // Helper function to check if an activity has at least one reservable slot
+  const isBookable = (card: ActivityCard | QuestCard) => {
+    return card.slots?.some(slot => {
+      const startsAtDate = new Date(slot.startsAt);
+      return isDateReservable(startsAtDate, card.id);
+    }) ?? false;
+  };
+
   const validCards = safe(cards.filter(hasImages));
-  const featuredCards = validCards.slice(0, 3);
-  const upcomingCards = validCards.slice(3);
+  
+  // Filter to only include bookable cards
+  const bookableCards = validCards.filter(isBookable);
+  
+  let featuredCards: (ActivityCard | QuestCard)[] = [];
+  let upcomingCards: (ActivityCard | QuestCard)[] = [];
+  
+  // If we have bookable cards, use them for both featured and upcoming sections
+  if (bookableCards.length > 0) {
+    // Take up to 3 cards for featured section
+    featuredCards = bookableCards.slice(0, 3);
+    
+    // Remaining bookable cards go to upcoming section
+    upcomingCards = bookableCards.slice(3);
+  } else {
+    // If no bookable cards available, use the original logic but show empty sections
+    // This is an edge case that should rarely happen if activities are properly configured
+    featuredCards = [];
+    upcomingCards = [];
+  }
 
   return { featuredCards, upcomingCards };
 };
