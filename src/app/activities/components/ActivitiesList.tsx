@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { CarouselSection } from "@/app/components/CarouselSection";
 import EmptySearchResults from "@/app/search/result/components/EmptySearchResults";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export default function ActivitiesList() {
     const searchParams = useSearchParams();
@@ -27,8 +28,16 @@ export default function ActivitiesList() {
   
     useSearchResultHeader(queryParams);
   
-    const { recommendedOpportunities, groupedOpportunities, loading, error, refetch } =
-    useSearchResults(queryParams);
+    const { 
+      recommendedOpportunities, 
+      groupedOpportunities, 
+      loading, 
+      refetch,
+      error,
+      loadMoreRef,
+      hasNextPage,
+      isLoadingMore,
+    } = useSearchResults(queryParams);
 
     const isEmpty =
     recommendedOpportunities.length === 0 && Object.keys(groupedOpportunities).length === 0;
@@ -47,6 +56,14 @@ export default function ActivitiesList() {
           isVertical={false}
         />
         <DateGroupedOpportunities groupedOpportunities={groupedOpportunities} />
+        {/* 無限スクロール用のローディング要素 - 常に表示 */}
+        <div ref={loadMoreRef} className="flex justify-center py-8">
+          {isLoadingMore && (
+            <div className="flex items-center space-x-2">
+              <LoadingIndicator fullScreen={false}/>
+            </div>
+          )}
+        </div>
       </main>
     </div>
     </>

@@ -4,6 +4,7 @@ import DateGroupedOpportunities from "@/app/search/result/components/DateGrouped
 import EmptySearchResults from "@/app/search/result/components/EmptySearchResults";
 import useSearchResultHeader from "@/app/search/result/components/SearchResultHeader";
 import useSearchResults from "@/app/search/result/hooks/useSearchResults";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
@@ -26,8 +27,16 @@ export default function QuestsList() {
 
     useSearchResultHeader(queryParams);
 
-    const { recommendedOpportunities, groupedOpportunities, loading, error, refetch } =
-    useSearchResults(queryParams);
+    const { 
+      recommendedOpportunities, 
+      groupedOpportunities, 
+      loading, 
+      refetch,
+      error,
+      loadMoreRef,
+      hasNextPage,
+      isLoadingMore,
+    } = useSearchResults(queryParams);
 
     const isEmpty =
     recommendedOpportunities.length === 0 && Object.keys(groupedOpportunities).length === 0;
@@ -46,6 +55,14 @@ export default function QuestsList() {
           isVertical={false}
         />
         <DateGroupedOpportunities groupedOpportunities={groupedOpportunities} />
+        {/* 無限スクロール用のローディング要素 - 常に表示 */}
+        <div ref={loadMoreRef} className="flex justify-center py-8">
+          {isLoadingMore && (
+            <div className="flex items-center space-x-2">
+              <LoadingIndicator fullScreen={false}/>
+            </div>
+          )}
+        </div>
       </main>
     </div>
     </>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import {
   GqlCurrentPrefecture,
   GqlOpportunitiesConnection,
@@ -18,6 +18,7 @@ import { presenterActivityCards } from "@/app/activities/data/presenter";
 import { presenterQuestCards } from "@/app/activities/data/presenter";
 import { IPrefectureCodeMap } from "@/app/search/data/type";
 import { logger } from "@/lib/logging";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 type CardType = ActivityCard | QuestCard;
 
@@ -31,24 +32,30 @@ export const useSearchResults = (
   error: Error | null;
   hasResults: boolean;
   refetch: () => void;
+  loadMoreRef: React.RefObject<HTMLDivElement>;
+  hasNextPage: boolean;
+  isLoadingMore: boolean;
 } => {
   const filter = useMemo(() => buildFilter(searchParams), [searchParams]);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const {
-    data,
-    loading: queryLoading,
-    error,
-    refetch,
-  } = useGetOpportunitiesQuery({
+     data,
+     loading: queryLoading,
+     error,
+     fetchMore,
+     refetch,
+    } = useGetOpportunitiesQuery({
     variables: {
       filter,
-      first: 100,
+      first: 15,
       includeSlot: true,
       slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
       slotSort: { startsAt: GqlSortDirection.Asc },
     },
     fetchPolicy: "network-only",
     nextFetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true,
   });
 
   const opportunities = useMemo(
@@ -65,6 +72,58 @@ export const useSearchResults = (
       },
     [data],
   );
+
+  const endCursor = opportunities.pageInfo?.endCursor;
+  const hasNextPage = opportunities.pageInfo?.hasNextPage ?? false;
+
+  const handleFetchMore = useCallback(async () => {
+    if (!hasNextPage || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    try {
+      await fetchMore({
+        variables: {
+          filter,
+          cursor: endCursor,
+          first: 15,
+          includeSlot: true,
+          slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
+          slotSort: { startsAt: GqlSortDirection.Asc },
+        },
+        updateQuery: (prev, { fetchMoreResult }) => {
+          if (!fetchMoreResult || !prev.opportunities || !fetchMoreResult.opportunities) {
+            return prev;
+          }
+
+          // パフォーマンス最適化: 重複排除を効率的に実行
+          const existingIds = new Set(prev.opportunities.edges.map(edge => edge?.node?.id));
+          const newEdges = fetchMoreResult.opportunities.edges.filter(
+            edge => edge?.node?.id && !existingIds.has(edge.node.id)
+          );
+
+          return {
+            ...prev,
+            opportunities: {
+              ...prev.opportunities,
+              edges: [...prev.opportunities.edges, ...newEdges],
+              pageInfo: fetchMoreResult.opportunities.pageInfo,
+            },
+          };
+        },
+      });
+    } catch (error) {
+      logger.error("Error fetching more search results", { error, searchParams });
+      toast.error("追加データの取得に失敗しました");
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [hasNextPage, isLoadingMore, filter, endCursor, fetchMore, searchParams]);
+
+  const loadMoreRef = useInfiniteScroll({
+    hasMore: hasNextPage && !queryLoading, // 初回ローディング中は無効化
+    isLoading: isLoadingMore,
+    onLoadMore: handleFetchMore,
+  });
 
   const recommendedOpportunities = useMemo(() => {
     if (searchParams.type === "quest") {
@@ -105,6 +164,9 @@ export const useSearchResults = (
     error: error ?? null,
     hasResults,
     refetch,
+    loadMoreRef,
+    hasNextPage,
+    isLoadingMore,
   };
 };
 
