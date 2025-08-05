@@ -82,6 +82,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
       copyData: organizerDidValue,
       isWarning: !organizerDidValue,
       warningText: "did発行準備中",
+      truncatePattern: "middle",
     },
     {
       label: "概要",

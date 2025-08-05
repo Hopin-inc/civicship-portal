@@ -8,12 +8,13 @@
 export const truncateText = (
   text: string | undefined | null, 
   length: number = 20, 
-  pattern: 'middle' | 'end' = 'middle'
+  pattern?: 'middle' | 'end'
 ): string => {
   if (!text) return "";
   if (text.length <= length) return text;
+  const patternType = pattern || 'end';
   
-  if (pattern === 'end') {
+  if (patternType === 'end') {
     // 最後を省略するパターン（真ん中省略と同じ文字数）
     const totalLength = length + 10; // 真ん中省略と同じ文字数
     return text.substring(0, totalLength - 3) + '...';

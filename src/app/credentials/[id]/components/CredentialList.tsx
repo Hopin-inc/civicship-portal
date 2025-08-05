@@ -57,6 +57,7 @@ export default function CredentialList(props: OpportunityListProps) {
       copyData: organizerDid ?? "",
       isWarning: !organizerDid,
       warningText: "did発行準備中",
+      truncatePattern: "middle",
     },
     {
       label: "概要",
@@ -66,7 +67,6 @@ export default function CredentialList(props: OpportunityListProps) {
         url: `/activities/${data?.participation?.opportunitySlot?.opportunity?.id}?community_id=${data?.participation?.opportunitySlot?.opportunity?.community?.id}`,
         text: "詳細を見る"
       },
-      truncatePattern: "end",
     },
     {
       label: "参加者",
@@ -77,6 +77,7 @@ export default function CredentialList(props: OpportunityListProps) {
       copyData: participantDid ?? "",
       isWarning: !participantDid,
       warningText: "did発行準備中",
+      truncatePattern: "middle",
     },
     {
       label: "開始日時",

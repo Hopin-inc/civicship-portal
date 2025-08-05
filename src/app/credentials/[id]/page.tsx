@@ -26,7 +26,7 @@ export default function CredentialsPage(props: { params: Promise<{ id: string }>
   });
 
   if (loading) return <Loading />;
-  if (!data && !loading && !vcData) return <NotFound />;
+  if (!data && !loading) return <NotFound />;
   
   return (
     <>

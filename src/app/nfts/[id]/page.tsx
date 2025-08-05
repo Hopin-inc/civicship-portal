@@ -56,18 +56,21 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
       warningText: "did発行準備中",
       showCopy: !!didValue,
       copyData: didValue ?? "",
+      truncatePattern: "middle",
     },
     {
       label: "証明書ID",
       value: instanceId,
       showCopy: true,
       copyData: instanceId,
+      truncatePattern: "middle",
     },
     {
       label: "コントラクト\nアドレス",
       value: contractAddress,
       showCopy: true,
       copyData: contractAddress,
+      truncatePattern: "middle",
     },
     {
       label: "チェーン",

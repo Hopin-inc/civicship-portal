@@ -83,7 +83,7 @@ export const InfoCard = ({
   secondaryLabel,
   warningText,
   showTruncate = true,
-  truncatePattern = 'middle'
+  truncatePattern
 }: InfoCardProps) => {
   if (!label) {
     console.warn('InfoCard: label is required');
