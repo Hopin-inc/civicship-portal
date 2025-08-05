@@ -17,7 +17,7 @@ const copyToClipboard = async (text: string, label: string) => {
 
 const WarningDisplay = ({ warningText }: { warningText: string }) => (
   <div className="flex items-center gap-1">
-    <Info className="w-4 h-4 text-[#EAB308]" />
+    <Info className="w-4 h-4 text-warning" />
     <span className="text-label-sm whitespace-pre-wrap text-center">
       {warningText}
     </span>
@@ -94,7 +94,7 @@ export const InfoCard = ({
   const displayValue = showTruncate ? truncateText(value, 15, truncatePattern) : value;
 
   return (
-    <Card className="rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-none">
+    <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
       <CardHeader className="flex flex-row items-center justify-between py-4 px-6">
         <div className="text-gray-400 text-xs whitespace-pre-wrap">
           {label}

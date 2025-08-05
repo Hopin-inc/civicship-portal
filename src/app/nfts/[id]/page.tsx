@@ -1,9 +1,8 @@
 "use client";
 import { use, useMemo } from "react";
 import { GqlDidIssuanceStatus, useGetNftInstanceWithDidQuery } from "@/types/graphql";
-import { InfoCard } from "@/components/shared/InfoCard";
+import { InfoCard, ErrorState } from "@/components/shared";
 import { InfoCardProps } from "@/types";
-import ErrorState from "@/components/shared/ErrorState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import Image from "next/image";
 
@@ -46,7 +45,7 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
     request => request.status === GqlDidIssuanceStatus.Completed
   )?.didValue;
 
-  const infoCards: InfoCardProps[] = [
+  const infoCardsValueList: InfoCardProps[] = [
     {
       label: "保有者",
       value: username,
@@ -98,7 +97,7 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
       </div>
       <div className="mt-6 p-4">
         <div className="grid grid-cols-1 gap-1 relative">
-          {infoCards.map((card, index) => (
+          {infoCardsValueList.map((card, index) => (
             <InfoCard key={index} {...card} />
           ))}
         </div>

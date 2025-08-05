@@ -71,7 +71,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
     return <ErrorState title="証明書詳細ページを読み込めませんでした" refetchRef={refetchRef} />;
   }
 
-  const infoCards: InfoCardProps[] = [
+  const infoCardsValueList: InfoCardProps[] = [
     {
       label: "主催者",
       value: organizer?.name ?? "",
@@ -112,7 +112,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
       )}
 
       <div className="space-y-1">
-        {infoCards.map((card, index) => (
+        {infoCardsValueList.map((card, index) => (
           <InfoCard key={index} {...card} />
         ))}
       </div>

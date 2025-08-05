@@ -9,9 +9,8 @@ import { CredentialRole, renderStatusCard } from "@/app/admin/credentials/[id]/d
 import { getLogoPath } from "@/lib/communities/metadata";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import React, { useEffect, useRef } from "react";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState, InfoCard } from "@/components/shared";
 import { ApolloError } from "@apollo/client";
-import { InfoCard } from "@/components/shared/InfoCard";
 import { InfoCardProps } from "@/types";
 
 interface OpportunityListProps {
@@ -47,7 +46,7 @@ export default function CredentialList(props: OpportunityListProps) {
 
   const logoPath = getLogoPath();
 
-  const infoCards: InfoCardProps[] = [
+  const infoCardsValueList: InfoCardProps[] = [
     {
       label: "主催者",
       value: data?.participation?.opportunitySlot?.opportunity?.createdByUser?.name ?? "",
@@ -118,7 +117,7 @@ export default function CredentialList(props: OpportunityListProps) {
       </div>
       <div className="mt-6 p-4">
         <div className="grid grid-cols-1 gap-1 relative">
-          {infoCards.map((card, index) => (
+          {infoCardsValueList.map((card, index) => (
             <InfoCard key={index} {...card} />
           ))}
           {vcData?.vcIssuanceRequests.edges[0]?.node?.completedAt && (
