@@ -12,6 +12,7 @@ import { currentCommunityConfig } from "@/lib/communities/metadata";
 import UserNftList from "@/app/users/components/UserNftList";
 import { useUserNft } from "@/app/users/hooks/useUserNft";
 import CardVertical from "@/app/components/CardVertical";
+import UserProfileSkeleton from "@/components/skeletons/UserProfileSkeleton";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
@@ -27,14 +28,14 @@ export default function MyProfilePage() {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  // 認証中 or リダイレクト待ち → ローディング表示
+  // 認証中 or リダイレクト待ち → スケルトン表示
   if (isAuthenticating || !currentUser) {
-    return <LoadingIndicator />;
+    return <UserProfileSkeleton />;
   }
 
   // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
-  if (!currentUser || isLoading) {
-    return <LoadingIndicator />;
+  if (isLoading) {
+    return <UserProfileSkeleton />;
   }
 
   // エラー

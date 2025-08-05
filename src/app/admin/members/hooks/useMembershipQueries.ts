@@ -16,8 +16,9 @@ export const useMembershipQueries = (communityId: string) => {
       first: 20,
       withDidIssuanceRequests: true,
     },
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-first",
     notifyOnNetworkStatusChange: true,
+    errorPolicy: "all",
   });
 
   const connection = data?.memberships ?? { edges: [], pageInfo: {} };
