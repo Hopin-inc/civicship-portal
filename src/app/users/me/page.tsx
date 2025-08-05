@@ -9,6 +9,8 @@ import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import ErrorState from "@/components/shared/ErrorState";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import UserNftList from "@/app/users/components/UserNftList";
+import { useUserNft } from "@/app/users/hooks/useUserNft";
 import CardVertical from "@/app/components/CardVertical";
 import UserProfileSkeleton from "@/components/skeletons/UserProfileSkeleton";
 
@@ -19,6 +21,7 @@ export default function MyProfilePage() {
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
     currentUser?.id,
   );
+  const { nftInstances } = useUserNft({ userId: currentUser?.id ?? "" });
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -59,6 +62,24 @@ export default function MyProfilePage() {
         userAsset={userData.asset}
         isOwner={true}
       />
+      {nftInstances && nftInstances.length > 0 ? (
+        <section className="py-6 mt-0">
+          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
+            証明書
+          </h2>
+          <div className="mt-4 flex gap-4 overflow-x-auto scrollbar-hide">
+            {nftInstances.map((nftInstance) => (
+              <UserNftList
+                key={nftInstance.id}
+                nftInstance={nftInstance}
+                isCarousel={true}
+              />
+            ))}
+          </div>
+        </section>
+      ) : (
+        null
+      )}
       <>
         {shouldShowOpportunities && (
           <>

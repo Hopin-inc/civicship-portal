@@ -3,8 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useQuery } from "@apollo/client";
-import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
@@ -28,6 +26,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next") as EncodedURIComponent;
   const [authorized, setAuthorized] = useState(false);
+  const [isInitialRender, setIsInitialRender] = useState(true);
 
 
   const authRedirectService = React.useMemo(() => {
@@ -35,7 +34,13 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (loading) {
+    if (!loading) {
+      setIsInitialRender(false);
+    }
+  }, [loading]);
+
+  useEffect(() => {
+    if (loading || isInitialRender) {
       return;
     }
 
@@ -64,9 +69,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     authCheck();
     return () => {
     };
-  }, [pathname, authenticationState, loading, router, authRedirectService, nextParam, searchParams]);
+  }, [pathname, authenticationState, loading, router, authRedirectService, nextParam, searchParams, isInitialRender]);
 
-  if (loading) {
+  if (loading || isInitialRender) {
     return <LoadingIndicator />;
   }
 
