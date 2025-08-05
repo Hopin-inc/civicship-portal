@@ -12,8 +12,7 @@ import { CredentialRole, renderStatusCard, statusStyle } from "./data/presenter"
 import { toast } from "sonner";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
-import { InfoCard } from "@/components/shared/InfoCard";
+import { InfoCard,ErrorState } from "@/components/shared";
 import { InfoCardProps } from "@/types";
 import { truncateText } from "@/utils/stringUtils";
 

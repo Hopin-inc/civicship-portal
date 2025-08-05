@@ -1,3 +1,3 @@
-export { default as ErrorState } from "./ErrorState";
-export { InfoCard } from "./InfoCard";
-export type { InfoCardProps } from "@/types"; 
+export * from "./ErrorState";
+export * from "./InfoCard";
+export type * from "@/types"; 
