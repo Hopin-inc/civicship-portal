@@ -30,6 +30,7 @@ export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = {
   "cmd5e86b9000fs60ektp6snb6": 0, // うどんタクシー“格さん”と行く！讃岐うどん食べ歩き＆うどん打ち体験スペシャルツアー
   "cmajlrsq4000ds60n8kr7d6rx": 1, // ［１７］ほたるの里で味わう夏の川遊び体験
   "cmajrg00h0031s60notq3ash8": 1, // ［３４］宮司と唱えるひふみ祝詞と、御守り体験
+  "cmaoctvav0029s60nr45s27bj": 1, // ［５７］道後の湯あがりに一杯！ビール工場見学
   // === for development ===
   "cmdoet4xa002ds60e7f5akwcb": 0,
   "cmdoesowc002bs60eytbbxkxe": 1,
