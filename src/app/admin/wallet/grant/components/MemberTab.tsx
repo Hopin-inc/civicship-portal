@@ -1,25 +1,26 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { GqlUser } from "@/types/graphql";
 import UserInfoCard from "./UserInfoCard";
 import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 interface MemberTabProps {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: bigint } } }[];
   searchQuery: string;
   onSelect: (user: GqlUser) => void;
-  onLoadMore?: () => void;
-  hasNextPage?: boolean;
+  loadMoreRef?: React.RefObject<HTMLDivElement>;
+  isLoadingMore?: boolean;
 }
 
 export function MemberTab({
   members,
   searchQuery,
   onSelect,
-  onLoadMore,
-  hasNextPage,
+  loadMoreRef,
+  isLoadingMore,
 }: MemberTabProps) {
   const communityId = COMMUNITY_ID;
   const {
@@ -27,27 +28,6 @@ export function MemberTab({
     loading,
     error,
   } = useMemberSearchFromCredentials(communityId, members, { searchQuery });
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (!hasNextPage || !onLoadMore) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const first = entries[0];
-        if (first.isIntersecting) {
-          onLoadMore();
-        }
-      },
-      { threshold: 1 },
-    );
-
-    const currentRef = loadMoreRef.current;
-    if (currentRef) observer.observe(currentRef);
-
-    return () => {
-      if (currentRef) observer.unobserve(currentRef);
-    };
-  }, [hasNextPage, onLoadMore]);
 
   if (error) {
     return (
@@ -92,7 +72,14 @@ export function MemberTab({
         );
       })}
 
-      {hasNextPage && <div ref={loadMoreRef} className="h-10" />}
+      {/* 無限スクロール用のローディング要素 - 常に表示 */}
+      <div ref={loadMoreRef} className="flex justify-center py-8">
+        {isLoadingMore && (
+          <div className="flex items-center space-x-2">
+            <LoadingIndicator fullScreen={false}/>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

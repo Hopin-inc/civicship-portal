@@ -13,7 +13,7 @@ import { presenterTransaction } from "@/app/wallets/data/presenter";
 import useUserTransactions from "@/app/wallets/hooks/useUserTransaction";
 import { toast } from "sonner";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from "@/components/shared";
 import { logger } from "@/lib/logging";
 
 export default function UserWalletPage() {

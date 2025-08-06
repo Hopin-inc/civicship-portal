@@ -2,17 +2,18 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
-import { GqlUser, useGetMemberWalletsQuery } from "@/types/graphql";
+import { GqlUser } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from "@/components/shared";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
 import UserSelectStep from "@/app/admin/wallet/grant/components/UserSelectStep";
 import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
+import { useMemberWallets } from "@/hooks/members/useMemberWallets";
 
 export default function DonatePointPage() {
   const router = useRouter();
@@ -24,14 +25,7 @@ export default function DonatePointPage() {
   const tab = searchParams.get("tab") ?? "";
   const [activeTab, setActiveTab] = useState<Tabs>(tab as Tabs);
 
-  const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
-    variables: {
-      filter: { communityId: COMMUNITY_ID },
-      first: 100,
-      withDidIssuanceRequests: true,
-    },
-    fetchPolicy: "network-only",
-  });
+  const { data, loading, error, refetch, loadMoreRef, hasNextPage, isLoadingMore } = useMemberWallets();
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -111,22 +105,7 @@ export default function DonatePointPage() {
     }
   };
 
-  const handleLoadMore = async () => {
-    const endCursor = data?.wallets?.pageInfo?.endCursor;
-    if (data?.wallets?.pageInfo?.hasNextPage && endCursor) {
-      await fetchMore({
-        variables: {
-          filter: { communityId: COMMUNITY_ID },
-          first: 100,
-          after: endCursor,
-        },
-      });
-    }
-  };
-
-  const hasNextPage = data?.wallets?.pageInfo?.hasNextPage ?? false;
-
-  if (loading) return <LoadingIndicator />;
+  if (loading && !isLoadingMore) return <LoadingIndicator />;
   if (error)
     return <ErrorState title="送信先のメンバーを取得できませんでした" refetchRef={refetchRef} />;
 
@@ -137,8 +116,8 @@ export default function DonatePointPage() {
           title="送り先を選ぶ"
           members={members}
           onSelect={(user) => setSelectedUser(user)}
-          onLoadMore={handleLoadMore}
-          hasNextPage={hasNextPage}
+          loadMoreRef={loadMoreRef}
+          isLoadingMore={isLoadingMore}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           listType="donate"
@@ -149,7 +128,7 @@ export default function DonatePointPage() {
           isLoading={isLoading}
           onBack={() => setSelectedUser(null)}
           onSubmit={handleDonate}
-          currentPoint={currentPoint} // ← ここ追加
+          currentPoint={currentPoint}
           title="ポイントをあげる"
           recipientLabel="あげる相手"
           submitLabel="あげる"
