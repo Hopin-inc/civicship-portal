@@ -77,6 +77,22 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     rootPath: "/activities",
     adminRootPath: "/admin/reservations",
   },
+  "himeji-ymca": {
+    id: "himeji-ymca",
+    tokenName: "姫路YMCA",
+    title: "姫路YMCA",
+    description: "",
+    shortDescription: "",
+    domain: "https://himeji-ymca.civicship.jp", // TODO: 環境によってドメインが変わるので、環境変数化する必要あり
+    faviconPrefix: "/communities/himeji-ymca",
+    logoPath: "/communities/himeji-ymca/logo.jpg",
+    squareLogoPath: "/communities/himeji-ymca/logo-square.jpg",
+    ogImagePath:
+      "https://storage.googleapis.com/prod-civicship-storage-public/asset/himeji-ymca/ogp.jpg",
+    enableFeatures: ["opportunities", "credentials", "quests", "points"],
+    rootPath: "/activities",
+    adminRootPath: "/admin/reservations",
+  },
   kibotcha: {
     id: "kibotcha",
     tokenName: "KIBOTCHA",
@@ -121,7 +137,15 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
-    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures", "quests"],
+    enableFeatures: [
+      "opportunities",
+      "places",
+      "points",
+      "articles",
+      "tickets",
+      "prefectures",
+      "quests",
+    ],
     rootPath: "/activities",
   },
 };
