@@ -55,7 +55,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     }
 
     const checkAdminAccess = async () => {
-      const { hasAccess, redirectPath } = await authRedirectService.checkAdminAccess(currentUser);
+      const { hasAccess, redirectPath } = await authRedirectService.checkAdminAccess(currentUser, window.location.pathname);
 
       if (!hasAccess && redirectPath) {
         if (redirectPath === "/") {

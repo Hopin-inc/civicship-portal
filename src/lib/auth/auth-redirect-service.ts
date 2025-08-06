@@ -10,6 +10,14 @@ import {
 import { logger } from "@/lib/logging";
 
 /**
+ * Owner専用のパス一覧
+ */
+const OWNER_ONLY_PATHS = [
+  '/admin/wallet',
+  '/admin/members'
+];
+
+/**
  * 認証状態に基づくリダイレクト処理を一元管理するサービス
  */
 export class AuthRedirectService {
@@ -187,6 +195,7 @@ export class AuthRedirectService {
    */
   public async checkAdminAccess(
     currentUser: any,
+    pathname?: string,
   ): Promise<{ hasAccess: boolean; redirectPath: string | null }> {
     if (!currentUser) {
       return { hasAccess: false, redirectPath: "/login" };
@@ -203,6 +212,12 @@ export class AuthRedirectService {
       return { hasAccess: false, redirectPath: "/" };
     }
 
+    // Owner専用のパスチェック
+    if (pathname && OWNER_ONLY_PATHS.some(ownerPath => pathname.startsWith(ownerPath))) {
+      if (targetMembership.role !== GqlRole.Owner) {
+        return { hasAccess: false, redirectPath: "/" };
+      }
+    }
     const isCommunityManager =
       targetMembership &&
       (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);
