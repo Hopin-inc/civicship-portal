@@ -10,7 +10,7 @@ interface ErrorStateProps {
   refetchRef?: React.MutableRefObject<(() => void) | null>;
 }
 
-const ErrorState: React.FC<ErrorStateProps> = ({
+export const ErrorState: React.FC<ErrorStateProps> = ({
   title = "ページを読み込めませんでした",
   refetchRef,
 }) => {
@@ -60,5 +60,3 @@ const ErrorState: React.FC<ErrorStateProps> = ({
     </div>
   );
 };
-
-export default ErrorState;

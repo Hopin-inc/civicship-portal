@@ -9,7 +9,7 @@ interface UserNftListProps {
   isCarousel?: boolean;
 }
 
-const UserNftList = ({ nftInstance, isCarousel = false }: UserNftListProps) => {
+export const NftCard = ({ nftInstance, isCarousel = false }: UserNftListProps) => {
   return (
     <Link
         key={nftInstance.id}
@@ -39,5 +39,3 @@ const UserNftList = ({ nftInstance, isCarousel = false }: UserNftListProps) => {
     </Link>
   );
 }
-
-export default UserNftList;
