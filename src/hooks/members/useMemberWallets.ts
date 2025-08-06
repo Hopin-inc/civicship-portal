@@ -47,7 +47,7 @@ export const useMemberWallets = (): UseMemberWalletsResult => {
 
   const handleFetchMore = useCallback(async () => {
     if (!hasNextPage || isLoadingMore) return;
-      setIsLoadingMore(true);
+    setIsLoadingMore(true);
     try {
       await fetchMore({
         variables: {

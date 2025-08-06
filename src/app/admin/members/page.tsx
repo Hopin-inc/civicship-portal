@@ -20,7 +20,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useMembershipCommand } from "@/app/admin/members/hooks/useMembershipMutations";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from "@/components/shared";
 import { useMemberWithDidSearch } from "../credentials/hooks/useMemberWithDidSearch";
 import SearchForm from "@/components/shared/SearchForm";
 

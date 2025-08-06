@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useActivities } from "../hooks/useActivities";
 import ActivitiesListSection from "./ListSection/ListSection";
 import { mapOpportunityCards } from "../data/presenter";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 import EmptyState from "@/components/shared/EmptyState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 

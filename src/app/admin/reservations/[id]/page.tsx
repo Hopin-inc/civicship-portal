@@ -5,7 +5,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { GqlParticipation, useGetReservationQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from "@/components/shared";
 import { presenterActivityCard } from "@/app/activities/data/presenter";
 import getReservationStatusMeta from "@/app/admin/reservations/hooks/useGetReservationStatusMeta";
 import NotFound from "@/app/not-found";

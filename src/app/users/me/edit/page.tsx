@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import useProfileEdit from "@/app/users/me/edit/hooks/useProfileEdit";
 import UserProfileEdit from "@/app/users/components/UserProfileEdit";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function ProfileEditPage() {

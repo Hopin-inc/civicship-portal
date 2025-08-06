@@ -5,7 +5,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
 import { notFound, useParams, useSearchParams } from "next/navigation";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Content, Footer, Header } from "./components";
 import { DisableReasonType } from "./types";

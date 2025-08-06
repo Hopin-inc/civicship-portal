@@ -13,7 +13,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { toast } from "sonner";
 import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 import { CommentTextarea } from "./components/ParticipationAge";
 import { errorMessages } from "@/utils/errorMessage";
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
