@@ -27,7 +27,7 @@ const FormSchema = z.object({
   name: z
     .string({ required_error: "名前を入力してください。" })
     .trim()
-    .min(1, "名前を入力してください。"),
+    .nonempty("名前を入力してください。"),
   prefecture: z.nativeEnum(GqlCurrentPrefecture, {
     required_error: "居住地を選択してください。",
   }),
