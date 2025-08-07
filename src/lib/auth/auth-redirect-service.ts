@@ -1,5 +1,5 @@
 import { AuthStateManager } from "./auth-state-manager";
-import { GqlRole } from "@/types/graphql";
+import { GqlRole, GqlUser } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   encodeURIComponentWithType,
@@ -194,7 +194,7 @@ export class AuthRedirectService {
    * 管理者権限チェック用のユーザー情報を取得
    */
   public async checkAdminAccess(
-    currentUser: any,
+    currentUser: GqlUser | null | undefined,
     pathname?: string,
   ): Promise<{ hasAccess: boolean; redirectPath: string | null }> {
     if (!currentUser) {
@@ -213,7 +213,7 @@ export class AuthRedirectService {
     }
 
     // Owner専用のパスチェック
-    if (pathname && OWNER_ONLY_PATHS.some(ownerPath => pathname.startsWith(ownerPath))) {
+    if (pathname && OWNER_ONLY_PATHS.some(ownerPath => matchPaths(pathname, ownerPath))) {
       if (targetMembership.role !== GqlRole.Owner) {
         return { hasAccess: false, redirectPath: "/" };
       }
