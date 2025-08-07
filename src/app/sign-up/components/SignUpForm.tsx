@@ -24,7 +24,10 @@ import { logger } from "@/lib/logging";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 const FormSchema = z.object({
-  name: z.string({ required_error: "名前を入力してください。" }),
+  name: z
+    .string({ required_error: "名前を入力してください。" })
+    .trim()
+    .nonempty("名前を入力してください。"),
   prefecture: z.nativeEnum(GqlCurrentPrefecture, {
     required_error: "居住地を選択してください。",
   }),
@@ -40,7 +43,7 @@ export function SignUpForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: "",
+      name: undefined,
       prefecture: GqlCurrentPrefecture.Unknown,
     },
   });
@@ -147,7 +150,11 @@ export function SignUpForm() {
             />
           )}
 
-          <Button type="submit" className="w-full h-12 text-base" disabled={isLoading}>
+          <Button 
+            type="submit" 
+            className="w-full h-12 text-base" 
+            disabled={isLoading || !!form.formState.errors.name}
+          >
             {isLoading ? "作成中..." : "アカウントを作成"}
           </Button>
         </form>
