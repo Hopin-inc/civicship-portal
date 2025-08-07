@@ -150,7 +150,11 @@ export function SignUpForm() {
             />
           )}
 
-          <Button type="submit" className="w-full h-12 text-base" disabled={isLoading}>
+          <Button 
+            type="submit" 
+            className="w-full h-12 text-base" 
+            disabled={isLoading || !!form.formState.errors.name}
+          >
             {isLoading ? "作成中..." : "アカウントを作成"}
           </Button>
         </form>
