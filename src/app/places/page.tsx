@@ -9,7 +9,7 @@ import { usePlaceQueryValues } from "@/app/places/hooks/usePlaceQueryValues";
 import { usePlaceQueryActions } from "@/app/places/hooks/usePlaceQueryActions";
 import PlaceListPage from "@/app/places/components/list/ListPage";
 import EmptyState from "@/components/shared/EmptyState";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 
 export default function PlacesPage() {
   const { selectedPlaceId, mode } = usePlaceQueryValues();

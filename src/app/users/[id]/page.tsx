@@ -7,7 +7,7 @@ import UserProfileSection from "@/app/users/components/UserProfileSection";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 

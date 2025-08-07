@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React, { useRef } from "react";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 
 const meta: Meta<typeof ErrorState> = {
   title: "Shared/Components/ErrorState",

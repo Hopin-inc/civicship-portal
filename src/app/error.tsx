@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import ErrorState from '@/components/shared/ErrorState'
+import { ErrorState } from '@/components/shared'
 import clientLogger from '@/lib/logging/client'
 
 export default function Error({

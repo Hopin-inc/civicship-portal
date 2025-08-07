@@ -8,7 +8,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useTicketClaim } from "@/app/tickets/receive/hooks/useTicketClaim";
 import TicketReceiveContent from "@/app/tickets/receive/components/TicketReceiveContent";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 import { toast } from "sonner";
 import { RawURIComponent } from "@/utils/path";
 
