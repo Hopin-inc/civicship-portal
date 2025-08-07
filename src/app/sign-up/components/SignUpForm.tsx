@@ -24,7 +24,7 @@ import { logger } from "@/lib/logging";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 const FormSchema = z.object({
-  name: z.string({ required_error: "名前を入力してください。" }),
+  name: z.string({ required_error: "名前を入力してください。" }).min(1, "名前を入力してください。"),
   prefecture: z.nativeEnum(GqlCurrentPrefecture, {
     required_error: "居住地を選択してください。",
   }),
