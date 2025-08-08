@@ -6,23 +6,15 @@ import {
   useGetEvaluationsQuery,
 } from "@/types/graphql";
 import { formatDateTime } from "@/utils/date";
-import { Copy, ExternalLink } from "lucide-react";
+import { Copy } from "lucide-react";
 import { use, useEffect, useMemo, useRef } from "react";
 import { CredentialRole, renderStatusCard, statusStyle } from "./data/presenter";
 import { toast } from "sonner";
-import Link from "next/link";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
-
-// DIDを省略表示する関数
-const truncateDid = (did: string | undefined | null, length: number = 20): string => {
-  if (!did) return "";
-  if (did.length <= length) return did;
-  const start = did.substring(0, length);
-  const end = did.substring(did.length - 10);
-  return `${start}...${end}`;
-};
+import { InfoCard,ErrorState } from "@/components/shared";
+import { InfoCardProps } from "@/types";
+import { truncateText } from "@/utils/stringUtils";
 
 // userIdからDIDを取得する関数
 function getDidValueByUserId(
@@ -79,6 +71,39 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
     return <ErrorState title="証明書詳細ページを読み込めませんでした" refetchRef={refetchRef} />;
   }
 
+  const infoCardsValueList: InfoCardProps[] = [
+    {
+      label: "主催者",
+      value: organizer?.name ?? "",
+      secondaryValue: organizerDidValue || "",
+      secondaryLabel: "DID",
+      showCopy: !!organizerDidValue,
+      copyData: organizerDidValue,
+      isWarning: !organizerDidValue,
+      warningText: "did発行準備中",
+      truncatePattern: "middle",
+    },
+    {
+      label: "概要",
+      value: opportunity?.title ?? "",
+      showExternalLink: true,
+      externalLink: {
+        url: `/activities/${opportunity?.id}?community_id=${opportunity?.community?.id}`,
+        text: "詳細を見る"
+      }
+    },
+    {
+      label: "開始日時",
+      value: formatDateTime(opportunitySlot?.startsAt ?? null, "yyyy年MM月dd日 HH:mm"),
+      showTruncate: false,
+    },
+    {
+      label: "終了日時",
+      value: formatDateTime(opportunitySlot?.endsAt ?? null, "yyyy年MM月dd日 HH:mm"),
+      showTruncate: false,
+    },
+  ];
+
   return (
     <div className="p-4 space-y-3 max-w-2xl mx-auto">
       {renderStatusCard(
@@ -86,70 +111,11 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
         CredentialRole.manager,
       )}
 
-      {/* 主催者カード */}
-      <Card className="rounded-2xl border border-zinc-200 bg-card shadow-none ">
-        <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
-          <div className="text-zinc-500 text-xs">主催者</div>
-          <div className="flex flex-col items-end">
-            <div className="text-sm font-bold text-black">{organizer?.name}</div>
-            <div className="flex items-center text-zinc-400 text-sm mt-1">
-              {organizerDidValue && (
-                <>
-                  <Copy
-                    className="w-4 h-4 mr-1 cursor-pointer"
-                    onClick={() => {
-                      navigator.clipboard.writeText(organizerDidValue);
-                      toast.success("コピーしました");
-                    }}
-                  />
-                  <span>{truncateDid(organizerDidValue)}</span>
-                </>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {/* 概要カード */}
-      <Card className="rounded-2xl border border-zinc-200 bg-card shadow-none">
-        <CardHeader className="flex flex-row items-center p-4 px-6 h-[56px]">
-          {/* ラベル（固定幅 + 中央揃え） */}
-          <div className="text-zinc-400 text-xs w-24 shrink-0">概要</div>
-
-          {/* タイトル + リンク */}
-          <div className="flex items-center justify-end gap-2 flex-1 min-w-0">
-            <span className="text-sm font-bold text-black truncate text-right">
-              {opportunity?.title}
-            </span>
-            <Link
-              href={`/activities/${opportunity?.id}?community_id=${opportunity?.community?.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <ExternalLink className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            </Link>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {/* 開始・終了日時 */}
-      <Card className="rounded-2xl border border-zinc-200 bg-card shadow-none ">
-        <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
-          <div className="text-zinc-500 text-xs min-w-fit whitespace-nowrap">開始日時</div>
-          <div className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
-            {formatDateTime(opportunitySlot?.startsAt ?? null, "yyyy年MM月dd日 HH:mm")}
-          </div>
-        </CardHeader>
-      </Card>
-
-      <Card className="rounded-2xl border border-zinc-200 bg-card shadow-none ">
-        <CardHeader className="flex flex-row items-center justify-between p-4 px-6">
-          <div className="text-zinc-500 text-xs min-w-fit whitespace-nowrap">終了日時</div>
-          <div className="font-bold text-black whitespace-nowrap overflow-hidden text-ellipsis text-sm ml-2 flex-2">
-            {formatDateTime(opportunitySlot?.endsAt ?? null, "yyyy年MM月dd日 HH:mm")}
-          </div>
-        </CardHeader>
-      </Card>
+      <div className="space-y-1">
+        {infoCardsValueList.map((card, index) => (
+          <InfoCard key={index} {...card} />
+        ))}
+      </div>
 
       {/* 発行先 */}
       <h1 className="text-base font-bold pt-6">証明書の発行先</h1>
@@ -190,7 +156,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
                           toast.success("コピーしました");
                         }}
                       />
-                      <span>{truncateDid(didValue, 25)}</span>
+                      <span>{truncateText(didValue, 25)}</span>
                     </>
                   )}
                 </div>

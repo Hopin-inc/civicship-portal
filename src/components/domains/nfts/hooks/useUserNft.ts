@@ -1,8 +1,10 @@
-import { useGetNftInstancesQuery } from "@/types/graphql";
+import { GqlUser, useGetNftInstancesQuery } from "@/types/graphql";
+
 interface UseUserNftProps {
-    userId: string;
+    userId: GqlUser["id"];
 }
-export const useUserNft = ({ userId }: UseUserNftProps) => {
+
+export const useUserNfts = ({ userId }: UseUserNftProps) => {
     const { data: nftInstances } = useGetNftInstancesQuery(
       {
         variables: {

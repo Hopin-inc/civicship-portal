@@ -14,7 +14,7 @@ export const useWallet = (userId?: string) => {
   const [userAsset, setUserAsset] = useState<UserAsset>({
     points: {
       walletId: "",
-      currentPoint: 0,
+      currentPoint: BigInt(0),
     },
     tickets: [],
   });

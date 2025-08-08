@@ -11,7 +11,7 @@ import { useReservationDateHandler } from "@/app/reservation/select-date/hooks/u
 import { filterSlotGroupsBySelectedDate } from "@/app/reservation/data/presenter/opportunitySlot";
 import TimeSlotList from "@/app/reservation/select-date/components/TimeSlotList";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 import { notFound, useSearchParams } from "next/navigation";
 import EmptyState from "@/components/shared/EmptyState";
 

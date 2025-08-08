@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { useHeader } from "@/components/providers/HeaderProvider";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import EmptyState from "@/components/shared/EmptyState";
 import { useParams } from "next/navigation";

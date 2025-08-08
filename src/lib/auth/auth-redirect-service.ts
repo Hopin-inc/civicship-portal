@@ -7,6 +7,7 @@ import {
   matchPaths,
   RawURIComponent,
 } from "@/utils/path";
+import { logger } from "@/lib/logging";
 
 /**
  * 認証状態に基づくリダイレクト処理を一元管理するサービス

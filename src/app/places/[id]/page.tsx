@@ -4,7 +4,7 @@ import { FC, useEffect, useRef } from "react";
 import { usePlaceDetail } from "@/app/places/[id]/hooks/usePlaceDetail";
 import PlaceOpportunities from "@/app/places/[id]/components/PlaceOpportunities";
 import PlaceFeaturedArticle from "@/app/places/[id]/components/PlaceFeaturedArticle";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 import ImagesCarousel from "@/components/ui/images-carousel";
 import PlaceOverview from "./components/PlaceOverview";
 import PlaceAddress from "./components/PlaceAddress";

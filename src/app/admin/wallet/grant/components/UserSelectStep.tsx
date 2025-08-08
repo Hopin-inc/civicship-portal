@@ -12,8 +12,8 @@ import { MemberTab } from "./MemberTab";
 interface Props {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: bigint } } }[];
   onSelect: (user: GqlUser) => void;
-  onLoadMore?: () => void;
-  hasNextPage?: boolean;
+  loadMoreRef?: React.RefObject<HTMLDivElement>;
+  isLoadingMore?: boolean;
   title?: string;
   activeTab: TabsEnum;
   setActiveTab: React.Dispatch<React.SetStateAction<TabsEnum>>;
@@ -23,8 +23,8 @@ interface Props {
 function UserSelectStep({
   members,
   onSelect,
-  onLoadMore,
-  hasNextPage,
+  loadMoreRef,
+  isLoadingMore,
   title,
   activeTab,
   setActiveTab,
@@ -57,8 +57,8 @@ function UserSelectStep({
           members={members}
           searchQuery={searchQuery}
           onSelect={onSelect}
-          onLoadMore={onLoadMore}
-          hasNextPage={hasNextPage}
+          loadMoreRef={loadMoreRef}
+          isLoadingMore={isLoadingMore}
         />
       )}
     </>

@@ -8,7 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { HeaderConfig } from "@/contexts/HeaderContext";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";

@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { CardWrapper } from "@/components/ui/card-wrapper";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from "@/components/shared";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";

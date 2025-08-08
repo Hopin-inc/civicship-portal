@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useActivities } from "@/app/activities/hooks/useActivities";
 import ActivitiesListSection from "@/app/activities/components/ListSection/ListSection";
 import { mapOpportunityCards } from "@/app/activities/data/presenter";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from "@/components/shared";
 import EmptyState from "@/components/shared/EmptyState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Coins } from "lucide-react";
