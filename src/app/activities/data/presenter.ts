@@ -13,7 +13,7 @@ import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
+import { isDateReservable, getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
 import { format, isAfter } from "date-fns";
 import { getCrossDayLabel } from "@/utils/date";
 import { ja } from "date-fns/locale";
@@ -43,7 +43,7 @@ export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): (ActivityCard 
   edges
     .map((edge) => edge.node)
     .filter((node): node is GqlOpportunity => !!node)
-    .map((node) => {
+    .map((node) => {  
       if (node.category === GqlOpportunityCategory.Activity) {
         return presenterActivityCard(node);
       } else if (node.category === GqlOpportunityCategory.Quest) {
@@ -187,7 +187,6 @@ export const presenterActivitySlot = (
         feeRequired: feeRequired ?? null,
         applicantCount: 1,
         isReservable,
-        opportunityId: slot?.opportunity?.id || "",
       };
     }) ?? []
   );
@@ -276,9 +275,23 @@ export const sliceActivitiesBySection = (
   const safe = <T>(cards: (T | undefined)[]): T[] => cards.filter((c): c is T => !!c);
   const hasImages = (card: ActivityCard | QuestCard) => card.images && card.images.length > 0;
 
+  const isBookable = (card: ActivityCard | QuestCard): boolean => {
+    return card.slots?.some(slot => {
+      if (slot.hostingStatus !== "SCHEDULED") return false;
+      return isDateReservable(slot.startsAt, card.id);
+    }) ?? false;
+  };
+
   const validCards = safe(cards.filter(hasImages));
-  const featuredCards = validCards.slice(0, 3);
-  const upcomingCards = validCards.slice(3);
+  
+  // Filter to only include bookable cards
+  const bookableCards = validCards.filter(isBookable);
+  
+  // Take up to 3 cards for featured section
+  const featuredCards = bookableCards.slice(0, 3);
+  
+  // Remaining bookable cards go to upcoming section
+  const upcomingCards = bookableCards.slice(3);
 
   return { featuredCards, upcomingCards };
 };

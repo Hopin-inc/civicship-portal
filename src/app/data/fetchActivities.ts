@@ -13,6 +13,7 @@ export function useFetchFeaturedAndCarousel() {
 
   const { data, loading } = useGetOpportunitiesQuery({
     variables: {
+      includeSlot: true,
       filter: {
         communityIds: [COMMUNITY_ID],
         or: [
@@ -33,7 +34,7 @@ export function useFetchFeaturedAndCarousel() {
       sort: {
         earliestSlotStartsAt: GqlSortDirection.Asc,
       },
-      first: 10,
+      first: 30,
     },
     fetchPolicy: "cache-first",
   });
