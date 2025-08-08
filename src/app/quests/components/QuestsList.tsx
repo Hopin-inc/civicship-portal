@@ -31,10 +31,7 @@ export default function QuestsList() {
       recommendedOpportunities, 
       groupedOpportunities, 
       loading, 
-      refetch,
-      error,
       loadMoreRef,
-      hasNextPage,
       isLoadingMore,
     } = useSearchResults(queryParams);
 

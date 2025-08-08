@@ -21,6 +21,7 @@ import { logger } from "@/lib/logging";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 type CardType = ActivityCard | QuestCard;
+const DEFAULT_PAGE_SIZE = 15;
 
 export const useSearchResults = (
   searchParams: SearchParams = {},
@@ -39,6 +40,15 @@ export const useSearchResults = (
   const filter = useMemo(() => buildFilter(searchParams), [searchParams]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // 共通のクエリ変数を定義
+  const baseQueryVariables = useMemo(() => ({
+    filter,
+    first: DEFAULT_PAGE_SIZE,
+    includeSlot: true,
+    slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
+    slotSort: { startsAt: GqlSortDirection.Asc },
+  }), [filter]);
+
   const {
      data,
      loading: queryLoading,
@@ -46,13 +56,7 @@ export const useSearchResults = (
      fetchMore,
      refetch,
     } = useGetOpportunitiesQuery({
-    variables: {
-      filter,
-      first: 15,
-      includeSlot: true,
-      slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
-      slotSort: { startsAt: GqlSortDirection.Asc },
-    },
+    variables: baseQueryVariables,
     fetchPolicy: "network-only",
     nextFetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
@@ -83,12 +87,8 @@ export const useSearchResults = (
     try {
       await fetchMore({
         variables: {
-          filter,
+          ...baseQueryVariables,
           cursor: endCursor,
-          first: 15,
-          includeSlot: true,
-          slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
-          slotSort: { startsAt: GqlSortDirection.Asc },
         },
         updateQuery: (prev, { fetchMoreResult }) => {
           if (!fetchMoreResult || !prev.opportunities || !fetchMoreResult.opportunities) {
@@ -97,15 +97,20 @@ export const useSearchResults = (
 
           // パフォーマンス最適化: 重複排除を効率的に実行
           const existingIds = new Set(prev.opportunities.edges.map(edge => edge?.node?.id));
-          const newEdges = fetchMoreResult.opportunities.edges.filter(
-            edge => edge?.node?.id && !existingIds.has(edge.node.id)
-          );
+          const newUniqueEdges = [];
+          for (const edge of fetchMoreResult.opportunities.edges) {
+            const id = edge?.node?.id;
+            if (id && !existingIds.has(id)) {
+              newUniqueEdges.push(edge);
+              existingIds.add(id); // 新しく追加したIDも重複チェックの対象にする
+            }
+          }
 
           return {
             ...prev,
             opportunities: {
               ...prev.opportunities,
-              edges: [...prev.opportunities.edges, ...newEdges],
+              edges: [...prev.opportunities.edges, ...newUniqueEdges],
               pageInfo: fetchMoreResult.opportunities.pageInfo,
             },
           };
@@ -117,7 +122,7 @@ export const useSearchResults = (
     } finally {
       setIsLoadingMore(false);
     }
-  }, [hasNextPage, isLoadingMore, filter, endCursor, fetchMore, searchParams]);
+  }, [hasNextPage, isLoadingMore, baseQueryVariables, endCursor, fetchMore, searchParams]);
 
   const loadMoreRef = useInfiniteScroll({
     hasMore: hasNextPage && !queryLoading, // 初回ローディング中は無効化
