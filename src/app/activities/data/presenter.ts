@@ -43,7 +43,7 @@ export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): (ActivityCard 
   edges
     .map((edge) => edge.node)
     .filter((node): node is GqlOpportunity => !!node)
-    .map((node) => {
+    .map((node) => {  
       if (node.category === GqlOpportunityCategory.Activity) {
         return presenterActivityCard(node);
       } else if (node.category === GqlOpportunityCategory.Quest) {
@@ -275,9 +275,9 @@ export const sliceActivitiesBySection = (
   const safe = <T>(cards: (T | undefined)[]): T[] => cards.filter((c): c is T => !!c);
   const hasImages = (card: ActivityCard | QuestCard) => card.images && card.images.length > 0;
 
-  // Helper function to check if an activity has at least one reservable slot
-  const isBookable = (card: ActivityCard | QuestCard) => {
+  const isBookable = (card: ActivityCard | QuestCard): boolean => {
     return card.slots?.some(slot => {
+      if (slot.hostingStatus !== "SCHEDULED") return false;
       return isDateReservable(slot.startsAt, card.id);
     }) ?? false;
   };

@@ -13,6 +13,7 @@ export function useFetchFeaturedAndCarousel() {
 
   const { data, loading } = useGetOpportunitiesQuery({
     variables: {
+      includeSlot: true,
       filter: {
         communityIds: [COMMUNITY_ID],
         or: [
