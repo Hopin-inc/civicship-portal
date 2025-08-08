@@ -6,7 +6,6 @@ import { Card } from "@/components/ui/card";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface OpportunityCardProps {
-  id: string;
   title: string;
   image?: string;
   imageAlt?: string;
@@ -20,19 +19,31 @@ interface OpportunityCardProps {
   onClick?: () => void;
 }
 
-export default function OpportunityCard({...props}: OpportunityCardProps) {
+export default function OpportunityCard({
+  title,
+  image,
+  imageAlt,
+  badge,
+  price,
+  priceIcon,
+  location,
+  locationIcon,
+  pointsToEarn,
+  href,
+  onClick,
+}: OpportunityCardProps) {
 
   const CardContent = (
     <div className="relative w-[164px] flex-shrink-0 mt-6">
       <Card className="w-full h-[205px] overflow-hidden relative">
-        {props.badge && (
+        {badge && (
           <div className={`absolute top-2 left-2 bg-primary-foreground text-primary px-2.5 py-1 rounded-xl text-label-xs font-bold z-10`}>
-            {props.badge}
+            {badge}
           </div>
         )}
         <Image
-          src={props.image || PLACEHOLDER_IMAGE}
-          alt={props.imageAlt || props.title}
+          src={image || PLACEHOLDER_IMAGE}
+          alt={imageAlt || title}
           width={400}
           height={400}
           sizes="164px"
@@ -47,27 +58,27 @@ export default function OpportunityCard({...props}: OpportunityCardProps) {
         />
       </Card>
       <div className="mt-3">
-        <h3 className="text-title-sm text-foreground line-clamp-2">{props.title}</h3>
+        <h3 className="text-title-sm text-foreground line-clamp-2">{title}</h3>
         <div className="mt-2 flex flex-col">
-          {props.price && (
+          {price && (
             <div className="text-body-sm text-muted-foreground flex items-center gap-1">
-              {props.priceIcon}
-              {props.price}
+              {priceIcon}
+              {price}
             </div>
           )}
           {location && (
             <div className="flex items-center text-body-sm text-muted-foreground mt-1">
-              {props.locationIcon}
-              <span className="line-clamp-1 break-words">{props.location}</span>
+              {locationIcon}
+              <span className="line-clamp-1 break-words">{location}</span>
             </div>
           )}
-          {props.pointsToEarn != null && (
+          {pointsToEarn != null && (
             <div className="flex items-center gap-1 pt-1">
               <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
                 P
               </p>
               <p className="text-sm font-bold">
-                {props.pointsToEarn}ptもらえる
+                {pointsToEarn}ptもらえる
               </p>
             </div>
           )}
@@ -76,17 +87,17 @@ export default function OpportunityCard({...props}: OpportunityCardProps) {
     </div>
   );
 
-  if (props.href) {
+  if (href) {
     return (
-      <Link href={props.href}>
+      <Link href={href}>
         {CardContent}
       </Link>
     );
   }
 
-  if (props.onClick) {
+  if (onClick) {
     return (
-      <button onClick={props.onClick} className="w-full text-left">
+      <button onClick={onClick} className="w-full text-left">
         {CardContent}
       </button>
     );
