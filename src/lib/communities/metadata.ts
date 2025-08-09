@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { getAssetWithFallback } from "@/utils/fileExists";
+import { DEFAULT_ASSET_PATHS } from "./constants";
 
 export type FeaturesType =
   | "places"
@@ -175,18 +175,12 @@ export const DEFAULT_OPEN_GRAPH_IMAGE = [
 
 // ロゴのパスを取得
 export function getLogoPath(): string {
-  return getAssetWithFallback(
-    currentCommunityConfig.logoPath,
-    "/communities/default/logo.jpg"
-  );
+  return currentCommunityConfig.logoPath ?? DEFAULT_ASSET_PATHS.LOGO;
 }
 
 // 正方形ロゴのパスを取得
 export function getSquareLogoPath(): string {
-  return getAssetWithFallback(
-    currentCommunityConfig.squareLogoPath,
-    "/communities/default/logo-square.jpg"
-  );
+  return currentCommunityConfig.squareLogoPath ?? DEFAULT_ASSET_PATHS.SQUARE_LOGO;
 }
 
 // コミュニティのメタデータを生成
@@ -199,18 +193,12 @@ function generateCommunityMetadata(communityId: string): CommunityMetadata {
     icons: {
       icon: [
         {
-          url: getAssetWithFallback(
-            `${baseConfig.faviconPrefix}/favicon.ico`,
-            "/communities/default/favicon.ico"
-          ),
+          url: baseConfig.faviconPrefix ? `${baseConfig.faviconPrefix}/favicon.ico` : DEFAULT_ASSET_PATHS.FAVICON,
         },
       ],
       apple: [
         {
-          url: getAssetWithFallback(
-            `${baseConfig.faviconPrefix}/apple-touch-icon.png`,
-            "/communities/default/apple-touch-icon.png"
-          ),
+          url: baseConfig.faviconPrefix ? `${baseConfig.faviconPrefix}/apple-touch-icon.png` : DEFAULT_ASSET_PATHS.APPLE_TOUCH_ICON,
         },
       ],
     },
@@ -234,10 +222,7 @@ function generateCommunityMetadata(communityId: string): CommunityMetadata {
       canonical: baseConfig.domain,
     },
     logo: {
-      url: getAssetWithFallback(
-        baseConfig.logoPath,
-        "/communities/default/logo.jpg"
-      ),
+      url: baseConfig.logoPath ?? DEFAULT_ASSET_PATHS.LOGO,
       alt: baseConfig.title,
     },
   };
