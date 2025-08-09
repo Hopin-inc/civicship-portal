@@ -1,5 +1,5 @@
 import { AuthStateManager } from "./auth-state-manager";
-import { GqlRole } from "@/types/graphql";
+import { GqlRole, GqlUser } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   encodeURIComponentWithType,
@@ -8,6 +8,14 @@ import {
   RawURIComponent,
 } from "@/utils/path";
 import { logger } from "@/lib/logging";
+
+/**
+ * Owner専用のパス一覧
+ */
+const OWNER_ONLY_PATHS = [
+  '/admin/wallet',
+  '/admin/members'
+];
 
 /**
  * 認証状態に基づくリダイレクト処理を一元管理するサービス
@@ -186,7 +194,8 @@ export class AuthRedirectService {
    * 管理者権限チェック用のユーザー情報を取得
    */
   public async checkAdminAccess(
-    currentUser: any,
+    currentUser: GqlUser | null | undefined,
+    pathname?: string,
   ): Promise<{ hasAccess: boolean; redirectPath: string | null }> {
     if (!currentUser) {
       return { hasAccess: false, redirectPath: "/login" };
@@ -203,6 +212,12 @@ export class AuthRedirectService {
       return { hasAccess: false, redirectPath: "/" };
     }
 
+    // Owner専用のパスチェック
+    if (pathname && OWNER_ONLY_PATHS.some(ownerPath => matchPaths(pathname, ownerPath))) {
+      if (targetMembership.role !== GqlRole.Owner) {
+        return { hasAccess: false, redirectPath: "/" };
+      }
+    }
     const isCommunityManager =
       targetMembership &&
       (targetMembership.role === GqlRole.Owner || targetMembership.role === GqlRole.Manager);

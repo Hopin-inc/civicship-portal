@@ -8,10 +8,11 @@ import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { toast } from "sonner";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { GqlRole } from "@/types/graphql";
+import { GqlRole, GqlCurrentUserQuery } from "@/types/graphql";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { AdminRoleContext } from "@/app/admin/context/AdminRoleContext";
+import { GqlMembership } from "@/types/graphql";
 
 /**
  * 管理者ガードコンポーネントのプロパティ
@@ -28,7 +29,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
+  const { data: userData, loading: userLoading } = useQuery<GqlCurrentUserQuery>(GET_CURRENT_USER, {
     skip: !isAuthenticated,
   });
 
@@ -55,7 +56,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     }
 
     const checkAdminAccess = async () => {
-      const { hasAccess, redirectPath } = await authRedirectService.checkAdminAccess(currentUser);
+      const { hasAccess, redirectPath } = await authRedirectService.checkAdminAccess(currentUser, window.location.pathname);
 
       if (!hasAccess && redirectPath) {
         if (redirectPath === "/") {
@@ -86,8 +87,8 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     return null;
   }
 
-  const targetMembership = currentUser.memberships.find(
-    (m: any) => m.community?.id === COMMUNITY_ID,
+  const targetMembership = currentUser.memberships?.find(
+    (m: GqlMembership) => m.community?.id === COMMUNITY_ID,
   );
   if (!targetMembership) {
     logger.debug("No membership found for community", { component: "AdminGuard" });
