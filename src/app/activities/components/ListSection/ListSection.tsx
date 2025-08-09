@@ -46,23 +46,27 @@ const ActivitiesListSection: React.FC<ActivitiesAllSectionProps> = ({
   if (isInitialLoading) return <OpportunitiesListSectionSkeleton />;
   if (opportunities.length === 0) return null;
 
+  const formatOpportunities = opportunities.map((opportunity) => {
+    return {
+      ...opportunity,
+      href: getLink(opportunity.id, opportunity.communityId, opportunity.category),
+      price: opportunity.category === GqlOpportunityCategory.Activity ? "feeRequired" in opportunity ? `${opportunity.feeRequired?.toLocaleString()}円/人~` : undefined : "参加無料",
+      priceIcon: opportunity.category === GqlOpportunityCategory.Activity ? <JapaneseYenIcon className="w-4 h-4" /> : undefined,
+      locationIcon: <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />,
+      badge: selectBadge(opportunity.hasReservableTicket, opportunity.pointsRequired) ?? undefined,
+      image: opportunity.images?.[0],
+      pointsToEarn: "pointsToEarn" in opportunity ? opportunity.pointsToEarn?.toLocaleString() ?? undefined : undefined,
+    }
+  })
+
   return (
     <section className="mt-6 px-6">
       {isTitle && <h2 className="text-display-md">すべての体験</h2>}
       <CardGrid>
-        {opportunities.map((opportunity) => (
+        {formatOpportunities.map((formattedOpportunity) => (
           <OpportunityCard 
-            key={opportunity.id}
-            title={opportunity.title}
-            image={opportunity.images?.[0]}
-            imageAlt={opportunity.title}
-            badge={selectBadge(opportunity.hasReservableTicket, opportunity.pointsRequired) ?? undefined}
-            price={opportunity.category === GqlOpportunityCategory.Activity ? "feeRequired" in opportunity ? `${opportunity.feeRequired?.toLocaleString()}円/人~` : undefined : "参加無料"}
-            location={opportunity.location}
-            pointsToEarn={"pointsToEarn" in opportunity ? opportunity.pointsToEarn?.toLocaleString() ?? undefined : undefined}
-            href={getLink(opportunity.id, opportunity.communityId, opportunity.category)}
-            priceIcon={opportunity.category === GqlOpportunityCategory.Activity ? <JapaneseYenIcon className="w-4 h-4" /> : undefined}
-            locationIcon={<MapPin className="mr-1 h-4 w-4 flex-shrink-0" />}
+            key={formattedOpportunity.id}
+            {...formattedOpportunity}
           />
         ))}
       </CardGrid>
