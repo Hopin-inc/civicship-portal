@@ -1,3 +1,5 @@
+"use client";
+
 interface CardGridProps {
   children: React.ReactNode;
 }
