@@ -1,6 +1,6 @@
 "use client";
 import { IPlaceDetail } from "@/app/places/data/type";
-import AddressMap from "@/components/shared/AddressMap";
+import AddressMap from "@/components/shared/DynamicAddressMap";
 
 const PlaceAddress = ({ detail }: { detail: IPlaceDetail }) => {
   return (

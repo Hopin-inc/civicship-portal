@@ -1,5 +1,5 @@
 import { OpportunityPlace } from "@/app/activities/data/type";
-import AddressMap from "@/components/shared/AddressMap";
+import AddressMap from "@/components/shared/DynamicAddressMap";
 
 export const PlaceSection = ({ place }: { place: OpportunityPlace }) => {
     return (

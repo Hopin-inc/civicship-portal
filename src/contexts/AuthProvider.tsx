@@ -2,6 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
 import { User } from "firebase/auth";
+import dynamic from "next/dynamic";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { TokenManager } from "@/lib/auth/token-manager";

@@ -41,6 +41,11 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="ja">
+      <head>
+        <link rel="preconnect" href="https://storage.googleapis.com" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+      </head>
       <body className={font.className}>
         {/* ✅ Google Ads (gtag.js) */}
         <Script
