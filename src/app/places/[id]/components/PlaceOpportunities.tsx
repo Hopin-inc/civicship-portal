@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/components/domains/opportunity/types";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
 
 interface PlaceOpportunitiesProps {

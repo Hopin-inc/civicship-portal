@@ -1,8 +1,8 @@
-import { ActivityCard, QuestCard } from "@/app/activities/data/type";
-import FeaturedSectionSkeleton from "@/app/activities/components/FeaturedSection/FeaturedSectionSkeleton";
-import ActivitiesFeaturedSliderWrapper from "./FeaturedSlideWrapper";
-import OpportunityImageSSR from "../activities/components/FeaturedSection/ImageSSR";
-import HeroHeader from "../activities/components/FeaturedSection/HeroHeader";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunity/types";
+import FeaturedSectionSkeleton from "@/components/domains/opportunity/components/FeaturedSection/FeaturedSectionSkeleton";
+import ActivitiesFeaturedSliderWrapper from "@/components/domains/opportunity/components/FeaturedSection/FeaturedSlideWrapper";
+import OpportunityImageSSR from "@/components/domains/opportunity/components/FeaturedSection/ImageSSR";
+import HeroHeader from "@/components/domains/opportunity/components/FeaturedSection/HeroHeader";
 
 interface Props {
   opportunities: (ActivityCard | QuestCard)[];
@@ -20,7 +20,7 @@ export default function FeaturedSection({
   const firstTitle = opportunities[0]?.title ?? "";
 
   return (
-    <section className="relative h-[70vh] w-full overflow-hidden mb-12 mt-0">
+    <section className="relative h-[70vh] w-full overflow-hidden">
       <HeroHeader />
       <OpportunityImageSSR image={firstImage} title={firstTitle} />
       <ActivitiesFeaturedSliderWrapper opportunities={opportunities} />

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ChevronRight, MapPin, Ticket } from "lucide-react";
-import { ActivityDetail } from "@/app/activities/data/type";
+import { ActivityDetail } from "@/components/domains/opportunity/types";
 import ImagesCarousel from "@/components/ui/images-carousel";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/components/domains/opportunity/types";
 import { GqlOpportunityCategory } from "@/types/graphql";
 
 const MockImage = ({ src, alt, width, height, ...props }: any) => (

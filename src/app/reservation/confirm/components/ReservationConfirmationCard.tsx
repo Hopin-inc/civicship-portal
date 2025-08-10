@@ -1,6 +1,6 @@
 "use client";
 
-import { ActivityCard, QuestCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunity/types";
 import Link from "next/link";
 import Image from "next/image";
 import React, { useCallback, useState } from "react";
@@ -8,7 +8,7 @@ import { PLACEHOLDER_IMAGE } from "@/utils";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { displayDuration } from "@/utils/date";
 import { Button } from "@/components/ui/button";
-import SelectionSheet from "../reservation/select-date/components/SelectionSheet";
+import SelectionSheet from "../../select-date/components/SelectionSheet";
 
 type Props = {
   opportunity: ActivityCard | QuestCard;
@@ -20,7 +20,7 @@ type Props = {
   onChange: (newValue: number) => void;
 };
 
-export const CardHorizontal = ({ opportunity, withShadow = true, category, startDateTime, endDateTime, participantCount, onChange }: Props) => {
+export const ReservationConfirmationCard = ({ opportunity, withShadow = true, category, startDateTime, endDateTime, participantCount, onChange }: Props) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const handleOpen = useCallback(() => setIsSheetOpen(true), []);
   const handleClose = useCallback(() => setIsSheetOpen(false), []);

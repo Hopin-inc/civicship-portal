@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
-import { ActivityDetail } from "@/app/activities/data/type";
+import { ActivityDetail } from "@/components/domains/opportunity/types";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 const MockImage = ({ src, alt, ...props }: any) => (

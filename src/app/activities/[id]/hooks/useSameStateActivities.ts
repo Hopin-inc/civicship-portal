@@ -3,8 +3,8 @@
 import { useMemo } from "react";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlOpportunity, useGetOpportunitiesQuery } from "@/types/graphql";
-import { presenterActivityCard } from "@/app/activities/data/presenter";
-import { ActivityCard, QuestCard } from "@/app/activities/data/type";
+import { presenterActivityCard } from "@/components/domains/opportunity/data/presenter";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunity/types";
 
 export const useSameStateActivities = (opportunityId: string, stateCode: string) => {
   const { data, loading, error, refetch } = useGetOpportunitiesQuery({

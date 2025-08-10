@@ -4,11 +4,11 @@ import {
   GqlSortDirection,
   useGetOpportunitiesQuery,
 } from "@/types/graphql";
-import { mapOpportunityCards, sliceActivitiesBySection } from "../activities/data/presenter";
+import { mapOpportunityCards, sliceOpportunitiesBySection } from "@/components/domains/opportunity/data/presenter";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
-export function useFetchFeaturedAndCarousel() {
+export function useOpportunitiesSections() {
   const shouldShowQuests = useFeatureCheck("quests");
 
   const { data, loading } = useGetOpportunitiesQuery({
@@ -38,7 +38,7 @@ export function useFetchFeaturedAndCarousel() {
     },
     fetchPolicy: "cache-first",
   });
-  const activityCards = mapOpportunityCards(data?.opportunities.edges ?? []);
-  const { featuredCards, upcomingCards } = sliceActivitiesBySection(activityCards);
+  const opportunityCards = mapOpportunityCards(data?.opportunities.edges ?? []);
+  const { featuredCards, upcomingCards } = sliceOpportunitiesBySection(opportunityCards);
   return { featuredCards, upcomingCards, loading };
 }

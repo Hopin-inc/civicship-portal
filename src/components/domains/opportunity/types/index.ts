@@ -2,6 +2,7 @@ import { GqlOpportunityCategory, GqlOpportunitySlot } from "@/types/graphql";
 import { CommunityId } from "@/types";
 import { TArticleCard } from "@/app/articles/data/type";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ReactElement } from "react";
 
 // ---------------------------------------------
 // 📦 Opportunity カード型（サマリ表示用）
@@ -28,6 +29,19 @@ export type OpportunityBaseCard = CommunityId & {
   location: string;
 
   hasReservableTicket: boolean;
+};
+
+// ---------------------------------------------
+// 🎨 フォーマット済みOpportunityカード型（UI表示用）
+// ---------------------------------------------
+export type FormattedOpportunityCard = Omit<ActivityCard | QuestCard, 'pointsToEarn'> & {
+  href: string;
+  price?: string;
+  priceIcon?: ReactElement;
+  locationIcon: ReactElement;
+  badge?: string;
+  image?: string;
+  pointsToEarn?: string;
 };
 
 // ---------------------------------------------

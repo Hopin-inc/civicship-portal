@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { OpportunityHost } from "@/app/activities/data/type";
+import { OpportunityHost } from "@/components/domains/opportunity/types";
 import ArticleCard from "@/app/articles/components/Card";
 
 export const HostInfoSection = ({ host }: { host: OpportunityHost }) => {

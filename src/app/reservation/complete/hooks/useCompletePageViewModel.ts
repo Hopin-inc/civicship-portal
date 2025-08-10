@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import {
   presenterActivityCard,
   presenterReservationDateTimeInfo,
-} from "@/app/activities/data/presenter";
+} from "@/components/domains/opportunity/data/presenter";
 import { useCompletePageDataRaw } from "./useCompletePageDataRaw";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 

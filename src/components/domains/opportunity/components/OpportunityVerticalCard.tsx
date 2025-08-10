@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
-interface OpportunityCardProps {
+interface OpportunityVerticalCardProps {
   title: string;
   image?: string;
   imageAlt?: string;
@@ -19,7 +19,7 @@ interface OpportunityCardProps {
   onClick?: () => void;
 }
 
-export default function OpportunityCard({
+export default function OpportunityVerticalCard({
   title,
   image,
   imageAlt,
@@ -31,7 +31,7 @@ export default function OpportunityCard({
   pointsToEarn,
   href,
   onClick,
-}: OpportunityCardProps) {
+}: OpportunityVerticalCardProps) {
 
   const CardContent = (
     <div className="relative w-[164px] flex-shrink-0 mt-6">

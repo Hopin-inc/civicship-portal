@@ -6,7 +6,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { GqlParticipation, useGetReservationQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
-import { presenterActivityCard } from "@/app/activities/data/presenter";
+import { presenterActivityCard } from "@/components/domains/opportunity/data/presenter";
 import getReservationStatusMeta from "@/app/admin/reservations/hooks/useGetReservationStatusMeta";
 import NotFound from "@/app/not-found";
 import { useReservationApproval } from "@/app/admin/reservations/hooks/approval/useReservationApproval";

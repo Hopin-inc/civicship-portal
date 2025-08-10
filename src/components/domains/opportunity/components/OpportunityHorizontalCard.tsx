@@ -10,12 +10,17 @@ import { PLACEHOLDER_IMAGE } from "@/utils";
 type Props = {
   opportunity: ActivityCard | QuestCard;
   withShadow?: boolean;
+  href: string;
+  price?: string;
+  priceIcon?: React.ReactNode;
+  location?: string;
+  locationIcon?: React.ReactNode;
 };
 
-function OpportunityCardHorizontal({ opportunity, withShadow = true }: Props) {
+function OpportunityHorizontalCard({ opportunity, withShadow = true, href, price, priceIcon, location, locationIcon }: Props) {
   return (
     <Link
-      href={`/activities/${opportunity.id}?community_id=${opportunity.communityId}`}
+      href={href}
       className="block"
     >
       <div className="mx-auto max-w-md">
@@ -41,15 +46,18 @@ function OpportunityCardHorizontal({ opportunity, withShadow = true }: Props) {
           </div>
           <div className="flex-1 px-4 py-3">
             <h2 className="text-title-sm text-foreground line-clamp-1">{opportunity.title}</h2>
-            <p className="mt-1 text-body-sm text-muted-foreground">
-              {"feeRequired" in opportunity && opportunity.feeRequired
-                ? `1人あたり${opportunity.feeRequired.toLocaleString()}円から`
-                : "料金未定"}
+            {price && (
+            <p className="mt-1 text-body-sm text-muted-foreground flex items-center gap-1">
+              {priceIcon}
+              {price}
             </p>
-            <div className="mt-1 flex items-center text-muted-foreground text-body-sm">
-              <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
-              <span className="line-clamp-1 break-words">{opportunity.location}</span>
-            </div>
+            )}
+            {location && (
+              <div className="mt-1 flex items-center text-muted-foreground text-body-sm">
+                {locationIcon}
+                <span className="line-clamp-1 break-words">{location}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -57,4 +65,4 @@ function OpportunityCardHorizontal({ opportunity, withShadow = true }: Props) {
   );
 }
 
-export default OpportunityCardHorizontal;
+export default OpportunityHorizontalCard;

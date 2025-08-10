@@ -1,12 +1,13 @@
 "use client";
-
+//使用されていないので次のフェーズで削除予定
 import { useEffect, useMemo, useRef } from "react";
 import { useActivities } from "../hooks/useActivities";
-import ActivitiesListSection from "./ListSection/ListSection";
-import { mapOpportunityCards } from "../data/presenter";
+import OpportunitiesListSection from "@/components/domains/opportunity/components/ListSection/OpportunitiesGridListSection";
+import { mapOpportunityCards } from "@/components/domains/opportunity/data/presenter";
 import { ErrorState } from '@/components/shared'
 import EmptyState from "@/components/shared/EmptyState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { formatOpportunity } from "@/components/domains/opportunity/utils";
 
 export default function ActivitiesPageClient() {
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
@@ -17,16 +18,7 @@ export default function ActivitiesPageClient() {
   }, [refetch]);
 
   const listCards = mapOpportunityCards(opportunities.edges ?? []);
-  const isFirstLoaded = !loading && opportunities?.edges?.length > 0;
   const isEmpty = !loading && opportunities?.edges?.length === 0;
-
-  // if (!isFirstLoaded && loading) {
-  //   return (
-  //     <div className="min-h-screen pb-16">
-  //       <ListSectionSkeleton />
-  //     </div>
-  //   );
-  // }
 
   const headerConfig = useMemo(
     () => ({
@@ -45,12 +37,15 @@ export default function ActivitiesPageClient() {
     return <EmptyState title="募集" />;
   }
 
+  const formatOpportunities = listCards.map(formatOpportunity);
+  
   return (
     <div className="min-h-screen">
-      <ActivitiesListSection
-        opportunities={listCards}
+      <OpportunitiesListSection
+        opportunities={formatOpportunities}
         isInitialLoading={false}
         isSectionLoading={loading}
+        opportunityTitle="すべての体験"
       />
       <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
     </div>

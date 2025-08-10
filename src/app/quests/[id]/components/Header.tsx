@@ -2,7 +2,7 @@
 
 import React from "react";
 import { MapPin } from "lucide-react";
-import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
+import { ActivityDetail, QuestDetail } from "@/components/domains/opportunity/types";
 import ImagesCarousel from "@/components/ui/images-carousel";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 

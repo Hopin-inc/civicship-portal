@@ -1,16 +1,18 @@
 "use client";
 
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunity/types";
 import { useCallback, useEffect, useState } from "react";
-import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import useEmblaCarousel from "embla-carousel-react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import OpportunityImageSlider from "@/app/activities/components/FeaturedSection/ImageSlider";
+import OpportunityImageSlider from "@/components/domains/opportunity/components/FeaturedSection/ImageSlider";
+import OpportunityHorizontalCard from "../OpportunityHorizontalCard";
+import { JapaneseYenIcon, MapPin } from "lucide-react";
+import { GqlOpportunityCategory } from "@/types/graphql";
 
-export default function ActivitiesFeaturedSlider({
+export default function FeaturedSlider({
   opportunities,
 }: {
-  opportunities: ActivityCard[];
+  opportunities: (ActivityCard | QuestCard)[];
 }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
@@ -55,7 +57,14 @@ export default function ActivitiesFeaturedSlider({
           {opportunities.map((op) => (
             <div key={op.id} className="embla__slide relative h-full w-full flex-[0_0_100%]">
               <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/60 via-black/40 to-transparent px-6 pb-8 pt-16">
-                <OpportunityCardHorizontal opportunity={op} />
+                <OpportunityHorizontalCard
+                  opportunity={op as ActivityCard}
+                  href={`/activities/${op.id}?community_id=${op.communityId}`}
+                  price={op.category === GqlOpportunityCategory.Activity ? "feeRequired" in op ? op.feeRequired?.toLocaleString() : "参加無料" : "参加無料"}
+                  priceIcon={<JapaneseYenIcon className="w-4 h-4" />}
+                  location={op.location}
+                  locationIcon={<MapPin className="mr-1 h-4 w-4 flex-shrink-0" />}
+                />
               </div>
             </div>
           ))}

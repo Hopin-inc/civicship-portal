@@ -8,7 +8,7 @@ import {
   GqlUser,
   Maybe,
 } from "@/types/graphql";
-import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard, QuestDetail } from "@/app/activities/data/type";
+import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard, QuestDetail } from "@/components/domains/opportunity/types";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
@@ -266,7 +266,7 @@ export const presenterReservationDateTimeInfo = (
   };
 };
 
-export const sliceActivitiesBySection = (
+export const sliceOpportunitiesBySection = (
   cards: (ActivityCard | QuestCard)[],
 ): {
   upcomingCards: (ActivityCard | QuestCard)[];

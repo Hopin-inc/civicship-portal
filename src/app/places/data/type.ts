@@ -1,5 +1,5 @@
 import { AppImage, Participant } from "@/types/utils";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/components/domains/opportunity/types";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 
 export type IPlacePin = {
