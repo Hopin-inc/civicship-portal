@@ -11,7 +11,7 @@ import { Coins } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
-import { formattedOpportunities } from "@/components/domains/opportunities/utils";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function OpportunitiesFeed() {
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
@@ -27,8 +27,8 @@ export default function OpportunitiesFeed() {
   const isEmpty = !loading && opportunities?.edges?.length === 0;
   const shouldShowQuests = useFeatureCheck("quests");
 
-  const firstFourFormatOpportunities = firstFour.map(formattedOpportunities);
-  const afterFourFormatOpportunities = afterFour.map(formattedOpportunities);
+  const firstFourFormatOpportunities = firstFour.map(formatOpportunities);
+  const afterFourFormatOpportunities = afterFour.map(formatOpportunities);
 
   const headerConfig = useMemo(
     () => ({

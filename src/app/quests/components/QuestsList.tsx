@@ -7,7 +7,7 @@ import useSearchResults from "@/app/search/result/hooks/useSearchResults";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
-import { formattedOpportunities } from "@/components/domains/opportunities/utils";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function QuestsList() {
     const searchParams = useSearchParams();
@@ -43,7 +43,7 @@ export default function QuestsList() {
     return <EmptySearchResults searchQuery={queryParams.q} />;
   }
 
-  const formatOpportunities = recommendedOpportunities.map(formattedOpportunities);
+  const formatOpportunities = recommendedOpportunities.map(formatOpportunities);
 
   return (
     <>

@@ -1,2 +1,2 @@
 export * from "./opportunityDisplay";
-export * from "./formattedOpportunities";
+export * from "./formatOpportunities";

@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
 import EmptySearchResults from "@/app/search/result/components/EmptySearchResults";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { formattedOpportunities } from "@/components/domains/opportunities/utils";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function ActivitiesList() {
     const searchParams = useSearchParams();
@@ -47,7 +47,7 @@ export default function ActivitiesList() {
       return <EmptySearchResults searchQuery={queryParams.q} />;
     }
 
-    const formatOpportunities = recommendedOpportunities.map(formattedOpportunities);
+    const formatOpportunities = recommendedOpportunities.map(formatOpportunities);
   
   return (
     <>

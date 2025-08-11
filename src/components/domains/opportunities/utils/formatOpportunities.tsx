@@ -3,7 +3,7 @@ import { JapaneseYenIcon, MapPin } from "lucide-react";
 import { getLink, selectBadge } from ".";
 import { ActivityCard, QuestCard, FormattedOpportunityCard } from "../types";
 
-export const formattedOpportunities = (opportunity: ActivityCard | QuestCard): FormattedOpportunityCard => {
+export const formatOpportunities = (opportunity: ActivityCard | QuestCard): FormattedOpportunityCard => {
     return {
       ...opportunity,
       href: getLink(opportunity.id, opportunity.communityId, opportunity.category),
