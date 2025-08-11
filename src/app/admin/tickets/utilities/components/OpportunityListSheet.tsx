@@ -10,9 +10,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
-import { presenterActivityCard } from "@/components/domains/opportunity/data/presenter";
+import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import { GqlOpportunity } from "@/types/graphql";
-import { ActivityCard } from "@/components/domains/opportunity/types";
+import { ActivityCard } from "@/components/domains/opportunities/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface OpportunityListSheetProps {

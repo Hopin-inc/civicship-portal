@@ -1,6 +1,6 @@
 "use client";
 
-import { ActivityCard, QuestCard } from "@/components/domains/opportunity/types";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin } from "lucide-react";

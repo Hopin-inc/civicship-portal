@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { FormattedOpportunityCard } from "@/components/domains/opportunity/types";
-import OpportunitiesListSectionSkeleton from "@/components/domains/opportunity/components/ListSection/OpportunityListSectionSkeleton";
-import OpportunityVerticalCard from "@/components/domains/opportunity/components/OpportunityVerticalCard";
+import { FormattedOpportunityCard } from "@/components/domains/opportunities/types";
+import OpportunitiesListSectionSkeleton from "@/components/domains/opportunities/components/ListSection/OpportunityListSectionSkeleton";
+import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
 import { CardGrid } from "@/components/shared/CardGrid";
 
 interface OpportunitiesGridListSectionProps {

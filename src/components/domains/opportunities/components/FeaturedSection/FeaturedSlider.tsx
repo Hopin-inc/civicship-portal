@@ -1,10 +1,10 @@
 "use client";
 
-import { ActivityCard, QuestCard } from "@/components/domains/opportunity/types";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import OpportunityImageSlider from "@/components/domains/opportunity/components/FeaturedSection/ImageSlider";
+import OpportunityImageSlider from "@/components/domains/opportunities/components/FeaturedSection/ImageSlider";
 import OpportunityHorizontalCard from "../OpportunityHorizontalCard";
 import { JapaneseYenIcon, MapPin } from "lucide-react";
 import { GqlOpportunityCategory } from "@/types/graphql";
@@ -58,7 +58,7 @@ export default function FeaturedSlider({
             <div key={op.id} className="embla__slide relative h-full w-full flex-[0_0_100%]">
               <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/60 via-black/40 to-transparent px-6 pb-8 pt-16">
                 <OpportunityHorizontalCard
-                  opportunity={op as ActivityCard}
+                  opportunity={op}
                   href={`/activities/${op.id}?community_id=${op.communityId}`}
                   price={op.category === GqlOpportunityCategory.Activity ? "feeRequired" in op ? op.feeRequired?.toLocaleString() : "参加無料" : "参加無料"}
                   priceIcon={<JapaneseYenIcon className="w-4 h-4" />}

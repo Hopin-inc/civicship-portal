@@ -7,7 +7,7 @@ import { mapOpportunityCards } from "@/components/domains/opportunity/data/prese
 import { ErrorState } from '@/components/shared'
 import EmptyState from "@/components/shared/EmptyState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { formatOpportunity } from "@/components/domains/opportunity/utils";
+import { formattedOpportunities } from "@/components/domains/opportunity/utils";
 
 export default function ActivitiesPageClient() {
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
@@ -37,7 +37,7 @@ export default function ActivitiesPageClient() {
     return <EmptyState title="募集" />;
   }
 
-  const formatOpportunities = listCards.map(formatOpportunity);
+  const formatOpportunities = listCards.map(formattedOpportunities);
   
   return (
     <div className="min-h-screen">

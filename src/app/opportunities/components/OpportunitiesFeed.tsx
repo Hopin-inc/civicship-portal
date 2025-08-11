@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useActivities } from "@/app/activities/hooks/useActivities";
-import OpportunitiesGridListSection from "@/components/domains/opportunity/components/ListSection/OpportunitiesGridListSection";
-import { mapOpportunityCards } from "@/components/domains/opportunity/data/presenter";
+import OpportunitiesGridListSection from "@/components/domains/opportunities/components/ListSection/OpportunitiesGridListSection";
+import { mapOpportunityCards } from "@/components/domains/opportunities/data/presenter";
 import { ErrorState } from "@/components/shared";
 import EmptyState from "@/components/shared/EmptyState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -11,7 +11,7 @@ import { Coins } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
-import { formatOpportunity } from "@/components/domains/opportunity/utils";
+import { formattedOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function OpportunitiesFeed() {
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
@@ -27,8 +27,8 @@ export default function OpportunitiesFeed() {
   const isEmpty = !loading && opportunities?.edges?.length === 0;
   const shouldShowQuests = useFeatureCheck("quests");
 
-  const firstFourFormatOpportunities = firstFour.map(formatOpportunity);
-  const afterFourFormatOpportunities = afterFour.map(formatOpportunity);
+  const firstFourFormatOpportunities = firstFour.map(formattedOpportunities);
+  const afterFourFormatOpportunities = afterFour.map(formattedOpportunities);
 
   const headerConfig = useMemo(
     () => ({

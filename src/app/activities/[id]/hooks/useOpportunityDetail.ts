@@ -8,8 +8,8 @@ import {
   GqlSortDirection,
   useGetOpportunityQuery,
 } from "@/types/graphql";
-import { presenterActivityDetail, presenterQuestDetail } from "@/components/domains/opportunity/data/presenter";
-import { ActivityDetail, QuestDetail } from "@/components/domains/opportunity/types";
+import { presenterActivityDetail, presenterQuestDetail } from "@/components/domains/opportunities/data/presenter";
+import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 
 export const useOpportunityDetail = (id: string) => {
   const { data, loading, error, refetch } = useGetOpportunityQuery({

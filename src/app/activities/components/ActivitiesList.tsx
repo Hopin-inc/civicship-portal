@@ -4,10 +4,10 @@ import useSearchResultHeader from "@/app/search/result/components/SearchResultHe
 import useSearchResults from "@/app/search/result/hooks/useSearchResults";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
-import { OpportunityCarouselListSection } from "@/components/domains/opportunity/components/ListSection/OpportunityCarouselListSection";
+import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
 import EmptySearchResults from "@/app/search/result/components/EmptySearchResults";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { formatOpportunity } from "@/components/domains/opportunity/utils";
+import { formattedOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function ActivitiesList() {
     const searchParams = useSearchParams();
@@ -47,7 +47,7 @@ export default function ActivitiesList() {
       return <EmptySearchResults searchQuery={queryParams.q} />;
     }
 
-    const formatOpportunities = recommendedOpportunities.map(formatOpportunity);
+    const formatOpportunities = recommendedOpportunities.map(formattedOpportunities);
   
   return (
     <>

@@ -1,8 +1,8 @@
-import { ActivityCard, QuestCard } from "@/components/domains/opportunity/types";
-import FeaturedSectionSkeleton from "@/components/domains/opportunity/components/FeaturedSection/FeaturedSectionSkeleton";
-import ActivitiesFeaturedSliderWrapper from "@/components/domains/opportunity/components/FeaturedSection/FeaturedSlideWrapper";
-import OpportunityImageSSR from "@/components/domains/opportunity/components/FeaturedSection/ImageSSR";
-import HeroHeader from "@/components/domains/opportunity/components/FeaturedSection/HeroHeader";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
+import FeaturedSectionSkeleton from "@/components/domains/opportunities/components/FeaturedSection/FeaturedSectionSkeleton";
+import ActivitiesFeaturedSliderWrapper from "@/components/domains/opportunities/components/FeaturedSection/FeaturedSlideWrapper";
+import OpportunityImageSSR from "@/components/domains/opportunities/components/FeaturedSection/ImageSSR";
+import HeroHeader from "@/components/domains/opportunities/components/FeaturedSection/HeroHeader";
 
 interface Props {
   opportunities: (ActivityCard | QuestCard)[];

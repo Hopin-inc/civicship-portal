@@ -4,11 +4,11 @@ import {
   GqlSortDirection,
   useGetOpportunitiesQuery,
 } from "@/types/graphql";
-import { mapOpportunityCards, sliceOpportunitiesBySection } from "@/components/domains/opportunity/data/presenter";
+import { mapOpportunityCards, sliceOpportunitiesBySection } from "@/components/domains/opportunities/data/presenter";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
-export function useOpportunitiesSections() {
+export function useFetchFeedOpportunities() {
   const shouldShowQuests = useFeatureCheck("quests");
 
   const { data, loading } = useGetOpportunitiesQuery({

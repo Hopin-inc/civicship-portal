@@ -3,10 +3,10 @@
 import React from "react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { ActivityCard, QuestCard } from "@/components/domains/opportunity/types";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 import { GqlOpportunityCategory } from "@/types/graphql";
-import { formatOpportunity } from "@/components/domains/opportunity/utils";
-import OpportunitiesGridListSection from "@/components/domains/opportunity/components/ListSection/OpportunitiesGridListSection";
+import { formattedOpportunities } from "@/components/domains/opportunities/utils";
+import OpportunitiesGridListSection from "@/components/domains/opportunities/components/ListSection/OpportunitiesGridListSection";
 
 interface DateGroupedOpportunitiesProps {
   groupedOpportunities: Record<string, (ActivityCard | QuestCard)[]>;
@@ -27,7 +27,7 @@ const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({
         if (opportunities.length === 0) return null;
         const first = opportunities[0];
         if (first.category === GqlOpportunityCategory.Activity) {
-          const formatOpportunities = opportunities.map(formatOpportunity);
+          const formatOpportunities = opportunities.map(formattedOpportunities);
           return (
             <OpportunitiesGridListSection
               key={dateKey}
@@ -39,7 +39,7 @@ const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({
           );
         }
         if (first.category === GqlOpportunityCategory.Quest) {
-          const formatOpportunities = opportunities.map(formatOpportunity);
+          const formatOpportunities = opportunities.map(formattedOpportunities);
           return (
             <OpportunitiesGridListSection
               key={dateKey}

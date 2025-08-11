@@ -8,7 +8,7 @@ import {
   GqlUser,
   Maybe,
 } from "@/types/graphql";
-import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard, QuestDetail } from "@/components/domains/opportunity/types";
+import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard, QuestDetail } from "@/components/domains/opportunities/types";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";

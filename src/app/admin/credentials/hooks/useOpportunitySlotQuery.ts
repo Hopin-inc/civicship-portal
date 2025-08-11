@@ -5,8 +5,8 @@ import {
   GqlSortDirection,
   useGetOpportunitySlotsQuery,
 } from "@/types/graphql";
-import { ActivityDetail } from "@/components/domains/opportunity/types";
-import { presenterActivityDetail } from "@/components/domains/opportunity/data/presenter";
+import { ActivityDetail } from "@/components/domains/opportunities/types";
+import { presenterActivityDetail } from "@/components/domains/opportunities/data/presenter";
 import { ActivitySlotGroupWithOpportunityId } from "../types/opportunitySlot";
 import { groupActivitySlotsByDate, presenterOpportunitySlots } from "../data/presenter/opportunitySlot";
 

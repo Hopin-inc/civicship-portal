@@ -3,9 +3,9 @@
 import { useEffect, useMemo } from "react";
 import { GqlGetOpportunityQuery, GqlOpportunityCategory, useGetOpportunityQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { presenterActivityDetail, presenterQuestDetail } from "@/components/domains/opportunity/data/presenter";
+import { presenterActivityDetail, presenterQuestDetail } from "@/components/domains/opportunities/data/presenter";
 import { useSlotAndTicketInfo } from "@/app/reservation/confirm/hooks/useSlotAndTicket";
-import type { ActivityDetail, QuestDetail } from "@/components/domains/opportunity/types";
+import type { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { logger } from "@/lib/logging";
 
 export const useReservationConfirm = ({

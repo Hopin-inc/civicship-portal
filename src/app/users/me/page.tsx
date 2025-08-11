@@ -12,8 +12,8 @@ import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useUserNfts } from "@/components/domains/nfts/hooks/useUserNft";
 import { NftCard } from "@/components/domains/nfts/components";
 import { CardCarousel } from "@/components/shared/CardCarousel";
-import OpportunityVerticalCard from "@/components/domains/opportunity/components/OpportunityVerticalCard";
-import { formatOpportunity } from "@/components/domains/opportunity/utils";
+import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
+import { formattedOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
@@ -54,7 +54,7 @@ export default function MyProfilePage() {
     currentCommunityConfig.enableFeatures.includes(feature),
   );
 
-  const formatOpportunities = selfOpportunities.map(formatOpportunity);
+  const formatOpportunities = selfOpportunities.map(formattedOpportunities);
 
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">

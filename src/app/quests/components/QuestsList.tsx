@@ -1,5 +1,5 @@
 "use client";
-import { OpportunityCarouselListSection } from "@/components/domains/opportunity/components/ListSection/OpportunityCarouselListSection";
+import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
 import DateGroupedOpportunities from "@/app/search/result/components/DateGroupedOpportunities";
 import EmptySearchResults from "@/app/search/result/components/EmptySearchResults";
 import useSearchResultHeader from "@/app/search/result/components/SearchResultHeader";
@@ -7,10 +7,7 @@ import useSearchResults from "@/app/search/result/hooks/useSearchResults";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
-import { formatOpportunity, getLink, selectBadge } from "@/components/domains/opportunity/utils";
-import { GqlOpportunityCategory } from "@/types/graphql";
-import { JapaneseYenIcon, MapPin } from "lucide-react";
-import { FormattedOpportunityCard } from "@/components/domains/opportunity/types";
+import { formattedOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function QuestsList() {
     const searchParams = useSearchParams();
@@ -46,7 +43,7 @@ export default function QuestsList() {
     return <EmptySearchResults searchQuery={queryParams.q} />;
   }
 
-  const formatOpportunities = recommendedOpportunities.map(formatOpportunity);
+  const formatOpportunities = recommendedOpportunities.map(formattedOpportunities);
 
   return (
     <>

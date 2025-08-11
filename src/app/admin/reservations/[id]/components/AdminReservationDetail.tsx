@@ -8,7 +8,7 @@ import { displayDuration } from "@/utils/date";
 import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { cn } from "@/lib/utils";
 import { GqlReservation, Maybe } from "@/types/graphql";
-import { ActivityCard } from "@/components/domains/opportunity/types";
+import { ActivityCard } from "@/components/domains/opportunities/types";
 
 interface ReservationDetailsProps {
   reservation: GqlReservation;

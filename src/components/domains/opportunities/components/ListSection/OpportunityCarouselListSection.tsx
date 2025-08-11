@@ -2,8 +2,8 @@
 
 import React from "react";
 import CarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
-import { FormattedOpportunityCard } from "@/components/domains/opportunity/types";
-import OpportunityVerticalCard from "@/components/domains/opportunity/components/OpportunityVerticalCard";
+import { FormattedOpportunityCard } from "@/components/domains/opportunities/types";
+import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
 import { CardCarousel } from "@/components/shared/CardCarousel";
 
 interface OpportunityCarouselListSectionProps {
