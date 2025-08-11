@@ -43,7 +43,7 @@ export default function QuestsList() {
     return <EmptySearchResults searchQuery={queryParams.q} />;
   }
 
-  const formatOpportunities = recommendedOpportunities.map(formatOpportunities);
+  const formattedOpportunities = recommendedOpportunities.map(formatOpportunities);
 
   return (
     <>
@@ -52,7 +52,7 @@ export default function QuestsList() {
         <div className="pt-4">
         <OpportunityCarouselListSection
           title="おすすめのお手伝い"
-          opportunities={formatOpportunities}
+          opportunities={formattedOpportunities}
         />
         </div>
         <DateGroupedOpportunities groupedOpportunities={groupedOpportunities} />

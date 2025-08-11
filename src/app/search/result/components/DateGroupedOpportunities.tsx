@@ -27,24 +27,24 @@ const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({
         if (opportunities.length === 0) return null;
         const first = opportunities[0];
         if (first.category === GqlOpportunityCategory.Activity) {
-          const formatOpportunities = opportunities.map(formatOpportunities);
+          const formattedOpportunities = opportunities.map(formatOpportunities);
           return (
             <OpportunitiesGridListSection
               key={dateKey}
               opportunityTitle={format(new Date(dateKey), "M/d(E)", { locale: ja })}
-              opportunities={formatOpportunities}
+              opportunities={formattedOpportunities}
               isInitialLoading={false}
               isSectionLoading={false}
             />
           );
         }
         if (first.category === GqlOpportunityCategory.Quest) {
-          const formatOpportunities = opportunities.map(formatOpportunities);
+          const formattedOpportunities = opportunities.map(formatOpportunities);
           return (
             <OpportunitiesGridListSection
               key={dateKey}
               opportunityTitle={format(new Date(dateKey), "M/d(E)", { locale: ja })}
-              opportunities={formatOpportunities}
+              opportunities={formattedOpportunities}
               isInitialLoading={false}
               isSectionLoading={false}
             />
