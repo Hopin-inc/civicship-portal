@@ -19,6 +19,7 @@ import { presenterQuestCards } from "@/app/activities/data/presenter";
 import { IPrefectureCodeMap } from "@/app/search/data/type";
 import { logger } from "@/lib/logging";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 type CardType = ActivityCard | QuestCard;
 const DEFAULT_PAGE_SIZE = 15;
@@ -178,6 +179,7 @@ export const useSearchResults = (
 function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
   const filter: OpportunityFilterInput = {
     publishStatus: [PublishStatus.Public],
+    communityIds: [COMMUNITY_ID],
   };
 
   if (searchParams.type === "activity") {
