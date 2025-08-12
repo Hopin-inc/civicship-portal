@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { DEFAULT_ASSET_PATHS } from "./constants";
 
 export type FeaturesType =
   | "places"
@@ -174,12 +175,12 @@ export const DEFAULT_OPEN_GRAPH_IMAGE = [
 
 // ロゴのパスを取得
 export function getLogoPath(): string {
-  return currentCommunityConfig.logoPath;
+  return currentCommunityConfig.logoPath ?? DEFAULT_ASSET_PATHS.LOGO;
 }
 
 // 正方形ロゴのパスを取得
 export function getSquareLogoPath(): string {
-  return currentCommunityConfig.squareLogoPath;
+  return currentCommunityConfig.squareLogoPath ?? DEFAULT_ASSET_PATHS.SQUARE_LOGO;
 }
 
 // コミュニティのメタデータを生成
@@ -192,12 +193,12 @@ function generateCommunityMetadata(communityId: string): CommunityMetadata {
     icons: {
       icon: [
         {
-          url: `${baseConfig.faviconPrefix}/favicon.ico`,
+          url: baseConfig.faviconPrefix ? `${baseConfig.faviconPrefix}/favicon.ico` : DEFAULT_ASSET_PATHS.FAVICON,
         },
       ],
       apple: [
         {
-          url: `${baseConfig.faviconPrefix}/apple-touch-icon.png`,
+          url: baseConfig.faviconPrefix ? `${baseConfig.faviconPrefix}/apple-touch-icon.png` : DEFAULT_ASSET_PATHS.APPLE_TOUCH_ICON,
         },
       ],
     },
@@ -221,7 +222,7 @@ function generateCommunityMetadata(communityId: string): CommunityMetadata {
       canonical: baseConfig.domain,
     },
     logo: {
-      url: baseConfig.logoPath,
+      url: baseConfig.logoPath ?? DEFAULT_ASSET_PATHS.LOGO,
       alt: baseConfig.title,
     },
   };
