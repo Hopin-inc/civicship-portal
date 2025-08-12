@@ -59,7 +59,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
         <div className="flex items-center gap-3">
           <div className="w-24 h-24 rounded-full overflow-hidden bg-muted">
             {profileImage ? (
-              <Avatar className="w-96 h-96">
+              <Avatar className="w-24 h-24">
                 <AvatarImage src={profileImage || PLACEHOLDER_IMAGE} alt={displayName} />
                 <AvatarFallback>{displayName.charAt(0) || "U"}</AvatarFallback>
               </Avatar>
