@@ -1,11 +1,13 @@
 "use client";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import { useHeader } from "@/components/providers/HeaderProvider";
 import Header from "@/components/layout/Header";
 import BottomBar from "@/components/layout/BottomBar";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import AdminBottomBar from "@/components/layout/AdminBottomBar";
+
+const AdminBottomBar = dynamic(() => import("@/components/layout/AdminBottomBar"), { ssr: false });
 
 interface MainContentProps {
   children: React.ReactNode;

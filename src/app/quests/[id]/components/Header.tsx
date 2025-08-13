@@ -3,7 +3,7 @@
 import React from "react";
 import { MapPin } from "lucide-react";
 import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
-import ImagesCarousel from "@/components/ui/images-carousel";
+import ImagesCarousel from "@/components/ui/DynamicImagesCarousel";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface HeaderProps {

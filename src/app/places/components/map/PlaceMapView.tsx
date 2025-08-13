@@ -2,8 +2,8 @@
 
 import React, { useRef } from "react";
 import PlaceToggleButton from "../ToggleButton";
-import PlaceCardsSheet from "./PlaceCardsSheet";
-import MapComponent from "./MapComponent";
+import PlaceCardsSheet from "./DynamicPlaceCardsSheet";
+import MapComponent from "./DynamicMapComponent";
 import { AnimatePresence, motion } from "framer-motion";
 import { IPlaceCard, IPlacePin } from "@/app/places/data/type";
 

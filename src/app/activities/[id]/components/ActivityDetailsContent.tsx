@@ -16,7 +16,7 @@ import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import IconWrapper from "@/components/shared/IconWrapper";
-import AddressMap from "@/components/shared/AddressMap";
+import AddressMap from "@/components/shared/DynamicAddressMap";
 import { ActivityBodySection } from "@/app/activities/[id]/components/ActivityBodySection";
 import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
