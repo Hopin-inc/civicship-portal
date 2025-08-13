@@ -26,7 +26,7 @@ export const OpportunityCarouselListSection: React.FC<OpportunityCarouselListSec
   const [month, day, weekday] = match ? match.slice(1) : [];
 
   return (
-    <section className="ml-6 mr-2 mt-6">
+    <section className="ml-6 mt-6">
       {isSearchResult ? (
         <h2 className="flex items-baseline gap-1">
           <span className="text-md text-gray-500">{month}/</span>

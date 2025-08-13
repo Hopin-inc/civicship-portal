@@ -6,8 +6,6 @@ import useEmblaCarousel from "embla-carousel-react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import OpportunityImageSlider from "@/components/domains/opportunities/components/FeaturedSection/ImageSlider";
 import OpportunityHorizontalCard from "../OpportunityHorizontalCard";
-import { JapaneseYenIcon, MapPin } from "lucide-react";
-import { GqlOpportunityCategory } from "@/types/graphql";
 
 export default function FeaturedSlider({
   opportunities,
@@ -60,10 +58,8 @@ export default function FeaturedSlider({
                 <OpportunityHorizontalCard
                   opportunity={op}
                   href={`/activities/${op.id}?community_id=${op.communityId}`}
-                  price={op.category === GqlOpportunityCategory.Activity ? "feeRequired" in op ? op.feeRequired?.toLocaleString() : "参加無料" : "参加無料"}
-                  priceIcon={<JapaneseYenIcon className="w-4 h-4" />}
+                  price={"feeRequired" in op ? op.feeRequired?.toLocaleString() : undefined}
                   location={op.location}
-                  locationIcon={<MapPin className="mr-1 h-4 w-4 flex-shrink-0" />}
                 />
               </div>
             </div>

@@ -54,7 +54,7 @@ export default function MyProfilePage() {
     currentCommunityConfig.enableFeatures.includes(feature),
   );
 
-  const formatOpportunities = selfOpportunities.map(formatOpportunities);
+  const formattedOpportunities = selfOpportunities.map(formatOpportunities);
 
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">
@@ -85,13 +85,13 @@ export default function MyProfilePage() {
       <>
         {shouldShowOpportunities && (
           <>
-            {formatOpportunities.length > 0 && (
+            {formattedOpportunities.length > 0 && (
               <section className="py-6 mt-0">
                 <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
                   主催中の体験
                 </h2>
                 <CardCarousel>
-                  {formatOpportunities.map((opportunity) => (
+                  {formattedOpportunities.map((opportunity) => (
                     <OpportunityVerticalCard
                       key={opportunity.id}
                       {...opportunity}

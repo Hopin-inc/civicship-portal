@@ -1,9 +1,9 @@
 "use client";
 
-import { ActivityCard, QuestCard } from "@/components/domains/opportunity/types";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin } from "lucide-react";
+import { JapaneseYenIcon, MapPin } from "lucide-react";
 import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
@@ -12,12 +12,10 @@ type Props = {
   withShadow?: boolean;
   href: string;
   price?: string;
-  priceIcon?: React.ReactNode;
   location?: string;
-  locationIcon?: React.ReactNode;
 };
 
-function OpportunityHorizontalCard({ opportunity, withShadow = true, href, price, priceIcon, location, locationIcon }: Props) {
+function OpportunityHorizontalCard({ opportunity, withShadow = true, href, price, location }: Props) {
   return (
     <Link
       href={href}
@@ -46,15 +44,13 @@ function OpportunityHorizontalCard({ opportunity, withShadow = true, href, price
           </div>
           <div className="flex-1 px-4 py-3">
             <h2 className="text-title-sm text-foreground line-clamp-1">{opportunity.title}</h2>
-            {price && (
             <p className="mt-1 text-body-sm text-muted-foreground flex items-center gap-1">
-              {priceIcon}
-              {price}
+              <JapaneseYenIcon className="w-4 h-4" />
+              {!price ? "参加無料" : `${price}円/人~`}
             </p>
-            )}
             {location && (
               <div className="mt-1 flex items-center text-muted-foreground text-body-sm">
-                {locationIcon}
+                <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
                 <span className="line-clamp-1 break-words">{location}</span>
               </div>
             )}

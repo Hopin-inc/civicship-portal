@@ -37,8 +37,6 @@ export type OpportunityBaseCard = CommunityId & {
 export type FormattedOpportunityCard = Omit<ActivityCard | QuestCard, 'pointsToEarn'> & {
   href: string;
   price?: string;
-  priceIcon?: ReactElement;
-  locationIcon: ReactElement;
   badge?: string;
   image?: string;
   pointsToEarn?: string;

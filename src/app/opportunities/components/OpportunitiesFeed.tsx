@@ -48,7 +48,7 @@ export default function OpportunitiesFeed() {
   }
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen">
       <OpportunitiesGridListSection
         opportunities={firstFourFormatOpportunities}
         isInitialLoading={false}
