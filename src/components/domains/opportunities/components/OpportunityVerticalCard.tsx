@@ -11,9 +11,9 @@ interface OpportunityVerticalCardProps {
   image?: string;
   imageAlt?: string;
   badge?: string;
-  price?: string;
+  price?: number | null;
   location?: string;
-  pointsToEarn?: string;
+  pointsToEarn?: number | null;
   href?: string;
   onClick?: () => void;
 }
@@ -73,7 +73,7 @@ export default function OpportunityVerticalCard({
                 P
               </p>
               <p className="text-sm font-bold">
-                {pointsToEarn}ptもらえる
+                {pointsToEarn.toLocaleString()}ptもらえる
               </p>
             </div>
           )}

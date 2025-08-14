@@ -58,7 +58,7 @@ export default function FeaturedSlider({
                 <OpportunityHorizontalCard
                   opportunity={op}
                   href={`/activities/${op.id}?community_id=${op.communityId}`}
-                  price={"feeRequired" in op ? op.feeRequired?.toLocaleString() : undefined}
+                  price={"feeRequired" in op ? op.feeRequired : undefined}
                   location={op.location}
                 />
               </div>

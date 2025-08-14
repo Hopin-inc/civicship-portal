@@ -36,10 +36,10 @@ export type OpportunityBaseCard = CommunityId & {
 // ---------------------------------------------
 export type FormattedOpportunityCard = Omit<ActivityCard | QuestCard, 'pointsToEarn'> & {
   href: string;
-  price?: string;
+  price?: number | null;
   badge?: string;
   image?: string;
-  pointsToEarn?: string;
+  pointsToEarn?: number | null;
 };
 
 // ---------------------------------------------
