@@ -2,23 +2,22 @@
 
 import React from "react";
 import CarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
-import OpportunityCardVertical from "./CardVertical";
-import { ActivityCard, QuestCard } from "@/app/activities/data/type";
+import { FormattedOpportunityCard } from "@/components/domains/opportunities/types";
+import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
+import { CardCarousel } from "@/components/shared/CardCarousel";
 
-interface ActivitiesCarouselSectionProps {
+interface OpportunityCarouselListSectionProps {
   title: string;
-  opportunities: (ActivityCard | QuestCard)[];
+  opportunities: FormattedOpportunityCard[];
   isInitialLoading?: boolean;
   isSearchResult?: boolean;
-  isVertical?: boolean;
 }
 
-export const CarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
+export const OpportunityCarouselListSection: React.FC<OpportunityCarouselListSectionProps> = ({
   title,
   opportunities,
   isInitialLoading = false,
   isSearchResult = false,
-  isVertical = true,
 }) => {
   if (isInitialLoading) return <CarouselSectionSkeleton title={title} />;
   if (opportunities.length === 0) return null;
@@ -27,7 +26,7 @@ export const CarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
   const [month, day, weekday] = match ? match.slice(1) : [];
 
   return (
-    <section className="px-6">
+    <section className="ml-6 mt-6">
       {isSearchResult ? (
         <h2 className="flex items-baseline gap-1">
           <span className="text-md text-gray-500">{month}/</span>
@@ -37,15 +36,14 @@ export const CarouselSection: React.FC<ActivitiesCarouselSectionProps> = ({
       ) : (
         <h2 className="text-display-md">{title}</h2>
       )}
-      <div className={`mt-4 ${isVertical ? "grid grid-cols-2 gap-4" : "flex gap-4 overflow-x-auto pb-4 scrollbar-hide"}`}>
+      <CardCarousel>
         {opportunities.map((opportunity, index) => (
-          <OpportunityCardVertical
+          <OpportunityVerticalCard
             key={`${opportunity.id}_${index}`}
-            opportunity={opportunity}
-            isCarousel
+            {...opportunity}
           />
         ))}
-      </div>
+      </CardCarousel>
     </section>
   );
 };

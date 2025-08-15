@@ -7,7 +7,7 @@ import OpportunitiesFeed from "@/app/opportunities/components/OpportunitiesFeed"
 import { useFetchFeedOpportunities } from "@/app/opportunities/hooks/useFetchFeedOpportunities";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
-export default function HomePage() {
+export default function OpportunitiesPage() {
     const { isAuthenticating, loading: authLoading } = useAuth();
     const { featuredCards, upcomingCards, loading } = useFetchFeedOpportunities();
     if (isAuthenticating || authLoading) {

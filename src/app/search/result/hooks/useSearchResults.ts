@@ -13,9 +13,9 @@ import {
 } from "@/types/graphql";
 import { groupCardsByDate, SearchParams } from "@/app/search/data/presenter";
 import { toast } from "sonner";
-import { ActivityCard, QuestCard } from "@/app/activities/data/type";
-import { presenterActivityCards } from "@/app/activities/data/presenter";
-import { presenterQuestCards } from "@/app/activities/data/presenter";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
+import { presenterActivityCards } from "@/components/domains/opportunities/data/presenter";
+import { presenterQuestCards } from "@/components/domains/opportunities/data/presenter";
 import { IPrefectureCodeMap } from "@/app/search/data/type";
 import { logger } from "@/lib/logging";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";

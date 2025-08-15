@@ -1,4 +1,4 @@
-import { OpportunityPlace } from "@/app/activities/data/type";
+import { OpportunityPlace } from "@/components/domains/opportunity/types";
 import AddressMap from "@/components/shared/AddressMap";
 
 export const PlaceSection = ({ place }: { place: OpportunityPlace }) => {

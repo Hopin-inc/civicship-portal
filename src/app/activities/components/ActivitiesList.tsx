@@ -4,9 +4,10 @@ import useSearchResultHeader from "@/app/search/result/components/SearchResultHe
 import useSearchResults from "@/app/search/result/hooks/useSearchResults";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
-import { CarouselSection } from "@/app/components/CarouselSection";
+import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
 import EmptySearchResults from "@/app/search/result/components/EmptySearchResults";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function ActivitiesList() {
     const searchParams = useSearchParams();
@@ -45,16 +46,19 @@ export default function ActivitiesList() {
     if (!loading && isEmpty) {
       return <EmptySearchResults searchQuery={queryParams.q} />;
     }
+
+    const formatOpportunities = recommendedOpportunities.map(formatOpportunities);
   
   return (
     <>
     <div className="min-h-screen">
       <main>
-        <CarouselSection
-          title="おすすめの体験"
-          opportunities={recommendedOpportunities}
-          isVertical={false}
-        />
+        <div className="pt-4">
+          <OpportunityCarouselListSection
+            title="おすすめの体験"
+            opportunities={formatOpportunities}
+          />
+        </div>
         <DateGroupedOpportunities groupedOpportunities={groupedOpportunities} />
         {/* 無限スクロール用のローディング要素 - 常に表示 */}
         <div ref={loadMoreRef} className="flex justify-center py-8">

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/components/domains/opportunity/types";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 

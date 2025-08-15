@@ -10,7 +10,7 @@ import {
   ActivityDetail,
   OpportunityHost,
   OpportunityPlace,
-} from "@/app/activities/data/type";
+} from "@/components/domains/opportunity/types";
 import ArticleCard from "@/app/articles/components/Card";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { Button } from "@/components/ui/button";

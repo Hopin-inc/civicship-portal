@@ -2,7 +2,7 @@
 
 import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
 import { useSortedSlotsByStartsAt } from "@/app/activities/[id]/hooks/useSortedSlotsByStartsAt";
-import { ActivityCard, ActivityDetail, QuestCard, QuestDetail } from "@/app/activities/data/type";
+import { ActivityCard, ActivityDetail, QuestCard, QuestDetail } from "@/components/domains/opportunity/types";
 import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
 import { useSameStateActivities } from "@/app/activities/[id]/hooks/useSameStateActivities";
 import { useAuth } from "@/contexts/AuthProvider";

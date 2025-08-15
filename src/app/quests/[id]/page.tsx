@@ -11,7 +11,7 @@ import { Content, Footer, Header } from "./components";
 import { DisableReasonType } from "./types";
 import { useActivityDetails } from "@/app/activities/[id]/hooks/useActivityDetails";
 import { GqlOpportunityCategory } from "@/types/graphql";
-import { QuestCard, QuestDetail } from "@/app/activities/data/type";
+import { QuestCard, QuestDetail } from "@/components/domains/opportunity/types";
 
 export default function ActivityPage() {
   const headerConfig = useMemo(

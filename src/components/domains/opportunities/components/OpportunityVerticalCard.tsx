@@ -4,37 +4,34 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { JapaneseYenIcon, MapPin } from "lucide-react";
 
-interface OpportunityCardProps {
+interface OpportunityVerticalCardProps {
   title: string;
   image?: string;
   imageAlt?: string;
   badge?: string;
-  price?: string;
-  priceIcon?: React.ReactNode;
+  price?: number | null;
   location?: string;
-  locationIcon?: React.ReactNode;
-  pointsToEarn?: string;
+  pointsToEarn?: number | null;
   href?: string;
   onClick?: () => void;
 }
 
-export default function OpportunityCard({
+export default function OpportunityVerticalCard({
   title,
   image,
   imageAlt,
   badge,
   price,
-  priceIcon,
   location,
-  locationIcon,
   pointsToEarn,
   href,
   onClick,
-}: OpportunityCardProps) {
+}: OpportunityVerticalCardProps) {
 
   const CardContent = (
-    <div className="relative w-[164px] flex-shrink-0 mt-6">
+    <div className="relative w-[164px]">
       <Card className="w-full h-[205px] overflow-hidden relative">
         {badge && (
           <div className={`absolute top-2 left-2 bg-primary-foreground text-primary px-2.5 py-1 rounded-xl text-label-xs font-bold z-10`}>
@@ -60,15 +57,13 @@ export default function OpportunityCard({
       <div className="mt-3">
         <h3 className="text-title-sm text-foreground line-clamp-2">{title}</h3>
         <div className="mt-2 flex flex-col">
-          {price && (
-            <div className="text-body-sm text-muted-foreground flex items-center gap-1">
-              {priceIcon}
-              {price}
-            </div>
-          )}
+          <div className="text-body-sm text-muted-foreground flex items-center gap-1">
+            <JapaneseYenIcon className="w-4 h-4" />
+            {!price ? "参加無料" : `${price}円/人~`}
+          </div>
           {location && (
             <div className="flex items-center text-body-sm text-muted-foreground mt-1">
-              {locationIcon}
+              <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
               <span className="line-clamp-1 break-words">{location}</span>
             </div>
           )}
@@ -78,7 +73,7 @@ export default function OpportunityCard({
                 P
               </p>
               <p className="text-sm font-bold">
-                {pointsToEarn}ptもらえる
+                {pointsToEarn.toLocaleString()}ptもらえる
               </p>
             </div>
           )}
@@ -89,7 +84,7 @@ export default function OpportunityCard({
 
   if (href) {
     return (
-      <Link href={href}>
+      <Link href={href} className="inline-block w-[164px] mt-6">
         {CardContent}
       </Link>
     );

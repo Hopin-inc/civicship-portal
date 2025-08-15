@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useActivities } from "@/app/activities/hooks/useActivities";
-import ActivitiesListSection from "@/app/activities/components/ListSection/ListSection";
-import { mapOpportunityCards } from "@/app/activities/data/presenter";
+import OpportunitiesGridListSection from "@/components/domains/opportunities/components/ListSection/OpportunitiesGridListSection";
+import { mapOpportunityCards } from "@/components/domains/opportunities/data/presenter";
 import { ErrorState } from "@/components/shared";
 import EmptyState from "@/components/shared/EmptyState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -11,8 +11,9 @@ import { Coins } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
-export default function PageClient() {
+export default function OpportunitiesFeed() {
   const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
   const router = useRouter();
   const refetchRef = useRef<(() => void) | null>(null);
@@ -23,17 +24,11 @@ export default function PageClient() {
   const allCards = mapOpportunityCards(opportunities.edges ?? []);
   const firstFour = allCards.slice(0, 4);
   const afterFour = allCards.slice(4);
-  const isFirstLoaded = !loading && opportunities?.edges?.length > 0;
   const isEmpty = !loading && opportunities?.edges?.length === 0;
   const shouldShowQuests = useFeatureCheck("quests");
 
-  // if (!isFirstLoaded && loading) {
-  //   return (
-  //     <div className="min-h-screen pb-16">
-  //       <ListSectionSkeleton />
-  //     </div>
-  //   );
-  // }
+  const firstFourFormatOpportunities = firstFour.map(formatOpportunities);
+  const afterFourFormatOpportunities = afterFour.map(formatOpportunities);
 
   const headerConfig = useMemo(
     () => ({
@@ -53,14 +48,13 @@ export default function PageClient() {
   }
 
   return (
-    <div className="min-h-screen ">
-      {/* 最初の4件 */}
-      <ActivitiesListSection
-        opportunities={firstFour}
+    <div className="min-h-screen">
+      <OpportunitiesGridListSection
+        opportunities={firstFourFormatOpportunities}
         isInitialLoading={false}
         isSectionLoading={loading}
+        opportunityTitle="すべての体験"
       />
-      {/* バナー */}
       {shouldShowQuests && (
       <div className="px-6">
         <button
@@ -83,12 +77,12 @@ export default function PageClient() {
           </button>
         </div>
       )}
-      {/* 5件目以降 */}
-      <ActivitiesListSection
-        opportunities={afterFour}
+      <OpportunitiesGridListSection
+        opportunities={afterFourFormatOpportunities}
         isInitialLoading={false}
         isSectionLoading={loading}
         isTitle={false}
+        opportunityTitle="すべての体験"
       />
       <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
     </div>

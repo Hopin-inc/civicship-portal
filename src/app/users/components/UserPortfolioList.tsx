@@ -7,7 +7,7 @@ import EmptyStateWithSearch from "@/components/shared/EmptyStateWithSearch";
 import { RefObject } from "react";
 import { ParticipantsList } from "@/components/shared/ParticipantsList";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/components/domains/opportunity/types";
 import { AppPortfolio } from "@/app/users/data/type";
 import { GqlEvaluationStatus, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";

@@ -7,7 +7,7 @@ import {
   useCreateReservationMutation,
 } from "@/types/graphql";
 import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
-import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
+import { ActivityDetail, QuestDetail } from "@/components/domains/opportunity/types";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
 import { ApolloError } from "@apollo/client";

@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { ActivityCard, QuestCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 
 const FeaturedSlider = dynamic(() => import("./FeaturedSlider"), {
   ssr: false,

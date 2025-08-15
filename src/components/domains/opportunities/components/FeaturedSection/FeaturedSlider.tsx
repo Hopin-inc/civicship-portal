@@ -1,16 +1,16 @@
 "use client";
 
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 import { useCallback, useEffect, useState } from "react";
-import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import useEmblaCarousel from "embla-carousel-react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import OpportunityImageSlider from "@/app/activities/components/FeaturedSection/ImageSlider";
+import OpportunityImageSlider from "@/components/domains/opportunities/components/FeaturedSection/ImageSlider";
+import OpportunityHorizontalCard from "../OpportunityHorizontalCard";
 
-export default function ActivitiesFeaturedSlider({
+export default function FeaturedSlider({
   opportunities,
 }: {
-  opportunities: ActivityCard[];
+  opportunities: (ActivityCard | QuestCard)[];
 }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
@@ -55,7 +55,12 @@ export default function ActivitiesFeaturedSlider({
           {opportunities.map((op) => (
             <div key={op.id} className="embla__slide relative h-full w-full flex-[0_0_100%]">
               <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/60 via-black/40 to-transparent px-6 pb-8 pt-16">
-                <OpportunityCardHorizontal opportunity={op} />
+                <OpportunityHorizontalCard
+                  opportunity={op}
+                  href={`/activities/${op.id}?community_id=${op.communityId}`}
+                  price={"feeRequired" in op ? op.feeRequired : undefined}
+                  location={op.location}
+                />
               </div>
             </div>
           ))}

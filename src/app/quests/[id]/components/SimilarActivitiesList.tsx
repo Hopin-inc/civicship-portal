@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ActivityCard, QuestCard } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunity/types";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
 
 interface SameStateActivitiesProps {

@@ -2,7 +2,7 @@
 
 import React from "react";
 import SameStateActivities from "./SimilarActivitiesList";
-import { ActivityCard, QuestCard, QuestDetail } from "@/app/activities/data/type";
+import { ActivityCard, QuestCard, QuestDetail } from "@/components/domains/opportunity/types";
 import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { BodySection } from "@/app/quests/[id]/components/BodySection";
 import { HostInfoSection, NoticeSection, PlaceSection, ScheduleSection } from "./sections";
