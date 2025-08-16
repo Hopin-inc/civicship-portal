@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { useActivities } from "@/app/activities/hooks/useActivities";
 import OpportunitiesGridListSection from "@/components/domains/opportunities/components/ListSection/OpportunitiesGridListSection";
 import { mapOpportunityCards } from "@/components/domains/opportunities/data/presenter";
 import { ErrorState } from "@/components/shared";
@@ -12,9 +11,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
+import { useFetchFeedOpportunities } from "../hooks/useFetchFeedOpportunities";
 
 export default function OpportunitiesFeed() {
-  const { opportunities, loading, error, loadMoreRef, refetch } = useActivities();
+  const { opportunities, loading, error, loadMoreRef, refetch } = useFetchFeedOpportunities();
   const router = useRouter();
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function OpportunitiesFeed() {
           className="w-full flex bg-blue-50 rounded-lg p-4 appearance-none border-none focus:outline-none"
           style={{ boxSizing: 'border-box' }}
           onClick={() => {
-            router.push("/quests");
+            router.push("/opportunities/search?type=quest");
           }}
         >
           <div>

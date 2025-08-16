@@ -6,7 +6,7 @@ import { GqlOpportunity, useGetOpportunitiesQuery } from "@/types/graphql";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 
-export const useSameStateActivities = (opportunityId: string, stateCode: string) => {
+export const useSameStateOpportunities = (opportunityId: string, stateCode: string) => {
   const { data, loading, error, refetch } = useGetOpportunitiesQuery({
     variables: {
       filter: {
@@ -19,7 +19,7 @@ export const useSameStateActivities = (opportunityId: string, stateCode: string)
     fetchPolicy: "cache-first",
   });
 
-  const sameStateActivities: ActivityCard[] | QuestCard[] = useMemo(() => {
+  const sameStateOpportunities: ActivityCard[] | QuestCard[] = useMemo(() => {
     return (data?.opportunities.edges ?? [])
       .map((edge) => edge.node)
       .filter((node): node is GqlOpportunity => !!node)
@@ -27,7 +27,7 @@ export const useSameStateActivities = (opportunityId: string, stateCode: string)
   }, [data?.opportunities.edges]);
 
   return {
-    sameStateActivities,
+    sameStateOpportunities,
     loading,
     error,
     refetch,

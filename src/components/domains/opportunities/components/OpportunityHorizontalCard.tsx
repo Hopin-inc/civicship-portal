@@ -8,17 +8,21 @@ import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 type Props = {
-  opportunity: ActivityCard | QuestCard;
-  withShadow?: boolean;
-  href: string;
+  title: string;
+  image?: string;
+  imageAlt?: string;
+  badge?: string;
   price?: number | null;
   location?: string;
+  pointsToEarn?: number | null;
+  href?: string;
+  withShadow?: boolean;
 };
 
-function OpportunityHorizontalCard({ opportunity, withShadow = true, href, price, location }: Props) {
+function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, location, pointsToEarn, href, withShadow = true }: Props) {
   return (
     <Link
-      href={href}
+      href={href ?? ""}
       className="block"
     >
       <div className="mx-auto max-w-md">
@@ -29,8 +33,8 @@ function OpportunityHorizontalCard({ opportunity, withShadow = true, href, price
         >
           <div className="relative h-[108px] w-[88px] flex-shrink-0">
             <Image
-              src={opportunity.images?.[0] ?? PLACEHOLDER_IMAGE}
-              alt={opportunity.title}
+              src={image ?? PLACEHOLDER_IMAGE}
+              alt={title}
               fill
               placeholder="blur"
               blurDataURL={PLACEHOLDER_IMAGE}
@@ -43,7 +47,7 @@ function OpportunityHorizontalCard({ opportunity, withShadow = true, href, price
             />
           </div>
           <div className="flex-1 px-4 py-3">
-            <h2 className="text-title-sm text-foreground line-clamp-1">{opportunity.title}</h2>
+            <h2 className="text-title-sm text-foreground line-clamp-1">{title}</h2>
             <p className="mt-1 text-body-sm text-muted-foreground flex items-center gap-1">
               <JapaneseYenIcon className="w-4 h-4" />
               {!price ? "参加無料" : `${price.toLocaleString()}円/人~`}

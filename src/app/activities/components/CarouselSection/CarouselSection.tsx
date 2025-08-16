@@ -2,7 +2,7 @@
 
 import React from "react";
 import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard, QuestCard } from "@/components/domains/opportunity/types";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 import CarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 
 type CardType = ActivityCard | QuestCard;

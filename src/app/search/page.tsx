@@ -149,7 +149,7 @@ function SearchPageContent({
     const values = getValues();
     const type = selectedTab === "quest" ? "quest" : "activity";
     // typeによって遷移先を切り替え
-    const nextPath = type === "activity" ? "/activities" : "/quests";
+    const nextPath = "/opportunities/search"
     const params = buildSearchResultParams(
       values.searchQuery,
       values.location,

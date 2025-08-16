@@ -13,11 +13,13 @@ import { useParams } from "next/navigation";
 import { errorMessages } from "@/utils/errorMessage";
 import useCancelReservation from "@/app/participations/[id]/hooks/useCancelReservation";
 import OpportunityInfo from "./components/OpportunityInfo";
-import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
+
 import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { logger } from "@/lib/logging";
+import { useOpportunityDetail } from "@/hooks/opportunities/useOpportunityDetail";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
@@ -35,6 +37,7 @@ const mapReservationStatusToUIStatus = (status: GqlReservationStatus): Participa
 };
 
 export default function ParticipationPage() {
+  const { user } = useAuth();
   const headerConfig = useMemo(
     () => ({
       title: "予約の確認",
@@ -61,9 +64,7 @@ export default function ParticipationPage() {
   
   // #NOTE: コンポーネントに必要な情報を取得するために、useCompletePageViewModel と useOpportunityDetail を使用しているがリクエストが重複するので、まとめたい
   const { dateTimeInfo } = useCompletePageViewModel(id ?? "", participation?.reservation?.id ?? "");
-  const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityDetail(
-    opportunity?.id ?? "",
-  );
+  const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityDetail(opportunity?.id ?? "", user);
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {

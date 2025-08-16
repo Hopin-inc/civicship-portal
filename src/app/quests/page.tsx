@@ -1,10 +1,11 @@
-import { QuestHeader, QuestsList } from "./components";
+"use client";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { useEffect } from "react";
 
 export default function QuestsPage() {
-  return (
-    <>
-      <QuestHeader />
-      <QuestsList />
-    </>
-  );
+  useEffect(() => {
+    window.location.href = "/opportunities/search?type=quest";
+  }, []);
+
+  return <LoadingIndicator/>;
 }

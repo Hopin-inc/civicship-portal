@@ -1,12 +1,11 @@
-import ActivitiesList from "./components/ActivitiesList";
-import ActivitiesHeader from "./components/Header";
+"use client";
+
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { useEffect } from "react";
 
 export default async function ActivitiesPage() {
-
-return (
-  <>
-  <ActivitiesHeader />
-  <ActivitiesList />
-  </>
-);
+  useEffect(() => {
+    window.location.href = "/opportunities";
+  }, []);
+  return <LoadingIndicator/>;
 }
