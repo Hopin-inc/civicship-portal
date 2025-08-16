@@ -3,6 +3,11 @@ import LinkifyIt from "linkify-it";
 import { useReadMore } from "@/hooks/useReadMore";
 import { Button } from "@/components/ui/button";
 
+interface OpportunityBodySectionProps {
+  body: string;
+  title: string;
+}
+
 const INITIAL_DISPLAY_LINES = 6;
 
 const phoneRegex = /0\d{1,4}-\d{1,4}-\d{3,4}|0\d{9,10}/g;
@@ -52,7 +57,7 @@ const renderWithLinks = (text: string): React.ReactNode[] => {
   return elements;
 };
 
-export const ActivityBodySection = ({ body }: { body: string }) => {
+export const OpportunityBodySection = ({ body, title }: OpportunityBodySectionProps) => {
   const { textRef, expanded, showReadMore, toggleExpanded, getTextStyle } = useReadMore({
     text: body,
     maxLines: INITIAL_DISPLAY_LINES,
@@ -60,7 +65,7 @@ export const ActivityBodySection = ({ body }: { body: string }) => {
 
   return (
     <section className="pt-6 pb-8 mt-0 max-w-mobile-l">
-      <h2 className="text-display-md text-foreground mb-4">体験できること</h2>
+      <h2 className="text-display-md text-foreground mb-4">{title}</h2>
       <div className="relative">
         <p
           ref={textRef}

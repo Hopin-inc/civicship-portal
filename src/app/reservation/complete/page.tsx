@@ -1,6 +1,5 @@
 "use client";
 
-import SameStateActivities from "@/app/activities/[id]/components/SimilarActivitiesList";
 import CompletionHeader from "@/app/reservation/complete/components/CompletionHeader";
 import React, { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -10,10 +9,13 @@ import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCo
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from '@/components/shared'
 import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
-import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
+import { useOpportunityDetail } from "@/hooks/opportunities/useOpportunityDetail";
+import { useAuth } from "@/contexts/AuthProvider";
+import { SimilarOpportunities } from "@/app/opportunities/[id]/components/SimilarOpportunitiesList";
 
 export default function CompletePage() {
+  const { user } = useAuth();
   const headerConfig: HeaderConfig = useMemo(
     () => ({
       showLogo: true,
@@ -66,7 +68,7 @@ export default function CompletePage() {
   }, [reservation, opportunity, dateTimeInfo, track]);
 
   // #NOTE: query でまとめて取得したいが、一時的対応
-  const { opportunity: oppotunityDetail } = useOpportunityDetail(opportunityId ?? "");
+  const { opportunity: oppotunityDetail,sameStateOpportunities } = useOpportunityDetail(opportunityId ?? "", user);
 
   if (loading) return <LoadingIndicator fullScreen />;
   if (error || !reservation || !opportunity || !dateTimeInfo || !oppotunityDetail)
@@ -90,9 +92,9 @@ export default function CompletePage() {
         <>
           <div className="h-2 bg-border -mx-6 w-full" />
           <div className="px-6 w-full">
-            <SameStateActivities
+            <SimilarOpportunities
               header="近くでおすすめの関わり"
-              opportunities={sameStateActivities}
+              opportunities={sameStateOpportunities}
               currentOpportunityId={opportunityId}
             />
           </div>

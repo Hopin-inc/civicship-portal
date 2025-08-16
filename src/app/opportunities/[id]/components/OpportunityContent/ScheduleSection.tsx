@@ -1,20 +1,19 @@
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
+import { getAdvanceBookingText } from "@/config/activityBookingConfig";
 import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 import { Link, CalendarX } from "lucide-react";
 import { useMemo } from "react";
+import { OpportunityScheduleCard } from "../OpportunityScheduleCard";
 import { Button } from "@/components/ui/button";
-import { ScheduleCard } from "../ScheduleCard";
 
 export const ScheduleSection = ({
     slots,
     opportunityId,
     communityId,
-    pointsToEarn,
   }: {
-    slots: QuestSlot[];
+    slots: (ActivitySlot | QuestSlot)[];
     opportunityId: string;
     communityId: string;
-    pointsToEarn: number;
   }) => {
     const query = new URLSearchParams({
       id: opportunityId,
@@ -38,16 +37,15 @@ export const ScheduleSection = ({
           {hasSchedule ? (
             <>
               <p className="text-muted-foreground font-bold mb-4 px-1">
-                ※予約は各日程の前日まで受付中{" "}
+                ※予約は各日程の{getAdvanceBookingText(opportunityId)}まで受付中{" "}
               </p>
               <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide px-4 -mx-4">
                 {slots.map((slot, index) => (
                   <div key={index} className="flex-shrink-0 first:ml-0">
-                    <ScheduleCard
+                    <OpportunityScheduleCard
                       slot={slot}
                       opportunityId={opportunityId}
                       communityId={communityId}
-                      pointsToEarn={pointsToEarn}
                     />
                   </div>
                 ))}

@@ -2,16 +2,16 @@
 
 import React from "react";
 import { ChevronRight, MapPin, Ticket } from "lucide-react";
-import { ActivityDetail } from "@/components/domains/opportunity/types";
+import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import ImagesCarousel from "@/components/ui/images-carousel";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
-interface ActivityDetailsHeaderProps {
-  opportunity: ActivityDetail;
+interface OpportunityDetailsHeaderProps {
+  opportunity: ActivityDetail | QuestDetail;
   availableTickets: number;
 }
 
-const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
+const OpportunityDetailsHeader: React.FC<OpportunityDetailsHeaderProps> = ({
   opportunity,
   availableTickets,
 }) => {
@@ -35,7 +35,7 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
         </div>
       </div>
 
-      {opportunity.reservableTickets && opportunity.reservableTickets.length > 0 && availableTickets > 0 && (
+      { "reservableTickets" in opportunity && opportunity.reservableTickets && opportunity.reservableTickets.length > 0 && availableTickets > 0 && (
         <div className="flex items-center gap-2 bg-primary-foreground text-primary rounded-lg px-4 py-3 mt-4 cursor-pointer hover:bg-primary-foreground/80">
           <Ticket className="w-5 h-5" />
           <p className="text-label-md">利用できるチケット</p>
@@ -47,4 +47,4 @@ const ActivityDetailsHeader: React.FC<ActivityDetailsHeaderProps> = ({
   );
 };
 
-export default ActivityDetailsHeader;
+export default OpportunityDetailsHeader;

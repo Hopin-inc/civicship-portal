@@ -11,7 +11,12 @@ interface OpportunitiesGridListSectionProps {
   isSectionLoading: boolean;
   isInitialLoading?: boolean;
   isTitle?: boolean;
-  opportunityTitle: string;
+  opportunityTitle: string | null;
+  displayDate?: {
+    month: string;
+    day: string;
+    weekday: string;
+  };
 }
 
 const OpportunitiesGridListSection: React.FC<OpportunitiesGridListSectionProps> = ({
@@ -20,13 +25,32 @@ const OpportunitiesGridListSection: React.FC<OpportunitiesGridListSectionProps> 
   isSectionLoading,
   isTitle = true,
   opportunityTitle,
+  displayDate,
 }) => {
-  if (isInitialLoading) return <OpportunitiesListSectionSkeleton title={opportunityTitle} />;
+  if (isInitialLoading) return <OpportunitiesListSectionSkeleton title={opportunityTitle ?? ""} />;
   if (opportunities.length === 0) return null;
+  const getTitle = () => {
+    if(isTitle && opportunityTitle){
+      return <h2 className="text-display-md">{opportunityTitle}</h2>
+    }else if(displayDate){
+      return(
+        <div className="flex items-end">
+          <div className="flex items-start">
+            <span className="text-label-md text-caption">{displayDate.month}</span>
+            <span className="text-label-md text-caption ml-[0.4px]">/</span>
+            <span className="text-display-xl font-bold text-foreground leading-none">{displayDate.day}</span>
+          </div>
+          <span className="text-md text-foreground">({displayDate.weekday})</span>
+        </div>
+      )
+    }else{
+      return null;
+    }
+  }
 
   return (
     <section className="mt-6 px-6">
-      {isTitle && <h2 className="text-display-md">{opportunityTitle}</h2>}
+      {getTitle()}
       <CardGrid>
         {opportunities.map((opportunity) => (
           <OpportunityVerticalCard 

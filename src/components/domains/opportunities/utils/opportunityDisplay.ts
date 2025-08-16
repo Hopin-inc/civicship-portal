@@ -15,9 +15,9 @@ export const selectBadge = (hasReservableTicket: boolean | null, pointsRequired:
 
 export const getLink = (id: string, communityId: string, category: GqlOpportunityCategory) => {
   if (category === GqlOpportunityCategory.Activity) {
-    return `/activities/${id}?community_id=${communityId}`;
+    return `/opportunities/${id}?community_id=${communityId}&type=activity`;
   } else if (category === GqlOpportunityCategory.Quest) {
-    return `/quests/${id}?community_id=${communityId}`;
+    return `/opportunities/${id}?community_id=${communityId}&type=quest`;
   }
   return "";
 }

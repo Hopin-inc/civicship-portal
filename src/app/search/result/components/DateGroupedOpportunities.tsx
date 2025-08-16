@@ -21,6 +21,15 @@ const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({
     ([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime(),
   );
 
+  const getDisplayDate = (dateKey: string) => {
+    const date = new Date(dateKey);
+    return {
+      month: format(date, "M", { locale: ja }),
+      day: format(date, "d", { locale: ja }),
+      weekday: format(date, "E", { locale: ja }),
+    }
+  }
+
   return (
     <section>
       {sortedEntries.map(([dateKey, opportunities]) => {
@@ -31,10 +40,11 @@ const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({
           return (
             <OpportunitiesGridListSection
               key={dateKey}
-              opportunityTitle={format(new Date(dateKey), "M/d(E)", { locale: ja })}
+              opportunityTitle={null}
               opportunities={formattedOpportunities}
               isInitialLoading={false}
               isSectionLoading={false}
+              displayDate={getDisplayDate(dateKey)}
             />
           );
         }
@@ -43,10 +53,11 @@ const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({
           return (
             <OpportunitiesGridListSection
               key={dateKey}
-              opportunityTitle={format(new Date(dateKey), "M/d(E)", { locale: ja })}
+              opportunityTitle={null}
               opportunities={formattedOpportunities}
               isInitialLoading={false}
               isSectionLoading={false}
+              displayDate={getDisplayDate(dateKey)}
             />
           );
         }

@@ -1,15 +1,15 @@
 "use client";
-import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
 import DateGroupedOpportunities from "@/app/search/result/components/DateGroupedOpportunities";
 import EmptySearchResults from "@/app/search/result/components/EmptySearchResults";
 import useSearchResultHeader from "@/app/search/result/components/SearchResultHeader";
 import useSearchResults from "@/app/search/result/hooks/useSearchResults";
+import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
-import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
-export default function QuestsList() {
+export default function SearchPage() {
     const searchParams = useSearchParams();
     
     const queryParams = useMemo(
@@ -18,7 +18,7 @@ export default function QuestsList() {
         from: searchParams.get("from") ?? undefined,
         to: searchParams.get("to") ?? undefined,
         guests: searchParams.get("guests") ?? undefined,
-        type: "quest" as "quest" | undefined,
+        type: searchParams.get("type") as "activity" | "quest" | undefined,
         ticket: searchParams.get("ticket") ?? undefined,
         points: searchParams.get("points") ?? undefined,
         q: searchParams.get("q") ?? undefined,
@@ -29,12 +29,12 @@ export default function QuestsList() {
     useSearchResultHeader(queryParams);
 
     const { 
-      recommendedOpportunities, 
-      groupedOpportunities, 
-      loading, 
-      loadMoreRef,
-      isLoadingMore,
-    } = useSearchResults(queryParams);
+        recommendedOpportunities, 
+        groupedOpportunities, 
+        loading, 
+        loadMoreRef,
+        isLoadingMore,
+      } = useSearchResults(queryParams);
 
     const isEmpty =
     recommendedOpportunities.length === 0 && Object.keys(groupedOpportunities).length === 0;
@@ -45,15 +45,25 @@ export default function QuestsList() {
 
   const formattedOpportunities = recommendedOpportunities.map(formatOpportunities);
 
-  return (
-    <>
+  const getTitle = () => {
+    if(queryParams.type === "activity"){
+      return "おすすめの体験";
+    }else if(queryParams.type === "quest"){
+      return "おすすめのお手伝い";
+    }else{
+      return "おすすめの体験";
+    }
+  }
+
+  return(
+  <div>
     <div className="min-h-screen">
       <main>
         <div className="pt-4">
-        <OpportunityCarouselListSection
-          title="おすすめのお手伝い"
-          opportunities={formattedOpportunities}
-        />
+          <OpportunityCarouselListSection
+            title={getTitle()}
+            opportunities={formattedOpportunities}
+          />
         </div>
         <DateGroupedOpportunities groupedOpportunities={groupedOpportunities} />
         {/* 無限スクロール用のローディング要素 - 常に表示 */}
@@ -66,6 +76,5 @@ export default function QuestsList() {
         </div>
       </main>
     </div>
-    </>
-  );
+  </div>);
 }

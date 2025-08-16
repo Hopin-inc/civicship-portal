@@ -5,16 +5,16 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { getCrossDayLabel } from "@/utils/date";
 
-interface ActivityScheduleCardProps {
-  slot: ActivitySlot;
+interface OpportunityScheduleCardProps {
+  slot: ActivitySlot | QuestSlot;
   opportunityId: string;
   communityId: string;
 }
 
-const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
+export const OpportunityScheduleCard: React.FC<OpportunityScheduleCardProps> = ({
   slot,
   opportunityId,
   communityId,
@@ -28,11 +28,11 @@ const ActivityScheduleCard: React.FC<ActivityScheduleCardProps> = ({
     : renderAvailableSlotCard(slot, opportunityId, communityId);
 };
 
-const renderFullSlotCard = (slot: ActivitySlot) => {
+const renderFullSlotCard = (slot: ActivitySlot | QuestSlot) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
 
-  const isFeeSpecified = slot.feeRequired != null;
+  const isFeeSpecified = "feeRequired" in slot && slot.feeRequired != null;
   const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
   const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-gray-400" : "text-gray-400"}`;
 
@@ -70,7 +70,7 @@ const renderFullSlotCard = (slot: ActivitySlot) => {
 };
 
 const renderAvailableSlotCard = (
-  slot: ActivitySlot,
+  slot: ActivitySlot | QuestSlot,
   opportunityId: string,
   communityId: string,
 ) => {
@@ -78,7 +78,7 @@ const renderAvailableSlotCard = (
   const endDate = new Date(slot.endsAt);
   const isReservable = slot.isReservable;
 
-  const isFeeSpecified = slot.feeRequired != null;
+  const isFeeSpecified = "feeRequired" in slot && slot.feeRequired != null;
   const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
   const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-muted-foreground/50" : "text-caption"}`;
 
@@ -140,5 +140,3 @@ const renderAvailableSlotCard = (
     </div>
   );
 };
-
-export default ActivityScheduleCard;
