@@ -18,8 +18,9 @@ import ReservationDetails from "@/app/reservation/complete/components/Reservatio
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { logger } from "@/lib/logging";
-import { useOpportunityDetail } from "@/hooks/opportunities/useOpportunityDetail";
+import { useOpportunityContext } from "@/hooks/opportunities/useOpportunityContext";
 import { useAuth } from "@/contexts/AuthProvider";
+import { isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
@@ -64,7 +65,7 @@ export default function ParticipationPage() {
   
   // #NOTE: コンポーネントに必要な情報を取得するために、useCompletePageViewModel と useOpportunityDetail を使用しているがリクエストが重複するので、まとめたい
   const { dateTimeInfo } = useCompletePageViewModel(id ?? "", participation?.reservation?.id ?? "");
-  const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityDetail(opportunity?.id ?? "", user);
+  const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityContext(opportunity?.id ?? "", user);
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -156,7 +157,7 @@ export default function ParticipationPage() {
             participantCount={dateTimeInfo.participantCount}
             paidParticipantCount={dateTimeInfo.paidParticipantCount}
             totalPrice={dateTimeInfo.totalPrice}
-            pricePerPerson={"feeRequired" in opportunityDetail ? opportunityDetail.feeRequired : 0}
+            pricePerPerson={isActivityCategory(opportunityDetail) ? opportunityDetail.feeRequired : 0}
             location={opportunityDetail.place}
             phoneNumber={participation.emergencyContactPhone}
             isReserved={true}
@@ -167,7 +168,7 @@ export default function ParticipationPage() {
             }}
             ticketCount={dateTimeInfo.ticketCount}
             category={opportunityDetail.category}
-            pointsToEarn={"pointsToEarn" in opportunityDetail ? opportunityDetail.pointsToEarn : 0}
+            pointsToEarn={isQuestCategory(opportunityDetail) ? opportunityDetail.pointsToEarn : 0}
           />
         </div>
       )}

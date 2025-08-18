@@ -118,3 +118,15 @@ export type ReservableActivityTicket = {
 export type RequiredUtility = {
   id: string;
 };
+
+export const isActivityCategory = (opportunity: ActivityDetail | QuestDetail | ActivityCard | QuestCard): opportunity is ActivityDetail | ActivityCard => {
+  return opportunity.category === GqlOpportunityCategory.Activity;
+};
+
+export const isQuestCategory = (opportunity: ActivityDetail | QuestDetail | ActivityCard | QuestCard): opportunity is QuestDetail | QuestCard => {
+  return opportunity.category === GqlOpportunityCategory.Quest;
+};
+
+export const isActivitySlotType = (slot: ActivitySlot | QuestSlot): slot is ActivitySlot => {
+  return 'feeRequired' in slot;
+};

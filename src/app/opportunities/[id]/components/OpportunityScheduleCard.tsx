@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { getCrossDayLabel } from "@/utils/date";
+import { isActivitySlotType } from "@/components/domains/opportunities/types";
 
 interface OpportunityScheduleCardProps {
   slot: ActivitySlot | QuestSlot;
@@ -32,7 +33,7 @@ const renderFullSlotCard = (slot: ActivitySlot | QuestSlot) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
 
-  const isFeeSpecified = "feeRequired" in slot && slot.feeRequired != null;
+  const isFeeSpecified = isActivitySlotType(slot) && slot.feeRequired != null;
   const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
   const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-gray-400" : "text-gray-400"}`;
 
@@ -78,7 +79,7 @@ const renderAvailableSlotCard = (
   const endDate = new Date(slot.endsAt);
   const isReservable = slot.isReservable;
 
-  const isFeeSpecified = "feeRequired" in slot && slot.feeRequired != null;
+  const isFeeSpecified = isActivitySlotType(slot) && slot.feeRequired != null;
   const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
   const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-muted-foreground/50" : "text-caption"}`;
 

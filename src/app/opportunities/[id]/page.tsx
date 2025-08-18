@@ -6,15 +6,19 @@ import { ErrorState } from "@/components/shared";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useOpportunityDetail } from "@/hooks/opportunities/useOpportunityDetail";
-import { notFound } from "next/navigation";
-import { use, useEffect, useMemo, useRef } from "react";
+import { useOpportunityContext } from "@/hooks/opportunities/useOpportunityContext";
+import { notFound, useParams } from "next/navigation";
+import { useEffect, useMemo, useRef } from "react";
 import OpportunityDetailsHeader from "./components/OpportunityDetailsHeader";
 import { OpportunityDetailsContent } from "./components/OpportunityDetailsContent";
 import { OpportunityDetailsFooter } from "./components/OpportunityDetailsFooter";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 
-export default function OpportunityDetailPage({ params }: { params: Promise<{ id: string, community_id: string }> }) {
+export default function OpportunityDetailPage() {
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const community_id = Array.isArray(params.community_id) ? params.community_id[0] : params.community_id;
   const headerConfig = useMemo(
     () => ({
       hideHeader: true,
@@ -22,7 +26,6 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
     [],
   );
   useHeaderConfig(headerConfig);
-  const { id,community_id } = use(params);
   const { user } = useAuth();
   const {
     opportunity,
@@ -32,7 +35,7 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
     loading,
     error,
     refetch,
-  } = useOpportunityDetail(id, user);
+  } = useOpportunityContext(id, user);
 
   const isExternalBooking =
   (opportunity?.title.includes("予約") || opportunity?.title.includes("問い合わせ")) ?? false;
@@ -45,7 +48,7 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
 
   if (loading) return <LoadingIndicator />;
 
-  if (error) return <ErrorState title="募集ページを読み込めませんでした"  />;
+  if (error) return <ErrorState title="募集ページを読み込めませんでした"  refetchRef={refetchRef}/>;
 
   if (!opportunity) return notFound();
 
@@ -79,8 +82,8 @@ export default function OpportunityDetailPage({ params }: { params: Promise<{ id
       </main>
       <OpportunityDetailsFooter
         opportunityId={opportunity.id}
-        price={"feeRequired" in opportunity ? opportunity.feeRequired : null}
-        point={"pointsToEarn" in opportunity ? opportunity.pointsToEarn : null}
+        price={isActivityCategory(opportunity) ? opportunity.feeRequired : null}
+        point={isQuestCategory(opportunity) ? opportunity.pointsToEarn : null}
         communityId={community_id}
         disableReason={getDisableReason(sortedSlots, isExternalBooking, opportunity.isReservable)}
       />

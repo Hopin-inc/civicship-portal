@@ -67,12 +67,14 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
         <div>
           <div>
             <p className="text-body-sm text-muted-foreground">1人あたり</p>
-              {price != null && (
-                <>
-                  <p className={cn("text-body-lg font-bold", price == null && "text-muted-foreground/50")}>
-                    {price != null ? `${price.toLocaleString()}円〜` : "料金未定"}
-                  </p>
-                </>
+              {price !== null ? (
+                <p className="text-body-lg font-bold">
+                  {`${price.toLocaleString()}円〜`}
+                </p>
+              ) : (
+                <p className="text-body-lg font-bold text-muted-foreground/50">
+                  料金未定
+                </p>
               )}
               {point != null && (
                 <p>

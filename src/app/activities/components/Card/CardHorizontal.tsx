@@ -1,6 +1,6 @@
 "use client";
 
-import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
+import { ActivityCard, isActivityCategory, QuestCard } from "@/components/domains/opportunities/types";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
@@ -42,9 +42,9 @@ function OpportunityCardHorizontal({ opportunity, withShadow = true }: Props) {
           <div className="flex-1 px-4 py-3">
             <h2 className="text-title-sm text-foreground line-clamp-1">{opportunity.title}</h2>
             <p className="mt-1 text-body-sm text-muted-foreground">
-              {"feeRequired" in opportunity && opportunity.feeRequired
-                ? `1人あたり${opportunity.feeRequired.toLocaleString()}円から`
-                : "料金未定"}
+            {isActivityCategory(opportunity) && opportunity.feeRequired
+              ? `1人あたり${opportunity.feeRequired.toLocaleString()}円から`
+              : "料金未定"}
             </p>
             <div className="mt-1 flex items-center text-muted-foreground text-body-sm">
               <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />

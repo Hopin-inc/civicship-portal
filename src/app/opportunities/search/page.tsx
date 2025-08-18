@@ -46,9 +46,7 @@ export default function SearchPage() {
   const formattedOpportunities = recommendedOpportunities.map(formatOpportunities);
 
   const getTitle = () => {
-    if(queryParams.type === "activity"){
-      return "おすすめの体験";
-    }else if(queryParams.type === "quest"){
+    if(queryParams.type === "quest"){
       return "おすすめのお手伝い";
     }else{
       return "おすすめの体験";
