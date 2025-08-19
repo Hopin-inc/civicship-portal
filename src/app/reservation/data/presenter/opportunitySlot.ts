@@ -21,11 +21,11 @@ export const isDateReservable = (date: Date | string, activityId?: string): bool
     return isAfter(targetDate, now);
   }
 
-  // N日前の23:59を計算するため、現在時刻からN日引く
+  // アクティビティの開催日時からN日前の日付を計算し、その日の終わりを締切とする
   const deadlineDate = addDays(targetDate, -advanceBookingDays);
   const deadline = endOfDay(deadlineDate);
-  
-  return isAfter(now, deadline) === false; // 現在時刻が締切前であれば予約可能
+
+  return !isAfter(now, deadline); // 現在時刻が締切を過ぎていなければ予約可能
 };
 
 export const presenterOpportunitySlots = (
