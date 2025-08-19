@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
-import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/components/domains/opportunity/types";
+import { ActivityCard } from "@/components/domains/opportunities/types";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
 
 const mockActivityCard: ActivityCard = {
   id: "1",
@@ -14,22 +14,14 @@ const mockActivityCard: ActivityCard = {
   location: "香川県高松市",
   feeRequired: 3000,
   hasReservableTicket: true,
+  pointsRequired: 100,
+  slots: [],
 };
 
-const meta: Meta<typeof OpportunityCardVertical> = {
+const meta: Meta<typeof OpportunityVerticalCard> = {
   title: "App/Activities/Card/CardVertical",
-  component: OpportunityCardVertical,
+  component: OpportunityVerticalCard,
   tags: ["autodocs"],
-  argTypes: {
-    opportunity: {
-      control: "object",
-      description: "Activity card data",
-    },
-    isCarousel: {
-      control: "boolean",
-      description: "Whether the card is displayed in a carousel (affects width)",
-    },
-  },
   parameters: {
     layout: "centered",
     nextjs: {
@@ -47,72 +39,74 @@ const meta: Meta<typeof OpportunityCardVertical> = {
 
 export default meta;
 
-type Story = StoryObj<typeof OpportunityCardVertical>;
+type Story = StoryObj<typeof OpportunityVerticalCard>;
 
 export const Default: Story = {
   args: {
-    opportunity: mockActivityCard,
-    isCarousel: false,
+    title: mockActivityCard.title,
+    image: mockActivityCard.images?.[0],
+    location: mockActivityCard.location,
+    price: mockActivityCard.feeRequired,
+    href: `/opportunities/${mockActivityCard.id}?community_id=${mockActivityCard.communityId}`,
   },
 };
 
 export const CarouselMode: Story = {
   args: {
-    opportunity: mockActivityCard,
-    isCarousel: true,
+    title: mockActivityCard.title,
+    image: mockActivityCard.images?.[0],
+    location: mockActivityCard.location,
+    price: mockActivityCard.feeRequired,
+    href: `/opportunities/${mockActivityCard.id}?community_id=${mockActivityCard.communityId}`,
   },
 };
 
 export const WithTicket: Story = {
   args: {
-    opportunity: {
-      ...mockActivityCard,
-      hasReservableTicket: true,
-    },
-    isCarousel: false,
+    title: mockActivityCard.title,
+    image: mockActivityCard.images?.[0],
+    location: mockActivityCard.location,
+    price: mockActivityCard.feeRequired,
+    badge: "チケット利用可",
+    href: `/opportunities/${mockActivityCard.id}?community_id=${mockActivityCard.communityId}`,
   },
 };
 
 export const WithoutTicket: Story = {
   args: {
-    opportunity: {
-      ...mockActivityCard,
-      hasReservableTicket: false,
-    },
-    isCarousel: false,
+    title: mockActivityCard.title,
+    image: mockActivityCard.images?.[0],
+    location: mockActivityCard.location,
+    price: mockActivityCard.feeRequired,
+    href: `/opportunities/${mockActivityCard.id}?community_id=${mockActivityCard.communityId}`,
   },
 };
 
 export const FreeActivity: Story = {
   args: {
-    opportunity: {
-      ...mockActivityCard,
-      title: "地域清掃ボランティア",
-      feeRequired: null,
-      hasReservableTicket: false,
-      images: [PLACEHOLDER_IMAGE],
-    },
-    isCarousel: false,
+    title: "地域清掃ボランティア",
+    image: PLACEHOLDER_IMAGE,
+    location: "香川県高松市",
+    price: null,
+    href: `/opportunities/1?community_id=neo88`,
   },
 };
 
 export const LongTitle: Story = {
   args: {
-    opportunity: {
-      ...mockActivityCard,
-      title: "伝統工芸体験ワークショップ：讃岐うどん作りと陶芸を組み合わせた特別プログラム",
-      location: "香川県善通寺市の伝統工芸センター",
-    },
-    isCarousel: false,
+    title: "伝統工芸体験ワークショップ：讃岐うどん作りと陶芸を組み合わせた特別プログラム",
+    image: mockActivityCard.images?.[0],
+    location: "香川県善通寺市の伝統工芸センター",
+    price: mockActivityCard.feeRequired,
+    href: `/opportunities/${mockActivityCard.id}?community_id=${mockActivityCard.communityId}`,
   },
 };
 
 export const NoImage: Story = {
   args: {
-    opportunity: {
-      ...mockActivityCard,
-      images: [],
-    },
-    isCarousel: false,
+    title: mockActivityCard.title,
+    location: mockActivityCard.location,
+    price: mockActivityCard.feeRequired,
+    href: `/opportunities/${mockActivityCard.id}?community_id=${mockActivityCard.communityId}`,
   },
 };
