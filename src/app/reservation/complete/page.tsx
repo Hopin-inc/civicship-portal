@@ -10,7 +10,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from '@/components/shared'
 import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
-import { useOpportunityContext } from "@/hooks/opportunities/useOpportunityContext";
+import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
 import { useAuth } from "@/contexts/AuthProvider";
 import { SimilarOpportunities } from "@/app/opportunities/[id]/components/SimilarOpportunitiesList";
 
@@ -68,7 +68,7 @@ export default function CompletePage() {
   }, [reservation, opportunity, dateTimeInfo, track]);
 
   // #NOTE: query でまとめて取得したいが、一時的対応
-  const { opportunity: oppotunityDetail,sameStateOpportunities } = useOpportunityContext(opportunityId ?? "", user);
+  const { opportunity: oppotunityDetail,sameStateOpportunities } = useOpportunityDetails(opportunityId ?? "", user);
 
   if (loading) return <LoadingIndicator fullScreen />;
   if (error || !reservation || !opportunity || !dateTimeInfo || !oppotunityDetail)

@@ -6,7 +6,7 @@ import { ErrorState } from "@/components/shared";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useOpportunityContext } from "@/hooks/opportunities/useOpportunityContext";
+import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
 import { notFound, useParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import OpportunityDetailsHeader from "./components/OpportunityDetailsHeader";
@@ -35,7 +35,7 @@ export default function OpportunityDetailPage() {
     loading,
     error,
     refetch,
-  } = useOpportunityContext(id, user);
+  } = useOpportunityDetails(id, user);
 
   const isExternalBooking =
   (opportunity?.title.includes("予約") || opportunity?.title.includes("問い合わせ")) ?? false;

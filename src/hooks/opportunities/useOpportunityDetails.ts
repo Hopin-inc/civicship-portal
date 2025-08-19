@@ -3,10 +3,10 @@ import { useSameStateOpportunities } from "./useSameStateOpportunities";
 import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
 import { useFilterFutureSlots } from "./useFilterFutureSlots";
 import { useSortedSlotsByStartsAt } from "./useSortedSlotsByStartsAt";
-import { useOpportunityDetail } from "./useopportunityDetail";
+import { useOpportunityDetail } from "./useOpportunityDetail";
 
 // 呼び出し側のインターフェースを維持
-export const useOpportunityContext = (id: string | undefined, user: Maybe<GqlUser> | undefined) => {
+export const useOpportunityDetails = (id: string | undefined, user: Maybe<GqlUser> | undefined) => {
   const { opportunity, loading, error, refetch, stateCode } = useOpportunityDetail(id);
 
   const {

@@ -18,7 +18,7 @@ import ReservationDetails from "@/app/reservation/complete/components/Reservatio
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { logger } from "@/lib/logging";
-import { useOpportunityContext } from "@/hooks/opportunities/useOpportunityContext";
+import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
 import { useAuth } from "@/contexts/AuthProvider";
 import { isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 
@@ -65,7 +65,7 @@ export default function ParticipationPage() {
   
   // #NOTE: コンポーネントに必要な情報を取得するために、useCompletePageViewModel と useOpportunityDetail を使用しているがリクエストが重複するので、まとめたい
   const { dateTimeInfo } = useCompletePageViewModel(id ?? "", participation?.reservation?.id ?? "");
-  const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityContext(opportunity?.id ?? "", user);
+  const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityDetails(opportunity?.id ?? "", user);
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
