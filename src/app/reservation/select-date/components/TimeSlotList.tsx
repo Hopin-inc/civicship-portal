@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
 import { formatTimeRange, getCrossDayLabel } from "@/utils/date";
 import { isBefore } from "date-fns";
-import { getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
+import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
 import { GqlOpportunityCategory } from "@/types/graphql";
 
 interface TimeSlotListProps {
@@ -48,8 +48,6 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
     [onSelectSlot],
   );
 
-  const registrationCutoff = getReservationThreshold(activityId);
-
   return (
     <div className="space-y-8">
       {dateSections.map((section, sectionIndex) => (
@@ -65,7 +63,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
               const startsAtDate = new Date(slot.startsAt);
               const endsAtDate = new Date(slot.endsAt);
 
-              const isRegistrationClosed = isBefore(startsAtDate, registrationCutoff);
+              const isRegistrationClosed = !isDateReservable(startsAtDate, activityId);
 
               const crossDayLabel = getCrossDayLabel(startsAtDate, endsAtDate);
 

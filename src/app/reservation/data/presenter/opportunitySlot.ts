@@ -5,25 +5,6 @@ import { ActivitySlot, ActivitySlotGroup } from "../type/opportunitySlot";
 import { getAdvanceBookingDays, DEFAULT_ADVANCE_BOOKING_DAYS } from "@/config/activityBookingConfig";
 
 /**
- * 予約可能判定のための閾値（現在時刻から何日後まで予約可能か）を返す
- * N日前の23:59まで予約を受け付ける（当日予約の場合は現在時刻）
- * @param activityId アクティビティID（指定されない場合はデフォルト値を使用）
- * @returns 予約可能判定のための閾値
- */
-export const getReservationThreshold = (activityId?: string): Date => {
-  const advanceBookingDays = getAdvanceBookingDays(activityId);
-  const now = new Date();
-
-  // 当日予約の場合は、閾値を現在時刻とする
-  if (advanceBookingDays === 0) {
-    return now;
-  }
-
-  const thresholdDate = addDays(now, advanceBookingDays);
-  return endOfDay(thresholdDate);
-};
-
-/**
  * 指定された日時が予約可能かどうかを判定する
  * N日前の23:59まで予約を受け付ける（当日予約の場合は現在時刻以降）
  * @param date 判定対象の日時
@@ -40,9 +21,11 @@ export const isDateReservable = (date: Date | string, activityId?: string): bool
     return isAfter(targetDate, now);
   }
 
-  const thresholdDate = addDays(now, advanceBookingDays);
-  const threshold = endOfDay(thresholdDate);
-  return isAfter(targetDate, threshold);
+  // N日前の23:59を計算するため、現在時刻からN日引く
+  const deadlineDate = addDays(targetDate, -advanceBookingDays);
+  const deadline = endOfDay(deadlineDate);
+  
+  return isAfter(now, deadline) === false; // 現在時刻が締切前であれば予約可能
 };
 
 export const presenterOpportunitySlots = (
@@ -67,8 +50,8 @@ export const presenterOpportunitySlot = (
   feeRequired: number | null,
 ): ActivitySlot => {
   const startsAtDate = new Date(slot.startsAt);
-  const activityId = slot.opportunity?.id;
-  const isReservable = isDateReservable(startsAtDate, activityId);
+  const opportunityId = slot.opportunity?.id;
+  const isReservable = isDateReservable(startsAtDate, opportunityId);
 
   return {
     id: slot.id,
