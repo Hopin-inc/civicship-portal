@@ -4,6 +4,7 @@ import { ActivityCard } from "@/components/domains/opportunities/types";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
+import { formatOpportunities } from "@/components/domains/opportunities/utils/formatOpportunities";
 
 const mockActivityCard: ActivityCard = {
   id: "1",
@@ -43,70 +44,61 @@ type Story = StoryObj<typeof OpportunityVerticalCard>;
 
 export const Default: Story = {
   args: {
-    title: mockActivityCard.title,
-    image: mockActivityCard.images?.[0],
-    location: mockActivityCard.location,
-    price: mockActivityCard.feeRequired,
-    href: `/opportunities/${mockActivityCard.id}?community_id=${mockActivityCard.communityId}`,
+    ...formatOpportunities(mockActivityCard),
   },
 };
 
 export const CarouselMode: Story = {
   args: {
-    title: mockActivityCard.title,
-    image: mockActivityCard.images?.[0],
-    location: mockActivityCard.location,
-    price: mockActivityCard.feeRequired,
-    href: `/opportunities/${mockActivityCard.id}?community_id=${mockActivityCard.communityId}`,
+    ...formatOpportunities(mockActivityCard),
   },
 };
 
 export const WithTicket: Story = {
   args: {
-    title: mockActivityCard.title,
-    image: mockActivityCard.images?.[0],
-    location: mockActivityCard.location,
-    price: mockActivityCard.feeRequired,
-    badge: "チケット利用可",
-    href: `/opportunities/${mockActivityCard.id}?community_id=${mockActivityCard.communityId}`,
+    ...formatOpportunities({
+      ...mockActivityCard,
+      hasReservableTicket: true,
+    }),
   },
 };
 
 export const WithoutTicket: Story = {
   args: {
-    title: mockActivityCard.title,
-    image: mockActivityCard.images?.[0],
-    location: mockActivityCard.location,
-    price: mockActivityCard.feeRequired,
-    href: `/opportunities/${mockActivityCard.id}?community_id=${mockActivityCard.communityId}`,
+    ...formatOpportunities({
+      ...mockActivityCard,
+      hasReservableTicket: false,
+    }),
   },
 };
 
 export const FreeActivity: Story = {
   args: {
-    title: "地域清掃ボランティア",
-    image: PLACEHOLDER_IMAGE,
-    location: "香川県高松市",
-    price: null,
-    href: `/opportunities/1?community_id=neo88`,
+    ...formatOpportunities({
+      ...mockActivityCard,
+      title: "地域清掃ボランティア",
+      feeRequired: null,
+      hasReservableTicket: false,
+      images: [PLACEHOLDER_IMAGE],
+    }),
   },
 };
 
 export const LongTitle: Story = {
   args: {
-    title: "伝統工芸体験ワークショップ：讃岐うどん作りと陶芸を組み合わせた特別プログラム",
-    image: mockActivityCard.images?.[0],
-    location: "香川県善通寺市の伝統工芸センター",
-    price: mockActivityCard.feeRequired,
-    href: `/opportunities/${mockActivityCard.id}?community_id=${mockActivityCard.communityId}`,
+    ...formatOpportunities({
+      ...mockActivityCard,
+      title: "伝統工芸体験ワークショップ：讃岐うどん作りと陶芸を組み合わせた特別プログラム",
+      location: "香川県善通寺市の伝統工芸センター",
+    }),
   },
 };
 
 export const NoImage: Story = {
   args: {
-    title: mockActivityCard.title,
-    location: mockActivityCard.location,
-    price: mockActivityCard.feeRequired,
-    href: `/opportunities/${mockActivityCard.id}?community_id=${mockActivityCard.communityId}`,
+    ...formatOpportunities({
+      ...mockActivityCard,
+      images: [],
+    }),
   },
 };

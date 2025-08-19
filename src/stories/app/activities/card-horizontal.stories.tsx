@@ -4,6 +4,7 @@ import { ActivityCard } from "@/components/domains/opportunities/types";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
+import { formatOpportunities } from "@/components/domains/opportunities/utils/formatOpportunities";
 
 const mockActivityCard: ActivityCard = {
   id: "1",
@@ -49,41 +50,47 @@ type Story = StoryObj<typeof OpportunityHorizontalCard>;
 
 export const Default: Story = {
   args: {
-    ...mockActivityCard,
+    ...formatOpportunities(mockActivityCard),
     withShadow: true,
   },
 };
 
 export const WithoutShadow: Story = {
   args: {
-    ...mockActivityCard,
+    ...formatOpportunities(mockActivityCard),
     withShadow: false,
   },
 };
 
 export const FreeActivity: Story = {
   args: {
-    title: "地域清掃ボランティア",
-    price: null,
-    image: PLACEHOLDER_IMAGE,
-    location: "香川県高松市",
+    ...formatOpportunities({
+      ...mockActivityCard,
+      title: "地域清掃ボランティア",
+      feeRequired: null,
+      images: [PLACEHOLDER_IMAGE],
+    }),
     withShadow: true,
   },
 };
 
 export const LongTitle: Story = {
   args: {
-    ...mockActivityCard,
-    title: "伝統工芸体験ワークショップ：讃岐うどん作りと陶芸を組み合わせた特別プログラム",
-    location: "香川県善通寺市の伝統工芸センター",
+    ...formatOpportunities({
+      ...mockActivityCard,
+      title: "伝統工芸体験ワークショップ：讃岐うどん作りと陶芸を組み合わせた特別プログラム",
+      location: "香川県善通寺市の伝統工芸センター",
+    }),
     withShadow: true,
   },
 };
 
 export const NoImage: Story = {
   args: {
-    ...mockActivityCard,
-    image: PLACEHOLDER_IMAGE,
+    ...formatOpportunities({
+      ...mockActivityCard,
+      images: [],
+    }),
     withShadow: true,
   },
 };
