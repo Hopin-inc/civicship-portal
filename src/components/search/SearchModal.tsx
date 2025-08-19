@@ -56,7 +56,11 @@ export default function SearchModal({ isOpen, onClose, initialParams = {} }: Sea
         }
         return undefined;
       })(),
-      guests: initialParams.guests ? parseInt(initialParams.guests, 10) : 0,
+      guests: (() => {
+        if (!initialParams.guests) return 0;
+        const parsed = parseInt(initialParams.guests, 10);
+        return Number.isNaN(parsed) ? 0 : parsed;
+      })(),
       useTicket: initialParams.ticket === "true",
     },
   });
