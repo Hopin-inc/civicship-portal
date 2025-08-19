@@ -1,21 +1,24 @@
 "use client";
 import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
-import { addDays, isAfter } from "date-fns";
+import { addDays, isAfter, endOfDay } from "date-fns";
 import { ActivitySlot, ActivitySlotGroup } from "../type/opportunitySlot";
 import { getAdvanceBookingDays, DEFAULT_ADVANCE_BOOKING_DAYS } from "@/config/activityBookingConfig";
 
 /**
  * 予約可能判定のための閾値（現在時刻から何日後まで予約可能か）を返す
+ * N日前の23:59まで予約を受け付ける
  * @param activityId アクティビティID（指定されない場合はデフォルト値を使用）
  * @returns 予約可能判定のための閾値
  */
 export const getReservationThreshold = (activityId?: string): Date => {
   const advanceBookingDays = getAdvanceBookingDays(activityId);
-  return addDays(new Date(), advanceBookingDays);
+  const thresholdDate = addDays(new Date(), advanceBookingDays);
+  return endOfDay(thresholdDate);
 };
 
 /**
  * 指定された日時が予約可能かどうかを判定する
+ * N日前の23:59まで予約を受け付ける
  * @param date 判定対象の日時
  * @param activityId アクティビティID（指定されない場合はデフォルト値を使用）
  * @returns 予約可能かどうか
@@ -23,7 +26,8 @@ export const getReservationThreshold = (activityId?: string): Date => {
 export const isDateReservable = (date: Date | string, activityId?: string): boolean => {
   const targetDate = typeof date === "string" ? new Date(date) : date;
   const advanceBookingDays = getAdvanceBookingDays(activityId);
-  const threshold = addDays(new Date(), advanceBookingDays);
+  const thresholdDate = addDays(new Date(), advanceBookingDays);
+  const threshold = endOfDay(thresholdDate);
   return isAfter(targetDate, threshold);
 };
 
