@@ -204,7 +204,7 @@ function SearchModalContent({
         />
       </div>
       
-      <div className="border-t bg-white z-[9999]">
+      <div className="border-t bg-white">
         <SearchFooter 
           onClear={handleClear} 
           onSearch={handleSearch} 
