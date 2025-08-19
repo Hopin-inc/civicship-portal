@@ -35,6 +35,7 @@ export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = {
   "cmb3a6qny01hcs60ncbsokqz8": 0, // ［８］藍ある暮らしに触れる
   // === for development ===
   "cmdoet4xa002ds60e7f5akwcb": 0,
+  "cmecrwvir0004s60e8mii3sxv": 1,
   "cmdoesowc002bs60eytbbxkxe": 1,
   "cmdoerhjc0029s60efbb4ub0m": 2
 };
