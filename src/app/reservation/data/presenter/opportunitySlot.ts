@@ -1,6 +1,6 @@
 "use client";
 import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
-import { addDays, isAfter, endOfDay } from "date-fns";
+import { addDays, isAfter, endOfDay, subDays } from "date-fns";
 import { ActivitySlot, ActivitySlotGroup } from "../type/opportunitySlot";
 import { getAdvanceBookingDays, DEFAULT_ADVANCE_BOOKING_DAYS } from "@/config/activityBookingConfig";
 
@@ -22,7 +22,7 @@ export const isDateReservable = (date: Date | string, activityId?: string): bool
   }
 
   // アクティビティの開催日時からN日前の日付を計算し、その日の終わりを締切とする
-  const deadlineDate = addDays(targetDate, -advanceBookingDays);
+  const deadlineDate = subDays(targetDate, advanceBookingDays);
   const deadline = endOfDay(deadlineDate);
 
   return !isAfter(now, deadline); // 現在時刻が締切を過ぎていなければ予約可能
