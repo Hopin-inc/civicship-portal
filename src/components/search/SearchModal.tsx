@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
@@ -68,7 +68,7 @@ export default function SearchModal({ isOpen, onClose, initialParams = {} }: Sea
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex justify-center">
+    <div className="fixed inset-0 flex justify-center z-50">
       <div className="bg-white w-full max-w-md max-h-[100vh] overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b bg-white relative">
           <Button variant="icon-only" size="sm" onClick={onClose}>
@@ -161,9 +161,9 @@ function SearchModalContent({
     !values.usePoints;
 
   return (
-    <div className="space-y-4 bg-white">
+    <div className="space-y-4">
       {shouldShowQuests && (
-        <div className="bg-white">
+        <div>
           <SearchTabs
             selectedTab={selectedTab}
             onTabChange={setSelectedTab}
@@ -171,11 +171,11 @@ function SearchModalContent({
         </div>
       )}
       
-      <div className="bg-white">
+      <div>
         <SearchForm onSearch={handleSearch} />
       </div>
       
-      <div className="bg-white">
+      <div>
         <SearchFilters
           onFilterClick={setActiveForm}
           formatDateRange={formatDateRange}
@@ -188,7 +188,7 @@ function SearchModalContent({
         />
       </div>
       
-      <div className="bg-white">
+      <div>
         <SearchFilterSheets
           activeForm={activeForm}
           setActiveForm={setActiveForm}
@@ -208,7 +208,7 @@ function SearchModalContent({
         />
       </div>
       
-      <div className="border-t bg-white">
+      <div className="border-t">
         <SearchFooter 
           onClear={handleClear} 
           onSearch={handleSearch} 
