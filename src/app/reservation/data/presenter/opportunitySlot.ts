@@ -67,7 +67,8 @@ export const presenterOpportunitySlot = (
   feeRequired: number | null,
 ): ActivitySlot => {
   const startsAtDate = new Date(slot.startsAt);
-  const isReservable = isDateReservable(startsAtDate);
+  const activityId = slot.opportunity?.id;
+  const isReservable = isDateReservable(startsAtDate, activityId);
 
   return {
     id: slot.id,
