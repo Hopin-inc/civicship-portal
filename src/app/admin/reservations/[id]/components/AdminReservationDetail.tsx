@@ -107,6 +107,7 @@ const ReservationCard: React.FC<{
       <CardHeader>
         <OpportunityHorizontalCard
           {...formattedActivityCard}
+          withShadow={false}
         ></OpportunityHorizontalCard>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
