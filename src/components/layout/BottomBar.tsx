@@ -52,7 +52,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     <nav
       className={cn(
         className,
-        "fixed bottom-0 left-0 w-full bg-background border-t border-input z-50 transition-transform duration-300",
+        "fixed bottom-0 left-0 w-full bg-background border-t border-input z-40 transition-transform duration-300",
         !isLiff ? "py-4" : "pt-4 pb-10",
         !isVisible && "transform translate-y-full",
       )}
