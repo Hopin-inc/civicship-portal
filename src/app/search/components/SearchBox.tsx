@@ -16,7 +16,6 @@ interface SearchFormProps {
   type?: string;
   ticket?: string;
   points?: string;
-  redirectTo?: string;
 }
 
 const PREFECTURE_LABELS: Record<string, string> = {
@@ -27,7 +26,7 @@ const PREFECTURE_LABELS: Record<string, string> = {
 };
 const DEFAULT_LABEL = "四国";
 
-const SearchBox = ({ location, from, to, guests, q, type, ticket, points, redirectTo }: SearchFormProps) => {
+const SearchBox = ({ location, from, to, guests, q, type, ticket, points }: SearchFormProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getLocationText = (location: string | undefined, isDefault: boolean = false): string => {
