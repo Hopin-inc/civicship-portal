@@ -35,7 +35,7 @@ export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = {
   "cmb3a6qny01hcs60ncbsokqz8": 0, // ［８］藍ある暮らしに触れる
   "cmajrynj70000s60nnm7djfbo": 1, // ［８８］地質で旅する夏、塩江ジオ川登り
   "cmajsmuff0006s60nlsaxpnme": 1, // ［７２］みらい社小屋で出会うITの世界
-  "cmajnmg5n001cs60n1eabrr1y": 1, // うどんタクシー“格さん”と行く！讃岐うどん食べ歩き＆うどん打ち体験スペシャルツアー
+  "cmajnmg5n001cs60n1eabrr1y": 1, // ［５５］松山妖怪と過ごす、変身浴衣撮影会
   // === for development ===
   "cmdoet4xa002ds60e7f5akwcb": 0,
   "cmdoesowc002bs60eytbbxkxe": 1,
