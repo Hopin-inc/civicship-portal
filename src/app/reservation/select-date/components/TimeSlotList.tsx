@@ -48,7 +48,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
     [onSelectSlot],
   );
 
-  const registrationCutoff = getReservationThreshold(activityId);
+  // Note: getReservationThreshold is no longer used since isDateReservable handles the logic internally
 
   return (
     <div className="space-y-8">
@@ -65,7 +65,7 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
               const startsAtDate = new Date(slot.startsAt);
               const endsAtDate = new Date(slot.endsAt);
 
-              const isRegistrationClosed = isBefore(startsAtDate, registrationCutoff);
+              const isRegistrationClosed = !slot.isReservable;
 
               const crossDayLabel = getCrossDayLabel(startsAtDate, endsAtDate);
 
