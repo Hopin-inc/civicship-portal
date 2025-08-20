@@ -38,6 +38,7 @@ export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = {
   "cmajnmg5n001cs60n1eabrr1y": 1, // ［５５］松山妖怪と過ごす、変身浴衣撮影会
   // === for development ===
   "cmdoet4xa002ds60e7f5akwcb": 0,
+  "cmecrwvir0004s60e8mii3sxv": 1,
   "cmdoesowc002bs60eytbbxkxe": 1,
   "cmdoerhjc0029s60efbb4ub0m": 2
 };
