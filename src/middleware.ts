@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
   const rootPath = currentCommunityConfig.rootPath || "/";
 
   // ルートページへのアクセスを処理
-  if (pathname === "/") {
+  if (pathname === "/" && rootPath !== "/") {
     return NextResponse.redirect(new URL(rootPath, request.url));
   }
 
