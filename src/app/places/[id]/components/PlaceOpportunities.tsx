@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { ActivityCard } from "@/components/domains/opportunity/types";
-import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
+import { ActivityCard } from "@/components/domains/opportunities/types";
+import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 interface PlaceOpportunitiesProps {
   opportunities: ActivityCard[];
@@ -10,6 +11,8 @@ interface PlaceOpportunitiesProps {
 
 const PlaceOpportunities: React.FC<PlaceOpportunitiesProps> = ({ opportunities }) => {
   if (!opportunities.length) return null;
+
+  const formattedOpportunities = opportunities.map(formatOpportunities);
 
   return (
     <div className="px-4 pt-6 pb-8 max-w-mobile-l mx-auto space-y-4">
@@ -22,8 +25,8 @@ const PlaceOpportunities: React.FC<PlaceOpportunitiesProps> = ({ opportunities }
         </h2>
       </div>
       <div className="flex gap-4 overflow-x-auto scrollbar-hide">
-        {opportunities.map((opportunity) => (
-          <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} isCarousel />
+        {formattedOpportunities.map((opportunity) => (
+          <OpportunityVerticalCard key={opportunity.id} {...opportunity} />
         ))}
       </div>
     </div>

@@ -6,13 +6,14 @@ import Link from "next/link";
 import EmptyStateWithSearch from "@/components/shared/EmptyStateWithSearch";
 import { RefObject } from "react";
 import { ParticipantsList } from "@/components/shared/ParticipantsList";
-import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/components/domains/opportunity/types";
+import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
+import { ActivityCard, FormattedOpportunityCard } from "@/components/domains/opportunities/types";
 import { AppPortfolio } from "@/app/users/data/type";
 import { GqlEvaluationStatus, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getCurrentRegionName } from "@/lib/communities/metadata";
 import { useRouter } from "next/navigation";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 type Props = {
   userId: string;
@@ -26,7 +27,7 @@ type Props = {
 };
 
 type ActiveOpportunitiesProps = {
-  opportunities: ActivityCard[];
+  opportunities: FormattedOpportunityCard[];
 };
 
 const getCategoryLabel = (
@@ -92,7 +93,7 @@ const ActiveOpportunities = ({ opportunities }: ActiveOpportunitiesProps) => {
         <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
           <div className="flex gap-4">
             {opportunities.map((opportunity) => (
-              <OpportunityCardVertical key={opportunity.id} opportunity={opportunity} isCarousel />
+              <OpportunityVerticalCard key={opportunity.id} {...opportunity} />
             ))}
           </div>
         </div>
@@ -250,10 +251,12 @@ const UserPortfolioList = ({
     // icon: <PhotoGallery />,
   };
 
+  const formattedOpportunities = activeOpportunities.map(formatOpportunities);
+
   return (
     <section className="py-6 mt-0">
       <div className="space-y-4">
-        {isSysAdmin && <ActiveOpportunities opportunities={activeOpportunities} />}
+        {isSysAdmin && <ActiveOpportunities opportunities={formattedOpportunities} />}
         <div className="flex items-center justify-between">
           <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
             これまでの関わり
