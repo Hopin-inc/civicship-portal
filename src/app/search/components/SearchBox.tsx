@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import SearchModal from "@/components/search/SearchModal";
+import { FormProvider, useForm } from "react-hook-form";
 
 interface SearchFormProps {
   location?: string;
@@ -66,6 +67,31 @@ const SearchBox = ({ location, from, to, guests, q, type, ticket, points }: Sear
   
   const badgeCount = [ticket, points].filter(Boolean).length;
 
+  const methods = useForm({
+    defaultValues: {
+      searchQuery: q || "",
+      location: location || "",
+      dateRange: (() => {
+        const fromStr = from;
+        const toStr = to;
+        if (fromStr && toStr) {
+          const fromDate = new Date(fromStr);
+          const toDate = new Date(toStr);
+          if (!Number.isNaN(fromDate.valueOf()) && !Number.isNaN(toDate.valueOf())) {
+            return { from: fromDate, to: toDate };
+          }
+        }
+        return undefined;
+      })(),
+      guests: (() => {
+        if (!guests) return 0;
+        const parsed = parseInt(guests, 10);
+        return Number.isNaN(parsed) ? 0 : parsed;
+      })(),
+      useTicket: ticket === "true",
+    },
+  });
+
   return (
     <>
       <Button
@@ -110,21 +136,13 @@ const SearchBox = ({ location, from, to, guests, q, type, ticket, points }: Sear
         </div>
         )}
       </Button>
-
-      <SearchModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        initialParams={{
-          location,
-          from,
-          to,
-          guests,
-          q,
-          type,
-          ticket,
-          points,
-        }}
-      />
+      <FormProvider {...methods}>
+        <SearchModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          type={type}
+        />
+      </FormProvider>
     </>
   );
 };
