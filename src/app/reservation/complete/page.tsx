@@ -37,8 +37,7 @@ export default function CompletePage() {
     reservation,
     opportunity,
     dateTimeInfo,
-    articleCard,
-    sameStateActivities,
+    sameStateOpportunities,
     loading,
     error,
     refetch,
@@ -68,7 +67,7 @@ export default function CompletePage() {
   }, [reservation, opportunity, dateTimeInfo, track]);
 
   // #NOTE: query でまとめて取得したいが、一時的対応
-  const { opportunity: oppotunityDetail,sameStateOpportunities } = useOpportunityDetails(opportunityId ?? "", user);
+  const { opportunity: oppotunityDetail } = useOpportunityDetails(opportunityId ?? "", user);
 
   if (loading) return <LoadingIndicator fullScreen />;
   if (error || !reservation || !opportunity || !dateTimeInfo || !oppotunityDetail)
@@ -88,7 +87,7 @@ export default function CompletePage() {
           ticketCount={ dateTimeInfo.ticketCount }
         />
       ) }
-      { opportunityId && sameStateActivities.length > 0 && (
+      { opportunityId && sameStateOpportunities.length > 0 && (
         <>
           <div className="h-2 bg-border -mx-6 w-full" />
           <div className="px-6 w-full">
