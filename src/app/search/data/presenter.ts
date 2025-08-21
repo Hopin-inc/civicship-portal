@@ -16,7 +16,6 @@ export interface SearchParams {
   ticket?: string;
   points?: string;
   q?: string;
-  redirectTo?: string;
 }
 
 export const formatDateRange = (range: DateRange | undefined): string => {
