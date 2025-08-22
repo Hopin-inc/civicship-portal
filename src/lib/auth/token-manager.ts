@@ -231,6 +231,83 @@ export class TokenManager {
   }
 
   /**
+   * 電話番号認証トークンの有効性を検証
+   * @returns 検証結果と詳細情報
+   */
+  static validatePhoneTokens(): {
+    isValid: boolean;
+    missingTokens: string[];
+    hasExpired: boolean;
+    details: {
+      hasPhoneUid: boolean;
+      hasAccessToken: boolean;
+      hasRefreshToken: boolean;
+      hasPhoneNumber: boolean;
+      expiresAt: number | null;
+      timeUntilExpiry: number | null;
+    };
+  } {
+    const tokens = this.getPhoneTokens();
+    const missingTokens: string[] = [];
+    
+    if (!tokens.phoneUid) missingTokens.push("phoneUid");
+    if (!tokens.accessToken) missingTokens.push("accessToken");
+    if (!tokens.refreshToken) missingTokens.push("refreshToken");
+    
+    const now = Date.now();
+    const bufferTime = 5 * 60 * 1000; // 5分のバッファ
+    const hasExpired = tokens.expiresAt ? (tokens.expiresAt - now < bufferTime) : true;
+    const timeUntilExpiry = tokens.expiresAt ? tokens.expiresAt - now : null;
+    
+    const isValid = missingTokens.length === 0 && !hasExpired;
+    
+    return {
+      isValid,
+      missingTokens,
+      hasExpired,
+      details: {
+        hasPhoneUid: !!tokens.phoneUid,
+        hasAccessToken: !!tokens.accessToken,
+        hasRefreshToken: !!tokens.refreshToken,
+        hasPhoneNumber: !!tokens.phoneNumber,
+        expiresAt: tokens.expiresAt,
+        timeUntilExpiry,
+      },
+    };
+  }
+
+  /**
+   * トークンの状態をログに記録
+   * @param operation 実行中の操作名
+   * @param context 追加のコンテキスト情報
+   */
+  static logTokenState(operation: string, context?: Record<string, any>): void {
+    const phoneValidation = this.validatePhoneTokens();
+    const lineTokens = this.getLineTokens();
+    
+    logger.info("Token state analysis", {
+      operation,
+      phoneTokens: {
+        isValid: phoneValidation.isValid,
+        missingTokens: phoneValidation.missingTokens,
+        hasExpired: phoneValidation.hasExpired,
+        hasPhoneUid: phoneValidation.details.hasPhoneUid,
+        hasAccessToken: phoneValidation.details.hasAccessToken,
+        hasRefreshToken: phoneValidation.details.hasRefreshToken,
+        hasPhoneNumber: phoneValidation.details.hasPhoneNumber,
+        timeUntilExpiry: phoneValidation.details.timeUntilExpiry,
+      },
+      lineTokens: {
+        hasAccessToken: !!lineTokens.accessToken,
+        hasRefreshToken: !!lineTokens.refreshToken,
+        hasExpiresAt: !!lineTokens.expiresAt,
+      },
+      component: "TokenManager",
+      ...context,
+    });
+  }
+
+  /**
    * Cookieを設定
    * @param name Cookieの名前
    * @param value Cookieの値
