@@ -74,7 +74,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
     enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures","quests"],
-    rootPath: "/activities",
+    rootPath: "/opportunities",
     adminRootPath: "/admin/reservations",
   },
   "himeji-ymca": {
@@ -90,7 +90,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     ogImagePath:
       "https://storage.googleapis.com/prod-civicship-storage-public/asset/himeji-ymca/ogp.jpg",
     enableFeatures: ["opportunities", "credentials", "quests", "points"],
-    rootPath: "/activities",
+    rootPath: "/opportunities",
     adminRootPath: "/admin/reservations",
   },
   kibotcha: {
@@ -146,7 +146,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       "prefectures",
       "quests",
     ],
-    rootPath: "/activities",
+    rootPath: "/opportunities",
   },
 };
 

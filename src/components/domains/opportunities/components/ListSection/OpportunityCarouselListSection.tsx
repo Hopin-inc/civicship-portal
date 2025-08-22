@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import CarouselSectionSkeleton from "@/app/activities/components/CarouselSection/CarouselSectionSkeleton";
 import { FormattedOpportunityCard } from "@/components/domains/opportunities/types";
 import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
 import { CardCarousel } from "@/components/shared/CardCarousel";
+import OpportunitiesListSectionSkeleton from "./OpportunityListSectionSkeleton";
 
 interface OpportunityCarouselListSectionProps {
   title: string;
@@ -19,7 +19,7 @@ export const OpportunityCarouselListSection: React.FC<OpportunityCarouselListSec
   isInitialLoading = false,
   isSearchResult = false,
 }) => {
-  if (isInitialLoading) return <CarouselSectionSkeleton title={title} />;
+  if (isInitialLoading) return <OpportunitiesListSectionSkeleton title={title} />;
   if (opportunities.length === 0) return null;
 
   const match = isSearchResult ? title.match(/^(\d+)\/(\d+)\((.+)\)$/) : null;

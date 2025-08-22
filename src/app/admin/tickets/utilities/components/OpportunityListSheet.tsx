@@ -9,11 +9,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import { GqlOpportunity } from "@/types/graphql";
-import { ActivityCard } from "@/components/domains/opportunities/types";
+import { ActivityCard, FormattedOpportunityCard } from "@/components/domains/opportunities/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
+import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
 
 interface OpportunityListSheetProps {
   opportunities: GqlOpportunity[];
@@ -27,6 +28,7 @@ export default function OpportunityListSheet({
                                                children,
                                              }: OpportunityListSheetProps) {
   const activityCards: ActivityCard[] = opportunities.map(presenterActivityCard);
+  const formattedActivityCards = activityCards.map(formatOpportunities);
 
   return (
     <Sheet>
@@ -50,10 +52,10 @@ export default function OpportunityListSheet({
                 関連する機会がありません
               </p>
             ) : (
-              activityCards.map((opportunity: ActivityCard) => (
-                <OpportunityCardHorizontal
+              formattedActivityCards.map((opportunity: FormattedOpportunityCard) => (
+                <OpportunityHorizontalCard
                   key={ opportunity.id }
-                  opportunity={ opportunity }
+                  {...opportunity}
                   withShadow={ false }
                 />
               ))

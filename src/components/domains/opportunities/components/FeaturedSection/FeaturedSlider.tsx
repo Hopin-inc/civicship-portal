@@ -6,6 +6,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import OpportunityImageSlider from "@/components/domains/opportunities/components/FeaturedSection/ImageSlider";
 import OpportunityHorizontalCard from "../OpportunityHorizontalCard";
+import { formatOpportunities } from "../../utils";
 
 export default function FeaturedSlider({
   opportunities,
@@ -39,6 +40,8 @@ export default function FeaturedSlider({
     [emblaApi, opportunities.length],
   );
 
+  const formattedOpportunities = opportunities.map(formatOpportunities);
+
   const images = opportunities.map((op) => op.images?.[1] ?? PLACEHOLDER_IMAGE);
 
   return (
@@ -52,14 +55,11 @@ export default function FeaturedSlider({
       />
       <div className="embla h-full" ref={emblaRef}>
         <div className="embla__container h-full">
-          {opportunities.map((op) => (
+          {formattedOpportunities.map((op) => (
             <div key={op.id} className="embla__slide relative h-full w-full flex-[0_0_100%]">
               <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/60 via-black/40 to-transparent px-6 pb-8 pt-16">
                 <OpportunityHorizontalCard
-                  opportunity={op}
-                  href={`/activities/${op.id}?community_id=${op.communityId}`}
-                  price={"feeRequired" in op ? op.feeRequired : undefined}
-                  location={op.location}
+                  {...op}
                 />
               </div>
             </div>
