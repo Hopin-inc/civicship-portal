@@ -34,7 +34,7 @@ const renderFullSlotCard = (slot: ActivitySlot | QuestSlot) => {
   const endDate = new Date(slot.endsAt);
 
   const isFeeSpecified = isActivitySlotType(slot) && slot.feeRequired != null;
-  const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
+  const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : null;
   const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-gray-400" : "text-gray-400"}`;
 
   const crossDayLabel = getCrossDayLabel(startDate, endDate);
@@ -80,7 +80,7 @@ const renderAvailableSlotCard = (
   const isReservable = slot.isReservable;
 
   const isFeeSpecified = isActivitySlotType(slot) && slot.feeRequired != null;
-  const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
+  const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : null;
   const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-muted-foreground/50" : "text-caption"}`;
 
   const query = new URLSearchParams({
