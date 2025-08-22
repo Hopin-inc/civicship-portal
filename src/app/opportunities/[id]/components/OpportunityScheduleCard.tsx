@@ -44,7 +44,7 @@ const renderFullSlotCard = (slot: ActivitySlot | QuestSlot, place?:number | null
             （{format(startDate, "E", { locale: ja })}）
           </span>
         </h3>
-        <p className="text-body-md text-gray-400 mb-4">
+        <p className="text-body-md text-gray-400">
           {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
           {crossDayLabel && (
             <span className="text-label-sm text-gray-400">（{crossDayLabel}）</span>
@@ -53,23 +53,24 @@ const renderFullSlotCard = (slot: ActivitySlot | QuestSlot, place?:number | null
         <div className="space-y-2">
           <div className="flex items-baseline">
             {place != null ? (
-              <p className="text-body-md font-bold">
+              <p className="text-body-md font-bold  mt-4">
                 {`${place.toLocaleString()}円`}
               </p>
             ) : points == null ? (
-              <p className="text-body-md font-bold text-gray-400">
+              <p className="text-body-md font-bold text-muted-foreground/50">
                 料金未定
               </p>
             ) : null}
-            {place != null && <p className="text-body-sm ml-1 text-gray-300">/ 人</p>}
+            {place != null && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
           </div>
           {points != null && (
             <div className="flex items-center gap-1 pt-1">
               <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
                 P
               </p>
-              <p className="text-sm font-bold">
-                {points.toLocaleString()}ptもらえる
+              <p className="">
+                <span className="text-body-md font-bold">{points.toLocaleString()}pt</span>
+                <span className="text-body-sm">もらえる</span>
               </p>
             </div>
           )}
@@ -122,9 +123,9 @@ const renderAvailableSlotCard = (
           )}
         </p>
         <div className="space-y-2">
-          <div className="flex items-baseline mt-4">
+          <div className="flex items-baseline">
             {place != null ? (
-              <p className="text-body-md font-bold">
+              <p className="text-body-md font-bold  mt-4">
                 {`${place.toLocaleString()}円`}
               </p>
             ) : points == null ? (
@@ -147,7 +148,7 @@ const renderAvailableSlotCard = (
           )}
         </div>
       </div>
-      <div className="flex justify-center mt-6 flex-col gap-2 items-center">
+      <div className="flex justify-center mt-4 flex-col gap-2 items-center">
         {isReservable ? (
           <>
             {slot.remainingCapacity &&
