@@ -71,11 +71,11 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
                 <p className="text-body-lg font-bold">
                   {`${price.toLocaleString()}円〜`}
                 </p>
-              ) : (
+              ) : point === null ? (
                 <p className="text-body-lg font-bold text-muted-foreground/50">
                   料金未定
                 </p>
-              )}
+              ) : null}
               {point != null && (
                 <p>
                   <span className="font-bold text-lg">{point.toLocaleString()}pt</span>

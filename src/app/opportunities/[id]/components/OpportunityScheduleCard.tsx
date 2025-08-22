@@ -9,6 +9,18 @@ import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunity
 import { getCrossDayLabel } from "@/utils/date";
 import { isActivitySlotType } from "@/components/domains/opportunities/types";
 
+const getFeeDisplayInfo = (slot: ActivitySlot | QuestSlot) => {
+  const isActivitySlot = isActivitySlotType(slot);
+  const isFeeSpecified = isActivitySlot && slot.feeRequired != null;
+  const feeText = isActivitySlot 
+    ? slot.feeRequired != null 
+      ? `${slot.feeRequired.toLocaleString()}円` 
+      : "料金未定"
+    : null;
+  
+  return { isActivitySlot, isFeeSpecified, feeText };
+};
+
 interface OpportunityScheduleCardProps {
   slot: ActivitySlot | QuestSlot;
   opportunityId: string;
@@ -21,9 +33,6 @@ export const OpportunityScheduleCard: React.FC<OpportunityScheduleCardProps> = (
   communityId,
 }) => {
   const isFull = slot.remainingCapacity === 0;
-  const startDate = new Date(slot.startsAt);
-  const endDate = new Date(slot.endsAt);
-  
   return isFull
     ? renderFullSlotCard(slot)
     : renderAvailableSlotCard(slot, opportunityId, communityId);
@@ -33,8 +42,7 @@ const renderFullSlotCard = (slot: ActivitySlot | QuestSlot) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
 
-  const isFeeSpecified = isActivitySlotType(slot) && slot.feeRequired != null;
-  const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
+  const { isFeeSpecified, feeText } = getFeeDisplayInfo(slot);
   const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-gray-400" : "text-gray-400"}`;
 
   const crossDayLabel = getCrossDayLabel(startDate, endDate);
@@ -79,8 +87,7 @@ const renderAvailableSlotCard = (
   const endDate = new Date(slot.endsAt);
   const isReservable = slot.isReservable;
 
-  const isFeeSpecified = isActivitySlotType(slot) && slot.feeRequired != null;
-  const feeText = isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円` : "料金未定";
+  const { isFeeSpecified, feeText } = getFeeDisplayInfo(slot);
   const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-muted-foreground/50" : "text-caption"}`;
 
   const query = new URLSearchParams({
