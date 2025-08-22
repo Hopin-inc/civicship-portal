@@ -231,6 +231,150 @@ export class TokenManager {
   }
 
   /**
+   * トークン状態の永続化と復旧機能（Phase 4 長期的改善）
+   * @param operation 実行中の操作名
+   * @returns トークン状態の詳細情報
+   */
+  static analyzeTokenState(operation: string): {
+    phoneTokens: {
+      isValid: boolean;
+      missingTokens: string[];
+      hasExpired: boolean;
+      timeUntilExpiry: number | null;
+    };
+    lineTokens: {
+      isValid: boolean;
+      hasExpired: boolean;
+    };
+    recommendations: string[];
+  } {
+    const phoneTokens = this.getPhoneTokens();
+    const lineTokens = this.getLineTokens();
+    
+    const missingPhoneTokens: string[] = [];
+    if (!phoneTokens.phoneUid) missingPhoneTokens.push("phoneUid");
+    if (!phoneTokens.accessToken) missingPhoneTokens.push("accessToken");
+    if (!phoneTokens.refreshToken) missingPhoneTokens.push("refreshToken");
+    
+    const now = Date.now();
+    const bufferTime = 5 * 60 * 1000; // 5分のバッファ
+    const phoneHasExpired = phoneTokens.expiresAt ? (phoneTokens.expiresAt - now < bufferTime) : true;
+    const phoneTimeUntilExpiry = phoneTokens.expiresAt ? phoneTokens.expiresAt - now : null;
+    
+    const phoneIsValid = missingPhoneTokens.length === 0 && !phoneHasExpired;
+    const lineIsValid = !!lineTokens.accessToken && !!lineTokens.refreshToken;
+    
+    const recommendations: string[] = [];
+    if (missingPhoneTokens.length > 0) {
+      recommendations.push(`電話番号認証を再実行してください（不足: ${missingPhoneTokens.join(", ")}）`);
+    }
+    if (phoneHasExpired) {
+      recommendations.push("電話番号認証トークンの有効期限が切れています");
+    }
+    if (!lineIsValid) {
+      recommendations.push("LINE認証を再実行してください");
+    }
+    
+    const result = {
+      phoneTokens: {
+        isValid: phoneIsValid,
+        missingTokens: missingPhoneTokens,
+        hasExpired: phoneHasExpired,
+        timeUntilExpiry: phoneTimeUntilExpiry,
+      },
+      lineTokens: {
+        isValid: lineIsValid,
+        hasExpired: false, // LINE token expiry is handled by Firebase
+      },
+      recommendations,
+    };
+    
+    logger.info("Token state analysis completed", {
+      operation,
+      phoneTokensValid: phoneIsValid,
+      lineTokensValid: lineIsValid,
+      missingPhoneTokens,
+      phoneHasExpired,
+      timeUntilExpiry: phoneTimeUntilExpiry,
+      recommendationsCount: recommendations.length,
+      component: "TokenManager",
+    });
+    
+    return result;
+  }
+
+  /**
+   * トークン状態の自動復旧を試行（Phase 4 長期的改善）
+   * @returns 復旧が成功したかどうか
+   */
+  static async attemptTokenRecovery(): Promise<{
+    success: boolean;
+    recoveredTokens: string[];
+    failedTokens: string[];
+  }> {
+    const recoveredTokens: string[] = [];
+    const failedTokens: string[] = [];
+    
+    try {
+      const lineTokens = this.getLineTokens();
+      if (lineTokens.refreshToken && !lineTokens.accessToken) {
+        const lineRecoverySuccess = await this.renewLineToken(lineTokens.refreshToken);
+        if (lineRecoverySuccess) {
+          recoveredTokens.push("LINE");
+          logger.info("LINE token recovery successful", {
+            component: "TokenManager",
+            operation: "attemptTokenRecovery",
+          });
+        } else {
+          failedTokens.push("LINE");
+        }
+      }
+      
+      const phoneTokens = this.getPhoneTokens();
+      if (phoneTokens.refreshToken && !phoneTokens.accessToken) {
+        const phoneRecoverySuccess = await this.renewPhoneToken(phoneTokens.refreshToken);
+        if (phoneRecoverySuccess) {
+          recoveredTokens.push("Phone");
+          logger.info("Phone token recovery successful", {
+            component: "TokenManager",
+            operation: "attemptTokenRecovery",
+          });
+        } else {
+          failedTokens.push("Phone");
+        }
+      }
+      
+      const success = recoveredTokens.length > 0 && failedTokens.length === 0;
+      
+      logger.info("Token recovery attempt completed", {
+        success,
+        recoveredTokens,
+        failedTokens,
+        component: "TokenManager",
+        operation: "attemptTokenRecovery",
+      });
+      
+      return {
+        success,
+        recoveredTokens,
+        failedTokens,
+      };
+    } catch (error) {
+      logger.error("Token recovery attempt failed", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "TokenManager",
+        operation: "attemptTokenRecovery",
+      });
+      
+      return {
+        success: false,
+        recoveredTokens,
+        failedTokens: ["LINE", "Phone"],
+      };
+    }
+  }
+
+  /**
    * Cookieを設定
    * @param name Cookieの名前
    * @param value Cookieの値

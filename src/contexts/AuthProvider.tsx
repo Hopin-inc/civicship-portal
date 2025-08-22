@@ -297,76 +297,197 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     prefecture: GqlCurrentPrefecture,
     phoneUid: string | null,
   ): Promise<User | null> => {
-    try {
-      if (!state.firebaseUser) {
-        toast.error("LINE認証が完了していません");
-        return null;
-      }
+    const maxRetries = 2;
+    let retryCount = 0;
+    
+    while (retryCount <= maxRetries) {
+      try {
+        if (!state.firebaseUser) {
+          logger.error("LINE authentication required for user creation", {
+            retryCount,
+            component: "AuthProvider",
+            errorCategory: "authentication_error",
+          });
+          toast.error("LINE認証が完了していません");
+          return null;
+        }
 
-      if (!phoneUid) {
-        toast.error("電話番号認証が完了していません");
-        return null;
-      }
+        if (!phoneUid) {
+          logger.error("Phone UID required for user creation", {
+            retryCount,
+            component: "AuthProvider",
+            errorCategory: "authentication_error",
+          });
+          toast.error("電話番号認証が完了していません");
+          return null;
+        }
 
-      const phoneTokens = TokenManager.getPhoneTokens();
-      const lineTokens = TokenManager.getLineTokens();
+        const phoneTokens = TokenManager.getPhoneTokens();
+        const lineTokens = TokenManager.getLineTokens();
 
-      logger.debug("Creating user with input", {
-        name,
-        currentPrefecture: prefecture,
-        communityId: COMMUNITY_ID,
-        phoneUid,
-        phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
-        component: "AuthProvider",
-      });
-
-      const { data } = await userSignUp({
-        variables: {
-          input: {
-            name,
-            currentPrefecture: prefecture, // Changed from prefecture to currentPrefecture to match backend schema
-            communityId: COMMUNITY_ID,
+        if (!phoneTokens.refreshToken) {
+          logger.warn("Phone refresh token missing during user creation", {
             phoneUid,
-            phoneNumber: phoneTokens.phoneNumber ?? undefined,
-            lineRefreshToken: lineTokens.refreshToken ?? undefined,
-            phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
-          },
-        },
-      });
+            retryCount,
+            hasPhoneNumber: !!phoneTokens.phoneNumber,
+            hasAccessToken: !!phoneTokens.accessToken,
+            component: "AuthProvider",
+            errorCategory: "token_validation",
+          });
+          
+          if (retryCount < maxRetries) {
+            retryCount++;
+            logger.info("Retrying user creation due to missing phone token", {
+              retryCount,
+              maxRetries,
+              phoneUid,
+              component: "AuthProvider",
+            });
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
+            continue;
+          } else {
+            toast.error("電話番号認証トークンが取得できません。再度認証を行ってください。");
+            return null;
+          }
+        }
 
-      if (data?.userSignUp?.user) {
-        await refetchUser();
-        toast.success("アカウントを作成しました");
-        return state.firebaseUser;
-      } else {
-        toast.error("アカウント作成に失敗しました");
-        return null;
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const isValidationError = errorMessage.includes("validation") ||
-                               errorMessage.includes("invalid") ||
-                               errorMessage.includes("required");
-      
-      if (isValidationError) {
-        logger.info("User creation validation error", {
-          error: errorMessage,
+        logger.debug("Creating user with validated input", {
+          name,
+          currentPrefecture: prefecture,
+          communityId: COMMUNITY_ID,
+          phoneUid,
+          phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
+          retryCount,
+          hasPhoneRefreshToken: !!phoneTokens.refreshToken,
+          hasLineRefreshToken: !!lineTokens.refreshToken,
           component: "AuthProvider",
-          errorCategory: "validation_error",
+          operation: "createUser",
         });
-      } else {
-        logger.error("User creation system error", {
+
+        const { data } = await userSignUp({
+          variables: {
+            input: {
+              name,
+              currentPrefecture: prefecture,
+              communityId: COMMUNITY_ID,
+              phoneUid,
+              phoneNumber: phoneTokens.phoneNumber ?? undefined,
+              lineRefreshToken: lineTokens.refreshToken ?? undefined,
+              phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
+            },
+          },
+        });
+
+        if (data?.userSignUp?.user) {
+          await refetchUser();
+          logger.info("User account created successfully", {
+            userId: data.userSignUp.user.id,
+            phoneUid,
+            retryCount,
+            component: "AuthProvider",
+            operation: "createUser",
+          });
+          toast.success("アカウントを作成しました");
+          return state.firebaseUser;
+        } else {
+          logger.error("User creation failed - no user data returned", {
+            phoneUid,
+            retryCount,
+            component: "AuthProvider",
+            errorCategory: "system_error",
+            operation: "createUser",
+          });
+          
+          if (retryCount < maxRetries) {
+            retryCount++;
+            logger.info("Retrying user creation due to empty response", {
+              retryCount,
+              maxRetries,
+              phoneUid,
+              component: "AuthProvider",
+            });
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+            continue;
+          } else {
+            toast.error("アカウント作成に失敗しました");
+            return null;
+          }
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const isValidationError = errorMessage.includes("validation") ||
+                                 errorMessage.includes("invalid") ||
+                                 errorMessage.includes("required") ||
+                                 errorMessage.includes("Phone UID") ||
+                                 errorMessage.includes("Phone auth token");
+        const isAuthenticationError = errorMessage.includes("Authentication") ||
+                                     errorMessage.includes("UNAUTHENTICATED");
+        const isNetworkError = errorMessage.includes("network") ||
+                              errorMessage.includes("timeout") ||
+                              errorMessage.includes("fetch");
+        
+        const errorContext = {
           error: errorMessage,
+          phoneUid,
+          retryCount,
+          maxRetries,
           component: "AuthProvider",
-          errorCategory: "system_error",
-        });
+          operation: "createUser",
+        };
+
+        if (isValidationError) {
+          logger.info("User creation validation error", {
+            ...errorContext,
+            errorCategory: "validation_error",
+          });
+          toast.error("入力内容に問題があります", {
+            description: "認証情報を確認して再度お試しください",
+          });
+          return null;
+        } else if (isAuthenticationError) {
+          logger.info("User creation authentication error", {
+            ...errorContext,
+            errorCategory: "authentication_error",
+          });
+          toast.error("認証に失敗しました", {
+            description: "再度認証を行ってください",
+          });
+          return null;
+        } else if (isNetworkError && retryCount < maxRetries) {
+          retryCount++;
+          logger.warn("User creation network error, retrying", {
+            ...errorContext,
+            errorCategory: "network_error",
+          });
+          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+          continue;
+        } else {
+          logger.error("User creation system error", {
+            ...errorContext,
+            errorCategory: "system_error",
+          });
+          
+          if (retryCount < maxRetries) {
+            retryCount++;
+            logger.info("Retrying user creation due to system error", {
+              retryCount,
+              maxRetries,
+              phoneUid,
+              component: "AuthProvider",
+            });
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+            continue;
+          } else {
+            toast.error("アカウント作成に失敗しました", {
+              description: "しばらく時間をおいて再度お試しください",
+            });
+            return null;
+          }
+        }
       }
-      
-      toast.error("アカウント作成に失敗しました", {
-        description: error instanceof Error ? error.message : "不明なエラーが発生しました",
-      });
-      return null;
     }
+    
+    return null;
   };
 
   const value: AuthContextType = {
