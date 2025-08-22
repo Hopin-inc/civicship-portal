@@ -4,6 +4,8 @@ import React from "react";
 import {
   ActivityCard,
   ActivityDetail,
+  isActivityCategory,
+  isQuestCategory,
   QuestCard,
   QuestDetail,
 } from "@/components/domains/opportunities/types";
@@ -52,8 +54,10 @@ export const OpportunityDetailsContent = ({
         slots={availableDates}
         opportunityId={opportunity.id}
         communityId={communityId}
+        place={isActivityCategory(opportunity) ? opportunity.feeRequired : null}
+        points={isQuestCategory(opportunity) ? opportunity.pointsToEarn : null}
       />
-      <NoticeSection opportunityId={opportunity.id} />
+      <NoticeSection />
       <SimilarOpportunities
         header={"近くでおすすめの体験"}
         opportunities={sameStateActivities}

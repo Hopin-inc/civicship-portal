@@ -10,10 +10,14 @@ export const ScheduleSection = ({
     slots,
     opportunityId,
     communityId,
+    place,
+    points,
   }: {
     slots: (ActivitySlot | QuestSlot)[];
     opportunityId: string;
     communityId: string;
+    place?:number | null;
+    points?:number | null;
   }) => {
     const query = new URLSearchParams({
       id: opportunityId,
@@ -46,6 +50,8 @@ export const ScheduleSection = ({
                       slot={slot}
                       opportunityId={opportunityId}
                       communityId={communityId}
+                      place={place}
+                      points={points}
                     />
                   </div>
                 ))}
