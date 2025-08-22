@@ -130,3 +130,7 @@ export const isQuestCategory = (opportunity: ActivityDetail | QuestDetail | Acti
 export const isActivitySlotType = (slot: ActivitySlot | QuestSlot): slot is ActivitySlot => {
   return 'feeRequired' in slot;
 };
+
+export const isQuestSlotType = (slot: ActivitySlot | QuestSlot): slot is QuestSlot => {
+  return 'pointsToEarn' in slot;
+};

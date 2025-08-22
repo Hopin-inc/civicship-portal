@@ -7,43 +7,31 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { getCrossDayLabel } from "@/utils/date";
-import { isActivitySlotType } from "@/components/domains/opportunities/types";
-
-const getFeeDisplayInfo = (slot: ActivitySlot | QuestSlot) => {
-  const isActivitySlot = isActivitySlotType(slot);
-  const isFeeSpecified = isActivitySlot && slot.feeRequired != null;
-  const feeText = isActivitySlot 
-    ? slot.feeRequired != null 
-      ? `${slot.feeRequired.toLocaleString()}円` 
-      : "料金未定"
-    : null;
-  
-  return { isActivitySlot, isFeeSpecified, feeText };
-};
 
 interface OpportunityScheduleCardProps {
   slot: ActivitySlot | QuestSlot;
   opportunityId: string;
   communityId: string;
+  place?:number | null;
+  points?:number | null;
 }
 
 export const OpportunityScheduleCard: React.FC<OpportunityScheduleCardProps> = ({
   slot,
   opportunityId,
   communityId,
+  place,
+  points,
 }) => {
   const isFull = slot.remainingCapacity === 0;
   return isFull
-    ? renderFullSlotCard(slot)
-    : renderAvailableSlotCard(slot, opportunityId, communityId);
+    ? renderFullSlotCard(slot, place, points)
+    : renderAvailableSlotCard(slot, opportunityId, communityId, place, points);
 };
 
-const renderFullSlotCard = (slot: ActivitySlot | QuestSlot) => {
+const renderFullSlotCard = (slot: ActivitySlot | QuestSlot, place?:number | null, points?:number | null) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
-
-  const { isFeeSpecified, feeText } = getFeeDisplayInfo(slot);
-  const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-gray-400" : "text-gray-400"}`;
 
   const crossDayLabel = getCrossDayLabel(startDate, endDate);
 
@@ -64,9 +52,27 @@ const renderFullSlotCard = (slot: ActivitySlot | QuestSlot) => {
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            <p className={feeClass}>{feeText}</p>
-            {isFeeSpecified && <p className="text-body-sm ml-1 text-gray-300">/ 人</p>}
+            {place != null ? (
+              <p className="text-body-md font-bold">
+                {`${place.toLocaleString()}円`}
+              </p>
+            ) : points == null ? (
+              <p className="text-body-md font-bold text-gray-400">
+                料金未定
+              </p>
+            ) : null}
+            {place != null && <p className="text-body-sm ml-1 text-gray-300">/ 人</p>}
           </div>
+          {points != null && (
+            <div className="flex items-center gap-1 pt-1">
+              <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+                P
+              </p>
+              <p className="text-sm font-bold">
+                {points.toLocaleString()}ptもらえる
+              </p>
+            </div>
+          )}
         </div>
       </div>
       <div className="flex justify-center mt-6">
@@ -82,13 +88,12 @@ const renderAvailableSlotCard = (
   slot: ActivitySlot | QuestSlot,
   opportunityId: string,
   communityId: string,
+  place?:number | null,
+  points?:number | null,
 ) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
   const isReservable = slot.isReservable;
-
-  const { isFeeSpecified, feeText } = getFeeDisplayInfo(slot);
-  const feeClass = `text-body-md font-bold ${!isFeeSpecified ? "text-muted-foreground/50" : "text-caption"}`;
 
   const query = new URLSearchParams({
     id: opportunityId,
@@ -110,17 +115,36 @@ const renderAvailableSlotCard = (
             （{format(startDate, "E", { locale: ja })}）
           </span>
         </h3>
-        <p className="text-body-md text-foreground mb-4">
+        <p className="text-body-md text-foreground">
           {format(startDate, "HH:mm")}〜{format(endDate, "HH:mm")}
           {crossDayLabel && (
             <span className="text-label-sm text-caption">（{crossDayLabel}）</span>
           )}
         </p>
         <div className="space-y-2">
-          <div className="flex items-baseline">
-            <p className={feeClass}>{feeText}</p>
-            {isFeeSpecified && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
+          <div className="flex items-baseline mt-4">
+            {place != null ? (
+              <p className="text-body-md font-bold">
+                {`${place.toLocaleString()}円`}
+              </p>
+            ) : points == null ? (
+              <p className="text-body-md font-bold text-muted-foreground/50">
+                料金未定
+              </p>
+            ) : null}
+            {place != null && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
           </div>
+          {points != null && (
+            <div className="flex items-center gap-1 pt-1">
+              <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+                P
+              </p>
+              <p className="">
+                <span className="text-body-md font-bold">{points.toLocaleString()}pt</span>
+                <span className="text-body-sm">もらえる</span>
+              </p>
+            </div>
+          )}
         </div>
       </div>
       <div className="flex justify-center mt-6 flex-col gap-2 items-center">
