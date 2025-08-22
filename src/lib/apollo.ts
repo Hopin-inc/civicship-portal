@@ -74,6 +74,40 @@ const requestLink = new ApolloLink((operation, forward) => {
           const tokenRequiredOperations = ["userSignUp", "linkPhoneAuth", "storePhoneAuthToken", "identityCheckPhoneUser"];
 
           if (tokenRequiredOperations.includes(operation.operationName || "")) {
+            if (operation.operationName === "userSignUp") {
+              const missingTokens: string[] = [];
+              
+              if (!phoneTokens.accessToken) {
+                missingTokens.push("X-Phone-Auth-Token");
+              }
+              
+              if (!phoneTokens.phoneUid) {
+                missingTokens.push("X-Phone-Uid");
+              }
+              
+              if (missingTokens.length > 0) {
+                logger.error("Required phone tokens missing for userSignUp", {
+                  missingTokens,
+                  hasPhoneNumber: !!phoneTokens.phoneNumber,
+                  hasRefreshToken: !!phoneTokens.refreshToken,
+                  component: "ApolloRequestLink",
+                  operation: operation.operationName,
+                  errorCategory: "token_validation",
+                });
+                
+                throw new Error(`Missing required tokens for userSignUp: ${missingTokens.join(", ")}`);
+              }
+              
+              logger.debug("Phone tokens validated for userSignUp", {
+                hasPhoneAuthToken: !!phoneTokens.accessToken,
+                hasPhoneUid: !!phoneTokens.phoneUid,
+                hasPhoneNumber: !!phoneTokens.phoneNumber,
+                hasRefreshToken: !!phoneTokens.refreshToken,
+                component: "ApolloRequestLink",
+                operation: operation.operationName,
+              });
+            }
+
             const requestHeaders = {
               ...baseHeaders,
               "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
