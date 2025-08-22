@@ -43,9 +43,10 @@ export const CardHorizontal = ({ opportunity, withShadow = true, category, start
                 src={opportunity.images?.[0] ?? PLACEHOLDER_IMAGE}
                 alt={opportunity.title}
                 fill
+                sizes="120px"
                 placeholder="blur"
                 blurDataURL={PLACEHOLDER_IMAGE}
-                loading="lazy"
+                priority
                 className="object-cover rounded-lg"
                 onError={(e) => {
                   const img = e.target as HTMLImageElement;

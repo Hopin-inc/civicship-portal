@@ -13,7 +13,11 @@
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json}'",
     "gql:generate": "export NODE_TLS_REJECT_UNAUTHORIZED=0 && graphql-codegen --config codegen.yaml",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "perf:measure": "lhci autorun",
+    "perf:collect": "lhci collect",
+    "perf:assert": "lhci assert",
+    "perf:dev": "echo 'ブラウザで https://localhost:8000/opportunities を開いて DevTools > Performance タブで測定してください'"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
@@ -46,7 +50,6 @@
     "@react-google-maps/api": "^2.20.6",
     "@types/gtag.js": "^0.0.20",
     "@types/linkify-it": "^5.0.0",
-    "apollo-upload-client": "^18.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -97,9 +100,11 @@
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-eslint/eslint-plugin": "^4.4.0",
     "@graphql-typed-document-node/core": "^3.2.0",
+    "@lhci/cli": "^0.15.1",
     "@storybook/addon-a11y": "^9.0.17",
     "@storybook/addon-docs": "^9.0.17",
     "@storybook/addon-vitest": "^9.0.17",
+    "@storybook/nextjs-vite": "^9.0.17",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/apollo-upload-client": "^18.0.0",
@@ -110,6 +115,8 @@
     "@types/react-dom": "^18.3.7",
     "@types/react-linkify": "^1.0.4",
     "@types/retry": "^0.12.5",
+    "@vitest/browser": "^3.2.4",
+    "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.5",
     "eslint-config-prettier": "^9.1.0",
@@ -117,16 +124,15 @@
     "eslint-plugin-storybook": "^9.0.17",
     "graphql-cost-analysis": "^1.0.3",
     "graphql-query-complexity": "^1.1.0",
+    "playwright": "^1.54.1",
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
     "sass": "^1.89.0",
     "storybook": "^9.0.17",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
-    "@storybook/nextjs-vite": "^9.0.17",
     "vitest": "^3.2.4",
-    "@vitest/browser": "^3.2.4",
-    "playwright": "^1.54.1",
-    "@vitest/coverage-v8": "^3.2.4"
-  }
+    "web-vitals": "^5.1.0"
+  },
+  "packageManager": "pnpm@9.15.9+sha512.68046141893c66fad01c079231128e9afb89ef87e2691d69e4d40eee228988295fd4682181bae55b58418c3a253bde65a505ec7c5f9403ece5cc3cd37dcf2531"
 }

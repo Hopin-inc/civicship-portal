@@ -1,5 +1,6 @@
 /** @type {import("next").NextConfig} */
 const nextConfig = {
+  productionBrowserSourceMaps: false,
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -15,18 +16,41 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "storage.googleapis.com",
+        pathname: "/kyoso-dev-civicship-storage-public/**",
+      },
+      {
+        protocol: "https",
+        hostname: "plus.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
         hostname: "**",
       },
     ],
-    domains: ["storage.googleapis.com", "plus.unsplash.com", "images.unsplash.com"],
   },
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
+    optimizePackageImports: ['@apollo/client', '@radix-ui/react-icons'],
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
   compress: true,
-  webpack(config) {
+  poweredByHeader: false, // セキュリティ向上
+  generateEtags: false, // パフォーマンス向上
+  webpack(config, { isServer }) {
     const fileLoaderRule = config.module.rules.find((rule) => rule.test?.test?.(".svg"));
 
     config.module.rules.push(
@@ -44,6 +68,40 @@ const nextConfig = {
     );
     fileLoaderRule.exclude = /\.svg$/i;
 
+    // ESモジュールとCommonJSの互換性を確保
+    config.resolve = {
+      ...config.resolve,
+      fallback: {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      },
+    };
+
+    // パフォーマンス最適化（クライアントサイドのみ）
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+            },
+            apollo: {
+              test: /[\\/]node_modules[\\/]@apollo[\\/]/,
+              name: 'apollo',
+              chunks: 'all',
+              priority: 10,
+            },
+          },
+        },
+      };
+    }
+
     return config;
   },
   async headers() {
@@ -54,6 +112,23 @@ const nextConfig = {
           {
             key: "Cache-Control",
             value: "public, max-age=31536000, immutable", // cache for 1 year
+          },
+        ],
+      },
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
           },
         ],
       },
