@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { LiffService } from "@/lib/auth/liff-service";
+import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { AuthState } from "@/contexts/AuthProvider";
+import { LiffService } from "@/lib/auth/liff-service";
+import { isAuthRequiredForPath } from "@/config/auth-config";
 import { logger } from "@/lib/logging";
-
 
 interface UseAutoLoginProps {
   environment: AuthEnvironment;
@@ -13,6 +14,8 @@ interface UseAutoLoginProps {
   liffService: LiffService;
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
   refetchUser: () => Promise<any>;
+  // 特定のページでのみ自動ログインを実行するための設定
+  authRequiredPaths?: string[];
 }
 
 const useAutoLogin = ({
@@ -21,7 +24,9 @@ const useAutoLogin = ({
   liffService,
   setState,
   refetchUser,
+  authRequiredPaths = [],
 }: UseAutoLoginProps) => {
+  const pathname = usePathname();
   const attemptedRef = useRef(false);
   const prevStateRef = useRef<{ authenticationState: string; isAuthenticating: boolean } | null>(
     null,
@@ -31,6 +36,19 @@ const useAutoLogin = ({
   useEffect(() => {
     if (environment !== AuthEnvironment.LIFF) {
       return;
+    }
+
+    // 特定のページでのみ自動ログインを実行する場合の条件チェック
+    if (authRequiredPaths.length > 0) {
+      // isAuthRequiredForPath関数を使用
+      if (!isAuthRequiredForPath(pathname)) {
+        logger.debug("Auto-login not required for current path", {
+          pathname,
+          authRequiredPaths,
+          component: "useAutoLogin",
+        });
+        return;
+      }
     }
 
     const currentState = {
@@ -97,6 +115,8 @@ const useAutoLogin = ({
     liffService,
     setState,
     refetchUser,
+    pathname,
+    authRequiredPaths,
   ]);
 
   useEffect(() => {

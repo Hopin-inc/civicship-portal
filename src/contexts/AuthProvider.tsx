@@ -91,12 +91,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
  */
 interface AuthProviderProps {
   children: React.ReactNode;
+  // 特定のページでのみLIFF認証を実行するための設定
+  liffAuthRequiredPaths?: string[];
 }
 
 /**
  * 認証プロバイダーコンポーネント
  */
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ 
+  children, 
+  liffAuthRequiredPaths = [] 
+}) => {
   const environment = detectEnvironment();
 
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
@@ -188,10 +193,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useFirebaseAuthState({ authStateManager, state, setState });
   usePhoneAuthState({ authStateManager, phoneAuthService, setState });
   useUserRegistrationState({ authStateManager, userData, setState });
-  useLiffInitialization({ environment, liffService });
+  useLiffInitialization({ environment, liffService, authRequiredPaths: liffAuthRequiredPaths });
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
   useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
-  useAutoLogin({ environment, state, liffService, setState, refetchUser });
+  useAutoLogin({ environment, state, liffService, setState, refetchUser, authRequiredPaths: liffAuthRequiredPaths });
 
   /**
    * LIFFでログイン
