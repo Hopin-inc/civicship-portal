@@ -213,6 +213,7 @@ export default function ReservationPage() {
           setIsConfirmDialogOpen={setIsConfirmDialogOpen}
           handleSaveAllAttendance={handleSaveAllAttendance}
           allEvaluated={allEvaluated}
+          opportunity={opportunity}
         />
       )}
     </div>
