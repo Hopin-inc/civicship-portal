@@ -9,7 +9,7 @@ import {
 import { onError } from "@apollo/client/link/error";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { __DEV__ } from "@apollo/client/utilities/globals";
-import { createHttpLink } from "@apollo/client";
+import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { TokenManager } from "./auth/token-manager";
 
 import { logger } from "@/lib/logging";
@@ -67,7 +67,7 @@ if (__DEV__) {
   loadErrorMessages();
 }
 
-const httpLink = createHttpLink({
+const uploadLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
   credentials: "same-origin",
   headers: {
@@ -223,7 +223,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
   }
 });
 
-const link = ApolloLink.from([requestLink, errorLink, httpLink]);
+const link = ApolloLink.from([requestLink, errorLink, uploadLink]);
 
 const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
   link,
