@@ -13,7 +13,6 @@ import {
   useCurrentUserQuery,
   useUserSignUpMutation,
 } from "@/types/graphql";
-import { RECOVER_PHONE_AUTH_TOKEN } from "@/graphql/account/identity/query";
 import { apolloClient } from "@/lib/apollo";
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
@@ -341,6 +340,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const accessToken = await lineAuth.currentUser.getIdToken();
         const expiresIn = Math.floor((phoneTokens.expiresAt - Date.now()) / 1000);
 
+        const { RECOVER_PHONE_AUTH_TOKEN } = await import("@/graphql/account/identity/query");
         const { data } = await apolloClient.mutate({
           mutation: RECOVER_PHONE_AUTH_TOKEN,
           variables: {
