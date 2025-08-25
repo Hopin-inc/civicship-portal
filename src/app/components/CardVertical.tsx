@@ -59,10 +59,10 @@ export default function OpportunityCardVertical({
           alt={title}
           width={400}
           height={400}
-          sizes="(max-width: 640px) 150px, 164px"
+          sizes="164px"
           placeholder={`blur`}
           blurDataURL={PLACEHOLDER_IMAGE}
-          priority={!isCarousel}
+          loading="lazy"
           className="h-full w-full object-cover"
           onError={(e) => {
             const img = e.target as HTMLImageElement;
