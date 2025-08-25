@@ -96,7 +96,7 @@
     "@graphql-codegen/typed-document-node": "^5.1.1",
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-eslint/eslint-plugin": "^4.4.0",
-        "@graphql-typed-document-node/core": "^3.2.0",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@storybook/addon-a11y": "^9.0.17",
     "@storybook/addon-docs": "^9.0.17",
     "@storybook/addon-vitest": "^9.0.17",
