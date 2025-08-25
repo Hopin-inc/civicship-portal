@@ -13,11 +13,7 @@
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json}'",
     "gql:generate": "export NODE_TLS_REJECT_UNAUTHORIZED=0 && graphql-codegen --config codegen.yaml",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "perf:measure": "lhci autorun",
-    "perf:collect": "lhci collect",
-    "perf:assert": "lhci assert",
-    "perf:dev": "echo 'ブラウザで https://localhost:8000/opportunities を開いて DevTools > Performance タブで測定してください'"
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
@@ -101,7 +97,6 @@
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-eslint/eslint-plugin": "^4.4.0",
     "@graphql-typed-document-node/core": "^3.2.0",
-    "@lhci/cli": "^0.15.1",
     "@storybook/addon-a11y": "^9.0.17",
     "@storybook/addon-docs": "^9.0.17",
     "@storybook/addon-vitest": "^9.0.17",
