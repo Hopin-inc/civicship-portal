@@ -13,6 +13,8 @@ import {
   useCurrentUserQuery,
   useUserSignUpMutation,
 } from "@/types/graphql";
+import { RECOVER_PHONE_AUTH_TOKEN } from "@/graphql/account/identity/query";
+import { apolloClient } from "@/lib/apollo";
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
@@ -72,6 +74,7 @@ interface AuthContextType {
     clearRecaptcha?: () => void;
     isVerifying: boolean;
     phoneUid: string | null;
+    handlePhoneAuthComplete?: (phoneUid: string, phoneNumber: string) => Promise<void>;
   };
 
   createUser: (
@@ -289,6 +292,96 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return success;
   };
 
+  const handlePhoneAuthComplete = useCallback(
+    async (phoneUid: string, phoneNumber: string) => {
+      logger.info("Phone authentication completed", {
+        phoneUid,
+        phoneNumber: maskPhoneNumber(phoneNumber),
+        component: "AuthProvider",
+      });
+
+      TokenManager.setPhoneTokens({
+        phoneUid,
+        phoneNumber,
+        accessToken: "",
+        refreshToken: "",
+        expiresAt: 0,
+      });
+
+      if (state.authenticationState === "user_registered") {
+        await recoverPhoneTokensForRegisteredUser(phoneUid);
+      }
+
+      await authStateManager?.handlePhoneAuthStateChange(true);
+    },
+    [authStateManager, state.authenticationState],
+  );
+
+  const recoverPhoneTokensForRegisteredUser = useCallback(
+    async (phoneUid: string) => {
+      try {
+        const phoneTokens = TokenManager.getPhoneTokens();
+        if (!phoneTokens.refreshToken || !phoneTokens.accessToken) {
+          logger.warn("Cannot recover tokens - missing phone tokens after authentication", {
+            phoneUid,
+            component: "AuthProvider",
+          });
+          return;
+        }
+
+        const { lineAuth } = await import("@/lib/auth/firebase-config");
+        if (!lineAuth.currentUser) {
+          logger.warn("Cannot recover tokens - no Firebase user", {
+            phoneUid,
+            component: "AuthProvider",
+          });
+          return;
+        }
+
+        const accessToken = await lineAuth.currentUser.getIdToken();
+        const expiresIn = Math.floor((phoneTokens.expiresAt - Date.now()) / 1000);
+
+        const { data } = await apolloClient.mutate({
+          mutation: RECOVER_PHONE_AUTH_TOKEN,
+          variables: {
+            input: {
+              phoneUid,
+              authToken: phoneTokens.accessToken,
+              refreshToken: phoneTokens.refreshToken,
+              expiresIn: Math.max(expiresIn, 3600),
+            },
+          },
+          context: {
+            headers: {
+              Authorization: accessToken ? `Bearer ${accessToken}` : "",
+            },
+          },
+        });
+
+        if (data?.recoverPhoneAuthToken?.success) {
+          logger.info("Phone tokens recovered successfully for registered user", {
+            phoneUid,
+            component: "AuthProvider",
+          });
+          toast.success("電話番号認証が完了しました");
+        } else {
+          logger.error("Failed to recover phone tokens", {
+            phoneUid,
+            message: data?.recoverPhoneAuthToken?.message,
+            component: "AuthProvider",
+          });
+        }
+      } catch (error) {
+        logger.error("Error recovering phone tokens for registered user", {
+          phoneUid,
+          error: error instanceof Error ? error.message : String(error),
+          component: "AuthProvider",
+        });
+      }
+    },
+    [],
+  );
+
   /**
    * ユーザーを作成
    */
@@ -389,6 +482,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       clearRecaptcha: () => phoneAuthService.clearRecaptcha(),
       isVerifying: phoneAuthService.getState().isVerifying,
       phoneUid: phoneAuthService.getState().phoneUid,
+      handlePhoneAuthComplete,
     },
     createUser,
     updateAuthState: async () => {
