@@ -112,10 +112,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   const [state, setState] = useState<AuthState>({
     firebaseUser: null,
     currentUser: null,
-    authenticationState: "loading",
+    authenticationState: "unauthenticated", // 初期値をunauthenticatedに変更
     environment,
     isAuthenticating: false,
   });
+
+  const [isAuthInitialized, setIsAuthInitialized] = useState(false);
+  const [authInitError, setAuthInitError] = useState<string | null>(null);
 
   const [userSignUp] = useUserSignUpMutation();
 
@@ -126,7 +129,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
       state.authenticationState,
-    ),
+    ) || !isAuthInitialized, // 認証初期化が完了していない場合はスキップ
     fetchPolicy: "network-only",
   });
 
@@ -164,9 +167,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     }
   }, [liffService, phoneAuthService]);
 
-  const [isAuthInitialized, setIsAuthInitialized] = useState(false);
-  const [authInitError, setAuthInitError] = useState<string | null>(null);
-
   useEffect(() => {
     if (!authStateManager) return;
 
@@ -180,6 +180,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       } catch (error) {
         setAuthInitError(error instanceof Error ? error.message : "認証の初期化に失敗しました");
         setIsAuthInitialized(false);
+        // エラーが発生しても初期化は完了として扱う
+        setIsAuthInitialized(true);
       }
     };
 
@@ -399,21 +401,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
+    // 認証初期化中でもローディングを表示しない
+    loading: userLoading || state.isAuthenticating,
   };
 
-  if (!isAuthInitialized) {
-    if (authInitError) {
-      const refetchRef = { 
-        current: () => {
-          setAuthInitError(null);
-          setIsAuthInitialized(false);
-        }
-      };
-      return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
-    }
-    
-    return <LoadingIndicator fullScreen={true} />;
+  // 認証初期化エラーの場合のみエラー表示
+  if (authInitError) {
+    const refetchRef = { 
+      current: () => {
+        setAuthInitError(null);
+        setIsAuthInitialized(false);
+      }
+    };
+    return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
