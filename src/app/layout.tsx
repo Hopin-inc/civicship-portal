@@ -11,6 +11,7 @@ import MainContent from "@/components/layout/MainContent";
 import React from "react";
 import { currentCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
+import { getAuthConfig } from "@/config/auth-config";
 import Script from "next/script";
 
 const font = Inter({ subsets: ["latin"] });
@@ -133,7 +134,7 @@ const RootLayout = ({
         />
         <CookiesProvider>
           <ApolloProvider>
-            <AuthProvider>
+            <AuthProvider liffAuthRequiredPaths={getAuthConfig()}>
               <HeaderProvider>
                 <LoadingProvider>
                   <AnalyticsProvider />
