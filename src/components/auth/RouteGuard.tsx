@@ -9,6 +9,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
+import { isAuthRequiredForPath } from "@/config/auth-config";
 
 /**
  * ルートガードコンポーネントのプロパティ
@@ -37,6 +38,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const authRedirectService = React.useMemo(() => {
     return AuthRedirectService.getInstance();
   }, []);
+
+  // 現在のページが認証不要かどうかを判定
+  const isAuthNotRequired = !isAuthRequiredForPath(pathname);
 
   useEffect(() => {
     if (!loading) {
@@ -76,6 +80,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     };
   }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams, isInitialRender]);
 
+  // 認証不要ページの場合は即座にコンテンツを表示（ローディングを表示しない）
+  if (isAuthNotRequired) {
+    return <>{ children }</>;
+  }
+
+  // 認証が必要なページの場合のみローディングを表示
   if (loading || userLoading || isInitialRender) {
     return <LoadingIndicator />;
   }
