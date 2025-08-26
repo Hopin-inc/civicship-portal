@@ -1,3 +1,5 @@
+import { logger } from "@/lib/logging";
+
 /**
  * 認証設定
  * 特定のページでのみLIFF認証を実行するための設定
@@ -177,25 +179,6 @@ export const clearPathCache = (): void => {
 };
 
 /**
- * キャッシュの統計情報を取得（デバッグ用）
- */
-export const getPathCacheStats = () => {
-  const stats = {
-    size: pathCache.size(),
-    capacity: pathCache.getCapacity(),
-    environment: process.env.NODE_ENV,
-    nodeEnv: process.env.NODE_ENV,
-  };
-  
-  // 開発環境でのみログ出力
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Auth Cache Stats:', stats);
-  }
-  
-  return stats;
-};
-
-/**
  * 環境変数から認証設定を取得
  * @returns 認証設定
  */
@@ -210,7 +193,11 @@ export const getAuthConfig = () => {
       clearPathCache();
       return parsedPaths;
     } catch (error) {
-      console.warn("Invalid LIFF_AUTH_PATHS environment variable:", error);
+      logger.warn("Invalid LIFF_AUTH_PATHS environment variable", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "auth-config",
+        errorCategory: "configuration_error",
+      });
     }
   }
   
