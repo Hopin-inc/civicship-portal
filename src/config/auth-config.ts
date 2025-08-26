@@ -33,25 +33,45 @@ export const LIFF_AUTH_EXCLUDED_PATHS = [
   "/terms",
 ];
 
+// パスチェック結果のキャッシュ
+const pathCache = new Map<string, boolean>();
+
 /**
- * 現在のパスが認証を必要とするかどうかを判定
+ * 現在のパスが認証を必要とするかどうかを判定（メモ化版）
  * @param pathname 現在のパス
  * @returns 認証が必要な場合はtrue
  */
 export const isAuthRequiredForPath = (pathname: string): boolean => {
-  // 除外パスのチェック
+  // キャッシュチェック
+  if (pathCache.has(pathname)) {
+    return pathCache.get(pathname)!;
+  }
+
+  // 除外パスのチェック（より効率的な実装）
   const isExcluded = LIFF_AUTH_EXCLUDED_PATHS.some(path => 
     pathname === path || pathname.startsWith(path + '/')
   );
   
   if (isExcluded) {
+    pathCache.set(pathname, false);
     return false;
   }
   
   // 認証が必要なパスのチェック
-  return LIFF_AUTH_REQUIRED_PATHS.some(path => 
+  const isRequired = LIFF_AUTH_REQUIRED_PATHS.some(path => 
     pathname === path || pathname.startsWith(path + '/')
   );
+  
+  // 結果をキャッシュ
+  pathCache.set(pathname, isRequired);
+  return isRequired;
+};
+
+/**
+ * パスキャッシュをクリア（開発時や設定変更時に使用）
+ */
+export const clearPathCache = (): void => {
+  pathCache.clear();
 };
 
 /**
@@ -64,7 +84,10 @@ export const getAuthConfig = () => {
   
   if (customAuthPaths) {
     try {
-      return JSON.parse(customAuthPaths) as string[];
+      const parsedPaths = JSON.parse(customAuthPaths) as string[];
+      // 設定変更時はキャッシュをクリア
+      clearPathCache();
+      return parsedPaths;
     } catch (error) {
       console.warn("Invalid LIFF_AUTH_PATHS environment variable:", error);
     }

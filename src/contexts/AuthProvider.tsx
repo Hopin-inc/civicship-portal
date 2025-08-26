@@ -24,6 +24,8 @@ import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
 import { usePhoneAuthState } from "@/hooks/auth/usePhoneAuthState";
 import { useUserRegistrationState } from "@/hooks/auth/useUserRegistrationState";
 import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
+import { useLiffPreload } from "@/hooks/auth/useLiffPreload";
+import { useAuthStateCache } from "@/hooks/auth/useAuthStateCache";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 import { logger } from "@/lib/logging";
@@ -195,6 +197,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   useFirebaseAuthState({ authStateManager, state, setState });
   usePhoneAuthState({ authStateManager, phoneAuthService, setState });
   useUserRegistrationState({ authStateManager, userData, setState });
+  useLiffPreload({ environment, liffService });
+  useAuthStateCache({ authRequiredPaths: liffAuthRequiredPaths });
   useLiffInitialization({ environment, liffService, authRequiredPaths: liffAuthRequiredPaths });
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
   useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
