@@ -7,7 +7,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import OpportunityDetailsHeader from "./components/OpportunityDetailsHeader";
 import { OpportunityDetailsContent } from "./components/OpportunityDetailsContent";
@@ -17,8 +17,9 @@ import { isActivityCategory, isQuestCategory } from "@/components/domains/opport
 
 export default function OpportunityDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
-  const community_id = Array.isArray(params.community_id) ? params.community_id[0] : params.community_id;
+  const community_id = searchParams.get("community_id") ?? "";
   const headerConfig = useMemo(
     () => ({
       hideHeader: true,

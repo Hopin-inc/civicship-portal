@@ -1,7 +1,7 @@
 import { presenterActivityDetail, presenterQuestDetail } from "@/components/domains/opportunities/data/presenter";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { GqlOpportunityCategory, GqlOpportunitySlotHostingStatus, GqlSortDirection, useGetOpportunityQuery } from "@/types/graphql";
+import { GqlOpportunity, GqlOpportunityCategory, GqlOpportunitySlotHostingStatus, GqlSortDirection, useGetOpportunityQuery } from "@/types/graphql";
 import { useMemo } from "react";
 
 // 基本のOpportunity詳細取得のみを担当
@@ -19,11 +19,17 @@ export const useOpportunityDetail = (id: string | undefined) => {
   });
 
   const opportunity: ActivityDetail | QuestDetail | null = useMemo(() => {
-    if(data?.opportunity && data.opportunity.category === GqlOpportunityCategory.Activity) 
-      return presenterActivityDetail(data.opportunity as any);
-    if(data?.opportunity && data.opportunity.category === GqlOpportunityCategory.Quest) 
-      return presenterQuestDetail(data.opportunity as any);
-    return data?.opportunity ? presenterActivityDetail(data.opportunity as any) : null;
+    if (!data?.opportunity) {
+      return null;
+    }
+    const { opportunity: opp } = data;
+    if (opp.category === GqlOpportunityCategory.Activity) {
+      return presenterActivityDetail(opp as GqlOpportunity);
+    }
+    if (opp.category === GqlOpportunityCategory.Quest) {
+      return presenterQuestDetail(opp as GqlOpportunity);
+    }
+    return null;
   }, [data?.opportunity]);
 
   return { 
