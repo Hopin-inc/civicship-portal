@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
-import { isAuthRequiredForPath } from "@/config/auth-config";
 import { logger } from "@/lib/logging";
+import { useAuthPathCheck } from "./useAuthPathCheck";
 
 interface UseLiffInitializationProps {
   environment: AuthEnvironment;
@@ -19,23 +18,20 @@ export const useLiffInitialization = ({
   liffService, 
   authRequiredPaths = [] 
 }: UseLiffInitializationProps) => {
-  const pathname = usePathname();
+  const { isAuthRequired, pathname } = useAuthPathCheck(authRequiredPaths);
 
   useEffect(() => {
     const initializeLiff = async () => {
       if (environment !== AuthEnvironment.LIFF) return;
 
-      // 特定のページでのみ認証を実行する場合の条件チェック
-      if (authRequiredPaths.length > 0) {
-        // isAuthRequiredForPath関数を使用
-        if (!isAuthRequiredForPath(pathname)) {
-          logger.debug("LIFF auth not required for current path", {
-            pathname,
-            authRequiredPaths,
-            component: "useLiffInitialization",
-          });
-          return;
-        }
+      // 認証が不要なページの場合は早期リターン
+      if (!isAuthRequired) {
+        logger.debug("LIFF auth not required for current path", {
+          pathname,
+          authRequiredPaths,
+          component: "useLiffInitialization",
+        });
+        return;
       }
 
       const timestamp = new Date().toISOString();
@@ -51,5 +47,5 @@ export const useLiffInitialization = ({
     };
 
     initializeLiff();
-  }, [environment, liffService, pathname, authRequiredPaths]);
+  }, [environment, liffService, isAuthRequired, pathname, authRequiredPaths]);
 };
