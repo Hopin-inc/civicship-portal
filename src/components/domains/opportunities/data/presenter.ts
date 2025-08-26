@@ -13,7 +13,7 @@ import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { isDateReservable, getReservationThreshold } from "@/app/reservation/data/presenter/opportunitySlot";
+import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
 import { format, isAfter } from "date-fns";
 import { getCrossDayLabel } from "@/utils/date";
 import { ja } from "date-fns/locale";
@@ -85,9 +85,8 @@ export const presenterQuestCard = (node: Partial<GqlOpportunity>): QuestCard => 
 
 export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail => {
   const { images, place, slots, articles, createdByUser } = data;
-  const threshold = getReservationThreshold(data.id);
 
-  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired);
+  const activitySlots = presenterActivitySlot(slots, data.id, data.feeRequired);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
@@ -118,9 +117,8 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
 
 export const presenterQuestDetail = (data: GqlOpportunity): QuestDetail => {
   const { images, place, slots, articles, createdByUser } = data;
-  const threshold = getReservationThreshold();
 
-  const activitySlots = presenterActivitySlot(slots, threshold, data.feeRequired);
+  const activitySlots = presenterActivitySlot(slots, data.id, data.feeRequired);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
@@ -139,7 +137,7 @@ export const presenterQuestDetail = (data: GqlOpportunity): QuestDetail => {
 
     place: presenterPlace(place),
     host: presenterOpportunityHost(createdByUser, articles?.[0]),
-    slots: presenterQuestSlot(slots, threshold),
+    slots: presenterQuestSlot(slots, data.id),
 
     pointsToEarn: data.pointsToEarn ?? 0,
     pointsRequired: data.pointsRequired ?? 0,
@@ -165,7 +163,7 @@ export function presenterOpportunityHost(
 
 export const presenterActivitySlot = (
   slots: Maybe<GqlOpportunitySlot[]> | undefined,
-  threshold: Date,
+  activityId?: string,
   feeRequired?: Maybe<number> | undefined,
 ): ActivitySlot[] => {
   return (
@@ -173,7 +171,7 @@ export const presenterActivitySlot = (
       const startsAtDate = slot?.startsAt ? new Date(slot.startsAt) : null;
 
       const isReservable = startsAtDate
-        ? isAfter(startsAtDate, threshold)
+        ? isDateReservable(startsAtDate, activityId)
         : false;
 
       return {
@@ -194,7 +192,7 @@ export const presenterActivitySlot = (
 
 function presenterQuestSlot(
   slots: Maybe<GqlOpportunitySlot[]> | undefined,
-  threshold: Date,
+  activityId?: string,
   feeRequired?: Maybe<number> | undefined,
 ): QuestSlot[] {
   const SLOT_IDS_TO_FORCE_RESERVABLE = ["cmc07ao5c0005s60nnc8ravvk"];
@@ -209,7 +207,7 @@ function presenterQuestSlot(
       const isReservable = isForceReservable
         ? true
         : startsAtDate
-          ? isAfter(startsAtDate, threshold)
+          ? isDateReservable(startsAtDate, activityId)
           : false;
 
       return {

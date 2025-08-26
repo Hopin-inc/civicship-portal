@@ -1,21 +1,12 @@
 "use client";
 import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
-import { addDays, isAfter } from "date-fns";
+import { addDays, isAfter, endOfDay, subDays } from "date-fns";
 import { ActivitySlot, ActivitySlotGroup } from "../type/opportunitySlot";
 import { getAdvanceBookingDays, DEFAULT_ADVANCE_BOOKING_DAYS } from "@/config/activityBookingConfig";
 
 /**
- * 予約可能判定のための閾値（現在時刻から何日後まで予約可能か）を返す
- * @param activityId アクティビティID（指定されない場合はデフォルト値を使用）
- * @returns 予約可能判定のための閾値
- */
-export const getReservationThreshold = (activityId?: string): Date => {
-  const advanceBookingDays = getAdvanceBookingDays(activityId);
-  return addDays(new Date(), advanceBookingDays);
-};
-
-/**
  * 指定された日時が予約可能かどうかを判定する
+ * N日前の23:59まで予約を受け付ける（当日予約の場合は現在時刻以降）
  * @param date 判定対象の日時
  * @param activityId アクティビティID（指定されない場合はデフォルト値を使用）
  * @returns 予約可能かどうか
@@ -23,16 +14,18 @@ export const getReservationThreshold = (activityId?: string): Date => {
 export const isDateReservable = (date: Date | string, activityId?: string): boolean => {
   const targetDate = typeof date === "string" ? new Date(date) : date;
   const advanceBookingDays = getAdvanceBookingDays(activityId);
-  const threshold = addDays(new Date(), advanceBookingDays);
-  return isAfter(targetDate, threshold);
-};
+  const now = new Date();
 
-/**
- * レガシー関数: 後方互換性のため残している
- * @deprecated getReservationThreshold(activityId) を使用してください
- */
-export const getReservationThresholdLegacy = (): Date => {
-  return addDays(new Date(), DEFAULT_ADVANCE_BOOKING_DAYS);
+  // 当日予約の場合は、閾値を現在時刻とする
+  if (advanceBookingDays === 0) {
+    return isAfter(targetDate, now);
+  }
+
+  // アクティビティの開催日時からN日前の日付を計算し、その日の終わりを締切とする
+  const deadlineDate = subDays(targetDate, advanceBookingDays);
+  const deadline = endOfDay(deadlineDate);
+
+  return !isAfter(now, deadline); // 現在時刻が締切を過ぎていなければ予約可能
 };
 
 export const presenterOpportunitySlots = (
@@ -57,7 +50,8 @@ export const presenterOpportunitySlot = (
   feeRequired: number | null,
 ): ActivitySlot => {
   const startsAtDate = new Date(slot.startsAt);
-  const isReservable = isDateReservable(startsAtDate);
+  const opportunityId = slot.opportunity?.id;
+  const isReservable = isDateReservable(startsAtDate, opportunityId);
 
   return {
     id: slot.id,

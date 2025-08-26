@@ -31,8 +31,14 @@ export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = {
   "cmajlrsq4000ds60n8kr7d6rx": 1, // ［１７］ほたるの里で味わう夏の川遊び体験
   "cmajrg00h0031s60notq3ash8": 1, // ［３４］宮司と唱えるひふみ祝詞と、御守り体験
   "cmaoctvav0029s60nr45s27bj": 1, // ［５７］道後の湯あがりに一杯！ビール工場見学
+  "cmee4z2ii000bs60e41et8krq": 0, // ショート動画制作を覚えて 地域(お店)の発信力を上げよう！
+  "cmb3a6qny01hcs60ncbsokqz8": 0, // ［８］藍ある暮らしに触れる
+  "cmajrynj70000s60nnm7djfbo": 1, // ［８８］地質で旅する夏、塩江ジオ川登り
+  "cmajsmuff0006s60nlsaxpnme": 1, // ［７２］みらい社小屋で出会うITの世界
+  "cmajnmg5n001cs60n1eabrr1y": 1, // ［５５］松山妖怪と過ごす、変身浴衣撮影会
   // === for development ===
   "cmdoet4xa002ds60e7f5akwcb": 0,
+  "cmecrwvir0004s60e8mii3sxv": 1,
   "cmdoesowc002bs60eytbbxkxe": 1,
   "cmdoerhjc0029s60efbb4ub0m": 2
 };
