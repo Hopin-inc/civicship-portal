@@ -10,7 +10,7 @@ import { onError } from "@apollo/client/link/error";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { __DEV__ } from "@apollo/client/utilities/globals";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
-import { TokenManager } from "./auth/token-manager";
+import { TokenManager, PhoneAuthTokens } from "./auth/token-manager";
 
 import { logger } from "@/lib/logging";
 
@@ -20,7 +20,7 @@ import { logger } from "@/lib/logging";
  * @param operationName GraphQL操作名
  * @throws {Error} 必要なトークンが不足している場合
  */
-function validateUserSignUpTokens(phoneTokens: any, operationName: string): void {
+function validateUserSignUpTokens(phoneTokens: PhoneAuthTokens, operationName: string): void {
   const missingTokens: string[] = [];
   
   if (!phoneTokens.accessToken) {
