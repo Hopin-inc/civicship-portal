@@ -9,37 +9,35 @@ interface UseAuthStateCacheProps {
 }
 
 /**
- * 認証状態をキャッシュして高速化するフック
- * 認証が必要なページへの遷移を予測し、事前に状態を準備
+ * 認証パスチェックのグローバルキャッシュをウォームアップするフック
+ * 認証が必要なパスへの遷移を予測し、事前にキャッシュを準備
  */
 export const useAuthStateCache = ({ authRequiredPaths = [] }: UseAuthStateCacheProps) => {
   const pathname = usePathname();
-  const cacheRef = useRef<Map<string, boolean>>(new Map());
+  const warmedUpRef = useRef(false);
 
   useEffect(() => {
-    // 現在のパスが認証不要の場合、関連する認証必要パスの状態をキャッシュ
-    if (authRequiredPaths.length > 0 && !isAuthRequiredForPath(pathname)) {
-      const cacheAuthStates = async () => {
-        // 認証が必要なパスの状態を事前にチェック
+    // 現在のパスが認証不要で、まだウォームアップしていない場合
+    if (authRequiredPaths.length > 0 && 
+        !isAuthRequiredForPath(pathname) && 
+        !warmedUpRef.current) {
+      
+      const warmupCache = () => {
+        warmedUpRef.current = true;
+        
+        // 認証が必要なパスのキャッシュをウォームアップ
         for (const authPath of authRequiredPaths) {
-          if (!cacheRef.current.has(authPath)) {
-            // 実際の認証チェックは行わず、パス情報のみキャッシュ
-            cacheRef.current.set(authPath, true);
-          }
+          // isAuthRequiredForPathを呼び出してグローバルキャッシュに結果を格納
+          isAuthRequiredForPath(authPath);
         }
       };
 
-      // アイドル時間を利用してキャッシュ
+      // アイドル時間を利用してウォームアップ
       if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => cacheAuthStates());
+        requestIdleCallback(() => warmupCache());
       } else {
-        setTimeout(cacheAuthStates, 500);
+        setTimeout(warmupCache, 500);
       }
     }
   }, [pathname, authRequiredPaths]);
-
-  return {
-    getCachedAuthState: (path: string) => cacheRef.current.get(path),
-    clearCache: () => cacheRef.current.clear(),
-  };
 };

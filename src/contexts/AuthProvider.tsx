@@ -26,6 +26,7 @@ import { useUserRegistrationState } from "@/hooks/auth/useUserRegistrationState"
 import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
 import { useLiffPreload } from "@/hooks/auth/useLiffPreload";
 import { useAuthStateCache } from "@/hooks/auth/useAuthStateCache";
+import { useAuthPredictiveLoading } from "@/hooks/auth/useAuthPredictiveLoading";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 import { logger } from "@/lib/logging";
@@ -199,6 +200,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   useUserRegistrationState({ authStateManager, userData, setState });
   useLiffPreload({ environment, liffService });
   useAuthStateCache({ authRequiredPaths: liffAuthRequiredPaths });
+  useAuthPredictiveLoading({ environment, liffService, authRequiredPaths: liffAuthRequiredPaths });
   useLiffInitialization({ environment, liffService, authRequiredPaths: liffAuthRequiredPaths });
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
   useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
