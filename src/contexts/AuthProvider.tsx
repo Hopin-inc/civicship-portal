@@ -320,53 +320,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const lineTokens = TokenManager.getLineTokens();
 
       if (!phoneTokens.refreshToken) {
-        logger.warn("Phone refresh token missing, attempting retry", {
+        logger.error("Phone refresh token missing", {
           phoneUid,
           component: "AuthProvider",
           errorCategory: "token_validation",
         });
-        
-        let retryCount = 0;
-        let retriedTokens = phoneTokens;
-        
-        while (!retriedTokens.refreshToken && retryCount < 3) {
-          retryCount++;
-          logger.debug(`Token retrieval retry attempt ${retryCount}`, {
-            phoneUid,
-            component: "AuthProvider",
-          });
-          
-          await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms between retries
-          retriedTokens = TokenManager.getPhoneTokens();
-        }
-        
-        if (!retriedTokens.refreshToken) {
-          logger.error("Phone refresh token unavailable after retries", {
-            phoneUid,
-            retryCount,
-            component: "AuthProvider",
-            errorCategory: "token_validation",
-          });
-          toast.error("電話番号認証トークンが取得できません。再度認証を行ってください。");
-          return null;
-        }
-        
-        logger.info("Phone refresh token retrieved after retry", {
-          phoneUid,
-          retryCount,
-          component: "AuthProvider",
-        });
-      }
-
-      const finalPhoneTokens = TokenManager.getPhoneTokens();
-      if (!finalPhoneTokens.refreshToken) {
-        logger.error("Phone refresh token validation failed", {
-          phoneUid,
-          hasPhoneNumber: !!finalPhoneTokens.phoneNumber,
-          component: "AuthProvider",
-          errorCategory: "token_validation",
-        });
-        toast.error("電話番号認証トークンが無効です。再度認証を行ってください。");
+        toast.error("電話番号認証トークンが取得できません。再度認証を行ってください。");
         return null;
       }
 
@@ -375,8 +334,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         currentPrefecture: prefecture,
         communityId: COMMUNITY_ID,
         phoneUid,
-        phoneNumber: maskPhoneNumber(finalPhoneTokens.phoneNumber || ""),
-        hasPhoneRefreshToken: !!finalPhoneTokens.refreshToken,
+        phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
+        hasPhoneRefreshToken: !!phoneTokens.refreshToken,
         hasLineRefreshToken: !!lineTokens.refreshToken,
         component: "AuthProvider",
       });
@@ -388,9 +347,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             currentPrefecture: prefecture,
             communityId: COMMUNITY_ID,
             phoneUid,
-            phoneNumber: finalPhoneTokens.phoneNumber ?? undefined,
+            phoneNumber: phoneTokens.phoneNumber ?? undefined,
             lineRefreshToken: lineTokens.refreshToken ?? undefined,
-            phoneRefreshToken: finalPhoneTokens.refreshToken ?? undefined,
+            phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
           },
         },
       });
