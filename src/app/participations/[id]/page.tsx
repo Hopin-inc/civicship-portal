@@ -13,11 +13,14 @@ import { useParams } from "next/navigation";
 import { errorMessages } from "@/utils/errorMessage";
 import useCancelReservation from "@/app/participations/[id]/hooks/useCancelReservation";
 import OpportunityInfo from "./components/OpportunityInfo";
-import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
+
 import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { logger } from "@/lib/logging";
+import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
+import { useAuth } from "@/contexts/AuthProvider";
+import { isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
@@ -35,6 +38,7 @@ const mapReservationStatusToUIStatus = (status: GqlReservationStatus): Participa
 };
 
 export default function ParticipationPage() {
+  const { user } = useAuth();
   const headerConfig = useMemo(
     () => ({
       title: "予約の確認",
@@ -61,9 +65,7 @@ export default function ParticipationPage() {
   
   // #NOTE: コンポーネントに必要な情報を取得するために、useCompletePageViewModel と useOpportunityDetail を使用しているがリクエストが重複するので、まとめたい
   const { dateTimeInfo } = useCompletePageViewModel(id ?? "", participation?.reservation?.id ?? "");
-  const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityDetail(
-    opportunity?.id ?? "",
-  );
+  const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityDetails(opportunity?.id ?? "", user);
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -155,7 +157,7 @@ export default function ParticipationPage() {
             participantCount={dateTimeInfo.participantCount}
             paidParticipantCount={dateTimeInfo.paidParticipantCount}
             totalPrice={dateTimeInfo.totalPrice}
-            pricePerPerson={"feeRequired" in opportunityDetail ? opportunityDetail.feeRequired : 0}
+            pricePerPerson={isActivityCategory(opportunityDetail) ? opportunityDetail.feeRequired : 0}
             location={opportunityDetail.place}
             phoneNumber={participation.emergencyContactPhone}
             isReserved={true}
@@ -166,7 +168,7 @@ export default function ParticipationPage() {
             }}
             ticketCount={dateTimeInfo.ticketCount}
             category={opportunityDetail.category}
-            pointsToEarn={"pointsToEarn" in opportunityDetail ? opportunityDetail.pointsToEarn : 0}
+            pointsToEarn={isQuestCategory(opportunityDetail) ? opportunityDetail.pointsToEarn : 0}
           />
         </div>
       )}
