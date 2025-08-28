@@ -1,12 +1,12 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
+import React, { createContext, useCallback, useContext, useState, useEffect, useMemo } from "react";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { lineAuth } from "@/lib/auth/firebase-config";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import { detectEnvironment } from "@/lib/auth/environment-detector";
 import {
   GqlCurrentPrefecture,
   GqlCurrentUserPayload,
@@ -33,6 +33,7 @@ import { logger } from "@/lib/logging";
 import { maskPhoneNumber } from "@/lib/logging/client/utils";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
 import { RawURIComponent } from "@/utils/path";
+import { AuthEnvironment } from "@/lib/auth/environment-detector";
 
 /**
  * 認証状態の型定義
@@ -198,20 +199,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       initializeAuth();
     }
   }, [authStateManager, isAuthInitialized, authInitError]);
-//通信していない
-  useAuthStateChangeListener({ authStateManager, setState });
-//通信していない
+
+  // 統合された認証フック（重複処理を削減）
+  const authHooksConfig = useMemo(() => ({
+    authStateManager,
+    setState,
+    state,
+    liffService,
+    refetchUser,
+    userData,
+    environment,
+    authRequiredPaths: liffAuthRequiredPaths
+  }), [authStateManager, state, liffService, userData, environment, liffAuthRequiredPaths]);
+
+  // 条件付きフック実行で不要な処理をスキップ
+  useAuthStateChangeListener(authHooksConfig);
   useTokenExpirationHandler({ state, setState, logout });
-  useFirebaseAuthState({ authStateManager, state, setState });
-  usePhoneAuthState({ authStateManager, phoneAuthService, setState });
-  useUserRegistrationState({ authStateManager, userData, setState });
-  useLiffPreload({ environment, liffService });
+  useFirebaseAuthState(authHooksConfig);
+  usePhoneAuthState({ ...authHooksConfig, phoneAuthService });
+  useUserRegistrationState(authHooksConfig);
   useAuthStateCache({ authRequiredPaths: liffAuthRequiredPaths });
-  useAuthPredictiveLoading({ environment, liffService, authRequiredPaths: liffAuthRequiredPaths });
-  useLiffInitialization({ environment, liffService, authRequiredPaths: liffAuthRequiredPaths });
+
+  // プリロード系フック（LIFF環境でのみ有効）
+  useLiffPreload({ environment, liffService });
+  useAuthPredictiveLoading(authHooksConfig);
+  useLiffInitialization(authHooksConfig);
+
+  // LIFF認証処理フック
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
   useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
-  useAutoLogin({ environment, state, liffService, setState, refetchUser, userData, authRequiredPaths: liffAuthRequiredPaths });
+
+  // 自動ログインは最後に実行
+  useAutoLogin(authHooksConfig);
 
   /**
    * LIFFでログイン

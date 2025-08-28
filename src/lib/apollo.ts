@@ -92,12 +92,13 @@ const requestLink = new ApolloLink((operation, forward) => {
   return new Observable((observer) => {
     (async () => {
       try {
-        const { lineAuth } = await import("./auth/firebase-config");
-        const phoneTokens = TokenManager.getPhoneTokens();
-
-        const firebaseToken = await tokenCache.getFirebaseToken();
-
-        const lineTokens = TokenManager.getLineTokens();
+        // トークン取得とFirebase設定を並列実行
+        const [{ lineAuth }, phoneTokens, firebaseToken, lineTokens] = await Promise.all([
+          import("./auth/firebase-config"),
+          Promise.resolve(TokenManager.getPhoneTokens()),
+          tokenCache.getFirebaseToken(),
+          Promise.resolve(TokenManager.getLineTokens())
+        ]);
         const accessToken = firebaseToken || lineTokens.accessToken;
 
         operation.setContext(({ headers = {} }) => {
