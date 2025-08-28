@@ -14,6 +14,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from '@/components/shared'
 import { notFound, useSearchParams } from "next/navigation";
 import EmptyState from "@/components/shared/EmptyState";
+import { isQuestCategory } from "@/components/domains/opportunities/types";
 
 export default function SelectDatePage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -68,7 +69,7 @@ export default function SelectDatePage() {
     return <EmptyState title="予約枠" />;
   }
 
-  const pointsToEarn = "pointsToEarn" in opportunity ? opportunity.pointsToEarn : 0;
+  const pointsToEarn = isQuestCategory(opportunity) ? opportunity.pointsToEarn : 0;
 
   return (
     <main className="px-6">

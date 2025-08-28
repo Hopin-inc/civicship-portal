@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { GqlPortfolioFilterInput, GqlPortfolioSortInput, InputMaybe, useGetUserFlexibleQuery } from "@/types/graphql";
 import { presenterManagerProfile } from "@/app/users/data/presenter";
-import { presenterActivityCard } from "@/app/activities/data/presenter";
+import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export const useUserProfile = (

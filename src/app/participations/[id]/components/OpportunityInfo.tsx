@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
+import { ActivityDetail, QuestDetail } from "@/components/domains/opportunity/types";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { ArrowRight } from "lucide-react";
