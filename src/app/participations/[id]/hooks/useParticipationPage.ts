@@ -6,11 +6,11 @@ import {
   calculateCancellationDeadline,
   presenterParticipation,
 } from "@/app/participations/[id]/data/presenter";
-import { presenterActivityCard } from "@/app/activities/data/presenter";
+import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import { useParticipationState } from "@/app/participations/[id]/hooks/useParticipationState";
 import type { ParticipationDetail } from "@/app/participations/[id]/data/type";
 import type { ReservationStatus } from "@/types/participationStatus";
-import type { ActivityCard } from "@/app/activities/data/type";
+import type { ActivityCard } from "@/components/domains/opportunities/types";
 import { logger } from "@/lib/logging";
 
 interface UseParticipationPageResult {

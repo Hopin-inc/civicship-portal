@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
-import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/components/domains/opportunities/types";
 import { GqlOpportunityCategory } from "@/types/graphql";
+import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 const MockImage = ({ src, alt, width, height, ...props }: any) => (
   <img src={src} alt={alt} width={width} height={height} {...props} />
@@ -20,6 +21,8 @@ const mockActivityCards: ActivityCard[] = [
     location: "香川県高松市",
     feeRequired: 3000,
     hasReservableTicket: true,
+    pointsRequired: 100,
+    slots: [],
   },
   {
     id: "2",
@@ -30,6 +33,8 @@ const mockActivityCards: ActivityCard[] = [
     location: "徳島県徳島市",
     feeRequired: null,
     hasReservableTicket: false,
+    pointsRequired: 100,
+    slots: [],
   },
   {
     id: "3",
@@ -40,6 +45,8 @@ const mockActivityCards: ActivityCard[] = [
     location: "愛媛県松山市",
     feeRequired: 2500,
     hasReservableTicket: true,
+    pointsRequired: 100,
+    slots: [],
   },
   {
     id: "4",
@@ -50,6 +57,8 @@ const mockActivityCards: ActivityCard[] = [
     location: "高知県高知市",
     feeRequired: 1500,
     hasReservableTicket: false,
+    pointsRequired: 100,
+    slots: [],
   },
   {
     id: "5",
@@ -60,12 +69,14 @@ const mockActivityCards: ActivityCard[] = [
     location: "香川県丸亀市",
     feeRequired: null,
     hasReservableTicket: true,
+    pointsRequired: 100,
+    slots: [],
   },
 ];
 
-const meta: Meta<typeof ActivitiesCarouselSection> = {
+const meta: Meta<typeof OpportunityCarouselListSection> = {
   title: "App/Activities/CarouselSection",
-  component: ActivitiesCarouselSection,
+  component: OpportunityCarouselListSection,
   tags: ["autodocs"],
   argTypes: {
     title: {
@@ -110,12 +121,12 @@ const meta: Meta<typeof ActivitiesCarouselSection> = {
 
 export default meta;
 
-type Story = StoryObj<typeof ActivitiesCarouselSection>;
+type Story = StoryObj<typeof OpportunityCarouselListSection>;
 
 export const Default: Story = {
   args: {
     title: "おすすめアクティビティ",
-    opportunities: mockActivityCards,
+    opportunities: mockActivityCards.map(formatOpportunities),
     isInitialLoading: false,
     isSearchResult: false,
   },
@@ -124,7 +135,7 @@ export const Default: Story = {
 export const SearchResults: Story = {
   args: {
     title: "7/25(木)",
-    opportunities: mockActivityCards.slice(0, 3),
+    opportunities: mockActivityCards.slice(0, 3).map(formatOpportunities),
     isInitialLoading: false,
     isSearchResult: true,
   },
@@ -142,7 +153,7 @@ export const InitialLoading: Story = {
 export const SingleActivity: Story = {
   args: {
     title: "特集アクティビティ",
-    opportunities: [mockActivityCards[0]],
+    opportunities: [mockActivityCards[0]].map(formatOpportunities),
     isInitialLoading: false,
     isSearchResult: false,
   },
@@ -160,7 +171,7 @@ export const EmptyState: Story = {
 export const FreeActivities: Story = {
   args: {
     title: "無料アクティビティ",
-    opportunities: mockActivityCards.filter(activity => activity.feeRequired === null),
+    opportunities: mockActivityCards.filter(activity => activity.feeRequired === null).map(formatOpportunities),
     isInitialLoading: false,
     isSearchResult: false,
   },
@@ -169,7 +180,7 @@ export const FreeActivities: Story = {
 export const TicketActivities: Story = {
   args: {
     title: "チケット利用可能",
-    opportunities: mockActivityCards.filter(activity => activity.hasReservableTicket),
+    opportunities: mockActivityCards.filter(activity => activity.hasReservableTicket).map(formatOpportunities),
     isInitialLoading: false,
     isSearchResult: false,
   },
@@ -178,7 +189,7 @@ export const TicketActivities: Story = {
 export const LongTitle: Story = {
   args: {
     title: "四国地域の伝統文化体験とコミュニティ活動",
-    opportunities: mockActivityCards.slice(0, 4),
+    opportunities: mockActivityCards.slice(0, 4).map(formatOpportunities),
     isInitialLoading: false,
     isSearchResult: false,
   },

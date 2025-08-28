@@ -16,7 +16,7 @@ import {
 } from "@/app/participations/[id]/data/type";
 import { ReservationStatus } from "@/types/participationStatus";
 import { presenterPlace } from "@/app/places/data/presenter";
-import { presenterOpportunityHost } from "@/app/activities/data/presenter";
+import { presenterOpportunityHost } from "@/components/domains/opportunities/data/presenter";
 import { subDays } from "date-fns";
 import { DEFAULT_CANCELLATION_DEADLINE_DAYS } from "@/config/activityBookingConfig";
 
