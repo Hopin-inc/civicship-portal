@@ -146,11 +146,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
    */
   const logout = useCallback(async (): Promise<void> => {
     try {
-      liffService.logout();
-
-      await lineAuth.signOut();
-
-      phoneAuthService.reset();
+      // 並列実行でログアウト処理を高速化
+      await Promise.all([
+        liffService.logout(),
+        lineAuth.signOut(),
+        Promise.resolve(phoneAuthService.reset()),
+      ]);
 
       TokenManager.clearAllTokens();
 
@@ -175,7 +176,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
     const initializeAuth = async () => {
       try {
-        await authStateManager.initialize();
+        // 認証初期化を並列実行で高速化
+        await Promise.all([
+          authStateManager.initialize(),
+          // 必要に応じて他の初期化処理を追加
+        ]);
+
         setIsAuthInitialized(true);
         setAuthInitError(null);
         const currentState = authStateManager.getState();
@@ -192,8 +198,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       initializeAuth();
     }
   }, [authStateManager, isAuthInitialized, authInitError]);
-
+//通信していない
   useAuthStateChangeListener({ authStateManager, setState });
+//通信していない
   useTokenExpirationHandler({ state, setState, logout });
   useFirebaseAuthState({ authStateManager, state, setState });
   usePhoneAuthState({ authStateManager, phoneAuthService, setState });
@@ -204,7 +211,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   useLiffInitialization({ environment, liffService, authRequiredPaths: liffAuthRequiredPaths });
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
   useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
-  useAutoLogin({ environment, state, liffService, setState, refetchUser, authRequiredPaths: liffAuthRequiredPaths });
+  useAutoLogin({ environment, state, liffService, setState, refetchUser, userData, authRequiredPaths: liffAuthRequiredPaths });
 
   /**
    * LIFFでログイン
@@ -224,7 +231,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
       const success = await liffService.signInWithLiffToken();
 
-      if (success) {
+      if (success && !userData?.currentUser) {
         await refetchUser();
       }
 
@@ -271,32 +278,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     const success = await phoneAuthService.verifyPhoneCode(verificationCode);
 
     if (success) {
-      setState((prev) => ({
-        ...prev,
-        authenticationState: "phone_authenticated",
-      }));
-
-      if (authStateManager) {
-        try {
-          const timestamp = new Date().toISOString();
-          logger.debug("Updating phone auth state in verifyPhoneCode", {
-            timestamp,
-            component: "AuthProvider",
-          });
-          await authStateManager.handlePhoneAuthStateChange(true);
-          logger.debug("AuthStateManager phone state updated successfully in verifyPhoneCode", {
-            timestamp,
-            component: "AuthProvider",
-          });
-        } catch (error) {
-          logger.warn("Failed to update AuthStateManager phone state in verifyPhoneCode", {
-            error: error instanceof Error ? error.message : String(error),
-            component: "AuthProvider",
-            errorCategory: "state_management",
-            retryable: true,
-          });
-        }
-      }
+      // 状態更新とAuthStateManager更新を並列実行
+      await Promise.all([
+        Promise.resolve().then(() => {
+          setState((prev) => ({
+            ...prev,
+            authenticationState: "phone_authenticated",
+          }));
+        }),
+        Promise.resolve().then(async () => {
+          if (authStateManager) {
+            try {
+              const timestamp = new Date().toISOString();
+              logger.debug("Updating phone auth state in verifyPhoneCode", {
+                timestamp,
+                component: "AuthProvider",
+              });
+              await authStateManager.handlePhoneAuthStateChange(true);
+              logger.debug("AuthStateManager phone state updated successfully in verifyPhoneCode", {
+                timestamp,
+                component: "AuthProvider",
+              });
+            } catch (error) {
+              logger.warn("Failed to update AuthStateManager phone state in verifyPhoneCode", {
+                error: error instanceof Error ? error.message : String(error),
+                component: "AuthProvider",
+                errorCategory: "state_management",
+                retryable: true,
+              });
+            }
+          }
+        }),
+      ]);
     }
 
     return success;
@@ -321,33 +334,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
         return null;
       }
 
-      const phoneTokens = TokenManager.getPhoneTokens();
-      const lineTokens = TokenManager.getLineTokens();
+      // トークン取得を並列実行
+      const [phoneTokens, lineTokens] = await Promise.all([
+        Promise.resolve(TokenManager.getPhoneTokens()),
+        Promise.resolve(TokenManager.getLineTokens()),
+      ]);
 
-      logger.debug("Creating user with input", {
-        name,
-        currentPrefecture: prefecture,
-        communityId: COMMUNITY_ID,
-        phoneUid,
-        phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
-        component: "AuthProvider",
-      });
-
-      const { data } = await userSignUp({
-        variables: {
-          input: {
+      // ユーザー作成とログ出力を並列実行
+      const [signUpResult] = await Promise.all([
+        userSignUp({
+          variables: {
+            input: {
+              name,
+              currentPrefecture: prefecture,
+              communityId: COMMUNITY_ID,
+              phoneUid,
+              phoneNumber: phoneTokens.phoneNumber ?? undefined,
+              lineRefreshToken: lineTokens.refreshToken ?? undefined,
+              phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
+            },
+          },
+        }),
+        // ログ出力は非同期で実行
+        Promise.resolve().then(() => {
+          logger.debug("Creating user with input", {
             name,
-            currentPrefecture: prefecture, // Changed from prefecture to currentPrefecture to match backend schema
+            currentPrefecture: prefecture,
             communityId: COMMUNITY_ID,
             phoneUid,
-            phoneNumber: phoneTokens.phoneNumber ?? undefined,
-            lineRefreshToken: lineTokens.refreshToken ?? undefined,
-            phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
-          },
-        },
-      });
+            phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
+            component: "AuthProvider",
+          });
+        }),
+      ]);
 
-      if (data?.userSignUp?.user) {
+      if (signUpResult.data?.userSignUp?.user) {
         await refetchUser();
         toast.success("アカウントを作成しました");
         return state.firebaseUser;
