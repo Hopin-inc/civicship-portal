@@ -47,6 +47,7 @@ export function PhoneVerificationForm() {
   const [isPhoneSubmitting, setIsSubmitting] = useState(false);
   const [isCodeVerifying, setIsCodeVerifying] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
+  const [isResendDisabled, setIsResendDisabled] = useState(false);
   // ==================================
 
   const formattedPhone = formatPhoneNumber(phoneNumber);
@@ -58,6 +59,23 @@ export function PhoneVerificationForm() {
       setIsRecaptchaReady(true);
     }
   }, []);
+
+  // 再送信タイマーの制御
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (isResendDisabled) {
+      timeout = setTimeout(() => {
+        setIsResendDisabled(false);
+      }, 60 * 1000);
+    }
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [isResendDisabled]);
+
+  const startResendTimer = () => {
+    setIsResendDisabled(true);
+  };
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +93,7 @@ export function PhoneVerificationForm() {
 
       if (verificationId) {
         setStep("code");
+        startResendTimer(); // 60秒タイマーを開始
       }
     } catch (error) {
       const categorized = categorizeFirebaseError(error);
@@ -83,6 +102,93 @@ export function PhoneVerificationForm() {
       if (categorized.type === "rate-limit") {
         setIsRateLimited(true);
         setTimeout(() => setIsRateLimited(false), 60 * 1000); // 60秒後に解除
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (isResendDisabled || isPhoneSubmitting) return;
+    
+    if (!isRecaptchaReady) {
+      toast.error("認証コード送信を準備中です");
+      return;
+    }
+    
+    // 電話番号が空の場合はエラー
+    if (!phoneNumber || !formattedPhone) {
+      toast.error("電話番号が設定されていません。電話番号入力画面に戻ってください。");
+      return;
+    }
+    
+    // reCAPTCHAコンテナの存在確認
+    const recaptchaContainer = document.getElementById("recaptcha-container");
+    if (!recaptchaContainer) {
+      toast.error("認証システムの準備ができていません。ページを再読み込みしてください。");
+      return;
+    }
+    
+    // デバッグ用: 電話番号の状態を確認
+    console.log("再送信時の電話番号:", phoneNumber);
+    console.log("再送信時のフォーマット済み電話番号:", formattedPhone);
+    console.log("reCAPTCHAコンテナ:", recaptchaContainer);
+    
+    setIsSubmitting(true);
+    
+    try {
+      // reCAPTCHAをクリアしてから再送信
+      phoneAuth.clearRecaptcha?.();
+      
+      // reCAPTCHAコンテナを完全に再作成
+      const recaptchaContainer = document.getElementById("recaptcha-container");
+      if (recaptchaContainer) {
+        // 既存のコンテナを削除
+        const parent = recaptchaContainer.parentNode;
+        if (parent) {
+          parent.removeChild(recaptchaContainer);
+          
+          // 新しいコンテナを作成（タイムスタンプ付きのID）
+          const newContainer = document.createElement("div");
+          const timestamp = Date.now();
+          newContainer.id = `recaptcha-container-${timestamp}`;
+          newContainer.style.display = "none"; // 非表示で配置
+          parent.appendChild(newContainer);
+          
+          // 元のIDに戻す
+          setTimeout(() => {
+            newContainer.id = "recaptcha-container";
+          }, 100);
+        }
+      }
+      
+      // グローバルreCAPTCHA状態もリセット
+      if (typeof window !== 'undefined' && (window as any).grecaptcha) {
+        try {
+          // すべてのreCAPTCHAインスタンスをリセット
+          (window as any).grecaptcha.reset();
+        } catch (e) {
+          console.log("reCAPTCHA reset (expected):", e instanceof Error ? e.message : String(e));
+        }
+      }
+      
+      // 少し待ってから再送信
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
+      
+      if (verificationId) {
+        toast.success("認証コードを再送信しました");
+        startResendTimer(); // 60秒タイマーを再開始
+      }
+    } catch (error) {
+      console.error("再送信エラー:", error);
+      const categorized = categorizeFirebaseError(error);
+      toast.error(categorized.message);
+      
+      if (categorized.type === "rate-limit") {
+        setIsRateLimited(true);
+        setTimeout(() => setIsRateLimited(false), 60 * 1000);
       }
     } finally {
       setIsSubmitting(false);
@@ -233,6 +339,9 @@ export function PhoneVerificationForm() {
         </>
       )}
       {step === "code" && (
+        <div id="recaptcha-container" ref={recaptchaContainerRef} style={{ display: 'none' }}></div>
+      )}
+      {step === "code" && (
         <form onSubmit={handleCodeSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="code" className="text-sm font-medium">
@@ -260,6 +369,22 @@ export function PhoneVerificationForm() {
               }
             >
               {isCodeVerifying ? "検証中..." : "コードを検証"}
+            </Button>
+            <Button
+              type="button"
+              className="w-full h-12 bg-primary text-white rounded-md"
+              disabled={
+                isResendDisabled ||
+                isPhoneSubmitting ||
+                isReloading
+              }
+              onClick={handleResendCode}
+            >
+              {isResendDisabled 
+                ? "60秒後に再送信できます" 
+                : isPhoneSubmitting 
+                  ? "送信中..." 
+                  : "コードを再送信"}
             </Button>
             <Button
               type="button"
