@@ -1,6 +1,6 @@
 import { AuthStateManager } from "./auth-state-manager";
 import { GqlRole, GqlUser } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { COMMUNITY_ID, currentCommunityConfig } from "@/lib/communities/metadata";
 import {
   encodeURIComponentWithType,
   extractSearchParamFromRelativePath,
@@ -184,7 +184,15 @@ export class AuthRedirectService {
         return `/sign-up${ nextParam }` as RawURIComponent;
 
       case "loading":
+        return "/" as RawURIComponent;
       case "user_registered":
+        // 認証済みユーザーは、nextPathがある場合はそこに、なければ適切なページにリダイレクト
+        if (nextPath && nextPath !== "/") {
+          return nextPath;
+        }
+        // コミュニティ設定に基づいて適切なページにリダイレクト
+        const rootPath = currentCommunityConfig.rootPath || "/";
+        return rootPath as RawURIComponent;
       default:
         return nextPath ?? "/" as RawURIComponent;
     }
