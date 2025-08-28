@@ -17,9 +17,9 @@ export function middleware(request: NextRequest) {
   const rootPath = currentCommunityConfig.rootPath || "/";
 
   // ルートページへのアクセスを処理
-  if (pathname === "/" && rootPath !== "/") {
-    return NextResponse.redirect(new URL(rootPath, request.url));
-  }
+  // if (pathname === "/" && rootPath !== "/") {
+  //   return NextResponse.redirect(new URL(rootPath, request.url));
+  // }
 
   for (const [feature, routes] of Object.entries(featureToRoutesMap)) {
     if (!enabledFeatures.includes(feature as FeaturesType)) {
