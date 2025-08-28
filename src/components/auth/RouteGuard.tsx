@@ -59,6 +59,19 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         setAuthorized(true);
         return;
       }
+      
+      // LIFF経由のログイン後は、適切なページにリダイレクト
+      if (isAuthenticated && authenticationState === "user_registered") {
+        const redirectPath = authRedirectService.getPostLineAuthRedirectPath(pathname as RawURIComponent);
+        if (redirectPath && redirectPath !== "/") {
+          logger.debug("RouteGuard: Redirecting authenticated user from root to appropriate page", {
+            component: "RouteGuard",
+            redirectPath,
+          });
+          router.replace(redirectPath);
+          return;
+        }
+      }
     }
 
     const authCheck = () => {
