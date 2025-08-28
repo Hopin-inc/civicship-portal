@@ -360,7 +360,7 @@ export function PhoneVerificationForm() {
           <div className="flex flex-col items-center gap-8 w-full mx-auto">
             <Button
               type="submit"
-              className="w-full h-12 bg-primary text-white rounded-md"
+              className="w-full h-12"
               disabled={
                 isCodeVerifying ||
                 phoneAuth.isVerifying ||
@@ -372,7 +372,8 @@ export function PhoneVerificationForm() {
             </Button>
             <Button
               type="button"
-              className="w-full h-12 bg-primary text-white rounded-md"
+              variant="tertiary"
+              className="w-full h-12"
               disabled={
                 isResendDisabled ||
                 isPhoneSubmitting ||
