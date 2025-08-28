@@ -8,9 +8,8 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import { ErrorState } from '@/components/shared'
+import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
-import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
-import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function UserPage() {
   const params = useParams();
@@ -43,8 +42,6 @@ export default function UserPage() {
     currentCommunityConfig.enableFeatures.includes(feature),
   );
 
-  const formattedOpportunities = selfOpportunities.map(formatOpportunities);
-
   return (
     <div className="container mx-auto py-6 max-w-3xl">
       <UserProfileSection
@@ -55,16 +52,17 @@ export default function UserPage() {
       />
       {shouldShowOpportunities && (
         <>
-          {formattedOpportunities.length > 0 && (
+          {selfOpportunities.length > 0 && (
             <section className="py-6 mt-0">
               <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
                 主催中の体験
               </h2>
               <div className="mt-4 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                {formattedOpportunities.map((opportunity) => (
-                  <OpportunityVerticalCard
+                {selfOpportunities.map((opportunity) => (
+                  <OpportunityCardVertical
                     key={opportunity.id}
-                    {...opportunity}
+                    opportunity={opportunity}
+                    isCarousel
                   />
                 ))}
               </div>

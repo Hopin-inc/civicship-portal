@@ -10,7 +10,7 @@ import {
 } from "@/app/users/data/type";
 import { presenterUserAsset } from "@/app/wallets/data/presenter";
 import { Participant } from "@/types/utils";
-import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
+import { presenterActivityCard } from "@/app/activities/data/presenter";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 

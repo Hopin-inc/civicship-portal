@@ -23,6 +23,7 @@ const useSearchResultHeader = (searchParams: SearchParams) => {
           from: searchParams.from,
           to: searchParams.to,
           guests: searchParams.guests && !isNaN(parseInt(searchParams.guests, 10)) ? parseInt(searchParams.guests, 10) : undefined,
+          redirectTo: searchParams.redirectTo,
           q: searchParams.q,
           points: searchParams.points,
           ticket: searchParams.ticket,

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
-import OpportunitiesListSection from "@/components/domains/opportunity/components/ListSection/OpportunitiesGridListSection";
-import { ActivityCard } from "@/components/domains/opportunity/types";
+import ActivitiesListSection from "@/app/activities/components/ListSection/ListSection";
+import { ActivityCard } from "@/app/activities/data/type";
 import { GqlOpportunityCategory } from "@/types/graphql";
 
 const MockImage = ({ src, alt, width, height, ...props }: any) => (
@@ -94,9 +94,9 @@ const mockActivityCards: ActivityCard[] = [
 ];
 
 
-const meta: Meta<typeof OpportunitiesListSection> = {
+const meta: Meta<typeof ActivitiesListSection> = {
   title: "App/Activities/ListSection",
-  component: OpportunitiesListSection,
+  component: ActivitiesListSection,
   tags: ["autodocs"],
   argTypes: {
     opportunities: {
@@ -133,7 +133,7 @@ const meta: Meta<typeof OpportunitiesListSection> = {
 
 export default meta;
 
-type Story = StoryObj<typeof OpportunitiesListSection>;
+type Story = StoryObj<typeof ActivitiesListSection>;
 
 export const Default: Story = {
   args: {

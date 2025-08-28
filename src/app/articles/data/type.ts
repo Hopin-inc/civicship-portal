@@ -1,5 +1,5 @@
 import { GqlArticleCategory } from "@/types/graphql";
-import { ActivityCard } from "@/components/domains/opportunity/types";
+import { ActivityCard } from "@/app/activities/data/type";
 
 export type TArticleCard = {
   id: string;

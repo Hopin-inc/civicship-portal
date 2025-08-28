@@ -7,7 +7,7 @@ import {
   TArticleRelatedUser,
   TArticleWithAuthor,
 } from "@/app/articles/data/type";
-import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
+import { presenterActivityCard } from "@/app/activities/data/presenter";
 
 export const presenterArticleCards = (
   edges?: (GqlArticleEdge | null | undefined)[],

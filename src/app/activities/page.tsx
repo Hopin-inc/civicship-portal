@@ -1,13 +1,12 @@
-"use client";
+import ActivitiesList from "./components/ActivitiesList";
+import ActivitiesHeader from "./components/Header";
 
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+export default async function ActivitiesPage() {
 
-export default function ActivitiesPage() {
-  const router = useRouter();
-  useEffect(() => {
-    router.replace("/opportunities/search?type=activity");
-  }, []);
-  return <LoadingIndicator/>;
+return (
+  <>
+  <ActivitiesHeader />
+  <ActivitiesList />
+  </>
+);
 }
