@@ -25,3 +25,24 @@ export const GET_CURRENT_USER = gql`
   }
   ${MEMBERSHIP_FRAGMENT}
 `;
+
+export const CHECK_PHONE_TOKEN_REGISTERED = gql`
+  query checkPhoneTokenRegistered {
+    checkPhoneTokenRegistered {
+      hasValidTokens
+      missingTokens
+      phoneUid
+      message
+    }
+  }
+`;
+
+export const RECOVER_PHONE_AUTH_TOKEN = gql`
+  mutation recoverPhoneAuthToken($input: RecoverPhoneAuthTokenInput!) {
+    recoverPhoneAuthToken(input: $input) {
+      success
+      expiresAt
+      message
+    }
+  }
+`;
