@@ -10,9 +10,49 @@ import { onError } from "@apollo/client/link/error";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { __DEV__ } from "@apollo/client/utilities/globals";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
-import { TokenManager } from "./auth/token-manager";
+import { TokenManager, PhoneAuthTokens } from "./auth/token-manager";
 
 import { logger } from "@/lib/logging";
+
+/**
+ * userSignUp操作に必要な電話番号トークンを検証する
+ * @param phoneTokens 電話番号トークン情報
+ * @param operationName GraphQL操作名
+ * @throws {Error} 必要なトークンが不足している場合
+ */
+function validateUserSignUpTokens(phoneTokens: PhoneAuthTokens, operationName: string): void {
+  const missingTokens: string[] = [];
+  
+  if (!phoneTokens.accessToken) {
+    missingTokens.push("X-Phone-Auth-Token");
+  }
+  
+  if (!phoneTokens.phoneUid) {
+    missingTokens.push("X-Phone-Uid");
+  }
+  
+  if (missingTokens.length > 0) {
+    logger.error("Required phone tokens missing for userSignUp", {
+      missingTokens,
+      hasPhoneNumber: !!phoneTokens.phoneNumber,
+      hasRefreshToken: !!phoneTokens.refreshToken,
+      component: "ApolloRequestLink",
+      operation: operationName,
+      errorCategory: "token_validation",
+    });
+    
+    throw new Error(`Missing required tokens for userSignUp: ${missingTokens.join(", ")}`);
+  }
+  
+  logger.debug("Phone tokens validated for userSignUp", {
+    hasPhoneAuthToken: !!phoneTokens.accessToken,
+    hasPhoneUid: !!phoneTokens.phoneUid,
+    hasPhoneNumber: !!phoneTokens.phoneNumber,
+    hasRefreshToken: !!phoneTokens.refreshToken,
+    component: "ApolloRequestLink",
+    operation: operationName,
+  });
+}
 
 if (__DEV__) {
   loadDevMessages();
@@ -74,6 +114,10 @@ const requestLink = new ApolloLink((operation, forward) => {
           const tokenRequiredOperations = ["userSignUp", "linkPhoneAuth", "storePhoneAuthToken", "identityCheckPhoneUser"];
 
           if (tokenRequiredOperations.includes(operation.operationName || "")) {
+            if (operation.operationName === "userSignUp") {
+              validateUserSignUpTokens(phoneTokens, operation.operationName);
+            }
+
             const requestHeaders = {
               ...baseHeaders,
               "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
