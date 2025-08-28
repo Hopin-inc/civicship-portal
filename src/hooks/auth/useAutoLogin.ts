@@ -62,12 +62,26 @@ const useAutoLogin = ({
     setState((prev) => ({ ...prev, isAuthenticating: true }));
     
     try {
-      const success = await liffService.signInWithLiffToken();
-      if (success) {
-        // ユーザー情報が既に取得済みかチェック
-        if (!userData?.currentUser) {
-          await refetchUser();
-        }
+      // Firebase認証とユーザーデータ取得を条件付き並列実行
+      const [authResult] = await Promise.allSettled([
+        liffService.signInWithLiffToken(),
+        // 既存ユーザーデータがない場合のみrefetchを並列実行
+        !userData?.currentUser ? refetchUser() : Promise.resolve()
+      ]);
+
+      if (authResult.status === 'fulfilled' && authResult.value) {
+        // 認証成功時の処理
+        logger.debug("Auto-login successful", {
+          component: "useAutoLogin",
+          timestamp,
+        });
+      } else if (authResult.status === 'rejected') {
+        // 認証失敗時の処理
+        logger.info("Auto-login with LIFF failed", {
+          authType: "liff",
+          error: authResult.reason instanceof Error ? authResult.reason.message : String(authResult.reason),
+          component: "useAutoLogin",
+        });
       }
     } catch (error) {
       logger.info("Auto-login with LIFF failed", {
