@@ -16,10 +16,13 @@ export function middleware(request: NextRequest) {
   const enabledFeatures = currentCommunityConfig.enableFeatures || [];
   const rootPath = currentCommunityConfig.rootPath || "/";
 
+  // liff.state があれば元のパス、それ以外は "/"
+  const redirectPath = request.nextUrl.searchParams.get("liff.state") || "/";
+
   // ルートページへのアクセスを処理
-  // if (pathname === "/" && rootPath !== "/") {
-  //   return NextResponse.redirect(new URL(rootPath, request.url));
-  // }
+  if (pathname === "/" && rootPath !== "/") {
+    return NextResponse.redirect(new URL(redirectPath, request.url));
+  }
 
   for (const [feature, routes] of Object.entries(featureToRoutesMap)) {
     if (!enabledFeatures.includes(feature as FeaturesType)) {
