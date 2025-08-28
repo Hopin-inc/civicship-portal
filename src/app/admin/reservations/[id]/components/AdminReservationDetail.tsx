@@ -5,11 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, JapaneseYen, Phone, User } from "lucide-react";
 import { displayPhoneNumber } from "@/utils";
 import { displayDuration } from "@/utils/date";
+import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
 import { cn } from "@/lib/utils";
 import { GqlReservation, Maybe } from "@/types/graphql";
-import { ActivityCard } from "@/components/domains/opportunities/types";
-import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
-import { formatOpportunities } from "@/components/domains/opportunities/utils";
+import { ActivityCard } from "@/app/activities/data/type";
 
 interface ReservationDetailsProps {
   reservation: GqlReservation;
@@ -101,14 +100,13 @@ const ReservationCard: React.FC<{
   participationFee: number;
   participantCount: number;
 }> = ({ activityCard, reservation, participationFee, participantCount }) => {
-  const formattedActivityCard = formatOpportunities(activityCard);
   return (
     <Card className="mb-10 shadow-none border-0">
       <CardHeader>
-        <OpportunityHorizontalCard
-          {...formattedActivityCard}
+        <OpportunityCardHorizontal
+          opportunity={activityCard}
           withShadow={false}
-        ></OpportunityHorizontalCard>
+        ></OpportunityCardHorizontal>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
         <p className="inline-flex items-center gap-2 text-body-md">

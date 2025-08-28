@@ -6,11 +6,11 @@ import {
   GqlUser,
   Maybe,
 } from "@/types/graphql";
-import { ActivityCard, OpportunityPlace } from "@/components/domains/opportunities/types";
+import { ActivityCard, OpportunityPlace } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { IPlaceCard, IPlaceDetail, IPlaceHost, IPlacePin } from "@/app/places/data/type";
 import { presenterArticleWithAuthor } from "@/app/articles/data/presenter";
-import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
+import { presenterActivityCard } from "@/app/activities/data/presenter";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 import {
   getPrimaryOpportunity,

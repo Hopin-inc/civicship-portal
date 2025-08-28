@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-async function fetchOpportunity(id: string, communityId: string): Promise<NonNullable<GqlGetOpportunityQuery['opportunity']> | null> {
+async function fetchOpportunity(id: string, communityId: string): Promise<GqlOpportunity | null> {
   const { data } = await apolloClient.query<
     GqlGetOpportunityQuery,
     GqlGetOpportunityQueryVariables

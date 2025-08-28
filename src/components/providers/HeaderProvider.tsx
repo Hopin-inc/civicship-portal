@@ -16,6 +16,7 @@ export interface HeaderConfig {
     from?: string;
     to?: string;
     guests?: number;
+    redirectTo?: string;
     q?: string;
     type?: string;
     ticket?: string;

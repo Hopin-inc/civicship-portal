@@ -74,8 +74,8 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
-    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures","quests"],
-    rootPath: "/opportunities",
+    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures"],
+    rootPath: "/activities",
     adminRootPath: "/admin/reservations",
   },
   "himeji-ymca": {
@@ -147,7 +147,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       "prefectures",
       "quests",
     ],
-    rootPath: "/opportunities",
+    rootPath: "/activities",
   },
 };
 

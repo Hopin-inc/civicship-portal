@@ -12,15 +12,14 @@ const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
 };
 
 export function middleware(request: NextRequest) {
+  // Get the current path
   const pathname = request.nextUrl.pathname;
+
+  // Get enabled features for the current community
   const enabledFeatures = currentCommunityConfig.enableFeatures || [];
   const rootPath = currentCommunityConfig.rootPath || "/";
 
-  // ルートページへのアクセスを処理
-  if (pathname === "/" && rootPath !== "/") {
-    return NextResponse.redirect(new URL(rootPath, request.url));
-  }
-
+  // Check if the current path corresponds to a disabled feature
   for (const [feature, routes] of Object.entries(featureToRoutesMap)) {
     if (!enabledFeatures.includes(feature as FeaturesType)) {
       for (const route of routes) {

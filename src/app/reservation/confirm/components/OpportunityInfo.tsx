@@ -2,12 +2,11 @@
 
 import React from "react";
 import Image from "next/image";
-import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
+import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import Link from "next/link";
-import { isActivityCategory } from "@/components/domains/opportunities/types";
 
 interface OpportunityInfoProps {
   opportunity: ActivityDetail | QuestDetail;
@@ -34,7 +33,7 @@ const getPointOrFee = (
   ticketCount?: number
 ) => {
   if(opportunity?.category === GqlOpportunityCategory.Activity) {
-    const feeRequired = isActivityCategory(opportunity) ? opportunity.feeRequired : 0;
+    const feeRequired = "feeRequired" in opportunity ? opportunity.feeRequired : 0;
     const normalParticipantCount = (participantCount ?? 0) - (ticketCount ?? 0) - (participantCountWithPoint ?? 0);
     return(
       <div className="border-b border-foreground-caption pb-4">
