@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { GqlOpportunityCategory, GqlWallet, useGetUserWalletQuery } from "@/types/graphql";
-import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
+import { ActivityDetail, QuestDetail } from "@/components/domains/opportunity/types";
 import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
 import { useSlotDateRange } from "@/app/reservation/confirm/hooks/useSlotDateRange";
 

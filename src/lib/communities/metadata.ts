@@ -74,8 +74,8 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
-    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures"],
-    rootPath: "/activities",
+    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures","quests"],
+    rootPath: "/opportunities",
     adminRootPath: "/admin/reservations",
   },
   "himeji-ymca": {
@@ -90,9 +90,9 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     squareLogoPath: "/communities/himeji-ymca/logo-square.jpg",
     ogImagePath:
       "https://storage.googleapis.com/prod-civicship-storage-public/asset/himeji-ymca/ogp.jpg",
-    enableFeatures: ["opportunities", "credentials", "quests", "points"],
-    rootPath: "/activities",
-    adminRootPath: "/admin/reservations",
+    enableFeatures: ["points"],
+    rootPath: "/users/me",
+    adminRootPath: "/admin/wallet",
   },
   kibotcha: {
     id: "kibotcha",
@@ -147,7 +147,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       "prefectures",
       "quests",
     ],
-    rootPath: "/activities",
+    rootPath: "/opportunities",
   },
 };
 
@@ -193,12 +193,16 @@ function generateCommunityMetadata(communityId: string): CommunityMetadata {
     icons: {
       icon: [
         {
-          url: baseConfig.faviconPrefix ? `${baseConfig.faviconPrefix}/favicon.ico` : DEFAULT_ASSET_PATHS.FAVICON,
+          url: baseConfig.faviconPrefix
+            ? `${baseConfig.faviconPrefix}/favicon.ico`
+            : DEFAULT_ASSET_PATHS.FAVICON,
         },
       ],
       apple: [
         {
-          url: baseConfig.faviconPrefix ? `${baseConfig.faviconPrefix}/apple-touch-icon.png` : DEFAULT_ASSET_PATHS.APPLE_TOUCH_ICON,
+          url: baseConfig.faviconPrefix
+            ? `${baseConfig.faviconPrefix}/apple-touch-icon.png`
+            : DEFAULT_ASSET_PATHS.APPLE_TOUCH_ICON,
         },
       ],
     },

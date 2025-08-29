@@ -4,8 +4,8 @@ import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { GqlOpportunity as GraphQLOpportunity, GqlOpportunityEdge } from "@/types/graphql";
-import { ActivityCard } from "@/app/activities/data/type";
-import { QuestCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/components/domains/opportunities/types";
+import { QuestCard } from "@/components/domains/opportunities/types";
 
 export interface SearchParams {
   location?: string;
@@ -16,7 +16,6 @@ export interface SearchParams {
   ticket?: string;
   points?: string;
   q?: string;
-  redirectTo?: string;
 }
 
 export const formatDateRange = (range: DateRange | undefined): string => {
