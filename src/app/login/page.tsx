@@ -16,6 +16,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { logger } from "@/lib/logging";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { decodeURIComponentWithType, EncodedURIComponent } from "@/utils/path";
+import { detectEnvironment, AuthEnvironment } from "@/lib/auth/environment-detector";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -49,14 +50,29 @@ export default function LoginPage() {
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
 
   useEffect(() => {
+    const environment = detectEnvironment();
+    const isLiffEnvironment = environment === AuthEnvironment.LIFF;
+    
     logger.debug("LoginPage: useEffect triggered for auth state change", {
       isAuthenticating,
       authenticationState,
       nextPath,
+      environment,
+      isLiffEnvironment,
       component: "LoginPage",
     });
     
     if (!isAuthenticating && authenticationState !== "unauthenticated") {
+      if (isLiffEnvironment) {
+        logger.debug("LoginPage: LIFF environment detected, skipping redirect", {
+          authenticationState,
+          nextPath,
+          environment,
+          component: "LoginPage",
+        });
+        return;
+      }
+      
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
       logger.debug("LoginPage: About to execute redirect", {
         authenticationState,
