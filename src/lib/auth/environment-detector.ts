@@ -61,14 +61,21 @@ export const detectEnvironment = (): AuthEnvironment => {
       isInClient: !!(window.liff && window.liff.isInClient()),
       userAgent: navigator?.userAgent || 'undefined',
       timestamp: now,
-      stackTrace: new Error().stack?.split('\n').slice(0, 5).join('\n') // 最初の5行のみ
+      searchParamsKeys: Array.from(searchParams.keys()),
+      hashParamsKeys: Array.from(hashParams.keys()),
+      stackTrace: new Error().stack?.split('\n').slice(0, 3).join('\n') // 最初の3行のみ
     };
+    
+    const isLiffUserAgent = typeof navigator !== "undefined" && /LIFF/i.test(navigator.userAgent);
     
     if (hasLiffState || (hasAccessToken && hasContextToken) || hasLiffClientId) {
       console.debug("detectEnvironment: URLパラメータでLIFF検出", debugInfo);
       result = AuthEnvironment.LIFF;
     } else if (window.liff && window.liff.isInClient()) {
       console.debug("detectEnvironment: window.liffでLIFF検出", debugInfo);
+      result = AuthEnvironment.LIFF;
+    } else if (isLiffUserAgent) {
+      console.debug("detectEnvironment: User-AgentでLIFF検出", debugInfo);
       result = AuthEnvironment.LIFF;
     } else if (typeof navigator !== "undefined" && /Line/i.test(navigator.userAgent)) {
       console.debug("detectEnvironment: LINE_BROWSER検出", debugInfo);
