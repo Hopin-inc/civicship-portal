@@ -9,6 +9,7 @@ import {
 } from "@/utils/path";
 import { logger } from "@/lib/logging";
 import { detectEnvironment, AuthEnvironment } from "./environment-detector";
+import { isAuthRequiredForPath } from "@/config/auth-config";
 
 /**
  * Owner専用のパス一覧
@@ -41,17 +42,16 @@ export class AuthRedirectService {
 
   /**
    * 保護されたパスかどうかを判定
+   * 統一された認証設定を使用してLIFF環境検出を含む
    */
   public isProtectedPath(pathname: string): boolean {
-    const protectedPaths = [
-      "/users/me",
-      "/tickets",
-      "/wallets",
-      "/wallets/*",
-      "/admin",
-      "/admin/*",
-    ];
-    return matchPaths(pathname, ...protectedPaths);
+    const isRequired = isAuthRequiredForPath(pathname);
+    logger.debug("AuthRedirectService: isProtectedPath called", {
+      pathname,
+      isRequired,
+      component: "AuthRedirectService",
+    });
+    return isRequired;
   }
 
   /**
