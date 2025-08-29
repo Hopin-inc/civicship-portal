@@ -13,6 +13,7 @@ import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { TokenManager } from "./auth/token-manager";
 
 import { logger } from "@/lib/logging";
+import { lineAuth } from "./auth/firebase-config";
 
 // Firebaseトークンのキャッシュ管理
 class TokenCache {
@@ -38,7 +39,6 @@ class TokenCache {
 
     // キャッシュが無効または存在しない場合は新しいトークンを取得
     try {
-      const { lineAuth } = await import("./auth/firebase-config");
       if (lineAuth.currentUser) {
         this.firebaseToken = await lineAuth.currentUser.getIdToken();
         this.firebaseTokenExpiry = now + this.TOKEN_CACHE_DURATION;
@@ -93,8 +93,7 @@ const requestLink = new ApolloLink((operation, forward) => {
     (async () => {
       try {
         // トークン取得とFirebase設定を並列実行
-        const [{ lineAuth }, phoneTokens, firebaseToken, lineTokens] = await Promise.all([
-          import("./auth/firebase-config"),
+        const [phoneTokens, firebaseToken, lineTokens] = await Promise.all([
           Promise.resolve(TokenManager.getPhoneTokens()),
           tokenCache.getFirebaseToken(),
           Promise.resolve(TokenManager.getLineTokens())

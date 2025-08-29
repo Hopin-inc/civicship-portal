@@ -4,6 +4,7 @@ import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { detectEnvironment, AuthEnvironment } from "./environment-detector";
 
 import { logger } from "@/lib/logging";
+import { lineAuth } from "./firebase-config";
 
 export type AuthenticationState =
   | "unauthenticated"
@@ -197,7 +198,6 @@ export class AuthStateManager {
    */
   private async checkUserRegistration(): Promise<boolean> {
     try {
-      const { lineAuth } = await import("./firebase-config");
       if (!lineAuth.currentUser) {
         return false;
       }
