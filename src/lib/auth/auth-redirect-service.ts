@@ -79,6 +79,10 @@ export class AuthRedirectService {
    * @returns リダイレクト先のパス、またはnull（リダイレクト不要の場合）
    */
   public getRedirectPath(pathname: RawURIComponent, next?: RawURIComponent | null): RawURIComponent | null {
+    // LIFF環境では自動ログイン処理が実行されるため、unauthenticated状態でもリダイレクトしない
+    const isLiffEnvironment = typeof window !== "undefined" && 
+      (window.location.href.includes("liff.line.me") || 
+       window.location.href.includes("liffClientId"));
     const authState = this.authStateManager.getState();
     const nextParam = next
       ? this.generateNextParam(next)
@@ -109,6 +113,10 @@ export class AuthRedirectService {
     if (this.isProtectedPath(pathname)) {
       switch (authState) {
         case "unauthenticated":
+          // LIFF環境では自動ログイン処理が実行されるため、リダイレクトしない
+          if (isLiffEnvironment) {
+            return null;
+          }
           return `/login${ nextParam }` as RawURIComponent;
         case "line_authenticated":
         case "line_token_expired":
@@ -171,9 +179,18 @@ export class AuthRedirectService {
 
     const authState = this.authStateManager.getState();
 
+    // LIFF環境では自動ログイン処理が実行されるため、unauthenticated状態でもリダイレクトしない
+    const isLiffEnvironment = typeof window !== "undefined" && 
+      (window.location.href.includes("liff.line.me") || 
+       window.location.href.includes("liffClientId"));
+
     switch (authState) {
       case "unauthenticated":
       case "line_token_expired":
+        // LIFF環境では自動ログイン処理が実行されるため、リダイレクトしない
+        if (isLiffEnvironment) {
+          return nextPath ?? "/" as RawURIComponent;
+        }
         return `/login${ nextParam }` as RawURIComponent;
 
       case "line_authenticated":
