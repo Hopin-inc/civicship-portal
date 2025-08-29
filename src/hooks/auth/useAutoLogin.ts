@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { LiffService } from "@/lib/auth/liff-service";
+import { useEffect, useRef, useCallback, useMemo } from "react";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { AuthState } from "@/contexts/AuthProvider";
+import { LiffService } from "@/lib/auth/liff-service";
 import { logger } from "@/lib/logging";
-
+import { useAuthPathCheck } from "./useAuthPathCheck";
+import { GqlCurrentUserQuery } from "@/types/graphql";
 
 interface UseAutoLoginProps {
   environment: AuthEnvironment;
@@ -13,6 +14,11 @@ interface UseAutoLoginProps {
   liffService: LiffService;
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
   refetchUser: () => Promise<any>;
+  userData: GqlCurrentUserQuery | undefined;
+  // 特定のページでのみ自動ログインを実行するための設定
+  authRequiredPaths?: string[];
+  // 認証処理が実行中かどうか
+  isProcessingAuth?: boolean;
 }
 
 const useAutoLogin = ({
@@ -21,84 +27,86 @@ const useAutoLogin = ({
   liffService,
   setState,
   refetchUser,
+  userData,
+  authRequiredPaths = [],
+  isProcessingAuth = false,
 }: UseAutoLoginProps) => {
+  const { isAuthRequired } = useAuthPathCheck(authRequiredPaths);
   const attemptedRef = useRef(false);
-  const prevStateRef = useRef<{ authenticationState: string; isAuthenticating: boolean } | null>(
-    null,
-  );
-  const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
 
-  useEffect(() => {
-    if (environment !== AuthEnvironment.LIFF) {
-      return;
-    }
-
-    const currentState = {
-      authenticationState: state.authenticationState,
-      isAuthenticating: state.isAuthenticating,
-    };
-
-    const currentLiffState = liffService.getState();
-    const liffStateKey = {
-      isInitialized: currentLiffState.isInitialized,
-      isLoggedIn: currentLiffState.isLoggedIn,
-    };
-
-    const stateChanged =
-      !prevStateRef.current ||
-      prevStateRef.current.authenticationState !== currentState.authenticationState ||
-      prevStateRef.current.isAuthenticating !== currentState.isAuthenticating;
-
-    const liffStateChanged =
-      !prevLiffStateRef.current ||
-      prevLiffStateRef.current.isInitialized !== liffStateKey.isInitialized ||
-      prevLiffStateRef.current.isLoggedIn !== liffStateKey.isLoggedIn;
-
-    if (stateChanged || liffStateChanged) {
-      prevStateRef.current = currentState;
-      prevLiffStateRef.current = liffStateKey;
-
-      if (
-        state.authenticationState === "unauthenticated" &&
-        !state.isAuthenticating &&
-        !attemptedRef.current &&
-        currentLiffState.isInitialized &&
-        currentLiffState.isLoggedIn
-      ) {
-        const handleAutoLogin = async () => {
-          attemptedRef.current = true;
-
-          const timestamp = new Date().toISOString();
-
-          setState((prev) => ({ ...prev, isAuthenticating: true }));
-          try {
-            const success = await liffService.signInWithLiffToken();
-            if (success) {
-              await refetchUser();
-            }
-          } catch (error) {
-            logger.info("Auto-login with LIFF failed", {
-              authType: "liff",
-              error: error instanceof Error ? error.message : String(error),
-              component: "useAutoLogin",
-            });
-          } finally {
-            setState((prev) => ({ ...prev, isAuthenticating: false }));
-          }
-        };
-
-        handleAutoLogin();
-      }
-    }
+  // 自動ログインの条件をメモ化
+  const shouldAutoLogin = useMemo(() => {
+    if (environment !== AuthEnvironment.LIFF) return false;
+    if (environment !== AuthEnvironment.LIFF && !isAuthRequired) return false;
+    if (isProcessingAuth) return false; // 認証処理が実行中の場合は自動ログインをスキップ
+    
+    const liffState = liffService.getState();
+    return (
+      state.authenticationState === "unauthenticated" &&
+      !state.isAuthenticating &&
+      !attemptedRef.current &&
+      liffState.isInitialized &&
+      liffState.isLoggedIn
+    );
   }, [
     environment,
+    isAuthRequired,
+    isProcessingAuth,
     state.authenticationState,
     state.isAuthenticating,
     liffService,
-    setState,
-    refetchUser,
   ]);
 
+  // 自動ログイン処理をメモ化
+  const handleAutoLogin = useCallback(async () => {
+    if (attemptedRef.current) return;
+    
+    attemptedRef.current = true;
+    const timestamp = new Date().toISOString();
+
+    setState((prev) => ({ ...prev, isAuthenticating: true }));
+    
+    try {
+      // Firebase認証とユーザーデータ取得を条件付き並列実行
+      const [authResult] = await Promise.allSettled([
+        liffService.signInWithLiffToken(),
+        // 既存ユーザーデータがない場合のみrefetchを並列実行
+        !userData?.currentUser ? refetchUser() : Promise.resolve()
+      ]);
+
+      if (authResult.status === 'fulfilled' && authResult.value) {
+        // 認証成功時の処理
+        logger.debug("Auto-login successful", {
+          component: "useAutoLogin",
+          timestamp,
+        });
+      } else if (authResult.status === 'rejected') {
+        // 認証失敗時の処理
+        logger.info("Auto-login with LIFF failed", {
+          authType: "liff",
+          error: authResult.reason instanceof Error ? authResult.reason.message : String(authResult.reason),
+          component: "useAutoLogin",
+        });
+      }
+    } catch (error) {
+      logger.info("Auto-login with LIFF failed", {
+        authType: "liff",
+        error: error instanceof Error ? error.message : String(error),
+        component: "useAutoLogin",
+      });
+    } finally {
+      setState((prev) => ({ ...prev, isAuthenticating: false }));
+    }
+  }, [liffService, setState, refetchUser, userData]);
+
+  // 自動ログインの実行
+  useEffect(() => {
+    if (shouldAutoLogin) {
+      handleAutoLogin();
+    }
+  }, [shouldAutoLogin, handleAutoLogin]);
+
+  // 認証状態が変わったらリセット
   useEffect(() => {
     if (state.authenticationState !== "unauthenticated") {
       attemptedRef.current = false;

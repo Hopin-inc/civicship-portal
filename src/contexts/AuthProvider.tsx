@@ -1,12 +1,12 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
+import React, { createContext, useCallback, useContext, useState, useEffect, useMemo } from "react";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { lineAuth } from "@/lib/auth/firebase-config";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import { detectEnvironment } from "@/lib/auth/environment-detector";
 import {
   GqlCurrentPrefecture,
   GqlCurrentUserPayload,
@@ -24,12 +24,16 @@ import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
 import { usePhoneAuthState } from "@/hooks/auth/usePhoneAuthState";
 import { useUserRegistrationState } from "@/hooks/auth/useUserRegistrationState";
 import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
+import { useLiffPreload } from "@/hooks/auth/useLiffPreload";
+import { useAuthStateCache } from "@/hooks/auth/useAuthStateCache";
+import { useAuthPredictiveLoading } from "@/hooks/auth/useAuthPredictiveLoading";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 import { logger } from "@/lib/logging";
 import { maskPhoneNumber } from "@/lib/logging/client/utils";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
 import { RawURIComponent } from "@/utils/path";
+import { AuthEnvironment } from "@/lib/auth/environment-detector";
 
 /**
  * 認証状態の型定義
@@ -91,12 +95,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
  */
 interface AuthProviderProps {
   children: React.ReactNode;
+  // 特定のページでのみLIFF認証を実行するための設定
+  liffAuthRequiredPaths?: string[];
 }
 
 /**
  * 認証プロバイダーコンポーネント
  */
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ 
+  children, 
+  liffAuthRequiredPaths = [] 
+}) => {
   const environment = detectEnvironment();
 
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
@@ -107,10 +116,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, setState] = useState<AuthState>({
     firebaseUser: null,
     currentUser: null,
-    authenticationState: "loading",
+    authenticationState: "unauthenticated", // 初期値をunauthenticatedに変更
     environment,
     isAuthenticating: false,
   });
+
+  const [isAuthInitialized, setIsAuthInitialized] = useState(false);
+  const [authInitError, setAuthInitError] = useState<string | null>(null);
+  const [isProcessingAuth, setIsProcessingAuth] = useState(false);
 
   const [userSignUp] = useUserSignUpMutation();
 
@@ -121,8 +134,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
       state.authenticationState,
-    ),
+    ) || !isAuthInitialized, // 認証初期化が完了していない場合はスキップ
     fetchPolicy: "network-only",
+    onCompleted: (data) => {
+      logger.info("✅ [AUTH] ユーザーデータ取得完了", {
+        hasUser: !!data?.currentUser,
+        component: "AuthProvider"
+      });
+    },
+    onError: (error) => {
+      logger.error("❌ [AUTH] ユーザーデータ取得エラー", {
+        error: error.message,
+        component: "AuthProvider"
+      });
+    }
   });
 
   const authStateManager = React.useMemo(() => {
@@ -135,11 +160,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    */
   const logout = useCallback(async (): Promise<void> => {
     try {
-      liffService.logout();
-
-      await lineAuth.signOut();
-
-      phoneAuthService.reset();
+      // 並列実行でログアウト処理を高速化
+      await Promise.all([
+        liffService.logout(),
+        lineAuth.signOut(),
+        Promise.resolve(phoneAuthService.reset()),
+      ]);
 
       TokenManager.clearAllTokens();
 
@@ -159,15 +185,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [liffService, phoneAuthService]);
 
-  const [isAuthInitialized, setIsAuthInitialized] = useState(false);
-  const [authInitError, setAuthInitError] = useState<string | null>(null);
-
   useEffect(() => {
     if (!authStateManager) return;
 
     const initializeAuth = async () => {
       try {
-        await authStateManager.initialize();
+        // 認証初期化を並列実行で高速化
+        await Promise.all([
+          authStateManager.initialize(),
+          // 必要に応じて他の初期化処理を追加
+        ]);
+
         setIsAuthInitialized(true);
         setAuthInitError(null);
         const currentState = authStateManager.getState();
@@ -175,6 +203,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } catch (error) {
         setAuthInitError(error instanceof Error ? error.message : "認証の初期化に失敗しました");
         setIsAuthInitialized(false);
+        // エラーが発生しても初期化は完了として扱う
+        setIsAuthInitialized(true);
       }
     };
 
@@ -183,15 +213,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [authStateManager, isAuthInitialized, authInitError]);
 
-  useAuthStateChangeListener({ authStateManager, setState });
+  // 統合された認証フック（重複処理を削減）
+  const authHooksConfig = useMemo(() => ({
+    authStateManager,
+    setState,
+    state,
+    liffService,
+    refetchUser,
+    userData,
+    environment,
+    authRequiredPaths: liffAuthRequiredPaths,
+    isProcessingAuth,
+    setIsProcessingAuth
+  }), [authStateManager, state, liffService, userData, environment, liffAuthRequiredPaths, isProcessingAuth, setIsProcessingAuth]);
+
+  // 条件付きフック実行で不要な処理をスキップ
+  useAuthStateChangeListener(authHooksConfig);
   useTokenExpirationHandler({ state, setState, logout });
-  useFirebaseAuthState({ authStateManager, state, setState });
-  usePhoneAuthState({ authStateManager, phoneAuthService, setState });
-  useUserRegistrationState({ authStateManager, userData, setState });
-  useLiffInitialization({ environment, liffService });
+  useFirebaseAuthState(authHooksConfig);
+  usePhoneAuthState({ ...authHooksConfig, phoneAuthService });
+  useUserRegistrationState(authHooksConfig);
+  useAuthStateCache({ authRequiredPaths: liffAuthRequiredPaths });
+
+  // プリロード系フック（LIFF環境でのみ有効）
+  useLiffPreload({ environment, liffService });
+  useAuthPredictiveLoading(authHooksConfig);
+  useLiffInitialization(authHooksConfig);
+
+  // LIFF認証処理フック
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
-  useAutoLogin({ environment, state, liffService, setState, refetchUser });
+  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser, setIsProcessingAuth, authStateManager });
+
+  // 自動ログインは最後に実行（認証処理の重複を防ぐ）
+  useAutoLogin(authHooksConfig);
 
   /**
    * LIFFでログイン
@@ -211,7 +265,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const success = await liffService.signInWithLiffToken();
 
-      if (success) {
+      if (success && !userData?.currentUser) {
         await refetchUser();
       }
 
@@ -258,32 +312,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const success = await phoneAuthService.verifyPhoneCode(verificationCode);
 
     if (success) {
-      setState((prev) => ({
-        ...prev,
-        authenticationState: "phone_authenticated",
-      }));
-
-      if (authStateManager) {
-        try {
-          const timestamp = new Date().toISOString();
-          logger.debug("Updating phone auth state in verifyPhoneCode", {
-            timestamp,
-            component: "AuthProvider",
-          });
-          await authStateManager.handlePhoneAuthStateChange(true);
-          logger.debug("AuthStateManager phone state updated successfully in verifyPhoneCode", {
-            timestamp,
-            component: "AuthProvider",
-          });
-        } catch (error) {
-          logger.warn("Failed to update AuthStateManager phone state in verifyPhoneCode", {
-            error: error instanceof Error ? error.message : String(error),
-            component: "AuthProvider",
-            errorCategory: "state_management",
-            retryable: true,
-          });
-        }
-      }
+      // 状態更新とAuthStateManager更新を並列実行
+      await Promise.all([
+        Promise.resolve().then(() => {
+          setState((prev) => ({
+            ...prev,
+            authenticationState: "phone_authenticated",
+          }));
+        }),
+        Promise.resolve().then(async () => {
+          if (authStateManager) {
+            try {
+              const timestamp = new Date().toISOString();
+              logger.debug("Updating phone auth state in verifyPhoneCode", {
+                timestamp,
+                component: "AuthProvider",
+              });
+              await authStateManager.handlePhoneAuthStateChange(true);
+              logger.debug("AuthStateManager phone state updated successfully in verifyPhoneCode", {
+                timestamp,
+                component: "AuthProvider",
+              });
+            } catch (error) {
+              logger.warn("Failed to update AuthStateManager phone state in verifyPhoneCode", {
+                error: error instanceof Error ? error.message : String(error),
+                component: "AuthProvider",
+                errorCategory: "state_management",
+                retryable: true,
+              });
+            }
+          }
+        }),
+      ]);
     }
 
     return success;
@@ -308,33 +368,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return null;
       }
 
-      const phoneTokens = TokenManager.getPhoneTokens();
-      const lineTokens = TokenManager.getLineTokens();
+      // トークン取得を並列実行
+      const [phoneTokens, lineTokens] = await Promise.all([
+        Promise.resolve(TokenManager.getPhoneTokens()),
+        Promise.resolve(TokenManager.getLineTokens()),
+      ]);
 
-      logger.debug("Creating user with input", {
-        name,
-        currentPrefecture: prefecture,
-        communityId: COMMUNITY_ID,
-        phoneUid,
-        phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
-        component: "AuthProvider",
-      });
-
-      const { data } = await userSignUp({
-        variables: {
-          input: {
+      // ユーザー作成とログ出力を並列実行
+      const [signUpResult] = await Promise.all([
+        userSignUp({
+          variables: {
+            input: {
+              name,
+              currentPrefecture: prefecture,
+              communityId: COMMUNITY_ID,
+              phoneUid,
+              phoneNumber: phoneTokens.phoneNumber ?? undefined,
+              lineRefreshToken: lineTokens.refreshToken ?? undefined,
+              phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
+            },
+          },
+        }),
+        // ログ出力は非同期で実行
+        Promise.resolve().then(() => {
+          logger.debug("Creating user with input", {
             name,
-            currentPrefecture: prefecture, // Changed from prefecture to currentPrefecture to match backend schema
+            currentPrefecture: prefecture,
             communityId: COMMUNITY_ID,
             phoneUid,
-            phoneNumber: phoneTokens.phoneNumber ?? undefined,
-            lineRefreshToken: lineTokens.refreshToken ?? undefined,
-            phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
-          },
-        },
-      });
+            phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
+            component: "AuthProvider",
+          });
+        }),
+      ]);
 
-      if (data?.userSignUp?.user) {
+      if (signUpResult.data?.userSignUp?.user) {
         await refetchUser();
         toast.success("アカウントを作成しました");
         return state.firebaseUser;
@@ -369,7 +437,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const value: AuthContextType = {
+  const authContextValue = useMemo(() => ({
     user: state.currentUser,
     firebaseUser: state.firebaseUser,
     uid: state.firebaseUser?.uid || null,
@@ -394,24 +462,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
-  };
+    loading: userLoading || state.isAuthenticating,
+  }), [
+    state.currentUser,
+    state.firebaseUser,
+    state.authenticationState,
+    state.isAuthenticating,
+    state.environment,
+    loginWithLiff,
+    logout,
+    phoneAuthService,
+    createUser,
+    refetchUser,
+    userLoading
+  ]);
 
-  if (!isAuthInitialized) {
-    if (authInitError) {
-      const refetchRef = { 
-        current: () => {
-          setAuthInitError(null);
-          setIsAuthInitialized(false);
-        }
-      };
-      return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
-    }
-    
-    return <LoadingIndicator fullScreen={true} />;
+  // 認証初期化エラーの場合のみエラー表示
+  if (authInitError) {
+    const refetchRef = { 
+      current: () => {
+        setAuthInitError(null);
+        setIsAuthInitialized(false);
+      }
+    };
+    return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
   }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>;
 };
 
 /**

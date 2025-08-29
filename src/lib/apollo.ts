@@ -13,13 +13,61 @@ import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { TokenManager } from "./auth/token-manager";
 
 import { logger } from "@/lib/logging";
+import { lineAuth } from "./auth/firebase-config";
+
+// Firebaseトークンのキャッシュ管理
+class TokenCache {
+  private static instance: TokenCache;
+  private firebaseToken: string | null = null;
+  private firebaseTokenExpiry: number = 0;
+  private readonly TOKEN_CACHE_DURATION = 50 * 60 * 1000; // 50分（Firebaseトークンの有効期限より短く）
+
+  static getInstance(): TokenCache {
+    if (!TokenCache.instance) {
+      TokenCache.instance = new TokenCache();
+    }
+    return TokenCache.instance;
+  }
+
+  async getFirebaseToken(): Promise<string | null> {
+    const now = Date.now();
+    
+    // キャッシュが有効な場合はキャッシュを返す
+    if (this.firebaseToken && now < this.firebaseTokenExpiry) {
+      return this.firebaseToken;
+    }
+
+    // キャッシュが無効または存在しない場合は新しいトークンを取得
+    try {
+      if (lineAuth.currentUser) {
+        this.firebaseToken = await lineAuth.currentUser.getIdToken();
+        this.firebaseTokenExpiry = now + this.TOKEN_CACHE_DURATION;
+        return this.firebaseToken;
+      }
+    } catch (error) {
+      logger.info("Failed to get Firebase token", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "TokenCache",
+      });
+    }
+
+    return null;
+  }
+
+  clearCache(): void {
+    this.firebaseToken = null;
+    this.firebaseTokenExpiry = 0;
+  }
+}
+
+const tokenCache = TokenCache.getInstance();
 
 if (__DEV__) {
   loadDevMessages();
   loadErrorMessages();
 }
 
-const httpLink = createUploadLink({
+const uploadLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
   credentials: "same-origin",
   headers: {
@@ -44,23 +92,12 @@ const requestLink = new ApolloLink((operation, forward) => {
   return new Observable((observer) => {
     (async () => {
       try {
-        const { lineAuth } = await import("./auth/firebase-config");
-        const phoneTokens = TokenManager.getPhoneTokens();
-
-        let firebaseToken = null;
-        if (lineAuth.currentUser) {
-          try {
-            firebaseToken = await lineAuth.currentUser.getIdToken();
-          } catch (error) {
-            logger.info("Failed to get Firebase token", {
-              error: error instanceof Error ? error.message : String(error),
-              component: "ApolloRequestLink",
-              operation: operation.operationName,
-            });
-          }
-        }
-
-        const lineTokens = TokenManager.getLineTokens();
+        // トークン取得とFirebase設定を並列実行
+        const [phoneTokens, firebaseToken, lineTokens] = await Promise.all([
+          Promise.resolve(TokenManager.getPhoneTokens()),
+          tokenCache.getFirebaseToken(),
+          Promise.resolve(TokenManager.getLineTokens())
+        ]);
         const accessToken = firebaseToken || lineTokens.accessToken;
 
         operation.setContext(({ headers = {} }) => {
@@ -186,14 +223,33 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
   }
 });
 
-const link = ApolloLink.from([requestLink, errorLink, httpLink]);
+const link = ApolloLink.from([requestLink, errorLink, uploadLink]);
 
 const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
   link,
   ssrMode: true,
   cache: new InMemoryCache({
-    resultCaching: false,
+    resultCaching: true,
+    typePolicies: {
+      Query: {
+        fields: {
+          currentUser: {
+            merge: true, // 結果をマージ
+          },
+        },
+      },
+    },
   }),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: "cache-and-network", // キャッシュを優先しつつ、バックグラウンドで更新
+      errorPolicy: "all",
+    },
+    query: {
+      fetchPolicy: "cache-first", // キャッシュを優先
+      errorPolicy: "all",
+    },
+  },
 };
 
 export const apolloClient = new ApolloClient(defaultOptions);

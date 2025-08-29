@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useQuery } from "@apollo/client";
-import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
+import { isAuthRequiredForPath } from "@/config/auth-config";
+import { detectEnvironment, AuthEnvironment, clearEnvironmentCache } from "@/lib/auth/environment-detector";
 
 /**
  * ルートガードコンポーネントのプロパティ
@@ -29,14 +29,24 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const nextParam = searchParams.get("next") as EncodedURIComponent;
   const [authorized, setAuthorized] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
+  
+  // LIFF環境の判定 - 不整合を防ぐためにメモ化し、パス変更時にキャッシュクリア
+  const environment = React.useMemo(() => {
+    clearEnvironmentCache(); // パス変更時にキャッシュをクリア
+    const env = detectEnvironment();
+    console.debug("RouteGuard: 環境検出（キャッシュクリア後）", { env, pathname });
+    return env;
+  }, [pathname]); // pathnameが変更された時に再検出
+  const isLiffEnvironment = environment === AuthEnvironment.LIFF;
 
-  const { loading: userLoading } = useQuery(GET_CURRENT_USER, {
-    skip: !isAuthenticated,
-  });
+  const userLoading = false;
 
   const authRedirectService = React.useMemo(() => {
     return AuthRedirectService.getInstance();
   }, []);
+
+  // 現在のページが認証不要かどうかを判定
+  const isAuthNotRequired = !isAuthRequiredForPath(pathname);
 
   useEffect(() => {
     if (!loading) {
@@ -45,6 +55,16 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, [loading]);
 
   useEffect(() => {
+    // LIFF環境で認証状態がloadingの場合は、自動ログインの完了を待つ
+    if (isLiffEnvironment && authenticationState === "loading") {
+      logger.debug("RouteGuard: Waiting for auto-login completion in LIFF environment", {
+        authenticationState,
+        environment,
+        component: "RouteGuard",
+      });
+      return;
+    }
+    
     if (loading || userLoading || isInitialRender) {
       return;
     }
@@ -65,7 +85,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       const pathNameWithParams = searchParams.size > 0
         ? `${ pathname }?${ searchParams.toString() }` as RawURIComponent
         : pathname as RawURIComponent;
+      
       const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam));
+      
       if (redirectPath) {
         router.replace(redirectPath);
       }
@@ -76,7 +98,13 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     };
   }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams, isInitialRender]);
 
-  if (loading || userLoading || isInitialRender) {
+  // 認証不要ページの場合は即座にコンテンツを表示（ローディングを表示しない）
+  if (isAuthNotRequired) {
+    return <>{ children }</>;
+  }
+
+  // 認証が必要なページの場合のみローディングを表示
+  if (loading || userLoading || isInitialRender || (isLiffEnvironment && authenticationState === "loading")) {
     return <LoadingIndicator />;
   }
 

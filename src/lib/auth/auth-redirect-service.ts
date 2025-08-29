@@ -8,6 +8,8 @@ import {
   RawURIComponent,
 } from "@/utils/path";
 import { logger } from "@/lib/logging";
+import { detectEnvironment, AuthEnvironment } from "./environment-detector";
+import { isAuthRequiredForPath } from "@/config/auth-config";
 
 /**
  * Owner専用のパス一覧
@@ -40,17 +42,16 @@ export class AuthRedirectService {
 
   /**
    * 保護されたパスかどうかを判定
+   * 統一された認証設定を使用してLIFF環境検出を含む
    */
   public isProtectedPath(pathname: string): boolean {
-    const protectedPaths = [
-      "/users/me",
-      "/tickets",
-      "/wallets",
-      "/wallets/*",
-      "/admin",
-      "/admin/*",
-    ];
-    return matchPaths(pathname, ...protectedPaths);
+    const isRequired = isAuthRequiredForPath(pathname);
+    logger.debug("AuthRedirectService: isProtectedPath called", {
+      pathname,
+      isRequired,
+      component: "AuthRedirectService",
+    });
+    return isRequired;
   }
 
   /**
@@ -79,10 +80,22 @@ export class AuthRedirectService {
    * @returns リダイレクト先のパス、またはnull（リダイレクト不要の場合）
    */
   public getRedirectPath(pathname: RawURIComponent, next?: RawURIComponent | null): RawURIComponent | null {
+    // LIFF環境では自動ログイン処理が実行されるため、unauthenticated状態でもリダイレクトしない
+    const environment = detectEnvironment();
+    const isLiffEnvironment = environment === AuthEnvironment.LIFF;
     const authState = this.authStateManager.getState();
     const nextParam = next
       ? this.generateNextParam(next)
       : this.generateNextParam(pathname);
+      
+    // デバッグログを追加
+    logger.debug("AuthRedirectService: getRedirectPath called", {
+      pathname,
+      authState,
+      environment,
+      isLiffEnvironment,
+      component: "AuthRedirectService",
+    });
 
     if (authState === "loading") {
       return null;
@@ -106,9 +119,33 @@ export class AuthRedirectService {
       }
     }
 
-    if (this.isProtectedPath(pathname)) {
+    const isProtected = this.isProtectedPath(pathname);
+    logger.debug("AuthRedirectService: isProtectedPath result", {
+      pathname,
+      isProtected,
+      authState,
+      isLiffEnvironment,
+      component: "AuthRedirectService",
+    });
+
+    if (isProtected) {
       switch (authState) {
         case "unauthenticated":
+          // LIFF環境では自動ログイン処理が実行されるため、リダイレクトしない
+          if (isLiffEnvironment) {
+            logger.debug("AuthRedirectService: LIFF environment detected, skipping login redirect", {
+              pathname,
+              authState,
+              component: "AuthRedirectService",
+            });
+            return null;
+          }
+          logger.debug("AuthRedirectService: Redirecting to login", {
+            pathname,
+            authState,
+            redirectTo: `/login${ nextParam }`,
+            component: "AuthRedirectService",
+          });
           return `/login${ nextParam }` as RawURIComponent;
         case "line_authenticated":
         case "line_token_expired":
@@ -117,6 +154,11 @@ export class AuthRedirectService {
         case "phone_token_expired":
           return `/sign-up${ nextParam }` as RawURIComponent;
         default:
+          logger.debug("AuthRedirectService: No redirect needed for protected path", {
+            pathname,
+            authState,
+            component: "AuthRedirectService",
+          });
           return null;
       }
     }
@@ -154,6 +196,12 @@ export class AuthRedirectService {
       }
     }
 
+    logger.debug("AuthRedirectService: No redirect needed", {
+      pathname,
+      authState,
+      isProtected,
+      component: "AuthRedirectService",
+    });
     return null;
   }
 
@@ -171,21 +219,67 @@ export class AuthRedirectService {
 
     const authState = this.authStateManager.getState();
 
+    // LIFF環境では自動ログイン処理が実行されるため、unauthenticated状態でもリダイレクトしない
+    const environment = detectEnvironment();
+    const isLiffEnvironment = environment === AuthEnvironment.LIFF;
+    
+    logger.debug("AuthRedirectService: getPostLineAuthRedirectPath called", {
+      nextPath,
+      authState,
+      environment,
+      isLiffEnvironment,
+      component: "AuthRedirectService",
+    });
+
     switch (authState) {
       case "unauthenticated":
       case "line_token_expired":
+        // LIFF環境では自動ログイン処理が実行されるため、リダイレクトしない
+        if (isLiffEnvironment) {
+          logger.debug("AuthRedirectService: getPostLineAuthRedirectPath - LIFF environment, returning nextPath", {
+            nextPath,
+            authState,
+            returnPath: nextPath ?? "/",
+            component: "AuthRedirectService",
+          });
+          return nextPath ?? "/" as RawURIComponent;
+        }
+        logger.debug("AuthRedirectService: getPostLineAuthRedirectPath - redirecting to login", {
+          nextPath,
+          authState,
+          returnPath: `/login${ nextParam }`,
+          component: "AuthRedirectService",
+        });
         return `/login${ nextParam }` as RawURIComponent;
 
       case "line_authenticated":
       case "phone_token_expired":
+        logger.debug("AuthRedirectService: getPostLineAuthRedirectPath - redirecting to phone verification", {
+          nextPath,
+          authState,
+          returnPath: `/sign-up/phone-verification${ nextParam }`,
+          component: "AuthRedirectService",
+        });
         return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
 
       case "phone_authenticated":
+        logger.debug("AuthRedirectService: getPostLineAuthRedirectPath - redirecting to sign-up", {
+          nextPath,
+          authState,
+          returnPath: `/sign-up${ nextParam }`,
+          component: "AuthRedirectService",
+        });
         return `/sign-up${ nextParam }` as RawURIComponent;
 
       case "loading":
       case "user_registered":
       default:
+        logger.debug("AuthRedirectService: getPostLineAuthRedirectPath - returning nextPath or home", {
+          nextPath,
+          authState,
+          returnPath: nextPath ?? "/",
+          component: "AuthRedirectService",
+        });
         return nextPath ?? "/" as RawURIComponent;
     }
   }

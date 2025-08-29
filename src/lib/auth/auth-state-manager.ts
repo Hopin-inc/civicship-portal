@@ -1,8 +1,10 @@
 import { TokenManager } from "./token-manager";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
+import { detectEnvironment, AuthEnvironment } from "./environment-detector";
 
 import { logger } from "@/lib/logging";
+import { lineAuth } from "./firebase-config";
 
 export type AuthenticationState =
   | "unauthenticated"
@@ -137,11 +139,29 @@ export class AuthStateManager {
   public async initialize(): Promise<void> {
     try {
       this.setState("loading");
-
+      
+      const environment = detectEnvironment();
       const lineTokens = TokenManager.getLineTokens();
       const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
       if (!hasValidLineToken) {
+        // LIFF環境では自動ログイン完了まで待機するが、タイムアウトを設定
+        if (environment === AuthEnvironment.LIFF) {
+          // loading状態を維持し、自動ログインに委ねるが、フォールバック処理を追加
+          logger.debug("LIFF environment detected, maintaining loading state for auto-login", {
+            component: "AuthStateManager",
+          });
+          
+          setTimeout(() => {
+            if (this.currentState === "loading") {
+              logger.debug("LIFF auto-login timeout, setting unauthenticated", {
+                component: "AuthStateManager",
+              });
+              this.setState("unauthenticated");
+            }
+          }, 10000);
+          return;
+        }
         this.setState("unauthenticated");
         return;
       }
@@ -178,7 +198,6 @@ export class AuthStateManager {
    */
   private async checkUserRegistration(): Promise<boolean> {
     try {
-      const { lineAuth } = await import("./firebase-config");
       if (!lineAuth.currentUser) {
         return false;
       }

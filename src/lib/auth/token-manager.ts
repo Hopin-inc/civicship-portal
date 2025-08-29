@@ -2,6 +2,7 @@
 
 
 import { logger } from "@/lib/logging";
+import { lineAuth } from "./firebase-config";
 
 /**
  * 認証トークン情報の型定義
@@ -145,8 +146,6 @@ export class TokenManager {
    */
   static async isLineTokenExpired(): Promise<boolean> {
     try {
-      const { lineAuth } = await import("./firebase-config");
-
       if (!lineAuth.currentUser) {
         return true; // No current user means not authenticated
       }

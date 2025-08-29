@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { notFound } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import UserProfileSection from "@/app/users/components/UserProfileSection";
@@ -11,31 +11,105 @@ import { ErrorState } from '@/components/shared'
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useUserNfts } from "@/components/domains/nfts/hooks/useUserNft";
 import { NftCard } from "@/components/domains/nfts/components";
+import { logger } from "@/lib/logging";
 import { CardCarousel } from "@/components/shared/CardCarousel";
 import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
+interface PerformanceLog {
+  pageStart?: number;
+  authComplete?: number;
+  profileComplete?: number;
+  nftComplete?: number;
+}
+
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
+  const [showNfts, setShowNfts] = useState(false);
+  const [performanceLog, setPerformanceLog] = useState<PerformanceLog>({});
+
+  useEffect(() => {
+    const startTime = performance.now();
+    const requestId = `page-${startTime}`;
+    setPerformanceLog(prev => ({ ...prev, pageStart: startTime }));
+    logger.info("🚀 [REQUEST START] MyProfilePage読み込み開始", {
+      requestId,
+      component: "MyProfilePage"
+    });
+  }, []);
 
   const { user: currentUser, isAuthenticating } = useAuth();
+  
+  useEffect(() => {
+    if (currentUser) {
+      const authCompleteTime = performance.now();
+      setPerformanceLog(prev => {
+        const authDuration = authCompleteTime - (prev.pageStart || authCompleteTime);
+        logger.info("✅ 認証完了", {
+          authDuration: `${authDuration.toFixed(2)}ms`,
+          requestId: `page-${prev.pageStart}`,
+          component: "MyProfilePage"
+        });
+        return { ...prev, authComplete: authCompleteTime };
+      });
+    }
+  }, [currentUser]);
+
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
     currentUser?.id,
   );
-  const { nftInstances } = useUserNfts({ userId: currentUser?.id ?? "" });
+  
+  useEffect(() => {
+    if (userData && !isLoading) {
+      const profileCompleteTime = performance.now();
+      setPerformanceLog(prev => {
+        const totalDuration = profileCompleteTime - (prev.pageStart || profileCompleteTime);
+        logger.info("✅ [REQUEST END] プロフィール読み込み完了", {
+          totalDuration: `${totalDuration.toFixed(2)}ms`,
+          requestId: `page-${prev.pageStart}`,
+          component: "MyProfilePage"
+        });
+        return { ...prev, profileComplete: profileCompleteTime };
+      });
+    }
+  }, [userData, isLoading, selfOpportunities]);
+  
+  const { nftInstances } = useUserNfts({ 
+    userId: showNfts ? (currentUser?.id ?? "") : ""
+  });
+  
+  useEffect(() => {
+    if (showNfts && nftInstances.length >= 0) {
+      const nftCompleteTime = performance.now();
+      setPerformanceLog(prev => {
+        const totalDuration = nftCompleteTime - (prev.pageStart || nftCompleteTime);
+        logger.info("🎨 NFT読み込み完了", {
+          totalDuration: `${totalDuration.toFixed(2)}ms`,
+          nftCount: nftInstances.length,
+          requestId: `page-${prev.pageStart}`,
+          component: "MyProfilePage"
+        });
+        return { ...prev, nftComplete: nftCompleteTime };
+      });
+    }
+  }, [showNfts, nftInstances]);
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  // 認証中 or リダイレクト待ち → ローディング表示
-  if (isAuthenticating || !currentUser) {
-    return <LoadingIndicator />;
-  }
+  useEffect(() => {
+    if (userData && !isLoading) {
+      const timer = setTimeout(() => {
+        setShowNfts(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [userData, isLoading]);
 
-  // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
-  if (!currentUser || isLoading) {
+  // 認証中またはメインデータ読み込み中 → ローディング表示
+  if (isAuthenticating || !currentUser || isLoading) {
     return <LoadingIndicator />;
   }
 

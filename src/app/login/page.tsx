@@ -16,6 +16,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { logger } from "@/lib/logging";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { decodeURIComponentWithType, EncodedURIComponent } from "@/utils/path";
+import { detectEnvironment, AuthEnvironment } from "@/lib/auth/environment-detector";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -24,7 +25,7 @@ export default function LoginPage() {
 
   const headerConfig = useMemo(
     () => ({
-      title: "ログイン",
+      title: "ログインです",
       showBackButton: false,
       showLogo: false,
     }),
@@ -33,6 +34,14 @@ export default function LoginPage() {
   useHeaderConfig(headerConfig);
 
   const { loginWithLiff, isAuthenticating, authenticationState, loading } = useAuth();
+  
+  // ログインページでは認証状態が未認証の場合はloadingを無視
+  const shouldShowLoading = useMemo(() => {
+    if (authenticationState === "unauthenticated") {
+      return isAuthenticating;
+    }
+    return loading || isAuthenticating || authenticationState === "line_authenticated" || authenticationState === "loading";
+  }, [loading, isAuthenticating, authenticationState]);
   const authRedirectService = AuthRedirectService.getInstance();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -41,8 +50,36 @@ export default function LoginPage() {
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
 
   useEffect(() => {
+    const environment = detectEnvironment();
+    const isLiffEnvironment = environment === AuthEnvironment.LIFF;
+    
+    logger.debug("LoginPage: useEffect triggered for auth state change", {
+      isAuthenticating,
+      authenticationState,
+      nextPath,
+      environment,
+      isLiffEnvironment,
+      component: "LoginPage",
+    });
+    
     if (!isAuthenticating && authenticationState !== "unauthenticated") {
+      if (isLiffEnvironment) {
+        logger.debug("LoginPage: LIFF environment detected, skipping redirect", {
+          authenticationState,
+          nextPath,
+          environment,
+          component: "LoginPage",
+        });
+        return;
+      }
+      
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
+      logger.debug("LoginPage: About to execute redirect", {
+        authenticationState,
+        nextPath,
+        redirectPath,
+        component: "LoginPage",
+      });
       router.replace(redirectPath);
     }
   }, [authenticationState, router, nextPath, authRedirectService, isAuthenticating]);
@@ -81,12 +118,24 @@ export default function LoginPage() {
     };
   }, []);
 
-  if (
-    loading ||
-    isAuthenticating ||
-    authenticationState === "line_authenticated" ||
-    authenticationState === "loading"
-  ) {
+  // ローディング状態のデバッグ
+  useEffect(() => {
+    logger.debug("LoginPage loading state", {
+      loading,
+      isAuthenticating,
+      authenticationState,
+      component: "LoginPage",
+    });
+  }, [loading, isAuthenticating, authenticationState]);
+
+  if (shouldShowLoading) {
+    logger.debug("LoginPage showing loading indicator", {
+      loading,
+      isAuthenticating,
+      authenticationState,
+      shouldShowLoading,
+      component: "LoginPage",
+    });
     return <LoadingIndicator />;
   }
 
