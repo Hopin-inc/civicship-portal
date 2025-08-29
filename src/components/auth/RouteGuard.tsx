@@ -86,28 +86,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         ? `${ pathname }?${ searchParams.toString() }` as RawURIComponent
         : pathname as RawURIComponent;
       
-      logger.debug("RouteGuard: About to call getRedirectPath", {
-        pathname: pathNameWithParams,
-        authenticationState,
-        isLiffEnvironment,
-        component: "RouteGuard",
-      });
-      
       const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam));
       
-      logger.debug("RouteGuard: getRedirectPath result", {
-        pathname: pathNameWithParams,
-        redirectPath,
-        willRedirect: !!redirectPath,
-        component: "RouteGuard",
-      });
-      
       if (redirectPath) {
-        logger.debug("RouteGuard: Executing redirect", {
-          from: pathNameWithParams,
-          to: redirectPath,
-          component: "RouteGuard",
-        });
         router.replace(redirectPath);
       }
       setAuthorized(true);
@@ -124,17 +105,6 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
   // 認証が必要なページの場合のみローディングを表示
   if (loading || userLoading || isInitialRender || (isLiffEnvironment && authenticationState === "loading")) {
-    logger.info("⏳ RouteGuard: ローディング表示中", {
-      loading,
-      userLoading,
-      isInitialRender,
-      isLiffEnvironment,
-      authenticationState,
-      pathname,
-      timestamp: performance.now(),
-      requestId: `route-${performance.now()}`,
-      component: "RouteGuard"
-    });
     return <LoadingIndicator />;
   }
 
