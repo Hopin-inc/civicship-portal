@@ -22,9 +22,10 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
 import { NoticeCard } from "@/components/shared/NoticeCard";
-import { CardHorizontal } from "@/app/components/CardHorizontal";
+import { ReservationConfirmationCard } from "@/app/reservation/confirm/components/ReservationConfirmationCard";
 import { ExpectedPoints } from "./components/ExpectedPoints";
 import { PaymentSummary } from "./components/PaymentSummary";
+import { isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -155,7 +156,7 @@ export default function ConfirmPage() {
           <NoticeCard title="申し込みは未確定です。" description="最後までご確認いただき確定させて下さい" />
         </div>
         <div className="mx-6 py-4 mt-2 border p-4 rounded-xl">
-          <CardHorizontal
+          <ReservationConfirmationCard
             opportunity={ {
               id: opportunity.id,
               title: opportunity.title,
@@ -214,7 +215,7 @@ export default function ConfirmPage() {
         {isQuest && (
           <>
             <ExpectedPoints 
-              points={"pointsToEarn" in opportunity ? opportunity.pointsToEarn * participantCount : null}
+              points={isQuestCategory(opportunity) ? opportunity.pointsToEarn * participantCount : null}
               participantCount={participantCount} />
             <div className="border-b border-gray-200 my-6"></div>
           </>
@@ -222,7 +223,7 @@ export default function ConfirmPage() {
         {isActivity && (
           <div className="mx-6">
             <PaymentSummary
-              pricePerPerson={ 'feeRequired' in opportunity ? opportunity.feeRequired : null }
+              pricePerPerson={ isActivityCategory(opportunity) ? opportunity.feeRequired : null }
               participantCount={ participantCount }
               useTickets={ ui.useTickets }
               ticketCount={ selectedTicketCount }

@@ -11,7 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { GqlEvaluationStatus, GqlParticipation } from "@/types/graphql";
+import { GqlEvaluationStatus, GqlParticipation, GqlOpportunity, GqlOpportunityCategory } from "@/types/graphql";
 import { cn } from "@/lib/utils";
 
 interface AttendanceListProps {
@@ -25,6 +25,7 @@ interface AttendanceListProps {
   setIsConfirmDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handleSaveAllAttendance: () => void;
   allEvaluated: boolean;
+  opportunity?: GqlOpportunity | null;
 }
 
 const AttendanceList: React.FC<AttendanceListProps> = ({
@@ -38,6 +39,7 @@ const AttendanceList: React.FC<AttendanceListProps> = ({
   setIsConfirmDialogOpen,
   handleSaveAllAttendance,
   allEvaluated,
+  opportunity,
 }) => {
   return (
     <div>
@@ -99,7 +101,9 @@ const AttendanceList: React.FC<AttendanceListProps> = ({
               <SheetHeader className="pb-6">
                 <SheetTitle>出欠情報を保存しますか？</SheetTitle>
                 <SheetDescription>
-                  保存後は編集できなくなります。本当に保存してよろしいですか？
+                  {opportunity?.category === GqlOpportunityCategory.Quest
+                    ? `出席した参加者には証明書が発行され、1人につき${opportunity.pointsToEarn || 0}ptが譲渡されます。また、保存後は編集できなくなります。本当に保存してよろしいですか？`
+                    : "出席した参加者には証明書が発行され、保存後は編集できなくなります。本当に保存してよろしいですか？"}
                 </SheetDescription>
               </SheetHeader>
               <div className="space-y-3 mt-4">

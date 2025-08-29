@@ -5,10 +5,11 @@ import { useSearchResults } from "@/app/search/result/hooks/useSearchResults";
 import DateGroupedOpportunities from "@/app/search/result/components/DateGroupedOpportunities";
 import EmptySearchResults from "@/app/search/result/components/EmptySearchResults";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ActivitiesCarouselSection from "@/app/activities/components/CarouselSection/CarouselSection";
 import { ErrorState } from '@/components/shared'
 import { useSearchParams } from "next/navigation";
 import useSearchResultHeader from "@/app/search/result/components/SearchResultHeader";
+import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function SearchResultPage() {
   const searchParams = useSearchParams();
@@ -50,12 +51,14 @@ export default function SearchResultPage() {
     return <EmptySearchResults searchQuery={queryParams.q} />;
   }
 
+  const formattedOpportunities = recommendedOpportunities.map(formatOpportunities);
+
   return (
     <div className="min-h-screen">
       <main>
-        <ActivitiesCarouselSection
-          title="おすすめの体験"
-          opportunities={recommendedOpportunities}
+        <OpportunityCarouselListSection
+            title={"おすすめの体験"}
+            opportunities={formattedOpportunities}
         />
         <DateGroupedOpportunities groupedOpportunities={groupedOpportunities} />
       </main>
