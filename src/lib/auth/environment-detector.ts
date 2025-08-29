@@ -14,8 +14,23 @@ export enum AuthEnvironment {
  * @returns 検出された環境タイプ
  */
 export const detectEnvironment = (): AuthEnvironment => {
-  if (typeof window !== "undefined" && window.liff && window.liff.isInClient()) {
-    return AuthEnvironment.LIFF;
+  if (typeof window !== "undefined") {
+    const url = window.location.href;
+    const searchParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    
+    const hasLiffState = searchParams.has("liff.state");
+    const hasAccessToken = hashParams.has("access_token");
+    const hasContextToken = hashParams.has("context_token");
+    const hasLiffClientId = searchParams.has("liffClientId");
+    
+    if (hasLiffState || (hasAccessToken && hasContextToken) || hasLiffClientId) {
+      return AuthEnvironment.LIFF;
+    }
+    
+    if (window.liff && window.liff.isInClient()) {
+      return AuthEnvironment.LIFF;
+    }
   }
 
   if (typeof navigator !== "undefined" && /Line/i.test(navigator.userAgent)) {
