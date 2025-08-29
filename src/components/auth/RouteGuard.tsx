@@ -124,7 +124,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
   // 認証が必要なページの場合のみローディングを表示
   if (loading || userLoading || isInitialRender || (isLiffEnvironment && authenticationState === "loading")) {
-    logger.info("RouteGuard: ローディング表示中", {
+    logger.info("⏳ RouteGuard: ローディング表示中", {
       loading,
       userLoading,
       isInitialRender,
@@ -132,6 +132,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       authenticationState,
       pathname,
       timestamp: performance.now(),
+      requestId: `route-${performance.now()}`,
       component: "RouteGuard"
     });
     return <LoadingIndicator />;

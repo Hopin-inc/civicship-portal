@@ -13,6 +13,14 @@ export const useUserProfile = (
   portfolioSort?: InputMaybe<GqlPortfolioSortInput>,
 ) => {
   const queryStartTime = performance.now();
+  const requestId = `profile-${queryStartTime}`;
+  
+  logger.info("🚀 useUserProfile: GraphQLクエリ開始", {
+    timestamp: queryStartTime,
+    requestId,
+    userId,
+    component: "useUserProfile"
+  });
   
   const result = useGetUserFlexibleQuery({
     variables: {
@@ -28,23 +36,25 @@ export const useUserProfile = (
     onCompleted: (data) => {
       const queryEndTime = performance.now();
       const queryDuration = queryEndTime - queryStartTime;
-      logger.info("useUserProfile: GraphQLクエリ完了", {
+      logger.info("✅ useUserProfile: GraphQLクエリ完了", {
         queryDuration: `${queryDuration.toFixed(2)}ms`,
         hasUser: !!data?.user,
         hasPortfolios: !!data?.user?.portfolios?.length,
         hasOpportunities: !!data?.user?.opportunitiesCreatedByMe?.length,
         hasWallets: !!data?.user?.wallets?.length,
         timestamp: queryEndTime,
+        requestId,
         component: "useUserProfile"
       });
     },
     onError: (error) => {
       const queryEndTime = performance.now();
       const queryDuration = queryEndTime - queryStartTime;
-      logger.error("useUserProfile: GraphQLクエリエラー", {
+      logger.error("❌ useUserProfile: GraphQLクエリエラー", {
         queryDuration: `${queryDuration.toFixed(2)}ms`,
         error: error.message,
         timestamp: queryEndTime,
+        requestId,
         component: "useUserProfile"
       });
     }
@@ -55,14 +65,21 @@ export const useUserProfile = (
     const user = result.data?.user;
     if (!user) return null;
     
+    logger.info("🚀 useUserProfile: ユーザーデータ処理開始", {
+      timestamp: processingStartTime,
+      requestId,
+      component: "useUserProfile"
+    });
+    
     const processedData = presenterManagerProfile(user as any, COMMUNITY_ID);
     const processingEndTime = performance.now();
     const processingDuration = processingEndTime - processingStartTime;
     
-    logger.info("useUserProfile: ユーザーデータ処理完了", {
+    logger.info("✅ useUserProfile: ユーザーデータ処理完了", {
       processingDuration: `${processingDuration.toFixed(2)}ms`,
       hasResult: !!processedData,
       timestamp: processingEndTime,
+      requestId,
       component: "useUserProfile"
     });
     
@@ -71,6 +88,13 @@ export const useUserProfile = (
 
   const selfOpportunities = useMemo(() => {
     const processingStartTime = performance.now();
+    
+    logger.info("🚀 useUserProfile: 機会データ処理開始", {
+      timestamp: processingStartTime,
+      requestId,
+      component: "useUserProfile"
+    });
+    
     const opportunities = result.data?.user?.opportunitiesCreatedByMe
       ?.filter((opportunity) => opportunity?.community?.id === COMMUNITY_ID)
       ?.map(presenterActivityCard) ?? [];
@@ -78,11 +102,12 @@ export const useUserProfile = (
     const processingEndTime = performance.now();
     const processingDuration = processingEndTime - processingStartTime;
     
-    logger.info("useUserProfile: 機会データ処理完了", {
+    logger.info("✅ useUserProfile: 機会データ処理完了", {
       processingDuration: `${processingDuration.toFixed(2)}ms`,
       totalOpportunities: result.data?.user?.opportunitiesCreatedByMe?.length || 0,
       filteredOpportunities: opportunities.length,
       timestamp: processingEndTime,
+      requestId,
       component: "useUserProfile"
     });
     

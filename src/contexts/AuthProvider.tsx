@@ -137,16 +137,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     ) || !isAuthInitialized, // 認証初期化が完了していない場合はスキップ
     fetchPolicy: "network-only",
     onCompleted: (data) => {
-      logger.info("AuthProvider: ユーザーデータクエリ完了", {
+      logger.info("✅ AuthProvider: ユーザーデータクエリ完了", {
         hasUser: !!data?.currentUser,
         timestamp: performance.now(),
+        requestId: `auth-${performance.now()}`,
         component: "AuthProvider"
       });
     },
     onError: (error) => {
-      logger.error("AuthProvider: ユーザーデータクエリエラー", {
+      logger.error("❌ AuthProvider: ユーザーデータクエリエラー", {
         error: error.message,
         timestamp: performance.now(),
+        requestId: `auth-${performance.now()}`,
         component: "AuthProvider"
       });
     }
