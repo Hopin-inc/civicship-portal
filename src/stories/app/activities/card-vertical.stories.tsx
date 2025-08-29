@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import React from "react";
-import OpportunityCardVertical from "@/app/activities/components/Card/CardVertical";
-import { ActivityCard } from "@/app/activities/data/type";
+import { ActivityCard } from "@/components/domains/opportunities/types";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
+import { formatOpportunities } from "@/components/domains/opportunities/utils/formatOpportunities";
 
 const mockActivityCard: ActivityCard = {
   id: "1",
@@ -14,22 +15,14 @@ const mockActivityCard: ActivityCard = {
   location: "香川県高松市",
   feeRequired: 3000,
   hasReservableTicket: true,
+  pointsRequired: 100,
+  slots: [],
 };
 
-const meta: Meta<typeof OpportunityCardVertical> = {
+const meta: Meta<typeof OpportunityVerticalCard> = {
   title: "App/Activities/Card/CardVertical",
-  component: OpportunityCardVertical,
+  component: OpportunityVerticalCard,
   tags: ["autodocs"],
-  argTypes: {
-    opportunity: {
-      control: "object",
-      description: "Activity card data",
-    },
-    isCarousel: {
-      control: "boolean",
-      description: "Whether the card is displayed in a carousel (affects width)",
-    },
-  },
   parameters: {
     layout: "centered",
     nextjs: {
@@ -47,72 +40,65 @@ const meta: Meta<typeof OpportunityCardVertical> = {
 
 export default meta;
 
-type Story = StoryObj<typeof OpportunityCardVertical>;
+type Story = StoryObj<typeof OpportunityVerticalCard>;
 
 export const Default: Story = {
   args: {
-    opportunity: mockActivityCard,
-    isCarousel: false,
+    ...formatOpportunities(mockActivityCard),
   },
 };
 
 export const CarouselMode: Story = {
   args: {
-    opportunity: mockActivityCard,
-    isCarousel: true,
+    ...formatOpportunities(mockActivityCard),
   },
 };
 
 export const WithTicket: Story = {
   args: {
-    opportunity: {
+    ...formatOpportunities({
       ...mockActivityCard,
       hasReservableTicket: true,
-    },
-    isCarousel: false,
+    }),
   },
 };
 
 export const WithoutTicket: Story = {
   args: {
-    opportunity: {
+    ...formatOpportunities({
       ...mockActivityCard,
       hasReservableTicket: false,
-    },
-    isCarousel: false,
+    }),
   },
 };
 
 export const FreeActivity: Story = {
   args: {
-    opportunity: {
+    ...formatOpportunities({
       ...mockActivityCard,
       title: "地域清掃ボランティア",
       feeRequired: null,
       hasReservableTicket: false,
       images: [PLACEHOLDER_IMAGE],
-    },
-    isCarousel: false,
+    }),
   },
 };
 
 export const LongTitle: Story = {
   args: {
-    opportunity: {
+    ...formatOpportunities({
       ...mockActivityCard,
       title: "伝統工芸体験ワークショップ：讃岐うどん作りと陶芸を組み合わせた特別プログラム",
       location: "香川県善通寺市の伝統工芸センター",
-    },
-    isCarousel: false,
+    }),
   },
 };
 
 export const NoImage: Story = {
   args: {
-    opportunity: {
+    ...formatOpportunities({
       ...mockActivityCard,
       images: [],
-    },
-    isCarousel: false,
+    }),
   },
 };

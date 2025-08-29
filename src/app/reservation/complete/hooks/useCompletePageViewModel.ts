@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import {
   presenterActivityCard,
   presenterReservationDateTimeInfo,
-} from "@/app/activities/data/presenter";
+} from "@/components/domains/opportunities/data/presenter";
 import { useCompletePageDataRaw } from "./useCompletePageDataRaw";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 
@@ -15,7 +15,7 @@ export function useCompletePageViewModel(
     gqlOpportunity,
     gqlOpportunitySlot,
     gqlArticle,
-    sameStateActivities,
+    sameStateOpportunities,
     loading,
     error,
     refetch,
@@ -39,7 +39,7 @@ export function useCompletePageViewModel(
     opportunity,
     articleCard,
     dateTimeInfo,
-    sameStateActivities,
+    sameStateOpportunities,
     loading,
     error,
     refetch,

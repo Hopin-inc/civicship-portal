@@ -10,8 +10,10 @@ import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import { ErrorState } from '@/components/shared'
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useUserNfts } from "@/components/domains/nfts/hooks/useUserNft";
-import CardVertical from "@/app/components/CardVertical";
 import { NftCard } from "@/components/domains/nfts/components";
+import { CardCarousel } from "@/components/shared/CardCarousel";
+import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
@@ -52,7 +54,8 @@ export default function MyProfilePage() {
     currentCommunityConfig.enableFeatures.includes(feature),
   );
 
-  // 正常表示
+  const formattedOpportunities = selfOpportunities.map(formatOpportunities);
+
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">
       <UserProfileSection
@@ -82,20 +85,19 @@ export default function MyProfilePage() {
       <>
         {shouldShowOpportunities && (
           <>
-            {selfOpportunities.length > 0 && (
+            {formattedOpportunities.length > 0 && (
               <section className="py-6 mt-0">
                 <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
                   主催中の体験
                 </h2>
-                <div className="mt-4 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                  {selfOpportunities.map((opportunity) => (
-                    <CardVertical
+                <CardCarousel>
+                  {formattedOpportunities.map((opportunity) => (
+                    <OpportunityVerticalCard
                       key={opportunity.id}
-                      opportunity={opportunity}
-                      isCarousel
+                      {...opportunity}
                     />
                   ))}
-                </div>
+                </CardCarousel>
               </section>
             )}
             <UserPortfolioList

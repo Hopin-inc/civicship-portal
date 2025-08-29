@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { GqlTicketStatus, useGetUserWalletQuery } from "@/types/graphql";
-import { ActivityDetail, QuestDetail } from "@/app/activities/data/type";
+import { ActivityDetail, QuestDetail } from "@/components/domains/opportunity/types";
 import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 
 export interface AvailableTicket {
