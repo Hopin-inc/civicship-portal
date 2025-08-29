@@ -8,6 +8,7 @@ import {
   RawURIComponent,
 } from "@/utils/path";
 import { logger } from "@/lib/logging";
+import { detectEnvironment, AuthEnvironment } from "./environment-detector";
 
 /**
  * Owner専用のパス一覧
@@ -80,13 +81,21 @@ export class AuthRedirectService {
    */
   public getRedirectPath(pathname: RawURIComponent, next?: RawURIComponent | null): RawURIComponent | null {
     // LIFF環境では自動ログイン処理が実行されるため、unauthenticated状態でもリダイレクトしない
-    const isLiffEnvironment = typeof window !== "undefined" && 
-      (window.location.href.includes("liff.line.me") || 
-       window.location.href.includes("liffClientId"));
+    const environment = detectEnvironment();
+    const isLiffEnvironment = environment === AuthEnvironment.LIFF;
     const authState = this.authStateManager.getState();
     const nextParam = next
       ? this.generateNextParam(next)
       : this.generateNextParam(pathname);
+      
+    // デバッグログを追加
+    logger.debug("AuthRedirectService: getRedirectPath called", {
+      pathname,
+      authState,
+      environment,
+      isLiffEnvironment,
+      component: "AuthRedirectService",
+    });
 
     if (authState === "loading") {
       return null;
@@ -180,9 +189,8 @@ export class AuthRedirectService {
     const authState = this.authStateManager.getState();
 
     // LIFF環境では自動ログイン処理が実行されるため、unauthenticated状態でもリダイレクトしない
-    const isLiffEnvironment = typeof window !== "undefined" && 
-      (window.location.href.includes("liff.line.me") || 
-       window.location.href.includes("liffClientId"));
+    const environment = detectEnvironment();
+    const isLiffEnvironment = environment === AuthEnvironment.LIFF;
 
     switch (authState) {
       case "unauthenticated":
