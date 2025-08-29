@@ -84,8 +84,29 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       const pathNameWithParams = searchParams.size > 0
         ? `${ pathname }?${ searchParams.toString() }` as RawURIComponent
         : pathname as RawURIComponent;
+      
+      logger.debug("RouteGuard: About to call getRedirectPath", {
+        pathname: pathNameWithParams,
+        authenticationState,
+        isLiffEnvironment,
+        component: "RouteGuard",
+      });
+      
       const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam));
+      
+      logger.debug("RouteGuard: getRedirectPath result", {
+        pathname: pathNameWithParams,
+        redirectPath,
+        willRedirect: !!redirectPath,
+        component: "RouteGuard",
+      });
+      
       if (redirectPath) {
+        logger.debug("RouteGuard: Executing redirect", {
+          from: pathNameWithParams,
+          to: redirectPath,
+          component: "RouteGuard",
+        });
         router.replace(redirectPath);
       }
       setAuthorized(true);

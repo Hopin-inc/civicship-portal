@@ -119,13 +119,33 @@ export class AuthRedirectService {
       }
     }
 
-    if (this.isProtectedPath(pathname)) {
+    const isProtected = this.isProtectedPath(pathname);
+    logger.debug("AuthRedirectService: isProtectedPath result", {
+      pathname,
+      isProtected,
+      authState,
+      isLiffEnvironment,
+      component: "AuthRedirectService",
+    });
+
+    if (isProtected) {
       switch (authState) {
         case "unauthenticated":
           // LIFF環境では自動ログイン処理が実行されるため、リダイレクトしない
           if (isLiffEnvironment) {
+            logger.debug("AuthRedirectService: LIFF environment detected, skipping login redirect", {
+              pathname,
+              authState,
+              component: "AuthRedirectService",
+            });
             return null;
           }
+          logger.debug("AuthRedirectService: Redirecting to login", {
+            pathname,
+            authState,
+            redirectTo: `/login${ nextParam }`,
+            component: "AuthRedirectService",
+          });
           return `/login${ nextParam }` as RawURIComponent;
         case "line_authenticated":
         case "line_token_expired":
@@ -134,6 +154,11 @@ export class AuthRedirectService {
         case "phone_token_expired":
           return `/sign-up${ nextParam }` as RawURIComponent;
         default:
+          logger.debug("AuthRedirectService: No redirect needed for protected path", {
+            pathname,
+            authState,
+            component: "AuthRedirectService",
+          });
           return null;
       }
     }
@@ -171,6 +196,12 @@ export class AuthRedirectService {
       }
     }
 
+    logger.debug("AuthRedirectService: No redirect needed", {
+      pathname,
+      authState,
+      isProtected,
+      component: "AuthRedirectService",
+    });
     return null;
   }
 
