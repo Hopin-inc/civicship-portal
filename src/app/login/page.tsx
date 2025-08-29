@@ -33,6 +33,14 @@ export default function LoginPage() {
   useHeaderConfig(headerConfig);
 
   const { loginWithLiff, isAuthenticating, authenticationState, loading } = useAuth();
+  
+  // ログインページでは認証状態が未認証の場合はloadingを無視
+  const shouldShowLoading = useMemo(() => {
+    if (authenticationState === "unauthenticated") {
+      return isAuthenticating;
+    }
+    return loading || isAuthenticating || authenticationState === "line_authenticated" || authenticationState === "loading";
+  }, [loading, isAuthenticating, authenticationState]);
   const authRedirectService = AuthRedirectService.getInstance();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -81,12 +89,24 @@ export default function LoginPage() {
     };
   }, []);
 
-  if (
-    loading ||
-    isAuthenticating ||
-    authenticationState === "line_authenticated" ||
-    authenticationState === "loading"
-  ) {
+  // ローディング状態のデバッグ
+  useEffect(() => {
+    logger.debug("LoginPage loading state", {
+      loading,
+      isAuthenticating,
+      authenticationState,
+      component: "LoginPage",
+    });
+  }, [loading, isAuthenticating, authenticationState]);
+
+  if (shouldShowLoading) {
+    logger.debug("LoginPage showing loading indicator", {
+      loading,
+      isAuthenticating,
+      authenticationState,
+      shouldShowLoading,
+      component: "LoginPage",
+    });
     return <LoadingIndicator />;
   }
 
