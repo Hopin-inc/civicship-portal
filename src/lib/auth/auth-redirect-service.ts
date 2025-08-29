@@ -222,26 +222,64 @@ export class AuthRedirectService {
     // LIFF環境では自動ログイン処理が実行されるため、unauthenticated状態でもリダイレクトしない
     const environment = detectEnvironment();
     const isLiffEnvironment = environment === AuthEnvironment.LIFF;
+    
+    logger.debug("AuthRedirectService: getPostLineAuthRedirectPath called", {
+      nextPath,
+      authState,
+      environment,
+      isLiffEnvironment,
+      component: "AuthRedirectService",
+    });
 
     switch (authState) {
       case "unauthenticated":
       case "line_token_expired":
         // LIFF環境では自動ログイン処理が実行されるため、リダイレクトしない
         if (isLiffEnvironment) {
+          logger.debug("AuthRedirectService: getPostLineAuthRedirectPath - LIFF environment, returning nextPath", {
+            nextPath,
+            authState,
+            returnPath: nextPath ?? "/",
+            component: "AuthRedirectService",
+          });
           return nextPath ?? "/" as RawURIComponent;
         }
+        logger.debug("AuthRedirectService: getPostLineAuthRedirectPath - redirecting to login", {
+          nextPath,
+          authState,
+          returnPath: `/login${ nextParam }`,
+          component: "AuthRedirectService",
+        });
         return `/login${ nextParam }` as RawURIComponent;
 
       case "line_authenticated":
       case "phone_token_expired":
+        logger.debug("AuthRedirectService: getPostLineAuthRedirectPath - redirecting to phone verification", {
+          nextPath,
+          authState,
+          returnPath: `/sign-up/phone-verification${ nextParam }`,
+          component: "AuthRedirectService",
+        });
         return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
 
       case "phone_authenticated":
+        logger.debug("AuthRedirectService: getPostLineAuthRedirectPath - redirecting to sign-up", {
+          nextPath,
+          authState,
+          returnPath: `/sign-up${ nextParam }`,
+          component: "AuthRedirectService",
+        });
         return `/sign-up${ nextParam }` as RawURIComponent;
 
       case "loading":
       case "user_registered":
       default:
+        logger.debug("AuthRedirectService: getPostLineAuthRedirectPath - returning nextPath or home", {
+          nextPath,
+          authState,
+          returnPath: nextPath ?? "/",
+          component: "AuthRedirectService",
+        });
         return nextPath ?? "/" as RawURIComponent;
     }
   }

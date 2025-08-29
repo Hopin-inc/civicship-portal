@@ -49,8 +49,21 @@ export default function LoginPage() {
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
 
   useEffect(() => {
+    logger.debug("LoginPage: useEffect triggered for auth state change", {
+      isAuthenticating,
+      authenticationState,
+      nextPath,
+      component: "LoginPage",
+    });
+    
     if (!isAuthenticating && authenticationState !== "unauthenticated") {
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
+      logger.debug("LoginPage: About to execute redirect", {
+        authenticationState,
+        nextPath,
+        redirectPath,
+        component: "LoginPage",
+      });
       router.replace(redirectPath);
     }
   }, [authenticationState, router, nextPath, authRedirectService, isAuthenticating]);
