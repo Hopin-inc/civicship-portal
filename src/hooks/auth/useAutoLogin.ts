@@ -37,7 +37,7 @@ const useAutoLogin = ({
   // 自動ログインの条件をメモ化
   const shouldAutoLogin = useMemo(() => {
     if (environment !== AuthEnvironment.LIFF) return false;
-    if (!isAuthRequired) return false;
+    if (environment !== AuthEnvironment.LIFF && !isAuthRequired) return false;
     if (isProcessingAuth) return false; // 認証処理が実行中の場合は自動ログインをスキップ
     
     const liffState = liffService.getState();
