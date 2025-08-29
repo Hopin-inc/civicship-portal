@@ -32,8 +32,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const [authorized, setAuthorized] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
   
-  // LIFF環境の判定
-  const environment = detectEnvironment();
+  // LIFF環境の判定 - 不整合を防ぐためにメモ化
+  const environment = React.useMemo(() => {
+    const env = detectEnvironment();
+    console.debug("RouteGuard: 環境検出", { env, pathname });
+    return env;
+  }, [pathname]); // pathnameが変更された時に再検出
   const isLiffEnvironment = environment === AuthEnvironment.LIFF;
 
   const { loading: userLoading } = useQuery(GET_CURRENT_USER, {
