@@ -1,4 +1,5 @@
 import { logger } from "@/lib/logging";
+import { detectEnvironment, AuthEnvironment } from "@/lib/auth/environment-detector";
 
 /**
  * 認証設定
@@ -149,6 +150,21 @@ export const isAuthRequiredForPath = (pathname: string): boolean => {
   // キャッシュチェック
   if (pathCache.has(normalizedPath)) {
     return pathCache.get(normalizedPath)!;
+  }
+
+  if (typeof window !== 'undefined') {
+    const environment = detectEnvironment();
+    const isLiffEnvironment = environment === AuthEnvironment.LIFF;
+    
+    if (isLiffEnvironment) {
+      const isRequired = LIFF_AUTH_REQUIRED_PATHS.some(path => 
+        pathname === path || pathname.startsWith(path + '/')
+      );
+      
+      // 結果をキャッシュ
+      pathCache.set(normalizedPath, isRequired);
+      return isRequired;
+    }
   }
 
   // 除外パスのチェック（より効率的な実装）
