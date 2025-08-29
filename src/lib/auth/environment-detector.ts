@@ -11,7 +11,7 @@ export enum AuthEnvironment {
 
 let cachedEnvironment: AuthEnvironment | null = null;
 let cacheTimestamp: number = 0;
-const CACHE_DURATION = 5000; // 5秒間のキャッシュ
+const CACHE_DURATION = 1000; // 1秒間のキャッシュ（テスト用に短縮）
 
 /**
  * 環境検出キャッシュをクリア
@@ -68,20 +68,28 @@ export const detectEnvironment = (): AuthEnvironment => {
     
     const isLiffUserAgent = typeof navigator !== "undefined" && /LIFF/i.test(navigator.userAgent);
     
+    const userAgentAnalysis = {
+      isLiffUserAgent,
+      hasLIFF: navigator?.userAgent?.includes('LIFF') || false,
+      hasLine: navigator?.userAgent?.includes('Line') || false,
+      liffRegexTest: /LIFF/i.test(navigator?.userAgent || ''),
+      lineRegexTest: /Line/i.test(navigator?.userAgent || '')
+    };
+    
     if (hasLiffState || (hasAccessToken && hasContextToken) || hasLiffClientId) {
-      console.debug("detectEnvironment: URLパラメータでLIFF検出", debugInfo);
+      console.debug("detectEnvironment: URLパラメータでLIFF検出", { ...debugInfo, userAgentAnalysis });
       result = AuthEnvironment.LIFF;
     } else if (window.liff && window.liff.isInClient()) {
-      console.debug("detectEnvironment: window.liffでLIFF検出", debugInfo);
+      console.debug("detectEnvironment: window.liffでLIFF検出", { ...debugInfo, userAgentAnalysis });
       result = AuthEnvironment.LIFF;
     } else if (isLiffUserAgent) {
-      console.debug("detectEnvironment: User-AgentでLIFF検出", debugInfo);
+      console.debug("detectEnvironment: User-AgentでLIFF検出", { ...debugInfo, userAgentAnalysis });
       result = AuthEnvironment.LIFF;
     } else if (typeof navigator !== "undefined" && /Line/i.test(navigator.userAgent)) {
-      console.debug("detectEnvironment: LINE_BROWSER検出", debugInfo);
+      console.debug("detectEnvironment: LINE_BROWSER検出", { ...debugInfo, userAgentAnalysis });
       result = AuthEnvironment.LINE_BROWSER;
     } else {
-      console.debug("detectEnvironment: REGULAR_BROWSER検出", debugInfo);
+      console.debug("detectEnvironment: REGULAR_BROWSER検出", { ...debugInfo, userAgentAnalysis });
       result = AuthEnvironment.REGULAR_BROWSER;
     }
   } else {

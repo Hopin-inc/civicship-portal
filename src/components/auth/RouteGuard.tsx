@@ -10,7 +10,7 @@ import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
 import { isAuthRequiredForPath } from "@/config/auth-config";
-import { detectEnvironment, AuthEnvironment } from "@/lib/auth/environment-detector";
+import { detectEnvironment, AuthEnvironment, clearEnvironmentCache } from "@/lib/auth/environment-detector";
 
 /**
  * ルートガードコンポーネントのプロパティ
@@ -32,10 +32,11 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const [authorized, setAuthorized] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
   
-  // LIFF環境の判定 - 不整合を防ぐためにメモ化
+  // LIFF環境の判定 - 不整合を防ぐためにメモ化し、パス変更時にキャッシュクリア
   const environment = React.useMemo(() => {
+    clearEnvironmentCache(); // パス変更時にキャッシュをクリア
     const env = detectEnvironment();
-    console.debug("RouteGuard: 環境検出", { env, pathname });
+    console.debug("RouteGuard: 環境検出（キャッシュクリア後）", { env, pathname });
     return env;
   }, [pathname]); // pathnameが変更された時に再検出
   const isLiffEnvironment = environment === AuthEnvironment.LIFF;
