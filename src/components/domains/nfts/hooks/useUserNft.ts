@@ -12,7 +12,7 @@ export const useUserNfts = ({ userId }: UseUserNftProps) => {
             userId: [userId],
           },
         },
-        fetchPolicy: "network-only",
+        fetchPolicy: "cache-first",
         skip: !userId,
       }
     );

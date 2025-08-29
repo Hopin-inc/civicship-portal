@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { notFound } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import UserProfileSection from "@/app/users/components/UserProfileSection";
@@ -15,19 +15,32 @@ import { NftCard } from "@/components/domains/nfts/components";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
+  const [showNfts, setShowNfts] = useState(false);
 
   const { user: currentUser, isAuthenticating } = useAuth();
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
     currentUser?.id,
   );
-  const { nftInstances } = useUserNfts({ userId: currentUser?.id ?? "" });
+  
+  const { nftInstances } = useUserNfts({ 
+    userId: showNfts ? (currentUser?.id ?? "") : ""
+  });
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  // 認証中またはデータ読み込み中 → ローディング表示
+  useEffect(() => {
+    if (userData && !isLoading) {
+      const timer = setTimeout(() => {
+        setShowNfts(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [userData, isLoading]);
+
+  // 認証中またはメインデータ読み込み中 → ローディング表示
   if (isAuthenticating || !currentUser || isLoading) {
     return <LoadingIndicator />;
   }

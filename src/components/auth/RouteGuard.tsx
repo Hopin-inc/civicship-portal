@@ -3,8 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useQuery } from "@apollo/client";
-import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
@@ -41,9 +39,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, [pathname]); // pathnameが変更された時に再検出
   const isLiffEnvironment = environment === AuthEnvironment.LIFF;
 
-  const { loading: userLoading } = useQuery(GET_CURRENT_USER, {
-    skip: !isAuthenticated,
-  });
+  const userLoading = false;
 
   const authRedirectService = React.useMemo(() => {
     return AuthRedirectService.getInstance();
