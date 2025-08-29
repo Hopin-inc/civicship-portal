@@ -20,15 +20,30 @@ const useAnalyticsUserBinding = () => {
   useEffect(() => {
     if (isAuthenticating) return;
 
-    getFirebaseAnalytics().then((analytics) => {
-      if (user?.id && analytics) {
-        setUserId(analytics, user.id);
-        setUserProperties(analytics, {
-          user_id: user.id,
-          phone_verified: isPhoneVerified ? "true" : "false",
+    getFirebaseAnalytics()
+      .then((analytics) => {
+        if (user?.id && analytics) {
+          try {
+            setUserId(analytics, user.id);
+            setUserProperties(analytics, {
+              user_id: user.id,
+              phone_verified: isPhoneVerified ? "true" : "false",
+            });
+          } catch (error) {
+            logger.warn("Analytics user binding failed", {
+              error: error instanceof Error ? error.message : String(error),
+              component: "useAnalyticsView",
+              userId: user.id
+            });
+          }
+        }
+      })
+      .catch((error) => {
+        logger.warn("Analytics initialization failed for user binding", {
+          error: error instanceof Error ? error.message : String(error),
+          component: "useAnalyticsView"
         });
-      }
-    });
+      });
   }, [user, isAuthenticating, isPhoneVerified]);
 };
 
@@ -65,29 +80,37 @@ type LogPageViewOptions = {
 };
 
 const logPageView = async (options: LogPageViewOptions = {}) => {
-  const analytics = await getFirebaseAnalytics();
-  if (!analytics) {
-    logger.warn("Analytics not initialized: skip page_view", {
+  try {
+    const analytics = await getFirebaseAnalytics();
+    if (!analytics) {
+      logger.warn("Analytics not initialized: skip page_view", {
+        component: "useAnalyticsView",
+      });
+      return;
+    }
+
+    const { path, title, ...restParams } = options;
+
+    const eventParams = {
+      page_location: window.location.href,
+      page_title: title || document.title,
+      normalized_path: path,
+      ...restParams,
+    };
+
+    logger.debug("Analytics logEvent - page_view", {
+      eventParams,
       component: "useAnalyticsView",
     });
-    return;
+
+    logEvent(analytics, "page_view", eventParams);
+  } catch (error) {
+    logger.warn("Analytics page view logging failed", {
+      error: error instanceof Error ? error.message : String(error),
+      component: "useAnalyticsView",
+      path: options.path
+    });
   }
-
-  const { path, title, ...restParams } = options;
-
-  const eventParams = {
-    page_location: window.location.href,
-    page_title: title || document.title,
-    normalized_path: path,
-    ...restParams,
-  };
-
-  logger.debug("Analytics logEvent - page_view", {
-    eventParams,
-    component: "useAnalyticsView",
-  });
-
-  logEvent(analytics, "page_view", eventParams);
 };
 
 const cuidRegex = /^c[a-z0-9]{20,}$/;

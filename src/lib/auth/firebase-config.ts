@@ -4,6 +4,7 @@ import { initializeApp } from "firebase/app";
 import { Auth, getAuth } from "firebase/auth";
 import { Analytics, getAnalytics, isSupported } from "firebase/analytics";
 import { logger } from "@/lib/logging";
+import { detectEnvironment, AuthEnvironment } from "./environment-detector";
 
 const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -27,15 +28,62 @@ phoneAuth.tenantId = null;
 
 let analyticsInstance: Analytics | undefined;
 
+/**
+ * IndexedDBの利用可能性をテストする
+ * @returns IndexedDBが利用可能な場合はtrue
+ */
+export const isIndexedDBAvailable = (): boolean => {
+  try {
+    if (typeof window === "undefined" || !window.indexedDB) {
+      return false;
+    }
+    
+    const testDB = window.indexedDB.open("__test__", 1);
+    testDB.onerror = () => false;
+    testDB.onsuccess = () => {
+      testDB.result.close();
+      window.indexedDB.deleteDatabase("__test__");
+    };
+    
+    return true;
+  } catch (error) {
+    logger.debug("IndexedDB availability test failed", {
+      error: error instanceof Error ? error.message : String(error),
+      component: "FirebaseConfig"
+    });
+    return false;
+  }
+};
+
 export const getFirebaseAnalytics = async (): Promise<Analytics | undefined> => {
   const isBrowser = typeof window !== "undefined";
   if (!isBrowser || process.env.NODE_ENV !== "production") return;
 
+  const environment = detectEnvironment();
+  const isLiffEnvironment = environment === AuthEnvironment.LIFF;
+  
+  if (isLiffEnvironment && !isIndexedDBAvailable()) {
+    logger.info("Analytics disabled in LIFF environment due to IndexedDB restrictions", { 
+      component: "FirebaseConfig",
+      environment 
+    });
+    return undefined;
+  }
+
   if (!analyticsInstance) {
-    const supported = await isSupported();
-    if (supported) {
-      analyticsInstance = getAnalytics(defaultApp);
-      logger.info("Analytics initialized", { component: "FirebaseConfig" });
+    try {
+      const supported = await isSupported();
+      if (supported) {
+        analyticsInstance = getAnalytics(defaultApp);
+        logger.info("Analytics initialized", { component: "FirebaseConfig", environment });
+      }
+    } catch (error) {
+      logger.warn("Analytics initialization failed", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "FirebaseConfig",
+        environment
+      });
+      return undefined;
     }
   }
 
