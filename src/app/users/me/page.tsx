@@ -27,13 +27,8 @@ export default function MyProfilePage() {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  // 認証中 or リダイレクト待ち → ローディング表示
-  if (isAuthenticating || !currentUser) {
-    return <LoadingIndicator />;
-  }
-
-  // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
-  if (!currentUser || isLoading) {
+  // 認証中またはデータ読み込み中 → ローディング表示
+  if (isAuthenticating || !currentUser || isLoading) {
     return <LoadingIndicator />;
   }
 

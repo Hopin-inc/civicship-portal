@@ -230,7 +230,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
   // LIFF認証処理フック
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser, setIsProcessingAuth });
+  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser, setIsProcessingAuth, authStateManager });
 
   // 自動ログインは最後に実行（認証処理の重複を防ぐ）
   useAutoLogin(authHooksConfig);

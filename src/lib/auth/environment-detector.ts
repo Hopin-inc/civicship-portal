@@ -11,7 +11,7 @@ export enum AuthEnvironment {
 
 let cachedEnvironment: AuthEnvironment | null = null;
 let cacheTimestamp: number = 0;
-const CACHE_DURATION = 1000; // 1秒間のキャッシュ（テスト用に短縮）
+const CACHE_DURATION = 5000; // 5秒間のキャッシュ（本番用に復元）
 
 /**
  * 環境検出キャッシュをクリア

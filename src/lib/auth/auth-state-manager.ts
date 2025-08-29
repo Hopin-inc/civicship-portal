@@ -144,12 +144,21 @@ export class AuthStateManager {
       const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
       if (!hasValidLineToken) {
-        // LIFF環境では自動ログイン完了まで待機
+        // LIFF環境では自動ログイン完了まで待機するが、タイムアウトを設定
         if (environment === AuthEnvironment.LIFF) {
-          // loading状態を維持し、自動ログインに委ねる
+          // loading状態を維持し、自動ログインに委ねるが、フォールバック処理を追加
           logger.debug("LIFF environment detected, maintaining loading state for auto-login", {
             component: "AuthStateManager",
           });
+          
+          setTimeout(() => {
+            if (this.currentState === "loading") {
+              logger.debug("LIFF auto-login timeout, setting unauthenticated", {
+                component: "AuthStateManager",
+              });
+              this.setState("unauthenticated");
+            }
+          }, 10000);
           return;
         }
         this.setState("unauthenticated");
