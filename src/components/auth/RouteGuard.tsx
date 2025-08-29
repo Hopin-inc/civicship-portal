@@ -10,6 +10,7 @@ import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
 import { isAuthRequiredForPath } from "@/config/auth-config";
+import { detectEnvironment, AuthEnvironment } from "@/lib/auth/environment-detector";
 
 /**
  * ルートガードコンポーネントのプロパティ
@@ -30,6 +31,10 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const nextParam = searchParams.get("next") as EncodedURIComponent;
   const [authorized, setAuthorized] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
+  
+  // LIFF環境の判定
+  const environment = detectEnvironment();
+  const isLiffEnvironment = environment === AuthEnvironment.LIFF;
 
   const { loading: userLoading } = useQuery(GET_CURRENT_USER, {
     skip: !isAuthenticated,
@@ -49,6 +54,16 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, [loading]);
 
   useEffect(() => {
+    // LIFF環境で認証状態がloadingの場合は、自動ログインの完了を待つ
+    if (isLiffEnvironment && authenticationState === "loading") {
+      logger.debug("RouteGuard: Waiting for auto-login completion in LIFF environment", {
+        authenticationState,
+        environment,
+        component: "RouteGuard",
+      });
+      return;
+    }
+    
     if (loading || userLoading || isInitialRender) {
       return;
     }
@@ -86,7 +101,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }
 
   // 認証が必要なページの場合のみローディングを表示
-  if (loading || userLoading || isInitialRender) {
+  if (loading || userLoading || isInitialRender || (isLiffEnvironment && authenticationState === "loading")) {
     return <LoadingIndicator />;
   }
 
