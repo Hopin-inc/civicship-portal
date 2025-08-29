@@ -28,10 +28,10 @@ export default function MyProfilePage() {
 
   useEffect(() => {
     const startTime = performance.now();
+    const requestId = `page-${startTime}`;
     setPerformanceLog(prev => ({ ...prev, pageStart: startTime }));
-    logger.info("🚀 MyProfilePage: ページ読み込み開始", {
-      timestamp: startTime,
-      requestId: `page-${startTime}`,
+    logger.info("🚀 [REQUEST START] MyProfilePage読み込み開始", {
+      requestId,
       component: "MyProfilePage"
     });
   }, []);
@@ -43,10 +43,8 @@ export default function MyProfilePage() {
       const authCompleteTime = performance.now();
       setPerformanceLog(prev => {
         const authDuration = authCompleteTime - (prev.pageStart || authCompleteTime);
-        logger.info("✅ MyProfilePage: 認証完了", {
-          timestamp: authCompleteTime,
+        logger.info("✅ 認証完了", {
           authDuration: `${authDuration.toFixed(2)}ms`,
-          userId: currentUser.id,
           requestId: `page-${prev.pageStart}`,
           component: "MyProfilePage"
         });
@@ -63,12 +61,9 @@ export default function MyProfilePage() {
     if (userData && !isLoading) {
       const profileCompleteTime = performance.now();
       setPerformanceLog(prev => {
-        const profileDuration = profileCompleteTime - (prev.authComplete || prev.pageStart || profileCompleteTime);
-        logger.info("✅ MyProfilePage: ユーザープロフィール読み込み完了", {
-          timestamp: profileCompleteTime,
-          profileDuration: `${profileDuration.toFixed(2)}ms`,
-          totalDuration: `${(profileCompleteTime - (prev.pageStart || profileCompleteTime)).toFixed(2)}ms`,
-          hasOpportunities: selfOpportunities.length > 0,
+        const totalDuration = profileCompleteTime - (prev.pageStart || profileCompleteTime);
+        logger.info("✅ [REQUEST END] プロフィール読み込み完了", {
+          totalDuration: `${totalDuration.toFixed(2)}ms`,
           requestId: `page-${prev.pageStart}`,
           component: "MyProfilePage"
         });
@@ -85,11 +80,8 @@ export default function MyProfilePage() {
     if (showNfts && nftInstances.length >= 0) {
       const nftCompleteTime = performance.now();
       setPerformanceLog(prev => {
-        const nftDuration = nftCompleteTime - (prev.profileComplete || prev.pageStart || nftCompleteTime);
         const totalDuration = nftCompleteTime - (prev.pageStart || nftCompleteTime);
-        logger.info("✅ MyProfilePage: NFTデータ読み込み完了", {
-          timestamp: nftCompleteTime,
-          nftDuration: `${nftDuration.toFixed(2)}ms`,
+        logger.info("🎨 NFT読み込み完了", {
           totalDuration: `${totalDuration.toFixed(2)}ms`,
           nftCount: nftInstances.length,
           requestId: `page-${prev.pageStart}`,
@@ -108,12 +100,6 @@ export default function MyProfilePage() {
   useEffect(() => {
     if (userData && !isLoading) {
       const timer = setTimeout(() => {
-        const nftStartTime = performance.now();
-        logger.info("🚀 MyProfilePage: NFT読み込み開始", {
-          timestamp: nftStartTime,
-          requestId: `nft-${nftStartTime}`,
-          component: "MyProfilePage"
-        });
         setShowNfts(true);
       }, 100);
       return () => clearTimeout(timer);
@@ -122,13 +108,6 @@ export default function MyProfilePage() {
 
   // 認証中またはメインデータ読み込み中 → ローディング表示
   if (isAuthenticating || !currentUser || isLoading) {
-    logger.info("⏳ MyProfilePage: ローディング表示中", {
-      isAuthenticating,
-      hasCurrentUser: !!currentUser,
-      isLoading,
-      timestamp: performance.now(),
-      component: "MyProfilePage"
-    });
     return <LoadingIndicator />;
   }
 

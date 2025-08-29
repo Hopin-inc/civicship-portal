@@ -9,13 +9,6 @@ export const useUserNfts = ({ userId }: UseUserNftProps) => {
     const queryStartTime = performance.now();
     const requestId = `nft-${queryStartTime}`;
     
-    logger.info("🚀 useUserNfts: NFTクエリ開始", {
-      timestamp: queryStartTime,
-      requestId,
-      userId,
-      component: "useUserNfts"
-    });
-    
     const { data: nftInstances } = useGetNftInstancesQuery(
       {
         variables: {
@@ -29,11 +22,9 @@ export const useUserNfts = ({ userId }: UseUserNftProps) => {
           const queryEndTime = performance.now();
           const queryDuration = queryEndTime - queryStartTime;
           const nftCount = data?.nftInstances?.edges?.length || 0;
-          logger.info("✅ useUserNfts: NFTクエリ完了", {
+          logger.info("🎨 [NFT] クエリ完了", {
             queryDuration: `${queryDuration.toFixed(2)}ms`,
             nftCount,
-            fetchPolicy: "cache-first",
-            timestamp: queryEndTime,
             requestId,
             component: "useUserNfts"
           });
@@ -41,10 +32,9 @@ export const useUserNfts = ({ userId }: UseUserNftProps) => {
         onError: (error) => {
           const queryEndTime = performance.now();
           const queryDuration = queryEndTime - queryStartTime;
-          logger.error("❌ useUserNfts: NFTクエリエラー", {
+          logger.error("❌ [NFT] クエリエラー", {
             queryDuration: `${queryDuration.toFixed(2)}ms`,
             error: error.message,
-            timestamp: queryEndTime,
             requestId,
             component: "useUserNfts"
           });
