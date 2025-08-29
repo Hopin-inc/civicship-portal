@@ -422,7 +422,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     }
   };
 
-  const value: AuthContextType = {
+  const authContextValue = useMemo(() => ({
     user: state.currentUser,
     firebaseUser: state.firebaseUser,
     uid: state.firebaseUser?.uid || null,
@@ -447,9 +447,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     updateAuthState: async () => {
       await refetchUser();
     },
-    // 認証初期化中でもローディングを表示しない
     loading: userLoading || state.isAuthenticating,
-  };
+  }), [
+    state.currentUser,
+    state.firebaseUser,
+    state.authenticationState,
+    state.isAuthenticating,
+    state.environment,
+    loginWithLiff,
+    logout,
+    phoneAuthService,
+    createUser,
+    refetchUser,
+    userLoading
+  ]);
 
   // 認証初期化エラーの場合のみエラー表示
   if (authInitError) {
@@ -462,7 +473,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
   }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>;
 };
 
 /**
