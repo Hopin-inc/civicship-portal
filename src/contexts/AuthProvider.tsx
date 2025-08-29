@@ -123,6 +123,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
   const [isAuthInitialized, setIsAuthInitialized] = useState(false);
   const [authInitError, setAuthInitError] = useState<string | null>(null);
+  const [isProcessingAuth, setIsProcessingAuth] = useState(false);
 
   const [userSignUp] = useUserSignUpMutation();
 
@@ -209,8 +210,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     refetchUser,
     userData,
     environment,
-    authRequiredPaths: liffAuthRequiredPaths
-  }), [authStateManager, state, liffService, userData, environment, liffAuthRequiredPaths]);
+    authRequiredPaths: liffAuthRequiredPaths,
+    isProcessingAuth,
+    setIsProcessingAuth
+  }), [authStateManager, state, liffService, userData, environment, liffAuthRequiredPaths, isProcessingAuth, setIsProcessingAuth]);
 
   // 条件付きフック実行で不要な処理をスキップ
   useAuthStateChangeListener(authHooksConfig);
@@ -227,9 +230,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
   // LIFF認証処理フック
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
+  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser, setIsProcessingAuth });
 
-  // 自動ログインは最後に実行
+  // 自動ログインは最後に実行（認証処理の重複を防ぐ）
   useAutoLogin(authHooksConfig);
 
   /**

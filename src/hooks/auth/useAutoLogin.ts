@@ -17,6 +17,8 @@ interface UseAutoLoginProps {
   userData: GqlCurrentUserQuery | undefined;
   // 特定のページでのみ自動ログインを実行するための設定
   authRequiredPaths?: string[];
+  // 認証処理が実行中かどうか
+  isProcessingAuth?: boolean;
 }
 
 const useAutoLogin = ({
@@ -27,6 +29,7 @@ const useAutoLogin = ({
   refetchUser,
   userData,
   authRequiredPaths = [],
+  isProcessingAuth = false,
 }: UseAutoLoginProps) => {
   const { isAuthRequired } = useAuthPathCheck(authRequiredPaths);
   const attemptedRef = useRef(false);
@@ -35,6 +38,7 @@ const useAutoLogin = ({
   const shouldAutoLogin = useMemo(() => {
     if (environment !== AuthEnvironment.LIFF) return false;
     if (!isAuthRequired) return false;
+    if (isProcessingAuth) return false; // 認証処理が実行中の場合は自動ログインをスキップ
     
     const liffState = liffService.getState();
     return (
@@ -47,6 +51,7 @@ const useAutoLogin = ({
   }, [
     environment,
     isAuthRequired,
+    isProcessingAuth,
     state.authenticationState,
     state.isAuthenticating,
     liffService,
