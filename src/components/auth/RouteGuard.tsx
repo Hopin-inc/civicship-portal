@@ -9,6 +9,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
+import { isNoAuthPath } from "@/lib/communities/metadata";
 
 /**
  * ルートガードコンポーネントのプロパティ
@@ -34,6 +35,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     skip: !isAuthenticated,
   });
 
+  // 認証が不要なページかどうかを判定
+  const isNoAuthRequired = isNoAuthPath(pathname);
+
   const authRedirectService = React.useMemo(() => {
     return AuthRedirectService.getInstance();
   }, []);
@@ -45,6 +49,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, [loading]);
 
   useEffect(() => {
+    // 認証が不要なページの場合は、ローディングを待たずに先に描画を開始
+    if (isNoAuthRequired) {
+      setAuthorized(true);
+      return;
+    }
+
     if (loading || userLoading || isInitialRender) {
       return;
     }
@@ -74,7 +84,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     authCheck();
     return () => {
     };
-  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams, isInitialRender]);
+  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams, isInitialRender, isNoAuthRequired]);
+
+  // 認証が不要なページの場合は、ローディングを待たずに先に描画を開始
+  if (isNoAuthRequired) {
+    return <>{ children }</>;
+  }
 
   if (loading || userLoading || isInitialRender) {
     return <LoadingIndicator />;

@@ -27,6 +27,7 @@ interface CommunityBaseConfig {
   enableFeatures: FeaturesType[];
   rootPath?: string;
   adminRootPath?: string;
+  noAuthPaths?: string[]; // 認証が不要なページのパス
 }
 
 // コミュニティごとのメタデータ型定義
@@ -77,6 +78,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures","quests"],
     rootPath: "/opportunities",
     adminRootPath: "/admin/reservations",
+    noAuthPaths: ["/opportunities"],
   },
   "himeji-ymca": {
     id: "himeji-ymca",
@@ -148,6 +150,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       "quests",
     ],
     rootPath: "/opportunities",
+    noAuthPaths: ["/opportunities"],
   },
 };
 
@@ -255,3 +258,15 @@ export const fallbackMetadata: Metadata = {
 export const getCommunityMetadata = (communityId: string): CommunityMetadata => {
   return generateCommunityMetadata(communityId);
 };
+
+// 指定されたパスが認証不要かどうかを判定する
+export function isNoAuthPath(pathname: string): boolean {
+  const config = currentCommunityConfig;
+  if (!config.noAuthPaths) {
+    return false;
+  }
+  
+  return config.noAuthPaths.some(noAuthPath => 
+    pathname === noAuthPath || pathname.startsWith(`${noAuthPath}/`)
+  );
+}
