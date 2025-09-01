@@ -7,6 +7,8 @@ import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
 import { logger } from "@/lib/logging";
 
+import { AuthEnvironment } from "@/lib/auth/environment-detector";
+
 interface UseFirebaseAuthStateProps {
   authStateManager: AuthStateManager | null;
   state: AuthState;
@@ -26,7 +28,6 @@ export const useFirebaseAuthState = ({
 
   useEffect(() => {
     const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
-
       setState((prev) => ({
         ...prev,
         firebaseUser: user,
