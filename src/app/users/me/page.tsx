@@ -24,7 +24,9 @@ export default function MyProfilePage() {
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
     currentUser?.id,
   );
-  const { nftInstances } = useUserNfts({ userId: currentUser?.id ?? "" });
+  // NFT機能を一時的に無効化（データベースエラー回避）
+  // const { nftInstances } = useUserNfts({ userId: currentUser?.id ?? "" });
+  const nftInstances: any[] = []; // 空配列に設定
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
