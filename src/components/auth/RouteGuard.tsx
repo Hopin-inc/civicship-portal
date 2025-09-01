@@ -13,6 +13,8 @@ import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent, match
 const AUTHENTICATION_FREE_PATHS = [
   '/opportunities',
   '/opportunities/*',
+  'activities',
+  'activities/*',
 ];
 
 /**
