@@ -21,8 +21,8 @@ interface ProgressStep {
 
 const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ 
   fullScreen = true,
-  authenticationState = "loading",
-  isLiffInitialized = false
+  authenticationState,
+  isLiffInitialized
 }) => {
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -31,19 +31,39 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     };
   }, []);
 
+  const showDetailedProgress = authenticationState !== undefined || isLiffInitialized !== undefined;
+
+  if (!showDetailedProgress) {
+    const SimpleSpinner = (
+      <div className="flex justify-center items-center">
+        <div className="animate-spin h-8 w-8 bg-blue-300 rounded-xl"></div>
+      </div>
+    );
+
+    if (fullScreen) {
+      return (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-background bg-opacity-80">
+          {SimpleSpinner}
+        </div>
+      );
+    }
+
+    return <div>{SimpleSpinner}</div>;
+  }
+
   const getProgressSteps = (): ProgressStep[] => {
     return [
       {
         id: "liff-init",
         label: "LIFF初期化中...",
-        isCompleted: isLiffInitialized,
-        isActive: !isLiffInitialized && authenticationState === "loading"
+        isCompleted: isLiffInitialized || false,
+        isActive: !(isLiffInitialized || false) && (authenticationState === "loading" || authenticationState === undefined)
       },
       {
         id: "firebase-auth",
         label: "Firebase認証中...",
-        isCompleted: ["line_authenticated", "phone_authenticated", "user_registered"].includes(authenticationState),
-        isActive: isLiffInitialized && authenticationState === "loading"
+        isCompleted: authenticationState ? ["line_authenticated", "phone_authenticated", "user_registered"].includes(authenticationState) : false,
+        isActive: (isLiffInitialized || false) && (authenticationState === "loading" || authenticationState === undefined)
       },
       {
         id: "user-info",
