@@ -83,6 +83,7 @@ interface AuthContextType {
   updateAuthState: () => Promise<void>;
 
   loading: boolean;
+  isLiffInitialized: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -412,6 +413,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       userLoading || 
       (state.isAuthenticating && !["line_authenticated", "phone_authenticated", "user_registered"].includes(state.authenticationState))
     ),
+    isLiffInitialized: liffService.getState().isInitialized,
   };
 
   if (!isAuthInitialized) {
@@ -425,7 +427,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
     }
     
-    return <LoadingIndicator fullScreen={true} />;
+    return <LoadingIndicator 
+      fullScreen={true} 
+      authenticationState={state.authenticationState}
+      isLiffInitialized={liffService.getState().isInitialized}
+    />;
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
