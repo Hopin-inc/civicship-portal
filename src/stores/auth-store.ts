@@ -104,6 +104,7 @@ export const useAuthStore = create<AuthState>()(
 
       try {
         get().setState("loading");
+        get().setIsAuthenticating(true);
 
         const lineTokens = TokenManager.getLineTokens();
         const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
@@ -152,6 +153,8 @@ export const useAuthStore = create<AuthState>()(
           error: error instanceof Error ? error.message : String(error),
         });
         get().setState("unauthenticated");
+      } finally {
+        get().setIsAuthenticating(false);
       }
     },
 
