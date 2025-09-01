@@ -273,14 +273,16 @@ export class LiffService {
 
           const userCredential = await signInWithCustomToken(lineAuth, customToken);
 
-          await updateProfile(userCredential.user, {
-            displayName: profile.displayName,
-            photoURL: profile.pictureUrl,
-          });
+          const [, idToken, tokenResult] = await Promise.all([
+            updateProfile(userCredential.user, {
+              displayName: profile.displayName,
+              photoURL: profile.pictureUrl,
+            }),
+            userCredential.user.getIdToken(false),
+            userCredential.user.getIdTokenResult(false)
+          ]);
 
-          const idToken = await userCredential.user.getIdToken();
           const refreshToken = userCredential.user.refreshToken;
-          const tokenResult = await userCredential.user.getIdTokenResult();
           const expirationTime = new Date(tokenResult.expirationTime).getTime();
 
           const tokens: AuthTokens = {
