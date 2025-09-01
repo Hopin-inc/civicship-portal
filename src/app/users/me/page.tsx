@@ -41,7 +41,22 @@ export default function MyProfilePage() {
       hasError: !!error,
       timestamp: new Date().toISOString(),
     });
-  }, []);
+  }, [currentUser, isAuthenticating, isLoading, error]);
+
+  // メインコンテンツのレンダリング完了を記録
+  useEffect(() => {
+    if (userData && nftInstances && formattedOpportunities) {
+      const endTime = performance.now();
+      logger.debug("[PERF] /users/me page main content rendered", {
+        component: "MyProfilePage",
+        duration: `${(endTime - renderStartTime.current).toFixed(2)}ms`,
+        hasUserData: !!userData,
+        hasNfts: !!(nftInstances && nftInstances.length > 0),
+        hasOpportunities: formattedOpportunities.length > 0,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }, [userData, nftInstances]);
 
   // 認証中 or リダイレクト待ち → ローディング表示
   if (isAuthenticating || !currentUser) {
@@ -95,19 +110,6 @@ export default function MyProfilePage() {
   );
 
   const formattedOpportunities = selfOpportunities.map(formatOpportunities);
-
-  // メインコンテンツのレンダリング完了を記録
-  useEffect(() => {
-    const endTime = performance.now();
-    logger.debug("[PERF] /users/me page main content rendered", {
-      component: "MyProfilePage",
-      duration: `${(endTime - renderStartTime.current).toFixed(2)}ms`,
-      hasUserData: !!userData,
-      hasNfts: !!(nftInstances && nftInstances.length > 0),
-      hasOpportunities: formattedOpportunities.length > 0,
-      timestamp: new Date().toISOString(),
-    });
-  }, [userData, nftInstances, formattedOpportunities]);
 
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">
