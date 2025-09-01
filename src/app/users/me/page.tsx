@@ -31,7 +31,7 @@ export default function MyProfilePage() {
 
   // 認証中 or リダイレクト待ち → ローディング表示
   if (isAuthenticating || !currentUser) {
-    return <LoadingIndicator />;
+    return <div>loading</div>;
   }
 
   // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
