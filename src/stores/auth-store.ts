@@ -71,7 +71,9 @@ export const useAuthStore = create<AuthState>()(
     setFirebaseUser: (user: User | null) => {
       set({ firebaseUser: user });
       if (user) {
-        get().syncFirebaseTokens(user);
+        setTimeout(() => {
+          get().syncFirebaseTokens(user);
+        }, 0);
       } else {
         TokenManager.clearLineTokens();
       }

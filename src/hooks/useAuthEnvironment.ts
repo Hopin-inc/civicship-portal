@@ -3,7 +3,8 @@ import { useAuthStore } from '@/stores/auth-store';
 import { AuthEnvironment } from '@/lib/auth/environment-detector';
 
 export const useAuthEnvironment = () => {
-  const { environment, liffService, authenticationState } = useAuthStore();
+  const store = useAuthStore();
+  const { environment, liffService, authenticationState } = store;
 
   useEffect(() => {
     if (environment !== AuthEnvironment.LIFF || !liffService) return;
