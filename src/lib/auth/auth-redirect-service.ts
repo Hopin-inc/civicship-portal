@@ -1,6 +1,6 @@
-import { AuthStateManager } from "./auth-state-manager";
 import { GqlRole, GqlUser } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useAuthStore } from "@/stores/auth-store";
 import {
   encodeURIComponentWithType,
   extractSearchParamFromRelativePath,
@@ -22,10 +22,8 @@ const OWNER_ONLY_PATHS = [
  */
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
-  private authStateManager: AuthStateManager;
 
   private constructor() {
-    this.authStateManager = AuthStateManager.getInstance();
   }
 
   /**
@@ -79,7 +77,7 @@ export class AuthRedirectService {
    * @returns リダイレクト先のパス、またはnull（リダイレクト不要の場合）
    */
   public getRedirectPath(pathname: RawURIComponent, next?: RawURIComponent | null): RawURIComponent | null {
-    const authState = this.authStateManager.getState();
+    const authState = useAuthStore.getState().authenticationState;
     const nextParam = next
       ? this.generateNextParam(next)
       : this.generateNextParam(pathname);
@@ -169,7 +167,7 @@ export class AuthRedirectService {
   public getPostLineAuthRedirectPath(nextPath: RawURIComponent | null): RawURIComponent {
     const nextParam = nextPath ? this.generateNextParam(nextPath) : "";
 
-    const authState = this.authStateManager.getState();
+    const authState = useAuthStore.getState().authenticationState;
 
     switch (authState) {
       case "unauthenticated":

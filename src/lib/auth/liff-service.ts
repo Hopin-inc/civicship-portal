@@ -292,12 +292,14 @@ export class LiffService {
 
           if (typeof window !== "undefined") {
             try {
-              const AuthStateManager = require("./auth-state-manager").AuthStateManager;
-              const authStateManager = AuthStateManager.getInstance();
+              const { useAuthStore } = await import("@/stores/auth-store");
               const timestamp = new Date().toISOString();
-              await authStateManager.handleLineAuthStateChange(true);
+              const currentState = useAuthStore.getState().authenticationState;
+              if (currentState === "unauthenticated" || currentState === "loading") {
+                useAuthStore.getState().setState("line_authenticated");
+              }
             } catch (error) {
-              logger.warn("Failed to update AuthStateManager state", {
+              logger.warn("Failed to update auth store state", {
                 error: error instanceof Error ? error.message : String(error),
                 component: "LiffService",
                 errorCategory: "state_management",
