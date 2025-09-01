@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
@@ -14,7 +15,7 @@ import {
   useUserSignUpMutation,
 } from "@/types/graphql";
 import { toast } from "sonner";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { COMMUNITY_ID, isNoAuthPath } from "@/lib/communities/metadata";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from '@/components/shared'
@@ -104,6 +105,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const phoneAuthService = PhoneAuthService.getInstance();
 
+  // 現在のパスが認証不要かどうかを判定
+  const pathname = usePathname();
+  const isNoAuthRequired = isNoAuthPath(pathname);
+
   const [state, setState] = useState<AuthState>({
     firebaseUser: null,
     currentUser: null,
@@ -121,7 +126,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
       state.authenticationState,
-    ),
+    ) || isNoAuthRequired,
     fetchPolicy: "network-only",
   });
 
@@ -163,6 +168,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [authInitError, setAuthInitError] = useState<string | null>(null);
 
   useEffect(() => {
+    // 認証が不要なページの場合は認証処理をスキップ
+    if (isNoAuthRequired) {
+      setIsAuthInitialized(true);
+      setState((prev) => ({ ...prev, authenticationState: "unauthenticated" }));
+      return;
+    }
+
     if (!authStateManager) return;
 
     const initializeAuth = async () => {
@@ -181,7 +193,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!isAuthInitialized && !authInitError) {
       initializeAuth();
     }
-  }, [authStateManager, isAuthInitialized, authInitError]);
+  }, [authStateManager, isAuthInitialized, authInitError, isNoAuthRequired]);
 
   useAuthStateChangeListener({ authStateManager, setState });
   useTokenExpirationHandler({ state, setState, logout });
@@ -394,7 +406,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
+    loading: isNoAuthRequired ? false : (state.authenticationState === "loading" || userLoading || state.isAuthenticating),
   };
 
   if (!isAuthInitialized) {

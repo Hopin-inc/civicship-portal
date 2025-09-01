@@ -78,7 +78,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures","quests"],
     rootPath: "/opportunities",
     adminRootPath: "/admin/reservations",
-    noAuthPaths: ["/opportunities"],
+    noAuthPaths: ["/opportunities", "/activities"],
   },
   "himeji-ymca": {
     id: "himeji-ymca",
