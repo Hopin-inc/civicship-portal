@@ -49,6 +49,15 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       return;
     }
 
+    if (pathname.startsWith('/opportunities')) {
+      logger.debug("RouteGuard: Skipping authentication for opportunities path", {
+        pathname,
+        component: "RouteGuard",
+      });
+      setAuthorized(true);
+      return;
+    }
+
     if (typeof window !== "undefined" && pathname === "/") {
       const urlParams = new URLSearchParams(window.location.search);
       const isReturnFromLineAuth = urlParams.has("code") && urlParams.has("state") && urlParams.has("liffClientId");
