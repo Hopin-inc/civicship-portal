@@ -233,46 +233,19 @@ export class AuthStateManager {
    * Firebase Authの状態も考慮してより確実にチェック
    */
   private async checkUserRegistration(): Promise<boolean> {
-    const startTime = performance.now();
-    logger.debug("User registration check started", {
-      component: "AuthStateManager",
-      timestamp: new Date().toISOString(),
-    });
-
     try {
       const { lineAuth } = await import("./firebase-config");
       if (!lineAuth.currentUser) {
-        const endTime = performance.now();
-        logger.debug("User registration check completed (no current user)", {
-          component: "AuthStateManager",
-          duration: `${(endTime - startTime).toFixed(2)}ms`,
-          timestamp: new Date().toISOString(),
-        });
         return false;
       }
 
       let accessToken = null;
       try {
-        const tokenStartTime = performance.now();
         accessToken = await lineAuth.currentUser.getIdToken();
-        const tokenEndTime = performance.now();
-        logger.debug("Firebase token retrieval completed", {
-          component: "AuthStateManager",
-          duration: `${(tokenEndTime - tokenStartTime).toFixed(2)}ms`,
-          timestamp: new Date().toISOString(),
-        });
       } catch (tokenError) {
-        const endTime = performance.now();
-        logger.info("Failed to get Firebase token for user registration check", {
-          error: tokenError instanceof Error ? tokenError.message : String(tokenError),
-          component: "AuthStateManager",
-          duration: `${(endTime - startTime).toFixed(2)}ms`,
-          timestamp: new Date().toISOString(),
-        });
         return false;
       }
 
-      const graphqlStartTime = performance.now();
       const { data } = await apolloClient.query({
         query: GET_CURRENT_USER,
         fetchPolicy: "network-only",
@@ -282,30 +255,17 @@ export class AuthStateManager {
           },
         },
       });
-      const graphqlEndTime = performance.now();
-      
-      logger.debug("GraphQL user query completed", {
-        component: "AuthStateManager",
-        duration: `${(graphqlEndTime - graphqlStartTime).toFixed(2)}ms`,
-        timestamp: new Date().toISOString(),
-      });
 
       const isRegistered = data?.currentUser?.user != null;
-      const endTime = performance.now();
       logger.debug("User registration check completed", {
         component: "AuthStateManager",
-        duration: `${(endTime - startTime).toFixed(2)}ms`,
         isRegistered,
-        timestamp: new Date().toISOString(),
       });
       return isRegistered;
     } catch (error) {
-      const endTime = performance.now();
       logger.info("Failed to check user registration", {
         error: error instanceof Error ? error.message : String(error),
-        component: "AuthStateManager",
-        duration: `${(endTime - startTime).toFixed(2)}ms`,
-        timestamp: new Date().toISOString(),
+        component: "AuthStateManager"
       });
       return false;
     }

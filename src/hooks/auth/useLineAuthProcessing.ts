@@ -63,13 +63,11 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         }
 
         await refetchUserRef.current();
-
       } catch (err) {
         logger.info("Error during LINE auth", {
           authType: "liff",
           error: err instanceof Error ? err.message : String(err),
           component: "useLineAuthProcessing",
-          timestamp: new Date().toISOString(),
         });
       } finally {
         setStateRef.current((prev) => ({ ...prev, isAuthenticating: false }));
