@@ -5,7 +5,7 @@ import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunity
 import { ErrorState } from "@/components/shared";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
 import { notFound, useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
@@ -27,7 +27,7 @@ export default function OpportunityDetailPage() {
     [],
   );
   useHeaderConfig(headerConfig);
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthStore();
   const {
     opportunity,
     sameStateOpportunities,

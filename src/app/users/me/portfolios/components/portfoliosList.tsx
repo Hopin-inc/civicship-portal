@@ -5,7 +5,7 @@ import { useState } from "react";
 import SearchForm from "@/components/shared/SearchForm";
 import FutureTab from "./FutureTab";
 import PastTab from "./PastTab";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 
 export function groupByDate<T extends { date: string }>(items: T[]): Record<string, T[]> {
   if (!items) return {};
@@ -21,7 +21,7 @@ export default function PortfoliosList() {
     const [activeTab, setActiveTab] = useState<TabsEnum>(TabsEnum.Future);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [input, setInput] = useState<string>("");
-    const { user: currentUser } = useAuth();
+    const { currentUser } = useAuthStore();
 
     return (
         <div className="py-6 px-6">

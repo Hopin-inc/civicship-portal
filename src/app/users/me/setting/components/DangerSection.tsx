@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { LogOut, XCircle } from "lucide-react";
 
 export default function DangerSection() {
-  const { logout } = useAuth();
+  const { logout } = useAuthStore();
   const [open, setOpen] = useState(false);
 
   return (

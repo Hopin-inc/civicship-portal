@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { transformTickets } from "@/app/tickets/data/presenter";
 import { TTicket } from "@/app/tickets/data/type";
 import { GqlTicketStatus, useGetTicketsQuery } from "@/types/graphql";
@@ -13,7 +13,8 @@ export interface UseTicketsResult {
 }
 
 export const useTickets = (): UseTicketsResult => {
-  const { user } = useAuth();
+  const { currentUser } = useAuthStore();
+  const user = currentUser;
 
   const { data, loading, error, refetch } = useGetTicketsQuery({
     variables: { filter: { ownerId: user?.id, status: GqlTicketStatus.Available } },

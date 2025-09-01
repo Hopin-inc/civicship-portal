@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import LoginModal from "@/app/login/components/LoginModal";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useTicketClaim } from "@/app/tickets/receive/hooks/useTicketClaim";
@@ -30,7 +30,7 @@ export default function TicketReceivePage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthStore();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const { claimLinkData, hasIssued, isClaimLoading, claimTicket, viewLoading, viewError } =

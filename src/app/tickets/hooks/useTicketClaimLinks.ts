@@ -9,7 +9,7 @@ import {
   GqlTicketClaimLinksQuery,
   useTicketClaimLinksQuery,
 } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 
 export interface UseTicketClaimLinksResult {
   ticketClaimLinks: TicketClaimLink[];
@@ -32,7 +32,8 @@ const fallbackConnection = {
 };
 
 export const useTicketClaimLinks = (): UseTicketClaimLinksResult => {
-  const { user } = useAuth();
+  const { currentUser } = useAuthStore();
+  const user = currentUser;
   const { data, loading, error, fetchMore, refetch } = useTicketClaimLinksQuery({
     variables: {
       filter: {

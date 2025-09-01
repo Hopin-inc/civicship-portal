@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import LoginModal from "@/app/login/components/LoginModal";
 import PaymentSection from "@/app/reservation/confirm/components/PaymentSection";
 import { useReservationConfirm } from "@/app/reservation/confirm/hooks/useReservationConfirm";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCounter";
 import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
 import { notFound, useRouter } from "next/navigation";
@@ -37,7 +37,9 @@ export default function ConfirmPage() {
     [],
   );
   useHeaderConfig(headerConfig);
-  const { user,isAuthenticated } = useAuth();
+  const { currentUser, authenticationState } = useAuthStore();
+  const user = currentUser;
+  const isAuthenticated = authenticationState === "user_registered";
   const router = useRouter();
 
   const {

@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { useQuery } from "@apollo/client";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { toast } from "sonner";
@@ -26,7 +26,9 @@ interface AdminGuardProps {
  * 管理者権限を持つユーザーのみアクセスを許可する
  */
 export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { authenticationState, isAuthenticating } = useAuthStore();
+  const isAuthenticated = authenticationState === "user_registered";
+  const authLoading = isAuthenticating;
   const router = useRouter();
 
   const { data: userData, loading: userLoading } = useQuery<GqlCurrentUserQuery>(GET_CURRENT_USER, {

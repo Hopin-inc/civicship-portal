@@ -3,7 +3,7 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import {
   GqlCurrentPrefecture,
   useGetUserFlexibleQuery,
@@ -15,7 +15,8 @@ import { logger } from "@/lib/logging";
 
 const useProfileEdit = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { currentUser } = useAuthStore();
+  const user = currentUser;
   const userId = user?.id;
 
   const [profile, setProfile] = useState<GeneralUserProfile>({

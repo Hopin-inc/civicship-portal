@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -32,7 +32,8 @@ export default function LoginPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { loginWithLiff, isAuthenticating, authenticationState, loading } = useAuth();
+  const { loginWithLiff, isAuthenticating, authenticationState } = useAuthStore();
+  const loading = isAuthenticating;
   const authRedirectService = AuthRedirectService.getInstance();
 
   const [isLoading, setIsLoading] = useState(false);

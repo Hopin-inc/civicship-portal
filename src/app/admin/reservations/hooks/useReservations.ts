@@ -8,7 +8,7 @@ import {
   GqlSortDirection,
   useGetReservationsQuery,
 } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 
 export interface UseReservationsResult {
   reservations: GqlReservationsConnection;
@@ -30,7 +30,8 @@ const fallbackConnection: GqlReservationsConnection = {
 };
 
 const useReservations = (filter: GqlReservationFilterInput): UseReservationsResult => {
-  const { user } = useAuth();
+  const { currentUser } = useAuthStore();
+  const user = currentUser;
 
   const mergedFilter = React.useMemo(
     () => ({

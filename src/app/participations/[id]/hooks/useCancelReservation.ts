@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { ApolloError } from "@apollo/client";
 import { GqlErrorCode, useCancelReservationMutation } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { logger } from "@/lib/logging";
 
 type Result = { success: true } | { success: false; code: GqlErrorCode };
@@ -11,7 +11,7 @@ type Result = { success: true } | { success: false; code: GqlErrorCode };
 const useCancelReservation = () => {
   const [cancelReservation, { loading }] = useCancelReservationMutation();
   const [isCancelling, setIsCancelling] = useState(false);
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthStore();
 
   const handleCancel = useCallback(
     async (reservationId: string): Promise<Result> => {

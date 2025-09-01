@@ -1,11 +1,13 @@
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { 
   GqlDidIssuanceStatus, 
   useGetUserFlexibleQuery 
 } from "@/types/graphql";
 
 export function useAccountData() {
-  const { user: currentUser, isAuthenticated, isPhoneVerified, isAuthenticating } = useAuth();
+  const { currentUser, authenticationState, isAuthenticating } = useAuthStore();
+  const isAuthenticated = authenticationState === "user_registered";
+  const isPhoneVerified = authenticationState === "phone_authenticated" || authenticationState === "user_registered";
   // ユーザー詳細データ
   const { data: userData, loading: userLoading } = useGetUserFlexibleQuery({
     variables: {
@@ -30,4 +32,4 @@ export function useAccountData() {
     isNftWalletLinked,
     loading: userLoading,
   };
-} 
+}  

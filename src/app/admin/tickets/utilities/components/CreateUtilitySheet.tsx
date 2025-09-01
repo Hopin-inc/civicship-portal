@@ -20,7 +20,7 @@ import {
   GqlSortDirection,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
@@ -40,7 +40,7 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
   const [selectedOpportunityIds, setSelectedOpportunityIds] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthStore();
   const [createUtility] = useCreateUtilityMutation();
 
   const { data: opportunityData, loading: opportunitiesLoading } = useGetOpportunitiesQuery({

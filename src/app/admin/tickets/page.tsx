@@ -8,7 +8,7 @@ import {
   useGetUtilitiesQuery,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { TicketIssueCard } from "@/app/admin/tickets/components/IssuerCard";
 import CreateUtilitySheet from "@/app/admin/tickets/utilities/components/CreateUtilitySheet";
 import CreateTicketSheet from "@/app/admin/tickets/components/CreateTicketSheet";
@@ -18,7 +18,7 @@ import { useTicketIssuers } from "./hooks/useTicketIssuers";
 export default function TicketsPage() {
   const headerConfig = useMemo(() => ({ title: "チケット管理", showLogo: false }), []);
   useHeaderConfig(headerConfig);
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthStore();
 
   const { data: utilityData, loading: utilitiesLoading, refetch: refetchUtilities } = useGetUtilitiesQuery({
     variables: {

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { notFound } from "next/navigation";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import UserProfileSection from "@/app/users/components/UserProfileSection";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import UserPortfolioList from "@/app/users/components/UserPortfolioList";
@@ -20,7 +20,7 @@ export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
   const renderStartTime = useRef<number>(performance.now());
 
-  const { user: currentUser, isAuthenticating } = useAuth();
+  const { currentUser, isAuthenticating } = useAuthStore();
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
     currentUser?.id,
   );

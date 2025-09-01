@@ -1,5 +1,5 @@
 "use client";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import FeaturedSection from "@/components/domains/opportunities/components/FeaturedSection/FeaturedSection";
 import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
@@ -8,7 +8,8 @@ import { useFetchFeedOpportunities } from "@/app/opportunities/hooks/useFetchFee
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function OpportunitiesPage() {
-    const { isAuthenticating, loading: authLoading } = useAuth();
+    const { isAuthenticating } = useAuthStore();
+    const authLoading = isAuthenticating;
     const { featuredCards, upcomingCards, loading } = useFetchFeedOpportunities();
     if (isAuthenticating || authLoading) {
       return <LoadingIndicator fullScreen={true} />;

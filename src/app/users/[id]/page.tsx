@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { notFound, useParams } from "next/navigation";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import UserProfileSection from "@/app/users/components/UserProfileSection";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import UserPortfolioList from "@/app/users/components/UserPortfolioList";
@@ -17,7 +17,7 @@ export default function UserPage() {
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
-  const { user: currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   const isOwner = currentUser?.id === id;
 
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(id ?? "");

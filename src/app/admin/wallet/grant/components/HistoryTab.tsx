@@ -4,7 +4,7 @@ import React from "react";
 import { GqlUser } from "@/types/graphql";
 import UserInfoCard from "./UserInfoCard";
 import { useWalletsAndDidIssuanceRequests } from "../hooks/useWalletsAndDidIssuanceRequests";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import Loading from "@/components/layout/Loading";
 
 interface HistoryTabProps {
@@ -14,7 +14,8 @@ interface HistoryTabProps {
 }
 
 export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps) {
-  const { user } = useAuth();
+  const { currentUser } = useAuthStore();
+  const user = currentUser;
   const { error, presentedTransactions, loading } = useWalletsAndDidIssuanceRequests({
     currentUserId: user?.id,
     listType,

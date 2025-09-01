@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -27,7 +27,12 @@ export function PhoneVerificationForm() {
   const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
 
   // ==================================
-  const { phoneAuth, isAuthenticated, loading, authenticationState, updateAuthState } = useAuth();
+  const authStore = useAuthStore();
+  const phoneAuth = authStore.phoneAuthService;
+  const isAuthenticated = authStore.authenticationState === "user_registered" || authStore.authenticationState === "phone_authenticated" || authStore.authenticationState === "line_authenticated";
+  const loading = authStore.isAuthenticating;
+  const authenticationState = authStore.authenticationState;
+  const updateAuthState = () => authStore.checkUserRegistration();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");

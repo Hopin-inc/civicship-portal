@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { GqlCurrentPrefecture } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -36,7 +36,11 @@ const FormSchema = z.object({
 type FormValues = z.infer<typeof FormSchema>;
 
 export function SignUpForm() {
-  const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
+  const { createUser, authenticationState, phoneAuthService, isAuthenticating } = useAuthStore();
+  const isAuthenticated = authenticationState === "user_registered";
+  const isPhoneVerified = authenticationState === "phone_authenticated" || authenticationState === "user_registered";
+  const phoneAuth = phoneAuthService?.getState() || { phoneUid: null };
+  const loading = isAuthenticating;
   const [isLoading, setIsLoading] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 

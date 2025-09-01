@@ -3,10 +3,11 @@
 import React from "react";
 import { AlertCircle } from "lucide-react";
 import IconWrapper from "@/components/shared/IconWrapper";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 
 const NotesSection = () => {
-  const { isAuthenticated } = useAuth();
+  const { authenticationState } = useAuthStore();
+  const isAuthenticated = authenticationState === "user_registered";
   return (
     <div className="rounded-lg p-6 mb-6">
       <h3 className="text-display-sm mb-6">注意事項</h3>

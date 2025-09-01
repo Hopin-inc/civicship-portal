@@ -1,7 +1,7 @@
 "use client";
 
 import { logEvent, setUserId, setUserProperties } from "firebase/analytics";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { useEffect, useMemo } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { logger } from "@/lib/logging";
@@ -15,7 +15,9 @@ export const useAnalyticsView = () => {
 // ---------------- ユーザー属性のバインディング ----------------
 
 const useAnalyticsUserBinding = () => {
-  const { user, isPhoneVerified, isAuthenticating } = useAuth();
+  const { currentUser, authenticationState, isAuthenticating } = useAuthStore();
+  const user = currentUser;
+  const isPhoneVerified = authenticationState === "phone_authenticated" || authenticationState === "user_registered";
 
   useEffect(() => {
     if (isAuthenticating) return;

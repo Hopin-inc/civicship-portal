@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { useGetUserWalletQuery } from "@/types/graphql";
 import { presenterUserAsset } from "@/app/wallets/data/presenter";
 import { UserAsset } from "@/app/wallets/data/type";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export const useWallet = (userId?: string) => {
-  const { user: authUser } = useAuth();
+  const { currentUser: authUser } = useAuthStore();
   const targetId = userId || authUser?.id;
 
   const [userAsset, setUserAsset] = useState<UserAsset>({

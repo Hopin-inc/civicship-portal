@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import Image from "next/image";
 import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -24,7 +24,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { loginWithLiff, isAuthenticating, isAuthenticated } = useAuth();
+  const { loginWithLiff, isAuthenticating, authenticationState } = useAuthStore();
+  const isAuthenticated = authenticationState === "user_registered";
 
   const handleLogin = async () => {
     if (!agreedTerms || !agreedPrivacy) {

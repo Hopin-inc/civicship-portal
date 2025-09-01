@@ -19,7 +19,7 @@ import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCo
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { logger } from "@/lib/logging";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
@@ -38,7 +38,7 @@ const mapReservationStatusToUIStatus = (status: GqlReservationStatus): Participa
 };
 
 export default function ParticipationPage() {
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthStore();
   const headerConfig = useMemo(
     () => ({
       title: "予約の確認",

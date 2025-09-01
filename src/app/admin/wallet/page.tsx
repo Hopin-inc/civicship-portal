@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { COMMUNITY_ID, getCommunityIdFromEnv } from "@/lib/communities/metadata";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
 import { GqlMembership, GqlRole, GqlWallet, useGetCommunityWalletQuery } from "@/types/graphql";
@@ -17,7 +17,7 @@ import { logger } from "@/lib/logging";
 
 export default function WalletPage() {
   const communityId = COMMUNITY_ID;
-  const { user: currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   const currentUserRole = currentUser?.memberships?.find(
     (m: GqlMembership) => m.community?.id === communityId,
   )?.role;

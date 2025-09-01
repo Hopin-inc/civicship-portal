@@ -1,4 +1,4 @@
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { GqlSortDirection, useGetOpportunitiesQuery } from "@/types/graphql";
 import { OpportunityCard } from "./OpportunityCard";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
@@ -22,7 +22,7 @@ const STEP_COLORS = {
 } as const;
 
 export default function OpportunityList({ setStep }: { setStep: (step: number) => void }) {
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthStore();
   const { selectedSlot,setSelectedSlot } = useSelection();
   const [searchQuery, setSearchQuery] = useState("");
   const [input, setInput] = useState("");

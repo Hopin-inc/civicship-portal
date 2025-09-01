@@ -27,7 +27,7 @@ import {
   GqlSortDirection,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 
 interface CreateTicketSheetProps {
   onTicketCreated?: () => Promise<void>;
@@ -40,7 +40,7 @@ export default function CreateTicketSheet({ onTicketCreated }: CreateTicketSheet
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthStore();
 
   const [issueTicket] = useTicketIssueMutation();
 

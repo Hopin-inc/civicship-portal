@@ -1,11 +1,12 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { SignUpForm } from "@/app/sign-up/components/SignUpForm";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export default function RegisterAccount() {
-  const { loading, authenticationState } = useAuth();
+  const { isAuthenticating, authenticationState } = useAuthStore();
+  const loading = isAuthenticating;
 
   if (loading) {
     return <LoadingIndicator />;

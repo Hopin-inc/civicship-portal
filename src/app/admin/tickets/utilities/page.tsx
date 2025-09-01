@@ -9,7 +9,7 @@ import {
   useGetUtilitiesQuery,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import CreateUtilitySheet from "./components/CreateUtilitySheet";
 import OpportunityListSheet from "./components/OpportunityListSheet";
 import { Coins, MessageSquareText, Tickets } from "lucide-react";
@@ -26,7 +26,7 @@ export default function UtilitiesPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthStore();
 
   const { data: utilityData, refetch: refetchUtilities } = useGetUtilitiesQuery({
     variables: {

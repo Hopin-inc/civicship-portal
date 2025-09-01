@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef } from "react";
 import { useTransactionHistory } from "@/app/wallets/[id]/hooks/useTransactionHistory";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { useHeader } from "@/components/providers/HeaderProvider";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
@@ -25,7 +25,8 @@ export default function WalletPage() {
   const params = useParams();
   const walletId = Array.isArray(params.id) ? params.id[0] : params.id;
 
-  const { user } = useAuth();
+  const { currentUser } = useAuthStore();
+  const user = currentUser;
   const { transactions, isLoading, error, refetch } = useTransactionHistory(
     user?.id ?? "",
     walletId ?? "",

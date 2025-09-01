@@ -11,11 +11,11 @@ import { ErrorState } from '@/components/shared'
 import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { SimilarOpportunities } from "@/app/opportunities/[id]/components/SimilarOpportunitiesList";
 
 export default function CompletePage() {
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthStore();
   const headerConfig: HeaderConfig = useMemo(
     () => ({
       showLogo: true,

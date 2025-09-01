@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlRole, GqlUser } from "@/types/graphql";
 import { toast } from "sonner";
@@ -26,7 +26,7 @@ import SearchForm from "@/components/shared/SearchForm";
 
 export default function MembersPage() {
   const communityId = COMMUNITY_ID;
-  const { user: currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [input, setInput] = useState("");
   const currentUserRole = currentUser?.memberships?.find(

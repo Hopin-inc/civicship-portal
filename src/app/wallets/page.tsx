@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef } from "react";
 import { useWallet } from "@/app/wallets/hooks/useWallet";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/app/wallets/components/WalletCard";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import { ErrorState } from "@/components/shared";
 import { logger } from "@/lib/logging";
 
 export default function UserWalletPage() {
-  const { user: currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   const userId = currentUser?.id;
   const searchParams = useSearchParams();
   const shouldRefresh = searchParams.get("refresh") === "true";

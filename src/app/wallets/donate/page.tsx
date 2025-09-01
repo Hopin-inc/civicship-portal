@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { GqlUser } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
@@ -17,7 +17,7 @@ import { useMemberWallets } from "@/hooks/members/useMemberWallets";
 
 export default function DonatePointPage() {
   const router = useRouter();
-  const { user: currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   const track = useAnalytics();
 
   const searchParams = useSearchParams();

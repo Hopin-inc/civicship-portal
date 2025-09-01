@@ -7,7 +7,7 @@ import {
   GqlTicketIssuerEdge,
   useGetTicketIssuersQuery,
 } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { ApolloError } from "@apollo/client";
 
 export interface UseTicketIssuersResult {
@@ -31,7 +31,8 @@ const fallbackConnection = {
 };
 
 export const useTicketIssuers = (): UseTicketIssuersResult => {
-  const { user } = useAuth();
+  const { currentUser } = useAuthStore();
+  const user = currentUser;
   
   const { data, loading, error, fetchMore, refetch } = useGetTicketIssuersQuery({
     variables: {
@@ -96,4 +97,4 @@ export const useTicketIssuers = (): UseTicketIssuersResult => {
     refetch,
     hasNextPage,
   };
-}; 
+};  

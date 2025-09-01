@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { useQuery } from "@apollo/client";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -23,7 +23,9 @@ interface RouteGuardProps {
  * 認証状態に基づいてページアクセスを制御する
  */
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
-  const { isAuthenticated, authenticationState, loading } = useAuth();
+  const { authenticationState, isAuthenticating } = useAuthStore();
+  const isAuthenticated = authenticationState === "user_registered";
+  const loading = isAuthenticating;
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
