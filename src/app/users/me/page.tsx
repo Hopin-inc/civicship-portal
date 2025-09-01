@@ -18,7 +18,7 @@ import { formatOpportunities } from "@/components/domains/opportunities/utils";
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
 
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, isAuthenticating } = useAuth();
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
     currentUser?.id,
   );
@@ -29,6 +29,16 @@ export default function MyProfilePage() {
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
+
+    // 認証中 or リダイレクト待ち → ローディング表示
+    if (isAuthenticating || !currentUser) {
+      return <LoadingIndicator />;
+    }
+  
+    // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
+    if (!currentUser || isLoading) {
+      return <LoadingIndicator />;
+    }
 
   // エラー
   if (error) {
