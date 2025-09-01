@@ -138,28 +138,33 @@ export class AuthStateManager {
     try {
       this.setState("loading");
 
-      const lineTokens = TokenManager.getLineTokens();
-      const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+      const [lineTokens, phoneTokens] = await Promise.all([
+        Promise.resolve(TokenManager.getLineTokens()),
+        Promise.resolve(TokenManager.getPhoneTokens())
+      ]);
+
+      const [isLineTokenExpired, isPhoneTokenExpired] = await Promise.all([
+        lineTokens.accessToken ? TokenManager.isLineTokenExpired() : Promise.resolve(true),
+        phoneTokens.accessToken ? TokenManager.isPhoneTokenExpired() : Promise.resolve(true)
+      ]);
+
+      const hasValidLineToken = lineTokens.accessToken && !isLineTokenExpired;
 
       if (!hasValidLineToken) {
         this.setState("unauthenticated");
         return;
       }
 
+      const hasValidPhoneToken = phoneTokens.accessToken && !isPhoneTokenExpired;
+
       const isUserRegistered = await this.checkUserRegistration();
 
       if (isUserRegistered) {
         this.setState("user_registered");
+      } else if (hasValidPhoneToken) {
+        this.setState("phone_authenticated");
       } else {
-        const phoneTokens = TokenManager.getPhoneTokens();
-        const hasValidPhoneToken =
-          phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
-
-        if (hasValidPhoneToken) {
-          this.setState("phone_authenticated");
-        } else {
-          this.setState("line_authenticated");
-        }
+        this.setState("line_authenticated");
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
