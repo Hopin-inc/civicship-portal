@@ -128,6 +128,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       state.authenticationState,
     ) || isNoAuthRequired,
     fetchPolicy: "network-only",
+    onCompleted: (data) => {
+      const endTime = performance.now();
+      logger.debug("GraphQL current user query completed", {
+        component: "AuthProvider",
+        hasUser: !!data?.currentUser?.user,
+        timestamp: new Date().toISOString(),
+      });
+    },
+    onError: (error) => {
+      const endTime = performance.now();
+      logger.error("GraphQL current user query failed", {
+        component: "AuthProvider",
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      });
+    },
   });
 
   const authStateManager = React.useMemo(() => {
@@ -440,8 +456,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
     }
     
+    logger.debug("AuthProvider rendering loading indicator", {
+      component: "AuthProvider",
+      timestamp: new Date().toISOString(),
+    });
     return <LoadingIndicator fullScreen={true} />;
   }
+
+  logger.debug("AuthProvider rendering main content", {
+    component: "AuthProvider",
+    authenticationState: state.authenticationState,
+    isAuthenticated: ["line_authenticated", "phone_authenticated", "user_registered"].includes(state.authenticationState),
+    timestamp: new Date().toISOString(),
+  });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
