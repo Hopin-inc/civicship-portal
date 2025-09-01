@@ -146,14 +146,20 @@ export class AuthStateManager {
         return;
       }
 
-      const phoneTokens = TokenManager.getPhoneTokens();
-      const hasValidPhoneToken =
-        phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
+      const isUserRegistered = await this.checkUserRegistration();
 
-      if (hasValidPhoneToken) {
-        this.setState("phone_authenticated");
+      if (isUserRegistered) {
+        this.setState("user_registered");
       } else {
-        this.setState("line_authenticated");
+        const phoneTokens = TokenManager.getPhoneTokens();
+        const hasValidPhoneToken =
+          phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
+
+        if (hasValidPhoneToken) {
+          this.setState("phone_authenticated");
+        } else {
+          this.setState("line_authenticated");
+        }
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -168,8 +174,7 @@ export class AuthStateManager {
 
   /**
    * ユーザー情報の登録状態を確認
-   * 注意: このメソッドは AuthProvider の useCurrentUserQuery との重複を避けるため、
-   * 直接的なクエリ実行は行わず、外部からの状態更新に依存します
+   * Firebase Authの状態も考慮してより確実にチェック
    */
   private async checkUserRegistration(): Promise<boolean> {
     try {
@@ -178,7 +183,29 @@ export class AuthStateManager {
         return false;
       }
 
-      return true; // Firebase ユーザーが存在する場合は認証済みとして扱う
+      let accessToken = null;
+      try {
+        accessToken = await lineAuth.currentUser.getIdToken();
+      } catch (tokenError) {
+        logger.info("Failed to get Firebase token for user registration check", {
+          error: tokenError instanceof Error ? tokenError.message : String(tokenError),
+          component: "AuthStateManager",
+        });
+        return false;
+      }
+
+      const { data } = await apolloClient.query({
+        query: GET_CURRENT_USER,
+        fetchPolicy: "network-only",
+        context: {
+          headers: {
+            Authorization: accessToken ? `Bearer ${accessToken}` : "",
+          },
+        },
+      });
+
+      const isRegistered = data?.currentUser?.user != null;
+      return isRegistered;
     } catch (error) {
       logger.info("Failed to check user registration", {
         error: error instanceof Error ? error.message : String(error),
@@ -196,7 +223,12 @@ export class AuthStateManager {
       const renewed = await TokenManager.renewLineToken();
 
       if (renewed && this.currentState === "line_token_expired") {
-        this.setState("line_authenticated");
+        const isUserRegistered = await this.checkUserRegistration();
+        if (isUserRegistered) {
+          this.setState("user_registered");
+        } else {
+          this.setState("line_authenticated");
+        }
       } else if (!renewed) {
         this.setState("unauthenticated");
       }
