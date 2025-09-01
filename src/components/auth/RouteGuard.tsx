@@ -8,7 +8,12 @@ import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
-import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
+import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent, matchPaths } from "@/utils/path";
+
+const AUTHENTICATION_FREE_PATHS = [
+  '/opportunities',
+  '/opportunities/*',
+];
 
 /**
  * ルートガードコンポーネントのプロパティ
@@ -49,9 +54,10 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       return;
     }
 
-    if (pathname.startsWith('/opportunities')) {
-      logger.debug("RouteGuard: Skipping authentication for opportunities path", {
+    if (matchPaths(pathname, ...AUTHENTICATION_FREE_PATHS)) {
+      logger.debug("RouteGuard: Skipping authentication for authentication-free path", {
         pathname,
+        matchedPaths: AUTHENTICATION_FREE_PATHS,
         component: "RouteGuard",
       });
       setAuthorized(true);
