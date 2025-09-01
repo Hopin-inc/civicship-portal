@@ -178,13 +178,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!authStateManager) return;
 
     const initializeAuth = async () => {
+      const startTime = performance.now();
+      logger.debug("Auth initialization started", {
+        component: "AuthProvider",
+        timestamp: new Date().toISOString(),
+      });
+
       try {
         await authStateManager.initialize();
+        const endTime = performance.now();
+        logger.debug("Auth initialization completed", {
+          component: "AuthProvider",
+          duration: `${(endTime - startTime).toFixed(2)}ms`,
+          timestamp: new Date().toISOString(),
+        });
+        
         setIsAuthInitialized(true);
         setAuthInitError(null);
         const currentState = authStateManager.getState();
         setState((prev) => ({ ...prev, authenticationState: currentState }));
       } catch (error) {
+        const endTime = performance.now();
+        logger.error("Auth initialization failed", {
+          component: "AuthProvider",
+          duration: `${(endTime - startTime).toFixed(2)}ms`,
+          error: error instanceof Error ? error.message : String(error),
+          timestamp: new Date().toISOString(),
+        });
         setAuthInitError(error instanceof Error ? error.message : "認証の初期化に失敗しました");
         setIsAuthInitialized(false);
       }
