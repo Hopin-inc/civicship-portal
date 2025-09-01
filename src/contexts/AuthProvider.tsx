@@ -420,22 +420,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
     }
     
-    logger.debug("[PERF] AuthProvider rendering loading indicator", {
-      component: "AuthProvider",
-      timestamp: new Date().toISOString(),
-    });
     return <LoadingIndicator fullScreen={true} />;
   }
-
-  logger.debug("[PERF] AuthProvider rendering main content", {
-    component: "AuthProvider",
-    authenticationState: state.authenticationState,
-    isAuthenticated: ["line_authenticated", "phone_authenticated", "user_registered"].includes(state.authenticationState),
-    loading: isNoAuthRequired ? false : (state.authenticationState === "loading" || userLoading || state.isAuthenticating),
-    userLoading,
-    isAuthenticating: state.isAuthenticating,
-    timestamp: new Date().toISOString(),
-  });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
