@@ -195,7 +195,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [authStateManager, isAuthInitialized, authInitError, isNoAuthRequired]);
 
-  useAuthStateChangeListener({ authStateManager, setState });
   useTokenExpirationHandler({ state, setState, logout });
   useFirebaseAuthState({ authStateManager, state, setState });
   usePhoneAuthState({ authStateManager, phoneAuthService, setState });
@@ -204,6 +203,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
   useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
   useAutoLogin({ environment, state, liffService, setState, refetchUser });
+  useAuthStateChangeListener({ authStateManager, setState });
 
   /**
    * LIFFでログイン

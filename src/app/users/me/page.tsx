@@ -19,9 +19,36 @@ export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
 
   const { user: currentUser, isAuthenticating } = useAuth();
-  const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
-    currentUser?.id,
-  );
+  // const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
+  //   currentUser?.id,
+  // );
+  
+  // モックデータ
+  const userData = {
+    profile: {
+      name: "モックユーザー",
+      image: null,
+      imagePreviewUrl: null,
+      bio: "これはモックデータです",
+      currentPrefecture: undefined,
+      urlFacebook: null,
+      urlInstagram: null,
+      urlX: null,
+    },
+    asset: {
+      points: {
+        walletId: "mock-wallet-id",
+        currentPoint: BigInt(1000),
+      },
+      tickets: [],
+    },
+    portfolios: [],
+    currentlyHiringOpportunities: [],
+  };
+  const selfOpportunities: any[] = [];
+  const isLoading = false;
+  const error = null;
+  const refetch = () => Promise.resolve();
   const { nftInstances } = useUserNfts({ userId: currentUser?.id ?? "" });
 
   const refetchRef = useRef<(() => void) | null>(null);
