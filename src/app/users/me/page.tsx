@@ -22,7 +22,6 @@ export default function MyProfilePage() {
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
     currentUser?.id,
   );
-  // NFT機能を一時的に無効化（データベースエラー回避）
   const { nftInstances } = useUserNfts({ userId: currentUser?.id ?? "" });
 
   const refetchRef = useRef<(() => void) | null>(null);
@@ -30,15 +29,15 @@ export default function MyProfilePage() {
     refetchRef.current = refetch;
   }, [refetch]);
 
-    // 認証中 or リダイレクト待ち → ローディング表示
-    if (isAuthenticating || !currentUser) {
-      return <LoadingIndicator />;
-    }
-  
-    // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
-    if (!currentUser || isLoading) {
-      return <LoadingIndicator />;
-    }
+  // 認証中 or リダイレクト待ち → ローディング表示
+  if (isAuthenticating || !currentUser) {
+    return <LoadingIndicator />;
+  }
+
+  // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
+  if (!currentUser || isLoading) {
+    return <LoadingIndicator />;
+  }
 
   // エラー
   if (error) {
