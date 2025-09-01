@@ -135,93 +135,39 @@ export class AuthStateManager {
    * 認証状態を初期化
    */
   public async initialize(): Promise<void> {
-    const startTime = performance.now();
-    logger.debug("AuthStateManager initialization started", {
-      component: "AuthStateManager",
-      timestamp: new Date().toISOString(),
-    });
 
     try {
       this.setState("loading");
 
-      const lineTokenStartTime = performance.now();
       const lineTokens = TokenManager.getLineTokens();
       const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
-      const lineTokenEndTime = performance.now();
-      
-      logger.debug("Line token validation completed", {
-        component: "AuthStateManager",
-        duration: `${(lineTokenEndTime - lineTokenStartTime).toFixed(2)}ms`,
-        hasValidToken: hasValidLineToken,
-        timestamp: new Date().toISOString(),
-      });
+
 
       if (!hasValidLineToken) {
         this.setState("unauthenticated");
-        const endTime = performance.now();
-        logger.debug("AuthStateManager initialization completed (no valid line token)", {
-          component: "AuthStateManager",
-          totalDuration: `${(endTime - startTime).toFixed(2)}ms`,
-          timestamp: new Date().toISOString(),
-        });
         return;
       }
 
-      const userRegistrationStartTime = performance.now();
       const isUserRegistered = await this.checkUserRegistration();
-      const userRegistrationEndTime = performance.now();
-      
-      logger.debug("User registration check completed", {
-        component: "AuthStateManager",
-        duration: `${(userRegistrationEndTime - userRegistrationStartTime).toFixed(2)}ms`,
-        isRegistered: isUserRegistered,
-        timestamp: new Date().toISOString(),
-      });
 
       if (isUserRegistered) {
         this.setState("user_registered");
-        const endTime = performance.now();
-        logger.debug("AuthStateManager initialization completed (user registered)", {
-          component: "AuthStateManager",
-          totalDuration: `${(endTime - startTime).toFixed(2)}ms`,
-          timestamp: new Date().toISOString(),
-        });
       } else {
-        const phoneTokenStartTime = performance.now();
         const phoneTokens = TokenManager.getPhoneTokens();
         const hasValidPhoneToken =
           phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
-        const phoneTokenEndTime = performance.now();
-        
-        logger.debug("Phone token validation completed", {
-          component: "AuthStateManager",
-          duration: `${(phoneTokenEndTime - phoneTokenStartTime).toFixed(2)}ms`,
-          hasValidToken: hasValidPhoneToken,
-          timestamp: new Date().toISOString(),
-        });
 
         if (hasValidPhoneToken) {
           this.setState("phone_authenticated");
         } else {
           this.setState("line_authenticated");
         }
-        
-        const endTime = performance.now();
-        logger.debug("AuthStateManager initialization completed (phone auth check)", {
-          component: "AuthStateManager",
-          totalDuration: `${(endTime - startTime).toFixed(2)}ms`,
-          finalState: hasValidPhoneToken ? "phone_authenticated" : "line_authenticated",
-          timestamp: new Date().toISOString(),
-        });
       }
     } catch (error) {
-      const endTime = performance.now();
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error("Auth initialization failed", {
         component: "AuthStateManager",
-        totalDuration: `${(endTime - startTime).toFixed(2)}ms`,
         error: errorMessage,
-        timestamp: new Date().toISOString(),
       });
       throw error;
     }
