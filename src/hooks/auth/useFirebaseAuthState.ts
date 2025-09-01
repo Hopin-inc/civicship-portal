@@ -28,14 +28,14 @@ export const useFirebaseAuthState = ({
 
   useEffect(() => {
     const startTime = performance.now();
-    logger.debug("Firebase auth state change listener started", {
+    logger.debug("[PERF] Firebase auth state change listener started", {
       component: "useFirebaseAuthState",
       timestamp: new Date().toISOString(),
     });
 
     const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
       const authChangeStartTime = performance.now();
-      logger.debug("Firebase auth state changed", {
+      logger.debug("[PERF] Firebase auth state changed", {
         component: "useFirebaseAuthState",
         hasUser: !!user,
         timestamp: new Date().toISOString(),
@@ -60,7 +60,7 @@ export const useFirebaseAuthState = ({
           const expirationTime = new Date(tokenResult.expirationTime).getTime();
           const tokenEndTime = performance.now();
 
-          logger.debug("Firebase token retrieval completed", {
+          logger.debug("[PERF] Firebase token retrieval completed", {
             component: "useFirebaseAuthState",
             duration: `${(tokenEndTime - tokenStartTime).toFixed(2)}ms`,
             timestamp: new Date().toISOString(),
@@ -88,7 +88,7 @@ export const useFirebaseAuthState = ({
         await currentAuthStateManager.handleLineAuthStateChange(!!user);
         const managerUpdateEndTime = performance.now();
         
-        logger.debug("AuthStateManager update completed", {
+        logger.debug("[PERF] AuthStateManager update completed", {
           component: "useFirebaseAuthState",
           duration: `${(managerUpdateEndTime - managerUpdateStartTime).toFixed(2)}ms`,
           timestamp: new Date().toISOString(),
@@ -96,7 +96,7 @@ export const useFirebaseAuthState = ({
       }
 
       const authChangeEndTime = performance.now();
-      logger.debug("Firebase auth state change processing completed", {
+      logger.debug("[PERF] Firebase auth state change processing completed", {
         component: "useFirebaseAuthState",
         duration: `${(authChangeEndTime - authChangeStartTime).toFixed(2)}ms`,
         timestamp: new Date().toISOString(),
@@ -104,7 +104,7 @@ export const useFirebaseAuthState = ({
     });
 
     const endTime = performance.now();
-    logger.debug("Firebase auth state change listener setup completed", {
+    logger.debug("[PERF] Firebase auth state change listener setup completed", {
       component: "useFirebaseAuthState",
       duration: `${(endTime - startTime).toFixed(2)}ms`,
       timestamp: new Date().toISOString(),

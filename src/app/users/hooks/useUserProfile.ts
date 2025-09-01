@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { GqlPortfolioFilterInput, GqlPortfolioSortInput, InputMaybe, useGetUserFlexibleQuery } from "@/types/graphql";
 import { presenterManagerProfile } from "@/app/users/data/presenter";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { logger } from "@/lib/logging";
 
 export const useUserProfile = (
   userId?: string,
@@ -22,7 +23,34 @@ export const useUserProfile = (
     },
     skip: !userId,
     fetchPolicy: "cache-and-network",
+    onCompleted: (data) => {
+      logger.debug("[PERF] useUserProfile query completed", {
+        component: "useUserProfile",
+        hasUser: !!data?.user,
+        hasPortfolios: !!(data?.user?.portfolios && data.user.portfolios.length > 0),
+        hasOpportunities: !!(data?.user?.opportunitiesCreatedByMe && data.user.opportunitiesCreatedByMe.length > 0),
+        timestamp: new Date().toISOString(),
+      });
+    },
+    onError: (error) => {
+      logger.error("[PERF] useUserProfile query failed", {
+        component: "useUserProfile",
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      });
+    },
   });
+
+  // クエリの開始を記録
+  useEffect(() => {
+    if (result.loading && userId) {
+      logger.debug("[PERF] useUserProfile query started", {
+        component: "useUserProfile",
+        userId,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }, [result.loading, userId]);
   
   const userData = useMemo(() => {
     const user = result.data?.user;

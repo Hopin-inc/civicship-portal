@@ -29,7 +29,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
 
     const handleLineAuthRedirect = async () => {
       const startTime = performance.now();
-      logger.debug("LINE auth redirect processing started", {
+      logger.debug("[PERF] LINE auth redirect processing started", {
         component: "useLineAuthProcessing",
         timestamp: new Date().toISOString(),
       });
@@ -42,7 +42,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         const initialized = await liffServiceRef.current.initialize();
         const initEndTime = performance.now();
         
-        logger.debug("LIFF initialization in auth processing completed", {
+        logger.debug("[PERF] LIFF initialization in auth processing completed", {
           component: "useLineAuthProcessing",
           duration: `${(initEndTime - initStartTime).toFixed(2)}ms`,
           success: initialized,
@@ -61,7 +61,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         const { isLoggedIn, profile } = liffServiceRef.current.getState();
         const stateCheckEndTime = performance.now();
         
-        logger.debug("LIFF state check completed", {
+        logger.debug("[PERF] LIFF state check completed", {
           component: "useLineAuthProcessing",
           duration: `${(stateCheckEndTime - stateCheckStartTime).toFixed(2)}ms`,
           isLoggedIn,
@@ -76,7 +76,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         const success = await liffServiceRef.current.signInWithLiffToken();
         const signInEndTime = performance.now();
         
-        logger.debug("LIFF sign in with token completed", {
+        logger.debug("[PERF] LIFF sign in with token completed", {
           component: "useLineAuthProcessing",
           duration: `${(signInEndTime - signInStartTime).toFixed(2)}ms`,
           success,
@@ -95,14 +95,14 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         await refetchUserRef.current();
         const refetchEndTime = performance.now();
         
-        logger.debug("User refetch completed", {
+        logger.debug("[PERF] User refetch completed", {
           component: "useLineAuthProcessing",
           duration: `${(refetchEndTime - refetchStartTime).toFixed(2)}ms`,
           timestamp: new Date().toISOString(),
         });
 
         const endTime = performance.now();
-        logger.debug("LINE auth redirect processing completed successfully", {
+        logger.debug("[PERF] LINE auth redirect processing completed successfully", {
           component: "useLineAuthProcessing",
           totalDuration: `${(endTime - startTime).toFixed(2)}ms`,
           timestamp: new Date().toISOString(),

@@ -14,9 +14,11 @@ import { NftCard } from "@/components/domains/nfts/components";
 import { CardCarousel } from "@/components/shared/CardCarousel";
 import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
+import { logger } from "@/lib/logging";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
+  const renderStartTime = useRef<number>(performance.now());
 
   const { user: currentUser, isAuthenticating } = useAuth();
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
@@ -29,23 +31,61 @@ export default function MyProfilePage() {
     refetchRef.current = refetch;
   }, [refetch]);
 
+  // ページレンダリングの開始を記録
+  useEffect(() => {
+    logger.debug("[PERF] /users/me page render started", {
+      component: "MyProfilePage",
+      hasCurrentUser: !!currentUser,
+      isAuthenticating,
+      isLoading,
+      hasError: !!error,
+      timestamp: new Date().toISOString(),
+    });
+  }, []);
+
   // 認証中 or リダイレクト待ち → ローディング表示
   if (isAuthenticating || !currentUser) {
+    const endTime = performance.now();
+    logger.debug("[PERF] /users/me page rendering loading (auth)", {
+      component: "MyProfilePage",
+      duration: `${(endTime - renderStartTime.current).toFixed(2)}ms`,
+      reason: isAuthenticating ? "authenticating" : "no_current_user",
+      timestamp: new Date().toISOString(),
+    });
     return <LoadingIndicator />;
   }
 
   // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
   if (!currentUser || isLoading) {
+    const endTime = performance.now();
+    logger.debug("[PERF] /users/me page rendering loading (data)", {
+      component: "MyProfilePage",
+      duration: `${(endTime - renderStartTime.current).toFixed(2)}ms`,
+      reason: !currentUser ? "no_current_user" : "is_loading",
+      timestamp: new Date().toISOString(),
+    });
     return <LoadingIndicator />;
   }
 
   // エラー
   if (error) {
+    const endTime = performance.now();
+    logger.debug("[PERF] /users/me page rendering error", {
+      component: "MyProfilePage",
+      duration: `${(endTime - renderStartTime.current).toFixed(2)}ms`,
+      timestamp: new Date().toISOString(),
+    });
     return <ErrorState title={"マイページを読み込めませんでした"} refetchRef={refetchRef} />;
   }
 
   // データがない → notFound()
   if (!userData) {
+    const endTime = performance.now();
+    logger.debug("[PERF] /users/me page not found", {
+      component: "MyProfilePage",
+      duration: `${(endTime - renderStartTime.current).toFixed(2)}ms`,
+      timestamp: new Date().toISOString(),
+    });
     return notFound();
   }
 
@@ -55,6 +95,19 @@ export default function MyProfilePage() {
   );
 
   const formattedOpportunities = selfOpportunities.map(formatOpportunities);
+
+  // メインコンテンツのレンダリング完了を記録
+  useEffect(() => {
+    const endTime = performance.now();
+    logger.debug("[PERF] /users/me page main content rendered", {
+      component: "MyProfilePage",
+      duration: `${(endTime - renderStartTime.current).toFixed(2)}ms`,
+      hasUserData: !!userData,
+      hasNfts: !!(nftInstances && nftInstances.length > 0),
+      hasOpportunities: formattedOpportunities.length > 0,
+      timestamp: new Date().toISOString(),
+    });
+  }, [userData, nftInstances, formattedOpportunities]);
 
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">
