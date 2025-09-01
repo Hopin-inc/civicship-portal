@@ -25,7 +25,7 @@ export default function LoginPage() {
 
   const headerConfig = useMemo(
     () => ({
-      title: "ログインです",
+      title: "ログイン",
       showBackButton: false,
       showLogo: false,
     }),

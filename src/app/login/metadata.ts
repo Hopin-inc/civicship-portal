@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { DEFAULT_OPEN_GRAPH_IMAGE, currentCommunityConfig } from "@/lib/communities/metadata";
 
 export const metadata: Metadata = {
-  title: `${currentCommunityConfig.title} - ログインです`,
+  title: `${currentCommunityConfig.title} - ログイン`,
   description: "ログインして、あなただけの" + currentCommunityConfig.title + "を。",
   openGraph: {
     title: `${currentCommunityConfig.title} - ログイン`,
