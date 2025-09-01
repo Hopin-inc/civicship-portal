@@ -71,10 +71,21 @@ const useAutoLogin = ({
           const timestamp = new Date().toISOString();
 
           setState((prev) => ({ ...prev, isAuthenticating: true }));
+          
           try {
             const success = await liffService.signInWithLiffToken();
+            
             if (success) {
-              await refetchUser();
+              Promise.resolve().then(async () => {
+                try {
+                  await refetchUser();
+                } catch (error) {
+                  logger.info("Deferred auto-login refetch failed", {
+                    error: error instanceof Error ? error.message : String(error),
+                    component: "useAutoLogin"
+                  });
+                }
+              });
             }
           } catch (error) {
             logger.info("Auto-login with LIFF failed", {

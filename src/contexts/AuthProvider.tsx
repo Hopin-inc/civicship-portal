@@ -201,9 +201,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useUserRegistrationState({ authStateManager, userData, setState });
   useLiffInitialization({ environment, liffService });
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
+  useAuthStateChangeListener({ authStateManager, setState });
+  
   useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
   useAutoLogin({ environment, state, liffService, setState, refetchUser });
-  useAuthStateChangeListener({ authStateManager, setState });
 
   /**
    * LIFFでログイン
@@ -406,7 +407,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: isNoAuthRequired ? false : (state.authenticationState === "loading" || userLoading || state.isAuthenticating),
+    loading: isNoAuthRequired ? false : (
+      state.authenticationState === "loading" || 
+      userLoading || 
+      (state.isAuthenticating && !["line_authenticated", "phone_authenticated", "user_registered"].includes(state.authenticationState))
+    ),
   };
 
   if (!isAuthInitialized) {

@@ -29,6 +29,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
 
     const handleLineAuthRedirect = async () => {
       processedRef.current = true;
+      
       setStateRef.current((prev) => ({ ...prev, isAuthenticating: true }));
 
       try {
@@ -48,10 +49,8 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
           return;
         }
 
-        // LIFFサインインとユーザーリフェッチを並列実行
         const signInPromise = liffServiceRef.current.signInWithLiffToken();
         
-        // サインインが完了したらユーザーリフェッチを開始
         const success = await signInPromise;
 
         if (!success) {
@@ -62,7 +61,17 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
           return;
         }
 
-        await refetchUserRef.current();
+        Promise.resolve().then(async () => {
+          try {
+            await refetchUserRef.current();
+          } catch (error) {
+            logger.info("Deferred user refetch failed", {
+              error: error instanceof Error ? error.message : String(error),
+              component: "useLineAuthProcessing"
+            });
+          }
+        });
+        
       } catch (err) {
         logger.info("Error during LINE auth", {
           authType: "liff",
