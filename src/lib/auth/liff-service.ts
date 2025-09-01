@@ -82,7 +82,11 @@ export class LiffService {
         return true;
       }
       if (this.initializing) {
-        return true;
+        // 初期化中の場合は完了を待つ
+        while (this.initializing) {
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        return this.state.isInitialized;
       }
       this.initializing = true;
 

@@ -72,8 +72,12 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
           return;
         }
 
+        // LIFFサインインとユーザーリフェッチを並列実行
         const signInStartTime = performance.now();
-        const success = await liffServiceRef.current.signInWithLiffToken();
+        const signInPromise = liffServiceRef.current.signInWithLiffToken();
+        
+        // サインインが完了したらユーザーリフェッチを開始
+        const success = await signInPromise;
         const signInEndTime = performance.now();
         
         logger.debug("[PERF] LIFF sign in with token completed", {
