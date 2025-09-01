@@ -18,7 +18,7 @@ import { formatOpportunities } from "@/components/domains/opportunities/utils";
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
 
-  const { user: currentUser, isAuthenticating } = useAuth();
+  const { user: currentUser, isAuthenticating, authenticationState, isLiffInitialized } = useAuth();
   // const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
   //   currentUser?.id,
   // );
@@ -58,7 +58,10 @@ export default function MyProfilePage() {
 
   // 認証中 or リダイレクト待ち → ローディング表示
   if (isAuthenticating || !currentUser) {
-    return <LoadingIndicator />;
+    return <LoadingIndicator 
+      authenticationState={authenticationState}
+      isLiffInitialized={isLiffInitialized}
+    />;
   }
 
   // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
