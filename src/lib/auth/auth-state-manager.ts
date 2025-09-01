@@ -165,7 +165,7 @@ export class AuthStateManager {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error("Auth initialization failed", {
         error: errorMessage,
-        component: "AuthStateManager",
+        component: "AuthStateManager"
       });
       throw error;
     }
