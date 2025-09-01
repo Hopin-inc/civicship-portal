@@ -135,13 +135,11 @@ export class AuthStateManager {
    * 認証状態を初期化
    */
   public async initialize(): Promise<void> {
-
     try {
       this.setState("loading");
 
       const lineTokens = TokenManager.getLineTokens();
       const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
-
 
       if (!hasValidLineToken) {
         this.setState("unauthenticated");
@@ -166,8 +164,8 @@ export class AuthStateManager {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error("Auth initialization failed", {
-        component: "AuthStateManager",
         error: errorMessage,
+        component: "AuthStateManager",
       });
       throw error;
     }
@@ -189,6 +187,10 @@ export class AuthStateManager {
       try {
         accessToken = await lineAuth.currentUser.getIdToken();
       } catch (tokenError) {
+        logger.info("Failed to get Firebase token for user registration check", {
+          error: tokenError instanceof Error ? tokenError.message : String(tokenError),
+          component: "AuthStateManager",
+        });
         return false;
       }
 
@@ -203,15 +205,11 @@ export class AuthStateManager {
       });
 
       const isRegistered = data?.currentUser?.user != null;
-      logger.debug("User registration check completed", {
-        component: "AuthStateManager",
-        isRegistered,
-      });
       return isRegistered;
     } catch (error) {
       logger.info("Failed to check user registration", {
         error: error instanceof Error ? error.message : String(error),
-        component: "AuthStateManager"
+        component: "AuthStateManager",
       });
       return false;
     }
