@@ -73,14 +73,10 @@ const useAutoLogin = ({
           setState((prev) => ({ ...prev, isAuthenticating: true }));
           
           try {
-            const signInPromise = liffService.signInWithLiffToken();
-            
-            setState((prev) => ({ ...prev, isAuthenticating: false }));
-            
-            const success = await signInPromise;
+            const success = await liffService.signInWithLiffToken();
             
             if (success) {
-              setTimeout(async () => {
+              Promise.resolve().then(async () => {
                 try {
                   await refetchUser();
                 } catch (error) {
@@ -89,7 +85,7 @@ const useAutoLogin = ({
                     component: "useAutoLogin"
                   });
                 }
-              }, 100);
+              });
             }
           } catch (error) {
             logger.info("Auto-login with LIFF failed", {
@@ -97,6 +93,7 @@ const useAutoLogin = ({
               error: error instanceof Error ? error.message : String(error),
               component: "useAutoLogin",
             });
+          } finally {
             setState((prev) => ({ ...prev, isAuthenticating: false }));
           }
         };

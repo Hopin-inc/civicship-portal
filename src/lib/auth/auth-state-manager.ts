@@ -139,8 +139,8 @@ export class AuthStateManager {
       this.setState("loading");
 
       const [lineTokens, phoneTokens] = await Promise.all([
-        Promise.resolve(TokenManager.getLineTokens()),
-        Promise.resolve(TokenManager.getPhoneTokens())
+        TokenManager.getLineTokens(),
+        TokenManager.getPhoneTokens()
       ]);
 
       const [isLineTokenExpired, isPhoneTokenExpired] = await Promise.all([

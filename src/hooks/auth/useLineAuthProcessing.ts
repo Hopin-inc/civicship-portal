@@ -33,10 +33,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
       setStateRef.current((prev) => ({ ...prev, isAuthenticating: true }));
 
       try {
-        const [initialized] = await Promise.all([
-          liffServiceRef.current.initialize(),
-          new Promise(resolve => setTimeout(resolve, 0))
-        ]);
+        const initialized = await liffServiceRef.current.initialize();
 
         if (!initialized) {
           logger.info("LIFF init failed", {
@@ -64,7 +61,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
           return;
         }
 
-        setTimeout(async () => {
+        Promise.resolve().then(async () => {
           try {
             await refetchUserRef.current();
           } catch (error) {
@@ -73,7 +70,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
               component: "useLineAuthProcessing"
             });
           }
-        }, 0);
+        });
         
       } catch (err) {
         logger.info("Error during LINE auth", {
