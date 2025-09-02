@@ -54,16 +54,10 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
   const getProgressSteps = (): ProgressStep[] => {
     return [
       {
-        id: "liff-init",
-        label: "LIFF初期化中...",
-        isCompleted: isLiffInitialized || false,
-        isActive: !(isLiffInitialized || false) && (authenticationState === "loading" || authenticationState === undefined)
-      },
-      {
-        id: "firebase-auth",
-        label: "Firebase認証中...",
+        id: "user-auth",
+        label: "ユーザー認証中...",
         isCompleted: authenticationState ? ["line_authenticated", "phone_authenticated", "user_registered"].includes(authenticationState) : false,
-        isActive: (isLiffInitialized || false) && (authenticationState === "loading" || authenticationState === undefined)
+        isActive: (authenticationState === "loading" || authenticationState === undefined)
       },
       {
         id: "user-info",
