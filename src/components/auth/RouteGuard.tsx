@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useQuery } from "@apollo/client";
@@ -23,6 +23,22 @@ interface RouteGuardProps {
  * 認証状態に基づいてページアクセスを制御する
  */
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
+  const pathname = usePathname();
+  
+  // 認証が不要なページかどうかを判定
+  const isNoAuthRequired = useMemo(() => isNoAuthPath(pathname), [pathname]);
+
+  // 認証が不要なページの場合は、認証関連のフックを一切実行せずに直接描画
+  if (isNoAuthRequired) {
+    return <>{ children }</>;
+  }
+
+  // 認証が必要なページの場合のみ、認証処理を実行
+  return <AuthenticatedRouteGuard>{children}</AuthenticatedRouteGuard>;
+};
+
+// 認証が必要なページ用のガードコンポーネント
+const AuthenticatedRouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, authenticationState, loading, isLiffInitialized } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -35,9 +51,6 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     skip: !isAuthenticated,
   });
 
-  // 認証が不要なページかどうかを判定
-  const isNoAuthRequired = isNoAuthPath(pathname);
-
   const authRedirectService = React.useMemo(() => {
     return AuthRedirectService.getInstance();
   }, []);
@@ -49,12 +62,6 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, [loading]);
 
   useEffect(() => {
-    // 認証が不要なページの場合は、ローディングを待たずに先に描画を開始
-    if (isNoAuthRequired) {
-      setAuthorized(true);
-      return;
-    }
-
     if (loading || userLoading || isInitialRender) {
       return;
     }
@@ -84,18 +91,15 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     authCheck();
     return () => {
     };
-  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams, isInitialRender, isNoAuthRequired]);
-
-  // 認証が不要なページの場合は、ローディングを待たずに先に描画を開始
-  if (isNoAuthRequired) {
-    return <>{ children }</>;
-  }
+  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams, isInitialRender]);
 
   if (loading || userLoading || isInitialRender) {
-    return <LoadingIndicator 
-      authenticationState={authenticationState}
-      isLiffInitialized={isLiffInitialized}
-    />;
+    return (
+      <LoadingIndicator 
+        authenticationState={authenticationState}
+        isLiffInitialized={isLiffInitialized}
+      />
+    );
   }
 
   return authorized ? <>{ children }</> : null;

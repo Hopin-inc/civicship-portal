@@ -417,6 +417,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   if (!isAuthInitialized) {
+    // noAuthPathsの場合は、ローディング画面を表示せずに直接childrenを描画
+    if (isNoAuthRequired) {
+      return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    }
+
     if (authInitError) {
       const refetchRef = { 
         current: () => {
