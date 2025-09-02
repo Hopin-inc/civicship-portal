@@ -204,8 +204,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
   useAuthStateChangeListener({ authStateManager, setState });
   
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
-  useAutoLogin({ environment, state, liffService, setState, refetchUser });
+  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser, isNoAuthRequired });
+  useAutoLogin({ environment, state, liffService, setState, refetchUser, isNoAuthRequired });
 
   /**
    * LIFFでログイン
