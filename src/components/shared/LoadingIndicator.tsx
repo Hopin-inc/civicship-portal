@@ -55,13 +55,13 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     return [
       {
         id: "user-auth",
-        label: "ユーザー認証中...",
+        label: "ご本人を確認しています",
         isCompleted: authenticationState ? ["line_authenticated", "phone_authenticated", "user_registered"].includes(authenticationState) : false,
         isActive: (authenticationState === "loading" || authenticationState === undefined)
       },
       {
         id: "user-info",
-        label: "ユーザー情報取得中...",
+        label: "アカウントを準備しています",
         isCompleted: authenticationState === "user_registered",
         isActive: authenticationState === "line_authenticated" || authenticationState === "phone_authenticated"
       }
@@ -114,7 +114,7 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
 
       <div className="flex items-center space-x-3">
         <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
-        <span className="text-lg font-medium text-gray-700">認証中...</span>
+        <span className="text-lg font-medium text-gray-700">ログイン処理中</span>
       </div>
 
       <div className="w-full max-w-sm space-y-1">
