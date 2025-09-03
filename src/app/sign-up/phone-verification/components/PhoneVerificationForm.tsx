@@ -48,6 +48,7 @@ export function PhoneVerificationForm() {
   const [isCodeVerifying, setIsCodeVerifying] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [isResendDisabled, setIsResendDisabled] = useState(false);
+  const [countdown, setCountdown] = useState(60);
   // ==================================
 
   const formattedPhone = formatPhoneNumber(phoneNumber);
@@ -62,14 +63,25 @@ export function PhoneVerificationForm() {
 
   // 再送信タイマーの制御
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    let interval: NodeJS.Timeout;
+    
     if (isResendDisabled) {
-      timeout = setTimeout(() => {
-        setIsResendDisabled(false);
-      }, 60 * 1000);
+      setCountdown(60);
+      
+      // カウントダウンを1秒ごとに更新
+      interval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            setIsResendDisabled(false);
+            return 60;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
+    
     return () => {
-      if (timeout) clearTimeout(timeout);
+      if (interval) clearInterval(interval);
     };
   }, [isResendDisabled]);
 
@@ -176,7 +188,7 @@ export function PhoneVerificationForm() {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
-      
+
       if (verificationId) {
         toast.success("認証コードを再送信しました");
         startResendTimer(); // 60秒タイマーを再開始
@@ -382,7 +394,7 @@ export function PhoneVerificationForm() {
               onClick={handleResendCode}
             >
               {isResendDisabled 
-                ? "60秒後に再送信できます" 
+                ? `${countdown}秒後に再送信できます` 
                 : isPhoneSubmitting 
                   ? "送信中..." 
                   : "コードを再送信"}
@@ -391,15 +403,35 @@ export function PhoneVerificationForm() {
               type="button"
               variant={"text"}
               disabled={isReloading}
-              onClick={() => {
-                phoneAuth.clearRecaptcha?.();
-                setIsReloading(true);
-                setStep("phone");
-                setTimeout(() => {
-                  window.location.reload();
-                }, 300);
-                setPhoneNumber("");
-                setVerificationCode("");
+              onClick={async () => {
+                try {
+                  if (phoneAuth.clearRecaptcha) {
+                    await phoneAuth.clearRecaptcha();
+                  }
+                  const recaptchaContainer = document.getElementById("recaptcha-container");
+                  if (recaptchaContainer) {
+                    const parent = recaptchaContainer.parentNode;
+                    if (parent) {
+                      parent.removeChild(recaptchaContainer);
+                      const newContainer = document.createElement("div");
+                      newContainer.id = "recaptcha-container";
+                      parent.appendChild(newContainer);
+                    }
+                  }
+                  
+                  setPhoneNumber("");
+                  setVerificationCode("");
+                  setStep("phone");
+                  
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 1000);
+                } catch (error) {
+                  toast.error("リロードに失敗しました");
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 1000);
+                }
               }}
             >
               電話番号を再入力
