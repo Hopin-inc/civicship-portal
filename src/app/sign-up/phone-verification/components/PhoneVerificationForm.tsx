@@ -134,57 +134,12 @@ export function PhoneVerificationForm() {
       return;
     }
     
-    // reCAPTCHAコンテナの存在確認
-    const recaptchaContainer = document.getElementById("recaptcha-container");
-    if (!recaptchaContainer) {
-      toast.error("認証システムの準備ができていません。ページを再読み込みしてください。");
-      return;
-    }
-    
-    // デバッグ用: 電話番号の状態を確認
-    console.log("再送信時の電話番号:", phoneNumber);
-    console.log("再送信時のフォーマット済み電話番号:", formattedPhone);
-    console.log("reCAPTCHAコンテナ:", recaptchaContainer);
-    
     setIsSubmitting(true);
     
     try {
-      // reCAPTCHAをクリアしてから再送信
+      // reCAPTCHAをクリアし、再描画を待ってから再送信します。
+      // 関連ロジックはphoneAuthServiceに集約されています。
       phoneAuth.clearRecaptcha?.();
-      
-      // reCAPTCHAコンテナを完全に再作成
-      const recaptchaContainer = document.getElementById("recaptcha-container");
-      if (recaptchaContainer) {
-        // 既存のコンテナを削除
-        const parent = recaptchaContainer.parentNode;
-        if (parent) {
-          parent.removeChild(recaptchaContainer);
-          
-          // 新しいコンテナを作成（タイムスタンプ付きのID）
-          const newContainer = document.createElement("div");
-          const timestamp = Date.now();
-          newContainer.id = `recaptcha-container-${timestamp}`;
-          newContainer.style.display = "none"; // 非表示で配置
-          parent.appendChild(newContainer);
-          
-          // 元のIDに戻す
-          setTimeout(() => {
-            newContainer.id = "recaptcha-container";
-          }, 100);
-        }
-      }
-      
-      // グローバルreCAPTCHA状態もリセット
-      if (typeof window !== 'undefined' && (window as any).grecaptcha) {
-        try {
-          // すべてのreCAPTCHAインスタンスをリセット
-          (window as any).grecaptcha.reset();
-        } catch (e) {
-          console.log("reCAPTCHA reset (expected):", e instanceof Error ? e.message : String(e));
-        }
-      }
-      
-      // 少し待ってから再送信
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
@@ -262,7 +217,6 @@ export function PhoneVerificationForm() {
       }
     } catch (error) {
       toast.error("電話番号からやり直して下さい");
-      console.log(error);
       setIsCodeVerifying(false);
     }
   };
@@ -351,93 +305,87 @@ export function PhoneVerificationForm() {
         </>
       )}
       {step === "code" && (
-        <div id="recaptcha-container" ref={recaptchaContainerRef} style={{ display: 'none' }}></div>
-      )}
-      {step === "code" && (
-        <form onSubmit={handleCodeSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="code" className="text-sm font-medium">
-              認証コード
-            </label>
-            <div className="flex justify-center py-4">
-              <InputOTP maxLength={6} value={verificationCode} onChange={handleOTPChange}>
-                <InputOTPGroup>
-                  {Array.from({ length: 6 }).map((_, index) => (
-                    <InputOTPSlot key={index} index={index} />
-                  ))}
-                </InputOTPGroup>
-              </InputOTP>
+        <>
+          <div id="recaptcha-container" ref={recaptchaContainerRef} style={{ display: 'none' }}></div>
+          <form onSubmit={handleCodeSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="code" className="text-sm font-medium">
+                認証コード
+              </label>
+              <div className="flex justify-center py-4">
+                <InputOTP maxLength={6} value={verificationCode} onChange={handleOTPChange}>
+                  <InputOTPGroup>
+                    {Array.from({ length: 6 }).map((_, index) => (
+                      <InputOTPSlot key={index} index={index} />
+                    ))}
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
             </div>
-          </div>
-          <div className="flex flex-col items-center gap-8 w-full mx-auto">
-            <Button
-              type="submit"
-              className="w-full h-12"
-              disabled={
-                isCodeVerifying ||
-                phoneAuth.isVerifying ||
-                verificationCode.length < 6 ||
-                isReloading
-              }
-            >
-              {isCodeVerifying ? "検証中..." : "コードを検証"}
-            </Button>
-            <Button
-              type="button"
-              variant="tertiary"
-              className="w-full h-12"
-              disabled={
-                isResendDisabled ||
-                isPhoneSubmitting ||
-                isReloading
-              }
-              onClick={handleResendCode}
-            >
-              {isResendDisabled 
-                ? `${countdown}秒後に再送信できます` 
-                : isPhoneSubmitting 
-                  ? "送信中..." 
-                  : "コードを再送信"}
-            </Button>
-            <Button
-              type="button"
-              variant={"text"}
-              disabled={isReloading}
-              onClick={async () => {
-                try {
-                  if (phoneAuth.clearRecaptcha) {
-                    await phoneAuth.clearRecaptcha();
-                  }
-                  const recaptchaContainer = document.getElementById("recaptcha-container");
-                  if (recaptchaContainer) {
-                    const parent = recaptchaContainer.parentNode;
-                    if (parent) {
-                      parent.removeChild(recaptchaContainer);
-                      const newContainer = document.createElement("div");
-                      newContainer.id = "recaptcha-container";
-                      parent.appendChild(newContainer);
-                    }
-                  }
-                  
-                  setPhoneNumber("");
-                  setVerificationCode("");
-                  setStep("phone");
-                  
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 1000);
-                } catch (error) {
-                  toast.error("リロードに失敗しました");
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 1000);
+            <div className="flex flex-col items-center gap-8 w-full mx-auto">
+              <Button
+                type="submit"
+                className="w-full h-12"
+                disabled={
+                  isCodeVerifying ||
+                  phoneAuth.isVerifying ||
+                  verificationCode.length < 6 ||
+                  isReloading
                 }
-              }}
-            >
-              電話番号を再入力
-            </Button>
-          </div>
-        </form>
+              >
+                {isCodeVerifying ? "検証中..." : "コードを検証"}
+              </Button>
+              <Button
+                type="button"
+                variant="tertiary"
+                className="w-full h-12"
+                disabled={
+                  isResendDisabled ||
+                  isPhoneSubmitting ||
+                  isReloading
+                }
+                onClick={handleResendCode}
+              >
+                {isResendDisabled 
+                  ? `${countdown}秒後に再送信できます` 
+                  : isPhoneSubmitting 
+                    ? "送信中..." 
+                    : "コードを再送信"}
+              </Button>
+              <Button
+                type="button"
+                variant={"text"}
+                disabled={isReloading}
+                onClick={async () => {
+                  try {
+                    // reCAPTCHAをクリア
+                    if (phoneAuth.clearRecaptcha) {
+                      await phoneAuth.clearRecaptcha();
+                    }
+                    
+                    // 状態をリセット
+                    setPhoneNumber("");
+                    setVerificationCode("");
+                    setStep("phone");
+                    
+                    // 少し待ってからページをリロード
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 1000);
+                  } catch (error) {
+                    console.error("reCAPTCHAクリアエラー:", error);
+                    // エラーが発生してもページをリロード
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 1000);
+                  }
+                }}
+              >
+                電話番号を再入力
+              </Button>
+            </div>
+          </form>
+        </>
       )}
     </div>
   );
