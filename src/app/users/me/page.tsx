@@ -30,10 +30,17 @@ export default function MyProfilePage() {
   }, [refetch]);
 
   if (isAuthenticating || !currentUser || isLoading) {
-    return <LoadingIndicator 
-      authenticationState={authenticationState}
-      isLiffInitialized={isLiffInitialized}
-    />;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-full max-w-4xl">
+          <LoadingIndicator 
+            authenticationState={authenticationState}
+            isLiffInitialized={isLiffInitialized}
+            fullScreen={false}
+          />
+        </div>
+      </div>
+    );
   }
 
   // エラー
