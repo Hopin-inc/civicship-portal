@@ -75,39 +75,25 @@ export class PhoneAuthService {
     try {
       // reCAPTCHA Verifierをクリア
       if (this.recaptchaVerifier) {
-        try {
-          this.recaptchaVerifier.clear();
-        } catch (e) {
-          // clear()でエラーが発生しても続行
-          logger.info("reCAPTCHA verifier clear error (expected)", {
-            authType: "phone",
-            error: e instanceof Error ? e.message : String(e),
-            component: "PhoneAuthService",
-          });
-        }
+        this.recaptchaVerifier.clear();
         this.recaptchaVerifier = null;
       }
       
-      // コンテナ要素を完全に削除して再作成
-      const recaptchaContainer = document.getElementById("recaptcha-container");
-      if (recaptchaContainer) {
-        const parent = recaptchaContainer.parentNode;
-        if (parent) {
-          // 既存のコンテナを削除
-          parent.removeChild(recaptchaContainer);
-          
-          // 新しいコンテナを作成
-          const newContainer = document.createElement("div");
-          newContainer.id = "recaptcha-container";
-          newContainer.style.display = "none"; // 非表示で配置
-          parent.appendChild(newContainer);
+      // コンテナ要素をクリア
+      if (this.recaptchaContainerElement) {
+        // 既存のreCAPTCHA要素を削除
+        const existingRecaptcha = this.recaptchaContainerElement.querySelector('.grecaptcha-badge');
+        if (existingRecaptcha) {
+          existingRecaptcha.remove();
         }
+        
+        // コンテナを空にする
+        this.recaptchaContainerElement.innerHTML = "";
       }
       
       // グローバルreCAPTCHA状態もリセット
       if (typeof window !== 'undefined' && (window as any).grecaptcha) {
         try {
-          // すべてのreCAPTCHAインスタンスをリセット
           (window as any).grecaptcha.reset();
         } catch (e) {
           // このエラーは予想されるので無視
