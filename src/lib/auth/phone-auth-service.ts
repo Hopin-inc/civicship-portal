@@ -140,26 +140,11 @@ export class PhoneAuthService {
       this.state.isVerifying = true;
       this.state.error = null;
 
-      // 前回のVerifierを明示的にクリア
+      // 前回のVerifierを明示的にクリア（DOM操作しない）
       this.clearRecaptcha();
 
       // Googleの内部非同期処理との競合を避けるため少し待つ
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // reCAPTCHAスクリプトの読み込み完了を待つ
-      let retryCount = 0;
-      const maxRetries = 10;
-      while (retryCount < maxRetries) {
-        if (typeof window !== 'undefined' && (window as any).grecaptcha) {
-          break;
-        }
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        retryCount++;
-      }
-
-      if (retryCount >= maxRetries) {
-        throw new Error("reCAPTCHA script not loaded");
-      }
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       this.recaptchaContainerElement = document.getElementById("recaptcha-container");
       if (!this.recaptchaContainerElement) {
