@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { AuthenticationState } from "@/lib/auth/auth-state-manager";
 
 interface LoadingIndicatorProps {
@@ -41,29 +41,58 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     return <div>{SimpleSpinner}</div>;
   }
 
-  const getProgressPercentage = (): number => {
-    if (!authenticationState) return 0;
+  const [animatedProgress, setAnimatedProgress] = useState(20);
+
+  const getTargetPercentage = (): number => {
+    if (!authenticationState) return 20;
     
     switch (authenticationState) {
       case "loading":
-        return 20;
+        return 80; // 80%までアニメーション
       case "line_authenticated":
       case "phone_authenticated":
-        return 80;
+        return 80; // 80%で待機
       case "user_registered":
-        return 100;
+        return 100; // 認証完了で100%
       default:
-        return 0;
+        return 20;
     }
   };
 
-  const progressPercentage = getProgressPercentage();
+  const targetPercentage = getTargetPercentage();
+
+  // 進捗アニメーション
+  useEffect(() => {
+    const duration = 2000; // 2秒でアニメーション
+    const startTime = Date.now();
+    const startProgress = animatedProgress;
+    const targetProgress = targetPercentage;
+
+    if (startProgress === targetProgress) return;
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // イージング関数（ease-out）
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const currentProgress = startProgress + (targetProgress - startProgress) * easeOut;
+      
+      setAnimatedProgress(Math.round(currentProgress));
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [targetPercentage, animatedProgress]);
 
   const ProgressBar: React.FC<{ percentage: number }> = ({ percentage }) => (
     <div className="w-full max-w-md">
       <div className="w-full bg-gray-200 rounded-full h-2">
         <div 
-          className="bg-blue-300 h-2 rounded-full transition-all duration-500 ease-out"
+          className="bg-blue-300 h-2 rounded-full transition-all duration-300 ease-out"
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -79,7 +108,7 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
       <div className="flex justify-center items-center">
         <div className="animate-spin h-8 w-8 bg-blue-300 rounded-xl"></div>
       </div>
-      <ProgressBar percentage={progressPercentage} />
+      <ProgressBar percentage={animatedProgress} />
     </div>
   );
 
