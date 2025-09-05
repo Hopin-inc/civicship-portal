@@ -71,18 +71,40 @@ export class PhoneAuthService {
   /**
    * reCAPTCHAをクリア
    */
-  /**
-   * reCAPTCHAをクリア
-   */
   public clearRecaptcha(): void {
     try {
+      // reCAPTCHA Verifierをクリア
       if (this.recaptchaVerifier) {
         this.recaptchaVerifier.clear();
         this.recaptchaVerifier = null;
       }
+      
+      // コンテナ要素をクリア
       if (this.recaptchaContainerElement) {
+        // 既存のreCAPTCHA要素を削除
+        const existingRecaptcha = this.recaptchaContainerElement.querySelector('.grecaptcha-badge');
+        if (existingRecaptcha) {
+          existingRecaptcha.remove();
+        }
+        
+        // コンテナを空にする
         this.recaptchaContainerElement.innerHTML = "";
       }
+      
+      // グローバルreCAPTCHA状態もリセット
+      if (typeof window !== 'undefined' && (window as any).grecaptcha) {
+        try {
+          (window as any).grecaptcha.reset();
+        } catch (e) {
+          // このエラーは予想されるので無視
+          logger.info("reCAPTCHA reset (expected)", {
+            authType: "phone",
+            error: e instanceof Error ? e.message : String(e),
+            component: "PhoneAuthService",
+          });
+        }
+      }
+      
       this.recaptchaContainerElement = null;
       this.isRecaptchaRendered = false;
     } catch (e) {

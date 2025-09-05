@@ -47,6 +47,8 @@ export function PhoneVerificationForm() {
   const [isPhoneSubmitting, setIsSubmitting] = useState(false);
   const [isCodeVerifying, setIsCodeVerifying] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
+  const [isResendDisabled, setIsResendDisabled] = useState(false);
+  const [countdown, setCountdown] = useState(60);
   // ==================================
 
   const formattedPhone = formatPhoneNumber(phoneNumber);
@@ -58,6 +60,34 @@ export function PhoneVerificationForm() {
       setIsRecaptchaReady(true);
     }
   }, []);
+
+  // 再送信タイマーの制御
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (isResendDisabled) {
+      setCountdown(60);
+      
+      // カウントダウンを1秒ごとに更新
+      interval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            setIsResendDisabled(false);
+            return 60;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isResendDisabled]);
+
+  const startResendTimer = () => {
+    setIsResendDisabled(true);
+  };
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +105,7 @@ export function PhoneVerificationForm() {
 
       if (verificationId) {
         setStep("code");
+        startResendTimer(); // 60秒タイマーを開始
       }
     } catch (error) {
       const categorized = categorizeFirebaseError(error);
@@ -83,6 +114,48 @@ export function PhoneVerificationForm() {
       if (categorized.type === "rate-limit") {
         setIsRateLimited(true);
         setTimeout(() => setIsRateLimited(false), 60 * 1000); // 60秒後に解除
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (isResendDisabled || isPhoneSubmitting) return;
+    
+    if (!isRecaptchaReady) {
+      toast.error("認証コード送信を準備中です");
+      return;
+    }
+    
+    // 電話番号が空の場合はエラー
+    if (!phoneNumber || !formattedPhone) {
+      toast.error("電話番号が設定されていません。電話番号入力画面に戻ってください。");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // reCAPTCHAをクリアし、再描画を待ってから再送信します。
+      // 関連ロジックはphoneAuthServiceに集約されています。
+      phoneAuth.clearRecaptcha?.();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
+
+      if (verificationId) {
+        toast.success("認証コードを再送信しました");
+        startResendTimer(); // 60秒タイマーを再開始
+      }
+    } catch (error) {
+      console.error("再送信エラー:", error);
+      const categorized = categorizeFirebaseError(error);
+      toast.error(categorized.message);
+      
+      if (categorized.type === "rate-limit") {
+        setIsRateLimited(true);
+        setTimeout(() => setIsRateLimited(false), 60 * 1000);
       }
     } finally {
       setIsSubmitting(false);
@@ -144,7 +217,6 @@ export function PhoneVerificationForm() {
       }
     } catch (error) {
       toast.error("電話番号からやり直して下さい");
-      console.log(error);
       setIsCodeVerifying(false);
     }
   };
@@ -233,53 +305,87 @@ export function PhoneVerificationForm() {
         </>
       )}
       {step === "code" && (
-        <form onSubmit={handleCodeSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="code" className="text-sm font-medium">
-              認証コード
-            </label>
-            <div className="flex justify-center py-4">
-              <InputOTP maxLength={6} value={verificationCode} onChange={handleOTPChange}>
-                <InputOTPGroup>
-                  {Array.from({ length: 6 }).map((_, index) => (
-                    <InputOTPSlot key={index} index={index} />
-                  ))}
-                </InputOTPGroup>
-              </InputOTP>
+        <>
+          <div id="recaptcha-container" ref={recaptchaContainerRef} style={{ display: 'none' }}></div>
+          <form onSubmit={handleCodeSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="code" className="text-sm font-medium">
+                認証コード
+              </label>
+              <div className="flex justify-center py-4">
+                <InputOTP maxLength={6} value={verificationCode} onChange={handleOTPChange}>
+                  <InputOTPGroup>
+                    {Array.from({ length: 6 }).map((_, index) => (
+                      <InputOTPSlot key={index} index={index} />
+                    ))}
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
             </div>
-          </div>
-          <div className="flex flex-col items-center gap-8 w-full mx-auto">
-            <Button
-              type="submit"
-              className="w-full h-12 bg-primary text-white rounded-md"
-              disabled={
-                isCodeVerifying ||
-                phoneAuth.isVerifying ||
-                verificationCode.length < 6 ||
-                isReloading
-              }
-            >
-              {isCodeVerifying ? "検証中..." : "コードを検証"}
-            </Button>
-            <Button
-              type="button"
-              variant={"text"}
-              disabled={isReloading}
-              onClick={() => {
-                phoneAuth.clearRecaptcha?.();
-                setIsReloading(true);
-                setStep("phone");
-                setTimeout(() => {
-                  window.location.reload();
-                }, 300);
-                setPhoneNumber("");
-                setVerificationCode("");
-              }}
-            >
-              電話番号を再入力
-            </Button>
-          </div>
-        </form>
+            <div className="flex flex-col items-center gap-8 w-full mx-auto">
+              <Button
+                type="submit"
+                className="w-full h-12"
+                disabled={
+                  isCodeVerifying ||
+                  phoneAuth.isVerifying ||
+                  verificationCode.length < 6 ||
+                  isReloading
+                }
+              >
+                {isCodeVerifying ? "検証中..." : "コードを検証"}
+              </Button>
+              <Button
+                type="button"
+                variant="tertiary"
+                className="w-full h-12"
+                disabled={
+                  isResendDisabled ||
+                  isPhoneSubmitting ||
+                  isReloading
+                }
+                onClick={handleResendCode}
+              >
+                {isResendDisabled 
+                  ? `${countdown}秒後に再送信できます` 
+                  : isPhoneSubmitting 
+                    ? "送信中..." 
+                    : "コードを再送信"}
+              </Button>
+              <Button
+                type="button"
+                variant={"text"}
+                disabled={isReloading}
+                onClick={async () => {
+                  try {
+                    // reCAPTCHAをクリア
+                    if (phoneAuth.clearRecaptcha) {
+                      await phoneAuth.clearRecaptcha();
+                    }
+                    
+                    // 状態をリセット
+                    setPhoneNumber("");
+                    setVerificationCode("");
+                    setStep("phone");
+                    
+                    // 少し待ってからページをリロード
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 1000);
+                  } catch (error) {
+                    console.error("reCAPTCHAクリアエラー:", error);
+                    // エラーが発生してもページをリロード
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 1000);
+                  }
+                }}
+              >
+                電話番号を再入力
+              </Button>
+            </div>
+          </form>
+        </>
       )}
     </div>
   );
