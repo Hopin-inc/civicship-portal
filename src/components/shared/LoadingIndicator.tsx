@@ -21,27 +21,9 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     };
   }, []);
 
-  const showDetailedProgress = authenticationState !== undefined || isLiffInitialized !== undefined;
-
-  if (!showDetailedProgress) {
-    const SimpleSpinner = (
-      <div className="flex justify-center items-center">
-        <div className="animate-spin h-8 w-8 bg-blue-300 rounded-xl"></div>
-      </div>
-    );
-
-    if (fullScreen) {
-      return (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-background bg-opacity-80">
-          {SimpleSpinner}
-        </div>
-      );
-    }
-
-    return <div>{SimpleSpinner}</div>;
-  }
-
   const [animatedProgress, setAnimatedProgress] = useState(20);
+
+  const showDetailedProgress = authenticationState !== undefined || isLiffInitialized !== undefined;
 
   const getTargetPercentage = (): number => {
     if (!authenticationState) return 20;
@@ -63,6 +45,8 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
 
   // 進捗アニメーション
   useEffect(() => {
+    if (!showDetailedProgress) return;
+
     const duration = 2000; // 2秒でアニメーション
     const startTime = Date.now();
     const startProgress = animatedProgress;
@@ -86,7 +70,25 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     };
 
     requestAnimationFrame(animate);
-  }, [targetPercentage, animatedProgress]);
+  }, [targetPercentage, animatedProgress, showDetailedProgress]);
+
+  if (!showDetailedProgress) {
+    const SimpleSpinner = (
+      <div className="flex justify-center items-center">
+        <div className="animate-spin h-8 w-8 bg-blue-300 rounded-xl"></div>
+      </div>
+    );
+
+    if (fullScreen) {
+      return (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-background bg-opacity-80">
+          {SimpleSpinner}
+        </div>
+      );
+    }
+
+    return <div>{SimpleSpinner}</div>;
+  }
 
   const ProgressBar: React.FC<{ percentage: number }> = ({ percentage }) => (
     <div className="w-full max-w-md">
