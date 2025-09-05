@@ -33,6 +33,7 @@ export class PhoneAuthService {
   private recaptchaVerifier: RecaptchaVerifier | null = null;
   private recaptchaContainerElement: HTMLElement | null = null;
   private isRecaptchaRendered: boolean = false;
+  private recaptchaContainerId: string = "recaptcha-container";
 
   /**
    * コンストラクタ
@@ -66,6 +67,13 @@ export class PhoneAuthService {
       PhoneAuthService.instance = new PhoneAuthService();
     }
     return PhoneAuthService.instance;
+  }
+
+  /**
+   * reCAPTCHAコンテナIDを動的に変更
+   */
+  private generateNewContainerId(): void {
+    this.recaptchaContainerId = `recaptcha-container-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
   /**
@@ -126,19 +134,30 @@ export class PhoneAuthService {
       this.state.isVerifying = true;
       this.state.error = null;
 
-      // 前回のVerifierを明示的にクリア（DOM操作しない）
+      // 前回のVerifierを明示的にクリア
       this.clearRecaptcha();
 
-      // Googleの内部非同期処理との競合を避けるため少し待つ
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // 新しいコンテナIDを生成（Firebaseの内部状態管理を回避）
+      this.generateNewContainerId();
 
-      this.recaptchaContainerElement = document.getElementById("recaptcha-container");
-      if (!this.recaptchaContainerElement) {
-        throw new Error("reCAPTCHA container element not found");
+      // Googleの内部非同期処理との競合を避けるため少し待つ
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // 新しいコンテナ要素を作成
+      const baseContainer = document.getElementById("recaptcha-container");
+      if (!baseContainer) {
+        throw new Error("Base reCAPTCHA container element not found");
       }
 
+      // 新しいコンテナ要素を作成
+      const newContainer = document.createElement("div");
+      newContainer.id = this.recaptchaContainerId;
+      baseContainer.appendChild(newContainer);
+
+      this.recaptchaContainerElement = newContainer;
+
       // 新しいインスタンスを作る
-      this.recaptchaVerifier = new RecaptchaVerifier(phoneAuth, "recaptcha-container", {
+      this.recaptchaVerifier = new RecaptchaVerifier(phoneAuth, this.recaptchaContainerId, {
         size: isRunningInLiff() ? "normal" : "invisible",
         callback: () => {},
         "expired-callback": () => {
