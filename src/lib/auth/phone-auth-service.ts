@@ -92,8 +92,8 @@ export class PhoneAuthService {
       const recaptchaContainer = document.getElementById("recaptcha-container");
       if (recaptchaContainer) {
         const parent = recaptchaContainer.parentNode;
-        if (parent) {
-          // 既存のコンテナを削除
+        if (parent && parent.contains(recaptchaContainer)) {
+          // 既存のコンテナを削除（親子関係を確認してから）
           parent.removeChild(recaptchaContainer);
           
           // 新しいコンテナを作成
@@ -101,6 +101,15 @@ export class PhoneAuthService {
           newContainer.id = "recaptcha-container";
           newContainer.style.display = "none"; // 非表示で配置
           parent.appendChild(newContainer);
+        } else if (recaptchaContainer.parentNode) {
+          // 親子関係が確認できない場合は、直接削除
+          recaptchaContainer.remove();
+          
+          // 新しいコンテナを作成
+          const newContainer = document.createElement("div");
+          newContainer.id = "recaptcha-container";
+          newContainer.style.display = "none";
+          document.body.appendChild(newContainer);
         }
       }
       
