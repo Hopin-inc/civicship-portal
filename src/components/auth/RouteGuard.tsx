@@ -33,7 +33,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     return <>{ children }</>;
   }
 
-  // 認証が必要なページの場合のみ、認証処理を実行
+  // 認証が必要なページの場合のみ認証処理を実行
   return <AuthenticatedRouteGuard>{children}</AuthenticatedRouteGuard>;
 };
 
