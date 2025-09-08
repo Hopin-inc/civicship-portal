@@ -49,6 +49,7 @@ export function PhoneVerificationForm() {
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [isResendDisabled, setIsResendDisabled] = useState(false);
   const [countdown, setCountdown] = useState(60);
+  const [showRecaptcha, setShowRecaptcha] = useState(false);
   // ==================================
 
   const formattedPhone = formatPhoneNumber(phoneNumber);
@@ -134,6 +135,8 @@ export function PhoneVerificationForm() {
       return;
     }
     
+    // 再送信時にreCAPTCHAを表示
+    setShowRecaptcha(true);
     setIsSubmitting(true);
     
     try {
@@ -150,6 +153,11 @@ export function PhoneVerificationForm() {
       if (verificationId) {
         toast.success("認証コードを再送信しました");
         startResendTimer(); // 60秒タイマーを再開始
+        
+        // 認証完了後、5秒後にreCAPTCHAを非表示にする
+        setTimeout(() => {
+          setShowRecaptcha(false);
+        }, 5000);
       }
     } catch (error) {
       console.error("再送信エラー:", error);
@@ -309,7 +317,6 @@ export function PhoneVerificationForm() {
       )}
       {step === "code" && (
         <>
-          <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
           <form onSubmit={handleCodeSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="code" className="text-sm font-medium">
@@ -355,6 +362,11 @@ export function PhoneVerificationForm() {
                     ? "送信中..." 
                     : "コードを再送信"}
               </Button>
+              <div 
+                id="recaptcha-container" 
+                ref={recaptchaContainerRef}
+                style={{ display: showRecaptcha ? 'block' : 'none' }}
+              ></div>
               <Button
                 type="button"
                 variant={"text"}
