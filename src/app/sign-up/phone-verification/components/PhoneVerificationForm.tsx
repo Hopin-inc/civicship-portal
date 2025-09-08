@@ -20,6 +20,7 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { RawURIComponent } from "@/utils/path";
 import { categorizeFirebaseError } from "@/lib/auth/firebase-config";
 import { isRunningInLiff } from "@/lib/auth/environment-detector";
+import { logger } from "@/lib/logging";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -77,29 +78,26 @@ export function PhoneVerificationForm() {
 
   // 再送信タイマーの制御
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-    if (isResendDisabled) {
-      setCountdown(60);
-      
-      // カウントダウンを1秒ごとに更新
-      interval = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            setIsResendDisabled(false);
-            return 60;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    if (!isResendDisabled) {
+      return;
     }
-    
-    return () => {
-      if (interval) clearInterval(interval);
-    };
+
+    const intervalId = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev > 1) {
+          return prev - 1;
+        }
+
+        setIsResendDisabled(false);
+        return 0;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
   }, [isResendDisabled]);
 
   const startResendTimer = () => {
+    setCountdown(60);
     setIsResendDisabled(true);
   };
 
@@ -174,7 +172,7 @@ export function PhoneVerificationForm() {
         // LIFF環境の場合は、reCAPTCHAのコールバックで非表示にする
       }
     } catch (error) {
-      console.error("再送信エラー:", error);
+      logger.error("再送信エラー:", { error });
       const categorized = categorizeFirebaseError(error);
       toast.error(categorized.message);
       
@@ -391,19 +389,15 @@ export function PhoneVerificationForm() {
                     if (phoneAuth.clearRecaptcha) {
                       await phoneAuth.clearRecaptcha();
                     }
-                    
+                  } catch (error) {
+                    logger.error("reCAPTCHAクリアエラー:", { error });
+                  } finally {
                     // 状態をリセット
                     setPhoneNumber("");
                     setVerificationCode("");
                     setStep("phone");
                     
                     // 少し待ってからページをリロード
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 1000);
-                  } catch (error) {
-                    console.error("reCAPTCHAクリアエラー:", error);
-                    // エラーが発生してもページをリロード
                     setTimeout(() => {
                       window.location.reload();
                     }, 1000);
