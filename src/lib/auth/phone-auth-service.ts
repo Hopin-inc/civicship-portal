@@ -157,15 +157,38 @@ export class PhoneAuthService {
       this.recaptchaContainerElement = newContainer;
 
       // 新しいインスタンスを作る
+      // LIFF環境ではnormal、通常ブラウザではinvisibleを使用
       this.recaptchaVerifier = new RecaptchaVerifier(phoneAuth, this.recaptchaContainerId, {
         size: isRunningInLiff() ? "normal" : "invisible",
-        callback: () => {},
+        callback: () => {
+          logger.debug("reCAPTCHA completed", {
+            authType: "phone",
+            component: "PhoneAuthService",
+            environment: isRunningInLiff() ? "liff" : "browser",
+          });
+        },
         "expired-callback": () => {
           this.clearRecaptcha();
         },
       });
 
       await this.recaptchaVerifier.render();
+
+      // LIFF環境では、reCAPTCHAの表示を待つ
+      if (isRunningInLiff()) {
+        // reCAPTCHAが表示されるまで少し待つ
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        
+        // reCAPTCHA要素が表示されているかチェック
+        const recaptchaElement = document.querySelector('.grecaptcha-badge');
+        if (!recaptchaElement) {
+          logger.warn("reCAPTCHA not visible in LIFF environment", {
+            authType: "phone",
+            component: "PhoneAuthService",
+            errorCategory: "ui_rendering",
+          });
+        }
+      }
 
       const confirmationResult = await signInWithPhoneNumber(
         phoneAuth,

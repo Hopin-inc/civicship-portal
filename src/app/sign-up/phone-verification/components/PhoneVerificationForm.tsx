@@ -19,6 +19,7 @@ import {
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { RawURIComponent } from "@/utils/path";
 import { categorizeFirebaseError } from "@/lib/auth/firebase-config";
+import { isRunningInLiff } from "@/lib/auth/environment-detector";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -139,7 +140,10 @@ export function PhoneVerificationForm() {
       // reCAPTCHAをクリアし、再描画を待ってから再送信します。
       // 関連ロジックはphoneAuthServiceに集約されています。
       phoneAuth.clearRecaptcha?.();
-      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // LIFF環境では、reCAPTCHAの再描画により時間がかかる場合があるため、待機時間を調整
+      const waitTime = isRunningInLiff() ? 1000 : 500;
+      await new Promise(resolve => setTimeout(resolve, waitTime));
       
       const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
 
@@ -305,7 +309,7 @@ export function PhoneVerificationForm() {
       )}
       {step === "code" && (
         <>
-          <div id="recaptcha-container" ref={recaptchaContainerRef} style={{ display: 'none' }}></div>
+          <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
           <form onSubmit={handleCodeSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="code" className="text-sm font-medium">
