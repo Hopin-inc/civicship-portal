@@ -62,6 +62,19 @@ export function PhoneVerificationForm() {
     }
   }, []);
 
+  // reCAPTCHA完了時のイベントリスナー
+  useEffect(() => {
+    const handleRecaptchaCompleted = () => {
+      setShowRecaptcha(false);
+    };
+
+    window.addEventListener('recaptcha-completed', handleRecaptchaCompleted);
+    
+    return () => {
+      window.removeEventListener('recaptcha-completed', handleRecaptchaCompleted);
+    };
+  }, []);
+
   // 再送信タイマーの制御
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -154,10 +167,11 @@ export function PhoneVerificationForm() {
         toast.success("認証コードを再送信しました");
         startResendTimer(); // 60秒タイマーを再開始
         
-        // 認証完了後、5秒後にreCAPTCHAを非表示にする
-        setTimeout(() => {
+        // LIFF環境でない場合は、即座にreCAPTCHAを非表示にする
+        if (!isRunningInLiff()) {
           setShowRecaptcha(false);
-        }, 5000);
+        }
+        // LIFF環境の場合は、reCAPTCHAのコールバックで非表示にする
       }
     } catch (error) {
       console.error("再送信エラー:", error);

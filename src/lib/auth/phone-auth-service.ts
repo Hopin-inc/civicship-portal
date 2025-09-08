@@ -166,6 +166,11 @@ export class PhoneAuthService {
             component: "PhoneAuthService",
             environment: isRunningInLiff() ? "liff" : "browser",
           });
+          
+          // LIFF環境でreCAPTCHAが完了したら、即座に非表示にするためのイベントを発火
+          if (isRunningInLiff()) {
+            window.dispatchEvent(new CustomEvent('recaptcha-completed'));
+          }
         },
         "expired-callback": () => {
           this.clearRecaptcha();
