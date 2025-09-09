@@ -9,7 +9,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
-import { isNoAuthPath } from "@/lib/communities/metadata";
+import { isProtectedPath } from "@/utils/path-guards";
 
 /**
  * ルートガードコンポーネントのプロパティ
@@ -25,15 +25,15 @@ interface RouteGuardProps {
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const pathname = usePathname();
   
-  // 認証が不要なページかどうかを判定
-  const isNoAuthRequired = useMemo(() => isNoAuthPath(pathname), [pathname]);
+  // 保護されたパスかどうかを判定（認証が必要なページ）
+  const isProtected = useMemo(() => isProtectedPath(pathname), [pathname]);
 
-  // 認証が不要なページの場合は、認証関連のフックを一切実行せずに直接描画
-  if (isNoAuthRequired) {
+  // 保護されていないページの場合は、認証関連のフックを一切実行せずに直接描画
+  if (!isProtected) {
     return <>{ children }</>;
   }
 
-  // 認証が必要なページの場合のみ認証処理を実行
+  // 保護されたページの場合のみ認証処理を実行
   return <AuthenticatedRouteGuard>{children}</AuthenticatedRouteGuard>;
 };
 
