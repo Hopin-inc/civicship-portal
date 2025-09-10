@@ -31,6 +31,7 @@ export function isProtectedPath(pathname: string): boolean {
     "/wallets/*",
     "/admin",
     "/admin/*",
+    "/participations/*"
   ];
   return matchPaths(pathname, ...protectedPaths);
 }
