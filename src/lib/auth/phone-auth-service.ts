@@ -33,6 +33,7 @@ export class PhoneAuthService {
   private recaptchaVerifier: RecaptchaVerifier | null = null;
   private recaptchaContainerElement: HTMLElement | null = null;
   private isRecaptchaRendered: boolean = false;
+  private recaptchaContainerId: string = "recaptcha-container";
 
   /**
    * コンストラクタ
@@ -69,20 +70,49 @@ export class PhoneAuthService {
   }
 
   /**
-   * reCAPTCHAをクリア
+   * reCAPTCHAコンテナIDを動的に変更
    */
+  private generateNewContainerId(): void {
+    this.recaptchaContainerId = `recaptcha-container-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
   /**
    * reCAPTCHAをクリア
    */
   public clearRecaptcha(): void {
     try {
+      // reCAPTCHA Verifierをクリア
       if (this.recaptchaVerifier) {
         this.recaptchaVerifier.clear();
         this.recaptchaVerifier = null;
       }
+      
+      // コンテナ要素をクリア
       if (this.recaptchaContainerElement) {
+        // 既存のreCAPTCHA要素を削除
+        const existingRecaptcha = this.recaptchaContainerElement.querySelector('.grecaptcha-badge');
+        if (existingRecaptcha) {
+          existingRecaptcha.remove();
+        }
+        
+        // コンテナを空にする
         this.recaptchaContainerElement.innerHTML = "";
       }
+      
+      // グローバルreCAPTCHA状態もリセット
+      if (typeof window !== 'undefined' && (window as any).grecaptcha) {
+        try {
+          (window as any).grecaptcha.reset();
+        } catch (e) {
+          // このエラーは予想されるので無視
+          logger.info("reCAPTCHA reset (expected)", {
+            authType: "phone",
+            error: e instanceof Error ? e.message : String(e),
+            component: "PhoneAuthService",
+          });
+        }
+      }
+      
       this.recaptchaContainerElement = null;
       this.isRecaptchaRendered = false;
     } catch (e) {
@@ -104,27 +134,66 @@ export class PhoneAuthService {
       this.state.isVerifying = true;
       this.state.error = null;
 
-      // 前回のVerifierを明示的にクリア（DOM操作しない）
+      // 前回のVerifierを明示的にクリア
       this.clearRecaptcha();
 
-      // Googleの内部非同期処理との競合を避けるため少し待つ
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // 新しいコンテナIDを生成（Firebaseの内部状態管理を回避）
+      this.generateNewContainerId();
 
-      this.recaptchaContainerElement = document.getElementById("recaptcha-container");
-      if (!this.recaptchaContainerElement) {
-        throw new Error("reCAPTCHA container element not found");
+      // Googleの内部非同期処理との競合を避けるため少し待つ
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // 新しいコンテナ要素を作成
+      const baseContainer = document.getElementById("recaptcha-container");
+      if (!baseContainer) {
+        throw new Error("Base reCAPTCHA container element not found");
       }
 
+      // 新しいコンテナ要素を作成
+      const newContainer = document.createElement("div");
+      newContainer.id = this.recaptchaContainerId;
+      baseContainer.appendChild(newContainer);
+
+      this.recaptchaContainerElement = newContainer;
+
       // 新しいインスタンスを作る
-      this.recaptchaVerifier = new RecaptchaVerifier(phoneAuth, "recaptcha-container", {
+      // LIFF環境ではnormal、通常ブラウザではinvisibleを使用
+      this.recaptchaVerifier = new RecaptchaVerifier(phoneAuth, this.recaptchaContainerId, {
         size: isRunningInLiff() ? "normal" : "invisible",
-        callback: () => {},
+        callback: () => {
+          logger.debug("reCAPTCHA completed", {
+            authType: "phone",
+            component: "PhoneAuthService",
+            environment: isRunningInLiff() ? "liff" : "browser",
+          });
+          
+          // LIFF環境でreCAPTCHAが完了したら、即座に非表示にするためのイベントを発火
+          if (isRunningInLiff()) {
+            window.dispatchEvent(new CustomEvent('recaptcha-completed'));
+          }
+        },
         "expired-callback": () => {
           this.clearRecaptcha();
         },
       });
 
       await this.recaptchaVerifier.render();
+
+      // LIFF環境では、reCAPTCHAの表示を待つ
+      if (isRunningInLiff()) {
+        // reCAPTCHAが表示されるまで少し待つ
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        
+        // reCAPTCHA要素が表示されているかチェック
+        const recaptchaElement = document.querySelector('.grecaptcha-badge');
+        if (!recaptchaElement) {
+          logger.warn("reCAPTCHA not visible in LIFF environment", {
+            authType: "phone",
+            component: "PhoneAuthService",
+            errorCategory: "ui_rendering",
+          });
+        }
+      }
 
       const confirmationResult = await signInWithPhoneNumber(
         phoneAuth,
