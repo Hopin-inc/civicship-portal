@@ -13,6 +13,7 @@ import {
   useCurrentUserQuery,
   useUserSignUpMutation,
 } from "@/types/graphql";
+import { apolloClient } from "@/lib/apollo";
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
@@ -72,6 +73,7 @@ interface AuthContextType {
     clearRecaptcha?: () => void;
     isVerifying: boolean;
     phoneUid: string | null;
+    handlePhoneAuthComplete?: (phoneUid: string, phoneNumber: string) => Promise<void>;
   };
 
   createUser: (
@@ -289,6 +291,97 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return success;
   };
 
+  const handlePhoneAuthComplete = useCallback(
+    async (phoneUid: string, phoneNumber: string) => {
+      logger.info("Phone authentication completed", {
+        phoneUid,
+        phoneNumber: maskPhoneNumber(phoneNumber),
+        component: "AuthProvider",
+      });
+
+      TokenManager.setPhoneTokens({
+        phoneUid,
+        phoneNumber,
+        accessToken: "",
+        refreshToken: "",
+        expiresAt: 0,
+      });
+
+      if (state.authenticationState === "user_registered") {
+        await recoverPhoneTokensForRegisteredUser(phoneUid);
+      }
+
+      await authStateManager?.handlePhoneAuthStateChange(true);
+    },
+    [authStateManager, state.authenticationState],
+  );
+
+  const recoverPhoneTokensForRegisteredUser = useCallback(
+    async (phoneUid: string) => {
+      try {
+        const phoneTokens = TokenManager.getPhoneTokens();
+        if (!phoneTokens.refreshToken || !phoneTokens.accessToken) {
+          logger.warn("Cannot recover tokens - missing phone tokens after authentication", {
+            phoneUid,
+            component: "AuthProvider",
+          });
+          return;
+        }
+
+        const { lineAuth } = await import("@/lib/auth/firebase-config");
+        if (!lineAuth.currentUser) {
+          logger.warn("Cannot recover tokens - no Firebase user", {
+            phoneUid,
+            component: "AuthProvider",
+          });
+          return;
+        }
+
+        const accessToken = await lineAuth.currentUser.getIdToken();
+        const expiresIn = Math.floor((phoneTokens.expiresAt - Date.now()) / 1000);
+
+        const { RECOVER_PHONE_AUTH_TOKEN } = await import("@/graphql/account/identity/query");
+        const { data } = await apolloClient.mutate({
+          mutation: RECOVER_PHONE_AUTH_TOKEN,
+          variables: {
+            input: {
+              phoneUid,
+              authToken: phoneTokens.accessToken,
+              refreshToken: phoneTokens.refreshToken,
+              expiresIn: Math.max(expiresIn, 3600),
+            },
+          },
+          context: {
+            headers: {
+              Authorization: accessToken ? `Bearer ${accessToken}` : "",
+            },
+          },
+        });
+
+        if (data?.recoverPhoneAuthToken?.success) {
+          logger.info("Phone tokens recovered successfully for registered user", {
+            phoneUid,
+            component: "AuthProvider",
+          });
+          toast.success("電話番号認証が完了しました");
+        } else {
+          logger.error("Failed to recover phone tokens", {
+            phoneUid,
+            message: data?.recoverPhoneAuthToken?.message,
+            component: "AuthProvider",
+          });
+        }
+      } catch (error) {
+        logger.error("Error recovering phone tokens for registered user", {
+          phoneUid,
+          error: error instanceof Error ? error.message : String(error),
+          component: "AuthProvider",
+        });
+      }
+    },
+    [],
+  );
+
   /**
    * ユーザーを作成
    */
@@ -299,11 +392,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   ): Promise<User | null> => {
     try {
       if (!state.firebaseUser) {
+        logger.error("LINE authentication required for user creation", {
+          component: "AuthProvider",
+          errorCategory: "authentication_error",
+        });
         toast.error("LINE認証が完了していません");
         return null;
       }
 
       if (!phoneUid) {
+        logger.error("Phone UID required for user creation", {
+          component: "AuthProvider",
+          errorCategory: "authentication_error",
+        });
         toast.error("電話番号認証が完了していません");
         return null;
       }
@@ -311,12 +412,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const phoneTokens = TokenManager.getPhoneTokens();
       const lineTokens = TokenManager.getLineTokens();
 
-      logger.debug("Creating user with input", {
+      if (!phoneTokens.refreshToken) {
+        logger.error("Phone refresh token missing", {
+          phoneUid,
+          component: "AuthProvider",
+          errorCategory: "token_validation",
+        });
+        toast.error("電話番号認証トークンが取得できません。再度認証を行ってください。");
+        return null;
+      }
+
+      logger.debug("Creating user with validated tokens", {
         name,
         currentPrefecture: prefecture,
         communityId: COMMUNITY_ID,
         phoneUid,
         phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
+        hasPhoneRefreshToken: !!phoneTokens.refreshToken,
+        hasLineRefreshToken: !!lineTokens.refreshToken,
         component: "AuthProvider",
       });
 
@@ -324,7 +437,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         variables: {
           input: {
             name,
-            currentPrefecture: prefecture, // Changed from prefecture to currentPrefecture to match backend schema
+            currentPrefecture: prefecture,
             communityId: COMMUNITY_ID,
             phoneUid,
             phoneNumber: phoneTokens.phoneNumber ?? undefined,
@@ -336,9 +449,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (data?.userSignUp?.user) {
         await refetchUser();
+        logger.info("User account created successfully", {
+          userId: data.userSignUp.user.id,
+          phoneUid,
+          component: "AuthProvider",
+        });
         toast.success("アカウントを作成しました");
         return state.firebaseUser;
       } else {
+        logger.error("User creation failed - no user data returned", {
+          phoneUid,
+          component: "AuthProvider",
+          errorCategory: "system_error",
+        });
         toast.error("アカウント作成に失敗しました");
         return null;
       }
@@ -346,25 +469,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const errorMessage = error instanceof Error ? error.message : String(error);
       const isValidationError = errorMessage.includes("validation") ||
                                errorMessage.includes("invalid") ||
-                               errorMessage.includes("required");
+                               errorMessage.includes("required") ||
+                               errorMessage.includes("Phone UID") ||
+                               errorMessage.includes("Phone auth token");
+      const isAuthenticationError = errorMessage.includes("Authentication") ||
+                                   errorMessage.includes("UNAUTHENTICATED");
       
       if (isValidationError) {
         logger.info("User creation validation error", {
           error: errorMessage,
+          phoneUid,
           component: "AuthProvider",
           errorCategory: "validation_error",
+        });
+        toast.error("入力内容に問題があります", {
+          description: "認証情報を確認して再度お試しください",
+        });
+      } else if (isAuthenticationError) {
+        logger.info("User creation authentication error", {
+          error: errorMessage,
+          phoneUid,
+          component: "AuthProvider",
+          errorCategory: "authentication_error",
+        });
+        toast.error("認証に失敗しました", {
+          description: "再度認証を行ってください",
         });
       } else {
         logger.error("User creation system error", {
           error: errorMessage,
+          phoneUid,
           component: "AuthProvider",
           errorCategory: "system_error",
         });
+        toast.error("アカウント作成に失敗しました", {
+          description: "しばらく時間をおいて再度お試しください",
+        });
       }
       
-      toast.error("アカウント作成に失敗しました", {
-        description: error instanceof Error ? error.message : "不明なエラーが発生しました",
-      });
       return null;
     }
   };
@@ -389,6 +531,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       clearRecaptcha: () => phoneAuthService.clearRecaptcha(),
       isVerifying: phoneAuthService.getState().isVerifying,
       phoneUid: phoneAuthService.getState().phoneUid,
+      handlePhoneAuthComplete,
     },
     createUser,
     updateAuthState: async () => {
