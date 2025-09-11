@@ -13,7 +13,7 @@ interface UseAutoLoginProps {
   liffService: LiffService;
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
   refetchUser: () => Promise<any>;
-  isNoAuthRequired: boolean;
+  isProtectedPath: boolean;
 }
 
 const useAutoLogin = ({
@@ -22,7 +22,7 @@ const useAutoLogin = ({
   liffService,
   setState,
   refetchUser,
-  isNoAuthRequired,
+  isProtectedPath,
 }: UseAutoLoginProps) => {
   const attemptedRef = useRef(false);
   const prevStateRef = useRef<{ authenticationState: string; isAuthenticating: boolean } | null>(
@@ -32,7 +32,7 @@ const useAutoLogin = ({
 
   useEffect(() => {
     // noAuthPathsの場合は何もしない
-    if (isNoAuthRequired) {
+    if (isProtectedPath) {
       return;
     }
 

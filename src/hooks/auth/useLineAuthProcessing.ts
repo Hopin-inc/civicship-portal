@@ -12,10 +12,10 @@ interface UseLineAuthProcessingProps {
   liffService: LiffService;
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
   refetchUser: () => Promise<any>;
-  isNoAuthRequired: boolean;
+  isProtectedPath: boolean;
 }
 
-export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setState, refetchUser, isNoAuthRequired }: UseLineAuthProcessingProps) => {
+export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setState, refetchUser, isProtectedPath }: UseLineAuthProcessingProps) => {
   const processedRef = useRef(false);
   const liffServiceRef = useRef(liffService);
   const setStateRef = useRef(setState);
@@ -27,7 +27,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
 
   useEffect(() => {
     // noAuthPathsの場合は何もしない
-    if (isNoAuthRequired) {
+    if (isProtectedPath) {
       return;
     }
 

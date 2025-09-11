@@ -15,7 +15,7 @@ import {
   useUserSignUpMutation,
 } from "@/types/graphql";
 import { toast } from "sonner";
-import { COMMUNITY_ID, isNoAuthPath } from "@/lib/communities/metadata";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from '@/components/shared'
@@ -31,6 +31,7 @@ import { logger } from "@/lib/logging";
 import { maskPhoneNumber } from "@/lib/logging/client/utils";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
 import { RawURIComponent } from "@/utils/path";
+import { isProtectedPath } from "@/utils/path-guards";
 
 /**
  * 認証状態の型定義
@@ -100,15 +101,11 @@ interface AuthProviderProps {
  */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const environment = detectEnvironment();
-
+  const pathname = usePathname();
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
   const liffService = LiffService.getInstance(liffId);
 
   const phoneAuthService = PhoneAuthService.getInstance();
-
-  // 現在のパスが認証不要かどうかを判定
-  const pathname = usePathname();
-  const isNoAuthRequired = isNoAuthPath(pathname);
 
   const [state, setState] = useState<AuthState>({
     firebaseUser: null,
@@ -127,7 +124,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
       state.authenticationState,
-    ) || isNoAuthRequired,
+    ) || isProtectedPath(pathname),
     fetchPolicy: "network-only",
   });
 
@@ -170,7 +167,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // 認証が不要なページの場合は認証処理をスキップ
-    if (isNoAuthRequired) {
+    if (isProtectedPath(pathname)) {
       setIsAuthInitialized(true);
       setState((prev) => ({ ...prev, authenticationState: "unauthenticated" }));
       return;
@@ -194,7 +191,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!isAuthInitialized && !authInitError) {
       initializeAuth();
     }
-  }, [authStateManager, isAuthInitialized, authInitError, isNoAuthRequired]);
+  }, [authStateManager, isAuthInitialized, authInitError, pathname]);
 
   useTokenExpirationHandler({ state, setState, logout });
   useFirebaseAuthState({ authStateManager, state, setState });
@@ -204,8 +201,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
   useAuthStateChangeListener({ authStateManager, setState });
   
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser, isNoAuthRequired });
-  useAutoLogin({ environment, state, liffService, setState, refetchUser, isNoAuthRequired });
+  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser, isProtectedPath: isProtectedPath(pathname) });
+  useAutoLogin({ environment, state, liffService, setState, refetchUser, isProtectedPath: !isProtectedPath(pathname) });
 
   /**
    * LIFFでログイン
@@ -408,7 +405,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: isNoAuthRequired ? false : (
+    loading: isProtectedPath(pathname) ? false : (
       state.authenticationState === "loading" || 
       userLoading || 
       (state.isAuthenticating && !["line_authenticated", "phone_authenticated", "user_registered"].includes(state.authenticationState))
@@ -418,7 +415,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   if (!isAuthInitialized) {
     // noAuthPathsの場合は、ローディング画面を表示せずに直接childrenを描画
-    if (isNoAuthRequired) {
+    if (isProtectedPath(pathname)) {
       return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
     }
 
