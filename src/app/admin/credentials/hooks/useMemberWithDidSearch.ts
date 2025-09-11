@@ -113,10 +113,10 @@ export const useMemberWithDidSearch = (
     
     setIsLoadingMore(true);
     try {
-      const [userId, communityIdFromCursor] = endCursor.split("_");
+      const [userId, communityId] = endCursor.split("_");
       await apolloFetchMore({
         variables: {
-          cursor: { userId, communityId: communityIdFromCursor },
+          cursor: { userId, communityId },
         },
         updateQuery: (prev, { fetchMoreResult }) => {
           if (!fetchMoreResult) return prev;
