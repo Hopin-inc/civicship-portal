@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_EVALUATIONS = gql`
-  query GetEvaluations($filter: EvaluationFilterInput, $withDidIssuanceRequests: Boolean! = false) {
-    evaluations(filter: $filter) {
+  query GetEvaluations($filter: EvaluationFilterInput, $first: Int, $withDidIssuanceRequests: Boolean! = false) {
+    evaluations(filter: $filter, first: $first) {
       edges {
         node {
           id

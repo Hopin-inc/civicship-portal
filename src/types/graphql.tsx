@@ -562,7 +562,7 @@ export type GqlIdentityPlatform = (typeof GqlIdentityPlatform)[keyof typeof GqlI
 export type GqlImageInput = {
   alt?: InputMaybe<Scalars["String"]["input"]>;
   caption?: InputMaybe<Scalars["String"]["input"]>;
-  file: Scalars["Upload"]["input"];
+  file?: InputMaybe<Scalars["Upload"]["input"]>;
 };
 
 export const GqlLineRichMenuType = {
@@ -4062,6 +4062,7 @@ export type GqlEvaluationFieldsFragment = {
 
 export type GqlGetEvaluationsQueryVariables = Exact<{
   filter?: InputMaybe<GqlEvaluationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
   withDidIssuanceRequests?: Scalars["Boolean"]["input"];
 }>;
 
@@ -4660,6 +4661,7 @@ export type GqlParticipationFieldsFragment = {
 
 export type GqlGetParticipationsQueryVariables = Exact<{
   filter?: InputMaybe<GqlParticipationFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
 export type GqlGetParticipationsQuery = {
@@ -8241,8 +8243,12 @@ export type EvaluationBulkCreateMutationOptions = Apollo.BaseMutationOptions<
   GqlEvaluationBulkCreateMutationVariables
 >;
 export const GetEvaluationsDocument = gql`
-  query GetEvaluations($filter: EvaluationFilterInput, $withDidIssuanceRequests: Boolean! = false) {
-    evaluations(filter: $filter) {
+  query GetEvaluations(
+    $filter: EvaluationFilterInput
+    $first: Int
+    $withDidIssuanceRequests: Boolean! = false
+  ) {
+    evaluations(filter: $filter, first: $first) {
       edges {
         node {
           id
@@ -8307,6 +8313,7 @@ export const GetEvaluationsDocument = gql`
  * const { data, loading, error } = useGetEvaluationsQuery({
  *   variables: {
  *      filter: // value for 'filter'
+ *      first: // value for 'first'
  *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
  *   },
  * });
@@ -9109,8 +9116,8 @@ export type ParticipationBulkCreateMutationOptions = Apollo.BaseMutationOptions<
   GqlParticipationBulkCreateMutationVariables
 >;
 export const GetParticipationsDocument = gql`
-  query GetParticipations($filter: ParticipationFilterInput) {
-    participations(filter: $filter) {
+  query GetParticipations($filter: ParticipationFilterInput, $first: Int) {
+    participations(filter: $filter, first: $first) {
       edges {
         node {
           id
@@ -9156,6 +9163,7 @@ export const GetParticipationsDocument = gql`
  * const { data, loading, error } = useGetParticipationsQuery({
  *   variables: {
  *      filter: // value for 'filter'
+ *      first: // value for 'first'
  *   },
  * });
  */
