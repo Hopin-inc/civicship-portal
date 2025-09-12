@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { MemberRow } from "./Member";
 import { GqlUser, GqlParticipationStatusReason, GqlMembershipEdge, useGetDidIssuanceRequestsQuery, useGetVcIssuanceRequestsByUserQuery, GqlDidIssuanceRequest } from "@/types/graphql";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 interface SearchResultListProps {
   searchQuery: string;
@@ -9,6 +10,10 @@ interface SearchResultListProps {
   handleCheck: (userId: string) => void;
   getParticipatedReason: (userId: string) => GqlParticipationStatusReason | undefined;
   DISABLED_REASONS: GqlParticipationStatusReason[];
+  hasNextPage?: boolean;
+  isLoadingMore?: boolean;
+  onLoadMore?: () => void;
+  loadMoreRef?: React.RefObject<HTMLDivElement>;
 }
 
 const SearchResultList: React.FC<SearchResultListProps> = ({
@@ -18,6 +23,9 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
   handleCheck,
   getParticipatedReason,
   DISABLED_REASONS,
+  hasNextPage = false,
+  isLoadingMore = false,
+  loadMoreRef,
 }) => {
   const visibleUserIds = useMemo(() => {
     const userIds: string[] = [];
@@ -57,6 +65,19 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
           </div>
         );
       })}
+      
+      {hasNextPage && (
+          <div ref={loadMoreRef} className="py-4 text-center mt-4">
+            {isLoadingMore ? (
+              <div className="py-2">
+                <LoadingIndicator fullScreen={false} />
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-sm">スクロールしてさらに読み込み...</p>
+            )}
+          </div>
+        )}
+      
     </>
   );
 };

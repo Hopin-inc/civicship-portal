@@ -29,7 +29,10 @@ function getIssuanceStats(evaluations: any[]) {
 export default function CredentialList() {
   const router = useRouter();
   const { data, loading, error } = useGetEvaluationsQuery({
-    variables: { filter: { communityId: COMMUNITY_ID } },
+    variables: { 
+      filter: { communityId: COMMUNITY_ID },
+      first: 100
+    },
   });
 
   const evaluationList = useMemo(() => {
