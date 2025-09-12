@@ -124,7 +124,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
       state.authenticationState,
-    ) || isProtectedPath(pathname),
+    ),
     fetchPolicy: "network-only",
   });
 
@@ -166,12 +166,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [authInitError, setAuthInitError] = useState<string | null>(null);
 
   useEffect(() => {
-    // 認証が不要なページの場合は認証処理をスキップ
-    if (isProtectedPath(pathname)) {
-      setIsAuthInitialized(true);
-      setState((prev) => ({ ...prev, authenticationState: "unauthenticated" }));
-      return;
-    }
+    // 認証が必要なページでも認証処理を実行する
+    // RouteGuardで適切なリダイレクト処理を行う
 
     if (!authStateManager) return;
 
@@ -405,7 +401,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: isProtectedPath(pathname) ? false : (
+    loading: (
       state.authenticationState === "loading" || 
       userLoading || 
       (state.isAuthenticating && !["line_authenticated", "phone_authenticated", "user_registered"].includes(state.authenticationState))
@@ -414,10 +410,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   if (!isAuthInitialized) {
-    // noAuthPathsの場合は、ローディング画面を表示せずに直接childrenを描画
-    if (isProtectedPath(pathname)) {
-      return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-    }
 
     if (authInitError) {
       const refetchRef = { 
