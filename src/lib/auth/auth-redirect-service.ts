@@ -71,6 +71,14 @@ export class AuthRedirectService {
       ? this.generateNextParam(next)
       : this.generateNextParam(pathname);
 
+    console.log("AuthRedirectService.getRedirectPath:", {
+      pathname,
+      authState,
+      next,
+      nextParam,
+      isProtectedPath: isProtectedPath(pathname)
+    });
+
     if (authState === "loading") {
       return null;
     }
@@ -94,18 +102,36 @@ export class AuthRedirectService {
     }
 
     if (isProtectedPath(pathname)) {
+      let redirectPath: RawURIComponent | null = null;
+      
       switch (authState) {
         case "unauthenticated":
-          return `/login${ nextParam }` as RawURIComponent;
+          redirectPath = `/login${ nextParam }` as RawURIComponent;
+          break;
         case "line_authenticated":
         case "line_token_expired":
-          return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
+          redirectPath = `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
+          break;
         case "phone_authenticated":
         case "phone_token_expired":
-          return `/sign-up${ nextParam }` as RawURIComponent;
+          redirectPath = `/sign-up${ nextParam }` as RawURIComponent;
+          break;
+        case "user_registered":
+          // ユーザー登録済みの場合は、認証が必要なページにアクセス可能
+          redirectPath = null;
+          break;
         default:
-          return null;
+          redirectPath = null;
+          break;
       }
+      
+      console.log("Protected path redirect decision:", {
+        pathname,
+        authState,
+        redirectPath
+      });
+      
+      return redirectPath;
     }
 
     if (this.isPathInSignUpFlow(pathname)) {
