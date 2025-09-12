@@ -82,7 +82,7 @@ const AuthenticatedRouteGuard: React.FC<{ children: React.ReactNode }> = ({ chil
       const pathNameWithParams = searchParams.size > 0
         ? `${ pathname }?${ searchParams.toString() }` as RawURIComponent
         : pathname as RawURIComponent;
-      const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam));
+      const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam), authenticationState);
       if (redirectPath) {
         router.replace(redirectPath);
       }
