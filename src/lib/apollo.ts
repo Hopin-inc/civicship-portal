@@ -50,7 +50,7 @@ const requestLink = new ApolloLink((operation, forward) => {
         let firebaseToken = null;
         if (lineAuth.currentUser) {
           try {
-            firebaseToken = await lineAuth.currentUser.getIdToken();
+            firebaseToken = await lineAuth.currentUser.getIdToken(false);
           } catch (error) {
             logger.info("Failed to get Firebase token", {
               error: error instanceof Error ? error.message : String(error),
@@ -192,7 +192,7 @@ const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
   link,
   ssrMode: true,
   cache: new InMemoryCache({
-    resultCaching: false,
+    resultCaching: true,
   }),
 };
 

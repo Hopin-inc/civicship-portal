@@ -30,6 +30,7 @@ export class LiffService {
   private liffId: string;
   private state: LiffState;
   private initializing = false;
+  private initializationPromise: Promise<boolean> | null = null;
 
   /**
    * コンストラクタ
@@ -78,24 +79,33 @@ export class LiffService {
    */
   public async initialize(): Promise<boolean> {
     try {
+      // 既に初期化済みの場合は成功を返す
       if (this.state.isInitialized) {
         return true;
       }
-      if (this.initializing) {
-        return true;
+
+      // 初期化中の場合は既存のPromiseを返す
+      if (this.initializing && this.initializationPromise) {
+        return await this.initializationPromise;
       }
+
+      // 初期化処理を開始
       this.initializing = true;
+      this.initializationPromise = this.performInitialization();
 
-      await liff.init({ liffId: this.liffId });
-      this.state.isInitialized = true;
-      this.state.isLoggedIn = liff.isLoggedIn();
+      // 初期化処理の完了を待つ
+      const result = await this.initializationPromise!;
+      
+      // 初期化完了後のクリーンアップ
+      this.initializing = false;
+      this.initializationPromise = null;
 
-      if (this.state.isLoggedIn) {
-        await this.updateProfile();
-      }
-
-      return true;
+      return result;
     } catch (error) {
+      // エラー発生時のクリーンアップ
+      this.initializing = false;
+      this.initializationPromise = null;
+      
       const errorMessage = error instanceof Error ? error.message : String(error);
       const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
                                      errorMessage.includes("LINE") ||
@@ -170,6 +180,48 @@ export class LiffService {
           error: errorMessage,
           component: "LiffService",
           errorCategory: "auth_temporary",
+        });
+      }
+      this.state.error = error as Error;
+      return false;
+    }
+  }
+
+  /**
+   * 実際の初期化処理を実行するプライベートメソッド
+   * @returns 初期化が成功したかどうか
+   */
+  private async performInitialization(): Promise<boolean> {
+    try {
+      await liff.init({ liffId: this.liffId });
+      this.state.isInitialized = true;
+      this.state.isLoggedIn = liff.isLoggedIn();
+
+      if (this.state.isLoggedIn) {
+        await this.updateProfile();
+      }
+
+      return true;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
+                                     errorMessage.includes("LINE") ||
+                                     errorMessage.includes("Load failed");
+      
+      if (isEnvironmentConstraint) {
+        logger.warn("LIFF environment initialization limitation", {
+          authType: "liff",
+          error: errorMessage,
+          component: "LiffService",
+          errorCategory: "environment_constraint",
+          expected: true,
+        });
+      } else {
+        logger.info("LIFF initialization failed", {
+          authType: "liff",
+          error: errorMessage,
+          component: "LiffService",
+          errorCategory: "initialization_error",
         });
       }
       this.state.error = error as Error;
@@ -269,14 +321,16 @@ export class LiffService {
 
           const userCredential = await signInWithCustomToken(lineAuth, customToken);
 
-          await updateProfile(userCredential.user, {
-            displayName: profile.displayName,
-            photoURL: profile.pictureUrl,
-          });
+          const [, idToken, tokenResult] = await Promise.all([
+            updateProfile(userCredential.user, {
+              displayName: profile.displayName,
+              photoURL: profile.pictureUrl,
+            }),
+            userCredential.user.getIdToken(false),
+            userCredential.user.getIdTokenResult(false)
+          ]);
 
-          const idToken = await userCredential.user.getIdToken();
           const refreshToken = userCredential.user.refreshToken;
-          const tokenResult = await userCredential.user.getIdTokenResult();
           const expirationTime = new Date(tokenResult.expirationTime).getTime();
 
           const tokens: AuthTokens = {

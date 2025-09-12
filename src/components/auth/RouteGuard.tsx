@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useQuery } from "@apollo/client";
@@ -9,6 +9,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
+import { isProtectedPath } from "@/utils/path-guards";
 
 /**
  * ルートガードコンポーネントのプロパティ
@@ -22,7 +23,23 @@ interface RouteGuardProps {
  * 認証状態に基づいてページアクセスを制御する
  */
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
-  const { isAuthenticated, authenticationState, loading } = useAuth();
+  const pathname = usePathname();
+  
+  // 保護されたパスかどうかを判定（認証が必要なページ）
+  const isProtected = useMemo(() => isProtectedPath(pathname), [pathname]);
+
+  // 保護されていないページの場合は、認証関連のフックを一切実行せずに直接描画
+  if (!isProtected) {
+    return <>{ children }</>;
+  }
+
+  // 保護されたページの場合のみ認証処理を実行
+  return <AuthenticatedRouteGuard>{children}</AuthenticatedRouteGuard>;
+};
+
+// 認証が必要なページ用のガードコンポーネント
+const AuthenticatedRouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, authenticationState, loading, isLiffInitialized } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -65,7 +82,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       const pathNameWithParams = searchParams.size > 0
         ? `${ pathname }?${ searchParams.toString() }` as RawURIComponent
         : pathname as RawURIComponent;
-      const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam));
+      const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam), authenticationState);
       if (redirectPath) {
         router.replace(redirectPath);
       }
@@ -77,7 +94,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams, isInitialRender]);
 
   if (loading || userLoading || isInitialRender) {
-    return <LoadingIndicator />;
+    return (
+      <LoadingIndicator 
+        authenticationState={authenticationState}
+        isLiffInitialized={isLiffInitialized}
+      />
+    );
   }
 
   return authorized ? <>{ children }</> : null;
