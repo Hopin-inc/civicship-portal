@@ -214,7 +214,7 @@ export default function CredentialRecipientSelector({
     }
   };
 
-  if (loading && !searchQuery) return <LoadingIndicator fullScreen={true} />;
+  if (loading && !searchQuery && !isLoadingMore ) return <LoadingIndicator fullScreen={true} />;
 
   return (
     <>
