@@ -7,6 +7,7 @@ import {
   matchPaths,
   RawURIComponent,
 } from "@/utils/path";
+import { isProtectedPath } from "@/utils/path-guards";
 import { logger } from "@/lib/logging";
 
 /**
@@ -38,20 +39,6 @@ export class AuthRedirectService {
     return AuthRedirectService.instance;
   }
 
-  /**
-   * 保護されたパスかどうかを判定
-   */
-  public isProtectedPath(pathname: string): boolean {
-    const protectedPaths = [
-      "/users/me",
-      "/tickets",
-      "/wallets",
-      "/wallets/*",
-      "/admin",
-      "/admin/*",
-    ];
-    return matchPaths(pathname, ...protectedPaths);
-  }
 
   /**
    * ユーザー登録プロセスのパスかどうかを判定
@@ -106,7 +93,7 @@ export class AuthRedirectService {
       }
     }
 
-    if (this.isProtectedPath(pathname)) {
+    if (isProtectedPath(pathname)) {
       switch (authState) {
         case "unauthenticated":
           return `/login${ nextParam }` as RawURIComponent;
