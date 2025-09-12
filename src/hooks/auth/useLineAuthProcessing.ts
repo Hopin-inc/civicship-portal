@@ -26,10 +26,8 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
   refetchUserRef.current = refetchUser;
 
   useEffect(() => {
-    // noAuthPathsの場合は何もしない
-    if (isProtectedPath) {
-      return;
-    }
+    // 認証が必要なページでも認証処理を実行する
+    // RouteGuardで適切なリダイレクト処理を行う
 
     if (!shouldProcessRedirect || processedRef.current) return;
 
