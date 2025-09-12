@@ -17,11 +17,11 @@ import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
-
-  const { user: currentUser, isAuthenticating } = useAuth();
+  const { user: currentUser, isAuthenticating, authenticationState, isLiffInitialized } = useAuth();
   const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
     currentUser?.id,
   );
+  
   const { nftInstances } = useUserNfts({ userId: currentUser?.id ?? "" });
 
   const refetchRef = useRef<(() => void) | null>(null);
@@ -29,14 +29,18 @@ export default function MyProfilePage() {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  // 認証中 or リダイレクト待ち → ローディング表示
-  if (isAuthenticating || !currentUser) {
-    return <LoadingIndicator />;
-  }
-
-  // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
-  if (!currentUser || isLoading) {
-    return <LoadingIndicator />;
+  if (isAuthenticating || !currentUser || isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-full max-w-4xl">
+          <LoadingIndicator 
+            authenticationState={authenticationState}
+            isLiffInitialized={isLiffInitialized}
+            fullScreen={false}
+          />
+        </div>
+      </div>
+    );
   }
 
   // エラー
