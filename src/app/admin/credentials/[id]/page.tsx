@@ -35,6 +35,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
   } = useGetEvaluationsQuery({
     variables: {
       withDidIssuanceRequests: true,
+      first: 100,
     },
   });
   const headerConfig = useMemo(

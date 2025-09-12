@@ -38,7 +38,7 @@ const DISABLED_REASONS: GqlParticipationStatusReason[] = [
 // ソートロジックを関数として分離
 const sortMembersByParticipation = (
   members: { user: GqlUser & { didInfo?: GqlDidIssuanceRequest | undefined } }[],
-  participatedUsers: Array<{ userId: string; slotId: string; isCreatedByUser: boolean }>,
+  participatedUsers: Array<{ userId: string; slotId: string; isCreatedByUser: boolean; reason?: GqlParticipationStatusReason }>,
   selectedSlotId: string | undefined,
 ) => {
   return [...members].sort((a, b) => {
@@ -49,21 +49,41 @@ const sortMembersByParticipation = (
       (u) => u.userId === b.user.id && u.slotId === selectedSlotId,
     );
 
-    // 1. isCreatedByUserがtrueのユーザーを最優先
-    if (aParticipated?.isCreatedByUser && !bParticipated?.isCreatedByUser) return -1;
-    if (!aParticipated?.isCreatedByUser && bParticipated?.isCreatedByUser) return 1;
+    // 選択可能性を判定する関数
+    const isSelectable = (user: GqlUser & { didInfo?: GqlDidIssuanceRequest | undefined }, participated?: { reason?: GqlParticipationStatusReason }) => {
+      const hasDid = !!user.didInfo?.didValue;
+      const isDisabled = participated?.reason && DISABLED_REASONS.includes(participated.reason);
+      return hasDid && !isDisabled;
+    };
 
-    // 2. 参加済みユーザーを上に
-    const aIsParticipated = !!aParticipated;
-    const bIsParticipated = !!bParticipated;
-    if (aIsParticipated && !bIsParticipated) return -1;
-    if (!aIsParticipated && bIsParticipated) return 1;
+    const aIsSelectable = isSelectable(a.user, aParticipated);
+    const bIsSelectable = isSelectable(b.user, bParticipated);
 
-    // 3. didデータがある人を上に
-    const aHasDid = !!a.user.didInfo?.didValue;
-    const bHasDid = !!b.user.didInfo?.didValue;
-    if (aHasDid && !bHasDid) return -1;
-    if (!aHasDid && bHasDid) return 1;
+    // 1. 選択できるユーザーを上に、選択できないユーザーを下に
+    if (aIsSelectable && !bIsSelectable) return -1;
+    if (!aIsSelectable && bIsSelectable) return 1;
+
+    // 2. 選択可能なユーザー内での優先順位
+    if (aIsSelectable && bIsSelectable) {
+      // 2-1. isCreatedByUserがtrueのユーザーを最優先
+      if (aParticipated?.isCreatedByUser && !bParticipated?.isCreatedByUser) return -1;
+      if (!aParticipated?.isCreatedByUser && bParticipated?.isCreatedByUser) return 1;
+
+      // 2-2. 参加済みユーザーを上に
+      const aIsParticipated = !!aParticipated;
+      const bIsParticipated = !!bParticipated;
+      if (aIsParticipated && !bIsParticipated) return -1;
+      if (!aIsParticipated && bIsParticipated) return 1;
+    }
+
+    // 3. 選択不可能なユーザー内での優先順位
+    if (!aIsSelectable && !bIsSelectable) {
+      // 3-1. DIDがあるユーザーを上に
+      const aHasDid = !!a.user.didInfo?.didValue;
+      const bHasDid = !!b.user.didInfo?.didValue;
+      if (aHasDid && !bHasDid) return -1;
+      if (!aHasDid && bHasDid) return 1;
+    }
 
     // 4. それ以外は順不同
     return 0;
@@ -137,7 +157,16 @@ export default function CredentialRecipientSelector({
     data: searchMembershipData,
     loading,
     error,
-  } = useMemberWithDidSearch(communityId, allMembers, { searchQuery });
+    hasNextPage,
+    isLoadingMore,
+    handleFetchMore,
+    loadMoreRef,
+  } = useMemberWithDidSearch(communityId, allMembers, { 
+    searchQuery,
+    enablePagination: true,
+    pageSize: 20,
+  });
+
 
   // 並び替え用の配列を作成
   const sortedMembers = useMemo(() => {
@@ -185,7 +214,7 @@ export default function CredentialRecipientSelector({
     }
   };
 
-  if (loading || membershipLoading) return <LoadingIndicator fullScreen={true} />;
+  if (loading && !searchQuery) return <LoadingIndicator fullScreen={true} />;
 
   return (
     <>
@@ -201,7 +230,7 @@ export default function CredentialRecipientSelector({
           <span className={`${STEP_COLORS.GRAY} text-base`}>)</span>
         </span>
       </div>
-      <div className="px-4 mb-4 pt-4">
+      <div className="mb-4 pt-4">
         <SearchForm
           value={input}
           onInputChange={setInput}
@@ -217,6 +246,10 @@ export default function CredentialRecipientSelector({
           handleCheck={handleCheck}
           getParticipatedReason={getParticipatedReason}
           DISABLED_REASONS={DISABLED_REASONS}
+          hasNextPage={hasNextPage}
+          isLoadingMore={isLoadingMore}
+          onLoadMore={handleFetchMore}
+          loadMoreRef={loadMoreRef}
         />
         <div className="fixed bottom-0 left-0 w-full bg-white z-10">
           <div className="w-full max-w-sm mx-auto flex justify-between px-4 py-4 border-t">
