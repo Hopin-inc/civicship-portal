@@ -1,7 +1,6 @@
 "use client";
 
 import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
@@ -31,7 +30,6 @@ import { logger } from "@/lib/logging";
 import { maskPhoneNumber } from "@/lib/logging/client/utils";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
 import { RawURIComponent } from "@/utils/path";
-import { isProtectedPath } from "@/utils/path-guards";
 
 /**
  * 認証状態の型定義
@@ -84,7 +82,6 @@ interface AuthContextType {
   updateAuthState: () => Promise<void>;
 
   loading: boolean;
-  isLiffInitialized: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -101,7 +98,7 @@ interface AuthProviderProps {
  */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const environment = detectEnvironment();
-  const pathname = usePathname();
+
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
   const liffService = LiffService.getInstance(liffId);
 
@@ -124,7 +121,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
       state.authenticationState,
-    ) || isProtectedPath(pathname),
+    ),
     fetchPolicy: "network-only",
   });
 
@@ -166,13 +163,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [authInitError, setAuthInitError] = useState<string | null>(null);
 
   useEffect(() => {
-    // 認証が不要なページの場合は認証処理をスキップ
-    if (isProtectedPath(pathname)) {
-      setIsAuthInitialized(true);
-      setState((prev) => ({ ...prev, authenticationState: "unauthenticated" }));
-      return;
-    }
-
     if (!authStateManager) return;
 
     const initializeAuth = async () => {
@@ -191,18 +181,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!isAuthInitialized && !authInitError) {
       initializeAuth();
     }
-  }, [authStateManager, isAuthInitialized, authInitError, pathname]);
+  }, [authStateManager, isAuthInitialized, authInitError]);
 
+  useAuthStateChangeListener({ authStateManager, setState });
   useTokenExpirationHandler({ state, setState, logout });
   useFirebaseAuthState({ authStateManager, state, setState });
   usePhoneAuthState({ authStateManager, phoneAuthService, setState });
   useUserRegistrationState({ authStateManager, userData, setState });
   useLiffInitialization({ environment, liffService });
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
-  useAuthStateChangeListener({ authStateManager, setState });
-  
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser, isProtectedPath: isProtectedPath(pathname) });
-  useAutoLogin({ environment, state, liffService, setState, refetchUser, isProtectedPath: !isProtectedPath(pathname) });
+  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
+  useAutoLogin({ environment, state, liffService, setState, refetchUser });
 
   /**
    * LIFFでログイン
@@ -405,20 +394,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: isProtectedPath(pathname) ? false : (
-      state.authenticationState === "loading" || 
-      userLoading || 
-      (state.isAuthenticating && !["line_authenticated", "phone_authenticated", "user_registered"].includes(state.authenticationState))
-    ),
-    isLiffInitialized: liffService.getState().isInitialized,
+    loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
   };
 
   if (!isAuthInitialized) {
-    // noAuthPathsの場合は、ローディング画面を表示せずに直接childrenを描画
-    if (isProtectedPath(pathname)) {
-      return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-    }
-
     if (authInitError) {
       const refetchRef = { 
         current: () => {
@@ -429,11 +408,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
     }
     
-    return <LoadingIndicator 
-      fullScreen={true} 
-      authenticationState={state.authenticationState}
-      isLiffInitialized={liffService.getState().isInitialized}
-    />;
+    return <LoadingIndicator fullScreen={true} />;
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

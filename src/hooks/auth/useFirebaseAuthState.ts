@@ -40,11 +40,9 @@ export const useFirebaseAuthState = ({
 
       if (user) {
         try {
-          const [idToken, tokenResult] = await Promise.all([
-            user.getIdToken(false),
-            user.getIdTokenResult(false)
-          ]);
+          const idToken = await user.getIdToken();
           const refreshToken = user.refreshToken;
+          const tokenResult = await user.getIdTokenResult();
           const expirationTime = new Date(tokenResult.expirationTime).getTime();
 
           TokenManager.saveLineTokens({

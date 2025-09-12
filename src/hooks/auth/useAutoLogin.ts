@@ -13,7 +13,6 @@ interface UseAutoLoginProps {
   liffService: LiffService;
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
   refetchUser: () => Promise<any>;
-  isProtectedPath: boolean;
 }
 
 const useAutoLogin = ({
@@ -22,7 +21,6 @@ const useAutoLogin = ({
   liffService,
   setState,
   refetchUser,
-  isProtectedPath,
 }: UseAutoLoginProps) => {
   const attemptedRef = useRef(false);
   const prevStateRef = useRef<{ authenticationState: string; isAuthenticating: boolean } | null>(
@@ -31,11 +29,6 @@ const useAutoLogin = ({
   const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
 
   useEffect(() => {
-    // noAuthPathsの場合は何もしない
-    if (isProtectedPath) {
-      return;
-    }
-
     if (environment !== AuthEnvironment.LIFF) {
       return;
     }
@@ -78,21 +71,10 @@ const useAutoLogin = ({
           const timestamp = new Date().toISOString();
 
           setState((prev) => ({ ...prev, isAuthenticating: true }));
-          
           try {
             const success = await liffService.signInWithLiffToken();
-            
             if (success) {
-              Promise.resolve().then(async () => {
-                try {
-                  await refetchUser();
-                } catch (error) {
-                  logger.info("Deferred auto-login refetch failed", {
-                    error: error instanceof Error ? error.message : String(error),
-                    component: "useAutoLogin"
-                  });
-                }
-              });
+              await refetchUser();
             }
           } catch (error) {
             logger.info("Auto-login with LIFF failed", {
