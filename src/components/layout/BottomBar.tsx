@@ -37,7 +37,9 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     pathname.startsWith("/sign-up") ||
     pathname === "/users/me/edit" ||
     (pathname.startsWith("/places") && placeId) ||
-    pathname.startsWith("/search")
+    pathname.startsWith("/search") || 
+    pathname.startsWith("/wallets") || 
+    pathname.startsWith("/credentials")
   ) {
     return null;
   }
