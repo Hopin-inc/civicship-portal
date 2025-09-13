@@ -23,7 +23,6 @@ export function MemberTab({
   const communityId = COMMUNITY_ID;
   const {
     data: searchMembershipData,
-    loading,
     error,
     loadMoreRef: searchLoadMoreRef,
     isLoadingMore: searchIsLoadingMore,
@@ -41,13 +40,6 @@ export function MemberTab({
     );
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-muted-foreground pt-4">読み込み中...</p>
-      </div>
-    );
-  }
 
   if (searchMembershipData.length === 0) {
     return (
