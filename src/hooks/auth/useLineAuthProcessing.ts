@@ -12,10 +12,9 @@ interface UseLineAuthProcessingProps {
   liffService: LiffService;
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
   refetchUser: () => Promise<any>;
-  isProtectedPath: boolean;
 }
 
-export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setState, refetchUser, isProtectedPath }: UseLineAuthProcessingProps) => {
+export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setState, refetchUser }: UseLineAuthProcessingProps) => {
   const processedRef = useRef(false);
   const liffServiceRef = useRef(liffService);
   const setStateRef = useRef(setState);
@@ -26,19 +25,14 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
   refetchUserRef.current = refetchUser;
 
   useEffect(() => {
-    // 認証が必要なページでも認証処理を実行する
-    // RouteGuardで適切なリダイレクト処理を行う
-
     if (!shouldProcessRedirect || processedRef.current) return;
 
     const handleLineAuthRedirect = async () => {
       processedRef.current = true;
-      
       setStateRef.current((prev) => ({ ...prev, isAuthenticating: true }));
 
       try {
         const initialized = await liffServiceRef.current.initialize();
-
         if (!initialized) {
           logger.info("LIFF init failed", {
             authType: "liff",
@@ -53,10 +47,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
           return;
         }
 
-        const signInPromise = liffServiceRef.current.signInWithLiffToken();
-        
-        const success = await signInPromise;
-
+        const success = await liffServiceRef.current.signInWithLiffToken();
         if (!success) {
           logger.info("signInWithLiffToken failed", {
             authType: "liff",
@@ -65,22 +56,12 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
           return;
         }
 
-        Promise.resolve().then(async () => {
-          try {
-            await refetchUserRef.current();
-          } catch (error) {
-            logger.info("Deferred user refetch failed", {
-              error: error instanceof Error ? error.message : String(error),
-              component: "useLineAuthProcessing"
-            });
-          }
-        });
-        
+        await refetchUserRef.current();
       } catch (err) {
         logger.info("Error during LINE auth", {
           authType: "liff",
           error: err instanceof Error ? err.message : String(err),
-          component: "useLineAuthProcessing",
+          component: "useLineAuthProcessing"
         });
       } finally {
         setStateRef.current((prev) => ({ ...prev, isAuthenticating: false }));
