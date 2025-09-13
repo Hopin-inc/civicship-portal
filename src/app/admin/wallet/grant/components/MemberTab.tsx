@@ -19,15 +19,18 @@ export function MemberTab({
   members,
   searchQuery,
   onSelect,
-  loadMoreRef,
-  isLoadingMore,
 }: MemberTabProps) {
   const communityId = COMMUNITY_ID;
   const {
     data: searchMembershipData,
-    loading,
     error,
-  } = useMemberSearchFromCredentials(communityId, members, { searchQuery });
+    loadMoreRef: searchLoadMoreRef,
+    isLoadingMore: searchIsLoadingMore,
+  } = useMemberSearchFromCredentials(communityId, members, { 
+    searchQuery ,
+    pageSize: 20,
+    enablePagination: true,
+  });
 
   if (error) {
     return (
@@ -37,13 +40,6 @@ export function MemberTab({
     );
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-muted-foreground pt-4">読み込み中...</p>
-      </div>
-    );
-  }
 
   if (searchMembershipData.length === 0) {
     return (
@@ -73,8 +69,8 @@ export function MemberTab({
       })}
 
       {/* 無限スクロール用のローディング要素 - 常に表示 */}
-      <div ref={loadMoreRef} className="flex justify-center py-8">
-        {isLoadingMore && (
+      <div ref={searchLoadMoreRef} className="flex justify-center py-8">
+        {searchIsLoadingMore && (
           <div className="flex items-center space-x-2">
             <LoadingIndicator fullScreen={false}/>
           </div>

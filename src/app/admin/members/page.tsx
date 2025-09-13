@@ -61,6 +61,8 @@ export default function MembersPage() {
 
   const { data: searchMembershipData } = useMemberWithDidSearch(communityId, members, {
     searchQuery,
+    pageSize: 20,
+    enablePagination: true,
   });
 
   const [pendingRoleChange, setPendingRoleChange] = useState<{
