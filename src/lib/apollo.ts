@@ -22,9 +22,9 @@ if (__DEV__) {
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
   credentials: "same-origin",
-  headers: {
-    "Apollo-Require-Preflight": "true",
-  },
+  // headers: {
+  //   "Apollo-Require-Preflight": "true",
+  // },
 });
 
 const requestLink = new ApolloLink((operation, forward) => {
@@ -71,7 +71,12 @@ const requestLink = new ApolloLink((operation, forward) => {
             "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
           };
 
-          const tokenRequiredOperations = ["userSignUp", "linkPhoneAuth", "storePhoneAuthToken", "identityCheckPhoneUser"];
+          const tokenRequiredOperations = [
+            "userSignUp",
+            "linkPhoneAuth",
+            "storePhoneAuthToken",
+            "identityCheckPhoneUser",
+          ];
 
           if (tokenRequiredOperations.includes(operation.operationName || "")) {
             const requestHeaders = {
@@ -152,10 +157,11 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
       });
     } else {
       const errorMessage = networkError.message || String(networkError);
-      const isTemporaryNetworkIssue = errorMessage.includes("Failed to fetch") || 
-                                     errorMessage.includes("Load failed") || 
-                                     errorMessage.includes("Network request failed");
-      
+      const isTemporaryNetworkIssue =
+        errorMessage.includes("Failed to fetch") ||
+        errorMessage.includes("Load failed") ||
+        errorMessage.includes("Network request failed");
+
       if (isTemporaryNetworkIssue) {
         logger.warn("Network connectivity issue", {
           error: errorMessage,
@@ -192,7 +198,9 @@ const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
   link,
   ssrMode: true,
   cache: new InMemoryCache({
-    resultCaching: false,
+    typePolicies: {
+      Membership: { keyFields: ["userId", "communityId"] },
+    },
   }),
 };
 
