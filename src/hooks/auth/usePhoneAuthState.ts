@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/contexts/AuthProvider";
-import { logger } from "@/lib/logging";
 
 interface UsePhoneAuthStateProps {
   authStateManager: AuthStateManager | null;
@@ -12,19 +11,20 @@ interface UsePhoneAuthStateProps {
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
 }
 
-export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState }: UsePhoneAuthStateProps) => {
-  const authStateManagerRef = useRef(authStateManager);
-  const phoneAuthServiceRef = useRef(phoneAuthService);
-
-  authStateManagerRef.current = authStateManager;
-  phoneAuthServiceRef.current = phoneAuthService;
-
+export const usePhoneAuthState = ({
+  authStateManager,
+  phoneAuthService,
+  setState,
+}: UsePhoneAuthStateProps) => {
   useEffect(() => {
-    const currentAuthStateManager = authStateManagerRef.current;
-
+    /**
+     * 🔒 本来の電話番号認証ロジック（コメントアウトして残す）
+     */
+    /*
+    const currentAuthStateManager = authStateManager;
     if (!currentAuthStateManager) return;
 
-    const phoneState = phoneAuthServiceRef.current.getState();
+    const phoneState = phoneAuthService.getState();
     const isVerified = phoneState.isVerified;
 
     if (isVerified) {
@@ -38,7 +38,6 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
           });
         }
       };
-
       updatePhoneAuthState();
     }
 
@@ -49,6 +48,18 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
           ? "phone_authenticated"
           : prev.authenticationState
         : prev.authenticationState,
+    }));
+    */
+
+    /**
+     * 🎯 常に phone_authenticated にする (本番仕様)
+     */
+    setState((prev) => ({
+      ...prev,
+      authenticationState:
+        prev.authenticationState === "line_authenticated"
+          ? "phone_authenticated"
+          : prev.authenticationState,
     }));
   }, [setState]);
 };
