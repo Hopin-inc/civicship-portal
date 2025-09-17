@@ -1,8 +1,13 @@
 import { AuthProvider } from "@/contexts/AuthProvider";
 import { metadata } from "./metadata";
+import { RouteGuard } from "@/components/auth/RouteGuard";
 
 export { metadata };
 
 export default function MyPageLayout({ children }: { children: React.ReactNode }) {
-  return <AuthProvider>{children}</AuthProvider>;
+  return (
+    <AuthProvider>
+      <RouteGuard>{children}</RouteGuard>
+    </AuthProvider>
+  );
 }
