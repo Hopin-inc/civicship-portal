@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from '@/components/shared'
+import { ErrorState } from "@/components/shared";
 import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
 import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
 import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
@@ -27,7 +27,6 @@ import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 import { logger } from "@/lib/logging";
-import { maskPhoneNumber } from "@/lib/logging/client/utils";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
 import { RawURIComponent } from "@/utils/path";
 
@@ -218,10 +217,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return success;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
-                                     errorMessage.includes("LINE") ||
-                                     errorMessage.includes("Load failed");
-      
+      const isEnvironmentConstraint =
+        errorMessage.includes("LIFF") ||
+        errorMessage.includes("LINE") ||
+        errorMessage.includes("Load failed");
+
       if (isEnvironmentConstraint) {
         logger.warn("LIFF environment limitation", {
           authType: "liff",
@@ -239,7 +239,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
       }
       return false;
-    }finally {
+    } finally {
       setState((prev) => ({ ...prev, isAuthenticating: false }));
     }
   };
@@ -303,20 +303,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return null;
       }
 
-      if (!phoneUid) {
-        toast.error("電話番号認証が完了していません");
-        return null;
-      }
+      // if (!phoneUid) {
+      //   toast.error("電話番号認証が完了していません");
+      //   return null;
+      // }
 
-      const phoneTokens = TokenManager.getPhoneTokens();
+      // const phoneTokens = TokenManager.getPhoneTokens();
       const lineTokens = TokenManager.getLineTokens();
 
       logger.debug("Creating user with input", {
         name,
         currentPrefecture: prefecture,
         communityId: COMMUNITY_ID,
-        phoneUid,
-        phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
+        // phoneUid,
+        // phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
         component: "AuthProvider",
       });
 
@@ -326,10 +326,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             name,
             currentPrefecture: prefecture, // Changed from prefecture to currentPrefecture to match backend schema
             communityId: COMMUNITY_ID,
-            phoneUid,
-            phoneNumber: phoneTokens.phoneNumber ?? undefined,
+            // phoneUid,
+            // phoneNumber: phoneTokens.phoneNumber ?? undefined,
             lineRefreshToken: lineTokens.refreshToken ?? undefined,
-            phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
+            // phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
           },
         },
       });
@@ -344,10 +344,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      const isValidationError = errorMessage.includes("validation") ||
-                               errorMessage.includes("invalid") ||
-                               errorMessage.includes("required");
-      
+      const isValidationError =
+        errorMessage.includes("validation") ||
+        errorMessage.includes("invalid") ||
+        errorMessage.includes("required");
+
       if (isValidationError) {
         logger.info("User creation validation error", {
           error: errorMessage,
@@ -361,7 +362,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorCategory: "system_error",
         });
       }
-      
+
       toast.error("アカウント作成に失敗しました", {
         description: error instanceof Error ? error.message : "不明なエラーが発生しました",
       });
@@ -399,15 +400,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   if (!isAuthInitialized) {
     if (authInitError) {
-      const refetchRef = { 
+      const refetchRef = {
         current: () => {
           setAuthInitError(null);
           setIsAuthInitialized(false);
-        }
+        },
       };
       return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
     }
-    
+
     return <LoadingIndicator fullScreen={true} />;
   }
 
