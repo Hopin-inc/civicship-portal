@@ -51,11 +51,15 @@ export function SignUpForm() {
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     try {
+      // ▼ 電話番号認証の必須チェックを外す
+      /*
       if (!isPhoneVerified) {
         toast.error("電話番号認証が完了していません");
         return;
       }
+      */
 
+      // ▼ phoneUid は任意（なければ undefined を渡す）
       const phoneUid = phoneAuth.phoneUid;
 
       const user = await createUser(values.name, values.prefecture, phoneUid);
@@ -81,7 +85,8 @@ export function SignUpForm() {
     return <LoadingIndicator />;
   }
 
-  if (!isAuthenticated || !isPhoneVerified) {
+  // ▼ 画面非表示ガードから isPhoneVerified を外す
+  if (!isAuthenticated /* || !isPhoneVerified */) {
     return null;
   }
 
@@ -150,9 +155,9 @@ export function SignUpForm() {
             />
           )}
 
-          <Button 
-            type="submit" 
-            className="w-full h-12 text-base" 
+          <Button
+            type="submit"
+            className="w-full h-12 text-base"
             disabled={isLoading || !!form.formState.errors.name}
           >
             {isLoading ? "作成中..." : "アカウントを作成"}
