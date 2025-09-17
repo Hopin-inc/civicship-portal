@@ -13,6 +13,9 @@ export type AuthenticationState =
   | "user_registered"
   | "loading";
 
+// 電話番号認証をスキップする本番仕様フラグ
+const SKIP_PHONE_VERIFICATION = true;
+
 /**
  * 認証状態の管理を担当するクラス
  * 認証状態の遷移ロジックを集約し、他のコンポーネントから参照できるようにする
@@ -110,7 +113,6 @@ export class AuthStateManager {
     this.stateChangeListeners = this.stateChangeListeners.filter((l) => l !== listener);
   }
 
-
   /**
    * 認証状態を更新
    */
@@ -130,7 +132,6 @@ export class AuthStateManager {
     });
   }
 
-
   /**
    * 認証状態を初期化
    */
@@ -139,7 +140,8 @@ export class AuthStateManager {
       this.setState("loading");
 
       const lineTokens = TokenManager.getLineTokens();
-      const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+      const hasValidLineToken =
+        lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
       if (!hasValidLineToken) {
         this.setState("unauthenticated");
@@ -150,27 +152,32 @@ export class AuthStateManager {
 
       if (isUserRegistered) {
         this.setState("user_registered");
+        return;
+      }
+      if (SKIP_PHONE_VERIFICATION) {
+        // [SKIP PHONE] 未登録でも phone_authenticated に昇格させる
+        this.setState("phone_authenticated");
       } else {
-        const phoneTokens = TokenManager.getPhoneTokens();
-        const hasValidPhoneToken =
-          phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
-
-        if (hasValidPhoneToken) {
-          this.setState("phone_authenticated");
-        } else {
-          this.setState("line_authenticated");
-        }
+        // const phoneTokens = TokenManager.getPhoneTokens();
+        // const hasValidPhoneToken =
+        //   phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
+        //
+        // if (hasValidPhoneToken) {
+        //   this.setState("phone_authenticated");
+        // } else {
+        //   this.setState("line_authenticated");
+        // }
+        this.setState("line_authenticated");
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error("Auth initialization failed", {
         error: errorMessage,
-        component: "AuthStateManager"
+        component: "AuthStateManager",
       });
       throw error;
     }
   }
-
 
   /**
    * ユーザー情報の登録状態を確認
@@ -246,20 +253,36 @@ export class AuthStateManager {
    */
   private async handlePhoneTokenRenewal(event: Event): Promise<void> {
     try {
-      const renewed = await TokenManager.renewPhoneToken();
+      // LINEの有効性だけを見る
       const lineTokens = TokenManager.getLineTokens();
       const hasValidLineToken =
         lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
+      if (!hasValidLineToken) {
+        this.setState("unauthenticated");
+        return;
+      }
+
+      if (SKIP_PHONE_VERIFICATION) {
+        // 常に phone_authenticated を維持/昇格
+        if (
+          this.currentState === "line_authenticated" ||
+          this.currentState === "phone_token_expired"
+        ) {
+          this.setState("phone_authenticated");
+        }
+        return;
+      }
+
+      // ↓ 元ロジック（コメントで保持）
+      /*
+      const renewed = await TokenManager.renewPhoneToken();
       if (renewed && this.currentState === "phone_token_expired") {
         this.setState("phone_authenticated");
       } else if (!renewed) {
-        if (!hasValidLineToken) {
-          this.setState("unauthenticated");
-        } else {
-          this.setState("line_authenticated");
-        }
+        this.setState("line_authenticated");
       }
+      */
     } catch (error) {
       logger.info("Failed to renew phone token", {
         authType: "phone",
@@ -271,11 +294,7 @@ export class AuthStateManager {
       const hasValidLineToken =
         lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
-      if (!hasValidLineToken) {
-        this.setState("unauthenticated");
-      } else {
-        this.setState("line_authenticated");
-      }
+      this.setState(hasValidLineToken ? "phone_authenticated" : "unauthenticated");
     }
   }
 
@@ -297,18 +316,31 @@ export class AuthStateManager {
    */
   public async handlePhoneAuthStateChange(isVerified: boolean): Promise<void> {
     const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = !!lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+    const hasValidLineToken =
+      !!lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
     if (!hasValidLineToken && this.currentState !== "loading") {
       this.setState("unauthenticated");
       return;
     }
 
-    if (isVerified) {
+    if (SKIP_PHONE_VERIFICATION) {
+      // 検証結果に関わらず phone_authenticated に寄せる
       if (
         this.currentState === "line_authenticated" ||
-        this.currentState === "line_token_expired"
+        this.currentState === "line_token_expired" ||
+        this.currentState === "phone_token_expired" ||
+        this.currentState === "loading"
       ) {
+        this.setState("phone_authenticated");
+      }
+      return;
+    }
+
+    // ↓ 元ロジック（コメントで保持）
+    /*
+    if (isVerified) {
+      if (this.currentState === "line_authenticated" || this.currentState === "line_token_expired") {
         this.setState("phone_authenticated");
       }
     } else {
@@ -316,6 +348,7 @@ export class AuthStateManager {
         this.setState("line_authenticated");
       }
     }
+    */
   }
 
   /**
