@@ -203,7 +203,7 @@ export class AuthStateManager {
 
       const { data } = await apolloClient.query({
         query: GET_CURRENT_USER,
-        fetchPolicy: "network-only",
+        fetchPolicy: "cache-first",
         context: {
           headers: {
             Authorization: accessToken ? `Bearer ${accessToken}` : "",
