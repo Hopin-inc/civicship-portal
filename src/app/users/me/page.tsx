@@ -1,102 +1,116 @@
+"use client";
+import { useUserNfts } from "@/components/domains/nfts/hooks/useUserNft";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
+import { ErrorState } from "@/components/shared";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { useAuth } from "@/contexts/AuthProvider";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { notFound } from "next/navigation";
+import { useRef, useEffect } from "react";
+import { useUserProfile } from "../hooks/useUserProfile";
+import { NftCard } from "@/components/domains/nfts/components";
+import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
+import { CardCarousel } from "@/components/shared/CardCarousel";
+import UserPortfolioList from "../components/UserPortfolioList";
+import UserProfileSection from "../components/UserProfileSection";
+
 export default function MyProfilePage() {
-  // const lastPortfolioRef = useRef<HTMLDivElement>(null);
-  //
-  // const { user: currentUser, isAuthenticating } = useAuth();
-  // const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
-  //   currentUser?.id,
-  // );
-  // const { nftInstances } = useUserNfts({ userId: currentUser?.id ?? "" });
-  //
-  // const refetchRef = useRef<(() => void) | null>(null);
-  // useEffect(() => {
-  //   refetchRef.current = refetch;
-  // }, [refetch]);
-  //
-  // // 認証中 or リダイレクト待ち → ローディング表示
-  // if (isAuthenticating || !currentUser) {
-  //   return <LoadingIndicator />;
-  // }
-  //
-  // // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
-  // if (!currentUser || isLoading) {
-  //   return <LoadingIndicator />;
-  // }
-  //
-  // // エラー
-  // if (error) {
-  //   return <ErrorState title={"マイページを読み込めませんでした"} refetchRef={refetchRef} />;
-  // }
-  //
-  // // データがない → notFound()
-  // if (!userData) {
-  //   return notFound();
-  // }
-  //
-  // const targetFeatures = ["opportunities", "credentials"] as const;
-  // const shouldShowOpportunities = targetFeatures.some((feature) =>
-  //   currentCommunityConfig.enableFeatures.includes(feature),
-  // );
-  //
-  // const formattedOpportunities = selfOpportunities.map(formatOpportunities);
+  const lastPortfolioRef = useRef<HTMLDivElement>(null);
+  
+  const { user: currentUser, isAuthenticating } = useAuth();
+  const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
+    currentUser?.id,
+  );
+  const { nftInstances } = useUserNfts({ userId: currentUser?.id ?? "" });
+  
+  const refetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
+  // 認証中 or リダイレクト待ち → ローディング表示
+  if (isAuthenticating || !currentUser) {
+    return <LoadingIndicator />;
+  }
+  
+  // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
+  if (!currentUser || isLoading) {
+    return <LoadingIndicator />;
+  }
+  
+  // エラー
+  if (error) {
+    return <ErrorState title={"マイページを読み込めませんでした"} refetchRef={refetchRef} />;
+  }
+  
+  // データがない → notFound()
+  if (!userData) {
+    return notFound();
+  }
+  
+  const targetFeatures = ["opportunities", "credentials"] as const;
+  const shouldShowOpportunities = targetFeatures.some((feature) =>
+    currentCommunityConfig.enableFeatures.includes(feature),
+  );
+  
+  const formattedOpportunities = selfOpportunities.map(formatOpportunities);
 
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">
-      user
-      {/*<UserProfileSection*/}
-      {/*  userId={currentUser?.id ?? ""}*/}
-      {/*  profile={userData.profile}*/}
-      {/*  userAsset={userData.asset}*/}
-      {/*  isOwner={true}*/}
-      {/*/>*/}
-      {/*{nftInstances && nftInstances.length > 0 ? (*/}
-      {/*  <section className="py-6 mt-0">*/}
-      {/*    <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">*/}
-      {/*      証明書*/}
-      {/*    </h2>*/}
-      {/*    <div className="mt-4 flex gap-4 overflow-x-auto scrollbar-hide">*/}
-      {/*      {nftInstances.map((nftInstance) => (*/}
-      {/*        <NftCard*/}
-      {/*          key={nftInstance.id}*/}
-      {/*          nftInstance={nftInstance}*/}
-      {/*          isCarousel={true}*/}
-      {/*        />*/}
-      {/*      ))}*/}
-      {/*    </div>*/}
-      {/*  </section>*/}
-      {/*) : (*/}
-      {/*  null*/}
-      {/*)}*/}
-      {/*<>*/}
-      {/*  {shouldShowOpportunities && (*/}
-      {/*    <>*/}
-      {/*      {formattedOpportunities.length > 0 && (*/}
-      {/*        <section className="py-6 mt-0">*/}
-      {/*          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">*/}
-      {/*            主催中の体験*/}
-      {/*          </h2>*/}
-      {/*          <CardCarousel>*/}
-      {/*            {formattedOpportunities.map((opportunity) => (*/}
-      {/*              <OpportunityVerticalCard*/}
-      {/*                key={opportunity.id}*/}
-      {/*                {...opportunity}*/}
-      {/*              />*/}
-      {/*            ))}*/}
-      {/*          </CardCarousel>*/}
-      {/*        </section>*/}
-      {/*      )}*/}
-      {/*      <UserPortfolioList*/}
-      {/*        userId={currentUser?.id ?? ""}*/}
-      {/*        isOwner={true}*/}
-      {/*        portfolios={userData.portfolios}*/}
-      {/*        isLoadingMore={false}*/}
-      {/*        hasMore={false}*/}
-      {/*        lastPortfolioRef={lastPortfolioRef}*/}
-      {/*        isSysAdmin={false}*/}
-      {/*        activeOpportunities={userData.currentlyHiringOpportunities}*/}
-      {/*      />*/}
-      {/*    </>*/}
-      {/*  )}*/}
-      {/*</>*/}
+      <UserProfileSection
+        userId={currentUser?.id ?? ""}
+        profile={userData.profile}
+        userAsset={userData.asset}
+        isOwner={true}
+      />
+      {nftInstances && nftInstances.length > 0 ? (
+        <section className="py-6 mt-0">
+          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
+            証明書
+          </h2>
+          <div className="mt-4 flex gap-4 overflow-x-auto scrollbar-hide">
+            {nftInstances.map((nftInstance) => (
+              <NftCard
+                key={nftInstance.id}
+                nftInstance={nftInstance}
+                isCarousel={true}
+              />
+            ))}
+          </div>
+        </section>
+      ) : (
+        null
+      )}
+      <>
+        {shouldShowOpportunities && (
+          <>
+            {formattedOpportunities.length > 0 && (
+              <section className="py-6 mt-0">
+                <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
+                  主催中の体験
+                </h2>
+                <CardCarousel>
+                  {formattedOpportunities.map((opportunity) => (
+                    <OpportunityVerticalCard
+                      key={opportunity.id}
+                      {...opportunity}
+                    />
+                  ))}
+                    </CardCarousel>
+              </section>
+            )}
+            <UserPortfolioList
+              userId={currentUser?.id ?? ""}
+              isOwner={true}
+              portfolios={userData.portfolios}
+              isLoadingMore={false}
+             hasMore={false}
+             lastPortfolioRef={lastPortfolioRef}
+             isSysAdmin={false}
+             activeOpportunities={userData.currentlyHiringOpportunities}
+           />
+         </>
+       )}
+      </>
     </div>
   );
 }
