@@ -4,7 +4,7 @@ import "./globals.css";
 import { CookiesProvider } from "next-client-cookies/server";
 import ApolloProvider from "@/components/providers/ApolloProvider";
 import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider } from "@/contexts/AuthProvider";
+// import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
 import React from "react";
@@ -130,7 +130,7 @@ const RootLayout = ({
         {/*/>*/}
         <CookiesProvider>
           <ApolloProvider>
-            <AuthProvider>
+            {/* <AuthProvider> */}
               <HeaderProvider>
                 {/*<LoadingProvider>*/}
                 {/*<AnalyticsProvider />*/}
@@ -138,7 +138,7 @@ const RootLayout = ({
                 <Toaster richColors className="mx-8" />
                 {/*</LoadingProvider>*/}
               </HeaderProvider>
-            </AuthProvider>
+            {/* </AuthProvider> */}
           </ApolloProvider>
         </CookiesProvider>
       </body>
