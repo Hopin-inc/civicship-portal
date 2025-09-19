@@ -29,13 +29,29 @@ const formatDateTime = (isoString: string | null | undefined): string => {
 
 const formatTransactionDescription = (description: string): { name: string; action: string } => {
   if (!description) return { name: "", action: "" };
-  if (description.endsWith("に支給")) {
-    const name = description.replace("に支給", "");
-    return { name, action: "に支給" };
+
+  const actions = [
+    "に支給",
+    "から支給",
+    "さんに譲渡",
+    "さんから譲渡",
+    "さんに支払い",
+    "さんから支払い",
+    "さんから返品",
+    "さんに返品",
+  ];
+
+  for (const action of actions) {
+    if (description.endsWith(action)) {
+      const name = description.replace(action, "");
+      return { name, action };
+    }
   }
-  if (description === "発行") {
+
+  if (["発行", "初回ボーナス", "ポイント移動", "支払い", "返金"].includes(description)) {
     return { name: description, action: "" };
   }
+
   return { name: description, action: "" };
 };
 
