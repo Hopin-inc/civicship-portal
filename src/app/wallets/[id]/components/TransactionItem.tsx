@@ -7,6 +7,7 @@ import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { GqlTransactionReason } from "@/types/graphql";
+import { truncateText } from "@/utils/stringUtils";
 
 interface TransactionItemProps {
   transaction: AppTransaction;
@@ -55,15 +56,6 @@ const formatTransactionDescription = (description: string): { name: string; acti
   return { name: description, action: "" };
 };
 
-const truncateDid = (did: string | undefined | null, length: number = 20): string => {
-  if (!did) return "did発行中";
-  if (did.length <= length) return did;
-  const start = did.substring(0, length);
-  const end = did.substring(did.length - 10);
-  return `${start}...${end}`;
-};
-
-
 const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image, didValue }) => {
   const isPositive = transaction.transferPoints > 0;
   const { name, action } = formatTransactionDescription(transaction.description);
@@ -88,7 +80,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image, d
               {formatCurrency(transaction.transferPoints)} pt
             </div>
           </div>
-          {transaction.reason !== GqlTransactionReason.PointIssued &&<span className="text-label-xs text-caption py-2">{truncateDid(transaction.didValue)}</span>}
+          {transaction.reason !== GqlTransactionReason.PointIssued &&<span className="text-label-xs text-caption py-2">{truncateText(transaction.didValue,20,"middle")}</span>}
           {transaction.comment && (
             <span className="text-label-xs text-caption bg-background-hover leading-relaxed block p-2 rounded-sm">
               {transaction.comment}

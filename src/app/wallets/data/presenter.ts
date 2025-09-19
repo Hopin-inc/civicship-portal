@@ -48,7 +48,7 @@ export const presenterTransaction = (
     transferPoints: signedPoint,
     transferredAt: node.createdAt ? new Date(node.createdAt).toISOString() : "",
     description: formatTransactionDescription(node.reason, from, to, signedPoint),
-    didValue: node.toWallet?.user?.didIssuanceRequests?.find(req => req?.status === GqlDidIssuanceStatus.Completed)?.didValue ?? "",
+    didValue: node.toWallet?.user?.didIssuanceRequests?.find(req => req?.status === GqlDidIssuanceStatus.Completed)?.didValue ?? "did発行中",
   };
 };
 
