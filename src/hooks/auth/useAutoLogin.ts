@@ -3,9 +3,8 @@
 import React, { useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
-import { AuthState } from "@/contexts/AuthProvider";
+import { AuthState } from "@/types/auth";
 import { logger } from "@/lib/logging";
-
 
 interface UseAutoLoginProps {
   environment: AuthEnvironment;
