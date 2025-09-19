@@ -5,7 +5,7 @@ import { currentCommunityConfig } from "@/lib/communities/metadata";
 export function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const pathname = url.pathname;
-  const rootPath = currentCommunityConfig.rootPath || "/";
+  const rootPath = currentCommunityConfig.rootPath || "/users/me";
 
   // A) LIFF戻りやリッチメニューのディープリンク
   if (pathname === "/") {
