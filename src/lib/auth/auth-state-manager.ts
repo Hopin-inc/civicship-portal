@@ -194,14 +194,17 @@ export class AuthStateManager {
         return false;
       }
 
+      const queryContext: { headers?: Record<string, string> } = {};
+      if (accessToken?.trim()) {
+        queryContext.headers = {
+          Authorization: `Bearer ${accessToken}`,
+        };
+      }
+
       const { data } = await apolloClient.query({
         query: GET_CURRENT_USER,
         fetchPolicy: "network-only",
-        context: {
-          headers: {
-            Authorization: accessToken ? `Bearer ${accessToken}` : "",
-          },
-        },
+        context: queryContext,
       });
 
       const isRegistered = data?.currentUser?.user != null;
