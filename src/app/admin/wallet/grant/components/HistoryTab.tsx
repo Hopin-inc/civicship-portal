@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { GqlUser } from "@/types/graphql";
 import UserInfoCard from "./UserInfoCard";
 import { useWalletsAndDidIssuanceRequests } from "../hooks/useWalletsAndDidIssuanceRequests";
@@ -15,11 +15,14 @@ interface HistoryTabProps {
 
 export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps) {
   const { user } = useAuth();
-  const { error, presentedTransactions, loading } = useWalletsAndDidIssuanceRequests({
+  const { error, presentedTransactions, loading, refetch } = useWalletsAndDidIssuanceRequests({
     currentUserId: user?.id,
     listType,
     keyword: searchQuery,
   });
+  useEffect(() => {
+    refetch();
+  }, []);
 
   if (error) {
     return (
