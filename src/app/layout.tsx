@@ -11,7 +11,6 @@ import MainContent from "@/components/layout/MainContent";
 import React from "react";
 import { currentCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
-import Script from "next/script";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -42,19 +41,6 @@ const RootLayout = ({
   return (
     <html lang="ja">
       <body className={font.className}>
-        {/* ✅ Google Ads (gtag.js) */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-17223693738"
-          strategy="afterInteractive"
-        />
-        <Script id="gtag-init" strategy="afterInteractive">
-          {`
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'AW-17223693738');
-    `}
-        </Script>
         <script
           dangerouslySetInnerHTML={{
             __html: `
