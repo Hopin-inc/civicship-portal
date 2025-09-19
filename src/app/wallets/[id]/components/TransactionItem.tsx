@@ -12,7 +12,6 @@ import { truncateText } from "@/utils/stringUtils";
 interface TransactionItemProps {
   transaction: AppTransaction;
   image?: string; // ← 追加
-  didValue?: string;
 }
 
 const formatDateTime = (isoString: string | null | undefined): string => {
@@ -56,7 +55,7 @@ const formatTransactionDescription = (description: string): { name: string; acti
   return { name: description, action: "" };
 };
 
-const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image, didValue }) => {
+const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image }) => {
   const isPositive = transaction.transferPoints > 0;
   const { name, action } = formatTransactionDescription(transaction.description);
   return (
