@@ -30,6 +30,7 @@ export class LiffService {
   private liffId: string;
   private state: LiffState;
   private initializing = false;
+  private initPromise?: Promise<boolean>;
 
   /**
    * コンストラクタ
@@ -77,51 +78,56 @@ export class LiffService {
    * @returns 初期化が成功したかどうか
    */
   public async initialize(): Promise<boolean> {
-    try {
-      if (this.state.isInitialized) {
+    if (this.state.isInitialized) return true;
+    if (this.initPromise) return this.initPromise;
+
+    this.initPromise = (async () => {
+      try {
+        this.initializing = true;
+        logger.debug("LIFF init:start", { component: "LiffService" });
+
+        await liff.init({ liffId: this.liffId });
+        this.state.isInitialized = true;
+        this.state.isLoggedIn = liff.isLoggedIn();
+        this.state.error = null;
+
+        if (this.state.isLoggedIn) {
+          await this.updateProfile();
+        }
+
+        logger.debug("LIFF init:done(ok)", { component: "LiffService" });
         return true;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
+                                       errorMessage.includes("LINE") ||
+                                       errorMessage.includes("Load failed");
+        
+        if (isEnvironmentConstraint) {
+          logger.warn("LIFF init:done(ng) - environment constraint", {
+            authType: "liff",
+            error: errorMessage,
+            component: "LiffService",
+            errorCategory: "environment_constraint",
+            expected: true,
+          });
+        } else {
+          logger.info("LIFF init:done(ng) - initialization failed", {
+            authType: "liff",
+            error: errorMessage,
+            component: "LiffService",
+            errorCategory: "initialization_error",
+          });
+        }
+        this.state.error = error as Error;
+        return false;
+      } finally {
+        this.initializing = false;
+        this.initPromise = undefined;
       }
-      if (this.initializing) {
-        return true;
-      }
-      this.initializing = true;
+    })();
 
-      await liff.init({ liffId: this.liffId });
-      this.state.isInitialized = true;
-      this.state.isLoggedIn = liff.isLoggedIn();
-
-      if (this.state.isLoggedIn) {
-        await this.updateProfile();
-      }
-
-      return true;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
-                                     errorMessage.includes("LINE") ||
-                                     errorMessage.includes("Load failed");
-      
-      if (isEnvironmentConstraint) {
-        logger.warn("LIFF environment initialization limitation", {
-          authType: "liff",
-          error: errorMessage,
-          component: "LiffService",
-          errorCategory: "environment_constraint",
-          expected: true,
-        });
-      } else {
-        logger.info("LIFF initialization failed", {
-          authType: "liff",
-          error: errorMessage,
-          component: "LiffService",
-          errorCategory: "initialization_error",
-        });
-      }
-      this.state.error = error as Error;
-      return false;
-    }finally {
-      this.initializing = false;
-    }
+    return this.initPromise;
   }
 
   /**

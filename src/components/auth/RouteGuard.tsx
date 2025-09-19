@@ -49,12 +49,15 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       return;
     }
 
-    if (typeof window !== "undefined" && pathname === "/") {
+    if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
-      const isReturnFromLineAuth =
-        urlParams.has("code") && urlParams.has("state") && urlParams.has("liffClientId");
-      if (isReturnFromLineAuth) {
-        logger.debug("RouteGuard: Skipping redirect for LINE auth return to homepage", {
+      const hasLiffParams = 
+        (urlParams.has("code") && urlParams.has("state") && urlParams.has("liffClientId")) ||
+        urlParams.has("liff.state");
+      
+      if (hasLiffParams) {
+        logger.debug("RouteGuard: Skipping redirect for LIFF parameters", {
+          pathname,
           component: "RouteGuard",
         });
         setAuthorized(true);

@@ -64,12 +64,15 @@ const requestLink = new ApolloLink((operation, forward) => {
         const accessToken = firebaseToken || lineTokens.accessToken;
 
         operation.setContext(({ headers = {} }) => {
-          const baseHeaders = {
+          const baseHeaders: Record<string, string> = {
             ...headers,
-            Authorization: accessToken ? `Bearer ${accessToken}` : "",
-            "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-            "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
+            "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID || "",
+            "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID || "",
           };
+          
+          if (accessToken?.trim()) {
+            baseHeaders.Authorization = `Bearer ${accessToken}`;
+          }
 
           const tokenRequiredOperations = ["userSignUp", "linkPhoneAuth", "storePhoneAuthToken", "identityCheckPhoneUser"];
 
@@ -99,14 +102,19 @@ const requestLink = new ApolloLink((operation, forward) => {
         });
         const lineTokens = TokenManager.getLineTokens();
 
-        operation.setContext(({ headers = {} }) => ({
-          headers: {
+        operation.setContext(({ headers = {} }) => {
+          const baseHeaders: Record<string, string> = {
             ...headers,
-            Authorization: lineTokens.accessToken ? `Bearer ${lineTokens.accessToken}` : "",
-            "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-            "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
-          },
-        }));
+            "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID || "",
+            "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID || "",
+          };
+          
+          if (lineTokens.accessToken?.trim()) {
+            baseHeaders.Authorization = `Bearer ${lineTokens.accessToken}`;
+          }
+          
+          return { headers: baseHeaders };
+        });
 
         forward(operation).subscribe(observer);
       }

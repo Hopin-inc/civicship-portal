@@ -9,6 +9,7 @@ import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
 import React from "react";
 import { currentCommunityMetadata } from "@/lib/communities/metadata";
+import LiffBootstrap from "./LiffBootstrap";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -42,6 +43,7 @@ const RootLayout = ({
         <CookiesProvider>
           <ApolloProvider>
             <HeaderProvider>
+              <LiffBootstrap />
               <LoadingProvider>
                 {/*/!*<AnalyticsProvider />*!/ useAuthを利用してるのでAuthProviderの最小化が実現できたら復元*/}
                 <MainContent>{children}</MainContent>
