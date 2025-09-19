@@ -157,5 +157,6 @@ function buildPresentedTransaction({
     label,
     didValue: truncateDid(didValue, 20),
     createdAt: transaction.createdAt,
+    comment: transaction.comment,
   };
 }

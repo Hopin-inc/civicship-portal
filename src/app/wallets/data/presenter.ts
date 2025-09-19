@@ -1,6 +1,6 @@
 "use client";
 
-import { GqlTransaction, GqlTransactionReason, GqlWallet, GqlWalletType } from "@/types/graphql";
+import { GqlDidIssuanceStatus, GqlTransaction, GqlTransactionReason, GqlWallet, GqlWalletType } from "@/types/graphql";
 import { AppTransaction, AvailableTicket, UserAsset } from "@/app/wallets/data/type";
 
 export const presenterUserAsset = (wallet: GqlWallet | undefined | null): UserAsset => {
@@ -44,9 +44,11 @@ export const presenterTransaction = (
     from,
     to,
     source: "",
+    comment: node.comment ?? "",
     transferPoints: signedPoint,
     transferredAt: node.createdAt ? new Date(node.createdAt).toISOString() : "",
     description: formatTransactionDescription(node.reason, from, to, signedPoint),
+    didValue: node.toWallet?.user?.didIssuanceRequests?.find(req => req?.status === GqlDidIssuanceStatus.Completed)?.didValue ?? "",
   };
 };
 

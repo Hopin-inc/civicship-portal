@@ -51,11 +51,12 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
           point={BigInt(tx.point)}
           sign={tx.sign}
           pointColor={tx.pointColor}
-          didValue={tx.didValue ?? "did取得中"}
+          didValue={tx.didValue}
           createdAt={tx.createdAt}
           onClick={() => {
             if (tx.otherUser) onSelect(tx.otherUser);
           }}
+          comment={tx.comment ?? undefined}
         />
       ))}
     </div>

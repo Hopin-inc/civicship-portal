@@ -4,7 +4,7 @@ export const TRANSACTION_FRAGMENT = gql`
   fragment TransactionFields on Transaction {
     id
     reason
-
+    comment
     fromPointChange
     toPointChange
 
