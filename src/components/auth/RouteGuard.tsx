@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
+import { useQuery } from "@apollo/client";
+import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
@@ -20,13 +22,17 @@ interface RouteGuardProps {
  * 認証状態に基づいてページアクセスを制御する
  */
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
-  const { authenticationState, loading } = useAuth();
+  const { isAuthenticated, authenticationState, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next") as EncodedURIComponent;
   const [authorized, setAuthorized] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
+
+  const { loading: userLoading } = useQuery(GET_CURRENT_USER, {
+    skip: !isAuthenticated,
+  });
 
   const authRedirectService = React.useMemo(() => {
     return AuthRedirectService.getInstance();
@@ -39,7 +45,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, [loading]);
 
   useEffect(() => {
-    if (loading || isInitialRender) {
+    if (loading || userLoading || isInitialRender) {
       return;
     }
 
@@ -76,6 +82,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     pathname,
     authenticationState,
     loading,
+    userLoading,
     router,
     authRedirectService,
     nextParam,
@@ -83,7 +90,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     isInitialRender,
   ]);
 
-  if (loading || isInitialRender) {
+  if (loading || userLoading || isInitialRender) {
     return <LoadingIndicator />;
   }
 
