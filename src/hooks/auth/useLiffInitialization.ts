@@ -5,7 +5,6 @@ import { LiffService } from "@/lib/auth/liff-service";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { logger } from "@/lib/logging";
 
-
 interface UseLiffInitializationProps {
   environment: AuthEnvironment;
   liffService: LiffService;
@@ -13,13 +12,15 @@ interface UseLiffInitializationProps {
 
 export const useLiffInitialization = ({ environment, liffService }: UseLiffInitializationProps) => {
   useEffect(() => {
+    let cancelled = false;
+
     const initializeLiff = async () => {
       if (environment !== AuthEnvironment.LIFF) return;
 
       const timestamp = new Date().toISOString();
 
       const liffSuccess = await liffService.initialize();
-      if (!liffSuccess) {
+      if (!liffSuccess && !cancelled) {
         logger.warn("LIFF initialization failed", {
           authType: "liff",
           timestamp,
@@ -29,5 +30,9 @@ export const useLiffInitialization = ({ environment, liffService }: UseLiffIniti
     };
 
     initializeLiff();
+
+    return () => {
+      cancelled = true;
+    };
   }, [environment, liffService]);
 };
