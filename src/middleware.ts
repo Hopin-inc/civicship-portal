@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { FeaturesType, currentCommunityConfig } from "@/lib/communities/metadata";
+import { NextResponse } from "next/server";
+import { currentCommunityConfig, FeaturesType } from "@/lib/communities/metadata";
 
 // Map features to their corresponding route paths
 const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
@@ -17,10 +17,11 @@ export function middleware(request: NextRequest) {
   const rootPath = currentCommunityConfig.rootPath || "/";
 
   // liff.state がある場合はrootPathへのリダイレクトをスキップ（LIFFのルーティングバグ対策）
-  const hasLiffState = request.nextUrl.searchParams.get("liff.state");
+  // const hasLiffState = request.nextUrl.searchParams.get("liff.state");
 
   // ルートページへのアクセスを処理（liff.stateがない場合、またはliff.stateが/の場合のみrootPathにリダイレクト）
-  if (pathname === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
+  // if (pathname === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
+  if (pathname === "/" && rootPath !== "/") {
     return NextResponse.redirect(new URL(rootPath, request.url));
   }
 
@@ -30,7 +31,7 @@ export function middleware(request: NextRequest) {
         if (feature === "opportunities" && /^\/activities\/[^/]+$/.test(pathname)) {
           continue;
         }
-        
+
         if (pathname === route || pathname.startsWith(`${route}/`)) {
           console.log(`Redirecting from disabled feature path: ${pathname} to ${rootPath}`);
           return NextResponse.redirect(new URL(rootPath, request.url));
