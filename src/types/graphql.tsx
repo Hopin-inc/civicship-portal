@@ -2449,6 +2449,7 @@ export type GqlTicketsConnection = {
 
 export type GqlTransaction = {
   __typename?: "Transaction";
+  comment?: Maybe<Scalars["String"]["output"]>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   createdByUser?: Maybe<GqlUser>;
   fromPointChange?: Maybe<Scalars["Int"]["output"]>;
@@ -2464,6 +2465,7 @@ export type GqlTransaction = {
 };
 
 export type GqlTransactionDonateSelfPointInput = {
+  comment?: InputMaybe<Scalars["String"]["input"]>;
   communityId: Scalars["ID"]["input"];
   toUserId: Scalars["ID"]["input"];
   transferPoints: Scalars["Int"]["input"];
@@ -2501,6 +2503,7 @@ export type GqlTransactionFilterInput = {
 };
 
 export type GqlTransactionGrantCommunityPointInput = {
+  comment?: InputMaybe<Scalars["String"]["input"]>;
   toUserId: Scalars["ID"]["input"];
   transferPoints: Scalars["Int"]["input"];
 };
@@ -2513,6 +2516,7 @@ export type GqlTransactionGrantCommunityPointSuccess = {
 };
 
 export type GqlTransactionIssueCommunityPointInput = {
+  comment?: InputMaybe<Scalars["String"]["input"]>;
   transferPoints: Scalars["Int"]["input"];
 };
 
@@ -3501,6 +3505,7 @@ export type GqlGetUserWalletQuery = {
         __typename?: "Transaction";
         id: string;
         reason: GqlTransactionReason;
+        comment?: string | null;
         fromPointChange?: number | null;
         toPointChange?: number | null;
         createdAt?: Date | null;
@@ -3613,6 +3618,7 @@ export type GqlGetWalletsWithTransactionQuery = {
           __typename?: "Transaction";
           id: string;
           reason: GqlTransactionReason;
+          comment?: string | null;
           fromPointChange?: number | null;
           toPointChange?: number | null;
           createdAt?: Date | null;
@@ -5828,6 +5834,7 @@ export type GqlTransactionFieldsFragment = {
   __typename?: "Transaction";
   id: string;
   reason: GqlTransactionReason;
+  comment?: string | null;
   fromPointChange?: number | null;
   toPointChange?: number | null;
   createdAt?: Date | null;
@@ -5846,6 +5853,7 @@ export type GqlPointIssueMutation = {
       __typename?: "Transaction";
       id: string;
       reason: GqlTransactionReason;
+      comment?: string | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
       createdAt?: Date | null;
@@ -5866,6 +5874,7 @@ export type GqlPointGrantMutation = {
       __typename?: "Transaction";
       id: string;
       reason: GqlTransactionReason;
+      comment?: string | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
       createdAt?: Date | null;
@@ -5886,6 +5895,7 @@ export type GqlPointDonateMutation = {
       __typename?: "Transaction";
       id: string;
       reason: GqlTransactionReason;
+      comment?: string | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
       createdAt?: Date | null;
@@ -5920,6 +5930,7 @@ export type GqlGetTransactionsQuery = {
         __typename?: "Transaction";
         id: string;
         reason: GqlTransactionReason;
+        comment?: string | null;
         fromPointChange?: number | null;
         toPointChange?: number | null;
         createdAt?: Date | null;
@@ -6233,6 +6244,7 @@ export const TransactionFieldsFragmentDoc = gql`
   fragment TransactionFields on Transaction {
     id
     reason
+    comment
     fromPointChange
     toPointChange
     createdAt

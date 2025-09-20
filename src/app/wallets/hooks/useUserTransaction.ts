@@ -29,9 +29,10 @@ const useUserTransactions = (userId: string): UseMyTransactionsResult => {
         or: [{ fromUserId: userId }, { toUserId: userId }],
       },
       first: 100,
+      withDidIssuanceRequests: true,
     },
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
   });
 
   const connection = data?.transactions ?? fallbackConnection;

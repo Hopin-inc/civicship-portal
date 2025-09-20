@@ -63,7 +63,7 @@ export default function DonatePointPage() {
       } => !!member && !!member.user,
     );
 
-  const handleDonate = async (amount: number) => {
+  const handleDonate = async (amount: number, comment?: string) => {
     if (!selectedUser) return;
 
     setIsLoading(true);
@@ -73,6 +73,7 @@ export default function DonatePointPage() {
           communityId: COMMUNITY_ID,
           transferPoints: amount,
           toUserId: selectedUser.id,
+          comment: comment,
         },
         permission: { userId: currentUser?.id ?? "" },
       });
@@ -130,9 +131,9 @@ export default function DonatePointPage() {
           onSubmit={handleDonate}
           currentPoint={currentPoint}
           title="ポイントをあげる"
-          recipientLabel="あげる相手"
+          recipientLabel="にあげる"
           submitLabel="あげる"
-          backLabel="送り先を選び直す"
+          backLabel="あげる相手を選び直す"
           presetAmounts={[1000, 3000, 5000, 10000]}
         />
       )}
