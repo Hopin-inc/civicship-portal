@@ -124,12 +124,24 @@ function TransferInputStep({
             </div>
             <div className="mt-6">
               <Label className="text-label-md font-medium">コメント</Label>
-              <Textarea
-                placeholder="例）草刈り手伝ってくれてありがとう！"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                className="mt-3 focus:outline-none focus:ring-0 shadow-none min-h-[120px]"
-              />
+              <div className="relative mt-3">
+                <Textarea
+                  placeholder="例）草刈り手伝ってくれてありがとう！"
+                  value={comment}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    if (newValue.length > 100) {
+                      toast.error("100文字以内で入力してください");
+                      return;
+                    }
+                    setComment(newValue);
+                  }}
+                  className="focus:outline-none focus:ring-0 shadow-none min-h-[120px] pr-12"
+                />
+                <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+                  {comment.length}/100
+                </div>
+              </div>
             </div>
           </section>
         </div>

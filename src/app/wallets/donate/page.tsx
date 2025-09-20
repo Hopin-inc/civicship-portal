@@ -131,9 +131,9 @@ export default function DonatePointPage() {
           onSubmit={handleDonate}
           currentPoint={currentPoint}
           title="ポイントをあげる"
-          recipientLabel="に譲渡"
+          recipientLabel="にあげる"
           submitLabel="あげる"
-          backLabel="譲渡先を選び直す"
+          backLabel="あげる相手を選び直す"
           presetAmounts={[1000, 3000, 5000, 10000]}
         />
       )}
