@@ -127,9 +127,9 @@ export default function UserWalletPage() {
         <button
             type="button"
             className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
-            onClick={() => router.push(`/wallets/donate?currentPoint=${currentPoint}&tab=history`)}
-          >
-          取引履歴へ
+            onClick={() => router.push(`/transactions`)}
+            >
+            コミュニティ履歴へ
         </button>
       </div>
       <div className="space-y-2 mt-2">
