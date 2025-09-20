@@ -22,7 +22,7 @@ export const useInfiniteTransactions = ({
   fetchMore,
 }: UseInfiniteTransactionsProps): UseInfiniteTransactionsReturn => {
   const [transactions, setTransactions] = useState<GqlTransaction[]>(
-    initialTransactions.edges?.map(edge => edge?.node).filter(Boolean) as GqlTransaction[] || []
+    (initialTransactions.edges?.map(edge => edge?.node) ?? []).filter(Boolean) as GqlTransaction[]
   );
   const [hasNextPage, setHasNextPage] = useState(initialTransactions.pageInfo?.hasNextPage ?? false);
   const [endCursor, setEndCursor] = useState(initialTransactions.pageInfo?.endCursor ?? null);
@@ -37,7 +37,7 @@ export const useInfiniteTransactions = ({
     try {
       const data = await fetchMore(endCursor, 20);
       
-      const newTransactions = data.edges?.map(edge => edge?.node).filter(Boolean) as GqlTransaction[] || [];
+      const newTransactions = (data.edges?.map(edge => edge?.node) ?? []).filter(Boolean) as GqlTransaction[];
       
       setTransactions(prev => [...prev, ...newTransactions]);
       setHasNextPage(data.pageInfo?.hasNextPage ?? false);

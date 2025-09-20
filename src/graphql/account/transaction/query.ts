@@ -110,7 +110,7 @@ export const GET_TRANSACTIONS_SERVER_QUERY = `
 /**
  * GraphQLリクエストを実行するヘルパー関数
  */
-export async function executeGraphQLQuery<TData = any, TVariables = any>(
+export async function executeGraphQLQuery<TData = unknown, TVariables = Record<string, unknown>>(
   query: string,
   variables: TVariables,
   headers: Record<string, string> = {}
@@ -137,7 +137,7 @@ export async function executeGraphQLQuery<TData = any, TVariables = any>(
   
   if (result.errors) {
     console.error("GraphQL errors:", result.errors);
-    throw new Error(`GraphQL errors: ${result.errors.map((e: any) => e.message).join(', ')}`);
+    throw new Error(`GraphQL errors: ${result.errors.map((e: { message: string }) => e.message).join(', ')}`);
   }
 
   return result.data;

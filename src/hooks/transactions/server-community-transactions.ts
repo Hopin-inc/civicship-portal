@@ -1,7 +1,6 @@
 import { executeGraphQLQuery, GET_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/transaction/query";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlTransactionsConnection, GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables } from "@/types/graphql";
-import { toast } from "sonner";
 
 export interface ServerCommunityTransactionsParams {
   first?: number;
@@ -50,7 +49,6 @@ export async function getServerCommunityTransactions(
     return (data.transactions as GqlTransactionsConnection) ?? fallbackConnection;
   } catch (error) {
     console.error("Failed to fetch community transactions:", error);
-    toast.error("データの取得に失敗しました");
     return fallbackConnection;
   }
 }

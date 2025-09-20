@@ -11,6 +11,8 @@ interface TransactionCardProps {
   image?: string;
 }
 
+const DID_ISSUANCE_PENDING_TEXT = "did発行中";
+
 const formatDateTime = (isoString: string | null | undefined): string => {
   if (!isoString) return "日時不明";
 
@@ -48,7 +50,6 @@ const statusLabel = (reason: GqlTransactionReason) => {
 
 
 const formatTransactionDescription = (reason: GqlTransactionReason, from: string, to: string): { name: string; to: string; action: string } => {
-    console.log(reason, from, to);
   switch (reason) {
     case GqlTransactionReason.Donation:
       return { name: from, to: to, action: `が譲渡` };
@@ -88,7 +89,7 @@ const getTransactionInfo = (transaction: GqlTransaction) => {
     reason: transaction.reason,
     comment: transaction.comment ?? "",
     transferredAt: transaction.createdAt ? new Date(transaction.createdAt).toISOString() : "",
-    didValue: transaction.toWallet?.user?.didIssuanceRequests?.find(req => req?.status === "COMPLETED")?.didValue ?? "did発行中",
+    didValue: transaction.toWallet?.user?.didIssuanceRequests?.find(req => req?.status === "COMPLETED")?.didValue ?? DID_ISSUANCE_PENDING_TEXT,
   };
 };
 
