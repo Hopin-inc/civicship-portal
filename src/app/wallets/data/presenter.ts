@@ -94,7 +94,7 @@ const formatTransactionDescription = (
   }
 };
 
-const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
+export const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
   if (!wallet) return "";
   switch (wallet.type) {
     case GqlWalletType.Member:

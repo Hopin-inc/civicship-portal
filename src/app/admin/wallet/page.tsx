@@ -140,7 +140,7 @@ export default function WalletPage() {
         <button
             type="button"
             className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
-            onClick={() => router.push(`/admin/wallet/grant?currentPoint=${currentPoint}&tab=history`)}
+            onClick={() => router.push(`/transactions`)}
           >
           コミュニティ履歴へ
         </button>
