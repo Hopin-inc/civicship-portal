@@ -49,7 +49,7 @@ export const usePhoneAuthState = ({
     setState((prev) => ({
       ...prev,
       authenticationState: isVerified
-        ? prev.authenticationState === "line_authenticated"
+        ? prev.authenticationState === "line_authenticated" || prev.authenticationState === "initializing" || prev.authenticationState === "stabilizing"
           ? "phone_authenticated"
           : prev.authenticationState
         : prev.authenticationState,

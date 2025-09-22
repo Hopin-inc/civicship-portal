@@ -6,6 +6,7 @@ import { logger } from "@/lib/logging";
 
 export type AuthenticationState =
   | "initializing"
+  | "stabilizing"
   | "unauthenticated"
   | "line_authenticated"
   | "line_token_expired"
@@ -160,7 +161,10 @@ export class AuthStateManager {
           component: "AuthStateManager",
           timestamp: new Date().toISOString(),
         });
-        this.setState("unauthenticated");
+        this.setState("stabilizing");
+        setTimeout(() => {
+          this.setState("unauthenticated");
+        }, 100);
         return;
       }
 
@@ -177,25 +181,29 @@ export class AuthStateManager {
         isUserRegistered,
       });
 
-      if (isUserRegistered) {
-        this.setState("user_registered");
-      } else {
-        const phoneTokens = TokenManager.getPhoneTokens();
-        const hasValidPhoneToken =
-          phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
+      this.setState("stabilizing");
 
-        logger.debug("AuthStateManager: Phone token check completed", {
-          component: "AuthStateManager",
-          timestamp: new Date().toISOString(),
-          hasValidPhoneToken,
-        });
-
-        if (hasValidPhoneToken) {
-          this.setState("phone_authenticated");
+      setTimeout(async () => {
+        if (isUserRegistered) {
+          this.setState("user_registered");
         } else {
-          this.setState("line_authenticated");
+          const phoneTokens = TokenManager.getPhoneTokens();
+          const hasValidPhoneToken =
+            phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
+
+          logger.debug("AuthStateManager: Phone token check completed", {
+            component: "AuthStateManager",
+            timestamp: new Date().toISOString(),
+            hasValidPhoneToken,
+          });
+
+          if (hasValidPhoneToken) {
+            this.setState("phone_authenticated");
+          } else {
+            this.setState("line_authenticated");
+          }
         }
-      }
+      }, 100);
 
       logger.debug("AuthStateManager: Initialization completed successfully", {
         component: "AuthStateManager",
@@ -357,7 +365,7 @@ export class AuthStateManager {
    */
   public async handleLineAuthStateChange(isAuthenticated: boolean): Promise<void> {
     if (isAuthenticated) {
-      if (this.currentState === "unauthenticated" || this.currentState === "loading" || this.currentState === "initializing") {
+      if (this.currentState === "unauthenticated" || this.currentState === "loading" || this.currentState === "initializing" || this.currentState === "stabilizing") {
         this.setState("line_authenticated");
       }
     } else {
@@ -372,7 +380,7 @@ export class AuthStateManager {
     const lineTokens = TokenManager.getLineTokens();
     const hasValidLineToken = !!lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
-    if (!hasValidLineToken && this.currentState !== "loading" && this.currentState !== "initializing") {
+    if (!hasValidLineToken && this.currentState !== "loading" && this.currentState !== "initializing" && this.currentState !== "stabilizing") {
       this.setState("unauthenticated");
       return;
     }
@@ -385,7 +393,7 @@ export class AuthStateManager {
         this.setState("phone_authenticated");
       }
     } else {
-      if (this.currentState !== "unauthenticated" && this.currentState !== "loading" && this.currentState !== "initializing") {
+      if (this.currentState !== "unauthenticated" && this.currentState !== "loading" && this.currentState !== "initializing" && this.currentState !== "stabilizing") {
         this.setState("line_authenticated");
       }
     }

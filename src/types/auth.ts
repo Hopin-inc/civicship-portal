@@ -8,12 +8,13 @@ export type AuthState = {
   currentUser: GqlCurrentUserPayload["user"] | null;
   authenticationState:
     | "initializing" // I0: 初期化中
-    | "unauthenticated" // S0: 未認証
-    | "line_authenticated" // S1: LINE認証済み
-    | "line_token_expired" // S1e: LINEトークン期限切れ
-    | "phone_authenticated" // S2: 電話番号認証済み
-    | "phone_token_expired" // S2e: 電話番号トークン期限切れ
-    | "user_registered" // S3: ユーザ情報登録済み
+    | "stabilizing" // S0: 認証状態安定化中
+    | "unauthenticated" // S1: 未認証
+    | "line_authenticated" // S2: LINE認証済み
+    | "line_token_expired" // S2e: LINEトークン期限切れ
+    | "phone_authenticated" // S3: 電話番号認証済み
+    | "phone_token_expired" // S3e: 電話番号トークン期限切れ
+    | "user_registered" // S4: ユーザ情報登録済み
     | "loading"; // L0: 状態チェック中
   environment: AuthEnvironment;
   isAuthenticating: boolean;

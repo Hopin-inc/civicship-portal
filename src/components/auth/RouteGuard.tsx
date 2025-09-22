@@ -45,7 +45,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, [loading]);
 
   useEffect(() => {
-    if (loading || userLoading || isInitialRender || authenticationState === "initializing") {
+    if (loading || userLoading || isInitialRender || authenticationState === "initializing" || authenticationState === "stabilizing") {
       return;
     }
 
@@ -90,7 +90,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     isInitialRender,
   ]);
 
-  if (loading || userLoading || isInitialRender || authenticationState === "initializing") {
+  if (loading || userLoading || isInitialRender || authenticationState === "initializing" || authenticationState === "stabilizing") {
     return <LoadingIndicator />;
   }
 

@@ -30,7 +30,7 @@ export const useFirebaseAuthState = ({
         ...prev,
         firebaseUser: user,
         authenticationState: user
-          ? prev.authenticationState === "loading"
+          ? prev.authenticationState === "loading" || prev.authenticationState === "initializing" || prev.authenticationState === "stabilizing"
             ? "line_authenticated"
             : prev.authenticationState
           : "unauthenticated",
