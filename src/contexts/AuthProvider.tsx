@@ -171,8 +171,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         await authStateManager.initialize();
         setIsAuthInitialized(true);
         setAuthInitError(null);
-        const currentState = authStateManager.getState();
-        setState((prev) => ({ ...prev, authenticationState: currentState }));
       } catch (error) {
         setAuthInitError(error instanceof Error ? error.message : "認証の初期化に失敗しました");
         setIsAuthInitialized(false);
@@ -382,7 +380,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authenticationState: state.authenticationState,
     isAuthenticating: state.isAuthenticating,
     environment: state.environment,
-    authInitComplete: isAuthInitialized && !authInitError && state.authenticationState !== "loading",
+    authInitComplete: isAuthInitialized && !authInitError,
     loginWithLiff,
     logout,
     phoneAuth: {
