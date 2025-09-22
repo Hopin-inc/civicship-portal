@@ -22,7 +22,7 @@ interface RouteGuardProps {
  * 認証状態に基づいてページアクセスを制御する
  */
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
-  const { isAuthenticated, authenticationState, loading } = useAuth();
+  const { isAuthenticated, authenticationState, loading, authReady } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -45,7 +45,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, [loading]);
 
   useEffect(() => {
-    if (loading || userLoading || isInitialRender || authenticationState === "initializing" || authenticationState === "stabilizing") {
+    if (loading || userLoading || isInitialRender || !authReady) {
       return;
     }
 
@@ -88,9 +88,10 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     nextParam,
     searchParams,
     isInitialRender,
+    authReady,
   ]);
 
-  if (loading || userLoading || isInitialRender || authenticationState === "initializing" || authenticationState === "stabilizing") {
+  if (loading || userLoading || isInitialRender || !authReady) {
     return <LoadingIndicator />;
   }
 

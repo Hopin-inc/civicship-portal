@@ -344,6 +344,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authenticationState: state.authenticationState,
     isAuthenticating: state.isAuthenticating,
     environment: state.environment,
+    authReady: isAuthInitialized && state.authenticationState !== "initializing",
     loginWithLiff,
     logout,
     phoneAuth: {
@@ -357,7 +358,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: state.authenticationState === "loading" || state.authenticationState === "initializing" || state.authenticationState === "stabilizing" || userLoading || state.isAuthenticating,
+    loading: state.authenticationState === "loading" || state.authenticationState === "initializing" || userLoading || state.isAuthenticating,
   };
 
   if (!isAuthInitialized) {

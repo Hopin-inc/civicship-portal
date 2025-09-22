@@ -29,6 +29,7 @@ export interface AuthContextType {
   authenticationState: AuthState["authenticationState"];
   isAuthenticating: boolean;
   environment: AuthEnvironment;
+  authReady: boolean;
 
   loginWithLiff: (redirectPath?: RawURIComponent) => Promise<boolean>;
   logout: () => Promise<void>;
