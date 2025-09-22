@@ -27,6 +27,7 @@ export class AuthStateManager {
   private readonly sessionId: string;
   private networkErrorListener: ((event: CustomEvent) => void) | null = null;
   private isInitializing: boolean = false;
+  private initializationPromise: Promise<void> | null = null;
 
   private constructor() {
     this.sessionId = this.initializeSessionId();
@@ -191,6 +192,15 @@ export class AuthStateManager {
    * 認証状態を初期化
    */
   public async initialize(): Promise<void> {
+    if (this.initializationPromise) {
+      console.log("🔄 AuthStateManager: Returning existing initialization promise", {
+        sessionId: this.sessionId,
+        currentState: this.currentState,
+        timestamp: new Date().toISOString(),
+      });
+      return this.initializationPromise;
+    }
+
     if (this.isInitializing) {
       console.log("🔄 AuthStateManager: Initialization already in progress", {
         sessionId: this.sessionId,
@@ -200,7 +210,12 @@ export class AuthStateManager {
       });
       return;
     }
-    
+
+    this.initializationPromise = this.performInitialization();
+    return this.initializationPromise;
+  }
+
+  private async performInitialization(): Promise<void> {
     this.isInitializing = true;
 
     try {
@@ -274,7 +289,14 @@ export class AuthStateManager {
             
             await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
           } else {
-            throw error; // Re-throw non-network errors
+            // For non-network errors, set unauthenticated state and exit retry loop
+            logger.error("AuthStateManager: Non-network error during initialization", {
+              error: errorMessage,
+              component: "AuthStateManager",
+              timestamp: new Date().toISOString(),
+            });
+            this.setState("unauthenticated");
+            return;
           }
         }
       }
@@ -321,6 +343,7 @@ export class AuthStateManager {
       throw error;
     } finally {
       this.isInitializing = false;
+      this.initializationPromise = null;
     }
   }
 

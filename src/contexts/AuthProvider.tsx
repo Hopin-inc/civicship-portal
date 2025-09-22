@@ -105,6 +105,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthInitialized, setIsAuthInitialized] = useState(false);
   const [authInitError, setAuthInitError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
+  const [authStateStabilizing, setAuthStateStabilizing] = useState(false);
 
   useEffect(() => {
     if (!authStateManager) return;
@@ -163,6 +164,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
   useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
   useAutoLogin({ environment, state, liffService, setState, refetchUser });
+
+  useEffect(() => {
+    if (isAuthInitialized && !authInitError && state.authenticationState !== "network_error") {
+      setAuthStateStabilizing(true);
+      const stabilizationTimer = setTimeout(() => {
+        setAuthStateStabilizing(false);
+      }, 5000); // 5 second stabilization period to prevent rapid state changes during network issues
+
+      return () => clearTimeout(stabilizationTimer);
+    }
+  }, [isAuthInitialized, authInitError, state.authenticationState]);
 
   /**
    * LIFFでログイン
@@ -354,7 +366,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authenticationState: state.authenticationState,
     isAuthenticating: state.isAuthenticating,
     environment: state.environment,
-    authReady: isAuthInitialized && !authInitError && !isInitializing && state.authenticationState !== "initializing" && state.authenticationState !== "verifying" && state.authenticationState !== "network_error" && state.authenticationState !== "loading" && !userLoading && !state.isAuthenticating,
+    authReady: isAuthInitialized && !authInitError && !isInitializing && !userLoading && !state.isAuthenticating && state.authenticationState !== "loading" && state.authenticationState !== "initializing" && state.authenticationState !== "verifying",
     loginWithLiff,
     logout,
     phoneAuth: {
