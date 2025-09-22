@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthState } from "@/types/auth";
+import { logger } from "@/lib/logging";
 
 interface UseLineAuthRedirectDetectionProps {
   state: AuthState;
@@ -17,7 +18,7 @@ export const useLineAuthRedirectDetection = ({
   const prevStateRef = useRef<{ authenticationState: string; isAuthenticating: boolean } | null>(
     null,
   );
-  const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
+  const prevLiffStateRef = useRef<{ state: string; isLoggedIn: boolean } | null>(null);
 
   useEffect(() => {
     const currentState = {
@@ -27,7 +28,7 @@ export const useLineAuthRedirectDetection = ({
 
     const currentLiffState = liffService.getState();
     const liffStateKey = {
-      isInitialized: currentLiffState.isInitialized,
+      state: currentLiffState.state,
       isLoggedIn: currentLiffState.isLoggedIn,
     };
 
@@ -38,7 +39,7 @@ export const useLineAuthRedirectDetection = ({
 
     const liffStateChanged =
       !prevLiffStateRef.current ||
-      prevLiffStateRef.current.isInitialized !== liffStateKey.isInitialized ||
+      prevLiffStateRef.current.state !== liffStateKey.state ||
       prevLiffStateRef.current.isLoggedIn !== liffStateKey.isLoggedIn;
 
     if (!stateChanged && !liffStateChanged) {
@@ -66,11 +67,23 @@ export const useLineAuthRedirectDetection = ({
       return;
     }
 
-    const { isInitialized, isLoggedIn } = currentLiffState;
+    const { state: liffState, isLoggedIn } = currentLiffState;
 
-    if (isInitialized && !isLoggedIn) {
+    if (liffState !== "pre-initialized" && liffState !== "initialized") {
+      logger.debug("useLineAuthRedirectDetection: Blocking redirect - LIFF not ready", {
+        component: "useLineAuthRedirectDetection",
+        liffState,
+        authState: state.authenticationState,
+      });
       setShouldProcessRedirect(false);
       return;
+    }
+
+    if (liffState === "pre-initialized" || liffState === "initialized") {
+      if (!isLoggedIn) {
+        setShouldProcessRedirect(false);
+        return;
+      }
     }
 
     setShouldProcessRedirect(true);

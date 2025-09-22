@@ -23,30 +23,40 @@ export const useLiffInitialization = ({ environment, liffService }: UseLiffIniti
         return;
       }
 
-      const timestamp = new Date().toISOString();
-      
-      logger.debug("useLiffInitialization: Starting LIFF initialization", {
-        component: "useLiffInitialization",
-        timestamp,
-        environment,
-        liffState: liffService.getState(),
-      });
+      try {
+        const currentState = liffService.getState();
+        
+        if (currentState.state === "pre-initialized") {
+          logger.debug("useLiffInitialization: SDK pre-initialized by bootstrap; proceeding with auth init", {
+            component: "useLiffInitialization",
+            timestamp: new Date().toISOString(),
+            currentState: currentState.state,
+          });
+        } else {
+          logger.debug("useLiffInitialization: Starting LIFF initialization", {
+            component: "useLiffInitialization",
+            timestamp: new Date().toISOString(),
+            environment,
+            currentState: currentState.state,
+          });
+        }
 
-      const liffSuccess = await liffService.initialize();
-      
-      logger.debug("useLiffInitialization: LIFF initialization completed", {
-        authType: "liff",
-        timestamp: new Date().toISOString(),
-        component: "useLiffInitialization",
-        success: liffSuccess,
-        finalLiffState: liffService.getState(),
-      });
-
-      if (!liffSuccess) {
+        await liffService.initialize();
+        
+        const finalState = liffService.getState();
+        logger.debug("useLiffInitialization: LIFF initialization completed", {
+          authType: "liff",
+          timestamp: new Date().toISOString(),
+          component: "useLiffInitialization",
+          finalState: finalState.state,
+          isLoggedIn: finalState.isLoggedIn,
+        });
+      } catch (error) {
         logger.warn("useLiffInitialization: LIFF initialization failed", {
           authType: "liff",
           timestamp: new Date().toISOString(),
           component: "useLiffInitialization",
+          error: error instanceof Error ? error.message : String(error),
           liffState: liffService.getState(),
         });
       }
