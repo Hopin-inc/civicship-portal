@@ -87,11 +87,6 @@ export class LiffService {
     this.state = "pre-initializing";
     this.preInitPromise = (async () => {
       try {
-        logger.debug("LiffService: Starting pre-initialization", {
-          component: "LiffService",
-          timestamp: new Date().toISOString(),
-        });
-
         const { default: liff } = await import("@line/liff");
         await liff.init({ liffId: this.liffId });
         
@@ -103,16 +98,10 @@ export class LiffService {
         this.isLoggedIn = liff.isLoggedIn();
         this.state = "pre-initialized";
         this.error = null;
-
-        logger.debug("LiffService: Pre-initialization completed", {
-          component: "LiffService",
-          timestamp: new Date().toISOString(),
-          isLoggedIn: this.isLoggedIn,
-        });
       } catch (error) {
         this.state = "failed";
         this.error = error as Error;
-        this.preInitPromise = null; // Allow retry
+        this.preInitPromise = null;
         
         const errorMessage = error instanceof Error ? error.message : String(error);
         const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
@@ -120,7 +109,7 @@ export class LiffService {
                                        errorMessage.includes("Load failed");
         
         if (isEnvironmentConstraint) {
-          logger.warn("LiffService: Pre-initialization environment limitation", {
+          logger.warn("LIFF environment pre-initialization limitation", {
             authType: "liff",
             error: errorMessage,
             component: "LiffService",
@@ -128,7 +117,7 @@ export class LiffService {
             expected: true,
           });
         } else {
-          logger.info("LiffService: Pre-initialization failed", {
+          logger.info("LIFF pre-initialization failed", {
             authType: "liff",
             error: errorMessage,
             component: "LiffService",
@@ -157,12 +146,6 @@ export class LiffService {
 
     this.initPromise = (async () => {
       try {
-        logger.debug("LiffService: Starting full initialization", {
-          component: "LiffService",
-          timestamp: new Date().toISOString(),
-          currentState: this.state,
-        });
-
         await this.preInitialize();
         
         this.state = "initializing";
@@ -172,21 +155,13 @@ export class LiffService {
         }
 
         this.state = "initialized";
-
-        logger.debug("LiffService: Full initialization completed", {
-          component: "LiffService",
-          timestamp: new Date().toISOString(),
-          isLoggedIn: this.isLoggedIn,
-          hasProfile: !!this.profile.userId,
-        });
       } catch (error) {
         this.state = "failed";
         this.error = error as Error;
-        this.initPromise = null; // Allow retry
+        this.initPromise = null;
         
-        logger.error("LiffService: Full initialization failed", {
+        logger.error("LIFF initialization failed", {
           component: "LiffService",
-          timestamp: new Date().toISOString(),
           error: error instanceof Error ? error.message : String(error),
         });
         

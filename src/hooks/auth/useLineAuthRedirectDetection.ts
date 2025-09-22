@@ -70,11 +70,6 @@ export const useLineAuthRedirectDetection = ({
     const { state: liffState, isLoggedIn } = currentLiffState;
 
     if (liffState !== "pre-initialized" && liffState !== "initialized") {
-      logger.debug("useLineAuthRedirectDetection: Blocking redirect - LIFF not ready", {
-        component: "useLineAuthRedirectDetection",
-        liffState,
-        authState: state.authenticationState,
-      });
       setShouldProcessRedirect(false);
       return;
     }
