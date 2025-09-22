@@ -1,18 +1,23 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useState, useEffect } from "react";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { lineAuth } from "@/lib/auth/firebase-config";
-import { detectEnvironment } from "@/lib/auth/environment-detector";
-import { GqlCurrentPrefecture, useCurrentUserQuery, useUserSignUpMutation } from "@/types/graphql";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import {
+  GqlCurrentPrefecture,
+  GqlCurrentUserPayload,
+  useCurrentUserQuery,
+  useUserSignUpMutation,
+} from "@/types/graphql";
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared";
+import { ErrorState } from '@/components/shared'
 import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
 import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
 import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
@@ -25,7 +30,60 @@ import { logger } from "@/lib/logging";
 import { maskPhoneNumber } from "@/lib/logging/client/utils";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
 import { RawURIComponent } from "@/utils/path";
-import { AuthContextType, AuthState } from "@/types/auth";
+
+/**
+ * 認証状態の型定義
+ */
+export type AuthState = {
+  firebaseUser: User | null;
+  currentUser: GqlCurrentUserPayload["user"] | null;
+  authenticationState:
+    | "unauthenticated" // S0: 未認証
+    | "line_authenticated" // S1: LINE認証済み
+    | "line_token_expired" // S1e: LINEトークン期限切れ
+    | "phone_authenticated" // S2: 電話番号認証済み
+    | "phone_token_expired" // S2e: 電話番号トークン期限切れ
+    | "user_registered" // S3: ユーザ情報登録済み
+    | "loading"; // L0: 状態チェック中
+  environment: AuthEnvironment;
+  isAuthenticating: boolean;
+};
+
+/**
+ * 認証コンテキストの型定義
+ */
+interface AuthContextType {
+  user: GqlCurrentUserPayload["user"] | null;
+  firebaseUser: User | null;
+  uid: string | null;
+  isAuthenticated: boolean;
+  isPhoneVerified: boolean;
+  isUserRegistered: boolean;
+  authenticationState: AuthState["authenticationState"];
+  isAuthenticating: boolean;
+  environment: AuthEnvironment;
+  authInitComplete: boolean;
+
+  loginWithLiff: (redirectPath?: RawURIComponent) => Promise<boolean>;
+  logout: () => Promise<void>;
+
+  phoneAuth: {
+    startPhoneVerification: (phoneNumber: string) => Promise<string | null>;
+    verifyPhoneCode: (verificationCode: string) => Promise<boolean>;
+    clearRecaptcha?: () => void;
+    isVerifying: boolean;
+    phoneUid: string | null;
+  };
+
+  createUser: (
+    name: string,
+    prefecture: GqlCurrentPrefecture,
+    phoneUid: string | null,
+  ) => Promise<User | null>;
+  updateAuthState: () => Promise<void>;
+
+  loading: boolean;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -104,53 +162,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [isAuthInitialized, setIsAuthInitialized] = useState(false);
   const [authInitError, setAuthInitError] = useState<string | null>(null);
-  const [isInitializing, setIsInitializing] = useState(false);
-  const [authStateStabilizing, setAuthStateStabilizing] = useState(false);
 
   useEffect(() => {
     if (!authStateManager) return;
 
     const initializeAuth = async () => {
-      if (isInitializing) {
-        console.log("🔄 AuthProvider: Initialization already in progress, skipping");
-        return;
-      }
-      
-      setIsInitializing(true);
-      
       try {
-        logger.debug("AuthProvider: Starting AuthStateManager initialization", {
-          component: "AuthProvider",
-          timestamp: new Date().toISOString(),
-          isAuthInitialized,
-          authInitError: !!authInitError,
-        });
-        
         await authStateManager.initialize();
         setIsAuthInitialized(true);
         setAuthInitError(null);
         const currentState = authStateManager.getState();
         setState((prev) => ({ ...prev, authenticationState: currentState }));
-        
-        logger.debug("AuthProvider: AuthStateManager initialization completed", {
-          component: "AuthProvider",
-          timestamp: new Date().toISOString(),
-          authState: currentState,
-        });
       } catch (error) {
-        logger.error("AuthProvider: AuthStateManager initialization failed", {
-          component: "AuthProvider",
-          timestamp: new Date().toISOString(),
-          error: error instanceof Error ? error.message : String(error),
-        });
         setAuthInitError(error instanceof Error ? error.message : "認証の初期化に失敗しました");
         setIsAuthInitialized(false);
-      } finally {
-        setIsInitializing(false);
       }
     };
 
-    if (!isAuthInitialized && !authInitError && !isInitializing) {
+    if (!isAuthInitialized && !authInitError) {
       initializeAuth();
     }
   }, [authStateManager, isAuthInitialized, authInitError]);
@@ -164,17 +193,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
   useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
   useAutoLogin({ environment, state, liffService, setState, refetchUser });
-
-  useEffect(() => {
-    if (isAuthInitialized && !authInitError && state.authenticationState !== "network_error") {
-      setAuthStateStabilizing(true);
-      const stabilizationTimer = setTimeout(() => {
-        setAuthStateStabilizing(false);
-      }, 5000); // 5 second stabilization period to prevent rapid state changes during network issues
-
-      return () => clearTimeout(stabilizationTimer);
-    }
-  }, [isAuthInitialized, authInitError, state.authenticationState]);
 
   /**
    * LIFFでログイン
@@ -201,11 +219,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return success;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      const isEnvironmentConstraint =
-        errorMessage.includes("LIFF") ||
-        errorMessage.includes("LINE") ||
-        errorMessage.includes("Load failed");
-
+      const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
+                                     errorMessage.includes("LINE") ||
+                                     errorMessage.includes("Load failed");
+      
       if (isEnvironmentConstraint) {
         logger.warn("LIFF environment limitation", {
           authType: "liff",
@@ -223,7 +240,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
       }
       return false;
-    } finally {
+    }finally {
       setState((prev) => ({ ...prev, isAuthenticating: false }));
     }
   };
@@ -328,11 +345,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      const isValidationError =
-        errorMessage.includes("validation") ||
-        errorMessage.includes("invalid") ||
-        errorMessage.includes("required");
-
+      const isValidationError = errorMessage.includes("validation") ||
+                               errorMessage.includes("invalid") ||
+                               errorMessage.includes("required");
+      
       if (isValidationError) {
         logger.info("User creation validation error", {
           error: errorMessage,
@@ -346,7 +362,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           errorCategory: "system_error",
         });
       }
-
+      
       toast.error("アカウント作成に失敗しました", {
         description: error instanceof Error ? error.message : "不明なエラーが発生しました",
       });
@@ -366,7 +382,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authenticationState: state.authenticationState,
     isAuthenticating: state.isAuthenticating,
     environment: state.environment,
-    authReady: isAuthInitialized && !authInitError && !isInitializing && !userLoading && !state.isAuthenticating && state.authenticationState !== "loading" && state.authenticationState !== "initializing" && state.authenticationState !== "verifying",
+    authInitComplete: isAuthInitialized && !authInitError && state.authenticationState !== "loading",
     loginWithLiff,
     logout,
     phoneAuth: {
@@ -380,20 +396,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: state.authenticationState === "loading" || state.authenticationState === "initializing" || state.authenticationState === "verifying" || state.authenticationState === "network_error" || userLoading || state.isAuthenticating,
+    loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
   };
 
   if (!isAuthInitialized) {
     if (authInitError) {
-      const refetchRef = {
+      const refetchRef = { 
         current: () => {
           setAuthInitError(null);
           setIsAuthInitialized(false);
-        },
+        }
       };
       return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
     }
-
+    
     return <LoadingIndicator fullScreen={true} />;
   }
 
