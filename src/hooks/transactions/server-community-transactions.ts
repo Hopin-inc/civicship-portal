@@ -1,4 +1,5 @@
-import { executeGraphQLQuery, GET_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/transaction/query";
+import { executeServerGraphQLQuery } from "@/lib/graphql/server";
+import { GET_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/transaction/query";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlTransactionsConnection, GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables } from "@/types/graphql";
 
@@ -41,12 +42,12 @@ export async function getServerCommunityTransactions(
       withDidIssuanceRequests,
     };
 
-    const data = await executeGraphQLQuery<GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables>(
+    const data = await executeServerGraphQLQuery<GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables>(
       GET_TRANSACTIONS_SERVER_QUERY,
       variables
     );
 
-    return (data.transactions as GqlTransactionsConnection) ?? fallbackConnection;
+    return data.transactions ?? fallbackConnection;
   } catch (error) {
     console.error("Failed to fetch community transactions:", error);
     return fallbackConnection;

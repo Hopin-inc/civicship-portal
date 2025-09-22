@@ -38,7 +38,7 @@ const useCommunityTransactions = (): UseCommunityTransactionsResult => {
     nextFetchPolicy: "cache-first",
   });
 
-  const connection = (data?.transactions as GqlTransactionsConnection) ?? fallbackConnection;
+  const connection = data?.transactions ?? fallbackConnection;
   const endCursor = connection.pageInfo?.endCursor;
   const hasNextPage = connection.pageInfo?.hasNextPage ?? false;
 
