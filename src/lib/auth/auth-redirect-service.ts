@@ -84,7 +84,7 @@ export class AuthRedirectService {
       ? this.generateNextParam(next)
       : this.generateNextParam(pathname);
 
-    if (authState === "loading" || authState === "initializing" || authState === "stabilizing") {
+    if (authState === "loading" || authState === "initializing") {
       return null;
     }
 
@@ -185,7 +185,6 @@ export class AuthRedirectService {
 
       case "loading":
       case "initializing":
-      case "stabilizing":
       case "user_registered":
       default:
         return nextPath ?? "/" as RawURIComponent;
