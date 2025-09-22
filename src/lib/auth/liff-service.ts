@@ -5,7 +5,6 @@ import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { categorizeFirebaseError, lineAuth } from "./firebase-config";
 import { AuthTokens, TokenManager } from "./token-manager";
 import retry from "retry";
-import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
 
 /**
@@ -108,22 +107,6 @@ export class LiffService {
                                        errorMessage.includes("LINE") ||
                                        errorMessage.includes("Load failed");
         
-        if (isEnvironmentConstraint) {
-          logger.warn("LIFF environment pre-initialization limitation", {
-            authType: "liff",
-            error: errorMessage,
-            component: "LiffService",
-            errorCategory: "environment_constraint",
-            expected: true,
-          });
-        } else {
-          logger.info("LIFF pre-initialization failed", {
-            authType: "liff",
-            error: errorMessage,
-            component: "LiffService",
-            errorCategory: "initialization_error",
-          });
-        }
         
         throw error;
       }
@@ -160,10 +143,6 @@ export class LiffService {
         this.error = error as Error;
         this.initPromise = null;
         
-        logger.error("LIFF initialization failed", {
-          component: "LiffService",
-          error: error instanceof Error ? error.message : String(error),
-        });
         
         throw error;
       }
@@ -206,22 +185,6 @@ export class LiffService {
                                      errorMessage.includes("LINE") ||
                                      errorMessage.includes("Load failed");
       
-      if (isEnvironmentConstraint) {
-        logger.warn("LIFF environment login limitation", {
-          authType: "liff",
-          error: errorMessage,
-          component: "LiffService",
-          errorCategory: "environment_constraint",
-          expected: true,
-        });
-      } else {
-        logger.info("LIFF login process failed", {
-          authType: "liff",
-          error: errorMessage,
-          component: "LiffService",
-          errorCategory: "auth_temporary",
-        });
-      }
       this.error = error as Error;
       return false;
     }
@@ -260,11 +223,6 @@ export class LiffService {
         pictureUrl: profile.pictureUrl || null,
       };
     } catch (error) {
-      logger.info("Failed to get LIFF profile", {
-        authType: "liff",
-        error: error instanceof Error ? error.message : String(error),
-        component: "LiffService",
-      });
     }
   }
 
@@ -287,10 +245,6 @@ export class LiffService {
   public async signInWithLiffToken(): Promise<boolean> {
     const accessToken = await this.getAccessToken();
     if (!accessToken) {
-      logger.info("No LIFF access token available", {
-        authType: "liff",
-        component: "LiffService",
-      });
       return false;
     }
 
@@ -346,12 +300,6 @@ export class LiffService {
               const timestamp = new Date().toISOString();
               await authStateManager.handleLineAuthStateChange(true);
             } catch (error) {
-              logger.warn("Failed to update AuthStateManager state", {
-                error: error instanceof Error ? error.message : String(error),
-                component: "LiffService",
-                errorCategory: "state_management",
-                retryable: true,
-              });
             }
           }
 
@@ -359,21 +307,7 @@ export class LiffService {
         } catch (error) {
           const categorizedError = categorizeFirebaseError(error);
 
-          logger.info(`LIFF authentication error (attempt ${currentAttempt})`, {
-            authType: "liff",
-            type: categorizedError.type,
-            message: categorizedError.message,
-            error: error instanceof Error ? error.message : String(error),
-            retryable: categorizedError.retryable,
-            attempt: currentAttempt,
-            component: "LiffService",
-          });
-
           if (!categorizedError.retryable || !operation.retry(error as Error)) {
-            logger.info("LIFF authentication failed after all retries", {
-              authType: "liff",
-              component: "LiffService",
-            });
 
             if (typeof window !== "undefined") {
               window.dispatchEvent(
