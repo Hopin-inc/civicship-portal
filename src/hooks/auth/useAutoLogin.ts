@@ -25,7 +25,7 @@ const useAutoLogin = ({
   const prevStateRef = useRef<{ authenticationState: string; isAuthenticating: boolean } | null>(
     null,
   );
-  const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
+  const prevLiffStateRef = useRef<{ state: string; isLoggedIn: boolean } | null>(null);
 
   useEffect(() => {
     if (environment !== AuthEnvironment.LIFF) {
@@ -39,7 +39,7 @@ const useAutoLogin = ({
 
     const currentLiffState = liffService.getState();
     const liffStateKey = {
-      isInitialized: currentLiffState.isInitialized,
+      state: currentLiffState.state,
       isLoggedIn: currentLiffState.isLoggedIn,
     };
 
@@ -50,7 +50,7 @@ const useAutoLogin = ({
 
     const liffStateChanged =
       !prevLiffStateRef.current ||
-      prevLiffStateRef.current.isInitialized !== liffStateKey.isInitialized ||
+      prevLiffStateRef.current.state !== liffStateKey.state ||
       prevLiffStateRef.current.isLoggedIn !== liffStateKey.isLoggedIn;
 
     if (stateChanged || liffStateChanged) {
@@ -61,7 +61,7 @@ const useAutoLogin = ({
         state.authenticationState === "unauthenticated" &&
         !state.isAuthenticating &&
         !attemptedRef.current &&
-        currentLiffState.isInitialized &&
+        (currentLiffState.state === "initialized" || currentLiffState.state === "pre-initialized") &&
         currentLiffState.isLoggedIn
       ) {
         const handleAutoLogin = async () => {

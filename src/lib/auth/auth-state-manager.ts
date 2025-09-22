@@ -5,6 +5,7 @@ import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { logger } from "@/lib/logging";
 
 export type AuthenticationState =
+  | "initializing"
   | "unauthenticated"
   | "line_authenticated"
   | "line_token_expired"
@@ -19,7 +20,7 @@ export type AuthenticationState =
  */
 export class AuthStateManager {
   private static instance: AuthStateManager;
-  private currentState: AuthenticationState = "loading";
+  private currentState: AuthenticationState = "initializing";
   private stateChangeListeners: ((state: AuthenticationState) => void)[] = [];
   private readonly sessionId: string;
 
@@ -142,7 +143,7 @@ export class AuthStateManager {
         sessionId: this.sessionId,
       });
       
-      this.setState("loading");
+      this.setState("initializing");
 
       const lineTokens = TokenManager.getLineTokens();
       const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
@@ -356,7 +357,7 @@ export class AuthStateManager {
    */
   public async handleLineAuthStateChange(isAuthenticated: boolean): Promise<void> {
     if (isAuthenticated) {
-      if (this.currentState === "unauthenticated" || this.currentState === "loading") {
+      if (this.currentState === "unauthenticated" || this.currentState === "loading" || this.currentState === "initializing") {
         this.setState("line_authenticated");
       }
     } else {
@@ -371,7 +372,7 @@ export class AuthStateManager {
     const lineTokens = TokenManager.getLineTokens();
     const hasValidLineToken = !!lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
-    if (!hasValidLineToken && this.currentState !== "loading") {
+    if (!hasValidLineToken && this.currentState !== "loading" && this.currentState !== "initializing") {
       this.setState("unauthenticated");
       return;
     }
@@ -384,7 +385,7 @@ export class AuthStateManager {
         this.setState("phone_authenticated");
       }
     } else {
-      if (this.currentState !== "unauthenticated" && this.currentState !== "loading") {
+      if (this.currentState !== "unauthenticated" && this.currentState !== "loading" && this.currentState !== "initializing") {
         this.setState("line_authenticated");
       }
     }

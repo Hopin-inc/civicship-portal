@@ -357,7 +357,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
+    loading: state.authenticationState === "loading" || state.authenticationState === "initializing" || userLoading || state.isAuthenticating,
   };
 
   if (!isAuthInitialized) {

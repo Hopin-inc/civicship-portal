@@ -7,6 +7,7 @@ export type AuthState = {
   firebaseUser: User | null;
   currentUser: GqlCurrentUserPayload["user"] | null;
   authenticationState:
+    | "initializing" // I0: 初期化中
     | "unauthenticated" // S0: 未認証
     | "line_authenticated" // S1: LINE認証済み
     | "line_token_expired" // S1e: LINEトークン期限切れ

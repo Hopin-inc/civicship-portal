@@ -61,7 +61,8 @@ export const useLineAuthRedirectDetection = ({
 
     if (
       state.authenticationState !== "unauthenticated" &&
-      state.authenticationState !== "loading"
+      state.authenticationState !== "loading" &&
+      state.authenticationState !== "initializing"
     ) {
       setShouldProcessRedirect(false);
       return;
