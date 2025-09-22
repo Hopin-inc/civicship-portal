@@ -184,6 +184,19 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
           errorCategory: "network_temporary",
           retryable: true,
         });
+        
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(
+            new CustomEvent("auth:network-error", {
+              detail: { 
+                source: "apollo", 
+                operation: operation.operationName,
+                error: errorMessage,
+                retryable: true
+              },
+            }),
+          );
+        }
       } else {
         logger.error("Network system error", {
           error: errorMessage,

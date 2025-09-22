@@ -8,6 +8,8 @@ export type AuthState = {
   currentUser: GqlCurrentUserPayload["user"] | null;
   authenticationState:
     | "initializing" // I0: 初期化中
+    | "verifying" // V0: 認証状態確認中（リダイレクト禁止）
+    | "network_error" // N0: ネットワークエラー（GraphQL接続失敗）
     | "unauthenticated" // S0: 未認証
     | "line_authenticated" // S1: LINE認証済み
     | "line_token_expired" // S1e: LINEトークン期限切れ

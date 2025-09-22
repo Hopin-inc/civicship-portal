@@ -104,11 +104,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [isAuthInitialized, setIsAuthInitialized] = useState(false);
   const [authInitError, setAuthInitError] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(false);
 
   useEffect(() => {
     if (!authStateManager) return;
 
     const initializeAuth = async () => {
+      if (isInitializing) {
+        console.log("🔄 AuthProvider: Initialization already in progress, skipping");
+        return;
+      }
+      
+      setIsInitializing(true);
+      
       try {
         logger.debug("AuthProvider: Starting AuthStateManager initialization", {
           component: "AuthProvider",
@@ -136,10 +144,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
         setAuthInitError(error instanceof Error ? error.message : "認証の初期化に失敗しました");
         setIsAuthInitialized(false);
+      } finally {
+        setIsInitializing(false);
       }
     };
 
-    if (!isAuthInitialized && !authInitError) {
+    if (!isAuthInitialized && !authInitError && !isInitializing) {
       initializeAuth();
     }
   }, [authStateManager, isAuthInitialized, authInitError]);
@@ -344,7 +354,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authenticationState: state.authenticationState,
     isAuthenticating: state.isAuthenticating,
     environment: state.environment,
-    authReady: isAuthInitialized && state.authenticationState !== "initializing",
+    authReady: isAuthInitialized && !authInitError && !isInitializing && state.authenticationState !== "initializing" && state.authenticationState !== "verifying" && state.authenticationState !== "network_error" && state.authenticationState !== "loading" && !userLoading && !state.isAuthenticating,
     loginWithLiff,
     logout,
     phoneAuth: {
@@ -358,7 +368,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: state.authenticationState === "loading" || state.authenticationState === "initializing" || userLoading || state.isAuthenticating,
+    loading: state.authenticationState === "loading" || state.authenticationState === "initializing" || state.authenticationState === "verifying" || state.authenticationState === "network_error" || userLoading || state.isAuthenticating,
   };
 
   if (!isAuthInitialized) {

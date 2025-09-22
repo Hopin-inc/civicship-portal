@@ -45,7 +45,22 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, [loading]);
 
   useEffect(() => {
+    console.log("🛡️ RouteGuard: useEffect triggered", {
+      loading,
+      userLoading,
+      isInitialRender,
+      authReady,
+      authenticationState,
+      isAuthenticated,
+    });
+    
     if (loading || userLoading || isInitialRender || !authReady) {
+      console.log("🛡️ RouteGuard: Skipping redirect check - not ready", {
+        loading,
+        userLoading,
+        isInitialRender,
+        authReady,
+      });
       return;
     }
 
@@ -71,7 +86,23 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         pathNameWithParams,
         decodeURIComponentWithType(nextParam),
       );
+      
+      console.log("🛡️ RouteGuard: Redirect check", {
+        pathname,
+        pathNameWithParams,
+        redirectPath,
+        authenticationState,
+        isAuthenticated,
+        willRedirect: !!redirectPath,
+      });
+      
       if (redirectPath) {
+        console.log("🛡️ RouteGuard: Performing redirect", {
+          from: pathNameWithParams,
+          to: redirectPath,
+          authenticationState,
+          isAuthenticated,
+        });
         router.replace(redirectPath);
       }
       setAuthorized(true);
@@ -91,7 +122,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     authReady,
   ]);
 
-  if (loading || userLoading || isInitialRender || !authReady) {
+  if (loading || userLoading || isInitialRender || !authReady || authenticationState === "network_error" || authenticationState === "verifying") {
     return <LoadingIndicator />;
   }
 
