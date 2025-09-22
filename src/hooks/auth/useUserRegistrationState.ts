@@ -22,6 +22,12 @@ export const useUserRegistrationState = ({
   authStateManagerRef.current = authStateManager;
 
   useEffect(() => {
+    const currentAuthStateManager = authStateManagerRef.current;
+    
+    if (currentAuthStateManager && currentAuthStateManager.getState() === "initializing") {
+      return;
+    }
+
     if (userData?.currentUser?.user) {
       const userId = userData.currentUser.user.id;
 
@@ -34,10 +40,11 @@ export const useUserRegistrationState = ({
       setState((prev) => ({
         ...prev,
         currentUser: userData.currentUser?.user,
-        authenticationState: "user_registered",
+        authenticationState: prev.authenticationState === "phone_authenticated" || prev.authenticationState === "line_authenticated" || prev.authenticationState === "initializing"
+          ? "user_registered"
+          : prev.authenticationState,
       }));
 
-      const currentAuthStateManager = authStateManagerRef.current;
       if (currentAuthStateManager) {
         const updateUserRegistrationState = async () => {
           try {
@@ -55,5 +62,5 @@ export const useUserRegistrationState = ({
     } else {
       processedUserIdRef.current = null;
     }
-  }, [userData, setState]);
+  }, [userData, setState, authStateManager]);
 };

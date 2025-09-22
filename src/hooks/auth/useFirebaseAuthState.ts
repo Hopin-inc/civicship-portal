@@ -25,12 +25,16 @@ export const useFirebaseAuthState = ({
   stateRef.current = state;
 
   useEffect(() => {
+    if (state.authenticationState === "initializing") {
+      return;
+    }
+
     const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
       setState((prev) => ({
         ...prev,
         firebaseUser: user,
         authenticationState: user
-          ? prev.authenticationState === "loading"
+          ? prev.authenticationState === "loading" || prev.authenticationState === "initializing"
             ? "line_authenticated"
             : prev.authenticationState
           : "unauthenticated",
@@ -66,5 +70,5 @@ export const useFirebaseAuthState = ({
     });
 
     return () => unsubscribe();
-  }, [setState]);
+  }, [setState, state.authenticationState]);
 };
