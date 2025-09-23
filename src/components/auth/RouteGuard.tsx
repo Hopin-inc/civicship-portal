@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useQuery } from "@apollo/client";
@@ -27,7 +27,6 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next") as EncodedURIComponent;
-  const [authorized, setAuthorized] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
 
   const { loading: userLoading } = useQuery(GET_CURRENT_USER, {
@@ -38,6 +37,22 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     return AuthRedirectService.getInstance();
   }, []);
 
+  const navKey = useMemo(
+    () => `${pathname}?${searchParams?.toString() ?? ""}`,
+    [pathname, searchParams]
+  );
+
+  const requireAuth = authRedirectService.isProtectedPath(pathname);
+
+  const decision = useMemo<"pending" | "stay" | "redirect">(() => {
+    if (!authInitComplete || loading || userLoading || isInitialRender) return "pending";
+    if (!requireAuth) return "stay";
+    return isAuthenticated ? "stay" : "redirect";
+  }, [authInitComplete, loading, userLoading, isInitialRender, requireAuth, isAuthenticated]);
+
+  const redirectingRef = useRef(false);
+  const lastHandledKeyRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (!loading) {
       setIsInitialRender(false);
@@ -45,9 +60,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, [loading]);
 
   useEffect(() => {
-    if (loading || userLoading || isInitialRender || !authInitComplete) {
+    if (decision !== "redirect") {
+      redirectingRef.current = false;
       return;
     }
+    if (redirectingRef.current) return;
+    if (lastHandledKeyRef.current === navKey) return;
 
     if (typeof window !== "undefined" && pathname === "/") {
       const urlParams = new URLSearchParams(window.location.search);
@@ -56,29 +74,26 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         logger.debug("RouteGuard: Skipping redirect for LINE auth return to homepage", {
           component: "RouteGuard",
         });
-        setAuthorized(true);
         return;
       }
     }
 
-    const authCheck = () => {
-      const pathNameWithParams = searchParams.size > 0
-        ? `${ pathname }?${ searchParams.toString() }` as RawURIComponent
-        : pathname as RawURIComponent;
-      const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam));
-      if (redirectPath) {
-        router.replace(redirectPath);
-      }
-      setAuthorized(true);
-    };
-    authCheck();
-    return () => {
-    };
-  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams, isInitialRender, authInitComplete]);
+    redirectingRef.current = true;
+    lastHandledKeyRef.current = navKey;
 
-  if (loading || userLoading || isInitialRender || !authInitComplete) {
-    return <LoadingIndicator />;
-  }
+    const pathWithParams = (searchParams?.toString())
+      ? `${pathname}?${searchParams!.toString()}` as RawURIComponent
+      : pathname as RawURIComponent;
 
-  return authorized ? <>{ children }</> : null;
+    const redirectPath = authRedirectService.getRedirectPath(
+      pathWithParams,
+      decodeURIComponentWithType(nextParam)
+    );
+    if (redirectPath) router.replace(redirectPath);
+  }, [decision, navKey, pathname, searchParams, nextParam, router, authRedirectService]);
+
+  if (decision === "pending") return <LoadingIndicator />;
+  if (decision === "redirect") return null;
+  
+  return <>{children}</>;
 };

@@ -162,25 +162,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [isAuthInitialized, setIsAuthInitialized] = useState(false);
   const [authInitError, setAuthInitError] = useState<string | null>(null);
+  const [authInitComplete, setAuthInitComplete] = useState(false);
+  const didInitRef = React.useRef(false);
 
   useEffect(() => {
     if (!authStateManager) return;
+    if (didInitRef.current) return;
+    didInitRef.current = true;
 
     const initializeAuth = async () => {
       try {
         await authStateManager.initialize();
         setIsAuthInitialized(true);
         setAuthInitError(null);
+        const currentState = authStateManager.getState();
+        setState((prev) => ({ ...prev, authenticationState: currentState }));
+        queueMicrotask(() => setAuthInitComplete(true));
       } catch (error) {
         setAuthInitError(error instanceof Error ? error.message : "認証の初期化に失敗しました");
         setIsAuthInitialized(false);
+        setAuthInitComplete(false);
       }
     };
 
-    if (!isAuthInitialized && !authInitError) {
-      initializeAuth();
-    }
-  }, [authStateManager, isAuthInitialized, authInitError]);
+    initializeAuth();
+  }, [authStateManager]);
 
   useAuthStateChangeListener({ authStateManager, setState });
   useTokenExpirationHandler({ state, setState, logout });
@@ -380,7 +386,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authenticationState: state.authenticationState,
     isAuthenticating: state.isAuthenticating,
     environment: state.environment,
-    authInitComplete: isAuthInitialized && !authInitError,
+    authInitComplete,
     loginWithLiff,
     logout,
     phoneAuth: {
