@@ -44,7 +44,17 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
   const requireAuth = authRedirectService.isProtectedPath(pathname);
 
-  const canDecide = authInitComplete && !loading && !userLoading && !isInitialRender;
+  const isStableAuthState = (state: string) =>
+    state === "user_registered" || 
+    state === "phone_authenticated" ||
+    state === "line_authenticated" || 
+    state === "unauthenticated";
+
+  const canDecide = useMemo(() => {
+    if (!authInitComplete || loading || userLoading || isInitialRender) return false;
+    return isStableAuthState(authenticationState);
+  }, [authInitComplete, loading, userLoading, isInitialRender, authenticationState]);
+
   const decision = useMemo<"pending" | "stay" | "redirect">(() => {
     if (!canDecide) return "pending";
     if (!requireAuth) return "stay";
