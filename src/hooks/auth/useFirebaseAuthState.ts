@@ -70,5 +70,5 @@ export const useFirebaseAuthState = ({
     });
 
     return () => unsubscribe();
-  }, [setState, state.authenticationState]);
+  }, [state.authenticationState]);
 };

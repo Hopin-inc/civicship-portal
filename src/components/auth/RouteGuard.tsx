@@ -44,19 +44,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
   const requireAuth = authRedirectService.isProtectedPath(pathname);
 
+  const canDecide = authInitComplete && !loading && !userLoading && !isInitialRender;
   const decision = useMemo<"pending" | "stay" | "redirect">(() => {
-    if (!authInitComplete || loading || userLoading || isInitialRender) return "pending";
-    
-    if (authenticationState === "loading" || 
-        authenticationState === "initializing" || 
-        authenticationState === "verifying" || 
-        authenticationState === "network_error") {
-      return "pending";
-    }
-    
+    if (!canDecide) return "pending";
     if (!requireAuth) return "stay";
     return isAuthenticated ? "stay" : "redirect";
-  }, [authInitComplete, loading, userLoading, isInitialRender, authenticationState, requireAuth, isAuthenticated]);
+  }, [canDecide, requireAuth, isAuthenticated]);
 
   const redirectingRef = useRef(false);
   const lastHandledKeyRef = useRef<string | null>(null);
@@ -72,8 +65,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       redirectingRef.current = false;
       return;
     }
-    if (redirectingRef.current) return;
-    if (lastHandledKeyRef.current === navKey) return;
+    if (redirectingRef.current || lastHandledKeyRef.current === navKey) return;
 
     if (typeof window !== "undefined" && pathname === "/") {
       const urlParams = new URLSearchParams(window.location.search);
@@ -89,18 +81,17 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     redirectingRef.current = true;
     lastHandledKeyRef.current = navKey;
 
-    const pathWithParams = (searchParams?.toString())
+    const pathWithParams = searchParams?.toString()
       ? `${pathname}?${searchParams!.toString()}` as RawURIComponent
       : pathname as RawURIComponent;
 
-    const redirectPath = authRedirectService.getRedirectPath(
-      pathWithParams,
-      decodeURIComponentWithType(nextParam)
-    );
-    if (redirectPath) router.replace(redirectPath);
-  }, [decision, navKey, pathname, searchParams, nextParam, router, authRedirectService]);
+    const target = authRedirectService.getRedirectPath(pathWithParams, decodeURIComponentWithType(nextParam));
+    if (!target || target === pathWithParams) return;
+    router.replace(target);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [decision, navKey, pathname, searchParams, nextParam, router /* authRedirectService intentionally stable */]);
 
-  if (decision === "pending") return <LoadingIndicator />;
+  if (decision === "pending") return null;
   if (decision === "redirect") return null;
   
   return <>{children}</>;

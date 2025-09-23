@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/types/auth";
+import { AuthState } from "@/contexts/AuthProvider";
 import { GqlCurrentUserQuery } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 
@@ -62,5 +62,5 @@ export const useUserRegistrationState = ({
     } else {
       processedUserIdRef.current = null;
     }
-  }, [userData, setState, authStateManager]);
+  }, [userData, authStateManager]);
 };

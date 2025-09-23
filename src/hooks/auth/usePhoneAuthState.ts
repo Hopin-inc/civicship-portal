@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/types/auth";
+import { AuthState } from "@/contexts/AuthProvider";
 import { logger } from "@/lib/logging";
 
 interface UsePhoneAuthStateProps {
@@ -58,5 +58,5 @@ export const usePhoneAuthState = ({
           : prev.authenticationState
         : prev.authenticationState,
     }));
-  }, [setState, authStateManager]);
+  }, [authStateManager]);
 };
