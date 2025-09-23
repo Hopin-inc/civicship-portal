@@ -46,9 +46,17 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
   const decision = useMemo<"pending" | "stay" | "redirect">(() => {
     if (!authInitComplete || loading || userLoading || isInitialRender) return "pending";
+    
+    if (authenticationState === "loading" || 
+        authenticationState === "initializing" || 
+        authenticationState === "verifying" || 
+        authenticationState === "network_error") {
+      return "pending";
+    }
+    
     if (!requireAuth) return "stay";
     return isAuthenticated ? "stay" : "redirect";
-  }, [authInitComplete, loading, userLoading, isInitialRender, requireAuth, isAuthenticated]);
+  }, [authInitComplete, loading, userLoading, isInitialRender, authenticationState, requireAuth, isAuthenticated]);
 
   const redirectingRef = useRef(false);
   const lastHandledKeyRef = useRef<string | null>(null);

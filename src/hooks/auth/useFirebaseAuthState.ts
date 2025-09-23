@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { lineAuth } from "@/lib/auth/firebase-config";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/types/auth";
+import { AuthState } from "@/contexts/AuthProvider";
 import { logger } from "@/lib/logging";
 
 interface UseFirebaseAuthStateProps {

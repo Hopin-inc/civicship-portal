@@ -44,7 +44,10 @@ export type AuthState = {
     | "phone_authenticated" // S2: 電話番号認証済み
     | "phone_token_expired" // S2e: 電話番号トークン期限切れ
     | "user_registered" // S3: ユーザ情報登録済み
-    | "loading"; // L0: 状態チェック中
+    | "loading" // L0: 状態チェック中
+    | "initializing" // 初期化中
+    | "verifying" // 検証中
+    | "network_error"; // ネットワークエラー
   environment: AuthEnvironment;
   isAuthenticating: boolean;
 };
