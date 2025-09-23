@@ -6,6 +6,7 @@ import {
   GqlWalletType,
   Maybe,
 } from "@/types/graphql";
+import { truncateText } from "@/utils/stringUtils";
 
 export function presentTransaction({
   transaction,
@@ -22,14 +23,6 @@ export function presentTransaction({
     ? presentGrantTransaction({ transaction, didIssuanceRequests })
     : presentDonateTransaction({ transaction, currentUserId, didIssuanceRequests });
 }
-
-const truncateDid = (did: string | undefined | null, length: number = 20): string => {
-  if (!did) return "";
-  if (did.length <= length) return did;
-  const start = did.substring(0, length);
-  const end = did.substring(did.length - 10);
-  return `${start}...${end}`;
-};
 
 const resolveDidIssuanceRequests = ({
   transaction,
@@ -155,7 +148,8 @@ function buildPresentedTransaction({
     sign,
     pointColor,
     label,
-    didValue: truncateDid(didValue, 20),
+    didValue: truncateText(didValue, 20, "middle"),
     createdAt: transaction.createdAt,
+    comment: transaction.comment,
   };
 }
