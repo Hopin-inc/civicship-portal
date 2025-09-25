@@ -146,25 +146,23 @@ function TransferInputStep({
               </div>
             </div>
           </section>
+          
+          <div className="flex flex-col gap-2 w-full mt-6">
+            <Button
+              onClick={() => amount && amount > 0 && amount <= currentPoint && onSubmit(amount, comment.trim() || undefined)}
+              disabled={
+                !amount || amount <= 0 || amount > currentPoint || isLoading || amount > INT_LIMIT
+              }
+              className="w-full"
+            >
+              {submitLabel}
+            </Button>
+            <Button variant="text" size="sm" onClick={onBack} className="w-full">
+              {backLabel}
+            </Button>
+          </div>
         </div>
       </main>
-
-      <footer className="fixed bottom-[40px] left-0 right-0 z-50 bg-background max-w-mobile-l w-full px-4 py-4 mx-auto">
-        <div className="flex flex-col gap-2">
-          <Button
-            onClick={() => amount && amount > 0 && amount <= currentPoint && onSubmit(amount, comment.trim() || undefined)}
-            disabled={
-              !amount || amount <= 0 || amount > currentPoint || isLoading || amount > INT_LIMIT
-            }
-            className="w-full"
-          >
-            {submitLabel}
-          </Button>
-          <Button variant="text" size="sm" onClick={onBack} className="w-full">
-            {backLabel}
-          </Button>
-        </div>
-      </footer>
     </>
   );
 }
