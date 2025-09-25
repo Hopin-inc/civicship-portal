@@ -126,6 +126,7 @@ function TransferInputStep({
               <Label className="text-label-md font-medium">コメント</Label>
               <div className="relative mt-3">
                 <Textarea
+                  maxLength={100}
                   placeholder="例）草刈り手伝ってくれてありがとう！"
                   value={comment}
                   onChange={(e) => {
