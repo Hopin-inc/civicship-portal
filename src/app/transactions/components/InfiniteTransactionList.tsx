@@ -5,6 +5,7 @@ import { GqlTransactionsConnection } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useInfiniteTransactions } from "@/hooks/transactions/useInfiniteTransactions";
 import { getServerCommunityTransactionsWithCursor } from "@/hooks/transactions/server-community-transactions";
+import { getFromUserImage, getToUserImage } from "@/app/admin/wallet/data/presenter";
 
 interface InfiniteTransactionListProps {
   initialTransactions: GqlTransactionsConnection;
@@ -18,9 +19,12 @@ export const InfiniteTransactionList = ({ initialTransactions }: InfiniteTransac
 
   return (
     <div className="space-y-4">
-      {transactions.map((transaction) => (
-        <TransactionCard key={transaction.id} transaction={transaction} />
-      ))}
+      {transactions.map((transaction) => {
+        const image = getFromUserImage(transaction);
+        return (
+          <TransactionCard key={transaction.id} transaction={transaction} image={image} />
+        );
+      })}
       
       {hasNextPage && (
         <div ref={loadMoreRef} className="flex justify-center py-4">
