@@ -9,12 +9,13 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Gift } from "lucide-react";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
-import { presenterTransaction } from "@/app/wallets/data/presenter";
+import { getOtherUserImage, presenterTransaction } from "@/app/wallets/data/presenter";
 import useUserTransactions from "@/app/wallets/hooks/useUserTransaction";
 import { toast } from "sonner";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { logger } from "@/lib/logging";
+import Link from "next/link";
 
 export default function UserWalletPage() {
   const { user: currentUser } = useAuth();
@@ -122,8 +123,14 @@ export default function UserWalletPage() {
         </Button>
       </div>
 
-      <div className="pt-10">
+      <div className="pt-10 flex justify-between items-center">
         <h2 className="text-display-sm">これまでの交換</h2>
+        <Link
+            href="/transactions"
+            className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
+            >
+            コミュニティ履歴へ
+        </Link>
       </div>
       <div className="space-y-2 mt-2">
         {connection.edges?.length === 0 ? (
@@ -136,7 +143,8 @@ export default function UserWalletPage() {
             if (!node) return null;
             const transaction = presenterTransaction(node, walletId);
             if (!transaction) return null;
-            return <TransactionItem key={transaction.id} transaction={transaction} />;
+            const image = getOtherUserImage(node, userId ?? "");
+            return <TransactionItem key={transaction.id} transaction={transaction} image={image}/>;
           })
         )}
 

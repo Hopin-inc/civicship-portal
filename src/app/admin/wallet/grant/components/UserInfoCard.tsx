@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GqlUser } from "@/types/graphql";
 import { formatDateTime } from "@/utils/date";
 import React from "react";
+import { truncateText } from "@/utils/stringUtils";
 
 interface Props {
   otherUser: GqlUser | undefined | null;
@@ -18,6 +19,7 @@ interface Props {
   showDate?: boolean;
   onClick?: () => void;
   children?: React.ReactNode;
+  comment?: string;
 }
 
 const UserInfoCard = ({
@@ -34,42 +36,51 @@ const UserInfoCard = ({
   showDate = true,
   onClick,
   children,
+  comment,
 }: Props) => (
-  <Card className="rounded-2xl border border-gray-200 flex items-start px-4 py-3" onClick={onClick}>
-    <Avatar className="mt-1">
-      <AvatarImage src={otherUser?.image || ""} />
-      <AvatarFallback>{otherUser?.name?.[0] || "U"}</AvatarFallback>
-    </Avatar>
-    <div className="flex-1 ml-4 min-w-0">
-      <div className="flex justify-between items-center min-w-0">
-        <span className="font-bold text-sm truncate max-w-[140px]">
+    <Card className="px-4 py-4 bg-white" onClick={onClick}>
+    <div className="flex items-start gap-3">
+      <Avatar className="h-10 w-10">
+        <AvatarImage src={otherUser?.image || ""} alt="user" />
+        <AvatarFallback>U</AvatarFallback>
+      </Avatar>
+      <div className="flex flex-col text-left min-w-0 flex-1">
+        <div className="flex items-start justify-between">
+          <span className="flex items-center truncate whitespace-nowrap overflow-hidden">
           {showLabel
             ? typeof label === "string"
               ? label
               : label && (
-                  <span className="transaction-label flex items-center min-w-0">
-                    <span className="truncate">{label.text.replace(label.smallText, "")}</span>
-                    <span className="text-xs flex-shrink-0">{label.smallText}</span>
+                  <span className="flex items-center min-w-0">
+                    <span className="truncate text-label-sm font-bold">{label.text.replace(label.smallText, "")}</span>
+                    <span className="text-xs flex-shrink-0 text-label-xs font-bold">{label.smallText}</span>
                   </span>
                 )
             : otherUser?.name
               ? `{{ ${otherUser.name} }}`
               : ""}
-        </span>
-        {showPoint && point !== undefined && (
-          <span className={`font-bold text-xs ${pointColor ?? ""}`}>
-            {sign}
-            {point.toLocaleString()}pt
+          </span>
+          {/* 右: 金額 */}
+          {showPoint && point !== undefined && (
+            <span className={`font-bold text-xs ${pointColor ?? ""}`}>
+              {sign}
+              {point.toLocaleString()}pt
+            </span>
+          )}
+        </div>
+        {showDid && <span className="text-label-xs text-caption py-2">{didValue?.length ? truncateText(didValue, 20, "middle") : "did取得中"}</span>}
+        {comment && (
+          <span className="text-label-xs text-caption bg-background-hover leading-relaxed block p-2 rounded-sm">
+            {comment}
           </span>
         )}
-      </div>
-      {showDid && <div className="text-gray-400 text-sm truncate mt-1">{didValue}</div>}
-      {showDate && (
-        <div className="text-gray-400 text-sm">
+        {showDate && (
+        <span className="text-label-xs text-muted-foreground mt-2 block">
           {formatDateTime(createdAt ?? null, "yyyy年MM月dd日 HH時mm分")}
-        </div>
-      )}
-      {children}
+        </span>
+        )}
+        {children}
+      </div>
     </div>
   </Card>
 );

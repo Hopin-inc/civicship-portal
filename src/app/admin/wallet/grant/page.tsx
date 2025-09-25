@@ -45,12 +45,12 @@ export default function GrantPointStepperPage() {
   const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGrantPoint = async (amount: number) => {
+  const handleGrantPoint = async (amount: number, comment?: string) => {
     if (!selectedUser) return;
     setIsLoading(true);
     try {
       const res = await grantPoint({
-        input: { transferPoints: amount, toUserId: selectedUser.id },
+        input: { transferPoints: amount, toUserId: selectedUser.id,comment: comment },
         permission: { communityId: COMMUNITY_ID },
       });
 

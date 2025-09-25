@@ -24,7 +24,7 @@ export type AppTransaction = {
   id: string;
   reason: GqlTransactionReason;
   description: string;
-
+  comment: string;
   source: string;
 
   from: string;
@@ -32,4 +32,5 @@ export type AppTransaction = {
   transferPoints: number;
 
   transferredAt: string;
+  didValue: string;
 };

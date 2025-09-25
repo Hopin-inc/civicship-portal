@@ -1,7 +1,8 @@
 "use client";
 
-import { GqlTransaction, GqlTransactionReason, GqlWallet, GqlWalletType } from "@/types/graphql";
+import { GqlDidIssuanceStatus, GqlTransaction, GqlTransactionReason, GqlWallet, GqlWalletType } from "@/types/graphql";
 import { AppTransaction, AvailableTicket, UserAsset } from "@/app/wallets/data/type";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 export const presenterUserAsset = (wallet: GqlWallet | undefined | null): UserAsset => {
   const walletId = wallet?.id ?? "";
@@ -37,16 +38,17 @@ export const presenterTransaction = (
   const rawPoint = node.fromPointChange ?? 0;
   const isOutgoing = node.fromWallet?.id === walletId;
   const signedPoint = isOutgoing ? -Math.abs(rawPoint) : Math.abs(rawPoint);
-
   return {
     id: node.id,
     reason: node.reason,
     from,
     to,
     source: "",
+    comment: node.comment ?? "",
     transferPoints: signedPoint,
     transferredAt: node.createdAt ? new Date(node.createdAt).toISOString() : "",
     description: formatTransactionDescription(node.reason, from, to, signedPoint),
+    didValue: node.toWallet?.user?.didIssuanceRequests?.find(req => req?.status === GqlDidIssuanceStatus.Completed)?.didValue ?? "did発行中",
   };
 };
 
@@ -92,7 +94,7 @@ const formatTransactionDescription = (
   }
 };
 
-const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
+export const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
   if (!wallet) return "";
   switch (wallet.type) {
     case GqlWalletType.Member:
@@ -101,5 +103,21 @@ const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
       return wallet.community?.name ?? "";
     default:
       return "";
+  }
+};
+
+export const getOtherUserImage = (node: GqlTransaction, targetId: string): string => {
+  const { fromWallet, toWallet } = node;
+  const otherWallet = fromWallet?.user?.id === targetId ? toWallet : fromWallet;
+  if (!otherWallet) {
+    return PLACEHOLDER_IMAGE;
+  }
+  switch (otherWallet.type) {
+    case GqlWalletType.Member:
+      return otherWallet.user?.image || PLACEHOLDER_IMAGE;
+    case GqlWalletType.Community:
+      return otherWallet.community?.image || PLACEHOLDER_IMAGE;
+    default:
+      return PLACEHOLDER_IMAGE;
   }
 };

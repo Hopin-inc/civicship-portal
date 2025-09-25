@@ -12,8 +12,10 @@ import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { presenterTransaction } from "@/app/wallets/data/presenter";
+import { getToWalletImage } from "@/app/admin/wallet/data/presenter";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
 import { logger } from "@/lib/logging";
+import Link from "next/link";
 
 export default function WalletPage() {
   const communityId = COMMUNITY_ID;
@@ -135,8 +137,14 @@ export default function WalletPage() {
         </Button>
       </div>
 
-      <div className="pt-10">
+      <div className="pt-10 flex justify-between items-center">
         <h2 className="text-display-sm">これまでの交換</h2>
+        <Link
+            href="/transactions"
+            className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
+            >
+            コミュニティ履歴へ
+        </Link>
       </div>
       <div className="space-y-2 mt-2">
         {connection.edges?.length === 0 ? (
@@ -149,7 +157,8 @@ export default function WalletPage() {
             if (!node) return null;
             const transaction = presenterTransaction(node, walletId);
             if (!transaction) return null;
-            return <TransactionItem key={transaction.id} transaction={transaction} />;
+            const image = getToWalletImage(node);
+            return <TransactionItem key={transaction.id} transaction={transaction} image={image} />;
           })
         )}
 
