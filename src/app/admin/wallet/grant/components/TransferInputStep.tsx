@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { truncateText } from "@/utils/stringUtils";
 
 interface Props {
   user: GqlUser;
@@ -53,12 +54,6 @@ function TransferInputStep({
   const [displayValue, setDisplayValue] = useState<string>("");
   const [comment, setComment] = useState<string>("");
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
 
   const formatWithComma = (value: string | number) => {
     const num = typeof value === "number" ? value : Number(value.replace(/,/g, ""));
@@ -101,7 +96,7 @@ function TransferInputStep({
                   <span className="text-label-sm font-bold">{user.name}</span>
                   <span className="text-label-xs font-bold">{recipientLabel}</span>
                 </div>
-                <span className="text-label-xs text-caption mt-1">{didValue}</span>
+                <span className="text-label-xs text-caption mt-1">{ didValue?.length ? truncateText(didValue, 20, "middle") : "did取得中"}</span>
               </div>
             </div>
           </Card>
@@ -145,25 +140,23 @@ function TransferInputStep({
               </div>
             </div>
           </section>
+          
+          <div className="flex flex-col gap-2 w-full mt-6">
+            <Button
+              onClick={() => amount && amount > 0 && amount <= currentPoint && onSubmit(amount, comment.trim() || undefined)}
+              disabled={
+                !amount || amount <= 0 || amount > currentPoint || isLoading || amount > INT_LIMIT
+              }
+              className="w-full"
+            >
+              {submitLabel}
+            </Button>
+            <Button variant="text" size="sm" onClick={onBack} className="w-full">
+              {backLabel}
+            </Button>
+          </div>
         </div>
       </main>
-
-      <footer className="fixed bottom-[120px] left-0 right-0 z-50 bg-background max-w-mobile-l w-full px-4 py-4 mx-auto">
-        <div className="flex flex-col gap-2">
-          <Button
-            onClick={() => amount && amount > 0 && amount <= currentPoint && onSubmit(amount, comment.trim() || undefined)}
-            disabled={
-              !amount || amount <= 0 || amount > currentPoint || isLoading || amount > INT_LIMIT
-            }
-            className="w-full"
-          >
-            {submitLabel}
-          </Button>
-          <Button variant="text" size="sm" onClick={onBack} className="w-full">
-            {backLabel}
-          </Button>
-        </div>
-      </footer>
     </>
   );
 }
