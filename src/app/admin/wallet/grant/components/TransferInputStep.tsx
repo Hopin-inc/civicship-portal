@@ -54,12 +54,6 @@ function TransferInputStep({
   const [displayValue, setDisplayValue] = useState<string>("");
   const [comment, setComment] = useState<string>("");
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
 
   const formatWithComma = (value: string | number) => {
     const num = typeof value === "number" ? value : Number(value.replace(/,/g, ""));
