@@ -2,6 +2,7 @@
 
 import { GqlDidIssuanceStatus, GqlTransaction, GqlTransactionReason, GqlWallet, GqlWalletType } from "@/types/graphql";
 import { AppTransaction, AvailableTicket, UserAsset } from "@/app/wallets/data/type";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 export const presenterUserAsset = (wallet: GqlWallet | undefined | null): UserAsset => {
   const walletId = wallet?.id ?? "";
@@ -37,7 +38,6 @@ export const presenterTransaction = (
   const rawPoint = node.fromPointChange ?? 0;
   const isOutgoing = node.fromWallet?.id === walletId;
   const signedPoint = isOutgoing ? -Math.abs(rawPoint) : Math.abs(rawPoint);
-
   return {
     id: node.id,
     reason: node.reason,
@@ -105,3 +105,21 @@ export const getNameFromWallet = (wallet: GqlWallet | null | undefined): string 
       return "";
   }
 };
+
+export const getOtherUserImage = (node: GqlTransaction, targetId: string): string => {
+  const fromUserId = node.fromWallet?.user?.id;
+  const toUserId = node.toWallet?.user?.id;
+  
+  // fromWalletのuserがtargetIdと一致しない場合
+  if (fromUserId && fromUserId !== targetId) {
+    return node.fromWallet?.user?.image || PLACEHOLDER_IMAGE;
+  }
+  
+  // toWalletのuserがtargetIdと一致しない場合
+  if (toUserId && toUserId !== targetId) {
+    return node.toWallet?.user?.image || PLACEHOLDER_IMAGE;
+  }
+  
+  // どちらも一致しない、またはどちらもnullの場合
+  return PLACEHOLDER_IMAGE;
+}

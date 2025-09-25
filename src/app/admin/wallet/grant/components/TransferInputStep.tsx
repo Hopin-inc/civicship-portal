@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { truncateText } from "@/utils/stringUtils";
 
 interface Props {
   user: GqlUser;
@@ -101,7 +102,7 @@ function TransferInputStep({
                   <span className="text-label-sm font-bold">{user.name}</span>
                   <span className="text-label-xs font-bold">{recipientLabel}</span>
                 </div>
-                <span className="text-label-xs text-caption mt-1">{didValue}</span>
+                <span className="text-label-xs text-caption mt-1">{ didValue?.length ? truncateText(didValue, 20, "middle") : "did取得中"}</span>
               </div>
             </div>
           </Card>
@@ -148,7 +149,7 @@ function TransferInputStep({
         </div>
       </main>
 
-      <footer className="fixed bottom-[120px] left-0 right-0 z-50 bg-background max-w-mobile-l w-full px-4 py-4 mx-auto">
+      <footer className="fixed bottom-[40px] left-0 right-0 z-50 bg-background max-w-mobile-l w-full px-4 py-4 mx-auto">
         <div className="flex flex-col gap-2">
           <Button
             onClick={() => amount && amount > 0 && amount <= currentPoint && onSubmit(amount, comment.trim() || undefined)}

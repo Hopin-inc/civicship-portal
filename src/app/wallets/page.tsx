@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Gift } from "lucide-react";
 import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
-import { presenterTransaction } from "@/app/wallets/data/presenter";
+import { getOtherUserImage, presenterTransaction } from "@/app/wallets/data/presenter";
 import useUserTransactions from "@/app/wallets/hooks/useUserTransaction";
 import { toast } from "sonner";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -143,7 +143,8 @@ export default function UserWalletPage() {
             if (!node) return null;
             const transaction = presenterTransaction(node, walletId);
             if (!transaction) return null;
-            return <TransactionItem key={transaction.id} transaction={transaction} />;
+            const image = getOtherUserImage(node, userId ?? "");
+            return <TransactionItem key={transaction.id} transaction={transaction} image={image}/>;
           })
         )}
 

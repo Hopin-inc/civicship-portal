@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GqlUser } from "@/types/graphql";
 import { formatDateTime } from "@/utils/date";
 import React from "react";
+import { truncateText } from "@/utils/stringUtils";
 
 interface Props {
   otherUser: GqlUser | undefined | null;
@@ -67,7 +68,7 @@ const UserInfoCard = ({
             </span>
           )}
         </div>
-        {showDid && <span className="text-label-xs text-caption py-2">{didValue?.length ? didValue : "did取得中"}</span>}
+        {showDid && <span className="text-label-xs text-caption py-2">{didValue?.length ? truncateText(didValue, 20, "middle") : "did取得中"}</span>}
         {comment && (
           <span className="text-label-xs text-caption bg-background-hover leading-relaxed block p-2 rounded-sm">
             {comment}
