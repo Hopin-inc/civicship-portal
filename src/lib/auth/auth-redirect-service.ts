@@ -23,6 +23,9 @@ const OWNER_ONLY_PATHS = [
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
   private authStateManager: AuthStateManager;
+  private lastRedirectTime: number = 0;
+  private lastRedirectPath: string | null = null;
+  private readonly REDIRECT_COOLDOWN_MS = 2000; // 2 second cooldown between redirects
 
   private constructor() {
     this.authStateManager = AuthStateManager.getInstance();
@@ -84,77 +87,43 @@ export class AuthRedirectService {
       ? this.generateNextParam(next)
       : this.generateNextParam(pathname);
 
-    if (authState === "loading") {
+    const now = Date.now();
+    const timeSinceLastRedirect = now - this.lastRedirectTime;
+    
+    if (timeSinceLastRedirect < this.REDIRECT_COOLDOWN_MS) {
+      logger.debug("AuthRedirectService: Redirect blocked due to cooldown", {
+        component: "AuthRedirectService",
+        timestamp: new Date().toISOString(),
+        timeSinceLastRedirect,
+        cooldownMs: this.REDIRECT_COOLDOWN_MS,
+        currentPath: pathname,
+        authState,
+      });
       return null;
     }
 
-    if (
-      ["/login", "/sign-up/phone-verification", "/sign-up"].includes(pathname)
-      && authState === "user_registered"
-    ) {
-      if (
-        next?.startsWith("/")
-        && !next.startsWith("/login")
-        && !next.startsWith("/sign-up")
-      ) {
-        return next;
-      } else if (next) {
-        const nextRoute = extractSearchParamFromRelativePath(next, "next");
-        return (nextRoute ?? "/") as RawURIComponent;
-      } else {
-        return "/" as RawURIComponent;
-      }
+    if (authState === "loading" || authState === "initializing" || authState === "verifying" || authState === "network_error") {
+      return null;
     }
 
-    if (this.isProtectedPath(pathname)) {
-      switch (authState) {
-        case "unauthenticated":
-          return `/login${ nextParam }` as RawURIComponent;
-        case "line_authenticated":
-        case "line_token_expired":
-          return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
-        case "phone_authenticated":
-        case "phone_token_expired":
-          return `/sign-up${ nextParam }` as RawURIComponent;
-        default:
-          return null;
-      }
+
+    const redirectPath = this.determineRedirectPath(authState, pathname, nextParam);
+    
+    if (redirectPath) {
+      this.lastRedirectTime = now;
+      this.lastRedirectPath = redirectPath;
+      
+      logger.debug("AuthRedirectService: Redirect path determined", {
+        component: "AuthRedirectService",
+        timestamp: new Date().toISOString(),
+        currentPath: pathname,
+        authState,
+        redirectPath,
+        redirectCooldownMs: this.REDIRECT_COOLDOWN_MS,
+      });
     }
 
-    if (this.isPathInSignUpFlow(pathname)) {
-      switch (authState) {
-        case "unauthenticated":
-          return `/login${ nextParam }` as RawURIComponent;
-
-        case "line_authenticated":
-        case "line_token_expired":
-          if (pathname !== "/sign-up/phone-verification") {
-            return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
-          }
-          return null; // stay here
-
-        case "phone_authenticated":
-          if (pathname !== "/sign-up") {
-            return `/sign-up${ nextParam }` as RawURIComponent;
-          }
-          return null; // stay here
-
-        case "user_registered":
-        default:
-          if (next && next.startsWith("/") && !next.startsWith("/sign-up")) {
-            return next;
-          }
-          return "/" as RawURIComponent;
-      }
-    }
-
-    if (this.isAdminPath(pathname)) {
-      if (authState !== "user_registered") {
-        return `/login${ nextParam }` as RawURIComponent;
-      }
-    }
-
-    return null;
+    return redirectPath;
   }
 
   private generateNextParam(nextPath: RawURIComponent): RawURIComponent {
@@ -184,6 +153,8 @@ export class AuthRedirectService {
         return `/sign-up${ nextParam }` as RawURIComponent;
 
       case "loading":
+      case "initializing":
+      case "verifying":
       case "user_registered":
       default:
         return nextPath ?? "/" as RawURIComponent;
@@ -227,5 +198,77 @@ export class AuthRedirectService {
     }
 
     return { hasAccess: true, redirectPath: null };
+  }
+
+  private determineRedirectPath(authState: string, pathname: RawURIComponent, nextParam: RawURIComponent): RawURIComponent | null {
+    if (
+      ["/login", "/sign-up/phone-verification", "/sign-up"].includes(pathname)
+      && authState === "user_registered"
+    ) {
+      const next = extractSearchParamFromRelativePath(pathname, "next");
+      if (
+        next?.startsWith("/")
+        && !next.startsWith("/login")
+        && !next.startsWith("/sign-up")
+      ) {
+        return next as RawURIComponent;
+      } else if (next) {
+        const nextRoute = extractSearchParamFromRelativePath(next, "next");
+        return (nextRoute ?? "/") as RawURIComponent;
+      } else {
+        return "/" as RawURIComponent;
+      }
+    }
+
+    if (this.isProtectedPath(pathname)) {
+      switch (authState) {
+        case "unauthenticated":
+          return `/login${ nextParam }` as RawURIComponent;
+        case "line_authenticated":
+        case "line_token_expired":
+          return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
+        case "phone_authenticated":
+        case "phone_token_expired":
+          return `/sign-up${ nextParam }` as RawURIComponent;
+        default:
+          return null;
+      }
+    }
+
+    if (this.isPathInSignUpFlow(pathname)) {
+      switch (authState) {
+        case "unauthenticated":
+          return `/login${ nextParam }` as RawURIComponent;
+
+        case "line_authenticated":
+        case "line_token_expired":
+          if (pathname !== "/sign-up/phone-verification") {
+            return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
+          }
+          return null; // stay here
+
+        case "phone_authenticated":
+          if (pathname !== "/sign-up") {
+            return `/sign-up${ nextParam }` as RawURIComponent;
+          }
+          return null; // stay here
+
+        case "user_registered":
+        default:
+          const next = extractSearchParamFromRelativePath(pathname, "next");
+          if (next && next.startsWith("/") && !next.startsWith("/sign-up")) {
+            return next as RawURIComponent;
+          }
+          return "/" as RawURIComponent;
+      }
+    }
+
+    if (this.isAdminPath(pathname)) {
+      if (authState !== "user_registered") {
+        return `/login${ nextParam }` as RawURIComponent;
+      }
+    }
+
+    return null;
   }
 }

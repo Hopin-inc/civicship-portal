@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { lineAuth } from "@/lib/auth/firebase-config";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/types/auth";
+import { AuthState } from "@/contexts/AuthProvider";
 import { logger } from "@/lib/logging";
 
 interface UseFirebaseAuthStateProps {
@@ -25,12 +25,16 @@ export const useFirebaseAuthState = ({
   stateRef.current = state;
 
   useEffect(() => {
+    if (state.authenticationState === "initializing") {
+      return;
+    }
+
     const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
       setState((prev) => ({
         ...prev,
         firebaseUser: user,
         authenticationState: user
-          ? prev.authenticationState === "loading"
+          ? prev.authenticationState === "loading" || prev.authenticationState === "initializing"
             ? "line_authenticated"
             : prev.authenticationState
           : "unauthenticated",
@@ -66,5 +70,5 @@ export const useFirebaseAuthState = ({
     });
 
     return () => unsubscribe();
-  }, [setState]);
+  }, [state.authenticationState]);
 };

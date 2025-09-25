@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/types/auth";
+import { AuthState } from "@/contexts/AuthProvider";
 import { logger } from "@/lib/logging";
 
 interface UsePhoneAuthStateProps {
@@ -28,6 +28,10 @@ export const usePhoneAuthState = ({
 
     if (!currentAuthStateManager) return;
 
+    if (currentAuthStateManager.getState() === "initializing") {
+      return;
+    }
+
     const phoneState = phoneAuthServiceRef.current.getState();
     const isVerified = phoneState.isVerified;
 
@@ -49,10 +53,10 @@ export const usePhoneAuthState = ({
     setState((prev) => ({
       ...prev,
       authenticationState: isVerified
-        ? prev.authenticationState === "line_authenticated"
+        ? prev.authenticationState === "line_authenticated" || prev.authenticationState === "initializing"
           ? "phone_authenticated"
           : prev.authenticationState
         : prev.authenticationState,
     }));
-  }, [setState]);
+  }, [authStateManager]);
 };

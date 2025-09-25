@@ -2,12 +2,11 @@
 
 import React from "react";
 import Image from "next/image";
-import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
+import { ActivityDetail, QuestDetail, isActivityCategory } from "@/components/domains/opportunities/types";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import Link from "next/link";
-import { isActivityCategory } from "@/components/domains/opportunities/types";
 
 interface OpportunityInfoProps {
   opportunity: ActivityDetail | QuestDetail;

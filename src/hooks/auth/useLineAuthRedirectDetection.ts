@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
-import { AuthState } from "@/types/auth";
+import { AuthState } from "@/contexts/AuthProvider";
 import { logger } from "@/lib/logging";
 
 interface UseLineAuthRedirectDetectionProps {
@@ -61,7 +61,8 @@ export const useLineAuthRedirectDetection = ({
 
     if (
       state.authenticationState !== "unauthenticated" &&
-      state.authenticationState !== "loading"
+      state.authenticationState !== "loading" &&
+      state.authenticationState !== "initializing"
     ) {
       setShouldProcessRedirect(false);
       return;

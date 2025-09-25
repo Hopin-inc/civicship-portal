@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/types/auth";
+import { AuthState } from "@/contexts/AuthProvider";
 
 interface UseAuthStateChangeListenerProps {
   authStateManager: AuthStateManager | null;
