@@ -107,19 +107,17 @@ export const getNameFromWallet = (wallet: GqlWallet | null | undefined): string 
 };
 
 export const getOtherUserImage = (node: GqlTransaction, targetId: string): string => {
-  const fromUserId = node.fromWallet?.user?.id;
-  const toUserId = node.toWallet?.user?.id;
-  
-  // fromWalletのuserがtargetIdと一致しない場合
-  if (fromUserId && fromUserId !== targetId) {
-    return node.fromWallet?.user?.image || PLACEHOLDER_IMAGE;
+  const { fromWallet, toWallet } = node;
+  const otherWallet = fromWallet?.user?.id === targetId ? toWallet : fromWallet;
+  if (!otherWallet) {
+    return PLACEHOLDER_IMAGE;
   }
-  
-  // toWalletのuserがtargetIdと一致しない場合
-  if (toUserId && toUserId !== targetId) {
-    return node.toWallet?.user?.image || PLACEHOLDER_IMAGE;
+  switch (otherWallet.type) {
+    case GqlWalletType.Member:
+      return otherWallet.user?.image || PLACEHOLDER_IMAGE;
+    case GqlWalletType.Community:
+      return otherWallet.community?.image || PLACEHOLDER_IMAGE;
+    default:
+      return PLACEHOLDER_IMAGE;
   }
-  
-  // どちらも一致しない、またはどちらもnullの場合
-  return PLACEHOLDER_IMAGE;
-}
+};
