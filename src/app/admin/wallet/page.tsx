@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { presenterTransaction } from "@/app/wallets/data/presenter";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
 import { logger } from "@/lib/logging";
+import Link from "next/link";
 
 export default function WalletPage() {
   const communityId = COMMUNITY_ID;
@@ -135,8 +136,14 @@ export default function WalletPage() {
         </Button>
       </div>
 
-      <div className="pt-10">
+      <div className="pt-10 flex justify-between items-center">
         <h2 className="text-display-sm">これまでの交換</h2>
+        <Link
+            href="/transactions"
+            className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
+            >
+            コミュニティ履歴へ
+        </Link>
       </div>
       <div className="space-y-2 mt-2">
         {connection.edges?.length === 0 ? (
