@@ -147,9 +147,6 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     enableFeatures: [
       "opportunities",
       "points",
-      "articles",
-      "tickets",
-      "prefectures",
       "quests",
     ],
     rootPath: "/opportunities",
