@@ -133,6 +133,28 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     rootPath: "/users/me",
     adminRootPath: "/admin/credentials",
   },
+  kotohira: {
+    id: "kotohira",
+    tokenName: "KOTOHIRA",
+    title: "琴平デジタル町民",
+    description: "「観光地を訪れる」から「観光地と関わる」へ。あなたも琴平デジタル町民として、DAO型地域共創の一員になりませんか？",
+    shortDescription: "「観光地を訪れる」から「観光地と関わる」へ。",
+    domain: "https://kotohira.civicship.app", // TODO: 環境によってドメインが変わるので、環境変数化する必要あり
+    faviconPrefix: "/communities/kotohira",
+    logoPath: "/communities/kotohira/logo.jpg",
+    squareLogoPath: "/communities/kotohira/logo-square.jpg",
+    ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/kotohira/ogp.jpg",
+    enableFeatures: [
+      "opportunities",
+      "points",
+      "articles",
+      "tickets",
+      "prefectures",
+      "quests",
+    ],
+    rootPath: "/opportunities",
+    adminRootPath: "/admin/reservations",
+  },
   default: {
     id: "default",
     tokenName: "NEO88",
