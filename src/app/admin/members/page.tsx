@@ -56,7 +56,7 @@ export default function MembersPage() {
     refetch
   } = useMemberWithDidSearch(communityId, [], {
     searchQuery,
-    pageSize: 20, // テスト用に1件に設定
+    pageSize: 20, 
     enablePagination: true,
   });
 
