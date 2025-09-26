@@ -205,6 +205,19 @@ export class AuthStateManager {
       });
 
       const isRegistered = data?.currentUser?.user != null;
+      
+      if (isRegistered) {
+        const phoneTokenValidation = await this.validatePhoneTokensForRegisteredUser();
+        if (!phoneTokenValidation.hasValidTokens) {
+          logger.info("Registered user missing phone tokens, requiring re-authentication", {
+            userId: data?.currentUser?.user?.id,
+            missingTokens: phoneTokenValidation.missingTokens,
+            component: "AuthStateManager",
+          });
+          return false;
+        }
+      }
+      
       return isRegistered;
     } catch (error) {
       logger.info("Failed to check user registration", {
@@ -342,6 +355,54 @@ export class AuthStateManager {
       } else {
         this.setState("line_authenticated");
       }
+    }
+  }
+
+  private async validatePhoneTokensForRegisteredUser(): Promise<{
+    hasValidTokens: boolean;
+    missingTokens: string[];
+  }> {
+    try {
+      const { lineAuth } = await import("./firebase-config");
+      if (!lineAuth.currentUser) {
+        return { hasValidTokens: false, missingTokens: ["no_firebase_user"] };
+      }
+
+      const accessToken = await lineAuth.currentUser.getIdToken();
+      const { CHECK_PHONE_TOKEN_REGISTERED } = await import("@/graphql/account/identity/query");
+
+      const { data } = await apolloClient.query({
+        query: CHECK_PHONE_TOKEN_REGISTERED,
+        fetchPolicy: "network-only",
+        context: {
+          headers: {
+            Authorization: accessToken ? `Bearer ${accessToken}` : "",
+          },
+        },
+      });
+
+      const result = data?.checkPhoneTokenRegistered;
+      if (!result) {
+        return { hasValidTokens: false, missingTokens: ["query_failed"] };
+      }
+
+      logger.debug("Phone token validation completed", {
+        hasValidTokens: result.hasValidTokens,
+        missingTokens: result.missingTokens,
+        phoneUid: result.phoneUid,
+        component: "AuthStateManager",
+      });
+
+      return {
+        hasValidTokens: result.hasValidTokens,
+        missingTokens: result.missingTokens || []
+      };
+    } catch (error) {
+      logger.error("Failed to validate phone tokens for registered user", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "AuthStateManager",
+      });
+      return { hasValidTokens: false, missingTokens: ["validation_error"] };
     }
   }
 }
