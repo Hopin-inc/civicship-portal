@@ -5,3 +5,7 @@ export type AppAuthInfo = {
   providerIds?: string[];
   user?: GqlUser | null;
 };
+
+export interface AuthContextType {
+  authInitComplete: boolean;
+}

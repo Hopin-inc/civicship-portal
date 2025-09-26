@@ -12,7 +12,11 @@ interface UsePhoneAuthStateProps {
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
 }
 
-export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState }: UsePhoneAuthStateProps) => {
+export const usePhoneAuthState = ({
+  authStateManager,
+  phoneAuthService,
+  setState,
+}: UsePhoneAuthStateProps) => {
   const authStateManagerRef = useRef(authStateManager);
   const phoneAuthServiceRef = useRef(phoneAuthService);
 
@@ -24,6 +28,10 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
 
     if (!currentAuthStateManager) return;
 
+    if (currentAuthStateManager.getState() === "initializing") {
+      return;
+    }
+
     const phoneState = phoneAuthServiceRef.current.getState();
     const isVerified = phoneState.isVerified;
 
@@ -34,7 +42,7 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
         } catch (error) {
           logger.error("Failed to update AuthStateManager phone state in useEffect", {
             error: error instanceof Error ? error.message : String(error),
-            component: "usePhoneAuthState"
+            component: "usePhoneAuthState",
           });
         }
       };
@@ -45,10 +53,10 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
     setState((prev) => ({
       ...prev,
       authenticationState: isVerified
-        ? prev.authenticationState === "line_authenticated"
+        ? prev.authenticationState === "line_authenticated" || prev.authenticationState === "initializing"
           ? "phone_authenticated"
           : prev.authenticationState
         : prev.authenticationState,
     }));
-  }, [setState]);
+  }, [authStateManager]);
 };

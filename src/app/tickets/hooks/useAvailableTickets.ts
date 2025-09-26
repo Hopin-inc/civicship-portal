@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
 import { GqlTicketStatus, useGetUserWalletQuery } from "@/types/graphql";
-import { ActivityDetail, QuestDetail } from "@/components/domains/opportunity/types";
+import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
+import { useMemo } from "react";
 import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 
 export interface AvailableTicket {
@@ -29,12 +29,13 @@ export const useAvailableTickets = (
   });
 
   return useMemo(() => {
-    const tickets = data?.user?.wallets?.find(w => w.community?.id === getCommunityIdFromEnv())?.tickets || [];
-    
+    const tickets =
+      data?.user?.wallets?.find((w) => w.community?.id === getCommunityIdFromEnv())?.tickets || [];
+
     // 同じチケットIDでグループ化
     const ticketGroups = new Map<string, any[]>();
-    tickets.forEach(ticket => {
-      const utilityId = ticket.utility?.id || 'unknown';
+    tickets.forEach((ticket) => {
+      const utilityId = ticket.utility?.id || "unknown";
       if (!ticketGroups.has(utilityId)) {
         ticketGroups.set(utilityId, []);
       }
@@ -44,20 +45,24 @@ export const useAvailableTickets = (
     const groupedTickets = Array.from(ticketGroups.entries()).map(([utilityId, ticketList]) => {
       const firstTicket = ticketList[0];
       // AVAILABLEステータスのチケットのみをカウント
-      const availableTickets = ticketList.filter(ticket => ticket.status === GqlTicketStatus.Available);
-      
+      const availableTickets = ticketList.filter(
+        (ticket) => ticket.status === GqlTicketStatus.Available,
+      );
+
       return {
         id: utilityId,
-        utility: firstTicket.utility ? {
-          id: firstTicket.utility.id,
-          name: firstTicket.utility.name ?? null,
-          owner: firstTicket.utility.owner ?? null
-        } : null,
+        utility: firstTicket.utility
+          ? {
+              id: firstTicket.utility.id,
+              name: firstTicket.utility.name ?? null,
+              owner: firstTicket.utility.owner ?? null,
+            }
+          : null,
         status: availableTickets.length > 0 ? GqlTicketStatus.Available : firstTicket.status,
-        count: availableTickets.length // AVAILABLEステータスのチケット数
+        count: availableTickets.length, // AVAILABLEステータスのチケット数
       };
     });
-    
+
     if (!opportunity?.targetUtilities.length) {
       return groupedTickets;
     }
@@ -68,10 +73,10 @@ export const useAvailableTickets = (
       const utilityId = t?.utility?.id;
       const hasRequiredUtility = utilityId && requiredUtilityIds.has(utilityId);
       const isAvailable = t.status === GqlTicketStatus.Available;
-      
+
       return hasRequiredUtility && isAvailable;
     });
-    
+
     return filteredTickets;
   }, [opportunity?.targetUtilities, data]);
 };

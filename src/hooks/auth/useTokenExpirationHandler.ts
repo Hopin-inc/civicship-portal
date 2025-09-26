@@ -2,8 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { AuthState } from "@/contexts/AuthProvider";
-import { logger } from "@/lib/logging";
+import { AuthState } from "@/types/auth";
 
 interface UseTokenExpirationHandlerProps {
   state: AuthState;
@@ -11,7 +10,11 @@ interface UseTokenExpirationHandlerProps {
   logout: () => Promise<void>;
 }
 
-export const useTokenExpirationHandler = ({ state, setState, logout }: UseTokenExpirationHandlerProps) => {
+export const useTokenExpirationHandler = ({
+  state,
+  setState,
+  logout,
+}: UseTokenExpirationHandlerProps) => {
   const stateRef = useRef(state);
   stateRef.current = state;
 

@@ -44,7 +44,10 @@ export type AuthState = {
     | "phone_authenticated" // S2: 電話番号認証済み
     | "phone_token_expired" // S2e: 電話番号トークン期限切れ
     | "user_registered" // S3: ユーザ情報登録済み
-    | "loading"; // L0: 状態チェック中
+    | "loading" // L0: 状態チェック中
+    | "initializing" // 初期化中
+    | "verifying" // 検証中
+    | "network_error"; // ネットワークエラー
   environment: AuthEnvironment;
   isAuthenticating: boolean;
 };
@@ -62,6 +65,7 @@ interface AuthContextType {
   authenticationState: AuthState["authenticationState"];
   isAuthenticating: boolean;
   environment: AuthEnvironment;
+  authInitComplete: boolean;
 
   loginWithLiff: (redirectPath?: RawURIComponent) => Promise<boolean>;
   logout: () => Promise<void>;
@@ -161,9 +165,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [isAuthInitialized, setIsAuthInitialized] = useState(false);
   const [authInitError, setAuthInitError] = useState<string | null>(null);
+  const [authInitComplete, setAuthInitComplete] = useState(false);
+  const didInitRef = React.useRef(false);
 
   useEffect(() => {
     if (!authStateManager) return;
+    if (didInitRef.current) return;
+    didInitRef.current = true;
 
     const initializeAuth = async () => {
       try {
@@ -172,16 +180,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setAuthInitError(null);
         const currentState = authStateManager.getState();
         setState((prev) => ({ ...prev, authenticationState: currentState }));
+        queueMicrotask(() => setAuthInitComplete(true));
       } catch (error) {
         setAuthInitError(error instanceof Error ? error.message : "認証の初期化に失敗しました");
         setIsAuthInitialized(false);
+        setAuthInitComplete(false);
       }
     };
 
-    if (!isAuthInitialized && !authInitError) {
-      initializeAuth();
-    }
-  }, [authStateManager, isAuthInitialized, authInitError]);
+    initializeAuth();
+  }, [authStateManager]);
 
   useAuthStateChangeListener({ authStateManager, setState });
   useTokenExpirationHandler({ state, setState, logout });
@@ -381,6 +389,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authenticationState: state.authenticationState,
     isAuthenticating: state.isAuthenticating,
     environment: state.environment,
+    authInitComplete,
     loginWithLiff,
     logout,
     phoneAuth: {

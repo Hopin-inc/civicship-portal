@@ -12,12 +12,22 @@ interface UseUserRegistrationStateProps {
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
 }
 
-export const useUserRegistrationState = ({ authStateManager, userData, setState }: UseUserRegistrationStateProps) => {
+export const useUserRegistrationState = ({
+  authStateManager,
+  userData,
+  setState,
+}: UseUserRegistrationStateProps) => {
   const processedUserIdRef = useRef<string | null>(null);
   const authStateManagerRef = useRef(authStateManager);
   authStateManagerRef.current = authStateManager;
 
   useEffect(() => {
+    const currentAuthStateManager = authStateManagerRef.current;
+    
+    if (currentAuthStateManager && currentAuthStateManager.getState() === "initializing") {
+      return;
+    }
+
     if (userData?.currentUser?.user) {
       const userId = userData.currentUser.user.id;
 
@@ -30,10 +40,11 @@ export const useUserRegistrationState = ({ authStateManager, userData, setState 
       setState((prev) => ({
         ...prev,
         currentUser: userData.currentUser?.user,
-        authenticationState: "user_registered",
+        authenticationState: prev.authenticationState === "phone_authenticated" || prev.authenticationState === "line_authenticated" || prev.authenticationState === "initializing"
+          ? "user_registered"
+          : prev.authenticationState,
       }));
 
-      const currentAuthStateManager = authStateManagerRef.current;
       if (currentAuthStateManager) {
         const updateUserRegistrationState = async () => {
           try {
@@ -41,7 +52,7 @@ export const useUserRegistrationState = ({ authStateManager, userData, setState 
           } catch (error) {
             logger.error("Failed to update AuthStateManager user registration state", {
               error: error instanceof Error ? error.message : String(error),
-              component: "useUserRegistrationState"
+              component: "useUserRegistrationState",
             });
           }
         };
@@ -51,5 +62,5 @@ export const useUserRegistrationState = ({ authStateManager, userData, setState 
     } else {
       processedUserIdRef.current = null;
     }
-  }, [userData, setState]);
+  }, [userData, authStateManager]);
 };
