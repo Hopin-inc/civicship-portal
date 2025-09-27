@@ -1,7 +1,4 @@
 import { cookies } from 'next/headers';
-import { apolloClient } from '@/lib/apollo';
-import { GET_CURRENT_USER } from '@/graphql/account/identity/query';
-import { LINK_PHONE_AUTH } from '@/graphql/account/identity/mutation';
 import { logger } from '@/lib/logging';
 
 export type AuthStep = "NEED_LOGIN" | "NEED_SIGNUP_PHONE" | "NEED_SIGNUP_PROFILE" | "SIGNED_IN";
@@ -19,64 +16,52 @@ export async function getAuthStep(): Promise<AuthStep> {
       return "NEED_LOGIN";
     }
     
-    const { data } = await apolloClient.query({
-      query: GET_CURRENT_USER,
-      fetchPolicy: "network-only",
-      context: {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}`, {
+        method: 'POST',
         headers: {
-          Authorization: `Bearer ${lineToken}`,
-          "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID || "",
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${lineToken}`,
+          'X-Community-Id': process.env.NEXT_PUBLIC_COMMUNITY_ID || '',
+          'X-Civicship-Tenant': process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID || '',
         },
-      },
-    });
-    
-    const user = data?.currentUser?.user;
-    
-    if (user) {
-      logger.debug('User found, signed in', {
-        component: 'getAuthStep',
-        authStep: 'SIGNED_IN',
-        userId: user.id
+        body: JSON.stringify({
+          query: `
+            query GetCurrentUser {
+              currentUser {
+                user {
+                  id
+                }
+              }
+            }
+          `
+        }),
       });
-      return "SIGNED_IN";
+      
+      if (response.ok) {
+        const result = await response.json();
+        const user = result?.data?.currentUser?.user;
+        
+        if (user) {
+          logger.debug('User found, signed in', {
+            component: 'getAuthStep',
+            authStep: 'SIGNED_IN',
+            userId: user.id
+          });
+          return "SIGNED_IN";
+        }
+      }
+    } catch (error) {
+      logger.debug('Failed to check user existence', {
+        component: 'getAuthStep',
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
     
     const phoneToken = cookieStore.get('phone_auth_token')?.value;
     const phoneUid = cookieStore.get('phone_uid')?.value;
     
     if (phoneToken && phoneUid) {
-      try {
-        const { data: linkData } = await apolloClient.mutate({
-          mutation: LINK_PHONE_AUTH,
-          variables: {
-            input: { phoneUid },
-            permission: { userId: phoneUid }
-          },
-          context: {
-            headers: {
-              Authorization: `Bearer ${lineToken}`,
-              "X-Phone-Auth-Token": phoneToken,
-              "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID || "",
-            },
-          },
-        });
-        
-        if (linkData?.linkPhoneAuth?.success) {
-          logger.debug('Silent LINE identity linking successful', {
-            component: 'getAuthStep',
-            authStep: 'SIGNED_IN',
-            phoneUid
-          });
-          return "SIGNED_IN";
-        }
-      } catch (error) {
-        logger.debug('Silent LINE identity linking failed', {
-          component: 'getAuthStep',
-          error: error instanceof Error ? error.message : String(error),
-          phoneUid
-        });
-      }
-      
       logger.debug('Phone token exists, need profile signup', {
         component: 'getAuthStep',
         authStep: 'NEED_SIGNUP_PROFILE'
