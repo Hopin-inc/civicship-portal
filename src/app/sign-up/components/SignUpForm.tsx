@@ -35,7 +35,11 @@ const FormSchema = z.object({
 
 type FormValues = z.infer<typeof FormSchema>;
 
-export function SignUpForm() {
+interface SignUpFormProps {
+  nextPath?: string;
+}
+
+export function SignUpForm({ nextPath = "/" }: SignUpFormProps) {
   const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -61,6 +65,7 @@ export function SignUpForm() {
       const user = await createUser(values.name, values.prefecture, phoneUid);
       if (user) {
         setIsRedirecting(true);
+        window.location.href = nextPath;
       }
     } catch (error) {
       logger.error("Sign up error", {

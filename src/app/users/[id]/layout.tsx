@@ -7,6 +7,7 @@ import {
 } from "@/types/graphql";
 import { apolloClient } from "@/lib/apollo";
 import { fallbackMetadata, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
+import ProtectedLayout from '@/components/auth/ProtectedLayout';
 import React from "react";
 
 type Props = {
@@ -53,6 +54,10 @@ async function fetchUser(id: string): Promise<GqlUser | null> {
   return data.user ?? null;
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+export default function Layout({ children, params }: { children: React.ReactNode; params: { id: string } }) {
+  return (
+    <ProtectedLayout currentPath={`/users/${params.id}`}>
+      {children}
+    </ProtectedLayout>
+  );
 }

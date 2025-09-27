@@ -53,8 +53,10 @@ export class LiffService {
     const baseUrl = `https://liff.line.me/${this.liffId}`;
     if (!redirectPath) return baseUrl;
 
-    const encodedNext = encodeURIComponent(redirectPath);
-    return `${baseUrl}?next=${encodedNext}`;
+    const { validateNextParam } = require('@/lib/auth/next-param-utils');
+    const validatedNext = validateNextParam(redirectPath);
+    const encodedNext = encodeURIComponent(validatedNext);
+    return `${baseUrl}?liff.state=${encodedNext}`;
   }
 
   /**

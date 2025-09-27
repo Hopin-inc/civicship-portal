@@ -1,7 +1,12 @@
+import ProtectedLayout from '@/components/auth/ProtectedLayout';
 import { metadata } from "./metadata";
 
 export { metadata };
 
 export default function TermsLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <ProtectedLayout currentPath="/terms">
+      {children}
+    </ProtectedLayout>
+  );
 }
