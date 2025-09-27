@@ -11,6 +11,7 @@ import {
   GqlOpportunity,
 } from "@/types/graphql";
 import { apolloClient } from "@/lib/apollo";
+import ProtectedLayout from '@/components/auth/ProtectedLayout';
 import React from "react";
 
 type Props = {
@@ -74,6 +75,17 @@ async function fetchOpportunity(id: string, communityId: string): Promise<NonNul
   return data.opportunity ?? null;
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+export default async function Layout({ 
+  children, 
+  params 
+}: { 
+  children: React.ReactNode;
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return (
+    <ProtectedLayout currentPath={`/quests/${id}`}>
+      {children}
+    </ProtectedLayout>
+  );
 }

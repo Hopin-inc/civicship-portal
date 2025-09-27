@@ -21,6 +21,7 @@ import { RawURIComponent } from "@/utils/path";
 import { categorizeFirebaseError } from "@/lib/auth/firebase-config";
 import { isRunningInLiff } from "@/lib/auth/environment-detector";
 import { logger } from "@/lib/logging";
+import { validateNextParam } from "@/lib/auth/next-param-utils";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -204,20 +205,22 @@ export function PhoneVerificationForm() {
 
         const status = data?.identityCheckPhoneUser?.status;
 
+        const validatedNext = validateNextParam(next);
+
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
             toast.success("電話番号認証が完了しました");
-            const redirectPath = `/sign-up${nextParam}`;
-            router.push(redirectPath);
+            const redirectPath = `/sign-up${validatedNext ? `?next=${encodeURIComponent(validatedNext)}` : ''}`;
+            router.replace(redirectPath);
             break;
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
             toast.success("ログインしました");
             const homeRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
-              nextParam as RawURIComponent,
+              validatedNext as RawURIComponent,
             );
-            router.push(homeRedirectPath || "/");
+            router.replace(homeRedirectPath || "/");
             break;
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
@@ -225,9 +228,9 @@ export function PhoneVerificationForm() {
             updateAuthState();
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
-              nextParam as RawURIComponent,
+              validatedNext as RawURIComponent,
             );
-            router.push(crossCommunityRedirectPath || "/");
+            router.replace(crossCommunityRedirectPath || "/");
             break;
 
           default:

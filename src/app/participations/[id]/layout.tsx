@@ -8,6 +8,7 @@ import {
   GqlParticipation,
 } from "@/types/graphql";
 import { apolloClient } from "@/lib/apollo";
+import ProtectedLayout from '@/components/auth/ProtectedLayout';
 
 type Props = {
   params: { id: string };
@@ -56,6 +57,10 @@ async function fetchParticipation(id: string): Promise<GqlParticipation | null> 
   return data.participation ?? null;
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+export default function Layout({ children, params }: { children: React.ReactNode; params: { id: string } }) {
+  return (
+    <ProtectedLayout currentPath={`/participations/${params.id}`}>
+      {children}
+    </ProtectedLayout>
+  );
 }

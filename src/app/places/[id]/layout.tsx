@@ -12,6 +12,7 @@ import {
   DEFAULT_OPEN_GRAPH_IMAGE,
   currentCommunityConfig,
 } from "@/lib/communities/metadata";
+import ProtectedLayout from '@/components/auth/ProtectedLayout';
 
 export const generateMetadata = async ({
   params,
@@ -79,6 +80,10 @@ const presenterPlaceDetailForMetadata = (place: GqlPlace) => {
   };
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+export default function Layout({ children, params }: { children: React.ReactNode; params: { id: string } }) {
+  return (
+    <ProtectedLayout currentPath={`/places/${params.id}`}>
+      {children}
+    </ProtectedLayout>
+  );
 }
