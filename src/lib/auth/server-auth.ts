@@ -8,7 +8,7 @@ export type AuthStep = "NEED_LOGIN" | "NEED_SIGNUP_PHONE" | "NEED_SIGNUP_PROFILE
 
 export async function getAuthStep(): Promise<AuthStep> {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const lineToken = cookieStore.get('line_auth_token')?.value;
     
     if (!lineToken) {
