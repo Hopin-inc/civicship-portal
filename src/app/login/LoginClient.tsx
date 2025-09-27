@@ -34,7 +34,11 @@ export default function LoginClient({ nextPath }: LoginClientProps) {
   const liffService = React.useMemo(() => {
     const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
     if (!liffId) {
-      throw new Error("LIFF ID is not configured");
+      logger.error("LIFF ID is not configured", {
+        component: "LoginClient",
+        error: "NEXT_PUBLIC_LIFF_ID environment variable is missing"
+      });
+      return null;
     }
     return LiffService.getInstance(liffId);
   }, []);
@@ -50,7 +54,7 @@ export default function LoginClient({ nextPath }: LoginClientProps) {
   }, [authenticationState, router, authRedirectService, nextPath]);
 
   useEffect(() => {
-    if (loading || liffInitialized || liffExecuted.current) return;
+    if (loading || liffInitialized || liffExecuted.current || !liffService) return;
 
     const initializeLiff = async () => {
       try {
