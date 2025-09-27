@@ -5,12 +5,13 @@ import { logger } from '@/lib/logging';
 import LoginClient from './LoginClient';
 
 interface LoginPageProps {
-  searchParams: { next?: string; 'liff.state'?: string };
+  searchParams: Promise<{ next?: string; 'liff.state'?: string }>;
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const authStep = await getAuthStep();
-  const nextPath = validateNextParam(searchParams.next || searchParams['liff.state'] || null);
+  const params = await searchParams;
+  const nextPath = validateNextParam(params.next || params['liff.state'] || null);
   
   if (authStep === "SIGNED_IN") {
     logger.info('Login page redirect for signed in user', {
