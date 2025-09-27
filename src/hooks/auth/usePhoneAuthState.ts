@@ -45,8 +45,8 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
     setState((prev) => ({
       ...prev,
       authenticationState: isVerified
-        ? prev.authenticationState === "line_authenticated"
-          ? "phone_authenticated"
+        ? prev.authenticationState === "partial"
+          ? "partial"
           : prev.authenticationState
         : prev.authenticationState,
     }));

@@ -3,10 +3,10 @@ import React from "react";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 
 const MockSignUpForm = ({ 
-  mockAuthState = "phone_authenticated",
+  mockAuthState = "partial",
   mockLoading = false 
 }: { 
-  mockAuthState?: "unauthenticated" | "line_authenticated" | "phone_authenticated";
+  mockAuthState?: "unauthenticated" | "partial" | "authenticated";
   mockLoading?: boolean;
 }) => {
   const [name, setName] = React.useState("");
@@ -42,7 +42,7 @@ const MockSignUpForm = ({
     );
   }
 
-  if (mockAuthState === "line_authenticated") {
+  if (mockAuthState === "partial") {
     return (
       <div className="text-center p-8">
         <p className="text-gray-600">電話番号認証が必要です</p>
@@ -114,7 +114,7 @@ const meta: Meta<typeof MockSignUpForm> = {
   argTypes: {
     mockAuthState: {
       control: "select",
-      options: ["unauthenticated", "line_authenticated", "phone_authenticated"],
+      options: ["unauthenticated", "partial", "authenticated"],
       description: "Mock authentication state",
     },
     mockLoading: {
@@ -144,14 +144,14 @@ type Story = StoryObj<typeof MockSignUpForm>;
 
 export const Default: Story = {
   args: {
-    mockAuthState: "phone_authenticated",
+    mockAuthState: "partial",
     mockLoading: false,
   },
 };
 
 export const Loading: Story = {
   args: {
-    mockAuthState: "phone_authenticated",
+    mockAuthState: "partial",
     mockLoading: true,
   },
 };
@@ -165,14 +165,14 @@ export const NotAuthenticated: Story = {
 
 export const NotPhoneVerified: Story = {
   args: {
-    mockAuthState: "line_authenticated",
+    mockAuthState: "partial",
     mockLoading: false,
   },
 };
 
 export const Interactive: Story = {
   args: {
-    mockAuthState: "phone_authenticated",
+    mockAuthState: "partial",
     mockLoading: false,
   },
 };

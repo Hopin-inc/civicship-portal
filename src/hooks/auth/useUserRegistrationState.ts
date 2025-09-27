@@ -30,7 +30,7 @@ export const useUserRegistrationState = ({ authStateManager, userData, setState 
       setState((prev) => ({
         ...prev,
         currentUser: userData.currentUser?.user,
-        authenticationState: "user_registered",
+        authenticationState: "authenticated",
       }));
 
       const currentAuthStateManager = authStateManagerRef.current;

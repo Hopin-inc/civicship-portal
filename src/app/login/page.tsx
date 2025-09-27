@@ -84,7 +84,7 @@ export default function LoginPage() {
   if (
     loading ||
     isAuthenticating ||
-    authenticationState === "line_authenticated" ||
+    authenticationState === "partial" ||
     authenticationState === "loading"
   ) {
     return <LoadingIndicator />;

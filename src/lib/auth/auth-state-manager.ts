@@ -5,13 +5,10 @@ import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { logger } from "@/lib/logging";
 
 export type AuthenticationState =
+  | "loading"
   | "unauthenticated"
-  | "line_authenticated"
-  | "line_token_expired"
-  | "phone_authenticated"
-  | "phone_token_expired"
-  | "user_registered"
-  | "loading";
+  | "partial"
+  | "authenticated";
 
 /**
  * 認証状態の管理を担当するクラス
@@ -149,16 +146,16 @@ export class AuthStateManager {
       const isUserRegistered = await this.checkUserRegistration();
 
       if (isUserRegistered) {
-        this.setState("user_registered");
+        this.setState("authenticated");
       } else {
         const phoneTokens = TokenManager.getPhoneTokens();
         const hasValidPhoneToken =
           phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
 
         if (hasValidPhoneToken) {
-          this.setState("phone_authenticated");
+          this.setState("authenticated");
         } else {
-          this.setState("line_authenticated");
+          this.setState("partial");
         }
       }
     } catch (error) {
@@ -222,12 +219,12 @@ export class AuthStateManager {
     try {
       const renewed = await TokenManager.renewLineToken();
 
-      if (renewed && this.currentState === "line_token_expired") {
+      if (renewed) {
         const isUserRegistered = await this.checkUserRegistration();
         if (isUserRegistered) {
-          this.setState("user_registered");
+          this.setState("authenticated");
         } else {
-          this.setState("line_authenticated");
+          this.setState("partial");
         }
       } else if (!renewed) {
         this.setState("unauthenticated");
@@ -251,13 +248,18 @@ export class AuthStateManager {
       const hasValidLineToken =
         lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
-      if (renewed && this.currentState === "phone_token_expired") {
-        this.setState("phone_authenticated");
+      if (renewed) {
+        const isUserRegistered = await this.checkUserRegistration();
+        if (isUserRegistered) {
+          this.setState("authenticated");
+        } else {
+          this.setState("partial");
+        }
       } else if (!renewed) {
         if (!hasValidLineToken) {
           this.setState("unauthenticated");
         } else {
-          this.setState("line_authenticated");
+          this.setState("partial");
         }
       }
     } catch (error) {
@@ -274,7 +276,7 @@ export class AuthStateManager {
       if (!hasValidLineToken) {
         this.setState("unauthenticated");
       } else {
-        this.setState("line_authenticated");
+        this.setState("partial");
       }
     }
   }
@@ -285,7 +287,12 @@ export class AuthStateManager {
   public async handleLineAuthStateChange(isAuthenticated: boolean): Promise<void> {
     if (isAuthenticated) {
       if (this.currentState === "unauthenticated" || this.currentState === "loading") {
-        this.setState("line_authenticated");
+        const isUserRegistered = await this.checkUserRegistration();
+        if (isUserRegistered) {
+          this.setState("authenticated");
+        } else {
+          this.setState("partial");
+        }
       }
     } else {
       this.setState("unauthenticated");
@@ -305,15 +312,17 @@ export class AuthStateManager {
     }
 
     if (isVerified) {
-      if (
-        this.currentState === "line_authenticated" ||
-        this.currentState === "line_token_expired"
-      ) {
-        this.setState("phone_authenticated");
+      if (this.currentState === "partial") {
+        const isUserRegistered = await this.checkUserRegistration();
+        if (isUserRegistered) {
+          this.setState("authenticated");
+        } else {
+          this.setState("partial");
+        }
       }
     } else {
       if (this.currentState !== "unauthenticated" && this.currentState !== "loading") {
-        this.setState("line_authenticated");
+        this.setState("partial");
       }
     }
   }
@@ -331,17 +340,63 @@ export class AuthStateManager {
     }
 
     if (isRegistered) {
-      this.setState("user_registered");
+      this.setState("authenticated");
     } else {
       const phoneTokens = TokenManager.getPhoneTokens();
       const hasValidPhoneToken =
         phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
 
       if (hasValidPhoneToken) {
-        this.setState("phone_authenticated");
+        this.setState("partial");
       } else {
-        this.setState("line_authenticated");
+        this.setState("partial");
       }
     }
+  }
+
+  /**
+   * 現在の認証状態が完全に認証済みかどうかを判定
+   */
+  public isFullyAuthenticated(): boolean {
+    return this.currentState === "authenticated";
+  }
+
+  /**
+   * 現在の認証状態がLINE認証済みかどうかを判定
+   */
+  public isLineAuthenticated(): boolean {
+    const lineTokens = TokenManager.getLineTokens();
+    return lineTokens && !TokenManager.isLineTokenExpired() && 
+           (this.currentState === "partial" || this.currentState === "authenticated");
+  }
+
+  /**
+   * 現在の認証状態が電話番号認証済みかどうかを判定
+   */
+  public isPhoneAuthenticated(): boolean {
+    const phoneTokens = TokenManager.getPhoneTokens();
+    return phoneTokens && !TokenManager.isPhoneTokenExpired() && 
+           (this.currentState === "partial" || this.currentState === "authenticated");
+  }
+
+  /**
+   * 現在の認証状態が未認証かどうかを判定
+   */
+  public isUnauthenticated(): boolean {
+    return this.currentState === "unauthenticated";
+  }
+
+  /**
+   * 現在の認証状態が部分認証かどうかを判定
+   */
+  public isPartiallyAuthenticated(): boolean {
+    return this.currentState === "partial";
+  }
+
+  /**
+   * 認証が必要かどうかを判定
+   */
+  public needsAuthentication(): boolean {
+    return this.currentState === "unauthenticated" || this.currentState === "partial";
   }
 }

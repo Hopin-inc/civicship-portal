@@ -90,7 +90,7 @@ export class AuthRedirectService {
 
     if (
       ["/login", "/sign-up/phone-verification", "/sign-up"].includes(pathname)
-      && authState === "user_registered"
+      && authState === "authenticated"
     ) {
       if (
         next?.startsWith("/")
@@ -110,12 +110,8 @@ export class AuthRedirectService {
       switch (authState) {
         case "unauthenticated":
           return `/login${ nextParam }` as RawURIComponent;
-        case "line_authenticated":
-        case "line_token_expired":
+        case "partial":
           return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
-        case "phone_authenticated":
-        case "phone_token_expired":
-          return `/sign-up${ nextParam }` as RawURIComponent;
         default:
           return null;
       }
@@ -126,20 +122,13 @@ export class AuthRedirectService {
         case "unauthenticated":
           return `/login${ nextParam }` as RawURIComponent;
 
-        case "line_authenticated":
-        case "line_token_expired":
+        case "partial":
           if (pathname !== "/sign-up/phone-verification") {
             return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
           }
           return null; // stay here
 
-        case "phone_authenticated":
-          if (pathname !== "/sign-up") {
-            return `/sign-up${ nextParam }` as RawURIComponent;
-          }
-          return null; // stay here
-
-        case "user_registered":
+        case "authenticated":
         default:
           if (next && next.startsWith("/") && !next.startsWith("/sign-up")) {
             return next;
@@ -149,7 +138,7 @@ export class AuthRedirectService {
     }
 
     if (this.isAdminPath(pathname)) {
-      if (authState !== "user_registered") {
+      if (authState !== "authenticated") {
         return `/login${ nextParam }` as RawURIComponent;
       }
     }
@@ -173,18 +162,13 @@ export class AuthRedirectService {
 
     switch (authState) {
       case "unauthenticated":
-      case "line_token_expired":
         return `/login${ nextParam }` as RawURIComponent;
 
-      case "line_authenticated":
-      case "phone_token_expired":
+      case "partial":
         return `/sign-up/phone-verification${ nextParam }` as RawURIComponent;
 
-      case "phone_authenticated":
-        return `/sign-up${ nextParam }` as RawURIComponent;
-
       case "loading":
-      case "user_registered":
+      case "authenticated":
       default:
         return nextPath ?? "/" as RawURIComponent;
     }

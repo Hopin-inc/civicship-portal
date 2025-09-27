@@ -39,11 +39,8 @@ export type AuthState = {
   currentUser: GqlCurrentUserPayload["user"] | null;
   authenticationState:
     | "unauthenticated" // S0: 未認証
-    | "line_authenticated" // S1: LINE認証済み
-    | "line_token_expired" // S1e: LINEトークン期限切れ
-    | "phone_authenticated" // S2: 電話番号認証済み
-    | "phone_token_expired" // S2e: 電話番号トークン期限切れ
-    | "user_registered" // S3: ユーザ情報登録済み
+    | "partial" // S1: 部分認証（LINE認証済みまたは電話番号認証済み）
+    | "authenticated" // S2: 完全認証（ユーザ情報登録済み）
     | "loading"; // L0: 状態チェック中
   environment: AuthEnvironment;
   isAuthenticating: boolean;
@@ -119,7 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading: userLoading,
     refetch: refetchUser,
   } = useCurrentUserQuery({
-    skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
+    skip: !["partial", "authenticated"].includes(
       state.authenticationState,
     ),
     fetchPolicy: "network-only",
@@ -260,7 +257,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (success) {
       setState((prev) => ({
         ...prev,
-        authenticationState: "phone_authenticated",
+        authenticationState: "partial",
       }));
 
       if (authStateManager) {
@@ -373,11 +370,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user: state.currentUser,
     firebaseUser: state.firebaseUser,
     uid: state.firebaseUser?.uid || null,
-    isAuthenticated: ["line_authenticated", "phone_authenticated", "user_registered"].includes(
+    isAuthenticated: ["partial", "authenticated"].includes(
       state.authenticationState,
     ),
-    isPhoneVerified: ["phone_authenticated", "user_registered"].includes(state.authenticationState),
-    isUserRegistered: state.authenticationState === "user_registered",
+    isPhoneVerified: ["partial", "authenticated"].includes(state.authenticationState),
+    isUserRegistered: state.authenticationState === "authenticated",
     authenticationState: state.authenticationState,
     isAuthenticating: state.isAuthenticating,
     environment: state.environment,

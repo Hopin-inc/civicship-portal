@@ -11,7 +11,7 @@ export default function RegisterAccount() {
     return <LoadingIndicator />;
   }
 
-  if (authenticationState === "user_registered") {
+  if (authenticationState === "authenticated") {
     return <LoadingIndicator />;
   }
 

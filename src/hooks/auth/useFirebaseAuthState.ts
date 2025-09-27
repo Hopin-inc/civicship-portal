@@ -33,7 +33,7 @@ export const useFirebaseAuthState = ({
         firebaseUser: user,
         authenticationState: user
           ? prev.authenticationState === "loading"
-            ? "line_authenticated"
+            ? "partial"
             : prev.authenticationState
           : "unauthenticated",
       }));

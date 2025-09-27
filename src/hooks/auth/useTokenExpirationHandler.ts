@@ -23,19 +23,10 @@ export const useTokenExpirationHandler = ({ state, setState, logout }: UseTokenE
       if (source === "graphql" || source === "network") {
         const currentState = stateRef.current.authenticationState;
 
-        if (currentState === "line_authenticated" || currentState === "user_registered") {
-          setState((prev) => ({ ...prev, authenticationState: "line_token_expired" }));
+        if (currentState === "partial" || currentState === "authenticated") {
+          setState((prev) => ({ ...prev, authenticationState: "unauthenticated" }));
           if (typeof window !== "undefined") {
             const event = new CustomEvent("auth:renew-line-token", { detail: {} });
-            window.dispatchEvent(event);
-          }
-          return;
-        }
-
-        if (currentState === "phone_authenticated") {
-          setState((prev) => ({ ...prev, authenticationState: "phone_token_expired" }));
-          if (typeof window !== "undefined") {
-            const event = new CustomEvent("auth:renew-phone-token", { detail: {} });
             window.dispatchEvent(event);
           }
           return;
