@@ -1,6 +1,6 @@
 import { TokenManager } from "./token-manager";
 import { apolloClient } from "@/lib/apollo";
-import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
+import { GET_CURRENT_USER, GET_CURRENT_USER_WITH_IDENTITIES } from "@/graphql/account/identity/query";
 
 import { logger } from "@/lib/logging";
 
@@ -143,9 +143,9 @@ export class AuthStateManager {
         return;
       }
 
-      const isUserRegistered = await this.checkUserRegistration();
-
-      if (isUserRegistered) {
+      const hasLineIdentityForTenant = await this.checkLineIdentityForCurrentTenant();
+      
+      if (hasLineIdentityForTenant) {
         this.setState("authenticated");
       } else {
         const phoneTokens = TokenManager.getPhoneTokens();
@@ -153,7 +153,7 @@ export class AuthStateManager {
           phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
 
         if (hasValidPhoneToken) {
-          this.setState("authenticated");
+          this.setState("partial");
         } else {
           this.setState("partial");
         }
@@ -205,6 +205,61 @@ export class AuthStateManager {
       return isRegistered;
     } catch (error) {
       logger.info("Failed to check user registration", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "AuthStateManager",
+      });
+      return false;
+    }
+  }
+
+  /**
+   * 現在のテナントに対するLINE Identityの存在を確認
+   */
+  private async checkLineIdentityForCurrentTenant(): Promise<boolean> {
+    try {
+      const { lineAuth } = await import("./firebase-config");
+      if (!lineAuth.currentUser) {
+        return false;
+      }
+
+      let accessToken = null;
+      try {
+        accessToken = await lineAuth.currentUser.getIdToken();
+      } catch (tokenError) {
+        logger.info("Failed to get Firebase token for LINE identity check", {
+          error: tokenError instanceof Error ? tokenError.message : String(tokenError),
+          component: "AuthStateManager",
+        });
+        return false;
+      }
+
+      const { data } = await apolloClient.query({
+        query: GET_CURRENT_USER_WITH_IDENTITIES,
+        fetchPolicy: "network-only",
+        context: {
+          headers: {
+            Authorization: accessToken ? `Bearer ${accessToken}` : "",
+          },
+        },
+      });
+
+      const user = data?.currentUser?.user;
+      if (!user || !user.identities) {
+        return false;
+      }
+
+      const hasLineIdentity = user.identities.some(
+        (identity: any) => identity.platform === "LINE"
+      );
+
+      logger.info("LINE identity check completed", {
+        hasLineIdentity,
+        component: "AuthStateManager",
+      });
+
+      return hasLineIdentity;
+    } catch (error) {
+      logger.info("Failed to check LINE identity for current tenant", {
         error: error instanceof Error ? error.message : String(error),
         component: "AuthStateManager",
       });
@@ -287,8 +342,8 @@ export class AuthStateManager {
   public async handleLineAuthStateChange(isAuthenticated: boolean): Promise<void> {
     if (isAuthenticated) {
       if (this.currentState === "unauthenticated" || this.currentState === "loading") {
-        const isUserRegistered = await this.checkUserRegistration();
-        if (isUserRegistered) {
+        const hasLineIdentityForTenant = await this.checkLineIdentityForCurrentTenant();
+        if (hasLineIdentityForTenant) {
           this.setState("authenticated");
         } else {
           this.setState("partial");
@@ -313,8 +368,8 @@ export class AuthStateManager {
 
     if (isVerified) {
       if (this.currentState === "partial") {
-        const isUserRegistered = await this.checkUserRegistration();
-        if (isUserRegistered) {
+        const hasLineIdentityForTenant = await this.checkLineIdentityForCurrentTenant();
+        if (hasLineIdentityForTenant) {
           this.setState("authenticated");
         } else {
           this.setState("partial");
@@ -340,7 +395,12 @@ export class AuthStateManager {
     }
 
     if (isRegistered) {
-      this.setState("authenticated");
+      const hasLineIdentityForTenant = await this.checkLineIdentityForCurrentTenant();
+      if (hasLineIdentityForTenant) {
+        this.setState("authenticated");
+      } else {
+        this.setState("partial");
+      }
     } else {
       const phoneTokens = TokenManager.getPhoneTokens();
       const hasValidPhoneToken =
