@@ -22,6 +22,7 @@ export class AuthStateManager {
   private currentState: AuthenticationState = "loading";
   private stateChangeListeners: ((state: AuthenticationState) => void)[] = [];
   private readonly sessionId: string;
+  private notificationTimeout: NodeJS.Timeout | null = null;
 
   private constructor() {
     this.sessionId = this.initializeSessionId();
@@ -117,17 +118,24 @@ export class AuthStateManager {
   public setState(state: AuthenticationState): void {
     if (this.currentState !== state) {
       this.currentState = state;
-      this.notifyStateChange();
+      this.debouncedNotifyStateChange();
     }
   }
 
   /**
-   * 認証状態の変更を通知
+   * 認証状態の変更を通知（デバウンス付き）
    */
-  private notifyStateChange(): void {
-    this.stateChangeListeners.forEach((listener) => {
-      listener(this.currentState);
-    });
+  private debouncedNotifyStateChange(): void {
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
+    
+    this.notificationTimeout = setTimeout(() => {
+      this.stateChangeListeners.forEach((listener) => {
+        listener(this.currentState);
+      });
+      this.notificationTimeout = null;
+    }, 50);
   }
 
 
