@@ -10,11 +10,12 @@ import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { useMutation } from "@apollo/client";
-import { IDENTITY_CHECK_PHONE_USER } from "@/graphql/account/identity/mutation";
+import { IDENTITY_CHECK_PHONE_USER, LINK_PHONE_AUTH } from "@/graphql/account/identity/mutation";
 import {
   GqlIdentityCheckPhoneUserPayload,
   GqlMutationIdentityCheckPhoneUserArgs,
   GqlPhoneUserStatus,
+  useLinkPhoneAuthMutation,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { RawURIComponent } from "@/utils/path";
@@ -37,6 +38,8 @@ export function PhoneVerificationForm() {
     { identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload },
     GqlMutationIdentityCheckPhoneUserArgs
   >(IDENTITY_CHECK_PHONE_USER);
+
+  const [linkPhoneAuth] = useLinkPhoneAuthMutation();
 
   const authRedirectService = AuthRedirectService.getInstance();
 
@@ -203,6 +206,7 @@ export function PhoneVerificationForm() {
         });
 
         const status = data?.identityCheckPhoneUser?.status;
+        const existingUser = data?.identityCheckPhoneUser?.user;
 
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
@@ -212,22 +216,48 @@ export function PhoneVerificationForm() {
             break;
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
-            toast.success("ログインしました");
-            const homeRedirectPath = authRedirectService.getRedirectPath(
-              "/" as RawURIComponent,
-              nextParam as RawURIComponent,
-            );
-            router.push(homeRedirectPath || "/");
-            break;
-
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
-            toast.success("メンバーシップが追加されました");
-            updateAuthState();
-            const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
-              "/" as RawURIComponent,
-              nextParam as RawURIComponent,
-            );
-            router.push(crossCommunityRedirectPath || "/");
+            try {
+              const phoneUid = phoneAuth.phoneUid;
+              if (phoneUid && existingUser?.id) {
+                await linkPhoneAuth({
+                  variables: {
+                    input: {
+                      phoneUid,
+                    },
+                    permission: {
+                      userId: existingUser.id,
+                    },
+                  },
+                });
+              }
+
+              if (status === GqlPhoneUserStatus.ExistingSameCommunity) {
+                toast.success("ログインしました");
+                const homeRedirectPath = authRedirectService.getRedirectPath(
+                  "/" as RawURIComponent,
+                  nextParam as RawURIComponent,
+                );
+                router.push(homeRedirectPath || "/");
+              } else {
+                toast.success("メンバーシップが追加されました");
+                updateAuthState();
+                const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
+                  "/" as RawURIComponent,
+                  nextParam as RawURIComponent,
+                );
+                router.push(crossCommunityRedirectPath || "/");
+              }
+            } catch (linkError) {
+              logger.error("Failed to link phone auth to existing user", {
+                error: linkError instanceof Error ? linkError.message : String(linkError),
+                component: "PhoneVerificationForm",
+                userId: existingUser?.id,
+                phoneUid: phoneAuth.phoneUid,
+              });
+              toast.error("アカウントの連携に失敗しました");
+              setIsCodeVerifying(false);
+            }
             break;
 
           default:
