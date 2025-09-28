@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { AuthState } from "@/contexts/AuthProvider";
@@ -27,6 +27,8 @@ const useAutoLogin = ({
     null,
   );
   const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
+
+  const [autoLoginTimeout, setAutoLoginTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (environment !== AuthEnvironment.LIFF) {
@@ -58,6 +60,10 @@ const useAutoLogin = ({
       prevStateRef.current = currentState;
       prevLiffStateRef.current = liffStateKey;
 
+      if (autoLoginTimeout) {
+        clearTimeout(autoLoginTimeout);
+      }
+
       if (
         state.authenticationState === "unauthenticated" &&
         !state.isAuthenticating &&
@@ -65,31 +71,41 @@ const useAutoLogin = ({
         currentLiffState.isInitialized &&
         currentLiffState.isLoggedIn
       ) {
-        const handleAutoLogin = async () => {
-          attemptedRef.current = true;
+        const timeout = setTimeout(async () => {
+          const handleAutoLogin = async () => {
+            attemptedRef.current = true;
 
-          const timestamp = new Date().toISOString();
+            const timestamp = new Date().toISOString();
 
-          setState((prev) => ({ ...prev, isAuthenticating: true }));
-          try {
-            const success = await liffService.signInWithLiffToken();
-            if (success) {
-              await refetchUser();
+            setState((prev) => ({ ...prev, isAuthenticating: true }));
+            try {
+              const success = await liffService.signInWithLiffToken();
+              if (success) {
+                await refetchUser();
+              }
+            } catch (error) {
+              logger.info("Auto-login with LIFF failed", {
+                authType: "liff",
+                error: error instanceof Error ? error.message : String(error),
+                component: "useAutoLogin",
+              });
+            } finally {
+              setState((prev) => ({ ...prev, isAuthenticating: false }));
             }
-          } catch (error) {
-            logger.info("Auto-login with LIFF failed", {
-              authType: "liff",
-              error: error instanceof Error ? error.message : String(error),
-              component: "useAutoLogin",
-            });
-          } finally {
-            setState((prev) => ({ ...prev, isAuthenticating: false }));
-          }
-        };
+          };
 
-        handleAutoLogin();
+          await handleAutoLogin();
+        }, 100); // 100ms debounce
+
+        setAutoLoginTimeout(timeout);
       }
     }
+
+    return () => {
+      if (autoLoginTimeout) {
+        clearTimeout(autoLoginTimeout);
+      }
+    };
   }, [
     environment,
     state.authenticationState,
@@ -97,6 +113,7 @@ const useAutoLogin = ({
     liffService,
     setState,
     refetchUser,
+    autoLoginTimeout,
   ]);
 
   useEffect(() => {

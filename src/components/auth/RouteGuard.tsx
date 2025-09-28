@@ -44,9 +44,15 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     }
   }, [loading]);
 
+  const [authCheckTimeout, setAuthCheckTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     if (loading || userLoading || isInitialRender) {
       return;
+    }
+
+    if (authCheckTimeout) {
+      clearTimeout(authCheckTimeout);
     }
 
     if (typeof window !== "undefined" && pathname === "/") {
@@ -61,20 +67,35 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       }
     }
 
-    const authCheck = () => {
-      const pathNameWithParams = searchParams.size > 0
-        ? `${ pathname }?${ searchParams.toString() }` as RawURIComponent
-        : pathname as RawURIComponent;
-      const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam));
-      if (redirectPath) {
-        router.replace(redirectPath);
-      }
-      setAuthorized(true);
-    };
-    authCheck();
+    const timeout = setTimeout(() => {
+      const authCheck = () => {
+        const pathNameWithParams = searchParams.size > 0
+          ? `${ pathname }?${ searchParams.toString() }` as RawURIComponent
+          : pathname as RawURIComponent;
+        
+        if (authRedirectService.isProtectedPath(pathname) && authenticationState === "user_registered") {
+          setAuthorized(true);
+          return;
+        }
+        
+        const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam));
+        if (redirectPath) {
+          logger.debug("RouteGuard: Redirecting to", { redirectPath, component: "RouteGuard" });
+          router.replace(redirectPath);
+        }
+        setAuthorized(true);
+      };
+      authCheck();
+    }, 50); // 50ms debounce
+
+    setAuthCheckTimeout(timeout);
+
     return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
     };
-  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams, isInitialRender]);
+  }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams, isInitialRender, authCheckTimeout]);
 
   if (loading || userLoading || isInitialRender) {
     return <LoadingIndicator />;
