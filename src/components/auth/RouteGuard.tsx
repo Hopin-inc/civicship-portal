@@ -49,6 +49,11 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       return;
     }
 
+    if (pathname.startsWith('/admin')) {
+      setAuthorized(true);
+      return;
+    }
+
     if (typeof window !== "undefined" && pathname === "/") {
       const urlParams = new URLSearchParams(window.location.search);
       const isReturnFromLineAuth = urlParams.has("code") && urlParams.has("state") && urlParams.has("liffClientId");
@@ -72,8 +77,6 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       setAuthorized(true);
     };
     authCheck();
-    return () => {
-    };
   }, [pathname, authenticationState, loading, userLoading, router, authRedirectService, nextParam, searchParams, isInitialRender]);
 
   if (loading || userLoading || isInitialRender) {

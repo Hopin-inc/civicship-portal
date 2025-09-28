@@ -20,9 +20,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from '@/components/shared'
 import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
 import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
-import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
-import { usePhoneAuthState } from "@/hooks/auth/usePhoneAuthState";
-import { useUserRegistrationState } from "@/hooks/auth/useUserRegistrationState";
+import { useConsolidatedAuthState } from "@/hooks/auth/useConsolidatedAuthState";
 import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
@@ -185,9 +183,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useAuthStateChangeListener({ authStateManager, setState });
   useTokenExpirationHandler({ state, setState, logout });
-  useFirebaseAuthState({ authStateManager, state, setState });
-  usePhoneAuthState({ authStateManager, phoneAuthService, setState });
-  useUserRegistrationState({ authStateManager, userData, setState });
+  
+  useConsolidatedAuthState({ 
+    authStateManager, 
+    state, 
+    setState, 
+    phoneAuthService, 
+    userData, 
+    refetchUser 
+  });
   useLiffInitialization({ environment, liffService });
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
   useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
