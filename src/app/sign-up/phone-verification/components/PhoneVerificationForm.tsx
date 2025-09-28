@@ -252,8 +252,12 @@ export function PhoneVerificationForm() {
     return <LoadingIndicator fullScreen={true} />;
   }
 
-  if (!isAuthenticated) {
-    return null;
+  if (!isAuthenticated || authenticationState === "loading") {
+    return <LoadingIndicator fullScreen={true} />;
+  }
+
+  if (authenticationState !== "line_authenticated" && authenticationState !== "line_token_expired") {
+    return <LoadingIndicator fullScreen={true} />;
   }
 
   // If it breaks in production, revert phoneAuth.isVerifying and reCAPTCHA to the same positions as in master.
