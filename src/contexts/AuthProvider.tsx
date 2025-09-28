@@ -24,11 +24,9 @@ import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
 import { usePhoneAuthState } from "@/hooks/auth/usePhoneAuthState";
 import { useUserRegistrationState } from "@/hooks/auth/useUserRegistrationState";
 import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
-import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
-import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
+import { useAuthCoordinator } from "@/hooks/auth/useAuthCoordinator";
 import { logger } from "@/lib/logging";
 import { maskPhoneNumber } from "@/lib/logging/client/utils";
-import useAutoLogin from "@/hooks/auth/useAutoLogin";
 import { RawURIComponent } from "@/utils/path";
 
 /**
@@ -189,9 +187,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   usePhoneAuthState({ authStateManager, phoneAuthService, setState });
   useUserRegistrationState({ authStateManager, userData, setState });
   useLiffInitialization({ environment, liffService });
-  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
-  useAutoLogin({ environment, state, liffService, setState, refetchUser });
+  useAuthCoordinator({ environment, state, liffService, setState, refetchUser });
 
   /**
    * LIFFでログイン

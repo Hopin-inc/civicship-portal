@@ -66,10 +66,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         ? `${ pathname }?${ searchParams.toString() }` as RawURIComponent
         : pathname as RawURIComponent;
       const redirectPath = authRedirectService.getRedirectPath(pathNameWithParams, decodeURIComponentWithType(nextParam));
-      if (redirectPath) {
+      
+      if (redirectPath && !authenticationState.includes("loading") && authenticationState !== "loading") {
         router.replace(redirectPath);
+      } else {
+        setAuthorized(true);
       }
-      setAuthorized(true);
     };
     authCheck();
     return () => {
