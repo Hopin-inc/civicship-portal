@@ -183,32 +183,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [authStateManager, isAuthInitialized, authInitError]);
 
-  const [pendingStateUpdates, setPendingStateUpdates] = useState<Partial<AuthState> | null>(null);
-  
-  const batchedSetState = useCallback((updater: React.SetStateAction<AuthState>) => {
-    if (typeof updater === 'function') {
-      setState(updater);
-    } else {
-      setPendingStateUpdates(prev => prev ? { ...prev, ...updater } : updater);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (pendingStateUpdates) {
-      setState(prev => ({ ...prev, ...pendingStateUpdates }));
-      setPendingStateUpdates(null);
-    }
-  }, [pendingStateUpdates]);
-
-  useAuthStateChangeListener({ authStateManager, setState: batchedSetState });
-  useTokenExpirationHandler({ state, setState: batchedSetState, logout });
-  useFirebaseAuthState({ authStateManager, state, setState: batchedSetState });
-  usePhoneAuthState({ authStateManager, phoneAuthService, setState: batchedSetState });
-  useUserRegistrationState({ authStateManager, userData, setState: batchedSetState });
+  useAuthStateChangeListener({ authStateManager, setState });
+  useTokenExpirationHandler({ state, setState, logout });
+  useFirebaseAuthState({ authStateManager, state, setState });
+  usePhoneAuthState({ authStateManager, phoneAuthService, setState });
+  useUserRegistrationState({ authStateManager, userData, setState });
   useLiffInitialization({ environment, liffService });
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState: batchedSetState, refetchUser });
-  useAutoLogin({ environment, state, liffService, setState: batchedSetState, refetchUser });
+  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
+  useAutoLogin({ environment, state, liffService, setState, refetchUser });
 
   /**
    * LIFFでログイン

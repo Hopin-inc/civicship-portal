@@ -113,7 +113,6 @@ const useAutoLogin = ({
     liffService,
     setState,
     refetchUser,
-    autoLoginTimeout,
   ]);
 
   useEffect(() => {
