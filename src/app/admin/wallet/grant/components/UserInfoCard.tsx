@@ -5,6 +5,26 @@ import { formatDateTime } from "@/utils/date";
 import React from "react";
 import { truncateText } from "@/utils/stringUtils";
 
+// ヘルパー関数: メインコンテナのクラス名を生成
+const getMainContainerClassName = (didValue?: string, comment?: string, tabType?: 'member' | 'other') => {
+  const classes = ['flex', 'justify-between'];
+  if (didValue || comment) {
+    classes.push('items-start');
+  } else {
+    classes.push(tabType === 'member' ? 'items-center' : 'items-start');
+  }
+  return classes.join(' ');
+};
+
+// ヘルパー関数: 名前表示用spanのクラス名を生成
+const getNameSpanClassName = (didValue?: string, comment?: string, tabType?: 'member' | 'other') => {
+  const classes = ['flex', 'items-center', 'truncate', 'whitespace-nowrap', 'overflow-hidden'];
+  if (!didValue && !comment && tabType === 'member') {
+    classes.push('h-10');
+  }
+  return classes.join(' ');
+};
+
 interface Props {
   otherUser: GqlUser | undefined | null;
   label?: string | { text: string; smallText: string };
@@ -15,7 +35,6 @@ interface Props {
   createdAt?: Date | null | undefined;
   showLabel?: boolean;
   showPoint?: boolean;
-  showDid?: boolean;
   showDate?: boolean;
   onClick?: () => void;
   children?: React.ReactNode;
@@ -33,7 +52,6 @@ const UserInfoCard = ({
   createdAt,
   showLabel = true,
   showPoint = true,
-  showDid = true,
   showDate = true,
   onClick,
   children,
@@ -47,8 +65,8 @@ const UserInfoCard = ({
         <AvatarFallback>U</AvatarFallback>
       </Avatar>
       <div className="flex flex-col text-left min-w-0 flex-1">
-        <div className={`flex ${didValue || comment ? 'items-start' : (tabType === 'member' ? 'items-center' : 'items-start')} justify-between`}>
-          <span className={`flex items-center truncate whitespace-nowrap overflow-hidden ${!didValue && !comment && tabType === 'member' ? 'h-10' : ''}`}>
+        <div className={getMainContainerClassName(didValue, comment, tabType)}>
+          <span className={getNameSpanClassName(didValue, comment, tabType)}>
           {showLabel
             ? typeof label === "string"
               ? label

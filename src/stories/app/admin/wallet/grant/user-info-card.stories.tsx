@@ -60,10 +60,6 @@ const meta: Meta<typeof UserInfoCard> = {
       control: "boolean",
       description: "Whether to show point amount",
     },
-    showDid: {
-      control: "boolean",
-      description: "Whether to show DID",
-    },
     showDate: {
       control: "boolean",
       description: "Whether to show date",
@@ -97,14 +93,13 @@ export const Default: Story = {
   args: {
     otherUser: mockUser,
     label: "田中太郎",
-    point: 150000,
+    point: BigInt(150000),
     sign: "+",
     pointColor: "text-green-600",
     didValue: "did:example:123456789abcdef",
     createdAt: new Date("2024-01-15T10:30:00Z"),
     showLabel: true,
     showPoint: true,
-    showDid: true,
     showDate: true,
   },
 };
@@ -116,7 +111,6 @@ export const WithoutPoints: Story = {
     didValue: "did:example:123456789abcdef",
     showLabel: true,
     showPoint: false,
-    showDid: true,
     showDate: false,
   },
 };
@@ -125,14 +119,13 @@ export const NegativePoints: Story = {
   args: {
     otherUser: mockUser,
     label: "ポイント支給",
-    point: 50000,
+    point: BigInt(50000),
     sign: "-",
     pointColor: "text-red-600",
     didValue: "did:example:123456789abcdef",
     createdAt: new Date("2024-01-15T10:30:00Z"),
     showLabel: true,
     showPoint: true,
-    showDid: true,
     showDate: true,
   },
 };
@@ -144,14 +137,13 @@ export const ComplexLabel: Story = {
       text: "ポイント支給（管理者）",
       smallText: "（管理者）",
     },
-    point: 100000,
+    point: BigInt(100000),
     sign: "+",
     pointColor: "text-blue-600",
     didValue: "did:example:123456789abcdef",
     createdAt: new Date("2024-01-15T10:30:00Z"),
     showLabel: true,
     showPoint: true,
-    showDid: true,
     showDate: true,
   },
 };
@@ -161,7 +153,6 @@ export const MinimalCard: Story = {
     otherUser: mockUser,
     showLabel: false,
     showPoint: false,
-    showDid: false,
     showDate: false,
   },
 };
@@ -170,7 +161,7 @@ export const ClickableCard: Story = {
   args: {
     otherUser: mockUser,
     label: "田中太郎",
-    point: 75000,
+    point: BigInt(75000),
     sign: "+",
     pointColor: "text-green-600",
     didValue: "did:example:123456789abcdef",
@@ -178,7 +169,6 @@ export const ClickableCard: Story = {
     onClick: () => console.log("Card clicked"),
     showLabel: true,
     showPoint: true,
-    showDid: true,
     showDate: true,
   },
 };
@@ -190,14 +180,13 @@ export const UserWithoutImage: Story = {
       image: null,
     },
     label: "画像なしユーザー",
-    point: 25000,
+    point: BigInt(25000),
     sign: "+",
     pointColor: "text-green-600",
     didValue: "did:example:987654321fedcba",
     createdAt: new Date("2024-01-15T10:30:00Z"),
     showLabel: true,
     showPoint: true,
-    showDid: true,
     showDate: true,
   },
 };
@@ -206,14 +195,13 @@ export const HighPointAmount: Story = {
   args: {
     otherUser: mockUser,
     label: "大口支給",
-    point: 5000000,
+    point: BigInt(5000000),
     sign: "+",
     pointColor: "text-purple-600",
     didValue: "did:example:123456789abcdef",
     createdAt: new Date("2024-01-15T10:30:00Z"),
     showLabel: true,
     showPoint: true,
-    showDid: true,
     showDate: true,
   },
 };
