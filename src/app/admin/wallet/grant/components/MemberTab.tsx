@@ -26,6 +26,7 @@ export function MemberTab({
     error,
     loadMoreRef: searchLoadMoreRef,
     isLoadingMore: searchIsLoadingMore,
+    loading: searchIsLoading,
   } = useMemberSearchFromCredentials(communityId, members, { 
     searchQuery ,
     pageSize: 20,
@@ -40,8 +41,17 @@ export function MemberTab({
     );
   }
 
+  if (searchMembershipData.length === 0 && searchIsLoading ) {
+    return (
+      <div className="space-y-3 px-4">
+        <p className="text-sm text-center text-muted-foreground pt-4">
+          読み込み中
+        </p>
+      </div>
+    );
+  }
 
-  if (searchMembershipData.length === 0) {
+  if (searchMembershipData.length === 0 && !searchIsLoading ) {
     return (
       <div className="space-y-3 px-4">
         <p className="text-sm text-center text-muted-foreground pt-4">
@@ -62,7 +72,8 @@ export function MemberTab({
             point={m.wallet?.currentPointView?.currentPoint ?? BigInt(0)}
             showPoint={true}
             showDate={false}
-            didValue={m.didInfo?.didValue ?? "did取得中"}
+            didValue={m.didInfo?.didValue ?? undefined}
+            tabType="member"
             onClick={() => onSelect(m)}
           />
         );

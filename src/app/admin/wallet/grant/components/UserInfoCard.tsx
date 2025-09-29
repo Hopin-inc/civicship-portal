@@ -20,6 +20,7 @@ interface Props {
   onClick?: () => void;
   children?: React.ReactNode;
   comment?: string;
+  tabType?: 'member' | 'other';
 }
 
 const UserInfoCard = ({
@@ -37,6 +38,7 @@ const UserInfoCard = ({
   onClick,
   children,
   comment,
+  tabType = 'other',
 }: Props) => (
     <Card className="px-4 py-4 bg-white" onClick={onClick}>
     <div className="flex items-start gap-3">
@@ -45,8 +47,8 @@ const UserInfoCard = ({
         <AvatarFallback>U</AvatarFallback>
       </Avatar>
       <div className="flex flex-col text-left min-w-0 flex-1">
-        <div className="flex items-start justify-between">
-          <span className="flex items-center truncate whitespace-nowrap overflow-hidden">
+        <div className={`flex ${didValue || comment ? 'items-start' : (tabType === 'member' ? 'items-center' : 'items-start')} justify-between`}>
+          <span className={`flex items-center truncate whitespace-nowrap overflow-hidden ${!didValue && !comment && tabType === 'member' ? 'h-10' : ''}`}>
           {showLabel
             ? typeof label === "string"
               ? label
@@ -68,7 +70,8 @@ const UserInfoCard = ({
             </span>
           )}
         </div>
-        {showDid && <span className="text-label-xs text-caption py-2">{didValue?.length ? truncateText(didValue, 20, "middle") : "did取得中"}</span>}
+        {didValue && <span className="text-label-xs text-caption py-2">{truncateText(didValue, 20, "middle")}</span>}
+        {!didValue && <div className="py-1"></div>}
         {comment && (
           <span className="text-label-xs text-caption bg-background-hover leading-relaxed block p-2 rounded-sm">
             {comment}
