@@ -6,7 +6,7 @@ import React from "react";
 import { truncateText } from "@/utils/stringUtils";
 
 // ヘルパー関数: メインコンテナのクラス名を生成
-const getMainContainerClassName = (didValue?: string, comment?: string, tabType?: 'member' | 'other') => {
+const getMainContainerClassName = (didValue?: string, comment?: string, tabType?: 'member' | 'history') => {
   const classes = ['flex', 'justify-between'];
   if (didValue || comment) {
     classes.push('items-start');
@@ -17,7 +17,7 @@ const getMainContainerClassName = (didValue?: string, comment?: string, tabType?
 };
 
 // ヘルパー関数: 名前表示用spanのクラス名を生成
-const getNameSpanClassName = (didValue?: string, comment?: string, tabType?: 'member' | 'other') => {
+const getNameSpanClassName = (didValue?: string, comment?: string, tabType?: 'member' | 'history') => {
   const classes = ['flex', 'items-center', 'truncate', 'whitespace-nowrap', 'overflow-hidden'];
   if (!didValue && !comment && tabType === 'member') {
     classes.push('h-10');
@@ -39,7 +39,7 @@ interface Props {
   onClick?: () => void;
   children?: React.ReactNode;
   comment?: string;
-  tabType?: 'member' | 'other';
+  tabType?: 'member' | 'history';
 }
 
 const UserInfoCard = ({
@@ -56,7 +56,7 @@ const UserInfoCard = ({
   onClick,
   children,
   comment,
-  tabType = 'other',
+  tabType = 'history',
 }: Props) => (
     <Card className="px-4 py-4 bg-white" onClick={onClick}>
     <div className="flex items-start gap-3">
