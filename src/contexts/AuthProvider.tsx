@@ -86,7 +86,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       TokenManager.clearAllTokens();
 
-      setState((prev) => ({
+      setState((prev: AuthState) => ({
         ...prev,
         firebaseUser: null,
         currentUser: null,
@@ -104,6 +104,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [isAuthInitialized, setIsAuthInitialized] = useState(false);
   const [authInitError, setAuthInitError] = useState<string | null>(null);
+  const [authInitComplete, setAuthInitComplete] = useState(false);
 
   useEffect(() => {
     if (!authStateManager) return;
@@ -121,7 +122,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsAuthInitialized(true);
         setAuthInitError(null);
         const currentState = authStateManager.getState();
-        setState((prev) => ({ ...prev, authenticationState: currentState }));
+        setState((prev: AuthState) => ({ ...prev, authenticationState: currentState }));
+        setAuthInitComplete(true);
         
         logger.debug("AuthProvider: AuthStateManager initialization completed", {
           component: "AuthProvider",
@@ -160,7 +162,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * @returns ログインが成功したかどうか
    */
   const loginWithLiff = async (redirectPath?: RawURIComponent): Promise<boolean> => {
-    setState((prev) => ({ ...prev, isAuthenticating: true }));
+    setState((prev: AuthState) => ({ ...prev, isAuthenticating: true }));
 
     try {
       await liffService.initialize();
@@ -202,7 +204,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       return false;
     } finally {
-      setState((prev) => ({ ...prev, isAuthenticating: false }));
+      setState((prev: AuthState) => ({ ...prev, isAuthenticating: false }));
     }
   };
 
@@ -220,7 +222,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const success = await phoneAuthService.verifyPhoneCode(verificationCode);
 
     if (success) {
-      setState((prev) => ({
+      setState((prev: AuthState) => ({
         ...prev,
         authenticationState: "phone_authenticated",
       }));
@@ -344,6 +346,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authenticationState: state.authenticationState,
     isAuthenticating: state.isAuthenticating,
     environment: state.environment,
+    authInitComplete,
     loginWithLiff,
     logout,
     phoneAuth: {
