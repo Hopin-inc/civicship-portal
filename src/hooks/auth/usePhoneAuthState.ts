@@ -10,12 +10,14 @@ interface UsePhoneAuthStateProps {
   authStateManager: AuthStateManager | null;
   phoneAuthService: PhoneAuthService;
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
+  enabled?: boolean;
 }
 
 export const usePhoneAuthState = ({
   authStateManager,
   phoneAuthService,
   setState,
+  enabled = true,
 }: UsePhoneAuthStateProps) => {
   const authStateManagerRef = useRef(authStateManager);
   const phoneAuthServiceRef = useRef(phoneAuthService);
@@ -24,6 +26,8 @@ export const usePhoneAuthState = ({
   phoneAuthServiceRef.current = phoneAuthService;
 
   useEffect(() => {
+    if (!enabled) return;
+    
     const currentAuthStateManager = authStateManagerRef.current;
 
     if (!currentAuthStateManager) return;

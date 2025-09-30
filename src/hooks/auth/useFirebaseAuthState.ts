@@ -11,12 +11,14 @@ interface UseFirebaseAuthStateProps {
   authStateManager: AuthStateManager | null;
   state: AuthState;
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
+  enabled?: boolean;
 }
 
 export const useFirebaseAuthState = ({
   authStateManager,
   state,
   setState,
+  enabled = true,
 }: UseFirebaseAuthStateProps) => {
   const authStateManagerRef = useRef(authStateManager);
   const stateRef = useRef(state);
@@ -25,6 +27,7 @@ export const useFirebaseAuthState = ({
   stateRef.current = state;
 
   useEffect(() => {
+    if (!authStateManager || !enabled) return;
     const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
       setState((prev) => ({
         ...prev,

@@ -8,11 +8,13 @@ import { logger } from "@/lib/logging";
 interface UseLineAuthRedirectDetectionProps {
   state: AuthState;
   liffService: LiffService;
+  enabled?: boolean;
 }
 
 export const useLineAuthRedirectDetection = ({
   state,
   liffService,
+  enabled = true,
 }: UseLineAuthRedirectDetectionProps) => {
   const [shouldProcessRedirect, setShouldProcessRedirect] = useState(false);
   const prevStateRef = useRef<{ authenticationState: string; isAuthenticating: boolean } | null>(
@@ -21,6 +23,10 @@ export const useLineAuthRedirectDetection = ({
   const prevLiffStateRef = useRef<{ state: string; isLoggedIn: boolean } | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      setShouldProcessRedirect(false);
+      return;
+    }
     const currentState = {
       authenticationState: state.authenticationState,
       isAuthenticating: state.isAuthenticating,

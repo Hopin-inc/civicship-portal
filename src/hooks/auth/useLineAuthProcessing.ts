@@ -10,6 +10,7 @@ interface UseLineAuthProcessingProps {
   liffService: LiffService;
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
   refetchUser: () => Promise<any>;
+  enabled?: boolean;
 }
 
 export const useLineAuthProcessing = ({
@@ -17,6 +18,7 @@ export const useLineAuthProcessing = ({
   liffService,
   setState,
   refetchUser,
+  enabled = true,
 }: UseLineAuthProcessingProps) => {
   const processedRef = useRef(false);
   const liffServiceRef = useRef(liffService);
@@ -28,21 +30,14 @@ export const useLineAuthProcessing = ({
   refetchUserRef.current = refetchUser;
 
   useEffect(() => {
-    if (!shouldProcessRedirect || processedRef.current) return;
+    if (!enabled || !shouldProcessRedirect || processedRef.current) return;
 
     const handleLineAuthRedirect = async () => {
       processedRef.current = true;
       setStateRef.current((prev) => ({ ...prev, isAuthenticating: true }));
 
       try {
-        const initialized = await liffServiceRef.current.initialize();
-        if (!initialized) {
-          logger.info("LIFF init failed", {
-            authType: "liff",
-            component: "useLineAuthProcessing",
-          });
-          return;
-        }
+        await liffServiceRef.current.initialize();
 
         const { isLoggedIn, profile } = liffServiceRef.current.getState();
 
@@ -50,9 +45,17 @@ export const useLineAuthProcessing = ({
           return;
         }
 
+        if (!profile) {
+          logger.info("No profile found", {
+            authType: "liff",
+            component: "useLineAuthProcessing",
+          });
+          return;
+        }
+
         const success = await liffServiceRef.current.signInWithLiffToken();
         if (!success) {
-          logger.info("signInWithLiffToken failed", {
+          logger.info("LIFF sign in failed", {
             authType: "liff",
             component: "useLineAuthProcessing",
           });
@@ -72,7 +75,7 @@ export const useLineAuthProcessing = ({
     };
 
     handleLineAuthRedirect();
-  }, [shouldProcessRedirect]);
+  }, [shouldProcessRedirect, enabled]);
 
   useEffect(() => {
     if (!shouldProcessRedirect) {

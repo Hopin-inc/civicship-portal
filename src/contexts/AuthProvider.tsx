@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState, useMemo } from "react";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
@@ -11,6 +11,7 @@ import { GqlCurrentPrefecture, useCurrentUserQuery, useUserSignUpMutation } from
 import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
+import { AuthOrchestrator, OrchestrationState } from "@/lib/auth/auth-orchestrator";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
@@ -18,14 +19,12 @@ import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandle
 import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
 import { usePhoneAuthState } from "@/hooks/auth/usePhoneAuthState";
 import { useUserRegistrationState } from "@/hooks/auth/useUserRegistrationState";
-import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 import { logger } from "@/lib/logging";
 import { maskPhoneNumber } from "@/lib/logging/client/utils";
-import useAutoLogin from "@/hooks/auth/useAutoLogin";
 import { RawURIComponent } from "@/utils/path";
-import { AuthContextType, AuthState } from "@/types/auth";
+import { AuthContextType, AuthState, InitializationPhase } from "@/types/auth";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -102,57 +101,108 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [liffService, phoneAuthService]);
 
-  const [isAuthInitialized, setIsAuthInitialized] = useState(false);
-  const [authInitError, setAuthInitError] = useState<string | null>(null);
+  const [orchestrationState, setOrchestrationState] = useState<OrchestrationState>({
+    phase: "idle",
+    error: null,
+    startTime: 0,
+    phaseStartTime: 0,
+  });
+
+  const orchestrator = useMemo(() => AuthOrchestrator.getInstance(), []);
 
   useEffect(() => {
     if (!authStateManager) return;
 
     const initializeAuth = async () => {
       try {
-        logger.debug("AuthProvider: Starting AuthStateManager initialization", {
+        logger.debug("AuthProvider: Starting orchestrated authentication initialization", {
           component: "AuthProvider",
           timestamp: new Date().toISOString(),
-          isAuthInitialized,
-          authInitError: !!authInitError,
+          environment,
         });
         
-        await authStateManager.initialize();
-        setIsAuthInitialized(true);
-        setAuthInitError(null);
-        const currentState = authStateManager.getState();
-        setState((prev) => ({ ...prev, authenticationState: currentState }));
+        const result = await orchestrator.initializeAuthentication(environment, liffService, authStateManager);
         
-        logger.debug("AuthProvider: AuthStateManager initialization completed", {
-          component: "AuthProvider",
-          timestamp: new Date().toISOString(),
-          authState: currentState,
-        });
+        if (result.success) {
+          const currentState = authStateManager.getState();
+          setState((prev) => ({ ...prev, authenticationState: currentState }));
+          
+          logger.debug("AuthProvider: Orchestrated initialization completed successfully", {
+            component: "AuthProvider",
+            timestamp: new Date().toISOString(),
+            authState: currentState,
+            duration: result.duration,
+          });
+        } else {
+          logger.error("AuthProvider: Orchestrated initialization failed", {
+            component: "AuthProvider",
+            timestamp: new Date().toISOString(),
+            error: result.error?.message,
+            phase: result.phase,
+          });
+        }
       } catch (error) {
-        logger.error("AuthProvider: AuthStateManager initialization failed", {
+        logger.error("AuthProvider: Orchestrated initialization error", {
           component: "AuthProvider",
           timestamp: new Date().toISOString(),
           error: error instanceof Error ? error.message : String(error),
         });
-        setAuthInitError(error instanceof Error ? error.message : "認証の初期化に失敗しました");
-        setIsAuthInitialized(false);
       }
     };
 
-    if (!isAuthInitialized && !authInitError) {
+    if (orchestrationState.phase === "idle") {
       initializeAuth();
     }
-  }, [authStateManager, isAuthInitialized, authInitError]);
+  }, [authStateManager, orchestrator, environment, liffService, orchestrationState.phase]);
 
-  useAuthStateChangeListener({ authStateManager, setState });
-  useTokenExpirationHandler({ state, setState, logout });
-  useFirebaseAuthState({ authStateManager, state, setState });
-  usePhoneAuthState({ authStateManager, phoneAuthService, setState });
-  useUserRegistrationState({ authStateManager, userData, setState });
-  useLiffInitialization({ environment, liffService });
-  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
-  useAutoLogin({ environment, state, liffService, setState, refetchUser });
+  useEffect(() => {
+    const unsubscribe = orchestrator.subscribe("AuthProvider", setOrchestrationState);
+    return unsubscribe;
+  }, [orchestrator]);
+
+  const isInitializationComplete = orchestrationState.phase === "complete";
+  
+  useAuthStateChangeListener({ 
+    authStateManager, 
+    setState, 
+    enabled: isInitializationComplete 
+  });
+  useTokenExpirationHandler({ 
+    state, 
+    setState, 
+    logout, 
+    enabled: isInitializationComplete 
+  });
+  useFirebaseAuthState({ 
+    authStateManager, 
+    state, 
+    setState, 
+    enabled: isInitializationComplete 
+  });
+  usePhoneAuthState({ 
+    authStateManager, 
+    phoneAuthService, 
+    setState, 
+    enabled: isInitializationComplete 
+  });
+  useUserRegistrationState({ 
+    authStateManager, 
+    userData, 
+    setState, 
+    enabled: isInitializationComplete 
+  });
+  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ 
+    state, 
+    liffService, 
+    enabled: isInitializationComplete 
+  });
+  useLineAuthProcessing({ 
+    shouldProcessRedirect, 
+    liffService, 
+    setState, 
+    refetchUser, 
+    enabled: isInitializationComplete && shouldProcessRedirect 
+  });
 
   /**
    * LIFFでログイン
@@ -344,6 +394,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authenticationState: state.authenticationState,
     isAuthenticating: state.isAuthenticating,
     environment: state.environment,
+    initializationPhase: orchestrationState.phase,
+    isInitializationComplete,
+    initializationError: orchestrationState.error,
     loginWithLiff,
     logout,
     phoneAuth: {
@@ -357,15 +410,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateAuthState: async () => {
       await refetchUser();
     },
-    loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
+    loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating || !isInitializationComplete,
   };
 
-  if (!isAuthInitialized) {
-    if (authInitError) {
+  if (!isInitializationComplete) {
+    if (orchestrationState.error) {
       const refetchRef = {
         current: () => {
-          setAuthInitError(null);
-          setIsAuthInitialized(false);
+          orchestrator.reset();
         },
       };
       return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;

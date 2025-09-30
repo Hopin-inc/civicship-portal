@@ -18,6 +18,14 @@ export type AuthState = {
   isAuthenticating: boolean;
 };
 
+export type InitializationPhase = 
+  | "idle"
+  | "liff_init" 
+  | "auth_state_init"
+  | "auto_login"
+  | "complete"
+  | "error";
+
 export interface AuthContextType {
   user: GqlCurrentUserPayload["user"] | null;
   firebaseUser: User | null;
@@ -28,6 +36,10 @@ export interface AuthContextType {
   authenticationState: AuthState["authenticationState"];
   isAuthenticating: boolean;
   environment: AuthEnvironment;
+
+  initializationPhase: InitializationPhase;
+  isInitializationComplete: boolean;
+  initializationError: Error | null;
 
   loginWithLiff: (redirectPath?: RawURIComponent) => Promise<boolean>;
   logout: () => Promise<void>;

@@ -22,7 +22,14 @@ interface RouteGuardProps {
  * 認証状態に基づいてページアクセスを制御する
  */
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
-  const { isAuthenticated, authenticationState, loading } = useAuth();
+  const { 
+    isAuthenticated, 
+    authenticationState, 
+    loading,
+    initializationPhase,
+    isInitializationComplete,
+    initializationError,
+  } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -45,6 +52,27 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   }, [loading]);
 
   useEffect(() => {
+    if (!isInitializationComplete || initializationPhase !== "complete") {
+      logger.debug("RouteGuard: Waiting for initialization completion", {
+        component: "RouteGuard",
+        pathname,
+        initializationPhase,
+        isInitializationComplete,
+        timestamp: new Date().toISOString(),
+      });
+      return;
+    }
+
+    if (initializationError) {
+      logger.warn("RouteGuard: Initialization error detected, staying pending", {
+        component: "RouteGuard",
+        pathname,
+        error: initializationError.message,
+        timestamp: new Date().toISOString(),
+      });
+      return;
+    }
+
     if (loading || userLoading || isInitialRender) {
       return;
     }
@@ -72,13 +100,30 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         decodeURIComponentWithType(nextParam),
       );
       if (redirectPath) {
+        logger.debug("RouteGuard: Redirect decision made", {
+          component: "RouteGuard",
+          pathname,
+          redirectPath,
+          authenticationState,
+          timestamp: new Date().toISOString(),
+        });
         router.replace(redirectPath);
+      } else {
+        logger.debug("RouteGuard: Access allowed", {
+          component: "RouteGuard",
+          pathname,
+          authenticationState,
+          timestamp: new Date().toISOString(),
+        });
       }
       setAuthorized(true);
     };
     authCheck();
     return () => {};
   }, [
+    isInitializationComplete,
+    initializationPhase,
+    initializationError,
     pathname,
     authenticationState,
     loading,
@@ -90,7 +135,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     isInitialRender,
   ]);
 
-  if (loading || userLoading || isInitialRender) {
+  if (!isInitializationComplete || loading || userLoading || isInitialRender) {
     return <LoadingIndicator />;
   }
 

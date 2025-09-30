@@ -10,18 +10,22 @@ interface UseUserRegistrationStateProps {
   authStateManager: AuthStateManager | null;
   userData: GqlCurrentUserQuery | undefined;
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
+  enabled?: boolean;
 }
 
 export const useUserRegistrationState = ({
   authStateManager,
   userData,
   setState,
+  enabled = true,
 }: UseUserRegistrationStateProps) => {
   const processedUserIdRef = useRef<string | null>(null);
   const authStateManagerRef = useRef(authStateManager);
   authStateManagerRef.current = authStateManager;
 
   useEffect(() => {
+    if (!enabled) return;
+    
     if (userData?.currentUser?.user) {
       const userId = userData.currentUser.user.id;
 
