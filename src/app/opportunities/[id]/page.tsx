@@ -5,7 +5,6 @@ import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunity
 import { ErrorState } from "@/components/shared";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
-import { useAuth } from "@/contexts/AuthProvider";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
 import { notFound, useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
@@ -27,19 +26,18 @@ export default function OpportunityDetailPage() {
     [],
   );
   useHeaderConfig(headerConfig);
-  const { user } = useAuth();
   const {
     opportunity,
     sameStateOpportunities,
-    availableTickets,
+    // availableTickets,
     sortedSlots,
     loading,
     error,
     refetch,
-  } = useOpportunityDetails(id, user);
+  } = useOpportunityDetails(id);
 
   const isExternalBooking =
-  (opportunity?.title.includes("予約") || opportunity?.title.includes("問い合わせ")) ?? false;
+    (opportunity?.title.includes("予約") || opportunity?.title.includes("問い合わせ")) ?? false;
 
   const refetchRef = useRef<(() => void) | null>(null);
 
@@ -49,7 +47,7 @@ export default function OpportunityDetailPage() {
 
   if (loading) return <LoadingIndicator />;
 
-  if (error) return <ErrorState title="募集ページを読み込めませんでした"  refetchRef={refetchRef}/>;
+  if (error) return <ErrorState title="募集ページを読み込めませんでした" refetchRef={refetchRef} />;
 
   if (!opportunity) return notFound();
 
@@ -63,7 +61,6 @@ export default function OpportunityDetailPage() {
     if (!isReservable) return "reservationClosed";
     return undefined;
   };
-  
 
   return (
     <>
@@ -72,13 +69,16 @@ export default function OpportunityDetailPage() {
       </div>
       <main className="min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
-            <OpportunityDetailsHeader opportunity={opportunity} availableTickets={availableTickets.length} />
-            <OpportunityDetailsContent 
-                opportunity={opportunity} 
-                availableDates={sortedSlots}
-                sameStateActivities={sameStateOpportunities}
-                communityId={community_id}
-            />
+          <OpportunityDetailsHeader
+            opportunity={opportunity}
+            // availableTickets={availableTickets.length}
+          />
+          <OpportunityDetailsContent
+            opportunity={opportunity}
+            availableDates={sortedSlots}
+            sameStateActivities={sameStateOpportunities}
+            communityId={community_id}
+          />
         </div>
       </main>
       <OpportunityDetailsFooter
