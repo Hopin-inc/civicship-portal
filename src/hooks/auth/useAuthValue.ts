@@ -22,6 +22,7 @@ export const useAuthValue = ({
   phoneAuthService,
   actions,
 }: UseAuthValueArgs): AuthContextType => {
+  const phoneAuth = useAuthStore((s) => s.phoneAuth);
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
   const currentUser = useAuthStore((s) => s.state.currentUser);
   const authenticationState = useAuthStore((s) => s.state.authenticationState);
@@ -51,8 +52,8 @@ export const useAuthValue = ({
         startPhoneVerification: actions.startPhoneVerification,
         verifyPhoneCode: actions.verifyPhoneCode,
         clearRecaptcha: () => phoneAuthService.clearRecaptcha(),
-        isVerifying: phoneAuthService.getState().isVerifying,
-        phoneUid: phoneAuthService.getState().phoneUid,
+        isVerifying: phoneAuth.isVerifying,
+        phoneUid: phoneAuth.phoneUid,
       },
       createUser: actions.createUser,
       updateAuthState: stableRefetchUser,
