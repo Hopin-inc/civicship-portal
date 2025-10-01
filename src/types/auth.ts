@@ -7,8 +7,10 @@ import { RawURIComponent } from "@/utils/path";
 export type AuthStore = {
   state: AuthState;
   phoneAuth: PhoneAuthState;
+  liffAuth: LiffState;
   setState: (partial: Partial<AuthState>) => void;
   setPhoneAuth: (partial: Partial<PhoneAuthState>) => void;
+  setLiffAuth: (partial: Partial<LiffState>) => void;
   reset: () => void;
 };
 
@@ -25,6 +27,17 @@ export type AuthState = {
     | "loading"; // L0: 状態チェック中
   environment: AuthEnvironment;
   isAuthenticating: boolean;
+};
+
+export type LiffState = {
+  isInitialized: boolean;
+  isLoggedIn: boolean;
+  profile: {
+    userId: string | null;
+    displayName: string | null;
+    pictureUrl: string | null;
+  };
+  error: Error | null;
 };
 
 export type PhoneAuthState = {

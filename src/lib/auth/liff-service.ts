@@ -7,36 +7,20 @@ import { AuthTokens, TokenManager } from "./token-manager";
 import retry from "retry";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
-
-export type LiffState = {
-  isInitialized: boolean;
-  isLoggedIn: boolean;
-  profile: {
-    userId: string | null;
-    displayName: string | null;
-    pictureUrl: string | null;
-  };
-  error: Error | null;
-};
+import { LiffState } from "@/types/auth";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 export class LiffService {
   private static instance: LiffService;
-  private liffId: string;
-  private state: LiffState;
+  private readonly liffId: string;
   private initializing = false;
 
   private constructor(liffId: string) {
     this.liffId = liffId;
-    this.state = {
-      isInitialized: false,
-      isLoggedIn: false,
-      profile: {
-        userId: null,
-        displayName: null,
-        pictureUrl: null,
-      },
-      error: null,
-    };
+  }
+
+  private get state(): LiffState {
+    return useAuthStore.getState().liffAuth;
   }
 
   public getLiffUrl(redirectPath?: string): string {
