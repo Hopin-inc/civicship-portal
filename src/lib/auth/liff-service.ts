@@ -5,15 +5,14 @@ import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { categorizeFirebaseError, lineAuth } from "./firebase-config";
 import { AuthTokens, TokenManager } from "./token-manager";
 import retry from "retry";
+import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
 
 /**
  * LIFF初期化状態の型定義
  */
-export type LiffInitState = "idle" | "pre-initializing" | "pre-initialized" | "initializing" | "initialized" | "failed";
-
 export type LiffState = {
-  state: LiffInitState;
+  isInitialized: boolean;
   isLoggedIn: boolean;
   profile: {
     userId: string | null;
@@ -27,18 +26,10 @@ export type LiffState = {
  * LIFF認証サービス
  */
 export class LiffService {
-  private static instance: LiffService | null = null;
+  private static instance: LiffService;
   private liffId: string;
-  private state: LiffInitState = "idle";
-  private isLoggedIn = false;
-  private profile = {
-    userId: null as string | null,
-    displayName: null as string | null,
-    pictureUrl: null as string | null,
-  };
-  private error: Error | null = null;
-  private preInitPromise: Promise<void> | null = null;
-  private initPromise: Promise<void> | null = null;
+  private state: LiffState;
+  private initializing = false;
 
   /**
    * コンストラクタ
@@ -46,6 +37,16 @@ export class LiffService {
    */
   private constructor(liffId: string) {
     this.liffId = liffId;
+    this.state = {
+      isInitialized: false,
+      isLoggedIn: false,
+      profile: {
+        userId: null,
+        displayName: null,
+        pictureUrl: null,
+      },
+      error: null,
+    };
   }
 
   public getLiffUrl(redirectPath?: string): string {
@@ -72,83 +73,55 @@ export class LiffService {
   }
 
   /**
-   * LIFF SDKの事前初期化（Root Layout用）
-   * SDK初期化のみを行い、認証ロジックは含まない
+   * LIFF SDKを初期化
+   * @returns 初期化が成功したかどうか
    */
-  public async preInitialize(): Promise<void> {
-    if (this.state === "pre-initialized" || this.state === "initialized") {
-      return;
-    }
-    if (this.preInitPromise) {
-      return this.preInitPromise;
-    }
-
-    this.state = "pre-initializing";
-    this.preInitPromise = (async () => {
-      try {
-        const { default: liff } = await import("@line/liff");
-        await liff.init({ liffId: this.liffId });
-        
-        const anyLiff = liff as any;
-        if (anyLiff?.ready?.then) {
-          await anyLiff.ready;
-        }
-
-        this.isLoggedIn = liff.isLoggedIn();
-        this.state = "pre-initialized";
-        this.error = null;
-      } catch (error) {
-        this.state = "failed";
-        this.error = error as Error;
-        this.preInitPromise = null;
-        
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
-                                       errorMessage.includes("LINE") ||
-                                       errorMessage.includes("Load failed");
-        
-        
-        throw error;
+  public async initialize(): Promise<boolean> {
+    try {
+      if (this.state.isInitialized) {
+        return true;
       }
-    })();
-
-    return this.preInitPromise;
-  }
-
-  /**
-   * LIFF認証初期化（AuthProvider用）
-   * SDK初期化を確保してから認証ロジックを実行
-   */
-  public async initialize(): Promise<void> {
-    if (this.state === "initialized") {
-      return;
-    }
-    if (this.initPromise) {
-      return this.initPromise;
-    }
-
-    this.initPromise = (async () => {
-      try {
-        await this.preInitialize();
-        
-        this.state = "initializing";
-
-        if (this.isLoggedIn) {
-          await this.updateProfile();
-        }
-
-        this.state = "initialized";
-      } catch (error) {
-        this.state = "failed";
-        this.error = error as Error;
-        this.initPromise = null;
-        
-        
-        throw error;
+      if (this.initializing) {
+        return true;
       }
-    })();
+      this.initializing = true;
 
-    return this.initPromise;
+      await liff.init({ liffId: this.liffId });
+      this.state.isInitialized = true;
+      this.state.isLoggedIn = liff.isLoggedIn();
+
+      if (this.state.isLoggedIn) {
+        await this.updateProfile();
+      }
+
+      return true;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
+                                     errorMessage.includes("LINE") ||
+                                     errorMessage.includes("Load failed");
+      
+      if (isEnvironmentConstraint) {
+        logger.warn("LIFF environment initialization limitation", {
+          authType: "liff",
+          error: errorMessage,
+          component: "LiffService",
+          errorCategory: "environment_constraint",
+          expected: true,
+        });
+      } else {
+        logger.info("LIFF initialization failed", {
+          authType: "liff",
+          error: errorMessage,
+          component: "LiffService",
+          errorCategory: "initialization_error",
+        });
+      }
+      this.state.error = error as Error;
+      return false;
+    }finally {
+      this.initializing = false;
+    }
   }
 
   /**
@@ -158,14 +131,12 @@ export class LiffService {
    */
   public async login(redirectPath?: RawURIComponent): Promise<boolean> {
     try {
-      if (this.state !== "initialized") {
+      if (!this.state.isInitialized) {
         await this.initialize();
       }
 
-      const { default: liff } = await import("@line/liff");
-
       if (liff.isInClient()) {
-        this.isLoggedIn = true;
+        this.state.isLoggedIn = true;
       } else {
         const redirectUri = typeof window !== "undefined"
           ? redirectPath
@@ -185,7 +156,23 @@ export class LiffService {
                                      errorMessage.includes("LINE") ||
                                      errorMessage.includes("Load failed");
       
-      this.error = error as Error;
+      if (isEnvironmentConstraint) {
+        logger.warn("LIFF environment login limitation", {
+          authType: "liff",
+          error: errorMessage,
+          component: "LiffService",
+          errorCategory: "environment_constraint",
+          expected: true,
+        });
+      } else {
+        logger.info("LIFF login process failed", {
+          authType: "liff",
+          error: errorMessage,
+          component: "LiffService",
+          errorCategory: "auth_temporary",
+        });
+      }
+      this.state.error = error as Error;
       return false;
     }
   }
@@ -193,12 +180,11 @@ export class LiffService {
   /**
    * LIFFからログアウト
    */
-  public async logout(): Promise<void> {
-    if ((this.state === "pre-initialized" || this.state === "initialized") && this.isLoggedIn) {
-      const { default: liff } = await import("@line/liff");
+  public logout(): void {
+    if (this.state.isInitialized && this.state.isLoggedIn) {
       liff.logout();
-      this.isLoggedIn = false;
-      this.profile = {
+      this.state.isLoggedIn = false;
+      this.state.profile = {
         userId: null,
         displayName: null,
         pictureUrl: null,
@@ -211,18 +197,22 @@ export class LiffService {
    */
   private async updateProfile(): Promise<void> {
     try {
-      if ((this.state !== "pre-initialized" && this.state !== "initialized") || !this.isLoggedIn) {
+      if (!this.state.isInitialized || !this.state.isLoggedIn) {
         return;
       }
 
-      const { default: liff } = await import("@line/liff");
       const profile = await liff.getProfile();
-      this.profile = {
+      this.state.profile = {
         userId: profile.userId,
         displayName: profile.displayName,
         pictureUrl: profile.pictureUrl || null,
       };
     } catch (error) {
+      logger.info("Failed to get LIFF profile", {
+        authType: "liff",
+        error: error instanceof Error ? error.message : String(error),
+        component: "LiffService",
+      });
     }
   }
 
@@ -230,11 +220,10 @@ export class LiffService {
    * LIFFアクセストークンを取得
    * @returns LIFFアクセストークン
    */
-  public async getAccessToken(): Promise<string | null> {
-    if ((this.state !== "pre-initialized" && this.state !== "initialized") || !this.isLoggedIn) {
+  public getAccessToken(): string | null {
+    if (!this.state.isInitialized || !this.state.isLoggedIn) {
       return null;
     }
-    const { default: liff } = await import("@line/liff");
     return liff.getAccessToken();
   }
 
@@ -243,8 +232,12 @@ export class LiffService {
    * @returns 認証が成功したかどうか
    */
   public async signInWithLiffToken(): Promise<boolean> {
-    const accessToken = await this.getAccessToken();
+    const accessToken = this.getAccessToken();
     if (!accessToken) {
+      logger.info("No LIFF access token available", {
+        authType: "liff",
+        component: "LiffService",
+      });
       return false;
     }
 
@@ -300,6 +293,12 @@ export class LiffService {
               const timestamp = new Date().toISOString();
               await authStateManager.handleLineAuthStateChange(true);
             } catch (error) {
+              logger.warn("Failed to update AuthStateManager state", {
+                error: error instanceof Error ? error.message : String(error),
+                component: "LiffService",
+                errorCategory: "state_management",
+                retryable: true,
+              });
             }
           }
 
@@ -307,7 +306,21 @@ export class LiffService {
         } catch (error) {
           const categorizedError = categorizeFirebaseError(error);
 
+          logger.info(`LIFF authentication error (attempt ${currentAttempt})`, {
+            authType: "liff",
+            type: categorizedError.type,
+            message: categorizedError.message,
+            error: error instanceof Error ? error.message : String(error),
+            retryable: categorizedError.retryable,
+            attempt: currentAttempt,
+            component: "LiffService",
+          });
+
           if (!categorizedError.retryable || !operation.retry(error as Error)) {
+            logger.info("LIFF authentication failed after all retries", {
+              authType: "liff",
+              component: "LiffService",
+            });
 
             if (typeof window !== "undefined") {
               window.dispatchEvent(
@@ -334,19 +347,6 @@ export class LiffService {
    * @returns LIFF状態
    */
   public getState(): LiffState {
-    return {
-      state: this.state,
-      isLoggedIn: this.isLoggedIn,
-      profile: { ...this.profile },
-      error: this.error,
-    };
-  }
-
-  /**
-   * 初期化状態のみを取得
-   * @returns 初期化状態
-   */
-  public getInitState(): LiffInitState {
-    return this.state;
+    return { ...this.state };
   }
 }

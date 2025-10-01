@@ -1,48 +1,45 @@
-import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import type { NextRequest } from "next/server";
+import { FeaturesType, currentCommunityConfig } from "@/lib/communities/metadata";
+
+// Map features to their corresponding route paths
+const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
+  places: ["/places"],
+  opportunities: ["/activities", "/search"],
+  points: ["/wallets"],
+  tickets: ["/tickets"],
+  articles: ["/articles"],
+};
 
 export function middleware(request: NextRequest) {
-  const url = request.nextUrl;
-  const pathname = url.pathname;
-  const rootPath = currentCommunityConfig.rootPath || "/users/me";
+  const pathname = request.nextUrl.pathname;
+  const enabledFeatures = currentCommunityConfig.enableFeatures || [];
+  const rootPath = currentCommunityConfig.rootPath || "/";
 
-  // A) LIFF戻りやリッチメニューのディープリンク
-  if (pathname === "/") {
-    const target = resolveLiffReturnTarget(url);
-    if (target) {
-      return NextResponse.redirect(new URL(target, request.url));
-    }
-  }
+  // liff.state がある場合はrootPathへのリダイレクトをスキップ（LIFFのルーティングバグ対策）
+  const hasLiffState = request.nextUrl.searchParams.get("liff.state");
 
-  // B) "/" → rootPath に強制リダイレクト
-  const liffState = url.searchParams.get("liff.state");
-  if (shouldRedirectFromRoot(pathname, rootPath, liffState)) {
+  // ルートページへのアクセスを処理（liff.stateがない場合、またはliff.stateが/の場合のみrootPathにリダイレクト）
+  if (pathname === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
     return NextResponse.redirect(new URL(rootPath, request.url));
   }
 
-  // C) それ以外は通す
-  return NextResponse.next();
-}
-
-function resolveLiffReturnTarget(url: URL): string | null {
-  const raw = url.searchParams.get("liff.state");
-  if (!raw || raw === "/") return null;
-
-  try {
-    const decoded = decodeURIComponent(raw);
-    return decoded.startsWith("/") ? decoded : `/${decoded}`;
-  } catch {
-    return raw.startsWith("/") ? raw : `/${raw}`;
+  for (const [feature, routes] of Object.entries(featureToRoutesMap)) {
+    if (!enabledFeatures.includes(feature as FeaturesType)) {
+      for (const route of routes) {
+        if (feature === "opportunities" && /^\/activities\/[^/]+$/.test(pathname)) {
+          continue;
+        }
+        
+        if (pathname === route || pathname.startsWith(`${route}/`)) {
+          console.log(`Redirecting from disabled feature path: ${pathname} to ${rootPath}`);
+          return NextResponse.redirect(new URL(rootPath, request.url));
+        }
+      }
+    }
   }
-}
 
-function shouldRedirectFromRoot(
-  pathname: string,
-  rootPath: string,
-  liffState: string | null,
-): boolean {
-  return pathname === "/" && rootPath !== "/" && (!liffState || liffState === "/");
+  return NextResponse.next();
 }
 
 export const config = {

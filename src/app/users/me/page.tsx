@@ -7,7 +7,7 @@ import UserProfileSection from "@/app/users/components/UserProfileSection";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
-import { ErrorState } from "@/components/shared";
+import { ErrorState } from '@/components/shared'
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useUserNfts } from "@/components/domains/nfts/hooks/useUserNft";
 import { NftCard } from "@/components/domains/nfts/components";
@@ -66,14 +66,22 @@ export default function MyProfilePage() {
       />
       {nftInstances && nftInstances.length > 0 ? (
         <section className="py-6 mt-0">
-          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">証明書</h2>
+          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
+            証明書
+          </h2>
           <div className="mt-4 flex gap-4 overflow-x-auto scrollbar-hide">
             {nftInstances.map((nftInstance) => (
-              <NftCard key={nftInstance.id} nftInstance={nftInstance} isCarousel={true} />
+              <NftCard
+                key={nftInstance.id}
+                nftInstance={nftInstance}
+                isCarousel={true}
+              />
             ))}
           </div>
         </section>
-      ) : null}
+      ) : (
+        null
+      )}
       <>
         {shouldShowOpportunities && (
           <>
@@ -84,7 +92,10 @@ export default function MyProfilePage() {
                 </h2>
                 <CardCarousel>
                   {formattedOpportunities.map((opportunity) => (
-                    <OpportunityVerticalCard key={opportunity.id} {...opportunity} />
+                    <OpportunityVerticalCard
+                      key={opportunity.id}
+                      {...opportunity}
+                    />
                   ))}
                 </CardCarousel>
               </section>

@@ -1,9 +1,12 @@
+import { GqlUser, Maybe } from "@/types/graphql";
 import { useSameStateOpportunities } from "./useSameStateOpportunities";
+import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
 import { useFilterFutureSlots } from "./useFilterFutureSlots";
 import { useSortedSlotsByStartsAt } from "./useSortedSlotsByStartsAt";
 import { useOpportunityDetail } from "./useOpportunityDetail";
 
-export const useOpportunityDetails = (id: string | undefined) => {
+// 呼び出し側のインターフェースを維持
+export const useOpportunityDetails = (id: string | undefined, user: Maybe<GqlUser> | undefined) => {
   const { opportunity, loading, error, refetch, stateCode } = useOpportunityDetail(id);
 
   const {
@@ -13,14 +16,14 @@ export const useOpportunityDetails = (id: string | undefined) => {
     refetch: refetchSameState,
   } = useSameStateOpportunities(id ?? "", stateCode ?? "");
 
-  // const availableTickets = useAvailableTickets(opportunity, user?.id);
+  const availableTickets = useAvailableTickets(opportunity, user?.id);
   const futureSlots = useFilterFutureSlots(opportunity?.slots);
   const sortedSlots = useSortedSlotsByStartsAt(futureSlots);
 
   return {
     opportunity,
     sameStateOpportunities,
-    // availableTickets,
+    availableTickets,
     sortedSlots,
     loading: loading || loadingSameState,
     error: error || errorSameState,

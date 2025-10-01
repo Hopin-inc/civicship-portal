@@ -2,26 +2,20 @@
 
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { AuthState } from "@/types/auth";
+import { AuthState } from "@/contexts/AuthProvider";
+import { logger } from "@/lib/logging";
 
 interface UseTokenExpirationHandlerProps {
   state: AuthState;
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
   logout: () => Promise<void>;
-  enabled?: boolean;
 }
 
-export const useTokenExpirationHandler = ({
-  state,
-  setState,
-  logout,
-  enabled = true,
-}: UseTokenExpirationHandlerProps) => {
+export const useTokenExpirationHandler = ({ state, setState, logout }: UseTokenExpirationHandlerProps) => {
   const stateRef = useRef(state);
   stateRef.current = state;
 
   useEffect(() => {
-    if (!enabled) return;
     const handleTokenExpired = (event: Event) => {
       const customEvent = event as CustomEvent<{ source: string }>;
       const { source } = customEvent.detail;
