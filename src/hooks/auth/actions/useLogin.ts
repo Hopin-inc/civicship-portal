@@ -1,14 +1,12 @@
 import { useCallback } from "react";
 import { logger } from "@/lib/logging";
-import { AuthState } from "@/types/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { RawURIComponent } from "@/utils/path";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
-export const useLogin = (
-  setState: (partial: Partial<AuthState>) => void,
-  liffService: LiffService,
-  refetchUser: () => Promise<any>,
-) => {
+export const useLogin = (liffService: LiffService, refetchUser: () => Promise<any>) => {
+  const setState = useAuthStore((s) => s.setState);
+
   return useCallback(
     async (redirectPath?: RawURIComponent): Promise<boolean> => {
       setState({ isAuthenticating: true });

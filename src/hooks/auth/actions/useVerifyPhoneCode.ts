@@ -1,23 +1,21 @@
 import { useCallback } from "react";
-import { AuthState } from "@/types/auth";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 export const useVerifyPhoneCode = (
-  setState: React.Dispatch<React.SetStateAction<AuthState>>,
   phoneAuthService: PhoneAuthService,
   authStateManager: AuthStateManager | null,
 ) => {
+  const setState = useAuthStore((s) => s.setState);
+
   return useCallback(
     async (verificationCode: string): Promise<boolean> => {
       const success = await phoneAuthService.verifyPhoneCode(verificationCode);
 
       if (success) {
-        setState((prev) => ({
-          ...prev,
-          authenticationState: "phone_authenticated",
-        }));
+        setState({ authenticationState: "phone_authenticated" });
 
         if (authStateManager) {
           try {

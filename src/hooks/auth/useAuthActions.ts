@@ -10,7 +10,6 @@ import { useStartPhoneVerification } from "@/hooks/auth/actions/useStartPhoneVer
 
 export type AuthDeps = {
   state: AuthState;
-  setState: (partial: Partial<AuthState>) => void;
   authStateManager: AuthStateManager | null;
   liffService: LiffService;
   phoneAuthService: PhoneAuthService;
@@ -18,14 +17,14 @@ export type AuthDeps = {
 };
 
 export const useAuthActions = (deps: AuthDeps) => {
-  const { state, setState, liffService, phoneAuthService, refetchUser } = deps;
+  const { state, liffService, phoneAuthService, refetchUser, authStateManager } = deps;
 
-  const loginWithLiff = useLogin(setState, liffService, refetchUser);
+  const loginWithLiff = useLogin(liffService, refetchUser);
   const createUser = useCreateUser(state, refetchUser);
-  const logout = useLogout(setState, liffService, phoneAuthService);
+  const logout = useLogout(liffService, phoneAuthService);
 
   const startPhoneVerification = useStartPhoneVerification(phoneAuthService);
-  const verifyPhoneCode = useVerifyPhoneCode(setState, phoneAuthService, deps.authStateManager);
+  const verifyPhoneCode = useVerifyPhoneCode(phoneAuthService, authStateManager);
 
   return { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode };
 };

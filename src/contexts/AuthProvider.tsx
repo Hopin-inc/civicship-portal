@@ -51,33 +51,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const { isAuthInitialized, authInitError, retryInitialization } = useAuthInitialization({
     authStateManager,
-    setState: setStoreState,
   });
 
   const { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode } =
     useAuthActions({
       state,
-      setState: setStoreState,
       authStateManager,
       liffService,
       phoneAuthService,
       refetchUser,
     });
 
-  useAuthStateChangeListener({ authStateManager, setState: setStoreState });
-  useTokenExpirationHandler({ state, setState: setStoreState, logout });
-  useFirebaseAuthState({ authStateManager, state, setState: setStoreState });
-  usePhoneAuthState({ authStateManager, phoneAuthService, setState: setStoreState });
-  useUserRegistrationState({ authStateManager, userData, setState: setStoreState });
+  useAuthStateChangeListener({ authStateManager });
+  useTokenExpirationHandler({ logout });
+  useFirebaseAuthState({ authStateManager });
+  usePhoneAuthState({ authStateManager, phoneAuthService });
+  useUserRegistrationState({ authStateManager, userData });
   useLiffInitialization({ environment, liffService });
-  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
+  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ liffService });
   useLineAuthProcessing({
     shouldProcessRedirect,
     liffService,
-    setState: setStoreState,
     refetchUser,
   });
-  useAutoLogin({ environment, state, liffService, setState: setStoreState, refetchUser });
+  useAutoLogin({ environment, liffService, refetchUser });
 
   const actions = React.useMemo(
     () => ({ logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification }),

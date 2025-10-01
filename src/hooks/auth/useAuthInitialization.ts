@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/types/auth";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 type UseAuthInitializationArgs = {
   authStateManager: AuthStateManager | null;
-  setState: (partial: Partial<AuthState>) => void;
 };
 
-export const useAuthInitialization = ({
-  authStateManager,
-  setState,
-}: UseAuthInitializationArgs) => {
+export const useAuthInitialization = ({ authStateManager }: UseAuthInitializationArgs) => {
   const [isAuthInitialized, setIsAuthInitialized] = useState(false);
   const [authInitError, setAuthInitError] = useState<string | null>(null);
+  const setState = useAuthStore((s) => s.setState);
 
   useEffect(() => {
     if (!authStateManager) return;

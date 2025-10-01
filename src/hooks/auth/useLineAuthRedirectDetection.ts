@@ -2,18 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
-import { AuthState } from "@/types/auth";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 interface UseLineAuthRedirectDetectionProps {
-  state: AuthState;
   liffService: LiffService;
 }
 
 export const useLineAuthRedirectDetection = ({
-  state,
   liffService,
 }: UseLineAuthRedirectDetectionProps) => {
   const [shouldProcessRedirect, setShouldProcessRedirect] = useState(false);
+
+  const authState = useAuthStore((s) => s.state);
+
   const prevStateRef = useRef<{ authenticationState: string; isAuthenticating: boolean } | null>(
     null,
   );
@@ -21,8 +22,8 @@ export const useLineAuthRedirectDetection = ({
 
   useEffect(() => {
     const currentState = {
-      authenticationState: state.authenticationState,
-      isAuthenticating: state.isAuthenticating,
+      authenticationState: authState.authenticationState,
+      isAuthenticating: authState.isAuthenticating,
     };
 
     const currentLiffState = liffService.getState();
@@ -53,14 +54,14 @@ export const useLineAuthRedirectDetection = ({
       return;
     }
 
-    if (state.isAuthenticating) {
+    if (authState.isAuthenticating) {
       setShouldProcessRedirect(false);
       return;
     }
 
     if (
-      state.authenticationState !== "unauthenticated" &&
-      state.authenticationState !== "loading"
+      authState.authenticationState !== "unauthenticated" &&
+      authState.authenticationState !== "loading"
     ) {
       setShouldProcessRedirect(false);
       return;
@@ -74,7 +75,7 @@ export const useLineAuthRedirectDetection = ({
     }
 
     setShouldProcessRedirect(true);
-  }, [state.authenticationState, state.isAuthenticating, liffService]);
+  }, [authState.authenticationState, authState.isAuthenticating, liffService]);
 
   return { shouldProcessRedirect };
 };

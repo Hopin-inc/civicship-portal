@@ -2,21 +2,21 @@
 
 import { useEffect, useRef } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/types/auth";
 import { GqlCurrentUserQuery } from "@/types/graphql";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 interface UseUserRegistrationStateProps {
   authStateManager: AuthStateManager | null;
   userData: GqlCurrentUserQuery | undefined;
-  setState: React.Dispatch<React.SetStateAction<AuthState>>;
 }
 
 export const useUserRegistrationState = ({
   authStateManager,
   userData,
-  setState,
 }: UseUserRegistrationStateProps) => {
+  const setState = useAuthStore((s) => s.setState);
+
   const processedUserIdRef = useRef<string | null>(null);
   const authStateManagerRef = useRef(authStateManager);
   authStateManagerRef.current = authStateManager;
@@ -31,11 +31,10 @@ export const useUserRegistrationState = ({
 
       processedUserIdRef.current = userId;
 
-      setState((prev) => ({
-        ...prev,
-        currentUser: userData.currentUser?.user,
+      setState({
+        currentUser: userData.currentUser.user,
         authenticationState: "user_registered",
-      }));
+      });
 
       const currentAuthStateManager = authStateManagerRef.current;
       if (currentAuthStateManager) {

@@ -4,20 +4,17 @@ import { useEffect, useRef } from "react";
 import { lineAuth } from "@/lib/auth/firebase-config";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/types/auth";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 interface UseFirebaseAuthStateProps {
   authStateManager: AuthStateManager | null;
-  state: AuthState;
-  setState: React.Dispatch<React.SetStateAction<AuthState>>;
 }
 
-export const useFirebaseAuthState = ({
-  authStateManager,
-  state,
-  setState,
-}: UseFirebaseAuthStateProps) => {
+export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateProps) => {
+  const setState = useAuthStore((s) => s.setState);
+  const state = useAuthStore((s) => s.state);
+
   const authStateManagerRef = useRef(authStateManager);
   const stateRef = useRef(state);
 
@@ -26,15 +23,14 @@ export const useFirebaseAuthState = ({
 
   useEffect(() => {
     const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
-      setState((prev) => ({
-        ...prev,
+      setState({
         firebaseUser: user,
         authenticationState: user
-          ? prev.authenticationState === "loading"
+          ? stateRef.current.authenticationState === "loading"
             ? "line_authenticated"
-            : prev.authenticationState
+            : stateRef.current.authenticationState
           : "unauthenticated",
-      }));
+      });
 
       if (user) {
         try {

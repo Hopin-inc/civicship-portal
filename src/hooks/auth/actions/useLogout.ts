@@ -1,27 +1,23 @@
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { toast } from "sonner";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { logger } from "@/lib/logging";
-import { AuthState } from "@/types/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
-export const useLogout = (
-  setState: React.Dispatch<React.SetStateAction<AuthState>>,
-  liffService: LiffService,
-  phoneAuthService: PhoneAuthService,
-) => {
+export const useLogout = (liffService: LiffService, phoneAuthService: PhoneAuthService) => {
+  const setState = useAuthStore((s) => s.setState);
   return useCallback(async () => {
     try {
       liffService.logout();
       phoneAuthService.reset();
       TokenManager.clearAllTokens();
-      setState((prev) => ({
-        ...prev,
+      setState({
         firebaseUser: null,
         currentUser: null,
         authenticationState: "unauthenticated",
-      }));
+      });
     } catch (error) {
       logger.warn("Logout failed", { error });
       toast.error("ログアウトに失敗しました");

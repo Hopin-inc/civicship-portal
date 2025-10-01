@@ -3,20 +3,21 @@
 import { useEffect, useRef } from "react";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/types/auth";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 interface UsePhoneAuthStateProps {
   authStateManager: AuthStateManager | null;
   phoneAuthService: PhoneAuthService;
-  setState: React.Dispatch<React.SetStateAction<AuthState>>;
 }
 
 export const usePhoneAuthState = ({
   authStateManager,
   phoneAuthService,
-  setState,
 }: UsePhoneAuthStateProps) => {
+  const setState = useAuthStore((s) => s.setState);
+  const state = useAuthStore((s) => s.state);
+
   const authStateManagerRef = useRef(authStateManager);
   const phoneAuthServiceRef = useRef(phoneAuthService);
 
@@ -46,13 +47,10 @@ export const usePhoneAuthState = ({
       updatePhoneAuthState();
     }
 
-    setState((prev) => ({
-      ...prev,
-      authenticationState: isVerified
-        ? prev.authenticationState === "line_authenticated"
-          ? "phone_authenticated"
-          : prev.authenticationState
-        : prev.authenticationState,
-    }));
-  }, [setState]);
+    if (isVerified) {
+      if (state.authenticationState === "line_authenticated") {
+        setState({ authenticationState: "phone_authenticated" });
+      }
+    }
+  }, [setState, state.authenticationState]);
 };
