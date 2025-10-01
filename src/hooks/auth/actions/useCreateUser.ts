@@ -5,10 +5,11 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { logger } from "@/lib/logging";
 import { GqlCurrentPrefecture, useUserSignUpMutation } from "@/types/graphql";
-import { AuthState } from "@/types/auth";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
-export const useCreateUser = (state: AuthState, refetchUser: () => Promise<any>) => {
+export const useCreateUser = (refetchUser: () => Promise<any>) => {
   const [userSignUp] = useUserSignUpMutation();
+  const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
 
   return useCallback(
     async (
@@ -17,7 +18,7 @@ export const useCreateUser = (state: AuthState, refetchUser: () => Promise<any>)
       phoneUid: string | null,
     ): Promise<User | null> => {
       try {
-        if (!state.firebaseUser) {
+        if (!firebaseUser) {
           toast.error("LINE認証が完了していません");
           return null;
         }
@@ -46,8 +47,9 @@ export const useCreateUser = (state: AuthState, refetchUser: () => Promise<any>)
         if (data?.userSignUp?.user) {
           await refetchUser();
           toast.success("アカウントを作成しました");
-          return state.firebaseUser;
+          return firebaseUser;
         }
+
         toast.error("アカウント作成に失敗しました");
         return null;
       } catch (error) {
@@ -57,6 +59,6 @@ export const useCreateUser = (state: AuthState, refetchUser: () => Promise<any>)
         return null;
       }
     },
-    [state.firebaseUser, refetchUser, userSignUp],
+    [firebaseUser, refetchUser, userSignUp],
   );
 };

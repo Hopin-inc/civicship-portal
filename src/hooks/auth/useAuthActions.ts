@@ -1,4 +1,3 @@
-import { AuthState } from "@/types/auth";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { useLogout } from "@/hooks/auth/actions/useLogout";
@@ -9,7 +8,6 @@ import { useLogin } from "@/hooks/auth/actions/useLogin";
 import { useStartPhoneVerification } from "@/hooks/auth/actions/useStartPhoneVerification";
 
 export type AuthDeps = {
-  state: AuthState;
   authStateManager: AuthStateManager | null;
   liffService: LiffService;
   phoneAuthService: PhoneAuthService;
@@ -17,10 +15,10 @@ export type AuthDeps = {
 };
 
 export const useAuthActions = (deps: AuthDeps) => {
-  const { state, liffService, phoneAuthService, refetchUser, authStateManager } = deps;
+  const { liffService, phoneAuthService, refetchUser, authStateManager } = deps;
 
   const loginWithLiff = useLogin(liffService, refetchUser);
-  const createUser = useCreateUser(state, refetchUser);
+  const createUser = useCreateUser(refetchUser);
   const logout = useLogout(liffService, phoneAuthService);
 
   const startPhoneVerification = useStartPhoneVerification(phoneAuthService);
