@@ -6,10 +6,8 @@ import {
   GqlUser,
 } from "@/types/graphql";
 import { apolloClient } from "@/lib/apollo";
-import { DEFAULT_OPEN_GRAPH_IMAGE, fallbackMetadata } from "@/lib/communities/metadata";
+import { fallbackMetadata, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
 import React from "react";
-import { AuthProvider } from "@/contexts/AuthProvider";
-import { RouteGuard } from "@/components/auth/RouteGuard";
 
 type Props = {
   params: { id: string };
@@ -56,9 +54,5 @@ async function fetchUser(id: string): Promise<GqlUser | null> {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <AuthProvider>
-      <RouteGuard>{children}</RouteGuard>
-    </AuthProvider>
-  );
+  return <>{children}</>;
 }

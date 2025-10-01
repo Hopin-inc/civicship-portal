@@ -64,16 +64,6 @@ const requestLink = new ApolloLink((operation, forward) => {
         const accessToken = firebaseToken || lineTokens.accessToken;
 
         operation.setContext(({ headers = {} }) => {
-          logger.debug("Apollo: Setting request headers", {
-            component: "ApolloRequestLink",
-            timestamp: new Date().toISOString(),
-            operation: operation.operationName,
-            hasAccessToken: !!accessToken,
-            accessTokenLength: accessToken?.length || 0,
-            hasFirebaseToken: !!firebaseToken,
-            hasLineToken: !!lineTokens.accessToken,
-          });
-
           const baseHeaders = {
             ...headers,
             Authorization: accessToken ? `Bearer ${accessToken}` : "",
@@ -109,24 +99,14 @@ const requestLink = new ApolloLink((operation, forward) => {
         });
         const lineTokens = TokenManager.getLineTokens();
 
-        operation.setContext(({ headers = {} }) => {
-          logger.debug("Apollo: Setting fallback headers after error", {
-            component: "ApolloRequestLink",
-            timestamp: new Date().toISOString(),
-            operation: operation.operationName,
-            hasLineToken: !!lineTokens.accessToken,
-            lineTokenLength: lineTokens.accessToken?.length || 0,
-          });
-
-          return {
-            headers: {
-              ...headers,
-              Authorization: lineTokens.accessToken ? `Bearer ${lineTokens.accessToken}` : "",
-              "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-              "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
-            },
-          };
-        });
+        operation.setContext(({ headers = {} }) => ({
+          headers: {
+            ...headers,
+            Authorization: lineTokens.accessToken ? `Bearer ${lineTokens.accessToken}` : "",
+            "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+            "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
+          },
+        }));
 
         forward(operation).subscribe(observer);
       }

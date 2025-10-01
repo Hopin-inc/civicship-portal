@@ -136,45 +136,17 @@ export class AuthStateManager {
    */
   public async initialize(): Promise<void> {
     try {
-      logger.debug("AuthStateManager: Starting initialization", {
-        component: "AuthStateManager",
-        timestamp: new Date().toISOString(),
-        sessionId: this.sessionId,
-      });
-      
       this.setState("loading");
 
       const lineTokens = TokenManager.getLineTokens();
       const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
-      logger.debug("AuthStateManager: Line token check completed", {
-        component: "AuthStateManager",
-        timestamp: new Date().toISOString(),
-        hasValidLineToken,
-        hasAccessToken: !!lineTokens.accessToken,
-      });
-
       if (!hasValidLineToken) {
-        logger.debug("AuthStateManager: No valid line token, setting unauthenticated", {
-          component: "AuthStateManager",
-          timestamp: new Date().toISOString(),
-        });
         this.setState("unauthenticated");
         return;
       }
 
-      logger.debug("AuthStateManager: Starting user registration check", {
-        component: "AuthStateManager",
-        timestamp: new Date().toISOString(),
-      });
-
       const isUserRegistered = await this.checkUserRegistration();
-
-      logger.debug("AuthStateManager: User registration check completed", {
-        component: "AuthStateManager",
-        timestamp: new Date().toISOString(),
-        isUserRegistered,
-      });
 
       if (isUserRegistered) {
         this.setState("user_registered");
@@ -183,31 +155,17 @@ export class AuthStateManager {
         const hasValidPhoneToken =
           phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
 
-        logger.debug("AuthStateManager: Phone token check completed", {
-          component: "AuthStateManager",
-          timestamp: new Date().toISOString(),
-          hasValidPhoneToken,
-        });
-
         if (hasValidPhoneToken) {
           this.setState("phone_authenticated");
         } else {
           this.setState("line_authenticated");
         }
       }
-
-      logger.debug("AuthStateManager: Initialization completed successfully", {
-        component: "AuthStateManager",
-        timestamp: new Date().toISOString(),
-        finalState: this.currentState,
-      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error("AuthStateManager: Initialization failed", {
+      logger.error("Auth initialization failed", {
         error: errorMessage,
-        component: "AuthStateManager",
-        timestamp: new Date().toISOString(),
-        sessionId: this.sessionId,
+        component: "AuthStateManager"
       });
       throw error;
     }
@@ -220,42 +178,21 @@ export class AuthStateManager {
    */
   private async checkUserRegistration(): Promise<boolean> {
     try {
-      logger.debug("AuthStateManager: Starting user registration check", {
-        component: "AuthStateManager",
-        timestamp: new Date().toISOString(),
-      });
-
       const { lineAuth } = await import("./firebase-config");
       if (!lineAuth.currentUser) {
-        logger.debug("AuthStateManager: No Firebase current user", {
-          component: "AuthStateManager",
-          timestamp: new Date().toISOString(),
-        });
         return false;
       }
 
       let accessToken = null;
       try {
         accessToken = await lineAuth.currentUser.getIdToken();
-        logger.debug("AuthStateManager: Firebase token obtained", {
-          component: "AuthStateManager",
-          timestamp: new Date().toISOString(),
-          hasToken: !!accessToken,
-        });
       } catch (tokenError) {
         logger.info("Failed to get Firebase token for user registration check", {
           error: tokenError instanceof Error ? tokenError.message : String(tokenError),
           component: "AuthStateManager",
-          timestamp: new Date().toISOString(),
         });
         return false;
       }
-
-      logger.debug("AuthStateManager: Making GraphQL request", {
-        component: "AuthStateManager",
-        timestamp: new Date().toISOString(),
-        hasAccessToken: !!accessToken,
-      });
 
       const { data } = await apolloClient.query({
         query: GET_CURRENT_USER,
@@ -268,20 +205,11 @@ export class AuthStateManager {
       });
 
       const isRegistered = data?.currentUser?.user != null;
-      
-      logger.debug("AuthStateManager: GraphQL request completed", {
-        component: "AuthStateManager",
-        timestamp: new Date().toISOString(),
-        isRegistered,
-        hasUserData: !!data?.currentUser?.user,
-      });
-
       return isRegistered;
     } catch (error) {
-      logger.info("AuthStateManager: Failed to check user registration", {
+      logger.info("Failed to check user registration", {
         error: error instanceof Error ? error.message : String(error),
         component: "AuthStateManager",
-        timestamp: new Date().toISOString(),
       });
       return false;
     }
