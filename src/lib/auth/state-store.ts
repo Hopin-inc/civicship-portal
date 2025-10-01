@@ -1,14 +1,19 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useSyncExternalStore } from "react";
 
-export interface AuthStateV2 {
-  authenticationState: "loading" | "unauthenticated" | "line_authenticated" | "phone_authenticated" | "user_registered";
+export type AuthStateV2 = {
+  authenticationState:
+    | "loading"
+    | "unauthenticated"
+    | "line_authenticated"
+    | "phone_authenticated"
+    | "user_registered";
   isAuthenticating: boolean;
   firebaseUser: any | null;
   currentUser: any | null;
   environment: "web" | "liff";
-}
+};
 
 const initialState: AuthStateV2 = {
   authenticationState: "loading",
@@ -19,44 +24,33 @@ const initialState: AuthStateV2 = {
 };
 
 let globalState: AuthStateV2 = { ...initialState };
-const listeners: Set<(state: AuthStateV2) => void> = new Set();
+const listeners = new Set<() => void>();
 
-const notifyListeners = () => {
-  listeners.forEach(listener => listener(globalState));
+const emitChange = () => {
+  for (const listener of listeners) listener();
 };
 
-export const setGlobalAuthState = (newState: Partial<AuthStateV2>) => {
+export function setGlobalAuthState(newState: Partial<AuthStateV2>) {
   globalState = { ...globalState, ...newState };
-  notifyListeners();
-};
+  emitChange();
+}
 
-export const resetGlobalAuthState = () => {
+export function resetGlobalAuthState() {
   globalState = { ...initialState };
-  notifyListeners();
-};
+  emitChange();
+}
 
-export const getGlobalAuthState = () => globalState;
+export function getGlobalAuthState() {
+  return globalState;
+}
 
-export const useAuthStore = () => {
-  const [state, setState] = useState<AuthStateV2>(globalState);
-
-  const setAuthState = useCallback((newState: Partial<AuthStateV2>) => {
-    setGlobalAuthState(newState);
-  }, []);
-
-  const reset = useCallback(() => {
-    resetGlobalAuthState();
-  }, []);
-
-  useState(() => {
-    const listener = (newState: AuthStateV2) => setState(newState);
-    listeners.add(listener);
-    return () => listeners.delete(listener);
-  });
-
-  return {
-    ...state,
-    setAuthState,
-    reset,
-  };
-};
+export function useAuthStore() {
+  return useSyncExternalStore(
+    (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    () => globalState,
+    () => initialState // SSR fallback
+  );
+}
