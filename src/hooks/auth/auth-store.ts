@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { AuthState, AuthStore, PhoneAuthState } from "@/types/auth";
+import { AuthState, AuthStore, LiffState, PhoneAuthState } from "@/types/auth";
 import { detectEnvironment } from "@/lib/auth/environment-detector";
 
 const initialAuthState: AuthState = {
@@ -19,9 +19,22 @@ const initialPhoneAuthState: PhoneAuthState = {
   error: null,
 };
 
+const initialLiffAuthState: LiffState = {
+  isInitialized: false,
+  isLoggedIn: false,
+  profile: {
+    userId: null,
+    displayName: null,
+    pictureUrl: null,
+  },
+  error: null,
+};
+
 export const useAuthStore = create<AuthStore>((set) => ({
   state: initialAuthState,
   phoneAuth: initialPhoneAuthState,
+  liffAuth: initialLiffAuthState,
+
   setState: (partial) =>
     set((s) => ({
       state: { ...s.state, ...partial },
@@ -30,9 +43,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set((s) => ({
       phoneAuth: { ...s.phoneAuth, ...partial },
     })),
+  setLiffAuth: (partial) =>
+    set((s) => ({
+      liffAuth: { ...s.liffAuth, ...partial },
+    })),
+
   reset: () =>
     set({
       state: initialAuthState,
       phoneAuth: initialPhoneAuthState,
+      liffAuth: initialLiffAuthState,
     }),
 }));
