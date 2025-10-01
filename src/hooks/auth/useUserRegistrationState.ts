@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/contexts/AuthProvider";
+import { AuthState } from "@/types/auth";
 import { GqlCurrentUserQuery } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 
@@ -12,7 +12,11 @@ interface UseUserRegistrationStateProps {
   setState: React.Dispatch<React.SetStateAction<AuthState>>;
 }
 
-export const useUserRegistrationState = ({ authStateManager, userData, setState }: UseUserRegistrationStateProps) => {
+export const useUserRegistrationState = ({
+  authStateManager,
+  userData,
+  setState,
+}: UseUserRegistrationStateProps) => {
   const processedUserIdRef = useRef<string | null>(null);
   const authStateManagerRef = useRef(authStateManager);
   authStateManagerRef.current = authStateManager;
@@ -41,7 +45,7 @@ export const useUserRegistrationState = ({ authStateManager, userData, setState 
           } catch (error) {
             logger.error("Failed to update AuthStateManager user registration state", {
               error: error instanceof Error ? error.message : String(error),
-              component: "useUserRegistrationState"
+              component: "useUserRegistrationState",
             });
           }
         };

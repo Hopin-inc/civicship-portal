@@ -2,10 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
-import { AuthState } from "@/contexts/AuthProvider";
+import { AuthState } from "@/types/auth";
 import { logger } from "@/lib/logging";
-
-import { AuthEnvironment } from "@/lib/auth/environment-detector";
 
 interface UseLineAuthProcessingProps {
   shouldProcessRedirect: boolean;
@@ -14,7 +12,12 @@ interface UseLineAuthProcessingProps {
   refetchUser: () => Promise<any>;
 }
 
-export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setState, refetchUser }: UseLineAuthProcessingProps) => {
+export const useLineAuthProcessing = ({
+  shouldProcessRedirect,
+  liffService,
+  setState,
+  refetchUser,
+}: UseLineAuthProcessingProps) => {
   const processedRef = useRef(false);
   const liffServiceRef = useRef(liffService);
   const setStateRef = useRef(setState);
@@ -36,7 +39,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         if (!initialized) {
           logger.info("LIFF init failed", {
             authType: "liff",
-            component: "useLineAuthProcessing"
+            component: "useLineAuthProcessing",
           });
           return;
         }
@@ -51,7 +54,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         if (!success) {
           logger.info("signInWithLiffToken failed", {
             authType: "liff",
-            component: "useLineAuthProcessing"
+            component: "useLineAuthProcessing",
           });
           return;
         }
@@ -61,7 +64,7 @@ export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setS
         logger.info("Error during LINE auth", {
           authType: "liff",
           error: err instanceof Error ? err.message : String(err),
-          component: "useLineAuthProcessing"
+          component: "useLineAuthProcessing",
         });
       } finally {
         setStateRef.current((prev) => ({ ...prev, isAuthenticating: false }));
