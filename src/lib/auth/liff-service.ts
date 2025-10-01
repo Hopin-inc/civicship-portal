@@ -23,6 +23,8 @@ export type LiffState = {
   error: Error | null;
 };
 
+export type InitOptions = { silent?: boolean };
+
 /**
  * LIFF認証サービス
  */
@@ -37,8 +39,8 @@ export class LiffService {
     pictureUrl: null as string | null,
   };
   private error: Error | null = null;
-  private preInitPromise: Promise<void> | null = null;
-  private initPromise: Promise<void> | null = null;
+  private initialized = false;
+  private initPromise: Promise<boolean> | null = null;
 
   /**
    * コンストラクタ
@@ -72,79 +74,48 @@ export class LiffService {
   }
 
   /**
-   * LIFF SDKの事前初期化（Root Layout用）
-   * SDK初期化のみを行い、認証ロジックは含まない
+   * LIFF SDKが利用可能かどうかを確認
    */
-  public async preInitialize(): Promise<void> {
-    if (this.state === "pre-initialized" || this.state === "initialized") {
-      return;
-    }
-    if (this.preInitPromise) {
-      return this.preInitPromise;
-    }
-
-    this.state = "pre-initializing";
-    this.preInitPromise = (async () => {
-      try {
-        const { default: liff } = await import("@line/liff");
-        await liff.init({ liffId: this.liffId });
-        
-        const anyLiff = liff as any;
-        if (anyLiff?.ready?.then) {
-          await anyLiff.ready;
-        }
-
-        this.isLoggedIn = liff.isLoggedIn();
-        this.state = "pre-initialized";
-        this.error = null;
-      } catch (error) {
-        this.state = "failed";
-        this.error = error as Error;
-        this.preInitPromise = null;
-        
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
-                                       errorMessage.includes("LINE") ||
-                                       errorMessage.includes("Load failed");
-        
-        
-        throw error;
-      }
-    })();
-
-    return this.preInitPromise;
+  public available(): boolean {
+    return typeof window !== "undefined" && !!(window as any).liff;
   }
 
   /**
-   * LIFF認証初期化（AuthProvider用）
-   * SDK初期化を確保してから認証ロジックを実行
+   * LIFF SDKの冪等初期化
+   * @param opts 初期化オプション
+   * @returns 初期化が成功したかどうか
    */
-  public async initialize(): Promise<void> {
-    if (this.state === "initialized") {
-      return;
-    }
-    if (this.initPromise) {
-      return this.initPromise;
-    }
+  public async ensureInitialized(opts: InitOptions = {}): Promise<boolean> {
+    if (!this.available()) return false;
+    if (this.initialized) return true;
+    if (this.initPromise) return this.initPromise;
+
+    const w = window as any;
+    const liff = w.liff as any;
 
     this.initPromise = (async () => {
       try {
-        await this.preInitialize();
-        
-        this.state = "initializing";
+        await liff.init({ liffId: this.liffId });
+        this.initialized = true;
+        this.state = "initialized";
+        this.isLoggedIn = liff.isLoggedIn();
+        this.error = null;
 
         if (this.isLoggedIn) {
           await this.updateProfile();
         }
 
-        this.state = "initialized";
-      } catch (error) {
+        return true;
+      } catch (e) {
+        if (!opts.silent) {
+          console.warn("[LIFF] init failed", e);
+        }
+        this.initialized = false;
         this.state = "failed";
-        this.error = error as Error;
+        this.error = e as Error;
+        return false;
+      } finally {
         this.initPromise = null;
-        
-        
-        throw error;
       }
     })();
 
@@ -152,42 +123,49 @@ export class LiffService {
   }
 
   /**
-   * LIFFでログイン
+   * LIFF認証初期化（AuthProvider用）
+   * SDK初期化を確保してから認証ロジックを実行
+   */
+  public async initialize(): Promise<void> {
+    const success = await this.ensureInitialized();
+    if (!success) {
+      throw new Error("LIFF initialization failed");
+    }
+  }
+
+  /**
+   * ログイン要求。未ログインのときだけ redirect する。
+   * 戻り値で「redirectした/してない」を上位が把握できるようにする。
+   */
+  public async loginWithLiff(redirectUri: string): Promise<"redirect" | "ok" | "unavailable" | "init_failed"> {
+    if (!this.available()) return "unavailable";
+    const ok = await this.ensureInitialized({ silent: true });
+    if (!ok) return "init_failed";
+
+    const w = window as any;
+    const liff = w.liff as any;
+
+    if (!liff.isLoggedIn()) {
+      liff.login({ redirectUri }); // ← ここでフロー終了（以降の処理はしない）
+      return "redirect";
+    }
+    return "ok";
+  }
+
+  /**
+   * LIFFでログイン（従来のインターフェース維持）
    * @param redirectPath リダイレクト先のパス（オプション）
    * @returns ログインが成功したかどうか
    */
   public async login(redirectPath?: RawURIComponent): Promise<boolean> {
-    try {
-      if (this.state !== "initialized") {
-        await this.initialize();
-      }
+    const redirectUri = typeof window !== "undefined"
+      ? redirectPath
+        ? window.location.origin + redirectPath
+        : window.location.origin
+      : "";
 
-      const { default: liff } = await import("@line/liff");
-
-      if (liff.isInClient()) {
-        this.isLoggedIn = true;
-      } else {
-        const redirectUri = typeof window !== "undefined"
-          ? redirectPath
-            ? window.location.origin + redirectPath
-            : window.location.origin
-          : undefined;
-
-        liff.login({ redirectUri });
-        return false; // リダイレクトするのでここには到達しない
-      }
-
-      await this.updateProfile();
-      return true;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
-                                     errorMessage.includes("LINE") ||
-                                     errorMessage.includes("Load failed");
-      
-      this.error = error as Error;
-      return false;
-    }
+    const result = await this.loginWithLiff(redirectUri);
+    return result === "ok";
   }
 
   /**

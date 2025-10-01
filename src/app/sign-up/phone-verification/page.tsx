@@ -27,7 +27,7 @@ export default function PhoneVerificationPage() {
     if (hasRedirected.current) return;
     const env = detectEnvironment();
 
-    if (env === AuthEnvironment.LINE_BROWSER) {
+    if (env === AuthEnvironment.LIFF_WITH_SDK) {
       hasRedirected.current = true;
       const redirectUrl = nextParam
         ? `/sign-up/phone-verification/line-browser?next=${nextParam}`

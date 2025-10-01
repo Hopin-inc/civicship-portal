@@ -13,7 +13,7 @@ interface UseLiffInitializationProps {
 export const useLiffInitialization = ({ environment, liffService }: UseLiffInitializationProps) => {
   useEffect(() => {
     const initializeLiff = async () => {
-      if (environment !== AuthEnvironment.LIFF) return;
+      if (environment !== AuthEnvironment.LIFF_IN_CLIENT) return;
 
       try {
         await liffService.initialize();

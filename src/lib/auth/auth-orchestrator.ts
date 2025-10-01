@@ -178,22 +178,29 @@ export class AuthOrchestrator {
       timestamp: new Date().toISOString(),
     });
 
-    if (environment === AuthEnvironment.LIFF || environment === AuthEnvironment.LINE_BROWSER) {
+    if (environment === AuthEnvironment.LIFF_IN_CLIENT || environment === AuthEnvironment.LIFF_WITH_SDK) {
       try {
-        await liffService.initialize();
-        logger.debug("AuthOrchestrator: LIFF initialization completed", {
-          component: "AuthOrchestrator",
-          timestamp: new Date().toISOString(),
-        });
+        const ok = await liffService.ensureInitialized({ silent: true });
+        if (!ok) {
+          logger.warn("AuthOrchestrator: LIFF init failed; falling back to WEB auth", {
+            component: "AuthOrchestrator",
+            timestamp: new Date().toISOString(),
+          });
+        } else {
+          logger.debug("AuthOrchestrator: LIFF initialization completed", {
+            component: "AuthOrchestrator",
+            timestamp: new Date().toISOString(),
+          });
+        }
       } catch (error) {
-        logger.warn("AuthOrchestrator: LIFF initialization failed, continuing with other phases", {
+        logger.error("AuthOrchestrator: LIFF init exception", {
           component: "AuthOrchestrator",
           error: error instanceof Error ? error.message : String(error),
           timestamp: new Date().toISOString(),
         });
       }
     } else {
-      logger.debug("AuthOrchestrator: Skipping LIFF initialization for non-LIFF environment", {
+      logger.debug("AuthOrchestrator: Skipping LIFF initialization for WEB environment", {
         component: "AuthOrchestrator",
         environment,
         timestamp: new Date().toISOString(),
@@ -237,7 +244,7 @@ export class AuthOrchestrator {
       timestamp: new Date().toISOString(),
     });
 
-    if (environment === AuthEnvironment.LIFF || environment === AuthEnvironment.LINE_BROWSER) {
+    if ((environment === AuthEnvironment.LIFF_IN_CLIENT || environment === AuthEnvironment.LIFF_WITH_SDK) && liffService.available()) {
       try {
         const liffState = liffService.getState();
         if ((liffState.state === "pre-initialized" || liffState.state === "initialized") && liffState.isLoggedIn) {
@@ -276,9 +283,10 @@ export class AuthOrchestrator {
         });
       }
     } else {
-      logger.debug("AuthOrchestrator: Skipping auto-login for non-LIFF environment", {
+      logger.debug("AuthOrchestrator: Skipping auto-login for WEB environment", {
         component: "AuthOrchestrator",
         environment,
+        available: liffService.available(),
         timestamp: new Date().toISOString(),
       });
     }

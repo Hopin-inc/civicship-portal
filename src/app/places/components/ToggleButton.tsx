@@ -12,7 +12,7 @@ interface PlaceToggleButtonProps {
 
 const PlaceToggleButton: React.FC<PlaceToggleButtonProps> = ({ isMapMode, onClick }) => {
   const env = detectEnvironment();
-  const isLiff = env === AuthEnvironment.LIFF;
+  const isLiff = env === AuthEnvironment.LIFF_IN_CLIENT;
 
   return (
     <div className={`fixed left-1/2 -translate-x-1/2 z-50 ${isLiff ? "bottom-28" : "bottom-24"}`}>

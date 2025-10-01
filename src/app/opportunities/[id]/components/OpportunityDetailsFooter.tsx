@@ -36,7 +36,7 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
   });
 
   const env = detectEnvironment();
-  const isLiff = env === AuthEnvironment.LIFF;
+  const isLiff = env === AuthEnvironment.LIFF_IN_CLIENT;
 
   const renderActionElement = () => {
     if (disableReason && disableReason in DISABLE_MESSAGES) {

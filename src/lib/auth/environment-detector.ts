@@ -4,25 +4,33 @@
  * 認証環境の種類を表す列挙型
  */
 export enum AuthEnvironment {
-  LIFF = "liff",
-  LINE_BROWSER = "line_browser",
-  REGULAR_BROWSER = "regular_browser",
+  LIFF_IN_CLIENT = "liff_in_client",   // LINEアプリ内 WebView
+  LIFF_WITH_SDK = "liff_with_sdk",     // SDKはあるが in-client ではない（外部ブラウザ）
+  WEB = "web",                         // SDKなしのふつうのWeb
 }
 
 /**
- * 現在の実行環境を検出する
+ * 現在の実行環境を検出する（機能検出ベース）
  * @returns 検出された環境タイプ
  */
 export const detectEnvironment = (): AuthEnvironment => {
-  if (typeof window !== "undefined" && window.liff && window.liff.isInClient()) {
-    return AuthEnvironment.LIFF;
+  if (typeof window === "undefined") return AuthEnvironment.WEB; // SSR安全
+
+  const w = window as any;
+  const liff = w?.liff;
+
+  if (liff) {
+    try {
+      if (typeof liff.isInClient === "function" && liff.isInClient()) {
+        return AuthEnvironment.LIFF_IN_CLIENT;
+      }
+      return AuthEnvironment.LIFF_WITH_SDK;
+    } catch {
+      return AuthEnvironment.LIFF_WITH_SDK;
+    }
   }
 
-  if (typeof navigator !== "undefined" && /Line/i.test(navigator.userAgent)) {
-    return AuthEnvironment.LINE_BROWSER;
-  }
-
-  return AuthEnvironment.REGULAR_BROWSER;
+  return AuthEnvironment.WEB;
 };
 
 /**
@@ -30,5 +38,5 @@ export const detectEnvironment = (): AuthEnvironment => {
  * @returns LIFF内で実行されている場合はtrue
  */
 export const isRunningInLiff = (): boolean => {
-  return detectEnvironment() === AuthEnvironment.LIFF;
+  return detectEnvironment() === AuthEnvironment.LIFF_IN_CLIENT;
 };
