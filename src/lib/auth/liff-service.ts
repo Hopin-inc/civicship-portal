@@ -8,9 +8,6 @@ import retry from "retry";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
 
-/**
- * LIFF初期化状態の型定義
- */
 export type LiffState = {
   isInitialized: boolean;
   isLoggedIn: boolean;
@@ -22,19 +19,12 @@ export type LiffState = {
   error: Error | null;
 };
 
-/**
- * LIFF認証サービス
- */
 export class LiffService {
   private static instance: LiffService;
   private liffId: string;
   private state: LiffState;
   private initializing = false;
 
-  /**
-   * コンストラクタ
-   * @param liffId LIFF ID
-   */
   private constructor(liffId: string) {
     this.liffId = liffId;
     this.state = {
@@ -57,11 +47,10 @@ export class LiffService {
     return `${baseUrl}?next=${encodedNext}`;
   }
 
-  /**
-   * シングルトンインスタンスを取得
-   * @param liffId LIFF ID（初回のみ必要）
-   * @returns LiffServiceのインスタンス
-   */
+  public static isLiffEnvironment(): boolean {
+    return liff.isInClient();
+  }
+
   public static getInstance(liffId?: string): LiffService {
     if (!LiffService.instance) {
       if (!liffId) {
@@ -72,10 +61,6 @@ export class LiffService {
     return LiffService.instance;
   }
 
-  /**
-   * LIFF SDKを初期化
-   * @returns 初期化が成功したかどうか
-   */
   public async initialize(): Promise<boolean> {
     try {
       if (this.state.isInitialized) {
@@ -97,10 +82,11 @@ export class LiffService {
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
-                                     errorMessage.includes("LINE") ||
-                                     errorMessage.includes("Load failed");
-      
+      const isEnvironmentConstraint =
+        errorMessage.includes("LIFF") ||
+        errorMessage.includes("LINE") ||
+        errorMessage.includes("Load failed");
+
       if (isEnvironmentConstraint) {
         logger.warn("LIFF environment initialization limitation", {
           authType: "liff",
@@ -119,16 +105,11 @@ export class LiffService {
       }
       this.state.error = error as Error;
       return false;
-    }finally {
+    } finally {
       this.initializing = false;
     }
   }
 
-  /**
-   * LIFFでログイン
-   * @param redirectPath リダイレクト先のパス（オプション）
-   * @returns ログインが成功したかどうか
-   */
   public async login(redirectPath?: RawURIComponent): Promise<boolean> {
     try {
       if (!this.state.isInitialized) {
@@ -138,11 +119,12 @@ export class LiffService {
       if (liff.isInClient()) {
         this.state.isLoggedIn = true;
       } else {
-        const redirectUri = typeof window !== "undefined"
-          ? redirectPath
-            ? window.location.origin + redirectPath
-            : window.location.origin
-          : undefined;
+        const redirectUri =
+          typeof window !== "undefined"
+            ? redirectPath
+              ? window.location.origin + redirectPath
+              : window.location.origin
+            : undefined;
 
         liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない
@@ -152,10 +134,11 @@ export class LiffService {
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
-                                     errorMessage.includes("LINE") ||
-                                     errorMessage.includes("Load failed");
-      
+      const isEnvironmentConstraint =
+        errorMessage.includes("LIFF") ||
+        errorMessage.includes("LINE") ||
+        errorMessage.includes("Load failed");
+
       if (isEnvironmentConstraint) {
         logger.warn("LIFF environment login limitation", {
           authType: "liff",
@@ -177,9 +160,6 @@ export class LiffService {
     }
   }
 
-  /**
-   * LIFFからログアウト
-   */
   public logout(): void {
     if (this.state.isInitialized && this.state.isLoggedIn) {
       liff.logout();
@@ -192,9 +172,6 @@ export class LiffService {
     }
   }
 
-  /**
-   * LIFFプロファイル情報を更新
-   */
   private async updateProfile(): Promise<void> {
     try {
       if (!this.state.isInitialized || !this.state.isLoggedIn) {
@@ -216,10 +193,6 @@ export class LiffService {
     }
   }
 
-  /**
-   * LIFFアクセストークンを取得
-   * @returns LIFFアクセストークン
-   */
   public getAccessToken(): string | null {
     if (!this.state.isInitialized || !this.state.isLoggedIn) {
       return null;
@@ -227,10 +200,6 @@ export class LiffService {
     return liff.getAccessToken();
   }
 
-  /**
-   * LIFFトークンを使用してFirebase認証を行う
-   * @returns 認証が成功したかどうか
-   */
   public async signInWithLiffToken(): Promise<boolean> {
     const accessToken = this.getAccessToken();
     if (!accessToken) {
@@ -342,10 +311,6 @@ export class LiffService {
     });
   }
 
-  /**
-   * 現在のLIFF状態を取得
-   * @returns LIFF状態
-   */
   public getState(): LiffState {
     return { ...this.state };
   }

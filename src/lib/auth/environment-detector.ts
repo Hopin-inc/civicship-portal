@@ -1,20 +1,15 @@
 "use client";
 
-/**
- * 認証環境の種類を表す列挙型
- */
+import { LiffService } from "@/lib/auth/liff-service";
+
 export enum AuthEnvironment {
   LIFF = "liff",
   LINE_BROWSER = "line_browser",
   REGULAR_BROWSER = "regular_browser",
 }
 
-/**
- * 現在の実行環境を検出する
- * @returns 検出された環境タイプ
- */
 export const detectEnvironment = (): AuthEnvironment => {
-  if (typeof window !== "undefined" && window.liff && window.liff.isInClient()) {
+  if (LiffService.isLiffEnvironment()) {
     return AuthEnvironment.LIFF;
   }
 
@@ -25,10 +20,6 @@ export const detectEnvironment = (): AuthEnvironment => {
   return AuthEnvironment.REGULAR_BROWSER;
 };
 
-/**
- * 現在の環境がLIFF内かどうかを確認
- * @returns LIFF内で実行されている場合はtrue
- */
 export const isRunningInLiff = (): boolean => {
   return detectEnvironment() === AuthEnvironment.LIFF;
 };
