@@ -1,18 +1,11 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { User } from "firebase/auth";
+import React, { createContext, useContext, useState } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
-import { TokenManager } from "@/lib/auth/token-manager";
-import { lineAuth } from "@/lib/auth/firebase-config";
 import { detectEnvironment } from "@/lib/auth/environment-detector";
-import { GqlCurrentPrefecture, useCurrentUserQuery, useUserSignUpMutation } from "@/types/graphql";
-import { toast } from "sonner";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCurrentUserQuery } from "@/types/graphql";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared";
 import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
 import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
 import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
@@ -21,11 +14,12 @@ import { useUserRegistrationState } from "@/hooks/auth/useUserRegistrationState"
 import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
-import { logger } from "@/lib/logging";
-import { maskPhoneNumber } from "@/lib/logging/client/utils";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
-import { RawURIComponent } from "@/utils/path";
 import { AuthContextType, AuthProviderProps, AuthState } from "@/types/auth";
+import { useAuthActions } from "@/hooks/auth/useAuthActions";
+import { useAuthInitialization } from "@/hooks/auth/useAuthInitialization";
+import { AuthProviderView } from "@/hooks/auth/AuthProviderView";
+import { useAuthValue } from "@/hooks/auth/useAuthValue";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -45,8 +39,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticating: false,
   });
 
-  const [userSignUp] = useUserSignUpMutation();
-
   const {
     data: userData,
     loading: userLoading,
@@ -63,55 +55,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return AuthStateManager.getInstance();
   }, []);
 
-  const logout = useCallback(async (): Promise<void> => {
-    try {
-      liffService.logout();
+  const { isAuthInitialized, authInitError, retryInitialization } = useAuthInitialization({
+    authStateManager,
+    setState,
+  });
 
-      await lineAuth.signOut();
-
-      phoneAuthService.reset();
-
-      TokenManager.clearAllTokens();
-
-      setState((prev) => ({
-        ...prev,
-        firebaseUser: null,
-        currentUser: null,
-        authenticationState: "unauthenticated",
-      }));
-    } catch (error) {
-      logger.warn("Logout process failed", {
-        error: error instanceof Error ? error.message : String(error),
-        component: "AuthProvider",
-        errorCategory: "user_environment",
-        retryable: true,
-      });
-    }
-  }, [liffService, phoneAuthService]);
-
-  const [isAuthInitialized, setIsAuthInitialized] = useState(false);
-  const [authInitError, setAuthInitError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!authStateManager) return;
-
-    const initializeAuth = async () => {
-      try {
-        await authStateManager.initialize();
-        setIsAuthInitialized(true);
-        setAuthInitError(null);
-        const currentState = authStateManager.getState();
-        setState((prev) => ({ ...prev, authenticationState: currentState }));
-      } catch (error) {
-        setAuthInitError(error instanceof Error ? error.message : "認証の初期化に失敗しました");
-        setIsAuthInitialized(false);
-      }
-    };
-
-    if (!isAuthInitialized && !authInitError) {
-      initializeAuth();
-    }
-  }, [authStateManager, isAuthInitialized, authInitError]);
+  const { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode } =
+    useAuthActions({
+      state,
+      setState,
+      authStateManager,
+      liffService,
+      phoneAuthService,
+      refetchUser,
+    });
 
   useAuthStateChangeListener({ authStateManager, setState });
   useTokenExpirationHandler({ state, setState, logout });
@@ -123,213 +80,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
   useAutoLogin({ environment, state, liffService, setState, refetchUser });
 
-  const loginWithLiff = async (redirectPath?: RawURIComponent): Promise<boolean> => {
-    setState((prev) => ({ ...prev, isAuthenticating: true }));
+  const actions = React.useMemo(
+    () => ({ logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification }),
+    [logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification],
+  );
+  const value = useAuthValue({
+    state,
+    userLoading,
+    refetchUser,
+    phoneAuthService,
+    actions,
+  });
 
-    try {
-      await liffService.initialize();
-
-      const loggedIn = await liffService.login(redirectPath);
-      if (!loggedIn) {
-        return false; // リダイレクトするのでここには到達しない
-      }
-
-      const success = await liffService.signInWithLiffToken();
-
-      if (success) {
-        await refetchUser();
-      }
-
-      return success;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const isEnvironmentConstraint =
-        errorMessage.includes("LIFF") ||
-        errorMessage.includes("LINE") ||
-        errorMessage.includes("Load failed");
-
-      if (isEnvironmentConstraint) {
-        logger.warn("LIFF environment limitation", {
-          authType: "liff",
-          error: errorMessage,
-          component: "AuthProvider",
-          errorCategory: "environment_constraint",
-          expected: true,
-        });
-      } else {
-        logger.info("LIFF login process failed", {
-          authType: "liff",
-          error: errorMessage,
-          component: "AuthProvider",
-          errorCategory: "auth_temporary",
-        });
-      }
-      return false;
-    } finally {
-      setState((prev) => ({ ...prev, isAuthenticating: false }));
-    }
-  };
-
-  const startPhoneVerification = async (phoneNumber: string): Promise<string | null> => {
-    return await phoneAuthService.startPhoneVerification(phoneNumber);
-  };
-
-  const verifyPhoneCode = async (verificationCode: string): Promise<boolean> => {
-    const success = await phoneAuthService.verifyPhoneCode(verificationCode);
-
-    if (success) {
-      setState((prev) => ({
-        ...prev,
-        authenticationState: "phone_authenticated",
-      }));
-
-      if (authStateManager) {
-        try {
-          const timestamp = new Date().toISOString();
-          logger.debug("Updating phone auth state in verifyPhoneCode", {
-            timestamp,
-            component: "AuthProvider",
-          });
-          await authStateManager.handlePhoneAuthStateChange(true);
-          logger.debug("AuthStateManager phone state updated successfully in verifyPhoneCode", {
-            timestamp,
-            component: "AuthProvider",
-          });
-        } catch (error) {
-          logger.warn("Failed to update AuthStateManager phone state in verifyPhoneCode", {
-            error: error instanceof Error ? error.message : String(error),
-            component: "AuthProvider",
-            errorCategory: "state_management",
-            retryable: true,
-          });
-        }
-      }
-    }
-
-    return success;
-  };
-
-  const createUser = async (
-    name: string,
-    prefecture: GqlCurrentPrefecture,
-    phoneUid: string | null,
-  ): Promise<User | null> => {
-    try {
-      if (!state.firebaseUser) {
-        toast.error("LINE認証が完了していません");
-        return null;
-      }
-
-      if (!phoneUid) {
-        toast.error("電話番号認証が完了していません");
-        return null;
-      }
-
-      const phoneTokens = TokenManager.getPhoneTokens();
-      const lineTokens = TokenManager.getLineTokens();
-
-      logger.debug("Creating user with input", {
-        name,
-        currentPrefecture: prefecture,
-        communityId: COMMUNITY_ID,
-        phoneUid,
-        phoneNumber: maskPhoneNumber(phoneTokens.phoneNumber || ""),
-        component: "AuthProvider",
-      });
-
-      const { data } = await userSignUp({
-        variables: {
-          input: {
-            name,
-            currentPrefecture: prefecture, // Changed from prefecture to currentPrefecture to match backend schema
-            communityId: COMMUNITY_ID,
-            phoneUid,
-            phoneNumber: phoneTokens.phoneNumber ?? undefined,
-            lineRefreshToken: lineTokens.refreshToken ?? undefined,
-            phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
-          },
-        },
-      });
-
-      if (data?.userSignUp?.user) {
-        await refetchUser();
-        toast.success("アカウントを作成しました");
-        return state.firebaseUser;
-      } else {
-        toast.error("アカウント作成に失敗しました");
-        return null;
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const isValidationError =
-        errorMessage.includes("validation") ||
-        errorMessage.includes("invalid") ||
-        errorMessage.includes("required");
-
-      if (isValidationError) {
-        logger.info("User creation validation error", {
-          error: errorMessage,
-          component: "AuthProvider",
-          errorCategory: "validation_error",
-        });
-      } else {
-        logger.error("User creation system error", {
-          error: errorMessage,
-          component: "AuthProvider",
-          errorCategory: "system_error",
-        });
-      }
-
-      toast.error("アカウント作成に失敗しました", {
-        description: error instanceof Error ? error.message : "不明なエラーが発生しました",
-      });
-      return null;
-    }
-  };
-
-  const value: AuthContextType = {
-    user: state.currentUser,
-    firebaseUser: state.firebaseUser,
-    uid: state.firebaseUser?.uid || null,
-    isAuthenticated: ["line_authenticated", "phone_authenticated", "user_registered"].includes(
-      state.authenticationState,
-    ),
-    isPhoneVerified: ["phone_authenticated", "user_registered"].includes(state.authenticationState),
-    isUserRegistered: state.authenticationState === "user_registered",
-    authenticationState: state.authenticationState,
-    isAuthenticating: state.isAuthenticating,
-    environment: state.environment,
-    loginWithLiff,
-    logout,
-    phoneAuth: {
-      startPhoneVerification,
-      verifyPhoneCode,
-      clearRecaptcha: () => phoneAuthService.clearRecaptcha(),
-      isVerifying: phoneAuthService.getState().isVerifying,
-      phoneUid: phoneAuthService.getState().phoneUid,
-    },
-    createUser,
-    updateAuthState: async () => {
-      await refetchUser();
-    },
-    loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
-  };
-
-  if (!isAuthInitialized) {
-    if (authInitError) {
-      const refetchRef = {
-        current: () => {
-          setAuthInitError(null);
-          setIsAuthInitialized(false);
-        },
-      };
-      return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
-    }
-
-    return <LoadingIndicator fullScreen={true} />;
-  }
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthProviderView
+      isAuthInitialized={isAuthInitialized}
+      authInitError={authInitError}
+      retryInitialization={retryInitialization}
+    >
+      <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+    </AuthProviderView>
+  );
 };
 
 export const useAuth = (): AuthContextType => {
