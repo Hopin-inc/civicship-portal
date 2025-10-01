@@ -1,0 +1,9 @@
+export const ENABLE_AUTH_V2 =
+  typeof process !== "undefined" && process.env.NEXT_PUBLIC_ENABLE_AUTH_V2 === "1";
+
+export const AUTH_V2_FLAGS = {
+  ENABLE_DAL: ENABLE_AUTH_V2,
+  ENABLE_USE_ACTION_STATE: ENABLE_AUTH_V2,
+  ENABLE_NEW_HOOKS: ENABLE_AUTH_V2,
+  ENABLE_SERVER_SESSION: ENABLE_AUTH_V2,
+} as const;
