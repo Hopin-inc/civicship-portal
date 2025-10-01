@@ -46,7 +46,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const shouldShowBackButton =
     config.showBackButton &&
     pathname !== "/" &&
-    !(env === AuthEnvironment.LIFF_IN_CLIENT || env === AuthEnvironment.LIFF_WITH_SDK);
+    !(env === AuthEnvironment.LIFF);
 
   return (
     <header

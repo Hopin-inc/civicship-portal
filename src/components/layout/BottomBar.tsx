@@ -20,7 +20,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const placeId = searchParams.get("placeId");
 
   const env = detectEnvironment();
-  const isLiff = env === AuthEnvironment.LIFF_IN_CLIENT;
+  const isLiff = env === AuthEnvironment.LIFF;
 
   const { isVisible } = useScrollDirection({ threshold: 20 });
 

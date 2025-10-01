@@ -23,18 +23,6 @@ export default function PhoneVerificationPage() {
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next") ?? searchParams.get("liff.state");
 
-  useEffect(() => {
-    if (hasRedirected.current) return;
-    const env = detectEnvironment();
-
-    if (env === AuthEnvironment.LIFF_WITH_SDK) {
-      hasRedirected.current = true;
-      const redirectUrl = nextParam
-        ? `/sign-up/phone-verification/line-browser?next=${nextParam}`
-        : "/sign-up/phone-verification/line-browser";
-      router.replace(redirectUrl);
-    }
-  }, [nextParam, router]);
 
   return (
     <div className="container mx-auto py-8">

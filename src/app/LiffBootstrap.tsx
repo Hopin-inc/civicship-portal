@@ -6,7 +6,7 @@ import { detectEnvironment, AuthEnvironment } from "@/lib/auth/environment-detec
 
 export default function LiffBootstrap() {
   useEffect(() => {
-    if (detectEnvironment() !== AuthEnvironment.LIFF_IN_CLIENT) return;
+    if (detectEnvironment() !== AuthEnvironment.LIFF) return;
     const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
     if (!liffId) return;
     

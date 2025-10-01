@@ -28,7 +28,7 @@ const useAutoLogin = ({
   const prevLiffStateRef = useRef<{ state: string; isLoggedIn: boolean } | null>(null);
 
   useEffect(() => {
-    if (environment !== AuthEnvironment.LIFF_IN_CLIENT) {
+    if (environment !== AuthEnvironment.LIFF) {
       return;
     }
 

@@ -178,7 +178,7 @@ export class AuthOrchestrator {
       timestamp: new Date().toISOString(),
     });
 
-    if (environment === AuthEnvironment.LIFF_IN_CLIENT || environment === AuthEnvironment.LIFF_WITH_SDK) {
+    if (environment === AuthEnvironment.LIFF) {
       try {
         const ok = await liffService.ensureInitialized({ silent: true });
         if (!ok) {
@@ -244,7 +244,7 @@ export class AuthOrchestrator {
       timestamp: new Date().toISOString(),
     });
 
-    if ((environment === AuthEnvironment.LIFF_IN_CLIENT || environment === AuthEnvironment.LIFF_WITH_SDK) && liffService.available()) {
+    if (environment === AuthEnvironment.LIFF && liffService.available()) {
       try {
         const liffState = liffService.getState();
         if ((liffState.state === "pre-initialized" || liffState.state === "initialized") && liffState.isLoggedIn) {
