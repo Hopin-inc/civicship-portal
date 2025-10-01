@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import { AuthState } from "@/types/auth";
+import { AuthState, AuthStore, PhoneAuthState } from "@/types/auth";
 import { detectEnvironment } from "@/lib/auth/environment-detector";
 
-const initialState: AuthState = {
+const initialAuthState: AuthState = {
   firebaseUser: null,
   currentUser: null,
   authenticationState: "loading",
@@ -10,17 +10,29 @@ const initialState: AuthState = {
   isAuthenticating: false,
 };
 
-type AuthStore = {
-  state: AuthState;
-  setState: (partial: Partial<AuthState>) => void;
-  reset: () => void;
+const initialPhoneAuthState: PhoneAuthState = {
+  isVerifying: false,
+  isVerified: false,
+  phoneNumber: null,
+  phoneUid: null,
+  verificationId: null,
+  error: null,
 };
 
 export const useAuthStore = create<AuthStore>((set) => ({
-  state: initialState,
+  state: initialAuthState,
+  phoneAuth: initialPhoneAuthState,
   setState: (partial) =>
     set((s) => ({
       state: { ...s.state, ...partial },
     })),
-  reset: () => set({ state: initialState }),
+  setPhoneAuth: (partial) =>
+    set((s) => ({
+      phoneAuth: { ...s.phoneAuth, ...partial },
+    })),
+  reset: () =>
+    set({
+      state: initialAuthState,
+      phoneAuth: initialPhoneAuthState,
+    }),
 }));

@@ -4,6 +4,14 @@ import { User } from "firebase/auth";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { RawURIComponent } from "@/utils/path";
 
+export type AuthStore = {
+  state: AuthState;
+  phoneAuth: PhoneAuthState;
+  setState: (partial: Partial<AuthState>) => void;
+  setPhoneAuth: (partial: Partial<PhoneAuthState>) => void;
+  reset: () => void;
+};
+
 export type AuthState = {
   firebaseUser: User | null;
   currentUser: GqlCurrentUserPayload["user"] | null;
@@ -17,6 +25,15 @@ export type AuthState = {
     | "loading"; // L0: 状態チェック中
   environment: AuthEnvironment;
   isAuthenticating: boolean;
+};
+
+export type PhoneAuthState = {
+  isVerifying: boolean;
+  isVerified: boolean;
+  phoneNumber: string | null;
+  phoneUid: string | null;
+  verificationId: string | null;
+  error: Error | null;
 };
 
 export interface AuthContextType {
