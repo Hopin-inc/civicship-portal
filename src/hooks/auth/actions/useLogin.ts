@@ -5,13 +5,13 @@ import { LiffService } from "@/lib/auth/liff-service";
 import { RawURIComponent } from "@/utils/path";
 
 export const useLogin = (
-  setState: React.Dispatch<React.SetStateAction<AuthState>>,
+  setState: (partial: Partial<AuthState>) => void,
   liffService: LiffService,
   refetchUser: () => Promise<any>,
 ) => {
   return useCallback(
     async (redirectPath?: RawURIComponent): Promise<boolean> => {
-      setState((prev) => ({ ...prev, isAuthenticating: true }));
+      setState({ isAuthenticating: true });
       try {
         await liffService.initialize();
         const loggedIn = await liffService.login(redirectPath);
@@ -24,7 +24,7 @@ export const useLogin = (
         logger.warn("LIFF login failed", { error: msg });
         return false;
       } finally {
-        setState((prev) => ({ ...prev, isAuthenticating: false }));
+        setState({ isAuthenticating: false });
       }
     },
     [setState, liffService, refetchUser],
