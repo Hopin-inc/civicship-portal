@@ -31,7 +31,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const phoneAuthService = PhoneAuthService.getInstance();
 
   const state = useAuthStore((s) => s.state);
-  const setStoreState = useAuthStore((s) => s.setState);
 
   const {
     data: userData,
@@ -55,7 +54,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode } =
     useAuthActions({
-      state,
       authStateManager,
       liffService,
       phoneAuthService,
@@ -82,7 +80,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 
   const value = useAuthValue({
-    state,
     userLoading,
     refetchUser,
     phoneAuthService,

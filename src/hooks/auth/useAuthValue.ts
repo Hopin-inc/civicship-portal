@@ -1,9 +1,9 @@
-import { useMemo } from "react";
-import { AuthContextType, AuthState } from "@/types/auth";
+import { useCallback, useMemo } from "react";
+import { AuthContextType } from "@/types/auth";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
+import { useAuthStore } from "./auth-store";
 
 type UseAuthValueArgs = {
-  state: AuthState;
   userLoading: boolean;
   refetchUser: () => Promise<any>;
   phoneAuthService: PhoneAuthService;
@@ -17,27 +17,34 @@ type UseAuthValueArgs = {
 };
 
 export const useAuthValue = ({
-  state,
   userLoading,
   refetchUser,
   phoneAuthService,
   actions,
 }: UseAuthValueArgs): AuthContextType => {
-  return useMemo(() => {
-    return {
-      user: state.currentUser,
-      firebaseUser: state.firebaseUser,
-      uid: state.firebaseUser?.uid || null,
+  const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
+  const currentUser = useAuthStore((s) => s.state.currentUser);
+  const authenticationState = useAuthStore((s) => s.state.authenticationState);
+  const isAuthenticating = useAuthStore((s) => s.state.isAuthenticating);
+  const environment = useAuthStore((s) => s.state.environment);
+
+  const stableRefetchUser = useCallback(async () => {
+    await refetchUser();
+  }, [refetchUser]);
+
+  return useMemo(
+    () => ({
+      user: currentUser,
+      firebaseUser,
+      uid: firebaseUser?.uid || null,
       isAuthenticated: ["line_authenticated", "phone_authenticated", "user_registered"].includes(
-        state.authenticationState,
+        authenticationState,
       ),
-      isPhoneVerified: ["phone_authenticated", "user_registered"].includes(
-        state.authenticationState,
-      ),
-      isUserRegistered: state.authenticationState === "user_registered",
-      authenticationState: state.authenticationState,
-      isAuthenticating: state.isAuthenticating,
-      environment: state.environment,
+      isPhoneVerified: ["phone_authenticated", "user_registered"].includes(authenticationState),
+      isUserRegistered: authenticationState === "user_registered",
+      authenticationState,
+      isAuthenticating,
+      environment,
       loginWithLiff: actions.loginWithLiff,
       logout: actions.logout,
       phoneAuth: {
@@ -48,10 +55,19 @@ export const useAuthValue = ({
         phoneUid: phoneAuthService.getState().phoneUid,
       },
       createUser: actions.createUser,
-      updateAuthState: async () => {
-        await refetchUser();
-      },
-      loading: state.authenticationState === "loading" || userLoading || state.isAuthenticating,
-    };
-  }, [state, userLoading, refetchUser, phoneAuthService, actions]);
+      updateAuthState: stableRefetchUser,
+      loading: authenticationState === "loading" || userLoading || isAuthenticating,
+    }),
+    [
+      currentUser,
+      firebaseUser,
+      authenticationState,
+      isAuthenticating,
+      environment,
+      actions,
+      phoneAuthService,
+      stableRefetchUser,
+      userLoading,
+    ],
+  );
 };
