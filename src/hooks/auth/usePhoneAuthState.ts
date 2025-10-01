@@ -17,6 +17,7 @@ export const usePhoneAuthState = ({
 }: UsePhoneAuthStateProps) => {
   const setState = useAuthStore((s) => s.setState);
   const state = useAuthStore((s) => s.state);
+  const phoneAuth = useAuthStore((s) => s.phoneAuth);
 
   const authStateManagerRef = useRef(authStateManager);
   const phoneAuthServiceRef = useRef(phoneAuthService);
@@ -29,8 +30,7 @@ export const usePhoneAuthState = ({
 
     if (!currentAuthStateManager) return;
 
-    const phoneState = phoneAuthServiceRef.current.getState();
-    const isVerified = phoneState.isVerified;
+    const isVerified = phoneAuth.isVerified;
 
     if (isVerified) {
       const updatePhoneAuthState = async () => {
@@ -52,5 +52,5 @@ export const usePhoneAuthState = ({
         setState({ authenticationState: "phone_authenticated" });
       }
     }
-  }, [setState, state.authenticationState]);
+  }, [setState, state.authenticationState, phoneAuth.isVerified]);
 };
