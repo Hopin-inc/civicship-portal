@@ -4,7 +4,7 @@ import { AuthState } from "@/types/auth";
 
 type UseAuthInitializationArgs = {
   authStateManager: AuthStateManager | null;
-  setState: React.Dispatch<React.SetStateAction<AuthState>>;
+  setState: (partial: Partial<AuthState>) => void;
 };
 
 export const useAuthInitialization = ({
@@ -23,7 +23,7 @@ export const useAuthInitialization = ({
         setIsAuthInitialized(true);
         setAuthInitError(null);
         const currentState = authStateManager.getState();
-        setState((prev) => ({ ...prev, authenticationState: currentState }));
+        setState({ authenticationState: currentState });
       } catch (error) {
         setAuthInitError(error instanceof Error ? error.message : "認証の初期化に失敗しました");
         setIsAuthInitialized(false);

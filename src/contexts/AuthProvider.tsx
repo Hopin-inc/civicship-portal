@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { detectEnvironment } from "@/lib/auth/environment-detector";
@@ -15,29 +15,23 @@ import { useLiffInitialization } from "@/hooks/auth/useLiffInitialization";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 import useAutoLogin from "@/hooks/auth/useAutoLogin";
-import { AuthContextType, AuthProviderProps, AuthState } from "@/types/auth";
+import { AuthContextType, AuthProviderProps } from "@/types/auth";
 import { useAuthActions } from "@/hooks/auth/useAuthActions";
 import { useAuthInitialization } from "@/hooks/auth/useAuthInitialization";
 import { AuthProviderView } from "@/hooks/auth/AuthProviderView";
 import { useAuthValue } from "@/hooks/auth/useAuthValue";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const environment = detectEnvironment();
-
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
   const liffService = LiffService.getInstance(liffId);
-
   const phoneAuthService = PhoneAuthService.getInstance();
 
-  const [state, setState] = useState<AuthState>({
-    firebaseUser: null,
-    currentUser: null,
-    authenticationState: "loading",
-    environment,
-    isAuthenticating: false,
-  });
+  const state = useAuthStore((s) => s.state);
+  const setStoreState = useAuthStore((s) => s.setState);
 
   const {
     data: userData,
@@ -57,33 +51,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const { isAuthInitialized, authInitError, retryInitialization } = useAuthInitialization({
     authStateManager,
-    setState,
+    setState: setStoreState,
   });
 
   const { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode } =
     useAuthActions({
       state,
-      setState,
+      setState: setStoreState,
       authStateManager,
       liffService,
       phoneAuthService,
       refetchUser,
     });
 
-  useAuthStateChangeListener({ authStateManager, setState });
-  useTokenExpirationHandler({ state, setState, logout });
-  useFirebaseAuthState({ authStateManager, state, setState });
-  usePhoneAuthState({ authStateManager, phoneAuthService, setState });
-  useUserRegistrationState({ authStateManager, userData, setState });
+  useAuthStateChangeListener({ authStateManager, setState: setStoreState });
+  useTokenExpirationHandler({ state, setState: setStoreState, logout });
+  useFirebaseAuthState({ authStateManager, state, setState: setStoreState });
+  usePhoneAuthState({ authStateManager, phoneAuthService, setState: setStoreState });
+  useUserRegistrationState({ authStateManager, userData, setState: setStoreState });
   useLiffInitialization({ environment, liffService });
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ state, liffService });
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, setState, refetchUser });
-  useAutoLogin({ environment, state, liffService, setState, refetchUser });
+  useLineAuthProcessing({
+    shouldProcessRedirect,
+    liffService,
+    setState: setStoreState,
+    refetchUser,
+  });
+  useAutoLogin({ environment, state, liffService, setState: setStoreState, refetchUser });
 
   const actions = React.useMemo(
     () => ({ logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification }),
     [logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification],
   );
+
   const value = useAuthValue({
     state,
     userLoading,

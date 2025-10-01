@@ -10,7 +10,7 @@ import { useStartPhoneVerification } from "@/hooks/auth/actions/useStartPhoneVer
 
 export type AuthDeps = {
   state: AuthState;
-  setState: React.Dispatch<React.SetStateAction<AuthState>>;
+  setState: (partial: Partial<AuthState>) => void;
   authStateManager: AuthStateManager | null;
   liffService: LiffService;
   phoneAuthService: PhoneAuthService;
