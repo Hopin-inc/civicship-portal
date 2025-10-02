@@ -9,6 +9,10 @@ export enum AuthEnvironment {
 }
 
 export const detectEnvironment = (): AuthEnvironment => {
+  if (typeof window === "undefined") {
+    return AuthEnvironment.REGULAR_BROWSER;
+  }
+
   if (liff.isInClient()) return AuthEnvironment.LIFF;
 
   if (typeof navigator !== "undefined" && /Line/i.test(navigator.userAgent)) {

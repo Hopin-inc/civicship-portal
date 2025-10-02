@@ -4,7 +4,6 @@ import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { useAuthStore } from "./auth-store";
 
 type UseAuthValueArgs = {
-  userLoading: boolean;
   refetchUser: () => Promise<any>;
   phoneAuthService: PhoneAuthService;
   actions: {
@@ -17,7 +16,6 @@ type UseAuthValueArgs = {
 };
 
 export const useAuthValue = ({
-  userLoading,
   refetchUser,
   phoneAuthService,
   actions,
@@ -57,7 +55,7 @@ export const useAuthValue = ({
       },
       createUser: actions.createUser,
       updateAuthState: stableRefetchUser,
-      loading: authenticationState === "loading" || userLoading || isAuthenticating,
+      loading: authenticationState === "loading" || isAuthenticating,
     }),
     [
       currentUser,
@@ -68,7 +66,6 @@ export const useAuthValue = ({
       actions,
       phoneAuthService,
       stableRefetchUser,
-      userLoading,
     ],
   );
 };

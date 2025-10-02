@@ -20,6 +20,8 @@ export type AuthState = {
   authenticationState: AuthenticationState;
   environment: AuthEnvironment;
   isAuthenticating: boolean;
+  shouldProcessRedirect: boolean;
+  processedRedirect: boolean;
 };
 
 export type AuthenticationState =
