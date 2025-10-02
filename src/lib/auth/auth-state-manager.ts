@@ -13,6 +13,7 @@ export class AuthStateManager {
 
   private constructor() {
     this.sessionId = this.initializeSessionId();
+    this.notifyStateChange();
     if (typeof window !== "undefined") {
       window.addEventListener("auth:renew-line-token", this.handleLineTokenRenewal.bind(this));
       window.addEventListener("auth:renew-phone-token", this.handlePhoneTokenRenewal.bind(this));
@@ -97,14 +98,14 @@ export class AuthStateManager {
         return;
       }
 
-      const isUserRegistered = await this.checkUserRegistration();
+      const isUserRegistered = this.checkUserRegistration();
 
       if (isUserRegistered) {
         this.setState("user_registered");
       } else {
         const phoneTokens = TokenManager.getPhoneTokens();
         const hasValidPhoneToken =
-          phoneTokens.accessToken && !TokenManager.isTokenExpiredSync(lineTokens);
+          phoneTokens.accessToken && !TokenManager.isTokenExpiredSync(phoneTokens);
 
         if (hasValidPhoneToken) {
           this.setState("phone_authenticated");
@@ -122,7 +123,7 @@ export class AuthStateManager {
     }
   }
 
-  private async checkUserRegistration(): Promise<boolean> {
+  private checkUserRegistration(): boolean {
     try {
       if (!lineAuth?.currentUser) {
         return false;
@@ -145,7 +146,7 @@ export class AuthStateManager {
       const renewed = await TokenManager.renewLineToken();
 
       if (renewed && this.currentState === "line_token_expired") {
-        const isUserRegistered = await this.checkUserRegistration();
+        const isUserRegistered = this.checkUserRegistration();
         if (isUserRegistered) {
           this.setState("user_registered");
         } else {
