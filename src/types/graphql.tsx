@@ -589,8 +589,6 @@ export type GqlMembership = {
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   headline?: Maybe<Scalars["String"]["output"]>;
   histories?: Maybe<Array<GqlMembershipHistory>>;
-  hostOpportunityCount?: Maybe<Scalars["Int"]["output"]>;
-  participationView?: Maybe<GqlMembershipParticipationView>;
   reason: GqlMembershipStatusReason;
   role: GqlRole;
   status: GqlMembershipStatus;
@@ -629,12 +627,6 @@ export type GqlMembershipHistory = {
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
 };
 
-export type GqlMembershipHostedMetrics = {
-  __typename?: "MembershipHostedMetrics";
-  geo: Array<GqlMembershipParticipationLocation>;
-  totalParticipantCount: Scalars["Int"]["output"];
-};
-
 export type GqlMembershipInviteInput = {
   communityId: Scalars["ID"]["input"];
   role?: InputMaybe<GqlRole>;
@@ -646,28 +638,6 @@ export type GqlMembershipInvitePayload = GqlMembershipInviteSuccess;
 export type GqlMembershipInviteSuccess = {
   __typename?: "MembershipInviteSuccess";
   membership: GqlMembership;
-};
-
-export type GqlMembershipParticipatedMetrics = {
-  __typename?: "MembershipParticipatedMetrics";
-  geo?: Maybe<Array<GqlMembershipParticipationLocation>>;
-  totalParticipatedCount: Scalars["Int"]["output"];
-};
-
-export type GqlMembershipParticipationLocation = {
-  __typename?: "MembershipParticipationLocation";
-  address: Scalars["String"]["output"];
-  latitude: Scalars["Decimal"]["output"];
-  longitude: Scalars["Decimal"]["output"];
-  placeId: Scalars["ID"]["output"];
-  placeImage?: Maybe<Scalars["String"]["output"]>;
-  placeName?: Maybe<Scalars["String"]["output"]>;
-};
-
-export type GqlMembershipParticipationView = {
-  __typename?: "MembershipParticipationView";
-  hosted: GqlMembershipHostedMetrics;
-  participated?: Maybe<GqlMembershipParticipatedMetrics>;
 };
 
 export type GqlMembershipRemoveInput = {
@@ -1218,6 +1188,7 @@ export type GqlOpportunityCreateInput = {
   feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
   images?: InputMaybe<Array<GqlImageInput>>;
   placeId?: InputMaybe<Scalars["ID"]["input"]>;
+  pointsRequired?: InputMaybe<Scalars["Int"]["input"]>;
   pointsToEarn?: InputMaybe<Scalars["Int"]["input"]>;
   publishStatus: GqlPublishStatus;
   relatedArticleIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
@@ -1392,6 +1363,7 @@ export type GqlOpportunityUpdateContentInput = {
   feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
   images?: InputMaybe<Array<GqlImageInput>>;
   placeId?: InputMaybe<Scalars["ID"]["input"]>;
+  pointsRequired?: InputMaybe<Scalars["Int"]["input"]>;
   pointsToEarn?: InputMaybe<Scalars["Int"]["input"]>;
   publishStatus: GqlPublishStatus;
   relatedArticleIds?: InputMaybe<Array<Scalars["ID"]["input"]>>;
@@ -2974,20 +2946,6 @@ export type GqlMembershipFieldsFragment = {
   reason: GqlMembershipStatusReason;
 };
 
-export type GqlHostedGeoFieldsFragment = {
-  __typename?: "MembershipHostedMetrics";
-  totalParticipantCount: number;
-  geo: Array<{
-    __typename?: "MembershipParticipationLocation";
-    placeId: string;
-    placeName?: string | null;
-    placeImage?: string | null;
-    latitude: any;
-    longitude: any;
-    address: string;
-  }>;
-};
-
 export type GqlAssignOwnerMutationVariables = Exact<{
   input: GqlMembershipSetRoleInput;
   permission: GqlCheckCommunityPermissionInput;
@@ -3352,6 +3310,7 @@ export type GqlGetUserFlexibleQueryVariables = Exact<{
   withWallets?: Scalars["Boolean"]["input"];
   withOpportunities?: Scalars["Boolean"]["input"];
   withDidIssuanceRequests?: Scalars["Boolean"]["input"];
+  withNftInstances?: Scalars["Boolean"]["input"];
 }>;
 
 export type GqlGetUserFlexibleQuery = {
@@ -3405,6 +3364,29 @@ export type GqlGetUserFlexibleQuery = {
         nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
       }> | null;
     }> | null;
+    nftInstances?: {
+      __typename?: "NftInstancesConnection";
+      totalCount: number;
+      pageInfo: {
+        __typename?: "PageInfo";
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+        startCursor?: string | null;
+        endCursor?: string | null;
+      };
+      edges: Array<{
+        __typename?: "NftInstanceEdge";
+        cursor: string;
+        node: {
+          __typename?: "NftInstance";
+          id: string;
+          instanceId: string;
+          imageUrl?: string | null;
+          name?: string | null;
+          createdAt: Date;
+        };
+      }>;
+    } | null;
     didIssuanceRequests?: Array<{
       __typename?: "DidIssuanceRequest";
       id: string;
@@ -6044,19 +6026,6 @@ export const MembershipFieldsFragmentDoc = gql`
     reason
   }
 `;
-export const HostedGeoFieldsFragmentDoc = gql`
-  fragment HostedGeoFields on MembershipHostedMetrics {
-    totalParticipantCount
-    geo {
-      placeId
-      placeName
-      placeImage
-      latitude
-      longitude
-      address
-    }
-  }
-`;
 export const PlaceFieldsFragmentDoc = gql`
   fragment PlaceFields on Place {
     id
@@ -7321,12 +7290,32 @@ export const GetUserFlexibleDocument = gql`
     $withWallets: Boolean! = false
     $withOpportunities: Boolean! = false
     $withDidIssuanceRequests: Boolean! = false
+    $withNftInstances: Boolean! = false
   ) {
     user(id: $id) {
       ...UserFields
       portfolios(filter: $portfolioFilter, sort: $portfolioSort, first: $portfolioFirst)
         @include(if: $withPortfolios) {
         ...UserPortfolioFields
+      }
+      nftInstances @include(if: $withNftInstances) {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+        totalCount
+        edges {
+          cursor
+          node {
+            id
+            instanceId
+            imageUrl
+            name
+            createdAt
+          }
+        }
       }
       didIssuanceRequests @include(if: $withDidIssuanceRequests) {
         ...DidIssuanceRequestFields
@@ -7381,6 +7370,7 @@ export const GetUserFlexibleDocument = gql`
  *      withWallets: // value for 'withWallets'
  *      withOpportunities: // value for 'withOpportunities'
  *      withDidIssuanceRequests: // value for 'withDidIssuanceRequests'
+ *      withNftInstances: // value for 'withNftInstances'
  *   },
  * });
  */
