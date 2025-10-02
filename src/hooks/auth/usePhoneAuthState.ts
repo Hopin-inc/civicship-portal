@@ -3,16 +3,22 @@
 import { useEffect, useRef } from "react";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/contexts/AuthProvider";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 interface UsePhoneAuthStateProps {
   authStateManager: AuthStateManager | null;
   phoneAuthService: PhoneAuthService;
-  setState: React.Dispatch<React.SetStateAction<AuthState>>;
 }
 
-export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState }: UsePhoneAuthStateProps) => {
+export const usePhoneAuthState = ({
+  authStateManager,
+  phoneAuthService,
+}: UsePhoneAuthStateProps) => {
+  const setState = useAuthStore((s) => s.setState);
+  const state = useAuthStore((s) => s.state);
+  const phoneAuth = useAuthStore((s) => s.phoneAuth);
+
   const authStateManagerRef = useRef(authStateManager);
   const phoneAuthServiceRef = useRef(phoneAuthService);
 
@@ -24,8 +30,7 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
 
     if (!currentAuthStateManager) return;
 
-    const phoneState = phoneAuthServiceRef.current.getState();
-    const isVerified = phoneState.isVerified;
+    const isVerified = phoneAuth.isVerified;
 
     if (isVerified) {
       const updatePhoneAuthState = async () => {
@@ -34,7 +39,7 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
         } catch (error) {
           logger.error("Failed to update AuthStateManager phone state in useEffect", {
             error: error instanceof Error ? error.message : String(error),
-            component: "usePhoneAuthState"
+            component: "usePhoneAuthState",
           });
         }
       };
@@ -42,13 +47,10 @@ export const usePhoneAuthState = ({ authStateManager, phoneAuthService, setState
       updatePhoneAuthState();
     }
 
-    setState((prev) => ({
-      ...prev,
-      authenticationState: isVerified
-        ? prev.authenticationState === "line_authenticated"
-          ? "phone_authenticated"
-          : prev.authenticationState
-        : prev.authenticationState,
-    }));
-  }, [setState]);
+    if (isVerified) {
+      if (state.authenticationState === "line_authenticated") {
+        setState({ authenticationState: "phone_authenticated" });
+      }
+    }
+  }, [setState, state.authenticationState, phoneAuth.isVerified]);
 };

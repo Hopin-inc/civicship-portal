@@ -1,60 +1,50 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { notFound } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
-import UserProfileSection from "@/app/users/components/UserProfileSection";
+import { useEffect, useMemo, useRef } from "react";
+import { useUserProfile } from "../hooks/useUserProfile";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import UserPortfolioList from "@/app/users/components/UserPortfolioList";
-import { useUserProfile } from "@/app/users/hooks/useUserProfile";
-import { ErrorState } from '@/components/shared'
+import { ErrorState } from "@/components/shared";
+import { notFound } from "next/navigation";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
-import { useUserNfts } from "@/components/domains/nfts/hooks/useUserNft";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
+import UserProfileSection from "@/app/users/components/UserProfileSection";
 import { NftCard } from "@/components/domains/nfts/components";
 import { CardCarousel } from "@/components/shared/CardCarousel";
 import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
-import { formatOpportunities } from "@/components/domains/opportunities/utils";
+import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 
 export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
 
   const { user: currentUser, isAuthenticating } = useAuth();
-  const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
+  const { userData, nftInstances, selfOpportunities, isLoading, error, refetch } = useUserProfile(
     currentUser?.id,
   );
-  const { nftInstances } = useUserNfts({ userId: currentUser?.id ?? "" });
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  // 認証中 or リダイレクト待ち → ローディング表示
-  if (isAuthenticating || !currentUser) {
+  const formattedOpportunities = useMemo(
+    () => selfOpportunities.map(formatOpportunities),
+    [selfOpportunities],
+  );
+
+  if (isAuthenticating || !currentUser || isLoading) {
     return <LoadingIndicator />;
   }
 
-  // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
-  if (!currentUser || isLoading) {
-    return <LoadingIndicator />;
-  }
-
-  // エラー
-  if (error) {
+  if (error)
     return <ErrorState title={"マイページを読み込めませんでした"} refetchRef={refetchRef} />;
-  }
 
-  // データがない → notFound()
-  if (!userData) {
-    return notFound();
-  }
+  if (!userData) return notFound();
 
   const targetFeatures = ["opportunities", "credentials"] as const;
   const shouldShowOpportunities = targetFeatures.some((feature) =>
     currentCommunityConfig.enableFeatures.includes(feature),
   );
-
-  const formattedOpportunities = selfOpportunities.map(formatOpportunities);
 
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">
@@ -66,22 +56,14 @@ export default function MyProfilePage() {
       />
       {nftInstances && nftInstances.length > 0 ? (
         <section className="py-6 mt-0">
-          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
-            証明書
-          </h2>
+          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">証明書</h2>
           <div className="mt-4 flex gap-4 overflow-x-auto scrollbar-hide">
             {nftInstances.map((nftInstance) => (
-              <NftCard
-                key={nftInstance.id}
-                nftInstance={nftInstance}
-                isCarousel={true}
-              />
+              <NftCard key={nftInstance.id} nftInstance={nftInstance} isCarousel={true} />
             ))}
           </div>
         </section>
-      ) : (
-        null
-      )}
+      ) : null}
       <>
         {shouldShowOpportunities && (
           <>
@@ -92,10 +74,7 @@ export default function MyProfilePage() {
                 </h2>
                 <CardCarousel>
                   {formattedOpportunities.map((opportunity) => (
-                    <OpportunityVerticalCard
-                      key={opportunity.id}
-                      {...opportunity}
-                    />
+                    <OpportunityVerticalCard key={opportunity.id} {...opportunity} />
                   ))}
                 </CardCarousel>
               </section>

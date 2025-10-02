@@ -2,74 +2,67 @@
 
 import { useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
-import { AuthState } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 import { logger } from "@/lib/logging";
-
-import { AuthEnvironment } from "@/lib/auth/environment-detector";
 
 interface UseLineAuthProcessingProps {
   shouldProcessRedirect: boolean;
   liffService: LiffService;
-  setState: React.Dispatch<React.SetStateAction<AuthState>>;
   refetchUser: () => Promise<any>;
 }
 
-export const useLineAuthProcessing = ({ shouldProcessRedirect, liffService, setState, refetchUser }: UseLineAuthProcessingProps) => {
+export const useLineAuthProcessing = ({
+  shouldProcessRedirect,
+  liffService,
+  refetchUser,
+}: UseLineAuthProcessingProps) => {
   const processedRef = useRef(false);
-  const liffServiceRef = useRef(liffService);
-  const setStateRef = useRef(setState);
-  const refetchUserRef = useRef(refetchUser);
 
-  liffServiceRef.current = liffService;
-  setStateRef.current = setState;
-  refetchUserRef.current = refetchUser;
+  const setState = useAuthStore((s) => s.setState);
 
   useEffect(() => {
     if (!shouldProcessRedirect || processedRef.current) return;
 
     const handleLineAuthRedirect = async () => {
       processedRef.current = true;
-      setStateRef.current((prev) => ({ ...prev, isAuthenticating: true }));
+      setState({ isAuthenticating: true });
 
       try {
-        const initialized = await liffServiceRef.current.initialize();
+        const initialized = await liffService.initialize();
         if (!initialized) {
           logger.info("LIFF init failed", {
             authType: "liff",
-            component: "useLineAuthProcessing"
+            component: "useLineAuthProcessing",
           });
           return;
         }
 
-        const { isLoggedIn, profile } = liffServiceRef.current.getState();
+        const { isLoggedIn } = liffService.getState();
+        if (!isLoggedIn) return;
 
-        if (!isLoggedIn) {
-          return;
-        }
-
-        const success = await liffServiceRef.current.signInWithLiffToken();
+        const success = await liffService.signInWithLiffToken();
         if (!success) {
           logger.info("signInWithLiffToken failed", {
             authType: "liff",
-            component: "useLineAuthProcessing"
+            component: "useLineAuthProcessing",
           });
           return;
         }
 
-        await refetchUserRef.current();
+        await refetchUser();
       } catch (err) {
         logger.info("Error during LINE auth", {
           authType: "liff",
           error: err instanceof Error ? err.message : String(err),
-          component: "useLineAuthProcessing"
+          component: "useLineAuthProcessing",
         });
       } finally {
-        setStateRef.current((prev) => ({ ...prev, isAuthenticating: false }));
+        setState({ isAuthenticating: false });
       }
     };
 
     handleLineAuthRedirect();
-  }, [shouldProcessRedirect]);
+  }, [shouldProcessRedirect, liffService, refetchUser, setState]);
 
   useEffect(() => {
     if (!shouldProcessRedirect) {

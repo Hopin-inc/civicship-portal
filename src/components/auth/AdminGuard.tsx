@@ -3,38 +3,21 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useQuery } from "@apollo/client";
-import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 import { toast } from "sonner";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { GqlRole, GqlCurrentUserQuery } from "@/types/graphql";
+import { GqlMembership, GqlRole } from "@/types/graphql";
 import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { AdminRoleContext } from "@/app/admin/context/AdminRoleContext";
-import { GqlMembership } from "@/types/graphql";
 
-/**
- * 管理者ガードコンポーネントのプロパティ
- */
 interface AdminGuardProps {
   children: React.ReactNode;
 }
 
-/**
- * 管理者ガードコンポーネント
- * 管理者権限を持つユーザーのみアクセスを許可する
- */
 export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading, user: currentUser } = useAuth();
   const router = useRouter();
-
-  const { data: userData, loading: userLoading } = useQuery<GqlCurrentUserQuery>(GET_CURRENT_USER, {
-    skip: !isAuthenticated,
-  });
-
-  const loading = authLoading || userLoading;
-  const currentUser = userData?.currentUser?.user;
 
   const authRedirectService = React.useMemo(() => {
     return AuthRedirectService.getInstance();
@@ -56,7 +39,10 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     }
 
     const checkAdminAccess = async () => {
-      const { hasAccess, redirectPath } = await authRedirectService.checkAdminAccess(currentUser, window.location.pathname);
+      const { hasAccess, redirectPath } = await authRedirectService.checkAdminAccess(
+        currentUser,
+        window.location.pathname,
+      );
 
       if (!hasAccess && redirectPath) {
         if (redirectPath === "/") {

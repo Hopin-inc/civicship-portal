@@ -1,34 +1,44 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
-import { AuthState } from "@/contexts/AuthProvider";
-import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 interface UseLineAuthRedirectDetectionProps {
-  state: AuthState;
   liffService: LiffService;
 }
 
-export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuthRedirectDetectionProps) => {
+export const useLineAuthRedirectDetection = ({
+  liffService,
+}: UseLineAuthRedirectDetectionProps) => {
   const [shouldProcessRedirect, setShouldProcessRedirect] = useState(false);
-  const prevStateRef = useRef<{ authenticationState: string; isAuthenticating: boolean } | null>(null);
+
+  const authState = useAuthStore((s) => s.state);
+
+  const prevStateRef = useRef<{ authenticationState: string; isAuthenticating: boolean } | null>(
+    null,
+  );
   const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
 
   useEffect(() => {
     const currentState = {
-      authenticationState: state.authenticationState,
-      isAuthenticating: state.isAuthenticating
+      authenticationState: authState.authenticationState,
+      isAuthenticating: authState.isAuthenticating,
     };
 
     const currentLiffState = liffService.getState();
-    const liffStateKey = { isInitialized: currentLiffState.isInitialized, isLoggedIn: currentLiffState.isLoggedIn };
+    const liffStateKey = {
+      isInitialized: currentLiffState.isInitialized,
+      isLoggedIn: currentLiffState.isLoggedIn,
+    };
 
-    const stateChanged = !prevStateRef.current ||
+    const stateChanged =
+      !prevStateRef.current ||
       prevStateRef.current.authenticationState !== currentState.authenticationState ||
       prevStateRef.current.isAuthenticating !== currentState.isAuthenticating;
 
-    const liffStateChanged = !prevLiffStateRef.current ||
+    const liffStateChanged =
+      !prevLiffStateRef.current ||
       prevLiffStateRef.current.isInitialized !== liffStateKey.isInitialized ||
       prevLiffStateRef.current.isLoggedIn !== liffStateKey.isLoggedIn;
 
@@ -44,14 +54,14 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
       return;
     }
 
-    if (state.isAuthenticating) {
+    if (authState.isAuthenticating) {
       setShouldProcessRedirect(false);
       return;
     }
 
     if (
-      state.authenticationState !== "unauthenticated" &&
-      state.authenticationState !== "loading"
+      authState.authenticationState !== "unauthenticated" &&
+      authState.authenticationState !== "loading"
     ) {
       setShouldProcessRedirect(false);
       return;
@@ -65,7 +75,7 @@ export const useLineAuthRedirectDetection = ({ state, liffService }: UseLineAuth
     }
 
     setShouldProcessRedirect(true);
-  }, [state.authenticationState, state.isAuthenticating, liffService]);
+  }, [authState.authenticationState, authState.isAuthenticating, liffService]);
 
   return { shouldProcessRedirect };
 };
