@@ -142,9 +142,7 @@ const link = ApolloLink.from([requestLink, errorLink, httpLink]);
 const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
   link,
   ssrMode: true,
-  cache: new InMemoryCache({
-    resultCaching: false,
-  }),
+  cache: new InMemoryCache(),
 };
 
 export const apolloClient = new ApolloClient(defaultOptions);
