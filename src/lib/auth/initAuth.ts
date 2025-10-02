@@ -84,6 +84,7 @@ export async function initAuth({
         isAuthenticating: false,
         isAuthInProgress: false,
       });
+      await authStateManager.handleUserRegistrationStateChange(false);
       return;
     }
 
@@ -93,6 +94,7 @@ export async function initAuth({
       isAuthenticating: false,
       isAuthInProgress: false,
     });
+    await authStateManager.handleUserRegistrationStateChange(false);
 
     // --- 非LIFF環境のみ追加サインイン処理
     if (environment !== AuthEnvironment.LIFF) {
@@ -114,11 +116,6 @@ export async function initAuth({
       }
     }
   } catch (e) {
-    setState({
-      authenticationState: "unauthenticated",
-      isAuthenticating: false,
-      isAuthInProgress: false,
-    });
     logger.error("initAuth failed", { error: e, component: "initAuth" });
     setState({
       authenticationState: "unauthenticated",
