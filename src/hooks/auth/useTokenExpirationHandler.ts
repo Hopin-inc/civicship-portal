@@ -2,16 +2,16 @@
 
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { AuthState } from "@/contexts/AuthProvider";
-import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 interface UseTokenExpirationHandlerProps {
-  state: AuthState;
-  setState: React.Dispatch<React.SetStateAction<AuthState>>;
   logout: () => Promise<void>;
 }
 
-export const useTokenExpirationHandler = ({ state, setState, logout }: UseTokenExpirationHandlerProps) => {
+export const useTokenExpirationHandler = ({ logout }: UseTokenExpirationHandlerProps) => {
+  const state = useAuthStore((s) => s.state);
+  const setState = useAuthStore((s) => s.setState);
+
   const stateRef = useRef(state);
   stateRef.current = state;
 
@@ -24,7 +24,7 @@ export const useTokenExpirationHandler = ({ state, setState, logout }: UseTokenE
         const currentState = stateRef.current.authenticationState;
 
         if (currentState === "line_authenticated" || currentState === "user_registered") {
-          setState((prev) => ({ ...prev, authenticationState: "line_token_expired" }));
+          setState({ authenticationState: "line_token_expired" });
           if (typeof window !== "undefined") {
             const event = new CustomEvent("auth:renew-line-token", { detail: {} });
             window.dispatchEvent(event);
@@ -33,7 +33,7 @@ export const useTokenExpirationHandler = ({ state, setState, logout }: UseTokenE
         }
 
         if (currentState === "phone_authenticated") {
-          setState((prev) => ({ ...prev, authenticationState: "phone_token_expired" }));
+          setState({ authenticationState: "phone_token_expired" });
           if (typeof window !== "undefined") {
             const event = new CustomEvent("auth:renew-phone-token", { detail: {} });
             window.dispatchEvent(event);

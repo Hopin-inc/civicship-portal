@@ -1,0 +1,58 @@
+import { create } from "zustand";
+import { AuthState, AuthStore, LiffState, PhoneAuthState } from "@/types/auth";
+import { detectEnvironment } from "@/lib/auth/environment-detector";
+
+const initialAuthState: AuthState = {
+  firebaseUser: null,
+  currentUser: null,
+  authenticationState: "loading",
+  environment: detectEnvironment(),
+  isAuthenticating: false,
+  isAuthInProgress: false,
+};
+
+const initialPhoneAuthState: PhoneAuthState = {
+  isVerifying: false,
+  isVerified: false,
+  phoneNumber: null,
+  phoneUid: null,
+  verificationId: null,
+  error: null,
+};
+
+const initialLiffAuthState: LiffState = {
+  isInitialized: false,
+  isLoggedIn: false,
+  profile: {
+    userId: null,
+    displayName: null,
+    pictureUrl: null,
+  },
+  error: null,
+};
+
+export const useAuthStore = create<AuthStore>((set) => ({
+  state: initialAuthState,
+  phoneAuth: initialPhoneAuthState,
+  liffAuth: initialLiffAuthState,
+
+  setState: (partial) =>
+    set((s) => ({
+      state: { ...s.state, ...partial },
+    })),
+  setPhoneAuth: (partial) =>
+    set((s) => ({
+      phoneAuth: { ...s.phoneAuth, ...partial },
+    })),
+  setLiffAuth: (partial) =>
+    set((s) => ({
+      liffAuth: { ...s.liffAuth, ...partial },
+    })),
+
+  reset: () =>
+    set({
+      state: initialAuthState,
+      phoneAuth: initialPhoneAuthState,
+      liffAuth: initialLiffAuthState,
+    }),
+}));

@@ -22,6 +22,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { logger } from "@/lib/logging";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 const FormSchema = z.object({
   name: z
@@ -38,7 +39,7 @@ type FormValues = z.infer<typeof FormSchema>;
 export function SignUpForm() {
   const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
+  const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -51,17 +52,19 @@ export function SignUpForm() {
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     try {
-      if (!isPhoneVerified) {
-        toast.error("電話番号認証が完了していません");
-        return;
+      if (!firebaseUser) {
+        toast.error("LINE認証が完了していません");
+        return null;
       }
 
       const phoneUid = phoneAuth.phoneUid;
-
-      const user = await createUser(values.name, values.prefecture, phoneUid);
-      if (user) {
-        setIsRedirecting(true);
+      if (!phoneUid || !isPhoneVerified) {
+        toast.error("電話番号認証が完了していません");
+        return null;
       }
+
+      await createUser(values.name, values.prefecture, phoneUid);
+      toast.success("アカウントを作成しました");
     } catch (error) {
       logger.error("Sign up error", {
         error: error instanceof Error ? error.message : String(error),
@@ -74,10 +77,6 @@ export function SignUpForm() {
   };
 
   if (loading) {
-    return <LoadingIndicator />;
-  }
-
-  if (isRedirecting) {
     return <LoadingIndicator />;
   }
 
@@ -150,9 +149,9 @@ export function SignUpForm() {
             />
           )}
 
-          <Button 
-            type="submit" 
-            className="w-full h-12 text-base" 
+          <Button
+            type="submit"
+            className="w-full h-12 text-base"
             disabled={isLoading || !!form.formState.errors.name}
           >
             {isLoading ? "作成中..." : "アカウントを作成"}
