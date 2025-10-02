@@ -76,7 +76,7 @@ export interface AuthContextType {
   createUser: (
     name: string,
     prefecture: GqlCurrentPrefecture,
-    phoneUid: string | null,
+    phoneUid: string,
   ) => Promise<User | null>;
   updateAuthState: () => Promise<void>;
 
