@@ -4,6 +4,7 @@ import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 
 import { logger } from "@/lib/logging";
 import { AuthenticationState } from "@/types/auth";
+import { lineAuth } from "@/lib/auth/firebase-config";
 
 export class AuthStateManager {
   private static instance: AuthStateManager;
@@ -49,10 +50,6 @@ export class AuthStateManager {
     } catch (error) {
       return this.generateSessionId();
     }
-  }
-
-  public getSessionId(): string {
-    return this.sessionId;
   }
 
   private generateSessionId(): string {
@@ -128,8 +125,7 @@ export class AuthStateManager {
 
   private async checkUserRegistration(): Promise<boolean> {
     try {
-      const { lineAuth } = await import("./firebase-config");
-      if (!lineAuth.currentUser) {
+      if (!lineAuth?.currentUser) {
         return false;
       }
 
@@ -146,7 +142,7 @@ export class AuthStateManager {
 
       const { data } = await apolloClient.query({
         query: GET_CURRENT_USER,
-        fetchPolicy: "network-only",
+        fetchPolicy: "cache-first",
         context: {
           headers: {
             Authorization: accessToken ? `Bearer ${accessToken}` : "",
@@ -154,8 +150,7 @@ export class AuthStateManager {
         },
       });
 
-      const isRegistered = data?.currentUser?.user != null;
-      return isRegistered;
+      return data?.currentUser?.user != null;
     } catch (error) {
       logger.info("Failed to check user registration", {
         error: error instanceof Error ? error.message : String(error),
