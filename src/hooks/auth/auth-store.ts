@@ -8,8 +8,6 @@ const initialAuthState: AuthState = {
   authenticationState: "loading",
   environment: detectEnvironment(),
   isAuthenticating: false,
-  shouldProcessRedirect: false,
-  processedRedirect: false,
 };
 
 const initialPhoneAuthState: PhoneAuthState = {
