@@ -23,14 +23,9 @@ export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateP
 
   useEffect(() => {
     const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
-      setState({
-        firebaseUser: user,
-        authenticationState: user
-          ? stateRef.current.authenticationState === "loading"
-            ? "line_authenticated"
-            : stateRef.current.authenticationState
-          : "unauthenticated",
-      });
+      const prevUser = stateRef.current.firebaseUser;
+
+      if (prevUser?.uid === user?.uid) return;
 
       if (user) {
         try {
@@ -39,10 +34,26 @@ export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateP
           const tokenResult = await user.getIdTokenResult();
           const expirationTime = new Date(tokenResult.expirationTime).getTime();
 
-          TokenManager.saveLineTokens({
-            accessToken: idToken,
-            refreshToken: refreshToken,
-            expiresAt: expirationTime,
+          const existing = TokenManager.getLineTokens();
+          if (
+            !existing.accessToken ||
+            existing.accessToken !== idToken ||
+            !existing.expiresAt ||
+            existing.expiresAt !== expirationTime
+          ) {
+            TokenManager.saveLineTokens({
+              accessToken: idToken,
+              refreshToken,
+              expiresAt: expirationTime,
+            });
+          }
+
+          setState({
+            firebaseUser: user,
+            authenticationState:
+              stateRef.current.authenticationState === "loading"
+                ? "line_authenticated"
+                : stateRef.current.authenticationState,
           });
         } catch (error) {
           logger.info("Failed to sync Firebase token to cookies", {
@@ -52,12 +63,15 @@ export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateP
         }
       } else {
         TokenManager.clearLineTokens();
+        setState({
+          firebaseUser: null,
+          authenticationState: "unauthenticated",
+        });
       }
 
       const currentAuthStateManager = authStateManagerRef.current;
-      const currentState = stateRef.current;
-      if (currentAuthStateManager && !currentState.isAuthenticating) {
-        await currentAuthStateManager.handleLineAuthStateChange(!!user);
+      if (currentAuthStateManager && !stateRef.current.isAuthenticating) {
+        void currentAuthStateManager.handleLineAuthStateChange(!!user);
       }
     });
 
