@@ -16,6 +16,9 @@ export const useLogin = (liffService: LiffService, refetchUser: () => Promise<an
         if (!loggedIn) return false;
         const success = await liffService.signInWithLiffToken();
         if (success) await refetchUser();
+        logger.debug("LINE authentication succeeded. Redirecting...", {
+          component: "LoginPage",
+        });
         return success;
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
