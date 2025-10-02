@@ -20,6 +20,7 @@ export type AuthState = {
   authenticationState: AuthenticationState;
   environment: AuthEnvironment;
   isAuthenticating: boolean;
+  isAuthInProgress: boolean;
 };
 
 export type AuthenticationState =

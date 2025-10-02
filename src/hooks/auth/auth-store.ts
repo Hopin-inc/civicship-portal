@@ -8,6 +8,7 @@ const initialAuthState: AuthState = {
   authenticationState: "loading",
   environment: detectEnvironment(),
   isAuthenticating: false,
+  isAuthInProgress: false,
 };
 
 const initialPhoneAuthState: PhoneAuthState = {
