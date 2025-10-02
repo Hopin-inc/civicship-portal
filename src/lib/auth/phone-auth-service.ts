@@ -6,11 +6,11 @@ import {
   signInWithCredential,
   signInWithPhoneNumber,
 } from "firebase/auth";
-import { phoneAuth } from "./firebase-config";
 import { PhoneAuthTokens, TokenManager } from "./token-manager";
 import { isRunningInLiff } from "./environment-detector";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/hooks/auth/auth-store";
+import { getPhoneAuth } from "@/lib/auth/firebase-config";
 
 export class PhoneAuthService {
   private static instance: PhoneAuthService;
@@ -97,7 +97,7 @@ export class PhoneAuthService {
 
       this.recaptchaContainerElement = newContainer;
 
-      this.recaptchaVerifier = new RecaptchaVerifier(phoneAuth, this.recaptchaContainerId, {
+      this.recaptchaVerifier = new RecaptchaVerifier(getPhoneAuth(), this.recaptchaContainerId, {
         size: isRunningInLiff() ? "normal" : "invisible",
         callback: () => {
           logger.debug("reCAPTCHA completed", {
@@ -117,7 +117,7 @@ export class PhoneAuthService {
       await this.recaptchaVerifier.render();
 
       const confirmationResult = await signInWithPhoneNumber(
-        phoneAuth,
+        getPhoneAuth(),
         phoneNumber,
         this.recaptchaVerifier,
       );
@@ -150,7 +150,7 @@ export class PhoneAuthService {
         phoneAuthState.verificationId,
         verificationCode,
       );
-      const userCredential = await signInWithCredential(phoneAuth, credential);
+      const userCredential = await signInWithCredential(getPhoneAuth(), credential);
 
       if (userCredential.user) {
         const idToken = await userCredential.user.getIdToken();
