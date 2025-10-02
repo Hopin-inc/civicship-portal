@@ -45,18 +45,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       refetchUser,
     });
 
-  useAuthStateChangeListener({ authStateManager });
-  useTokenExpirationHandler({ logout });
+  useLiffInitialization({ environment, liffService });
+  useAutoLogin({ environment, liffService, refetchUser });
+
   useFirebaseAuthState({ authStateManager });
   usePhoneAuthState({ authStateManager, phoneAuthService });
-  useLiffInitialization({ environment, liffService });
+
+  useAuthStateChangeListener({ authStateManager });
+  useTokenExpirationHandler({ logout });
+
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({ liffService });
   useLineAuthProcessing({
     shouldProcessRedirect,
     liffService,
     refetchUser,
   });
-  useAutoLogin({ environment, liffService, refetchUser });
 
   const actions = React.useMemo(
     () => ({ logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification }),
