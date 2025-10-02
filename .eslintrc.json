@@ -1,8 +1,5 @@
 {
   "root": true,
-  "parserOptions": {
-    "sourceType": "module"   // ← これを追加
-  },
   "overrides": [
     {
       "files": [

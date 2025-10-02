@@ -1,6 +1,6 @@
 "use client";
 
-import { getApps, initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { Auth, getAuth } from "firebase/auth";
 import { Analytics, getAnalytics, isSupported } from "firebase/analytics";
 import { logger } from "@/lib/logging";
@@ -21,14 +21,9 @@ export const lineApp = initializeApp(firebaseConfig, "line-auth-app");
 export const lineAuth: Auth = getAuth(lineApp);
 lineAuth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
 
-export const getPhoneAuth = (): Auth => {
-  const app =
-    getApps().find((a) => a.name === "phone-auth-app") ??
-    initializeApp(firebaseConfig, "phone-auth-app");
-  const auth = getAuth(app);
-  auth.tenantId = null;
-  return auth;
-};
+export const phoneApp = initializeApp(firebaseConfig, "phone-auth-app");
+export const phoneAuth: Auth = getAuth(phoneApp);
+phoneAuth.tenantId = null;
 
 let analyticsInstance: Analytics | undefined;
 

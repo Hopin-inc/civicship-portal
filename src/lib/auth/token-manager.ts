@@ -1,5 +1,6 @@
 "use client";
 
+
 import { logger } from "@/lib/logging";
 
 /**
@@ -159,13 +160,6 @@ export class TokenManager {
       });
       return true; // Any error means the token/session is invalid
     }
-  }
-
-  static isTokenExpiredSync(tokens: AuthTokens): boolean {
-    if (!tokens.expiresAt) return true;
-    const now = Date.now();
-    const bufferTime = 5 * 60 * 1000;
-    return tokens.expiresAt - now < bufferTime;
   }
 
   /**

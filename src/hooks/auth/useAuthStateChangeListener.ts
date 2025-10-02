@@ -2,27 +2,20 @@
 
 import { useEffect } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { AuthState } from "@/types/auth";
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { AuthState } from "@/contexts/AuthProvider";
 import { logger } from "@/lib/logging";
 
 interface UseAuthStateChangeListenerProps {
   authStateManager: AuthStateManager | null;
+  setState: React.Dispatch<React.SetStateAction<AuthState>>;
 }
 
-export const useAuthStateChangeListener = ({
-  authStateManager,
-}: UseAuthStateChangeListenerProps) => {
-  const setState = useAuthStore((s) => s.setState);
-
+export const useAuthStateChangeListener = ({ authStateManager, setState }: UseAuthStateChangeListenerProps) => {
   useEffect(() => {
     if (!authStateManager) return;
+
     const handleStateChange = (newState: AuthState["authenticationState"]) => {
-      logger.debug("AuthStateManager → Store", {
-        from: useAuthStore.getState().state.authenticationState,
-        to: newState,
-      });
-      setState({ authenticationState: newState });
+      setState((prev) => ({ ...prev, authenticationState: newState }));
     };
 
     authStateManager.addStateChangeListener(handleStateChange);

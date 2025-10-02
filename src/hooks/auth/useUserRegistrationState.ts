@@ -2,21 +2,17 @@
 
 import { useEffect, useRef } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
+import { AuthState } from "@/contexts/AuthProvider";
 import { GqlCurrentUserQuery } from "@/types/graphql";
 import { logger } from "@/lib/logging";
-import { useAuthStore } from "@/hooks/auth/auth-store";
 
 interface UseUserRegistrationStateProps {
   authStateManager: AuthStateManager | null;
   userData: GqlCurrentUserQuery | undefined;
+  setState: React.Dispatch<React.SetStateAction<AuthState>>;
 }
 
-export const useUserRegistrationState = ({
-  authStateManager,
-  userData,
-}: UseUserRegistrationStateProps) => {
-  const setState = useAuthStore((s) => s.setState);
-
+export const useUserRegistrationState = ({ authStateManager, userData, setState }: UseUserRegistrationStateProps) => {
   const processedUserIdRef = useRef<string | null>(null);
   const authStateManagerRef = useRef(authStateManager);
   authStateManagerRef.current = authStateManager;
@@ -31,10 +27,11 @@ export const useUserRegistrationState = ({
 
       processedUserIdRef.current = userId;
 
-      setState({
-        currentUser: userData.currentUser.user,
+      setState((prev) => ({
+        ...prev,
+        currentUser: userData.currentUser?.user,
         authenticationState: "user_registered",
-      });
+      }));
 
       const currentAuthStateManager = authStateManagerRef.current;
       if (currentAuthStateManager) {
@@ -44,7 +41,7 @@ export const useUserRegistrationState = ({
           } catch (error) {
             logger.error("Failed to update AuthStateManager user registration state", {
               error: error instanceof Error ? error.message : String(error),
-              component: "useUserRegistrationState",
+              component: "useUserRegistrationState"
             });
           }
         };

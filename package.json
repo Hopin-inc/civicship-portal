@@ -58,7 +58,6 @@
     "graphql": "^16.11.0",
     "graphql-scalars": "^1.24.2",
     "input-otp": "^1.4.2",
-    "libphonenumber-js": "^1.12.23",
     "linkify-it": "^5.0.0",
     "lucide-react": "^0.427.0",
     "markdown-to-txt": "^2.0.1",
@@ -87,8 +86,7 @@
     "utility-types": "^3.11.0",
     "winston": "^3.17.0",
     "xss": "^1.0.15",
-    "zod": "^3.25.32",
-    "zustand": "^5.0.8"
+    "zod": "^3.25.32"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.0.1",
@@ -99,11 +97,9 @@
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-eslint/eslint-plugin": "^4.4.0",
     "@graphql-typed-document-node/core": "^3.2.0",
-    "@next/bundle-analyzer": "^15.5.4",
     "@storybook/addon-a11y": "^9.0.17",
     "@storybook/addon-docs": "^9.0.17",
     "@storybook/addon-vitest": "^9.0.17",
-    "@storybook/nextjs-vite": "^9.0.17",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/apollo-upload-client": "^18.0.0",
@@ -114,8 +110,6 @@
     "@types/react-dom": "^18.3.7",
     "@types/react-linkify": "^1.0.4",
     "@types/retry": "^0.12.5",
-    "@vitest/browser": "^3.2.4",
-    "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.5",
     "eslint-config-prettier": "^9.1.0",
@@ -123,13 +117,16 @@
     "eslint-plugin-storybook": "^9.0.17",
     "graphql-cost-analysis": "^1.0.3",
     "graphql-query-complexity": "^1.1.0",
-    "playwright": "^1.54.1",
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
     "sass": "^1.89.0",
     "storybook": "^9.0.17",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
-    "vitest": "^3.2.4"
+    "@storybook/nextjs-vite": "^9.0.17",
+    "vitest": "^3.2.4",
+    "@vitest/browser": "^3.2.4",
+    "playwright": "^1.54.1",
+    "@vitest/coverage-v8": "^3.2.4"
   }
 }
