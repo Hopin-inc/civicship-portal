@@ -1,29 +1,37 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { AuthState } from "@/contexts/AuthProvider";
 import { logger } from "@/lib/logging";
+
 
 interface UseAutoLoginProps {
   environment: AuthEnvironment;
+  state: AuthState;
   liffService: LiffService;
+  setState: React.Dispatch<React.SetStateAction<AuthState>>;
   refetchUser: () => Promise<any>;
 }
 
-const useAutoLogin = ({ environment, liffService, refetchUser }: UseAutoLoginProps) => {
+const useAutoLogin = ({
+  environment,
+  state,
+  liffService,
+  setState,
+  refetchUser,
+}: UseAutoLoginProps) => {
   const attemptedRef = useRef(false);
   const prevStateRef = useRef<{ authenticationState: string; isAuthenticating: boolean } | null>(
     null,
   );
   const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
 
-  const state = useAuthStore((s) => s.state);
-  const setState = useAuthStore((s) => s.setState);
-
   useEffect(() => {
-    if (environment !== AuthEnvironment.LIFF) return;
+    if (environment !== AuthEnvironment.LIFF) {
+      return;
+    }
 
     const currentState = {
       authenticationState: state.authenticationState,
@@ -60,7 +68,9 @@ const useAutoLogin = ({ environment, liffService, refetchUser }: UseAutoLoginPro
         const handleAutoLogin = async () => {
           attemptedRef.current = true;
 
-          setState({ isAuthenticating: true });
+          const timestamp = new Date().toISOString();
+
+          setState((prev) => ({ ...prev, isAuthenticating: true }));
           try {
             const success = await liffService.signInWithLiffToken();
             if (success) {
@@ -73,7 +83,7 @@ const useAutoLogin = ({ environment, liffService, refetchUser }: UseAutoLoginPro
               component: "useAutoLogin",
             });
           } finally {
-            setState({ isAuthenticating: false });
+            setState((prev) => ({ ...prev, isAuthenticating: false }));
           }
         };
 
@@ -85,8 +95,8 @@ const useAutoLogin = ({ environment, liffService, refetchUser }: UseAutoLoginPro
     state.authenticationState,
     state.isAuthenticating,
     liffService,
-    refetchUser,
     setState,
+    refetchUser,
   ]);
 
   useEffect(() => {

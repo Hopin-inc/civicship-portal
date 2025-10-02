@@ -11,32 +11,15 @@ export const GET_USER_FLEXIBLE = gql`
     $withWallets: Boolean! = false
     $withOpportunities: Boolean! = false
     $withDidIssuanceRequests: Boolean! = false
-    $withNftInstances: Boolean! = false
   ) {
     user(id: $id) {
       ...UserFields
-      portfolios(filter: $portfolioFilter, sort: $portfolioSort, first: $portfolioFirst)
-        @include(if: $withPortfolios) {
+      portfolios(
+        filter: $portfolioFilter
+        sort: $portfolioSort
+        first: $portfolioFirst
+      ) @include(if: $withPortfolios) {
         ...UserPortfolioFields
-      }
-      nftInstances @include(if: $withNftInstances) {
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-          startCursor
-          endCursor
-        }
-        totalCount
-        edges {
-          cursor
-          node {
-            id
-            instanceId
-            imageUrl
-            name
-            createdAt
-          }
-        }
       }
       didIssuanceRequests @include(if: $withDidIssuanceRequests) {
         ...DidIssuanceRequestFields

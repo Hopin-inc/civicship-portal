@@ -97,11 +97,10 @@ export class LiffService {
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      const isEnvironmentConstraint =
-        errorMessage.includes("LIFF") ||
-        errorMessage.includes("LINE") ||
-        errorMessage.includes("Load failed");
-
+      const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
+                                     errorMessage.includes("LINE") ||
+                                     errorMessage.includes("Load failed");
+      
       if (isEnvironmentConstraint) {
         logger.warn("LIFF environment initialization limitation", {
           authType: "liff",
@@ -120,7 +119,7 @@ export class LiffService {
       }
       this.state.error = error as Error;
       return false;
-    } finally {
+    }finally {
       this.initializing = false;
     }
   }
@@ -139,12 +138,11 @@ export class LiffService {
       if (liff.isInClient()) {
         this.state.isLoggedIn = true;
       } else {
-        const redirectUri =
-          typeof window !== "undefined"
-            ? redirectPath
-              ? window.location.origin + redirectPath
-              : window.location.origin
-            : undefined;
+        const redirectUri = typeof window !== "undefined"
+          ? redirectPath
+            ? window.location.origin + redirectPath
+            : window.location.origin
+          : undefined;
 
         liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない
@@ -154,11 +152,10 @@ export class LiffService {
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      const isEnvironmentConstraint =
-        errorMessage.includes("LIFF") ||
-        errorMessage.includes("LINE") ||
-        errorMessage.includes("Load failed");
-
+      const isEnvironmentConstraint = errorMessage.includes("LIFF") ||
+                                     errorMessage.includes("LINE") ||
+                                     errorMessage.includes("Load failed");
+      
       if (isEnvironmentConstraint) {
         logger.warn("LIFF environment login limitation", {
           authType: "liff",

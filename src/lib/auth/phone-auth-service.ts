@@ -6,30 +6,62 @@ import {
   signInWithCredential,
   signInWithPhoneNumber,
 } from "firebase/auth";
+import { phoneAuth } from "./firebase-config";
 import { PhoneAuthTokens, TokenManager } from "./token-manager";
 import { isRunningInLiff } from "./environment-detector";
+import { maskPhoneNumber } from "../logging/client/utils";
 import { logger } from "@/lib/logging";
-import { useAuthStore } from "@/hooks/auth/auth-store";
-import { getPhoneAuth } from "@/lib/auth/firebase-config";
 
+/**
+ * 電話番号認証の状態
+ */
+export type PhoneAuthState = {
+  isVerifying: boolean;
+  isVerified: boolean;
+  phoneNumber: string | null;
+  phoneUid: string | null;
+  verificationId: string | null;
+  error: Error | null;
+};
+
+/**
+ * 電話番号認証サービス
+ */
 export class PhoneAuthService {
   private static instance: PhoneAuthService;
+  private state: PhoneAuthState;
   private recaptchaVerifier: RecaptchaVerifier | null = null;
   private recaptchaContainerElement: HTMLElement | null = null;
   private isRecaptchaRendered: boolean = false;
   private recaptchaContainerId: string = "recaptcha-container";
 
+  /**
+   * コンストラクタ
+   */
   private constructor() {
+    this.state = {
+      isVerifying: false,
+      isVerified: false,
+      phoneNumber: null,
+      phoneUid: null,
+      verificationId: null,
+      error: null,
+    };
+
     const savedTokens = TokenManager.getPhoneTokens();
     if (savedTokens.phoneUid && savedTokens.phoneNumber && savedTokens.accessToken) {
-      useAuthStore.getState().setPhoneAuth({
-        isVerified: true,
-        phoneUid: savedTokens.phoneUid,
-        phoneNumber: savedTokens.phoneNumber,
-      });
+      this.state.isVerified = true;
+      this.state.phoneUid = savedTokens.phoneUid;
+      this.state.phoneNumber = savedTokens.phoneNumber;
+
+    } else {
     }
   }
 
+  /**
+   * シングルトンインスタンスを取得
+   * @returns PhoneAuthServiceのインスタンス
+   */
   public static getInstance(): PhoneAuthService {
     if (!PhoneAuthService.instance) {
       PhoneAuthService.instance = new PhoneAuthService();
@@ -37,29 +69,42 @@ export class PhoneAuthService {
     return PhoneAuthService.instance;
   }
 
+  /**
+   * reCAPTCHAコンテナIDを動的に変更
+   */
   private generateNewContainerId(): void {
-    this.recaptchaContainerId = `recaptcha-container-${Date.now()}-${Math.random()
-      .toString(36)
-      .substr(2, 9)}`;
+    this.recaptchaContainerId = `recaptcha-container-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
+  /**
+   * reCAPTCHAをクリア
+   */
   public clearRecaptcha(): void {
     try {
+      // reCAPTCHA Verifierをクリア
       if (this.recaptchaVerifier) {
         this.recaptchaVerifier.clear();
         this.recaptchaVerifier = null;
       }
+      
+      // コンテナ要素をクリア
       if (this.recaptchaContainerElement) {
-        const existingRecaptcha = this.recaptchaContainerElement.querySelector(".grecaptcha-badge");
+        // 既存のreCAPTCHA要素を削除
+        const existingRecaptcha = this.recaptchaContainerElement.querySelector('.grecaptcha-badge');
         if (existingRecaptcha) {
           existingRecaptcha.remove();
         }
+        
+        // コンテナを空にする
         this.recaptchaContainerElement.innerHTML = "";
       }
-      if (typeof window !== "undefined" && (window as any).grecaptcha) {
+      
+      // グローバルreCAPTCHA状態もリセット
+      if (typeof window !== 'undefined' && (window as any).grecaptcha) {
         try {
           (window as any).grecaptcha.reset();
         } catch (e) {
+          // このエラーは予想されるので無視
           logger.info("reCAPTCHA reset (expected)", {
             authType: "phone",
             error: e instanceof Error ? e.message : String(e),
@@ -67,6 +112,7 @@ export class PhoneAuthService {
           });
         }
       }
+      
       this.recaptchaContainerElement = null;
       this.isRecaptchaRendered = false;
     } catch (e) {
@@ -78,26 +124,41 @@ export class PhoneAuthService {
     }
   }
 
+  /**
+   * 電話番号認証を開始
+   * @param phoneNumber 電話番号
+   * @returns 認証IDまたはnull（エラー時）
+   */
   public async startPhoneVerification(phoneNumber: string): Promise<string | null> {
     try {
-      useAuthStore.getState().setPhoneAuth({ isVerifying: true, error: null });
+      this.state.isVerifying = true;
+      this.state.error = null;
 
+      // 前回のVerifierを明示的にクリア
       this.clearRecaptcha();
+
+      // 新しいコンテナIDを生成（Firebaseの内部状態管理を回避）
       this.generateNewContainerId();
+
+      // Googleの内部非同期処理との競合を避けるため少し待つ
       await new Promise((resolve) => setTimeout(resolve, 500));
 
+      // 新しいコンテナ要素を作成
       const baseContainer = document.getElementById("recaptcha-container");
       if (!baseContainer) {
         throw new Error("Base reCAPTCHA container element not found");
       }
 
+      // 新しいコンテナ要素を作成
       const newContainer = document.createElement("div");
       newContainer.id = this.recaptchaContainerId;
       baseContainer.appendChild(newContainer);
 
       this.recaptchaContainerElement = newContainer;
 
-      this.recaptchaVerifier = new RecaptchaVerifier(getPhoneAuth(), this.recaptchaContainerId, {
+      // 新しいインスタンスを作る
+      // LIFF環境ではnormal、通常ブラウザではinvisibleを使用
+      this.recaptchaVerifier = new RecaptchaVerifier(phoneAuth, this.recaptchaContainerId, {
         size: isRunningInLiff() ? "normal" : "invisible",
         callback: () => {
           logger.debug("reCAPTCHA completed", {
@@ -105,8 +166,10 @@ export class PhoneAuthService {
             component: "PhoneAuthService",
             environment: isRunningInLiff() ? "liff" : "browser",
           });
+          
+          // LIFF環境でreCAPTCHAが完了したら、即座に非表示にするためのイベントを発火
           if (isRunningInLiff()) {
-            window.dispatchEvent(new CustomEvent("recaptcha-completed"));
+            window.dispatchEvent(new CustomEvent('recaptcha-completed'));
           }
         },
         "expired-callback": () => {
@@ -116,82 +179,232 @@ export class PhoneAuthService {
 
       await this.recaptchaVerifier.render();
 
+      // LIFF環境では、reCAPTCHAの表示を待つ
+      if (isRunningInLiff()) {
+        // reCAPTCHAが表示されるまで少し待つ
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        
+        // reCAPTCHA要素が表示されているかチェック
+        const recaptchaElement = document.querySelector('.grecaptcha-badge');
+        if (!recaptchaElement) {
+          logger.warn("reCAPTCHA not visible in LIFF environment", {
+            authType: "phone",
+            component: "PhoneAuthService",
+            errorCategory: "ui_rendering",
+          });
+        }
+      }
+
       const confirmationResult = await signInWithPhoneNumber(
-        getPhoneAuth(),
+        phoneAuth,
         phoneNumber,
         this.recaptchaVerifier,
       );
 
-      useAuthStore.getState().setPhoneAuth({
-        phoneNumber,
-        verificationId: confirmationResult.verificationId,
-      });
+      this.state.phoneNumber = phoneNumber;
+      this.state.verificationId = confirmationResult.verificationId;
 
       return confirmationResult.verificationId;
     } catch (error) {
-      useAuthStore.getState().setPhoneAuth({ error: error as Error });
-      throw error;
-    } finally {
-      useAuthStore.getState().setPhoneAuth({ isVerifying: false });
-    }
-  }
-
-  public async verifyPhoneCode(verificationCode: string): Promise<boolean> {
-    const phoneAuthState = useAuthStore.getState().phoneAuth;
-    if (!phoneAuthState.verificationId) {
-      logger.error("Missing verificationId", { component: "PhoneAuthService" });
-      return false;
-    }
-
-    useAuthStore.getState().setPhoneAuth({ isVerifying: true, error: null });
-
-    try {
-      const credential = PhoneAuthProvider.credential(
-        phoneAuthState.verificationId,
-        verificationCode,
-      );
-      const userCredential = await signInWithCredential(getPhoneAuth(), credential);
-
-      if (userCredential.user) {
-        const idToken = await userCredential.user.getIdToken();
-        const refreshToken = userCredential.user.refreshToken;
-        const tokenResult = await userCredential.user.getIdTokenResult();
-        const expirationTime = new Date(tokenResult.expirationTime).getTime();
-
-        const tokens: PhoneAuthTokens = {
-          phoneUid: userCredential.user.uid,
-          phoneNumber: phoneAuthState.phoneNumber,
-          accessToken: idToken,
-          refreshToken,
-          expiresAt: expirationTime,
-        };
-        TokenManager.savePhoneTokens(tokens);
-
-        useAuthStore.getState().setPhoneAuth({
-          phoneUid: userCredential.user.uid,
-          isVerified: true,
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isUserInputError = errorMessage.includes("invalid") ||
+                              errorMessage.includes("format") ||
+                              errorMessage.includes("number");
+      
+      if (isUserInputError) {
+        logger.info("Phone verification user input error", {
+          authType: "phone",
+          error: errorMessage,
+          component: "PhoneAuthService",
+          phoneNumber: maskPhoneNumber(phoneNumber),
+          errorCategory: "user_input",
         });
-        return true;
+      } else {
+        logger.warn("Phone verification process failed", {
+          authType: "phone",
+          error: errorMessage,
+          component: "PhoneAuthService",
+          phoneNumber: maskPhoneNumber(phoneNumber),
+          errorCategory: "verification_temporary",
+          retryable: true,
+        });
       }
-      return false;
-    } catch (error) {
-      useAuthStore.getState().setPhoneAuth({ error: error as Error });
-      return false;
-    } finally {
-      useAuthStore.getState().setPhoneAuth({ isVerifying: false });
+      this.state.error = error as Error;
+      throw error;
+    }finally {
+      this.state.isVerifying = false;
     }
   }
 
+  /**
+   * 電話番号認証コードを検証
+   * @param verificationCode 認証コード
+   * @returns 検証が成功したかどうか
+   */
+  public async verifyPhoneCode(verificationCode: string): Promise<boolean> {
+    try {
+      this.state.isVerifying = true;
+      this.state.error = null;
+
+      if (!this.state.verificationId) {
+        logger.error("Missing verificationId", {
+          component: "PhoneAuthService",
+        });
+        return false;
+      }
+
+      try {
+        const credential = PhoneAuthProvider.credential(
+          this.state.verificationId,
+          verificationCode,
+        );
+
+        let verificationSuccessful = false;
+
+        try {
+          const userCredential = await signInWithCredential(phoneAuth, credential);
+
+          if (userCredential.user) {
+            this.state.phoneUid = userCredential.user.uid;
+
+            const idToken = await userCredential.user.getIdToken();
+            const refreshToken = userCredential.user.refreshToken;
+
+            const tokenResult = await userCredential.user.getIdTokenResult();
+            const expirationTime = new Date(tokenResult.expirationTime).getTime();
+
+            const tokens: PhoneAuthTokens = {
+              phoneUid: userCredential.user.uid,
+              phoneNumber: this.state.phoneNumber,
+              accessToken: idToken,
+              refreshToken: refreshToken,
+              expiresAt: expirationTime,
+            };
+            TokenManager.savePhoneTokens(tokens);
+            verificationSuccessful = true;
+          } else {
+            logger.error("No user returned from signInWithCredential", {
+              component: "PhoneAuthService",
+            });
+          }
+
+          await phoneAuth.signOut();
+        } catch (signInError) {
+          const errorMessage = signInError instanceof Error ? signInError.message : String(signInError);
+          const isUserInputError = errorMessage.includes("invalid") ||
+                                  errorMessage.includes("wrong") ||
+                                  errorMessage.includes("incorrect");
+          
+          if (isUserInputError) {
+            logger.info("Phone verification invalid code", {
+              authType: "phone",
+              error: errorMessage,
+              component: "PhoneAuthService",
+              errorCategory: "user_input",
+            });
+          } else {
+            logger.warn("Phone credential sign-in failed", {
+              authType: "phone",
+              error: errorMessage,
+              component: "PhoneAuthService",
+              errorCategory: "auth_temporary",
+              retryable: true,
+            });
+          }
+          return false;
+        }
+
+        if (verificationSuccessful) {
+          this.state.isVerified = true;
+          return true;
+        } else {
+          return false;
+        }
+      } catch (credentialError) {
+        logger.info("Invalid verification code", {
+          authType: "phone",
+          error:
+            credentialError instanceof Error ? credentialError.message : String(credentialError),
+          component: "PhoneAuthService",
+          errorCategory: "user_input",
+        });
+        return false;
+      }
+    } catch (error) {
+      logger.warn("Code verification process failed", {
+        authType: "phone",
+        error: error instanceof Error ? error.message : String(error),
+        component: "PhoneAuthService",
+        errorCategory: "verification_temporary",
+        retryable: true,
+      });
+      this.state.error = error as Error;
+      return false;
+    }finally {
+      this.state.isVerifying = false;
+    }
+  }
+
+  /**
+   * 電話番号認証トークンを更新
+   * @returns 新しいトークンまたはnull（エラー時）
+   */
+  public async refreshPhoneIdToken(): Promise<string | null> {
+    try {
+      if (!phoneAuth.currentUser) {
+        logger.info("Cannot refresh phone token: No authenticated user", {
+          authType: "phone",
+          component: "PhoneAuthService",
+        });
+        return null;
+      }
+
+      const idToken = await phoneAuth.currentUser.getIdToken(true);
+      const refreshToken = phoneAuth.currentUser.refreshToken;
+      const tokenResult = await phoneAuth.currentUser.getIdTokenResult();
+      const expirationTime = new Date(tokenResult.expirationTime).getTime();
+
+      const tokens: PhoneAuthTokens = {
+        phoneUid: phoneAuth.currentUser.uid,
+        phoneNumber: this.state.phoneNumber,
+        accessToken: idToken,
+        refreshToken: refreshToken,
+        expiresAt: expirationTime,
+      };
+      TokenManager.savePhoneTokens(tokens);
+
+      return idToken;
+    } catch (error) {
+      logger.info("Failed to refresh phone ID token", {
+        authType: "phone",
+        error: error instanceof Error ? error.message : String(error),
+        component: "PhoneAuthService",
+      });
+      return null;
+    }
+  }
+
+  /**
+   * 現在の電話番号認証状態を取得
+   * @returns 電話番号認証状態
+   */
+  public getState(): PhoneAuthState {
+    return { ...this.state };
+  }
+
+  /**
+   * 電話番号認証状態をリセット
+   */
   public reset(): void {
     this.clearRecaptcha();
     TokenManager.clearPhoneTokens();
-    useAuthStore.getState().setPhoneAuth({
+    this.state = {
       isVerifying: false,
       isVerified: false,
       phoneNumber: null,
       phoneUid: null,
       verificationId: null,
       error: null,
-    });
+    };
   }
 }
