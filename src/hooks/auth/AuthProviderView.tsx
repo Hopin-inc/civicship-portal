@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { ErrorState } from "@/components/shared";
 
 type Props = {
   isAuthInitialized: boolean;
@@ -16,10 +17,10 @@ export const AuthProviderView: React.FC<Props> = ({
   children,
 }) => {
   // if (!isAuthInitialized) {
-  //   if (authInitError) {
-  //     const refetchRef = { current: retryInitialization };
-  //     return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
-  //   }
+  if (authInitError) {
+    const refetchRef = { current: retryInitialization };
+    return <ErrorState title="認証の初期化に失敗しました" refetchRef={refetchRef} />;
+  }
   //   return <LoadingIndicator fullScreen />;
   // }
 
