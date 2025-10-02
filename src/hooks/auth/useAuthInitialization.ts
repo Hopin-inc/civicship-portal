@@ -19,9 +19,10 @@ export const useAuthInitialization = ({ authStateManager }: UseAuthInitializatio
     loading: userLoading,
     refetch: refetchUser,
   } = useCurrentUserQuery({
-    skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
-      state.authenticationState,
-    ),
+    skip: !authStateManager,
+    // skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
+    //   state.authenticationState,
+    // ),
     fetchPolicy: "network-only",
   });
 
