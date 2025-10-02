@@ -46,6 +46,7 @@ export const useCreateUser = (refetchUser: () => Promise<any>) => {
 
         if (data?.userSignUp?.user) {
           await refetchUser();
+          useAuthStore.getState().setState({ authenticationState: "user_registered" });
           toast.success("アカウントを作成しました");
           return firebaseUser;
         }

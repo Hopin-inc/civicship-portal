@@ -38,7 +38,6 @@ type FormValues = z.infer<typeof FormSchema>;
 export function SignUpForm() {
   const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -57,11 +56,7 @@ export function SignUpForm() {
       }
 
       const phoneUid = phoneAuth.phoneUid;
-
-      const user = await createUser(values.name, values.prefecture, phoneUid);
-      if (user) {
-        setIsRedirecting(true);
-      }
+      await createUser(values.name, values.prefecture, phoneUid);
     } catch (error) {
       logger.error("Sign up error", {
         error: error instanceof Error ? error.message : String(error),
@@ -74,10 +69,6 @@ export function SignUpForm() {
   };
 
   if (loading) {
-    return <LoadingIndicator />;
-  }
-
-  if (isRedirecting) {
     return <LoadingIndicator />;
   }
 
@@ -150,9 +141,9 @@ export function SignUpForm() {
             />
           )}
 
-          <Button 
-            type="submit" 
-            className="w-full h-12 text-base" 
+          <Button
+            type="submit"
+            className="w-full h-12 text-base"
             disabled={isLoading || !!form.formState.errors.name}
           >
             {isLoading ? "作成中..." : "アカウントを作成"}
