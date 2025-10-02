@@ -1,9 +1,8 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthProvider";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useUserProfile } from "../hooks/useUserProfile";
-import { useUserNfts } from "@/components/domains/nfts/hooks/useUserNft";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { notFound } from "next/navigation";
@@ -19,42 +18,33 @@ export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
 
   const { user: currentUser, isAuthenticating } = useAuth();
-  const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(
+  const { userData, nftInstances, selfOpportunities, isLoading, error, refetch } = useUserProfile(
     currentUser?.id,
   );
-  const { nftInstances } = useUserNfts({ userId: currentUser?.id ?? "" });
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  // 認証中 or リダイレクト待ち → ローディング表示
-  if (isAuthenticating || !currentUser) {
+  const formattedOpportunities = useMemo(
+    () => selfOpportunities.map(formatOpportunities),
+    [selfOpportunities],
+  );
+
+  if (isAuthenticating || !currentUser || isLoading) {
     return <LoadingIndicator />;
   }
 
-  // 認証完了してるけど currentUser が null → 何も描画しない（push 発火済み）
-  if (!currentUser || isLoading) {
-    return <LoadingIndicator />;
-  }
-
-  // エラー
-  if (error) {
+  if (error)
     return <ErrorState title={"マイページを読み込めませんでした"} refetchRef={refetchRef} />;
-  }
 
-  // データがない → notFound()
-  if (!userData) {
-    return notFound();
-  }
+  if (!userData) return notFound();
 
   const targetFeatures = ["opportunities", "credentials"] as const;
   const shouldShowOpportunities = targetFeatures.some((feature) =>
     currentCommunityConfig.enableFeatures.includes(feature),
   );
-
-  const formattedOpportunities = selfOpportunities.map(formatOpportunities);
 
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">
