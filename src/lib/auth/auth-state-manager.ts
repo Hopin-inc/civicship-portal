@@ -1,10 +1,9 @@
 import { TokenManager } from "./token-manager";
-import { apolloClient } from "@/lib/apollo";
-import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 
 import { logger } from "@/lib/logging";
 import { AuthenticationState } from "@/types/auth";
 import { lineAuth } from "@/lib/auth/firebase-config";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 export class AuthStateManager {
   private static instance: AuthStateManager;
@@ -128,29 +127,10 @@ export class AuthStateManager {
       if (!lineAuth?.currentUser) {
         return false;
       }
+      const state = useAuthStore.getState();
+      const currentUser = state.state.currentUser;
 
-      let accessToken = null;
-      try {
-        accessToken = await lineAuth.currentUser.getIdToken();
-      } catch (tokenError) {
-        logger.info("Failed to get Firebase token for user registration check", {
-          error: tokenError instanceof Error ? tokenError.message : String(tokenError),
-          component: "AuthStateManager",
-        });
-        return false;
-      }
-
-      const { data } = await apolloClient.query({
-        query: GET_CURRENT_USER,
-        fetchPolicy: "cache-first",
-        context: {
-          headers: {
-            Authorization: accessToken ? `Bearer ${accessToken}` : "",
-          },
-        },
-      });
-
-      return data?.currentUser?.user != null;
+      return currentUser != null;
     } catch (error) {
       logger.info("Failed to check user registration", {
         error: error instanceof Error ? error.message : String(error),
