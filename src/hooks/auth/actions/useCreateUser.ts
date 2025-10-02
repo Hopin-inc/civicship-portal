@@ -1,6 +1,4 @@
 import { useCallback } from "react";
-import { User } from "firebase/auth";
-import { toast } from "sonner";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { TokenManager } from "@/lib/auth/token-manager";
 import { logger } from "@/lib/logging";
@@ -12,21 +10,8 @@ export const useCreateUser = (refetchUser: () => Promise<any>) => {
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
 
   return useCallback(
-    async (
-      name: string,
-      prefecture: GqlCurrentPrefecture,
-      phoneUid: string | null,
-    ): Promise<User | null> => {
+    async (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string) => {
       try {
-        if (!firebaseUser) {
-          toast.error("LINE認証が完了していません");
-          return null;
-        }
-        if (!phoneUid) {
-          toast.error("電話番号認証が完了していません");
-          return null;
-        }
-
         const phoneTokens = TokenManager.getPhoneTokens();
         const lineTokens = TokenManager.getLineTokens();
 
@@ -45,18 +30,20 @@ export const useCreateUser = (refetchUser: () => Promise<any>) => {
         });
 
         if (data?.userSignUp?.user) {
-          await refetchUser();
-          useAuthStore.getState().setState({ authenticationState: "user_registered" });
-          toast.success("アカウントを作成しました");
+          const { data: refreshed } = await refetchUser();
+          if (refreshed?.currentUser?.user) {
+            useAuthStore.getState().setState({
+              firebaseUser,
+              authenticationState: "user_registered",
+              currentUser: refreshed.currentUser.user,
+            });
+          }
           return firebaseUser;
         }
-
-        toast.error("アカウント作成に失敗しました");
         return null;
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
         logger.error("User creation error", { error: msg });
-        toast.error("アカウント作成に失敗しました", { description: msg });
         return null;
       }
     },
