@@ -39,11 +39,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     fetchPolicy: "network-only",
   });
 
-  // const { isAuthInitialized, authInitError, retryInitialization, userLoading } =
-  //   useAuthInitialization({
-  //     authStateManager,
-  //   });
-
   const { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode } =
     useAuthActions({
       authStateManager,
@@ -52,21 +47,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       refetchUser,
     });
 
-  // useLiffInitialization({ environment, liffService });
-  // useAutoLogin({ environment, liffService, refetchUser });
-
   useFirebaseAuthState({ authStateManager });
-  // usePhoneAuthState({ authStateManager, phoneAuthService });
-
   useAuthStateChangeListener({ authStateManager });
   useTokenExpirationHandler({ logout });
-
-  // const { shouldProcessRedirect } = useLineAuthRedirectDetection({ liffService });
-  // useLineAuthProcessing({
-  //   shouldProcessRedirect,
-  //   liffService,
-  //   refetchUser,
-  // });
 
   const actions = React.useMemo(
     () => ({ logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification }),
@@ -79,15 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     actions,
   });
 
-  return (
-    // <AuthProviderView
-    //   isAuthInitialized={isAuthInitialized}
-    //   authInitError={authInitError}
-    //   retryInitialization={retryInitialization}
-    // >
-    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-    // </AuthProviderView>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {
