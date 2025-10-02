@@ -3,20 +3,8 @@ import { apolloClient } from "@/lib/apollo";
 import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
 
 import { logger } from "@/lib/logging";
+import { AuthenticationState } from "@/types/auth";
 
-export type AuthenticationState =
-  | "unauthenticated"
-  | "line_authenticated"
-  | "line_token_expired"
-  | "phone_authenticated"
-  | "phone_token_expired"
-  | "user_registered"
-  | "loading";
-
-/**
- * 認証状態の管理を担当するクラス
- * 認証状態の遷移ロジックを集約し、他のコンポーネントから参照できるようにする
- */
 export class AuthStateManager {
   private static instance: AuthStateManager;
   private currentState: AuthenticationState = "loading";
@@ -31,9 +19,6 @@ export class AuthStateManager {
     }
   }
 
-  /**
-   * シングルトンインスタンスを取得
-   */
   public static getInstance(): AuthStateManager {
     if (!AuthStateManager.instance) {
       AuthStateManager.instance = new AuthStateManager();
@@ -41,25 +26,10 @@ export class AuthStateManager {
     return AuthStateManager.instance;
   }
 
-  /**
-   * 現在の認証状態を取得
-   */
   public getState(): AuthenticationState {
     return this.currentState;
   }
 
-  /**
-   * 現在のセッションIDを取得
-   */
-  public getSessionId(): string {
-    return this.sessionId;
-  }
-
-  /**
-   * セッションIDを初期化する
-   * localStorage から既存のIDを取得するか、新しいIDを生成する
-   * ログイン状態に関係なく同一ブラウザでは同じIDを維持
-   */
   private initializeSessionId(): string {
     if (typeof window === "undefined") {
       return this.generateSessionId();
@@ -81,9 +51,10 @@ export class AuthStateManager {
     }
   }
 
-  /**
-   * セッションIDを生成する
-   */
+  public getSessionId(): string {
+    return this.sessionId;
+  }
+
   private generateSessionId(): string {
     if (typeof crypto !== "undefined" && crypto.randomUUID) {
       return `auth_${Date.now()}_${crypto.randomUUID().replace(/-/g, "").substring(0, 9)}`;
@@ -96,24 +67,14 @@ export class AuthStateManager {
     }
   }
 
-  /**
-   * 認証状態の変更を監視するリスナーを追加
-   */
   public addStateChangeListener(listener: (state: AuthenticationState) => void): void {
     this.stateChangeListeners.push(listener);
   }
 
-  /**
-   * 認証状態の変更を監視するリスナーを削除
-   */
   public removeStateChangeListener(listener: (state: AuthenticationState) => void): void {
     this.stateChangeListeners = this.stateChangeListeners.filter((l) => l !== listener);
   }
 
-
-  /**
-   * 認証状態を更新
-   */
   public setState(state: AuthenticationState): void {
     if (this.currentState !== state) {
       this.currentState = state;
@@ -121,25 +82,19 @@ export class AuthStateManager {
     }
   }
 
-  /**
-   * 認証状態の変更を通知
-   */
   private notifyStateChange(): void {
     this.stateChangeListeners.forEach((listener) => {
       listener(this.currentState);
     });
   }
 
-
-  /**
-   * 認証状態を初期化
-   */
   public async initialize(): Promise<void> {
     try {
       this.setState("loading");
 
       const lineTokens = TokenManager.getLineTokens();
-      const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+      const hasValidLineToken =
+        lineTokens.accessToken && !TokenManager.isTokenExpiredSync(lineTokens);
 
       if (!hasValidLineToken) {
         this.setState("unauthenticated");
@@ -153,7 +108,7 @@ export class AuthStateManager {
       } else {
         const phoneTokens = TokenManager.getPhoneTokens();
         const hasValidPhoneToken =
-          phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
+          phoneTokens.accessToken && !TokenManager.isTokenExpiredSync(lineTokens);
 
         if (hasValidPhoneToken) {
           this.setState("phone_authenticated");
@@ -165,17 +120,12 @@ export class AuthStateManager {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error("Auth initialization failed", {
         error: errorMessage,
-        component: "AuthStateManager"
+        component: "AuthStateManager",
       });
       throw error;
     }
   }
 
-
-  /**
-   * ユーザー情報の登録状態を確認
-   * Firebase Authの状態も考慮してより確実にチェック
-   */
   private async checkUserRegistration(): Promise<boolean> {
     try {
       const { lineAuth } = await import("./firebase-config");
@@ -215,9 +165,6 @@ export class AuthStateManager {
     }
   }
 
-  /**
-   * LINEトークン更新イベントのハンドラー
-   */
   private async handleLineTokenRenewal(event: Event): Promise<void> {
     try {
       const renewed = await TokenManager.renewLineToken();
@@ -241,9 +188,6 @@ export class AuthStateManager {
     }
   }
 
-  /**
-   * 電話番号トークン更新イベントのハンドラー
-   */
   private async handlePhoneTokenRenewal(event: Event): Promise<void> {
     try {
       const renewed = await TokenManager.renewPhoneToken();
@@ -279,9 +223,6 @@ export class AuthStateManager {
     }
   }
 
-  /**
-   * LINE認証状態の変更を処理
-   */
   public async handleLineAuthStateChange(isAuthenticated: boolean): Promise<void> {
     if (isAuthenticated) {
       if (this.currentState === "unauthenticated" || this.currentState === "loading") {
@@ -292,12 +233,10 @@ export class AuthStateManager {
     }
   }
 
-  /**
-   * 電話番号認証状態の変更を処理
-   */
   public async handlePhoneAuthStateChange(isVerified: boolean): Promise<void> {
     const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = !!lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+    const hasValidLineToken =
+      !!lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
     if (!hasValidLineToken && this.currentState !== "loading") {
       this.setState("unauthenticated");
@@ -318,9 +257,6 @@ export class AuthStateManager {
     }
   }
 
-  /**
-   * ユーザー情報登録状態の変更を処理
-   */
   public async handleUserRegistrationStateChange(isRegistered: boolean): Promise<void> {
     const lineTokens = TokenManager.getLineTokens();
     const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
