@@ -7,6 +7,8 @@ import type { LiffService } from "@/lib/auth/liff-service";
 import type { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
 
+let inProgress = false;
+
 export async function initAuth({
   liffService,
   authStateManager,
@@ -14,6 +16,8 @@ export async function initAuth({
   liffService: LiffService;
   authStateManager: AuthStateManager;
 }) {
+  if (inProgress) return;
+  inProgress = true;
   const environment = detectEnvironment();
   const { setState } = useAuthStore.getState();
   setState({ authenticationState: "loading", isAuthenticating: true });
@@ -70,25 +74,27 @@ export async function initAuth({
     setState({ authenticationState: "line_authenticated", isAuthenticating: false });
 
     // --- 🔑 リダイレクト後処理
-    const { isInitialized, isLoggedIn } = liffService.getState();
-    const alreadyProcessed = useAuthStore.getState().state.processedRedirect;
+    if (environment !== AuthEnvironment.LIFF) {
+      const { isInitialized, isLoggedIn } = liffService.getState();
 
-    if (isInitialized && isLoggedIn && !alreadyProcessed) {
-      setState({ processedRedirect: true });
-      const success = await liffService.signInWithLiffToken();
-      if (success) {
-        const newUser = await fetchCurrentUserClient(); // 👈 refetchUser の代わりに再取得
-        if (newUser) {
-          setState({
-            currentUser: newUser,
-            authenticationState: "user_registered",
-            isAuthenticating: false,
-          });
-          await authStateManager.handleUserRegistrationStateChange(true);
+      if (isInitialized && isLoggedIn) {
+        const success = await liffService.signInWithLiffToken();
+        if (success) {
+          const newUser = await fetchCurrentUserClient();
+          if (newUser) {
+            setState({
+              currentUser: newUser,
+              authenticationState: "user_registered",
+              isAuthenticating: false,
+            });
+            await authStateManager.handleUserRegistrationStateChange(true);
+          }
         }
       }
     }
   } catch (e) {
     setState({ authenticationState: "unauthenticated", isAuthenticating: false });
+  } finally {
+    inProgress = false;
   }
 }
