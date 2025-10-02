@@ -2,21 +2,14 @@ import {
   ApolloClient,
   ApolloClientOptions,
   ApolloLink,
-  InMemoryCache,
   NormalizedCacheObject,
-} from "@apollo/client";
+} from "@apollo/client/core";
+import { InMemoryCache } from "@apollo/client/cache";
 import { onError } from "@apollo/client/link/error";
-import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
-import { __DEV__ } from "@apollo/client/utilities/globals";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { TokenManager } from "./auth/token-manager";
 
 import { logger } from "@/lib/logging";
-
-if (__DEV__) {
-  loadDevMessages();
-  loadErrorMessages();
-}
 
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
