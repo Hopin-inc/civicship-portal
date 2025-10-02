@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthState } from "@/types/auth";
 import { useAuthStore } from "@/hooks/auth/auth-store";
+import { logger } from "@/lib/logging";
 
 interface UseAuthStateChangeListenerProps {
   authStateManager: AuthStateManager | null;
@@ -17,6 +18,10 @@ export const useAuthStateChangeListener = ({
   useEffect(() => {
     if (!authStateManager) return;
     const handleStateChange = (newState: AuthState["authenticationState"]) => {
+      logger.debug("AuthStateManager → Store", {
+        from: useAuthStore.getState().state.authenticationState,
+        to: newState,
+      });
       setState({ authenticationState: newState });
     };
 
