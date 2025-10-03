@@ -13,6 +13,8 @@ import { useAuthValue } from "@/hooks/auth/useAuthValue";
 import { useCurrentUserQuery } from "@/types/graphql";
 import { initAuth } from "@/lib/auth/initAuth";
 import { useAuthStore } from "@/hooks/auth/auth-store";
+import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
+import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -50,6 +52,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useFirebaseAuthState({ authStateManager });
   useAuthStateChangeListener({ authStateManager });
   useTokenExpirationHandler({ logout });
+  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ liffService });
+  useLineAuthProcessing({ shouldProcessRedirect, liffService, refetchUser });
 
   const actions = React.useMemo(
     () => ({ logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification }),
