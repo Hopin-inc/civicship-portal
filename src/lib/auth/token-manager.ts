@@ -1,6 +1,8 @@
 "use client";
 
 import { logger } from "@/lib/logging";
+import { lineAuth } from "@/lib/auth/firebase-config";
+import { User } from "@firebase/auth";
 
 /**
  * 認証トークン情報の型定義
@@ -11,9 +13,6 @@ export interface AuthTokens {
   expiresAt: number | null;
 }
 
-/**
- * 電話番号認証トークン情報の型定義
- */
 export interface PhoneAuthTokens {
   phoneUid: string | null;
   phoneNumber: string | null;
@@ -22,10 +21,10 @@ export interface PhoneAuthTokens {
   expiresAt: number | null;
 }
 
-/**
- * 認証トークンを管理するクラス
- */
 export class TokenManager {
+  private static cachedToken: string | null = null;
+  private static cachedExpiry: number | null = null;
+
   private static readonly LINE_ACCESS_TOKEN_KEY = "access_token";
   private static readonly LINE_REFRESH_TOKEN_KEY = "refresh_token";
   private static readonly LINE_TOKEN_EXPIRES_AT_KEY = "token_expires_at";
@@ -102,10 +101,10 @@ export class TokenManager {
     const expiresAtStr = this.getCookie(this.PHONE_TOKEN_EXPIRES_AT_KEY);
 
     return {
-      phoneUid,
-      phoneNumber,
       accessToken,
       refreshToken,
+      phoneUid,
+      phoneNumber,
       expiresAt: expiresAtStr ? parseInt(expiresAtStr, 10) : null,
     };
   }
@@ -136,6 +135,21 @@ export class TokenManager {
   static clearAllTokens(): void {
     this.clearLineTokens();
     this.clearPhoneTokens();
+  }
+
+  static async getCachedToken(user: User | null): Promise<string | null> {
+    if (!user) return null;
+
+    const now = Date.now();
+    const bufferTime = 5 * 60 * 1000; // 5分前に更新
+
+    if (!this.cachedToken || !this.cachedExpiry || this.cachedExpiry - now < bufferTime) {
+      const idTokenResult = await user.getIdTokenResult();
+      this.cachedToken = idTokenResult.token;
+      this.cachedExpiry = new Date(idTokenResult.expirationTime).getTime();
+    }
+
+    return this.cachedToken;
   }
 
   /**
