@@ -3,7 +3,7 @@ import { GqlCurrentUserServerQuery, GqlCurrentUserServerQueryVariables } from "@
 import { cookies } from "next/headers";
 
 export async function getUserServer() {
-  const id = (await cookies()).get("userId")?.value;
+  const id = (await cookies()).get("user_id")?.value;
   if (!id) return null;
 
   const res = await executeServerGraphQLQuery<
