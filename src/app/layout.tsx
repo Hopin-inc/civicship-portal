@@ -46,7 +46,7 @@ const RootLayout = async ({
       <body className={font.className}>
         <CookiesProvider>
           <ApolloProvider>
-            <AuthProvider>
+            <AuthProvider ssrCurrentUser={user}>
               <HeaderProvider>
                 <LoadingProvider>
                   <AnalyticsProvider />

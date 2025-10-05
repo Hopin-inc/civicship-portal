@@ -3,27 +3,35 @@ import { GqlCurrentUserServerQuery, GqlCurrentUserServerQueryVariables } from "@
 import { cookies } from "next/headers";
 
 export async function getUserServer() {
-  const id = (await cookies()).get("user_id")?.value;
-  if (!id) return null;
+  const session = (await cookies()).get("session")?.value;
 
   const res = await executeServerGraphQLQuery<
     GqlCurrentUserServerQuery,
     GqlCurrentUserServerQueryVariables
-  >(GET_CURRENT_USER_SERVER_QUERY, { id });
-  console.log(res);
-  return res.user ?? null;
+  >(GET_CURRENT_USER_SERVER_QUERY, {}, session ? { Authorization: `Bearer ${session}` } : {});
+  return res.currentUser?.user ?? null;
 }
 
 const GET_CURRENT_USER_SERVER_QUERY = `
-  query currentUserServer($id: ID!) {
-    user(id: $id) {
-      id
-      name
-      memberships {
-        status
-        role
-        user { id name }
-        community { id name }
+  query currentUserServer {
+    currentUser {
+      user {
+        id
+        name
+        memberships {
+          status
+          role
+          user {
+            id
+            name
+          }
+          community {
+            id
+            name
+          }
+          role
+          status
+        }
       }
     }
   }

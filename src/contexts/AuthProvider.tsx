@@ -4,7 +4,6 @@ import React, { createContext, useContext, useEffect } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
 import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
 import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
 import { AuthContextType, AuthProviderProps } from "@/types/auth";
@@ -15,10 +14,11 @@ import { initAuth } from "@/lib/auth/initAuth";
 import { useAuthStore } from "@/hooks/auth/auth-store";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
+import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children, ssrCurrentUser }) => {
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
   const liffService = LiffService.getInstance(liffId);
   const phoneAuthService = PhoneAuthService.getInstance();
@@ -31,8 +31,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     if (!authStateManager) return;
-    void initAuth({ liffService, authStateManager });
-  }, [authStateManager, liffService]);
+    void initAuth({ liffService, authStateManager, ssrCurrentUser });
+  }, [authStateManager, liffService, ssrCurrentUser]);
 
   const { refetch: refetchUser } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(

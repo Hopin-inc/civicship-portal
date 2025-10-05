@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import { UTILITY_WITH_OWNER_FRAGMENT } from "@/graphql/reward/utility/fragment";
-import { MEMBERSHIP_FRAGMENT } from "@/graphql/account/membership/fragment";
 
 export const GET_USER_FLEXIBLE = gql`
   query GetUserFlexible(
@@ -104,27 +103,4 @@ export const GET_USER_WALLET = gql`
     }
   }
   ${UTILITY_WITH_OWNER_FRAGMENT}
-`;
-
-export const GET_CURRENT_USER_SERVER = gql`
-  query currentUserServer($id: ID!) {
-    user(id: $id) {
-      id
-      name
-      memberships {
-        ...MembershipFields
-        user {
-          id
-          name
-        }
-        community {
-          id
-          name
-        }
-        role
-        status
-      }
-    }
-  }
-  ${MEMBERSHIP_FRAGMENT}
 `;
