@@ -1,9 +1,6 @@
-import { TokenManager } from "./token-manager";
-
-import { logger } from "@/lib/logging";
 import { AuthenticationState } from "@/types/auth";
-import { lineAuth } from "@/lib/auth/firebase-config";
 import { useAuthStore } from "@/hooks/auth/auth-store";
+import { logger } from "@/lib/logging";
 
 export class AuthStateManager {
   private static instance: AuthStateManager;
@@ -32,25 +29,6 @@ export class AuthStateManager {
   public removeStateChangeListener(listener: (state: AuthenticationState) => void): void {
     this.stateChangeListeners = this.stateChangeListeners.filter((l) => l !== listener);
   }
-
-  private checkUserRegistration(): boolean {
-    try {
-      if (!lineAuth?.currentUser) {
-        return false;
-      }
-      const state = useAuthStore.getState();
-      const currentUser = state.state.currentUser;
-
-      return currentUser != null;
-    } catch (error) {
-      logger.info("Failed to check user registration", {
-        error: error instanceof Error ? error.message : String(error),
-        component: "AuthStateManager",
-      });
-      return false;
-    }
-  }
-
 
   public async handleLineAuthStateChange(isAuthenticated: boolean): Promise<void> {
     const { state, setState } = useAuthStore.getState();
@@ -97,34 +75,44 @@ export class AuthStateManager {
     }
   }
 
-  public async handleUserRegistrationStateChange(isRegistered: boolean): Promise<void> {
-    const { state, setState, phoneAuth } = useAuthStore.getState();
+  public async handleUserRegistrationStateChange(
+    isRegistered: boolean,
+    options?: { ssrMode?: boolean },
+  ): Promise<void> {
+    const { state } = useAuthStore.getState();
+
+    if (options?.ssrMode) {
+      useAuthStore.getState().setState({
+        authenticationState: isRegistered ? "user_registered" : "line_authenticated",
+      });
+      logger.debug("handleUserRegistrationStateChange: SSR確定モード");
+      return;
+    }
+
     const { lineTokens } = state;
     const hasValidLineToken =
-      lineTokens.accessToken &&
-      lineTokens.expiresAt &&
+      !!lineTokens.accessToken &&
+      !!lineTokens.expiresAt &&
       lineTokens.expiresAt - Date.now() > 5 * 60 * 1000;
 
     if (!hasValidLineToken) {
-      setState({ authenticationState: "unauthenticated" });
+      await this.handleLineAuthStateChange(false);
       return;
     }
 
     if (isRegistered) {
-      setState({ authenticationState: "user_registered" });
-    } else {
-      const { phoneTokens } = phoneAuth;
-      const hasValidPhoneToken =
-        phoneTokens.accessToken &&
-        phoneTokens.expiresAt &&
-        phoneTokens.expiresAt - Date.now() > 5 * 60 * 1000;
-
-      if (hasValidPhoneToken) {
-        setState({ authenticationState: "phone_authenticated" });
-      } else {
-        setState({ authenticationState: "line_authenticated" });
-      }
+      useAuthStore.getState().setState({ authenticationState: "user_registered" });
+      logger.debug("handleUserRegistrationStateChange: 登録済み → user_registered");
+      return;
     }
+
+    const { phoneAuth } = useAuthStore.getState();
+    const hasValidPhoneToken =
+      !!phoneAuth.phoneTokens.accessToken &&
+      !!phoneAuth.phoneTokens.expiresAt &&
+      phoneAuth.phoneTokens.expiresAt - Date.now() > 5 * 60 * 1000;
+
+    await this.handlePhoneAuthStateChange(hasValidPhoneToken);
   }
 
   private initializeSessionId(): string {
