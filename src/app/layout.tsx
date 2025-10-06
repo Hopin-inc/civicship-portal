@@ -40,7 +40,6 @@ const RootLayout = async ({
   children: React.ReactNode;
 }>) => {
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
-  console.log(user, lineAuthenticated, phoneAuthenticated);
 
   return (
     <html lang="ja">
