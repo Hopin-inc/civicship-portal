@@ -3,6 +3,7 @@ import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/hooks/auth/auth-store";
+import { TokenManager } from "@/lib/auth/token-manager";
 
 export const useVerifyPhoneCode = (
   phoneAuthService: PhoneAuthService,
@@ -31,6 +32,7 @@ export const useVerifyPhoneCode = (
         phoneTokens: tokens,
         error: null,
       });
+      TokenManager.savePhoneAuthFlag(true);
 
       setAuthState({ authenticationState: "phone_authenticated" });
 
