@@ -49,11 +49,6 @@ export async function initAuth(params: InitAuthParams) {
     });
   }
 
-  console.log("⚠️Start initAuthFull", {
-    isAuthInProgress: useAuthStore.getState().state.isAuthInProgress,
-    authState: useAuthStore.getState().state,
-  });
-
   // --- 通常モード ---
   return await initAuthFull({
     liffService,
@@ -155,7 +150,9 @@ async function initAuthFull({
 
       await Promise.resolve();
     } catch (err) {
-      console.error("Failed to refresh server session", { err });
+      logger.error("Failed to refresh server session", { err });
+      finalizeAuthState("unauthenticated", undefined, setState);
+      return;
     }
 
     // --- ① PHONE認証済みかを先に確認（DB基準 or token基準） ---
