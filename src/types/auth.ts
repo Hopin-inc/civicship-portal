@@ -1,11 +1,12 @@
 import React from "react";
-import { GqlCurrentPrefecture, GqlCurrentUserPayload } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlCurrentUserPayload, GqlUser } from "@/types/graphql";
 import { User } from "firebase/auth";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { RawURIComponent } from "@/utils/path";
 
 export type AuthStore = {
   state: AuthState;
+  // cashedToken: string | null;
   phoneAuth: PhoneAuthState;
   liffAuth: LiffState;
   setState: (partial: Partial<AuthState>) => void;
@@ -46,6 +47,7 @@ export type LiffState = {
 export type PhoneAuthState = {
   isVerifying: boolean;
   isVerified: boolean;
+  refreshToken: string | null;
   phoneNumber: string | null;
   phoneUid: string | null;
   verificationId: string | null;
@@ -86,4 +88,5 @@ export interface AuthContextType {
 
 export interface AuthProviderProps {
   children: React.ReactNode;
+  ssrCurrentUser?: GqlUser | undefined | null;
 }

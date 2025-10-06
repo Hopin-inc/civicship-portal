@@ -14,6 +14,7 @@ const initialAuthState: AuthState = {
 const initialPhoneAuthState: PhoneAuthState = {
   isVerifying: false,
   isVerified: false,
+  refreshToken: null,
   phoneNumber: null,
   phoneUid: null,
   verificationId: null,
