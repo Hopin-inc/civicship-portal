@@ -19,11 +19,14 @@ export default function RegisterAccount() {
   );
 
   useEffect(() => {
-    if (!isAuthenticating && authenticationState !== "unauthenticated") {
+    if (loading || isAuthenticating) return;
+    const isValidState = authenticationState === "phone_authenticated";
+
+    if (!isValidState) {
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
       router.replace(redirectPath);
     }
-  }, [authenticationState, router, nextPath, authRedirectService, isAuthenticating]);
+  }, [authenticationState, isAuthenticating, loading, nextPath, router, authRedirectService]);
 
   if (loading) {
     return <LoadingIndicator />;

@@ -12,7 +12,7 @@ interface RouteGuardProps {
 }
 
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
-  const { authenticationState, loading } = useAuth();
+  const { authenticationState, loading, isAuthenticating } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -21,7 +21,11 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const authRedirectService = React.useMemo(() => AuthRedirectService.getInstance(), []);
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || isAuthenticating) return;
+
+    if (authenticationState === "loading" || authenticationState === "authenticating") {
+      return;
+    }
 
     if (typeof window !== "undefined" && pathname === "/") {
       const urlParams = new URLSearchParams(window.location.search);
