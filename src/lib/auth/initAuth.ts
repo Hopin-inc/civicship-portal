@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/hooks/auth/auth-store";
-import { lineAuth } from "@/lib/auth/firebase-config";
+import { lineAuth, getPhoneAuth } from "@/lib/auth/firebase-config";
 import { fetchCurrentUserClient } from "@/lib/auth/fetchCurrentUser";
 import { User } from "firebase/auth";
 import type { LiffService } from "@/lib/auth/liff-service";
@@ -8,6 +8,7 @@ import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detec
 import { logger } from "@/lib/logging";
 import { GqlUser } from "@/types/graphql";
 import { createSession } from "@/hooks/auth/actions/createSession";
+import { TokenManager } from "@/lib/auth/token-manager";
 
 export async function initAuth({
   liffService,
@@ -123,7 +124,56 @@ export async function initAuth({
       return;
     }
 
-    // --- SSRフラグがない場合のフォールバック（LINE認証のみ）
+    // --- SSRフラグがない場合、Firebase Authから復元を試みる
+    setState({
+      authenticationState: "authenticating",
+      isAuthenticating: true,
+      isAuthInProgress: true,
+    });
+
+    const phoneAuth = getPhoneAuth();
+    const phoneUser = await new Promise<User | null>((resolve) => {
+      const unsub = phoneAuth.onAuthStateChanged((user) => {
+        unsub();
+        resolve(user);
+      });
+    });
+
+    if (phoneUser?.phoneNumber) {
+      try {
+        const idToken = await phoneUser.getIdToken();
+        const refreshToken = phoneUser.refreshToken;
+        const tokenResult = await phoneUser.getIdTokenResult();
+        const expirationTime = new Date(tokenResult.expirationTime).getTime();
+
+        useAuthStore.getState().setPhoneAuth({
+          isVerified: true,
+          phoneUid: phoneUser.uid,
+          phoneNumber: phoneUser.phoneNumber,
+          phoneTokens: {
+            accessToken: idToken,
+            refreshToken,
+            expiresAt: expirationTime,
+          },
+        });
+
+        TokenManager.savePhoneAuthFlag(true);
+
+        setState({
+          authenticationState: "phone_authenticated",
+          isAuthenticating: false,
+          isAuthInProgress: false,
+        });
+        await authStateManager.handleUserRegistrationStateChange(false);
+        return;
+      } catch (error) {
+        logger.error("Failed to restore phone auth from Firebase", {
+          error,
+          component: "initAuth",
+        });
+      }
+    }
+
     setState({
       authenticationState: "line_authenticated",
       isAuthenticating: false,
