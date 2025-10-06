@@ -1,20 +1,24 @@
 import { useAuthStore } from "@/hooks/auth/auth-store";
 import { lineAuth } from "@/lib/auth/firebase-config";
-import { TokenManager } from "@/lib/auth/token-manager";
 import { fetchCurrentUserClient } from "@/lib/auth/fetchCurrentUser";
 import { User } from "firebase/auth";
 import type { LiffService } from "@/lib/auth/liff-service";
 import type { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
 import { logger } from "@/lib/logging";
+import { GqlUser } from "@/types/graphql";
+import { createSession } from "@/hooks/auth/actions/createSession";
 
 export async function initAuth({
   liffService,
   authStateManager,
+  ssrCurrentUser,
 }: {
   liffService: LiffService;
-  authStateManager: AuthStateManager;
+  authStateManager: AuthStateManager | null;
+  ssrCurrentUser?: GqlUser | undefined | null;
 }) {
+  if (!authStateManager) return;
   const { state, setState } = useAuthStore.getState();
 
   // --- 多重初期化防止（store 管理）
@@ -43,31 +47,26 @@ export async function initAuth({
       });
       return;
     }
-
-    // --- Firebase トークン保存（有効期限チェックして更新が必要な場合のみ）
-    const tokenResult = await firebaseUser.getIdTokenResult();
-    const newExpiresAt = new Date(tokenResult.expirationTime).getTime();
-    const existingTokens = TokenManager.getLineTokens();
-
-    if (!existingTokens.accessToken || TokenManager.isTokenExpiredSync(existingTokens)) {
-      TokenManager.saveLineTokens({
-        accessToken: tokenResult.token,
-        refreshToken: firebaseUser.refreshToken,
-        expiresAt: newExpiresAt,
-      });
-    }
-
     setState({ firebaseUser });
 
+    const idToken = await firebaseUser.getIdToken(true);
+    await createSession(idToken);
+
     // --- SSRですでに currentUser がある場合は skip
-    let currentUser = state.currentUser;
-    if (!currentUser) {
-      currentUser = await fetchCurrentUserClient();
+    let effectiveUser = ssrCurrentUser ?? state.currentUser;
+
+    if (!effectiveUser) {
+      effectiveUser = await fetchCurrentUserClient();
+      if (effectiveUser) {
+        setState({ currentUser: effectiveUser });
+      }
+    } else {
+      setState({ currentUser: effectiveUser });
     }
 
-    if (currentUser) {
+    if (effectiveUser) {
       setState({
-        currentUser,
+        currentUser: effectiveUser,
         authenticationState: "user_registered",
         isAuthenticating: false,
         isAuthInProgress: false,
@@ -77,16 +76,21 @@ export async function initAuth({
     }
 
     // --- Phone Token チェック
-    const phoneTokens = TokenManager.getPhoneTokens();
-    if (phoneTokens?.accessToken) {
-      setState({
-        authenticationState: "phone_authenticated",
-        isAuthenticating: false,
-        isAuthInProgress: false,
-      });
-      await authStateManager.handleUserRegistrationStateChange(false);
-      return;
-    }
+    setState({
+      authenticationState: "phone_authenticated",
+      isAuthenticating: false,
+      isAuthInProgress: false,
+    });
+    // const phoneTokens = TokenManager.getPhoneTokens();
+    // if (phoneTokens?.isPhoneVerified) {
+    //   setState({
+    //     authenticationState: "phone_authenticated",
+    //     isAuthenticating: false,
+    //     isAuthInProgress: false,
+    //   });
+    //   await authStateManager.handleUserRegistrationStateChange(false);
+    //   return;
+    // }
 
     // --- LINE 認証だけの場合
     setState({
@@ -95,6 +99,8 @@ export async function initAuth({
       isAuthInProgress: false,
     });
     await authStateManager.handleUserRegistrationStateChange(false);
+
+    console.log(state);
 
     // --- 非LIFF環境のみ追加サインイン処理
     if (environment !== AuthEnvironment.LIFF) {
