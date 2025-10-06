@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
@@ -33,7 +33,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     return AuthStateManager.getInstance();
   }, []);
 
+  const hasInitialized = useRef(false);
   useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
     if (!authStateManager) return;
     void initAuth({
       liffService,
@@ -42,7 +46,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       ssrLineAuthenticated,
       ssrPhoneAuthenticated,
     });
-  }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated]);
+  }, [authStateManager]);
 
   const { refetch: refetchUser } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
