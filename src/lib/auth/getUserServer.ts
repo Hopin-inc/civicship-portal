@@ -5,6 +5,7 @@ import {
   GqlUser,
 } from "@/types/graphql";
 import { cookies } from "next/headers";
+import { logger } from "@/lib/logging";
 
 export async function getUserServer(): Promise<{
   user: GqlUser | null;
@@ -41,7 +42,7 @@ export async function getUserServer(): Promise<{
       phoneAuthenticated: hasPhoneIdentity,
     };
   } catch (error) {
-    console.error("⚠️ Failed to fetch currentUser:", {
+    logger.error("⚠️ Failed to fetch currentUser:", {
       message: (error as Error).message,
       stack: (error as Error).stack,
     });
