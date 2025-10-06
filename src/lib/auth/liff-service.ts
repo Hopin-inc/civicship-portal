@@ -3,7 +3,7 @@
 import liff from "@line/liff";
 import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { categorizeFirebaseError, lineAuth } from "./firebase-config";
-import { AuthTokens, TokenManager } from "./token-manager";
+import { TokenManager } from "./token-manager";
 import retry from "retry";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
@@ -294,6 +294,10 @@ export class LiffService {
               });
 
               TokenManager.saveLineAuthFlag(true);
+              const isPhoneVerified = TokenManager.phoneVerified();
+              if (isPhoneVerified) {
+                TokenManager.savePhoneAuthFlag(true);
+              }
 
               const AuthStateManager = require("./auth-state-manager").AuthStateManager;
               const authStateManager = AuthStateManager.getInstance();
