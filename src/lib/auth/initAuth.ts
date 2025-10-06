@@ -134,7 +134,13 @@ async function initAuthFull({
       finalizeAuthState("unauthenticated", undefined, setState);
       return;
     }
-    TokenManager.saveLineAuthFlag(true);
+    try {
+      const idToken = await firebaseUser.getIdToken(true);
+      await createSession(idToken);
+      TokenManager.saveLineAuthFlag(true);
+    } catch (err) {
+      console.error("Failed to refresh server session", { err });
+    }
 
     // --- ① PHONE認証済みかを先に確認（DB基準 or token基準） ---
     const isPhoneVerified = TokenManager.phoneVerified();
@@ -272,8 +278,6 @@ async function restoreUserSession(
   const idToken = await firebaseUser.getIdToken(true);
   const tokenResult = await firebaseUser.getIdTokenResult();
   const expiresAt = new Date(tokenResult.expirationTime).getTime();
-
-  await createSession(idToken);
 
   useAuthStore.getState().setState({
     lineTokens: {
