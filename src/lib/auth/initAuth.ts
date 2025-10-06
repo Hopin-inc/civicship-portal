@@ -102,32 +102,34 @@ export async function initAuth({
       return;
     }
 
-    // --- Phone Token チェック
-    setState({
-      authenticationState: "phone_authenticated",
-      isAuthenticating: false,
-      isAuthInProgress: false,
-    });
-    // const phoneTokens = TokenManager.getPhoneTokens();
-    // if (phoneTokens?.isPhoneVerified) {
-    //   setState({
-    //     authenticationState: "phone_authenticated",
-    //     isAuthenticating: false,
-    //     isAuthInProgress: false,
-    //   });
-    //   await authStateManager.handleUserRegistrationStateChange(false);
-    //   return;
-    // }
+    // --- SSRフラグがある場合はそれを信頼して終了
+    if (ssrPhoneAuthenticated) {
+      setState({
+        authenticationState: "phone_authenticated",
+        isAuthenticating: false,
+        isAuthInProgress: false,
+      });
+      await authStateManager.handleUserRegistrationStateChange(false);
+      return;
+    }
 
-    // --- LINE 認証だけの場合
+    if (ssrLineAuthenticated) {
+      setState({
+        authenticationState: "line_authenticated",
+        isAuthenticating: false,
+        isAuthInProgress: false,
+      });
+      await authStateManager.handleUserRegistrationStateChange(false);
+      return;
+    }
+
+    // --- SSRフラグがない場合のフォールバック（LINE認証のみ）
     setState({
       authenticationState: "line_authenticated",
       isAuthenticating: false,
       isAuthInProgress: false,
     });
     await authStateManager.handleUserRegistrationStateChange(false);
-
-    console.log(state);
 
     // --- 非LIFF環境のみ追加サインイン処理
     if (environment !== AuthEnvironment.LIFF) {
