@@ -24,14 +24,11 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (loading || isAuthenticating) return;
-    const isValidState = authenticationState === "unauthenticated";
-
-    if (!isValidState) {
+    if (!isAuthenticating && authenticationState !== "unauthenticated") {
       const redirectPath = authRedirectService.getPostLineAuthRedirectPath(nextPath);
       router.replace(redirectPath);
     }
-  }, [authenticationState, isAuthenticating, loading, nextPath, router, authRedirectService]);
+  }, [authenticationState, nextPath, authRedirectService, isAuthenticating, router]);
 
   const handleLogin = async (agreedTerms: boolean, agreedPrivacy: boolean) => {
     if (!agreedTerms || !agreedPrivacy) {

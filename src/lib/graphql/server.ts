@@ -17,17 +17,17 @@ export interface GraphQLResponse<T> {
 /**
  * サーバーサイドでGraphQLクエリを実行する関数
  */
-export async function executeServerGraphQLQuery<
-  TData = unknown,
-  TVariables = Record<string, unknown>,
->(query: string, variables: TVariables, headers: Record<string, string> = {}): Promise<TData> {
+export async function executeServerGraphQLQuery<TData = unknown, TVariables = Record<string, unknown>>(
+  query: string,
+  variables: TVariables,
+  headers: Record<string, string> = {}
+): Promise<TData> {
   const response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
-      "X-Auth-Mode": "session",
-      "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID!,
-      "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID!,
+      'Content-Type': 'application/json',
+      'X-Civicship-Tenant': process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID!,
+      'X-Community-Id': process.env.NEXT_PUBLIC_COMMUNITY_ID!,
       ...headers,
     },
     body: JSON.stringify({
@@ -41,10 +41,10 @@ export async function executeServerGraphQLQuery<
   }
 
   const result: GraphQLResponse<TData> = await response.json();
-
+  
   if (result.errors) {
     console.error("GraphQL errors:", result.errors);
-    throw new Error(`GraphQL errors: ${result.errors.map((e) => e.message).join(", ")}`);
+    throw new Error(`GraphQL errors: ${result.errors.map((e) => e.message).join(', ')}`);
   }
 
   return result.data;

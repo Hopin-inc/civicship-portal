@@ -34,28 +34,35 @@ export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateP
           const tokenResult = await user.getIdTokenResult();
           const expirationTime = new Date(tokenResult.expirationTime).getTime();
 
-          setState({
-            firebaseUser: user,
-            lineTokens: {
+          const existing = TokenManager.getLineTokens();
+          if (
+            !existing.accessToken ||
+            existing.accessToken !== idToken ||
+            !existing.expiresAt ||
+            existing.expiresAt !== expirationTime
+          ) {
+            TokenManager.saveLineTokens({
               accessToken: idToken,
               refreshToken,
               expiresAt: expirationTime,
-            },
+            });
+          }
+
+          setState({
+            firebaseUser: user,
             authenticationState:
               stateRef.current.authenticationState === "loading"
                 ? "line_authenticated"
                 : stateRef.current.authenticationState,
           });
-
-          TokenManager.saveLineAuthFlag(true);
         } catch (error) {
-          logger.info("Failed to sync Firebase token", {
+          logger.info("Failed to sync Firebase token to cookies", {
             error: error instanceof Error ? error.message : String(error),
             component: "useFirebaseAuthState",
           });
         }
       } else {
-        TokenManager.clearLineAuthFlag();
+        TokenManager.clearLineTokens();
         setState({
           firebaseUser: null,
           authenticationState: "unauthenticated",

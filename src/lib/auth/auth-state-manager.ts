@@ -1,6 +1,9 @@
-import { AuthenticationState } from "@/types/auth";
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { TokenManager } from "./token-manager";
+
 import { logger } from "@/lib/logging";
+import { AuthenticationState } from "@/types/auth";
+import { lineAuth } from "@/lib/auth/firebase-config";
+import { useAuthStore } from "@/hooks/auth/auth-store";
 
 export class AuthStateManager {
   private static instance: AuthStateManager;
@@ -9,6 +12,10 @@ export class AuthStateManager {
 
   private constructor() {
     this.sessionId = this.initializeSessionId();
+    if (typeof window !== "undefined") {
+      window.addEventListener("auth:renew-line-token", this.handleLineTokenRenewal.bind(this));
+      window.addEventListener("auth:renew-phone-token", this.handlePhoneTokenRenewal.bind(this));
+    }
   }
 
   public static getInstance(): AuthStateManager {
@@ -30,6 +37,86 @@ export class AuthStateManager {
     this.stateChangeListeners = this.stateChangeListeners.filter((l) => l !== listener);
   }
 
+  private checkUserRegistration(): boolean {
+    try {
+      if (!lineAuth?.currentUser) {
+        return false;
+      }
+      const state = useAuthStore.getState();
+      const currentUser = state.state.currentUser;
+
+      return currentUser != null;
+    } catch (error) {
+      logger.info("Failed to check user registration", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "AuthStateManager",
+      });
+      return false;
+    }
+  }
+
+  private async handleLineTokenRenewal(event: Event): Promise<void> {
+    const { state, setState } = useAuthStore.getState();
+
+    try {
+      const renewed = await TokenManager.renewLineToken();
+
+      if (renewed && state.authenticationState === "line_token_expired") {
+        // user_registered かどうかは currentUser の有無で判定
+        if (state.currentUser) {
+          setState({ authenticationState: "user_registered" });
+        } else {
+          setState({ authenticationState: "line_authenticated" });
+        }
+      } else if (!renewed) {
+        setState({ authenticationState: "unauthenticated" });
+      }
+    } catch (error) {
+      logger.info("Failed to renew LINE token", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "AuthStateManager",
+      });
+      setState({ authenticationState: "unauthenticated" });
+    }
+  }
+
+  private async handlePhoneTokenRenewal(event: Event): Promise<void> {
+    const { state, setState } = useAuthStore.getState();
+
+    try {
+      const renewed = await TokenManager.renewPhoneToken();
+      const lineTokens = TokenManager.getLineTokens();
+      const hasValidLineToken =
+        lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+
+      if (renewed && state.authenticationState === "phone_token_expired") {
+        setState({ authenticationState: "phone_authenticated" });
+      } else if (!renewed) {
+        if (!hasValidLineToken) {
+          setState({ authenticationState: "unauthenticated" });
+        } else {
+          setState({ authenticationState: "line_authenticated" });
+        }
+      }
+    } catch (error) {
+      logger.info("Failed to renew phone token", {
+        authType: "phone",
+        error: error instanceof Error ? error.message : String(error),
+        component: "AuthStateManager",
+      });
+
+      const lineTokens = TokenManager.getLineTokens();
+      const hasValidLineToken =
+        lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+
+      if (!hasValidLineToken) {
+        setState({ authenticationState: "unauthenticated" });
+      } else {
+        setState({ authenticationState: "line_authenticated" });
+      }
+    }
+  }
+
   public async handleLineAuthStateChange(isAuthenticated: boolean): Promise<void> {
     const { state, setState } = useAuthStore.getState();
 
@@ -46,14 +133,12 @@ export class AuthStateManager {
   }
 
   public async handlePhoneAuthStateChange(isVerified: boolean): Promise<void> {
-    const { state, phoneAuth, setState } = useAuthStore.getState();
-    const { phoneTokens } = phoneAuth;
-    const hasValidPhoneToken =
-      !!phoneTokens.accessToken &&
-      phoneTokens.expiresAt &&
-      phoneTokens.expiresAt - Date.now() > 5 * 60 * 1000;
+    const { state, setState } = useAuthStore.getState();
+    const lineTokens = TokenManager.getLineTokens();
+    const hasValidLineToken =
+      !!lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
-    if (!hasValidPhoneToken && state.authenticationState !== "loading") {
+    if (!hasValidLineToken && state.authenticationState !== "loading") {
       setState({ authenticationState: "unauthenticated" });
       return;
     }
@@ -75,48 +160,28 @@ export class AuthStateManager {
     }
   }
 
-  public async handleUserRegistrationStateChange(
-    isRegistered: boolean,
-    options?: { ssrMode?: boolean },
-  ): Promise<void> {
-    const { state, setState } = useAuthStore.getState();
-
-    if (options?.ssrMode) {
-      setState({
-        authenticationState: isRegistered ? "user_registered" : "line_authenticated",
-      });
-      logger.debug("handleUserRegistrationStateChange: SSR Mode");
-      return;
-    }
-
-    if (state.isAuthenticating) return;
-
-    const { lineTokens } = state;
-    const hasValidLineToken =
-      !!lineTokens.accessToken &&
-      !!lineTokens.expiresAt &&
-      lineTokens.expiresAt - Date.now() > 5 * 60 * 1000;
+  public async handleUserRegistrationStateChange(isRegistered: boolean): Promise<void> {
+    const { setState } = useAuthStore.getState();
+    const lineTokens = TokenManager.getLineTokens();
+    const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
 
     if (!hasValidLineToken) {
+      setState({ authenticationState: "unauthenticated" });
       return;
     }
 
     if (isRegistered) {
-      if (state.authenticationState !== "user_registered") {
-        setState({ authenticationState: "user_registered" });
+      setState({ authenticationState: "user_registered" });
+    } else {
+      const phoneTokens = TokenManager.getPhoneTokens();
+      const hasValidPhoneToken =
+        phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
+
+      if (hasValidPhoneToken) {
+        setState({ authenticationState: "phone_authenticated" });
+      } else {
+        setState({ authenticationState: "line_authenticated" });
       }
-      logger.debug("handleUserRegistrationStateChange: user_registered");
-      return;
-    }
-
-    const { phoneAuth } = useAuthStore.getState();
-    const hasValidPhoneToken =
-      !!phoneAuth.phoneTokens.accessToken &&
-      !!phoneAuth.phoneTokens.expiresAt &&
-      phoneAuth.phoneTokens.expiresAt - Date.now() > 5 * 60 * 1000;
-
-    if (hasValidPhoneToken && state.authenticationState === "line_authenticated") {
-      await this.handlePhoneAuthStateChange(true);
     }
   }
 

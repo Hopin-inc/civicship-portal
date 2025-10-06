@@ -12,16 +12,11 @@ export const useLogout = (liffService: LiffService, phoneAuthService: PhoneAuthS
     try {
       liffService.logout();
       phoneAuthService.reset();
-      TokenManager.clearAllAuthFlags();
+      TokenManager.clearAllTokens();
       setState({
         firebaseUser: null,
         currentUser: null,
         authenticationState: "unauthenticated",
-        lineTokens: {
-          accessToken: null,
-          refreshToken: null,
-          expiresAt: null,
-        },
       });
     } catch (error) {
       logger.warn("Logout failed", { error });

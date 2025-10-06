@@ -1,12 +1,11 @@
 import React from "react";
-import { GqlCurrentPrefecture, GqlCurrentUserPayload, GqlUser } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlCurrentUserPayload } from "@/types/graphql";
 import { User } from "firebase/auth";
 import { AuthEnvironment } from "@/lib/auth/environment-detector";
 import { RawURIComponent } from "@/utils/path";
 
 export type AuthStore = {
   state: AuthState;
-  // cashedToken: string | null;
   phoneAuth: PhoneAuthState;
   liffAuth: LiffState;
   setState: (partial: Partial<AuthState>) => void;
@@ -22,11 +21,6 @@ export type AuthState = {
   environment: AuthEnvironment;
   isAuthenticating: boolean;
   isAuthInProgress: boolean;
-  lineTokens: {
-    accessToken: string | null;
-    refreshToken: string | null;
-    expiresAt: number | null;
-  };
 };
 
 export type AuthenticationState =
@@ -36,8 +30,7 @@ export type AuthenticationState =
   | "phone_authenticated" // S2: 電話番号認証済み
   | "phone_token_expired" // S2e: 電話番号トークン期限切れ
   | "user_registered" // S3: ユーザ情報登録済み
-  | "loading" // L0: 状態チェック中
-  | "authenticating"; // L1: Firebase認証セッション確認中
+  | "loading"; // L0: 状態チェック中
 
 export type LiffState = {
   isInitialized: boolean;
@@ -53,16 +46,10 @@ export type LiffState = {
 export type PhoneAuthState = {
   isVerifying: boolean;
   isVerified: boolean;
-  refreshToken: string | null;
   phoneNumber: string | null;
   phoneUid: string | null;
   verificationId: string | null;
   error: Error | null;
-  phoneTokens: {
-    accessToken: string | null;
-    refreshToken: string | null;
-    expiresAt: number | null;
-  };
 };
 
 export interface AuthContextType {
@@ -85,7 +72,6 @@ export interface AuthContextType {
     clearRecaptcha?: () => void;
     isVerifying: boolean;
     phoneUid: string | null;
-    phoneNumber: string | null;
   };
 
   createUser: (
@@ -100,7 +86,4 @@ export interface AuthContextType {
 
 export interface AuthProviderProps {
   children: React.ReactNode;
-  ssrCurrentUser?: GqlUser | undefined | null;
-  ssrLineAuthenticated?: boolean;
-  ssrPhoneAuthenticated?: boolean;
 }

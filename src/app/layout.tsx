@@ -11,7 +11,6 @@ import MainContent from "@/components/layout/MainContent";
 import React from "react";
 import { currentCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
-import { getUserServer } from "@/lib/auth/getUserServer";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -34,23 +33,17 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-const RootLayout = async ({
+const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
-
   return (
     <html lang="ja">
       <body className={font.className}>
         <CookiesProvider>
           <ApolloProvider>
-            <AuthProvider
-              ssrCurrentUser={user}
-              ssrLineAuthenticated={lineAuthenticated}
-              ssrPhoneAuthenticated={phoneAuthenticated}
-            >
+            <AuthProvider>
               <HeaderProvider>
                 <LoadingProvider>
                   <AnalyticsProvider />
