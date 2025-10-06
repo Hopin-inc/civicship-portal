@@ -8,7 +8,7 @@ import { GqlUser } from "@/types/graphql";
 import { User } from "firebase/auth";
 import { fetchCurrentUserClient } from "@/lib/auth/fetchCurrentUser";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
-import { getPhoneAuth, lineAuth } from "@/lib/auth/firebase-config";
+import { lineAuth } from "@/lib/auth/firebase-config";
 import { createSession } from "@/hooks/auth/actions/createSession";
 
 interface InitAuthParams {
@@ -128,7 +128,34 @@ async function initAuthFull({
       finalizeAuthState("unauthenticated", undefined, setState);
       return;
     }
+    TokenManager.saveLineAuthFlag(true);
 
+    // --- ① PHONE認証済みかを先に確認（DB基準 or token基準） ---
+    const isPhoneVerified = TokenManager.phoneVerified();
+    if (ssrPhoneAuthenticated || isPhoneVerified) {
+      // SSRでphone認証済みなら → user登録確認
+      const user = await restoreUserSession(ssrCurrentUser, firebaseUser, setState);
+      if (user) {
+        finalizeAuthState("user_registered", user, setState);
+        await authStateManager.handleUserRegistrationStateChange(true);
+        return;
+      }
+
+      // phone認証済みだがuser未登録
+      finalizeAuthState("phone_authenticated", undefined, setState);
+      await authStateManager.handleUserRegistrationStateChange(false);
+      return;
+    }
+
+    // --- ② phone認証まだ（ローカル補完 or LINEのみ） ---
+    const localPhoneAuth = TokenManager.getPhoneAuthFlag?.() ?? false;
+    if (localPhoneAuth) {
+      finalizeAuthState("phone_authenticated", undefined, setState);
+      await authStateManager.handleUserRegistrationStateChange(false);
+      return;
+    }
+
+    // --- ③ user登録確認（LINEだけで登録済みパターン） ---
     const user = await restoreUserSession(ssrCurrentUser, firebaseUser, setState);
     if (user) {
       finalizeAuthState("user_registered", user, setState);
@@ -136,11 +163,28 @@ async function initAuthFull({
       return;
     }
 
-    const phoneRestored = await restorePhoneAuth(setState);
-    if (phoneRestored) {
-      finalizeAuthState("phone_authenticated", undefined, setState);
-      await authStateManager.handleUserRegistrationStateChange(false);
-      return;
+    // --- ④ LIFF再サインイン fallback ---
+    if (environment !== AuthEnvironment.LIFF) {
+      const { isInitialized, isLoggedIn } = liffService.getState();
+      if (isInitialized && isLoggedIn) {
+        try {
+          const success = await liffService.signInWithLiffToken();
+          if (success) {
+            const newUser = await fetchCurrentUserClient();
+            if (newUser) {
+              setState({
+                currentUser: newUser,
+                authenticationState: "user_registered",
+                isAuthenticating: false,
+                isAuthInProgress: false,
+              });
+              await authStateManager.handleUserRegistrationStateChange(true);
+            }
+          }
+        } catch (error) {
+          logger.error("Non-LIFF sign-in failed", { error, component: "initAuth" });
+        }
+      }
     }
 
     finalizeAuthState("line_authenticated", undefined, setState);
@@ -162,8 +206,14 @@ function prepareInitialState(
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
 ) {
   if (ssrLineAuthenticated) {
+    let initialState: AuthenticationState = "line_authenticated";
+
+    if (ssrPhoneAuthenticated) {
+      initialState = "phone_authenticated";
+    }
+
     setState({
-      authenticationState: ssrPhoneAuthenticated ? "user_registered" : "line_authenticated",
+      authenticationState: initialState,
       isAuthenticating: true,
       isAuthInProgress: true,
     });
@@ -231,39 +281,6 @@ async function restoreUserSession(
   }
 
   return null;
-}
-
-async function restorePhoneAuth(setState: any): Promise<boolean> {
-  const phoneAuth = getPhoneAuth();
-
-  const phoneUser = await new Promise<User | null>((resolve) => {
-    const unsub = phoneAuth.onAuthStateChanged((user) => {
-      unsub();
-      resolve(user);
-    });
-  });
-
-  if (!phoneUser?.phoneNumber) return false;
-
-  try {
-    const idToken = await phoneUser.getIdToken();
-    const refreshToken = phoneUser.refreshToken;
-    const tokenResult = await phoneUser.getIdTokenResult();
-    const expiresAt = new Date(tokenResult.expirationTime).getTime();
-
-    useAuthStore.getState().setPhoneAuth({
-      isVerified: true,
-      phoneUid: phoneUser.uid,
-      phoneNumber: phoneUser.phoneNumber,
-      phoneTokens: { accessToken: idToken, refreshToken, expiresAt },
-    });
-
-    TokenManager.savePhoneAuthFlag(true);
-    return true;
-  } catch (error) {
-    logger.error("Failed to restore phone auth", { error, component: "restorePhoneAuth" });
-    return false;
-  }
 }
 
 function finalizeAuthState(

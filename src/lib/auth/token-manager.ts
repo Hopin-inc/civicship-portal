@@ -27,6 +27,7 @@ export class TokenManager {
 
   private static readonly LINE_AUTHENTICATED_KEY = "line_authenticated";
   private static readonly PHONE_AUTHENTICATED_KEY = "phone_authenticated";
+  private static readonly PHONE_ACCESS_TOKEN_KEY = "phone_auth_token";
 
   /**
    * LINE認証済みフラグを保存
@@ -58,6 +59,11 @@ export class TokenManager {
    */
   static getPhoneAuthFlag(): boolean {
     return this.getCookie(this.PHONE_AUTHENTICATED_KEY) === "true";
+  }
+
+  static phoneVerified(): boolean {
+    const accessToken = this.getCookie(this.PHONE_ACCESS_TOKEN_KEY);
+    return accessToken !== null;
   }
 
   /**
@@ -127,8 +133,6 @@ export class TokenManager {
     return tokens.expiresAt - now < bufferTime;
   }
 
-
-
   /**
    * Cookieを設定
    * @param name Cookieの名前
@@ -165,5 +169,16 @@ export class TokenManager {
     if (typeof document === "undefined") return;
 
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
+  }
+
+  static clearDeprecatedCookies(): void {
+    this.deleteCookie("phone_uid");
+    this.deleteCookie("phone_number");
+    this.deleteCookie("phone_auth_token");
+    this.deleteCookie("phone_refresh_token");
+    this.deleteCookie("phone_token_expires_at");
+    this.deleteCookie("access_token");
+    this.deleteCookie("refresh_token");
+    this.deleteCookie("token_expires_at");
   }
 }
