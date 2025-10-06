@@ -7,7 +7,6 @@ import {
   matchPaths,
   RawURIComponent,
 } from "@/utils/path";
-import { useAuthStore } from "@/hooks/auth/auth-store";
 
 /**
  * Owner専用のパス一覧
@@ -159,9 +158,11 @@ export class AuthRedirectService {
    */
   public getPostLineAuthRedirectPath(nextPath: RawURIComponent | null): RawURIComponent {
     const nextParam = nextPath ? this.generateNextParam(nextPath) : "";
-    const { authenticationState } = useAuthStore.getState().state;
 
-    switch (authenticationState) {
+    const authState = this.authStateManager.getState();
+    console.log(authState);
+
+    switch (authState) {
       case "unauthenticated":
       case "line_token_expired":
         return `/login${nextParam}` as RawURIComponent;

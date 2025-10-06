@@ -1,9 +1,11 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useRef } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
+import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
+import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
 import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
 import { AuthContextType, AuthProviderProps } from "@/types/auth";
 import { useAuthActions } from "@/hooks/auth/useAuthActions";
@@ -13,17 +15,10 @@ import { initAuth } from "@/lib/auth/initAuth";
 import { useAuthStore } from "@/hooks/auth/auth-store";
 import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
 import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
-import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
-import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({
-  children,
-  ssrCurrentUser,
-  ssrLineAuthenticated,
-  ssrPhoneAuthenticated,
-}) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
   const liffService = LiffService.getInstance(liffId);
   const phoneAuthService = PhoneAuthService.getInstance();
@@ -34,34 +29,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     return AuthStateManager.getInstance();
   }, []);
 
-  const hasInitialized = useRef(false);
   useEffect(() => {
-    if (hasInitialized.current) return;
-    hasInitialized.current = true;
-
     if (!authStateManager) return;
-    void initAuth({
-      liffService,
-      authStateManager,
-      ssrCurrentUser,
-      ssrLineAuthenticated,
-      ssrPhoneAuthenticated,
-    });
-  }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated]);
+    void initAuth({ liffService, authStateManager });
+  }, [authStateManager, liffService]);
 
-  const { refetch } = useCurrentUserQuery({
+  const { refetch: refetchUser } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
       state.authenticationState,
     ),
     fetchPolicy: "network-only",
   });
-
-  const refetchUser = useCallback(async () => {
-    const { data } = await refetch();
-    const user = data?.currentUser?.user ?? null;
-    console.debug("🔁 refetchUser result:", user);
-    return user;
-  }, [refetch]);
 
   const { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode } =
     useAuthActions({

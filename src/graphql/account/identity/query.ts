@@ -25,32 +25,3 @@ export const GET_CURRENT_USER = gql`
   }
   ${MEMBERSHIP_FRAGMENT}
 `;
-
-export const GET_CURRENT_USER_SERVER = gql`
-  query currentUserServer {
-    currentUser {
-      user {
-        id
-        name
-        identities {
-          uid
-          platform
-        }
-        memberships {
-          ...MembershipFields
-          user {
-            id
-            name
-          }
-          community {
-            id
-            name
-          }
-          role
-          status
-        }
-      }
-    }
-  }
-  ${MEMBERSHIP_FRAGMENT}
-`;

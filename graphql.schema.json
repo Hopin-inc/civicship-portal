@@ -4613,14 +4613,14 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "phoneUid",
+            "name": "communityId",
             "description": null,
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "ID",
                 "ofType": null
               }
             },
