@@ -1,13 +1,9 @@
 import { useCallback } from "react";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
-import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/hooks/auth/auth-store";
 
-export const useStartPhoneVerification = (
-  phoneAuthService: PhoneAuthService,
-  authStateManager: AuthStateManager | null,
-) => {
+export const useStartPhoneVerification = (phoneAuthService: PhoneAuthService) => {
   const setPhoneAuth = useAuthStore((s) => s.setPhoneAuth);
 
   return useCallback(
@@ -36,18 +32,8 @@ export const useStartPhoneVerification = (
         return null;
       } finally {
         setPhoneAuth({ isVerifying: false });
-        if (authStateManager) {
-          try {
-            await authStateManager.handlePhoneAuthStateChange(false);
-          } catch (err) {
-            logger.warn("AuthStateManager phone init failed", {
-              error: err instanceof Error ? err.message : String(err),
-              component: "AuthActions",
-            });
-          }
-        }
       }
     },
-    [setPhoneAuth, phoneAuthService, authStateManager],
+    [setPhoneAuth, phoneAuthService],
   );
 };
