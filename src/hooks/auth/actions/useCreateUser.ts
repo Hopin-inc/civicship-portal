@@ -12,8 +12,9 @@ export const useCreateUser = (refetchUser: () => Promise<any>) => {
   return useCallback(
     async (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string) => {
       try {
-        const phoneTokens = TokenManager.getPhoneTokens();
-        const lineTokens = TokenManager.getLineTokens();
+        const { state, phoneAuth } = useAuthStore.getState();
+        const { lineTokens } = state;
+        const { phoneTokens } = phoneAuth;
 
         const { data } = await userSignUp({
           variables: {
@@ -22,7 +23,7 @@ export const useCreateUser = (refetchUser: () => Promise<any>) => {
               currentPrefecture: prefecture,
               communityId: COMMUNITY_ID,
               phoneUid,
-              phoneNumber: phoneTokens.phoneNumber ?? undefined,
+              phoneNumber: phoneAuth.phoneNumber ?? undefined,
               lineRefreshToken: lineTokens.refreshToken ?? undefined,
               phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
             },

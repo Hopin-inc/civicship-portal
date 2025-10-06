@@ -17,7 +17,12 @@ import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListe
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children, ssrCurrentUser }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({
+  children,
+  ssrCurrentUser,
+  ssrLineAuthenticated,
+  ssrPhoneAuthenticated,
+}) => {
   const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
   const liffService = LiffService.getInstance(liffId);
   const phoneAuthService = PhoneAuthService.getInstance();
@@ -30,8 +35,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, ssrCurrent
 
   useEffect(() => {
     if (!authStateManager) return;
-    void initAuth({ liffService, authStateManager, ssrCurrentUser });
-  }, [authStateManager, liffService, ssrCurrentUser]);
+    void initAuth({
+      liffService,
+      authStateManager,
+      ssrCurrentUser,
+      ssrLineAuthenticated,
+      ssrPhoneAuthenticated,
+    });
+  }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated]);
 
   const { refetch: refetchUser } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(

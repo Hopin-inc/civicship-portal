@@ -13,17 +13,30 @@ export async function initAuth({
   liffService,
   authStateManager,
   ssrCurrentUser,
+  ssrLineAuthenticated,
+  ssrPhoneAuthenticated,
 }: {
   liffService: LiffService;
   authStateManager: AuthStateManager | null;
   ssrCurrentUser?: GqlUser | undefined | null;
+  ssrLineAuthenticated?: boolean;
+  ssrPhoneAuthenticated?: boolean;
 }) {
   if (!authStateManager) return;
   const { state, setState } = useAuthStore.getState();
 
   // --- 多重初期化防止（store 管理）
   if (state.isAuthInProgress) return;
-  setState({ authenticationState: "loading", isAuthenticating: true, isAuthInProgress: true });
+
+  if (ssrLineAuthenticated) {
+    setState({
+      authenticationState: ssrPhoneAuthenticated ? "phone_authenticated" : "line_authenticated",
+      isAuthenticating: true,
+      isAuthInProgress: true,
+    });
+  } else {
+    setState({ authenticationState: "loading", isAuthenticating: true, isAuthInProgress: true });
+  }
 
   try {
     const environment = detectEnvironment();
@@ -52,19 +65,33 @@ export async function initAuth({
     const idToken = await firebaseUser.getIdToken(true);
     await createSession(idToken);
 
-    // --- SSRですでに currentUser がある場合は skip
-    let effectiveUser = ssrCurrentUser ?? state.currentUser;
+    // --- SSRですでに currentUser がある場合はそれを使用
+    if (ssrCurrentUser) {
+      setState({
+        currentUser: ssrCurrentUser,
+        authenticationState: "user_registered",
+        isAuthenticating: false,
+        isAuthInProgress: false,
+      });
+      await authStateManager.handleUserRegistrationStateChange(true);
+      return;
+    }
 
+    // --- SSRにユーザー情報がない場合はクライアントで取得
+    let effectiveUser = state.currentUser;
     if (!effectiveUser) {
       effectiveUser = await fetchCurrentUserClient();
       if (effectiveUser) {
-        setState({ currentUser: effectiveUser });
+        setState({
+          currentUser: effectiveUser,
+          authenticationState: "user_registered",
+          isAuthenticating: false,
+          isAuthInProgress: false,
+        });
+        await authStateManager.handleUserRegistrationStateChange(true);
+        return;
       }
     } else {
-      setState({ currentUser: effectiveUser });
-    }
-
-    if (effectiveUser) {
       setState({
         currentUser: effectiveUser,
         authenticationState: "user_registered",

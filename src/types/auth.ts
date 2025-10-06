@@ -22,6 +22,11 @@ export type AuthState = {
   environment: AuthEnvironment;
   isAuthenticating: boolean;
   isAuthInProgress: boolean;
+  lineTokens: {
+    accessToken: string | null;
+    refreshToken: string | null;
+    expiresAt: number | null;
+  };
 };
 
 export type AuthenticationState =
@@ -52,6 +57,11 @@ export type PhoneAuthState = {
   phoneUid: string | null;
   verificationId: string | null;
   error: Error | null;
+  phoneTokens: {
+    accessToken: string | null;
+    refreshToken: string | null;
+    expiresAt: number | null;
+  };
 };
 
 export interface AuthContextType {
@@ -89,4 +99,6 @@ export interface AuthContextType {
 export interface AuthProviderProps {
   children: React.ReactNode;
   ssrCurrentUser?: GqlUser | undefined | null;
+  ssrLineAuthenticated?: boolean;
+  ssrPhoneAuthenticated?: boolean;
 }

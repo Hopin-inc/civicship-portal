@@ -39,14 +39,18 @@ const RootLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const user = await getUserServer();
+  const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
 
   return (
     <html lang="ja">
       <body className={font.className}>
         <CookiesProvider>
           <ApolloProvider>
-            <AuthProvider ssrCurrentUser={user}>
+            <AuthProvider
+              ssrCurrentUser={user}
+              ssrLineAuthenticated={lineAuthenticated}
+              ssrPhoneAuthenticated={phoneAuthenticated}
+            >
               <HeaderProvider>
                 <LoadingProvider>
                   <AnalyticsProvider />

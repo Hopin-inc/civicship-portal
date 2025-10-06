@@ -20,12 +20,10 @@ export class PhoneAuthService {
   private recaptchaContainerId: string = "recaptcha-container";
 
   private constructor() {
-    const savedTokens = TokenManager.getPhoneTokens();
-    if (savedTokens.phoneUid && savedTokens.phoneNumber && savedTokens.accessToken) {
+    const isPhoneAuthenticated = TokenManager.getPhoneAuthFlag();
+    if (isPhoneAuthenticated) {
       useAuthStore.getState().setPhoneAuth({
         isVerified: true,
-        phoneUid: savedTokens.phoneUid,
-        phoneNumber: savedTokens.phoneNumber,
       });
     }
   }
@@ -158,19 +156,19 @@ export class PhoneAuthService {
         const tokenResult = await userCredential.user.getIdTokenResult();
         const expirationTime = new Date(tokenResult.expirationTime).getTime();
 
-        const tokens: PhoneAuthTokens = {
-          phoneUid: userCredential.user.uid,
-          phoneNumber: phoneAuthState.phoneNumber,
-          accessToken: idToken,
-          refreshToken,
-          expiresAt: expirationTime,
-        };
-        TokenManager.savePhoneTokens(tokens);
-
         useAuthStore.getState().setPhoneAuth({
           phoneUid: userCredential.user.uid,
+          phoneNumber: phoneAuthState.phoneNumber,
           isVerified: true,
+          phoneTokens: {
+            accessToken: idToken,
+            refreshToken,
+            expiresAt: expirationTime,
+          },
         });
+
+        TokenManager.savePhoneAuthFlag(true);
+
         return true;
       }
       return false;
@@ -184,7 +182,7 @@ export class PhoneAuthService {
 
   public reset(): void {
     this.clearRecaptcha();
-    TokenManager.clearPhoneTokens();
+    TokenManager.clearPhoneAuthFlag();
     useAuthStore.getState().setPhoneAuth({
       isVerifying: false,
       isVerified: false,
@@ -192,6 +190,11 @@ export class PhoneAuthService {
       phoneUid: null,
       verificationId: null,
       error: null,
+      phoneTokens: {
+        accessToken: null,
+        refreshToken: null,
+        expiresAt: null,
+      },
     });
   }
 }

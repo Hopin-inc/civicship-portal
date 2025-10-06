@@ -9,6 +9,11 @@ const initialAuthState: AuthState = {
   environment: detectEnvironment(),
   isAuthenticating: false,
   isAuthInProgress: false,
+  lineTokens: {
+    accessToken: null,
+    refreshToken: null,
+    expiresAt: null,
+  },
 };
 
 const initialPhoneAuthState: PhoneAuthState = {
@@ -19,6 +24,11 @@ const initialPhoneAuthState: PhoneAuthState = {
   phoneUid: null,
   verificationId: null,
   error: null,
+  phoneTokens: {
+    accessToken: null,
+    refreshToken: null,
+    expiresAt: null,
+  },
 };
 
 const initialLiffAuthState: LiffState = {

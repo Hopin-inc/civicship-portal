@@ -12,10 +12,6 @@ export class AuthStateManager {
 
   private constructor() {
     this.sessionId = this.initializeSessionId();
-    if (typeof window !== "undefined") {
-      window.addEventListener("auth:renew-line-token", this.handleLineTokenRenewal.bind(this));
-      window.addEventListener("auth:renew-phone-token", this.handlePhoneTokenRenewal.bind(this));
-    }
   }
 
   public static getInstance(): AuthStateManager {
@@ -55,67 +51,6 @@ export class AuthStateManager {
     }
   }
 
-  private async handleLineTokenRenewal(event: Event): Promise<void> {
-    const { state, setState } = useAuthStore.getState();
-
-    try {
-      const renewed = await TokenManager.renewLineToken();
-
-      if (renewed && state.authenticationState === "line_token_expired") {
-        // user_registered かどうかは currentUser の有無で判定
-        if (state.currentUser) {
-          setState({ authenticationState: "user_registered" });
-        } else {
-          setState({ authenticationState: "line_authenticated" });
-        }
-      } else if (!renewed) {
-        setState({ authenticationState: "unauthenticated" });
-      }
-    } catch (error) {
-      logger.info("Failed to renew LINE token", {
-        error: error instanceof Error ? error.message : String(error),
-        component: "AuthStateManager",
-      });
-      setState({ authenticationState: "unauthenticated" });
-    }
-  }
-
-  private async handlePhoneTokenRenewal(event: Event): Promise<void> {
-    const { state, setState } = useAuthStore.getState();
-
-    try {
-      const renewed = await TokenManager.renewPhoneToken();
-      const lineTokens = TokenManager.getLineTokens();
-      const hasValidLineToken =
-        lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
-
-      if (renewed && state.authenticationState === "phone_token_expired") {
-        setState({ authenticationState: "phone_authenticated" });
-      } else if (!renewed) {
-        if (!hasValidLineToken) {
-          setState({ authenticationState: "unauthenticated" });
-        } else {
-          setState({ authenticationState: "line_authenticated" });
-        }
-      }
-    } catch (error) {
-      logger.info("Failed to renew phone token", {
-        authType: "phone",
-        error: error instanceof Error ? error.message : String(error),
-        component: "AuthStateManager",
-      });
-
-      const lineTokens = TokenManager.getLineTokens();
-      const hasValidLineToken =
-        lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
-
-      if (!hasValidLineToken) {
-        setState({ authenticationState: "unauthenticated" });
-      } else {
-        setState({ authenticationState: "line_authenticated" });
-      }
-    }
-  }
 
   public async handleLineAuthStateChange(isAuthenticated: boolean): Promise<void> {
     const { state, setState } = useAuthStore.getState();
@@ -134,9 +69,11 @@ export class AuthStateManager {
 
   public async handlePhoneAuthStateChange(isVerified: boolean): Promise<void> {
     const { state, setState } = useAuthStore.getState();
-    const lineTokens = TokenManager.getLineTokens();
+    const { lineTokens } = state;
     const hasValidLineToken =
-      !!lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+      !!lineTokens.accessToken &&
+      lineTokens.expiresAt &&
+      lineTokens.expiresAt - Date.now() > 5 * 60 * 1000;
 
     if (!hasValidLineToken && state.authenticationState !== "loading") {
       setState({ authenticationState: "unauthenticated" });
@@ -161,9 +98,12 @@ export class AuthStateManager {
   }
 
   public async handleUserRegistrationStateChange(isRegistered: boolean): Promise<void> {
-    const { setState } = useAuthStore.getState();
-    const lineTokens = TokenManager.getLineTokens();
-    const hasValidLineToken = lineTokens.accessToken && !(await TokenManager.isLineTokenExpired());
+    const { state, setState, phoneAuth } = useAuthStore.getState();
+    const { lineTokens } = state;
+    const hasValidLineToken =
+      lineTokens.accessToken &&
+      lineTokens.expiresAt &&
+      lineTokens.expiresAt - Date.now() > 5 * 60 * 1000;
 
     if (!hasValidLineToken) {
       setState({ authenticationState: "unauthenticated" });
@@ -173,9 +113,11 @@ export class AuthStateManager {
     if (isRegistered) {
       setState({ authenticationState: "user_registered" });
     } else {
-      const phoneTokens = TokenManager.getPhoneTokens();
+      const { phoneTokens } = phoneAuth;
       const hasValidPhoneToken =
-        phoneTokens.accessToken && !(await TokenManager.isPhoneTokenExpired());
+        phoneTokens.accessToken &&
+        phoneTokens.expiresAt &&
+        phoneTokens.expiresAt - Date.now() > 5 * 60 * 1000;
 
       if (hasValidPhoneToken) {
         setState({ authenticationState: "phone_authenticated" });

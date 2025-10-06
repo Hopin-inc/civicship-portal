@@ -25,116 +25,61 @@ export class TokenManager {
   private static cachedToken: string | null = null;
   private static cachedExpiry: number | null = null;
 
-  private static readonly LINE_ACCESS_TOKEN_KEY = "access_token";
-  private static readonly LINE_REFRESH_TOKEN_KEY = "refresh_token";
-  private static readonly LINE_TOKEN_EXPIRES_AT_KEY = "token_expires_at";
-
-  private static readonly PHONE_UID_KEY = "phone_uid";
-  private static readonly PHONE_NUMBER_KEY = "phone_number";
-  private static readonly PHONE_ACCESS_TOKEN_KEY = "phone_auth_token";
-  private static readonly PHONE_REFRESH_TOKEN_KEY = "phone_refresh_token";
-  private static readonly PHONE_TOKEN_EXPIRES_AT_KEY = "phone_token_expires_at";
+  private static readonly LINE_AUTHENTICATED_KEY = "line_authenticated";
+  private static readonly PHONE_AUTHENTICATED_KEY = "phone_authenticated";
 
   /**
-   * LINE認証トークンをCookieに保存
-   * @param tokens 保存するトークン情報
+   * LINE認証済みフラグを保存
+   * @param isAuthenticated 認証済みかどうか
    */
-  static saveLineTokens(tokens: AuthTokens): void {
-    if (tokens.accessToken) {
-      this.setCookie(this.LINE_ACCESS_TOKEN_KEY, tokens.accessToken);
-    }
-    if (tokens.refreshToken) {
-      this.setCookie(this.LINE_REFRESH_TOKEN_KEY, tokens.refreshToken);
-    }
-    if (tokens.expiresAt) {
-      this.setCookie(this.LINE_TOKEN_EXPIRES_AT_KEY, tokens.expiresAt.toString());
-    }
+  static saveLineAuthFlag(isAuthenticated: boolean): void {
+    this.setCookie(this.LINE_AUTHENTICATED_KEY, isAuthenticated.toString());
   }
 
   /**
-   * 電話番号認証トークンをCookieに保存
-   * @param tokens 保存するトークン情報
+   * Phone認証済みフラグを保存
+   * @param isAuthenticated 認証済みかどうか
    */
-  static savePhoneTokens(tokens: PhoneAuthTokens): void {
-    if (tokens.phoneUid) {
-      this.setCookie(this.PHONE_UID_KEY, tokens.phoneUid);
-    }
-    if (tokens.phoneNumber) {
-      this.setCookie(this.PHONE_NUMBER_KEY, tokens.phoneNumber);
-    }
-    if (tokens.accessToken) {
-      this.setCookie(this.PHONE_ACCESS_TOKEN_KEY, tokens.accessToken);
-    }
-    if (tokens.refreshToken) {
-      this.setCookie(this.PHONE_REFRESH_TOKEN_KEY, tokens.refreshToken);
-    }
-    if (tokens.expiresAt) {
-      this.setCookie(this.PHONE_TOKEN_EXPIRES_AT_KEY, tokens.expiresAt.toString());
-    }
+  static savePhoneAuthFlag(isAuthenticated: boolean): void {
+    this.setCookie(this.PHONE_AUTHENTICATED_KEY, isAuthenticated.toString());
   }
 
   /**
-   * LINE認証トークンをCookieから取得
-   * @returns 取得したトークン情報
+   * LINE認証済みフラグを取得
+   * @returns 認証済みかどうか
    */
-  static getLineTokens(): AuthTokens {
-    const accessToken = this.getCookie(this.LINE_ACCESS_TOKEN_KEY);
-    const refreshToken = this.getCookie(this.LINE_REFRESH_TOKEN_KEY);
-    const expiresAtStr = this.getCookie(this.LINE_TOKEN_EXPIRES_AT_KEY);
-
-    return {
-      accessToken,
-      refreshToken,
-      expiresAt: expiresAtStr ? parseInt(expiresAtStr, 10) : null,
-    };
+  static getLineAuthFlag(): boolean {
+    return this.getCookie(this.LINE_AUTHENTICATED_KEY) === "true";
   }
 
   /**
-   * 電話番号認証トークンをCookieから取得
-   * @returns 取得したトークン情報
+   * Phone認証済みフラグを取得
+   * @returns 認証済みかどうか
    */
-  static getPhoneTokens(): PhoneAuthTokens {
-    const phoneUid = this.getCookie(this.PHONE_UID_KEY);
-    const phoneNumber = this.getCookie(this.PHONE_NUMBER_KEY);
-    const accessToken = this.getCookie(this.PHONE_ACCESS_TOKEN_KEY);
-    const refreshToken = this.getCookie(this.PHONE_REFRESH_TOKEN_KEY);
-    const expiresAtStr = this.getCookie(this.PHONE_TOKEN_EXPIRES_AT_KEY);
-
-    return {
-      accessToken,
-      refreshToken,
-      phoneUid,
-      phoneNumber,
-      expiresAt: expiresAtStr ? parseInt(expiresAtStr, 10) : null,
-    };
+  static getPhoneAuthFlag(): boolean {
+    return this.getCookie(this.PHONE_AUTHENTICATED_KEY) === "true";
   }
 
   /**
-   * LINE認証トークンをCookieから削除
+   * LINE認証済みフラグをクリア
    */
-  static clearLineTokens(): void {
-    this.deleteCookie(this.LINE_ACCESS_TOKEN_KEY);
-    this.deleteCookie(this.LINE_REFRESH_TOKEN_KEY);
-    this.deleteCookie(this.LINE_TOKEN_EXPIRES_AT_KEY);
+  static clearLineAuthFlag(): void {
+    this.deleteCookie(this.LINE_AUTHENTICATED_KEY);
   }
 
   /**
-   * 電話番号認証トークンをCookieから削除
+   * Phone認証済みフラグをクリア
    */
-  static clearPhoneTokens(): void {
-    this.deleteCookie(this.PHONE_UID_KEY);
-    this.deleteCookie(this.PHONE_NUMBER_KEY);
-    this.deleteCookie(this.PHONE_ACCESS_TOKEN_KEY);
-    this.deleteCookie(this.PHONE_REFRESH_TOKEN_KEY);
-    this.deleteCookie(this.PHONE_TOKEN_EXPIRES_AT_KEY);
+  static clearPhoneAuthFlag(): void {
+    this.deleteCookie(this.PHONE_AUTHENTICATED_KEY);
   }
 
   /**
-   * すべての認証トークンをCookieから削除
+   * すべての認証フラグをクリア
    */
-  static clearAllTokens(): void {
-    this.clearLineTokens();
-    this.clearPhoneTokens();
+  static clearAllAuthFlags(): void {
+    this.clearLineAuthFlag();
+    this.clearPhoneAuthFlag();
   }
 
   static async getCachedToken(user: User | null): Promise<string | null> {
@@ -182,73 +127,7 @@ export class TokenManager {
     return tokens.expiresAt - now < bufferTime;
   }
 
-  /**
-   * 電話番号認証トークンが有効期限切れかどうかを確認
-   * @returns 有効期限切れの場合はtrue
-   */
-  static async isPhoneTokenExpired(): Promise<boolean> {
-    const { expiresAt } = this.getPhoneTokens();
-    if (!expiresAt) return true;
 
-    const now = Date.now();
-    const bufferTime = 5 * 60 * 1000; // 5分（ミリ秒）
-    return expiresAt - now < bufferTime;
-  }
-
-  /**
-   * LINE認証トークンを自動更新
-   * @param providedRefreshToken 更新に使用するリフレッシュトークン（省略時はCookieから取得を試みる）
-   * @returns 更新が成功したかどうか
-   */
-  static async renewLineToken(providedRefreshToken?: string | null): Promise<boolean> {
-    try {
-      const refreshToken = providedRefreshToken || this.getLineTokens().refreshToken;
-      if (!refreshToken) return false;
-
-      if (typeof window !== "undefined") {
-        const event = new CustomEvent("auth:renew-line-token", {
-          detail: { refreshToken },
-        });
-        window.dispatchEvent(event);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      logger.info("Failed to renew LINE token", {
-        error: error instanceof Error ? error.message : String(error),
-        component: "TokenManager",
-      });
-      return false;
-    }
-  }
-
-  /**
-   * 電話番号認証トークンを自動更新
-   * @param providedRefreshToken 更新に使用するリフレッシュトークン（省略時はCookieから取得を試みる）
-   * @returns 更新が成功したかどうか
-   */
-  static async renewPhoneToken(providedRefreshToken?: string | null): Promise<boolean> {
-    try {
-      const refreshToken = providedRefreshToken || this.getPhoneTokens().refreshToken;
-      if (!refreshToken) return false;
-
-      if (typeof window !== "undefined") {
-        const event = new CustomEvent("auth:renew-phone-token", {
-          detail: { refreshToken },
-        });
-        window.dispatchEvent(event);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      logger.info("Failed to renew phone token", {
-        authType: "phone",
-        error: error instanceof Error ? error.message : String(error),
-        component: "TokenManager",
-      });
-      return false;
-    }
-  }
 
   /**
    * Cookieを設定

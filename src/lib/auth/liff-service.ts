@@ -282,21 +282,25 @@ export class LiffService {
           const tokenResult = await userCredential.user.getIdTokenResult();
           const expirationTime = new Date(tokenResult.expirationTime).getTime();
 
-          const tokens: AuthTokens = {
-            accessToken: idToken,
-            refreshToken: refreshToken,
-            expiresAt: expirationTime,
-          };
-          TokenManager.saveLineTokens(tokens);
-
           if (typeof window !== "undefined") {
             try {
+              const { useAuthStore } = await import("@/hooks/auth/auth-store");
+              useAuthStore.getState().setState({
+                lineTokens: {
+                  accessToken: idToken,
+                  refreshToken: refreshToken,
+                  expiresAt: expirationTime,
+                },
+              });
+
+              TokenManager.saveLineAuthFlag(true);
+
               const AuthStateManager = require("./auth-state-manager").AuthStateManager;
               const authStateManager = AuthStateManager.getInstance();
               const timestamp = new Date().toISOString();
               await authStateManager.handleLineAuthStateChange(true);
             } catch (error) {
-              logger.warn("Failed to update AuthStateManager state", {
+              logger.warn("Failed to update auth state", {
                 error: error instanceof Error ? error.message : String(error),
                 component: "LiffService",
                 errorCategory: "state_management",
