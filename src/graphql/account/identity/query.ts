@@ -32,6 +32,10 @@ export const GET_CURRENT_USER_SERVER = gql`
       user {
         id
         name
+        identities {
+          uid
+          platform
+        }
         memberships {
           ...MembershipFields
           user {

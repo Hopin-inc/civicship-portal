@@ -2947,6 +2947,11 @@ export type GqlCurrentUserServerQuery = {
       __typename?: "User";
       id: string;
       name: string;
+      identities?: Array<{
+        __typename?: "Identity";
+        uid: string;
+        platform?: GqlIdentityPlatform | null;
+      }> | null;
       memberships?: Array<{
         __typename?: "Membership";
         role: GqlRole;
@@ -6667,6 +6672,10 @@ export const CurrentUserServerDocument = gql`
       user {
         id
         name
+        identities {
+          uid
+          platform
+        }
         memberships {
           ...MembershipFields
           user {
