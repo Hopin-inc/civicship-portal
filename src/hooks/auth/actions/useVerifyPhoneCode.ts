@@ -3,42 +3,52 @@ import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/hooks/auth/auth-store";
+import { TokenManager } from "@/lib/auth/token-manager";
 
 export const useVerifyPhoneCode = (
   phoneAuthService: PhoneAuthService,
   authStateManager: AuthStateManager | null,
 ) => {
-  const setState = useAuthStore((s) => s.setState);
+  const setAuthState = useAuthStore((s) => s.setState);
+  const setPhoneAuth = useAuthStore((s) => s.setPhoneAuth);
 
   return useCallback(
     async (verificationCode: string): Promise<boolean> => {
-      const success = await phoneAuthService.verifyPhoneCode(verificationCode);
+      const result = await phoneAuthService.verifyPhoneCode(verificationCode);
 
-      if (success) {
-        setState({ authenticationState: "phone_authenticated" });
+      if (!result.success) return false;
 
-        if (authStateManager) {
-          try {
-            const timestamp = new Date().toISOString();
-            logger.debug("Updating phone auth state", { timestamp, component: "AuthActions" });
-            await authStateManager.handlePhoneAuthStateChange(true);
-            logger.debug("AuthStateManager phone state updated successfully", {
-              timestamp,
-              component: "AuthActions",
-            });
-          } catch (error) {
-            logger.warn("Failed to update AuthStateManager phone state", {
-              error: error instanceof Error ? error.message : String(error),
-              component: "AuthActions",
-              errorCategory: "state_management",
-              retryable: true,
-            });
+      const tokens = result.tokens
+        ? {
+            accessToken: result.tokens.accessToken ?? null,
+            refreshToken: result.tokens.refreshToken ?? null,
+            expiresAt: result.tokens.expiresAt ?? null,
           }
+        : undefined;
+
+      setPhoneAuth({
+        phoneUid: result.phoneUid ?? null,
+        isVerified: true,
+        phoneTokens: tokens,
+        error: null,
+      });
+      TokenManager.savePhoneAuthFlag(true);
+
+      setAuthState({ authenticationState: "phone_authenticated" });
+
+      if (authStateManager) {
+        try {
+          await authStateManager.handlePhoneAuthStateChange(true);
+          logger.debug("AuthStateManager phone state updated successfully");
+        } catch (err) {
+          logger.warn("Failed to update AuthStateManager phone state", {
+            error: err instanceof Error ? err.message : String(err),
+          });
         }
       }
 
-      return success;
+      return true;
     },
-    [setState, phoneAuthService, authStateManager],
+    [setAuthState, setPhoneAuth, phoneAuthService, authStateManager],
   );
 };
