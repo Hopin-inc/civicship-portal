@@ -29,10 +29,14 @@ export async function initAuth(params: InitAuthParams) {
   } = params;
 
   const { setState, state } = useAuthStore.getState();
-  const environment = detectEnvironment();
-
   if (state.isAuthInProgress) return;
 
+  setState({
+    isAuthInProgress: true,
+    isAuthenticating: true,
+  });
+
+  const environment = detectEnvironment();
   // --- SSR完全保証モード（最速復元） ---
   if (ssrCurrentUser && ssrLineAuthenticated) {
     return await initAuthFast({
@@ -124,7 +128,7 @@ async function initAuthFull({
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
 }) {
   try {
-    prepareInitialState({ ssrLineAuthenticated, ssrPhoneAuthenticated }, setState);
+    prepareInitialState(setState);
 
     const firebaseUser = await initializeFirebase(liffService, environment, setState);
     if (!firebaseUser) {
@@ -136,8 +140,20 @@ async function initAuthFull({
     }
     try {
       const idToken = await firebaseUser.getIdToken(true);
+      const tokenResult = await firebaseUser.getIdTokenResult();
+
       await createSession(idToken);
+
       TokenManager.saveLineAuthFlag(true);
+      useAuthStore.getState().setState({
+        lineTokens: {
+          accessToken: idToken,
+          refreshToken: firebaseUser.refreshToken ?? null,
+          expiresAt: new Date(tokenResult.expirationTime).getTime(),
+        },
+      });
+
+      await Promise.resolve();
     } catch (err) {
       console.error("Failed to refresh server session", { err });
     }
@@ -188,35 +204,12 @@ async function initAuthFull({
   }
 }
 
-function prepareInitialState(
-  {
-    ssrLineAuthenticated,
-    ssrPhoneAuthenticated,
-  }: {
-    ssrLineAuthenticated?: boolean;
-    ssrPhoneAuthenticated?: boolean;
-  },
-  setState: ReturnType<typeof useAuthStore.getState>["setState"],
-) {
-  if (ssrLineAuthenticated) {
-    let initialState: AuthenticationState = "line_authenticated";
-
-    if (ssrPhoneAuthenticated) {
-      initialState = "phone_authenticated";
-    }
-
-    setState({
-      authenticationState: initialState,
-      isAuthenticating: true,
-      isAuthInProgress: true,
-    });
-  } else {
-    setState({
-      authenticationState: "loading",
-      isAuthenticating: true,
-      isAuthInProgress: true,
-    });
-  }
+function prepareInitialState(setState: ReturnType<typeof useAuthStore.getState>["setState"]) {
+  setState({
+    authenticationState: "loading",
+    isAuthenticating: true,
+    isAuthInProgress: true,
+  });
 }
 
 async function initializeFirebase(
@@ -275,8 +268,8 @@ async function restoreUserSession(
   firebaseUser: User,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
 ): Promise<GqlUser | null> {
-  const idToken = await firebaseUser.getIdToken(true);
   const tokenResult = await firebaseUser.getIdTokenResult();
+  const idToken = tokenResult.token;
   const expiresAt = new Date(tokenResult.expirationTime).getTime();
 
   useAuthStore.getState().setState({
