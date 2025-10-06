@@ -92,12 +92,32 @@ export class TokenManager {
     if (!user) return null;
 
     const now = Date.now();
-    const bufferTime = 5 * 60 * 1000; // 5分前に更新
+    const bufferTime = 5 * 60 * 1000; // 有効期限5分前に更新
 
+    // キャッシュが存在しない or 有効期限が近い → 更新処理
     if (!this.cachedToken || !this.cachedExpiry || this.cachedExpiry - now < bufferTime) {
-      const idTokenResult = await user.getIdTokenResult();
-      this.cachedToken = idTokenResult.token;
-      this.cachedExpiry = new Date(idTokenResult.expirationTime).getTime();
+      try {
+        // 一度キャッシュの有効期限を確認
+        const idTokenResult = await user.getIdTokenResult();
+        const expiry = new Date(idTokenResult.expirationTime).getTime();
+
+        if (expiry - now < bufferTime) {
+          // 🔁 有効期限が近い or 既に切れている → 強制更新
+          const freshToken = await user.getIdToken(true);
+          const freshResult = await user.getIdTokenResult();
+          this.cachedToken = freshToken;
+          this.cachedExpiry = new Date(freshResult.expirationTime).getTime();
+          return this.cachedToken;
+        }
+
+        // ✅ まだ有効ならキャッシュ更新
+        this.cachedToken = idTokenResult.token;
+        this.cachedExpiry = expiry;
+      } catch (err) {
+        console.warn("⚠️ Failed to refresh Firebase token", err);
+        this.cachedToken = null;
+        this.cachedExpiry = null;
+      }
     }
 
     return this.cachedToken;
