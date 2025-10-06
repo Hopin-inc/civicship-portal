@@ -1,11 +1,10 @@
 import { useCallback } from "react";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { TokenManager } from "@/lib/auth/token-manager";
 import { logger } from "@/lib/logging";
-import { GqlCurrentPrefecture, useUserSignUpMutation } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlUser, useUserSignUpMutation } from "@/types/graphql";
 import { useAuthStore } from "@/hooks/auth/auth-store";
 
-export const useCreateUser = (refetchUser: () => Promise<any>) => {
+export const useCreateUser = (refetchUser: () => Promise<GqlUser | null>) => {
   const [userSignUp] = useUserSignUpMutation();
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
 
@@ -31,12 +30,12 @@ export const useCreateUser = (refetchUser: () => Promise<any>) => {
         });
 
         if (data?.userSignUp?.user) {
-          const { data: refreshed } = await refetchUser();
-          if (refreshed?.currentUser?.user) {
+          const user = await refetchUser();
+          if (user) {
             useAuthStore.getState().setState({
               firebaseUser,
               authenticationState: "user_registered",
-              currentUser: refreshed.currentUser.user,
+              currentUser: user,
             });
           }
           return firebaseUser;

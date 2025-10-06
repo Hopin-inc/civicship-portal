@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useRef } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
@@ -48,12 +48,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     });
   }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated]);
 
-  const { refetch: refetchUser } = useCurrentUserQuery({
+  const { refetch } = useCurrentUserQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
       state.authenticationState,
     ),
     fetchPolicy: "network-only",
   });
+
+  const refetchUser = useCallback(async () => {
+    const { data } = await refetch();
+    const user = data?.currentUser?.user ?? null;
+    console.debug("🔁 refetchUser result:", user);
+    return user;
+  }, [refetch]);
 
   useFirebaseAuthState({ authStateManager });
   useAuthStateChangeListener({ authStateManager });

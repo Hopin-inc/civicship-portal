@@ -4,11 +4,12 @@ import { useEffect, useRef } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { useAuthStore } from "@/hooks/auth/auth-store";
 import { logger } from "@/lib/logging";
+import { GqlUser } from "@/types/graphql";
 
 interface UseLineAuthProcessingProps {
   shouldProcessRedirect: boolean;
   liffService: LiffService;
-  refetchUser: () => Promise<any>;
+  refetchUser: () => Promise<GqlUser | null>;
 }
 
 export const useLineAuthProcessing = ({
