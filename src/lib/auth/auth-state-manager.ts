@@ -46,14 +46,14 @@ export class AuthStateManager {
   }
 
   public async handlePhoneAuthStateChange(isVerified: boolean): Promise<void> {
-    const { state, setState } = useAuthStore.getState();
-    const { lineTokens } = state;
-    const hasValidLineToken =
-      !!lineTokens.accessToken &&
-      lineTokens.expiresAt &&
-      lineTokens.expiresAt - Date.now() > 5 * 60 * 1000;
+    const { state, phoneAuth, setState } = useAuthStore.getState();
+    const { phoneTokens } = phoneAuth;
+    const hasValidPhoneToken =
+      !!phoneTokens.accessToken &&
+      phoneTokens.expiresAt &&
+      phoneTokens.expiresAt - Date.now() > 5 * 60 * 1000;
 
-    if (!hasValidLineToken && state.authenticationState !== "loading") {
+    if (!hasValidPhoneToken && state.authenticationState !== "loading") {
       setState({ authenticationState: "unauthenticated" });
       return;
     }
@@ -79,15 +79,17 @@ export class AuthStateManager {
     isRegistered: boolean,
     options?: { ssrMode?: boolean },
   ): Promise<void> {
-    const { state } = useAuthStore.getState();
+    const { state, setState } = useAuthStore.getState();
 
     if (options?.ssrMode) {
-      useAuthStore.getState().setState({
+      setState({
         authenticationState: isRegistered ? "user_registered" : "line_authenticated",
       });
-      logger.debug("handleUserRegistrationStateChange: SSR確定モード");
+      logger.debug("handleUserRegistrationStateChange: SSR Mode");
       return;
     }
+
+    if (state.isAuthenticating) return;
 
     const { lineTokens } = state;
     const hasValidLineToken =
@@ -96,13 +98,14 @@ export class AuthStateManager {
       lineTokens.expiresAt - Date.now() > 5 * 60 * 1000;
 
     if (!hasValidLineToken) {
-      await this.handleLineAuthStateChange(false);
       return;
     }
 
     if (isRegistered) {
-      useAuthStore.getState().setState({ authenticationState: "user_registered" });
-      logger.debug("handleUserRegistrationStateChange: 登録済み → user_registered");
+      if (state.authenticationState !== "user_registered") {
+        setState({ authenticationState: "user_registered" });
+      }
+      logger.debug("handleUserRegistrationStateChange: user_registered");
       return;
     }
 
@@ -112,7 +115,9 @@ export class AuthStateManager {
       !!phoneAuth.phoneTokens.expiresAt &&
       phoneAuth.phoneTokens.expiresAt - Date.now() > 5 * 60 * 1000;
 
-    await this.handlePhoneAuthStateChange(hasValidPhoneToken);
+    if (hasValidPhoneToken && state.authenticationState === "line_authenticated") {
+      await this.handlePhoneAuthStateChange(true);
+    }
   }
 
   private initializeSessionId(): string {
