@@ -125,6 +125,9 @@ async function initAuthFull({
 
     const firebaseUser = await initializeFirebase(liffService, environment, setState);
     if (!firebaseUser) {
+      if (environment !== AuthEnvironment.LIFF) {
+        await tryReSignIn(liffService, authStateManager, setState);
+      }
       finalizeAuthState("unauthenticated", undefined, setState);
       return;
     }
@@ -163,28 +166,9 @@ async function initAuthFull({
       return;
     }
 
-    // --- ④ LIFF再サインイン fallback ---
+    // --- fallback: 非LIFF再署名 (401防止ライン) ---
     if (environment !== AuthEnvironment.LIFF) {
-      const { isInitialized, isLoggedIn } = liffService.getState();
-      if (isInitialized && isLoggedIn) {
-        try {
-          const success = await liffService.signInWithLiffToken();
-          if (success) {
-            const newUser = await fetchCurrentUserClient();
-            if (newUser) {
-              setState({
-                currentUser: newUser,
-                authenticationState: "user_registered",
-                isAuthenticating: false,
-                isAuthInProgress: false,
-              });
-              await authStateManager.handleUserRegistrationStateChange(true);
-            }
-          }
-        } catch (error) {
-          logger.error("Non-LIFF sign-in failed", { error, component: "initAuth" });
-        }
-      }
+      await tryReSignIn(liffService, authStateManager, setState);
     }
 
     finalizeAuthState("line_authenticated", undefined, setState);
@@ -248,6 +232,33 @@ async function initializeFirebase(
       });
     }))
   );
+}
+
+async function tryReSignIn(
+  liffService: LiffService,
+  authStateManager: AuthStateManager,
+  setState: ReturnType<typeof useAuthStore.getState>["setState"],
+) {
+  const { isInitialized, isLoggedIn } = liffService.getState();
+  if (isInitialized && isLoggedIn) {
+    try {
+      const success = await liffService.signInWithLiffToken();
+      if (success) {
+        const newUser = await fetchCurrentUserClient();
+        if (newUser) {
+          setState({
+            currentUser: newUser,
+            authenticationState: "user_registered",
+            isAuthenticating: false,
+            isAuthInProgress: false,
+          });
+          await authStateManager.handleUserRegistrationStateChange(true);
+        }
+      }
+    } catch (error) {
+      logger.error("ReSignIn failed", { error, component: "tryReSignIn" });
+    }
+  }
 }
 
 async function restoreUserSession(
