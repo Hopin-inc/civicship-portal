@@ -85,6 +85,7 @@ export interface AuthContextType {
     clearRecaptcha?: () => void;
     isVerifying: boolean;
     phoneUid: string | null;
+    phoneNumber: string | null;
   };
 
   createUser: (
