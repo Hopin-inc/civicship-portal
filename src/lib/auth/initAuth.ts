@@ -158,7 +158,8 @@ async function initAuthFull({
     // --- ① PHONE認証済みかを先に確認（DB基準 or token基準） ---
     const isPhoneVerified = TokenManager.phoneVerified();
     if (ssrPhoneAuthenticated || isPhoneVerified) {
-      // SSRでphone認証済みなら → user登録確認
+      // Cookieにも永続化（SSRとの整合保持）
+      TokenManager.savePhoneAuthFlag(true);
       const user = await restoreUserSession(ssrCurrentUser, firebaseUser, setState);
       if (user) {
         finalizeAuthState("user_registered", user, setState);
