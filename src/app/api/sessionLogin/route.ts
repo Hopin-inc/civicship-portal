@@ -6,7 +6,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing idToken" }, { status: 400 });
   }
 
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+  const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT ?? "https://localhost:3000";
+  const apiBase = apiEndpoint.replace(/\/graphql\/?$/, "");
 
   const res = await fetch(`${apiBase}/sessionLogin`, {
     method: "POST",

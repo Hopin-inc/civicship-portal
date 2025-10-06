@@ -1,5 +1,6 @@
 export async function createSession(idToken: string) {
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://localhost:3000";
+  const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT ?? "https://localhost:3000";
+  const apiBase = apiEndpoint.replace(/\/graphql\/?$/, "");
 
   const res = await fetch(`${apiBase}/sessionLogin`, {
     method: "POST",
