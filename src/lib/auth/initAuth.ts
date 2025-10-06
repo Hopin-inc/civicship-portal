@@ -45,7 +45,10 @@ export async function initAuth(params: InitAuthParams) {
     });
   }
 
-  console.log("⚠️Start initAuthFull");
+  console.log("⚠️Start initAuthFull", {
+    isAuthInProgress: useAuthStore.getState().state.isAuthInProgress,
+    authState: useAuthStore.getState().state,
+  });
 
   // --- 通常モード ---
   return await initAuthFull({

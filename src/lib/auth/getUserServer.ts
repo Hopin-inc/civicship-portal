@@ -14,6 +14,7 @@ export async function getUserServer(): Promise<{
   const cookieStore = await cookies();
 
   const session = cookieStore.get("session")?.value ?? null;
+  console.log("session", session);
   const hasSession = !!session;
 
   const phoneAuthenticated = cookieStore.get("phone_authenticated")?.value === "true";
@@ -34,6 +35,8 @@ export async function getUserServer(): Promise<{
 
     const user: GqlUser | null = res.currentUser?.user ?? null;
     const hasPhoneIdentity = !!user?.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
+    console.log("hasPhoneIdentity", hasPhoneIdentity);
+    console.log("user", user);
 
     return {
       user,
