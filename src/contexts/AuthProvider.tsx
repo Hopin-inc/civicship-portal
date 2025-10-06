@@ -4,7 +4,6 @@ import React, { createContext, useContext, useEffect } from "react";
 import { LiffService } from "@/lib/auth/liff-service";
 import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
 import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
 import { AuthContextType, AuthProviderProps } from "@/types/auth";
 import { useAuthActions } from "@/hooks/auth/useAuthActions";
@@ -41,6 +40,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, ssrCurrent
     fetchPolicy: "network-only",
   });
 
+  useFirebaseAuthState({ authStateManager });
+  useAuthStateChangeListener({ authStateManager });
+  // useTokenExpirationHandler({ logout });
+  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ liffService });
+  useLineAuthProcessing({ shouldProcessRedirect, liffService, refetchUser });
+
   const { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode } =
     useAuthActions({
       authStateManager,
@@ -48,12 +53,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, ssrCurrent
       phoneAuthService,
       refetchUser,
     });
-
-  useFirebaseAuthState({ authStateManager });
-  useAuthStateChangeListener({ authStateManager });
-  useTokenExpirationHandler({ logout });
-  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ liffService });
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, refetchUser });
 
   const actions = React.useMemo(
     () => ({ logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification }),
