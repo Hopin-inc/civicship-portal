@@ -1,8 +1,5 @@
 export async function createSession(idToken: string) {
-  const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT ?? "https://localhost:3000";
-  const apiBase = apiEndpoint.replace(/\/graphql\/?$/, "");
-
-  const res = await fetch(`${apiBase}/sessionLogin`, {
+  const res = await fetch("/api/sessionLogin", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ idToken }),
@@ -15,6 +12,6 @@ export async function createSession(idToken: string) {
     throw new Error(`Failed to create session cookie (${res.status})`);
   }
 
-  console.info("✅ Session cookie successfully created (via server)");
+  console.info("✅ Session cookie successfully created (via proxy)");
   return true;
 }
