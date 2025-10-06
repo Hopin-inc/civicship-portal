@@ -21,7 +21,7 @@ export const useAuthActions = (deps: AuthDeps) => {
   const createUser = useCreateUser(refetchUser);
   const logout = useLogout(liffService, phoneAuthService);
 
-  const startPhoneVerification = useStartPhoneVerification(phoneAuthService);
+  const startPhoneVerification = useStartPhoneVerification(phoneAuthService, authStateManager);
   const verifyPhoneCode = useVerifyPhoneCode(phoneAuthService, authStateManager);
 
   return { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode };
