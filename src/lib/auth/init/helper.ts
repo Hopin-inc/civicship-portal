@@ -1,0 +1,167 @@
+import { useAuthStore } from "@/hooks/auth/auth-store";
+import { AuthenticationState } from "@/types/auth";
+import { GqlUser } from "@/types/graphql";
+import { AuthStateManager } from "@/lib/auth/auth-state-manager";
+import { fetchCurrentUserClient } from "@/lib/auth/init/fetchCurrentUser";
+import { TokenManager } from "@/lib/auth/token-manager";
+import { createSession } from "@/hooks/auth/actions/createSession";
+import { User } from "firebase/auth";
+import { LiffService } from "@/lib/auth/liff-service";
+import { AuthEnvironment } from "@/lib/auth/environment-detector";
+
+/**
+ * 1️⃣ 認証前の初期状態を設定
+ */
+export function prepareInitialState(
+  setState: ReturnType<typeof useAuthStore.getState>["setState"],
+) {
+  const current = useAuthStore.getState().state.authenticationState;
+  if (current !== "loading") return;
+  setState({
+    authenticationState: "loading",
+    isAuthenticating: true,
+    isAuthInProgress: true,
+  });
+}
+
+/**
+ * 2️⃣ FirebaseUser が存在しない場合の LIFF / 通常ブラウザハンドリング
+ */
+export function handleUnauthenticatedBranch(
+  liffService: LiffService,
+  environment: AuthEnvironment,
+  setState: ReturnType<typeof useAuthStore.getState>["setState"],
+  authStateManager: AuthStateManager,
+): "handled" | "pending" | "continue" {
+  const liffState = liffService.getState();
+
+  // regular_browser → 即 unauthenticated
+  if (environment !== AuthEnvironment.LIFF) {
+    finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
+    return "handled";
+  }
+
+  if (!liffState.isInitialized) {
+    setState({
+      authenticationState: "loading",
+      isAuthenticating: true,
+      isAuthInProgress: true,
+    });
+    return "pending";
+  }
+
+  if (liffState.isLoggedIn) {
+    setState({
+      authenticationState: "authenticating",
+      isAuthenticating: true,
+      isAuthInProgress: true,
+    });
+    return "pending";
+  }
+
+  finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
+  return "handled";
+}
+
+/**
+ * 3️⃣ FirebaseUser からセッションを確立
+ */
+export async function establishSessionFromFirebaseUser(
+  firebaseUser: User,
+  setState: ReturnType<typeof useAuthStore.getState>["setState"],
+): Promise<boolean> {
+  try {
+    const idToken = await firebaseUser.getIdToken(true);
+    const tokenResult = await firebaseUser.getIdTokenResult();
+
+    await createSession(idToken);
+    TokenManager.saveLineAuthFlag(true);
+
+    setState({
+      lineTokens: {
+        accessToken: idToken,
+        refreshToken: firebaseUser.refreshToken ?? null,
+        expiresAt: new Date(tokenResult.expirationTime).getTime(),
+      },
+    });
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 4️⃣ ユーザーセッションを復元（SSR or Firebaseから）
+ */
+export async function restoreUserSession(
+  ssrCurrentUser: GqlUser | null | undefined,
+  firebaseUser: User,
+  setState: ReturnType<typeof useAuthStore.getState>["setState"],
+) {
+  const tokenResult = await firebaseUser.getIdTokenResult();
+  useAuthStore.getState().setState({
+    lineTokens: {
+      accessToken: tokenResult.token,
+      refreshToken: firebaseUser.refreshToken ?? null,
+      expiresAt: new Date(tokenResult.expirationTime).getTime(),
+    },
+  });
+
+  if (ssrCurrentUser) {
+    setState({ currentUser: ssrCurrentUser });
+    return ssrCurrentUser;
+  }
+
+  const user = await fetchCurrentUserClient();
+  if (user) {
+    setState({ currentUser: user });
+    return user;
+  }
+
+  return null;
+}
+
+/**
+ * 5️⃣ phone認証 or 登録状態を評価して認証状態を確定
+ */
+export async function evaluateUserRegistrationState(
+  user: GqlUser,
+  ssrPhoneAuthenticated: boolean | undefined,
+  setState: ReturnType<typeof useAuthStore.getState>["setState"],
+  authStateManager: AuthStateManager,
+): Promise<boolean> {
+  const hasPhoneIdentity = !!user.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
+
+  const isRegistered = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
+
+  if (isRegistered) {
+    TokenManager.savePhoneAuthFlag(true);
+    finalizeAuthState("user_registered", user, setState, authStateManager);
+    await authStateManager.handleUserRegistrationStateChange(true);
+    return true;
+  }
+
+  finalizeAuthState("line_authenticated", user, setState, authStateManager);
+  await authStateManager.handleUserRegistrationStateChange(false);
+  return false;
+}
+
+/**
+ * 6️⃣ 状態を確定
+ */
+export function finalizeAuthState(
+  state: AuthenticationState,
+  user?: GqlUser,
+  setState?: ReturnType<typeof useAuthStore.getState>["setState"],
+  authStateManager?: AuthStateManager,
+) {
+  if (authStateManager) {
+    authStateManager.updateState(state, "finalizeAuthState proxy");
+  }
+  setState?.({
+    currentUser: user ?? null,
+    isAuthenticating: false,
+    isAuthInProgress: false,
+  });
+}
