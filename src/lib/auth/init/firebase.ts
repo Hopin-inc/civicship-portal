@@ -1,8 +1,8 @@
-import { lineAuth } from "@/lib/auth/firebase-config";
-import { AuthEnvironment } from "@/lib/auth/environment-detector";
+import { lineAuth } from "@/lib/auth/core/firebase-config";
+import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
-import { LiffService } from "@/lib/auth/liff-service";
-import { AuthStateManager } from "@/lib/auth/auth-state-manager";
+import { LiffService } from "@/lib/auth/service/liff-service";
+import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { fetchCurrentUserClient } from "@/lib/auth/init/fetchCurrentUser";
 
 export async function initializeFirebase(liffService: LiffService, environment: AuthEnvironment) {

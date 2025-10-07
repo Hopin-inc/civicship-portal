@@ -1,10 +1,10 @@
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { logger } from "@/lib/logging";
-import { TokenManager } from "@/lib/auth/token-manager";
+import { TokenManager } from "@/lib/auth/core/token-manager";
 import { GqlUser } from "@/types/graphql";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
-import { LiffService } from "@/lib/auth/liff-service";
-import { AuthStateManager } from "@/lib/auth/auth-state-manager";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
+import { LiffService } from "@/lib/auth/service/liff-service";
+import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import {
   establishSessionFromFirebaseUser,
   evaluateUserRegistrationState,

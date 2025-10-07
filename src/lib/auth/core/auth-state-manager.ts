@@ -1,11 +1,32 @@
 import { AuthenticationState } from "@/types/auth";
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { logger } from "@/lib/logging";
 
 export class AuthStateManager {
   private static instance: AuthStateManager;
   private stateChangeListeners: ((state: AuthenticationState) => void)[] = [];
   private readonly sessionId: string;
+  private isUpdating = false;
+  private readonly ALLOWED_TRANSITIONS: Record<AuthenticationState, AuthenticationState[]> = {
+    unauthenticated: ["line_authenticated", "phone_authenticated", "user_registered"],
+    line_authenticated: [
+      "line_authenticated",
+      "line_token_expired",
+      "phone_authenticated",
+      "user_registered",
+    ],
+    line_token_expired: ["line_authenticated"],
+    phone_authenticated: ["phone_authenticated", "phone_token_expired", "user_registered"],
+    phone_token_expired: ["phone_authenticated"],
+    user_registered: ["user_registered"],
+    loading: ["unauthenticated", "line_authenticated", "phone_authenticated", "user_registered"],
+    authenticating: [
+      "unauthenticated",
+      "line_authenticated",
+      "phone_authenticated",
+      "user_registered",
+    ],
+  };
 
   private constructor() {
     this.sessionId = this.initializeSessionId();
@@ -22,6 +43,32 @@ export class AuthStateManager {
     return useAuthStore.getState().state.authenticationState;
   }
 
+  public updateState(newState: AuthenticationState, reason?: string): void {
+    if (this.isUpdating) return;
+    this.isUpdating = true;
+
+    try {
+      const { state, setState } = useAuthStore.getState();
+      const current = state.authenticationState;
+      const allowed = this.ALLOWED_TRANSITIONS[current] ?? [];
+
+      if (!allowed.includes(newState)) {
+        logger.debug(`[AuthStateManager] 🚫 Blocked transition: ${current} → ${newState}`, {
+          reason,
+        });
+        return;
+      }
+
+      if (newState === current) return;
+
+      logger.debug(`[AuthStateManager] ✅ Transition: ${current} → ${newState}`, { reason });
+      setState({ authenticationState: newState });
+      this.stateChangeListeners.forEach((listener) => listener(newState));
+    } finally {
+      this.isUpdating = false;
+    }
+  }
+
   public addStateChangeListener(listener: (state: AuthenticationState) => void): void {
     this.stateChangeListeners.push(listener);
   }
@@ -31,17 +78,17 @@ export class AuthStateManager {
   }
 
   public async handleLineAuthStateChange(isAuthenticated: boolean): Promise<void> {
-    const { state, setState } = useAuthStore.getState();
+    const { state } = useAuthStore.getState();
 
     if (isAuthenticated) {
       if (
         state.authenticationState === "unauthenticated" ||
         state.authenticationState === "loading"
       ) {
-        setState({ authenticationState: "line_authenticated" });
+        this.updateState("line_authenticated", "handleLineAuthStateChange");
       }
     } else {
-      setState({ authenticationState: "unauthenticated" });
+      this.updateState("unauthenticated", "handleLineAuthStateChange");
     }
   }
 
@@ -54,7 +101,7 @@ export class AuthStateManager {
       phoneTokens.expiresAt - Date.now() > 5 * 60 * 1000;
 
     if (!hasValidPhoneToken && state.authenticationState !== "loading") {
-      setState({ authenticationState: "unauthenticated" });
+      this.updateState("unauthenticated", "handlePhoneAuthStateChange");
       return;
     }
 
@@ -63,14 +110,14 @@ export class AuthStateManager {
         state.authenticationState === "line_authenticated" ||
         state.authenticationState === "line_token_expired"
       ) {
-        setState({ authenticationState: "phone_authenticated" });
+        this.updateState("phone_authenticated", "handlePhoneAuthStateChange");
       }
     } else {
       if (
         state.authenticationState !== "unauthenticated" &&
         state.authenticationState !== "loading"
       ) {
-        setState({ authenticationState: "line_authenticated" });
+        this.updateState("line_authenticated", "handlePhoneAuthStateChange");
       }
     }
   }
@@ -79,12 +126,11 @@ export class AuthStateManager {
     isRegistered: boolean,
     options?: { ssrMode?: boolean },
   ): Promise<void> {
-    const { state, setState } = useAuthStore.getState();
+    const { state } = useAuthStore.getState();
 
     if (options?.ssrMode) {
-      setState({
-        authenticationState: isRegistered ? "user_registered" : "line_authenticated",
-      });
+      const newState = isRegistered ? "user_registered" : "line_authenticated";
+      this.updateState(newState, "handleUserRegistrationStateChange");
       logger.debug("handleUserRegistrationStateChange: SSR Mode");
       return;
     }
@@ -103,7 +149,7 @@ export class AuthStateManager {
 
     if (isRegistered) {
       if (state.authenticationState !== "user_registered") {
-        setState({ authenticationState: "user_registered" });
+        this.updateState("user_registered", "handleUserRegistrationStateChange");
       }
       logger.debug("handleUserRegistrationStateChange: user_registered");
       return;

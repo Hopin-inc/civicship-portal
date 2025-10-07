@@ -1,7 +1,7 @@
 "use client";
 
 import { logger } from "@/lib/logging";
-import { lineAuth } from "@/lib/auth/firebase-config";
+import { lineAuth } from "@/lib/auth/core/firebase-config";
 import { User } from "@firebase/auth";
 
 /**

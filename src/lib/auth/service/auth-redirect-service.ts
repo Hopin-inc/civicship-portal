@@ -1,4 +1,4 @@
-import { AuthStateManager } from "./auth-state-manager";
+import { AuthStateManager } from "../core/auth-state-manager";
 import { GqlRole, GqlUser } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
@@ -7,7 +7,6 @@ import {
   matchPaths,
   RawURIComponent,
 } from "@/utils/path";
-import { useAuthStore } from "@/hooks/auth/auth-store";
 
 /**
  * Owner専用のパス一覧
@@ -79,12 +78,36 @@ export class AuthRedirectService {
     const authState = this.authStateManager.getState();
     const nextParam = next ? this.generateNextParam(next) : this.generateNextParam(pathname);
 
-    if (authState === "loading") {
+    // ✅ クエリを除去した basePath を使用
+    const basePath = pathname.split("?")[0];
+
+    // --- 🪵 デバッグログ追加 ---
+    const entry = {
+      ts: new Date().toISOString(),
+      step: "🎯 getRedirectPath",
+      pathname,
+      basePath, // 👈 新規追加
+      next,
+      authState,
+    };
+    console.log("[AUTH REDIRECT PATH]", entry);
+
+    if (typeof window !== "undefined") {
+      try {
+        const existing = JSON.parse(localStorage.getItem("get-redirect-path-debug") || "[]");
+        existing.push(entry);
+        localStorage.setItem("get-redirect-path-debug", JSON.stringify(existing.slice(-200)));
+      } catch {}
+    }
+
+    // --- ローディング時は安全にスキップ ---
+    if (authState === "loading" || authState === "authenticating") {
       return null;
     }
 
+    // --- user_registered がログイン・サインアップ画面に来たら redirect ---
     if (
-      ["/login", "/sign-up/phone-verification", "/sign-up"].includes(pathname) &&
+      ["/login", "/sign-up/phone-verification", "/sign-up"].includes(basePath) &&
       authState === "user_registered"
     ) {
       if (next?.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
@@ -97,14 +120,13 @@ export class AuthRedirectService {
       }
     }
 
-    if (this.isProtectedPath(pathname)) {
+    // --- 認証保護ルートの処理 ---
+    if (this.isProtectedPath(basePath)) {
       switch (authState) {
         case "unauthenticated":
           return `/login${nextParam}` as RawURIComponent;
-        case "line_authenticated":
         case "line_token_expired":
           return `/sign-up/phone-verification${nextParam}` as RawURIComponent;
-        case "phone_authenticated":
         case "phone_token_expired":
           return `/sign-up${nextParam}` as RawURIComponent;
         default:
@@ -112,23 +134,24 @@ export class AuthRedirectService {
       }
     }
 
-    if (this.isPathInSignUpFlow(pathname)) {
+    // --- サインアップフロー内の処理 ---
+    if (this.isPathInSignUpFlow(basePath)) {
       switch (authState) {
         case "unauthenticated":
           return `/login${nextParam}` as RawURIComponent;
 
         case "line_authenticated":
         case "line_token_expired":
-          if (pathname !== "/sign-up/phone-verification") {
+          if (basePath !== "/sign-up/phone-verification") {
             return `/sign-up/phone-verification${nextParam}` as RawURIComponent;
           }
-          return null; // stay here
+          return null;
 
         case "phone_authenticated":
-          if (pathname !== "/sign-up") {
+          if (basePath !== "/sign-up") {
             return `/sign-up${nextParam}` as RawURIComponent;
           }
-          return null; // stay here
+          return null;
 
         case "user_registered":
         default:
@@ -139,7 +162,8 @@ export class AuthRedirectService {
       }
     }
 
-    if (this.isAdminPath(pathname)) {
+    // --- 管理画面パスの保護 ---
+    if (this.isAdminPath(basePath)) {
       if (authState !== "user_registered") {
         return `/login${nextParam}` as RawURIComponent;
       }
@@ -150,34 +174,6 @@ export class AuthRedirectService {
 
   private generateNextParam(nextPath: RawURIComponent): RawURIComponent {
     return `?next=${encodeURIComponentWithType(nextPath)}` as RawURIComponent;
-  }
-
-  /**
-   * LINE認証後のリダイレクト処理
-   * @returns リダイレクト先のパス
-   * @param nextPath
-   */
-  public getPostLineAuthRedirectPath(nextPath: RawURIComponent | null): RawURIComponent {
-    const nextParam = nextPath ? this.generateNextParam(nextPath) : "";
-    const { authenticationState } = useAuthStore.getState().state;
-
-    switch (authenticationState) {
-      case "unauthenticated":
-      case "line_token_expired":
-        return `/login${nextParam}` as RawURIComponent;
-
-      case "line_authenticated":
-      case "phone_token_expired":
-        return `/sign-up/phone-verification${nextParam}` as RawURIComponent;
-
-      case "phone_authenticated":
-        return `/sign-up${nextParam}` as RawURIComponent;
-
-      case "loading":
-      case "user_registered":
-      default:
-        return (nextPath ?? "/users/me") as RawURIComponent;
-    }
   }
 
   /**

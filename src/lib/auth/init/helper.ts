@@ -1,13 +1,12 @@
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { AuthenticationState } from "@/types/auth";
 import { GqlUser } from "@/types/graphql";
-import { AuthStateManager } from "@/lib/auth/auth-state-manager";
+import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { fetchCurrentUserClient } from "@/lib/auth/init/fetchCurrentUser";
-import { TokenManager } from "@/lib/auth/token-manager";
-import { createSession } from "@/hooks/auth/actions/createSession";
+import { TokenManager } from "@/lib/auth/core/token-manager";
 import { User } from "firebase/auth";
-import { LiffService } from "@/lib/auth/liff-service";
-import { AuthEnvironment } from "@/lib/auth/environment-detector";
+import { LiffService } from "@/lib/auth/service/liff-service";
+import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 
 /**
  * 1️⃣ 認証前の初期状態を設定
@@ -89,6 +88,24 @@ export async function establishSessionFromFirebaseUser(
   } catch {
     return false;
   }
+}
+
+async function createSession(idToken: string) {
+  const res = await fetch("/api/sessionLogin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken }),
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error("createSession failed", res.status, errText);
+    throw new Error(`Failed to create session cookie (${res.status})`);
+  }
+
+  console.info("✅ Session cookie successfully created (via proxy)");
+  return true;
 }
 
 /**

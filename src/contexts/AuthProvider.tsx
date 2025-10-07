@@ -1,20 +1,15 @@
 "use client";
 
 import React, { createContext, useCallback, useContext, useEffect, useRef } from "react";
-import { LiffService } from "@/lib/auth/liff-service";
-import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
-import { AuthStateManager } from "@/lib/auth/auth-state-manager";
-import { useFirebaseAuthState } from "@/hooks/auth/useFirebaseAuthState";
 import { AuthContextType, AuthProviderProps } from "@/types/auth";
-import { useAuthActions } from "@/hooks/auth/useAuthActions";
-import { useAuthValue } from "@/hooks/auth/useAuthValue";
-import { useCurrentUserQuery } from "@/types/graphql";
-import { initAuth } from "@/lib/auth/initAuth";
-import { useAuthStore } from "@/hooks/auth/auth-store";
-import { useLineAuthRedirectDetection } from "@/hooks/auth/useLineAuthRedirectDetection";
-import { useLineAuthProcessing } from "@/hooks/auth/useLineAuthProcessing";
-import { useAuthStateChangeListener } from "@/hooks/auth/useAuthStateChangeListener";
-import { useTokenExpirationHandler } from "@/hooks/auth/useTokenExpirationHandler";
+import { initAuth } from "@/lib/auth/init";
+import { useCurrentUserServerQuery } from "@/types/graphql";
+import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { applySsrAuthState } from "@/lib/auth/init/applySsrAuthState";
+import { useAuthActions } from "@/hooks/auth/actions";
+import { useAuthSideEffects } from "@/hooks/auth/init/sideEffects";
+import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -24,22 +19,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   ssrLineAuthenticated,
   ssrPhoneAuthenticated,
 }) => {
-  const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
-  const liffService = LiffService.getInstance(liffId);
-  const phoneAuthService = PhoneAuthService.getInstance();
+  const { liffService, phoneAuthService, authStateManager } = useAuthDependencies();
   const { state } = useAuthStore();
-
-  const authStateManager = React.useMemo(() => {
-    if (typeof window === "undefined") return null;
-    return AuthStateManager.getInstance();
-  }, []);
-
   const hasInitialized = useRef(false);
+
   useEffect(() => {
     if (hasInitialized.current) return;
     hasInitialized.current = true;
 
     if (!authStateManager) return;
+
+    // ✅ SSR初期状態適用
+    applySsrAuthState(ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated);
+
+    // 🚀 通常の初期化
     void initAuth({
       liffService,
       authStateManager,
@@ -47,9 +40,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       ssrLineAuthenticated,
       ssrPhoneAuthenticated,
     });
-  }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated]);
+  }, [authStateManager]);
 
-  const { refetch } = useCurrentUserQuery({
+  const { refetch } = useCurrentUserServerQuery({
     skip: !["line_authenticated", "phone_authenticated", "user_registered"].includes(
       state.authenticationState,
     ),
@@ -58,9 +51,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
   const refetchUser = useCallback(async () => {
     const { data } = await refetch();
-    const user = data?.currentUser?.user ?? null;
-    console.debug("🔁 refetchUser result:", user);
-    return user;
+    return data?.currentUser?.user ?? null;
   }, [refetch]);
 
   const { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode } =
@@ -71,22 +62,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       refetchUser,
     });
 
-  useFirebaseAuthState({ authStateManager });
-  useAuthStateChangeListener({ authStateManager });
-  useTokenExpirationHandler({ logout });
-  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ liffService });
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, refetchUser });
+  useAuthSideEffects({ authStateManager, liffService, logout, refetchUser });
 
   const actions = React.useMemo(
     () => ({ logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification }),
     [logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification],
   );
 
-  const value = useAuthValue({
-    refetchUser,
-    phoneAuthService,
-    actions,
-  });
+  const value = useAuthValue({ refetchUser, phoneAuthService, actions });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

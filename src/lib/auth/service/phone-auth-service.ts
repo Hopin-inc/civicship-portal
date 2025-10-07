@@ -6,11 +6,11 @@ import {
   signInWithCredential,
   signInWithPhoneNumber,
 } from "firebase/auth";
-import { TokenManager } from "./token-manager";
-import { isRunningInLiff } from "./environment-detector";
+import { TokenManager } from "../core/token-manager";
+import { isRunningInLiff } from "../core/environment-detector";
 import { logger } from "@/lib/logging";
-import { useAuthStore } from "@/hooks/auth/auth-store";
-import { getPhoneAuth } from "@/lib/auth/firebase-config";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { getPhoneAuth } from "@/lib/auth/core/firebase-config";
 
 export class PhoneAuthService {
   private static instance: PhoneAuthService;

@@ -1,6 +1,6 @@
 "use client";
 
-import { detectEnvironment } from "@/lib/auth/environment-detector";
+import { detectEnvironment } from "@/lib/auth/core/environment-detector";
 
 /**
  * 認証ログ用のユーティリティ関数
