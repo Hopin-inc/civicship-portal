@@ -93,7 +93,7 @@ export interface AuthContextType {
     prefecture: GqlCurrentPrefecture,
     phoneUid: string,
   ) => Promise<User | null>;
-  updateAuthState: () => Promise<void>;
+  updateAuthState: () => Promise<GqlUser | null>;
 
   loading: boolean;
 }
