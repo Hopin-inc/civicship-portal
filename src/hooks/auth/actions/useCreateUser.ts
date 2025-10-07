@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
 import { GqlCurrentPrefecture, GqlUser, useUserSignUpMutation } from "@/types/graphql";
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 export const useCreateUser = (refetchUser: () => Promise<GqlUser | null>) => {
   const [userSignUp] = useUserSignUpMutation();

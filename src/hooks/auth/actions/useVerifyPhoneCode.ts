@@ -1,9 +1,9 @@
 import { useCallback } from "react";
-import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
-import { AuthStateManager } from "@/lib/auth/auth-state-manager";
+import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
+import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { logger } from "@/lib/logging";
-import { useAuthStore } from "@/hooks/auth/auth-store";
-import { TokenManager } from "@/lib/auth/token-manager";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { TokenManager } from "@/lib/auth/core/token-manager";
 
 export const useVerifyPhoneCode = (
   phoneAuthService: PhoneAuthService,

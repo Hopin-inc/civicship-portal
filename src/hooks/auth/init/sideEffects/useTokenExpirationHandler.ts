@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface UseTokenExpirationHandlerProps {
   logout: () => Promise<void>;

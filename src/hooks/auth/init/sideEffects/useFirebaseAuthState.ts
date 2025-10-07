@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { lineAuth } from "@/lib/auth/firebase-config";
-import { TokenManager } from "@/lib/auth/token-manager";
-import { AuthStateManager } from "@/lib/auth/auth-state-manager";
+import { lineAuth } from "@/lib/auth/core/firebase-config";
+import { TokenManager } from "@/lib/auth/core/token-manager";
+import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { logger } from "@/lib/logging";
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface UseFirebaseAuthStateProps {
   authStateManager: AuthStateManager | null;

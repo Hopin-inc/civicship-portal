@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
+import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
 import { logger } from "@/lib/logging";
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 export const useStartPhoneVerification = (phoneAuthService: PhoneAuthService) => {
   const setPhoneAuth = useAuthStore((s) => s.setPhoneAuth);
