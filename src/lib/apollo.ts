@@ -7,10 +7,10 @@ import {
 import { InMemoryCache } from "@apollo/client/cache";
 import { onError } from "@apollo/client/link/error";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
-import { TokenManager } from "./auth/token-manager";
+import { TokenManager } from "./auth/core/token-manager";
 
 import { logger } from "@/lib/logging";
-import { lineAuth } from "@/lib/auth/firebase-config";
+import { lineAuth } from "@/lib/auth/core/firebase-config";
 import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createUploadLink({

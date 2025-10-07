@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { useEffect, useMemo } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { logger } from "@/lib/logging";
-import { getFirebaseAnalytics } from "@/lib/auth/firebase-config";
+import { getFirebaseAnalytics } from "@/lib/auth/core/firebase-config";
 
 export const useAnalyticsView = () => {
   useAnalyticsUserBinding();

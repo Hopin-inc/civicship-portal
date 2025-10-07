@@ -6,13 +6,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import LoginModal from "@/app/login/components/LoginModal";
 import { useHeader } from "@/components/providers/HeaderProvider";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { cn } from "@/lib/utils";
 import SearchBox from "@/app/search/components/SearchBox";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+
 interface HeaderProps {
   className?: string;
 }

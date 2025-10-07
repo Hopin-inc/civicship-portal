@@ -1,12 +1,11 @@
 import React from "react";
 import { GqlCurrentPrefecture, GqlCurrentUserPayload, GqlUser } from "@/types/graphql";
 import { User } from "firebase/auth";
-import { AuthEnvironment } from "@/lib/auth/environment-detector";
+import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { RawURIComponent } from "@/utils/path";
 
 export type AuthStore = {
   state: AuthState;
-  // cashedToken: string | null;
   phoneAuth: PhoneAuthState;
   liffAuth: LiffState;
   setState: (partial: Partial<AuthState>) => void;
@@ -41,6 +40,7 @@ export type AuthenticationState =
 
 export type LiffState = {
   isInitialized: boolean;
+  isLiffProcessing: boolean;
   isLoggedIn: boolean;
   profile: {
     userId: string | null;

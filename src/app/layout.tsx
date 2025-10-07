@@ -11,7 +11,7 @@ import MainContent from "@/components/layout/MainContent";
 import React from "react";
 import { currentCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
-import { getUserServer } from "@/lib/auth/getUserServer";
+import { getUserServer } from "@/lib/auth/init/getUserServer";
 
 const font = Inter({ subsets: ["latin"] });
 

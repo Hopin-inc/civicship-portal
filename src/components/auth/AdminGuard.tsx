@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlMembership, GqlRole } from "@/types/graphql";
-import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { AdminRoleContext } from "@/app/admin/context/AdminRoleContext";
 

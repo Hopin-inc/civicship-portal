@@ -3,7 +3,7 @@
 import React from "react";
 import { List, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
 
 interface PlaceToggleButtonProps {
   isMapMode: boolean;
