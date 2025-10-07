@@ -18,7 +18,7 @@ export type AuthDeps = {
 export const useAuthActions = (deps: AuthDeps) => {
   const { liffService, phoneAuthService, refetchUser, authStateManager } = deps;
 
-  const loginWithLiff = useLogin(liffService, refetchUser, authStateManager);
+  const loginWithLiff = useLogin(liffService, refetchUser);
   const createUser = useCreateUser(refetchUser);
   const logout = useLogout(liffService, phoneAuthService);
 
