@@ -26,9 +26,6 @@ export const useAuthStateChangeListener = ({
 
       if (current === newState) return;
 
-      logger.debug("AuthStateManager → updateState", { from: current, to: newState });
-
-      // ✅ 状態遷移はすべて Manager を通す
       authStateManager.updateState(newState, "useAuthStateChangeListener");
     };
 
