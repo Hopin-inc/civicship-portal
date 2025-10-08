@@ -1,4 +1,3 @@
-// app/users/me/page.tsx
 import MyProfileClient from "./component/MyProfileClient";
 import { fetchProfileServer } from "@/app/users/me/libs/fetchProfileServer";
 import { presenterManagerProfile } from "@/app/users/data/presenter";
