@@ -10,6 +10,7 @@ import { GqlMembership, GqlRole } from "@/types/graphql";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { AdminRoleContext } from "@/app/admin/context/AdminRoleContext";
+import { AccessPolicy } from "@/lib/auth/core/access-policy";
 
 interface AdminGuardProps {
   children: React.ReactNode;
@@ -38,25 +39,17 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
       return;
     }
 
-    const checkAdminAccess = async () => {
-      const { hasAccess, redirectPath } = await authRedirectService.checkAdminAccess(
-        currentUser,
-        window.location.pathname,
-      );
-
-      if (!hasAccess && redirectPath) {
-        if (redirectPath === "/") {
-          toast.warning("管理者権限がありません");
-        }
-        logger.debug("Admin access denied. Redirecting", {
-          component: "AdminGuard",
-          redirectPath,
-        });
+    const checkAdminAccess = () => {
+      const pathname = window.location.pathname;
+      const canAccess = AccessPolicy.canAccess(currentUser, pathname);
+      if (!canAccess) {
+        const redirectPath = AccessPolicy.getFallbackPath(currentUser);
+        if (redirectPath === "/") toast.warning("管理者権限がありません");
         router.replace(redirectPath);
         return;
       }
 
-      logger.debug("User is authorized as community manager", {
+      logger.debug("✅ User is authorized as community manager", {
         component: "AdminGuard",
       });
     };
