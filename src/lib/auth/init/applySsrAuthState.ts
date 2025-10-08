@@ -10,12 +10,8 @@ export function applySsrAuthState(
   if (!ssrLineAuthenticated && !ssrPhoneAuthenticated && !ssrCurrentUser) return;
 
   let initialState: AuthenticationState = "loading";
-  if (ssrCurrentUser) {
+  if (ssrCurrentUser && ssrLineAuthenticated && ssrPhoneAuthenticated) {
     initialState = "user_registered";
-  } else if (ssrPhoneAuthenticated) {
-    initialState = "phone_authenticated";
-  } else if (ssrLineAuthenticated) {
-    initialState = "line_authenticated";
   }
 
   useAuthStore.getState().setState({
