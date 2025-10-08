@@ -80,7 +80,7 @@ export async function establishSessionFromFirebaseUser(
       lineTokens: {
         accessToken: idToken,
         refreshToken: firebaseUser.refreshToken ?? null,
-        expiresAt: new Date(tokenResult.expirationTime).getTime(),
+        expiresAt: String(new Date(tokenResult.expirationTime).getTime()),
       },
     });
 
@@ -121,7 +121,7 @@ export async function restoreUserSession(
     lineTokens: {
       accessToken: tokenResult.token,
       refreshToken: firebaseUser.refreshToken ?? null,
-      expiresAt: new Date(tokenResult.expirationTime).getTime(),
+      expiresAt: String(new Date(tokenResult.expirationTime).getTime()),
     },
   });
 
@@ -168,17 +168,35 @@ export async function evaluateUserRegistrationState(
  * 6️⃣ 状態を確定
  */
 export function finalizeAuthState(
-  state: AuthenticationState,
-  user?: GqlUser,
-  setState?: ReturnType<typeof useAuthStore.getState>["setState"],
-  authStateManager?: AuthStateManager,
+  newState: AuthenticationState,
+  user: GqlUser | undefined,
+  setState: ReturnType<typeof useAuthStore.getState>["setState"],
+  authStateManager: AuthStateManager,
 ) {
-  if (authStateManager) {
-    authStateManager.updateState(state, "finalizeAuthState proxy");
-  }
-  setState?.({
-    currentUser: user ?? null,
+  const { state } = useAuthStore.getState();
+  const prev = state.authenticationState;
+
+  const entry = {
+    ts: new Date().toISOString(),
+    step: "🧩 finalizeAuthState",
+    from: prev,
+    to: newState,
+    hasUser: !!user,
+  };
+  console.log("[FINALIZE AUTH]", entry);
+
+  try {
+    const existing = JSON.parse(localStorage.getItem("init-auth-debug") || "[]");
+    existing.push(entry);
+    localStorage.setItem("init-auth-debug", JSON.stringify(existing.slice(-200)));
+  } catch {}
+
+  setState({
+    authenticationState: newState,
     isAuthenticating: false,
     isAuthInProgress: false,
+    currentUser: user ?? null,
   });
+
+  authStateManager.updateState(newState, "finalizeAuthState");
 }

@@ -2,8 +2,6 @@ import { lineAuth } from "@/lib/auth/core/firebase-config";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
 import { LiffService } from "@/lib/auth/service/liff-service";
-import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
-import { fetchCurrentUserClient } from "@/lib/auth/init/fetchCurrentUser";
 
 export async function initializeFirebase(liffService: LiffService, environment: AuthEnvironment) {
   if (environment === AuthEnvironment.LIFF) {
@@ -23,28 +21,4 @@ export async function initializeFirebase(liffService: LiffService, environment: 
       });
     }))
   );
-}
-
-export async function tryReSignIn(
-  liffService: LiffService,
-  authStateManager: AuthStateManager,
-  setState: any,
-) {
-  const { isInitialized, isLoggedIn } = liffService.getState();
-  if (!(isInitialized && isLoggedIn)) return;
-
-  try {
-    const success = await liffService.signInWithLiffToken();
-    if (!success) return;
-
-    authStateManager.updateState("line_authenticated", "tryReSignIn");
-    const newUser = await fetchCurrentUserClient();
-    if (newUser) {
-      setState({ currentUser: newUser });
-      authStateManager.updateState("user_registered", "tryReSignIn (user found)");
-      await authStateManager.handleUserRegistrationStateChange(true);
-    }
-  } catch (error) {
-    logger.error("ReSignIn failed", { error, component: "tryReSignIn" });
-  }
 }
