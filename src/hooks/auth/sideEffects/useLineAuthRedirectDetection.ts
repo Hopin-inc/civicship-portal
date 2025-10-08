@@ -8,6 +8,10 @@ interface UseLineAuthRedirectDetectionProps {
   liffService: LiffService;
 }
 
+/**
+ * Detects when LIFF redirect handling should begin based on
+ * authentication and LIFF state transitions.
+ */
 export const useLineAuthRedirectDetection = ({
   liffService,
 }: UseLineAuthRedirectDetectionProps) => {
@@ -20,93 +24,40 @@ export const useLineAuthRedirectDetection = ({
   );
   const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
 
-  // --- 共通ログ関数 ---
-  const log = (step: string, data?: Record<string, any>) => {
-    const entry = {
-      ts: new Date().toISOString(),
-      step,
-      ...data,
-    };
-    console.log("[REDIRECT DETECTION]", entry);
-    try {
-      const existing = JSON.parse(localStorage.getItem("redirect-detect-debug") || "[]");
-      existing.push(entry);
-      localStorage.setItem("redirect-detect-debug", JSON.stringify(existing.slice(-200)));
-    } catch {}
-  };
-
   useEffect(() => {
-    const currentState = {
-      authenticationState,
-      isAuthenticating,
-    };
+    const authState = { authenticationState, isAuthenticating };
+    const liffState = liffService.getState();
 
-    const currentLiffState = liffService.getState();
-    const liffStateKey = {
-      isInitialized: currentLiffState.isInitialized,
-      isLoggedIn: currentLiffState.isLoggedIn,
-    };
-
-    log("🔄 Effect run", {
-      authenticationState: currentState.authenticationState,
-      isAuthenticating: currentState.isAuthenticating,
-      isInitialized: liffStateKey.isInitialized,
-      isLoggedIn: liffStateKey.isLoggedIn,
-    });
-
+    // --- 差分検出ロジック ---
     const stateChanged =
       !prevStateRef.current ||
-      prevStateRef.current.authenticationState !== currentState.authenticationState ||
-      prevStateRef.current.isAuthenticating !== currentState.isAuthenticating;
+      prevStateRef.current.authenticationState !== authState.authenticationState ||
+      prevStateRef.current.isAuthenticating !== authState.isAuthenticating;
 
     const liffStateChanged =
       !prevLiffStateRef.current ||
-      prevLiffStateRef.current.isInitialized !== liffStateKey.isInitialized ||
-      prevLiffStateRef.current.isLoggedIn !== liffStateKey.isLoggedIn;
+      prevLiffStateRef.current.isInitialized !== liffState.isInitialized ||
+      prevLiffStateRef.current.isLoggedIn !== liffState.isLoggedIn;
 
-    if (!stateChanged && !liffStateChanged) {
-      log("⏸ No state change detected → skip");
-      return;
-    }
+    if (!stateChanged && !liffStateChanged) return;
 
-    prevStateRef.current = currentState;
-    prevLiffStateRef.current = liffStateKey;
+    prevStateRef.current = authState;
+    prevLiffStateRef.current = liffState;
 
-    if (typeof window === "undefined") {
-      log("🌐 SSR environment → skip");
+    // --- スキップ条件まとめ ---
+    const shouldSkip =
+      typeof window === "undefined" || // SSR
+      isAuthenticating || // 認証中
+      !["unauthenticated", "loading"].includes(authenticationState) || // 認証不要状態
+      (liffState.isInitialized && !liffState.isLoggedIn); // LIFF初期化済みだがログイン未実施
+
+    if (shouldSkip) {
       setShouldProcessRedirect(false);
       return;
     }
 
-    if (isAuthenticating) {
-      log("⏳ Still authenticating → skip");
-      setShouldProcessRedirect(false);
-      return;
-    }
-
-    if (authenticationState !== "unauthenticated" && authenticationState !== "loading") {
-      log("🚫 Auth state not unauthenticated/loading → skip", {
-        authenticationState: authenticationState,
-      });
-      setShouldProcessRedirect(false);
-      return;
-    }
-
-    const { isInitialized, isLoggedIn } = currentLiffState;
-
-    if (isInitialized && !isLoggedIn) {
-      log("🚫 LIFF initialized but not logged in → skip");
-      setShouldProcessRedirect(false);
-      return;
-    }
-
-    log("✅ Conditions met → shouldProcessRedirect = true");
     setShouldProcessRedirect(true);
-  }, [authenticationState, isAuthenticating]);
-
-  useEffect(() => {
-    log("📡 shouldProcessRedirect changed", { shouldProcessRedirect });
-  }, [shouldProcessRedirect]);
+  }, [authenticationState, isAuthenticating, liffService]);
 
   return { shouldProcessRedirect };
 };
