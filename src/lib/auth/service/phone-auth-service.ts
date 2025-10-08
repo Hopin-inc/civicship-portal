@@ -130,7 +130,7 @@ export class PhoneAuthService {
   public async verifyPhoneCode(verificationCode: string): Promise<{
     success: boolean;
     phoneUid?: string;
-    tokens?: { accessToken: string; refreshToken: string; expiresAt: number };
+    tokens?: { accessToken: string; refreshToken: string; expiresAt: string };
   }> {
     const phoneAuthState = useAuthStore.getState().phoneAuth;
     if (!phoneAuthState.verificationId) {
@@ -152,7 +152,7 @@ export class PhoneAuthService {
       const idToken = await userCredential.user.getIdToken();
       const refreshToken = userCredential.user.refreshToken;
       const tokenResult = await userCredential.user.getIdTokenResult();
-      const expirationTime = new Date(tokenResult.expirationTime).getTime();
+      const expiresAt = String(new Date(tokenResult.expirationTime).getTime());
 
       return {
         success: true,
@@ -160,7 +160,7 @@ export class PhoneAuthService {
         tokens: {
           accessToken: idToken,
           refreshToken,
-          expiresAt: expirationTime,
+          expiresAt,
         },
       };
     } catch (error) {

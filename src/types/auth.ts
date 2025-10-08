@@ -24,7 +24,7 @@ export type AuthState = {
   lineTokens: {
     accessToken: string | null;
     refreshToken: string | null;
-    expiresAt: number | null;
+    expiresAt: string | null;
   };
 };
 
@@ -61,7 +61,7 @@ export type PhoneAuthState = {
   phoneTokens: {
     accessToken: string | null;
     refreshToken: string | null;
-    expiresAt: number | null;
+    expiresAt: string | null;
   };
 };
 
