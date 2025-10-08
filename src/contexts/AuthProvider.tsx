@@ -49,6 +49,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     return data?.currentUser?.user ?? null;
   }, [refetch]);
 
+  useAuthSideEffects({ authStateManager, liffService, refetchUser });
+
   const { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode } =
     useAuthActions({
       authStateManager,
@@ -56,8 +58,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       phoneAuthService,
       refetchUser,
     });
-
-  useAuthSideEffects({ authStateManager, liffService, logout, refetchUser });
 
   const actions = React.useMemo(
     () => ({ logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification }),
