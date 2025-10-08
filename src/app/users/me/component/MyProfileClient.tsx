@@ -8,26 +8,40 @@ import { NftCard } from "@/components/domains/nfts/components";
 import { CardCarousel } from "@/components/shared/CardCarousel";
 import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
 import UserPortfolioList from "@/app/users/components/UserPortfolioList";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { useAuth } from "@/contexts/AuthProvider";
+import { useUserProfile } from "@/app/users/hooks/useUserProfile";
 import { GqlNftInstance, GqlUser } from "@/types/graphql";
 import { ManagerProfile } from "@/app/users/data/type";
 import { FormattedOpportunityCard } from "@/components/domains/opportunities/types";
 
 interface MyProfileClientProps {
-  user: GqlUser | null;
-  profile: ManagerProfile;
-  nftInstances: GqlNftInstance[];
-  selfOpportunities: FormattedOpportunityCard[];
+  ssrData: {
+    user: GqlUser;
+    profile: ManagerProfile;
+    nftInstances: GqlNftInstance[];
+    selfOpportunities: FormattedOpportunityCard[];
+  } | null;
 }
 
-export default function MyProfileClient({
-  user,
-  profile,
-  nftInstances,
-  selfOpportunities,
-}: MyProfileClientProps) {
+export default function MyProfileClient({ ssrData }: MyProfileClientProps) {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
+  const { user: currentUser } = useAuth();
 
-  if (!profile) return notFound();
+  const {
+    userData: csrUser,
+    isLoading: loading,
+    nftInstances: csrNftInstances,
+    selfOpportunities: csrSelfOpportunities,
+  } = useUserProfile(ssrData ? undefined : currentUser?.id);
+
+  const profile = csrUser ?? ssrData?.profile ?? null;
+  const nftInstances = csrNftInstances ?? ssrData?.nftInstances ?? [];
+  const selfOpportunities = csrSelfOpportunities ?? ssrData?.selfOpportunities ?? [];
+  const user = csrUser ?? ssrData?.user ?? null;
+
+  if (loading && !ssrData) return <LoadingIndicator />;
+  if (!user || !profile) return notFound();
 
   const targetFeatures = ["opportunities", "credentials"] as const;
   const shouldShowOpportunities = targetFeatures.some((feature) =>
@@ -37,13 +51,13 @@ export default function MyProfileClient({
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">
       <UserProfileSection
-        userId={user?.id ?? ""}
+        userId={user.id}
         profile={profile.profile}
         userAsset={profile.asset}
         isOwner
       />
 
-      {/* 証明書セクション */}
+      {/* 証明書 */}
       {nftInstances.length > 0 && (
         <section className="py-6 mt-0">
           <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">証明書</h2>
@@ -72,7 +86,7 @@ export default function MyProfileClient({
           )}
 
           <UserPortfolioList
-            userId={user?.id ?? ""}
+            userId={user.id}
             isOwner
             portfolios={profile.portfolios}
             isLoadingMore={false}
