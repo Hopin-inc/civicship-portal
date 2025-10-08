@@ -7,6 +7,7 @@ export class AuthStateManager {
   private stateChangeListeners: ((state: AuthenticationState) => void)[] = [];
   private readonly sessionId: string;
   private isUpdating = false;
+  private pendingState: AuthenticationState | null = null;
   private readonly ALLOWED_TRANSITIONS: Record<AuthenticationState, AuthenticationState[]> = {
     unauthenticated: ["line_authenticated", "phone_authenticated", "user_registered"],
     line_authenticated: [
@@ -44,7 +45,9 @@ export class AuthStateManager {
   }
 
   public updateState(newState: AuthenticationState, reason?: string): void {
-    if (this.isUpdating) return;
+    if (this.isUpdating) {
+      return;
+    }
     this.isUpdating = true;
 
     try {
@@ -52,20 +55,24 @@ export class AuthStateManager {
       const current = state.authenticationState;
       const allowed = this.ALLOWED_TRANSITIONS[current] ?? [];
 
-      if (!allowed.includes(newState)) {
-        logger.debug(`[AuthStateManager] 🚫 Blocked transition: ${current} → ${newState}`, {
-          reason,
-        });
+      if (newState === current || this.pendingState === newState) {
         return;
       }
 
-      if (newState === current) return;
+      const downgradeBlocked =
+        current !== "unauthenticated" &&
+        newState === "unauthenticated" &&
+        reason !== "explicit_sign_out";
+      if (downgradeBlocked) return;
 
-      logger.debug(`[AuthStateManager] ✅ Transition: ${current} → ${newState}`, { reason });
+      if (!allowed.includes(newState)) return;
+
+      this.pendingState = newState;
       setState({ authenticationState: newState });
       this.stateChangeListeners.forEach((listener) => listener(newState));
     } finally {
       this.isUpdating = false;
+      this.pendingState = null;
     }
   }
 
@@ -98,7 +105,7 @@ export class AuthStateManager {
     const hasValidPhoneToken =
       !!phoneTokens.accessToken &&
       phoneTokens.expiresAt &&
-      phoneTokens.expiresAt - Date.now() > 5 * 60 * 1000;
+      Number(phoneTokens.expiresAt) - Date.now() > 5 * 60 * 1000;
 
     if (!hasValidPhoneToken && state.authenticationState !== "loading") {
       this.updateState("unauthenticated", "handlePhoneAuthStateChange");
@@ -141,7 +148,7 @@ export class AuthStateManager {
     const hasValidLineToken =
       !!lineTokens.accessToken &&
       !!lineTokens.expiresAt &&
-      lineTokens.expiresAt - Date.now() > 5 * 60 * 1000;
+      Number(lineTokens.expiresAt) - Date.now() > 5 * 60 * 1000;
 
     if (!hasValidLineToken) {
       return;
@@ -159,7 +166,7 @@ export class AuthStateManager {
     const hasValidPhoneToken =
       !!phoneAuth.phoneTokens.accessToken &&
       !!phoneAuth.phoneTokens.expiresAt &&
-      phoneAuth.phoneTokens.expiresAt - Date.now() > 5 * 60 * 1000;
+      Number(phoneAuth.phoneTokens.expiresAt) - Date.now() > 5 * 60 * 1000;
 
     if (hasValidPhoneToken && state.authenticationState === "line_authenticated") {
       await this.handlePhoneAuthStateChange(true);
