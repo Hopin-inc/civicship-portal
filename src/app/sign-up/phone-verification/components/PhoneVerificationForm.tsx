@@ -195,8 +195,8 @@ export function PhoneVerificationForm() {
       const success = await phoneAuth.verifyPhoneCode(verificationCode);
       const phoneAuthState = useAuthStore.getState().phoneAuth;
       const setAuthState = useAuthStore.getState().setState;
-      if (!phoneAuthState.phoneUid) {
-        toast.error("uidが無効");
+      if (!success || !phoneAuthState.phoneUid) {
+        toast.error("認証コードが無効です");
         return;
       }
       if (success) {
@@ -207,7 +207,6 @@ export function PhoneVerificationForm() {
             },
           },
         });
-        console.log(data);
 
         const status = data?.identityCheckPhoneUser?.status;
 
