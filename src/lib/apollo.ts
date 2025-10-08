@@ -7,7 +7,6 @@ import {
 import { InMemoryCache } from "@apollo/client/cache";
 import { onError } from "@apollo/client/link/error";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
-import { TokenManager } from "./auth/core/token-manager";
 
 import { logger } from "@/lib/logging";
 import { lineAuth } from "@/lib/auth/core/firebase-config";
@@ -26,7 +25,7 @@ const requestLink = setContext(async (operation, prevContext) => {
 
   if (typeof window !== "undefined") {
     const user = lineAuth.currentUser;
-    token = user ? await TokenManager.getCachedToken(user) : null;
+    token = user ? await user.getIdToken() : null;
   }
 
   const baseHeaders = {

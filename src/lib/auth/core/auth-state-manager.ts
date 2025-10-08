@@ -9,16 +9,14 @@ export class AuthStateManager {
   private isUpdating = false;
   private pendingState: AuthenticationState | null = null;
   private readonly ALLOWED_TRANSITIONS: Record<AuthenticationState, AuthenticationState[]> = {
-    unauthenticated: ["line_authenticated", "phone_authenticated", "user_registered"],
-    line_authenticated: [
+    unauthenticated: [
+      "authenticating",
       "line_authenticated",
-      "line_token_expired",
       "phone_authenticated",
       "user_registered",
     ],
-    line_token_expired: ["line_authenticated"],
-    phone_authenticated: ["phone_authenticated", "phone_token_expired", "user_registered"],
-    phone_token_expired: ["phone_authenticated"],
+    line_authenticated: ["line_authenticated", "phone_authenticated", "user_registered"],
+    phone_authenticated: ["phone_authenticated", "user_registered"],
     user_registered: ["user_registered"],
     loading: ["unauthenticated", "line_authenticated", "phone_authenticated", "user_registered"],
     authenticating: [
@@ -46,6 +44,7 @@ export class AuthStateManager {
 
   public updateState(newState: AuthenticationState, reason?: string): void {
     if (this.isUpdating) {
+      console.warn("[AuthStateManager] ⚠️ Skipped update — already updating", { newState });
       return;
     }
     this.isUpdating = true;
@@ -55,21 +54,54 @@ export class AuthStateManager {
       const current = state.authenticationState;
       const allowed = this.ALLOWED_TRANSITIONS[current] ?? [];
 
+      const entry = {
+        ts: new Date().toISOString(),
+        current,
+        newState,
+        reason: reason ?? "(no reason)",
+        allowed,
+        isAllowed: allowed.includes(newState),
+        downgradeBlocked: current !== "unauthenticated" && newState === "unauthenticated",
+      };
+      console.info("[AuthStateManager] 🔄 updateState called", entry);
+
+      // ✅ ローカルストレージにも保存
+      try {
+        const key = "auth-state-transitions";
+        const existing = JSON.parse(localStorage.getItem(key) || "[]");
+        existing.push(entry);
+        localStorage.setItem(key, JSON.stringify(existing.slice(-200))); // 最新200件だけ保持
+      } catch (e) {
+        console.warn("[AuthStateManager] failed to write to localStorage", e);
+      }
+
       if (newState === current || this.pendingState === newState) {
+        console.info("[AuthStateManager] ⏸ No state change (same or pending)", {
+          current,
+          newState,
+        });
         return;
       }
 
       const downgradeBlocked =
-        current !== "unauthenticated" &&
-        newState === "unauthenticated" &&
-        reason !== "explicit_sign_out";
-      if (downgradeBlocked) return;
+        !["unauthenticated", "loading"].includes(current) && newState === "unauthenticated";
+      if (downgradeBlocked) {
+        console.warn("[AuthStateManager] 🚫 Downgrade blocked", { current, newState });
+        return;
+      }
 
-      if (!allowed.includes(newState)) return;
+      if (!allowed.includes(newState)) {
+        console.warn("[AuthStateManager] 🚫 Transition not allowed", { current, newState });
+        return;
+      }
 
       this.pendingState = newState;
       setState({ authenticationState: newState });
+      console.info("[AuthStateManager] ✅ State updated", { from: current, to: newState });
+
       this.stateChangeListeners.forEach((listener) => listener(newState));
+    } catch (err) {
+      console.error("[AuthStateManager] 💥 updateState failed", err);
     } finally {
       this.isUpdating = false;
       this.pendingState = null;
@@ -113,10 +145,7 @@ export class AuthStateManager {
     }
 
     if (isVerified) {
-      if (
-        state.authenticationState === "line_authenticated" ||
-        state.authenticationState === "line_token_expired"
-      ) {
+      if (state.authenticationState === "line_authenticated") {
         this.updateState("phone_authenticated", "handlePhoneAuthStateChange");
       }
     } else {
