@@ -41,7 +41,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
 
     const checkAdminAccess = () => {
       const pathname = window.location.pathname;
-      const canAccess = AccessPolicy.canAccess(currentUser, pathname);
+      const canAccess = AccessPolicy.canAccessRole(currentUser, pathname);
       if (!canAccess) {
         const redirectPath = AccessPolicy.getFallbackPath(currentUser);
         if (redirectPath === "/") toast.warning("管理者権限がありません");
