@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { AuthContextType } from "@/types/auth";
 import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
-import { useAuthStore } from "../../../lib/auth/core/auth-store";
 import { GqlUser } from "@/types/graphql";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 type UseAuthValueArgs = {
   refetchUser: () => Promise<GqlUser | null>;
