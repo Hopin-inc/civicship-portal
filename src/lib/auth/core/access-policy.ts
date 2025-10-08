@@ -27,7 +27,7 @@ export class AccessPolicy {
     return role === GqlRole.Owner;
   }
 
-  public static canAccess(user: GqlUser | null | undefined, pathname: string): boolean {
+  public static canAccessRole(user: GqlUser | null | undefined, pathname: string): boolean {
     if (!user) return false;
 
     const membership = this.getMembership(user);
