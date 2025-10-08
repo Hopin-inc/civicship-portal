@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { lineAuth as auth } from "@/lib/auth/firebase-config";
+import { lineAuth as auth } from "@/lib/auth/core/firebase-config";
 import { useCookies } from "next-client-cookies";
 import { useRouter } from "next/navigation";
 
@@ -22,10 +22,12 @@ const SignUpHeader: React.FC = () => {
   };
 
   return (
-    <header
-      className="fixed top-0 left-0 right-0 z-50 bg-background border-b max-w-mobile-l mx-auto w-full h-16 flex items-center px-4">
-      <Link href="/public" onClick={ handleCancel }
-            className="absolute left-4 inline-flex items-center text-muted-foreground hover:text-foreground">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b max-w-mobile-l mx-auto w-full h-16 flex items-center px-4">
+      <Link
+        href="/public"
+        onClick={handleCancel}
+        className="absolute left-4 inline-flex items-center text-muted-foreground hover:text-foreground"
+      >
         <ChevronLeft className="h-5 w-5 mr-1" />
         戻る
       </Link>
