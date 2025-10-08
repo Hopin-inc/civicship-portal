@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { formatPhoneNumber } from "@/app/sign-up/phone-verification/utils";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { useMutation } from "@apollo/client";
 import { IDENTITY_CHECK_PHONE_USER } from "@/graphql/account/identity/mutation";
 import {
@@ -17,10 +17,10 @@ import {
   GqlPhoneUserStatus,
 } from "@/types/graphql";
 import { RawURIComponent } from "@/utils/path";
-import { categorizeFirebaseError } from "@/lib/auth/firebase-config";
-import { isRunningInLiff } from "@/lib/auth/environment-detector";
+import { categorizeFirebaseError } from "@/lib/auth/core/firebase-config";
+import { isRunningInLiff } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
