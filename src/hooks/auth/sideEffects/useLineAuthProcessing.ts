@@ -103,9 +103,18 @@ export const useLineAuthProcessing = ({
         log("✅ refetchUser done", { hasUser: !!user });
 
         if (!user) {
-          log("🚫 no user found → finalize unauthenticated");
-          setState({ authenticationState: "unauthenticated", isAuthenticating: false });
-          authStateManager.updateState("unauthenticated", "useLineAuthProcessing");
+          log("🚫 no user found → set line_authenticated (awaiting registration)");
+          TokenManager.saveLineAuthFlag(true);
+          setState({
+            authenticationState: "line_authenticated",
+            isAuthenticating: false,
+          });
+          authStateManager.updateState(
+            "line_authenticated",
+            "useLineAuthProcessing (no user found)",
+          );
+          await authStateManager.handleUserRegistrationStateChange(false);
+
           return;
         }
 
@@ -147,18 +156,13 @@ export const useLineAuthProcessing = ({
       } finally {
         setState({ isAuthenticating: false });
         log("🏁 finalize → isAuthenticating=false");
+        setTimeout(() => {
+          processedRef.current = false;
+          log("♻️ Reset processedRef (after finalize)");
+        }, 500); // ← 適度なディレイ
       }
     };
 
     handleLineAuthRedirect();
   }, [shouldProcessRedirect, refetchUser, setState]);
-
-  useEffect(() => {
-    if (!shouldProcessRedirect) {
-      setTimeout(() => {
-        processedRef.current = false;
-        log("♻️ Reset processedRef (delayed)");
-      }, 1000);
-    }
-  }, [shouldProcessRedirect]);
 };
