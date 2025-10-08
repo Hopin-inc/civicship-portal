@@ -2,6 +2,7 @@ import { AuthStateManager } from "../core/auth-state-manager";
 import { GqlUser } from "@/types/graphql";
 import { encodeURIComponentWithType, matchPaths, RawURIComponent } from "@/utils/path";
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
+import { AuthenticationState } from "@/types/auth";
 
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
@@ -18,16 +19,6 @@ export class AuthRedirectService {
     return AuthRedirectService.instance;
   }
 
-  public isUserPath(pathname: string): boolean {
-    const userPaths = ["/users/me", "/tickets", "/wallets", "/wallets/*", "/admin", "/admin/*"];
-    return matchPaths(pathname, ...userPaths);
-  }
-
-  public isPathInSignUpFlow(pathname: string): boolean {
-    const phoneVerificationRequiredPaths = ["/sign-up", "/sign-up/phone-verification"];
-    return matchPaths(pathname, ...phoneVerificationRequiredPaths);
-  }
-
   public getRedirectPath(
     pathname: RawURIComponent,
     next?: RawURIComponent | null,
@@ -37,101 +28,118 @@ export class AuthRedirectService {
     const basePath = pathname.split("?")[0];
     const nextParam = next ? this.generateNextParam(next) : this.generateNextParam(pathname);
 
-    const log = (step: string, extra?: Record<string, any>) => {
-      const entry = {
-        ts: new Date().toISOString(),
-        step,
-        pathname,
-        basePath,
-        next,
-        authState,
-        currentUser: !!currentUser,
-        ...extra,
-      };
-      try {
-        const existing = JSON.parse(localStorage.getItem("redirect-debug") || "[]");
-        existing.push(entry);
-        localStorage.setItem("redirect-debug", JSON.stringify(existing.slice(-200)));
-      } catch {}
-      console.log("[REDIRECT DEBUG]", entry);
-    };
+    if (authState === "loading" || authState === "authenticating") return null;
 
-    log("🧭 getRedirectPath start");
-
-    if (authState === "loading" || authState === "authenticating") {
-      log("⏸ state=loading/authenticating → no redirect");
-      return null;
-    }
-
-    // 1️⃣ ログイン済みユーザーがloginやsign-up画面に来た場合
-    if (["/login", "/sign-up", "/sign-up/phone-verification"].includes(basePath)) {
-      // 登録済みならトップへ
-      if (authState === "user_registered") {
-        if (next?.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
-          return next as RawURIComponent;
-        }
-        return "/" as RawURIComponent;
-      }
-
-      // LINE認証済み（電話未認証）なら電話番号ページへ
-      if (authState === "line_authenticated") {
-        return `/sign-up/phone-verification${nextParam}` as RawURIComponent;
-      }
-
-      // 電話認証済みなら sign-up へ
-      if (authState === "phone_authenticated") {
-        return `/sign-up${nextParam}` as RawURIComponent;
-      }
-    }
+    // 1️⃣ ログイン済みユーザーがlogin/sign-up画面に来た場合
+    const redirectFromLogin = this.handleAuthEntryFlow(
+      pathname,
+      basePath,
+      authState,
+      next,
+      nextParam,
+    );
+    if (redirectFromLogin) return redirectFromLogin;
 
     // 2️⃣ 未認証ユーザーがユーザー専用パスに来た場合
-    if (this.isUserPath(basePath)) {
-      log("👤 accessing user-only path", { basePath });
-      if (authState === "unauthenticated") return `/login${nextParam}` as RawURIComponent;
-      if (authState === "line_token_expired")
-        return `/sign-up/phone-verification${nextParam}` as RawURIComponent;
-      if (authState === "phone_token_expired") return `/sign-up${nextParam}` as RawURIComponent;
-    }
+    const redirectFromUserPath = this.handleUserPath(basePath, authState, currentUser, nextParam);
+    if (redirectFromUserPath) return redirectFromUserPath;
 
-    // 3️⃣ サインアップフロー内の状態
-    if (this.isPathInSignUpFlow(basePath)) {
-      log("🌀 inside sign-up flow", { basePath });
-      switch (authState) {
-        case "unauthenticated":
-          return `/login${nextParam}` as RawURIComponent;
-        case "line_authenticated":
-        case "line_token_expired": {
-          const target = `/sign-up/phone-verification${nextParam}`;
-          // すでにそのページにいるならリダイレクト不要
-          if (pathname === target || basePath === "/sign-up/phone-verification") {
-            log("✅ already on phone verification page");
-            return null;
-          }
-          log("📞 redirect to phone verification", { from: pathname, to: target });
-          return target as RawURIComponent;
-        }
+    // 4️⃣ ロール不足
+    const redirectByRole = this.handleRoleRestriction(currentUser, basePath);
+    if (redirectByRole) return redirectByRole;
 
-        case "phone_authenticated":
-          if (basePath !== "/sign-up") {
-            log("🪪 redirect to sign-up", { basePath });
-            return `/sign-up${nextParam}` as RawURIComponent;
-          }
-          break;
-      }
-    }
-
-    // 4️⃣ ロール不足の時はAccessPolicyで判断（任意）
-    if (currentUser && !AccessPolicy.canAccess(currentUser, basePath)) {
-      const fallback = AccessPolicy.getFallbackPath(currentUser);
-      log("🚫 insufficient role → redirect", { fallback });
-      return fallback as RawURIComponent;
-    }
-
-    log("✅ no redirect needed");
     return null;
   }
 
   private generateNextParam(nextPath: RawURIComponent): RawURIComponent {
     return `?next=${encodeURIComponentWithType(nextPath)}` as RawURIComponent;
+  }
+
+  private isAuthEntryPath(pathname: string): boolean {
+    const authEntryPaths = ["/login", "/sign-up", "/sign-up/phone-verification"];
+    return matchPaths(pathname, ...authEntryPaths);
+  }
+
+  private handleAuthEntryFlow(
+    pathname: string,
+    basePath: string,
+    authState: AuthenticationState,
+    next?: string | null,
+    nextParam?: string,
+  ): RawURIComponent | null {
+    if (!this.isAuthEntryPath(basePath)) return null;
+
+    switch (authState) {
+      case "unauthenticated":
+        if (basePath !== "/login") {
+          return `/login${nextParam}` as RawURIComponent; // 未ログイン → ログインへ
+        }
+        return null;
+
+      case "line_authenticated": {
+        const target = `/sign-up/phone-verification${nextParam}`;
+        if (pathname === target || basePath === "/sign-up/phone-verification") return null; // すでに居る場合はリダイレクト不要
+        return target as RawURIComponent; // LINE認証済み → 電話認証へ
+      }
+
+      case "phone_authenticated":
+        if (basePath !== "/sign-up") {
+          return `/sign-up${nextParam}` as RawURIComponent; // 電話認証済み → サインアップへ
+        }
+        return null;
+
+      case "user_registered":
+        // 登録済みユーザーが sign-up 系や login に来たらトップ or nextへ
+        if (next?.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
+          return next as RawURIComponent;
+        }
+        return "/" as RawURIComponent;
+
+      default:
+        return null;
+    }
+  }
+
+  private isUserPath(pathname: string): boolean {
+    const userPaths = ["/users/me", "/tickets", "/wallets", "/wallets/*", "/admin", "/admin/*"];
+    return matchPaths(pathname, ...userPaths);
+  }
+
+  private handleUserPath(
+    basePath: string,
+    authState: AuthenticationState,
+    currentUser: GqlUser | null | undefined,
+    nextParam?: string,
+  ): RawURIComponent | null {
+    if (!this.isUserPath(basePath)) return null;
+
+    switch (authState) {
+      case "unauthenticated":
+        return `/login${nextParam}` as RawURIComponent; // 未ログイン → ログインへ
+
+      case "line_authenticated":
+        if (!currentUser) {
+          return `/sign-up/phone-verification${nextParam}` as RawURIComponent; // LINE認証済み・未登録 → 電話認証へ
+        }
+        break;
+
+      case "phone_authenticated":
+        if (!currentUser) {
+          return `/sign-up${nextParam}` as RawURIComponent; // 電話認証済み・未登録 → サインアップへ
+        }
+        break;
+    }
+    return null;
+  }
+
+  private handleRoleRestriction(
+    currentUser: GqlUser | null | undefined,
+    basePath: string,
+  ): RawURIComponent | null {
+    if (!currentUser) return null;
+    if (!AccessPolicy.canAccessRole(currentUser, basePath)) {
+      return AccessPolicy.getFallbackPath(currentUser) as RawURIComponent;
+    }
+    return null;
   }
 }
