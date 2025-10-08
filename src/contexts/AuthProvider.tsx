@@ -5,21 +5,10 @@ import { AuthContextType, AuthProviderProps } from "@/types/auth";
 import { initAuth } from "@/lib/auth/init";
 import { useCurrentUserServerQuery } from "@/types/graphql";
 import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
-import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { applySsrAuthState } from "@/lib/auth/init/applySsrAuthState";
 import { useAuthActions } from "@/hooks/auth/actions";
-import { useAuthSideEffects } from "../hooks/auth/sideEffects";
+import { useAuthSideEffects } from "@/hooks/auth/sideEffects";
 import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
-
-useAuthStore.subscribe((storeState) => {
-  const { authenticationState } = storeState.state;
-  const entry = { ts: new Date().toISOString(), state: authenticationState };
-  const key = "auth-state-log";
-  const logs = JSON.parse(localStorage.getItem(key) || "[]");
-  logs.push(entry);
-  localStorage.setItem(key, JSON.stringify(logs.slice(-100)));
-  console.log("[AUTH STATE]", entry);
-});
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -30,7 +19,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   ssrPhoneAuthenticated,
 }) => {
   const { liffService, phoneAuthService, authStateManager } = useAuthDependencies();
-  const { state } = useAuthStore();
   const hasInitialized = useRef(false);
 
   useEffect(() => {
@@ -58,7 +46,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
   const refetchUser = useCallback(async () => {
     const { data } = await refetch();
-    console.log("[AUTH] refetchUser", data);
     return data?.currentUser?.user ?? null;
   }, [refetch]);
 
