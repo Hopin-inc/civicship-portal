@@ -45,8 +45,8 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     });
 
     // --- ローディング中はレンダー止める ---
-    if (loading || authState.isAuthenticating || authState.isAuthInProgress) {
-      log("⏸ skip: still loading/authenticating");
+    if (authState.isAuthenticating || authState.isAuthInProgress) {
+      log("⏸ skip: still authenticating (internal)");
       setIsReadyToRender(false);
       return;
     }
@@ -83,7 +83,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       authenticationState: authState.authenticationState,
     });
 
-    if (redirectPath) {
+    if (redirectPath && redirectPath !== pathWithParams) {
       // ✅ 二重リダイレクト防止
       if (redirectedRef.current !== redirectPath) {
         log("🚀 redirecting", { from: pathWithParams, to: redirectPath });
