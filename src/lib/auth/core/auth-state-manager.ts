@@ -1,6 +1,5 @@
 import { AuthenticationState } from "@/types/auth";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
-import { logger } from "@/lib/logging";
 
 export class AuthStateManager {
   private static instance: AuthStateManager;
@@ -43,10 +42,7 @@ export class AuthStateManager {
   }
 
   public updateState(newState: AuthenticationState, reason?: string): void {
-    if (this.isUpdating) {
-      console.warn("[AuthStateManager] ⚠️ Skipped update — already updating", { newState });
-      return;
-    }
+    if (this.isUpdating) return;
     this.isUpdating = true;
 
     try {
@@ -54,54 +50,20 @@ export class AuthStateManager {
       const current = state.authenticationState;
       const allowed = this.ALLOWED_TRANSITIONS[current] ?? [];
 
-      const entry = {
-        ts: new Date().toISOString(),
-        current,
-        newState,
-        reason: reason ?? "(no reason)",
-        allowed,
-        isAllowed: allowed.includes(newState),
-        downgradeBlocked: current !== "unauthenticated" && newState === "unauthenticated",
-      };
-      console.info("[AuthStateManager] 🔄 updateState called", entry);
-
-      // ✅ ローカルストレージにも保存
-      try {
-        const key = "auth-state-transitions";
-        const existing = JSON.parse(localStorage.getItem(key) || "[]");
-        existing.push(entry);
-        localStorage.setItem(key, JSON.stringify(existing.slice(-200))); // 最新200件だけ保持
-      } catch (e) {
-        console.warn("[AuthStateManager] failed to write to localStorage", e);
-      }
-
       if (newState === current || this.pendingState === newState) {
-        console.info("[AuthStateManager] ⏸ No state change (same or pending)", {
-          current,
-          newState,
-        });
         return;
       }
 
       const downgradeBlocked =
         !["unauthenticated", "loading"].includes(current) && newState === "unauthenticated";
-      if (downgradeBlocked) {
-        console.warn("[AuthStateManager] 🚫 Downgrade blocked", { current, newState });
-        return;
-      }
+      if (downgradeBlocked) return;
 
-      if (!allowed.includes(newState)) {
-        console.warn("[AuthStateManager] 🚫 Transition not allowed", { current, newState });
-        return;
-      }
+      if (!allowed.includes(newState)) return;
 
       this.pendingState = newState;
       setState({ authenticationState: newState });
-      console.info("[AuthStateManager] ✅ State updated", { from: current, to: newState });
 
       this.stateChangeListeners.forEach((listener) => listener(newState));
-    } catch (err) {
-      console.error("[AuthStateManager] 💥 updateState failed", err);
     } finally {
       this.isUpdating = false;
       this.pendingState = null;
@@ -167,7 +129,6 @@ export class AuthStateManager {
     if (options?.ssrMode) {
       const newState = isRegistered ? "user_registered" : "line_authenticated";
       this.updateState(newState, "handleUserRegistrationStateChange");
-      logger.debug("handleUserRegistrationStateChange: SSR Mode");
       return;
     }
 
@@ -187,7 +148,6 @@ export class AuthStateManager {
       if (state.authenticationState !== "user_registered") {
         this.updateState("user_registered", "handleUserRegistrationStateChange");
       }
-      logger.debug("handleUserRegistrationStateChange: user_registered");
       return;
     }
 
