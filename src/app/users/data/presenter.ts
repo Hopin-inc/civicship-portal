@@ -1,31 +1,14 @@
-"use client";
-
 import { GqlCurrentPrefecture, GqlPortfolio, GqlUser } from "@/types/graphql";
-import {
-  AppPortfolio,
-  AppUser,
-  AppUserSelf,
-  GeneralUserProfile,
-  ManagerProfile,
-} from "@/app/users/data/type";
+import { AppPortfolio, AppUser, GeneralUserProfile, ManagerProfile } from "@/app/users/data/type";
 import { presenterUserAsset } from "@/app/wallets/data/presenter";
 import { Participant } from "@/types/utils";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 
 export const presenterAppUser = (gqlUser: GqlUser): AppUser => {
   return {
     id: gqlUser.id,
     profile: presenterUserProfile(gqlUser),
-    portfolios: (gqlUser.portfolios ?? []).map(presenterPortfolio),
-  };
-};
-
-export const presenterAppUserSelf = (gqlUser: GqlUser): AppUserSelf => {
-  return {
-    ...presenterAppUser(gqlUser),
-    asset: presenterUserAsset(gqlUser.wallets?.find(w => w.community?.id === getCommunityIdFromEnv())),
     portfolios: (gqlUser.portfolios ?? []).map(presenterPortfolio),
   };
 };
