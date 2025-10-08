@@ -24,36 +24,15 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const redirectedRef = React.useRef<string | null>(null); // ← ① 追加（useEffectの外）
 
-  // --- 共通ログ関数 ---
-  const log = (step: string, data?: Record<string, any>) => {
-    const entry = { ts: new Date().toISOString(), step, ...data };
-    console.log("[ROUTE GUARD]", entry);
-    try {
-      const existing = JSON.parse(localStorage.getItem("route-guard-debug") || "[]");
-      existing.push(entry);
-      localStorage.setItem("route-guard-debug", JSON.stringify(existing.slice(-200)));
-    } catch {}
-  };
-
   useEffect(() => {
-    log("🌀 useEffect triggered", {
-      pathname,
-      authenticationState: authState.authenticationState,
-      loading,
-      isAuthenticating: authState.isAuthenticating,
-      isAuthInProgress: authState.isAuthInProgress,
-    });
-
     // --- ローディング中はレンダー止める ---
     if (authState.isAuthenticating || authState.isAuthInProgress) {
-      log("⏸ skip: still authenticating (internal)");
       setIsReadyToRender(false);
       return;
     }
 
     // --- 中間状態も止める ---
     if (["loading", "authenticating"].includes(authState.authenticationState)) {
-      log("⏸ skip: transient state", { authenticationState: authState.authenticationState });
       setIsReadyToRender(false);
       return;
     }
@@ -64,7 +43,6 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       const isReturnFromLineAuth =
         urlParams.has("code") && urlParams.has("state") && urlParams.has("liffClientId");
       if (isReturnFromLineAuth) {
-        log("🚪 skip redirect: return from LINE auth", { pathname });
         setIsReadyToRender(false);
         return;
       }
@@ -77,24 +55,14 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       decodeURIComponentWithType(nextParam),
     );
 
-    log("🔍 evaluating redirect", {
-      pathWithParams,
-      redirectPath,
-      authenticationState: authState.authenticationState,
-    });
-
     if (redirectPath && redirectPath !== pathWithParams) {
       // ✅ 二重リダイレクト防止
       if (redirectedRef.current !== redirectPath) {
-        log("🚀 redirecting", { from: pathWithParams, to: redirectPath });
         redirectedRef.current = redirectPath; // ← ② 記録
         setIsReadyToRender(false);
         router.replace(redirectPath);
-      } else {
-        log("🛑 skip duplicate redirect", { redirectPath });
       }
     } else {
-      log("✅ no redirect (stays on page)", { pathname });
       redirectedRef.current = null; // ← ③ リセット（次回遷移に備える）
       setIsReadyToRender(true);
     }
