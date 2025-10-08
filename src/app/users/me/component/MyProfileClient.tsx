@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import UserProfileSection from "@/app/users/components/UserProfileSection";
 import { NftCard } from "@/components/domains/nfts/components";
-import { CardCarousel } from "@/components/shared/CardCarousel";
 import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
 import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -77,11 +76,14 @@ export default function MyProfileClient({ ssrData }: MyProfileClientProps) {
               <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
                 主催中の体験
               </h2>
-              <CardCarousel>
-                {selfOpportunities.map((opportunity) => (
-                  <OpportunityVerticalCard key={opportunity.id} {...opportunity} />
-                ))}
-              </CardCarousel>
+              {/* 横スクロール領域 */}
+              <div className="-mx-6 overflow-x-auto scrollbar-hide">
+                <div className="flex gap-4 px-6 min-w-max">
+                  {selfOpportunities.map((o) => (
+                    <OpportunityVerticalCard key={o.id} {...o} />
+                  ))}
+                </div>
+              </div>
             </section>
           )}
 
