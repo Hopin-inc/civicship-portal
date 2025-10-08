@@ -173,26 +173,7 @@ export function finalizeAuthState(
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
   authStateManager: AuthStateManager,
 ) {
-  const { state } = useAuthStore.getState();
-  const prev = state.authenticationState;
-
-  const entry = {
-    ts: new Date().toISOString(),
-    step: "🧩 finalizeAuthState",
-    from: prev,
-    to: newState,
-    hasUser: !!user,
-  };
-  console.log("[FINALIZE AUTH]", entry);
-
-  try {
-    const existing = JSON.parse(localStorage.getItem("init-auth-debug") || "[]");
-    existing.push(entry);
-    localStorage.setItem("init-auth-debug", JSON.stringify(existing.slice(-200)));
-  } catch {}
-
   setState({
-    authenticationState: newState,
     isAuthenticating: false,
     isAuthInProgress: false,
     currentUser: user ?? null,
