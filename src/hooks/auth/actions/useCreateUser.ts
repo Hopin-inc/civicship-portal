@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
 import { GqlCurrentPrefecture, GqlUser, useUserSignUpMutation } from "@/types/graphql";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
@@ -20,11 +19,13 @@ export const useCreateUser = (refetchUser: () => Promise<GqlUser | null>) => {
             input: {
               name,
               currentPrefecture: prefecture,
-              communityId: COMMUNITY_ID,
               phoneUid,
               phoneNumber: phoneAuth.phoneNumber ?? undefined,
-              lineRefreshToken: lineTokens.refreshToken ?? undefined,
+              phoneAccessToken: phoneTokens.accessToken ?? undefined,
+              phoneTokenExpiresAt: phoneTokens.expiresAt ?? undefined,
               phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
+              lineRefreshToken: lineTokens.refreshToken ?? undefined,
+              lineTokenExpiresAt: lineTokens.expiresAt ?? undefined,
             },
           },
         });
