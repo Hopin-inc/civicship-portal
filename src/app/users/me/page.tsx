@@ -20,7 +20,6 @@ export default async function MyProfilePage() {
       ?.map(presenterActivityCard)
       ?.map(formatOpportunities) ?? [];
 
-  // ✅ 整形済み構造としてまとめる
   const ssrData = {
     user: ssrUser,
     profile: presentedProfile,
