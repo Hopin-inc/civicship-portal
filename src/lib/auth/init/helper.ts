@@ -31,35 +31,37 @@ export function handleUnauthenticatedBranch(
   environment: AuthEnvironment,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
   authStateManager: AuthStateManager,
-): "handled" | "pending" | "continue" {
+): boolean {
   const liffState = liffService.getState();
 
-  // regular_browser → 即 unauthenticated
-  if (environment !== AuthEnvironment.LIFF) {
+  if (environment === AuthEnvironment.LIFF) {
+    // 未初期化 → 継続待ち
+    if (!liffState.isInitialized) {
+      setState({
+        authenticationState: "loading",
+        isAuthenticating: true,
+        isAuthInProgress: true,
+      });
+      return true; // 継続
+    }
+
+    // ログイン済み → トークン待ち
+    if (liffState.isLoggedIn) {
+      setState({
+        authenticationState: "authenticating",
+        isAuthenticating: true,
+        isAuthInProgress: true,
+      });
+      return true; // 継続
+    }
+
+    // 未ログイン → 未認証確定
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
-    return "handled";
-  }
-
-  if (!liffState.isInitialized) {
-    setState({
-      authenticationState: "loading",
-      isAuthenticating: true,
-      isAuthInProgress: true,
-    });
-    return "pending";
-  }
-
-  if (liffState.isLoggedIn) {
-    setState({
-      authenticationState: "authenticating",
-      isAuthenticating: true,
-      isAuthInProgress: true,
-    });
-    return "pending";
+    return false; // 終了
   }
 
   finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
-  return "handled";
+  return false;
 }
 
 /**
@@ -179,5 +181,5 @@ export function finalizeAuthState(
     currentUser: user ?? null,
   });
 
-  authStateManager.updateState(newState, "finalizeAuthState");
+  authStateManager.updateState(newState);
 }

@@ -38,7 +38,6 @@ export async function initAuth(params: InitAuthParams) {
   setState({ isAuthInProgress: true, isAuthenticating: true });
 
   const environment = detectEnvironment();
-
   if (ssrCurrentUser && ssrLineAuthenticated) {
     return await initAuthFast({
       ssrCurrentUser,
@@ -49,7 +48,6 @@ export async function initAuth(params: InitAuthParams) {
       setState,
     });
   }
-
   return await initAuthFull({
     liffService,
     authStateManager,
@@ -90,7 +88,6 @@ async function initAuthFast({
       setState,
       authStateManager,
     );
-
     TokenManager.saveLineAuthFlag(true);
     if (ssrPhoneAuthenticated) TokenManager.savePhoneAuthFlag(true);
     await authStateManager.handleUserRegistrationStateChange(true, { ssrMode: true });
@@ -120,13 +117,13 @@ async function initAuthFull({
 
     const firebaseUser = await initializeFirebase(liffService, environment);
     if (!firebaseUser) {
-      const result = handleUnauthenticatedBranch(
+      const shouldContinue = handleUnauthenticatedBranch(
         liffService,
         environment,
         setState,
         authStateManager,
       );
-      if (result !== "continue") return;
+      if (!shouldContinue) return;
       return;
     }
 
