@@ -32,7 +32,7 @@ export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateP
           const idToken = await user.getIdToken();
           const refreshToken = user.refreshToken;
           const tokenResult = await user.getIdTokenResult();
-          const expirationTime = new Date(tokenResult.expirationTime).getTime();
+          const expirationTime = String(new Date(tokenResult.expirationTime).getTime());
 
           setState({
             firebaseUser: user,
