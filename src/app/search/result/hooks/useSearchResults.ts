@@ -24,6 +24,55 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 type CardType = ActivityCard | QuestCard;
 const DEFAULT_PAGE_SIZE = 15;
 
+function getTodayStartInJST(): Date {
+  const now = new Date();
+  const jstOffset = 9 * 60 * 60 * 1000;
+  const nowJST = new Date(now.getTime() + jstOffset);
+  
+  const todayJST = new Date(Date.UTC(
+    nowJST.getUTCFullYear(),
+    nowJST.getUTCMonth(),
+    nowJST.getUTCDate(),
+    0, 0, 0, 0
+  ));
+  
+  return new Date(todayJST.getTime() - jstOffset);
+}
+
+function parseDateStringToUTC(dateString: string, isEndOfDay: boolean = false): Date | null {
+  const [year, month, day] = dateString.split("-").map(Number);
+  if (isNaN(year) || isNaN(month) || isNaN(day)) {
+    return null;
+  }
+  
+  if (isEndOfDay) {
+    return new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
+  }
+  return new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+}
+
+function buildSlotDateRange(searchParams: SearchParams): Record<string, Date> {
+  const slotDateRange: Record<string, Date> = {};
+  
+  if (searchParams.from) {
+    const fromDate = parseDateStringToUTC(searchParams.from);
+    if (fromDate) {
+      slotDateRange.gte = fromDate;
+    }
+  } else {
+    slotDateRange.gte = getTodayStartInJST();
+  }
+  
+  if (searchParams.to) {
+    const toDate = parseDateStringToUTC(searchParams.to, true);
+    if (toDate) {
+      slotDateRange.lte = toDate;
+    }
+  }
+  
+  return slotDateRange;
+}
+
 export const useSearchResults = (
   searchParams: SearchParams = {},
 ): {
@@ -193,27 +242,7 @@ function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
     filter.stateCodes = [IPrefectureCodeMap[location]];
   }
 
-  if (searchParams.from || searchParams.to) {
-    const slotDateRange: Record<string, Date> = {};
-
-    if (searchParams.from) {
-      const [year, month, day] = searchParams.from.split("-").map(Number);
-      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
-        slotDateRange.gte = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-      }
-    }
-
-    if (searchParams.to) {
-      const [year, month, day] = searchParams.to.split("-").map(Number);
-      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
-        slotDateRange.lte = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
-      }
-    }
-
-    if (Object.keys(slotDateRange).length > 0) {
-      filter.slotDateRange = slotDateRange;
-    }
-  }
+  filter.slotDateRange = buildSlotDateRange(searchParams);
 
   if (searchParams.guests) {
     const guests = parseInt(searchParams.guests, 10);
