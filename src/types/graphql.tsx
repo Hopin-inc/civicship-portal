@@ -187,6 +187,10 @@ export type GqlCitiesInput = {
   name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
+export type GqlCitiesSortInput = {
+  code?: InputMaybe<GqlSortDirection>;
+};
+
 export type GqlCity = {
   __typename?: "City";
   code: Scalars["ID"]["output"];
@@ -410,12 +414,23 @@ export const GqlErrorCode = {
   ClaimLinkExpired: "CLAIM_LINK_EXPIRED",
   Forbidden: "FORBIDDEN",
   InsufficientBalance: "INSUFFICIENT_BALANCE",
+  InsufficientInventory: "INSUFFICIENT_INVENTORY",
   InternalServerError: "INTERNAL_SERVER_ERROR",
   InvalidTransferMethod: "INVALID_TRANSFER_METHOD",
+  InventoryCalculationError: "INVENTORY_CALCULATION_ERROR",
+  InventoryUnavailable: "INVENTORY_UNAVAILABLE",
   MissingWalletInformation: "MISSING_WALLET_INFORMATION",
+  NmkrInsufficientCredits: "NMKR_INSUFFICIENT_CREDITS",
+  NmkrMintingFailed: "NMKR_MINTING_FAILED",
+  NmkrTokenUnavailable: "NMKR_TOKEN_UNAVAILABLE",
   NotFound: "NOT_FOUND",
   NoAvailableParticipationSlots: "NO_AVAILABLE_PARTICIPATION_SLOTS",
+  OrderCancellationFailed: "ORDER_CANCELLATION_FAILED",
+  OversellDetected: "OVERSELL_DETECTED",
+  PaymentSessionCreationFailed: "PAYMENT_SESSION_CREATION_FAILED",
+  PaymentStateTransitionFailed: "PAYMENT_STATE_TRANSITION_FAILED",
   PersonalRecordOnlyDeletable: "PERSONAL_RECORD_ONLY_DELETABLE",
+  ProductNotFound: "PRODUCT_NOT_FOUND",
   RateLimit: "RATE_LIMIT",
   ReservationAdvanceBookingRequired: "RESERVATION_ADVANCE_BOOKING_REQUIRED",
   ReservationCancellationTimeout: "RESERVATION_CANCELLATION_TIMEOUT",
@@ -427,6 +442,7 @@ export const GqlErrorCode = {
   Unknown: "UNKNOWN",
   UnsupportedTransactionReason: "UNSUPPORTED_TRANSACTION_REASON",
   ValidationError: "VALIDATION_ERROR",
+  WebhookMetadataInvalid: "WEBHOOK_METADATA_INVALID",
 } as const;
 
 export type GqlErrorCode = (typeof GqlErrorCode)[keyof typeof GqlErrorCode];
@@ -610,7 +626,7 @@ export type GqlMembershipEdge = GqlEdge & {
 export type GqlMembershipFilterInput = {
   communityId?: InputMaybe<Scalars["ID"]["input"]>;
   keyword?: InputMaybe<Scalars["String"]["input"]>;
-  role?: InputMaybe<GqlRole>;
+  role?: InputMaybe<Array<GqlRole>>;
   status?: InputMaybe<GqlMembershipStatus>;
   userId?: InputMaybe<Scalars["ID"]["input"]>;
 };
@@ -755,6 +771,7 @@ export type GqlMutation = {
   placeCreate?: Maybe<GqlPlaceCreatePayload>;
   placeDelete?: Maybe<GqlPlaceDeletePayload>;
   placeUpdate?: Maybe<GqlPlaceUpdatePayload>;
+  productBuy: GqlProductBuyPayload;
   reservationAccept?: Maybe<GqlReservationSetStatusPayload>;
   reservationCancel?: Maybe<GqlReservationSetStatusPayload>;
   reservationCreate?: Maybe<GqlReservationCreatePayload>;
@@ -937,6 +954,10 @@ export type GqlMutationPlaceUpdateArgs = {
   permission: GqlCheckCommunityPermissionInput;
 };
 
+export type GqlMutationProductBuyArgs = {
+  productId: Scalars["ID"]["input"];
+};
+
 export type GqlMutationReservationAcceptArgs = {
   id: Scalars["ID"]["input"];
   permission: GqlCheckOpportunityPermissionInput;
@@ -1113,6 +1134,26 @@ export type GqlNftInstancesConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type GqlNftMint = {
+  __typename?: "NftMint";
+  createdAt: Scalars["Datetime"]["output"];
+  error?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  nftInstance: GqlNftInstance;
+  order: GqlOrder;
+  status: GqlNftMintStatus;
+  txHash?: Maybe<Scalars["String"]["output"]>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export const GqlNftMintStatus = {
+  Failed: "FAILED",
+  Minted: "MINTED",
+  Queued: "QUEUED",
+  Submitted: "SUBMITTED",
+} as const;
+
+export type GqlNftMintStatus = (typeof GqlNftMintStatus)[keyof typeof GqlNftMintStatus];
 export type GqlNftToken = {
   __typename?: "NftToken";
   address: Scalars["String"]["output"];
@@ -1379,6 +1420,39 @@ export type GqlOpportunityUpdateContentSuccess = {
   opportunity: GqlOpportunity;
 };
 
+export type GqlOrder = {
+  __typename?: "Order";
+  createdAt: Scalars["Datetime"]["output"];
+  externalRef?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  items?: Maybe<Array<GqlOrderItem>>;
+  paymentProvider: GqlPaymentProvider;
+  status: GqlOrderStatus;
+  totalAmount?: Maybe<Scalars["Int"]["output"]>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  user: GqlUser;
+};
+
+export type GqlOrderItem = {
+  __typename?: "OrderItem";
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  nftMints: Array<GqlNftMint>;
+  priceSnapshot: Scalars["Int"]["output"];
+  product: GqlProduct;
+  quantity: Scalars["Int"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export const GqlOrderStatus = {
+  Canceled: "CANCELED",
+  Failed: "FAILED",
+  Paid: "PAID",
+  Pending: "PENDING",
+  Refunded: "REFUNDED",
+} as const;
+
+export type GqlOrderStatus = (typeof GqlOrderStatus)[keyof typeof GqlOrderStatus];
 export type GqlPageInfo = {
   __typename?: "PageInfo";
   endCursor?: Maybe<Scalars["String"]["output"]>;
@@ -1540,6 +1614,12 @@ export type GqlParticipationsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export const GqlPaymentProvider = {
+  Nmkr: "NMKR",
+  Stripe: "STRIPE",
+} as const;
+
+export type GqlPaymentProvider = (typeof GqlPaymentProvider)[keyof typeof GqlPaymentProvider];
 export const GqlPhoneUserStatus = {
   ExistingDifferentCommunity: "EXISTING_DIFFERENT_COMMUNITY",
   ExistingSameCommunity: "EXISTING_SAME_COMMUNITY",
@@ -1602,6 +1682,7 @@ export type GqlPlaceEdge = GqlEdge & {
 
 export type GqlPlaceFilterInput = {
   cityCode?: InputMaybe<Scalars["ID"]["input"]>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
   keyword?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -1688,6 +1769,36 @@ export type GqlPortfoliosConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type GqlProduct = {
+  __typename?: "Product";
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  description?: Maybe<Scalars["String"]["output"]>;
+  endsAt?: Maybe<Scalars["Datetime"]["output"]>;
+  estimatedNextNumber?: Maybe<Scalars["Int"]["output"]>;
+  id: Scalars["ID"]["output"];
+  imageUrl?: Maybe<Scalars["String"]["output"]>;
+  isSoldOut: Scalars["Boolean"]["output"];
+  maxSupply?: Maybe<Scalars["Int"]["output"]>;
+  name: Scalars["String"]["output"];
+  price: Scalars["Int"]["output"];
+  remainingSupply: Scalars["Int"]["output"];
+  startsAt?: Maybe<Scalars["Datetime"]["output"]>;
+  type: GqlProductType;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type GqlProductBuyPayload = GqlProductBuySuccess;
+
+export type GqlProductBuySuccess = {
+  __typename?: "ProductBuySuccess";
+  paymentLink: Scalars["String"]["output"];
+};
+
+export const GqlProductType = {
+  Nft: "NFT",
+} as const;
+
+export type GqlProductType = (typeof GqlProductType)[keyof typeof GqlProductType];
 export const GqlPublishStatus = {
   CommunityInternal: "COMMUNITY_INTERNAL",
   Private: "PRIVATE",
@@ -1723,6 +1834,7 @@ export type GqlQuery = {
   place?: Maybe<GqlPlace>;
   places: GqlPlacesConnection;
   portfolios?: Maybe<Array<GqlPortfolio>>;
+  product?: Maybe<GqlProduct>;
   reservation?: Maybe<GqlReservation>;
   reservationHistories: GqlReservationHistoriesConnection;
   reservationHistory?: Maybe<GqlReservationHistory>;
@@ -1764,6 +1876,7 @@ export type GqlQueryCitiesArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   filter?: InputMaybe<GqlCitiesInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlCitiesSortInput>;
 };
 
 export type GqlQueryCommunitiesArgs = {
@@ -1882,6 +1995,10 @@ export type GqlQueryPortfoliosArgs = {
   filter?: InputMaybe<GqlPortfolioFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<GqlPortfolioSortInput>;
+};
+
+export type GqlQueryProductArgs = {
+  id: Scalars["ID"]["input"];
 };
 
 export type GqlQueryReservationArgs = {
