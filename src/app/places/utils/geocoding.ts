@@ -3,15 +3,6 @@
  * #NOTE: DBに保存された緯度経度を優先的に使用し、ない場合のみ住所から位置情報を取得して表示する
  */
 
-// export const PRIORITIZE_LAT_LNG_PLACE_IDS = [
-//   "cmahq8fb5000rs60nhlqmuz0h", // SAKAZUKI BOTANICAL
-//   "cmahr04i90015s60nt3942swi", // 田村神社
-//   "cmahstwr4002rs60n6map2wiu", // 大庄屋
-//   "cmahtero00038s60n9y0iotq7", // 萬翠荘
-//   "cmahv5tcx004es60nh9pvayyh", // 田渕石材株式会社
-//   "cmahq8fb5000rs60nhlqmuz0h", // 眞鍋自転車店
-// ];
-
 const HARDCODED_COORDINATES: Record<string, google.maps.LatLngLiteral> = {
   cmahstwr4002rs60n6map2wiu: { lat: 34.178142, lng: 133.818358 }, // 大庄屋
 };
