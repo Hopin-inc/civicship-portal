@@ -25,18 +25,14 @@ type CardType = ActivityCard | QuestCard;
 const DEFAULT_PAGE_SIZE = 15;
 
 function getTodayStartInJST(): Date {
-  const now = new Date();
-  const jstOffset = 9 * 60 * 60 * 1000;
-  const nowJST = new Date(now.getTime() + jstOffset);
-  
-  const todayJST = new Date(Date.UTC(
-    nowJST.getUTCFullYear(),
-    nowJST.getUTCMonth(),
-    nowJST.getUTCDate(),
-    0, 0, 0, 0
-  ));
-  
-  return new Date(todayJST.getTime() - jstOffset);
+  const jstDateString = new Intl.DateTimeFormat('ja-JP', {
+    timeZone: 'Asia/Tokyo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date()).split('/').join('-');
+
+  return new Date(`${jstDateString}T00:00:00+09:00`);
 }
 
 function parseDateStringToUTC(dateString: string, isEndOfDay: boolean = false): Date | null {
