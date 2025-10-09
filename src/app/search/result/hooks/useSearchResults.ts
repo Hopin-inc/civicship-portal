@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   GqlCurrentPrefecture,
   GqlOpportunitiesConnection,
@@ -14,8 +14,10 @@ import {
 import { groupCardsByDate, SearchParams } from "@/app/search/data/presenter";
 import { toast } from "sonner";
 import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
-import { presenterActivityCards } from "@/components/domains/opportunities/data/presenter";
-import { presenterQuestCards } from "@/components/domains/opportunities/data/presenter";
+import {
+  presenterActivityCards,
+  presenterQuestCards,
+} from "@/components/domains/opportunities/data/presenter";
 import { IPrefectureCodeMap } from "@/app/search/data/type";
 import { logger } from "@/lib/logging";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
@@ -23,6 +25,56 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 type CardType = ActivityCard | QuestCard;
 const DEFAULT_PAGE_SIZE = 15;
+
+function getTodayStartInJST(): Date {
+  const parts = new Intl.DateTimeFormat('ja-JP', {
+    timeZone: 'Asia/Tokyo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date());
+
+  const year = parts.find((part) => part.type === "year")!.value;
+  const month = parts.find((part) => part.type === "month")!.value;
+  const day = parts.find((part) => part.type === "day")!.value;
+
+  const jstDateString = `${year}-${month}-${day}`;
+
+  return new Date(`${jstDateString}T00:00:00+09:00`);
+}
+
+function parseDateStringToUTC(dateString: string, isEndOfDay: boolean = false): Date | null {
+  const [year, month, day] = dateString.split("-").map(Number);
+  if (isNaN(year) || isNaN(month) || isNaN(day)) {
+    return null;
+  }
+
+  if (isEndOfDay) {
+    return new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
+  }
+  return new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+}
+
+function buildSlotDateRange(searchParams: SearchParams): Record<string, Date> {
+  const slotDateRange: Record<string, Date> = {};
+  
+  const fromDate = searchParams.from ? parseDateStringToUTC(searchParams.from) : null;
+
+  if (fromDate) {
+    slotDateRange.gte = fromDate;
+  } else {
+    slotDateRange.gte = getTodayStartInJST();
+  }
+  
+  if (searchParams.to) {
+    const toDate = parseDateStringToUTC(searchParams.to, true);
+    if (toDate) {
+      slotDateRange.lte = toDate;
+    }
+  }
+  
+  return slotDateRange;
+}
 
 export const useSearchResults = (
   searchParams: SearchParams = {},
@@ -193,31 +245,11 @@ function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
     filter.stateCodes = [IPrefectureCodeMap[location]];
   }
 
-  if (searchParams.from || searchParams.to) {
-    const slotDateRange: Record<string, Date> = {};
-
-    if (searchParams.from) {
-      const [year, month, day] = searchParams.from.split("-").map(Number);
-      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
-        slotDateRange.gte = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-      }
-    }
-
-    if (searchParams.to) {
-      const [year, month, day] = searchParams.to.split("-").map(Number);
-      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
-        slotDateRange.lte = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
-      }
-    }
-
-    if (Object.keys(slotDateRange).length > 0) {
-      filter.slotDateRange = slotDateRange;
-    }
-  }
+  filter.slotDateRange = buildSlotDateRange(searchParams);
 
   if (searchParams.guests) {
-    const guests = parseInt(searchParams.guests, 10);
-    if (!isNaN(guests) && guests > 0) {
+    const guests = Number(searchParams.guests);
+    if (Number.isInteger(guests) && guests > 0) {
       filter.slotRemainingCapacity = guests;
     }
   }
@@ -230,9 +262,8 @@ function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
     filter.isReservableWithPoint = true;
   }
 
-  if (searchParams.q) {
-    filter.keyword = searchParams.q;
-  }
+  const keyword = searchParams.q?.trim();
+  if (keyword) filter.keyword = keyword;
 
   return filter;
 }
