@@ -3,10 +3,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import {
-  getCoordinatesFromAddress,
-  PRIORITIZE_LAT_LNG_PLACE_IDS,
-} from "@/app/places/utils/geocoding";
+import { getCoordinatesFromAddress } from "@/app/places/utils/geocoding";
 import { logger } from "@/lib/logging";
 
 interface AddressMapProps {
@@ -20,8 +17,8 @@ interface AddressMapProps {
   markerOptions?: Omit<google.maps.MarkerOptions, "position" | "map">;
   onMapLoad?: (map: google.maps.Map) => void;
   onLocationFound?: (location: google.maps.LatLng) => void;
-  latitude?: number; // 緯度（フォールバック用）
-  longitude?: number; //経度（フォールバック用）
+  latitude?: number; // 緯度（優先的に使用）
+  longitude?: number; // 経度（優先的に使用）
   placeId: string;
 }
 
@@ -42,8 +39,6 @@ const useAddressGeocoding = (
   const [location, setLocation] = useState<google.maps.LatLng | null>(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const geocodeRequestRef = useRef<AbortController | null>(null);
-
-  const prioritizeLatLng = PRIORITIZE_LAT_LNG_PLACE_IDS.includes(placeId);
 
   const setFallbackLocation = useCallback(
     (map?: google.maps.Map | null, zoom?: number) => {
@@ -72,7 +67,7 @@ const useAddressGeocoding = (
     async (map?: google.maps.Map | null, zoom?: number) => {
       if (!address) return null;
 
-      if (prioritizeLatLng && fallbackLat && fallbackLng) {
+      if (fallbackLat !== undefined && fallbackLng !== undefined) {
         return setFallbackLocation(map, zoom);
       }
 
@@ -118,7 +113,7 @@ const useAddressGeocoding = (
         setIsGeocoding(false);
       }
     },
-    [address, fallbackLat, fallbackLng, onSuccess, prioritizeLatLng, setFallbackLocation],
+    [address, fallbackLat, fallbackLng, onSuccess, setFallbackLocation, placeId],
   );
 
   return {
@@ -130,7 +125,7 @@ const useAddressGeocoding = (
 
 /**
  * 住所から位置を特定してマップとマーカーを表示するコンポーネント
- * #NOTE: strapi に保存された緯度経度は若干位置がずれるため、住所から位置情報を再取得して表示するために利用している
+ * #NOTE: DBに保存された緯度経度を優先的に使用し、ない場合のみ住所から位置情報を取得して表示する
  */
 export default function AddressMap({
   address,
