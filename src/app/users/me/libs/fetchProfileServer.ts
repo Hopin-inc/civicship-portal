@@ -6,6 +6,7 @@ import {
 } from "@/types/graphql";
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
+import { FETCH_PROFILE_SERVER_QUERY } from "@/graphql/account/user/server";
 
 export async function fetchProfileServer(): Promise<GqlUser | null> {
   const cookieStore = await cookies();
@@ -31,77 +32,3 @@ export async function fetchProfileServer(): Promise<GqlUser | null> {
     return null;
   }
 }
-
-const FETCH_PROFILE_SERVER_QUERY = `
-  query fetchProfileServer {
-    currentUser {
-      user {
-        id
-        name
-        image
-        bio
-        currentPrefecture
-        phoneNumber
-        urlFacebook
-        urlInstagram
-        urlX
-
-        portfolios (first: 10) {}
-          id
-          title
-          thumbnailUrl
-          source
-          category
-          date
-          reservationStatus
-          evaluationStatus
-          place {
-            id
-            name
-          }
-          participants {
-            id
-            image
-          }
-        }
-
-        nftInstances {
-          totalCount
-          edges {
-            node {
-              id
-              instanceId
-              name
-              imageUrl
-              createdAt
-            }
-          }
-        }
-
-        wallets {
-          id
-          type
-          currentPointView {
-            currentPoint
-          }
-          community {
-            id
-          }
-        }
-
-        opportunitiesCreatedByMe {
-          id
-          title
-          community {
-            id
-            name
-          }
-          place {
-            id
-            name
-          }
-        }
-      }
-    }
-  }
-`;

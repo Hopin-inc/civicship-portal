@@ -6,6 +6,7 @@ import {
 } from "@/types/graphql";
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
+import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
 
 export async function getUserServer(): Promise<{
   user: GqlUser | null;
@@ -53,26 +54,3 @@ export async function getUserServer(): Promise<{
     };
   }
 }
-
-const GET_CURRENT_USER_SERVER_QUERY = `
-  query currentUserServer {
-    currentUser {
-      user {
-        id
-        name
-        identities {
-          uid
-          platform
-        }
-        memberships {
-          status
-          role
-          community {
-            id
-            name
-          }
-        }
-      }
-    }
-  }
-`;
