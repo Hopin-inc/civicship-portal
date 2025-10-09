@@ -25,12 +25,18 @@ type CardType = ActivityCard | QuestCard;
 const DEFAULT_PAGE_SIZE = 15;
 
 function getTodayStartInJST(): Date {
-  const jstDateString = new Intl.DateTimeFormat('ja-JP', {
+  const parts = new Intl.DateTimeFormat('ja-JP', {
     timeZone: 'Asia/Tokyo',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-  }).format(new Date()).split('/').join('-');
+  }).formatToParts(new Date());
+
+  const year = parts.find((part) => part.type === "year")!.value;
+  const month = parts.find((part) => part.type === "month")!.value;
+  const day = parts.find((part) => part.type === "day")!.value;
+
+  const jstDateString = `${year}-${month}-${day}`;
 
   return new Date(`${jstDateString}T00:00:00+09:00`);
 }
@@ -50,11 +56,10 @@ function parseDateStringToUTC(dateString: string, isEndOfDay: boolean = false): 
 function buildSlotDateRange(searchParams: SearchParams): Record<string, Date> {
   const slotDateRange: Record<string, Date> = {};
   
-  if (searchParams.from) {
-    const fromDate = parseDateStringToUTC(searchParams.from);
-    if (fromDate) {
-      slotDateRange.gte = fromDate;
-    }
+  const fromDate = searchParams.from ? parseDateStringToUTC(searchParams.from) : null;
+  
+  if (fromDate) {
+    slotDateRange.gte = fromDate;
   } else {
     slotDateRange.gte = getTodayStartInJST();
   }
