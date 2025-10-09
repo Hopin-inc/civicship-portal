@@ -17,14 +17,14 @@ export const useAuthStateChangeListener = ({
     if (!authStateManager) return;
 
     const handleStateChange = (newState: AuthState["authenticationState"]) => {
-      const current = useAuthStore.getState().state.authenticationState;
+      const currentState = useAuthStore.getState().state.authenticationState;
 
-      if (current === "loading" && newState === "unauthenticated") {
+      if (currentState === "loading" && newState === "unauthenticated") {
         logger.debug("⏭ skip unauthenticated during loading phase");
         return;
       }
 
-      if (current === newState) return;
+      if (currentState === newState) return;
 
       authStateManager.updateState(newState, "useAuthStateChangeListener");
     };
