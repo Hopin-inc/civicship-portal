@@ -28,25 +28,14 @@ const requestLink = setContext(async (operation, prevContext) => {
     token = user ? await user.getIdToken() : null;
   }
 
-  const baseHeaders = {
+  const headers = {
     ...prevContext.headers,
     Authorization: token ? `Bearer ${token}` : "",
     "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
     "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
   };
 
-  const tokenRequiredOperations = [
-    "userSignUp",
-    "linkPhoneAuth",
-    "storePhoneAuthToken",
-    "identityCheckPhoneUser",
-  ];
-
-  if (tokenRequiredOperations.includes(operation.operationName || "")) {
-    return { headers: { ...baseHeaders } };
-  }
-
-  return { headers: baseHeaders };
+  return { headers };
 });
 
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
