@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   GqlCurrentPrefecture,
   GqlOpportunitiesConnection,
@@ -14,8 +14,10 @@ import {
 import { groupCardsByDate, SearchParams } from "@/app/search/data/presenter";
 import { toast } from "sonner";
 import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
-import { presenterActivityCards } from "@/components/domains/opportunities/data/presenter";
-import { presenterQuestCards } from "@/components/domains/opportunities/data/presenter";
+import {
+  presenterActivityCards,
+  presenterQuestCards,
+} from "@/components/domains/opportunities/data/presenter";
 import { IPrefectureCodeMap } from "@/app/search/data/type";
 import { logger } from "@/lib/logging";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
@@ -46,7 +48,7 @@ function parseDateStringToUTC(dateString: string, isEndOfDay: boolean = false): 
   if (isNaN(year) || isNaN(month) || isNaN(day)) {
     return null;
   }
-  
+
   if (isEndOfDay) {
     return new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
   }
@@ -57,7 +59,7 @@ function buildSlotDateRange(searchParams: SearchParams): Record<string, Date> {
   const slotDateRange: Record<string, Date> = {};
   
   const fromDate = searchParams.from ? parseDateStringToUTC(searchParams.from) : null;
-  
+
   if (fromDate) {
     slotDateRange.gte = fromDate;
   } else {
@@ -246,8 +248,8 @@ function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
   filter.slotDateRange = buildSlotDateRange(searchParams);
 
   if (searchParams.guests) {
-    const guests = parseInt(searchParams.guests, 10);
-    if (!isNaN(guests) && guests > 0) {
+    const guests = Number(searchParams.guests);
+    if (Number.isInteger(guests) && guests > 0) {
       filter.slotRemainingCapacity = guests;
     }
   }
@@ -260,9 +262,8 @@ function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
     filter.isReservableWithPoint = true;
   }
 
-  if (searchParams.q) {
-    filter.keyword = searchParams.q;
-  }
+  const keyword = searchParams.q?.trim();
+  if (keyword) filter.keyword = keyword;
 
   return filter;
 }
