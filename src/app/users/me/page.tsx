@@ -18,6 +18,7 @@ export default function MyProfilePage() {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
 
   const { user: currentUser, isAuthenticating } = useAuth();
+  console.log(currentUser);
   const { userData, nftInstances, selfOpportunities, isLoading, error, refetch } = useUserProfile(
     currentUser?.id,
   );

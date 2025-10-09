@@ -187,6 +187,10 @@ export type GqlCitiesInput = {
   name?: InputMaybe<Scalars["String"]["input"]>;
 };
 
+export type GqlCitiesSortInput = {
+  code?: InputMaybe<GqlSortDirection>;
+};
+
 export type GqlCity = {
   __typename?: "City";
   code: Scalars["ID"]["output"];
@@ -1602,6 +1606,7 @@ export type GqlPlaceEdge = GqlEdge & {
 
 export type GqlPlaceFilterInput = {
   cityCode?: InputMaybe<Scalars["ID"]["input"]>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
   keyword?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -1764,6 +1769,7 @@ export type GqlQueryCitiesArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   filter?: InputMaybe<GqlCitiesInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlCitiesSortInput>;
 };
 
 export type GqlQueryCommunitiesArgs = {
