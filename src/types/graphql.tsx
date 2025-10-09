@@ -1774,10 +1774,8 @@ export type GqlProduct = {
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   description?: Maybe<Scalars["String"]["output"]>;
   endsAt?: Maybe<Scalars["Datetime"]["output"]>;
-  estimatedNextNumber?: Maybe<Scalars["Int"]["output"]>;
   id: Scalars["ID"]["output"];
   imageUrl?: Maybe<Scalars["String"]["output"]>;
-  isSoldOut: Scalars["Boolean"]["output"];
   maxSupply?: Maybe<Scalars["Int"]["output"]>;
   name: Scalars["String"]["output"];
   price: Scalars["Int"]["output"];
@@ -5597,6 +5595,54 @@ export type GqlGetPlaceQuery = {
   } | null;
 };
 
+export type GqlProductFieldsFragment = {
+  __typename?: "Product";
+  id: string;
+  type: GqlProductType;
+  name: string;
+  description?: string | null;
+  imageUrl?: string | null;
+  price: number;
+  maxSupply?: number | null;
+  startsAt?: Date | null;
+  endsAt?: Date | null;
+  remainingSupply: number;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+};
+
+export type GqlBuyProductMutationVariables = Exact<{
+  productId: Scalars["ID"]["input"];
+}>;
+
+export type GqlBuyProductMutation = {
+  __typename?: "Mutation";
+  productBuy: { __typename?: "ProductBuySuccess"; paymentLink: string };
+};
+
+export type GqlGetProductQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetProductQuery = {
+  __typename?: "Query";
+  product?: {
+    __typename?: "Product";
+    id: string;
+    type: GqlProductType;
+    name: string;
+    description?: string | null;
+    imageUrl?: string | null;
+    price: number;
+    maxSupply?: number | null;
+    startsAt?: Date | null;
+    endsAt?: Date | null;
+    remainingSupply: number;
+    createdAt?: Date | null;
+    updatedAt?: Date | null;
+  } | null;
+};
+
 export type GqlTicketFieldsFragment = {
   __typename?: "Ticket";
   id: string;
@@ -6285,6 +6331,22 @@ export const ReservationFieldsFragmentDoc = gql`
     status
     comment
     participantCountWithPoint
+  }
+`;
+export const ProductFieldsFragmentDoc = gql`
+  fragment ProductFields on Product {
+    id
+    type
+    name
+    description
+    imageUrl
+    price
+    maxSupply
+    startsAt
+    endsAt
+    remainingSupply
+    createdAt
+    updatedAt
   }
 `;
 export const TicketFieldsFragmentDoc = gql`
@@ -10312,6 +10374,115 @@ export type GetPlaceQueryHookResult = ReturnType<typeof useGetPlaceQuery>;
 export type GetPlaceLazyQueryHookResult = ReturnType<typeof useGetPlaceLazyQuery>;
 export type GetPlaceSuspenseQueryHookResult = ReturnType<typeof useGetPlaceSuspenseQuery>;
 export type GetPlaceQueryResult = Apollo.QueryResult<GqlGetPlaceQuery, GqlGetPlaceQueryVariables>;
+export const BuyProductDocument = gql`
+  mutation BuyProduct($productId: ID!) {
+    productBuy(productId: $productId) {
+      ... on ProductBuySuccess {
+        paymentLink
+      }
+    }
+  }
+`;
+export type GqlBuyProductMutationFn = Apollo.MutationFunction<
+  GqlBuyProductMutation,
+  GqlBuyProductMutationVariables
+>;
+
+/**
+ * __useBuyProductMutation__
+ *
+ * To run a mutation, you first call `useBuyProductMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBuyProductMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [buyProductMutation, { data, loading, error }] = useBuyProductMutation({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useBuyProductMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlBuyProductMutation, GqlBuyProductMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlBuyProductMutation, GqlBuyProductMutationVariables>(
+    BuyProductDocument,
+    options,
+  );
+}
+export type BuyProductMutationHookResult = ReturnType<typeof useBuyProductMutation>;
+export type BuyProductMutationResult = Apollo.MutationResult<GqlBuyProductMutation>;
+export type BuyProductMutationOptions = Apollo.BaseMutationOptions<
+  GqlBuyProductMutation,
+  GqlBuyProductMutationVariables
+>;
+export const GetProductDocument = gql`
+  query GetProduct($id: ID!) {
+    product(id: $id) {
+      ...ProductFields
+    }
+  }
+  ${ProductFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetProductQuery__
+ *
+ * To run a query within a React component, call `useGetProductQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProductQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProductQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetProductQuery(
+  baseOptions: Apollo.QueryHookOptions<GqlGetProductQuery, GqlGetProductQueryVariables> &
+    ({ variables: GqlGetProductQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetProductQuery, GqlGetProductQueryVariables>(
+    GetProductDocument,
+    options,
+  );
+}
+export function useGetProductLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetProductQuery, GqlGetProductQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetProductQuery, GqlGetProductQueryVariables>(
+    GetProductDocument,
+    options,
+  );
+}
+export function useGetProductSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetProductQuery, GqlGetProductQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetProductQuery, GqlGetProductQueryVariables>(
+    GetProductDocument,
+    options,
+  );
+}
+export type GetProductQueryHookResult = ReturnType<typeof useGetProductQuery>;
+export type GetProductLazyQueryHookResult = ReturnType<typeof useGetProductLazyQuery>;
+export type GetProductSuspenseQueryHookResult = ReturnType<typeof useGetProductSuspenseQuery>;
+export type GetProductQueryResult = Apollo.QueryResult<
+  GqlGetProductQuery,
+  GqlGetProductQueryVariables
+>;
 export const TicketIssueDocument = gql`
   mutation ticketIssue($input: TicketIssueInput!, $permission: CheckCommunityPermissionInput!) {
     ticketIssue(input: $input, permission: $permission) {
