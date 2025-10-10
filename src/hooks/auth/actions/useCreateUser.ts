@@ -1,41 +1,42 @@
 import { useCallback } from "react";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { TokenManager } from "@/lib/auth/token-manager";
 import { logger } from "@/lib/logging";
-import { GqlCurrentPrefecture, useUserSignUpMutation } from "@/types/graphql";
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { GqlCurrentPrefecture, GqlUser, useUserSignUpMutation } from "@/types/graphql";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
-export const useCreateUser = (refetchUser: () => Promise<any>) => {
+export const useCreateUser = (refetchUser: () => Promise<GqlUser | null>) => {
   const [userSignUp] = useUserSignUpMutation();
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
 
   return useCallback(
     async (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string) => {
       try {
-        const phoneTokens = TokenManager.getPhoneTokens();
-        const lineTokens = TokenManager.getLineTokens();
+        const { state, phoneAuth } = useAuthStore.getState();
+        const { lineTokens } = state;
+        const { phoneTokens } = phoneAuth;
 
         const { data } = await userSignUp({
           variables: {
             input: {
               name,
               currentPrefecture: prefecture,
-              communityId: COMMUNITY_ID,
               phoneUid,
-              phoneNumber: phoneTokens.phoneNumber ?? undefined,
-              lineRefreshToken: lineTokens.refreshToken ?? undefined,
+              phoneNumber: phoneAuth.phoneNumber ?? undefined,
+              phoneAccessToken: phoneTokens.accessToken ?? undefined,
+              phoneTokenExpiresAt: phoneTokens.expiresAt ?? undefined,
               phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
+              lineRefreshToken: lineTokens.refreshToken ?? undefined,
+              lineTokenExpiresAt: lineTokens.expiresAt ?? undefined,
             },
           },
         });
 
         if (data?.userSignUp?.user) {
-          const { data: refreshed } = await refetchUser();
-          if (refreshed?.currentUser?.user) {
+          const user = await refetchUser();
+          if (user) {
             useAuthStore.getState().setState({
               firebaseUser,
               authenticationState: "user_registered",
-              currentUser: refreshed.currentUser.user,
+              currentUser: user,
             });
           }
           return firebaseUser;

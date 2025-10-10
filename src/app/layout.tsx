@@ -12,6 +12,7 @@ import React from "react";
 import { currentCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
+import { getUserServer } from "@/lib/auth/init/getUserServer";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -34,18 +35,24 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-const RootLayout = ({
+const RootLayout = async ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
+
   return (
     <html lang="ja">
       <body className={font.className}>
         <ClientPolyfills />
         <CookiesProvider>
           <ApolloProvider>
-            <AuthProvider>
+            <AuthProvider
+              ssrCurrentUser={user}
+              ssrLineAuthenticated={lineAuthenticated}
+              ssrPhoneAuthenticated={phoneAuthenticated}
+            >
               <HeaderProvider>
                 <LoadingProvider>
                   <AnalyticsProvider />

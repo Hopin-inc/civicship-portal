@@ -7,7 +7,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 interface HeaderProps {
@@ -37,8 +37,8 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     pathname.startsWith("/sign-up") ||
     pathname === "/users/me/edit" ||
     (pathname.startsWith("/places") && placeId) ||
-    pathname.startsWith("/search") || 
-    pathname.startsWith("/wallets") || 
+    pathname.startsWith("/search") ||
+    pathname.startsWith("/wallets") ||
     pathname.startsWith("/credentials") ||
     pathname.startsWith("/transactions")
   ) {
@@ -64,7 +64,10 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
           {currentCommunityConfig.enableFeatures.includes("opportunities") && (
             <Link
               href="/opportunities"
-              className={cn(getLinkStyle("/opportunities", "/opportunities/*", "opportunities/search/*"), "flex-grow")}
+              className={cn(
+                getLinkStyle("/opportunities", "/opportunities/*", "opportunities/search/*"),
+                "flex-grow",
+              )}
             >
               <Search size={24} />
               <span className="text-xs mt-1">見つける</span>

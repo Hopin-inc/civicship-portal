@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { lineAuth } from "@/lib/auth/firebase-config";
-import { TokenManager } from "@/lib/auth/token-manager";
-import { AuthStateManager } from "@/lib/auth/auth-state-manager";
+import { lineAuth } from "@/lib/auth/core/firebase-config";
+import { TokenManager } from "@/lib/auth/core/token-manager";
+import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { logger } from "@/lib/logging";
-import { useAuthStore } from "@/hooks/auth/auth-store";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface UseFirebaseAuthStateProps {
   authStateManager: AuthStateManager | null;
@@ -32,37 +32,30 @@ export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateP
           const idToken = await user.getIdToken();
           const refreshToken = user.refreshToken;
           const tokenResult = await user.getIdTokenResult();
-          const expirationTime = new Date(tokenResult.expirationTime).getTime();
-
-          const existing = TokenManager.getLineTokens();
-          if (
-            !existing.accessToken ||
-            existing.accessToken !== idToken ||
-            !existing.expiresAt ||
-            existing.expiresAt !== expirationTime
-          ) {
-            TokenManager.saveLineTokens({
-              accessToken: idToken,
-              refreshToken,
-              expiresAt: expirationTime,
-            });
-          }
+          const expirationTime = String(new Date(tokenResult.expirationTime).getTime());
 
           setState({
             firebaseUser: user,
+            lineTokens: {
+              accessToken: idToken,
+              refreshToken,
+              expiresAt: expirationTime,
+            },
             authenticationState:
               stateRef.current.authenticationState === "loading"
                 ? "line_authenticated"
                 : stateRef.current.authenticationState,
           });
+
+          TokenManager.saveLineAuthFlag(true);
         } catch (error) {
-          logger.info("Failed to sync Firebase token to cookies", {
+          logger.info("Failed to sync Firebase token", {
             error: error instanceof Error ? error.message : String(error),
             component: "useFirebaseAuthState",
           });
         }
       } else {
-        TokenManager.clearLineTokens();
+        TokenManager.clearLineAuthFlag();
         setState({
           firebaseUser: null,
           authenticationState: "unauthenticated",

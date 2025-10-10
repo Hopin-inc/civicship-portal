@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { AuthState, AuthStore, LiffState, PhoneAuthState } from "@/types/auth";
-import { detectEnvironment } from "@/lib/auth/environment-detector";
+import { detectEnvironment } from "@/lib/auth/core/environment-detector";
 
 const initialAuthState: AuthState = {
   firebaseUser: null,
@@ -9,19 +9,31 @@ const initialAuthState: AuthState = {
   environment: detectEnvironment(),
   isAuthenticating: false,
   isAuthInProgress: false,
+  lineTokens: {
+    accessToken: null,
+    refreshToken: null,
+    expiresAt: null,
+  },
 };
 
 const initialPhoneAuthState: PhoneAuthState = {
   isVerifying: false,
   isVerified: false,
+  refreshToken: null,
   phoneNumber: null,
   phoneUid: null,
   verificationId: null,
   error: null,
+  phoneTokens: {
+    accessToken: null,
+    refreshToken: null,
+    expiresAt: null,
+  },
 };
 
 const initialLiffAuthState: LiffState = {
   isInitialized: false,
+  isLiffProcessing: false,
   isLoggedIn: false,
   profile: {
     userId: null,

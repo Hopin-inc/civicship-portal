@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import { PhoneVerificationForm } from "./components/PhoneVerificationForm";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function PhoneVerificationPage() {

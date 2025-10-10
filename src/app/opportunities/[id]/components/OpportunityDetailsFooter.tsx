@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
 import { cn } from "@/lib/utils";
 
 export type DisableReasonType = "noSlots" | "reservationClosed" | "externalBooking";
@@ -67,21 +67,17 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
         <div>
           <div>
             <p className="text-body-sm text-muted-foreground">1人あたり</p>
-              {price !== null ? (
-                <p className="text-body-lg font-bold">
-                  {`${price.toLocaleString()}円〜`}
-                </p>
-              ) : point === null ? (
-                <p className="text-body-lg font-bold text-muted-foreground/50">
-                  料金未定
-                </p>
-              ) : null}
-              {point != null && (
-                <p>
-                  <span className="font-bold text-lg">{point.toLocaleString()}pt</span>
-                  <span className="text-sm font-normal">もらえる</span>
-                </p> 
-              )}
+            {price !== null ? (
+              <p className="text-body-lg font-bold">{`${price.toLocaleString()}円〜`}</p>
+            ) : point === null ? (
+              <p className="text-body-lg font-bold text-muted-foreground/50">料金未定</p>
+            ) : null}
+            {point != null && (
+              <p>
+                <span className="font-bold text-lg">{point.toLocaleString()}pt</span>
+                <span className="text-sm font-normal">もらえる</span>
+              </p>
+            )}
           </div>
         </div>
         {renderActionElement()}
@@ -89,4 +85,3 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
     </footer>
   );
 };
-

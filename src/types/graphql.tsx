@@ -546,7 +546,7 @@ export type GqlIdentity = {
 };
 
 export type GqlIdentityCheckPhoneUserInput = {
-  communityId: Scalars["ID"]["input"];
+  phoneUid: Scalars["String"]["input"];
 };
 
 export type GqlIdentityCheckPhoneUserPayload = {
@@ -2600,13 +2600,15 @@ export type GqlUserFilterInput = {
 };
 
 export type GqlUserSignUpInput = {
-  communityId: Scalars["ID"]["input"];
   currentPrefecture: GqlCurrentPrefecture;
   image?: InputMaybe<GqlImageInput>;
   lineRefreshToken?: InputMaybe<Scalars["String"]["input"]>;
+  lineTokenExpiresAt?: InputMaybe<Scalars["String"]["input"]>;
   name: Scalars["String"]["input"];
+  phoneAccessToken?: InputMaybe<Scalars["String"]["input"]>;
   phoneNumber?: InputMaybe<Scalars["String"]["input"]>;
   phoneRefreshToken?: InputMaybe<Scalars["String"]["input"]>;
+  phoneTokenExpiresAt?: InputMaybe<Scalars["String"]["input"]>;
   phoneUid?: InputMaybe<Scalars["String"]["input"]>;
   slug?: InputMaybe<Scalars["String"]["input"]>;
 };
@@ -2929,6 +2931,35 @@ export type GqlCurrentUserQuery = {
       __typename?: "User";
       id: string;
       name: string;
+      memberships?: Array<{
+        __typename?: "Membership";
+        role: GqlRole;
+        status: GqlMembershipStatus;
+        headline?: string | null;
+        bio?: string | null;
+        reason: GqlMembershipStatusReason;
+        user?: { __typename?: "User"; id: string; name: string } | null;
+        community?: { __typename?: "Community"; id: string; name?: string | null } | null;
+      }> | null;
+    } | null;
+  } | null;
+};
+
+export type GqlCurrentUserServerQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlCurrentUserServerQuery = {
+  __typename?: "Query";
+  currentUser?: {
+    __typename?: "CurrentUserPayload";
+    user?: {
+      __typename?: "User";
+      id: string;
+      name: string;
+      identities?: Array<{
+        __typename?: "Identity";
+        uid: string;
+        platform?: GqlIdentityPlatform | null;
+      }> | null;
       memberships?: Array<{
         __typename?: "Membership";
         role: GqlRole;
@@ -6642,6 +6673,98 @@ export type CurrentUserSuspenseQueryHookResult = ReturnType<typeof useCurrentUse
 export type CurrentUserQueryResult = Apollo.QueryResult<
   GqlCurrentUserQuery,
   GqlCurrentUserQueryVariables
+>;
+export const CurrentUserServerDocument = gql`
+  query currentUserServer {
+    currentUser {
+      user {
+        id
+        name
+        identities {
+          uid
+          platform
+        }
+        memberships {
+          ...MembershipFields
+          user {
+            id
+            name
+          }
+          community {
+            id
+            name
+          }
+          role
+          status
+        }
+      }
+    }
+  }
+  ${MembershipFieldsFragmentDoc}
+`;
+
+/**
+ * __useCurrentUserServerQuery__
+ *
+ * To run a query within a React component, call `useCurrentUserServerQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCurrentUserServerQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCurrentUserServerQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCurrentUserServerQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlCurrentUserServerQuery,
+    GqlCurrentUserServerQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlCurrentUserServerQuery, GqlCurrentUserServerQueryVariables>(
+    CurrentUserServerDocument,
+    options,
+  );
+}
+export function useCurrentUserServerLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlCurrentUserServerQuery,
+    GqlCurrentUserServerQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlCurrentUserServerQuery, GqlCurrentUserServerQueryVariables>(
+    CurrentUserServerDocument,
+    options,
+  );
+}
+export function useCurrentUserServerSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlCurrentUserServerQuery,
+        GqlCurrentUserServerQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlCurrentUserServerQuery, GqlCurrentUserServerQueryVariables>(
+    CurrentUserServerDocument,
+    options,
+  );
+}
+export type CurrentUserServerQueryHookResult = ReturnType<typeof useCurrentUserServerQuery>;
+export type CurrentUserServerLazyQueryHookResult = ReturnType<typeof useCurrentUserServerLazyQuery>;
+export type CurrentUserServerSuspenseQueryHookResult = ReturnType<
+  typeof useCurrentUserServerSuspenseQuery
+>;
+export type CurrentUserServerQueryResult = Apollo.QueryResult<
+  GqlCurrentUserServerQuery,
+  GqlCurrentUserServerQueryVariables
 >;
 export const AssignOwnerDocument = gql`
   mutation assignOwner(

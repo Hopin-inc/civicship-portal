@@ -1,7 +1,7 @@
 import React from "react";
-import { GqlCurrentPrefecture, GqlCurrentUserPayload } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlCurrentUserPayload, GqlUser } from "@/types/graphql";
 import { User } from "firebase/auth";
-import { AuthEnvironment } from "@/lib/auth/environment-detector";
+import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { RawURIComponent } from "@/utils/path";
 
 export type AuthStore = {
@@ -21,19 +21,24 @@ export type AuthState = {
   environment: AuthEnvironment;
   isAuthenticating: boolean;
   isAuthInProgress: boolean;
+  lineTokens: {
+    accessToken: string | null;
+    refreshToken: string | null;
+    expiresAt: string | null;
+  };
 };
 
 export type AuthenticationState =
   | "unauthenticated" // S0: 未認証
   | "line_authenticated" // S1: LINE認証済み
-  | "line_token_expired" // S1e: LINEトークン期限切れ
   | "phone_authenticated" // S2: 電話番号認証済み
-  | "phone_token_expired" // S2e: 電話番号トークン期限切れ
   | "user_registered" // S3: ユーザ情報登録済み
-  | "loading"; // L0: 状態チェック中
+  | "loading" // L0: 状態チェック中
+  | "authenticating"; // L1: Firebase認証セッション確認中
 
 export type LiffState = {
   isInitialized: boolean;
+  isLiffProcessing: boolean;
   isLoggedIn: boolean;
   profile: {
     userId: string | null;
@@ -46,10 +51,16 @@ export type LiffState = {
 export type PhoneAuthState = {
   isVerifying: boolean;
   isVerified: boolean;
+  refreshToken: string | null;
   phoneNumber: string | null;
   phoneUid: string | null;
   verificationId: string | null;
   error: Error | null;
+  phoneTokens: {
+    accessToken: string | null;
+    refreshToken: string | null;
+    expiresAt: string | null;
+  };
 };
 
 export interface AuthContextType {
@@ -72,6 +83,7 @@ export interface AuthContextType {
     clearRecaptcha?: () => void;
     isVerifying: boolean;
     phoneUid: string | null;
+    phoneNumber: string | null;
   };
 
   createUser: (
@@ -79,11 +91,14 @@ export interface AuthContextType {
     prefecture: GqlCurrentPrefecture,
     phoneUid: string,
   ) => Promise<User | null>;
-  updateAuthState: () => Promise<void>;
+  updateAuthState: () => Promise<GqlUser | null>;
 
   loading: boolean;
 }
 
 export interface AuthProviderProps {
   children: React.ReactNode;
+  ssrCurrentUser?: GqlUser | undefined | null;
+  ssrLineAuthenticated?: boolean;
+  ssrPhoneAuthenticated?: boolean;
 }

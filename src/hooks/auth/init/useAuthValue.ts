@@ -1,10 +1,11 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { AuthContextType } from "@/types/auth";
-import { PhoneAuthService } from "@/lib/auth/phone-auth-service";
-import { useAuthStore } from "./auth-store";
+import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
+import { GqlUser } from "@/types/graphql";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 type UseAuthValueArgs = {
-  refetchUser: () => Promise<any>;
+  refetchUser: () => Promise<GqlUser | null>;
   phoneAuthService: PhoneAuthService;
   actions: {
     loginWithLiff: AuthContextType["loginWithLiff"];
@@ -27,10 +28,6 @@ export const useAuthValue = ({
   const isAuthenticating = useAuthStore((s) => s.state.isAuthenticating);
   const environment = useAuthStore((s) => s.state.environment);
 
-  const stableRefetchUser = useCallback(async () => {
-    await refetchUser();
-  }, [refetchUser]);
-
   return useMemo(
     () => ({
       user: currentUser,
@@ -52,9 +49,10 @@ export const useAuthValue = ({
         clearRecaptcha: () => phoneAuthService.clearRecaptcha(),
         isVerifying: phoneAuth.isVerifying,
         phoneUid: phoneAuth.phoneUid,
+        phoneNumber: phoneAuth.phoneNumber,
       },
       createUser: actions.createUser,
-      updateAuthState: stableRefetchUser,
+      updateAuthState: refetchUser,
       loading: authenticationState === "loading" || isAuthenticating,
     }),
     [
@@ -63,9 +61,16 @@ export const useAuthValue = ({
       authenticationState,
       isAuthenticating,
       environment,
-      actions,
+      actions.loginWithLiff,
+      actions.logout,
+      actions.startPhoneVerification,
+      actions.verifyPhoneCode,
+      actions.createUser,
+      phoneAuth.isVerifying,
+      phoneAuth.phoneUid,
+      phoneAuth.phoneNumber,
+      refetchUser,
       phoneAuthService,
-      stableRefetchUser,
     ],
   );
 };

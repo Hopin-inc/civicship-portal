@@ -2,15 +2,13 @@
 
 import liff from "@line/liff";
 import { signInWithCustomToken, updateProfile } from "firebase/auth";
-import { categorizeFirebaseError, lineAuth } from "./firebase-config";
-import { AuthTokens, TokenManager } from "./token-manager";
-import retry from "retry";
+import { lineAuth } from "../core/firebase-config";
+import { TokenManager } from "../core/token-manager";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 
-/**
- * LIFF初期化状態の型定義
- */
 export type LiffState = {
   isInitialized: boolean;
   isLoggedIn: boolean;
@@ -22,19 +20,12 @@ export type LiffState = {
   error: Error | null;
 };
 
-/**
- * LIFF認証サービス
- */
 export class LiffService {
   private static instance: LiffService;
   private liffId: string;
   private state: LiffState;
   private initializing = false;
 
-  /**
-   * コンストラクタ
-   * @param liffId LIFF ID
-   */
   private constructor(liffId: string) {
     this.liffId = liffId;
     this.state = {
@@ -57,11 +48,6 @@ export class LiffService {
     return `${baseUrl}?next=${encodedNext}`;
   }
 
-  /**
-   * シングルトンインスタンスを取得
-   * @param liffId LIFF ID（初回のみ必要）
-   * @returns LiffServiceのインスタンス
-   */
   public static getInstance(liffId?: string): LiffService {
     if (!LiffService.instance) {
       if (!liffId) {
@@ -72,10 +58,6 @@ export class LiffService {
     return LiffService.instance;
   }
 
-  /**
-   * LIFF SDKを初期化
-   * @returns 初期化が成功したかどうか
-   */
   public async initialize(): Promise<boolean> {
     try {
       if (this.state.isInitialized) {
@@ -125,11 +107,6 @@ export class LiffService {
     }
   }
 
-  /**
-   * LIFFでログイン
-   * @param redirectPath リダイレクト先のパス（オプション）
-   * @returns ログインが成功したかどうか
-   */
   public async login(redirectPath?: RawURIComponent): Promise<boolean> {
     try {
       if (!this.state.isInitialized) {
@@ -180,9 +157,6 @@ export class LiffService {
     }
   }
 
-  /**
-   * LIFFからログアウト
-   */
   public logout(): void {
     if (this.state.isInitialized && this.state.isLoggedIn) {
       liff.logout();
@@ -195,9 +169,6 @@ export class LiffService {
     }
   }
 
-  /**
-   * LIFFプロファイル情報を更新
-   */
   private async updateProfile(): Promise<void> {
     try {
       if (!this.state.isInitialized || !this.state.isLoggedIn) {
@@ -219,10 +190,6 @@ export class LiffService {
     }
   }
 
-  /**
-   * LIFFアクセストークンを取得
-   * @returns LIFFアクセストークン
-   */
   public getAccessToken(): string | null {
     if (!this.state.isInitialized || !this.state.isLoggedIn) {
       return null;
@@ -230,125 +197,97 @@ export class LiffService {
     return liff.getAccessToken();
   }
 
-  /**
-   * LIFFトークンを使用してFirebase認証を行う
-   * @returns 認証が成功したかどうか
-   */
   public async signInWithLiffToken(): Promise<boolean> {
     const accessToken = this.getAccessToken();
-    if (!accessToken) {
-      logger.info("No LIFF access token available", {
-        authType: "liff",
-        component: "LiffService",
-      });
-      return false;
+    if (!accessToken) return false;
+
+    const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+    const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
+    const authStateManager = AuthStateManager.getInstance();
+
+    // 最大3回まで（token切れ or transient errorのみリトライ）
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Community-Id": communityId ?? "",
+          },
+          body: JSON.stringify({ accessToken }),
+        });
+
+        if (!response.ok) {
+          if (response.status >= 500 || response.status === 401) {
+            if (attempt < 3) continue;
+          }
+          throw new Error(`LIFF authentication failed: ${response.status}`);
+        }
+
+        const { customToken, profile } = await response.json();
+        const userCredential = await signInWithCustomToken(lineAuth, customToken);
+
+        await Promise.race([
+          new Promise<void>((resolve) => {
+            const unsub = lineAuth.onAuthStateChanged((u) => {
+              if (u) {
+                unsub();
+                resolve();
+              }
+            });
+          }),
+          new Promise<void>((resolve) => {
+            setTimeout(() => {
+              resolve();
+            }, 5000);
+          }),
+        ]);
+
+        await updateProfile(userCredential.user, {
+          displayName: profile.displayName,
+          photoURL: profile.pictureUrl,
+        });
+
+        const idToken = await userCredential.user.getIdToken();
+        const refreshToken = userCredential.user.refreshToken;
+        const tokenResult = await userCredential.user.getIdTokenResult();
+        const expiresAt = String(new Date(tokenResult.expirationTime).getTime());
+
+        useAuthStore.getState().setState({
+          lineTokens: {
+            accessToken: idToken,
+            refreshToken,
+            expiresAt,
+          },
+        });
+
+        TokenManager.saveLineAuthFlag(true);
+
+        const isPhoneVerified = TokenManager.phoneVerified();
+        if (isPhoneVerified) {
+          TokenManager.savePhoneAuthFlag(true);
+        }
+
+        authStateManager.updateState("line_authenticated", "signInWithLiffToken");
+        useAuthStore.getState().setState({
+          isAuthenticating: false,
+        });
+
+        return true;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+
+        if (message.includes("401") || message.includes("network") || message.includes("fetch")) {
+          await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s,2s,3s
+          continue;
+        }
+        break;
+      }
     }
 
-    const operation = retry.operation({
-      retries: 3,
-      factor: 2,
-      minTimeout: 1000,
-      maxTimeout: 10000,
-      randomize: true,
-    });
-
-    return new Promise((resolve) => {
-      operation.attempt(async (currentAttempt) => {
-        try {
-          const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json", "X-Community-Id": communityId ?? "" },
-              body: JSON.stringify({ accessToken }),
-            },
-          );
-
-          if (!response.ok) {
-            throw new Error(`LIFF authentication failed: ${response.status}`);
-          }
-          const { customToken, profile } = await response.json();
-
-          const userCredential = await signInWithCustomToken(lineAuth, customToken);
-
-          await updateProfile(userCredential.user, {
-            displayName: profile.displayName,
-            photoURL: profile.pictureUrl,
-          });
-
-          const idToken = await userCredential.user.getIdToken();
-          const refreshToken = userCredential.user.refreshToken;
-          const tokenResult = await userCredential.user.getIdTokenResult();
-          const expirationTime = new Date(tokenResult.expirationTime).getTime();
-
-          const tokens: AuthTokens = {
-            accessToken: idToken,
-            refreshToken: refreshToken,
-            expiresAt: expirationTime,
-          };
-          TokenManager.saveLineTokens(tokens);
-
-          if (typeof window !== "undefined") {
-            try {
-              const AuthStateManager = require("./auth-state-manager").AuthStateManager;
-              const authStateManager = AuthStateManager.getInstance();
-              const timestamp = new Date().toISOString();
-              await authStateManager.handleLineAuthStateChange(true);
-            } catch (error) {
-              logger.warn("Failed to update AuthStateManager state", {
-                error: error instanceof Error ? error.message : String(error),
-                component: "LiffService",
-                errorCategory: "state_management",
-                retryable: true,
-              });
-            }
-          }
-
-          resolve(true);
-        } catch (error) {
-          const categorizedError = categorizeFirebaseError(error);
-
-          logger.info(`LIFF authentication error (attempt ${currentAttempt})`, {
-            authType: "liff",
-            type: categorizedError.type,
-            message: categorizedError.message,
-            error: error instanceof Error ? error.message : String(error),
-            retryable: categorizedError.retryable,
-            attempt: currentAttempt,
-            component: "LiffService",
-          });
-
-          if (!categorizedError.retryable || !operation.retry(error as Error)) {
-            logger.info("LIFF authentication failed after all retries", {
-              authType: "liff",
-              component: "LiffService",
-            });
-
-            if (typeof window !== "undefined") {
-              window.dispatchEvent(
-                new CustomEvent("auth:error", {
-                  detail: {
-                    source: "liff",
-                    errorType: categorizedError.type,
-                    errorMessage: categorizedError.message,
-                    originalError: error,
-                  },
-                }),
-              );
-            }
-
-            resolve(false);
-          }
-        }
-      });
-    });
+    return false;
   }
 
-  /**
-   * 現在のLIFF状態を取得
-   * @returns LIFF状態
-   */
   public getState(): LiffState {
     return { ...this.state };
   }

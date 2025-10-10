@@ -7,9 +7,10 @@ import {
 import { InMemoryCache } from "@apollo/client/cache";
 import { onError } from "@apollo/client/link/error";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
-import { TokenManager } from "./auth/token-manager";
 
 import { logger } from "@/lib/logging";
+import { lineAuth } from "@/lib/auth/core/firebase-config";
+import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -19,42 +20,22 @@ const httpLink = createUploadLink({
   },
 });
 
-const requestLink = new ApolloLink((operation, forward) => {
-  const lineTokens = TokenManager.getLineTokens();
-  const phoneTokens = TokenManager.getPhoneTokens();
+const requestLink = setContext(async (operation, prevContext) => {
+  let token: string | null = null;
 
-  operation.setContext(({ headers = {} }) => {
-    const baseHeaders = {
-      ...headers,
-      Authorization: lineTokens.accessToken ? `Bearer ${lineTokens.accessToken}` : "",
-      "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-      "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
-    };
+  if (typeof window !== "undefined") {
+    const user = lineAuth.currentUser;
+    token = user ? await user.getIdToken() : null;
+  }
 
-    const tokenRequiredOperations = [
-      "userSignUp",
-      "linkPhoneAuth",
-      "storePhoneAuthToken",
-      "identityCheckPhoneUser",
-    ];
+  const headers = {
+    ...prevContext.headers,
+    Authorization: token ? `Bearer ${token}` : "",
+    "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+    "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
+  };
 
-    if (tokenRequiredOperations.includes(operation.operationName || "")) {
-      return {
-        headers: {
-          ...baseHeaders,
-          "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
-          "X-Phone-Auth-Token": phoneTokens.accessToken || "",
-          "X-Phone-Token-Expires-At": phoneTokens.expiresAt ? phoneTokens.expiresAt.toString() : "",
-          "X-Phone-Uid": phoneTokens.phoneUid || "",
-          "X-Phone-Number": phoneTokens.phoneNumber || "",
-        },
-      };
-    }
-
-    return { headers: baseHeaders };
-  });
-
-  return forward(operation);
+  return { headers };
 });
 
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {

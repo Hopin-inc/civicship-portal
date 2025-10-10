@@ -8,7 +8,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { encodeURIComponentWithType, RawURIComponent } from "@/utils/path";
 import { cn } from "@/lib/utils";
@@ -36,7 +35,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
     setError(null);
 
     try {
-      await loginWithLiff(`/login?next=${ encodeURIComponentWithType(nextPath as RawURIComponent) }` as RawURIComponent);
+      await loginWithLiff(
+        `/login?next=${encodeURIComponentWithType(nextPath as RawURIComponent)}` as RawURIComponent,
+      );
       setIsLoading(false);
       onClose();
     } catch (err) {
@@ -61,7 +62,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
         <SheetTitle className={"text-body-md mb-4"}>
           <div className="text-body-md mb-6">
             <strong className="font-bold">{currentCommunityConfig.title}</strong>
-            { !isAuthenticated ? "を利用するにはLINEでログインして下さい" : "を利用するにはユーザー登録してください" }
+            {!isAuthenticated
+              ? "を利用するにはLINEでログインして下さい"
+              : "を利用するにはユーザー登録してください"}
           </div>
         </SheetTitle>
         <div className="flex flex-col items-start space-y-8">
@@ -101,21 +104,23 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
 
           {error && <p className="text-sm text-red-500 mb-4 text-center">{error}</p>}
 
-          { !isAuthenticated ?
+          {!isAuthenticated ? (
             <Button
-              onClick={ handleLogin }
-              disabled={ isLoading || isAuthenticating }
+              onClick={handleLogin}
+              disabled={isLoading || isAuthenticating}
               className="w-full bg-[#06C755] hover:bg-[#05B74B] text-white rounded-full h-14 flex items-center justify-center gap-2"
             >
-              <Image src="/images/line-icon.png" alt="LINE" width={ 24 } height={ 24 } priority />
-              { isLoading || isAuthenticating ? "ログイン中..." : "LINEでログイン" }
+              <Image src="/images/line-icon.png" alt="LINE" width={24} height={24} priority />
+              {isLoading || isAuthenticating ? "ログイン中..." : "LINEでログイン"}
             </Button>
-          : <Link
-              href={ `/sign-up/phone-verification?next=${ encodeURIComponentWithType(nextPath ?? null) }` }
-              className={ cn(buttonVariants({ variant: "primary", size: "lg" }), "w-full") }
+          ) : (
+            <Link
+              href={`/sign-up/phone-verification?next=${encodeURIComponentWithType(nextPath ?? null)}`}
+              className={cn(buttonVariants({ variant: "primary", size: "lg" }), "w-full")}
             >
               ユーザー登録に進む
-            </Link> }
+            </Link>
+          )}
         </div>
       </SheetContent>
     </Sheet>

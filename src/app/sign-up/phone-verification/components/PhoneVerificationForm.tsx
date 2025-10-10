@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { formatPhoneNumber } from "@/app/sign-up/phone-verification/utils";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { useMutation } from "@apollo/client";
 import { IDENTITY_CHECK_PHONE_USER } from "@/graphql/account/identity/mutation";
 import {
@@ -16,11 +16,11 @@ import {
   GqlMutationIdentityCheckPhoneUserArgs,
   GqlPhoneUserStatus,
 } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { RawURIComponent } from "@/utils/path";
-import { categorizeFirebaseError } from "@/lib/auth/firebase-config";
-import { isRunningInLiff } from "@/lib/auth/environment-detector";
+import { categorizeFirebaseError } from "@/lib/auth/core/firebase-config";
+import { isRunningInLiff } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -69,10 +69,10 @@ export function PhoneVerificationForm() {
       setShowRecaptcha(false);
     };
 
-    window.addEventListener('recaptcha-completed', handleRecaptchaCompleted);
-    
+    window.addEventListener("recaptcha-completed", handleRecaptchaCompleted);
+
     return () => {
-      window.removeEventListener('recaptcha-completed', handleRecaptchaCompleted);
+      window.removeEventListener("recaptcha-completed", handleRecaptchaCompleted);
     };
   }, []);
 
@@ -134,37 +134,37 @@ export function PhoneVerificationForm() {
 
   const handleResendCode = async () => {
     if (isResendDisabled || isPhoneSubmitting) return;
-    
+
     if (!isRecaptchaReady) {
       toast.error("認証コード送信を準備中です");
       return;
     }
-    
+
     // 電話番号が空の場合はエラー
     if (!phoneNumber || !formattedPhone) {
       toast.error("電話番号が設定されていません。電話番号入力画面に戻ってください。");
       return;
     }
-    
+
     // 再送信時にreCAPTCHAを表示
     setShowRecaptcha(true);
     setIsSubmitting(true);
-    
+
     try {
       // reCAPTCHAをクリアし、再描画を待ってから再送信します。
       // 関連ロジックはphoneAuthServiceに集約されています。
       phoneAuth.clearRecaptcha?.();
-      
+
       // LIFF環境では、reCAPTCHAの再描画により時間がかかる場合があるため、待機時間を調整
       const waitTime = isRunningInLiff() ? 1000 : 500;
-      await new Promise(resolve => setTimeout(resolve, waitTime));
-      
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
+
       const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
 
       if (verificationId) {
         toast.success("認証コードを再送信しました");
         startResendTimer(); // 60秒タイマーを再開始
-        
+
         // LIFF環境でない場合は、即座にreCAPTCHAを非表示にする
         if (!isRunningInLiff()) {
           setShowRecaptcha(false);
@@ -175,7 +175,7 @@ export function PhoneVerificationForm() {
       logger.error("再送信エラー:", { error });
       const categorized = categorizeFirebaseError(error);
       toast.error(categorized.message);
-      
+
       if (categorized.type === "rate-limit") {
         setIsRateLimited(true);
         setTimeout(() => setIsRateLimited(false), 60 * 1000);
@@ -193,16 +193,28 @@ export function PhoneVerificationForm() {
 
     try {
       const success = await phoneAuth.verifyPhoneCode(verificationCode);
+      const phoneAuthState = useAuthStore.getState().phoneAuth;
+      const setAuthState = useAuthStore.getState().setState;
+      if (!success || !phoneAuthState.phoneUid) {
+        toast.error("認証コードが無効です");
+        return;
+      }
       if (success) {
         const { data } = await identityCheckPhoneUser({
           variables: {
             input: {
-              communityId: COMMUNITY_ID,
+              phoneUid: phoneAuthState.phoneUid,
             },
           },
         });
 
         const status = data?.identityCheckPhoneUser?.status;
+
+        if (!status) {
+          toast.error("認証ステータスの取得に失敗しました。再試行してください。");
+          setIsCodeVerifying(false);
+          return;
+        }
 
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
@@ -217,12 +229,14 @@ export function PhoneVerificationForm() {
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
             );
+            setAuthState({ authenticationState: "user_registered" });
             router.push(homeRedirectPath || "/");
             break;
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
             toast.success("メンバーシップが追加されました");
             updateAuthState();
+            setAuthState({ authenticationState: "user_registered" });
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
@@ -361,23 +375,19 @@ export function PhoneVerificationForm() {
                 type="button"
                 variant="tertiary"
                 className="w-full h-12"
-                disabled={
-                  isResendDisabled ||
-                  isPhoneSubmitting ||
-                  isReloading
-                }
+                disabled={isResendDisabled || isPhoneSubmitting || isReloading}
                 onClick={handleResendCode}
               >
-                {isResendDisabled 
-                  ? `${countdown}秒後に再送信できます` 
-                  : isPhoneSubmitting 
-                    ? "送信中..." 
+                {isResendDisabled
+                  ? `${countdown}秒後に再送信できます`
+                  : isPhoneSubmitting
+                    ? "送信中..."
                     : "コードを再送信"}
               </Button>
-              <div 
-                id="recaptcha-container" 
+              <div
+                id="recaptcha-container"
                 ref={recaptchaContainerRef}
-                style={{ display: showRecaptcha ? 'block' : 'none' }}
+                style={{ display: showRecaptcha ? "block" : "none" }}
               ></div>
               <Button
                 type="button"
@@ -396,7 +406,7 @@ export function PhoneVerificationForm() {
                     setPhoneNumber("");
                     setVerificationCode("");
                     setStep("phone");
-                    
+
                     // 少し待ってからページをリロード
                     setTimeout(() => {
                       window.location.reload();
