@@ -35,7 +35,7 @@ export const FETCH_PROFILE_SERVER_QUERY = `
         urlInstagram
         urlX
 
-        portfolios (first: 10) {}
+        portfolios {
           id
           title
           thumbnailUrl
