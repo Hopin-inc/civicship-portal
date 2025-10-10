@@ -414,12 +414,23 @@ export const GqlErrorCode = {
   ClaimLinkExpired: "CLAIM_LINK_EXPIRED",
   Forbidden: "FORBIDDEN",
   InsufficientBalance: "INSUFFICIENT_BALANCE",
+  InsufficientInventory: "INSUFFICIENT_INVENTORY",
   InternalServerError: "INTERNAL_SERVER_ERROR",
   InvalidTransferMethod: "INVALID_TRANSFER_METHOD",
+  InventoryCalculationError: "INVENTORY_CALCULATION_ERROR",
+  InventoryUnavailable: "INVENTORY_UNAVAILABLE",
   MissingWalletInformation: "MISSING_WALLET_INFORMATION",
+  NmkrInsufficientCredits: "NMKR_INSUFFICIENT_CREDITS",
+  NmkrMintingFailed: "NMKR_MINTING_FAILED",
+  NmkrTokenUnavailable: "NMKR_TOKEN_UNAVAILABLE",
   NotFound: "NOT_FOUND",
   NoAvailableParticipationSlots: "NO_AVAILABLE_PARTICIPATION_SLOTS",
+  OrderCancellationFailed: "ORDER_CANCELLATION_FAILED",
+  OversellDetected: "OVERSELL_DETECTED",
+  PaymentSessionCreationFailed: "PAYMENT_SESSION_CREATION_FAILED",
+  PaymentStateTransitionFailed: "PAYMENT_STATE_TRANSITION_FAILED",
   PersonalRecordOnlyDeletable: "PERSONAL_RECORD_ONLY_DELETABLE",
+  ProductNotFound: "PRODUCT_NOT_FOUND",
   RateLimit: "RATE_LIMIT",
   ReservationAdvanceBookingRequired: "RESERVATION_ADVANCE_BOOKING_REQUIRED",
   ReservationCancellationTimeout: "RESERVATION_CANCELLATION_TIMEOUT",
@@ -431,6 +442,7 @@ export const GqlErrorCode = {
   Unknown: "UNKNOWN",
   UnsupportedTransactionReason: "UNSUPPORTED_TRANSACTION_REASON",
   ValidationError: "VALIDATION_ERROR",
+  WebhookMetadataInvalid: "WEBHOOK_METADATA_INVALID",
 } as const;
 
 export type GqlErrorCode = (typeof GqlErrorCode)[keyof typeof GqlErrorCode];
@@ -614,7 +626,7 @@ export type GqlMembershipEdge = GqlEdge & {
 export type GqlMembershipFilterInput = {
   communityId?: InputMaybe<Scalars["ID"]["input"]>;
   keyword?: InputMaybe<Scalars["String"]["input"]>;
-  role?: InputMaybe<GqlRole>;
+  role?: InputMaybe<Array<GqlRole>>;
   status?: InputMaybe<GqlMembershipStatus>;
   userId?: InputMaybe<Scalars["ID"]["input"]>;
 };
@@ -759,6 +771,7 @@ export type GqlMutation = {
   placeCreate?: Maybe<GqlPlaceCreatePayload>;
   placeDelete?: Maybe<GqlPlaceDeletePayload>;
   placeUpdate?: Maybe<GqlPlaceUpdatePayload>;
+  productBuy: GqlProductBuyPayload;
   reservationAccept?: Maybe<GqlReservationSetStatusPayload>;
   reservationCancel?: Maybe<GqlReservationSetStatusPayload>;
   reservationCreate?: Maybe<GqlReservationCreatePayload>;
@@ -941,6 +954,10 @@ export type GqlMutationPlaceUpdateArgs = {
   permission: GqlCheckCommunityPermissionInput;
 };
 
+export type GqlMutationProductBuyArgs = {
+  productId: Scalars["ID"]["input"];
+};
+
 export type GqlMutationReservationAcceptArgs = {
   id: Scalars["ID"]["input"];
   permission: GqlCheckOpportunityPermissionInput;
@@ -1117,6 +1134,26 @@ export type GqlNftInstancesConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type GqlNftMint = {
+  __typename?: "NftMint";
+  createdAt: Scalars["Datetime"]["output"];
+  error?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  nftInstance: GqlNftInstance;
+  order: GqlOrder;
+  status: GqlNftMintStatus;
+  txHash?: Maybe<Scalars["String"]["output"]>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export const GqlNftMintStatus = {
+  Failed: "FAILED",
+  Minted: "MINTED",
+  Queued: "QUEUED",
+  Submitted: "SUBMITTED",
+} as const;
+
+export type GqlNftMintStatus = (typeof GqlNftMintStatus)[keyof typeof GqlNftMintStatus];
 export type GqlNftToken = {
   __typename?: "NftToken";
   address: Scalars["String"]["output"];
@@ -1383,6 +1420,39 @@ export type GqlOpportunityUpdateContentSuccess = {
   opportunity: GqlOpportunity;
 };
 
+export type GqlOrder = {
+  __typename?: "Order";
+  createdAt: Scalars["Datetime"]["output"];
+  externalRef?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  items?: Maybe<Array<GqlOrderItem>>;
+  paymentProvider: GqlPaymentProvider;
+  status: GqlOrderStatus;
+  totalAmount?: Maybe<Scalars["Int"]["output"]>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  user: GqlUser;
+};
+
+export type GqlOrderItem = {
+  __typename?: "OrderItem";
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  nftMints: Array<GqlNftMint>;
+  priceSnapshot: Scalars["Int"]["output"];
+  product: GqlProduct;
+  quantity: Scalars["Int"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export const GqlOrderStatus = {
+  Canceled: "CANCELED",
+  Failed: "FAILED",
+  Paid: "PAID",
+  Pending: "PENDING",
+  Refunded: "REFUNDED",
+} as const;
+
+export type GqlOrderStatus = (typeof GqlOrderStatus)[keyof typeof GqlOrderStatus];
 export type GqlPageInfo = {
   __typename?: "PageInfo";
   endCursor?: Maybe<Scalars["String"]["output"]>;
@@ -1544,6 +1614,12 @@ export type GqlParticipationsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export const GqlPaymentProvider = {
+  Nmkr: "NMKR",
+  Stripe: "STRIPE",
+} as const;
+
+export type GqlPaymentProvider = (typeof GqlPaymentProvider)[keyof typeof GqlPaymentProvider];
 export const GqlPhoneUserStatus = {
   ExistingDifferentCommunity: "EXISTING_DIFFERENT_COMMUNITY",
   ExistingSameCommunity: "EXISTING_SAME_COMMUNITY",
@@ -1693,6 +1769,34 @@ export type GqlPortfoliosConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type GqlProduct = {
+  __typename?: "Product";
+  createdAt?: Maybe<Scalars["Datetime"]["output"]>;
+  description?: Maybe<Scalars["String"]["output"]>;
+  endsAt?: Maybe<Scalars["Datetime"]["output"]>;
+  id: Scalars["ID"]["output"];
+  imageUrl?: Maybe<Scalars["String"]["output"]>;
+  maxSupply?: Maybe<Scalars["Int"]["output"]>;
+  name: Scalars["String"]["output"];
+  price: Scalars["Int"]["output"];
+  remainingSupply: Scalars["Int"]["output"];
+  startsAt?: Maybe<Scalars["Datetime"]["output"]>;
+  type: GqlProductType;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type GqlProductBuyPayload = GqlProductBuySuccess;
+
+export type GqlProductBuySuccess = {
+  __typename?: "ProductBuySuccess";
+  paymentLink: Scalars["String"]["output"];
+};
+
+export const GqlProductType = {
+  Nft: "NFT",
+} as const;
+
+export type GqlProductType = (typeof GqlProductType)[keyof typeof GqlProductType];
 export const GqlPublishStatus = {
   CommunityInternal: "COMMUNITY_INTERNAL",
   Private: "PRIVATE",
@@ -1728,6 +1832,7 @@ export type GqlQuery = {
   place?: Maybe<GqlPlace>;
   places: GqlPlacesConnection;
   portfolios?: Maybe<Array<GqlPortfolio>>;
+  product?: Maybe<GqlProduct>;
   reservation?: Maybe<GqlReservation>;
   reservationHistories: GqlReservationHistoriesConnection;
   reservationHistory?: Maybe<GqlReservationHistory>;
@@ -1888,6 +1993,10 @@ export type GqlQueryPortfoliosArgs = {
   filter?: InputMaybe<GqlPortfolioFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<GqlPortfolioSortInput>;
+};
+
+export type GqlQueryProductArgs = {
+  id: Scalars["ID"]["input"];
 };
 
 export type GqlQueryReservationArgs = {
@@ -5486,6 +5595,54 @@ export type GqlGetPlaceQuery = {
   } | null;
 };
 
+export type GqlProductFieldsFragment = {
+  __typename?: "Product";
+  id: string;
+  type: GqlProductType;
+  name: string;
+  description?: string | null;
+  imageUrl?: string | null;
+  price: number;
+  maxSupply?: number | null;
+  startsAt?: Date | null;
+  endsAt?: Date | null;
+  remainingSupply: number;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+};
+
+export type GqlBuyProductMutationVariables = Exact<{
+  productId: Scalars["ID"]["input"];
+}>;
+
+export type GqlBuyProductMutation = {
+  __typename?: "Mutation";
+  productBuy: { __typename?: "ProductBuySuccess"; paymentLink: string };
+};
+
+export type GqlGetProductQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetProductQuery = {
+  __typename?: "Query";
+  product?: {
+    __typename?: "Product";
+    id: string;
+    type: GqlProductType;
+    name: string;
+    description?: string | null;
+    imageUrl?: string | null;
+    price: number;
+    maxSupply?: number | null;
+    startsAt?: Date | null;
+    endsAt?: Date | null;
+    remainingSupply: number;
+    createdAt?: Date | null;
+    updatedAt?: Date | null;
+  } | null;
+};
+
 export type GqlTicketFieldsFragment = {
   __typename?: "Ticket";
   id: string;
@@ -6174,6 +6331,22 @@ export const ReservationFieldsFragmentDoc = gql`
     status
     comment
     participantCountWithPoint
+  }
+`;
+export const ProductFieldsFragmentDoc = gql`
+  fragment ProductFields on Product {
+    id
+    type
+    name
+    description
+    imageUrl
+    price
+    maxSupply
+    startsAt
+    endsAt
+    remainingSupply
+    createdAt
+    updatedAt
   }
 `;
 export const TicketFieldsFragmentDoc = gql`
@@ -10201,6 +10374,115 @@ export type GetPlaceQueryHookResult = ReturnType<typeof useGetPlaceQuery>;
 export type GetPlaceLazyQueryHookResult = ReturnType<typeof useGetPlaceLazyQuery>;
 export type GetPlaceSuspenseQueryHookResult = ReturnType<typeof useGetPlaceSuspenseQuery>;
 export type GetPlaceQueryResult = Apollo.QueryResult<GqlGetPlaceQuery, GqlGetPlaceQueryVariables>;
+export const BuyProductDocument = gql`
+  mutation BuyProduct($productId: ID!) {
+    productBuy(productId: $productId) {
+      ... on ProductBuySuccess {
+        paymentLink
+      }
+    }
+  }
+`;
+export type GqlBuyProductMutationFn = Apollo.MutationFunction<
+  GqlBuyProductMutation,
+  GqlBuyProductMutationVariables
+>;
+
+/**
+ * __useBuyProductMutation__
+ *
+ * To run a mutation, you first call `useBuyProductMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBuyProductMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [buyProductMutation, { data, loading, error }] = useBuyProductMutation({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useBuyProductMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlBuyProductMutation, GqlBuyProductMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlBuyProductMutation, GqlBuyProductMutationVariables>(
+    BuyProductDocument,
+    options,
+  );
+}
+export type BuyProductMutationHookResult = ReturnType<typeof useBuyProductMutation>;
+export type BuyProductMutationResult = Apollo.MutationResult<GqlBuyProductMutation>;
+export type BuyProductMutationOptions = Apollo.BaseMutationOptions<
+  GqlBuyProductMutation,
+  GqlBuyProductMutationVariables
+>;
+export const GetProductDocument = gql`
+  query GetProduct($id: ID!) {
+    product(id: $id) {
+      ...ProductFields
+    }
+  }
+  ${ProductFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetProductQuery__
+ *
+ * To run a query within a React component, call `useGetProductQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProductQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProductQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetProductQuery(
+  baseOptions: Apollo.QueryHookOptions<GqlGetProductQuery, GqlGetProductQueryVariables> &
+    ({ variables: GqlGetProductQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetProductQuery, GqlGetProductQueryVariables>(
+    GetProductDocument,
+    options,
+  );
+}
+export function useGetProductLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetProductQuery, GqlGetProductQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetProductQuery, GqlGetProductQueryVariables>(
+    GetProductDocument,
+    options,
+  );
+}
+export function useGetProductSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetProductQuery, GqlGetProductQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetProductQuery, GqlGetProductQueryVariables>(
+    GetProductDocument,
+    options,
+  );
+}
+export type GetProductQueryHookResult = ReturnType<typeof useGetProductQuery>;
+export type GetProductLazyQueryHookResult = ReturnType<typeof useGetProductLazyQuery>;
+export type GetProductSuspenseQueryHookResult = ReturnType<typeof useGetProductSuspenseQuery>;
+export type GetProductQueryResult = Apollo.QueryResult<
+  GqlGetProductQuery,
+  GqlGetProductQueryVariables
+>;
 export const TicketIssueDocument = gql`
   mutation ticketIssue($input: TicketIssueInput!, $permission: CheckCommunityPermissionInput!) {
     ticketIssue(input: $input, permission: $permission) {

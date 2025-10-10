@@ -37,8 +37,9 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     pathname.startsWith("/sign-up") ||
     pathname === "/users/me/edit" ||
     (pathname.startsWith("/places") && placeId) ||
-    pathname.startsWith("/search") || 
-    pathname.startsWith("/wallets") || 
+    pathname.startsWith("/search") ||
+    pathname.startsWith("/wallets") ||
+    pathname.startsWith("/products") ||
     pathname.startsWith("/credentials") ||
     pathname.startsWith("/transactions")
   ) {
@@ -64,7 +65,10 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
           {currentCommunityConfig.enableFeatures.includes("opportunities") && (
             <Link
               href="/opportunities"
-              className={cn(getLinkStyle("/opportunities", "/opportunities/*", "opportunities/search/*"), "flex-grow")}
+              className={cn(
+                getLinkStyle("/opportunities", "/opportunities/*", "opportunities/search/*"),
+                "flex-grow",
+              )}
             >
               <Search size={24} />
               <span className="text-xs mt-1">見つける</span>
