@@ -39,6 +39,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   if (error || !data?.product) return <ErrorState title="商品情報を取得できませんでした" />;
 
   const { name, description, price, imageUrl, remainingSupply, startsAt, endsAt } = data.product;
+  const LOW_STOCK_THRESHOLD = 5;
 
   const infoCards: InfoCardProps[] = [
     {
@@ -80,7 +81,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         ) : (
           <NoticeCard
             title="決済について"
-            description="ブラウザで決済ページが開きます。支払い完了後は自動的にLINEに戻ります。"
+            description="新しいタブで決済ページが開きます。支払い完了後は自動的にLINEに戻ります。"
           />
         )}
       </div>
@@ -117,7 +118,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         </Button>
 
         {/* 在庫メッセージ */}
-        {remainingSupply <= 5 && (
+        {remainingSupply <= LOW_STOCK_THRESHOLD && (
           <p
             className={`text-xs mt-3 text-center ${
               remainingSupply === 0 ? "text-muted-foreground" : "text-warning"
