@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { NoticeCard } from "@/components/shared/NoticeCard";
 
 interface ApprovalSheetProps {
   isApplied: boolean;
@@ -26,6 +27,9 @@ interface ApprovalSheetProps {
   message: string;
   setMessage: (value: string) => void;
   DEFAULT_MESSAGE: string;
+  organizerBalance: bigint;
+  requiredPoints: number;
+  balanceLoading: boolean;
 }
 
 const ApprovalSheet: React.FC<ApprovalSheetProps> = ({
@@ -43,11 +47,22 @@ const ApprovalSheet: React.FC<ApprovalSheetProps> = ({
   message,
   setMessage,
   DEFAULT_MESSAGE,
+  organizerBalance,
+  requiredPoints,
+  balanceLoading,
 }) => {
   if (!isApplied) return null;
 
+  const isInsufficientBalance = !balanceLoading && organizerBalance < BigInt(requiredPoints);
+
   return (
     <div className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto p-6 bg-background border-t-2 border-b-card space-y-3">
+      {isInsufficientBalance && (
+        <NoticeCard
+          title="ポイント残高が不足しています"
+          description={`承認により${requiredPoints}ptが必要ですが、現在の残高は${organizerBalance.toString()}ptです。承認は可能ですが、後続の処理で失敗する可能性があります。`}
+        />
+      )}
       {/* 承認シート */}
       <Sheet open={isAcceptSheetOpen} onOpenChange={setIsAcceptSheetOpen}>
         <SheetTrigger asChild>

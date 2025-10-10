@@ -21,6 +21,7 @@ import AttendanceSheet from "@/app/admin/reservations/components/AttendanceSheet
 import { useAttendanceState } from "@/app/admin/reservations/hooks/attendance/useAttendanceState";
 import { useSaveAttendances } from "@/app/admin/reservations/hooks/attendance/useSaveAttendances";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useOrganizerWallet } from "@/app/admin/reservations/hooks/useOrganizerWallet";
 
 export default function ReservationPage() {
   const params = useParams();
@@ -103,6 +104,11 @@ export default function ReservationPage() {
 
   const { isApplied } = useReservationStatus(reservation);
 
+  const { currentPoint: organizerBalance, loading: balanceLoading } = useOrganizerWallet({
+    organizerId: opportunity?.createdByUser?.id,
+    communityId: opportunity?.community?.id || COMMUNITY_ID,
+  });
+
   const { handleAccept, handleReject, acceptLoading, rejectLoading } = useReservationApproval({
     id: id ?? "",
     reservation,
@@ -182,6 +188,9 @@ export default function ReservationPage() {
           message={approvalMessage}
           setMessage={setApprovalMessage}
           DEFAULT_MESSAGE={APPROVAL_DEFAULT_MESSAGE}
+          organizerBalance={organizerBalance}
+          requiredPoints={participantCount * (opportunity?.pointsToEarn || 0)}
+          balanceLoading={balanceLoading}
         />
       )}
 
@@ -214,6 +223,8 @@ export default function ReservationPage() {
           handleSaveAllAttendance={handleSaveAllAttendance}
           allEvaluated={allEvaluated}
           opportunity={opportunity}
+          organizerBalance={organizerBalance}
+          balanceLoading={balanceLoading}
         />
       )}
     </div>
