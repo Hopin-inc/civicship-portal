@@ -35,6 +35,7 @@ export async function initAuth(params: InitAuthParams) {
   const { setState, state } = useAuthStore.getState();
   if (state.isAuthInProgress) return;
 
+  TokenManager.clearDeprecatedCookies();
   setState({ isAuthInProgress: true, isAuthenticating: true });
 
   const environment = detectEnvironment();
