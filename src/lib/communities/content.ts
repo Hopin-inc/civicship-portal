@@ -1,5 +1,3 @@
-import fs from "fs";
-import path from "path";
 import { getCommunityIdFromEnv } from "./metadata";
 
 interface CommunityContent {
@@ -7,7 +5,7 @@ interface CommunityContent {
   noticeItems: string[];
 }
 
-const COMMUNITY_CONTENT: Record<string, CommunityContent> = {
+export const COMMUNITY_CONTENT: Record<string, CommunityContent> = {
   neo88: {
     noticeItems: [
       "ホストによる確認後に、予約が確定します。",
@@ -35,35 +33,6 @@ const COMMUNITY_CONTENT: Record<string, CommunityContent> = {
     termsFile: "default.md",
   },
 };
-
-export function getTermsContent(): string {
-  const communityId = getCommunityIdFromEnv();
-  const content = COMMUNITY_CONTENT[communityId];
-
-  const termsFile = content?.termsFile || COMMUNITY_CONTENT.default.termsFile;
-
-  if (!content || !content.termsFile) {
-    console.warn(
-      `Terms content for community "${communityId}" is not configured. Using default terms.`,
-    );
-  }
-
-  const termsPath = path.join(
-    process.cwd(),
-    "src",
-    "lib",
-    "communities",
-    "terms",
-    termsFile,
-  );
-
-  try {
-    return fs.readFileSync(termsPath, "utf-8");
-  } catch (error) {
-    console.error(`Failed to read terms file at ${termsPath}:`, error);
-    throw new Error(`Terms file not found: ${termsFile}`);
-  }
-}
 
 // 現在のコミュニティの注意事項を取得する関数
 export function getNoticeItems(): string[] {
