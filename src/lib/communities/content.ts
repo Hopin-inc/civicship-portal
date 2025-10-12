@@ -40,20 +40,12 @@ export function getTermsContent(): string {
   const communityId = getCommunityIdFromEnv();
   const content = COMMUNITY_CONTENT[communityId];
 
+  const termsFile = content?.termsFile || COMMUNITY_CONTENT.default.termsFile;
+
   if (!content || !content.termsFile) {
     console.warn(
       `Terms content for community "${communityId}" is not configured. Using default terms.`,
     );
-    const defaultTermsFile = COMMUNITY_CONTENT.default.termsFile;
-    const termsPath = path.join(
-      process.cwd(),
-      "src",
-      "lib",
-      "communities",
-      "terms",
-      defaultTermsFile,
-    );
-    return fs.readFileSync(termsPath, "utf-8");
   }
 
   const termsPath = path.join(
@@ -62,9 +54,15 @@ export function getTermsContent(): string {
     "lib",
     "communities",
     "terms",
-    content.termsFile,
+    termsFile,
   );
-  return fs.readFileSync(termsPath, "utf-8");
+
+  try {
+    return fs.readFileSync(termsPath, "utf-8");
+  } catch (error) {
+    console.error(`Failed to read terms file at ${termsPath}:`, error);
+    throw new Error(`Terms file not found: ${termsFile}`);
+  }
 }
 
 // 現在のコミュニティの注意事項を取得する関数

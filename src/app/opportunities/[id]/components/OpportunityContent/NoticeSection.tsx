@@ -11,7 +11,7 @@ export const NoticeSection: FC = () => {
         <h2 className="text-display-md text-foreground mb-4">注意事項</h2>
         <div className="space-y-4">
           {noticeItems.map((item, index) => (
-            <div key={index} className="flex items-center gap-3">
+            <div key={item} className="flex items-center gap-3">
               <IconWrapper color="warning">
                 <AlertCircle size={20} strokeWidth={2.5} />
               </IconWrapper>
