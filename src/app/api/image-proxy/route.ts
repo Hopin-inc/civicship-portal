@@ -1,22 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import serverLogger from '@/lib/logging/server';
 
-const ALLOWED_BUCKETS = [
-  'prod-civicship-storage-public',
-  'kyoso-dev-civicship-storage-public',
-];
-
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.searchParams.get('url');
 
   if (!url || !url.startsWith('https://storage.googleapis.com/')) {
     return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
-  }
-
-  const bucketMatch = url.match(/^https:\/\/storage\.googleapis\.com\/([^\/]+)/);
-  if (!bucketMatch || !ALLOWED_BUCKETS.includes(bucketMatch[1])) {
-    serverLogger.warn('Rejected image-proxy request for disallowed bucket', { url });
-    return NextResponse.json({ error: 'Bucket not allowed' }, { status: 403 });
   }
 
   try {
