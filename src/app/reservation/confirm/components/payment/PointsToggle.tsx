@@ -60,16 +60,18 @@ export const PointsToggle: React.FC<PointsToggleProps> = memo(
         {/* 上部セクション（常に青い背景） */}
         <div className={`flex items-center justify-between p-4 ${usePoints ? "bg-blue-50" : ""}`}>
           <div className="flex items-start gap-4">
-            <Switch
-              checked={usePoints}
-              onCheckedChange={toggleUsePoints}
-              disabled={maxPoints === 0 || disabled || forceEnabled}
-            />
+            {!forceEnabled && (
+              <Switch
+                checked={usePoints}
+                onCheckedChange={toggleUsePoints}
+                disabled={maxPoints === 0 || disabled}
+              />
+            )}
             <div className="flex flex-col gap-y-1">
-              <span className={`text-label-md ${disabled ? 'text-gray-400' : ''}`}>
+              <span className={`text-label-md ${disabled && !forceEnabled ? 'text-gray-400' : ''}`}>
                 ポイントを利用する
               </span>
-              <p className={`text-body-sm ${disabled ? 'text-gray-400' : ''}`}>
+              <p className={`text-body-sm ${disabled && !forceEnabled ? 'text-gray-400' : ''}`}>
                 保有しているポイント: {Number(maxPoints).toLocaleString()}pt
               </p>
               {disabled && !forceEnabled && (
