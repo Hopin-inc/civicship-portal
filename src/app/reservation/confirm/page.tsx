@@ -219,13 +219,15 @@ export default function ConfirmPage() {
         ) : null }
         <div className="mb-2" />
         {/* <NotesSection /> */}
-        <CommentTextarea
-          title={"主催者への伝言"}
-          description={"案内人の事前準備が変わる場合があるため、参加者の年齢等の記入にご協力ください"} 
-          placeholder="例）51歳、5歳で参加します"
-          value={ui.ageComment}
-          onChange={ui.setAgeComment}
-        />
+        <div className="mt-2">
+          <CommentTextarea
+            title={"主催者への伝言"}
+            description={"案内人の事前準備が変わる場合があるため、参加者の年齢等の記入にご協力ください"} 
+            placeholder="例）51歳、5歳で参加します"
+            value={ui.ageComment}
+            onChange={ui.setAgeComment}
+          />
+        </div>
         <div className="mb-4 mt-2" />
         <div className="mx-6 border-b border-gray-200 my-6"></div>
         {isQuest && (
