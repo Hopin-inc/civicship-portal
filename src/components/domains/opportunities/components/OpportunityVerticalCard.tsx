@@ -57,10 +57,12 @@ export default function OpportunityVerticalCard({
       <div className="mt-3">
         <h3 className="text-title-sm text-foreground line-clamp-2">{title}</h3>
         <div className="mt-2 flex flex-col">
-          <div className="text-body-sm text-muted-foreground flex items-center gap-1">
-            <JapaneseYenIcon className="w-4 h-4" />
-            {!price ? "参加無料" : `${price}円/人~`}
-          </div>
+          {price !== undefined && (
+            <div className="text-body-sm text-muted-foreground flex items-center gap-1">
+              <JapaneseYenIcon className="w-4 h-4" />
+              {!price ? "参加無料" : `${price}円/人~`}
+            </div>
+          )}
           {location && (
             <div className="flex items-center text-body-sm text-muted-foreground mt-1">
               <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />

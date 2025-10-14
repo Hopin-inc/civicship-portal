@@ -12,6 +12,7 @@ interface PointsToggleProps {
   remainingSlots: number;
   disabled: boolean;
   allDisabled: boolean;
+  forceEnabled?: boolean;
 }
 
 export const PointsToggle: React.FC<PointsToggleProps> = memo(
@@ -24,15 +25,17 @@ export const PointsToggle: React.FC<PointsToggleProps> = memo(
     onPointCountChange, 
     remainingSlots, 
     disabled,
-    allDisabled
+    allDisabled,
+    forceEnabled
   }) => {
     const [pointCount, setPointCount] = useState(0);
 
     const toggleUsePoints = useCallback(() => {
+      if (forceEnabled) return;
       if (maxPoints > 0 && !disabled) {
         setUsePoints(!usePoints);
       }
-    }, [maxPoints, setUsePoints, usePoints, disabled]);
+    }, [maxPoints, setUsePoints, usePoints, disabled, forceEnabled]);
 
     const handleIncrement = () => {
       const maxUsablePoints = Math.floor(maxPoints / (pointsRequired ?? 0));
@@ -60,7 +63,7 @@ export const PointsToggle: React.FC<PointsToggleProps> = memo(
             <Switch
               checked={usePoints}
               onCheckedChange={toggleUsePoints}
-              disabled={maxPoints === 0 || disabled}
+              disabled={maxPoints === 0 || disabled || forceEnabled}
             />
             <div className="flex flex-col gap-y-1">
               <span className={`text-label-md ${disabled ? 'text-gray-400' : ''}`}>
@@ -69,9 +72,14 @@ export const PointsToggle: React.FC<PointsToggleProps> = memo(
               <p className={`text-body-sm ${disabled ? 'text-gray-400' : ''}`}>
                 保有しているポイント: {Number(maxPoints).toLocaleString()}pt
               </p>
-              {disabled && (
+              {disabled && !forceEnabled && (
                 <p className="text-xs text-gray-500 mt-1">
                   チケットで参加者数分をカバーしているため使用できません
+                </p>
+              )}
+              {forceEnabled && (
+                <p className="text-xs text-gray-500 mt-1">
+                  この活動は参加費無料でポイント利用が必須です
                 </p>
               )}
             </div>

@@ -48,10 +48,12 @@ function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, locat
           </div>
           <div className="flex-1 px-4 py-3">
             <h2 className="text-title-sm text-foreground line-clamp-1">{title}</h2>
-            <p className="mt-1 text-body-sm text-muted-foreground flex items-center gap-1">
-              <JapaneseYenIcon className="w-4 h-4" />
-              {!price ? "参加無料" : `${price.toLocaleString()}円/人~`}
-            </p>
+            {price !== undefined && (
+              <p className="mt-1 text-body-sm text-muted-foreground flex items-center gap-1">
+                <JapaneseYenIcon className="w-4 h-4" />
+                {!price ? "参加無料" : `${price.toLocaleString()}円/人~`}
+              </p>
+            )}
             {location && (
               <div className="mt-1 flex items-center text-muted-foreground text-body-sm">
                 <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />

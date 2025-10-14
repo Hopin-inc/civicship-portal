@@ -22,6 +22,7 @@ interface PaymentSectionProps {
   onPointCountChange?: (count: number) => void;
   onTicketCountChange?: (count: number) => void;
   onSelectedTicketsChange?: (selectedTickets: { [ticketId: string]: number }) => void;
+  forcePointsEnabled?: boolean;
 }
 
 const PaymentSection: React.FC<PaymentSectionProps> = memo(
@@ -38,6 +39,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
     onPointCountChange,
     onTicketCountChange,
     onSelectedTicketsChange,
+    forcePointsEnabled,
   }) => {
     const [selectedTicketCount, setSelectedTicketCount] = useState(0);
     const [selectedPointCount, setSelectedPointCount] = useState(0);
@@ -111,6 +113,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
             onPointCountChange={handlePointCountChange}
             remainingSlots={remainingSlots}
             disabled={selectedTicketCount >= participantCount || !userWallet || userWallet < pointsRequired}
+            forceEnabled={forcePointsEnabled}
             allDisabled={allDisabled}
           />
         )}

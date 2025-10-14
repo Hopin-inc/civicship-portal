@@ -97,6 +97,15 @@ export default function ConfirmPage() {
     return <ErrorState title="予約情報を読み込めませんでした" refetchRef={ refetchRef } />;
   if (!opportunity) return notFound();
 
+  const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
+  const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired : 0;
+
+  useEffect(() => {
+    if ((feeRequired === null || feeRequired === 0) && pointsRequired > 0) {
+      ui.setUsePoints(true);
+    }
+  }, [feeRequired, pointsRequired, ui]);
+
   const handleConfirm = async () => {
     const result = await handleReservation({
       opportunity,
@@ -143,7 +152,6 @@ export default function ConfirmPage() {
   const isActivity = opportunity.category === GqlOpportunityCategory.Activity;
   const isQuest = opportunity.category === GqlOpportunityCategory.Quest;
   const maxTickets = availableTickets.reduce((sum, ticket) => sum + ticket.count, 0);
-  const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired:0;
   return (
     <>
       <main className="min-h-screen">
@@ -197,6 +205,7 @@ export default function ConfirmPage() {
             onPointCountChange={setSelectedPointCount}
             onTicketCountChange={setSelectedTicketCount}
             onSelectedTicketsChange={setSelectedTickets}
+            forcePointsEnabled={(feeRequired === null || feeRequired === 0) && pointsRequired > 0}
           />
           <div className="border-b border-gray-200 my-6"></div>
           </>
