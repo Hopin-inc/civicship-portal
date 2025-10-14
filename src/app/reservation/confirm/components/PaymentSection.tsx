@@ -115,6 +115,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
             remainingSlots={remainingSlots}
             disabled={selectedTicketCount >= participantCount || !userWallet || userWallet < pointsRequired}
             allDisabled={allDisabled}
+            isPointsOnly={isPointsOnly}
           />
         )}
       </div>

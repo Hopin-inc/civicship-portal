@@ -12,6 +12,7 @@ interface PointsToggleProps {
   remainingSlots: number;
   disabled: boolean;
   allDisabled: boolean;
+  isPointsOnly?: boolean;
 }
 
 export const PointsToggle: React.FC<PointsToggleProps> = memo(
@@ -24,7 +25,8 @@ export const PointsToggle: React.FC<PointsToggleProps> = memo(
     onPointCountChange, 
     remainingSlots, 
     disabled,
-    allDisabled
+    allDisabled,
+    isPointsOnly
   }) => {
     const [pointCount, setPointCount] = useState(0);
 
@@ -85,9 +87,20 @@ export const PointsToggle: React.FC<PointsToggleProps> = memo(
           }`}
         >
           <div className="p-4 space-y-4 border-gray-200 bg-background text-foreground">
-            <p className="text-body-sm text-caption">
-              1人あたり{pointsRequired?.toLocaleString()}ポイントで参加可能です。参加する人数を入力してください。
-            </p>
+            {isPointsOnly ? (
+              <p className="text-body-sm text-caption">
+                1人あたり{pointsRequired?.toLocaleString()}ポイントで参加可能です。参加する人数を入力してください。
+              </p>
+            ) : (
+              <>
+                <p className="text-body-sm text-caption">
+                  {pointsRequired?.toLocaleString()}ポイントごとに1人無料で参加可能です。
+                </p>
+                <p className="text-body-sm text-caption">
+                  ポイントを利用して参加する人数を入力してください。
+                </p>
+              </>
+            )}
             
             <div className="flex items-center justify-center">
               <Button
