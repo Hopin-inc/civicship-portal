@@ -244,6 +244,7 @@ export default function ConfirmPage() {
               usePoints={ ui.usePoints }
               pointCount={ selectedPointCount }
               pointsRequired={pointsRequired ? opportunity.pointsRequired : null }
+              isPointsOnly={(feeRequired === null || feeRequired === 0) && pointsRequired > 0}
             />
             <div className="border-b border-gray-200 my-6"></div>
           </div>

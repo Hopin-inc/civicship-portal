@@ -79,7 +79,7 @@ export const PointsToggle: React.FC<PointsToggleProps> = memo(
               )}
               {forceEnabled && (
                 <p className="text-xs text-gray-500 mt-1">
-                  この活動は参加費無料でポイント利用が必須です
+                  参加申込にはポイントが必要です
                 </p>
               )}
             </div>
@@ -94,10 +94,7 @@ export const PointsToggle: React.FC<PointsToggleProps> = memo(
         >
           <div className="p-4 space-y-4 border-gray-200 bg-background text-foreground">
             <p className="text-body-sm text-caption">
-              {pointsRequired?.toLocaleString()}ポイントごとに1人無料で参加可能です。
-            </p>
-            <p className="text-body-sm text-caption">
-              ポイントを利用して参加する人数を入力してください。
+              1人あたり{pointsRequired?.toLocaleString()}ポイントで参加可能です。参加する人数を入力してください。
             </p>
             
             <div className="flex items-center justify-center">

@@ -8,26 +8,32 @@ interface PaymentSummaryProps {
   usePoints: boolean;
   pointCount: number;
   pointsRequired: number | null;
+  isPointsOnly?: boolean;
 }
 
 export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
-  ({ pricePerPerson, participantCount, useTickets, ticketCount, usePoints, pointCount, pointsRequired }) => {
+  ({ pricePerPerson, participantCount, useTickets, ticketCount, usePoints, pointCount, pointsRequired, isPointsOnly }) => {
     const totalAmount = pricePerPerson != null ? pricePerPerson * (participantCount - ticketCount - pointCount) : null;
     const summaryAmount = totalAmount != null ? totalAmount : null;
     const hasPaymentMethod = usePoints && pointCount > 0 || useTickets && ticketCount > 0;
+    const totalPointsRequired = (pointsRequired ?? 0) * participantCount;
+    
     return (
       <>
         <div className="mb-[6px] flex justify-between items-center">
-          <h4 className="text-display-sm font-bold">合計金額</h4>
+          <h4 className="text-display-sm font-bold">{isPointsOnly ? "必要ポイント" : "合計金額"}</h4>
           <span
             className={`text-body-lg font-bold ${
-              pricePerPerson == null ? "text-muted-foreground/50" : ""
+              pricePerPerson == null && !isPointsOnly ? "text-muted-foreground/50" : ""
             }`}
           >
-            {totalAmount != null ? `${summaryAmount?.toLocaleString()}円` : "料金未定"}
+            {isPointsOnly 
+              ? `${totalPointsRequired.toLocaleString()}pt` 
+              : (totalAmount != null ? `${summaryAmount?.toLocaleString()}円` : "料金未定")
+            }
           </span>
         </div>
-        <p className="text-body-sm text-caption mb-4">料金は現地でお支払いください。</p>
+        {!isPointsOnly && <p className="text-body-sm text-caption mb-4">料金は現地でお支払いください。</p>}
 
         <div className="bg-muted rounded-lg p-4">
           <div className="space-y-2">
