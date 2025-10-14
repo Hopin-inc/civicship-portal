@@ -12,7 +12,6 @@ interface PointsToggleProps {
   remainingSlots: number;
   disabled: boolean;
   allDisabled: boolean;
-  forceEnabled?: boolean;
 }
 
 export const PointsToggle: React.FC<PointsToggleProps> = memo(
@@ -25,17 +24,15 @@ export const PointsToggle: React.FC<PointsToggleProps> = memo(
     onPointCountChange, 
     remainingSlots, 
     disabled,
-    allDisabled,
-    forceEnabled
+    allDisabled
   }) => {
     const [pointCount, setPointCount] = useState(0);
 
     const toggleUsePoints = useCallback(() => {
-      if (forceEnabled) return;
       if (maxPoints > 0 && !disabled) {
         setUsePoints(!usePoints);
       }
-    }, [maxPoints, setUsePoints, usePoints, disabled, forceEnabled]);
+    }, [maxPoints, setUsePoints, usePoints, disabled]);
 
     const handleIncrement = () => {
       const maxUsablePoints = Math.floor(maxPoints / (pointsRequired ?? 0));
@@ -60,28 +57,21 @@ export const PointsToggle: React.FC<PointsToggleProps> = memo(
         {/* 上部セクション（常に青い背景） */}
         <div className={`flex items-center justify-between p-4 ${usePoints ? "bg-blue-50" : ""}`}>
           <div className="flex items-start gap-4">
-            {!forceEnabled && (
-              <Switch
-                checked={usePoints}
-                onCheckedChange={toggleUsePoints}
-                disabled={maxPoints === 0 || disabled}
-              />
-            )}
+            <Switch
+              checked={usePoints}
+              onCheckedChange={toggleUsePoints}
+              disabled={maxPoints === 0 || disabled}
+            />
             <div className="flex flex-col gap-y-1">
-              <span className={`text-label-md ${disabled && !forceEnabled ? 'text-gray-400' : ''}`}>
+              <span className={`text-label-md ${disabled ? 'text-gray-400' : ''}`}>
                 ポイントを利用する
               </span>
-              <p className={`text-body-sm ${disabled && !forceEnabled ? 'text-gray-400' : ''}`}>
+              <p className={`text-body-sm ${disabled ? 'text-gray-400' : ''}`}>
                 保有しているポイント: {Number(maxPoints).toLocaleString()}pt
               </p>
-              {disabled && !forceEnabled && (
+              {disabled && (
                 <p className="text-xs text-gray-500 mt-1">
                   チケットで参加者数分をカバーしているため使用できません
-                </p>
-              )}
-              {forceEnabled && (
-                <p className="text-xs text-gray-500 mt-1">
-                  参加申込にはポイントが必要です
                 </p>
               )}
             </div>

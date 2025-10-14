@@ -193,8 +193,8 @@ export default function ConfirmPage() {
             onChange={ setParticipantCount }
           />
         </div>
-        <div className="mx-6 border-b border-gray-200 my-6"></div>
-        {isActivity && (pointsRequired > 0 || maxTickets > 0) ? (
+        {!isPointsOnly && <div className="mx-6 border-b border-gray-200 my-6"></div>}
+        {isActivity && (pointsRequired > 0 || maxTickets > 0) && !isPointsOnly ? (
           <>
           <PaymentSection
             ticketCount={ ticketCounter.count }
@@ -213,7 +213,6 @@ export default function ConfirmPage() {
             onPointCountChange={setSelectedPointCount}
             onTicketCountChange={setSelectedTicketCount}
             onSelectedTicketsChange={setSelectedTickets}
-            forcePointsEnabled={(feeRequired === null || feeRequired === 0) && pointsRequired > 0}
           />
           <div className="border-b border-gray-200 my-6"></div>
           </>

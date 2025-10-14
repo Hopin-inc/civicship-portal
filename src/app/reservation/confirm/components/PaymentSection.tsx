@@ -22,7 +22,6 @@ interface PaymentSectionProps {
   onPointCountChange?: (count: number) => void;
   onTicketCountChange?: (count: number) => void;
   onSelectedTicketsChange?: (selectedTickets: { [ticketId: string]: number }) => void;
-  forcePointsEnabled?: boolean;
 }
 
 const PaymentSection: React.FC<PaymentSectionProps> = memo(
@@ -36,14 +35,16 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
     userWallet,
     pointsRequired,
     availableTickets,
+    pricePerPerson,
     onPointCountChange,
     onTicketCountChange,
     onSelectedTicketsChange,
-    forcePointsEnabled,
   }) => {
     const [selectedTicketCount, setSelectedTicketCount] = useState(0);
     const [selectedPointCount, setSelectedPointCount] = useState(0);
     const [allDisabled, setAllDisabled] = useState(false);
+    
+    const isPointsOnly = (pricePerPerson === null || pricePerPerson === 0) && pointsRequired > 0;
 
     const totalSelected = selectedTicketCount + selectedPointCount;
     const remainingSlots = Math.max(0, participantCount - totalSelected);
@@ -103,7 +104,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
             onSelectedTicketsChange={handleSelectedTicketsChange}
           />
         )}
-        {pointsRequired > 0 && !forcePointsEnabled && (
+        {pointsRequired > 0 && !isPointsOnly && (
           <PointsToggle
             usePoints={usePoints}
             setUsePoints={setUsePoints}
@@ -113,7 +114,6 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
             onPointCountChange={handlePointCountChange}
             remainingSlots={remainingSlots}
             disabled={selectedTicketCount >= participantCount || !userWallet || userWallet < pointsRequired}
-            forceEnabled={forcePointsEnabled}
             allDisabled={allDisabled}
           />
         )}
