@@ -92,6 +92,17 @@ export default function ConfirmPage() {
   const ui = useReservationUIState();
   const { handleReservation, creatingReservation } = useReservationCommand();
 
+  useEffect(() => {
+    if (!opportunity) return;
+    
+    const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
+    const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired : 0;
+    
+    if ((feeRequired === null || feeRequired === 0) && pointsRequired > 0) {
+      ui.setUsePoints(true);
+    }
+  }, [opportunity, ui]);
+
   if (loading) return <LoadingIndicator />;
   if (hasError)
     return <ErrorState title="予約情報を読み込めませんでした" refetchRef={ refetchRef } />;
@@ -99,12 +110,6 @@ export default function ConfirmPage() {
 
   const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
   const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired : 0;
-
-  useEffect(() => {
-    if ((feeRequired === null || feeRequired === 0) && pointsRequired > 0) {
-      ui.setUsePoints(true);
-    }
-  }, [feeRequired, pointsRequired, ui]);
 
   const handleConfirm = async () => {
     const result = await handleReservation({
