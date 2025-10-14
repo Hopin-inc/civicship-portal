@@ -103,7 +103,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
             onSelectedTicketsChange={handleSelectedTicketsChange}
           />
         )}
-        {pointsRequired > 0 && (
+        {pointsRequired > 0 && !forcePointsEnabled && (
           <PointsToggle
             usePoints={usePoints}
             setUsePoints={setUsePoints}

@@ -157,6 +157,9 @@ export default function ConfirmPage() {
   const isActivity = opportunity.category === GqlOpportunityCategory.Activity;
   const isQuest = opportunity.category === GqlOpportunityCategory.Quest;
   const maxTickets = availableTickets.reduce((sum, ticket) => sum + ticket.count, 0);
+  const isPointsOnly = (feeRequired === null || feeRequired === 0) && pointsRequired > 0;
+  const totalPointsRequired = pointsRequired * participantCount;
+  const hasInsufficientPoints = isPointsOnly && (!userWallet || userWallet < totalPointsRequired);
   return (
     <>
       <main className="min-h-screen">
@@ -249,18 +252,25 @@ export default function ConfirmPage() {
             <div className="border-b border-gray-200 my-6"></div>
           </div>
         )}
-        <footer className="max-w-mobile-l w-full h-20 flex items-center px-4 py-4 justify-between mx-auto">
+        <footer className="max-w-mobile-l w-full flex flex-col items-center px-4 py-4 justify-between mx-auto">
           {isAuthenticated ? (
-          <Button
-            size="lg"
-            className="mx-auto px-20"
-            onClick={ handleConfirm }
-            disabled={
-              creatingReservation || (ui.useTickets && ticketCounter.count > availableTickets.length)
-            }
-          >
-            { getButtonText() }
-          </Button>
+          <>
+            <Button
+              size="lg"
+              className="mx-auto px-20"
+              onClick={ handleConfirm }
+              disabled={
+                creatingReservation || (ui.useTickets && ticketCounter.count > availableTickets.length) || hasInsufficientPoints
+              }
+            >
+              { getButtonText() }
+            </Button>
+            {hasInsufficientPoints && (
+              <p className="text-body-sm text-red-500 mt-2">
+                ポイントが不足しているため申し込みできません
+              </p>
+            )}
+          </>
         ) : (
           <Button
             size="lg"
