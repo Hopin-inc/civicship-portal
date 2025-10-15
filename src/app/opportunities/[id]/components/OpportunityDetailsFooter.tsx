@@ -70,7 +70,10 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
           <div>
             <p className="text-body-sm text-muted-foreground">1人あたり</p>
             {price === 0 && pointsRequired != null && pointsRequired > 0 ? (
-              <p className="text-body-lg font-bold">{`${pointsRequired.toLocaleString()}pt必要`}</p>
+              <p>
+                <span className="font-bold text-body-lg">{pointsRequired.toLocaleString()}pt</span>
+                <span className="text-sm font-normal">必要</span>
+              </p>
             ) : price !== null ? (
               <p className="text-body-lg font-bold">{`${price.toLocaleString()}円〜`}</p>
             ) : point === null ? (
@@ -78,7 +81,7 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
             ) : null}
             {point != null && (
               <p>
-                <span className="font-bold text-lg">{point.toLocaleString()}pt</span>
+                <span className="font-bold text-body-lg">{point.toLocaleString()}pt</span>
                 <span className="text-sm font-normal">もらえる</span>
               </p>
             )}
