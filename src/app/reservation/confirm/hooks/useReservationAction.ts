@@ -7,7 +7,7 @@ import {
   useCreateReservationMutation,
 } from "@/types/graphql";
 import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
-import { ActivityDetail, QuestDetail } from "@/components/domains/opportunity/types";
+import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
 import { ApolloError } from "@apollo/client";
@@ -58,6 +58,7 @@ interface ReservationParams {
   selectedTicketCount: number;
   selectedTickets?: { [ticketId: string]: number };
   comment?: string;
+  userWallet: number | null;
 }
 
 export const useReservationCommand = () => {
@@ -76,12 +77,24 @@ export const useReservationCommand = () => {
       usePoints,
       selectedPointCount,
       selectedTicketCount,
-      selectedTickets
+      selectedTickets,
+      userWallet
     }: ReservationParams): Promise<Result> => {
       if (loading) return { success: false, code: GqlErrorCode.Unknown };
       if (!user) return { success: false, code: GqlErrorCode.Unauthenticated };
       if (!opportunity || !selectedSlot)
         return { success: false, code: GqlErrorCode.ValidationError };
+
+      const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
+      const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired : 0;
+      const isPointsOnly = (feeRequired === null || feeRequired === 0) && pointsRequired > 0;
+      
+      if (isPointsOnly) {
+        const totalPointsRequired = pointsRequired * participantCount;
+        if (typeof userWallet !== 'number' || userWallet < totalPointsRequired) {
+          return { success: false, code: GqlErrorCode.ValidationError };
+        }
+      }
 
       const count = selectedTicketCount;
       const ticketIds = useTickets ? getSelectedTicketIds(wallets, selectedTickets) : [];

@@ -127,6 +127,7 @@ export default function ConfirmPage() {
       selectedPointCount: selectedPointCount,
       selectedTicketCount: selectedTicketCount,
       selectedTickets: selectedTickets,
+      userWallet: userWallet ?? null,
     });
 
     if (creatingReservation) {

@@ -7,6 +7,7 @@ export type ActivitySlotGroup = {
 
 export type ActivitySlot = OpportunitySlot & {
   feeRequired: number | null;
+  pointsRequired: number | null;
   opportunityId: string;
 };
 
