@@ -199,37 +199,15 @@ export class LiffService {
 
   public async signInWithLiffToken(): Promise<boolean> {
     const accessToken = this.getAccessToken();
+    if (!accessToken) return false;
+
     const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
-
-    logger.info("signInWithLiffToken started", {
-      authType: "liff",
-      component: "LiffService",
-      hasAccessToken: !!accessToken,
-      endpoint,
-    });
-
-    if (!accessToken) {
-      logger.info("signInWithLiffToken: no access token", {
-        authType: "liff",
-        component: "LiffService",
-        liffState: this.state,
-      });
-      return false;
-    }
-
     const authStateManager = AuthStateManager.getInstance();
 
     // 最大3回まで（token切れ or transient errorのみリトライ）
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
-        logger.info("Sending LIFF token exchange request", {
-          authType: "liff",
-          component: "LiffService",
-          attempt,
-          endpoint,
-        });
-
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
@@ -239,22 +217,7 @@ export class LiffService {
           body: JSON.stringify({ accessToken }),
         });
 
-        logger.info("LIFF token exchange response received", {
-          authType: "liff",
-          component: "LiffService",
-          status: response.status,
-          ok: response.ok,
-        });
-
         if (!response.ok) {
-          logger.info("LIFF token exchange failed", {
-            authType: "liff",
-            component: "LiffService",
-            status: response.status,
-            statusText: response.statusText,
-            attempt,
-          });
-
           if (response.status >= 500 || response.status === 401) {
             if (attempt < 3) continue;
           }
@@ -314,15 +277,6 @@ export class LiffService {
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
 
-        logger.info("signInWithLiffToken error caught", {
-          authType: "liff",
-          component: "LiffService",
-          attempt,
-          errorMessage: message,
-          errorName: error instanceof Error ? error.name : undefined,
-          errorStack: error instanceof Error ? error.stack : undefined,
-        });
-
         if (message.includes("401") || message.includes("network") || message.includes("fetch")) {
           await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s,2s,3s
           continue;
@@ -330,12 +284,6 @@ export class LiffService {
         break;
       }
     }
-
-    logger.info("signInWithLiffToken returning false after all attempts", {
-      authType: "liff",
-      component: "LiffService",
-      totalAttempts: 3,
-    });
 
     return false;
   }
