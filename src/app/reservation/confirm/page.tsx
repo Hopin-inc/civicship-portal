@@ -13,7 +13,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { toast } from "sonner";
 import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from '@/components/shared'
+import { ErrorState } from "@/components/shared";
 import { CommentTextarea } from "./components/ParticipationAge";
 import { errorMessages } from "@/utils/errorMessage";
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
@@ -37,7 +37,7 @@ export default function ConfirmPage() {
     [],
   );
   useHeaderConfig(headerConfig);
-  const { user,isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const router = useRouter();
 
   const {
@@ -82,7 +82,9 @@ export default function ConfirmPage() {
       },
     },
   });
-  const userWallet:number | null = walletData?.wallets?.edges?.find((edge) => edge?.node?.user?.id === user?.id)?.node?.currentPointView?.currentPoint;
+  const userWallet: number | null = walletData?.wallets?.edges?.find(
+    (edge) => edge?.node?.user?.id === user?.id,
+  )?.node?.currentPointView?.currentPoint;
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = triggerRefetch;
@@ -94,10 +96,10 @@ export default function ConfirmPage() {
 
   useEffect(() => {
     if (!opportunity) return;
-    
-    const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
-    const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired : 0;
-    
+
+    const feeRequired = "feeRequired" in opportunity ? opportunity.feeRequired : null;
+    const pointsRequired = "pointsRequired" in opportunity ? opportunity.pointsRequired : 0;
+
     if ((feeRequired === null || feeRequired === 0) && pointsRequired > 0) {
       ui.setUsePoints(true);
     }
@@ -105,11 +107,11 @@ export default function ConfirmPage() {
 
   if (loading) return <LoadingIndicator />;
   if (hasError)
-    return <ErrorState title="予約情報を読み込めませんでした" refetchRef={ refetchRef } />;
+    return <ErrorState title="予約情報を読み込めませんでした" refetchRef={refetchRef} />;
   if (!opportunity) return notFound();
 
-  const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
-  const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired : 0;
+  const feeRequired = "feeRequired" in opportunity ? opportunity.feeRequired : null;
+  const pointsRequired = "pointsRequired" in opportunity ? opportunity.pointsRequired : 0;
 
   const handleConfirm = async () => {
     const result = await handleReservation({
@@ -152,77 +154,81 @@ export default function ConfirmPage() {
       reservation_id: result.reservation.id,
       guests: participationCount.toString(),
     });
-    router.push(`/reservation/complete?${ query.toString() }`);
+    router.push(`/reservation/complete?${query.toString()}`);
   };
   const isActivity = opportunity.category === GqlOpportunityCategory.Activity;
   const isQuest = opportunity.category === GqlOpportunityCategory.Quest;
   const maxTickets = availableTickets.reduce((sum, ticket) => sum + ticket.count, 0);
   const isPointsOnly = (feeRequired === null || feeRequired === 0) && pointsRequired > 0;
   const totalPointsRequired = pointsRequired * participantCount;
-  const hasInsufficientPoints = isPointsOnly && typeof userWallet === 'number' && userWallet < totalPointsRequired;
+  const hasInsufficientPoints =
+    isPointsOnly && typeof userWallet === "number" && userWallet < totalPointsRequired;
   return (
     <>
       <main className="min-h-screen">
         <LoginModal
-          isOpen={ ui.isLoginModalOpen }
-          onClose={ () => ui.setIsLoginModalOpen(false) }
-          nextPath={ window.location.pathname + window.location.search as RawURIComponent }
+          isOpen={ui.isLoginModalOpen}
+          onClose={() => ui.setIsLoginModalOpen(false)}
+          nextPath={(window.location.pathname + window.location.search) as RawURIComponent}
         />
         <div className="px-6 py-4">
-          <NoticeCard title="申し込みは未確定です。" description="最後までご確認いただき確定させて下さい" />
+          <NoticeCard
+            title="申し込みは未確定です。"
+            description="最後までご確認いただき確定させて下さい"
+          />
         </div>
         <div className="mx-6 py-4 mt-2 border p-4 rounded-xl">
           <ReservationConfirmationCard
-            opportunity={ {
+            opportunity={{
               id: opportunity.id,
               title: opportunity.title,
-              feeRequired:'feeRequired' in opportunity ? opportunity.feeRequired : null,
+              feeRequired: "feeRequired" in opportunity ? opportunity.feeRequired : null,
               category: GqlOpportunityCategory.Activity,
               communityId: COMMUNITY_ID,
               images: opportunity.images,
               location: opportunity.place.name,
               hasReservableTicket: false,
-              pointsRequired: 'pointsRequired' in opportunity ? opportunity.pointsRequired : null,
+              pointsRequired: "pointsRequired" in opportunity ? opportunity.pointsRequired : null,
               slots: [],
-            } }
-            startDateTime={ startDateTime ?? null }
-            endDateTime={ endDateTime ?? null }
-            category={ opportunity.category }
-            withShadow={ false }
-            participantCount={ participantCount }
-            onChange={ setParticipantCount }
+            }}
+            startDateTime={startDateTime ?? null}
+            endDateTime={endDateTime ?? null}
+            category={opportunity.category}
+            withShadow={false}
+            participantCount={participantCount}
+            onChange={setParticipantCount}
           />
         </div>
         {!isPointsOnly && <div className="mx-6 border-b border-gray-200 my-6"></div>}
         {isActivity && (pointsRequired > 0 || maxTickets > 0) && !isPointsOnly ? (
-          <>
           <PaymentSection
-            ticketCount={ ticketCounter.count }
-            onIncrement={ ticketCounter.increment }
-            onDecrement={ ticketCounter.decrement }
-            maxTickets={ maxTickets }
-            availableTickets={ availableTickets }
-            pricePerPerson={ 'feeRequired' in opportunity ? opportunity.feeRequired : null }
-            participantCount={ participantCount }
-            useTickets={ ui.useTickets }
-            setUseTickets={ ui.setUseTickets }
-            userWallet={ userWallet }
-            usePoints={ ui.usePoints }
-            setUsePoints={ ui.setUsePoints }
-            pointsRequired={ 'pointsRequired' in opportunity ? opportunity.pointsRequired : 0 }
+            ticketCount={ticketCounter.count}
+            onIncrement={ticketCounter.increment}
+            onDecrement={ticketCounter.decrement}
+            maxTickets={maxTickets}
+            availableTickets={availableTickets}
+            pricePerPerson={"feeRequired" in opportunity ? opportunity.feeRequired : null}
+            participantCount={participantCount}
+            useTickets={ui.useTickets}
+            setUseTickets={ui.setUseTickets}
+            userWallet={userWallet}
+            usePoints={ui.usePoints}
+            setUsePoints={ui.setUsePoints}
+            pointsRequired={"pointsRequired" in opportunity ? opportunity.pointsRequired : 0}
             onPointCountChange={setSelectedPointCount}
             onTicketCountChange={setSelectedTicketCount}
             onSelectedTicketsChange={setSelectedTickets}
           />
-          <div className="border-b border-gray-200 my-6"></div>
-          </>
-        ) : null }
+        ) : null}
+        <div className="border-b border-gray-200 my-6"></div>
         <div className="mb-2" />
         {/* <NotesSection /> */}
-        <div className="mt-2">
+        <div>
           <CommentTextarea
             title={"主催者への伝言"}
-            description={"案内人の事前準備が変わる場合があるため、参加者の年齢等の記入にご協力ください"} 
+            description={
+              "案内人の事前準備が変わる場合があるため、参加者の年齢等の記入にご協力ください"
+            }
             placeholder="例）51歳、5歳で参加します"
             value={ui.ageComment}
             onChange={ui.setAgeComment}
@@ -232,22 +238,25 @@ export default function ConfirmPage() {
         <div className="mx-6 border-b border-gray-200 my-6"></div>
         {isQuest && (
           <>
-            <ExpectedPoints 
-              points={isQuestCategory(opportunity) ? opportunity.pointsToEarn * participantCount : null}
-              participantCount={participantCount} />
+            <ExpectedPoints
+              points={
+                isQuestCategory(opportunity) ? opportunity.pointsToEarn * participantCount : null
+              }
+              participantCount={participantCount}
+            />
             <div className="border-b border-gray-200 my-6"></div>
           </>
         )}
         {isActivity && (
           <div className="mx-6">
             <PaymentSummary
-              pricePerPerson={ isActivityCategory(opportunity) ? opportunity.feeRequired : null }
-              participantCount={ participantCount }
-              useTickets={ ui.useTickets }
-              ticketCount={ selectedTicketCount }
-              usePoints={ ui.usePoints }
-              pointCount={ selectedPointCount }
-              pointsRequired={pointsRequired ? opportunity.pointsRequired : null }
+              pricePerPerson={isActivityCategory(opportunity) ? opportunity.feeRequired : null}
+              participantCount={participantCount}
+              useTickets={ui.useTickets}
+              ticketCount={selectedTicketCount}
+              usePoints={ui.usePoints}
+              pointCount={selectedPointCount}
+              pointsRequired={pointsRequired ? opportunity.pointsRequired : null}
               isPointsOnly={(feeRequired === null || feeRequired === 0) && pointsRequired > 0}
             />
             <div className="border-b border-gray-200 my-6"></div>
@@ -255,37 +264,39 @@ export default function ConfirmPage() {
         )}
         <footer className="max-w-mobile-l w-full flex flex-col items-center px-4 py-4 justify-between mx-auto">
           {isAuthenticated ? (
-          <>
+            <>
+              <Button
+                size="lg"
+                className="mx-auto px-20"
+                onClick={handleConfirm}
+                disabled={
+                  creatingReservation ||
+                  (ui.useTickets && ticketCounter.count > availableTickets.length) ||
+                  hasInsufficientPoints
+                }
+              >
+                {getButtonText()}
+              </Button>
+              {hasInsufficientPoints && (
+                <p className="text-body-sm text-red-500 mt-2">
+                  ポイントが不足しているため申し込みできません
+                </p>
+              )}
+            </>
+          ) : (
             <Button
               size="lg"
+              variant="secondary"
               className="mx-auto px-20"
-              onClick={ handleConfirm }
-              disabled={
-                creatingReservation || (ui.useTickets && ticketCounter.count > availableTickets.length) || hasInsufficientPoints
-              }
+              onClick={() => ui.setIsLoginModalOpen(true)}
             >
-              { getButtonText() }
-            </Button>
-            {hasInsufficientPoints && (
-              <p className="text-body-sm text-red-500 mt-2">
-                ポイントが不足しているため申し込みできません
+              <p className="whitespace-pre-line">
+                <span className="text-label-md font-bold">LINEログインして</span>
+                <br />
+                <span className="text-label-lg pt-1 font-bold">申し込む</span>
               </p>
-            )}
-          </>
-        ) : (
-          <Button
-            size="lg"
-            variant="secondary"
-            className="mx-auto px-20"
-            onClick={ () => ui.setIsLoginModalOpen(true) }
-          >
-            <p className="whitespace-pre-line">
-              <span className="text-label-md font-bold">LINEログインして</span>
-              <br />
-              <span className="text-label-lg pt-1 font-bold">申し込む</span>
-            </p>
-          </Button>
-        )}
+            </Button>
+          )}
         </footer>
       </main>
     </>
