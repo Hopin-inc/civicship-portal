@@ -11,8 +11,16 @@ export async function initializeFirebase(
   if (environment === AuthEnvironment.LIFF) {
     try {
       await liffService.initialize();
-    } catch (err) {
-      logger.warn("LIFF initialization failed", { err });
+      const liffState = liffService.getState();
+      if (liffState.isLoggedIn) {
+        try {
+          await liffService.signInWithLiffToken();
+        } catch (signInErr) {
+          logger.warn("LIFF sign-in with token failed", { err: signInErr });
+        }
+      }
+    } catch (initErr) {
+      logger.warn("LIFF initialization failed", { err: initErr });
     }
   }
 
