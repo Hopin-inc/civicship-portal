@@ -52,7 +52,7 @@ function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, locat
             {price !== undefined && (
               <div className="text-body-sm text-muted-foreground flex items-center gap-1">
                 <JapaneseYenIcon className="w-4 h-4" />
-                <p>{!price ? "参加無料" : `${price}円/人~`}</p>
+                <p>{!price ? "参加無料" : `${price.toLocaleString()}円/人~`}</p>
               </div>
             )}
             {price === undefined && pointsRequired != null && pointsRequired > 0 && (
