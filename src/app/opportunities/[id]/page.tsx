@@ -85,6 +85,7 @@ export default function OpportunityDetailPage() {
         opportunityId={opportunity.id}
         price={isActivityCategory(opportunity) ? opportunity.feeRequired : null}
         point={isQuestCategory(opportunity) ? opportunity.pointsToEarn : null}
+        pointsRequired={isActivityCategory(opportunity) ? opportunity.pointsRequired : null}
         communityId={community_id}
         disableReason={getDisableReason(sortedSlots, isExternalBooking, opportunity.isReservable)}
       />

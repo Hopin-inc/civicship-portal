@@ -15,11 +15,12 @@ type Props = {
   price?: number | null;
   location?: string;
   pointsToEarn?: number | null;
+  pointsRequired?: number | null;
   href?: string;
   withShadow?: boolean;
 };
 
-function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, location, pointsToEarn, href, withShadow = true }: Props) {
+function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, location, pointsToEarn, pointsRequired, href, withShadow = true }: Props) {
   return (
     <Link
       href={href ?? ""}
@@ -53,6 +54,16 @@ function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, locat
                 <JapaneseYenIcon className="w-4 h-4" />
                 {!price ? "参加無料" : `${price.toLocaleString()}円/人~`}
               </p>
+            )}
+            {price === undefined && pointsRequired != null && pointsRequired > 0 && (
+              <div className="mt-1 flex items-center gap-1">
+                <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+                  P
+                </p>
+                <p className="text-sm font-bold">
+                  {pointsRequired.toLocaleString()}pt必要
+                </p>
+              </div>
             )}
             {location && (
               <div className="mt-1 flex items-center text-muted-foreground text-body-sm">

@@ -13,6 +13,7 @@ interface OpportunityDetailsFooterProps {
   opportunityId: string;
   price: number | null;
   point: number | null;
+  pointsRequired?: number | null;
   communityId: string | undefined;
   disableReason?: DisableReasonType;
 }
@@ -27,6 +28,7 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
   opportunityId,
   price,
   point,
+  pointsRequired,
   communityId,
   disableReason,
 }) => {
@@ -67,7 +69,9 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
         <div>
           <div>
             <p className="text-body-sm text-muted-foreground">1人あたり</p>
-            {price !== null ? (
+            {price === 0 && pointsRequired != null && pointsRequired > 0 ? (
+              <p className="text-body-lg font-bold">{`${pointsRequired.toLocaleString()}pt必要`}</p>
+            ) : price !== null ? (
               <p className="text-body-lg font-bold">{`${price.toLocaleString()}円〜`}</p>
             ) : point === null ? (
               <p className="text-body-lg font-bold text-muted-foreground/50">料金未定</p>

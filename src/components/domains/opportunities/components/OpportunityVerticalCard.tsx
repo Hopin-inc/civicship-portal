@@ -14,6 +14,7 @@ interface OpportunityVerticalCardProps {
   price?: number | null;
   location?: string;
   pointsToEarn?: number | null;
+  pointsRequired?: number | null;
   href?: string;
   onClick?: () => void;
 }
@@ -26,6 +27,7 @@ export default function OpportunityVerticalCard({
   price,
   location,
   pointsToEarn,
+  pointsRequired,
   href,
   onClick,
 }: OpportunityVerticalCardProps) {
@@ -61,6 +63,16 @@ export default function OpportunityVerticalCard({
             <div className="text-body-sm text-muted-foreground flex items-center gap-1">
               <JapaneseYenIcon className="w-4 h-4" />
               {!price ? "参加無料" : `${price}円/人~`}
+            </div>
+          )}
+          {price === undefined && pointsRequired != null && pointsRequired > 0 && (
+            <div className="flex items-center gap-1">
+              <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+                P
+              </p>
+              <p className="text-sm font-bold">
+                {pointsRequired.toLocaleString()}pt必要
+              </p>
             </div>
           )}
           {location && (
