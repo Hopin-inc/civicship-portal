@@ -97,10 +97,7 @@ export const useLineAuthProcessing = ({
           component: "useLineAuthProcessing",
         });
       } finally {
-        setState({ 
-          isAuthenticating: false,
-          isAuthInProgress: false,
-        });
+        setState({ isAuthenticating: false });
         // Delay reset slightly to avoid immediate re-trigger in concurrent renders
         setTimeout(() => {
           processedRef.current = false;
