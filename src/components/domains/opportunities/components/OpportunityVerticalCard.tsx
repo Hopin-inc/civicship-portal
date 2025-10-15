@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { JapaneseYenIcon, MapPin } from "lucide-react";
+import React from "react";
 
 interface OpportunityVerticalCardProps {
   title: string;
@@ -41,8 +42,8 @@ export default function OpportunityVerticalCard({
           </div>
         )}
         <Image
-          src={image || PLACEHOLDER_IMAGE}
-          alt={imageAlt || title}
+          src={image ?? PLACEHOLDER_IMAGE}
+          alt={imageAlt ?? title}
           width={400}
           height={400}
           sizes="164px"
@@ -62,30 +63,28 @@ export default function OpportunityVerticalCard({
           {price !== undefined && (
             <div className="text-body-sm text-muted-foreground flex items-center gap-1">
               <JapaneseYenIcon className="w-4 h-4" />
-              {!price ? "参加無料" : `${price}円/人~`}
+              <p>{!price ? "参加無料" : `${price}円/人~`}</p>
             </div>
           )}
           {price === undefined && pointsRequired != null && pointsRequired > 0 && (
-            <div className="flex items-center gap-1">
-              <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+            <div className="text-body-sm text-muted-foreground flex items-center gap-1">
+              <span className="text-[11px] rounded-full w-4 h-4 flex items-center justify-center border border-muted-foreground leading-none">
                 P
-              </p>
-              <p className="text-sm font-bold">
-                {pointsRequired.toLocaleString()}pt必要
-              </p>
+              </span>
+              <p>{pointsRequired.toLocaleString()}pt/人~</p>
             </div>
           )}
           {location && (
             <div className="flex items-center text-body-sm text-muted-foreground mt-1">
               <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
-              <span className="line-clamp-1 break-words">{location}</span>
+              <p className="line-clamp-1 break-words">{location}</p>
             </div>
           )}
           {pointsToEarn != null && (
             <div className="flex items-center gap-1 pt-1">
-              <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+              <span className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
                 P
-              </p>
+              </span>
               <p className="text-sm font-bold">
                 {pointsToEarn.toLocaleString()}ptもらえる
               </p>
