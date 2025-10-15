@@ -163,7 +163,7 @@ export default function ConfirmPage() {
   const isPointsOnly = (feeRequired === null || feeRequired === 0) && pointsRequired > 0;
   const totalPointsRequired = pointsRequired * participantCount;
   const hasInsufficientPoints =
-    isPointsOnly && typeof userWallet === "number" && userWallet < totalPointsRequired;
+    isPointsOnly && (typeof userWallet !== "number" || userWallet < totalPointsRequired);
   return (
     <>
       <main className="min-h-screen">
