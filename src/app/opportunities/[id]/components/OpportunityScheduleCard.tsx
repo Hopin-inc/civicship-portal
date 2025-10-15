@@ -14,6 +14,7 @@ interface OpportunityScheduleCardProps {
   communityId: string;
   place?:number | null;
   points?:number | null;
+  pointsRequired?:number | null;
 }
 
 export const OpportunityScheduleCard: React.FC<OpportunityScheduleCardProps> = ({
@@ -22,14 +23,15 @@ export const OpportunityScheduleCard: React.FC<OpportunityScheduleCardProps> = (
   communityId,
   place,
   points,
+  pointsRequired,
 }) => {
   const isFull = slot.remainingCapacity === 0;
   return isFull
-    ? renderFullSlotCard(slot, place, points)
-    : renderAvailableSlotCard(slot, opportunityId, communityId, place, points);
+    ? renderFullSlotCard(slot, place, points, pointsRequired)
+    : renderAvailableSlotCard(slot, opportunityId, communityId, place, points, pointsRequired);
 };
 
-const renderFullSlotCard = (slot: ActivitySlot | QuestSlot, place?:number | null, points?:number | null) => {
+const renderFullSlotCard = (slot: ActivitySlot | QuestSlot, place?:number | null, points?:number | null, pointsRequired?:number | null) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
 
@@ -52,7 +54,16 @@ const renderFullSlotCard = (slot: ActivitySlot | QuestSlot, place?:number | null
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            {place != null ? (
+            {place === 0 && pointsRequired != null && pointsRequired > 0 ? (
+              <div className="flex items-center gap-1 mt-4">
+                <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+                  P
+                </p>
+                <p className="text-body-md font-bold">
+                  {pointsRequired.toLocaleString()}pt必要
+                </p>
+              </div>
+            ) : place != null ? (
               <p className="text-body-md font-bold  mt-4">
                 {`${place.toLocaleString()}円`}
               </p>
@@ -61,7 +72,7 @@ const renderFullSlotCard = (slot: ActivitySlot | QuestSlot, place?:number | null
                 料金未定
               </p>
             ) : null}
-            {place != null && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
+            {place != null && place > 0 && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
           </div>
           {points != null && (
             <div className="flex items-center gap-1 pt-1">
@@ -91,6 +102,7 @@ const renderAvailableSlotCard = (
   communityId: string,
   place?:number | null,
   points?:number | null,
+  pointsRequired?:number | null,
 ) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
@@ -124,7 +136,16 @@ const renderAvailableSlotCard = (
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            {place != null ? (
+            {place === 0 && pointsRequired != null && pointsRequired > 0 ? (
+              <div className="flex items-center gap-1 mt-4">
+                <p className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
+                  P
+                </p>
+                <p className="text-body-md font-bold">
+                  {pointsRequired.toLocaleString()}pt必要
+                </p>
+              </div>
+            ) : place != null ? (
               <p className="text-body-md font-bold  mt-4">
                 {`${place.toLocaleString()}円`}
               </p>
@@ -133,7 +154,7 @@ const renderAvailableSlotCard = (
                 料金未定
               </p>
             ) : null}
-            {place != null && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
+            {place != null && place > 0 && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
           </div>
           {points != null && (
             <div className="flex items-center gap-1 pt-1">
