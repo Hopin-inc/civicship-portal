@@ -111,7 +111,7 @@ export const useReservationCommand = () => {
               paymentMethod: useTickets ? "TICKET" : "FEE",
               ticketIdsIfNeed: useTickets ? ticketIds : undefined,
               comment: comment ?? undefined,
-              participantCountWithPoint: usePoints ? selectedPointCount : undefined,
+              participantCountWithPoint: isPointsOnly ? participantCount : (usePoints ? selectedPointCount : undefined),
             },
           },
         });
