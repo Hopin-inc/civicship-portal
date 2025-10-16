@@ -26,9 +26,7 @@ export const useAvailableTickets = (
     // ✅ 1. ticketsInputが配列構造かedges構造かを吸収してフラット化
     const tickets: GqlTicket[] = Array.isArray(ticketsInput)
       ? ticketsInput
-      : Array.isArray(ticketsInput?.edges)
-        ? ticketsInput.edges.map((e) => e.node)
-        : [];
+      : (ticketsInput?.edges?.map((e) => e.node) ?? []);
 
     // ✅ 2. 空なら即リターン
     if (tickets.length === 0) return [];
