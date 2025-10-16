@@ -17,7 +17,7 @@ import { ErrorState } from "@/components/shared";
 import { CommentTextarea } from "./components/ParticipationAge";
 import { errorMessages } from "@/utils/errorMessage";
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
-import { GqlOpportunityCategory, GqlWalletType, useGetMemberWalletsQuery } from "@/types/graphql";
+import { GqlOpportunityCategory } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
@@ -69,22 +69,13 @@ export default function ConfirmPage() {
     startDateTime,
     endDateTime,
     availableTickets,
+    currentPoint,
     loading,
     hasError,
     triggerRefetch,
   } = useReservationConfirm({ opportunityId, slotId, userId: user?.id });
 
-  const { data: walletData } = useGetMemberWalletsQuery({
-    variables: {
-      filter: {
-        userId: user?.id,
-        type: GqlWalletType.Member,
-      },
-    },
-  });
-  const userWallet: number | null = walletData?.wallets?.edges?.find(
-    (edge) => edge?.node?.user?.id === user?.id,
-  )?.node?.currentPointView?.currentPoint;
+  const userWallet: number = currentPoint;
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = triggerRefetch;
@@ -127,7 +118,7 @@ export default function ConfirmPage() {
       selectedPointCount: selectedPointCount,
       selectedTicketCount: selectedTicketCount,
       selectedTickets: selectedTickets,
-      userWallet: userWallet ?? null,
+      userWallet: userWallet,
     });
 
     if (creatingReservation) {
