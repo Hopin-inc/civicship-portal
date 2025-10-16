@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import LoginModal from "@/app/login/components/LoginModal";
-import PaymentSection from "@/app/reservation/confirm/components/PaymentSection";
+import PaymentSection from "@/app/reservation/confirm/components/payment/PaymentSection";
 import { useReservationConfirm } from "@/app/reservation/confirm/hooks/useReservationConfirm";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCounter";
@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
-import { CommentTextarea } from "./components/ParticipationAge";
+import { CommentTextarea } from "./components/CommentTextarea";
 import { errorMessages } from "@/utils/errorMessage";
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
 import { GqlOpportunityCategory } from "@/types/graphql";
@@ -23,8 +23,8 @@ import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
 import { NoticeCard } from "@/components/shared/NoticeCard";
 import { ReservationConfirmationCard } from "@/app/reservation/confirm/components/ReservationConfirmationCard";
-import { ExpectedPoints } from "./components/ExpectedPoints";
-import { PaymentSummary } from "./components/PaymentSummary";
+import { ExpectedPoints } from "./components/payment/ExpectedPoints";
+import { PaymentSummary } from "./components/payment/PaymentSummary";
 import { isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 
 export default function ConfirmPage() {

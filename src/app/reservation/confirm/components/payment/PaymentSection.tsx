@@ -1,8 +1,6 @@
-import React, { memo, useState, useCallback, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { TicketsToggle } from "./payment/TicketsToggle";
-import { PaymentSummary } from "./PaymentSummary";
-import { PointsToggle } from "./payment/PointsToggle";
+import React, { memo, useCallback, useEffect, useState } from "react";
+import { TicketsToggle } from "./TicketsToggle";
+import { PointsToggle } from "./PointsToggle";
 import { AvailableTicket } from "@/app/tickets/hooks/useAvailableTickets";
 
 interface PaymentSectionProps {
@@ -43,7 +41,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
     const [selectedTicketCount, setSelectedTicketCount] = useState(0);
     const [selectedPointCount, setSelectedPointCount] = useState(0);
     const [allDisabled, setAllDisabled] = useState(false);
-    
+
     const isPointsOnly = (pricePerPerson === null || pricePerPerson === 0) && pointsRequired > 0;
 
     const totalSelected = selectedTicketCount + selectedPointCount;
@@ -51,42 +49,51 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
 
     useEffect(() => {
       const shouldBeDisabled = selectedTicketCount + selectedPointCount >= participantCount;
-      
-      if(shouldBeDisabled) {
+
+      if (shouldBeDisabled) {
         setAllDisabled(true);
       } else {
         setAllDisabled(false);
       }
     }, [selectedTicketCount, selectedPointCount, participantCount]);
 
-    const handleTicketCountChange = useCallback((count: number) => {
-      setSelectedTicketCount(count);
-      if (onTicketCountChange) {
-        onTicketCountChange(count);
-      }
-    }, [onTicketCountChange]);
+    const handleTicketCountChange = useCallback(
+      (count: number) => {
+        setSelectedTicketCount(count);
+        if (onTicketCountChange) {
+          onTicketCountChange(count);
+        }
+      },
+      [onTicketCountChange],
+    );
 
-    const handlePointCountChange = useCallback((count: number) => {
-      setSelectedPointCount(count);
-      if (onPointCountChange) {
-        onPointCountChange(count);
-      }
-    }, [onPointCountChange]);
+    const handlePointCountChange = useCallback(
+      (count: number) => {
+        setSelectedPointCount(count);
+        if (onPointCountChange) {
+          onPointCountChange(count);
+        }
+      },
+      [onPointCountChange],
+    );
 
-    const handleSelectedTicketsChange = useCallback((tickets: { [ticketId: string]: number }) => {
-      if (onSelectedTicketsChange) {
-        onSelectedTicketsChange(tickets);
-      }
-    }, [onSelectedTicketsChange]);
+    const handleSelectedTicketsChange = useCallback(
+      (tickets: { [ticketId: string]: number }) => {
+        if (onSelectedTicketsChange) {
+          onSelectedTicketsChange(tickets);
+        }
+      },
+      [onSelectedTicketsChange],
+    );
     const getTitle = () => {
       if (maxTickets > 0 && pointsRequired > 0) {
         return "ポイント・チケットを利用";
-      } else if(pointsRequired > 0) {
+      } else if (pointsRequired > 0) {
         return "ポイントを利用";
-      }else{
+      } else {
         return "チケットを利用";
       }
-    }
+    };
     return (
       <div className="rounded-lg px-6">
         <h3 className="text-display-sm mb-4">{getTitle()}</h3>
@@ -113,7 +120,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
             pointsRequired={pointsRequired}
             onPointCountChange={handlePointCountChange}
             remainingSlots={remainingSlots}
-            disabled={selectedTicketCount >= participantCount || !userWallet || userWallet < pointsRequired}
+            disabled={
+              selectedTicketCount >= participantCount || !userWallet || userWallet < pointsRequired
+            }
             allDisabled={allDisabled}
             isPointsOnly={isPointsOnly}
           />
