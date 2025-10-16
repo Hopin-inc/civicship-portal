@@ -3,9 +3,10 @@
 import React, { useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { GqlParticipation, useGetReservationQuery } from "@/types/graphql";
+import { GqlParticipation, GqlEvaluationStatus, useGetReservationQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
+import { NoticeCard } from "@/components/shared/NoticeCard";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import getReservationStatusMeta from "@/app/admin/reservations/hooks/useGetReservationStatusMeta";
 import NotFound from "@/app/not-found";
@@ -111,6 +112,18 @@ export default function ReservationPage() {
     communityId: opportunity?.community?.id || COMMUNITY_ID,
   });
 
+  const passedCount = Object.values(attendanceData).filter(
+    (status) => status === GqlEvaluationStatus.Passed
+  ).length;
+
+  const requiredPointsForApproval = participantCount * (opportunity?.pointsToEarn || 0);
+  const requiredPointsForAttendance = passedCount * (opportunity?.pointsToEarn || 0);
+  
+  const isInsufficientBalanceForApproval = 
+    !balanceLoading && organizerBalance < BigInt(requiredPointsForApproval);
+  const isInsufficientBalanceForAttendance = 
+    !balanceLoading && organizerBalance < BigInt(requiredPointsForAttendance);
+
   const { handleAccept, handleReject, acceptLoading, rejectLoading } = useReservationApproval({
     id: id ?? "",
     reservation,
@@ -190,6 +203,24 @@ export default function ReservationPage() {
         />
       </div>
 
+      {mode === "approval" && isApplied() && isInsufficientBalanceForApproval && (
+        <div className="mt-4">
+          <NoticeCard
+            title="ポイント残高が不足しています"
+            description={`承認により${requiredPointsForApproval}ptが必要ですが、現在の残高は${organizerBalance.toString()}ptです。承認は可能ですが、後続の処理で失敗する可能性があります。`}
+          />
+        </div>
+      )}
+
+      {mode === "attendance" && isInsufficientBalanceForAttendance && (
+        <div className="mt-4">
+          <NoticeCard
+            title="ポイント残高が不足しています"
+            description={`出席者への報酬支払いに${requiredPointsForAttendance}ptが必要ですが、現在の残高は${organizerBalance.toString()}ptです。`}
+          />
+        </div>
+      )}
+
       {mode === "approval" && (
         <ApprovalSheet
           isApplied={isApplied()}
@@ -206,9 +237,7 @@ export default function ReservationPage() {
           message={approvalMessage}
           setMessage={setApprovalMessage}
           DEFAULT_MESSAGE={APPROVAL_DEFAULT_MESSAGE}
-          organizerBalance={organizerBalance}
-          requiredPoints={participantCount * (opportunity?.pointsToEarn || 0)}
-          balanceLoading={balanceLoading}
+          isInsufficientBalance={isInsufficientBalanceForApproval}
         />
       )}
 
@@ -241,8 +270,7 @@ export default function ReservationPage() {
           handleSaveAllAttendance={handleSaveAllAttendance}
           allEvaluated={allEvaluated}
           opportunity={opportunity}
-          organizerBalance={organizerBalance}
-          balanceLoading={balanceLoading}
+          isInsufficientBalance={isInsufficientBalanceForAttendance}
         />
       )}
     </div>

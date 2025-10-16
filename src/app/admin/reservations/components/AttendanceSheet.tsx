@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/sheet";
 import { GqlEvaluationStatus, GqlParticipation, GqlOpportunity, GqlOpportunityCategory } from "@/types/graphql";
 import { cn } from "@/lib/utils";
-import { NoticeCard } from "@/components/shared/NoticeCard";
 
 interface AttendanceListProps {
   participations: GqlParticipation[];
@@ -27,8 +26,7 @@ interface AttendanceListProps {
   handleSaveAllAttendance: () => void;
   allEvaluated: boolean;
   opportunity?: GqlOpportunity | null;
-  organizerBalance: bigint;
-  balanceLoading: boolean;
+  isInsufficientBalance: boolean;
 }
 
 const AttendanceList: React.FC<AttendanceListProps> = ({
@@ -43,16 +41,8 @@ const AttendanceList: React.FC<AttendanceListProps> = ({
   handleSaveAllAttendance,
   allEvaluated,
   opportunity,
-  organizerBalance,
-  balanceLoading,
+  isInsufficientBalance,
 }) => {
-  const passedCount = Object.values(attendanceData).filter(
-    (status) => status === GqlEvaluationStatus.Passed
-  ).length;
-  
-  const requiredPoints = passedCount * (opportunity?.pointsToEarn || 0);
-  const isInsufficientBalance = !balanceLoading && organizerBalance < BigInt(requiredPoints);
-
   return (
     <div>
       <h2 className="text-title-sm font-bold mb-3">参加者</h2>
@@ -102,21 +92,9 @@ const AttendanceList: React.FC<AttendanceListProps> = ({
             <SheetTrigger asChild>
               {participations.length > 0 && !isSaved && (
                 <div className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto p-4 bg-background border-t-2 border-b-card space-y-3 z-50">
-                  {isInsufficientBalance ? (
-                    <div className="space-y-3">
-                      <NoticeCard
-                        title="ポイント残高が不足しています"
-                        description={`出席者への報酬支払いに${requiredPoints}ptが必要ですが、現在の残高は${organizerBalance.toString()}ptです。`}
-                      />
-                      <Button className="w-full py-4" size="lg" disabled>
-                        残高不足のため保存できません
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button className="w-full py-4" size="lg" disabled={isSaving || !allEvaluated}>
-                      {isSaving ? "保存中…" : "出欠を保存する"}
-                    </Button>
-                  )}
+                  <Button className="w-full py-4" size="lg" disabled={isSaving || !allEvaluated || isInsufficientBalance}>
+                    {isSaving ? "保存中…" : "出欠を保存する"}
+                  </Button>
                 </div>
               )}
             </SheetTrigger>
