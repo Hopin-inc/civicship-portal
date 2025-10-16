@@ -75,7 +75,7 @@ export default function ConfirmPage() {
     triggerRefetch,
   } = useReservationConfirm({ opportunityId, slotId, userId: user?.id });
 
-  const userWallet: number = currentPoint;
+  const userWallet: number | null = currentPoint;
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = triggerRefetch;
@@ -108,7 +108,7 @@ export default function ConfirmPage() {
     const result = await handleReservation({
       opportunity,
       selectedSlot,
-      wallets,
+      wallets: wallets as any,
       user: user ?? null,
       ticketCounter,
       participantCount,
@@ -154,7 +154,7 @@ export default function ConfirmPage() {
   const isPointsOnly = (feeRequired === null || feeRequired === 0) && pointsRequired > 0;
   const totalPointsRequired = pointsRequired * participantCount;
   const hasInsufficientPoints =
-    isPointsOnly && (typeof userWallet !== "number" || userWallet < totalPointsRequired);
+    isPointsOnly && (userWallet === null || userWallet < totalPointsRequired);
   return (
     <>
       <main className="min-h-screen">

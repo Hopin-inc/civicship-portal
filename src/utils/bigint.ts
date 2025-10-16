@@ -9,30 +9,29 @@
  * GraphQLのBigInt型（文字列としてシリアライズ）を数値に変換
  * 
  * @param value - BigInt値（文字列または数値）
- * @returns 数値（無効な値の場合は0）
+ * @returns 数値（データが存在しない場合はnull）
  * 
  * @example
  * parseBigIntToNumber("100") // 100
  * parseBigIntToNumber(100) // 100
- * parseBigIntToNumber(null) // 0
- * parseBigIntToNumber(undefined) // 0
- * parseBigIntToNumber("") // 0 (APIが空文字列を返す場合に対応)
+ * parseBigIntToNumber(null) // null
+ * parseBigIntToNumber(undefined) // null
+ * parseBigIntToNumber("") // null
+ * parseBigIntToNumber("0") // 0
  * 
  * @note
- * 空文字列やnull/undefinedは0にフォールバックする。
- * これにより、旧GraphQLスキーマやStrapiとの互換性を保ち、
- * 「ポイントがない」状態を正しく扱える。
+ * null/undefinedはnullを返す。これにより「データなし」と「ポイント0」を区別できる。
  */
-export function parseBigIntToNumber(value: unknown): number {
+export function parseBigIntToNumber(value: unknown): number | null {
   if (value === undefined || value === null || value === '') {
-    return 0;
+    return null;
   }
   
   const num = typeof value === 'string' ? Number(value) : value;
   
   if (typeof num !== 'number' || isNaN(num)) {
     console.warn('[BigInt] Invalid value for number conversion:', value);
-    return 0;
+    return null;
   }
   
   return num;
