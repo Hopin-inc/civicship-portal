@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Banknote, Calendar, MapPin, Users } from "lucide-react";
 import type { ParticipationDetail } from "@/app/participations/[id]/data/type";
-import { ActivityCard } from "@/components/domains/opportunity/types";
+import { ActivityCard } from "@/components/domains/opportunities/types";
 
 interface ParticipationDetailsProps {
   opportunity: ActivityCard;
