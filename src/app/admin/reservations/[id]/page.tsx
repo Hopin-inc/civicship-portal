@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { GqlParticipation, GqlEvaluationStatus, useGetReservationQuery } from "@/types/graphql";
+import { GqlEvaluationStatus, GqlParticipation, useGetReservationQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { NoticeCard } from "@/components/shared/NoticeCard";
@@ -167,15 +167,15 @@ export default function ReservationPage() {
   const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
 
   const passedCount = Object.values(attendanceData).filter(
-    (status) => status === GqlEvaluationStatus.Passed
+    (status) => status === GqlEvaluationStatus.Passed,
   ).length;
 
   const requiredPointsForApproval = participantCount * (opportunity?.pointsToEarn || 0);
   const requiredPointsForAttendance = passedCount * (opportunity?.pointsToEarn || 0);
-  
-  const isInsufficientBalanceForApproval = 
+
+  const isInsufficientBalanceForApproval =
     !balanceLoading && organizerBalance < BigInt(requiredPointsForApproval);
-  const isInsufficientBalanceForAttendance = 
+  const isInsufficientBalanceForAttendance =
     !balanceLoading && organizerBalance < BigInt(requiredPointsForAttendance);
 
   const priceInfo: PriceInfo = {
@@ -192,7 +192,16 @@ export default function ReservationPage() {
   const { label, variant } = getReservationStatusMeta(reservation);
 
   return (
-    <div className="p-6 mt-4">
+    <div className="p-6">
+      {mode === "approval" && isApplied() && isInsufficientBalanceForApproval && (
+        <div className="mb-8">
+          <NoticeCard
+            title="ポイント残高が不足しています"
+            description={`承認により${requiredPointsForApproval}ptが必要ですが、現在の残高は${organizerBalance.toString()}ptです。`}
+          />
+        </div>
+      )}
+
       <div>
         <AdminReservationDetails
           reservation={reservation}
@@ -202,15 +211,6 @@ export default function ReservationPage() {
           variant={variant}
         />
       </div>
-
-      {mode === "approval" && isApplied() && isInsufficientBalanceForApproval && (
-        <div className="mt-4">
-          <NoticeCard
-            title="ポイント残高が不足しています"
-            description={`承認により${requiredPointsForApproval}ptが必要ですが、現在の残高は${organizerBalance.toString()}ptです。承認は可能ですが、後続の処理で失敗する可能性があります。`}
-          />
-        </div>
-      )}
 
       {mode === "attendance" && isInsufficientBalanceForAttendance && (
         <div className="mt-4">
