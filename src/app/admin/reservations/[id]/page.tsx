@@ -153,16 +153,21 @@ export default function ReservationPage() {
   const participantCount = reservation.participations?.length || 0;
   const feeRequired = opportunity.feeRequired ?? 0;
   const pointsRequired = opportunity.pointsRequired ?? 0;
+  const pointsToEarn = opportunity.pointsToEarn ?? 0;
   const participationFee = feeRequired * participantCount;
   const totalPointsRequired = pointsRequired * participantCount;
+  const totalPointsToEarn = pointsToEarn * participantCount;
   const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
 
-  const priceInfo = {
+  const priceInfo: PriceInfo = {
     participationFee,
     participantCount,
     pointsRequired,
     totalPointsRequired,
     isPointsOnly,
+    category: opportunity.category,
+    pointsToEarn,
+    totalPointsToEarn,
   };
 
   const { label, variant } = getReservationStatusMeta(reservation);

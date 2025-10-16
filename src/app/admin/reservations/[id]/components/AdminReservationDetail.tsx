@@ -6,7 +6,7 @@ import { CalendarIcon, CoinsIcon, JapaneseYen, Phone, User } from "lucide-react"
 import { displayPhoneNumber } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { cn } from "@/lib/utils";
-import { GqlReservation, Maybe } from "@/types/graphql";
+import { GqlOpportunityCategory, GqlReservation, Maybe } from "@/types/graphql";
 import { ActivityCard } from "@/components/domains/opportunities/types";
 import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
@@ -99,7 +99,18 @@ const ReservationCard: React.FC<{
   priceInfo: PriceInfo;
 }> = ({ activityCard, reservation, priceInfo }) => {
   const formattedActivityCard = formatOpportunities(activityCard);
-  const { participationFee, participantCount, pointsRequired, totalPointsRequired, isPointsOnly } = priceInfo;
+  const { 
+    participationFee, 
+    participantCount, 
+    pointsRequired, 
+    totalPointsRequired, 
+    isPointsOnly,
+    category,
+    pointsToEarn,
+    totalPointsToEarn 
+  } = priceInfo;
+  
+  const isQuest = category === GqlOpportunityCategory.Quest;
   
   return (
     <Card className="mb-10 shadow-none border-0">
@@ -123,23 +134,37 @@ const ReservationCard: React.FC<{
           {reservation.participations?.length ?? 0}名
         </p>
         
-        {!isPointsOnly && (
-          <p className="inline-flex items-center gap-2 text-body-md">
-            <JapaneseYen size={24} />
-            {participationFee.toLocaleString()}円
-            <span className="text-label-sm text-muted-foreground">
-              ({reservation.opportunitySlot?.opportunity?.feeRequired?.toLocaleString() ?? 0}円×
-              {participantCount.toLocaleString()}人)
-            </span>
-          </p>
+        {!isQuest && (
+          <>
+            {!isPointsOnly && (
+              <p className="inline-flex items-center gap-2 text-body-md">
+                <JapaneseYen size={24} />
+                {participationFee.toLocaleString()}円
+                <span className="text-label-sm text-muted-foreground">
+                  ({reservation.opportunitySlot?.opportunity?.feeRequired?.toLocaleString() ?? 0}円×
+                  {participantCount.toLocaleString()}人)
+                </span>
+              </p>
+            )}
+            
+            {pointsRequired > 0 && (
+              <p className="inline-flex items-center gap-2 text-body-md">
+                <CoinsIcon size={24} />
+                {totalPointsRequired.toLocaleString()}pt
+                <span className="text-label-sm text-muted-foreground">
+                  ({pointsRequired.toLocaleString()}pt×{participantCount.toLocaleString()}人)
+                </span>
+              </p>
+            )}
+          </>
         )}
         
-        {pointsRequired > 0 && (
-          <p className="inline-flex items-center gap-2 text-body-md mt-1">
+        {isQuest && pointsToEarn && pointsToEarn > 0 && (
+          <p className="inline-flex items-center gap-2 text-body-md">
             <CoinsIcon size={24} />
-            {totalPointsRequired.toLocaleString()}pt
+            獲得予定ポイント: {totalPointsToEarn?.toLocaleString()}pt
             <span className="text-label-sm text-muted-foreground">
-              ({pointsRequired.toLocaleString()}pt×{participantCount.toLocaleString()}人)
+              ({pointsToEarn.toLocaleString()}pt×{participantCount.toLocaleString()}人)
             </span>
           </p>
         )}
