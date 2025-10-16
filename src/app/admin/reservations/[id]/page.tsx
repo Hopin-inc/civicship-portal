@@ -112,18 +112,6 @@ export default function ReservationPage() {
     communityId: opportunity?.community?.id || COMMUNITY_ID,
   });
 
-  const passedCount = Object.values(attendanceData).filter(
-    (status) => status === GqlEvaluationStatus.Passed
-  ).length;
-
-  const requiredPointsForApproval = participantCount * (opportunity?.pointsToEarn || 0);
-  const requiredPointsForAttendance = passedCount * (opportunity?.pointsToEarn || 0);
-  
-  const isInsufficientBalanceForApproval = 
-    !balanceLoading && organizerBalance < BigInt(requiredPointsForApproval);
-  const isInsufficientBalanceForAttendance = 
-    !balanceLoading && organizerBalance < BigInt(requiredPointsForAttendance);
-
   const { handleAccept, handleReject, acceptLoading, rejectLoading } = useReservationApproval({
     id: id ?? "",
     reservation,
@@ -177,6 +165,18 @@ export default function ReservationPage() {
   const totalPointsRequired = pointsRequired * participantCount;
   const totalPointsToEarn = pointsToEarn * participantCount;
   const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
+
+  const passedCount = Object.values(attendanceData).filter(
+    (status) => status === GqlEvaluationStatus.Passed
+  ).length;
+
+  const requiredPointsForApproval = participantCount * (opportunity?.pointsToEarn || 0);
+  const requiredPointsForAttendance = passedCount * (opportunity?.pointsToEarn || 0);
+  
+  const isInsufficientBalanceForApproval = 
+    !balanceLoading && organizerBalance < BigInt(requiredPointsForApproval);
+  const isInsufficientBalanceForAttendance = 
+    !balanceLoading && organizerBalance < BigInt(requiredPointsForAttendance);
 
   const priceInfo: PriceInfo = {
     participationFee,
