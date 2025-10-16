@@ -14,7 +14,7 @@ import { ActivityDetail, QuestDetail, isActivityCategory, isQuestCategory } from
 import { AvailableTicket } from "@/app/tickets/hooks/useAvailableTickets";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
-interface ConfirmPageViewProps {
+export interface ConfirmPageViewProps {
   user: GqlCurrentUserPayload["user"] | null;
   isAuthenticated: boolean;
   isLoginModalOpen: boolean;

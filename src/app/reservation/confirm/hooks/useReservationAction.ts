@@ -16,7 +16,11 @@ import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 
 // 選択されたチケットからチケットIDを取得する関数
 const getSelectedTicketIds = (
-  wallets: GqlWallet[] | null,
+  wallets: Array<{
+    type?: string;
+    community?: { id: string } | null;
+    tickets?: Array<{ id: string; utility?: { id: string } | null; status?: string | null }> | null;
+  }> | null | undefined,
   selectedTickets: { [ticketId: string]: number } | undefined,
 ): string[] => {
   if (!selectedTickets || !wallets) return [];
@@ -48,7 +52,11 @@ type Result =
 interface ReservationParams {
   opportunity: ActivityDetail | QuestDetail | null;
   selectedSlot: ActivitySlot | QuestSlot | null;
-  wallets: GqlWallet[] | null;
+  wallets: Array<{
+    type?: string;
+    community?: { id: string } | null;
+    tickets?: Array<{ id: string; utility?: { id: string } | null; status?: string | null }> | null;
+  }> | null | undefined;
   user: Pick<GqlUser, "id"> | null;
   ticketCounter: UseTicketCounterReturn;
   participantCount: number;
