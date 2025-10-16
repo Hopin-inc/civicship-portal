@@ -3,11 +3,21 @@
  * Convert GraphQL types to UI-specific types
  */
 
-import { GqlTicket, GqlTicketStatus, GqlOpportunityCategory, GqlOpportunitySlot, GqlOpportunitySlotHostingStatus, Maybe } from "@/types/graphql";
+import {
+  GqlOpportunityCategory,
+  GqlOpportunitySlot,
+  GqlOpportunitySlotHostingStatus,
+  GqlTicket,
+  GqlTicketStatus,
+  Maybe,
+} from "@/types/graphql";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { toNumberSafe } from "../utils/paymentCalculations";
 import { presenterPlace } from "@/app/places/data/presenter";
-import { presenterOpportunityHost, presenterActivitySlot } from "@/components/domains/opportunities/data/presenter";
+import {
+  presenterActivitySlot,
+  presenterOpportunityHost,
+} from "@/components/domains/opportunities/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
@@ -40,13 +50,13 @@ export interface ReservationWallet {
 /**
  * GraphQL opportunity データを ActivityDetail に変換 (reservation/confirm 専用)
  * GraphQLクエリ結果の型(__typename含む)を受け入れるため、柔軟な型を使用
- * 
+ *
  * @param data - GraphQL query result for opportunity (includes __typename fields)
  * @returns ActivityDetail object or null if data is invalid
  */
 export function presentReservationActivity(data: any): ActivityDetail | null {
   if (!data) return null;
-  
+
   const { images, place, slots, articles, createdByUser } = data;
   const activitySlots = presenterActivitySlot(slots, data.id, data.feeRequired);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
@@ -78,13 +88,13 @@ export function presentReservationActivity(data: any): ActivityDetail | null {
 /**
  * GraphQL opportunity データを QuestDetail に変換 (reservation/confirm 専用)
  * GraphQLクエリ結果の型(__typename含む)を受け入れるため、柔軟な型を使用
- * 
+ *
  * @param data - GraphQL query result for opportunity (includes __typename fields)
  * @returns QuestDetail object or null if data is invalid
  */
 export function presentReservationQuest(data: any): QuestDetail | null {
   if (!data) return null;
-  
+
   const { images, place, slots, articles, createdByUser } = data;
   const questSlots = presentQuestSlotsLocal(slots, data.id);
   const isReservable = questSlots.some((slot: QuestSlot) => slot.isReservable);
@@ -152,7 +162,7 @@ function presentQuestSlotsLocal(
 /**
  * GraphQLウォレットデータから予約確認用のウォレット情報を生成
  * GraphQLクエリ結果の型(__typename含む)を受け入れるため、柔軟な型を使用
- * 
+ *
  * @param wallets - GraphQLから取得したウォレット配列（コミュニティでフィルタ済み）
  * @param opportunity - 機会情報（チケットフィルタリングに使用）
  * @returns 予約確認用のウォレット情報、データがない場合はnull
@@ -162,14 +172,14 @@ export function presentReservationWallet(
   opportunity: ActivityDetail | QuestDetail | null,
 ): ReservationWallet | null {
   if (!wallets || wallets.length === 0) return null;
-  
+
   const memberWallet = wallets[0];
-  
+
   const currentPoint = toNumberSafe(memberWallet?.currentPointView?.currentPoint, 0);
   const rawTickets = memberWallet?.tickets ?? [];
   const allTickets: GqlTicket[] = Array.isArray(rawTickets) ? rawTickets : [];
   const tickets = presentAvailableTickets(allTickets, opportunity);
-  
+
   return {
     currentPoint,
     tickets,
@@ -178,7 +188,7 @@ export function presentReservationWallet(
 
 /**
  * GraphQLチケットを利用可能チケット形式に変換
- * 
+ *
  * @param tickets - GraphQLチケット配列
  * @param opportunity - 機会情報（対象ユーティリティでフィルタ）
  * @returns 利用可能チケット配列
@@ -196,38 +206,31 @@ function presentAvailableTickets(
     ticketGroups.get(utilityId)!.push(ticket);
   });
 
-  const groupedTickets = Array.from(ticketGroups.entries()).map(
-    ([utilityId, ticketList]) => {
-      const firstTicket = ticketList[0];
-      const availableTickets = ticketList.filter(
-        (ticket) => ticket.status === GqlTicketStatus.Available
-      );
+  const groupedTickets = Array.from(ticketGroups.entries()).map(([utilityId, ticketList]) => {
+    const firstTicket = ticketList[0];
+    const availableTickets = ticketList.filter(
+      (ticket) => ticket.status === GqlTicketStatus.Available,
+    );
 
-      return {
-        id: utilityId,
-        utility: firstTicket.utility
-          ? {
-              id: firstTicket.utility.id,
-              name: firstTicket.utility.name ?? null,
-              owner: firstTicket.utility.owner ?? null,
-            }
-          : null,
-        status:
-          availableTickets.length > 0
-            ? GqlTicketStatus.Available
-            : firstTicket.status,
-        count: availableTickets.length,
-      };
-    }
-  );
+    return {
+      id: utilityId,
+      utility: firstTicket.utility
+        ? {
+            id: firstTicket.utility.id,
+            name: firstTicket.utility.name ?? null,
+            owner: firstTicket.utility.owner ?? null,
+          }
+        : null,
+      status: availableTickets.length > 0 ? GqlTicketStatus.Available : firstTicket.status,
+      count: availableTickets.length,
+    };
+  });
 
   if (!opportunity?.targetUtilities.length) {
     return groupedTickets;
   }
 
-  const requiredUtilityIds = new Set(
-    opportunity.targetUtilities.map((u) => u.id)
-  );
+  const requiredUtilityIds = new Set(opportunity.targetUtilities.map((u) => u.id));
 
   return groupedTickets.filter((t) => {
     const utilityId = t?.utility?.id;
@@ -235,17 +238,4 @@ function presentAvailableTickets(
     const isAvailable = t.status === GqlTicketStatus.Available;
     return hasRequiredUtility && isAvailable;
   });
-}
-
-/**
- * Convert GraphQL wallets to current point value
- * @deprecated Use presentReservationWallet instead
- */
-export function presentUserWallet(wallets: Array<{ type: string; currentPointView?: { currentPoint?: unknown } | null }> | null | undefined): number | null {
-  if (!wallets) {
-    return null;
-  }
-
-  const memberWallet = wallets.find((w: { type: string }) => w.type === "MEMBER");
-  return toNumberSafe(memberWallet?.currentPointView?.currentPoint as number | bigint | null | undefined) ?? null;
 }
