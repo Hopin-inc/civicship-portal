@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, JapaneseYen, Phone, User } from "lucide-react";
+import { CalendarIcon, CoinsIcon, JapaneseYen, Phone, User } from "lucide-react";
 import { displayPhoneNumber } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { cn } from "@/lib/utils";
@@ -10,14 +10,14 @@ import { GqlReservation, Maybe } from "@/types/graphql";
 import { ActivityCard } from "@/components/domains/opportunities/types";
 import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
+import { PriceInfo } from "@/app/admin/reservations/types";
 
 interface ReservationDetailsProps {
   reservation: GqlReservation;
   activityCard: ActivityCard;
   label: string;
   variant: "primary" | "secondary" | "success" | "outline" | "destructive" | "warning";
-  participationFee: number;
-  participantCount: number;
+  priceInfo: PriceInfo;
 }
 
 const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
@@ -25,8 +25,7 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
   activityCard,
   label,
   variant,
-  participationFee,
-  participantCount,
+  priceInfo,
 }) => {
   return (
     <div>
@@ -37,8 +36,7 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
       <ReservationCard
         activityCard={activityCard}
         reservation={reservation}
-        participationFee={participationFee}
-        participantCount={participantCount}
+        priceInfo={priceInfo}
       />
 
       <h2 className="text-title-sm font-bold mb-3">コメント</h2>
@@ -98,10 +96,11 @@ const UserCard: React.FC<{
 const ReservationCard: React.FC<{
   activityCard: ActivityCard;
   reservation: GqlReservation;
-  participationFee: number;
-  participantCount: number;
-}> = ({ activityCard, reservation, participationFee, participantCount }) => {
+  priceInfo: PriceInfo;
+}> = ({ activityCard, reservation, priceInfo }) => {
   const formattedActivityCard = formatOpportunities(activityCard);
+  const { participationFee, participantCount, pointsRequired, totalPointsRequired, isPointsOnly } = priceInfo;
+  
   return (
     <Card className="mb-10 shadow-none border-0">
       <CardHeader>
@@ -123,14 +122,27 @@ const ReservationCard: React.FC<{
           <User size={24} />
           {reservation.participations?.length ?? 0}名
         </p>
-        <p className="inline-flex items-center gap-2 text-body-md">
-          <JapaneseYen size={24} />
-          {participationFee.toLocaleString()}円
-          <span className="text-label-sm text-muted-foreground">
-            ({reservation.opportunitySlot?.opportunity?.feeRequired?.toLocaleString() ?? 0}円×
-            {participantCount.toLocaleString()}人)
-          </span>
-        </p>
+        
+        {!isPointsOnly && (
+          <p className="inline-flex items-center gap-2 text-body-md">
+            <JapaneseYen size={24} />
+            {participationFee.toLocaleString()}円
+            <span className="text-label-sm text-muted-foreground">
+              ({reservation.opportunitySlot?.opportunity?.feeRequired?.toLocaleString() ?? 0}円×
+              {participantCount.toLocaleString()}人)
+            </span>
+          </p>
+        )}
+        
+        {pointsRequired > 0 && (
+          <p className="inline-flex items-center gap-2 text-body-md mt-1">
+            <CoinsIcon size={24} />
+            {totalPointsRequired.toLocaleString()}pt
+            <span className="text-label-sm text-muted-foreground">
+              ({pointsRequired.toLocaleString()}pt×{participantCount.toLocaleString()}人)
+            </span>
+          </p>
+        )}
       </CardContent>
     </Card>
   );

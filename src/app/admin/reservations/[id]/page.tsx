@@ -21,6 +21,7 @@ import AttendanceSheet from "@/app/admin/reservations/components/AttendanceSheet
 import { useAttendanceState } from "@/app/admin/reservations/hooks/attendance/useAttendanceState";
 import { useSaveAttendances } from "@/app/admin/reservations/hooks/attendance/useSaveAttendances";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { PriceInfo } from "@/app/admin/reservations/types";
 
 export default function ReservationPage() {
   const params = useParams();
@@ -149,7 +150,19 @@ export default function ReservationPage() {
 
   const activityCard = presenterActivityCard(opportunity);
   const participantCount = reservation.participations?.length || 0;
-  const participationFee = (opportunity.feeRequired || 0) * participantCount;
+  const feeRequired = opportunity.feeRequired ?? 0;
+  const pointsRequired = opportunity.pointsRequired ?? 0;
+  const participationFee = feeRequired * participantCount;
+  const totalPointsRequired = pointsRequired * participantCount;
+  const isPointsOnly = (!feeRequired || feeRequired === 0) && pointsRequired > 0;
+
+  const priceInfo = {
+    participationFee,
+    participantCount,
+    pointsRequired,
+    totalPointsRequired,
+    isPointsOnly,
+  };
 
   const { label, variant } = getReservationStatusMeta(reservation);
 
@@ -159,8 +172,7 @@ export default function ReservationPage() {
         <AdminReservationDetails
           reservation={reservation}
           activityCard={activityCard}
-          participantCount={participantCount}
-          participationFee={participationFee}
+          priceInfo={priceInfo}
           label={label}
           variant={variant}
         />
