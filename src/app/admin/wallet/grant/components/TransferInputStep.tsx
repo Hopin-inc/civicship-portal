@@ -54,31 +54,31 @@ function TransferInputStep({
   const [displayValue, setDisplayValue] = useState<string>("");
   const [comment, setComment] = useState<string>("");
 
-
-  const formatWithComma = (value: string | number) => {
-    const num = typeof value === "number" ? value : Number(value.replace(/,/g, ""));
-    if (isNaN(num)) return "";
-    return new Intl.NumberFormat().format(num);
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/,/g, "");
-    const num = Number(raw);
-    if (isNaN(num)) {
+    const raw = e.target.value;
+    
+    if (raw === "") {
       setAmount(null);
       setDisplayValue("");
-    } else {
-      if (num > currentPoint) {
-        toast.error("保有ポイントを超えています");
-        return;
-      }
-      if (num > INT_LIMIT) {
-        toast.error("20億以下を指定して下さい");
-        return;
-      }
-      setAmount(num);
-      setDisplayValue(formatWithComma(raw));
+      return;
     }
+    
+    const num = Number(raw);
+    if (isNaN(num)) {
+      return; // 数字以外の入力は無視
+    }
+    
+    if (num > currentPoint) {
+      toast.error("保有ポイントを超えています");
+      return;
+    }
+    if (num > INT_LIMIT) {
+      toast.error("20億以下を指定して下さい");
+      return;
+    }
+    
+    setAmount(num);
+    setDisplayValue(raw);
   };
 
   return (
@@ -109,7 +109,8 @@ function TransferInputStep({
             </div>
             <Input
                 type="text"
-                placeholder="1,000pt"
+                inputMode="numeric"
+                placeholder="1000pt"
                 value={displayValue}
                 onChange={handleInputChange}
                 className="mt-3 focus:outline-none focus:ring-0 shadow-none"
