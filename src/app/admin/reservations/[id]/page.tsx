@@ -22,6 +22,7 @@ import { useAttendanceState } from "@/app/admin/reservations/hooks/attendance/us
 import { useSaveAttendances } from "@/app/admin/reservations/hooks/attendance/useSaveAttendances";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { PriceInfo } from "@/app/admin/reservations/types";
+import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 
 export default function ReservationPage() {
   const params = useParams();
@@ -154,7 +155,7 @@ export default function ReservationPage() {
   const pointsRequired = opportunity.pointsRequired ?? 0;
   const participationFee = feeRequired * participantCount;
   const totalPointsRequired = pointsRequired * participantCount;
-  const isPointsOnly = (!feeRequired || feeRequired === 0) && pointsRequired > 0;
+  const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
 
   const priceInfo = {
     participationFee,

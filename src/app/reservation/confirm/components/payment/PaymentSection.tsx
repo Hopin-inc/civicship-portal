@@ -2,6 +2,7 @@ import React, { memo, useCallback, useEffect, useState } from "react";
 import { TicketsToggle } from "./TicketsToggle";
 import { PointsToggle } from "./PointsToggle";
 import { AvailableTicket } from "@/app/tickets/hooks/useAvailableTickets";
+import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 
 interface PaymentSectionProps {
   ticketCount: number;
@@ -42,7 +43,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
     const [selectedPointCount, setSelectedPointCount] = useState(0);
     const [allDisabled, setAllDisabled] = useState(false);
 
-    const isPointsOnly = (pricePerPerson === null || pricePerPerson === 0) && pointsRequired > 0;
+    const isPointsOnly = isPointsOnlyOpportunity(pricePerPerson, pointsRequired);
 
     const totalSelected = selectedTicketCount + selectedPointCount;
     const remainingSlots = Math.max(0, participantCount - totalSelected);

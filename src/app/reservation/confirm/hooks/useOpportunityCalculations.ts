@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { AvailableTicket } from "@/app/tickets/hooks/useAvailableTickets";
+import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 
 interface UseOpportunityCalculationsProps {
   opportunity: ActivityDetail | QuestDetail | null;
@@ -46,7 +47,7 @@ export function useOpportunityCalculations({
     const isActivity = opportunity.category === GqlOpportunityCategory.Activity;
     const isQuest = opportunity.category === GqlOpportunityCategory.Quest;
     const maxTickets = availableTickets.reduce((sum, ticket) => sum + ticket.count, 0);
-    const isPointsOnly = (feeRequired === null || feeRequired === 0) && pointsRequired > 0;
+    const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
     const totalPointsRequired = pointsRequired * participantCount;
     const hasInsufficientPoints = isPointsOnly && (userWallet === null || userWallet < totalPointsRequired);
 

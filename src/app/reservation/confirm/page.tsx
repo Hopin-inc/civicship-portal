@@ -107,7 +107,7 @@ export default function ConfirmPage() {
 
     if (!result.success) {
       if (!user) {
-        ui.setIsLoginModalOpen(false);
+        ui.setIsLoginModalOpen(true);
       } else {
         const message = errorMessages[result.code] ?? "予期しないエラーが発生しました。";
         toast.error(message);

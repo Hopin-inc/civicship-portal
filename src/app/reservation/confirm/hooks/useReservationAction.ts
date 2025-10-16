@@ -13,14 +13,11 @@ import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicke
 import { ApolloError } from "@apollo/client";
 import { logger } from "@/lib/logging";
 import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
+import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 
 // 選択されたチケットからチケットIDを取得する関数
 const getSelectedTicketIds = (
-  wallets: Array<{
-    type?: string;
-    community?: { id: string } | null;
-    tickets?: Array<{ id: string; utility?: { id: string } | null; status?: string | null }> | null;
-  }> | null | undefined,
+  wallets: GqlWallet[] | null | undefined,
   selectedTickets: { [ticketId: string]: number } | undefined,
 ): string[] => {
   if (!selectedTickets || !wallets) return [];
@@ -52,11 +49,7 @@ type Result =
 interface ReservationParams {
   opportunity: ActivityDetail | QuestDetail | null;
   selectedSlot: ActivitySlot | QuestSlot | null;
-  wallets: Array<{
-    type?: string;
-    community?: { id: string } | null;
-    tickets?: Array<{ id: string; utility?: { id: string } | null; status?: string | null }> | null;
-  }> | null | undefined;
+  wallets: GqlWallet[] | null | undefined;
   user: Pick<GqlUser, "id"> | null;
   ticketCounter: UseTicketCounterReturn;
   participantCount: number;
@@ -95,7 +88,7 @@ export const useReservationCommand = () => {
 
       const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
       const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired : 0;
-      const isPointsOnly = (feeRequired === null || feeRequired === 0) && pointsRequired > 0;
+      const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
       
       if (isPointsOnly) {
         const totalPointsRequired = pointsRequired * participantCount;

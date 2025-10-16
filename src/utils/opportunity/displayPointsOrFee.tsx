@@ -1,6 +1,7 @@
 import React from "react";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { ActivityDetail, QuestDetail, isActivityCategory } from "@/components/domains/opportunities/types";
+import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 
 interface GetPointOrFeeParams {
   opportunity: ActivityDetail | QuestDetail | null;
@@ -21,7 +22,7 @@ export const getPointOrFee = ({
 }: GetPointOrFeeParams) => {
   if (opportunity?.category === GqlOpportunityCategory.Activity) {
     const feeRequired = isActivityCategory(opportunity) ? opportunity.feeRequired : 0;
-    const isPointsOnly = (feeRequired === null || feeRequired === 0) && pointsRequired && pointsRequired > 0;
+    const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
     const normalParticipantCount = (participantCount ?? 0) - (ticketCount ?? 0) - (participantCountWithPoint ?? 0);
     
     if (isPointsOnly) {
