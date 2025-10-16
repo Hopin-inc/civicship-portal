@@ -10,15 +10,15 @@ import { ErrorState } from "@/components/shared";
 import { errorMessages } from "@/utils/errorMessage";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
-import { useReservationConfirm } from "@/app/reservation/confirm/hooks/useReservationConfirm";
+import { useReservationOpportunity } from "@/app/reservation/confirm/hooks/useReservationOpportunity";
+import { useReservationWallet } from "@/app/reservation/confirm/hooks/useReservationWallet";
 import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
 import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
 import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCounter";
-import { useOpportunityCalculations } from "@/app/reservation/confirm/hooks/useOpportunityCalculations";
-import { useReservationValidation } from "@/app/reservation/confirm/hooks/useReservationValidation";
+import { calculateReservationDetails } from "@/app/reservation/confirm/utils/reservationCalculations";
+import { validateReservation } from "@/app/reservation/confirm/utils/reservationValidation";
 import ConfirmPageView from "@/app/reservation/confirm/components/ConfirmPageView";
-import type { GqlWallet } from "@/types/graphql";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -43,40 +43,51 @@ export default function ConfirmPage() {
   const {
     opportunity,
     selectedSlot,
-    wallets,
     startDateTime,
     endDateTime,
-    availableTickets,
-    currentPoint,
-    loading,
-    hasError,
-    triggerRefetch,
-  } = useReservationConfirm({ opportunityId, slotId, userId: user?.id });
+    loading: oppLoading,
+    error: oppError,
+    refetch: oppRefetch,
+  } = useReservationOpportunity({ opportunityId, slotId });
 
-  const userWallet: number | null = currentPoint;
+  const {
+    wallet,
+    loading: walletLoading,
+    error: walletError,
+    refetch: walletRefetch,
+  } = useReservationWallet({ userId: user?.id, opportunity });
+
+  const loading = oppLoading || walletLoading;
+  const hasError = Boolean(oppError || walletError);
+  const triggerRefetch = () => {
+    oppRefetch();
+    walletRefetch();
+  };
+
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = triggerRefetch;
   }, [triggerRefetch]);
 
-  const ticketCounter = useTicketCounter(availableTickets.length);
+  const ticketCounter = useTicketCounter(wallet?.tickets.length ?? 0);
   const ui = useReservationUIState();
   const { handleReservation, creatingReservation } = useReservationCommand();
 
-  const calculations = useOpportunityCalculations({
-    opportunity,
-    availableTickets,
-    participantCount,
-    userWallet,
-  });
+  const calculations = useMemo(
+    () => calculateReservationDetails(opportunity, wallet, participantCount),
+    [opportunity, wallet, participantCount]
+  );
 
-  const validation = useReservationValidation({
-    creatingReservation,
-    useTickets: ui.useTickets,
-    ticketCount: ticketCounter.count,
-    maxTickets: calculations.maxTickets,
-    hasInsufficientPoints: calculations.hasInsufficientPoints,
-  });
+  const validation = useMemo(
+    () => validateReservation(
+      creatingReservation,
+      ui.useTickets,
+      ticketCounter.count,
+      calculations.maxTickets,
+      calculations.hasInsufficientPoints,
+    ),
+    [creatingReservation, ui.useTickets, ticketCounter.count, calculations.maxTickets, calculations.hasInsufficientPoints]
+  );
 
   useEffect(() => {
     if (calculations.isPointsOnly) {
@@ -92,7 +103,7 @@ export default function ConfirmPage() {
     const result = await handleReservation({
       opportunity,
       selectedSlot,
-      wallets,
+      wallet,
       user: user ?? null,
       ticketCounter,
       participantCount,
@@ -102,7 +113,7 @@ export default function ConfirmPage() {
       selectedPointCount,
       selectedTicketCount,
       selectedTickets,
-      userWallet,
+      userWallet: wallet?.currentPoint ?? null,
     });
 
     if (!result.success) {
@@ -159,8 +170,8 @@ export default function ConfirmPage() {
       setUsePoints={ui.setUsePoints}
       ageComment={ui.ageComment}
       onAgeCommentChange={ui.setAgeComment}
-      availableTickets={availableTickets}
-      userWallet={userWallet}
+      availableTickets={wallet?.tickets ?? []}
+      userWallet={wallet?.currentPoint ?? null}
       ticketCounter={ticketCounter}
       onConfirm={handleConfirm}
       validation={validation}
