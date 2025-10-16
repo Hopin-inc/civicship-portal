@@ -11,7 +11,7 @@ import { CommentTextarea } from "@/app/reservation/confirm/components/CommentTex
 import { ExpectedPoints } from "@/app/reservation/confirm/components/payment/ExpectedPoints";
 import { PaymentSummary } from "@/app/reservation/confirm/components/payment/PaymentSummary";
 import { ActivityDetail, QuestDetail, isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
-import { AvailableTicket } from "@/app/tickets/hooks/useAvailableTickets";
+import { AvailableTicket } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export interface ConfirmPageViewProps {

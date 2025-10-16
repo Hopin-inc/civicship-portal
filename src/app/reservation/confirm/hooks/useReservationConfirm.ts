@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { GqlGetOpportunityQuery, GqlOpportunityCategory, useGetOpportunityQuery } from "@/types/graphql";
+import { GqlOpportunityCategory, useGetOpportunityQuery, useGetUserWalletQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { presenterActivityDetail, presenterQuestDetail } from "@/components/domains/opportunities/data/presenter";
-import { useSlotAndTicketInfo } from "@/app/reservation/confirm/hooks/useSlotAndTicket";
+import { presentReservationActivity, presentReservationQuest, presentReservationWallet } from "../presenters/presentReservationConfirm";
+import { findSlotById, parseSlotDateRange } from "../utils/slotUtils";
 import type { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { logger } from "@/lib/logging";
 
@@ -34,25 +34,42 @@ export const useReservationConfirm = ({
 
   const opportunity: ActivityDetail | QuestDetail | null = useMemo(() => {
     if (data?.opportunity?.category === GqlOpportunityCategory.Activity) {
-      return presenterActivityDetail(data.opportunity);
+      return presentReservationActivity(data.opportunity);
     }
     if (data?.opportunity?.category === GqlOpportunityCategory.Quest) {
-      return presenterQuestDetail(data.opportunity);
+      return presentReservationQuest(data.opportunity);
     }
     return null;
   }, [data]);
 
   const {
-    wallets,
-    selectedSlot,
-    availableTickets,
-    startDateTime,
-    endDateTime,
-    currentPoint,
-    walletLoading,
-    walletError,
-    walletRefetch,
-  } = useSlotAndTicketInfo(opportunity, userId, slotId);
+    data: walletData,
+    loading: walletLoading,
+    error: walletError,
+    refetch: walletRefetch,
+  } = useGetUserWalletQuery({
+    variables: userId ? { id: userId } : undefined,
+    skip: !userId,
+  });
+
+  const wallet = useMemo(
+    () => {
+      const wallets = walletData?.user?.wallets;
+      if (!wallets || !Array.isArray(wallets)) return null;
+      return presentReservationWallet(wallets, opportunity);
+    },
+    [walletData?.user?.wallets, opportunity]
+  );
+
+  const selectedSlot = useMemo(() => {
+    if (!opportunity) return null;
+    return findSlotById(opportunity.slots, slotId);
+  }, [opportunity, slotId]);
+
+  const { startDateTime, endDateTime } = useMemo(
+    () => parseSlotDateRange(selectedSlot),
+    [selectedSlot]
+  );
 
   const loading = oppLoading || walletLoading;
   const hasError = Boolean(oppError || walletError);
@@ -77,9 +94,7 @@ export const useReservationConfirm = ({
     selectedSlot,
     startDateTime,
     endDateTime,
-    wallets,
-    availableTickets,
-    currentPoint,
+    wallet,
     loading,
     hasError,
     triggerRefetch: () => {
