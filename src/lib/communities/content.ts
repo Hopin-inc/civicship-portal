@@ -17,7 +17,7 @@ export const COMMUNITY_CONTENT: Record<string, CommunityContent> = {
   },
   kotohira: {
     noticeItems: [
-      "申し込みと同時に予約が確定します。",
+      "主催者の承認後に予約が確定します。",
       "「お手伝い」はポイントが貰えます。現地で参加確認後に主催者から付与いたします。",
       "「体験」はポイントのみで交換できます（現金では支払いができません）予約と同時にポイント利用となります。",
     ],
