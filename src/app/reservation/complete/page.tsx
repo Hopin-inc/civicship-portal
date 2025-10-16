@@ -74,7 +74,7 @@ export default function CompletePage() {
     return <ErrorState title="申込完了ページを読み込めませんでした" refetchRef={refetchRef} />;
 
   return (
-    <main className="flex flex-col items-center">
+    <main className="min-h-screen">
       <CompletionHeader requireApproval={oppotunityDetail?.requireApproval} />
       {oppotunityDetail && (
         <OpportunityInfo
