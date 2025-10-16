@@ -160,9 +160,9 @@ const extractFirstHostFromPlace = (host?: Maybe<GqlUser>): IPlaceHost => {
 export function presenterPlace(place?: Maybe<GqlPlace>): OpportunityPlace {
   return {
     id: place?.id || "",
-    name: place?.name || "",
+    name: place?.name ?? null,
     description: "",
-    address: place?.address || "",
+    address: place?.address ?? null,
     latitude: place?.latitude ?? undefined,
     longitude: place?.longitude ?? undefined,
   };

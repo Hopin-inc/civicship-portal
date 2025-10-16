@@ -29,13 +29,15 @@ const ParticipationDetails: React.FC<ParticipationDetailsProps> = ({
           </div>
         </div>
 
-        <div className="flex items-start gap-2">
-          <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0" />
-          <div>
-            <p>{participation.place.name || ""}</p>
-            <p className="text-sm text-muted-foreground">{participation.place.address || ""}</p>
+        {participation.place.name && participation.place.address && (
+          <div className="flex items-start gap-2">
+            <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0" />
+            <div>
+              <p>{participation.place.name}</p>
+              <p className="text-sm text-muted-foreground">{participation.place.address}</p>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-blue-600 flex-shrink-0" />

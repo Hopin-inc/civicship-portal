@@ -57,7 +57,7 @@ export const mapNodeToCardProps = (node: GraphQLOpportunity): ActivityCard => ({
   title: node.title,
   category: node.category,
   feeRequired: node.feeRequired || 0,
-  location: node.place?.name || "場所未定",
+  location: node.place?.name ?? null,
   images: node.images || [],
   communityId: node.community?.id || "",
   hasReservableTicket: node.isReservableWithTicket || false,

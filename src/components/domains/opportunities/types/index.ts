@@ -26,7 +26,7 @@ export type OpportunityBaseCard = CommunityId & {
   category: GqlOpportunityCategory;
   title: string;
   images: string[];
-  location: string;
+  location: string | null;
 
   hasReservableTicket: boolean;
 };
@@ -100,9 +100,9 @@ export type OpportunityHost = {
 // ---------------------------------------------
 export type OpportunityPlace = {
   id: string;
-  name: string;
+  name: string | null;
   description: string;
-  address: string;
+  address: string | null;
 
   latitude: number;
   longitude: number;
