@@ -146,7 +146,13 @@ export default function ParticipationPage() {
           />
         </div>
       )}
-      <OpportunityInfo opportunity={opportunityDetail} />
+      <OpportunityInfo 
+        opportunity={opportunityDetail}
+        dateTimeInfo={dateTimeInfo}
+        participationCount={dateTimeInfo?.participantCount}
+        totalPrice={dateTimeInfo?.totalPrice}
+        ticketCount={dateTimeInfo?.ticketCount}
+      />
       {dateTimeInfo && opportunityDetail && (
         <div className="px-6 mb-10 mt-8">
           <h2 className="text-label-md font-bold mb-4">予約詳細</h2>
