@@ -21,6 +21,8 @@ import AttendanceSheet from "@/app/admin/reservations/components/AttendanceSheet
 import { useAttendanceState } from "@/app/admin/reservations/hooks/attendance/useAttendanceState";
 import { useSaveAttendances } from "@/app/admin/reservations/hooks/attendance/useSaveAttendances";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { PriceInfo } from "@/app/admin/reservations/types";
+import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 import { useOrganizerWallet } from "@/app/admin/reservations/hooks/useOrganizerWallet";
 
 export default function ReservationPage() {
@@ -155,7 +157,24 @@ export default function ReservationPage() {
 
   const activityCard = presenterActivityCard(opportunity);
   const participantCount = reservation.participations?.length || 0;
-  const participationFee = (opportunity.feeRequired || 0) * participantCount;
+  const feeRequired = opportunity.feeRequired ?? 0;
+  const pointsRequired = opportunity.pointsRequired ?? 0;
+  const pointsToEarn = opportunity.pointsToEarn ?? 0;
+  const participationFee = feeRequired * participantCount;
+  const totalPointsRequired = pointsRequired * participantCount;
+  const totalPointsToEarn = pointsToEarn * participantCount;
+  const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
+
+  const priceInfo: PriceInfo = {
+    participationFee,
+    participantCount,
+    pointsRequired,
+    totalPointsRequired,
+    isPointsOnly,
+    category: opportunity.category,
+    pointsToEarn,
+    totalPointsToEarn,
+  };
 
   const { label, variant } = getReservationStatusMeta(reservation);
 
@@ -165,8 +184,7 @@ export default function ReservationPage() {
         <AdminReservationDetails
           reservation={reservation}
           activityCard={activityCard}
-          participantCount={participantCount}
-          participationFee={participationFee}
+          priceInfo={priceInfo}
           label={label}
           variant={variant}
         />

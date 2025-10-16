@@ -40,7 +40,11 @@ export const presenterOpportunitySlots = (
 
       if (!node || !opportunity) return null;
 
-      return presenterOpportunitySlot(node, opportunity.feeRequired ?? null);
+      return presenterOpportunitySlot(
+        node,
+        opportunity.feeRequired ?? null,
+        opportunity.pointsRequired ?? null
+      );
     })
     .filter((slot): slot is ActivitySlot => slot !== null);
 };
@@ -48,6 +52,7 @@ export const presenterOpportunitySlots = (
 export const presenterOpportunitySlot = (
   slot: GqlOpportunitySlot,
   feeRequired: number | null,
+  pointsRequired: number | null,
 ): ActivitySlot => {
   const startsAtDate = new Date(slot.startsAt);
   const opportunityId = slot.opportunity?.id;
@@ -57,6 +62,7 @@ export const presenterOpportunitySlot = (
     id: slot.id,
     hostingStatus: slot.hostingStatus,
     feeRequired,
+    pointsRequired,
     opportunityId: slot.opportunity?.id ?? "",
     capacity: slot.capacity ?? 0,
     remainingCapacity: slot.remainingCapacity ?? 0,
@@ -82,9 +88,10 @@ export const filterSlotGroupsBySelectedDate = (
 export const presenterActivitySlots = (
   slots: GqlOpportunitySlot[] | null | undefined,
   feeRequired: number,
+  pointsRequired: number | null,
 ): ActivitySlot[] => {
   if (!slots || slots.length === 0) return [];
-  return slots.map((slot) => presenterOpportunitySlot(slot, feeRequired));
+  return slots.map((slot) => presenterOpportunitySlot(slot, feeRequired, pointsRequired));
 };
 
 export const groupActivitySlotsByDate = (slots: ActivitySlot[]): ActivitySlotGroup[] => {

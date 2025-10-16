@@ -7,7 +7,7 @@ import {
   GqlWallet,
   Maybe,
 } from "@/types/graphql";
-import { OpportunityCard, RequiredUtility } from "@/components/domains/opportunity/types";
+import { OpportunityCard, RequiredUtility } from "@/components/domains/opportunities/types";
 import {
   ActivityField,
   QuestField,
@@ -15,7 +15,7 @@ import {
 } from "@/app/reservation/data/type/reservation";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 import { presenterPlace } from "@/app/places/data/presenter";
-import { presenterOpportunityHost } from "@/components/domains/opportunity/data/presenter";
+import { presenterOpportunityHost } from "@/components/domains/opportunities/data/presenter";
 import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 
 export const getTicketIds = (
@@ -24,8 +24,9 @@ export const getTicketIds = (
   ticketCount: number,
 ) => {
   return (
-    wallets?.find(w => w.community?.id === getCommunityIdFromEnv())?.tickets
-      ?.filter((edge: GqlTicket) => {
+    wallets
+      ?.find((w) => w.community?.id === getCommunityIdFromEnv())
+      ?.tickets?.filter((edge: GqlTicket) => {
         if (!requiredUtilities?.length) return true;
         const utilityId = edge?.utility?.id;
         return utilityId && requiredUtilities.some((u) => u.id === utilityId);

@@ -3,36 +3,30 @@ import {
   GqlErrorCode,
   GqlReservation,
   GqlUser,
-  GqlWallet,
   useCreateReservationMutation,
 } from "@/types/graphql";
-import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
-import { ActivityDetail, QuestDetail } from "@/components/domains/opportunity/types";
+import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
+import { ReservationWallet } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
 import { ApolloError } from "@apollo/client";
 import { logger } from "@/lib/logging";
-import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
+import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 
-// 選択されたチケットからチケットIDを取得する関数
 const getSelectedTicketIds = (
-  wallets: GqlWallet[] | null,
+  wallet: ReservationWallet | null,
   selectedTickets: { [ticketId: string]: number } | undefined,
 ): string[] => {
-  if (!selectedTickets || !wallets) return [];
+  if (!selectedTickets || !wallet) return [];
   
   const ticketIds: string[] = [];
-  const allTickets = wallets
-    .find(w => w.community?.id === getCommunityIdFromEnv())
-    ?.tickets || [];
+  const allTickets = wallet.tickets;
   
   Object.entries(selectedTickets).forEach(([utilityId, count]) => {
-    // 同じutilityに属するチケットから指定された枚数分を取得
     const availableTickets = allTickets.filter(ticket => 
       ticket.utility?.id === utilityId && ticket.status === "AVAILABLE"
     );
     
-    // 指定された枚数分のチケットIDを追加
     for (let i = 0; i < count && i < availableTickets.length; i++) {
       ticketIds.push(availableTickets[i].id);
     }
@@ -48,7 +42,7 @@ type Result =
 interface ReservationParams {
   opportunity: ActivityDetail | QuestDetail | null;
   selectedSlot: ActivitySlot | QuestSlot | null;
-  wallets: GqlWallet[] | null;
+  wallet: ReservationWallet | null;
   user: Pick<GqlUser, "id"> | null;
   ticketCounter: UseTicketCounterReturn;
   participantCount: number;
@@ -58,6 +52,7 @@ interface ReservationParams {
   selectedTicketCount: number;
   selectedTickets?: { [ticketId: string]: number };
   comment?: string;
+  userWallet: number | null;
 }
 
 export const useReservationCommand = () => {
@@ -67,7 +62,7 @@ export const useReservationCommand = () => {
     async ({
       opportunity,
       selectedSlot,
-      wallets,
+      wallet,
       user,
       ticketCounter,
       useTickets,
@@ -76,15 +71,27 @@ export const useReservationCommand = () => {
       usePoints,
       selectedPointCount,
       selectedTicketCount,
-      selectedTickets
+      selectedTickets,
+      userWallet
     }: ReservationParams): Promise<Result> => {
       if (loading) return { success: false, code: GqlErrorCode.Unknown };
       if (!user) return { success: false, code: GqlErrorCode.Unauthenticated };
       if (!opportunity || !selectedSlot)
         return { success: false, code: GqlErrorCode.ValidationError };
 
+      const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
+      const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired : 0;
+      const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
+      
+      if (isPointsOnly) {
+        const totalPointsRequired = pointsRequired * participantCount;
+        if (typeof userWallet !== 'number' || userWallet < totalPointsRequired) {
+          return { success: false, code: GqlErrorCode.ValidationError };
+        }
+      }
+
       const count = selectedTicketCount;
-      const ticketIds = useTickets ? getSelectedTicketIds(wallets, selectedTickets) : [];
+      const ticketIds = useTickets ? getSelectedTicketIds(wallet, selectedTickets) : [];
       if (useTickets && ticketIds.length < count) {
         return { success: false, code: GqlErrorCode.TicketParticipantMismatch };
       }
@@ -97,7 +104,7 @@ export const useReservationCommand = () => {
               paymentMethod: useTickets ? "TICKET" : "FEE",
               ticketIdsIfNeed: useTickets ? ticketIds : undefined,
               comment: comment ?? undefined,
-              participantCountWithPoint: usePoints ? selectedPointCount : undefined,
+              participantCountWithPoint: isPointsOnly ? participantCount : (usePoints ? selectedPointCount : undefined),
             },
           },
         });

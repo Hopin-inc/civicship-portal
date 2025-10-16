@@ -1,6 +1,5 @@
 "use client";
 
-import { ActivityCard, QuestCard } from "@/components/domains/opportunity/types";
 import Link from "next/link";
 import Image from "next/image";
 import React, { useCallback, useState } from "react";
@@ -9,6 +8,7 @@ import { GqlOpportunityCategory } from "@/types/graphql";
 import { displayDuration } from "@/utils/date";
 import { Button } from "@/components/ui/button";
 import SelectionSheet from "../../select-date/components/SelectionSheet";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 
 type Props = {
   opportunity: ActivityCard | QuestCard;
@@ -20,18 +20,26 @@ type Props = {
   onChange: (newValue: number) => void;
 };
 
-export const ReservationConfirmationCard = ({ opportunity, withShadow = true, category, startDateTime, endDateTime, participantCount, onChange }: Props) => {
+export const ReservationConfirmationCard = ({
+  opportunity,
+  withShadow = true,
+  category,
+  startDateTime,
+  endDateTime,
+  participantCount,
+  onChange,
+}: Props) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const handleOpen = useCallback(() => setIsSheetOpen(true), []);
   const handleClose = useCallback(() => setIsSheetOpen(false), []);
-  const link = category === GqlOpportunityCategory.Quest ? `/quests/${opportunity.id}?community_id=${opportunity.communityId}` : `/activities/${opportunity.id}?community_id=${opportunity.communityId}`;
+  const link =
+    category === GqlOpportunityCategory.Quest
+      ? `/quests/${opportunity.id}?community_id=${opportunity.communityId}`
+      : `/activities/${opportunity.id}?community_id=${opportunity.communityId}`;
 
   return (
     <>
-      <Link
-        href={link}
-        className="block"
-      >
+      <Link href={link} className="block">
         <div className="mx-auto max-w-md">
           <div
             className={`flex overflow-hidden rounded-xl bg-background ${
@@ -54,13 +62,19 @@ export const ReservationConfirmationCard = ({ opportunity, withShadow = true, ca
               />
             </div>
             <div className="flex-1 px-4 py-3">
-              <h2 className="text-body-sm text-foreground line-clamp-4 font-bold leading-6">{opportunity.title}</h2>
+              <h2 className="text-body-sm text-foreground line-clamp-4 font-bold leading-6">
+                {opportunity.title}
+              </h2>
             </div>
           </div>
           <div>
             <h2 className="text-label-sm font-bold pt-10">日時</h2>
             <p className="text-body-sm text-foreground pt-1 whitespace-pre-wrap">
-              {displayDuration(startDateTime?.toISOString() ?? "", endDateTime?.toISOString() ?? "", true)}
+              {displayDuration(
+                startDateTime?.toISOString() ?? "",
+                endDateTime?.toISOString() ?? "",
+                true,
+              )}
             </p>
           </div>
           <div className="border-b border-gray-200 my-4"></div>
@@ -89,4 +103,4 @@ export const ReservationConfirmationCard = ({ opportunity, withShadow = true, ca
       </div>
     </>
   );
-}
+};

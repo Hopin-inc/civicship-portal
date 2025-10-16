@@ -7,6 +7,7 @@ import { logger } from "@/lib/logging";
 import { GqlUser } from "@/types/graphql";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { TokenManager } from "@/lib/auth/core/token-manager";
+import { lineAuth } from "@/lib/auth/core/firebase-config";
 
 interface UseLineAuthProcessingProps {
   shouldProcessRedirect: boolean;
@@ -45,13 +46,20 @@ export const useLineAuthProcessing = ({
         const { isLoggedIn } = liffService.getState();
         if (!isLoggedIn) return;
 
-        const success = await liffService.signInWithLiffToken();
-        if (!success) {
-          logger.info("signInWithLiffToken failed", {
+        if (lineAuth.currentUser) {
+          logger.info("Firebase already authenticated, skipping signInWithLiffToken", {
             authType: "liff",
             component: "useLineAuthProcessing",
           });
-          return; // 🟠 stop: login token exchange failed
+        } else {
+          const success = await liffService.signInWithLiffToken();
+          if (!success) {
+            logger.info("signInWithLiffToken failed", {
+              authType: "liff",
+              component: "useLineAuthProcessing",
+            });
+            return; // 🟠 stop: login token exchange failed
+          }
         }
 
         const user = await refetchUser();

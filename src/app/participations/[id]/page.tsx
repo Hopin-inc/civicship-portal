@@ -13,14 +13,11 @@ import { useParams } from "next/navigation";
 import { errorMessages } from "@/utils/errorMessage";
 import useCancelReservation from "@/app/participations/[id]/hooks/useCancelReservation";
 import OpportunityInfo from "./components/OpportunityInfo";
-
-import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { logger } from "@/lib/logging";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
 import { useAuth } from "@/contexts/AuthProvider";
-import { isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
@@ -146,32 +143,16 @@ export default function ParticipationPage() {
           />
         </div>
       )}
-      <OpportunityInfo opportunity={opportunityDetail} />
-      {dateTimeInfo && opportunityDetail && (
-        <div className="px-6 mb-10 mt-8">
-          <h2 className="text-label-md font-bold mb-4">予約詳細</h2>
-          <ReservationDetails
-            formattedDate={dateTimeInfo.formattedDate}
-            startTime={dateTimeInfo.startTime}
-            endTime={dateTimeInfo.endTime}
-            participantCount={dateTimeInfo.participantCount}
-            paidParticipantCount={dateTimeInfo.paidParticipantCount}
-            totalPrice={dateTimeInfo.totalPrice}
-            pricePerPerson={isActivityCategory(opportunityDetail) ? opportunityDetail.feeRequired : 0}
-            location={opportunityDetail.place}
-            phoneNumber={participation.emergencyContactPhone}
-            isReserved={true}
-            dateDiffLabel={dateTimeInfo.dateDiffLabel}
-            points={{
-              usedPoints: dateTimeInfo.usedPoints,
-              participantCountWithPoint: dateTimeInfo.participantCountWithPoint,
-            }}
-            ticketCount={dateTimeInfo.ticketCount}
-            category={opportunityDetail.category}
-            pointsToEarn={isQuestCategory(opportunityDetail) ? opportunityDetail.pointsToEarn : 0}
-          />
-        </div>
-      )}
+      <OpportunityInfo 
+        opportunity={opportunityDetail}
+        dateTimeInfo={dateTimeInfo}
+        participationCount={dateTimeInfo?.participantCount}
+        phoneNumber={participation.emergencyContactPhone}
+        comment={participation.reservation?.comment}
+        totalPrice={dateTimeInfo?.totalPrice}
+        ticketCount={dateTimeInfo?.ticketCount}
+        variant="participation"
+      />
       {/*<div className="px-6">*/}
       {/*  <h2 className="text-label-md font-bold mb-4">メッセージ</h2>*/}
       {/*  /!* #TODO: メッセージの表示を動的にする *!/*/}

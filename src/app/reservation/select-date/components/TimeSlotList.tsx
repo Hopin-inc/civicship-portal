@@ -87,15 +87,28 @@ const TimeSlotList: React.FC<TimeSlotListProps> = ({
                         )}
                       </p>
                       {category === GqlOpportunityCategory.Activity && (
-                        <p
-                          className={`text-md font-bold ${
-                            isFull || !isFeeSpecified || isRegistrationClosed
-                              ? "text-muted-foreground/50"
-                              : ""
-                          }`}
-                        >
-                          {isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円/人` : "料金未定"}
-                        </p>
+                        <>
+                          {slot.feeRequired === 0 && slot.pointsRequired != null && slot.pointsRequired > 0 ? (
+                            <div className="flex items-center gap-1 pt-1">
+                              <p className={`${isFull || isRegistrationClosed ? "bg-ring" : "bg-primary"} text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none`}>
+                                P
+                              </p>
+                              <p className={`text-md font-bold ${isFull || isRegistrationClosed ? "text-muted-foreground/50" : ""}`}>
+                                {slot.pointsRequired.toLocaleString()}pt必要
+                              </p>
+                            </div>
+                          ) : (
+                            <p
+                              className={`text-md font-bold ${
+                                isFull || !isFeeSpecified || isRegistrationClosed
+                                  ? "text-muted-foreground/50"
+                                  : ""
+                              }`}
+                            >
+                              {isFeeSpecified ? `${slot.feeRequired!.toLocaleString()}円/人` : "料金未定"}
+                            </p>
+                          )}
+                        </>
                       )}
                       {category === GqlOpportunityCategory.Quest && (
                       <div className="flex items-center gap-1 pt-1">

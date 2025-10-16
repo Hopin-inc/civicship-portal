@@ -56,6 +56,7 @@ export const OpportunityDetailsContent = ({
         communityId={communityId}
         place={isActivityCategory(opportunity) ? opportunity.feeRequired : null}
         points={isQuestCategory(opportunity) ? opportunity.pointsToEarn : null}
+        pointsRequired={isActivityCategory(opportunity) ? opportunity.pointsRequired : null}
       />
       <NoticeSection />
       <SimilarOpportunities
