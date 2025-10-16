@@ -1,27 +1,25 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { GqlOpportunityCategory, useGetOpportunityQuery, useGetUserWalletQuery } from "@/types/graphql";
+import { GqlOpportunityCategory, useGetOpportunityQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { presentReservationActivity, presentReservationQuest, presentReservationWallet } from "../presenters/presentReservationConfirm";
+import { presentReservationActivity, presentReservationQuest } from "../presenters/presentReservationConfirm";
 import { findSlotById, parseSlotDateRange } from "../utils/slotUtils";
 import type { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { logger } from "@/lib/logging";
 
-export const useReservationConfirm = ({
+export const useReservationOpportunity = ({
   opportunityId,
   slotId,
-  userId,
 }: {
   opportunityId: string;
   slotId: string;
-  userId?: string;
 }) => {
   const {
     data,
-    loading: oppLoading,
-    error: oppError,
-    refetch: oppRefetch,
+    loading,
+    error,
+    refetch,
   } = useGetOpportunityQuery({
     variables: {
       id: opportunityId,
@@ -42,25 +40,6 @@ export const useReservationConfirm = ({
     return null;
   }, [data]);
 
-  const {
-    data: walletData,
-    loading: walletLoading,
-    error: walletError,
-    refetch: walletRefetch,
-  } = useGetUserWalletQuery({
-    variables: userId ? { id: userId } : undefined,
-    skip: !userId,
-  });
-
-  const wallet = useMemo(
-    () => {
-      const wallets = walletData?.user?.wallets;
-      if (!wallets || !Array.isArray(wallets)) return null;
-      return presentReservationWallet(wallets, opportunity);
-    },
-    [walletData?.user?.wallets, opportunity]
-  );
-
   const selectedSlot = useMemo(() => {
     if (!opportunity) return null;
     return findSlotById(opportunity.slots, slotId);
@@ -71,35 +50,22 @@ export const useReservationConfirm = ({
     [selectedSlot]
   );
 
-  const loading = oppLoading || walletLoading;
-  const hasError = Boolean(oppError || walletError);
-
   useEffect(() => {
-    if (oppError)
+    if (error)
       logger.info("Opportunity query error", {
-        error: oppError.message || String(oppError),
-        component: "useReservationConfirm",
+        error: error.message || String(error),
+        component: "useReservationOpportunity",
         opportunityId,
       });
-    if (walletError)
-      logger.info("Slot/Wallet error", {
-        error: walletError.message || String(walletError),
-        component: "useReservationConfirm",
-        slotId,
-      });
-  }, [oppError, walletError, opportunityId, slotId]);
+  }, [error, opportunityId]);
 
   return {
     opportunity,
     selectedSlot,
     startDateTime,
     endDateTime,
-    wallet,
     loading,
-    hasError,
-    triggerRefetch: () => {
-      void oppRefetch();
-      void walletRefetch();
-    },
+    error,
+    refetch,
   };
 };

@@ -10,7 +10,8 @@ import { ErrorState } from "@/components/shared";
 import { errorMessages } from "@/utils/errorMessage";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
-import { useReservationConfirm } from "@/app/reservation/confirm/hooks/useReservationConfirm";
+import { useReservationOpportunity } from "@/app/reservation/confirm/hooks/useReservationOpportunity";
+import { useReservationWallet } from "@/app/reservation/confirm/hooks/useReservationWallet";
 import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
 import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
@@ -42,13 +43,26 @@ export default function ConfirmPage() {
   const {
     opportunity,
     selectedSlot,
-    wallet,
     startDateTime,
     endDateTime,
-    loading,
-    hasError,
-    triggerRefetch,
-  } = useReservationConfirm({ opportunityId, slotId, userId: user?.id });
+    loading: oppLoading,
+    error: oppError,
+    refetch: oppRefetch,
+  } = useReservationOpportunity({ opportunityId, slotId });
+
+  const {
+    wallet,
+    loading: walletLoading,
+    error: walletError,
+    refetch: walletRefetch,
+  } = useReservationWallet({ userId: user?.id, opportunity });
+
+  const loading = oppLoading || walletLoading;
+  const hasError = Boolean(oppError || walletError);
+  const triggerRefetch = () => {
+    oppRefetch();
+    walletRefetch();
+  };
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
