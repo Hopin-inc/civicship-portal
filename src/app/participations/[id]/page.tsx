@@ -151,6 +151,7 @@ export default function ParticipationPage() {
         comment={participation.reservation?.comment}
         totalPrice={dateTimeInfo?.totalPrice}
         ticketCount={dateTimeInfo?.ticketCount}
+        variant="participation"
       />
       {/*<div className="px-6">*/}
       {/*  <h2 className="text-label-md font-bold mb-4">メッセージ</h2>*/}

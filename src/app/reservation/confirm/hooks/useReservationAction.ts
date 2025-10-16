@@ -17,7 +17,7 @@ import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportu
 
 // 選択されたチケットからチケットIDを取得する関数
 const getSelectedTicketIds = (
-  wallets: GqlWallet[] | null | undefined,
+  wallets: GqlWallet[] | null,
   selectedTickets: { [ticketId: string]: number } | undefined,
 ): string[] => {
   if (!selectedTickets || !wallets) return [];
@@ -49,7 +49,7 @@ type Result =
 interface ReservationParams {
   opportunity: ActivityDetail | QuestDetail | null;
   selectedSlot: ActivitySlot | QuestSlot | null;
-  wallets: GqlWallet[] | null | undefined;
+  wallets: GqlWallet[] | null;
   user: Pick<GqlUser, "id"> | null;
   ticketCounter: UseTicketCounterReturn;
   participantCount: number;

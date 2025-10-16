@@ -3,6 +3,8 @@
  * BigIntの安全な変換とポイント計算を提供
  */
 
+import { toNumberSafe } from "@/utils/bigint";
+
 /**
  * GraphQL BigInt型を安全にBigIntに変換
  * nullやundefinedの場合はnullを返す
@@ -30,41 +32,7 @@ export function toBigIntSafe(value: unknown): bigint | null {
   return null;
 }
 
-/**
- * GraphQL BigInt型を安全に数値に変換
- * nullやundefinedの場合はnullを返す
- */
-export function toNumberSafe(value: unknown): number | null {
-  if (value === null || value === undefined || value === '') {
-    return null;
-  }
-  
-  try {
-    if (typeof value === 'bigint') {
-      return Number(value);
-    }
-    if (typeof value === 'string') {
-      const num = Number(value);
-      if (isNaN(num)) {
-        console.warn('[PaymentCalculations] Invalid number string:', value);
-        return null;
-      }
-      return num;
-    }
-    if (typeof value === 'number') {
-      if (isNaN(value)) {
-        console.warn('[PaymentCalculations] NaN value:', value);
-        return null;
-      }
-      return value;
-    }
-  } catch (error) {
-    console.warn('[PaymentCalculations] Invalid number value:', value, error);
-    return null;
-  }
-  
-  return null;
-}
+export { toNumberSafe };
 
 /**
  * 必要ポイント数を計算

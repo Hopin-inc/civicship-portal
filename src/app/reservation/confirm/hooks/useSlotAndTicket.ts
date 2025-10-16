@@ -5,7 +5,7 @@ import { GqlOpportunityCategory, GqlWallet, GqlWalletType, useGetUserWalletQuery
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
 import { useSlotDateRange } from "@/app/reservation/confirm/hooks/useSlotDateRange";
-import { parseBigIntToNumber } from "@/utils/bigint";
+import { toNumberSafe } from "@/utils/bigint";
 
 export function useSlotAndTicketInfo(
   opportunity: ActivityDetail | QuestDetail | null,
@@ -27,7 +27,7 @@ export function useSlotAndTicketInfo(
 
   const currentPoint = useMemo(() => {
     const memberWallet = wallets?.find(w => w.type === GqlWalletType.Member);
-    return parseBigIntToNumber(memberWallet?.currentPointView?.currentPoint);
+    return toNumberSafe(memberWallet?.currentPointView?.currentPoint, 0);
   }, [wallets]);
 
   const selectedSlot = useMemo(() => {
