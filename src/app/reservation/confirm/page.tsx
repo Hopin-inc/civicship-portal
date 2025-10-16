@@ -17,7 +17,6 @@ import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReserv
 import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCounter";
 import { useOpportunityCalculations } from "@/app/reservation/confirm/hooks/useOpportunityCalculations";
 import { useReservationValidation } from "@/app/reservation/confirm/hooks/useReservationValidation";
-import { presentUserWallet } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
 import ConfirmPageView from "@/app/reservation/confirm/components/ConfirmPageView";
 import type { GqlWallet } from "@/types/graphql";
 
@@ -54,10 +53,7 @@ export default function ConfirmPage() {
     triggerRefetch,
   } = useReservationConfirm({ opportunityId, slotId, userId: user?.id });
 
-  const userWallet = useMemo(
-    () => presentUserWallet(wallets),
-    [wallets]
-  );
+  const userWallet: number | null = currentPoint;
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = triggerRefetch;
