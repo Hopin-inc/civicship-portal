@@ -48,6 +48,7 @@ export const useReservationConfirm = ({
     availableTickets,
     startDateTime,
     endDateTime,
+    currentPoint,
     walletLoading,
     walletError,
     walletRefetch,
@@ -78,8 +79,9 @@ export const useReservationConfirm = ({
     endDateTime,
     wallets,
     availableTickets,
+    currentPoint,
     loading,
-    hasError, // ← serialize-safe
+    hasError,
     triggerRefetch: () => {
       void oppRefetch();
       void walletRefetch();

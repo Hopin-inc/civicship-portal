@@ -14,6 +14,7 @@ interface OpportunityScheduleCardProps {
   communityId: string;
   place?:number | null;
   points?:number | null;
+  pointsRequired?:number | null;
 }
 
 export const OpportunityScheduleCard: React.FC<OpportunityScheduleCardProps> = ({
@@ -22,14 +23,15 @@ export const OpportunityScheduleCard: React.FC<OpportunityScheduleCardProps> = (
   communityId,
   place,
   points,
+  pointsRequired,
 }) => {
   const isFull = slot.remainingCapacity === 0;
   return isFull
-    ? renderFullSlotCard(slot, place, points)
-    : renderAvailableSlotCard(slot, opportunityId, communityId, place, points);
+    ? renderFullSlotCard(slot, place, points, pointsRequired)
+    : renderAvailableSlotCard(slot, opportunityId, communityId, place, points, pointsRequired);
 };
 
-const renderFullSlotCard = (slot: ActivitySlot | QuestSlot, place?:number | null, points?:number | null) => {
+const renderFullSlotCard = (slot: ActivitySlot | QuestSlot, price?:number | null, points?:number | null, pointsRequired?:number | null) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
 
@@ -52,16 +54,25 @@ const renderFullSlotCard = (slot: ActivitySlot | QuestSlot, place?:number | null
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            {place != null ? (
-              <p className="text-body-md font-bold  mt-4">
-                {`${place.toLocaleString()}円`}
+            {price === 0 && pointsRequired != null && pointsRequired > 0 ? (
+              <p className="text-body-sm">
+                <span className="text-body-md font-bold">
+                  {pointsRequired.toLocaleString()}pt
+                </span>
+                /人
+              </p>
+            ) : price != null ? (
+              <p className="text-body-sm">
+                <span className="text-body-md font-bold">
+                  {price.toLocaleString()}円
+                </span>
+                /人
               </p>
             ) : points == null ? (
               <p className="text-body-md font-bold text-muted-foreground/50">
                 料金未定
               </p>
             ) : null}
-            {place != null && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
           </div>
           {points != null && (
             <div className="flex items-center gap-1 pt-1">
@@ -89,8 +100,9 @@ const renderAvailableSlotCard = (
   slot: ActivitySlot | QuestSlot,
   opportunityId: string,
   communityId: string,
-  place?:number | null,
+  price?:number | null,
   points?:number | null,
+  pointsRequired?:number | null,
 ) => {
   const startDate = new Date(slot.startsAt);
   const endDate = new Date(slot.endsAt);
@@ -124,16 +136,25 @@ const renderAvailableSlotCard = (
         </p>
         <div className="space-y-2">
           <div className="flex items-baseline">
-            {place != null ? (
-              <p className="text-body-md font-bold  mt-4">
-                {`${place.toLocaleString()}円`}
+            {price === 0 && pointsRequired != null && pointsRequired > 0 ? (
+              <p className="text-body-sm">
+                <span className="text-body-md font-bold">
+                  {pointsRequired.toLocaleString()}pt
+                </span>
+                /人
+              </p>
+            ) : price != null ? (
+              <p className="text-body-sm">
+                <span className="text-body-md font-bold">
+                  {price.toLocaleString()}円
+                </span>
+                /人
               </p>
             ) : points == null ? (
               <p className="text-body-md font-bold text-muted-foreground/50">
                 料金未定
               </p>
             ) : null}
-            {place != null && <p className="text-body-sm ml-1 text-caption">/ 人</p>}
           </div>
           {points != null && (
             <div className="flex items-center gap-1 pt-1">
