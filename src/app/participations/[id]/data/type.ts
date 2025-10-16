@@ -3,7 +3,11 @@ import {
   GqlOpportunitySlotHostingStatus,
   GqlReservationStatus,
 } from "@/types/graphql";
-import { ActivityCard, OpportunityHost, OpportunityPlace } from "@/components/domains/opportunity/types";
+import {
+  ActivityCard,
+  OpportunityHost,
+  OpportunityPlace,
+} from "@/components/domains/opportunities/types";
 import { ParticipationStatus, ParticipationStatusReason } from "@/types/participationStatus";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 

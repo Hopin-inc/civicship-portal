@@ -5,7 +5,7 @@ import {
   GqlPortfolioSource,
   GqlReservationStatus,
 } from "@/types/graphql";
-import { ActivityCard } from "@/components/domains/opportunity/types";
+import { ActivityCard } from "@/components/domains/opportunities/types";
 import { Participant } from "@/types/utils";
 import { UserAsset } from "@/app/wallets/data/type";
 
