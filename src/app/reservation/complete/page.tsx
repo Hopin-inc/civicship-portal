@@ -7,8 +7,8 @@ import { useSearchParams } from "next/navigation";
 import { HeaderConfig } from "@/contexts/HeaderContext";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from '@/components/shared'
-import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
+import { ErrorState } from "@/components/shared";
+import OpportunityInfo from "@/app/reservation/complete/components/OpportunityInfo";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
 import { useAuth } from "@/contexts/AuthProvider";
@@ -75,19 +75,19 @@ export default function CompletePage() {
 
   return (
     <main className="flex flex-col items-center">
-      <CompletionHeader requireApproval={ oppotunityDetail?.requireApproval } />
-      { oppotunityDetail && (
+      <CompletionHeader requireApproval={oppotunityDetail?.requireApproval} />
+      {oppotunityDetail && (
         <OpportunityInfo
-          opportunity={ oppotunityDetail }
-          dateTimeInfo={ dateTimeInfo }
-          participationCount={ participationCount }
-          phoneNumber={ reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber }
-          comment={ reservation.comment }
-          totalPrice={ dateTimeInfo.totalPrice }
-          ticketCount={ dateTimeInfo.ticketCount }
+          opportunity={oppotunityDetail}
+          dateTimeInfo={dateTimeInfo}
+          participationCount={participationCount}
+          phoneNumber={reservation.opportunitySlot?.opportunity?.createdByUser?.phoneNumber}
+          comment={reservation.comment}
+          totalPrice={dateTimeInfo.totalPrice}
+          ticketCount={dateTimeInfo.ticketCount}
         />
-      ) }
-      { opportunityId && sameStateOpportunities.length > 0 && (
+      )}
+      {opportunityId && sameStateOpportunities.length > 0 && (
         <>
           <div className="h-2 bg-border -mx-6 w-full" />
           <div className="px-6 w-full">
