@@ -5,6 +5,8 @@ import { GqlGetOpportunityQuery, GqlOpportunityCategory, useGetOpportunityQuery 
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { presenterActivityDetail, presenterQuestDetail } from "@/components/domains/opportunities/data/presenter";
 import { useSlotAndTicketInfo } from "@/app/reservation/confirm/hooks/useSlotAndTicket";
+import { useWalletData } from "@/app/reservation/confirm/hooks/useWalletData";
+import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
 import type { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { logger } from "@/lib/logging";
 
@@ -42,20 +44,14 @@ export const useReservationConfirm = ({
     return null;
   }, [data]);
 
-  const {
-    wallets,
-    selectedSlot,
-    availableTickets,
-    startDateTime,
-    endDateTime,
-    currentPoint,
-    walletLoading,
-    walletError,
-    walletRefetch,
-  } = useSlotAndTicketInfo(opportunity, userId, slotId);
+  const walletData = useWalletData(userId);
 
-  const loading = oppLoading || walletLoading;
-  const hasError = Boolean(oppError || walletError);
+  const slotInfo = useSlotAndTicketInfo(opportunity, slotId, walletData);
+
+  const availableTickets = useAvailableTickets(opportunity, walletData.tickets);
+
+  const loading = oppLoading || walletData.loading;
+  const hasError = Boolean(oppError || walletData.error);
 
   useEffect(() => {
     if (oppError)
@@ -64,27 +60,27 @@ export const useReservationConfirm = ({
         component: "useReservationConfirm",
         opportunityId,
       });
-    if (walletError)
+    if (walletData.error)
       logger.info("Slot/Wallet error", {
-        error: walletError.message || String(walletError),
+        error: walletData.error.message || String(walletData.error),
         component: "useReservationConfirm",
         slotId,
       });
-  }, [oppError, walletError, opportunityId, slotId]);
+  }, [oppError, walletData.error, opportunityId, slotId]);
 
   return {
     opportunity,
-    selectedSlot,
-    startDateTime,
-    endDateTime,
-    wallets,
+    selectedSlot: slotInfo.selectedSlot,
+    startDateTime: slotInfo.startDateTime,
+    endDateTime: slotInfo.endDateTime,
+    wallets: slotInfo.wallets,
     availableTickets,
-    currentPoint,
+    currentPoint: slotInfo.currentPoint,
     loading,
     hasError,
     triggerRefetch: () => {
       void oppRefetch();
-      void walletRefetch();
+      void walletData.refetch();
     },
   };
 };
