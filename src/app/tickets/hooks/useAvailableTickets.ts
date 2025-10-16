@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { GqlTicketStatus, GqlTicket } from "@/types/graphql";
+import { GqlTicket, GqlTicketStatus } from "@/types/graphql";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 
 export interface AvailableTicket {
@@ -20,9 +20,20 @@ export interface AvailableTicket {
 
 export const useAvailableTickets = (
   opportunity: ActivityDetail | QuestDetail | null,
-  tickets: GqlTicket[]
+  ticketsInput: GqlTicket[] | { edges?: { node: GqlTicket }[] } | null | undefined,
 ): AvailableTicket[] => {
   return useMemo(() => {
+    // ✅ 1. ticketsInputが配列構造かedges構造かを吸収してフラット化
+    const tickets: GqlTicket[] = Array.isArray(ticketsInput)
+      ? ticketsInput
+      : Array.isArray(ticketsInput?.edges)
+        ? ticketsInput.edges.map((e) => e.node)
+        : [];
+
+    // ✅ 2. 空なら即リターン
+    if (tickets.length === 0) return [];
+
+    // ✅ 3. チケットをutilityごとにグループ化
     const ticketGroups = new Map<string, GqlTicket[]>();
     tickets.forEach((ticket) => {
       const utilityId = ticket.utility?.id || "unknown";
@@ -32,47 +43,40 @@ export const useAvailableTickets = (
       ticketGroups.get(utilityId)!.push(ticket);
     });
 
-    const groupedTickets = Array.from(ticketGroups.entries()).map(
-      ([utilityId, ticketList]) => {
-        const firstTicket = ticketList[0];
-        const availableTickets = ticketList.filter(
-          (ticket) => ticket.status === GqlTicketStatus.Available
-        );
+    // ✅ 4. グループごとにAvailable数などを集計
+    const groupedTickets = Array.from(ticketGroups.entries()).map(([utilityId, ticketList]) => {
+      const firstTicket = ticketList[0];
+      const availableTickets = ticketList.filter(
+        (ticket) => ticket.status === GqlTicketStatus.Available,
+      );
 
-        return {
-          id: utilityId,
-          utility: firstTicket.utility
-            ? {
-                id: firstTicket.utility.id,
-                name: firstTicket.utility.name ?? null,
-                owner: firstTicket.utility.owner ?? null,
-              }
-            : null,
-          status:
-            availableTickets.length > 0
-              ? GqlTicketStatus.Available
-              : firstTicket.status,
-          count: availableTickets.length,
-        };
-      }
-    );
+      return {
+        id: utilityId,
+        utility: firstTicket.utility
+          ? {
+              id: firstTicket.utility.id,
+              name: firstTicket.utility.name ?? null,
+              owner: firstTicket.utility.owner ?? null,
+            }
+          : null,
+        status: availableTickets.length > 0 ? GqlTicketStatus.Available : firstTicket.status,
+        count: availableTickets.length,
+      };
+    });
 
-    if (!opportunity?.targetUtilities.length) {
+    // ✅ 5. 対象Utilityフィルタリング
+    if (!opportunity?.targetUtilities?.length) {
       return groupedTickets;
     }
 
-    const requiredUtilityIds = new Set(
-      opportunity.targetUtilities.map((u) => u.id)
-    );
+    const requiredUtilityIds = new Set(opportunity.targetUtilities.map((u) => u.id));
 
-    const filteredTickets = groupedTickets.filter((t) => {
+    return groupedTickets.filter((t) => {
       const utilityId = t?.utility?.id;
       const hasRequiredUtility = utilityId && requiredUtilityIds.has(utilityId);
       const isAvailable = t.status === GqlTicketStatus.Available;
 
       return hasRequiredUtility && isAvailable;
     });
-
-    return filteredTickets;
-  }, [opportunity?.targetUtilities, tickets]);
+  }, [opportunity?.targetUtilities, ticketsInput]);
 };
