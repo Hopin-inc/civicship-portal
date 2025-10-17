@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { GqlParticipation, useGetReservationQuery } from "@/types/graphql";
+import { GqlEvaluationStatus, GqlParticipation, useGetReservationQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
@@ -23,13 +23,22 @@ import { useSaveAttendances } from "@/app/admin/reservations/hooks/attendance/us
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { PriceInfo } from "@/app/admin/reservations/types";
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
+import { useOrganizerWallet } from "@/app/admin/reservations/hooks/useOrganizerWallet";
+import { InsufficientBalanceNotice } from "@/app/admin/reservations/[id]/components/InsufficientBalanceNotice";
 
 export default function ReservationPage() {
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const searchParams = useSearchParams();
-  const mode = searchParams.get("mode");
+  const modeParam = searchParams.get("mode");
+
+  const mode = useMemo(() => {
+    if (modeParam === "approval" || modeParam === "attendance" || modeParam === "cancellation") {
+      return modeParam;
+    }
+    return null;
+  }, [modeParam]);
 
   const headerConfig = useMemo(
     () => ({
@@ -105,6 +114,11 @@ export default function ReservationPage() {
 
   const { isApplied } = useReservationStatus(reservation);
 
+  const { currentPoint: organizerBalance, loading: balanceLoading } = useOrganizerWallet({
+    organizerId: opportunity?.createdByUser?.id,
+    communityId: opportunity?.community?.id || COMMUNITY_ID,
+  });
+
   const { handleAccept, handleReject, acceptLoading, rejectLoading } = useReservationApproval({
     id: id ?? "",
     reservation,
@@ -159,6 +173,18 @@ export default function ReservationPage() {
   const totalPointsToEarn = pointsToEarn * participantCount;
   const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
 
+  const passedCount = Object.values(attendanceData).filter(
+    (status) => status === GqlEvaluationStatus.Passed,
+  ).length;
+
+  const requiredPointsForApproval = participantCount * (opportunity?.pointsToEarn || 0);
+  const requiredPointsForAttendance = passedCount * (opportunity?.pointsToEarn || 0);
+
+  const isInsufficientBalanceForApproval =
+    !balanceLoading && organizerBalance < BigInt(requiredPointsForApproval);
+  const isInsufficientBalanceForAttendance =
+    !balanceLoading && organizerBalance < BigInt(requiredPointsForAttendance);
+
   const priceInfo: PriceInfo = {
     participationFee,
     participantCount,
@@ -173,7 +199,17 @@ export default function ReservationPage() {
   const { label, variant } = getReservationStatusMeta(reservation);
 
   return (
-    <div className="p-6 mt-4">
+    <div className="p-6">
+      <InsufficientBalanceNotice
+        mode={mode}
+        isApplied={isApplied()}
+        isInsufficientBalanceForApproval={isInsufficientBalanceForApproval}
+        isInsufficientBalanceForAttendance={isInsufficientBalanceForAttendance}
+        requiredPointsForApproval={requiredPointsForApproval}
+        requiredPointsForAttendance={requiredPointsForAttendance}
+        organizerBalance={organizerBalance}
+      />
+
       <div>
         <AdminReservationDetails
           reservation={reservation}
@@ -232,6 +268,7 @@ export default function ReservationPage() {
           handleSaveAllAttendance={handleSaveAllAttendance}
           allEvaluated={allEvaluated}
           opportunity={opportunity}
+          isInsufficientBalance={isInsufficientBalanceForAttendance}
         />
       )}
     </div>
