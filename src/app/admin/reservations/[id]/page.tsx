@@ -6,7 +6,6 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { GqlEvaluationStatus, GqlParticipation, useGetReservationQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
-import { NoticeCard } from "@/components/shared/NoticeCard";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import getReservationStatusMeta from "@/app/admin/reservations/hooks/useGetReservationStatusMeta";
 import NotFound from "@/app/not-found";
@@ -25,13 +24,21 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { PriceInfo } from "@/app/admin/reservations/types";
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 import { useOrganizerWallet } from "@/app/admin/reservations/hooks/useOrganizerWallet";
+import { InsufficientBalanceNotice } from "@/app/admin/reservations/[id]/components/InsufficientBalanceNotice";
 
 export default function ReservationPage() {
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const searchParams = useSearchParams();
-  const mode = searchParams.get("mode");
+  const modeParam = searchParams.get("mode");
+
+  const mode = useMemo(() => {
+    if (modeParam === "approval" || modeParam === "attendance" || modeParam === "cancellation") {
+      return modeParam;
+    }
+    return null;
+  }, [modeParam]);
 
   const headerConfig = useMemo(
     () => ({
@@ -193,14 +200,15 @@ export default function ReservationPage() {
 
   return (
     <div className="p-6">
-      {mode === "approval" && isApplied() && isInsufficientBalanceForApproval && (
-        <div className="mb-8">
-          <NoticeCard
-            title="ポイント残高が不足しています"
-            description={`承認により${requiredPointsForApproval}ptが必要ですが、現在の残高は${organizerBalance.toString()}ptです。`}
-          />
-        </div>
-      )}
+      <InsufficientBalanceNotice
+        mode={mode}
+        isApplied={isApplied()}
+        isInsufficientBalanceForApproval={isInsufficientBalanceForApproval}
+        isInsufficientBalanceForAttendance={isInsufficientBalanceForAttendance}
+        requiredPointsForApproval={requiredPointsForApproval}
+        requiredPointsForAttendance={requiredPointsForAttendance}
+        organizerBalance={organizerBalance}
+      />
 
       <div>
         <AdminReservationDetails
@@ -211,15 +219,6 @@ export default function ReservationPage() {
           variant={variant}
         />
       </div>
-
-      {mode === "attendance" && isInsufficientBalanceForAttendance && (
-        <div className="mt-4">
-          <NoticeCard
-            title="ポイント残高が不足しています"
-            description={`出席者への報酬支払いに${requiredPointsForAttendance}ptが必要ですが、現在の残高は${organizerBalance.toString()}ptです。`}
-          />
-        </div>
-      )}
 
       {mode === "approval" && (
         <ApprovalSheet
@@ -237,7 +236,6 @@ export default function ReservationPage() {
           message={approvalMessage}
           setMessage={setApprovalMessage}
           DEFAULT_MESSAGE={APPROVAL_DEFAULT_MESSAGE}
-          isInsufficientBalance={isInsufficientBalanceForApproval}
         />
       )}
 

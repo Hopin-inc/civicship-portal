@@ -26,7 +26,6 @@ interface ApprovalSheetProps {
   message: string;
   setMessage: (value: string) => void;
   DEFAULT_MESSAGE: string;
-  isInsufficientBalance: boolean;
 }
 
 const ApprovalSheet: React.FC<ApprovalSheetProps> = ({
@@ -44,7 +43,6 @@ const ApprovalSheet: React.FC<ApprovalSheetProps> = ({
   message,
   setMessage,
   DEFAULT_MESSAGE,
-  isInsufficientBalance,
 }) => {
   if (!isApplied) return null;
 
@@ -52,7 +50,7 @@ const ApprovalSheet: React.FC<ApprovalSheetProps> = ({
     <div className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto p-6 bg-background border-t-2 border-b-card space-y-3">
       <Sheet open={isAcceptSheetOpen} onOpenChange={setIsAcceptSheetOpen}>
         <SheetTrigger asChild>
-          <Button className="w-full" variant="primary" size="lg" disabled={isInsufficientBalance}>
+          <Button className="w-full" variant="primary" size="lg">
             申込を承認する
           </Button>
         </SheetTrigger>
