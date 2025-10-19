@@ -47,6 +47,7 @@ export function middleware(request: NextRequest) {
     `'nonce-${nonce}'`, // ← インラインを許可する唯一の手段
     "https://static.line-scdn.net",
     "https://www.google.com",
+    "https://www.googletagmanager.com",
     ...(isDev ? [`'unsafe-eval'`] : []), // ← 開発のみ許可（本番は絶対NG）
   ].join(" ");
 
