@@ -52,6 +52,7 @@ export function middleware(request: NextRequest) {
 
   const styleSrc = [
     `'self'`,
+    `'nonce-${nonce}'`, // CSS-in-JSが挿入する <style> を許可
     "https://fonts.googleapis.com",
     // 可能なら style も nonce 化。インライン style が残るなら開発中だけ 'unsafe-inline' を一時許可
     ...(isDev ? [`'unsafe-inline'`] : []),
@@ -68,6 +69,7 @@ export function middleware(request: NextRequest) {
     "https://www.google.com",
     "https://maps.googleapis.com",
     "https://firebase.googleapis.com",
+    "https://www.googletagmanager.com",
   ].join(" ");
 
   const frameSrc = [
