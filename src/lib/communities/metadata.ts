@@ -137,18 +137,33 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     id: "kotohira",
     tokenName: "KOTOHIRA",
     title: "琴平デジタル町民",
-    description: "「観光地を訪れる」から「観光地と関わる」へ。あなたも琴平デジタル町民として、DAO型地域共創の一員になりませんか？",
+    description:
+      "「観光地を訪れる」から「観光地と関わる」へ。あなたも琴平デジタル町民として、DAO型地域共創の一員になりませんか？",
     shortDescription: "「観光地を訪れる」から「観光地と関わる」へ。",
     domain: "https://kotohira.civicship.app", // TODO: 環境によってドメインが変わるので、環境変数化する必要あり
     faviconPrefix: "/communities/kotohira",
     logoPath: "/communities/kotohira/logo.jpg",
     squareLogoPath: "/communities/kotohira/logo-square.jpg",
-    ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/kotohira/ogp.jpg",
-    enableFeatures: [
-      "opportunities",
-      "points",
-      "quests",
-    ],
+    ogImagePath:
+      "https://storage.googleapis.com/prod-civicship-storage-public/asset/kotohira/ogp.jpg",
+    enableFeatures: ["opportunities", "points", "quests"],
+    rootPath: "/opportunities",
+    adminRootPath: "/admin/reservations",
+  },
+  izu: {
+    id: "izu",
+    tokenName: "IZU",
+    title: "IZUとDAO",
+    description:
+      "クエストを通じて街に関わり、体験やお手伝いでポイントが貯まる。旅先で出会う人や場所とつながり、伊豆のまちをもっと深く楽しめるデジタル住民アプリです。",
+    shortDescription: '観光を越えて、伊豆に "溶ける" デジタル住民アプリ',
+    domain: "https://izu.civicship.app", // TODO: 環境によってドメインが変わるので、環境変数化する必要あり
+    faviconPrefix: "/communities/izu",
+    logoPath: "/communities/izu/logo.jpg",
+    squareLogoPath: "/communities/izu/logo-square.jpg",
+    ogImagePath:
+      "https://storage.googleapis.com/prod-civicship-storage-public/asset/izu/ogp.jpg",
+    enableFeatures: ["opportunities", "points", "quests"],
     rootPath: "/opportunities",
     adminRootPath: "/admin/reservations",
   },
