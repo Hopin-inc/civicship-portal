@@ -227,21 +227,19 @@ export class LiffService {
         const { customToken, profile } = await response.json();
         const userCredential = await signInWithCustomToken(lineAuth, customToken);
 
-        await Promise.race([
-          new Promise<void>((resolve) => {
-            const unsub = lineAuth.onAuthStateChanged((u) => {
-              if (u) {
-                unsub();
-                resolve();
-              }
-            });
-          }),
-          new Promise<void>((resolve) => {
-            setTimeout(() => {
+        await new Promise<void>((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            reject(new Error("Firebase authentication timeout: lineAuth.currentUser not set within 30 seconds"));
+          }, 30000);
+
+          const unsub = lineAuth.onAuthStateChanged((u) => {
+            if (u) {
+              clearTimeout(timeout);
+              unsub();
               resolve();
-            }, 5000);
-          }),
-        ]);
+            }
+          });
+        });
 
         await updateProfile(userCredential.user, {
           displayName: profile.displayName,
