@@ -150,7 +150,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     rootPath: "/opportunities",
     adminRootPath: "/admin/reservations",
   },
-  "izu-dao": {
+  izu: {
     id: "izu",
     tokenName: "IZU",
     title: "IZUとDAO",
