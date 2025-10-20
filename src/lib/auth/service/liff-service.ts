@@ -268,7 +268,6 @@ export class LiffService {
           TokenManager.savePhoneAuthFlag(true);
         }
 
-        authStateManager.updateState("line_authenticated", "signInWithLiffToken");
         useAuthStore.getState().setState({
           isAuthenticating: false,
         });
