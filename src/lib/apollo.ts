@@ -9,12 +9,12 @@ import { onError } from "@apollo/client/link/error";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
 import { logger } from "@/lib/logging";
-import { lineAuth } from "@/lib/auth/core/firebase-config";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
-  credentials: "same-origin",
+  credentials: "include",
   headers: {
     "Apollo-Require-Preflight": "true",
   },
@@ -22,15 +22,25 @@ const httpLink = createUploadLink({
 
 const requestLink = setContext(async (operation, prevContext) => {
   let token: string | null = null;
+  let authMode: "session" | "id_token" = "session";
 
   if (typeof window !== "undefined") {
-    const user = lineAuth.currentUser;
-    token = user ? await user.getIdToken() : null;
+    const { firebaseUser } = useAuthStore.getState().state;
+    
+    if (firebaseUser) {
+      try {
+        token = await firebaseUser.getIdToken();
+        authMode = "id_token";
+      } catch (error) {
+        logger.warn("Failed to get ID token, falling back to session", { error });
+      }
+    }
   }
 
   const headers = {
     ...prevContext.headers,
     Authorization: token ? `Bearer ${token}` : "",
+    "X-Auth-Mode": authMode,
     "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
     "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
   };
