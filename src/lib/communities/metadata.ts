@@ -153,7 +153,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     faviconPrefix: "/communities/izu",
     logoPath: "/communities/izu/logo.jpg",
     squareLogoPath: "/communities/izu/logo-square.jpg",
-    ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/izu/ogp.jpg",
+    ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/izu/ogp.png",
     enableFeatures: ["opportunities", "points", "quests"],
     rootPath: "/opportunities",
     adminRootPath: "/admin/reservations",
