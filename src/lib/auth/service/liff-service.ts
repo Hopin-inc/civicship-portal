@@ -268,10 +268,6 @@ export class LiffService {
           TokenManager.savePhoneAuthFlag(true);
         }
 
-        useAuthStore.getState().setState({
-          isAuthenticating: false,
-        });
-
         return true;
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
