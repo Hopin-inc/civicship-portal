@@ -42,7 +42,7 @@ export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateP
               expiresAt: expirationTime,
             },
             authenticationState:
-              stateRef.current.authenticationState === "loading"
+              stateRef.current.authenticationState === "loading" && !stateRef.current.isAuthInProgress
                 ? "line_authenticated"
                 : stateRef.current.authenticationState,
           });
