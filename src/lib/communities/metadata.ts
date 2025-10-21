@@ -155,8 +155,8 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     squareLogoPath: "/communities/izu/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/izu/ogp.png",
     enableFeatures: ["points", "justDaoIt"],
-    rootPath: "/opportunities",
-    adminRootPath: "/admin/reservations",
+    rootPath: "/users/me",
+    adminRootPath: "/admin/wallet",
   },
   default: {
     id: "default",
