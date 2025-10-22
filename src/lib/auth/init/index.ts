@@ -114,10 +114,13 @@ async function initAuthFull({
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
 }) {
   try {
+    logger.info("🔍 [initAuthFull] Starting full auth initialization");
     prepareInitialState(setState);
 
+    logger.info("🔍 [initAuthFull] Initializing Firebase");
     const firebaseUser = await initializeFirebase(liffService, environment);
     if (!firebaseUser) {
+      logger.info("🔍 [initAuthFull] No Firebase user, handling unauthenticated branch");
       const shouldContinue = handleUnauthenticatedBranch(
         liffService,
         environment,
@@ -128,18 +131,27 @@ async function initAuthFull({
       return;
     }
 
+    logger.info("🔍 [initAuthFull] Firebase user found, establishing session", {
+      firebaseUserId: firebaseUser.uid,
+    });
     const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState);
     if (!sessionOk) {
+      logger.info("🔍 [initAuthFull] Session establishment failed");
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
     }
 
+    logger.info("🔍 [initAuthFull] Session established, restoring user session");
     const user = await restoreUserSession(ssrCurrentUser, firebaseUser, setState);
     if (!user) {
+      logger.info("🔍 [initAuthFull] User restoration failed");
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
     }
 
+    logger.info("🔍 [initAuthFull] User restored, evaluating registration state", {
+      userId: user.id,
+    });
     await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager);
   } catch (error) {
     logger.error("initAuthFull failed", { error });
