@@ -39,7 +39,7 @@ export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateP
               ? "line_authenticated"
               : stateRef.current.authenticationState;
 
-          console.info("🔍 [useFirebaseAuthState] Firebase auth state changed:", {
+          logger.info("🔍 [useFirebaseAuthState] Firebase auth state changed:", {
             currentState: stateRef.current.authenticationState,
             isAuthInProgress: stateRef.current.isAuthInProgress,
             isAuthenticating: stateRef.current.isAuthenticating,

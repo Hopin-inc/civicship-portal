@@ -7,6 +7,7 @@ import { TokenManager } from "@/lib/auth/core/token-manager";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
+import { logger } from "@/lib/logging";
 
 /**
  * 1️⃣ 認証前の初期状態を設定
@@ -154,7 +155,7 @@ export async function evaluateUserRegistrationState(
 
   const isRegistered = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
 
-  console.info("🔍 [evaluateUserRegistrationState] Debug info:", {
+  logger.info("🔍 [evaluateUserRegistrationState] Debug info:", {
     userId: user.id,
     identities: user.identities,
     hasPhoneIdentity,
@@ -185,7 +186,7 @@ export function finalizeAuthState(
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
   authStateManager: AuthStateManager,
 ) {
-  console.info("🔍 [finalizeAuthState] Finalizing auth state:", {
+  logger.info("🔍 [finalizeAuthState] Finalizing auth state:", {
     newState,
     userId: user?.id,
     hasUser: !!user,
