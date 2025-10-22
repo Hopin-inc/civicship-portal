@@ -22,10 +22,9 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**",
+        hostname: "storage.googleapis.com",
       },
     ],
-    domains: ["storage.googleapis.com", "plus.unsplash.com", "images.unsplash.com"],
   },
   experimental: {
     webpackBuildWorker: true,
@@ -56,11 +55,20 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
+          },
+        ],
+      },
+      {
         source: "/_next/image",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable", // cache for 1 year
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
