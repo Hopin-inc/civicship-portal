@@ -34,6 +34,19 @@ export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateP
           const tokenResult = await user.getIdTokenResult();
           const expirationTime = String(new Date(tokenResult.expirationTime).getTime());
 
+          const newAuthState =
+            stateRef.current.authenticationState === "loading" && !stateRef.current.isAuthInProgress
+              ? "line_authenticated"
+              : stateRef.current.authenticationState;
+
+          console.info("🔍 [useFirebaseAuthState] Firebase auth state changed:", {
+            currentState: stateRef.current.authenticationState,
+            isAuthInProgress: stateRef.current.isAuthInProgress,
+            isAuthenticating: stateRef.current.isAuthenticating,
+            willSetStateTo: newAuthState,
+            firebaseUserId: user.uid,
+          });
+
           setState({
             firebaseUser: user,
             lineTokens: {
@@ -41,10 +54,7 @@ export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateP
               refreshToken,
               expiresAt: expirationTime,
             },
-            authenticationState:
-              stateRef.current.authenticationState === "loading" && !stateRef.current.isAuthInProgress
-                ? "line_authenticated"
-                : stateRef.current.authenticationState,
+            authenticationState: newAuthState,
           });
 
           TokenManager.saveLineAuthFlag(true);
