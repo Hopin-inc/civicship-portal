@@ -1,47 +1,19 @@
-import { GqlCurrentUserPayload } from "@/types/graphql";
+import { CurrentUserServerDocument, GqlCurrentUserPayload } from "@/types/graphql";
+import { apolloClient } from "@/lib/apollo";
 import { logger } from "@/lib/logging";
-import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
 
 export async function fetchCurrentUserClient(): Promise<GqlCurrentUserPayload["user"] | null> {
   try {
     logger.info("🔍 [fetchCurrentUserClient] Fetching user from GraphQL API");
-    
-    const response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Auth-Mode": "session",
-        "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID!,
-        "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID!,
-      },
-      credentials: "include", // セッションCookieを送信
-      body: JSON.stringify({
-        query: GET_CURRENT_USER_SERVER_QUERY,
-        variables: {},
-      }),
+    const { data } = await apolloClient.query({
+      query: CurrentUserServerDocument,
+      fetchPolicy: "network-only",
     });
-
-    if (!response.ok) {
-      logger.error("🔍 [fetchCurrentUserClient] HTTP error", {
-        status: response.status,
-        statusText: response.statusText,
-      });
-      return null;
-    }
-
-    const result = await response.json();
     
-    if (result.errors) {
-      logger.error("🔍 [fetchCurrentUserClient] GraphQL errors", {
-        errors: result.errors.map((e: any) => e.message),
-      });
-      return null;
-    }
-
-    const user = result.data?.currentUser?.user ?? null;
+    const user = data?.currentUser?.user ?? null;
     logger.info("🔍 [fetchCurrentUserClient] GraphQL response received", {
-      hasData: !!result.data,
-      hasCurrentUser: !!result.data?.currentUser,
+      hasData: !!data,
+      hasCurrentUser: !!data?.currentUser,
       hasUser: !!user,
       userId: user?.id,
       identitiesCount: user?.identities?.length ?? 0,
