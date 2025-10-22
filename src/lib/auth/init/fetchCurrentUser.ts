@@ -1,10 +1,30 @@
 import { CurrentUserServerDocument, GqlCurrentUserPayload } from "@/types/graphql";
 import { apolloClient } from "@/lib/apollo";
+import { logger } from "@/lib/logging";
 
 export async function fetchCurrentUserClient(): Promise<GqlCurrentUserPayload["user"] | null> {
-  const { data } = await apolloClient.query({
-    query: CurrentUserServerDocument,
-    fetchPolicy: "network-only",
-  });
-  return data?.currentUser?.user ?? null;
+  try {
+    logger.info("🔍 [fetchCurrentUserClient] Fetching user from GraphQL API");
+    const { data } = await apolloClient.query({
+      query: CurrentUserServerDocument,
+      fetchPolicy: "network-only",
+    });
+    
+    const user = data?.currentUser?.user ?? null;
+    logger.info("🔍 [fetchCurrentUserClient] GraphQL response received", {
+      hasData: !!data,
+      hasCurrentUser: !!data?.currentUser,
+      hasUser: !!user,
+      userId: user?.id,
+      identitiesCount: user?.identities?.length ?? 0,
+    });
+    
+    return user;
+  } catch (error) {
+    logger.error("🔍 [fetchCurrentUserClient] GraphQL query failed", {
+      error: error instanceof Error ? error.message : String(error),
+      errorType: error?.constructor?.name,
+    });
+    return null;
+  }
 }
