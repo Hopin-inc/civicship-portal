@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export function useRecaptchaManager(containerId: string = "recaptcha-container") {
+export function useRecaptchaManager() {
   const [isReady, setIsReady] = useState(false);
   const [showRecaptcha, setShowRecaptcha] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,18 +13,6 @@ export function useRecaptchaManager(containerId: string = "recaptcha-container")
     }
   }, []);
 
-  useEffect(() => {
-    const handleRecaptchaCompleted = () => {
-      setShowRecaptcha(false);
-    };
-
-    window.addEventListener("recaptcha-completed", handleRecaptchaCompleted);
-
-    return () => {
-      window.removeEventListener("recaptcha-completed", handleRecaptchaCompleted);
-    };
-  }, []);
-
   const show = useCallback(() => {
     setShowRecaptcha(true);
   }, []);
@@ -32,6 +20,14 @@ export function useRecaptchaManager(containerId: string = "recaptcha-container")
   const hide = useCallback(() => {
     setShowRecaptcha(false);
   }, []);
+
+  useEffect(() => {
+    window.addEventListener("recaptcha-completed", hide);
+
+    return () => {
+      window.removeEventListener("recaptcha-completed", hide);
+    };
+  }, [hide]);
 
   return {
     isReady,
