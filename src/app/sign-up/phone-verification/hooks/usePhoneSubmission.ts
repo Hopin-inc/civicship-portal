@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
-import { categorizeFirebaseError } from "@/lib/auth/utils/error-handler";
+import { categorizeFirebaseError } from "@/lib/auth/core/firebase-config";
 import { isRunningInLiff } from "@/lib/auth/core/environment-detector";
 import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
 import { useRecaptchaManager } from "./useRecaptchaManager";
@@ -20,7 +20,7 @@ interface PhoneSubmissionResult {
 export function usePhoneSubmission(
   phoneAuth: PhoneAuthService,
   recaptchaManager: ReturnType<typeof useRecaptchaManager>,
-  resendTimer: ReturnType<typeof useResendTimer>
+  resendTimer: Pick<ReturnType<typeof useResendTimer>, "isDisabled" | "start">
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
@@ -79,7 +79,7 @@ export function usePhoneSubmission(
 
   const resend = useCallback(
     async (formattedPhone: string): Promise<PhoneSubmissionResult> => {
-      if (resendTimer.isDisabled || isSubmitting) {
+      if (resendTimer.isDisabled || isSubmitting || isRateLimited) {
         return { success: false };
       }
 
@@ -150,7 +150,7 @@ export function usePhoneSubmission(
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, isSubmitting]
+    [phoneAuth, recaptchaManager, resendTimer, isSubmitting, isRateLimited]
   );
 
   return {
