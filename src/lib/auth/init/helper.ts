@@ -159,8 +159,8 @@ export async function evaluateUserRegistrationState(
     (m) => m.community?.id === COMMUNITY_ID
   );
 
-  const isRegistered = (ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified()) 
-    && hasMembershipInCurrentCommunity;
+  const isPhoneVerified = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
+  const isRegistered = isPhoneVerified && hasMembershipInCurrentCommunity;
 
   if (isRegistered) {
     TokenManager.savePhoneAuthFlag(true);
