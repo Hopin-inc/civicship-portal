@@ -8,6 +8,7 @@ import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 /**
  * 1️⃣ 認証前の初期状態を設定
@@ -153,8 +154,13 @@ export async function evaluateUserRegistrationState(
   authStateManager: AuthStateManager,
 ): Promise<boolean> {
   const hasPhoneIdentity = !!user.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
+  
+  const hasMembershipInCurrentCommunity = !!user.memberships?.some(
+    (m) => m.community?.id === COMMUNITY_ID
+  );
 
-  const isRegistered = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
+  const isPhoneVerified = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
+  const isRegistered = isPhoneVerified && hasMembershipInCurrentCommunity;
 
   if (isRegistered) {
     TokenManager.savePhoneAuthFlag(true);
