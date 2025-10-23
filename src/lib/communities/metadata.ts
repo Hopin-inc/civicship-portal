@@ -56,6 +56,11 @@ interface CommunityBaseConfig {
   adminRootPath?: string;
   /** コミュニティ固有の規約・文書リスト */
   documents?: CommunityDocument[];
+  /** 共通文書（利用規約・プライバシーポリシー）のオーバーライド */
+  commonDocumentOverrides?: {
+    terms?: CommunityDocument;
+    privacy?: CommunityDocument;
+  };
 }
 
 // コミュニティごとのメタデータ型定義
@@ -223,6 +228,14 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     enableFeatures: ["points", "justDaoIt"],
     rootPath: "/users/me",
     adminRootPath: "/admin/wallet",
+    commonDocumentOverrides: {
+      privacy: {
+        id: "privacy",
+        title: "プライバシーポリシー (PDF)",
+        path: "/communities/izu/privacy-policy.pdf",
+        type: "external",
+      },
+    },
     documents: [
       {
         id: "bylaws",
