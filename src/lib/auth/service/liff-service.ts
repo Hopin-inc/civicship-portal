@@ -268,6 +268,11 @@ export class LiffService {
           TokenManager.savePhoneAuthFlag(true);
         }
 
+        authStateManager.updateState("line_authenticated", "signInWithLiffToken");
+        useAuthStore.getState().setState({
+          isAuthenticating: false,
+        });
+
         return true;
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
