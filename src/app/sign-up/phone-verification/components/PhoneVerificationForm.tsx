@@ -19,7 +19,7 @@ export function PhoneVerificationForm() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
   const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
-  const { phoneAuth, isAuthenticated, loading, authenticationState, updateAuthState } = useAuth();
+  const { phoneAuth, isAuthenticated, loading, updateAuthState } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<VerificationStep>("phone");

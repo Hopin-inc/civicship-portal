@@ -40,7 +40,13 @@ export function useCodeVerification(
   const verify = useCallback(
     async (verificationCode: string): Promise<CodeVerificationResult> => {
       if (isVerifying) {
-        return { success: false };
+        return {
+          success: false,
+          error: {
+            message: "認証処理中です。しばらくお待ちください。",
+            type: "already-verifying",
+          },
+        };
       }
 
       setIsVerifying(true);

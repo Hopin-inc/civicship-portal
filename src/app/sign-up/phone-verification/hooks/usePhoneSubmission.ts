@@ -66,7 +66,15 @@ export function usePhoneSubmission(
       }
 
       if (isSubmitting || isRateLimited) {
-        return { success: false };
+        return {
+          success: false,
+          error: {
+            message: isRateLimited
+              ? "送信回数が上限に達しました。しばらく待ってから再試行してください。"
+              : "送信処理中です。しばらくお待ちください。",
+            type: isRateLimited ? "rate-limit" : "already-submitting",
+          },
+        };
       }
 
       setIsSubmitting(true);
@@ -87,7 +95,17 @@ export function usePhoneSubmission(
   const resend = useCallback(
     async (formattedPhone: string): Promise<PhoneSubmissionResult> => {
       if (resendTimer.isDisabled || isSubmitting || isRateLimited) {
-        return { success: false };
+        return {
+          success: false,
+          error: {
+            message: isRateLimited
+              ? "送信回数が上限に達しました。しばらく待ってから再試行してください。"
+              : resendTimer.isDisabled
+              ? "再送信は60秒後に可能です。"
+              : "送信処理中です。しばらくお待ちください。",
+            type: isRateLimited ? "rate-limit" : resendTimer.isDisabled ? "resend-disabled" : "already-submitting",
+          },
+        };
       }
 
       if (!recaptchaManager.isReady) {
