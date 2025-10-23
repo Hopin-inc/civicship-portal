@@ -27,13 +27,26 @@ const requestLink = setContext(async (operation, prevContext) => {
   if (typeof window !== "undefined") {
     const { firebaseUser } = useAuthStore.getState().state;
     
+    logger.info("🔍 [Apollo requestLink] Setting up request context", {
+      operation: operation.operationName,
+      hasFirebaseUser: !!firebaseUser,
+    });
+    
     if (firebaseUser) {
       try {
         token = await firebaseUser.getIdToken();
         authMode = "id_token";
+        logger.info("🔍 [Apollo requestLink] Using ID token auth", {
+          operation: operation.operationName,
+          hasToken: !!token,
+        });
       } catch (error) {
         logger.warn("Failed to get ID token, falling back to session", { error });
       }
+    } else {
+      logger.info("🔍 [Apollo requestLink] Using session auth (no Firebase user)", {
+        operation: operation.operationName,
+      });
     }
   }
 
@@ -44,6 +57,12 @@ const requestLink = setContext(async (operation, prevContext) => {
     "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
     "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
   };
+
+  logger.info("🔍 [Apollo requestLink] Final headers", {
+    operation: operation.operationName,
+    authMode,
+    hasAuthHeader: !!headers.Authorization,
+  });
 
   return { headers };
 });

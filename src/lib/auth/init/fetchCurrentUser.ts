@@ -4,11 +4,18 @@ import { logger } from "@/lib/logging";
 
 export async function fetchCurrentUserClient(): Promise<GqlCurrentUserPayload["user"] | null> {
   try {
-    logger.info("🔍 [fetchCurrentUserClient] Fetching user from GraphQL API");
+    logger.info("🔍 [fetchCurrentUserClient] Starting GraphQL query", {
+      hasWindow: typeof window !== "undefined",
+      apolloClientExists: !!apolloClient,
+    });
+    
+    logger.info("🔍 [fetchCurrentUserClient] Calling apolloClient.query");
     const { data } = await apolloClient.query({
       query: CurrentUserServerDocument,
       fetchPolicy: "network-only",
     });
+    
+    logger.info("🔍 [fetchCurrentUserClient] apolloClient.query completed");
     
     const user = data?.currentUser?.user ?? null;
     logger.info("🔍 [fetchCurrentUserClient] GraphQL response received", {
@@ -24,6 +31,7 @@ export async function fetchCurrentUserClient(): Promise<GqlCurrentUserPayload["u
     logger.error("🔍 [fetchCurrentUserClient] GraphQL query failed", {
       error: error instanceof Error ? error.message : String(error),
       errorType: error?.constructor?.name,
+      stack: error instanceof Error ? error.stack : undefined,
     });
     return null;
   }
