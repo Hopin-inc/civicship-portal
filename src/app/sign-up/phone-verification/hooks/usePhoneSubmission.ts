@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
 import { categorizeFirebaseError } from "@/lib/auth/core/firebase-config";
 import { isRunningInLiff } from "@/lib/auth/core/environment-detector";
@@ -25,21 +25,23 @@ export function usePhoneSubmission(
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
 
-  const isSubmittingRef = useRef(isSubmitting);
-  const isRateLimitedRef = useRef(isRateLimited);
+  useEffect(() => {
+    if (!isRateLimited) {
+      return;
+    }
 
-  isSubmittingRef.current = isSubmitting;
-  isRateLimitedRef.current = isRateLimited;
+    const timerId = setTimeout(() => {
+      setIsRateLimited(false);
+    }, PHONE_VERIFICATION_CONSTANTS.RATE_LIMIT_DURATION_MS);
+
+    return () => clearTimeout(timerId);
+  }, [isRateLimited]);
 
   const handleSubmissionError = useCallback((error: unknown): PhoneSubmissionResult => {
     const categorized = categorizeFirebaseError(error);
 
     if (categorized.type === "rate-limit") {
       setIsRateLimited(true);
-      setTimeout(
-        () => setIsRateLimited(false),
-        PHONE_VERIFICATION_CONSTANTS.RATE_LIMIT_DURATION_MS
-      );
     }
 
     return {
@@ -63,7 +65,7 @@ export function usePhoneSubmission(
         };
       }
 
-      if (isSubmittingRef.current || isRateLimitedRef.current) {
+      if (isSubmitting || isRateLimited) {
         return { success: false };
       }
 
@@ -79,12 +81,12 @@ export function usePhoneSubmission(
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError]
+    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited]
   );
 
   const resend = useCallback(
     async (formattedPhone: string): Promise<PhoneSubmissionResult> => {
-      if (resendTimer.isDisabled || isSubmittingRef.current || isRateLimitedRef.current) {
+      if (resendTimer.isDisabled || isSubmitting || isRateLimited) {
         return { success: false };
       }
 
@@ -134,7 +136,7 @@ export function usePhoneSubmission(
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError]
+    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited]
   );
 
   return {
