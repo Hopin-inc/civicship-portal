@@ -1,7 +1,7 @@
-import { CurrentUserServerDocument, GqlCurrentUserPayload } from "@/types/graphql";
-import { apolloClient } from "@/lib/apollo";
+import { GqlCurrentUserPayload } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 import { User } from "firebase/auth";
+import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
 
 export async function fetchCurrentUserClient(
   firebaseUser?: User | null
@@ -10,12 +10,13 @@ export async function fetchCurrentUserClient(
     const authMode = firebaseUser ? "id_token" : "session";
     logger.info("🔍 [fetchCurrentUserClient] Starting GraphQL query", {
       hasWindow: typeof window !== "undefined",
-      apolloClientExists: !!apolloClient,
       hasFirebaseUser: !!firebaseUser,
       authMode,
+      endpoint: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
     
     const headers: Record<string, string> = {
+      "Content-Type": "application/json",
       "X-Auth-Mode": authMode,
       "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID!,
       "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID!,
@@ -26,24 +27,54 @@ export async function fetchCurrentUserClient(
       headers["Authorization"] = `Bearer ${token}`;
       logger.info("🔍 [fetchCurrentUserClient] Using ID token auth", {
         hasToken: !!token,
+        tokenLength: token?.length,
       });
     } else {
       logger.info("🔍 [fetchCurrentUserClient] Using session auth");
     }
     
-    logger.info("🔍 [fetchCurrentUserClient] Calling apolloClient.query");
-    const { data } = await apolloClient.query({
-      query: CurrentUserServerDocument,
-      fetchPolicy: "network-only",
-      context: { headers },
+    logger.info("🔍 [fetchCurrentUserClient] Sending fetch request", {
+      headers: Object.keys(headers),
     });
     
-    logger.info("🔍 [fetchCurrentUserClient] apolloClient.query completed");
+    const response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
+      method: "POST",
+      headers,
+      credentials: "include",
+      body: JSON.stringify({
+        query: GET_CURRENT_USER_SERVER_QUERY,
+        variables: {},
+      }),
+    });
     
-    const user = data?.currentUser?.user ?? null;
+    logger.info("🔍 [fetchCurrentUserClient] Fetch completed", {
+      status: response.status,
+      ok: response.ok,
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error("🔍 [fetchCurrentUserClient] HTTP error", {
+        status: response.status,
+        statusText: response.statusText,
+        errorText,
+      });
+      return null;
+    }
+    
+    const result = await response.json();
+    
+    if (result.errors) {
+      logger.error("🔍 [fetchCurrentUserClient] GraphQL errors", {
+        errors: result.errors,
+      });
+      return null;
+    }
+    
+    const user = result.data?.currentUser?.user ?? null;
     logger.info("🔍 [fetchCurrentUserClient] GraphQL response received", {
-      hasData: !!data,
-      hasCurrentUser: !!data?.currentUser,
+      hasData: !!result.data,
+      hasCurrentUser: !!result.data?.currentUser,
       hasUser: !!user,
       userId: user?.id,
       identitiesCount: user?.identities?.length ?? 0,
@@ -51,7 +82,7 @@ export async function fetchCurrentUserClient(
     
     return user;
   } catch (error) {
-    logger.error("🔍 [fetchCurrentUserClient] GraphQL query failed", {
+    logger.error("🔍 [fetchCurrentUserClient] Request failed", {
       error: error instanceof Error ? error.message : String(error),
       errorType: error?.constructor?.name,
       stack: error instanceof Error ? error.stack : undefined,
