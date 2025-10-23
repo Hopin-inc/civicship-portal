@@ -121,6 +121,7 @@ export async function restoreUserSession(
 ) {
   const tokenResult = await firebaseUser.getIdTokenResult();
   useAuthStore.getState().setState({
+    firebaseUser,
     lineTokens: {
       accessToken: tokenResult.token,
       refreshToken: firebaseUser.refreshToken ?? null,
@@ -133,7 +134,7 @@ export async function restoreUserSession(
     return ssrCurrentUser;
   }
 
-  const user = await fetchCurrentUserClient();
+  const user = await fetchCurrentUserClient(firebaseUser);
   if (user) {
     setState({ currentUser: user });
     return user;
