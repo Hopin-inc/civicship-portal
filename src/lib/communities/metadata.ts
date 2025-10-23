@@ -12,6 +12,33 @@ export type FeaturesType =
   | "justDaoIt"
   | "quests";
 
+/**
+ * コミュニティの規約・文書の定義
+ */
+export interface CommunityDocument {
+  /** 文書のID（一意識別子） */
+  id: string;
+
+  /** 表示名 */
+  title: string;
+
+  /** ファイルパスまたはURL */
+  path: string;
+
+  /**
+   * リンクタイプ
+   * - 'external': 外部リンク（PDF等、新しいタブで開く）
+   * - 'internal': 内部ページ（Next.js Link使用）
+   */
+  type: "external" | "internal";
+
+  /**
+   * 表示順序（小さい順に表示）
+   * 指定しない場合は定義順
+   */
+  order?: number;
+}
+
 // コミュニティごとのベース設定
 interface CommunityBaseConfig {
   id: string;
@@ -27,6 +54,8 @@ interface CommunityBaseConfig {
   enableFeatures: FeaturesType[];
   rootPath?: string;
   adminRootPath?: string;
+  /** コミュニティ固有の規約・文書リスト */
+  documents?: CommunityDocument[];
 }
 
 // コミュニティごとのメタデータ型定義
@@ -109,6 +138,43 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     enableFeatures: ["points", "justDaoIt"],
     rootPath: "/users/me",
     adminRootPath: "/admin/wallet",
+    documents: [
+      {
+        id: "bylaws",
+        title: "定款 (PDF)",
+        path: "/communities/kibotcha/bylaws.pdf",
+        type: "external",
+        order: 1,
+      },
+      {
+        id: "operating-regulations",
+        title: "運営規程 (PDF)",
+        path: "/communities/kibotcha/operating-regulations.pdf",
+        type: "external",
+        order: 2,
+      },
+      {
+        id: "dao-meeting-rules",
+        title: "DAO総会規程 (PDF)",
+        path: "/communities/kibotcha/dao-meeting-rules.pdf",
+        type: "external",
+        order: 3,
+      },
+      {
+        id: "token-regulations",
+        title: "トークン規程 (PDF)",
+        path: "/communities/kibotcha/token-regulations.pdf",
+        type: "external",
+        order: 4,
+      },
+      {
+        id: "whitepaper",
+        title: "ホワイトペーパー (PDF)",
+        path: "/communities/kibotcha/whitepaper.pdf",
+        type: "external",
+        order: 5,
+      },
+    ],
   },
   dais: {
     id: "dais",
@@ -157,6 +223,43 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     enableFeatures: ["points", "justDaoIt"],
     rootPath: "/users/me",
     adminRootPath: "/admin/wallet",
+    documents: [
+      {
+        id: "bylaws",
+        title: "定款 (PDF)",
+        path: "/communities/izu/bylaws.pdf",
+        type: "external",
+        order: 1,
+      },
+      {
+        id: "operating-regulations",
+        title: "運営規程 (PDF)",
+        path: "/communities/izu/operating-regulations.pdf",
+        type: "external",
+        order: 2,
+      },
+      {
+        id: "dao-meeting-rules",
+        title: "DAO総会規程 (PDF)",
+        path: "/communities/izu/dao-meeting-rules.pdf",
+        type: "external",
+        order: 3,
+      },
+      {
+        id: "token-regulations",
+        title: "トークン規程 (PDF)",
+        path: "/communities/izu/token-regulations.pdf",
+        type: "external",
+        order: 4,
+      },
+      {
+        id: "whitepaper",
+        title: "ホワイトペーパー (PDF)",
+        path: "/communities/izu/whitepaper.pdf",
+        type: "external",
+        order: 5,
+      },
+    ],
   },
   default: {
     id: "default",
