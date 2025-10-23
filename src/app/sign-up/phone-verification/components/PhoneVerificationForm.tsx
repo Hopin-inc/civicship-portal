@@ -24,6 +24,7 @@ import { VerificationStep } from "../types";
 import { validatePhoneNumber } from "../utils/validation";
 import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
 import { useResendTimer } from "../hooks/useResendTimer";
+import { useRecaptchaManager } from "../hooks/useRecaptchaManager";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -43,44 +44,22 @@ export function PhoneVerificationForm() {
 
   const authRedirectService = AuthRedirectService.getInstance();
 
-  const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
-  const recaptchaContainerRef = useRef<HTMLDivElement>(null);
-
   // ==================================
   const [isReloading, setIsReloading] = useState(false);
   const [isPhoneSubmitting, setIsSubmitting] = useState(false);
   const [isCodeVerifying, setIsCodeVerifying] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
-  const [showRecaptcha, setShowRecaptcha] = useState(false);
   // ==================================
 
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
+  const recaptchaManager = useRecaptchaManager();
 
   const { isValid: isPhoneValid, formattedPhone } = validatePhoneNumber(phoneNumber);
-
-  useEffect(() => {
-    if (recaptchaContainerRef.current) {
-      setIsRecaptchaReady(true);
-    }
-  }, []);
-
-  // reCAPTCHA完了時のイベントリスナー
-  useEffect(() => {
-    const handleRecaptchaCompleted = () => {
-      setShowRecaptcha(false);
-    };
-
-    window.addEventListener("recaptcha-completed", handleRecaptchaCompleted);
-
-    return () => {
-      window.removeEventListener("recaptcha-completed", handleRecaptchaCompleted);
-    };
-  }, []);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isRecaptchaReady) {
+    if (!recaptchaManager.isReady) {
       toast.error("認証コード送信を準備中です");
       return;
     }
@@ -114,7 +93,7 @@ export function PhoneVerificationForm() {
   const handleResendCode = async () => {
     if (isResendDisabled || isPhoneSubmitting) return;
 
-    if (!isRecaptchaReady) {
+    if (!recaptchaManager.isReady) {
       toast.error("認証コード送信を準備中です");
       return;
     }
@@ -126,7 +105,7 @@ export function PhoneVerificationForm() {
     }
 
     // 再送信時にreCAPTCHAを表示
-    setShowRecaptcha(true);
+    recaptchaManager.show();
     setIsSubmitting(true);
 
     try {
@@ -144,7 +123,7 @@ export function PhoneVerificationForm() {
         startResendTimer();
 
         if (!isRunningInLiff()) {
-          setShowRecaptcha(false);
+          recaptchaManager.hide();
         }
       }
     } catch (error) {
@@ -317,7 +296,7 @@ export function PhoneVerificationForm() {
               </Button>
             </div>
           </form>
-          <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
+          <div id="recaptcha-container" ref={recaptchaManager.containerRef}></div>
         </>
       )}
       {step === "code" && (
@@ -365,8 +344,8 @@ export function PhoneVerificationForm() {
               </Button>
               <div
                 id="recaptcha-container"
-                ref={recaptchaContainerRef}
-                style={{ display: showRecaptcha ? "block" : "none" }}
+                ref={recaptchaManager.containerRef}
+                style={{ display: recaptchaManager.showRecaptcha ? "block" : "none" }}
               ></div>
               <Button
                 type="button"
