@@ -4,10 +4,15 @@ import Link from "next/link";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function PromiseSection() {
-  const commonDocuments = [
+  const defaultCommonDocuments = [
     { id: "terms", title: "利用規約", path: "/terms", type: "internal" as const },
     { id: "privacy", title: "プライバシーポリシー", path: "/privacy", type: "internal" as const },
   ];
+
+  const commonDocuments = defaultCommonDocuments.map((doc) => {
+    const override = currentCommunityConfig.commonDocumentOverrides?.[doc.id as "terms" | "privacy"];
+    return override || doc;
+  });
 
   const communityDocuments = currentCommunityConfig.documents || [];
 
