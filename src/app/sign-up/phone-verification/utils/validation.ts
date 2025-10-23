@@ -1,5 +1,5 @@
 import { PhoneValidationResult } from "../types";
-import { formatPhoneNumber } from "./utils";
+import { formatPhoneNumber } from "../utils";
 import { PHONE_VERIFICATION_CONSTANTS } from "./phoneVerificationConstants";
 
 export function validatePhoneNumber(phoneNumber: string): PhoneValidationResult {

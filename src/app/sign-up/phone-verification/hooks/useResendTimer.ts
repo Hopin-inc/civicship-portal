@@ -61,7 +61,7 @@ export function useResendTimer(
         setIsDisabled(false);
         return 0;
       });
-    }, 1000);
+    }, PHONE_VERIFICATION_CONSTANTS.INTERVAL_MS);
 
     return () => clearInterval(intervalId);
   }, [isDisabled]);

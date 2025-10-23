@@ -15,4 +15,6 @@ export const PHONE_VERIFICATION_CONSTANTS = {
   RELOAD_DELAY_MS: 1000,
   // リロードボタン押下時の初期遅延（ミリ秒）
   RELOAD_INITIAL_DELAY_MS: 300,
+  // タイマーのインターバル（ミリ秒）
+  INTERVAL_MS: 1000,
 } as const;
