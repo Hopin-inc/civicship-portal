@@ -156,16 +156,6 @@ export async function evaluateUserRegistrationState(
 
   const isRegistered = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
 
-  logger.info("🔍 [evaluateUserRegistrationState] Debug info:", {
-    userId: user.id,
-    identities: user.identities,
-    hasPhoneIdentity,
-    ssrPhoneAuthenticated,
-    cookiePhoneVerified: TokenManager.phoneVerified(),
-    isRegistered,
-    finalState: isRegistered ? "user_registered" : "line_authenticated",
-  });
-
   if (isRegistered) {
     TokenManager.savePhoneAuthFlag(true);
     finalizeAuthState("user_registered", user, setState, authStateManager);
@@ -187,16 +177,6 @@ export function finalizeAuthState(
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
   authStateManager: AuthStateManager,
 ) {
-  logger.info("🔍 [finalizeAuthState] Finalizing auth state:", {
-    newState,
-    userId: user?.id,
-    hasUser: !!user,
-    settingFlags: {
-      isAuthenticating: false,
-      isAuthInProgress: false,
-    },
-  });
-
   setState({
     isAuthenticating: false,
     isAuthInProgress: false,
