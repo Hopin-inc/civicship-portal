@@ -5,7 +5,6 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useRouter, useSearchParams } from "next/navigation";
-import { formatPhoneNumber } from "@/app/sign-up/phone-verification/utils";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
@@ -21,6 +20,10 @@ import { categorizeFirebaseError } from "@/lib/auth/core/firebase-config";
 import { isRunningInLiff } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { VerificationStep } from "../types";
+import { validatePhoneNumber } from "../utils/validation";
+import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
+import { useResendTimer } from "../hooks/useResendTimer";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -31,7 +34,7 @@ export function PhoneVerificationForm() {
   const { phoneAuth, isAuthenticated, loading, authenticationState, updateAuthState } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
-  const [step, setStep] = useState<"phone" | "code">("phone");
+  const [step, setStep] = useState<VerificationStep>("phone");
 
   const [identityCheckPhoneUser] = useMutation<
     { identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload },
@@ -48,14 +51,12 @@ export function PhoneVerificationForm() {
   const [isPhoneSubmitting, setIsSubmitting] = useState(false);
   const [isCodeVerifying, setIsCodeVerifying] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
-  const [isResendDisabled, setIsResendDisabled] = useState(false);
-  const [countdown, setCountdown] = useState(60);
   const [showRecaptcha, setShowRecaptcha] = useState(false);
   // ==================================
 
-  const formattedPhone = formatPhoneNumber(phoneNumber);
-  const digitsOnly = formattedPhone.replace(/\D/g, "");
-  const isPhoneValid = digitsOnly.startsWith("81") && digitsOnly.length === 12;
+  const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
+
+  const { isValid: isPhoneValid, formattedPhone } = validatePhoneNumber(phoneNumber);
 
   useEffect(() => {
     if (recaptchaContainerRef.current) {
@@ -76,31 +77,6 @@ export function PhoneVerificationForm() {
     };
   }, []);
 
-  // 再送信タイマーの制御
-  useEffect(() => {
-    if (!isResendDisabled) {
-      return;
-    }
-
-    const intervalId = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev > 1) {
-          return prev - 1;
-        }
-
-        setIsResendDisabled(false);
-        return 0;
-      });
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [isResendDisabled]);
-
-  const startResendTimer = () => {
-    setCountdown(60);
-    setIsResendDisabled(true);
-  };
-
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -117,7 +93,7 @@ export function PhoneVerificationForm() {
 
       if (verificationId) {
         setStep("code");
-        startResendTimer(); // 60秒タイマーを開始
+        startResendTimer();
       }
     } catch (error) {
       const categorized = categorizeFirebaseError(error);
@@ -125,7 +101,10 @@ export function PhoneVerificationForm() {
 
       if (categorized.type === "rate-limit") {
         setIsRateLimited(true);
-        setTimeout(() => setIsRateLimited(false), 60 * 1000); // 60秒後に解除
+        setTimeout(
+          () => setIsRateLimited(false),
+          PHONE_VERIFICATION_CONSTANTS.RATE_LIMIT_DURATION_MS,
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -151,25 +130,22 @@ export function PhoneVerificationForm() {
     setIsSubmitting(true);
 
     try {
-      // reCAPTCHAをクリアし、再描画を待ってから再送信します。
-      // 関連ロジックはphoneAuthServiceに集約されています。
       phoneAuth.clearRecaptcha?.();
 
-      // LIFF環境では、reCAPTCHAの再描画により時間がかかる場合があるため、待機時間を調整
-      const waitTime = isRunningInLiff() ? 1000 : 500;
+      const waitTime = isRunningInLiff()
+        ? PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_LIFF
+        : PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_BROWSER;
       await new Promise((resolve) => setTimeout(resolve, waitTime));
 
       const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
 
       if (verificationId) {
         toast.success("認証コードを再送信しました");
-        startResendTimer(); // 60秒タイマーを再開始
+        startResendTimer();
 
-        // LIFF環境でない場合は、即座にreCAPTCHAを非表示にする
         if (!isRunningInLiff()) {
           setShowRecaptcha(false);
         }
-        // LIFF環境の場合は、reCAPTCHAのコールバックで非表示にする
       }
     } catch (error) {
       logger.error("再送信エラー:", { error });
@@ -178,7 +154,10 @@ export function PhoneVerificationForm() {
 
       if (categorized.type === "rate-limit") {
         setIsRateLimited(true);
-        setTimeout(() => setIsRateLimited(false), 60 * 1000);
+        setTimeout(
+          () => setIsRateLimited(false),
+          PHONE_VERIFICATION_CONSTANTS.RATE_LIMIT_DURATION_MS,
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -188,7 +167,7 @@ export function PhoneVerificationForm() {
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isCodeVerifying) return; // 二重送信防止
+    if (isCodeVerifying) return;
     setIsCodeVerifying(true);
 
     try {
@@ -331,7 +310,7 @@ export function PhoneVerificationForm() {
                   setIsReloading(true);
                   setTimeout(() => {
                     window.location.reload();
-                  }, 300);
+                  }, PHONE_VERIFICATION_CONSTANTS.RELOAD_INITIAL_DELAY_MS);
                 }}
               >
                 切り替わらない際は再読み込み
@@ -365,7 +344,7 @@ export function PhoneVerificationForm() {
                 disabled={
                   isCodeVerifying ||
                   phoneAuth.isVerifying ||
-                  verificationCode.length < 6 ||
+                  verificationCode.length < PHONE_VERIFICATION_CONSTANTS.VERIFICATION_CODE_LENGTH ||
                   isReloading
                 }
               >
@@ -395,22 +374,19 @@ export function PhoneVerificationForm() {
                 disabled={isReloading}
                 onClick={async () => {
                   try {
-                    // reCAPTCHAをクリア
                     if (phoneAuth.clearRecaptcha) {
                       await phoneAuth.clearRecaptcha();
                     }
                   } catch (error) {
                     logger.error("reCAPTCHAクリアエラー:", { error });
                   } finally {
-                    // 状態をリセット
                     setPhoneNumber("");
                     setVerificationCode("");
                     setStep("phone");
 
-                    // 少し待ってからページをリロード
                     setTimeout(() => {
                       window.location.reload();
-                    }, 1000);
+                    }, PHONE_VERIFICATION_CONSTANTS.RELOAD_DELAY_MS);
                   }
                 }}
               >
