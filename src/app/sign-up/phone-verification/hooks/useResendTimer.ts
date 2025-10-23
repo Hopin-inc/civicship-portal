@@ -31,6 +31,12 @@ export function useResendTimer(
   const [isDisabled, setIsDisabled] = useState(false);
   const [countdown, setCountdown] = useState(initialSeconds);
 
+  useEffect(() => {
+    if (!isDisabled) {
+      setCountdown(initialSeconds);
+    }
+  }, [initialSeconds, isDisabled]);
+
   /**
    * Starts the countdown timer
    */
