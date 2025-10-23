@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
 import { categorizeFirebaseError } from "@/lib/auth/core/firebase-config";
 import { isRunningInLiff } from "@/lib/auth/core/environment-detector";
@@ -25,6 +25,32 @@ export function usePhoneSubmission(
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
 
+  const isSubmittingRef = useRef(isSubmitting);
+  const isRateLimitedRef = useRef(isRateLimited);
+
+  isSubmittingRef.current = isSubmitting;
+  isRateLimitedRef.current = isRateLimited;
+
+  const handleSubmissionError = useCallback((error: unknown): PhoneSubmissionResult => {
+    const categorized = categorizeFirebaseError(error);
+
+    if (categorized.type === "rate-limit") {
+      setIsRateLimited(true);
+      setTimeout(
+        () => setIsRateLimited(false),
+        PHONE_VERIFICATION_CONSTANTS.RATE_LIMIT_DURATION_MS
+      );
+    }
+
+    return {
+      success: false,
+      error: {
+        message: categorized.message,
+        type: categorized.type,
+      },
+    };
+  }, []);
+
   const submit = useCallback(
     async (formattedPhone: string): Promise<PhoneSubmissionResult> => {
       if (!recaptchaManager.isReady) {
@@ -37,49 +63,28 @@ export function usePhoneSubmission(
         };
       }
 
-      if (isSubmitting || isRateLimited) {
+      if (isSubmittingRef.current || isRateLimitedRef.current) {
         return { success: false };
       }
 
       setIsSubmitting(true);
 
       try {
-        const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
-
-        if (verificationId) {
-          resendTimer.start();
-          return { success: true };
-        }
-
-        return { success: false };
+        await phoneAuth.startPhoneVerification(formattedPhone);
+        resendTimer.start();
+        return { success: true };
       } catch (error) {
-        const categorized = categorizeFirebaseError(error);
-
-        if (categorized.type === "rate-limit") {
-          setIsRateLimited(true);
-          setTimeout(
-            () => setIsRateLimited(false),
-            PHONE_VERIFICATION_CONSTANTS.RATE_LIMIT_DURATION_MS
-          );
-        }
-
-        return {
-          success: false,
-          error: {
-            message: categorized.message,
-            type: categorized.type,
-          },
-        };
+        return handleSubmissionError(error);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, isSubmitting, isRateLimited]
+    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError]
   );
 
   const resend = useCallback(
     async (formattedPhone: string): Promise<PhoneSubmissionResult> => {
-      if (resendTimer.isDisabled || isSubmitting || isRateLimited) {
+      if (resendTimer.isDisabled || isSubmittingRef.current || isRateLimitedRef.current) {
         return { success: false };
       }
 
@@ -114,43 +119,22 @@ export function usePhoneSubmission(
           : PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_BROWSER;
         await new Promise((resolve) => setTimeout(resolve, waitTime));
 
-        const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
+        await phoneAuth.startPhoneVerification(formattedPhone);
+        resendTimer.start();
 
-        if (verificationId) {
-          resendTimer.start();
-
-          if (!isRunningInLiff()) {
-            recaptchaManager.hide();
-          }
-
-          return { success: true };
+        if (!isRunningInLiff()) {
+          recaptchaManager.hide();
         }
 
-        return { success: false };
+        return { success: true };
       } catch (error) {
         logger.error("再送信エラー:", { error });
-        const categorized = categorizeFirebaseError(error);
-
-        if (categorized.type === "rate-limit") {
-          setIsRateLimited(true);
-          setTimeout(
-            () => setIsRateLimited(false),
-            PHONE_VERIFICATION_CONSTANTS.RATE_LIMIT_DURATION_MS
-          );
-        }
-
-        return {
-          success: false,
-          error: {
-            message: categorized.message,
-            type: categorized.type,
-          },
-        };
+        return handleSubmissionError(error);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, isSubmitting, isRateLimited]
+    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError]
   );
 
   return {
