@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
@@ -16,8 +16,6 @@ import {
   GqlPhoneUserStatus,
 } from "@/types/graphql";
 import { RawURIComponent } from "@/utils/path";
-import { categorizeFirebaseError } from "@/lib/auth/core/firebase-config";
-import { isRunningInLiff } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { VerificationStep } from "../types";
@@ -25,6 +23,7 @@ import { validatePhoneNumber } from "../utils/validation";
 import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
 import { useResendTimer } from "../hooks/useResendTimer";
 import { useRecaptchaManager } from "../hooks/useRecaptchaManager";
+import { usePhoneSubmission } from "../hooks/usePhoneSubmission";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -46,100 +45,37 @@ export function PhoneVerificationForm() {
 
   // ==================================
   const [isReloading, setIsReloading] = useState(false);
-  const [isPhoneSubmitting, setIsSubmitting] = useState(false);
   const [isCodeVerifying, setIsCodeVerifying] = useState(false);
-  const [isRateLimited, setIsRateLimited] = useState(false);
   // ==================================
 
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
   const recaptchaManager = useRecaptchaManager();
+  const phoneSubmission = usePhoneSubmission(phoneAuth, recaptchaManager, {
+    isDisabled: isResendDisabled,
+    start: startResendTimer,
+  });
 
   const { isValid: isPhoneValid, formattedPhone } = validatePhoneNumber(phoneNumber);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!recaptchaManager.isReady) {
-      toast.error("認証コード送信を準備中です");
-      return;
-    }
+    const result = await phoneSubmission.submit(formattedPhone);
 
-    if (isPhoneSubmitting || isRateLimited) return;
-    setIsSubmitting(true);
-
-    try {
-      const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
-
-      if (verificationId) {
-        setStep("code");
-        startResendTimer();
-      }
-    } catch (error) {
-      const categorized = categorizeFirebaseError(error);
-      toast.error(categorized.message);
-
-      if (categorized.type === "rate-limit") {
-        setIsRateLimited(true);
-        setTimeout(
-          () => setIsRateLimited(false),
-          PHONE_VERIFICATION_CONSTANTS.RATE_LIMIT_DURATION_MS,
-        );
-      }
-    } finally {
-      setIsSubmitting(false);
+    if (result.success) {
+      setStep("code");
+    } else if (result.error) {
+      toast.error(result.error.message);
     }
   };
 
   const handleResendCode = async () => {
-    if (isResendDisabled || isPhoneSubmitting) return;
+    const result = await phoneSubmission.resend(formattedPhone);
 
-    if (!recaptchaManager.isReady) {
-      toast.error("認証コード送信を準備中です");
-      return;
-    }
-
-    // 電話番号が空の場合はエラー
-    if (!phoneNumber || !formattedPhone) {
-      toast.error("電話番号が設定されていません。電話番号入力画面に戻ってください。");
-      return;
-    }
-
-    // 再送信時にreCAPTCHAを表示
-    recaptchaManager.show();
-    setIsSubmitting(true);
-
-    try {
-      phoneAuth.clearRecaptcha?.();
-
-      const waitTime = isRunningInLiff()
-        ? PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_LIFF
-        : PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_BROWSER;
-      await new Promise((resolve) => setTimeout(resolve, waitTime));
-
-      const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
-
-      if (verificationId) {
-        toast.success("認証コードを再送信しました");
-        startResendTimer();
-
-        if (!isRunningInLiff()) {
-          recaptchaManager.hide();
-        }
-      }
-    } catch (error) {
-      logger.error("再送信エラー:", { error });
-      const categorized = categorizeFirebaseError(error);
-      toast.error(categorized.message);
-
-      if (categorized.type === "rate-limit") {
-        setIsRateLimited(true);
-        setTimeout(
-          () => setIsRateLimited(false),
-          PHONE_VERIFICATION_CONSTANTS.RATE_LIMIT_DURATION_MS,
-        );
-      }
-    } finally {
-      setIsSubmitting(false);
+    if (result.success) {
+      toast.success("認証コードを再送信しました");
+    } else if (result.error) {
+      toast.error(result.error.message);
     }
   };
 
@@ -266,16 +202,16 @@ export function PhoneVerificationForm() {
                 type="submit"
                 className="w-full h-12 bg-primary text-white rounded-md"
                 disabled={
-                  isPhoneSubmitting ||
+                  phoneSubmission.isSubmitting ||
                   phoneAuth.isVerifying ||
                   !isPhoneValid ||
                   isReloading ||
-                  isRateLimited
+                  phoneSubmission.isRateLimited
                 }
               >
-                {isPhoneSubmitting || phoneAuth.isVerifying
+                {phoneSubmission.isSubmitting || phoneAuth.isVerifying
                   ? "送信中..."
-                  : isRateLimited
+                  : phoneSubmission.isRateLimited
                     ? "制限中..."
                     : "認証コードを送信"}{" "}
               </Button>
@@ -333,12 +269,12 @@ export function PhoneVerificationForm() {
                 type="button"
                 variant="tertiary"
                 className="w-full h-12"
-                disabled={isResendDisabled || isPhoneSubmitting || isReloading}
+                disabled={isResendDisabled || phoneSubmission.isSubmitting || isReloading}
                 onClick={handleResendCode}
               >
                 {isResendDisabled
                   ? `${countdown}秒後に再送信できます`
-                  : isPhoneSubmitting
+                  : phoneSubmission.isSubmitting
                     ? "送信中..."
                     : "コードを再送信"}
               </Button>
