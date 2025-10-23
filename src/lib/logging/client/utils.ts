@@ -65,134 +65,6 @@ const generateNewSessionId = (): string => {
 };
 
 /**
- * 電話番号をマスクする（下4桁のみ表示）
- * @param phoneNumber マスクする電話番号
- * @returns マスクされた電話番号
- */
-export const maskPhoneNumber = (phoneNumber: string | null | undefined): string => {
-  if (!phoneNumber) return "none";
-  if (phoneNumber.length <= 4) return "****";
-  return "*".repeat(phoneNumber.length - 4) + phoneNumber.slice(-4);
-};
-
-/**
- * ユーザーIDをマスクする
- * @param userId マスクするユーザーID
- * @returns マスクされたユーザーID
- */
-export const maskUserId = (userId: string | null | undefined): string => {
-  if (!userId) return "none";
-  let hash = 0;
-  for (let i = 0; i < userId.length; i++) {
-    const char = userId.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash; // 32ビット整数に変換
-  }
-  return `user_${Math.abs(hash).toString(36)}`;
-};
-
-/**
- * デバイスとブラウザ情報を取得する
- * @returns デバイスとブラウザ情報
- */
-export const getDeviceInfo = (): Record<string, any> => {
-  if (typeof window === "undefined") {
-    if (serverUtils) {
-      return serverUtils.getDeviceInfo();
-    }
-    return { platform: "server" };
-  }
-
-  if (typeof navigator === "undefined") {
-    return { platform: "unknown" };
-  }
-
-  const userAgent = navigator.userAgent || "";
-  const isLINE = /Line/i.test(userAgent);
-  const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
-  const isAndroid = /Android/i.test(userAgent);
-  const isMobile = isIOS || isAndroid;
-
-  const isChrome = /Chrome/i.test(userAgent) && !/Edg|Edge/i.test(userAgent);
-  const isFirefox = /Firefox/i.test(userAgent);
-  const isSafari = /Safari/i.test(userAgent) && !/Chrome/i.test(userAgent);
-  const isEdge = /Edg|Edge/i.test(userAgent);
-
-  return {
-    platform: isLINE ? "LINE" : "Web",
-    device: {
-      type: isMobile ? (isIOS ? "iOS" : "Android") : "Desktop",
-      isMobile,
-      isIOS,
-      isAndroid,
-      isLINE,
-    },
-    browser: {
-      userAgent: userAgent.substring(0, 100), // 長すぎる場合は切り詰める
-      isChrome,
-      isFirefox,
-      isSafari,
-      isEdge,
-      name: isChrome
-        ? "Chrome"
-        : isFirefox
-          ? "Firefox"
-          : isSafari
-            ? "Safari"
-            : isEdge
-              ? "Edge"
-              : "Other",
-    },
-    screen:
-      typeof window !== "undefined"
-        ? {
-            width: window.innerWidth,
-            height: window.innerHeight,
-          }
-        : undefined,
-  };
-};
-
-/**
- * ネットワーク状態を取得する
- * @returns ネットワーク状態情報
- */
-export const getNetworkInfo = (): Record<string, any> => {
-  if (typeof window === "undefined") {
-    if (serverUtils) {
-      return serverUtils.getNetworkInfo();
-    }
-    return { online: true };
-  }
-
-  if (typeof navigator === "undefined") {
-    return { online: true };
-  }
-
-  interface NetworkInformation {
-    effectiveType?: string;
-    downlink?: number;
-    rtt?: number;
-    saveData?: boolean;
-  }
-
-  const connection =
-    "connection" in navigator ? ((navigator as any).connection as NetworkInformation) : null;
-
-  return {
-    online: navigator.onLine,
-    connection: connection
-      ? {
-          effectiveType: connection.effectiveType,
-          downlink: connection.downlink,
-          rtt: connection.rtt,
-          saveData: connection.saveData,
-        }
-      : undefined,
-  };
-};
-
-/**
  * 認証ログのコンテキストを作成する
  * @param sessionId セッションID
  * @param authType 認証タイプ（"liff" または "phone"）
@@ -208,10 +80,7 @@ export const createAuthLogContext = (
     return serverUtils.createAuthLogContext(sessionId, authType, additionalContext);
   }
 
-  const userId =
-    additionalContext?.userId ||
-    (additionalContext?.user?.uid ? maskUserId(additionalContext.user.uid) : undefined);
-
+  const userId = additionalContext?.userId || (additionalContext?.user?.uid ?? undefined);
   const authEnvironment = detectEnvironment();
 
   const errorInfo = additionalContext?.error
@@ -228,14 +97,6 @@ export const createAuthLogContext = (
       }
     : {};
 
-  const levelInfo = additionalContext?.level ? { level: additionalContext.level } : {};
-
-  const deviceInfo =
-    typeof window === "undefined" && serverUtils ? { platform: "server" } : getDeviceInfo();
-
-  const networkInfo =
-    typeof window === "undefined" && serverUtils ? { online: true } : getNetworkInfo();
-
   return {
     sessionId,
     runtime: typeof window === "undefined" ? "server" : "client",
@@ -243,12 +104,7 @@ export const createAuthLogContext = (
     component: additionalContext?.component || "AuthProvider",
     authType,
     ...(userId ? { userId } : {}),
-    env: {
-      ...deviceInfo,
-      network: networkInfo,
-    },
     authEnvironment,
-    ...levelInfo,
     ...errorInfo,
     ...additionalContext,
   };

@@ -7,6 +7,7 @@ import { TokenManager } from "@/lib/auth/core/token-manager";
 import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
+import { logger } from "@/lib/logging";
 
 /**
  * 1️⃣ 認証前の初期状態を設定
@@ -120,6 +121,7 @@ export async function restoreUserSession(
 ) {
   const tokenResult = await firebaseUser.getIdTokenResult();
   useAuthStore.getState().setState({
+    firebaseUser,
     lineTokens: {
       accessToken: tokenResult.token,
       refreshToken: firebaseUser.refreshToken ?? null,
@@ -132,7 +134,7 @@ export async function restoreUserSession(
     return ssrCurrentUser;
   }
 
-  const user = await fetchCurrentUserClient();
+  const user = await fetchCurrentUserClient(firebaseUser);
   if (user) {
     setState({ currentUser: user });
     return user;
