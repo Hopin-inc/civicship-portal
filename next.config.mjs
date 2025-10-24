@@ -31,6 +31,7 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "ipfs.io",
+        pathname: "/ipfs/**",
       },
     ],
   },
