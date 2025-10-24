@@ -7,10 +7,11 @@ import UserProfileSection from "@/app/users/components/UserProfileSection";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import UserPortfolioList from "@/app/users/components/UserPortfolioList";
 import { useUserProfile } from "@/app/users/hooks/useUserProfile";
-import { ErrorState } from '@/components/shared'
+import { ErrorState } from "@/components/shared";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
+import { NftCard } from "@/components/domains/nfts/components";
 
 export default function UserPage() {
   const params = useParams();
@@ -20,7 +21,9 @@ export default function UserPage() {
   const { user: currentUser } = useAuth();
   const isOwner = currentUser?.id === id;
 
-  const { userData, selfOpportunities, isLoading, error, refetch } = useUserProfile(id ?? "");
+  const { userData, nftInstances, selfOpportunities, isLoading, error, refetch } = useUserProfile(
+    id ?? "",
+  );
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
@@ -53,6 +56,19 @@ export default function UserPage() {
         userAsset={userData.asset}
         isOwner={isOwner}
       />
+
+      {/* 証明書 */}
+      {nftInstances.length > 0 && (
+        <section className="py-6 mt-0">
+          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">証明書</h2>
+          <div className="mt-4 flex gap-4 overflow-x-auto scrollbar-hide">
+            {nftInstances.map((nftInstance) => (
+              <NftCard key={nftInstance.id} nftInstance={nftInstance} isCarousel />
+            ))}
+          </div>
+        </section>
+      )}
+
       {shouldShowOpportunities && (
         <>
           {formattedOpportunities.length > 0 && (
@@ -62,10 +78,7 @@ export default function UserPage() {
               </h2>
               <div className="mt-4 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                 {formattedOpportunities.map((opportunity) => (
-                  <OpportunityVerticalCard
-                    key={opportunity.id}
-                    {...opportunity}
-                  />
+                  <OpportunityVerticalCard key={opportunity.id} {...opportunity} />
                 ))}
               </div>
             </section>
