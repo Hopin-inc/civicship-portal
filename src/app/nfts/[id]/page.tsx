@@ -65,14 +65,14 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
       copyData: contractAddress,
       truncatePattern: "middle",
     },
-    {
-      label: "チェーン",
-      value: "Ethereum",
-    },
-    {
-      label: "規格",
-      value: tokenType,
-    },
+    // {
+    //   label: "チェーン",
+    //   value: "Ethereum",
+    // },
+    // {
+    //   label: "規格",
+    //   value: tokenType,
+    // },
   ];
 
   return (
