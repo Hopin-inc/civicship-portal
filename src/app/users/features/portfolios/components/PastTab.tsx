@@ -13,7 +13,7 @@ export default function PastTab({ searchQuery }: PastTabProps) {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
   const { portfolios } = useUserProfileContext();
 
-  const today = useMemo(() => new Date(), []);
+  const today = new Date();
 
   const filteredPortfolios = useMemo(() => {
     return filterPastPortfolios(portfolios, searchQuery, today);

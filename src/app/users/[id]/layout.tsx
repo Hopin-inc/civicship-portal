@@ -1,5 +1,6 @@
 import React from "react";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { fetchPublicUserServer } from "@/app/users/features/shared/server";
 import { currentCommunityConfig, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
@@ -53,7 +54,7 @@ export default async function Layout({
   const gqlUser = await fetchPublicUserServer(params.id);
 
   if (!gqlUser) {
-    return <>{children}</>;
+    notFound();
   }
 
   const portfolios = (gqlUser.portfolios ?? []).map(mapGqlPortfolio);

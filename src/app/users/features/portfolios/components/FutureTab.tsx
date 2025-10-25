@@ -13,7 +13,7 @@ export default function FutureTab({ searchQuery }: FutureTabProps) {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
   const { portfolios } = useUserProfileContext();
 
-  const today = useMemo(() => new Date(), []);
+  const today = new Date();
 
   const filteredPortfolios = useMemo(() => {
     return filterFuturePortfolios(portfolios, searchQuery, today);
