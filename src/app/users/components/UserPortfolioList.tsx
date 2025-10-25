@@ -14,6 +14,7 @@ import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getCurrentRegionName } from "@/lib/communities/metadata";
 import { useRouter } from "next/navigation";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
+import { parsePortfolioDate } from "@/app/users/lib/portfolioHelpers";
 
 type Props = {
   userId: string;
@@ -111,7 +112,7 @@ export const PortfolioCard = ({
   isLast: boolean;
   lastRef: RefObject<HTMLDivElement>;
 }) => {
-  const isPast = new Date(portfolio.date) < new Date();
+  const isPast = parsePortfolioDate(portfolio.date) < new Date();
   const isPassed = portfolio.evaluationStatus === GqlEvaluationStatus.Passed;
   const linkHref =
     portfolio.source === "ARTICLE"

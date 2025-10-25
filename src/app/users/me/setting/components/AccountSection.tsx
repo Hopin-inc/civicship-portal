@@ -3,9 +3,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Copy, FileKey, Info, LinkIcon, PhoneIcon } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
-import { useAccountData } from "../hooks/useAccountData";
-import Loading from "@/components/layout/Loading";
+import { useAuth } from "@/contexts/AuthProvider";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useUserProfileContext } from "@/app/users/contexts/UserProfileContext";
+import { GqlDidIssuanceStatus } from "@/types/graphql";
 
 const truncateDid = (did: string | undefined | null, length: number = 20): string => {
   if (!did) return "";
@@ -16,18 +17,13 @@ const truncateDid = (did: string | undefined | null, length: number = 20): strin
 };
 
 export default function AccountSection() {
-  const {
-    isAuthenticated,
-    isPhoneVerified,
-    isAuthenticating,
-    didValue,
-    isNftWalletLinked,
-    loading,
-  } = useAccountData();
+  const { isAuthenticated, isPhoneVerified, isAuthenticating } = useAuth();
+  const { gqlUser } = useUserProfileContext();
 
-  if (loading) {
-    return <Loading />;
-  }
+  const didValue = gqlUser.didIssuanceRequests
+    ?.find(req => req?.status === GqlDidIssuanceStatus.Completed)
+    ?.didValue;
+  const isNftWalletLinked = !!gqlUser.nftWallet?.id;
 
   return (
     <Card className="w-full max-w-md mx-auto">

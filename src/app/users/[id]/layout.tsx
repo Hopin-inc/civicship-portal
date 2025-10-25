@@ -2,6 +2,8 @@ import React from "react";
 import { Metadata } from "next";
 import { fetchPublicUserServer } from "@/app/users/data/fetchPublicUserServer";
 import { currentCommunityConfig, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
+import { presenterPortfolio } from "@/app/users/presenters";
+import { UserProfileProvider } from "@/app/users/contexts/UserProfileContext";
 
 type Props = {
   params: { id: string };
@@ -54,9 +56,6 @@ export default async function Layout({
   if (!gqlUser) {
     return <>{children}</>;
   }
-
-  const { presenterPortfolio } = await import("@/app/users/presenters");
-  const { UserProfileProvider } = await import("@/app/users/contexts/UserProfileContext");
   
   const portfolios = (gqlUser.portfolios ?? []).map(presenterPortfolio);
 

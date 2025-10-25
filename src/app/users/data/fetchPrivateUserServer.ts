@@ -8,12 +8,6 @@ import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
 import { FETCH_PROFILE_SERVER_QUERY } from "@/graphql/account/user/server";
 
-/**
- * プライベートプロフィール用のサーバー側データ取得
- * 認証済みユーザーの完全な情報（wallet, tickets, points, nftInstances）を含む
- * 
- * @returns GqlUser | null
- */
 export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
   const cookieStore = await cookies();
   const session = cookieStore.get("session")?.value ?? null;

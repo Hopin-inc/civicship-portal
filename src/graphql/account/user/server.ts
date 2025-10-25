@@ -78,6 +78,22 @@ export const FETCH_PROFILE_SERVER_QUERY = `
           }
         }
 
+        nftWallet {
+          id
+          walletAddress
+        }
+
+        didIssuanceRequests {
+          id
+          status
+          didValue
+          requestedAt
+          processedAt
+          completedAt
+          createdAt
+          updatedAt
+        }
+
         opportunitiesCreatedByMe {
           id
           title

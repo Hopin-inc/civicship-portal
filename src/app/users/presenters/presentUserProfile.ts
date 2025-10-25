@@ -3,13 +3,6 @@ import { UserProfileViewModel } from "@/app/users/types";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { prefectureLabels } from "./prefectureLabels";
 
-/**
- * GqlUser を UserProfileViewModel に変換
- *
- * @param gqlUser - GraphQL から取得したユーザー情報
- * @param isOwner - 本人かどうか（プライベート情報の表示制御）
- * @returns UserProfileViewModel
- */
 export function presentUserProfile(
   gqlUser: GqlUser,
   isOwner: boolean = false,
