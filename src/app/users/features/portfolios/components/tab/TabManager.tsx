@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter, useSearchParams } from "next/navigation";
 import clsx from "clsx";
-import { TabsEnum } from "../types";
+import { TabsEnum } from "../../types";
 
 interface TabManagerProps {
   activeTab: TabsEnum;
@@ -39,7 +39,7 @@ export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
             "px-6 py-2 font-bold text-base",
             activeTab === TabsEnum.Future
               ? "border-blue-600 border-b-[2px]"
-              : "bg-white text-black border-b-[1px]"
+              : "bg-white text-black border-b-[1px]",
           )}
         >
           今後の予定
@@ -50,7 +50,7 @@ export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
             "px-6 py-2 font-bold text-base",
             activeTab === TabsEnum.Past
               ? "border-blue-600 border-b-[2px]"
-              : "bg-white text-black border-b-[1px]"
+              : "bg-white text-black border-b-[1px]",
           )}
         >
           過去
@@ -58,4 +58,4 @@ export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
       </TabsList>
     </Tabs>
   );
-} 
+}

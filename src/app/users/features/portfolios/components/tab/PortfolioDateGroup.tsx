@@ -1,8 +1,8 @@
 import { format, parse } from "date-fns";
 import { ja } from "date-fns/locale";
 import { AppPortfolio } from "@/app/users/features/shared/types";
-import { PortfolioGrid } from "./PortfolioGrid";
-import { presentPortfolioCard } from "../presenters/presentPortfolioCard";
+import { PortfolioGrid } from "../PortfolioGrid";
+import { presentPortfolioCard } from "../../presenters/presentPortfolioCard";
 import React from "react";
 
 type Props = {
