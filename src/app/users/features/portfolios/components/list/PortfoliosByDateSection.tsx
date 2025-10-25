@@ -13,7 +13,7 @@ export const PortfoliosByDateSection: React.FC<Props> = ({ grouped, lastPortfoli
   <div className="mt-4 space-y-8">
     {Object.entries(grouped).map(([date, items]) => {
       const dateViewModel = presentDateHeading(date);
-      const viewModels = items.map(presentPortfolioCard);
+      const viewModels = items.map((p) => presentPortfolioCard(p));
 
       return (
         <div key={date}>

@@ -1,9 +1,10 @@
-import Image from "next/image";
 import { UserProfileViewModel } from "@/app/users/features/profile/types";
 import { UserProfileHeader } from "./UserProfileHeader";
 import { UserTicketsAndPoints } from "./UserTicketsAndPoints";
 import { UserPortfolioSection } from "@/app/users/features/portfolios";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { NftCard } from "@/components/domains/nfts/components";
+import { CardCarousel } from "@/components/shared/CardCarousel";
 
 interface UserProfileViewProps {
   viewModel: UserProfileViewModel;
@@ -51,25 +52,14 @@ export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
       {isOwner && viewModel.nftInstances && viewModel.nftInstances.length > 0 && (
         <section className="py-6 mt-0">
           <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
-            保有するNFT証明書
+            証明書
           </h2>
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            {viewModel.nftInstances.map((nft) => (
-              <div key={nft.id} className="flex flex-col items-center p-4 border rounded-lg">
-                {nft.imageUrl && (
-                  <div className="relative w-full h-32 rounded-md mb-2 overflow-hidden">
-                    <Image
-                      src={nft.imageUrl}
-                      alt={nft.name}
-                      fill
-                      className="object-cover"
-                      sizes="(min-width: 768px) 33vw, 50vw"
-                    />
-                  </div>
-                )}
-                <p className="text-sm font-medium text-center">{nft.name}</p>
-              </div>
-            ))}
+          <div className="mt-4">
+            <CardCarousel>
+              {viewModel.nftInstances.map((nft) => (
+                <NftCard key={nft.id} nftInstance={nft} isCarousel />
+              ))}
+            </CardCarousel>
           </div>
         </section>
       )}

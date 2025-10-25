@@ -7,11 +7,11 @@ export type PortfolioCardViewModel = {
   isPassed: boolean;
   dateDisplay: string;
   showScheduleBadge: boolean;
-  location?: string;
+  location?: string | null;
   participants?: Array<{
     id: string;
     name: string;
-    image?: string | null;
+    image: string | null;
   }>;
   badge: {
     label: string;

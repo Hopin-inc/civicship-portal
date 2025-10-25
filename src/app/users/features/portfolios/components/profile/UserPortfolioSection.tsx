@@ -31,7 +31,7 @@ export function UserPortfolioSection({
   const router = useRouter();
 
   const activeOpportunityCards = presentActiveOpportunityCards(activeOpportunities);
-  const portfolioViewModels = portfolios.map(presentPortfolioCard);
+  const portfolioViewModels = portfolios.map((p) => presentPortfolioCard(p));
 
   return (
     <section className="py-6 mt-0">
