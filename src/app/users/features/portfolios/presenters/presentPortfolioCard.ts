@@ -108,8 +108,12 @@ export function presentPortfolioCard(
     isPassed,
     dateDisplay: formatPortfolioDate(portfolio.dateISO),
     showScheduleBadge,
-    location: portfolio.location,
-    participants: portfolio.participants,
+    location: portfolio.location ?? undefined,
+    participants: portfolio.participants?.map((p) => ({
+      id: p.id,
+      name: p.name,
+      image: p.image ?? null,
+    })),
     badge,
     showShield,
   };

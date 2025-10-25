@@ -11,23 +11,28 @@ interface PortfolioTabsProps {
   setActiveTab: React.Dispatch<React.SetStateAction<PortfolioTab>>;
 }
 
+function isPortfolioTab(value: string | null): value is PortfolioTab {
+  return value === PortfolioTab.Future || value === PortfolioTab.Past;
+}
+
 export function PortfolioTabs({ activeTab, setActiveTab }: PortfolioTabsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const tabParam = searchParams.get("tab");
-    if (tabParam === PortfolioTab.Future || tabParam === PortfolioTab.Past) {
+    if (isPortfolioTab(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [searchParams, setActiveTab]);
 
   const handleTabChange = (value: string) => {
-    const newTab = value as PortfolioTab;
-    setActiveTab(newTab);
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("tab", newTab);
-    router.push(`?${params.toString()}`, { scroll: false });
+    if (isPortfolioTab(value)) {
+      setActiveTab(value);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("tab", value);
+      router.push(`?${params.toString()}`, { scroll: false });
+    }
   };
 
   return (
