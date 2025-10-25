@@ -1,2 +1,2 @@
-export * from "./api/fetchPrivateUserServer";
-export * from "./api/fetchPublicUserServer";
+export * from "@/app/users/features/shared/server/fetchPrivateUserServer";
+export * from "@/app/users/features/shared/server/fetchPublicUserServer";
