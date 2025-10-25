@@ -5,6 +5,7 @@ import { RawURIComponent } from "@/utils/path";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { GqlUser } from "@/types/graphql";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
+import { useCommunityContext } from "@/contexts/CommunityContext";
 
 export const useLogin = (
   liffService: LiffService,
@@ -12,6 +13,7 @@ export const useLogin = (
   authStateManager: AuthStateManager | null,
 ) => {
   const setState = useAuthStore((s) => s.setState);
+  const { communityId } = useCommunityContext();
 
   return useCallback(
     async (redirectPath?: RawURIComponent): Promise<boolean> => {
@@ -29,7 +31,7 @@ export const useLogin = (
         const loggedIn = await liffService.login(redirectPath);
         if (!loggedIn) return false;
 
-        return await liffService.signInWithLiffToken();
+        return await liffService.signInWithLiffToken(communityId ?? undefined);
       } catch (error) {
         logger.warn("LIFF login failed", {
           error: error instanceof Error ? error.message : String(error),
@@ -43,6 +45,6 @@ export const useLogin = (
         return false;
       }
     },
-    [setState, liffService, authStateManager],
+    [setState, liffService, authStateManager, communityId],
   );
 };

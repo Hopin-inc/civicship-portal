@@ -119,6 +119,7 @@ export async function restoreUserSession(
   ssrCurrentUser: GqlUser | null | undefined,
   firebaseUser: User,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
+  communityId?: string,
 ) {
   const tokenResult = await firebaseUser.getIdTokenResult();
   useAuthStore.getState().setState({
@@ -135,7 +136,7 @@ export async function restoreUserSession(
     return ssrCurrentUser;
   }
 
-  const user = await fetchCurrentUserClient(firebaseUser);
+  const user = await fetchCurrentUserClient(firebaseUser, communityId);
   if (user) {
     setState({ currentUser: user });
     return user;
@@ -152,11 +153,12 @@ export async function evaluateUserRegistrationState(
   ssrPhoneAuthenticated: boolean | undefined,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
   authStateManager: AuthStateManager,
+  communityId?: string,
 ): Promise<boolean> {
   const hasPhoneIdentity = !!user.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
   
   const hasMembershipInCurrentCommunity = !!user.memberships?.some(
-    (m) => m.community?.id === COMMUNITY_ID
+    (m) => m.community?.id === (communityId ?? COMMUNITY_ID)
   );
 
   const isPhoneVerified = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();

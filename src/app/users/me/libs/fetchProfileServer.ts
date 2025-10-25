@@ -7,6 +7,8 @@ import {
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
 import { FETCH_PROFILE_SERVER_QUERY } from "@/graphql/account/user/server";
+import { getCommunityIdFromRequest } from "@/lib/communities/server-resolve";
+import { getAuthForCommunity, getEnvAuthConfig } from "@/lib/communities/runtime-auth";
 
 export async function fetchProfileServer(): Promise<GqlUser | null> {
   const cookieStore = await cookies();
@@ -17,11 +19,21 @@ export async function fetchProfileServer(): Promise<GqlUser | null> {
     return null;
   }
 
+  const communityId = getCommunityIdFromRequest();
+  
+  const envAuth = getEnvAuthConfig();
+  const tenantId = envAuth.tenantId ?? getAuthForCommunity(communityId).tenantId;
+
   try {
     const res = await executeServerGraphQLQuery<
       GqlCurrentUserServerQuery,
       GqlCurrentUserServerQueryVariables
-    >(FETCH_PROFILE_SERVER_QUERY, {}, { Authorization: `Bearer ${session}` });
+    >(
+      FETCH_PROFILE_SERVER_QUERY,
+      {},
+      { Authorization: `Bearer ${session}` },
+      { tenantId, communityId }
+    );
 
     return res.currentUser?.user ?? null;
   } catch (error) {

@@ -7,6 +7,8 @@ import {
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
 import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
+import { getCommunityIdFromRequest } from "@/lib/communities/server-resolve";
+import { getAuthForCommunity, getEnvAuthConfig } from "@/lib/communities/runtime-auth";
 
 export async function getUserServer(): Promise<{
   user: GqlUser | null;
@@ -28,11 +30,21 @@ export async function getUserServer(): Promise<{
     };
   }
 
+  const communityId = getCommunityIdFromRequest();
+  
+  const envAuth = getEnvAuthConfig();
+  const tenantId = envAuth.tenantId ?? getAuthForCommunity(communityId).tenantId;
+
   try {
     const res = await executeServerGraphQLQuery<
       GqlCurrentUserServerQuery,
       GqlCurrentUserServerQueryVariables
-    >(GET_CURRENT_USER_SERVER_QUERY, {}, { Authorization: `Bearer ${session}` });
+    >(
+      GET_CURRENT_USER_SERVER_QUERY,
+      {},
+      { Authorization: `Bearer ${session}` },
+      { tenantId, communityId }
+    );
 
     const user: GqlUser | null = res.currentUser?.user ?? null;
     const hasPhoneIdentity = !!user?.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");

@@ -11,42 +11,66 @@ import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { setContext } from "@apollo/client/link/context";
+import { getEnvAuthConfig, getEnvCommunityId, getAuthForCommunity } from "@/lib/communities/runtime-auth";
+import type { CommunityId } from "@/lib/communities/runtime-auth";
 
-const httpLink = createUploadLink({
-  uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
-  credentials: "include",
-  headers: {
-    "Apollo-Require-Preflight": "true",
-  },
-});
+function buildRequestLink(tenantId: string, communityId: string) {
+  return setContext(async (operation, prevContext) => {
+    let token: string | null = null;
+    let authMode: "session" | "id_token" = "session";
 
-const requestLink = setContext(async (operation, prevContext) => {
-  let token: string | null = null;
-  let authMode: "session" | "id_token" = "session";
+    if (typeof window !== "undefined") {
+      const { firebaseUser } = useAuthStore.getState().state;
 
-  if (typeof window !== "undefined") {
-    const { firebaseUser } = useAuthStore.getState().state;
-    
-    if (firebaseUser) {
-      try {
-        token = await firebaseUser.getIdToken();
-        authMode = "id_token";
-      } catch (error) {
-        logger.warn("Failed to get ID token, falling back to session", { error });
+      if (firebaseUser) {
+        try {
+          token = await firebaseUser.getIdToken();
+          authMode = "id_token";
+        } catch (error) {
+          logger.warn("Failed to get ID token, falling back to session", { error });
+        }
       }
     }
-  }
 
-  const headers = {
-    ...prevContext.headers,
-    Authorization: token ? `Bearer ${token}` : "",
-    "X-Auth-Mode": authMode,
-    "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-    "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
+    const headers = {
+      ...prevContext.headers,
+      Authorization: token ? `Bearer ${token}` : "",
+      "X-Auth-Mode": authMode,
+      "X-Civicship-Tenant": tenantId,
+      "X-Community-Id": communityId,
+    };
+
+    return { headers };
+  });
+}
+
+function createHttpLink(uri: string) {
+  return createUploadLink({
+    uri,
+    credentials: "include",
+    headers: {
+      "Apollo-Require-Preflight": "true",
+    },
+  });
+}
+
+function createBaseApolloOptions(link: ApolloLink): ApolloClientOptions<NormalizedCacheObject> {
+  return {
+    link,
+    ssrMode: true,
+    cache: new InMemoryCache(),
   };
+}
 
-  return { headers };
-});
+const envCommunityId = getEnvCommunityId();
+const staticCommunityId = envCommunityId ?? "";
+const staticTenantId = envCommunityId 
+  ? getAuthForCommunity(envCommunityId).tenantId 
+  : (getEnvAuthConfig().tenantId ?? "");
+
+const httpLink = createHttpLink(process.env.NEXT_PUBLIC_API_ENDPOINT!);
+
+const requestLink = buildRequestLink(staticTenantId, staticCommunityId);
 
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
   if (graphQLErrors) {
@@ -122,11 +146,18 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
 });
 
 const link = ApolloLink.from([requestLink, errorLink, httpLink]);
+export const apolloClient = new ApolloClient(createBaseApolloOptions(link));
 
-const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
-  link,
-  ssrMode: true,
-  cache: new InMemoryCache(),
-};
+export function createApolloClient(options: {
+  communityId: string;
+  tenantId: string;
+  apiEndpoint: string;
+}): ApolloClient<NormalizedCacheObject> {
+  const { communityId, tenantId, apiEndpoint } = options;
 
-export const apolloClient = new ApolloClient(defaultOptions);
+  const httpLink = createHttpLink(apiEndpoint);
+  const requestLink = buildRequestLink(tenantId, communityId);
+  const link = ApolloLink.from([requestLink, errorLink, httpLink]);
+
+  return new ApolloClient(createBaseApolloOptions(link));
+}

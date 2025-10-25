@@ -9,15 +9,18 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
 import React from "react";
-import { currentCommunityMetadata } from "@/lib/communities/metadata";
+import { getCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
+import { CommunityProvider } from "@/contexts/CommunityContext";
+import { getCommunityIdFromRequest } from "@/lib/communities/server-resolve";
 
 const font = Inter({ subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const metadata = currentCommunityMetadata;
+  const communityId = getCommunityIdFromRequest();
+  const metadata = getCommunityMetadata(communityId);
 
   return {
     title: metadata.title,
@@ -40,6 +43,8 @@ const RootLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const communityId = getCommunityIdFromRequest();
+
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
 
   return (
@@ -47,21 +52,23 @@ const RootLayout = async ({
       <body className={font.className}>
         <ClientPolyfills />
         <CookiesProvider>
-          <ApolloProvider>
-            <AuthProvider
-              ssrCurrentUser={user}
-              ssrLineAuthenticated={lineAuthenticated}
-              ssrPhoneAuthenticated={phoneAuthenticated}
-            >
-              <HeaderProvider>
-                <LoadingProvider>
-                  <AnalyticsProvider />
-                  <MainContent>{children}</MainContent>
-                  <Toaster richColors className="mx-8" />
-                </LoadingProvider>
-              </HeaderProvider>
-            </AuthProvider>
-          </ApolloProvider>
+          <CommunityProvider initialCommunityId={communityId}>
+            <ApolloProvider>
+              <AuthProvider
+                ssrCurrentUser={user}
+                ssrLineAuthenticated={lineAuthenticated}
+                ssrPhoneAuthenticated={phoneAuthenticated}
+              >
+                <HeaderProvider>
+                  <LoadingProvider>
+                    <AnalyticsProvider />
+                    <MainContent>{children}</MainContent>
+                    <Toaster richColors className="mx-8" />
+                  </LoadingProvider>
+                </HeaderProvider>
+              </AuthProvider>
+            </ApolloProvider>
+          </CommunityProvider>
         </CookiesProvider>
       </body>
     </html>

@@ -9,6 +9,7 @@ import { applySsrAuthState } from "@/lib/auth/init/applySsrAuthState";
 import { useAuthActions } from "@/hooks/auth/actions";
 import { useAuthSideEffects } from "@/hooks/auth/sideEffects";
 import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
+import { useCommunityContext } from "@/contexts/CommunityContext";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -19,6 +20,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   ssrPhoneAuthenticated,
 }) => {
   const { liffService, phoneAuthService, authStateManager } = useAuthDependencies();
+  const { communityId } = useCommunityContext();
   const hasInitialized = useRef(false);
 
   useEffect(() => {
@@ -37,8 +39,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       ssrCurrentUser,
       ssrLineAuthenticated,
       ssrPhoneAuthenticated,
+      communityId: communityId ?? undefined,
     });
-  }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated]);
+  }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated, communityId]);
 
   const { refetch } = useCurrentUserServerQuery({
     fetchPolicy: "network-only",
