@@ -8,6 +8,7 @@ import { GqlUser } from "@/types/graphql";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { TokenManager } from "@/lib/auth/core/token-manager";
 import { lineAuth } from "@/lib/auth/core/firebase-config";
+import { useCommunityContext } from "@/contexts/CommunityContext";
 
 interface UseLineAuthProcessingProps {
   shouldProcessRedirect: boolean;
@@ -24,6 +25,7 @@ export const useLineAuthProcessing = ({
 }: UseLineAuthProcessingProps) => {
   const processedRef = useRef(false);
   const setState = useAuthStore((s) => s.setState);
+  const { communityId } = useCommunityContext();
 
   useEffect(() => {
     if (!shouldProcessRedirect || processedRef.current || !authStateManager) return;
@@ -52,7 +54,7 @@ export const useLineAuthProcessing = ({
             component: "useLineAuthProcessing",
           });
         } else {
-          const success = await liffService.signInWithLiffToken();
+          const success = await liffService.signInWithLiffToken(communityId ?? undefined);
           if (!success) {
             logger.info("signInWithLiffToken failed", {
               authType: "liff",
@@ -114,5 +116,5 @@ export const useLineAuthProcessing = ({
     };
 
     handleLineAuthRedirect();
-  }, [shouldProcessRedirect, refetchUser, setState, liffService, authStateManager]);
+  }, [shouldProcessRedirect, refetchUser, setState, liffService, authStateManager, communityId]);
 };

@@ -4,6 +4,8 @@ import { getApps, initializeApp } from "firebase/app";
 import { Auth, getAuth } from "firebase/auth";
 import { Analytics, getAnalytics, isSupported } from "firebase/analytics";
 import { logger } from "@/lib/logging";
+import { getAuthForCommunity, getEnvAuthConfig } from "@/lib/communities/runtime-auth";
+import type { CommunityId } from "@/lib/communities/runtime-auth";
 
 const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -19,7 +21,20 @@ export const defaultApp = initializeApp(firebaseConfigWithAppId);
 
 export const lineApp = initializeApp(firebaseConfig, "line-auth-app");
 export const lineAuth: Auth = getAuth(lineApp);
-lineAuth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
+
+const envTenantId = getEnvAuthConfig().tenantId;
+lineAuth.tenantId = envTenantId ?? null;
+
+/**
+ * Set Firebase Auth tenantId based on communityId
+ * Used in multi-tenant mode when env vars are not present
+ */
+export function setFirebaseTenantId(communityId: string): void {
+  if (envTenantId) return;
+  
+  const authConfig = getAuthForCommunity(communityId as CommunityId);
+  lineAuth.tenantId = authConfig.tenantId;
+}
 
 export const getPhoneAuth = (): Auth => {
   const app =

@@ -2,20 +2,28 @@ import { GqlCurrentUserPayload } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 import { User } from "firebase/auth";
 import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
+import { getAuthForCommunity, getEnvAuthConfig, getEnvCommunityId } from "@/lib/communities/runtime-auth";
+import type { CommunityId } from "@/lib/communities/runtime-auth";
 
 export async function fetchCurrentUserClient(
-  firebaseUser?: User | null
+  firebaseUser?: User | null,
+  communityId?: string
 ): Promise<GqlCurrentUserPayload["user"] | null> {
   try {
     const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    const tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID;
-    const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+    
+    const envCommunityId = getEnvCommunityId();
+    const envAuth = getEnvAuthConfig();
+    
+    const finalCommunityId = envCommunityId ?? communityId ?? "";
+    const finalTenantId = envAuth.tenantId ?? 
+      (finalCommunityId ? getAuthForCommunity(finalCommunityId as CommunityId).tenantId : "");
 
-    if (!apiEndpoint || !tenantId || !communityId) {
-      logger.error("[fetchCurrentUserClient] Missing required environment variables", {
+    if (!apiEndpoint || !finalTenantId || !finalCommunityId) {
+      logger.error("[fetchCurrentUserClient] Missing required configuration", {
         hasApiEndpoint: !!apiEndpoint,
-        hasTenantId: !!tenantId,
-        hasCommunityId: !!communityId,
+        hasTenantId: !!finalTenantId,
+        hasCommunityId: !!finalCommunityId,
       });
       return null;
     }
@@ -25,8 +33,8 @@ export async function fetchCurrentUserClient(
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "X-Auth-Mode": authMode,
-      "X-Civicship-Tenant": tenantId,
-      "X-Community-Id": communityId,
+      "X-Civicship-Tenant": finalTenantId,
+      "X-Community-Id": finalCommunityId,
     };
 
     if (firebaseUser) {

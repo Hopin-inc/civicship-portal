@@ -4,9 +4,11 @@ import {
   GqlCurrentUserServerQueryVariables,
   GqlUser,
 } from "@/types/graphql";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { logger } from "@/lib/logging";
 import { FETCH_PROFILE_SERVER_QUERY } from "@/graphql/account/user/server";
+import { getEnvCommunityId, resolveCommunityIdFromHost, getAuthForCommunity, getEnvAuthConfig } from "@/lib/communities/runtime-auth";
+import type { CommunityId } from "@/lib/communities/runtime-auth";
 
 export async function fetchProfileServer(): Promise<GqlUser | null> {
   const cookieStore = await cookies();
@@ -17,11 +19,24 @@ export async function fetchProfileServer(): Promise<GqlUser | null> {
     return null;
   }
 
+  const headersList = headers();
+  const host = headersList.get("host") ?? "localhost";
+  const envCommunityId = getEnvCommunityId();
+  const communityId = envCommunityId ?? resolveCommunityIdFromHost(host);
+  
+  const envAuth = getEnvAuthConfig();
+  const tenantId = envAuth.tenantId ?? getAuthForCommunity(communityId as CommunityId).tenantId;
+
   try {
     const res = await executeServerGraphQLQuery<
       GqlCurrentUserServerQuery,
       GqlCurrentUserServerQueryVariables
-    >(FETCH_PROFILE_SERVER_QUERY, {}, { Authorization: `Bearer ${session}` });
+    >(
+      FETCH_PROFILE_SERVER_QUERY,
+      {},
+      { Authorization: `Bearer ${session}` },
+      { tenantId, communityId }
+    );
 
     return res.currentUser?.user ?? null;
   } catch (error) {

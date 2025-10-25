@@ -1,7 +1,9 @@
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { GET_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/transaction/query";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlTransactionsConnection, GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables } from "@/types/graphql";
+import { getEnvCommunityId, resolveCommunityIdFromHost, getAuthForCommunity, getEnvAuthConfig } from "@/lib/communities/runtime-auth";
+import type { CommunityId } from "@/lib/communities/runtime-auth";
+import { headers } from "next/headers";
 
 export interface ServerCommunityTransactionsParams {
   first?: number;
@@ -32,10 +34,18 @@ export async function getServerCommunityTransactions(
     withDidIssuanceRequests = true,
   } = params;
 
+  const headersList = headers();
+  const host = headersList.get("host") ?? "localhost";
+  const envCommunityId = getEnvCommunityId();
+  const communityId = envCommunityId ?? resolveCommunityIdFromHost(host);
+  
+  const envAuth = getEnvAuthConfig();
+  const tenantId = envAuth.tenantId ?? getAuthForCommunity(communityId as CommunityId).tenantId;
+
   try {
     const variables: GqlGetTransactionsQueryVariables = {
       filter: {
-        communityId: COMMUNITY_ID,
+        communityId,
       },
       first,
       cursor: after,
@@ -44,7 +54,9 @@ export async function getServerCommunityTransactions(
 
     const data = await executeServerGraphQLQuery<GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables>(
       GET_TRANSACTIONS_SERVER_QUERY,
-      variables
+      variables,
+      {},
+      { tenantId, communityId }
     );
 
     return data.transactions ?? fallbackConnection;

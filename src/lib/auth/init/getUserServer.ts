@@ -4,9 +4,11 @@ import {
   GqlCurrentUserServerQueryVariables,
   GqlUser,
 } from "@/types/graphql";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { logger } from "@/lib/logging";
 import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
+import { getEnvCommunityId, resolveCommunityIdFromHost, getAuthForCommunity, getEnvAuthConfig } from "@/lib/communities/runtime-auth";
+import type { CommunityId } from "@/lib/communities/runtime-auth";
 
 export async function getUserServer(): Promise<{
   user: GqlUser | null;
@@ -28,11 +30,24 @@ export async function getUserServer(): Promise<{
     };
   }
 
+  const headersList = headers();
+  const host = headersList.get("host") ?? "localhost";
+  const envCommunityId = getEnvCommunityId();
+  const communityId = envCommunityId ?? resolveCommunityIdFromHost(host);
+  
+  const envAuth = getEnvAuthConfig();
+  const tenantId = envAuth.tenantId ?? getAuthForCommunity(communityId as CommunityId).tenantId;
+
   try {
     const res = await executeServerGraphQLQuery<
       GqlCurrentUserServerQuery,
       GqlCurrentUserServerQueryVariables
-    >(GET_CURRENT_USER_SERVER_QUERY, {}, { Authorization: `Bearer ${session}` });
+    >(
+      GET_CURRENT_USER_SERVER_QUERY,
+      {},
+      { Authorization: `Bearer ${session}` },
+      { tenantId, communityId }
+    );
 
     const user: GqlUser | null = res.currentUser?.user ?? null;
     const hasPhoneIdentity = !!user?.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");

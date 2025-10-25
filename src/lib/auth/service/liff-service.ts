@@ -197,11 +197,11 @@ export class LiffService {
     return liff.getAccessToken();
   }
 
-  public async signInWithLiffToken(): Promise<boolean> {
+  public async signInWithLiffToken(communityId?: string): Promise<boolean> {
     const accessToken = this.getAccessToken();
     if (!accessToken) return false;
 
-    const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+    const finalCommunityId = process.env.NEXT_PUBLIC_COMMUNITY_ID ?? communityId ?? "";
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
     const authStateManager = AuthStateManager.getInstance();
 
@@ -212,7 +212,7 @@ export class LiffService {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Community-Id": communityId ?? "",
+            "X-Community-Id": finalCommunityId,
           },
           body: JSON.stringify({ accessToken }),
         });

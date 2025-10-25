@@ -21,6 +21,7 @@ interface InitAuthParams {
   ssrCurrentUser?: GqlUser | undefined | null;
   ssrLineAuthenticated?: boolean;
   ssrPhoneAuthenticated?: boolean;
+  communityId?: string;
 }
 
 export async function initAuth(params: InitAuthParams) {
@@ -30,6 +31,7 @@ export async function initAuth(params: InitAuthParams) {
     ssrLineAuthenticated,
     ssrPhoneAuthenticated,
     liffService,
+    communityId,
   } = params;
 
   const { setState, state } = useAuthStore.getState();
@@ -56,6 +58,7 @@ export async function initAuth(params: InitAuthParams) {
     ssrCurrentUser,
     ssrPhoneAuthenticated,
     setState,
+    communityId,
   });
 }
 
@@ -105,6 +108,7 @@ async function initAuthFull({
   ssrCurrentUser,
   ssrPhoneAuthenticated,
   setState,
+  communityId,
 }: {
   liffService: LiffService;
   authStateManager: AuthStateManager;
@@ -112,11 +116,12 @@ async function initAuthFull({
   ssrCurrentUser?: GqlUser | undefined | null;
   ssrPhoneAuthenticated?: boolean;
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
+  communityId?: string;
 }) {
   try {
     prepareInitialState(setState);
 
-    const firebaseUser = await initializeFirebase(liffService, environment);
+    const firebaseUser = await initializeFirebase(liffService, environment, communityId);
     if (!firebaseUser) {
       const shouldContinue = handleUnauthenticatedBranch(
         liffService,
@@ -134,7 +139,7 @@ async function initAuthFull({
       return;
     }
 
-    const user = await restoreUserSession(ssrCurrentUser, firebaseUser, setState);
+    const user = await restoreUserSession(ssrCurrentUser, firebaseUser, setState, communityId);
     if (!user) {
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;

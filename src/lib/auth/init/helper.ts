@@ -119,6 +119,7 @@ export async function restoreUserSession(
   ssrCurrentUser: GqlUser | null | undefined,
   firebaseUser: User,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
+  communityId?: string,
 ) {
   const tokenResult = await firebaseUser.getIdTokenResult();
   useAuthStore.getState().setState({
@@ -135,7 +136,7 @@ export async function restoreUserSession(
     return ssrCurrentUser;
   }
 
-  const user = await fetchCurrentUserClient(firebaseUser);
+  const user = await fetchCurrentUserClient(firebaseUser, communityId);
   if (user) {
     setState({ currentUser: user });
     return user;

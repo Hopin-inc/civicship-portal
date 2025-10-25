@@ -10,8 +10,14 @@ const CommunityContext = createContext<{
   setCommunityId: () => {},
 });
 
-export const CommunityProvider = ({ children }: { children: React.ReactNode }) => {
-  const [communityId, setCommunityId] = useState<string | null>(null);
+export const CommunityProvider = ({
+  children,
+  initialCommunityId,
+}: {
+  children: React.ReactNode;
+  initialCommunityId?: string;
+}) => {
+  const [communityId, setCommunityId] = useState<string | null>(initialCommunityId ?? null);
 
   return (
     <CommunityContext.Provider value={{ communityId, setCommunityId }}>

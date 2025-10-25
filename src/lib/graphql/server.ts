@@ -20,14 +20,25 @@ export interface GraphQLResponse<T> {
 export async function executeServerGraphQLQuery<
   TData = unknown,
   TVariables = Record<string, unknown>,
->(query: string, variables: TVariables, headers: Record<string, string> = {}): Promise<TData> {
+>(
+  query: string,
+  variables: TVariables,
+  headers: Record<string, string> = {},
+  options?: {
+    tenantId?: string;
+    communityId?: string;
+  }
+): Promise<TData> {
+  const tenantId = options?.tenantId ?? process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? "";
+  const communityId = options?.communityId ?? process.env.NEXT_PUBLIC_COMMUNITY_ID ?? "";
+
   const response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-Auth-Mode": "session",
-      "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID!,
-      "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID!,
+      "X-Civicship-Tenant": tenantId,
+      "X-Community-Id": communityId,
       ...headers,
     },
     body: JSON.stringify({
