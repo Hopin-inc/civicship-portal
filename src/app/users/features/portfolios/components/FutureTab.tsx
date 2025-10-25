@@ -13,11 +13,9 @@ export default function FutureTab({ searchQuery }: FutureTabProps) {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
   const { portfolios } = useUserProfileContext();
 
-  const today = new Date();
-
   const filteredPortfolios = useMemo(() => {
-    return filterFuturePortfolios(portfolios, searchQuery, today);
-  }, [portfolios, searchQuery, today]);
+    return filterFuturePortfolios(portfolios, searchQuery, new Date());
+  }, [portfolios, searchQuery]);
 
   const grouped = groupByDate(filteredPortfolios);
 
