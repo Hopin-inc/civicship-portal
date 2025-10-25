@@ -4,26 +4,26 @@ import React, { useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter, useSearchParams } from "next/navigation";
 import clsx from "clsx";
-import { TabsEnum } from "../../types";
+import { PortfolioTab } from "../../types";
 
-interface TabManagerProps {
-  activeTab: TabsEnum;
-  setActiveTab: React.Dispatch<React.SetStateAction<TabsEnum>>;
+interface PortfolioTabsProps {
+  activeTab: PortfolioTab;
+  setActiveTab: React.Dispatch<React.SetStateAction<PortfolioTab>>;
 }
 
-export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
+export function PortfolioTabs({ activeTab, setActiveTab }: PortfolioTabsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const tabParam = searchParams.get("tab");
-    if (tabParam === TabsEnum.Future || tabParam === TabsEnum.Past) {
+    if (tabParam === PortfolioTab.Future || tabParam === PortfolioTab.Past) {
       setActiveTab(tabParam);
     }
   }, [searchParams, setActiveTab]);
 
   const handleTabChange = (value: string) => {
-    const newTab = value as TabsEnum;
+    const newTab = value as PortfolioTab;
     setActiveTab(newTab);
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", newTab);
@@ -34,10 +34,10 @@ export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
     <Tabs value={activeTab} onValueChange={handleTabChange}>
       <TabsList>
         <TabsTrigger
-          value={TabsEnum.Future}
+          value={PortfolioTab.Future}
           className={clsx(
             "px-6 py-2 font-bold text-base",
-            activeTab === TabsEnum.Future
+            activeTab === PortfolioTab.Future
               ? "border-blue-600 border-b-[2px]"
               : "bg-white text-black border-b-[1px]",
           )}
@@ -45,10 +45,10 @@ export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
           今後の予定
         </TabsTrigger>
         <TabsTrigger
-          value={TabsEnum.Past}
+          value={PortfolioTab.Past}
           className={clsx(
             "px-6 py-2 font-bold text-base",
-            activeTab === TabsEnum.Past
+            activeTab === PortfolioTab.Past
               ? "border-blue-600 border-b-[2px]"
               : "bg-white text-black border-b-[1px]",
           )}

@@ -1,4 +1,4 @@
-import { PortfoliosList } from "@/app/users/features/portfolios";
+import { PortfoliosPage as PortfoliosPageComponent } from "@/app/users/features/portfolios";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 
@@ -15,7 +15,7 @@ export default function PortfoliosPage() {
 
   return (
     <div>
-      <PortfoliosList />
+      <PortfoliosPageComponent />
     </div>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 import { useRef } from "react";
-import { groupByDate } from "./utils";
+import { groupByDate } from "./date-grouping";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
-import { PortfolioDateGroup } from "./PortfolioDateGroup";
+import { PortfoliosByDateSection } from "./PortfoliosByDateSection";
 import { filterPastPortfolios } from "../../lib";
 
 interface PastTabProps {
@@ -14,7 +14,7 @@ export function PastTab({ searchQuery }: PastTabProps) {
   const { portfolios } = useUserProfileContext();
 
   const filteredPortfolios = filterPastPortfolios(portfolios, searchQuery, new Date());
-  const grouped = groupByDate(filteredPortfolios);
+  const portfoliosByDate = groupByDate(filteredPortfolios);
 
-  return <PortfolioDateGroup grouped={grouped} lastPortfolioRef={lastPortfolioRef} />;
+  return <PortfoliosByDateSection grouped={portfoliosByDate} lastPortfolioRef={lastPortfolioRef} />;
 }

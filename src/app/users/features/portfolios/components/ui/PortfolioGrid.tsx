@@ -1,5 +1,5 @@
 import { RefObject } from "react";
-import { PortfolioCardViewModel } from "../../presenters/types";
+import { PortfolioCardViewModel } from "../../presenters/viewModels";
 import { PortfolioCard } from "./PortfolioCard";
 
 type PortfolioGridProps = {

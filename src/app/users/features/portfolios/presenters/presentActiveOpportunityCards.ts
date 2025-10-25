@@ -1,7 +1,7 @@
-import { ActiveOpportunityCardViewModel, SlimOpportunity } from "./types";
+import { ActiveOpportunityCardViewModel, OpportunitySummary } from "./viewModels";
 
-export function presentActiveOpportunities(
-  opportunities: SlimOpportunity[],
+export function presentActiveOpportunityCards(
+  opportunities: OpportunitySummary[],
 ): ActiveOpportunityCardViewModel[] {
   return opportunities.map((opp) => ({
     id: opp.id,

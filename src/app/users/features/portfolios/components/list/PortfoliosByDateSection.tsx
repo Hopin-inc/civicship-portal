@@ -1,7 +1,7 @@
 import { AppPortfolio } from "@/app/users/features/shared/types";
 import { PortfolioGrid } from "../ui/PortfolioGrid";
 import { presentPortfolioCard } from "../../presenters/presentPortfolioCard";
-import { presentDateGroup } from "../../presenters/presentDateGroup";
+import { presentDateHeading } from "../../presenters/presentDateHeading";
 import React from "react";
 
 type Props = {
@@ -9,10 +9,10 @@ type Props = {
   lastPortfolioRef: React.RefObject<HTMLDivElement>;
 };
 
-export const PortfolioDateGroup: React.FC<Props> = ({ grouped, lastPortfolioRef }) => (
+export const PortfoliosByDateSection: React.FC<Props> = ({ grouped, lastPortfolioRef }) => (
   <div className="mt-4 space-y-8">
     {Object.entries(grouped).map(([date, items]) => {
-      const dateViewModel = presentDateGroup(date);
+      const dateViewModel = presentDateHeading(date);
       const viewModels = items.map(presentPortfolioCard);
 
       return (

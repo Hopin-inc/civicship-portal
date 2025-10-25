@@ -1,8 +1,8 @@
 "use client";
-import { groupByDate } from "./utils";
+import { groupByDate } from "./date-grouping";
 import { useRef } from "react";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
-import { PortfolioDateGroup } from "./PortfolioDateGroup";
+import { PortfoliosByDateSection } from "./PortfoliosByDateSection";
 import { filterFuturePortfolios } from "../../lib";
 
 interface FutureTabProps {
@@ -14,7 +14,7 @@ export function FutureTab({ searchQuery }: FutureTabProps) {
   const { portfolios } = useUserProfileContext();
 
   const filteredPortfolios = filterFuturePortfolios(portfolios, searchQuery, new Date());
-  const grouped = groupByDate(filteredPortfolios);
+  const portfoliosByDate = groupByDate(filteredPortfolios);
 
-  return <PortfolioDateGroup grouped={grouped} lastPortfolioRef={lastPortfolioRef} />;
+  return <PortfoliosByDateSection grouped={portfoliosByDate} lastPortfolioRef={lastPortfolioRef} />;
 }

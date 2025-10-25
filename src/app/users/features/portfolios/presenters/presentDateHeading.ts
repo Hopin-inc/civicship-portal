@@ -1,8 +1,8 @@
 import { format, parseISO } from "date-fns";
 import { ja } from "date-fns/locale";
-import { DateGroupViewModel } from "./types";
+import { DateGroupViewModel } from "./viewModels";
 
-export function presentDateGroup(dateISO: string): DateGroupViewModel {
+export function presentDateHeading(dateISO: string): DateGroupViewModel {
   const dateObj = parseISO(dateISO);
   const isValid = !isNaN(dateObj.getTime());
 

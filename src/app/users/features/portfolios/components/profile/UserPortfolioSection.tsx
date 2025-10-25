@@ -6,7 +6,7 @@ import { AppPortfolio } from "@/app/users/features/shared/types";
 import { ActiveOpportunitiesSection } from "./ActiveOpportunitiesSection";
 import { PortfolioGrid } from "../ui/PortfolioGrid";
 import { PortfolioEmptyState } from "../ui/PortfolioEmptyState";
-import { presentActiveOpportunities } from "../../presenters/presentActiveOpportunities";
+import { presentActiveOpportunityCards } from "../../presenters/presentActiveOpportunityCards";
 import { presentPortfolioCard } from "../../presenters/presentPortfolioCard";
 
 interface UserPortfolioSectionProps {
@@ -30,7 +30,7 @@ export function UserPortfolioSection({
   const showEmptyState = portfolios.length === 0;
   const router = useRouter();
 
-  const activeOpportunityCards = presentActiveOpportunities(activeOpportunities);
+  const activeOpportunityCards = presentActiveOpportunityCards(activeOpportunities);
   const portfolioViewModels = portfolios.map(presentPortfolioCard);
 
   return (

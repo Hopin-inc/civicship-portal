@@ -2,7 +2,7 @@ import { AppPortfolio } from "@/app/users/features/shared/types";
 import { GqlEvaluationStatus, GqlReservationStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { parsePortfolioDate, formatPortfolioDate } from "@/app/users/features/portfolios/lib";
-import { PortfolioCardViewModel } from "./types";
+import { PortfolioCardViewModel } from "./viewModels";
 
 function getCategoryLabel(
   source: "OPPORTUNITY" | "ARTICLE",

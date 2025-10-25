@@ -27,7 +27,7 @@ export type ActiveOpportunityCardViewModel = {
   href: string;
 };
 
-export type SlimOpportunity = {
+export type OpportunitySummary = {
   id: string;
   title: string;
   images?: string[];
