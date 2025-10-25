@@ -1,11 +1,7 @@
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
-import {
-  GqlGetUserFlexibleQuery,
-  GqlGetUserFlexibleQueryVariables,
-  GqlUser,
-} from "@/types/graphql";
+import { GqlUser } from "@/types/graphql";
 import { logger } from "@/lib/logging";
-import { GET_USER_FLEXIBLE } from "@/graphql/account/user/query";
+import { GET_PUBLIC_USER_SERVER_QUERY } from "@/graphql/account/user/server";
 
 /**
  * 公開プロフィール用のサーバー側データ取得
@@ -19,18 +15,11 @@ export async function fetchPublicUserServer(
 ): Promise<GqlUser | null> {
   try {
     const res = await executeServerGraphQLQuery<
-      GqlGetUserFlexibleQuery,
-      GqlGetUserFlexibleQueryVariables
+      { user: GqlUser | null },
+      { id: string }
     >(
-      GET_USER_FLEXIBLE,
-      {
-        id: userId,
-        withPortfolios: true,
-        withOpportunities: true,
-        withNftInstances: false, // 公開ページではNFTを表示しない
-        withWallets: false,      // プライベート情報を除外
-        withDidIssuanceRequests: false,
-      },
+      GET_PUBLIC_USER_SERVER_QUERY,
+      { id: userId },
       {} // 認証ヘッダーなし（公開情報のみ取得）
     );
 
