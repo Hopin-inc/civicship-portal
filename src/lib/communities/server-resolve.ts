@@ -1,3 +1,4 @@
+import "server-only";
 import { headers } from "next/headers";
 import { getEnvCommunityId, normalizeCommunityId, type CommunityId } from "./runtime-auth";
 

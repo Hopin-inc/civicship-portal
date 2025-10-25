@@ -6,15 +6,17 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useInfiniteTransactions } from "@/hooks/transactions/useInfiniteTransactions";
 import { getServerCommunityTransactionsWithCursor } from "@/hooks/transactions/server-community-transactions";
 import { getFromWalletImage, getToWalletImage } from "@/app/admin/wallet/data/presenter";
+import { useCommunity } from "@/contexts/CommunityContext";
 
 interface InfiniteTransactionListProps {
   initialTransactions: GqlTransactionsConnection;
 }
 
 export const InfiniteTransactionList = ({ initialTransactions }: InfiniteTransactionListProps) => {
+  const { communityId } = useCommunity();
   const { transactions, hasNextPage, loading, loadMoreRef } = useInfiniteTransactions({
     initialTransactions,
-    fetchMore: getServerCommunityTransactionsWithCursor,
+    fetchMore: (cursor, first) => getServerCommunityTransactionsWithCursor(communityId, cursor, first),
   });
 
   return (

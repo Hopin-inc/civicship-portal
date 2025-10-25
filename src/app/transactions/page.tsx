@@ -1,9 +1,12 @@
 import { Header } from "@/app/transactions/components/Header";
 import { getServerCommunityTransactions } from "@/hooks/transactions/server";
 import { InfiniteTransactionList } from "./components/InfiniteTransactionList";
+import { getCommunityIdFromRequest } from "@/lib/communities/server-resolve";
 
 export default async function TransactionsPage() {
+    const communityId = getCommunityIdFromRequest();
     const transactions = await getServerCommunityTransactions({
+        communityId,
         first: 20,
     });
     return (

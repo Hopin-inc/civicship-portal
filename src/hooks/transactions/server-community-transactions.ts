@@ -1,10 +1,10 @@
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { GET_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/transaction/query";
 import { GqlTransactionsConnection, GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables } from "@/types/graphql";
-import { getCommunityIdFromRequest } from "@/lib/communities/server-resolve";
-import { getAuthForCommunity, getEnvAuthConfig } from "@/lib/communities/runtime-auth";
+import { getAuthForCommunity, getEnvAuthConfig, type CommunityId } from "@/lib/communities/runtime-auth";
 
 export interface ServerCommunityTransactionsParams {
+  communityId: CommunityId;
   first?: number;
   after?: string;
   withDidIssuanceRequests?: boolean;
@@ -25,15 +25,14 @@ const fallbackConnection: GqlTransactionsConnection = {
  * サーバーサイドでコミュニティのトランザクションを取得する関数
  */
 export async function getServerCommunityTransactions(
-  params: ServerCommunityTransactionsParams = {}
+  params: ServerCommunityTransactionsParams
 ): Promise<GqlTransactionsConnection> {
   const {
+    communityId,
     first = 50,
     after,
     withDidIssuanceRequests = true,
   } = params;
-
-  const communityId = getCommunityIdFromRequest();
   
   const envAuth = getEnvAuthConfig();
   const tenantId = envAuth.tenantId ?? getAuthForCommunity(communityId).tenantId;
@@ -66,10 +65,12 @@ export async function getServerCommunityTransactions(
  * カーソルベースのページネーションでコミュニティのトランザクションを取得する関数
  */
 export async function getServerCommunityTransactionsWithCursor(
+  communityId: CommunityId,
   cursor?: string,
   first: number = 20
 ): Promise<GqlTransactionsConnection> {
   return getServerCommunityTransactions({
+    communityId,
     first,
     after: cursor,
   });
