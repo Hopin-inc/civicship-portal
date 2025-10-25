@@ -19,7 +19,7 @@ export function presentUserProfile(
     id: p.id,
     title: p.title,
     coverUrl: p.thumbnailUrl ?? undefined,
-    createdAt: p.date,
+    createdAt: p.date instanceof Date ? p.date.toISOString() : String(p.date),
   }));
 
   const selfOpportunities = (gqlUser.opportunitiesCreatedByMe ?? []).map((opp) => ({
@@ -37,7 +37,7 @@ export function presentUserProfile(
   const nftInstances = isOwner
     ? (gqlUser.nftInstances?.edges ?? []).map((edge) => ({
         id: edge.node.id,
-        name: edge.node.name,
+        name: edge.node.name ?? "",
         imageUrl: edge.node.imageUrl ?? undefined,
       }))
     : undefined;
