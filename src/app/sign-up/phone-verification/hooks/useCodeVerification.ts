@@ -52,11 +52,10 @@ export function useCodeVerification(
       setIsVerifying(true);
 
       try {
-        const success = await phoneAuth.verifyPhoneCode(verificationCode);
-        const phoneAuthState = useAuthStore.getState().phoneAuth;
+        const result = await phoneAuth.verifyPhoneCode(verificationCode);
         const setAuthState = useAuthStore.getState().setState;
 
-        if (!success || !phoneAuthState.phoneUid) {
+        if (!result.success || !result.phoneUid) {
           return {
             success: false,
             error: {
@@ -69,7 +68,7 @@ export function useCodeVerification(
         const { data } = await identityCheckPhoneUser({
           variables: {
             input: {
-              phoneUid: phoneAuthState.phoneUid,
+              phoneUid: result.phoneUid,
             },
           },
         });
