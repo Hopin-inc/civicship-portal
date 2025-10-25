@@ -1,4 +1,5 @@
 import { AppPortfolio } from "@/app/users/features/shared/types";
+import { GqlOpportunityCategory, GqlOpportunitySlot } from "@/types/graphql";
 
 /**
  * ユーザープロフィール画面用のViewModel
@@ -39,14 +40,14 @@ export type UserProfileViewModel = {
   currentlyHiringOpportunities: Array<{
     id: string;
     title: string;
-    category: any;
+    category: GqlOpportunityCategory;
     images: string[];
     location: string;
     communityId: string;
     hasReservableTicket: boolean;
     feeRequired: number | null;
     pointsRequired: number | null;
-    slots: any[];
+    slots: GqlOpportunitySlot[];
   }>;
 
   nftInstances?: Array<{
