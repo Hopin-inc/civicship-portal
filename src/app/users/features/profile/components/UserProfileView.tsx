@@ -38,6 +38,19 @@ export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
         )}
       </div>
 
+      {viewModel.nftInstances && viewModel.nftInstances.length > 0 && (
+        <section className="py-6 mt-0">
+          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">証明書</h2>
+          <div className="mt-4">
+            <CardCarousel>
+              {viewModel.nftInstances.map((nft) => (
+                <NftCard key={nft.id} nftInstance={nft} isCarousel />
+              ))}
+            </CardCarousel>
+          </div>
+        </section>
+      )}
+
       {shouldShowOpportunities && (
         <>
           <UserPortfolioSection
@@ -47,21 +60,6 @@ export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
             activeOpportunities={viewModel.currentlyHiringOpportunities}
           />
         </>
-      )}
-
-      {isOwner && viewModel.nftInstances && viewModel.nftInstances.length > 0 && (
-        <section className="py-6 mt-0">
-          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
-            証明書
-          </h2>
-          <div className="mt-4">
-            <CardCarousel>
-              {viewModel.nftInstances.map((nft) => (
-                <NftCard key={nft.id} nftInstance={nft} isCarousel />
-              ))}
-            </CardCarousel>
-          </div>
-        </section>
       )}
     </div>
   );
