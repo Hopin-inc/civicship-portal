@@ -4,6 +4,8 @@ import { presenterUserAsset } from "@/app/wallets/data/presenter";
 import { Participant } from "@/types/utils";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { UserProfileViewModel } from "./view-model";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export const presenterAppUser = (gqlUser: GqlUser): AppUser => {
   return {
@@ -86,3 +88,58 @@ export const prefectureOptions = [
   GqlCurrentPrefecture.Kochi,
   GqlCurrentPrefecture.Ehime,
 ];
+
+export const presenterPublicUserProfileViewModel = (
+  gqlUser: GqlUser,
+  isOwner: boolean = false
+): UserProfileViewModel => {
+  const wallet = gqlUser.wallets?.find((w) => w.community?.id === COMMUNITY_ID);
+  const portfolios = (gqlUser.portfolios ?? []).map((p) => ({
+    id: p.id,
+    title: p.title,
+    coverUrl: p.thumbnailUrl ?? undefined,
+    createdAt: p.date,
+  }));
+
+  const selfOpportunities = (gqlUser.opportunitiesCreatedByMe ?? []).map((opp) => ({
+    id: opp.id,
+    title: opp.title,
+    coverUrl: opp.images?.[0] ?? undefined,
+    category: opp.category ?? "",
+  }));
+
+  const currentlyHiringOpportunities = selfOpportunities.map((opp) => ({
+    id: opp.id,
+    title: opp.title,
+  }));
+
+  const nftInstances = isOwner
+    ? (gqlUser.nftInstances?.edges ?? []).map((edge) => ({
+        id: edge.node.id,
+        name: edge.node.name,
+        imageUrl: edge.node.imageUrl ?? undefined,
+      }))
+    : undefined;
+
+  return {
+    id: gqlUser.id,
+    name: gqlUser.name,
+    bio: gqlUser.bio ?? undefined,
+    imageUrl: gqlUser.image ?? undefined,
+    currentPrefecture: gqlUser.currentPrefecture
+      ? prefectureLabels[gqlUser.currentPrefecture]
+      : undefined,
+    socialUrl: {
+      x: gqlUser.urlX ?? null,
+      instagram: gqlUser.urlInstagram ?? null,
+      facebook: gqlUser.urlFacebook ?? null,
+    },
+    ticketsAvailable: isOwner ? wallet?.tickets?.length ?? 0 : undefined,
+    points: isOwner ? wallet?.currentPointView?.currentPoint ?? 0 : undefined,
+    portfolios,
+    selfOpportunities,
+    currentlyHiringOpportunities,
+    nftInstances,
+    showOpportunities: selfOpportunities.length > 0,
+  };
+};
