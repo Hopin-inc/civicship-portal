@@ -14,17 +14,12 @@ import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
 import { CommunityProvider } from "@/contexts/CommunityContext";
-import { normalizeCommunityId, getEnvCommunityId } from "@/lib/communities/runtime-auth";
-import { headers } from "next/headers";
+import { getCommunityIdFromRequest } from "@/lib/communities/server-resolve";
 
 const font = Inter({ subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const headersList = headers();
-  const host = headersList.get("host") ?? "localhost";
-  const envCommunityId = getEnvCommunityId();
-
-  const communityId = normalizeCommunityId(envCommunityId, host);
+  const communityId = getCommunityIdFromRequest();
   const metadata = getCommunityMetadata(communityId);
 
   return {
@@ -48,10 +43,7 @@ const RootLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const headersList = headers();
-  const host = headersList.get("host") ?? "localhost";
-  const envCommunityId = getEnvCommunityId();
-  const communityId = normalizeCommunityId(envCommunityId, host);
+  const communityId = getCommunityIdFromRequest();
 
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
 

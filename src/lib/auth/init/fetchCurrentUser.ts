@@ -16,8 +16,9 @@ export async function fetchCurrentUserClient(
     const envAuth = getEnvAuthConfig();
     
     const finalCommunityId = envCommunityId ?? communityId ?? "";
-    const finalTenantId = envAuth.tenantId ?? 
-      (finalCommunityId ? getAuthForCommunity(finalCommunityId).tenantId : "");
+    const finalTenantId = finalCommunityId 
+      ? getAuthForCommunity(finalCommunityId).tenantId 
+      : (envAuth.tenantId ?? "");
 
     if (!apiEndpoint || !finalTenantId || !finalCommunityId) {
       logger.error("[fetchCurrentUserClient] Missing required configuration", {

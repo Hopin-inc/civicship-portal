@@ -109,15 +109,12 @@ export function normalizeCommunityId(envId: string | null, host: string): Commun
 export function getAuthForCommunity(input?: string | null): CommunityAuthConfig {
   const env = getEnvAuthConfig();
   
-  let validCommunityId: CommunityId;
+  let validCommunityId: CommunityId = "neo88";
   if (input && isValidCommunityId(input)) {
     validCommunityId = input;
-  } else {
-    if (input) {
-      const logLevel = process.env.NODE_ENV === "production" ? "error" : "warn";
-      logger[logLevel](`Invalid communityId: ${input}, falling back to neo88`, { input });
-    }
-    validCommunityId = "neo88";
+  } else if (input) {
+    const logLevel = process.env.NODE_ENV === "production" ? "error" : "warn";
+    logger[logLevel](`Invalid communityId: ${input}, falling back to neo88`, { input });
   }
   
   const fallback = AUTH_BY_COMMUNITY[validCommunityId];

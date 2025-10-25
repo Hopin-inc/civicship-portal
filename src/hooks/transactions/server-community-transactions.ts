@@ -1,9 +1,8 @@
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { GET_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/transaction/query";
 import { GqlTransactionsConnection, GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables } from "@/types/graphql";
-import { getEnvCommunityId, resolveCommunityIdFromHost, getAuthForCommunity, getEnvAuthConfig } from "@/lib/communities/runtime-auth";
-import type { CommunityId } from "@/lib/communities/runtime-auth";
-import { headers } from "next/headers";
+import { getCommunityIdFromRequest } from "@/lib/communities/server-resolve";
+import { getAuthForCommunity, getEnvAuthConfig } from "@/lib/communities/runtime-auth";
 
 export interface ServerCommunityTransactionsParams {
   first?: number;
@@ -34,10 +33,7 @@ export async function getServerCommunityTransactions(
     withDidIssuanceRequests = true,
   } = params;
 
-  const headersList = headers();
-  const host = headersList.get("host") ?? "localhost";
-  const envCommunityId = getEnvCommunityId();
-  const communityId = envCommunityId ?? resolveCommunityIdFromHost(host);
+  const communityId = getCommunityIdFromRequest();
   
   const envAuth = getEnvAuthConfig();
   const tenantId = envAuth.tenantId ?? getAuthForCommunity(communityId).tenantId;
