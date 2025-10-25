@@ -3,23 +3,10 @@ import { TabManager } from "./TabManager";
 import { TabsEnum } from "../../types";
 import { useState } from "react";
 import SearchForm from "@/components/shared/SearchForm";
-import FutureTab from "./FutureTab";
-import PastTab from "./PastTab";
+import { FutureTab } from "./FutureTab";
+import { PastTab } from "./PastTab";
 
-export function groupByDate<T extends { dateISO: string }>(items: T[]): Record<string, T[]> {
-  if (!items) return {};
-  return items.reduce(
-    (acc, item) => {
-      const date = item.dateISO;
-      if (!acc[date]) acc[date] = [];
-      acc[date].push(item);
-      return acc;
-    },
-    {} as Record<string, T[]>,
-  );
-}
-
-export default function PortfoliosList() {
+export function PortfoliosList() {
   const [activeTab, setActiveTab] = useState<TabsEnum>(TabsEnum.Future);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [input, setInput] = useState<string>("");

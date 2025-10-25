@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useRef } from "react";
-import { groupByDate } from "./PortfoliosList";
+import { groupByDate } from "./utils";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
 import { PortfolioDateGroup } from "./PortfolioDateGroup";
 import { filterPastPortfolios } from "../../lib";
@@ -9,7 +9,7 @@ interface PastTabProps {
   searchQuery: string;
 }
 
-export default function PastTab({ searchQuery }: PastTabProps) {
+export function PastTab({ searchQuery }: PastTabProps) {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
   const { portfolios } = useUserProfileContext();
 

@@ -1,10 +1,4 @@
-import { ActiveOpportunityCardViewModel } from "./types";
-
-type SlimOpportunity = {
-  id: string;
-  title: string;
-  images?: string[];
-};
+import { ActiveOpportunityCardViewModel, SlimOpportunity } from "./types";
 
 export function presentActiveOpportunities(
   opportunities: SlimOpportunity[],

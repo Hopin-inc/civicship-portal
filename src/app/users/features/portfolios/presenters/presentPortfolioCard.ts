@@ -53,8 +53,11 @@ function getStatusStylesForPassed(evaluationStatus?: GqlEvaluationStatus | null)
   }
 }
 
-export function presentPortfolioCard(portfolio: AppPortfolio): PortfolioCardViewModel {
-  const isPast = parsePortfolioDate(portfolio.dateISO) < new Date();
+export function presentPortfolioCard(
+  portfolio: AppPortfolio,
+  now: Date = new Date(),
+): PortfolioCardViewModel {
+  const isPast = parsePortfolioDate(portfolio.dateISO) < now;
   const isPassed = portfolio.evaluationStatus === GqlEvaluationStatus.Passed;
 
   const linkHref =

@@ -39,11 +39,11 @@ export function portfolioMatchesSearch(portfolio: AppPortfolio, searchQuery: str
 export function filterFuturePortfolios(
   portfolios: AppPortfolio[],
   searchQuery: string,
-  today: Date,
+  now: Date = new Date(),
 ): AppPortfolio[] {
   return portfolios
     .filter((portfolio) => {
-      if (!isPortfolioInFuture(portfolio, today)) return false;
+      if (!isPortfolioInFuture(portfolio, now)) return false;
       return portfolioMatchesSearch(portfolio, searchQuery);
     })
     .sort((a, b) => {
@@ -54,11 +54,11 @@ export function filterFuturePortfolios(
 export function filterPastPortfolios(
   portfolios: AppPortfolio[],
   searchQuery: string,
-  today: Date,
+  now: Date = new Date(),
 ): AppPortfolio[] {
   return portfolios
     .filter((portfolio) => {
-      if (!isPortfolioInPast(portfolio, today)) return false;
+      if (!isPortfolioInPast(portfolio, now)) return false;
       return portfolioMatchesSearch(portfolio, searchQuery);
     })
     .sort((a, b) => {

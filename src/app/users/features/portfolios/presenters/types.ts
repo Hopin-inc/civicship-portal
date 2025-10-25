@@ -26,3 +26,15 @@ export type ActiveOpportunityCardViewModel = {
   image?: string;
   href: string;
 };
+
+export type SlimOpportunity = {
+  id: string;
+  title: string;
+  images?: string[];
+};
+
+export type DateGroupViewModel = {
+  month: string;
+  day: string;
+  weekday: string;
+};

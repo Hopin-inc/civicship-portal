@@ -1,5 +1,5 @@
 "use client";
-import { groupByDate } from "./PortfoliosList";
+import { groupByDate } from "./utils";
 import { useMemo, useRef } from "react";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
 import { PortfolioDateGroup } from "./PortfolioDateGroup";
@@ -9,7 +9,7 @@ interface FutureTabProps {
   searchQuery: string;
 }
 
-export default function FutureTab({ searchQuery }: FutureTabProps) {
+export function FutureTab({ searchQuery }: FutureTabProps) {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
   const { portfolios } = useUserProfileContext();
 
