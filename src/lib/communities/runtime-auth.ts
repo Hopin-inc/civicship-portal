@@ -1,64 +1,54 @@
-/**
- * コミュニティID型定義
- */
 export type CommunityId = "neo88" | "kibotcha" | "dais" | "kotohira" | "himeji-ymca" | "izu";
 
-/**
- * コミュニティ固有の認証設定
- */
 export interface CommunityAuthConfig {
   tenantId: string;
   liffId: string;
   lineClient: string;
 }
 
-/**
- * コミュニティ固有の認証設定レジストリ
- * 環境変数がない場合のフォールバックとして使用
- */
+const AUTH_BY_COMMUNITY_COMMENT = `
+本番環境では環境変数（NEXT_PUBLIC_*）が優先されるため、
+このレジストリのダミー値は使用されません。
+開発時は .env.local で環境変数を設定してください。
+`;
+void AUTH_BY_COMMUNITY_COMMENT;
 const AUTH_BY_COMMUNITY: Record<CommunityId, CommunityAuthConfig> = {
   neo88: {
-    tenantId: "neo88-5qtpy",
-    liffId: "2007251473-yJNnzapO",
-    lineClient: "2007251473",
+    tenantId: "dummy-tenant-id",
+    liffId: "dummy-liff-id",
+    lineClient: "dummy-line-client",
   },
   kibotcha: {
-    tenantId: "kibotcha-sff2c",
-    liffId: "2007594502-amjOlNx",
-    lineClient: "2007594502",
+    tenantId: "dummy-tenant-id",
+    liffId: "dummy-liff-id",
+    lineClient: "dummy-line-client",
   },
   dais: {
-    tenantId: "neo88-5qtpy",
-    liffId: "2007251473-yJNnzapO",
-    lineClient: "2007251473",
+    tenantId: "dummy-tenant-id",
+    liffId: "dummy-liff-id",
+    lineClient: "dummy-line-client",
   },
   kotohira: {
-    tenantId: "kotohira-xxxxx", // TODO: 実際の値に置き換え
-    liffId: "kotohira-liff-id",
-    lineClient: "kotohira-client",
+    tenantId: "dummy-tenant-id",
+    liffId: "dummy-liff-id",
+    lineClient: "dummy-line-client",
   },
   "himeji-ymca": {
-    tenantId: "himeji-ymca-xxxxx", // TODO: 実際の値に置き換え
-    liffId: "himeji-ymca-liff-id",
-    lineClient: "himeji-ymca-client",
+    tenantId: "dummy-tenant-id",
+    liffId: "dummy-liff-id",
+    lineClient: "dummy-line-client",
   },
   izu: {
-    tenantId: "izu-xxxxx", // TODO: 実際の値に置き換え
-    liffId: "izu-liff-id",
-    lineClient: "izu-client",
+    tenantId: "dummy-tenant-id",
+    liffId: "dummy-liff-id",
+    lineClient: "dummy-line-client",
   },
 };
 
-/**
- * 環境変数からコミュニティIDを取得
- */
 export function getEnvCommunityId(): string | null {
   return process.env.NEXT_PUBLIC_COMMUNITY_ID ?? null;
 }
 
-/**
- * 環境変数から認証設定を取得
- */
 export function getEnvAuthConfig(): Partial<CommunityAuthConfig> {
   return {
     tenantId: process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
@@ -67,9 +57,7 @@ export function getEnvAuthConfig(): Partial<CommunityAuthConfig> {
   };
 }
 
-/**
- * ドメインからコミュニティIDへのマッピング
- */
+
 export const DOMAIN_TO_COMMUNITY: Record<string, CommunityId> = {
   "www.neo88.app": "neo88",
   "kibotcha.civicship.jp": "kibotcha",
@@ -89,9 +77,6 @@ export const DOMAIN_TO_COMMUNITY: Record<string, CommunityId> = {
   "localhost:3000": "neo88",
 };
 
-/**
- * ホスト名からコミュニティIDを解決
- */
 export function resolveCommunityIdFromHost(host: string): CommunityId {
   const communityId = DOMAIN_TO_COMMUNITY[host];
   if (!communityId) {
@@ -101,13 +86,17 @@ export function resolveCommunityIdFromHost(host: string): CommunityId {
   return communityId;
 }
 
-/**
- * コミュニティIDから認証設定を取得
- * 環境変数優先、なければレジストリから取得
- */
 export function getAuthForCommunity(communityId: CommunityId): CommunityAuthConfig {
   const env = getEnvAuthConfig();
   const fallback = AUTH_BY_COMMUNITY[communityId];
+
+  const usingFallback = !env.tenantId || !env.liffId || !env.lineClient;
+  if (usingFallback && process.env.NODE_ENV === "production") {
+    console.error(
+      `[getAuthForCommunity] Production environment missing required env vars for ${communityId}. ` +
+      `Set NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID, NEXT_PUBLIC_LIFF_ID, NEXT_PUBLIC_LINE_CLIENT.`
+    );
+  }
 
   return {
     tenantId: env.tenantId ?? fallback.tenantId,
