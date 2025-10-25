@@ -3,22 +3,17 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {
-  GqlCurrentPrefecture,
-  useUpdateMyProfileMutation,
-} from "@/types/graphql";
-import { GeneralUserProfile } from "@/app/users/data/type";
-import { prefectureLabels, presenterUserProfile } from "@/app/users/presenters";
+import { GqlCurrentPrefecture, useUpdateMyProfileMutation } from "@/types/graphql";
+import { GeneralUserProfile } from "@/app/users/features/data/type";
+import { prefectureLabels, presenterUserProfile } from "../../../features/presenters";
 import { logger } from "@/lib/logging";
-import { useUserProfileContext } from "@/app/users/contexts/UserProfileContext";
+import { useUserProfileContext } from "@/app/users/features/contexts/UserProfileContext";
 
 const useProfileEdit = () => {
   const router = useRouter();
   const { gqlUser, userId } = useUserProfileContext();
 
-  const [profile, setProfile] = useState<GeneralUserProfile>(() => 
-    presenterUserProfile(gqlUser)
-  );
+  const [profile, setProfile] = useState<GeneralUserProfile>(() => presenterUserProfile(gqlUser));
 
   const [updateProfile, { loading: updating }] = useUpdateMyProfileMutation();
 

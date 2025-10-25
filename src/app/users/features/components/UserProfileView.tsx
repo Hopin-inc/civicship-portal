@@ -1,4 +1,4 @@
-import { UserProfileViewModel } from "@/app/users/types";
+import { UserProfileViewModel } from "../types";
 import { UserProfileHeader } from "./UserProfileHeader";
 import { UserTicketsAndPoints } from "./UserTicketsAndPoints";
 import { UserOpportunitiesSection } from "./UserOpportunitiesSection";
@@ -42,7 +42,7 @@ export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
           {viewModel.showOpportunities && viewModel.selfOpportunities.length > 0 && (
             <UserOpportunitiesSection opportunities={viewModel.selfOpportunities} />
           )}
-          
+
           <UserPortfolioSection
             userId={viewModel.id}
             portfolios={viewModel.portfolios}

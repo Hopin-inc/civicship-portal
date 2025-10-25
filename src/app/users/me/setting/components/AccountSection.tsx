@@ -5,7 +5,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthProvider";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
-import { useUserProfileContext } from "@/app/users/contexts/UserProfileContext";
+import { useUserProfileContext } from "@/app/users/features/contexts/UserProfileContext";
 import { GqlDidIssuanceStatus } from "@/types/graphql";
 
 const truncateDid = (did: string | undefined | null, length: number = 20): string => {
@@ -20,9 +20,9 @@ export default function AccountSection() {
   const { isAuthenticated, isPhoneVerified, isAuthenticating } = useAuth();
   const { gqlUser } = useUserProfileContext();
 
-  const didValue = gqlUser.didIssuanceRequests
-    ?.find(req => req?.status === GqlDidIssuanceStatus.Completed)
-    ?.didValue;
+  const didValue = gqlUser.didIssuanceRequests?.find(
+    (req) => req?.status === GqlDidIssuanceStatus.Completed,
+  )?.didValue;
   const isNftWalletLinked = !!gqlUser.nftWallet?.id;
 
   return (

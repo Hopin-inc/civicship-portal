@@ -1,5 +1,5 @@
 import { GqlUser } from "@/types/graphql";
-import { UserProfileViewModel } from "@/app/users/types";
+import { UserProfileViewModel } from "../types";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { prefectureLabels } from "./prefectureLabels";
 

@@ -1,9 +1,9 @@
 import React from "react";
 import { Metadata } from "next";
-import { fetchPublicUserServer } from "@/app/users/data/fetchPublicUserServer";
+import { fetchPublicUserServer } from "@/app/users/features/api/fetchPublicUserServer";
 import { currentCommunityConfig, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
-import { presenterPortfolio } from "@/app/users/presenters";
-import { UserProfileProvider } from "@/app/users/contexts/UserProfileContext";
+import { presenterPortfolio } from "../features/presenters";
+import { UserProfileProvider } from "@/app/users/features/contexts/UserProfileContext";
 
 type Props = {
   params: { id: string };
@@ -44,10 +44,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function Layout({ 
+export default async function Layout({
   children,
   params,
-}: { 
+}: {
   children: React.ReactNode;
   params: { id: string };
 }) {
@@ -56,7 +56,7 @@ export default async function Layout({
   if (!gqlUser) {
     return <>{children}</>;
   }
-  
+
   const portfolios = (gqlUser.portfolios ?? []).map(presenterPortfolio);
 
   return (

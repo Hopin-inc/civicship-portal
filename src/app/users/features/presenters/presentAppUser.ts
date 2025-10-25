@@ -1,5 +1,5 @@
 import { GqlPortfolio, GqlUser } from "@/types/graphql";
-import { AppPortfolio, GeneralUserProfile } from "@/app/users/data/type";
+import { AppPortfolio, GeneralUserProfile } from "@/app/users/features/data/type";
 import { Participant } from "@/types/utils";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 

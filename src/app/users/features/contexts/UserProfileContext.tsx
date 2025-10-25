@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, ReactNode, useContext } from "react";
 import { GqlUser } from "@/types/graphql";
-import { AppPortfolio } from "@/app/users/data/type";
+import { AppPortfolio } from "@/app/users/features/data/type";
 
 export interface UserProfileContextValue {
   userId: string;
@@ -19,11 +19,7 @@ export interface UserProfileProviderProps {
 }
 
 export function UserProfileProvider({ children, value }: UserProfileProviderProps) {
-  return (
-    <UserProfileContext.Provider value={value}>
-      {children}
-    </UserProfileContext.Provider>
-  );
+  return <UserProfileContext.Provider value={value}>{children}</UserProfileContext.Provider>;
 }
 
 export function useUserProfileContext() {

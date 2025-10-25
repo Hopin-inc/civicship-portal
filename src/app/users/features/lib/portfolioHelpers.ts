@@ -1,4 +1,4 @@
-import { AppPortfolio } from "@/app/users/data/type";
+import { AppPortfolio } from "@/app/users/features/data/type";
 
 export function parsePortfolioDate(dateString: string): Date {
   return new Date(dateString);
@@ -17,12 +17,9 @@ export function normalizeSearchQuery(query: string): string {
   return query.toLowerCase().trim();
 }
 
-export function portfolioMatchesSearch(
-  portfolio: AppPortfolio,
-  searchQuery: string
-): boolean {
+export function portfolioMatchesSearch(portfolio: AppPortfolio, searchQuery: string): boolean {
   if (!searchQuery) return true;
-  
+
   const normalizedQuery = normalizeSearchQuery(searchQuery);
   return (
     portfolio.title.toLowerCase().includes(normalizedQuery) ||
@@ -33,7 +30,7 @@ export function portfolioMatchesSearch(
 export function filterFuturePortfolios(
   portfolios: AppPortfolio[],
   searchQuery: string,
-  today: Date
+  today: Date,
 ): AppPortfolio[] {
   return portfolios
     .filter((portfolio) => {
@@ -48,7 +45,7 @@ export function filterFuturePortfolios(
 export function filterPastPortfolios(
   portfolios: AppPortfolio[],
   searchQuery: string,
-  today: Date
+  today: Date,
 ): AppPortfolio[] {
   return portfolios
     .filter((portfolio) => {
