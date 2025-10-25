@@ -45,6 +45,8 @@ export function middleware(request: NextRequest) {
   const scriptSrc = [
     `'self'`,
     `'nonce-${nonce}'`, // ← インラインを許可する唯一の手段
+    `${process.env.NEXT_PUBLIC_API_ENDPOINT}`,
+    `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}`,
     "https://static.line-scdn.net",
     "https://www.google.com",
     "https://www.googletagmanager.com",
@@ -54,6 +56,8 @@ export function middleware(request: NextRequest) {
   const styleSrc = [
     `'self'`,
     `'nonce-${nonce}'`, // CSS-in-JSが挿入する <style> を許可
+    `${process.env.NEXT_PUBLIC_API_ENDPOINT}`,
+    `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}`,
     "https://fonts.googleapis.com",
     // 可能なら style も nonce 化。インライン style が残るなら開発中だけ 'unsafe-inline' を一時許可
     ...(isDev ? [`'unsafe-inline'`] : []),
@@ -71,6 +75,8 @@ export function middleware(request: NextRequest) {
     "https://maps.googleapis.com",
     "https://firebase.googleapis.com",
     "https://www.googletagmanager.com",
+    "https://www.google-analytics.com",
+    "https://analytics.google.com",
   ].join(" ");
 
   const frameSrc = [
