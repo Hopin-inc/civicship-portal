@@ -1,11 +1,21 @@
-import Header from "./components/Header";
 import PortfoliosList from "@/app/users/features/portfolios/components/portfoliosList";
+import { useMemo } from "react";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function PortfoliosPage() {
-    return (
-        <div>
-            <Header />
-            <PortfoliosList />
-        </div>
-    );
+  const headerConfig = useMemo(
+    () => ({
+      title: "すべての関わり",
+      showLogo: false,
+      showBackButton: true,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
+
+  return (
+    <div>
+      <PortfoliosList />
+    </div>
+  );
 }
