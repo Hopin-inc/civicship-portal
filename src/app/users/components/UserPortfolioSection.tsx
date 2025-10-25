@@ -37,7 +37,7 @@ export function UserPortfolioSection({
     }),
     location: null,
     source: "OPPORTUNITY" as const,
-    category: null,
+    category: "ACTIVITY" as const,
     reservationStatus: null,
     evaluationStatus: null,
     participants: [],

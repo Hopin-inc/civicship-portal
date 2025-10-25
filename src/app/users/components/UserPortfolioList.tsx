@@ -268,30 +268,6 @@ const UserPortfolioList = ({
           >
             すべて見る
           </button>
-          {/*{isOwner && (*/}
-          {/*  <DropdownMenu>*/}
-          {/*    <DropdownMenuTrigger asChild>*/}
-          {/*      <Button variant="icon-only" size="sm" className="w-8 h-8 p-0">*/}
-          {/*        <Ellipsis className="w-5 h-5" />*/}
-          {/*      </Button>*/}
-          {/*    </DropdownMenuTrigger>*/}
-          {/*    /!* #TODO: 導線接続 *!/*/}
-          {/*    <DropdownMenuContent align="end" className="w-44">*/}
-          {/*      <DropdownMenuItem>*/}
-          {/*        <Plus className="mr-2 h-5 w-5 text-primary" />*/}
-          {/*        <span className="text-primary text-label-md">関わりを追加</span>*/}
-          {/*      </DropdownMenuItem>*/}
-          {/*      <DropdownMenuItem>*/}
-          {/*        <Clock className="mr-2 h-5 w-5" />*/}
-          {/*        <span className="text-label-md">過去の予約</span>*/}
-          {/*      </DropdownMenuItem>*/}
-          {/*      <DropdownMenuItem>*/}
-          {/*        <FileText className="mr-2 h-5 w-5" />*/}
-          {/*        <span className="text-label-md">参加証明を発行</span>*/}
-          {/*      </DropdownMenuItem>*/}
-          {/*    </DropdownMenuContent>*/}
-          {/*  </DropdownMenu>*/}
-          {/*)}*/}
         </div>
         {showEmptyState ? (
           <EmptyStateWithSearch {...emptyStateProps} />

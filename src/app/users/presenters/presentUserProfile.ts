@@ -5,19 +5,21 @@ import { prefectureLabels } from "./prefectureLabels";
 
 /**
  * GqlUser を UserProfileViewModel に変換
- * 
+ *
  * @param gqlUser - GraphQL から取得したユーザー情報
  * @param isOwner - 本人かどうか（プライベート情報の表示制御）
  * @returns UserProfileViewModel
  */
 export function presentUserProfile(
   gqlUser: GqlUser,
-  isOwner: boolean = false
+  isOwner: boolean = false,
 ): UserProfileViewModel {
   const wallet = gqlUser.wallets?.find((w) => w.community?.id === COMMUNITY_ID);
   const portfolios = (gqlUser.portfolios ?? []).map((p) => ({
     id: p.id,
     title: p.title,
+    source: p.source ?? "OPPORTUNITY",
+    category: p.category ?? "ACTIVITY",
     coverUrl: p.thumbnailUrl ?? undefined,
     createdAt: p.date instanceof Date ? p.date.toISOString() : String(p.date),
   }));
@@ -55,8 +57,8 @@ export function presentUserProfile(
       instagram: gqlUser.urlInstagram ?? null,
       facebook: gqlUser.urlFacebook ?? null,
     },
-    ticketsAvailable: isOwner ? wallet?.tickets?.length ?? 0 : undefined,
-    points: isOwner ? wallet?.currentPointView?.currentPoint ?? 0 : undefined,
+    ticketsAvailable: isOwner ? (wallet?.tickets?.length ?? 0) : undefined,
+    points: isOwner ? (wallet?.currentPointView?.currentPoint ?? 0) : undefined,
     portfolios,
     selfOpportunities,
     currentlyHiringOpportunities,
