@@ -34,10 +34,10 @@ export default function MyProfileClient({ ssrData }: MyProfileClientProps) {
     selfOpportunities: csrSelfOpportunities,
   } = useUserProfile(ssrData ? undefined : currentUser?.id);
 
-  const profile = csrUser ?? ssrData?.profile ?? null;
-  const nftInstances = csrNftInstances ?? ssrData?.nftInstances ?? [];
-  const selfOpportunities = csrSelfOpportunities ?? ssrData?.selfOpportunities ?? [];
-  const user = csrUser ?? ssrData?.user ?? null;
+  const profile = ssrData?.profile ?? csrUser ?? null;
+  const nftInstances = ssrData?.nftInstances ?? csrNftInstances ?? [];
+  const selfOpportunities = ssrData?.selfOpportunities ?? csrSelfOpportunities ?? [];
+  const user = ssrData?.user ?? csrUser ?? null;
 
   if (loading && !ssrData) return <LoadingIndicator />;
   if (!user || !profile) return notFound();
