@@ -44,19 +44,31 @@ function buildRequestLink(tenantId: string, communityId: string) {
   });
 }
 
+function createHttpLink(uri: string) {
+  return createUploadLink({
+    uri,
+    credentials: "include",
+    headers: {
+      "Apollo-Require-Preflight": "true",
+    },
+  });
+}
+
+function createBaseApolloOptions(link: ApolloLink): ApolloClientOptions<NormalizedCacheObject> {
+  return {
+    link,
+    ssrMode: true,
+    cache: new InMemoryCache(),
+  };
+}
+
 const envCommunityId = getEnvCommunityId();
 const staticCommunityId = envCommunityId ?? "";
 const staticTenantId = envCommunityId 
   ? getAuthForCommunity(envCommunityId).tenantId 
   : (getEnvAuthConfig().tenantId ?? "");
 
-const httpLink = createUploadLink({
-  uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
-  credentials: "include",
-  headers: {
-    "Apollo-Require-Preflight": "true",
-  },
-});
+const httpLink = createHttpLink(process.env.NEXT_PUBLIC_API_ENDPOINT!);
 
 const requestLink = buildRequestLink(staticTenantId, staticCommunityId);
 
@@ -134,14 +146,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
 });
 
 const link = ApolloLink.from([requestLink, errorLink, httpLink]);
-
-const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
-  link,
-  ssrMode: true,
-  cache: new InMemoryCache(),
-};
-
-export const apolloClient = new ApolloClient(defaultOptions);
+export const apolloClient = new ApolloClient(createBaseApolloOptions(link));
 
 export function createApolloClient(options: {
   communityId: string;
@@ -150,20 +155,9 @@ export function createApolloClient(options: {
 }): ApolloClient<NormalizedCacheObject> {
   const { communityId, tenantId, apiEndpoint } = options;
 
-  const httpLink = createUploadLink({
-    uri: apiEndpoint,
-    credentials: "include",
-    headers: {
-      "Apollo-Require-Preflight": "true",
-    },
-  });
-
+  const httpLink = createHttpLink(apiEndpoint);
   const requestLink = buildRequestLink(tenantId, communityId);
   const link = ApolloLink.from([requestLink, errorLink, httpLink]);
 
-  return new ApolloClient({
-    link,
-    ssrMode: true,
-    cache: new InMemoryCache(),
-  });
+  return new ApolloClient(createBaseApolloOptions(link));
 }

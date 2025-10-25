@@ -106,17 +106,22 @@ export function normalizeCommunityId(envId: string | null, host: string): Commun
   return resolveCommunityIdFromHost(host);
 }
 
-export function getAuthForCommunity(input?: string | null): CommunityAuthConfig {
-  const env = getEnvAuthConfig();
-  
-  let validCommunityId: CommunityId = "neo88";
+function getValidCommunityId(input?: string | null): CommunityId {
   if (input && isValidCommunityId(input)) {
-    validCommunityId = input;
-  } else if (input) {
+    return input;
+  }
+
+  if (input) {
     const logLevel = process.env.NODE_ENV === "production" ? "error" : "warn";
     logger[logLevel](`Invalid communityId: ${input}, falling back to neo88`, { input });
   }
-  
+
+  return "neo88";
+}
+
+export function getAuthForCommunity(input?: string | null): CommunityAuthConfig {
+  const env = getEnvAuthConfig();
+  const validCommunityId = getValidCommunityId(input);
   const fallback = AUTH_BY_COMMUNITY[validCommunityId];
 
   const usingFallback = !env.tenantId || !env.liffId || !env.lineClient;

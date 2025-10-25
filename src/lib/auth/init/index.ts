@@ -145,7 +145,7 @@ async function initAuthFull({
       return;
     }
 
-    await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager);
+    await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager, communityId);
   } catch (error) {
     logger.error("initAuthFull failed", { error });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);

@@ -153,11 +153,12 @@ export async function evaluateUserRegistrationState(
   ssrPhoneAuthenticated: boolean | undefined,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
   authStateManager: AuthStateManager,
+  communityId?: string,
 ): Promise<boolean> {
   const hasPhoneIdentity = !!user.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
   
   const hasMembershipInCurrentCommunity = !!user.memberships?.some(
-    (m) => m.community?.id === COMMUNITY_ID
+    (m) => m.community?.id === (communityId ?? COMMUNITY_ID)
   );
 
   const isPhoneVerified = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
