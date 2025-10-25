@@ -1,8 +1,8 @@
 "use client";
 
-import { useUserProfileContext } from "@/app/users/features/contexts/UserProfileContext";
-import { presentUserProfile } from "../features/presenters";
-import { UserProfileView } from "../features/components";
+import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
+import { presentUserProfile } from "@/app/users/features/shared/mappers";
+import { UserProfileView } from "@/app/users/features/profile/components/UserProfileView";
 
 export default function MyProfilePage() {
   const { gqlUser, isOwner } = useUserProfileContext();

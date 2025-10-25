@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { metadata } from "./metadata";
-import { fetchPrivateUserServer } from "../features/data";
-import { presenterPortfolio } from "../features/presenters";
-import { UserProfileProvider } from "@/app/users/features/contexts/UserProfileContext";
+import { fetchPrivateUserServer } from "@/app/users/features/shared/api/fetchPrivateUserServer";
+import { presenterPortfolio } from "@/app/users/features/shared/mappers";
+import { UserProfileProvider } from "@/app/users/features/shared/contexts/UserProfileContext";
 
 export { metadata };
 

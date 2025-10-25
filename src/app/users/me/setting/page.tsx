@@ -1,8 +1,8 @@
-import AccountSection from "./components/AccountSection";
-import DangerSection from "./components/DangerSection";
-import HelpSection from "./components/HelpSection";
-import PromiseSection from "./components/PromiseSection";
-import SettingSection from "./components/SettingSection";
+import AccountSection from "@/app/users/features/settings/components/AccountSection";
+import DangerSection from "@/app/users/features/settings/components/DangerSection";
+import HelpSection from "@/app/users/features/settings/components/HelpSection";
+import PromiseSection from "@/app/users/features/settings/components/PromiseSection";
+import SettingSection from "@/app/users/features/settings/components/SettingSection";
 
 export default function SettingPage() {
   return (

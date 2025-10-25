@@ -1,7 +1,7 @@
 import { format, parse } from "date-fns";
 import { ja } from "date-fns/locale";
-import { AppPortfolio } from "@/app/users/features/data/type";
-import { PortfolioGrid } from "@/app/users/features/components/UserPortfolioList";
+import { AppPortfolio } from "@/app/users/features/shared/types";
+import { PortfolioGrid } from "@/app/users/features/portfolios/components/UserPortfolioList";
 import React from "react";
 
 type Props = {

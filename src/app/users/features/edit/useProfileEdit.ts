@@ -4,10 +4,11 @@ import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { GqlCurrentPrefecture, useUpdateMyProfileMutation } from "@/types/graphql";
-import { GeneralUserProfile } from "@/app/users/features/data/type";
-import { prefectureLabels, presenterUserProfile } from "../../../features/presenters";
+import { GeneralUserProfile } from "@/app/users/features/shared/types";
+import { presenterUserProfile } from "@/app/users/features/shared/mappers";
+import { prefectureLabels } from "@/app/users/features/shared/constants";
 import { logger } from "@/lib/logging";
-import { useUserProfileContext } from "@/app/users/features/contexts/UserProfileContext";
+import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
 
 const useProfileEdit = () => {
   const router = useRouter();

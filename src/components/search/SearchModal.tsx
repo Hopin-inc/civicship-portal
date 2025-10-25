@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
 import SearchTabs, { SearchTabType } from "@/app/search/components/Tabs";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
-import { visiblePrefectureLabels } from "../../app/users/features/presenters";
+import { visiblePrefectureLabels } from "@/app/users/features/shared/constants";
 import { useSearchForm } from "@/app/search/hooks/useSearchForm";
 import SearchForm from "@/app/search/components/SearchForm";
 import SearchFilters from "@/app/search/components/SearchFilters";

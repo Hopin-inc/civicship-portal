@@ -8,13 +8,13 @@ import { RefObject } from "react";
 import { ParticipantsList } from "@/components/shared/ParticipantsList";
 import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
 import { ActivityCard, FormattedOpportunityCard } from "@/components/domains/opportunities/types";
-import { AppPortfolio } from "@/app/users/features/data/type";
+import { AppPortfolio } from "@/app/users/features/shared/types";
 import { GqlEvaluationStatus, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getCurrentRegionName } from "@/lib/communities/metadata";
 import { useRouter } from "next/navigation";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
-import { parsePortfolioDate } from "@/app/users/features/lib/portfolioHelpers";
+import { parsePortfolioDate } from "@/app/users/features/portfolios/lib";
 
 type Props = {
   userId: string;

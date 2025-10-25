@@ -5,7 +5,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthProvider";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
-import { useUserProfileContext } from "@/app/users/features/contexts/UserProfileContext";
+import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
 import { GqlDidIssuanceStatus } from "@/types/graphql";
 
 const truncateDid = (did: string | undefined | null, length: number = 20): string => {

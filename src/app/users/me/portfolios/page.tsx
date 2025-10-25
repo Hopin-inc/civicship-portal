@@ -1,5 +1,5 @@
 import Header from "./components/Header";
-import PortfoliosList from "./components/portfoliosList";
+import PortfoliosList from "@/app/users/features/portfolios/components/portfoliosList";
 
 export default function PortfoliosPage() {
     return (

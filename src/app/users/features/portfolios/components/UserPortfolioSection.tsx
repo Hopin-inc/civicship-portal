@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import UserPortfolioList from "@/app/users/features/components/UserPortfolioList";
+import UserPortfolioList from "@/app/users/features/portfolios/components/UserPortfolioList";
 
 interface UserPortfolioSectionProps {
   userId: string;
