@@ -8,7 +8,13 @@ import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
 import { FETCH_PROFILE_SERVER_QUERY } from "@/graphql/account/user/server";
 
-export async function fetchProfileServer(): Promise<GqlUser | null> {
+/**
+ * プライベートプロフィール用のサーバー側データ取得
+ * 認証済みユーザーの完全な情報（wallet, tickets, points, nftInstances）を含む
+ * 
+ * @returns GqlUser | null
+ */
+export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
   const cookieStore = await cookies();
   const session = cookieStore.get("session")?.value ?? null;
   const hasSession = !!session;
@@ -25,7 +31,7 @@ export async function fetchProfileServer(): Promise<GqlUser | null> {
 
     return res.currentUser?.user ?? null;
   } catch (error) {
-    logger.error("⚠️ Failed to fetch user (SSR flexible):", {
+    logger.error("⚠️ Failed to fetch private user (SSR):", {
       message: (error as Error).message,
       stack: (error as Error).stack,
     });

@@ -1,18 +1,18 @@
 import { redirect } from "next/navigation";
-import { fetchProfileServer } from "@/app/users/me/libs/fetchProfileServer";
-import { presenterPublicUserProfileViewModel } from "@/app/users/data/presenter";
-import { UserProfileContainer } from "@/app/users/components/containers/UserProfileContainer";
+import { fetchPrivateUserServer } from "@/app/users/data";
+import { presentUserProfile } from "@/app/users/presenters";
+import { UserProfileClient } from "@/app/users/components";
 
 export const dynamic = 'force-dynamic';
 
 export default async function MyProfilePage() {
-  const ssrUser = await fetchProfileServer();
+  const ssrUser = await fetchPrivateUserServer();
 
   if (!ssrUser) {
     redirect('/login');
   }
 
-  const viewModel = presenterPublicUserProfileViewModel(ssrUser, true);
+  const viewModel = presentUserProfile(ssrUser, true);
 
-  return <UserProfileContainer viewModel={viewModel} currentUserId={ssrUser.id} />;
+  return <UserProfileClient viewModel={viewModel} />;
 }

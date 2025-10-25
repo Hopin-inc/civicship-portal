@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { fetchPublicUserServer } from "@/app/users/data/fetchPublicUserServer";
-import { presenterPublicUserProfileViewModel } from "@/app/users/data/presenter";
-import { UserProfileContainer } from "@/app/users/components/containers/UserProfileContainer";
+import { fetchPublicUserServer } from "@/app/users/data";
+import { presentUserProfile } from "@/app/users/presenters";
+import { UserProfileClient } from "@/app/users/components";
 
 interface PageProps {
   params: {
@@ -18,7 +18,7 @@ export default async function UserPage({ params }: PageProps) {
     notFound();
   }
 
-  const viewModel = presenterPublicUserProfileViewModel(gqlUser, false);
+  const viewModel = presentUserProfile(gqlUser, false);
 
-  return <UserProfileContainer viewModel={viewModel} currentUserId={null} />;
+  return <UserProfileClient viewModel={viewModel} />;
 }

@@ -10,7 +10,7 @@ import {
   useUpdateMyProfileMutation,
 } from "@/types/graphql";
 import { GeneralUserProfile } from "@/app/users/data/type";
-import { prefectureLabels, presenterUserProfile } from "@/app/users/data/presenter";
+import { prefectureLabels, presenterUserProfile } from "@/app/users/presenters";
 import { logger } from "@/lib/logging";
 
 const useProfileEdit = () => {

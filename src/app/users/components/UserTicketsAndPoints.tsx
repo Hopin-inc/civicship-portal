@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import { ChevronRight, Ticket as TicketIcon, Wallet } from "lucide-react";
@@ -10,7 +8,7 @@ interface UserTicketsAndPointsProps {
   pointCount: number;
 }
 
-const UserTicketsAndPoints: React.FC<UserTicketsAndPointsProps> = ({ ticketCount, pointCount }) => {
+export function UserTicketsAndPoints({ ticketCount, pointCount }: UserTicketsAndPointsProps) {
   const ticketClass =
     ticketCount > 0
       ? "flex items-center gap-2 bg-primary-foreground text-primary rounded-lg px-4 py-3 mt-2 cursor-pointer hover:bg-primary-foreground/80"
@@ -45,6 +43,4 @@ const UserTicketsAndPoints: React.FC<UserTicketsAndPointsProps> = ({ ticketCount
       )}
     </div>
   );
-};
-
-export default UserTicketsAndPoints;
+}

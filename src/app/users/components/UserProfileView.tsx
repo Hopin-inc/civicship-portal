@@ -1,4 +1,4 @@
-import { UserProfileViewModel } from "@/app/users/data/view-model";
+import { UserProfileViewModel } from "@/app/users/types";
 import { UserProfileHeader } from "./UserProfileHeader";
 import { UserTicketsAndPoints } from "./UserTicketsAndPoints";
 import { UserOpportunitiesSection } from "./UserOpportunitiesSection";
@@ -50,6 +50,28 @@ export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
             activeOpportunities={viewModel.currentlyHiringOpportunities}
           />
         </>
+      )}
+
+      {isOwner && viewModel.nftInstances && viewModel.nftInstances.length > 0 && (
+        <section className="py-6 mt-0">
+          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
+            保有するNFT証明書
+          </h2>
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            {viewModel.nftInstances.map((nft) => (
+              <div key={nft.id} className="flex flex-col items-center p-4 border rounded-lg">
+                {nft.imageUrl && (
+                  <img
+                    src={nft.imageUrl}
+                    alt={nft.name}
+                    className="w-full h-32 object-cover rounded-md mb-2"
+                  />
+                )}
+                <p className="text-sm font-medium text-center">{nft.name}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
