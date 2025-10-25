@@ -1,21 +1,15 @@
 import { GqlUser } from "@/types/graphql";
 import { UserProfileViewModel } from "@/app/users/features/profile/types";
+import { AppPortfolio } from "@/app/users/features/shared/types";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { prefectureLabels } from "@/shared/prefectures/constants";
 
 export function presentUserProfile(
   gqlUser: GqlUser,
   isOwner: boolean = false,
+  portfolios?: AppPortfolio[],
 ): UserProfileViewModel {
   const wallet = gqlUser.wallets?.find((w) => w.community?.id === COMMUNITY_ID);
-  const portfolios = (gqlUser.portfolios ?? []).map((p) => ({
-    id: p.id,
-    title: p.title,
-    source: p.source ?? "OPPORTUNITY",
-    category: p.category ?? "ACTIVITY",
-    coverUrl: p.thumbnailUrl ?? undefined,
-    createdAt: p.date instanceof Date ? p.date.toISOString() : String(p.date),
-  }));
 
   const selfOpportunities = (gqlUser.opportunitiesCreatedByMe ?? []).map((opp) => ({
     id: opp.id,
@@ -52,7 +46,7 @@ export function presentUserProfile(
     },
     ticketsAvailable: isOwner ? (wallet?.tickets?.length ?? 0) : undefined,
     points: isOwner ? (wallet?.currentPointView?.currentPoint ?? 0) : undefined,
-    portfolios,
+    portfolios: portfolios ?? [],
     selfOpportunities,
     currentlyHiringOpportunities,
     nftInstances,

@@ -1,3 +1,5 @@
+import { AppPortfolio } from "@/app/users/features/shared/types";
+
 /**
  * ユーザープロフィール画面用のViewModel
  * /users/[id] と /users/me の両方で使用
@@ -25,14 +27,7 @@ export type UserProfileViewModel = {
   ticketsAvailable?: number;
   points?: number;
 
-  portfolios: Array<{
-    id: string;
-    title: string;
-    source: string;
-    category: string;
-    coverUrl?: string;
-    createdAt: string;
-  }>;
+  portfolios: AppPortfolio[];
 
   selfOpportunities: Array<{
     id: string;

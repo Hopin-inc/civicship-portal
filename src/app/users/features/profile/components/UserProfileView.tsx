@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { UserProfileViewModel } from "@/app/users/features/profile/types";
 import { UserProfileHeader } from "./UserProfileHeader";
 import { UserTicketsAndPoints } from "./UserTicketsAndPoints";
@@ -61,11 +62,15 @@ export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
             {viewModel.nftInstances.map((nft) => (
               <div key={nft.id} className="flex flex-col items-center p-4 border rounded-lg">
                 {nft.imageUrl && (
-                  <img
-                    src={nft.imageUrl}
-                    alt={nft.name}
-                    className="w-full h-32 object-cover rounded-md mb-2"
-                  />
+                  <div className="relative w-full h-32 rounded-md mb-2 overflow-hidden">
+                    <Image
+                      src={nft.imageUrl}
+                      alt={nft.name}
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 768px) 33vw, 50vw"
+                    />
+                  </div>
                 )}
                 <p className="text-sm font-medium text-center">{nft.name}</p>
               </div>

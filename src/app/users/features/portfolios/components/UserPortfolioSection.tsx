@@ -1,16 +1,12 @@
 "use client";
 
 import { useRef } from "react";
+import { AppPortfolio } from "@/app/users/features/shared/types";
 import UserPortfolioList from "@/app/users/features/portfolios/components/UserPortfolioList";
 
 interface UserPortfolioSectionProps {
   userId: string;
-  portfolios: Array<{
-    id: string;
-    title: string;
-    coverUrl?: string;
-    createdAt: string;
-  }>;
+  portfolios: AppPortfolio[];
   isOwner: boolean;
   activeOpportunities: Array<{
     id: string;
@@ -25,19 +21,6 @@ export function UserPortfolioSection({
   activeOpportunities,
 }: UserPortfolioSectionProps) {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
-
-  const appPortfolios = portfolios.map((p) => ({
-    id: p.id,
-    title: p.title,
-    image: p.coverUrl ?? null,
-    dateISO: new Date(p.createdAt).toISOString(),
-    location: null,
-    source: "OPPORTUNITY" as const,
-    category: "ACTIVITY" as const,
-    reservationStatus: null,
-    evaluationStatus: null,
-    participants: [],
-  }));
 
   const activityCards = activeOpportunities.map((opp) => ({
     id: opp.id,
@@ -56,7 +39,7 @@ export function UserPortfolioSection({
     <UserPortfolioList
       userId={userId}
       isOwner={isOwner}
-      portfolios={appPortfolios}
+      portfolios={portfolios}
       isLoadingMore={false}
       hasMore={false}
       lastPortfolioRef={lastPortfolioRef}

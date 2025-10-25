@@ -4,8 +4,8 @@ import { useUserProfileContext, presentUserProfile } from "@/app/users/features/
 import { UserProfileView } from "@/app/users/features/profile";
 
 export default function UserPage() {
-  const { gqlUser, isOwner } = useUserProfileContext();
-  const viewModel = presentUserProfile(gqlUser, isOwner);
+  const { gqlUser, isOwner, portfolios } = useUserProfileContext();
+  const viewModel = presentUserProfile(gqlUser, isOwner, portfolios);
 
   return <UserProfileView viewModel={viewModel} isOwner={isOwner} />;
 }
