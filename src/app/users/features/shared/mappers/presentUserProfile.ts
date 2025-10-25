@@ -1,20 +1,8 @@
-import { GqlUser, GqlOpportunityCategory, GqlOpportunitySlot, GqlTicketStatus } from "@/types/graphql";
+import { GqlUser, GqlTicketStatus } from "@/types/graphql";
 import { UserProfileViewModel } from "@/app/users/features/profile/types";
 import { AppPortfolio } from "@/app/users/features/shared/types";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { prefectureLabels } from "@/shared/prefectures/constants";
-
-type OpportunityWithContext = {
-  id: string;
-  title: string;
-  category: GqlOpportunityCategory;
-  images?: string[] | null;
-  isReservableWithTicket?: boolean | null;
-  feeRequired?: number | null;
-  pointsRequired?: number | null;
-  place?: { name?: string | null } | null;
-  community?: { id?: string | null } | null;
-};
 
 export function presentUserProfile(
   gqlUser: GqlUser,
@@ -30,21 +18,11 @@ export function presentUserProfile(
     category: opp.category ?? "",
   }));
 
-  const currentlyHiringOpportunities = (gqlUser.opportunitiesCreatedByMe ?? []).map((opp) => {
-    const oppWithContext = opp as OpportunityWithContext;
-    return {
-      id: oppWithContext.id,
-      title: oppWithContext.title,
-      category: oppWithContext.category,
-      images: oppWithContext.images ?? [],
-      location: oppWithContext.place?.name ?? "",
-      communityId: oppWithContext.community?.id ?? "",
-      hasReservableTicket: oppWithContext.isReservableWithTicket ?? false,
-      feeRequired: oppWithContext.feeRequired ?? null,
-      pointsRequired: oppWithContext.pointsRequired ?? null,
-      slots: [] as GqlOpportunitySlot[],
-    };
-  });
+  const currentlyHiringOpportunities = (gqlUser.opportunitiesCreatedByMe ?? []).map((opp) => ({
+    id: opp.id,
+    title: opp.title,
+    images: opp.images ?? undefined,
+  }));
 
   const nftInstances = isOwner
     ? (gqlUser.nftInstances?.edges ?? []).map((edge) => ({

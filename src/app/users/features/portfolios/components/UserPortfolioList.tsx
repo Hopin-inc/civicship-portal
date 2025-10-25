@@ -7,14 +7,18 @@ import EmptyStateWithSearch from "@/components/shared/EmptyStateWithSearch";
 import { RefObject } from "react";
 import { ParticipantsList } from "@/components/shared/ParticipantsList";
 import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
-import { ActivityCard, FormattedOpportunityCard } from "@/components/domains/opportunities/types";
 import { AppPortfolio } from "@/app/users/features/shared/types";
 import { GqlEvaluationStatus, GqlPortfolioSource, GqlReservationStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getCurrentRegionName } from "@/lib/communities/metadata";
 import { useRouter } from "next/navigation";
-import { formatOpportunities } from "@/components/domains/opportunities/utils";
 import { parsePortfolioDate, formatPortfolioDate } from "@/app/users/features/portfolios/lib";
+
+type SlimOpportunityCard = {
+  id: string;
+  title: string;
+  images?: string[];
+};
 
 type Props = {
   userId: string;
@@ -24,11 +28,16 @@ type Props = {
   hasMore: boolean;
   lastPortfolioRef: RefObject<HTMLDivElement>;
   isSysAdmin?: boolean;
-  activeOpportunities?: ActivityCard[];
+  activeOpportunities?: SlimOpportunityCard[];
 };
 
 type ActiveOpportunitiesProps = {
-  opportunities: FormattedOpportunityCard[];
+  opportunities: Array<{
+    id: string;
+    title: string;
+    image?: string;
+    href: string;
+  }>;
 };
 
 const getCategoryLabel = (
@@ -252,12 +261,17 @@ const UserPortfolioList = ({
     // icon: <PhotoGallery />,
   };
 
-  const formattedOpportunities = activeOpportunities.map(formatOpportunities);
+  const slimOpportunities = activeOpportunities.map((opp) => ({
+    id: opp.id,
+    title: opp.title,
+    image: opp.images?.[0],
+    href: `/opportunities/${opp.id}`,
+  }));
 
   return (
     <section className="py-6 mt-0">
       <div className="space-y-4">
-        {formattedOpportunities.length > 0 && <ActiveOpportunities opportunities={formattedOpportunities} />}
+        {slimOpportunities.length > 0 && <ActiveOpportunities opportunities={slimOpportunities} />}
         <div className="flex items-center justify-between">
           <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
             これまでの関わり

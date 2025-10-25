@@ -3,7 +3,6 @@
 import { useRef } from "react";
 import { AppPortfolio } from "@/app/users/features/shared/types";
 import UserPortfolioList from "@/app/users/features/portfolios/components/UserPortfolioList";
-import { GqlOpportunityCategory, GqlOpportunitySlot } from "@/types/graphql";
 
 interface UserPortfolioSectionProps {
   userId: string;
@@ -12,14 +11,7 @@ interface UserPortfolioSectionProps {
   activeOpportunities: Array<{
     id: string;
     title: string;
-    category: GqlOpportunityCategory;
-    images: string[];
-    location: string;
-    communityId: string;
-    hasReservableTicket: boolean;
-    feeRequired: number | null;
-    pointsRequired: number | null;
-    slots: GqlOpportunitySlot[];
+    images?: string[];
   }>;
 }
 

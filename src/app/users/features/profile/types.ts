@@ -40,14 +40,7 @@ export type UserProfileViewModel = {
   currentlyHiringOpportunities: Array<{
     id: string;
     title: string;
-    category: GqlOpportunityCategory;
-    images: string[];
-    location: string;
-    communityId: string;
-    hasReservableTicket: boolean;
-    feeRequired: number | null;
-    pointsRequired: number | null;
-    slots: GqlOpportunitySlot[];
+    images?: string[];
   }>;
 
   nftInstances?: Array<{
