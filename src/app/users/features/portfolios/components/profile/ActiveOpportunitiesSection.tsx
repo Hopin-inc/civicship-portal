@@ -15,7 +15,7 @@ export const ActiveOpportunitiesSection = ({ opportunities }: ActiveOpportunitie
   return (
     <div>
       <div className="flex items-center gap-x-2">
-        <h2 className="text-display-sm font-semibold text-foreground py-4">現在募集中の関わり</h2>
+        <h2 className="text-display-sm font-semibold text-foreground">募集中の関わり</h2>
         <span className="bg-primary text-primary-foreground text-xs font-medium px-2 py-0.5 rounded-full">
           {opportunities.length}
         </span>

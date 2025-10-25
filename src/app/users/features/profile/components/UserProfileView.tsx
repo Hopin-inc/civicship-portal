@@ -2,7 +2,6 @@ import Image from "next/image";
 import { UserProfileViewModel } from "@/app/users/features/profile/types";
 import { UserProfileHeader } from "./UserProfileHeader";
 import { UserTicketsAndPoints } from "./UserTicketsAndPoints";
-import { UserOpportunitiesSection } from "./UserOpportunitiesSection";
 import { UserPortfolioSection } from "@/app/users/features/portfolios";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 
@@ -40,10 +39,6 @@ export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
 
       {shouldShowOpportunities && (
         <>
-          {viewModel.showOpportunities && viewModel.selfOpportunities.length > 0 && (
-            <UserOpportunitiesSection opportunities={viewModel.selfOpportunities} />
-          )}
-
           <UserPortfolioSection
             userId={viewModel.id}
             portfolios={viewModel.portfolios}
