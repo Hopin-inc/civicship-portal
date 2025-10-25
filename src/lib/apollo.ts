@@ -45,10 +45,10 @@ function buildRequestLink(tenantId: string, communityId: string) {
 }
 
 const envCommunityId = getEnvCommunityId();
-const envAuth = getEnvAuthConfig();
-const fallback = envCommunityId ? getAuthForCommunity(envCommunityId) : undefined;
-const staticTenantId = envAuth.tenantId ?? fallback?.tenantId ?? "";
 const staticCommunityId = envCommunityId ?? "";
+const staticTenantId = envCommunityId 
+  ? getAuthForCommunity(envCommunityId).tenantId 
+  : (getEnvAuthConfig().tenantId ?? "");
 
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
