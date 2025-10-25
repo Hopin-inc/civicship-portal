@@ -1,3 +1,4 @@
+"use client";
 import { PortfoliosPage as PortfoliosPageComponent } from "@/app/users/features/portfolios";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
