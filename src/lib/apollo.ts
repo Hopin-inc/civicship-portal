@@ -46,7 +46,7 @@ function buildRequestLink(tenantId: string, communityId: string) {
 
 const envCommunityId = getEnvCommunityId();
 const envAuth = getEnvAuthConfig();
-const fallback = envCommunityId ? getAuthForCommunity(envCommunityId as CommunityId) : undefined;
+const fallback = envCommunityId ? getAuthForCommunity(envCommunityId) : undefined;
 const staticTenantId = envAuth.tenantId ?? fallback?.tenantId ?? "";
 const staticCommunityId = envCommunityId ?? "";
 

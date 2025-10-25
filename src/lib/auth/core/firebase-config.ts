@@ -32,7 +32,7 @@ lineAuth.tenantId = envTenantId ?? null;
 export function setFirebaseTenantId(communityId: string): void {
   if (envTenantId) return;
   
-  const authConfig = getAuthForCommunity(communityId as CommunityId);
+  const authConfig = getAuthForCommunity(communityId);
   lineAuth.tenantId = authConfig.tenantId;
 }
 

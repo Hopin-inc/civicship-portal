@@ -25,7 +25,7 @@ export async function fetchProfileServer(): Promise<GqlUser | null> {
   const communityId = envCommunityId ?? resolveCommunityIdFromHost(host);
   
   const envAuth = getEnvAuthConfig();
-  const tenantId = envAuth.tenantId ?? getAuthForCommunity(communityId as CommunityId).tenantId;
+  const tenantId = envAuth.tenantId ?? getAuthForCommunity(communityId).tenantId;
 
   try {
     const res = await executeServerGraphQLQuery<

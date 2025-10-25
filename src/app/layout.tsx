@@ -14,7 +14,7 @@ import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
 import { CommunityProvider } from "@/contexts/CommunityContext";
-import { getEnvCommunityId, resolveCommunityIdFromHost } from "@/lib/communities/runtime-auth";
+import { normalizeCommunityId, getEnvCommunityId } from "@/lib/communities/runtime-auth";
 import { headers } from "next/headers";
 
 const font = Inter({ subsets: ["latin"] });
@@ -22,8 +22,9 @@ const font = Inter({ subsets: ["latin"] });
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = headers();
   const host = headersList.get("host") ?? "localhost";
+  const envCommunityId = getEnvCommunityId();
 
-  const communityId = getEnvCommunityId() ?? resolveCommunityIdFromHost(host);
+  const communityId = normalizeCommunityId(envCommunityId, host);
   const metadata = getCommunityMetadata(communityId);
 
   return {
@@ -49,7 +50,8 @@ const RootLayout = async ({
 }>) => {
   const headersList = headers();
   const host = headersList.get("host") ?? "localhost";
-  const communityId = getEnvCommunityId() ?? resolveCommunityIdFromHost(host);
+  const envCommunityId = getEnvCommunityId();
+  const communityId = normalizeCommunityId(envCommunityId, host);
 
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
 

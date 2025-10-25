@@ -14,7 +14,7 @@ export function useAuthDependencies() {
     if (envLiffId) return envLiffId;
     
     if (communityId) {
-      const authConfig = getAuthForCommunity(communityId as CommunityId);
+      const authConfig = getAuthForCommunity(communityId);
       return authConfig.liffId;
     }
     

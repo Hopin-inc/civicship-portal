@@ -15,7 +15,7 @@ const ApolloProvider = ({ children }: React.PropsWithChildren) => {
       return apolloClient;
     }
 
-    const authConfig = getAuthForCommunity(communityId as CommunityId);
+    const authConfig = getAuthForCommunity(communityId);
     return createApolloClient({
       communityId,
       tenantId: authConfig.tenantId,

@@ -1,9 +1,17 @@
+import { logger } from "@/lib/logging";
+
 export type CommunityId = "neo88" | "kibotcha" | "dais" | "kotohira" | "himeji-ymca" | "izu";
+
+export const COMMUNITY_IDS = ["neo88", "kibotcha", "dais", "kotohira", "himeji-ymca", "izu"] as const;
 
 export interface CommunityAuthConfig {
   tenantId: string;
   liffId: string;
   lineClient: string;
+}
+
+export function isValidCommunityId(value: unknown): value is CommunityId {
+  return typeof value === "string" && COMMUNITY_IDS.includes(value as CommunityId);
 }
 
 const AUTH_BY_COMMUNITY_COMMENT = `
@@ -80,21 +88,46 @@ export const DOMAIN_TO_COMMUNITY: Record<string, CommunityId> = {
 export function resolveCommunityIdFromHost(host: string): CommunityId {
   const communityId = DOMAIN_TO_COMMUNITY[host];
   if (!communityId) {
-    console.warn(`Unknown host: ${host}, falling back to neo88`);
+    logger.warn(`Unknown host: ${host}, falling back to neo88`, { host });
     return "neo88";
   }
   return communityId;
 }
 
-export function getAuthForCommunity(communityId: CommunityId): CommunityAuthConfig {
+export function normalizeCommunityId(envId: string | null, host: string): CommunityId {
+  if (envId && isValidCommunityId(envId)) {
+    return envId;
+  }
+  
+  if (envId && !isValidCommunityId(envId)) {
+    logger.warn(`Invalid NEXT_PUBLIC_COMMUNITY_ID: ${envId}, resolving from host`, { envId, host });
+  }
+  
+  return resolveCommunityIdFromHost(host);
+}
+
+export function getAuthForCommunity(input?: string | null): CommunityAuthConfig {
   const env = getEnvAuthConfig();
-  const fallback = AUTH_BY_COMMUNITY[communityId];
+  
+  let validCommunityId: CommunityId;
+  if (input && isValidCommunityId(input)) {
+    validCommunityId = input;
+  } else {
+    if (input) {
+      const logLevel = process.env.NODE_ENV === "production" ? "error" : "warn";
+      logger[logLevel](`Invalid communityId: ${input}, falling back to neo88`, { input });
+    }
+    validCommunityId = "neo88";
+  }
+  
+  const fallback = AUTH_BY_COMMUNITY[validCommunityId];
 
   const usingFallback = !env.tenantId || !env.liffId || !env.lineClient;
   if (usingFallback && process.env.NODE_ENV === "production") {
-    console.error(
-      `[getAuthForCommunity] Production environment missing required env vars for ${communityId}. ` +
-      `Set NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID, NEXT_PUBLIC_LIFF_ID, NEXT_PUBLIC_LINE_CLIENT.`
+    logger.error(
+      `[getAuthForCommunity] Production environment missing required env vars for ${validCommunityId}. ` +
+      `Set NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID, NEXT_PUBLIC_LIFF_ID, NEXT_PUBLIC_LINE_CLIENT.`,
+      { communityId: validCommunityId }
     );
   }
 
