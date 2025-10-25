@@ -1,7 +1,8 @@
 import { format, parse } from "date-fns";
 import { ja } from "date-fns/locale";
 import { AppPortfolio } from "@/app/users/features/shared/types";
-import { PortfolioGrid } from "@/app/users/features/portfolios/components/UserPortfolioList";
+import { PortfolioGrid } from "./PortfolioGrid";
+import { presentPortfolioCard } from "../presenters/presentPortfolioCard";
 import React from "react";
 
 type Props = {
@@ -17,6 +18,7 @@ export const PortfolioDateGroup: React.FC<Props> = ({ grouped, lastPortfolioRef 
       const month = isValid ? format(dateObj, "M", { locale: ja }) : "";
       const day = isValid ? format(dateObj, "dd", { locale: ja }) : "";
       const weekday = isValid ? format(dateObj, "E", { locale: ja }) : "";
+      const viewModels = items.map(presentPortfolioCard);
 
       return (
         <div key={date}>
@@ -27,7 +29,7 @@ export const PortfolioDateGroup: React.FC<Props> = ({ grouped, lastPortfolioRef 
             <span className="text-xs ml-1 mb-1">({weekday})</span>
           </div>
           <PortfolioGrid
-            portfolios={items}
+            viewModels={viewModels}
             isLoadingMore={false}
             hasMore={false}
             lastPortfolioRef={lastPortfolioRef}
