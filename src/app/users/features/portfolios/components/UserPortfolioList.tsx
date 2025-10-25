@@ -14,7 +14,7 @@ import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getCurrentRegionName } from "@/lib/communities/metadata";
 import { useRouter } from "next/navigation";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
-import { parsePortfolioDate } from "@/app/users/features/portfolios/lib";
+import { parsePortfolioDate, formatPortfolioDate } from "@/app/users/features/portfolios/lib";
 
 type Props = {
   userId: string;
@@ -112,7 +112,7 @@ export const PortfolioCard = ({
   isLast: boolean;
   lastRef: RefObject<HTMLDivElement>;
 }) => {
-  const isPast = parsePortfolioDate(portfolio.date) < new Date();
+  const isPast = parsePortfolioDate(portfolio.dateISO) < new Date();
   const isPassed = portfolio.evaluationStatus === GqlEvaluationStatus.Passed;
   const linkHref =
     portfolio.source === "ARTICLE"
@@ -177,7 +177,7 @@ export const PortfolioCard = ({
             <div className="flex items-center gap-1 text-body-sm text-caption">
               <Calendar className="w-4 h-4" />
               <span>
-                {portfolio.date}
+                {formatPortfolioDate(portfolio.dateISO)}
                 {portfolio.source === "OPPORTUNITY" &&
                   !isPast &&
                   portfolio.reservationStatus !== GqlReservationStatus.Canceled &&

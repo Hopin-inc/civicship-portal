@@ -7,10 +7,10 @@ import FutureTab from "./FutureTab";
 import PastTab from "./PastTab";
 import { useAuth } from "@/contexts/AuthProvider";
 
-export function groupByDate<T extends { date: string }>(items: T[]): Record<string, T[]> {
+export function groupByDate<T extends { dateISO: string }>(items: T[]): Record<string, T[]> {
   if (!items) return {};
   return items.reduce((acc, item) => {
-    const date = item.date;
+    const date = item.dateISO;
     if (!acc[date]) acc[date] = [];
     acc[date].push(item);
     return acc;

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import {
   GqlCurrentUserServerQuery,

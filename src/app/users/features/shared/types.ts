@@ -40,7 +40,7 @@ export type AppPortfolio = {
   evaluationStatus?: GqlEvaluationStatus | null;
   title: string;
   image: string | null;
-  date: string;
+  dateISO: string;
 
   location: string | null;
   participants: Participant[];

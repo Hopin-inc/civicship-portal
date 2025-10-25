@@ -17,8 +17,6 @@ export const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
 };
 
 export const presenterPortfolio = (gqlPortfolio: GqlPortfolio): AppPortfolio => {
-  const dateObj = new Date(gqlPortfolio.date);
-
   return {
     id: gqlPortfolio.id,
     source: gqlPortfolio.source,
@@ -27,11 +25,7 @@ export const presenterPortfolio = (gqlPortfolio: GqlPortfolio): AppPortfolio => 
     evaluationStatus: gqlPortfolio.evaluationStatus ?? null,
     title: gqlPortfolio.title,
     image: gqlPortfolio.thumbnailUrl ?? PLACEHOLDER_IMAGE,
-    date: dateObj.toLocaleDateString("ja-JP", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }),
+    dateISO: new Date(gqlPortfolio.date).toISOString(),
     location: gqlPortfolio.place?.name ?? null,
     participants: (gqlPortfolio.participants ?? []).map(presentParticipant),
   };

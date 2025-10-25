@@ -1,11 +1,20 @@
 import { AppPortfolio } from "@/app/users/features/shared/types";
 
-export function parsePortfolioDate(dateString: string): Date {
-  return new Date(dateString);
+export function parsePortfolioDate(dateISO: string): Date {
+  return new Date(dateISO);
+}
+
+export function formatPortfolioDate(dateISO: string): string {
+  const dateObj = new Date(dateISO);
+  return dateObj.toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 export function isPortfolioInFuture(portfolio: AppPortfolio, today: Date): boolean {
-  const portfolioDate = parsePortfolioDate(portfolio.date);
+  const portfolioDate = parsePortfolioDate(portfolio.dateISO);
   return portfolioDate >= today;
 }
 
@@ -38,7 +47,7 @@ export function filterFuturePortfolios(
       return portfolioMatchesSearch(portfolio, searchQuery);
     })
     .sort((a, b) => {
-      return parsePortfolioDate(a.date).getTime() - parsePortfolioDate(b.date).getTime();
+      return parsePortfolioDate(a.dateISO).getTime() - parsePortfolioDate(b.dateISO).getTime();
     });
 }
 
@@ -53,6 +62,6 @@ export function filterPastPortfolios(
       return portfolioMatchesSearch(portfolio, searchQuery);
     })
     .sort((a, b) => {
-      return parsePortfolioDate(b.date).getTime() - parsePortfolioDate(a.date).getTime();
+      return parsePortfolioDate(b.dateISO).getTime() - parsePortfolioDate(a.dateISO).getTime();
     });
 }
