@@ -101,6 +101,11 @@ export const FETCH_PROFILE_SERVER_QUERY = `
         opportunitiesCreatedByMe {
           id
           title
+          category
+          images
+          isReservableWithTicket
+          feeRequired
+          pointsRequired
           community {
             id
             name
@@ -149,6 +154,11 @@ export const GET_PUBLIC_USER_SERVER_QUERY = `
       opportunitiesCreatedByMe {
         id
         title
+        category
+        images
+        isReservableWithTicket
+        feeRequired
+        pointsRequired
         community {
           id
           name
