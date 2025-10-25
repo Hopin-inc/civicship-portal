@@ -39,6 +39,14 @@ export type UserProfileViewModel = {
   currentlyHiringOpportunities: Array<{
     id: string;
     title: string;
+    category: any;
+    images: string[];
+    location: string;
+    communityId: string;
+    hasReservableTicket: boolean;
+    feeRequired: number | null;
+    pointsRequired: number | null;
+    slots: any[];
   }>;
 
   nftInstances?: Array<{

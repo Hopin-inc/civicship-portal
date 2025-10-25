@@ -18,9 +18,17 @@ export function presentUserProfile(
     category: opp.category ?? "",
   }));
 
-  const currentlyHiringOpportunities = selfOpportunities.map((opp) => ({
+  const currentlyHiringOpportunities = (gqlUser.opportunitiesCreatedByMe ?? []).map((opp) => ({
     id: opp.id,
     title: opp.title,
+    category: opp.category,
+    images: opp.images ?? [],
+    location: (opp as any).place?.name ?? "",
+    communityId: (opp as any).community?.id ?? "",
+    hasReservableTicket: opp.isReservableWithTicket ?? false,
+    feeRequired: opp.feeRequired ?? null,
+    pointsRequired: opp.pointsRequired ?? null,
+    slots: [],
   }));
 
   const nftInstances = isOwner

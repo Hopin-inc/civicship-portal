@@ -11,6 +11,14 @@ interface UserPortfolioSectionProps {
   activeOpportunities: Array<{
     id: string;
     title: string;
+    category: any;
+    images: string[];
+    location: string;
+    communityId: string;
+    hasReservableTicket: boolean;
+    feeRequired: number | null;
+    pointsRequired: number | null;
+    slots: any[];
   }>;
 }
 
@@ -22,19 +30,6 @@ export function UserPortfolioSection({
 }: UserPortfolioSectionProps) {
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
 
-  const activityCards = activeOpportunities.map((opp) => ({
-    id: opp.id,
-    title: opp.title,
-    category: "ACTIVITY" as const,
-    feeRequired: null,
-    location: "",
-    images: [],
-    communityId: "",
-    hasReservableTicket: false,
-    pointsRequired: null,
-    slots: [],
-  }));
-
   return (
     <UserPortfolioList
       userId={userId}
@@ -44,7 +39,7 @@ export function UserPortfolioSection({
       hasMore={false}
       lastPortfolioRef={lastPortfolioRef}
       isSysAdmin={false}
-      activeOpportunities={activityCards}
+      activeOpportunities={activeOpportunities}
     />
   );
 }
