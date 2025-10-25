@@ -42,6 +42,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+export default async function Layout({ 
+  children,
+  params,
+}: { 
+  children: React.ReactNode;
+  params: { id: string };
+}) {
+  const gqlUser = await fetchPublicUserServer(params.id);
+
+  if (!gqlUser) {
+    return <>{children}</>;
+  }
+
+  const { presenterPortfolio } = await import("@/app/users/presenters");
+  const { UserProfileProvider } = await import("@/app/users/contexts/UserProfileContext");
+  
+  const portfolios = (gqlUser.portfolios ?? []).map(presenterPortfolio);
+
+  return (
+    <UserProfileProvider
+      value={{
+        userId: gqlUser.id,
+        isOwner: false,
+        gqlUser,
+        portfolios,
+      }}
+    >
+      {children}
+    </UserProfileProvider>
+  );
 }

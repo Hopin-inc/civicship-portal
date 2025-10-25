@@ -1,24 +1,12 @@
-import { notFound } from "next/navigation";
-import { fetchPublicUserServer } from "@/app/users/data";
+"use client";
+
+import { useUserProfileContext } from "@/app/users/contexts/UserProfileContext";
 import { presentUserProfile } from "@/app/users/presenters";
-import { UserProfileClient } from "@/app/users/components";
+import { UserProfileView } from "@/app/users/components";
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-}
+export default function UserPage() {
+  const { gqlUser, isOwner } = useUserProfileContext();
+  const viewModel = presentUserProfile(gqlUser, isOwner);
 
-export default async function UserPage({ params }: PageProps) {
-  const { id } = params;
-  
-  const gqlUser = await fetchPublicUserServer(id);
-  
-  if (!gqlUser) {
-    notFound();
-  }
-
-  const viewModel = presentUserProfile(gqlUser, false);
-
-  return <UserProfileClient viewModel={viewModel} />;
+  return <UserProfileView viewModel={viewModel} isOwner={isOwner} />;
 }

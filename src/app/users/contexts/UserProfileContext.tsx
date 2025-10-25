@@ -1,0 +1,35 @@
+"use client";
+
+import { createContext, useContext, ReactNode } from "react";
+import { GqlUser } from "@/types/graphql";
+import { AppPortfolio } from "@/app/users/data/type";
+
+export interface UserProfileContextValue {
+  userId: string;
+  isOwner: boolean;
+  gqlUser: GqlUser;
+  portfolios: AppPortfolio[];
+}
+
+const UserProfileContext = createContext<UserProfileContextValue | null>(null);
+
+export interface UserProfileProviderProps {
+  children: ReactNode;
+  value: UserProfileContextValue;
+}
+
+export function UserProfileProvider({ children, value }: UserProfileProviderProps) {
+  return (
+    <UserProfileContext.Provider value={value}>
+      {children}
+    </UserProfileContext.Provider>
+  );
+}
+
+export function useUserProfileContext() {
+  const context = useContext(UserProfileContext);
+  if (!context) {
+    throw new Error("useUserProfileContext must be used within UserProfileProvider");
+  }
+  return context;
+}

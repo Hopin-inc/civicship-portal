@@ -3,55 +3,24 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthProvider";
 import {
   GqlCurrentPrefecture,
-  useGetUserFlexibleQuery,
   useUpdateMyProfileMutation,
 } from "@/types/graphql";
 import { GeneralUserProfile } from "@/app/users/data/type";
 import { prefectureLabels, presenterUserProfile } from "@/app/users/presenters";
 import { logger } from "@/lib/logging";
+import { useUserProfileContext } from "@/app/users/contexts/UserProfileContext";
 
 const useProfileEdit = () => {
   const router = useRouter();
-  const { user } = useAuth();
-  const userId = user?.id;
+  const { gqlUser, userId } = useUserProfileContext();
 
-  const [profile, setProfile] = useState<GeneralUserProfile>({
-    name: "",
-    image: null,
-    imagePreviewUrl: null,
-    bio: "",
-    currentPrefecture: undefined,
-    urlFacebook: "",
-    urlInstagram: "",
-    urlX: "",
-    phone: "",
-  });
-
-  const {
-    data,
-    loading: userLoading,
-    error: userError,
-  } = useGetUserFlexibleQuery({
-    variables: {
-      id: userId ?? "",
-      withOpportunities: false,
-      withPortfolios: false,
-      withWallets: false,
-    },
-    skip: !userId,
-  });
+  const [profile, setProfile] = useState<GeneralUserProfile>(() => 
+    presenterUserProfile(gqlUser)
+  );
 
   const [updateProfile, { loading: updating }] = useUpdateMyProfileMutation();
-
-  // 初期データの取り込み
-  useEffect(() => {
-    if (data?.user) {
-      setProfile(presenterUserProfile(data.user));
-    }
-  }, [data]);
 
   const setSocialLinks = (links: { facebook: string; instagram: string; twitter: string }) => {
     setProfile((prev) => ({
@@ -131,20 +100,8 @@ const useProfileEdit = () => {
     [],
   );
 
-  const formattedError = useMemo(() => {
-    if (userError) {
-      logger.error("Error fetching user profile", {
-        error: userError.message || String(userError),
-        component: "useProfileEdit",
-        userId,
-      });
-      toast.error("プロフィールの取得に失敗しました");
-    }
-    return null;
-  }, [userError]);
-
   return {
-    profileImage: profile.imagePreviewUrl || data?.user?.image || null,
+    profileImage: profile.imagePreviewUrl || gqlUser.image || null,
     displayName: profile.name,
     location: profile.currentPrefecture,
     bio: profile.bio ?? "",
@@ -154,8 +111,8 @@ const useProfileEdit = () => {
       twitter: profile.urlX ?? "",
     },
     phone: profile.phone,
-    userLoading,
-    error: formattedError,
+    userLoading: false,
+    error: null,
     updating,
     prefectureOptions,
     setDisplayName: (name: string) => setProfile((prev) => ({ ...prev, name })),

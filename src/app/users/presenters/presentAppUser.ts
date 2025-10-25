@@ -1,27 +1,7 @@
 import { GqlPortfolio, GqlUser } from "@/types/graphql";
-import { AppPortfolio, AppUser, GeneralUserProfile, ManagerProfile } from "@/app/users/data/type";
-import { presenterUserAsset } from "@/app/wallets/data/presenter";
+import { AppPortfolio, GeneralUserProfile } from "@/app/users/data/type";
 import { Participant } from "@/types/utils";
-import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-
-export const presenterAppUser = (gqlUser: GqlUser): AppUser => {
-  return {
-    id: gqlUser.id,
-    profile: presenterUserProfile(gqlUser),
-    portfolios: (gqlUser.portfolios ?? []).map(presenterPortfolio),
-  };
-};
-
-export const presenterManagerProfile = (gqlUser: GqlUser, communityId: string): ManagerProfile => {
-  return {
-    ...presenterAppUser(gqlUser),
-    asset: presenterUserAsset(gqlUser.wallets?.find((w) => w.community?.id === communityId)),
-    currentlyHiringOpportunities: (gqlUser.opportunitiesCreatedByMe ?? []).map(
-      presenterActivityCard,
-    ),
-  };
-};
 
 export const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
   return {

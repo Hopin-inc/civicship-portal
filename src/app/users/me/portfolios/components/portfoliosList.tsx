@@ -21,7 +21,6 @@ export default function PortfoliosList() {
     const [activeTab, setActiveTab] = useState<TabsEnum>(TabsEnum.Future);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [input, setInput] = useState<string>("");
-    const { user: currentUser } = useAuth();
 
     return (
         <div className="py-6 px-6">
@@ -34,8 +33,8 @@ export default function PortfoliosList() {
                     placeholder="キーワードで検索"
                 />
             </div>
-            {activeTab === TabsEnum.Future && <FutureTab searchQuery={searchQuery} currentUser={currentUser} />}
-            {activeTab === TabsEnum.Past && <PastTab searchQuery={searchQuery} currentUser={currentUser} />}
+            {activeTab === TabsEnum.Future && <FutureTab searchQuery={searchQuery} />}
+            {activeTab === TabsEnum.Past && <PastTab searchQuery={searchQuery} />}
         </div>
     );
 }

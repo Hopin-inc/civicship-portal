@@ -5,27 +5,7 @@ import {
   GqlPortfolioSource,
   GqlReservationStatus,
 } from "@/types/graphql";
-import { ActivityCard } from "@/components/domains/opportunities/types";
 import { Participant } from "@/types/utils";
-import { UserAsset } from "@/app/wallets/data/type";
-
-// ---------------------------------------------
-// 👤 基本ユーザー型（すべてのユーザー共通）
-// ---------------------------------------------
-export type AppUser = {
-  id: string;
-  profile: GeneralUserProfile;
-  portfolios: AppPortfolio[];
-};
-
-export type AppUserSelf = AppUser & {
-  asset: UserAsset;
-};
-
-export type ManagerProfile = AppUser & {
-  asset: UserAsset;
-  currentlyHiringOpportunities: ActivityCard[];
-};
 
 // ---------------------------------------------
 // 🧑‍💼 プロフィール情報（公開・非公開）

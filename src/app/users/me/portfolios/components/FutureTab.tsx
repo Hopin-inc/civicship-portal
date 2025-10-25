@@ -1,36 +1,40 @@
 "use client";
 import { groupByDate } from "./portfoliosList";
 import { useMemo, useRef } from "react";
-import { useUserProfile } from "@/app/users/hooks/useUserProfile";
-import { GqlSortDirection, Maybe } from "@/types/graphql";
-import { GqlUser } from "@/types/graphql";
+import { useUserProfileContext } from "@/app/users/contexts/UserProfileContext";
 import { PortfolioDateGroup } from "./PortfolioDateGroup";
 
 interface FutureTabProps {
     searchQuery: string;
-    currentUser: Maybe<GqlUser> | undefined;
 }
 
-export default function FutureTab({ searchQuery, currentUser }: FutureTabProps) {
+export default function FutureTab({ searchQuery }: FutureTabProps) {
     const lastPortfolioRef = useRef<HTMLDivElement>(null);
-    const today = useMemo(() => {
-        const d = new Date();
-        return d;
-    }, []);
-    const { userData } = useUserProfile(
-      currentUser?.id,
-      {
-        dateRange: {
-          gte: today,
-        },
-        keyword: searchQuery,
-      },
-      {
-        date: GqlSortDirection.Asc,
-      },
-    );
-    const portfolios = userData?.portfolios;
-    const grouped = groupByDate(portfolios ?? []);
+    const { portfolios } = useUserProfileContext();
+    
+    const today = useMemo(() => new Date(), []);
+    
+    const filteredPortfolios = useMemo(() => {
+        return portfolios.filter((portfolio) => {
+            const portfolioDate = new Date(portfolio.date);
+            if (portfolioDate < today) return false;
+            
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                return (
+                    portfolio.title.toLowerCase().includes(query) ||
+                    portfolio.location?.toLowerCase().includes(query)
+                );
+            }
+            
+            return true;
+        }).sort((a, b) => {
+            return new Date(a.date).getTime() - new Date(b.date).getTime();
+        });
+    }, [portfolios, searchQuery, today]);
+    
+    const grouped = groupByDate(filteredPortfolios);
+    
     return (
         <PortfolioDateGroup grouped={grouped} lastPortfolioRef={lastPortfolioRef} />
     );
