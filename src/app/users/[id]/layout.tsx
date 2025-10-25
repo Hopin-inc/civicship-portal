@@ -2,7 +2,7 @@ import React from "react";
 import { Metadata } from "next";
 import { fetchPublicUserServer } from "@/app/users/features/shared/api/fetchPublicUserServer";
 import { currentCommunityConfig, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
-import { presenterPortfolio } from "@/app/users/features/shared/mappers";
+import { mapGqlPortfolio } from "@/app/users/features/shared/mappers";
 import { UserProfileProvider } from "@/app/users/features/shared/contexts/UserProfileContext";
 
 type Props = {
@@ -57,7 +57,7 @@ export default async function Layout({
     return <>{children}</>;
   }
 
-  const portfolios = (gqlUser.portfolios ?? []).map(presenterPortfolio);
+  const portfolios = (gqlUser.portfolios ?? []).map(mapGqlPortfolio);
 
   return (
     <UserProfileProvider

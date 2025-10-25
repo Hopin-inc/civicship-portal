@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { GqlCurrentPrefecture, useUpdateMyProfileMutation } from "@/types/graphql";
 import { GeneralUserProfile } from "@/app/users/features/shared/types";
-import { presenterUserProfile } from "@/app/users/features/shared/mappers";
-import { prefectureLabels } from "@/app/users/features/shared/constants";
+import { mapGqlUserToProfile } from "@/app/users/features/shared/mappers";
+import { prefectureLabels } from "@/shared/prefectures/constants";
 import { logger } from "@/lib/logging";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
 
@@ -14,7 +14,7 @@ const useProfileEdit = () => {
   const router = useRouter();
   const { gqlUser, userId } = useUserProfileContext();
 
-  const [profile, setProfile] = useState<GeneralUserProfile>(() => presenterUserProfile(gqlUser));
+  const [profile, setProfile] = useState<GeneralUserProfile>(() => mapGqlUserToProfile(gqlUser));
 
   const [updateProfile, { loading: updating }] = useUpdateMyProfileMutation();
 

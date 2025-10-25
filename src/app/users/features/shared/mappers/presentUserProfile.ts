@@ -1,7 +1,7 @@
 import { GqlUser } from "@/types/graphql";
 import { UserProfileViewModel } from "@/app/users/features/profile/types";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { prefectureLabels } from "@/app/users/features/shared/constants";
+import { prefectureLabels } from "@/shared/prefectures/constants";
 
 export function presentUserProfile(
   gqlUser: GqlUser,

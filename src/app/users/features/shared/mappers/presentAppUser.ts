@@ -3,7 +3,7 @@ import { AppPortfolio, GeneralUserProfile } from "@/app/users/features/shared/ty
 import { Participant } from "@/types/utils";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
-export const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
+export const mapGqlUserToProfile = (gqlUser: GqlUser): GeneralUserProfile => {
   return {
     name: gqlUser.name,
     image: null,
@@ -16,7 +16,7 @@ export const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
   };
 };
 
-export const presenterPortfolio = (gqlPortfolio: GqlPortfolio): AppPortfolio => {
+export const mapGqlPortfolio = (gqlPortfolio: GqlPortfolio): AppPortfolio => {
   return {
     id: gqlPortfolio.id,
     source: gqlPortfolio.source,
@@ -27,11 +27,11 @@ export const presenterPortfolio = (gqlPortfolio: GqlPortfolio): AppPortfolio => 
     image: gqlPortfolio.thumbnailUrl ?? PLACEHOLDER_IMAGE,
     dateISO: new Date(gqlPortfolio.date).toISOString(),
     location: gqlPortfolio.place?.name ?? null,
-    participants: (gqlPortfolio.participants ?? []).map(presentParticipant),
+    participants: (gqlPortfolio.participants ?? []).map(mapGqlParticipant),
   };
 };
 
-export const presentParticipant = (gqlParticipant: GqlUser): Participant => {
+export const mapGqlParticipant = (gqlParticipant: GqlUser): Participant => {
   return {
     id: gqlParticipant.id,
     image: gqlParticipant.image ?? PLACEHOLDER_IMAGE,
