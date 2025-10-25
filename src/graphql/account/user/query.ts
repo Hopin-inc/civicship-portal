@@ -1,5 +1,12 @@
 import { gql } from "@apollo/client";
 import { UTILITY_WITH_OWNER_FRAGMENT } from "@/graphql/reward/utility/fragment";
+import { USER_FRAGMENT, USER_PORTFOLIO_FRAGMENT } from "@/graphql/account/user/fragment";
+import { OPPORTUNITY_FRAGMENT } from "@/graphql/experience/opportunity/fragment";
+import { WALLET_FRAGMENT } from "@/graphql/account/wallet/fragment";
+import { COMMUNITY_FRAGMENT } from "@/graphql/account/community/fragment";
+import { PLACE_FRAGMENT } from "@/graphql/location/place/fragment";
+import { DID_ISSUANCE_REQUEST_FRAGMENT } from "@/graphql/experience/didIssuanceRequest/fragment";
+import { TICKET_FRAGMENT } from "@/graphql/reward/ticket/fragment";
 
 export const GET_USER_FLEXIBLE = gql`
   query GetUserFlexible(
@@ -61,6 +68,14 @@ export const GET_USER_FLEXIBLE = gql`
       }
     }
   }
+  ${USER_FRAGMENT}
+  ${USER_PORTFOLIO_FRAGMENT}
+  ${OPPORTUNITY_FRAGMENT}
+  ${WALLET_FRAGMENT}
+  ${COMMUNITY_FRAGMENT}
+  ${PLACE_FRAGMENT}
+  ${DID_ISSUANCE_REQUEST_FRAGMENT}
+  ${TICKET_FRAGMENT}
 `;
 
 export const GET_USER_WALLET = gql`
