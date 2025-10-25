@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import useProfileEdit from "@/app/users/features/edit/hooks/useProfileEdit";
-import UserProfileEdit from "@/app/users/features/edit/components/UserProfileEdit";
+import { useProfileEdit, UserProfileEdit } from "@/app/users/features/edit";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 
