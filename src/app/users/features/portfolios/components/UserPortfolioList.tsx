@@ -257,7 +257,7 @@ const UserPortfolioList = ({
   return (
     <section className="py-6 mt-0">
       <div className="space-y-4">
-        {isSysAdmin && <ActiveOpportunities opportunities={formattedOpportunities} />}
+        {formattedOpportunities.length > 0 && <ActiveOpportunities opportunities={formattedOpportunities} />}
         <div className="flex items-center justify-between">
           <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
             これまでの関わり
