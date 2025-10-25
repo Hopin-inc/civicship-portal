@@ -46,7 +46,7 @@ export function presentUserProfile(
       facebook: gqlUser.urlFacebook ?? null,
     },
     ticketsAvailable: isOwner 
-      ? (wallet?.tickets?.filter((t) => t.status === GqlTicketStatus.Available).length ?? 0) 
+      ? (wallet?.tickets ?? []).filter((t) => t.status === GqlTicketStatus.Available).length
       : undefined,
     points: isOwner ? (wallet?.currentPointView?.currentPoint ?? 0) : undefined,
     portfolios: portfolios ?? [],
