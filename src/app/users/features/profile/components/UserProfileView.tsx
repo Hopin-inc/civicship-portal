@@ -2,7 +2,7 @@ import { UserProfileViewModel } from "@/app/users/features/profile/types";
 import { UserProfileHeader } from "./UserProfileHeader";
 import { UserTicketsAndPoints } from "./UserTicketsAndPoints";
 import { UserOpportunitiesSection } from "./UserOpportunitiesSection";
-import { UserPortfolioSection } from "@/app/users/features/portfolios/components/UserPortfolioSection";
+import { UserPortfolioSection } from "@/app/users/features/portfolios";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 interface UserProfileViewProps {

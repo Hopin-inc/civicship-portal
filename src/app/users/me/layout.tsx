@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import { metadata } from "./metadata";
-import { fetchPrivateUserServer } from "@/app/users/features/shared/api/fetchPrivateUserServer";
-import { mapGqlPortfolio } from "@/app/users/features/shared/mappers";
-import { UserProfileProvider } from "@/app/users/features/shared/contexts/UserProfileContext";
+import { fetchPrivateUserServer } from "@/app/users/features/shared/server";
+import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
 
 export { metadata };
 

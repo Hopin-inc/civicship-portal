@@ -30,11 +30,7 @@ export function UserPortfolioSection({
     id: p.id,
     title: p.title,
     image: p.coverUrl ?? null,
-    date: new Date(p.createdAt).toLocaleDateString("ja-JP", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }),
+    dateISO: new Date(p.createdAt).toISOString(),
     location: null,
     source: "OPPORTUNITY" as const,
     category: "ACTIVITY" as const,

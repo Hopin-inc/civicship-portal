@@ -32,7 +32,7 @@ export function portfolioMatchesSearch(portfolio: AppPortfolio, searchQuery: str
   const normalizedQuery = normalizeSearchQuery(searchQuery);
   return (
     portfolio.title.toLowerCase().includes(normalizedQuery) ||
-    portfolio.location?.toLowerCase().includes(normalizedQuery)
+    (portfolio.location?.toLowerCase().includes(normalizedQuery) ?? false)
   );
 }
 

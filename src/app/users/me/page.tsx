@@ -1,7 +1,6 @@
 "use client";
 
-import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
-import { presentUserProfile } from "@/app/users/features/shared/mappers";
+import { useUserProfileContext, presentUserProfile } from "@/app/users/features/shared";
 import { UserProfileView } from "@/app/users/features/profile";
 
 export default function MyProfilePage() {

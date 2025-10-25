@@ -1,9 +1,8 @@
 import React from "react";
 import { Metadata } from "next";
-import { fetchPublicUserServer } from "@/app/users/features/shared/api/fetchPublicUserServer";
+import { fetchPublicUserServer } from "@/app/users/features/shared/server";
 import { currentCommunityConfig, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
-import { mapGqlPortfolio } from "@/app/users/features/shared/mappers";
-import { UserProfileProvider } from "@/app/users/features/shared/contexts/UserProfileContext";
+import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
 
 type Props = {
   params: { id: string };
