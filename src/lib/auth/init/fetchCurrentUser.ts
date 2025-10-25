@@ -7,21 +7,34 @@ export async function fetchCurrentUserClient(
   firebaseUser?: User | null
 ): Promise<GqlCurrentUserPayload["user"] | null> {
   try {
+    const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
+    const tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID;
+    const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+
+    if (!apiEndpoint || !tenantId || !communityId) {
+      logger.error("[fetchCurrentUserClient] Missing required environment variables", {
+        hasApiEndpoint: !!apiEndpoint,
+        hasTenantId: !!tenantId,
+        hasCommunityId: !!communityId,
+      });
+      return null;
+    }
+
     const authMode = firebaseUser ? "id_token" : "session";
-    
+
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "X-Auth-Mode": authMode,
-      "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID!,
-      "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID!,
+      "X-Civicship-Tenant": tenantId,
+      "X-Community-Id": communityId,
     };
-    
+
     if (firebaseUser) {
       const token = await firebaseUser.getIdToken();
       headers["Authorization"] = `Bearer ${token}`;
     }
-    
-    const response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
+
+    const response = await fetch(apiEndpoint, {
       method: "POST",
       headers,
       credentials: "include",
