@@ -42,9 +42,7 @@ export function CodeVerificationStep({
 
   const handleBackToPhone = async () => {
     try {
-      if (phoneAuth.clearRecaptcha) {
-        await phoneAuth.clearRecaptcha();
-      }
+      await phoneAuth.clearRecaptcha();
     } catch (error) {
       logger.error("reCAPTCHAクリアエラー:", { error });
     } finally {

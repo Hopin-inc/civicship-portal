@@ -136,6 +136,7 @@ export function useCodeVerification(
           },
         };
       } finally {
+        // エラー時も含めて、必ずisVerifyingをfalseに戻す
         setIsVerifying(false);
       }
     },

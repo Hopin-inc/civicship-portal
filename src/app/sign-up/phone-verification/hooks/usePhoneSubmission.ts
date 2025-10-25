@@ -11,6 +11,7 @@ import { logger } from "@/lib/logging";
 
 interface PhoneSubmissionResult {
   success: boolean;
+  message?: string;
   error?: {
     message: string;
     type: string;
@@ -146,7 +147,7 @@ export function usePhoneSubmission(
           recaptchaManager.hide();
         }
 
-        return { success: true };
+        return { success: true, message: "認証コードを再送信しました" };
       } catch (error) {
         logger.error("再送信エラー:", { error });
         return handleSubmissionError(error);

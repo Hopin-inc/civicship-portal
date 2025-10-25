@@ -37,6 +37,11 @@ export function PhoneVerificationForm() {
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!isPhoneValid) {
+      toast.error("有効な電話番号を入力してください");
+      return;
+    }
+
     const result = await phoneSubmission.submit(formattedPhone);
 
     if (result.success) {
@@ -50,7 +55,9 @@ export function PhoneVerificationForm() {
     const result = await phoneSubmission.resend(formattedPhone);
 
     if (result.success) {
-      toast.success("認証コードを再送信しました");
+      if (result.message) {
+        toast.success(result.message);
+      }
     } else if (result.error) {
       toast.error(result.error.message);
     }
