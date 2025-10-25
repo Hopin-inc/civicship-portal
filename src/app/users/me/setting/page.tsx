@@ -1,10 +1,23 @@
-import AccountSection from "./components/AccountSection";
-import DangerSection from "./components/DangerSection";
-import HelpSection from "./components/HelpSection";
-import PromiseSection from "./components/PromiseSection";
-import SettingSection from "./components/SettingSection";
+import {
+  AccountSection,
+  DangerSection,
+  PromiseSection,
+  SettingSection,
+} from "@/app/users/features/settings";
+import { useMemo } from "react";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function SettingPage() {
+  const headerConfig = useMemo(
+    () => ({
+      title: "設定",
+      showLogo: false,
+      showBackButton: true,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
+
   return (
     <div className="container mx-auto px-6 py-6 max-w-3xl">
       <h2 className="text-sm mb-2 font-bold">アカウント</h2>

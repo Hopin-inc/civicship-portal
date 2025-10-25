@@ -1,18 +1,17 @@
 "use client";
 
 import React, { useMemo } from "react";
-import useProfileEdit from "@/app/users/me/edit/hooks/useProfileEdit";
-import UserProfileEdit from "@/app/users/components/UserProfileEdit";
+import { useProfileEdit, UserProfileEdit } from "@/app/users/features/edit";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from '@/components/shared'
+import { ErrorState } from "@/components/shared";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function ProfileEditPage() {
   const headerConfig = useMemo(
     () => ({
       title: "プロフィール編集",
-      showBackButton: true,
       showLogo: false,
+      showBackButton: true,
     }),
     [],
   );

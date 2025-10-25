@@ -76,20 +76,73 @@ export const FETCH_PROFILE_SERVER_QUERY = `
           community {
             id
           }
+          tickets {
+            id
+            status
+          }
+        }
+
+        nftWallet {
+          id
+          walletAddress
+        }
+
+        didIssuanceRequests {
+          id
+          status
+          didValue
+          requestedAt
+          processedAt
+          completedAt
+          createdAt
+          updatedAt
         }
 
         opportunitiesCreatedByMe {
           id
           title
-          community {
-            id
-            name
-          }
-          place {
-            id
-            name
-          }
+          images
         }
+      }
+    }
+  }
+`;
+
+export const GET_PUBLIC_USER_SERVER_QUERY = `
+  query GetPublicUser($id: ID!) {
+    user(id: $id) {
+      id
+      name
+      image
+      bio
+      currentPrefecture
+      urlFacebook
+      urlInstagram
+      urlX
+
+      portfolios {
+        id
+        title
+        thumbnailUrl
+        source
+        category
+        date
+        reservationStatus
+        evaluationStatus
+        place {
+          id
+          name
+        }
+        participants {
+          id
+          image
+        }
+      }
+
+      opportunitiesCreatedByMe {
+        id
+        title
+        images
       }
     }
   }
