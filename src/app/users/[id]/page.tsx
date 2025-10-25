@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { fetchPublicUserServer } from "@/app/users/data/fetchPublicUserServer";
 import { presenterPublicUserProfileViewModel } from "@/app/users/data/presenter";
-import { UserProfileContainer } from "./UserProfile.container.client";
+import { UserProfileContainer } from "@/app/users/components/containers/UserProfileContainer";
 
 interface PageProps {
   params: {

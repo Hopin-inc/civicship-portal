@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/contexts/AuthProvider";
 import { UserProfileViewModel } from "@/app/users/data/view-model";
-import { UserProfileView } from "../components/presentation/UserProfileView";
+import { UserProfileView } from "../presentation/UserProfileView";
 
 interface UserProfileContainerProps {
   viewModel: UserProfileViewModel;

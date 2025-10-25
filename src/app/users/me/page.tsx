@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { fetchProfileServer } from "@/app/users/me/libs/fetchProfileServer";
 import { presenterPublicUserProfileViewModel } from "@/app/users/data/presenter";
-import { UserProfileContainer } from "../[id]/UserProfile.container.client";
+import { UserProfileContainer } from "@/app/users/components/containers/UserProfileContainer";
 
 export const dynamic = 'force-dynamic';
 
