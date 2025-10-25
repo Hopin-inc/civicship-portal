@@ -4,10 +4,10 @@ import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { AppPortfolio } from "@/app/users/features/shared/types";
 import { ActiveOpportunitiesSection } from "./ActiveOpportunitiesSection";
-import { PortfolioGrid } from "./PortfolioGrid";
-import { PortfolioEmptyState } from "./PortfolioEmptyState";
-import { presentActiveOpportunities } from "../presenters/presentActiveOpportunities";
-import { presentPortfolioCard } from "../presenters/presentPortfolioCard";
+import { PortfolioGrid } from "../ui/PortfolioGrid";
+import { PortfolioEmptyState } from "../ui/PortfolioEmptyState";
+import { presentActiveOpportunities } from "../../presenters/presentActiveOpportunities";
+import { presentPortfolioCard } from "../../presenters/presentPortfolioCard";
 
 interface UserPortfolioSectionProps {
   userId: string;

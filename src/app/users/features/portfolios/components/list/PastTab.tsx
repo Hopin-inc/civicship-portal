@@ -1,9 +1,9 @@
 "use client";
 import { useMemo, useRef } from "react";
-import { groupByDate } from "../portfoliosList";
+import { groupByDate } from "./PortfoliosList";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
 import { PortfolioDateGroup } from "./PortfolioDateGroup";
-import { filterPastPortfolios } from "@/app/users/features/portfolios/lib";
+import { filterPastPortfolios } from "../../lib";
 
 interface PastTabProps {
   searchQuery: string;

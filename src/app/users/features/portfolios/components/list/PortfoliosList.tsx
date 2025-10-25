@@ -1,10 +1,10 @@
 "use client";
-import { TabManager } from "./tab/TabManager";
-import { TabsEnum } from "../types";
+import { TabManager } from "./TabManager";
+import { TabsEnum } from "../../types";
 import { useState } from "react";
 import SearchForm from "@/components/shared/SearchForm";
-import FutureTab from "./tab/FutureTab";
-import PastTab from "./tab/PastTab";
+import FutureTab from "./FutureTab";
+import PastTab from "./PastTab";
 
 export function groupByDate<T extends { dateISO: string }>(items: T[]): Record<string, T[]> {
   if (!items) return {};

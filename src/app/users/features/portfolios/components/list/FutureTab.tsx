@@ -1,9 +1,9 @@
 "use client";
-import { groupByDate } from "../portfoliosList";
+import { groupByDate } from "./PortfoliosList";
 import { useMemo, useRef } from "react";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
 import { PortfolioDateGroup } from "./PortfolioDateGroup";
-import { filterFuturePortfolios } from "@/app/users/features/portfolios/lib";
+import { filterFuturePortfolios } from "../../lib";
 
 interface FutureTabProps {
   searchQuery: string;

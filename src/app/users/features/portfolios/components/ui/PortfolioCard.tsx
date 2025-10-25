@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { RefObject } from "react";
 import { ParticipantsList } from "@/components/shared/ParticipantsList";
-import { PortfolioCardViewModel } from "../presenters/types";
+import { PortfolioCardViewModel } from "../../presenters/types";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 type PortfolioCardProps = {
