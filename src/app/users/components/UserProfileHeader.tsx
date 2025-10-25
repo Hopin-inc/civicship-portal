@@ -1,10 +1,6 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { prefectureLabels } from "@/app/users/data/presenter";
-import { GqlCurrentPrefecture } from "@/types/graphql";
 import { Facebook, Home, Instagram, Twitter } from "lucide-react";
 import { useReadMore } from "@/hooks/useReadMore";
 import { PLACEHOLDER_IMAGE } from "@/utils";
@@ -15,9 +11,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 interface UserProfileHeaderProps {
   id: string;
   name: string;
-  image: string;
-  bio: string;
-  currentPrefecture?: GqlCurrentPrefecture | null;
+  imageUrl?: string;
+  bio?: string;
+  currentPrefecture?: string;
   isOwner: boolean;
   socialUrl: {
     x: string | null;
@@ -26,26 +22,25 @@ interface UserProfileHeaderProps {
   };
 }
 
-const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
+export function UserProfileHeader({
   id,
   name,
-  image,
+  imageUrl,
   bio,
   currentPrefecture,
   isOwner,
   socialUrl,
-}) => {
+}: UserProfileHeaderProps) {
   const socialButtonClasses =
     "rounded-full border border-input w-10 h-10 flex items-center justify-center";
 
   return (
     <div className="relative max-w-mobile-l mx-auto w-full">
       <div className="flex flex-col items-center">
-        {/* Profile Image */}
         <div className="flex items-center w-full mb-4">
           <div className="flex-grow">
             <Avatar className="w-24 h-24">
-              <AvatarImage src={image || PLACEHOLDER_IMAGE} alt={name} />
+              <AvatarImage src={imageUrl || PLACEHOLDER_IMAGE} alt={name} />
               <AvatarFallback>{name?.charAt(0) || "U"}</AvatarFallback>
             </Avatar>
           </div>
@@ -68,7 +63,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
             {currentCommunityConfig.enableFeatures.includes("prefectures") && currentPrefecture && (
               <div className="flex items-center text-label-md text-caption mb-3">
                 <Home className="w-4 h-4 mr-1" />
-                <span>{prefectureLabels[currentPrefecture] || "不明"}</span>
+                <span>{currentPrefecture}</span>
               </div>
             )}
           </div>
@@ -104,9 +99,9 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
       </div>
     </div>
   );
-};
+}
 
-const BioSection = ({ bio }: { bio: string }) => {
+function BioSection({ bio }: { bio: string }) {
   const { textRef, expanded, showReadMore, toggleExpanded, getTextStyle } = useReadMore({
     text: bio,
     maxLines: 6,
@@ -133,6 +128,4 @@ const BioSection = ({ bio }: { bio: string }) => {
       )}
     </div>
   );
-};
-
-export default UserProfileHeader;
+}

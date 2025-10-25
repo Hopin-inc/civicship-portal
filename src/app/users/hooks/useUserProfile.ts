@@ -7,7 +7,7 @@ import {
   InputMaybe,
   useGetUserFlexibleQuery,
 } from "@/types/graphql";
-import { presenterManagerProfile } from "@/app/users/data/presenter";
+import { presenterManagerProfile } from "@/app/users/presenters";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 

@@ -1,5 +1,7 @@
 import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
+import { GqlOpportunityCategory } from "@/types/graphql";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface UserOpportunitiesSectionProps {
   opportunities: Array<{
@@ -16,7 +18,13 @@ export function UserOpportunitiesSection({ opportunities }: UserOpportunitiesSec
       id: opp.id,
       title: opp.title,
       images: opp.coverUrl ? [opp.coverUrl] : [],
-      category: opp.category,
+      location: "場所未定",
+      category: GqlOpportunityCategory.Activity,
+      feeRequired: null,
+      pointsRequired: null,
+      hasReservableTicket: false,
+      communityId: COMMUNITY_ID,
+      slots: [],
     })
   );
 

@@ -1,0 +1,66 @@
+import { GqlPortfolio, GqlUser } from "@/types/graphql";
+import { AppPortfolio, AppUser, GeneralUserProfile, ManagerProfile } from "@/app/users/data/type";
+import { presenterUserAsset } from "@/app/wallets/data/presenter";
+import { Participant } from "@/types/utils";
+import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
+import { PLACEHOLDER_IMAGE } from "@/utils";
+
+export const presenterAppUser = (gqlUser: GqlUser): AppUser => {
+  return {
+    id: gqlUser.id,
+    profile: presenterUserProfile(gqlUser),
+    portfolios: (gqlUser.portfolios ?? []).map(presenterPortfolio),
+  };
+};
+
+export const presenterManagerProfile = (gqlUser: GqlUser, communityId: string): ManagerProfile => {
+  return {
+    ...presenterAppUser(gqlUser),
+    asset: presenterUserAsset(gqlUser.wallets?.find((w) => w.community?.id === communityId)),
+    currentlyHiringOpportunities: (gqlUser.opportunitiesCreatedByMe ?? []).map(
+      presenterActivityCard,
+    ),
+  };
+};
+
+export const presenterUserProfile = (gqlUser: GqlUser): GeneralUserProfile => {
+  return {
+    name: gqlUser.name,
+    image: null,
+    imagePreviewUrl: gqlUser.image ?? PLACEHOLDER_IMAGE,
+    bio: gqlUser.bio ?? null,
+    currentPrefecture: gqlUser.currentPrefecture ?? undefined,
+    urlFacebook: gqlUser.urlFacebook ?? null,
+    urlInstagram: gqlUser.urlInstagram ?? null,
+    urlX: gqlUser.urlX ?? null,
+  };
+};
+
+export const presenterPortfolio = (gqlPortfolio: GqlPortfolio): AppPortfolio => {
+  const dateObj = new Date(gqlPortfolio.date);
+
+  return {
+    id: gqlPortfolio.id,
+    source: gqlPortfolio.source,
+    category: gqlPortfolio.category,
+    reservationStatus: gqlPortfolio.reservationStatus ?? null,
+    evaluationStatus: gqlPortfolio.evaluationStatus ?? null,
+    title: gqlPortfolio.title,
+    image: gqlPortfolio.thumbnailUrl ?? PLACEHOLDER_IMAGE,
+    date: dateObj.toLocaleDateString("ja-JP", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
+    location: gqlPortfolio.place?.name ?? null,
+    participants: (gqlPortfolio.participants ?? []).map(presentParticipant),
+  };
+};
+
+export const presentParticipant = (gqlParticipant: GqlUser): Participant => {
+  return {
+    id: gqlParticipant.id,
+    image: gqlParticipant.image ?? PLACEHOLDER_IMAGE,
+    name: gqlParticipant.name,
+  };
+};
