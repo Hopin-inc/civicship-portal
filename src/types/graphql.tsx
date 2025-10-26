@@ -3534,19 +3534,7 @@ export type GqlGetUserWalletQuery = {
           __typename?: "Wallet";
           id: string;
           type: GqlWalletType;
-          user?: {
-            __typename?: "User";
-            id: string;
-            name: string;
-            image?: string | null;
-            bio?: string | null;
-            currentPrefecture?: GqlCurrentPrefecture | null;
-            phoneNumber?: string | null;
-            urlFacebook?: string | null;
-            urlInstagram?: string | null;
-            urlX?: string | null;
-            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
-          } | null;
+          user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
           community?: {
             __typename?: "Community";
             id: string;
@@ -3559,19 +3547,7 @@ export type GqlGetUserWalletQuery = {
           __typename?: "Wallet";
           id: string;
           type: GqlWalletType;
-          user?: {
-            __typename?: "User";
-            id: string;
-            name: string;
-            image?: string | null;
-            bio?: string | null;
-            currentPrefecture?: GqlCurrentPrefecture | null;
-            phoneNumber?: string | null;
-            urlFacebook?: string | null;
-            urlInstagram?: string | null;
-            urlX?: string | null;
-            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
-          } | null;
+          user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
           community?: {
             __typename?: "Community";
             id: string;
@@ -7562,7 +7538,9 @@ export const GetUserWalletDocument = gql`
           fromWallet {
             ...WalletFields
             user {
-              ...UserFields
+              id
+              name
+              image
             }
             community {
               ...CommunityFields
@@ -7571,7 +7549,9 @@ export const GetUserWalletDocument = gql`
           toWallet {
             ...WalletFields
             user {
-              ...UserFields
+              id
+              name
+              image
             }
             community {
               ...CommunityFields
