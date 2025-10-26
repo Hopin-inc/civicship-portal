@@ -26,11 +26,22 @@ export function PhoneVerificationForm() {
 
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
   const recaptchaManager = useRecaptchaManager();
-  const phoneSubmission = usePhoneSubmission(phoneAuth, recaptchaManager, {
-    isDisabled: isResendDisabled,
-    start: startResendTimer,
-  });
-  const codeVerification = useCodeVerification(phoneAuth, nextParam, updateAuthState);
+  const phoneSubmission = usePhoneSubmission(
+    {
+      startPhoneVerification: phoneAuth.startPhoneVerification,
+      clearRecaptcha: phoneAuth.clearRecaptcha,
+    },
+    recaptchaManager,
+    {
+      isDisabled: isResendDisabled,
+      start: startResendTimer,
+    }
+  );
+  const codeVerification = useCodeVerification(
+    { verifyPhoneCode: phoneAuth.verifyPhoneCode },
+    nextParam,
+    updateAuthState
+  );
 
   const { isValid: isPhoneValid, formattedPhone } = validatePhoneNumber(phoneNumber);
 
