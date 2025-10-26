@@ -50,6 +50,13 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     // --- リダイレクト判定 ---
     const pathWithParams = searchParams.size ? `${pathname}?${searchParams.toString()}` : pathname;
+    
+    if (pathname === "/sign-up/phone-verification") {
+      console.log("[RouteGuard] Skipping redirect on phone-verification page");
+      setIsReadyToRender(true);
+      return;
+    }
+    
     const redirectPath = authRedirectService.getRedirectPath(
       pathWithParams as RawURIComponent,
       decodeURIComponentWithType(nextParam),

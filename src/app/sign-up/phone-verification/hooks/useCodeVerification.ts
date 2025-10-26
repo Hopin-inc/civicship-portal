@@ -53,26 +53,20 @@ export function useCodeVerification(
 
       try {
         console.log("[useCodeVerification] Starting phone code verification");
-        console.log("[useCodeVerification] phoneAuth.verifyPhoneCode type:", typeof phoneAuth.verifyPhoneCode);
-        const result = await phoneAuth.verifyPhoneCode(verificationCode);
-        console.log("[useCodeVerification] verifyPhoneCode raw result:", result);
-        console.log("[useCodeVerification] verifyPhoneCode result type:", typeof result);
-        console.log("[useCodeVerification] verifyPhoneCode result:", {
-          success: result.success,
-          hasPhoneUid: !!result.phoneUid,
-          phoneUidPrefix: result.phoneUid?.substring(0, 8),
-        });
+        const success = await phoneAuth.verifyPhoneCode(verificationCode);
+        console.log("[useCodeVerification] verifyPhoneCode success:", success);
         
         const authStoreState = useAuthStore.getState();
+        const phoneUid = authStoreState.phoneAuth.phoneUid;
         console.log("[useCodeVerification] Auth store state after verifyPhoneCode:", {
-          authenticationState: authStoreState.authenticationState,
-          phoneAuthPhoneUid: authStoreState.phoneAuth.phoneUid,
+          authenticationState: authStoreState.state.authenticationState,
+          phoneAuthPhoneUid: phoneUid,
           phoneAuthIsVerified: authStoreState.phoneAuth.isVerified,
         });
         
-        const setAuthState = useAuthStore.getState().setState;
+        const setAuthState = authStoreState.setState;
 
-        if (!result.success || !result.phoneUid) {
+        if (!success || !phoneUid) {
           console.log("[useCodeVerification] Early return: invalid code or missing phoneUid");
           return {
             success: false,
@@ -83,15 +77,14 @@ export function useCodeVerification(
           };
         }
 
-        console.log("[useCodeVerification] Calling identityCheckPhoneUser mutation with phoneUid:", result.phoneUid?.substring(0, 8) + "...");
-        console.log("[useCodeVerification] identityCheckPhoneUser function type:", typeof identityCheckPhoneUser);
+        console.log("[useCodeVerification] Calling identityCheckPhoneUser mutation with phoneUid:", phoneUid?.substring(0, 8) + "...");
         
         let data;
         try {
           const mutationResult = await identityCheckPhoneUser({
             variables: {
               input: {
-                phoneUid: result.phoneUid,
+                phoneUid: phoneUid,
               },
             },
           });
