@@ -153,6 +153,8 @@ export class AuthFlowLogger {
     this.authType = authType;
     
     if (typeof window !== "undefined") {
+      (window as any).__currentAuthFlowId = this.flowId;
+      
       import("@/lib/logging").then(mod => {
         this.logger = mod.logger;
       });

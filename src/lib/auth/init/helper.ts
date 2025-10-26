@@ -138,7 +138,6 @@ async function createSession(idToken: string) {
       status: res.status,
       errorText: errText.substring(0, 200),
     });
-    console.error("createSession failed", res.status, errText);
     throw new Error(`Failed to create session cookie (${res.status})`);
   }
 
@@ -146,7 +145,6 @@ async function createSession(idToken: string) {
     component: "helper",
     status: res.status,
   });
-  console.info("✅ Session cookie successfully created (via proxy)");
   return true;
 }
 

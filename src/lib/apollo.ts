@@ -25,9 +25,12 @@ const requestLink = setContext(async (operation, prevContext) => {
   let token: string | null = null;
   let authMode: "session" | "id_token" = "session";
   let tokenInfo: any = null;
+  let flowId: string | undefined;
 
   if (typeof window !== "undefined") {
     const { firebaseUser } = useAuthStore.getState().state;
+    
+    flowId = (window as any).__currentAuthFlowId;
     
     if (firebaseUser) {
       try {
@@ -44,6 +47,7 @@ const requestLink = setContext(async (operation, prevContext) => {
         logger.debug("[Apollo] Request with id_token", {
           component: "apollo",
           operationName: operation.operationName,
+          flowId,
           authMode,
           hasAuthorization: !!token,
           ...tokenInfo,
@@ -52,6 +56,7 @@ const requestLink = setContext(async (operation, prevContext) => {
         logger.warn("Failed to get ID token, falling back to session", { 
           component: "apollo",
           operationName: operation.operationName,
+          flowId,
           error 
         });
       }
@@ -59,6 +64,7 @@ const requestLink = setContext(async (operation, prevContext) => {
       logger.debug("[Apollo] Request with session", {
         component: "apollo",
         operationName: operation.operationName,
+        flowId,
         authMode,
         hasFirebaseUser: false,
       });
@@ -71,6 +77,7 @@ const requestLink = setContext(async (operation, prevContext) => {
     "X-Auth-Mode": authMode,
     "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
     "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
+    ...(flowId ? { "X-Flow-Id": flowId } : {}),
   };
 
   return { headers };
