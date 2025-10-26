@@ -77,6 +77,7 @@ export function middleware(request: NextRequest) {
     "https://www.googletagmanager.com",
     "https://www.google-analytics.com",
     "https://analytics.google.com",
+    "https://firebaseinstallations.googleapis.com",
   ].join(" ");
 
   const frameSrc = [
