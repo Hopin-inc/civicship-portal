@@ -7,6 +7,31 @@ import { detectEnvironment } from "@/lib/auth/core/environment-detector";
  * クライアント環境とサーバー環境の両方で動作するよう設計
  */
 
+/**
+ * フローIDを生成する（認証フロー追跡用）
+ * @returns 一意のフローID
+ */
+export const generateFlowId = (): string => {
+  return `flow_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+};
+
+/**
+ * UIDの末尾6文字を取得（プライバシー保護）
+ */
+export const getUidSuffix = (uid: string | null | undefined): string | null => {
+  if (!uid) return null;
+  return uid.slice(-6);
+};
+
+/**
+ * 電話番号をマスク（末尾4桁のみ表示）
+ */
+export const maskPhoneNumber = (phone: string | null | undefined): string | null => {
+  if (!phone) return null;
+  if (phone.length <= 4) return "****";
+  return `****${phone.slice(-4)}`;
+};
+
 let serverUtils: any = null;
 
 if (typeof window === "undefined") {
@@ -108,4 +133,62 @@ export const createAuthLogContext = (
     ...errorInfo,
     ...additionalContext,
   };
+};
+
+/**
+ * フロー追跡用のログヘルパークラス
+ * flowIdを自動的に付与してログを出力
+ */
+export class AuthFlowLogger {
+  private flowId: string;
+  private startTime: number;
+  private sessionId: string;
+  private authType: "liff" | "phone" | "general";
+
+  constructor(flowId?: string, authType: "liff" | "phone" | "general" = "general") {
+    this.flowId = flowId || generateFlowId();
+    this.startTime = Date.now();
+    this.sessionId = generateSessionId();
+    this.authType = authType;
+  }
+
+  getFlowId(): string {
+    return this.flowId;
+  }
+
+  private createContext(additionalMeta?: Record<string, any>) {
+    return createAuthLogContext(this.sessionId, this.authType, {
+      flowId: this.flowId,
+      elapsed: Date.now() - this.startTime,
+      ...additionalMeta,
+    });
+  }
+
+  info(message: string, meta?: Record<string, any>) {
+    const context = this.createContext(meta);
+    if (typeof window !== "undefined") {
+      console.info(`[AUTH] ${message}`, context);
+    }
+  }
+
+  warn(message: string, meta?: Record<string, any>) {
+    const context = this.createContext(meta);
+    if (typeof window !== "undefined") {
+      console.warn(`[AUTH] ${message}`, context);
+    }
+  }
+
+  error(message: string, meta?: Record<string, any>) {
+    const context = this.createContext(meta);
+    if (typeof window !== "undefined") {
+      console.error(`[AUTH] ${message}`, context);
+    }
+  }
+
+  debug(message: string, meta?: Record<string, any>) {
+    const context = this.createContext(meta);
+    if (typeof window !== "undefined") {
+      console.debug(`[AUTH] ${message}`, context);
+    }
+  }
 };

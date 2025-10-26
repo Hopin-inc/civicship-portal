@@ -14,8 +14,7 @@ import { useCodeVerification } from "../hooks/useCodeVerification";
 import { PhoneInputStep } from "./PhoneInputStep";
 import { CodeVerificationStep } from "./CodeVerificationStep";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
-
-const generateFlowId = () => `phone-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+import { AuthFlowLogger } from "@/lib/logging/client/utils";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -27,16 +26,18 @@ export function PhoneVerificationForm() {
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<VerificationStep>("phone");
   const flowIdRef = useRef<string | null>(null);
+  const authLoggerRef = useRef<AuthFlowLogger | null>(null);
 
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
   const recaptchaManager = useRecaptchaManager();
   const phoneSubmission = usePhoneSubmission(
     {
       startPhoneVerification: (phoneNumber: string) => {
-        const flowId = flowIdRef.current || generateFlowId();
-        flowIdRef.current = flowId;
-        console.log("[PhoneForm] startPhoneVerification wrapper called", { 
-          flowId,
+        if (!authLoggerRef.current) {
+          authLoggerRef.current = new AuthFlowLogger(undefined, "phone");
+          flowIdRef.current = authLoggerRef.current.getFlowId();
+        }
+        authLoggerRef.current.info("phone/form_start_verification", { 
           hasPhoneAuth: !!phoneAuth,
           hasFn: typeof phoneAuth.startPhoneVerification === 'function'
         });
@@ -48,7 +49,8 @@ export function PhoneVerificationForm() {
     {
       isDisabled: isResendDisabled,
       start: startResendTimer,
-    }
+    },
+    authLoggerRef.current || undefined
   );
   const codeVerification = useCodeVerification(
     { 
@@ -73,21 +75,24 @@ export function PhoneVerificationForm() {
       return;
     }
 
-    const flowId = generateFlowId();
-    flowIdRef.current = flowId;
-    console.log("[PhoneForm] Phone submit started", { 
-      flowId,
+    if (!authLoggerRef.current) {
+      authLoggerRef.current = new AuthFlowLogger(undefined, "phone");
+      flowIdRef.current = authLoggerRef.current.getFlowId();
+    }
+
+    authLoggerRef.current.info("phone/form_submit_start", { 
       phoneMasked: formattedPhone.replace(/\d(?=\d{4})/g, '*')
     });
 
     const result = await phoneSubmission.submit(formattedPhone);
 
     if (result.success) {
-      console.log("[PhoneForm] Phone submit success, moving to code step", { flowId });
+      authLoggerRef.current.info("phone/form_submit_success", { 
+        nextStep: "code"
+      });
       setStep("code");
     } else if (result.error) {
-      console.error("[PhoneForm] Phone submit failed", { 
-        flowId, 
+      authLoggerRef.current.error("phone/form_submit_failed", { 
         errorType: result.error.type,
         errorMessage: result.error.message
       });
@@ -110,14 +115,12 @@ export function PhoneVerificationForm() {
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const flowId = flowIdRef.current;
-    console.log("[PhoneForm] Code submit started", { flowId });
+    authLoggerRef.current?.info("phone/form_code_submit_start", {});
 
     const result = await codeVerification.verify(verificationCode);
 
     if (result.success) {
-      console.log("[PhoneForm] Code verification success", { 
-        flowId,
+      authLoggerRef.current?.info("phone/form_code_verification_success", { 
         hasRedirectPath: !!result.redirectPath,
         redirectPath: result.redirectPath
       });
@@ -125,12 +128,13 @@ export function PhoneVerificationForm() {
         toast.success(result.message);
       }
       if (result.redirectPath) {
-        console.log("[PhoneForm] Calling router.push", { flowId, to: result.redirectPath });
+        authLoggerRef.current?.info("phone/form_navigation", { 
+          to: result.redirectPath 
+        });
         router.push(result.redirectPath);
       }
     } else if (result.error) {
-      console.error("[PhoneForm] Code verification failed", { 
-        flowId,
+      authLoggerRef.current?.error("phone/form_code_verification_failed", { 
         errorType: result.error.type,
         errorMessage: result.error.message
       });
@@ -143,6 +147,8 @@ export function PhoneVerificationForm() {
   };
 
   const handleBackToPhone = () => {
+    authLoggerRef.current?.info("phone/form_back_to_phone", {});
+    
     setPhoneNumber("");
     setVerificationCode("");
     setStep("phone");
@@ -154,6 +160,9 @@ export function PhoneVerificationForm() {
         verificationId: null,
       },
     });
+    
+    authLoggerRef.current = null;
+    flowIdRef.current = null;
   };
 
   if (loading) {

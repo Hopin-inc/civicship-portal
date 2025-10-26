@@ -8,6 +8,7 @@ import { useRecaptchaManager } from "./useRecaptchaManager";
 import { useResendTimer } from "./useResendTimer";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { AuthFlowLogger, maskPhoneNumber } from "@/lib/logging/client/utils";
 
 interface PhoneSubmissionResult {
   success: boolean;
@@ -24,7 +25,8 @@ export function usePhoneSubmission(
     clearRecaptcha?: () => void;
   },
   recaptchaManager: ReturnType<typeof useRecaptchaManager>,
-  resendTimer: Pick<ReturnType<typeof useResendTimer>, "isDisabled" | "start">
+  resendTimer: Pick<ReturnType<typeof useResendTimer>, "isDisabled" | "start">,
+  authLogger?: AuthFlowLogger
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
@@ -59,7 +61,17 @@ export function usePhoneSubmission(
 
   const submit = useCallback(
     async (formattedPhone: string): Promise<PhoneSubmissionResult> => {
+      authLogger?.info("phone/submit_start", {
+        phoneNumber: maskPhoneNumber(formattedPhone),
+        recaptchaReady: recaptchaManager.isReady,
+        isSubmitting,
+        isRateLimited,
+      });
+
       if (!recaptchaManager.isReady) {
+        authLogger?.warn("phone/submit_blocked", {
+          reason: "recaptcha_not_ready",
+        });
         return {
           success: false,
           error: {
@@ -70,6 +82,9 @@ export function usePhoneSubmission(
       }
 
       if (isSubmitting || isRateLimited) {
+        authLogger?.warn("phone/submit_blocked", {
+          reason: isRateLimited ? "rate_limited" : "already_submitting",
+        });
         return {
           success: false,
           error: {
@@ -81,6 +96,10 @@ export function usePhoneSubmission(
         };
       }
 
+      authLogger?.info("phone/clear_verification_id", {
+        action: "clearing_stale_verification_id",
+      });
+
       useAuthStore.getState().setState({
         phoneAuth: {
           ...useAuthStore.getState().phoneAuth,
@@ -91,11 +110,28 @@ export function usePhoneSubmission(
       setIsSubmitting(true);
 
       try {
+        authLogger?.info("phone/start_verification_call", {
+          phoneNumber: maskPhoneNumber(formattedPhone),
+        });
+
         const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
         
         const storedId = useAuthStore.getState().phoneAuth.verificationId;
         
+        authLogger?.info("phone/verification_result", {
+          verificationIdReturned: !!verificationId,
+          verificationIdStored: !!storedId,
+          idsMatch: verificationId === storedId,
+          verificationIdSuffix: verificationId ? verificationId.slice(-6) : null,
+          storedIdSuffix: storedId ? storedId.slice(-6) : null,
+        });
+        
         if (!verificationId || !storedId || storedId !== verificationId) {
+          authLogger?.error("phone/verification_id_mismatch", {
+            verificationIdReturned: !!verificationId,
+            verificationIdStored: !!storedId,
+            idsMatch: verificationId === storedId,
+          });
           return {
             success: false,
             error: {
@@ -105,20 +141,38 @@ export function usePhoneSubmission(
           };
         }
         
+        authLogger?.info("phone/submit_success", {
+          verificationIdSuffix: verificationId.slice(-6),
+        });
+
         resendTimer.start();
         return { success: true };
       } catch (error) {
+        authLogger?.error("phone/submit_error", {
+          errorCode: (error as any)?.code,
+          errorMessage: (error as any)?.message,
+        });
         return handleSubmissionError(error);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited]
+    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited, authLogger]
   );
 
   const resend = useCallback(
     async (formattedPhone: string): Promise<PhoneSubmissionResult> => {
+      authLogger?.info("phone/resend_start", {
+        phoneNumber: maskPhoneNumber(formattedPhone),
+        resendDisabled: resendTimer.isDisabled,
+        isSubmitting,
+        isRateLimited,
+      });
+
       if (resendTimer.isDisabled || isSubmitting || isRateLimited) {
+        authLogger?.warn("phone/resend_blocked", {
+          reason: isRateLimited ? "rate_limited" : resendTimer.isDisabled ? "resend_disabled" : "already_submitting",
+        });
         return {
           success: false,
           error: {
@@ -133,6 +187,9 @@ export function usePhoneSubmission(
       }
 
       if (!recaptchaManager.isReady) {
+        authLogger?.warn("phone/resend_blocked", {
+          reason: "recaptcha_not_ready",
+        });
         return {
           success: false,
           error: {
@@ -143,6 +200,9 @@ export function usePhoneSubmission(
       }
 
       if (!formattedPhone) {
+        authLogger?.error("phone/resend_error", {
+          reason: "phone_number_missing",
+        });
         return {
           success: false,
           error: {
@@ -156,6 +216,10 @@ export function usePhoneSubmission(
       setIsSubmitting(true);
 
       try {
+        authLogger?.info("phone/resend_clear_recaptcha", {
+          action: "clearing_recaptcha_and_verification_id",
+        });
+
         phoneAuth.clearRecaptcha?.();
 
         useAuthStore.getState().setState({
@@ -168,13 +232,36 @@ export function usePhoneSubmission(
         const waitTime = isRunningInLiff()
           ? PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_LIFF
           : PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_BROWSER;
+
+        authLogger?.info("phone/resend_wait", {
+          waitTimeMs: waitTime,
+          isLiff: isRunningInLiff(),
+        });
+
         await new Promise((resolve) => setTimeout(resolve, waitTime));
+
+        authLogger?.info("phone/resend_verification_call", {
+          phoneNumber: maskPhoneNumber(formattedPhone),
+        });
 
         const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
         
         const storedId = useAuthStore.getState().phoneAuth.verificationId;
         
+        authLogger?.info("phone/resend_verification_result", {
+          verificationIdReturned: !!verificationId,
+          verificationIdStored: !!storedId,
+          idsMatch: verificationId === storedId,
+          verificationIdSuffix: verificationId ? verificationId.slice(-6) : null,
+          storedIdSuffix: storedId ? storedId.slice(-6) : null,
+        });
+        
         if (!verificationId || !storedId || storedId !== verificationId) {
+          authLogger?.error("phone/resend_verification_id_mismatch", {
+            verificationIdReturned: !!verificationId,
+            verificationIdStored: !!storedId,
+            idsMatch: verificationId === storedId,
+          });
           return {
             success: false,
             error: {
@@ -184,6 +271,10 @@ export function usePhoneSubmission(
           };
         }
         
+        authLogger?.info("phone/resend_success", {
+          verificationIdSuffix: verificationId.slice(-6),
+        });
+
         resendTimer.start();
 
         if (!isRunningInLiff()) {
@@ -192,13 +283,17 @@ export function usePhoneSubmission(
 
         return { success: true, message: "認証コードを再送信しました" };
       } catch (error) {
+        authLogger?.error("phone/resend_error", {
+          errorCode: (error as any)?.code,
+          errorMessage: (error as any)?.message,
+        });
         logger.error("再送信エラー:", { error });
         return handleSubmissionError(error);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited]
+    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited, authLogger]
   );
 
   return {

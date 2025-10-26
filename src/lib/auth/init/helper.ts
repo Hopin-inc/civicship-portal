@@ -9,6 +9,7 @@ import { LiffService } from "@/lib/auth/service/liff-service";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { getUidSuffix } from "@/lib/logging/client/utils";
 
 /**
  * 1️⃣ 認証前の初期状態を設定
@@ -74,8 +75,21 @@ export async function establishSessionFromFirebaseUser(
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
 ): Promise<boolean> {
   try {
+    logger.info("[establishSession] Starting session establishment", {
+      component: "helper",
+      uidSuffix: getUidSuffix(firebaseUser.uid),
+    });
+
     const idToken = await firebaseUser.getIdToken(true);
     const tokenResult = await firebaseUser.getIdTokenResult();
+
+    logger.info("[establishSession] Token obtained", {
+      component: "helper",
+      uidSuffix: getUidSuffix(firebaseUser.uid),
+      signInProvider: tokenResult.signInProvider,
+      tenantPresent: !!(tokenResult.claims.firebase as any)?.tenant,
+      expiresAt: tokenResult.expirationTime,
+    });
 
     await createSession(idToken);
     TokenManager.saveLineAuthFlag(true);
@@ -88,13 +102,28 @@ export async function establishSessionFromFirebaseUser(
       },
     });
 
+    logger.info("[establishSession] Session established successfully", {
+      component: "helper",
+      uidSuffix: getUidSuffix(firebaseUser.uid),
+    });
+
     return true;
-  } catch {
+  } catch (error) {
+    logger.error("[establishSession] Session establishment failed", {
+      component: "helper",
+      error: error instanceof Error ? error.message : String(error),
+    });
     return false;
   }
 }
 
 async function createSession(idToken: string) {
+  logger.info("[createSession] Starting session creation", {
+    component: "helper",
+    isSecureContext: typeof window !== "undefined" ? window.isSecureContext : null,
+    origin: typeof window !== "undefined" ? window.location.origin : null,
+  });
+
   const res = await fetch("/api/sessionLogin", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -104,10 +133,19 @@ async function createSession(idToken: string) {
 
   if (!res.ok) {
     const errText = await res.text();
+    logger.error("[createSession] Session creation failed", {
+      component: "helper",
+      status: res.status,
+      errorText: errText.substring(0, 200),
+    });
     console.error("createSession failed", res.status, errText);
     throw new Error(`Failed to create session cookie (${res.status})`);
   }
 
+  logger.info("[createSession] Session cookie successfully created", {
+    component: "helper",
+    status: res.status,
+  });
   console.info("✅ Session cookie successfully created (via proxy)");
   return true;
 }
@@ -120,7 +158,21 @@ export async function restoreUserSession(
   firebaseUser: User,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
 ) {
+  logger.info("[restoreUserSession] Starting user session restoration", {
+    component: "helper",
+    uidSuffix: getUidSuffix(firebaseUser.uid),
+    hasSsrUser: !!ssrCurrentUser,
+  });
+
   const tokenResult = await firebaseUser.getIdTokenResult();
+  
+  logger.info("[restoreUserSession] Token info", {
+    component: "helper",
+    uidSuffix: getUidSuffix(firebaseUser.uid),
+    signInProvider: tokenResult.signInProvider,
+    tenantPresent: !!(tokenResult.claims.firebase as any)?.tenant,
+  });
+
   useAuthStore.getState().setState({
     firebaseUser,
     lineTokens: {
@@ -131,15 +183,33 @@ export async function restoreUserSession(
   });
 
   if (ssrCurrentUser) {
+    logger.info("[restoreUserSession] Using SSR user", {
+      component: "helper",
+      userId: getUidSuffix(ssrCurrentUser.id),
+    });
     setState({ currentUser: ssrCurrentUser });
     return ssrCurrentUser;
   }
 
+  logger.info("[restoreUserSession] Fetching user from client", {
+    component: "helper",
+    uidSuffix: getUidSuffix(firebaseUser.uid),
+  });
+
   const user = await fetchCurrentUserClient(firebaseUser);
   if (user) {
+    logger.info("[restoreUserSession] User fetched successfully", {
+      component: "helper",
+      userId: getUidSuffix(user.id),
+    });
     setState({ currentUser: user });
     return user;
   }
+
+  logger.warn("[restoreUserSession] No user found", {
+    component: "helper",
+    uidSuffix: getUidSuffix(firebaseUser.uid),
+  });
 
   return null;
 }
@@ -183,6 +253,13 @@ export function finalizeAuthState(
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
   authStateManager: AuthStateManager,
 ) {
+  logger.info("[finalizeAuthState] Finalizing auth state", {
+    component: "helper",
+    newState,
+    hasUser: !!user,
+    userId: user ? getUidSuffix(user.id) : null,
+  });
+
   setState({
     isAuthenticating: false,
     isAuthInProgress: false,
