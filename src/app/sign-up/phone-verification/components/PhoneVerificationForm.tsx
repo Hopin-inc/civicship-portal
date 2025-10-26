@@ -83,9 +83,6 @@ export function PhoneVerificationForm() {
       if (result.message) {
         toast.success(result.message);
       }
-      if (result.redirectPath) {
-        router.push(result.redirectPath);
-      }
     } else if (result.error) {
       toast.error(result.error.message);
     }
