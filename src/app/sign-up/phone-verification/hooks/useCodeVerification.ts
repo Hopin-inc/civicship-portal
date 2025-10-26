@@ -52,10 +52,17 @@ export function useCodeVerification(
       setIsVerifying(true);
 
       try {
+        console.log("[useCodeVerification] Starting phone code verification");
         const result = await phoneAuth.verifyPhoneCode(verificationCode);
+        console.log("[useCodeVerification] verifyPhoneCode result:", {
+          success: result.success,
+          hasPhoneUid: !!result.phoneUid,
+          phoneUidPrefix: result.phoneUid?.substring(0, 8),
+        });
         const setAuthState = useAuthStore.getState().setState;
 
         if (!result.success || !result.phoneUid) {
+          console.log("[useCodeVerification] Early return: invalid code or missing phoneUid");
           return {
             success: false,
             error: {
@@ -65,6 +72,7 @@ export function useCodeVerification(
           };
         }
 
+        console.log("[useCodeVerification] Calling identityCheckPhoneUser mutation");
         const { data } = await identityCheckPhoneUser({
           variables: {
             input: {
@@ -74,6 +82,12 @@ export function useCodeVerification(
         });
 
         const status = data?.identityCheckPhoneUser?.status;
+        console.log("[useCodeVerification] identityCheckPhoneUser response:", {
+          status,
+          hasData: !!data,
+          hasUser: !!data?.identityCheckPhoneUser?.user,
+          hasMembership: !!data?.identityCheckPhoneUser?.membership,
+        });
 
         if (!status) {
           return {
@@ -87,6 +101,7 @@ export function useCodeVerification(
 
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
+            console.log("[useCodeVerification] Status: NEW_USER, redirecting to /sign-up");
             return {
               success: true,
               redirectPath: `/sign-up${nextParam}`,
@@ -94,11 +109,13 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
+            console.log("[useCodeVerification] Status: EXISTING_SAME_COMMUNITY, setting user_registered");
             setAuthState({ authenticationState: "user_registered" });
             const homeRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
             );
+            console.log("[useCodeVerification] Redirecting to:", homeRedirectPath || "/");
             return {
               success: true,
               redirectPath: homeRedirectPath || "/",
@@ -106,12 +123,14 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
+            console.log("[useCodeVerification] Status: EXISTING_DIFFERENT_COMMUNITY, updating auth state");
             updateAuthState();
             setAuthState({ authenticationState: "user_registered" });
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
             );
+            console.log("[useCodeVerification] Redirecting to:", crossCommunityRedirectPath || "/");
             return {
               success: true,
               redirectPath: crossCommunityRedirectPath || "/",
@@ -128,6 +147,7 @@ export function useCodeVerification(
             };
         }
       } catch (error) {
+        console.error("[useCodeVerification] Error during verification:", error);
         return {
           success: false,
           error: {

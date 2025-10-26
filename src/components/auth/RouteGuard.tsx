@@ -55,9 +55,17 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       decodeURIComponentWithType(nextParam),
     );
 
+    console.log("[RouteGuard] Redirect check:", {
+      pathname,
+      authState: authState.authenticationState,
+      redirectPath,
+      willRedirect: !!(redirectPath && redirectPath !== pathWithParams),
+    });
+
     if (redirectPath && redirectPath !== pathWithParams) {
       // ✅ 二重リダイレクト防止
       if (redirectedRef.current !== redirectPath) {
+        console.log("[RouteGuard] Redirecting from", pathWithParams, "to", redirectPath);
         redirectedRef.current = redirectPath; // ← ② 記録
         setIsReadyToRender(false);
         router.replace(redirectPath);
