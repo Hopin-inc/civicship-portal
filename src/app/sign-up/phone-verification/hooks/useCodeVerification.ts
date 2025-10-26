@@ -25,7 +25,7 @@ interface CodeVerificationResult {
 export function useCodeVerification(
   phoneAuth: { verifyPhoneCode: (verificationCode: string) => Promise<boolean> },
   nextParam: string,
-  updateAuthState: () => void
+  updateAuthState: () => Promise<any>
 ) {
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -49,15 +49,19 @@ export function useCodeVerification(
       }
 
       setIsVerifying(true);
+      
+      const authStoreState = useAuthStore.getState();
+      const setAuthState = authStoreState.setState;
+      
+      setAuthState({ isAuthInProgress: true });
 
       try {
         const success = await phoneAuth.verifyPhoneCode(verificationCode);
         
-        const authStoreState = useAuthStore.getState();
-        const phoneUid = authStoreState.phoneAuth.phoneUid;
-        const setAuthState = authStoreState.setState;
+        const phoneUid = useAuthStore.getState().phoneAuth.phoneUid;
 
         if (!success || !phoneUid) {
+          setAuthState({ isAuthInProgress: false });
           return {
             success: false,
             error: {
@@ -78,6 +82,7 @@ export function useCodeVerification(
         const status = data?.identityCheckPhoneUser?.status;
 
         if (!status) {
+          setAuthState({ isAuthInProgress: false });
           return {
             success: false,
             error: {
@@ -89,6 +94,7 @@ export function useCodeVerification(
 
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
+            setAuthState({ isAuthInProgress: false });
             return {
               success: true,
               redirectPath: `/sign-up${nextParam}`,
@@ -96,7 +102,8 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
-            setAuthState({ authenticationState: "user_registered" });
+            await updateAuthState();
+            setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             const homeRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
@@ -108,8 +115,8 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
-            updateAuthState();
-            setAuthState({ authenticationState: "user_registered" });
+            await updateAuthState();
+            setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
@@ -121,6 +128,7 @@ export function useCodeVerification(
             };
 
           default:
+            setAuthState({ isAuthInProgress: false });
             return {
               success: false,
               error: {
@@ -130,6 +138,7 @@ export function useCodeVerification(
             };
         }
       } catch (error) {
+        setAuthState({ isAuthInProgress: false });
         return {
           success: false,
           error: {
@@ -138,7 +147,6 @@ export function useCodeVerification(
           },
         };
       } finally {
-        // エラー時も含めて、必ずisVerifyingをfalseに戻す
         setIsVerifying(false);
       }
     },
