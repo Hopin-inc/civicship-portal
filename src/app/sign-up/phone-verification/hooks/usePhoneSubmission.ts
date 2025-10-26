@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
 import { categorizeFirebaseError } from "@/lib/auth/core/firebase-config";
 import { isRunningInLiff } from "@/lib/auth/core/environment-detector";
 import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
@@ -19,7 +18,10 @@ interface PhoneSubmissionResult {
 }
 
 export function usePhoneSubmission(
-  phoneAuth: PhoneAuthService,
+  phoneAuth: {
+    startPhoneVerification: (phoneNumber: string) => Promise<string | null>;
+    clearRecaptcha?: () => void;
+  },
   recaptchaManager: ReturnType<typeof useRecaptchaManager>,
   resendTimer: Pick<ReturnType<typeof useResendTimer>, "isDisabled" | "start">
 ) {

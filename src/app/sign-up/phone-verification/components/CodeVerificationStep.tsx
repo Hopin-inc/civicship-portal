@@ -5,7 +5,6 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { Button } from "@/components/ui/button";
 import { logger } from "@/lib/logging";
 import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
-import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
 
 interface CodeVerificationStepProps {
   verificationCode: string;
@@ -20,7 +19,7 @@ interface CodeVerificationStepProps {
   isPhoneSubmitting: boolean;
   showRecaptcha: boolean;
   recaptchaContainerRef: React.RefObject<HTMLDivElement>;
-  phoneAuth: PhoneAuthService;
+  phoneAuth: { clearRecaptcha: () => void };
 }
 
 export function CodeVerificationStep({
