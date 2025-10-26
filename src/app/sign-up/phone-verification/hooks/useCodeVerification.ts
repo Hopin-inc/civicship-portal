@@ -53,12 +53,23 @@ export function useCodeVerification(
 
       try {
         console.log("[useCodeVerification] Starting phone code verification");
+        console.log("[useCodeVerification] phoneAuth.verifyPhoneCode type:", typeof phoneAuth.verifyPhoneCode);
         const result = await phoneAuth.verifyPhoneCode(verificationCode);
+        console.log("[useCodeVerification] verifyPhoneCode raw result:", result);
+        console.log("[useCodeVerification] verifyPhoneCode result type:", typeof result);
         console.log("[useCodeVerification] verifyPhoneCode result:", {
           success: result.success,
           hasPhoneUid: !!result.phoneUid,
           phoneUidPrefix: result.phoneUid?.substring(0, 8),
         });
+        
+        const authStoreState = useAuthStore.getState();
+        console.log("[useCodeVerification] Auth store state after verifyPhoneCode:", {
+          authenticationState: authStoreState.authenticationState,
+          phoneAuthPhoneUid: authStoreState.phoneAuth.phoneUid,
+          phoneAuthIsVerified: authStoreState.phoneAuth.isVerified,
+        });
+        
         const setAuthState = useAuthStore.getState().setState;
 
         if (!result.success || !result.phoneUid) {
@@ -72,14 +83,25 @@ export function useCodeVerification(
           };
         }
 
-        console.log("[useCodeVerification] Calling identityCheckPhoneUser mutation");
-        const { data } = await identityCheckPhoneUser({
-          variables: {
-            input: {
-              phoneUid: result.phoneUid,
+        console.log("[useCodeVerification] Calling identityCheckPhoneUser mutation with phoneUid:", result.phoneUid?.substring(0, 8) + "...");
+        console.log("[useCodeVerification] identityCheckPhoneUser function type:", typeof identityCheckPhoneUser);
+        
+        let data;
+        try {
+          const mutationResult = await identityCheckPhoneUser({
+            variables: {
+              input: {
+                phoneUid: result.phoneUid,
+              },
             },
-          },
-        });
+          });
+          data = mutationResult.data;
+          console.log("[useCodeVerification] identityCheckPhoneUser mutation completed successfully");
+          console.log("[useCodeVerification] Raw mutation result:", mutationResult);
+        } catch (mutationError) {
+          console.error("[useCodeVerification] identityCheckPhoneUser mutation failed:", mutationError);
+          throw mutationError;
+        }
 
         const status = data?.identityCheckPhoneUser?.status;
         console.log("[useCodeVerification] identityCheckPhoneUser response:", {
@@ -87,6 +109,7 @@ export function useCodeVerification(
           hasData: !!data,
           hasUser: !!data?.identityCheckPhoneUser?.user,
           hasMembership: !!data?.identityCheckPhoneUser?.membership,
+          fullData: data,
         });
 
         if (!status) {
