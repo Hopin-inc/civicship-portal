@@ -58,7 +58,7 @@ export class PhoneAuthService {
         try {
           (window as any).grecaptcha.reset();
         } catch (e) {
-          logger.info("reCAPTCHA reset (expected)", {
+          console.info("reCAPTCHA reset (expected)", {
             authType: "phone",
             error: e instanceof Error ? e.message : String(e),
             component: "PhoneAuthService",
@@ -68,7 +68,7 @@ export class PhoneAuthService {
       this.recaptchaContainerElement = null;
       this.isRecaptchaRendered = false;
     } catch (e) {
-      logger.info("Error clearing reCAPTCHA", {
+      console.info("Error clearing reCAPTCHA", {
         authType: "phone",
         error: e instanceof Error ? e.message : String(e),
         component: "PhoneAuthService",
@@ -78,7 +78,7 @@ export class PhoneAuthService {
 
   public async startPhoneVerification(phoneNumber: string): Promise<string | null> {
     const flowId = `phone-${Date.now()}`;
-    logger.debug("[PhoneAuthService] startPhoneVerification:enter", {
+    console.debug("[PhoneAuthService] startPhoneVerification:enter", {
       flowId,
       env: isRunningInLiff() ? "liff" : "browser",
       hasThis: !!this,
@@ -88,28 +88,28 @@ export class PhoneAuthService {
     });
 
     try {
-      logger.debug("[PhoneAuthService] Clearing recaptcha", { flowId });
+      console.debug("[PhoneAuthService] Clearing recaptcha", { flowId });
       this.clearRecaptcha();
       
-      logger.debug("[PhoneAuthService] Generating container ID", { flowId });
+      console.debug("[PhoneAuthService] Generating container ID", { flowId });
       this.generateNewContainerId();
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const baseContainer = document.getElementById("recaptcha-container");
-      logger.debug("[PhoneAuthService] Base container check", { 
+      console.debug("[PhoneAuthService] Base container check", { 
         flowId,
         exists: !!baseContainer 
       });
       
       if (!baseContainer) {
-        logger.error("[PhoneAuthService] Base container not found", { flowId });
+        console.error("[PhoneAuthService] Base container not found", { flowId });
         throw new Error("Base reCAPTCHA container element not found");
       }
 
       const newContainer = document.createElement("div");
       newContainer.id = this.recaptchaContainerId;
       baseContainer.appendChild(newContainer);
-      logger.debug("[PhoneAuthService] Container appended", { 
+      console.debug("[PhoneAuthService] Container appended", { 
         flowId,
         containerId: this.recaptchaContainerId 
       });
@@ -117,7 +117,7 @@ export class PhoneAuthService {
       this.recaptchaContainerElement = newContainer;
 
       const recaptchaSize = isRunningInLiff() ? "normal" : "invisible";
-      logger.debug("[PhoneAuthService] Creating RecaptchaVerifier", { 
+      console.debug("[PhoneAuthService] Creating RecaptchaVerifier", { 
         flowId,
         size: recaptchaSize 
       });
@@ -125,7 +125,7 @@ export class PhoneAuthService {
       this.recaptchaVerifier = new RecaptchaVerifier(getPhoneAuth(), this.recaptchaContainerId, {
         size: recaptchaSize,
         callback: () => {
-          logger.debug("[PhoneAuthService] reCAPTCHA completed", {
+          console.debug("[PhoneAuthService] reCAPTCHA completed", {
             flowId,
             authType: "phone",
             component: "PhoneAuthService",
@@ -136,16 +136,16 @@ export class PhoneAuthService {
           }
         },
         "expired-callback": () => {
-          logger.info("[PhoneAuthService] reCAPTCHA expired", { flowId });
+          console.info("[PhoneAuthService] reCAPTCHA expired", { flowId });
           this.clearRecaptcha();
         },
       });
 
-      logger.debug("[PhoneAuthService] Rendering recaptcha", { flowId });
+      console.debug("[PhoneAuthService] Rendering recaptcha", { flowId });
       await this.recaptchaVerifier.render();
-      logger.debug("[PhoneAuthService] Recaptcha rendered", { flowId });
+      console.debug("[PhoneAuthService] Recaptcha rendered", { flowId });
 
-      logger.debug("[PhoneAuthService] Calling signInWithPhoneNumber", { flowId });
+      console.debug("[PhoneAuthService] Calling signInWithPhoneNumber", { flowId });
       const confirmationResult = await signInWithPhoneNumber(
         getPhoneAuth(),
         phoneNumber,
@@ -153,14 +153,14 @@ export class PhoneAuthService {
       );
 
       const verificationId = confirmationResult.verificationId;
-      logger.info("[PhoneAuthService] signInWithPhoneNumber success", { 
+      console.info("[PhoneAuthService] signInWithPhoneNumber success", { 
         flowId,
         hasVerificationId: !!verificationId 
       });
 
       useAuthStore.getState().setPhoneAuth({ verificationId });
       const storedId = useAuthStore.getState().phoneAuth.verificationId;
-      logger.debug("[PhoneAuthService] VerificationId stored", { 
+      console.debug("[PhoneAuthService] VerificationId stored", { 
         flowId,
         stored: !!storedId,
         match: storedId === verificationId
@@ -168,7 +168,7 @@ export class PhoneAuthService {
 
       return verificationId;
     } catch (error) {
-      logger.error("[PhoneAuthService] Phone verification start failed", {
+      console.error("[PhoneAuthService] Phone verification start failed", {
         flowId,
         error: error instanceof Error ? error.message : String(error),
         errorCode: (error as any)?.code,
@@ -186,7 +186,7 @@ export class PhoneAuthService {
   }> {
     const phoneAuthState = useAuthStore.getState().phoneAuth;
     if (!phoneAuthState.verificationId) {
-      logger.error("Missing verificationId", { component: "PhoneAuthService" });
+      console.error("Missing verificationId", { component: "PhoneAuthService" });
       return { success: false };
     }
 
@@ -216,7 +216,7 @@ export class PhoneAuthService {
         },
       };
     } catch (error) {
-      logger.error("verifyPhoneCode failed", {
+      console.error("verifyPhoneCode failed", {
         error: error instanceof Error ? error.message : String(error),
         component: "PhoneAuthService",
       });

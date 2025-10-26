@@ -13,7 +13,6 @@ import { usePhoneSubmission } from "../hooks/usePhoneSubmission";
 import { useCodeVerification } from "../hooks/useCodeVerification";
 import { PhoneInputStep } from "./PhoneInputStep";
 import { CodeVerificationStep } from "./CodeVerificationStep";
-import { logger } from "@/lib/logging";
 
 const generateFlowId = () => `phone-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
@@ -35,7 +34,7 @@ export function PhoneVerificationForm() {
       startPhoneVerification: (phoneNumber: string) => {
         const flowId = flowIdRef.current || generateFlowId();
         flowIdRef.current = flowId;
-        logger.debug("[PhoneForm] startPhoneVerification wrapper called", { 
+        console.log("[PhoneForm] startPhoneVerification wrapper called", { 
           flowId,
           hasPhoneAuth: !!phoneAuth,
           hasFn: typeof phoneAuth.startPhoneVerification === 'function'
@@ -54,7 +53,7 @@ export function PhoneVerificationForm() {
     { 
       verifyPhoneCode: (code: string) => {
         const flowId = flowIdRef.current;
-        logger.debug("[PhoneForm] verifyPhoneCode wrapper called", { flowId });
+        console.log("[PhoneForm] verifyPhoneCode wrapper called", { flowId });
         return phoneAuth.verifyPhoneCode(code);
       }
     },
@@ -75,7 +74,7 @@ export function PhoneVerificationForm() {
 
     const flowId = generateFlowId();
     flowIdRef.current = flowId;
-    logger.info("[PhoneForm] Phone submit started", { 
+    console.log("[PhoneForm] Phone submit started", { 
       flowId,
       phoneMasked: formattedPhone.replace(/\d(?=\d{4})/g, '*')
     });
@@ -83,10 +82,10 @@ export function PhoneVerificationForm() {
     const result = await phoneSubmission.submit(formattedPhone);
 
     if (result.success) {
-      logger.info("[PhoneForm] Phone submit success, moving to code step", { flowId });
+      console.log("[PhoneForm] Phone submit success, moving to code step", { flowId });
       setStep("code");
     } else if (result.error) {
-      logger.error("[PhoneForm] Phone submit failed", { 
+      console.error("[PhoneForm] Phone submit failed", { 
         flowId, 
         errorType: result.error.type,
         errorMessage: result.error.message
@@ -111,12 +110,12 @@ export function PhoneVerificationForm() {
     e.preventDefault();
 
     const flowId = flowIdRef.current;
-    logger.info("[PhoneForm] Code submit started", { flowId });
+    console.log("[PhoneForm] Code submit started", { flowId });
 
     const result = await codeVerification.verify(verificationCode);
 
     if (result.success) {
-      logger.info("[PhoneForm] Code verification success", { 
+      console.log("[PhoneForm] Code verification success", { 
         flowId,
         hasRedirectPath: !!result.redirectPath,
         redirectPath: result.redirectPath
@@ -125,11 +124,11 @@ export function PhoneVerificationForm() {
         toast.success(result.message);
       }
       if (result.redirectPath) {
-        logger.info("[PhoneForm] Calling router.push", { flowId, to: result.redirectPath });
+        console.log("[PhoneForm] Calling router.push", { flowId, to: result.redirectPath });
         router.push(result.redirectPath);
       }
     } else if (result.error) {
-      logger.error("[PhoneForm] Code verification failed", { 
+      console.error("[PhoneForm] Code verification failed", { 
         flowId,
         errorType: result.error.type,
         errorMessage: result.error.message

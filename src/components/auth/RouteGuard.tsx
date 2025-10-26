@@ -7,7 +7,6 @@ import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { logger } from "@/lib/logging";
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -30,7 +29,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     const effectRunId = ++effectRunCountRef.current;
     const flowId = `routeguard-${Date.now()}-${effectRunId}`;
     
-    logger.debug("[RouteGuard] Effect triggered", {
+    console.debug("[RouteGuard] Effect triggered", {
       flowId,
       effectRunId,
       pathname,
@@ -41,7 +40,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     });
 
     if (authState.isAuthenticating || authState.isAuthInProgress) {
-      logger.debug("[RouteGuard] Gated by isAuthenticating/isAuthInProgress", { 
+      console.debug("[RouteGuard] Gated by isAuthenticating/isAuthInProgress", { 
         flowId,
         isAuthenticating: authState.isAuthenticating,
         isAuthInProgress: authState.isAuthInProgress
@@ -51,7 +50,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     }
 
     if (["loading", "authenticating"].includes(authState.authenticationState)) {
-      logger.debug("[RouteGuard] Gated by loading/authenticating state", { 
+      console.debug("[RouteGuard] Gated by loading/authenticating state", { 
         flowId,
         state: authState.authenticationState
       });
@@ -64,7 +63,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       const isReturnFromLineAuth =
         urlParams.has("code") && urlParams.has("state") && urlParams.has("liffClientId");
       if (isReturnFromLineAuth) {
-        logger.debug("[RouteGuard] Gated by LINE auth return", { flowId });
+        console.debug("[RouteGuard] Gated by LINE auth return", { flowId });
         setIsReadyToRender(false);
         return;
       }
@@ -72,7 +71,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     const pathWithParams = searchParams.size ? `${pathname}?${searchParams.toString()}` : pathname;
     
-    logger.debug("[RouteGuard] Computing redirect path", {
+    console.debug("[RouteGuard] Computing redirect path", {
       flowId,
       pathWithParams,
       nextParamDecoded: nextParam ? decodeURIComponent(nextParam) : null
@@ -83,7 +82,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       decodeURIComponentWithType(nextParam),
     );
 
-    logger.info("[RouteGuard] Redirect path computed", {
+    console.info("[RouteGuard] Redirect path computed", {
       flowId,
       from: pathWithParams,
       to: redirectPath,
@@ -92,7 +91,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     if (redirectPath && redirectPath !== pathWithParams) {
       if (redirectedRef.current !== redirectPath) {
-        logger.info("[RouteGuard] Executing router.replace", { 
+        console.info("[RouteGuard] Executing router.replace", { 
           flowId,
           to: redirectPath,
           previousRedirect: redirectedRef.current
@@ -101,13 +100,13 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         setIsReadyToRender(false);
         router.replace(redirectPath);
       } else {
-        logger.debug("[RouteGuard] Skipping duplicate redirect", { 
+        console.debug("[RouteGuard] Skipping duplicate redirect", { 
           flowId,
           redirectPath
         });
       }
     } else {
-      logger.debug("[RouteGuard] Ready to render", { flowId, pathname });
+      console.debug("[RouteGuard] Ready to render", { flowId, pathname });
       redirectedRef.current = null;
       setIsReadyToRender(true);
     }

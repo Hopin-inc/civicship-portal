@@ -44,14 +44,14 @@ export function useCodeVerification(
       const flowId = flowIdRef?.current || `verify-${Date.now()}`;
       const authStoreState = useAuthStore.getState();
       
-      logger.info("[useCodeVerification] verify:start", { 
+      console.info("[useCodeVerification] verify:start", { 
         flowId,
         isVerifying,
         isAuthInProgress: authStoreState.state.isAuthInProgress
       });
 
       if (isVerifying) {
-        logger.warn("[useCodeVerification] Already verifying", { flowId });
+        console.warn("[useCodeVerification] Already verifying", { flowId });
         return {
           success: false,
           error: {
@@ -65,22 +65,22 @@ export function useCodeVerification(
       
       const setAuthState = authStoreState.setState;
       
-      logger.debug("[useCodeVerification] Setting isAuthInProgress=true", { flowId });
+      console.debug("[useCodeVerification] Setting isAuthInProgress=true", { flowId });
       setAuthState({ isAuthInProgress: true });
 
       try {
-        logger.debug("[useCodeVerification] Calling verifyPhoneCode", { flowId });
+        console.debug("[useCodeVerification] Calling verifyPhoneCode", { flowId });
         const success = await phoneAuth.verifyPhoneCode(verificationCode);
         
         const phoneUid = useAuthStore.getState().phoneAuth.phoneUid;
-        logger.debug("[useCodeVerification] verifyPhoneCode result", { 
+        console.debug("[useCodeVerification] verifyPhoneCode result", { 
           flowId,
           success,
           hasPhoneUid: !!phoneUid
         });
 
         if (!success || !phoneUid) {
-          logger.error("[useCodeVerification] Invalid code or missing phoneUid", { flowId });
+          console.error("[useCodeVerification] Invalid code or missing phoneUid", { flowId });
           setAuthState({ isAuthInProgress: false });
           return {
             success: false,
@@ -91,7 +91,7 @@ export function useCodeVerification(
           };
         }
 
-        logger.debug("[useCodeVerification] Calling identityCheckPhoneUser", { flowId });
+        console.debug("[useCodeVerification] Calling identityCheckPhoneUser", { flowId });
         const { data } = await identityCheckPhoneUser({
           variables: {
             input: {
@@ -101,13 +101,13 @@ export function useCodeVerification(
         });
 
         const status = data?.identityCheckPhoneUser?.status;
-        logger.info("[useCodeVerification] identityCheckPhoneUser result", { 
+        console.info("[useCodeVerification] identityCheckPhoneUser result", { 
           flowId,
           status
         });
 
         if (!status) {
-          logger.error("[useCodeVerification] Status fetch failed", { flowId });
+          console.error("[useCodeVerification] Status fetch failed", { flowId });
           setAuthState({ isAuthInProgress: false });
           return {
             success: false,
@@ -120,7 +120,7 @@ export function useCodeVerification(
 
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
-            logger.info("[useCodeVerification] NewUser - no updateAuthState needed", { flowId });
+            console.info("[useCodeVerification] NewUser - no updateAuthState needed", { flowId });
             setAuthState({ isAuthInProgress: false });
             return {
               success: true,
@@ -129,17 +129,17 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
-            logger.info("[useCodeVerification] ExistingSameCommunity - calling updateAuthState", { flowId });
+            console.info("[useCodeVerification] ExistingSameCommunity - calling updateAuthState", { flowId });
             const updateStartTime = Date.now();
             await updateAuthState();
             const updateDuration = Date.now() - updateStartTime;
-            logger.info("[useCodeVerification] updateAuthState completed", { 
+            console.info("[useCodeVerification] updateAuthState completed", { 
               flowId,
               durationMs: updateDuration
             });
             
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
-            logger.debug("[useCodeVerification] Computing redirect path", { 
+            console.debug("[useCodeVerification] Computing redirect path", { 
               flowId,
               nextParam
             });
@@ -147,7 +147,7 @@ export function useCodeVerification(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
             );
-            logger.info("[useCodeVerification] Redirect path computed", { 
+            console.info("[useCodeVerification] Redirect path computed", { 
               flowId,
               redirectPath: homeRedirectPath
             });
@@ -158,17 +158,17 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
-            logger.info("[useCodeVerification] ExistingDifferentCommunity - calling updateAuthState", { flowId });
+            console.info("[useCodeVerification] ExistingDifferentCommunity - calling updateAuthState", { flowId });
             const updateStartTime2 = Date.now();
             await updateAuthState();
             const updateDuration2 = Date.now() - updateStartTime2;
-            logger.info("[useCodeVerification] updateAuthState completed", { 
+            console.info("[useCodeVerification] updateAuthState completed", { 
               flowId,
               durationMs: updateDuration2
             });
             
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
-            logger.debug("[useCodeVerification] Computing redirect path", { 
+            console.debug("[useCodeVerification] Computing redirect path", { 
               flowId,
               nextParam
             });
@@ -176,7 +176,7 @@ export function useCodeVerification(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
             );
-            logger.info("[useCodeVerification] Redirect path computed", { 
+            console.info("[useCodeVerification] Redirect path computed", { 
               flowId,
               redirectPath: crossCommunityRedirectPath
             });
@@ -187,7 +187,7 @@ export function useCodeVerification(
             };
 
           default:
-            logger.error("[useCodeVerification] Unknown status", { flowId, status });
+            console.error("[useCodeVerification] Unknown status", { flowId, status });
             setAuthState({ isAuthInProgress: false });
             return {
               success: false,
@@ -198,7 +198,7 @@ export function useCodeVerification(
             };
         }
       } catch (error) {
-        logger.error("[useCodeVerification] Verification failed", { 
+        console.error("[useCodeVerification] Verification failed", { 
           flowId,
           error: error instanceof Error ? error.message : String(error)
         });
@@ -212,7 +212,7 @@ export function useCodeVerification(
         };
       } finally {
         setIsVerifying(false);
-        logger.debug("[useCodeVerification] verify:complete", { flowId });
+        console.debug("[useCodeVerification] verify:complete", { flowId });
       }
     },
     [phoneAuth, identityCheckPhoneUser, authRedirectService, nextParam, updateAuthState, isVerifying, flowIdRef]
