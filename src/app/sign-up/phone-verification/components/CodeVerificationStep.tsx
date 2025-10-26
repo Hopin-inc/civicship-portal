@@ -19,7 +19,7 @@ interface CodeVerificationStepProps {
   isPhoneSubmitting: boolean;
   showRecaptcha: boolean;
   recaptchaContainerRef: React.RefObject<HTMLDivElement>;
-  phoneAuth: { clearRecaptcha: () => void };
+  phoneAuth: { clearRecaptcha?: () => void };
 }
 
 export function CodeVerificationStep({
@@ -41,7 +41,7 @@ export function CodeVerificationStep({
 
   const handleBackToPhone = async () => {
     try {
-      await phoneAuth.clearRecaptcha();
+      await phoneAuth.clearRecaptcha?.();
     } catch (error) {
       logger.error("reCAPTCHAクリアエラー:", { error });
     } finally {
