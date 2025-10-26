@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -13,6 +13,9 @@ import { usePhoneSubmission } from "../hooks/usePhoneSubmission";
 import { useCodeVerification } from "../hooks/useCodeVerification";
 import { PhoneInputStep } from "./PhoneInputStep";
 import { CodeVerificationStep } from "./CodeVerificationStep";
+import { logger } from "@/lib/logging";
+
+const generateFlowId = () => `phone-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -23,12 +26,22 @@ export function PhoneVerificationForm() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<VerificationStep>("phone");
+  const flowIdRef = useRef<string | null>(null);
 
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
   const recaptchaManager = useRecaptchaManager();
   const phoneSubmission = usePhoneSubmission(
     {
-      startPhoneVerification: phoneAuth.startPhoneVerification,
+      startPhoneVerification: (phoneNumber: string) => {
+        const flowId = flowIdRef.current || generateFlowId();
+        flowIdRef.current = flowId;
+        logger.debug("[PhoneForm] startPhoneVerification wrapper called", { 
+          flowId,
+          hasPhoneAuth: !!phoneAuth,
+          hasFn: typeof phoneAuth.startPhoneVerification === 'function'
+        });
+        return phoneAuth.startPhoneVerification(phoneNumber);
+      },
       clearRecaptcha: phoneAuth.clearRecaptcha,
     },
     recaptchaManager,
@@ -38,9 +51,16 @@ export function PhoneVerificationForm() {
     }
   );
   const codeVerification = useCodeVerification(
-    { verifyPhoneCode: phoneAuth.verifyPhoneCode },
+    { 
+      verifyPhoneCode: (code: string) => {
+        const flowId = flowIdRef.current;
+        logger.debug("[PhoneForm] verifyPhoneCode wrapper called", { flowId });
+        return phoneAuth.verifyPhoneCode(code);
+      }
+    },
     nextParam,
-    updateAuthState
+    updateAuthState,
+    flowIdRef
   );
 
   const { isValid: isPhoneValid, formattedPhone } = validatePhoneNumber(phoneNumber);
@@ -53,11 +73,24 @@ export function PhoneVerificationForm() {
       return;
     }
 
+    const flowId = generateFlowId();
+    flowIdRef.current = flowId;
+    logger.info("[PhoneForm] Phone submit started", { 
+      flowId,
+      phoneMasked: formattedPhone.replace(/\d(?=\d{4})/g, '*')
+    });
+
     const result = await phoneSubmission.submit(formattedPhone);
 
     if (result.success) {
+      logger.info("[PhoneForm] Phone submit success, moving to code step", { flowId });
       setStep("code");
     } else if (result.error) {
+      logger.error("[PhoneForm] Phone submit failed", { 
+        flowId, 
+        errorType: result.error.type,
+        errorMessage: result.error.message
+      });
       toast.error(result.error.message);
     }
   };
@@ -77,16 +110,30 @@ export function PhoneVerificationForm() {
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const flowId = flowIdRef.current;
+    logger.info("[PhoneForm] Code submit started", { flowId });
+
     const result = await codeVerification.verify(verificationCode);
 
     if (result.success) {
+      logger.info("[PhoneForm] Code verification success", { 
+        flowId,
+        hasRedirectPath: !!result.redirectPath,
+        redirectPath: result.redirectPath
+      });
       if (result.message) {
         toast.success(result.message);
       }
       if (result.redirectPath) {
+        logger.info("[PhoneForm] Calling router.push", { flowId, to: result.redirectPath });
         router.push(result.redirectPath);
       }
     } else if (result.error) {
+      logger.error("[PhoneForm] Code verification failed", { 
+        flowId,
+        errorType: result.error.type,
+        errorMessage: result.error.message
+      });
       toast.error(result.error.message);
     }
   };

@@ -3,6 +3,7 @@ import { GqlUser } from "@/types/graphql";
 import { encodeURIComponentWithType, matchPaths, RawURIComponent } from "@/utils/path";
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
 import { AuthenticationState } from "@/types/auth";
+import { logger } from "@/lib/logging";
 
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
@@ -24,13 +25,27 @@ export class AuthRedirectService {
     next?: RawURIComponent | null,
     currentUser?: GqlUser | null,
   ): RawURIComponent | null {
+    const flowId = `redirect-${Date.now()}`;
     const authState = this.authStateManager.getState();
     const basePath = pathname.split("?")[0];
     const nextParam = next ? this.generateNextParam(next) : this.generateNextParam(pathname);
 
-    if (authState === "loading" || authState === "authenticating") return null;
+    logger.debug("[AuthRedirectService] getRedirectPath:start", {
+      flowId,
+      pathname,
+      basePath,
+      next,
+      authState,
+      hasCurrentUser: !!currentUser,
+      currentUserId: currentUser?.id,
+      membershipsCount: currentUser?.memberships?.length
+    });
 
-    // 1️⃣ ログイン済みユーザーがlogin/sign-up画面に来た場合
+    if (authState === "loading" || authState === "authenticating") {
+      logger.debug("[AuthRedirectService] Skipping redirect - loading/authenticating", { flowId, authState });
+      return null;
+    }
+
     const redirectFromLogin = this.handleAuthEntryFlow(
       pathname,
       basePath,
@@ -38,16 +53,39 @@ export class AuthRedirectService {
       next,
       nextParam,
     );
-    if (redirectFromLogin) return redirectFromLogin;
+    if (redirectFromLogin) {
+      logger.info("[AuthRedirectService] Redirect from auth entry flow", { 
+        flowId,
+        from: pathname,
+        to: redirectFromLogin,
+        reason: "handleAuthEntryFlow"
+      });
+      return redirectFromLogin;
+    }
 
-    // 2️⃣ 未認証ユーザーがユーザー専用パスに来た場合
     const redirectFromUserPath = this.handleUserPath(basePath, authState, currentUser, nextParam);
-    if (redirectFromUserPath) return redirectFromUserPath;
+    if (redirectFromUserPath) {
+      logger.info("[AuthRedirectService] Redirect from user path", { 
+        flowId,
+        from: pathname,
+        to: redirectFromUserPath,
+        reason: "handleUserPath"
+      });
+      return redirectFromUserPath;
+    }
 
-    // 4️⃣ ロール不足
     const redirectByRole = this.handleRoleRestriction(currentUser, basePath);
-    if (redirectByRole) return redirectByRole;
+    if (redirectByRole) {
+      logger.info("[AuthRedirectService] Redirect by role restriction", { 
+        flowId,
+        from: pathname,
+        to: redirectByRole,
+        reason: "handleRoleRestriction"
+      });
+      return redirectByRole;
+    }
 
+    logger.debug("[AuthRedirectService] No redirect needed", { flowId, pathname });
     return null;
   }
 
