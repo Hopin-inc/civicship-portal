@@ -144,12 +144,19 @@ export class AuthFlowLogger {
   private startTime: number;
   private sessionId: string;
   private authType: "liff" | "phone" | "general";
+  private logger: any;
 
   constructor(flowId?: string, authType: "liff" | "phone" | "general" = "general") {
     this.flowId = flowId || generateFlowId();
     this.startTime = Date.now();
     this.sessionId = generateSessionId();
     this.authType = authType;
+    
+    if (typeof window !== "undefined") {
+      import("@/lib/logging").then(mod => {
+        this.logger = mod.logger;
+      });
+    }
   }
 
   getFlowId(): string {
@@ -166,29 +173,29 @@ export class AuthFlowLogger {
 
   info(message: string, meta?: Record<string, any>) {
     const context = this.createContext(meta);
-    if (typeof window !== "undefined") {
-      console.info(`[AUTH] ${message}`, context);
+    if (this.logger) {
+      this.logger.info(`[AUTH] ${message}`, context);
     }
   }
 
   warn(message: string, meta?: Record<string, any>) {
     const context = this.createContext(meta);
-    if (typeof window !== "undefined") {
-      console.warn(`[AUTH] ${message}`, context);
+    if (this.logger) {
+      this.logger.warn(`[AUTH] ${message}`, context);
     }
   }
 
   error(message: string, meta?: Record<string, any>) {
     const context = this.createContext(meta);
-    if (typeof window !== "undefined") {
-      console.error(`[AUTH] ${message}`, context);
+    if (this.logger) {
+      this.logger.error(`[AUTH] ${message}`, context);
     }
   }
 
   debug(message: string, meta?: Record<string, any>) {
     const context = this.createContext(meta);
-    if (typeof window !== "undefined") {
-      console.debug(`[AUTH] ${message}`, context);
+    if (this.logger) {
+      this.logger.debug(`[AUTH] ${message}`, context);
     }
   }
 };

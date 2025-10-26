@@ -13,6 +13,7 @@ import { currentCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
+import { NavigationWatcher } from "@/components/debug/NavigationWatcher";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -53,6 +54,7 @@ const RootLayout = async ({
               ssrLineAuthenticated={lineAuthenticated}
               ssrPhoneAuthenticated={phoneAuthenticated}
             >
+              <NavigationWatcher />
               <HeaderProvider>
                 <LoadingProvider>
                   <AnalyticsProvider />

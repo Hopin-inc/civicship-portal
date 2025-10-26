@@ -1,5 +1,6 @@
 import { AuthenticationState } from "@/types/auth";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { logger } from "@/lib/logging";
 
 export class AuthStateManager {
   private static instance: AuthStateManager;
@@ -50,18 +51,55 @@ export class AuthStateManager {
       const current = state.authenticationState;
       const allowed = this.ALLOWED_TRANSITIONS[current] ?? [];
 
+      logger.debug("[AuthStateManager] updateState called", {
+        component: "AuthStateManager",
+        from: current,
+        to: newState,
+        reason: reason || "no reason provided",
+        hasCurrentUser: !!state.currentUser,
+        isAuthenticating: state.isAuthenticating,
+        isAuthInProgress: state.isAuthInProgress,
+      });
+
       if (newState === current || this.pendingState === newState) {
+        logger.debug("[AuthStateManager] State unchanged, skipping", {
+          component: "AuthStateManager",
+          state: current,
+          reason: newState === current ? "same state" : "pending state",
+        });
         return;
       }
 
       const downgradeBlocked =
         !["unauthenticated", "loading"].includes(current) && newState === "unauthenticated";
-      if (downgradeBlocked) return;
+      if (downgradeBlocked) {
+        logger.warn("[AuthStateManager] Downgrade blocked", {
+          component: "AuthStateManager",
+          from: current,
+          to: newState,
+        });
+        return;
+      }
 
-      if (!allowed.includes(newState)) return;
+      if (!allowed.includes(newState)) {
+        logger.warn("[AuthStateManager] Transition not allowed", {
+          component: "AuthStateManager",
+          from: current,
+          to: newState,
+          allowedTransitions: allowed,
+        });
+        return;
+      }
 
       this.pendingState = newState;
       setState({ authenticationState: newState });
+
+      logger.info("[AuthStateManager] State updated", {
+        component: "AuthStateManager",
+        from: current,
+        to: newState,
+        reason: reason || "no reason provided",
+      });
 
       this.stateChangeListeners.forEach((listener) => listener(newState));
     } finally {
