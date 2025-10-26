@@ -7,6 +7,7 @@ import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstant
 import { useRecaptchaManager } from "./useRecaptchaManager";
 import { useResendTimer } from "./useResendTimer";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface PhoneSubmissionResult {
   success: boolean;
@@ -83,7 +84,20 @@ export function usePhoneSubmission(
       setIsSubmitting(true);
 
       try {
-        await phoneAuth.startPhoneVerification(formattedPhone);
+        const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
+        
+        const storedId = useAuthStore.getState().phoneAuth.verificationId;
+        
+        if (!verificationId || !storedId) {
+          return {
+            success: false,
+            error: {
+              message: "認証コードの送信に失敗しました。もう一度お試しください。",
+              type: "verification-id-missing"
+            }
+          };
+        }
+        
         resendTimer.start();
         return { success: true };
       } catch (error) {
@@ -142,7 +156,20 @@ export function usePhoneSubmission(
           : PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_BROWSER;
         await new Promise((resolve) => setTimeout(resolve, waitTime));
 
-        await phoneAuth.startPhoneVerification(formattedPhone);
+        const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
+        
+        const storedId = useAuthStore.getState().phoneAuth.verificationId;
+        
+        if (!verificationId || !storedId) {
+          return {
+            success: false,
+            error: {
+              message: "認証コードの再送信に失敗しました。もう一度お試しください。",
+              type: "verification-id-missing"
+            }
+          };
+        }
+        
         resendTimer.start();
 
         if (!isRunningInLiff()) {
