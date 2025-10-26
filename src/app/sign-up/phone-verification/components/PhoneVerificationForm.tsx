@@ -66,26 +66,16 @@ export function PhoneVerificationForm() {
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("[PhoneVerificationForm] handleCodeSubmit: Starting code verification");
     const result = await codeVerification.verify(verificationCode);
-    console.log("[PhoneVerificationForm] handleCodeSubmit: Verification result:", {
-      success: result.success,
-      hasRedirectPath: !!result.redirectPath,
-      redirectPath: result.redirectPath,
-      hasError: !!result.error,
-      errorType: result.error?.type,
-    });
 
     if (result.success) {
       if (result.message) {
         toast.success(result.message);
       }
       if (result.redirectPath) {
-        console.log("[PhoneVerificationForm] handleCodeSubmit: Pushing to:", result.redirectPath);
         router.push(result.redirectPath);
       }
     } else if (result.error) {
-      console.log("[PhoneVerificationForm] handleCodeSubmit: Error:", result.error);
       toast.error(result.error.message);
     }
   };

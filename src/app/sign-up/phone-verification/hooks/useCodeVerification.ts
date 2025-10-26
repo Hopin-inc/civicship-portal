@@ -52,22 +52,13 @@ export function useCodeVerification(
       setIsVerifying(true);
 
       try {
-        console.log("[useCodeVerification] Starting phone code verification");
         const success = await phoneAuth.verifyPhoneCode(verificationCode);
-        console.log("[useCodeVerification] verifyPhoneCode success:", success);
         
         const authStoreState = useAuthStore.getState();
         const phoneUid = authStoreState.phoneAuth.phoneUid;
-        console.log("[useCodeVerification] Auth store state after verifyPhoneCode:", {
-          authenticationState: authStoreState.state.authenticationState,
-          phoneAuthPhoneUid: phoneUid,
-          phoneAuthIsVerified: authStoreState.phoneAuth.isVerified,
-        });
-        
         const setAuthState = authStoreState.setState;
 
         if (!success || !phoneUid) {
-          console.log("[useCodeVerification] Early return: invalid code or missing phoneUid");
           return {
             success: false,
             error: {
@@ -77,33 +68,15 @@ export function useCodeVerification(
           };
         }
 
-        console.log("[useCodeVerification] Calling identityCheckPhoneUser mutation with phoneUid:", phoneUid?.substring(0, 8) + "...");
-        
-        let data;
-        try {
-          const mutationResult = await identityCheckPhoneUser({
-            variables: {
-              input: {
-                phoneUid: phoneUid,
-              },
+        const { data } = await identityCheckPhoneUser({
+          variables: {
+            input: {
+              phoneUid: phoneUid,
             },
-          });
-          data = mutationResult.data;
-          console.log("[useCodeVerification] identityCheckPhoneUser mutation completed successfully");
-          console.log("[useCodeVerification] Raw mutation result:", mutationResult);
-        } catch (mutationError) {
-          console.error("[useCodeVerification] identityCheckPhoneUser mutation failed:", mutationError);
-          throw mutationError;
-        }
+          },
+        });
 
         const status = data?.identityCheckPhoneUser?.status;
-        console.log("[useCodeVerification] identityCheckPhoneUser response:", {
-          status,
-          hasData: !!data,
-          hasUser: !!data?.identityCheckPhoneUser?.user,
-          hasMembership: !!data?.identityCheckPhoneUser?.membership,
-          fullData: data,
-        });
 
         if (!status) {
           return {
@@ -117,7 +90,6 @@ export function useCodeVerification(
 
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
-            console.log("[useCodeVerification] Status: NEW_USER, redirecting to /sign-up");
             return {
               success: true,
               redirectPath: `/sign-up${nextParam}`,
@@ -125,13 +97,11 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
-            console.log("[useCodeVerification] Status: EXISTING_SAME_COMMUNITY, setting user_registered");
             setAuthState({ authenticationState: "user_registered" });
             const homeRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
             );
-            console.log("[useCodeVerification] Redirecting to:", homeRedirectPath || "/");
             return {
               success: true,
               redirectPath: homeRedirectPath || "/",
@@ -139,14 +109,12 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
-            console.log("[useCodeVerification] Status: EXISTING_DIFFERENT_COMMUNITY, updating auth state");
             updateAuthState();
             setAuthState({ authenticationState: "user_registered" });
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
             );
-            console.log("[useCodeVerification] Redirecting to:", crossCommunityRedirectPath || "/");
             return {
               success: true,
               redirectPath: crossCommunityRedirectPath || "/",
@@ -163,7 +131,6 @@ export function useCodeVerification(
             };
         }
       } catch (error) {
-        console.error("[useCodeVerification] Error during verification:", error);
         return {
           success: false,
           error: {
