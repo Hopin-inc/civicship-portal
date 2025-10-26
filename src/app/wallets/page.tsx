@@ -21,7 +21,7 @@ export default async function WalletsRedirectPage({
   const session = cookieStore.get("session")?.value;
   
   if (!session) {
-    redirect("/login");
+    redirect("/error?message=wallet_not_found");
   }
   
   try {
@@ -45,7 +45,7 @@ export default async function WalletsRedirectPage({
     );
     
     if (!wallet) {
-      redirect("/error");
+      redirect("/error?message=wallet_not_found");
     }
     
     const queryString = new URLSearchParams(
@@ -56,6 +56,6 @@ export default async function WalletsRedirectPage({
     redirect(redirectUrl);
   } catch (error) {
     console.error("Failed to fetch wallet:", error);
-    redirect("/error");
+    redirect("/error?message=wallet_fetch_failed");
   }
 }

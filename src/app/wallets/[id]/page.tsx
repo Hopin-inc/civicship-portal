@@ -1,31 +1,27 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/contexts/AuthProvider";
+import React, { useMemo } from "react";
+import { useRouter } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
 import TransactionItem from "@/components/shared/TransactionItem";
 import { Button } from "@/components/ui/button";
 import { Gift } from "lucide-react";
-import { useWallet } from "@/app/wallets/hooks/useWallet";
-import useUserTransactions from "@/app/wallets/hooks/useUserTransaction";
-import { presenterTransaction, getOtherUserImage } from "@/app/wallets/data/presenter";
-import { toPointNumber } from "@/utils/bigint";
 import { toast } from "sonner";
-import { logger } from "@/lib/logging";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import Link from "next/link";
+import { useWalletContext } from "@/app/wallets/features/shared/contexts/WalletContext";
 
 export default function WalletDetailPage() {
-  const params = useParams();
-  const walletId = Array.isArray(params.id) ? params.id[0] : params.id;
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const shouldRefresh = searchParams.get("refresh") === "true";
-  const { user: currentUser } = useAuth();
-  const userId = currentUser?.id;
+  const {
+    walletView,
+    transactions,
+    isLoadingWallet,
+    error,
+    refresh,
+  } = useWalletContext();
 
   const headerConfig = useMemo(
     () => ({
@@ -37,82 +33,27 @@ export default function WalletDetailPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { userAsset, isLoading, error, refetch: refetchWallet } = useWallet(userId);
-  const {
-    connection,
-    loadMoreRef,
-    refetch: refetchTransactions,
-  } = useUserTransactions(userId ?? "");
-
-  const currentPoint = toPointNumber(userAsset.points.currentPoint, 0);
-
-  useEffect(() => {
-    if (!isLoading && userAsset.points.walletId && userAsset.points.walletId !== walletId) {
-      router.replace("/wallets");
-    }
-  }, [isLoading, userAsset.points.walletId, walletId, router]);
-
-  useEffect(() => {
-    if (shouldRefresh) {
-      const refreshData = async () => {
-        try {
-          await Promise.all([refetchWallet(), refetchTransactions()]);
-          const url = new URL(window.location.href);
-          url.searchParams.delete("refresh");
-          window.history.replaceState({}, "", url);
-        } catch (err) {
-          logger.error("Refresh failed after redirect", {
-            error: err instanceof Error ? err.message : String(err),
-            component: "WalletDetailPage",
-          });
-        }
-      };
-      refreshData();
-    }
-  }, [shouldRefresh, refetchWallet, refetchTransactions]);
-
-  useEffect(() => {
-    const handleFocus = async () => {
-      try {
-        await refetchWallet();
-        refetchTransactions();
-      } catch (err) {
-        logger.error("Refetch failed on focus", {
-          error: err instanceof Error ? err.message : String(err),
-          component: "WalletDetailPage",
-        });
-      }
-    };
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
-  }, [refetchWallet, refetchTransactions]);
+  const currentPoint = walletView?.points ?? 0;
 
   const handleNavigateToGive = () =>
     router.push(`/wallets/donate?currentPoint=${currentPoint}&tab=history`);
 
-  const refetchRef = useRef<(() => void) | null>(null);
-  useEffect(() => {
-    refetchRef.current = refetchWallet;
-  }, [refetchWallet]);
-
-  if (isLoading) return <LoadingIndicator />;
-  if (error) return <ErrorState title={"ウォレット"} refetchRef={refetchRef} />;
+  if (isLoadingWallet && !walletView) return <LoadingIndicator />;
+  if (error) return <ErrorState title={"ウォレット"} />;
 
   return (
     <div className="space-y-6 max-w-xl mx-auto mt-8 px-4">
       <WalletCard
         currentPoint={currentPoint}
-        isLoading={isLoading}
+        isLoading={isLoadingWallet}
         onRefetch={async () => {
           try {
-            await refetchWallet();
-            refetchTransactions();
+            await refresh();
             toast.success("ウォレット情報を更新しました");
           } catch (err) {
             toast.error("再読み込みに失敗しました");
           }
         }}
-        showRefreshButton={!shouldRefresh}
       />
 
       <div className="flex justify-center">
@@ -138,22 +79,28 @@ export default function WalletDetailPage() {
         </Link>
       </div>
       <div className="space-y-2 mt-2">
-        {connection.edges?.length === 0 ? (
+        {transactions.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center pt-6">
             まだ交換したことがありません
           </p>
         ) : (
-          connection.edges?.map((edge) => {
-            const node = edge?.node;
-            if (!node) return null;
-            const transaction = presenterTransaction(node, userAsset.points.walletId);
-            if (!transaction) return null;
-            const image = getOtherUserImage(node, userId ?? "");
-            return <TransactionItem key={transaction.id} transaction={transaction} image={image} />;
-          })
+          transactions.map((transaction) => (
+            <TransactionItem
+              key={transaction.id}
+              transaction={{
+                id: transaction.id,
+                reason: transaction.reason,
+                description: transaction.description,
+                comment: transaction.comment,
+                transferPoints: transaction.transferPoints,
+                transferredAt: transaction.transferredAt,
+                didValue: transaction.didValue,
+                isOutgoing: transaction.isOutgoing,
+              }}
+              image={transaction.avatarUrl}
+            />
+          ))
         )}
-
-        <div ref={loadMoreRef} className="h-10" />
       </div>
     </div>
   );
