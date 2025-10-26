@@ -1,49 +1,74 @@
 import React from "react";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { fetchPublicUserServer } from "@/app/users/features/shared/server";
+import { currentCommunityConfig, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
+import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
 
-// type Props = {
-//   params: { id: string };
-// };
-//
-// export async function generateMetadata(input: Promise<Props>): Promise<Metadata> {
-//   const { params } = await input;
-//   const id = params.id;
-//   const res = await fetchUser(id);
-//
-//   if (!res) return fallbackMetadata;
-//
-//   return {
-//     title: res.name,
-//     description: res.bio ?? "",
-//     openGraph: {
-//       type: "profile",
-//       title: res.name,
-//       description: res.bio ?? "",
-//       images: res.image
-//         ? [
-//             {
-//               url: res.image,
-//               width: 1200,
-//               height: 630,
-//               alt: res.name,
-//             },
-//           ]
-//         : DEFAULT_OPEN_GRAPH_IMAGE,
-//     },
-//   };
-// }
-//
-// async function fetchUser(id: string): Promise<GqlUser | null> {
-//   const { data } = await apolloClient.query<
-//     GqlGetUserFlexibleQuery,
-//     GqlGetUserFlexibleQueryVariables
-//   >({
-//     query: GetUserFlexibleDocument,
-//     variables: { id },
-//   });
-//
-//   return data.user ?? null;
-// }
+type Props = {
+  params: { id: string };
+};
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+const fallbackMetadata: Metadata = {
+  title: currentCommunityConfig.title,
+  description: currentCommunityConfig.description,
+  openGraph: {
+    images: DEFAULT_OPEN_GRAPH_IMAGE,
+  },
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = params;
+  const user = await fetchPublicUserServer(id);
+
+  if (!user) return fallbackMetadata;
+
+  return {
+    title: `${user.name} | ${currentCommunityConfig.title}`,
+    description: user.bio ?? "",
+    openGraph: {
+      type: "profile",
+      title: user.name,
+      description: user.bio ?? "",
+      images: user.image
+        ? [
+            {
+              url: user.image,
+              width: 1200,
+              height: 630,
+              alt: user.name,
+            },
+          ]
+        : DEFAULT_OPEN_GRAPH_IMAGE,
+    },
+  };
+}
+
+export default async function Layout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: { id: string };
+}) {
+  const gqlUser = await fetchPublicUserServer(params.id);
+
+  if (!gqlUser) {
+    notFound();
+  }
+
+  const portfolios = (gqlUser.portfolios ?? []).map(mapGqlPortfolio);
+
+  return (
+    <UserProfileProvider
+      value={{
+        userId: gqlUser.id,
+        isOwner: false,
+        gqlUser,
+        portfolios,
+      }}
+    >
+      {children}
+    </UserProfileProvider>
+  );
 }

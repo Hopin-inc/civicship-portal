@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
 import SearchTabs, { SearchTabType } from "@/app/search/components/Tabs";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
-import { visiblePrefectureLabels } from "@/app/users/data/presenter";
+import { visiblePrefectureLabels } from "@/shared/prefectures/constants";
 import { useSearchForm } from "@/app/search/hooks/useSearchForm";
 import SearchForm from "@/app/search/components/SearchForm";
 import SearchFilters from "@/app/search/components/SearchFilters";
@@ -24,7 +24,7 @@ interface SearchModalProps {
 export default function SearchModal({ isOpen, onClose, type }: SearchModalProps) {
   const router = useRouter();
   const shouldShowQuests = useFeatureCheck("quests");
-  
+
   const defaultTab: SearchTabType = shouldShowQuests && type === "quest" ? "quest" : "activity";
   const [selectedTab, setSelectedTab] = useState<SearchTabType>(defaultTab);
   const [activeForm, setActiveForm] = useState<SearchFilterType>(null);
@@ -62,11 +62,10 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
       values.usePoints,
       type,
     );
-    
+
     router.push(`/opportunities/search?${params.toString()}`);
     onClose();
   };
-
 
   const clearActiveFilter = () => {
     if (activeForm) {
@@ -92,10 +91,7 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
         <div className="flex-1 overflow-auto p-4 bg-white">
           <div className="space-y-4">
             {shouldShowQuests && (
-              <SearchTabs
-                selectedTab={selectedTab}
-                onTabChange={setSelectedTab}
-              />
+              <SearchTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />
             )}
             <SearchForm onSearch={handleSearch} />
             <SearchFilters
@@ -123,13 +119,16 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
               setUsePoints={(val) => setValue("usePoints", val)}
               clearActiveFilter={clearActiveFilter}
               getSheetHeight={() => "60vh"}
-              prefectures={Object.entries(visiblePrefectureLabels).map(([id, name]) => ({ id, name }))}
+              prefectures={Object.entries(visiblePrefectureLabels).map(([id, name]) => ({
+                id,
+                name,
+              }))}
             />
             <div className="border-t">
-              <SearchFooter 
-                onClear={handleClear} 
-                onSearch={handleSearch} 
-                isNoCondition={isNoCondition} 
+              <SearchFooter
+                onClear={handleClear}
+                onSearch={handleSearch}
+                isNoCondition={isNoCondition}
               />
             </div>
           </div>

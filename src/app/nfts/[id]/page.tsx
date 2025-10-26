@@ -1,14 +1,15 @@
 "use client";
 import { use, useMemo } from "react";
 import { GqlDidIssuanceStatus, useGetNftInstanceWithDidQuery } from "@/types/graphql";
-import { InfoCard, ErrorState } from "@/components/shared";
+import { ErrorState, InfoCard } from "@/components/shared";
 import { InfoCardProps } from "@/types";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import Image from "next/image";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export default function NftPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { data: nftInstanceWithDid } = useGetNftInstanceWithDidQuery({
+  const { data: nftInstanceWithDid, loading } = useGetNftInstanceWithDidQuery({
     variables: { id: id },
   });
   const headerConfig = useMemo(
@@ -21,28 +22,21 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
   );
   useHeaderConfig(headerConfig);
 
+  if (loading) return <LoadingIndicator />;
+
   if (!nftInstanceWithDid?.nftInstance) {
-    return <ErrorState title="NFTが見つかりません" />
+    return <ErrorState title="NFTが見つかりません" />;
   }
 
   const nftInstance = nftInstanceWithDid.nftInstance;
-  const { 
-    instanceId, 
-    imageUrl, 
-    name: instanceName 
-  } = nftInstance;
-  
-  const { 
-    address: contractAddress, 
-    type: tokenType 
-  } = nftInstance.nftToken ?? {};
-  
-  const { 
-    name: username 
-  } = nftInstance.nftWallet?.user ?? {};
-  
+  const { instanceId, imageUrl, name: instanceName } = nftInstance;
+
+  const { address: contractAddress, type: tokenType } = nftInstance.nftToken ?? {};
+
+  const { name: username } = nftInstance.nftWallet?.user ?? {};
+
   const didValue = nftInstance.nftWallet?.user?.didIssuanceRequests?.find(
-    request => request.status === GqlDidIssuanceStatus.Completed
+    (request) => request.status === GqlDidIssuanceStatus.Completed,
   )?.didValue;
 
   const infoCardsValueList: InfoCardProps[] = [
@@ -71,14 +65,14 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
       copyData: contractAddress,
       truncatePattern: "middle",
     },
-    {
-      label: "チェーン",
-      value: "Ethereum",
-    },
-    {
-      label: "規格",
-      value: tokenType,
-    },
+    // {
+    //   label: "チェーン",
+    //   value: "Ethereum",
+    // },
+    // {
+    //   label: "規格",
+    //   value: tokenType,
+    // },
   ];
 
   return (
@@ -86,13 +80,15 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
       <div className="flex justify-center mt-10">
         <div>
           <Image
-              src={imageUrl ?? ""}
-              alt={instanceName ?? "証明書"}
-              width={120}
-              height={120}
-              className="object-cover border-none shadow-none mx-auto rounded-sm"
+            src={imageUrl ?? ""}
+            alt={instanceName ?? "証明書"}
+            width={120}
+            height={120}
+            className="object-cover border-none shadow-none mx-auto rounded-sm"
           />
-          <h1 className="text-title-sm font-bold w-[70%] mx-auto mt-4 text-center">{instanceName}</h1>
+          <h1 className="text-title-sm font-bold w-[70%] mx-auto mt-4 text-center">
+            {instanceName}
+          </h1>
         </div>
       </div>
       <div className="mt-6 p-4">

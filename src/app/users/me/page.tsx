@@ -1,31 +1,11 @@
-import MyProfileClient from "./component/MyProfileClient";
-import { fetchProfileServer } from "@/app/users/me/libs/fetchProfileServer";
-import { presenterManagerProfile } from "@/app/users/data/presenter";
-import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
-import { formatOpportunities } from "@/components/domains/opportunities/utils";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+"use client";
 
-export default async function MyProfilePage() {
-  const ssrUser = await fetchProfileServer();
+import { useUserProfileContext, presentUserProfile } from "@/app/users/features/shared";
+import { UserProfileView } from "@/app/users/features/profile";
 
-  if (!ssrUser) {
-    return <MyProfileClient ssrData={null} />;
-  }
+export default function MyProfilePage() {
+  const { gqlUser, isOwner, portfolios } = useUserProfileContext();
+  const viewModel = presentUserProfile(gqlUser, isOwner, portfolios);
 
-  const presentedProfile = presenterManagerProfile(ssrUser, COMMUNITY_ID);
-  const nftInstances = ssrUser.nftInstances?.edges?.map((e) => e.node) ?? [];
-  const selfOpportunities =
-    ssrUser.opportunitiesCreatedByMe
-      ?.filter((o) => o?.community?.id === COMMUNITY_ID)
-      ?.map(presenterActivityCard)
-      ?.map(formatOpportunities) ?? [];
-
-  const ssrData = {
-    user: ssrUser,
-    profile: presentedProfile,
-    nftInstances,
-    selfOpportunities,
-  };
-
-  return <MyProfileClient ssrData={ssrData} />;
+  return <UserProfileView viewModel={viewModel} isOwner={isOwner} />;
 }

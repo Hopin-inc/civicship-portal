@@ -1081,7 +1081,7 @@ export type GqlNftInstance = {
   json?: Maybe<Scalars["JSON"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   nftToken?: Maybe<GqlNftToken>;
-  nftWallet: GqlNftWallet;
+  nftWallet?: Maybe<GqlNftWallet>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
 };
 
@@ -1363,6 +1363,7 @@ export type GqlOpportunitySortInput = {
 export type GqlOpportunityUpdateContentInput = {
   body?: InputMaybe<Scalars["String"]["input"]>;
   category: GqlOpportunityCategory;
+  createdBy?: InputMaybe<Scalars["ID"]["input"]>;
   description: Scalars["String"]["input"];
   feeRequired?: InputMaybe<Scalars["Int"]["input"]>;
   images?: InputMaybe<Array<GqlImageInput>>;
@@ -3180,7 +3181,7 @@ export type GqlGetNftInstancesQuery = {
         createdAt: Date;
         description?: string | null;
         imageUrl?: string | null;
-        nftWallet: {
+        nftWallet?: {
           __typename?: "NftWallet";
           id: string;
           walletAddress: string;
@@ -3197,7 +3198,7 @@ export type GqlGetNftInstancesQuery = {
               completedAt?: Date | null;
             }> | null;
           };
-        };
+        } | null;
         nftToken?: {
           __typename?: "NftToken";
           id: string;
@@ -3238,7 +3239,7 @@ export type GqlGetNftInstanceWithDidQuery = {
       type: string;
       json?: any | null;
     } | null;
-    nftWallet: {
+    nftWallet?: {
       __typename?: "NftWallet";
       id: string;
       walletAddress: string;
@@ -3258,7 +3259,7 @@ export type GqlGetNftInstanceWithDidQuery = {
           updatedAt?: Date | null;
         }> | null;
       };
-    };
+    } | null;
   } | null;
 };
 

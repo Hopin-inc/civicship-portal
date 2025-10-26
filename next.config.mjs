@@ -28,6 +28,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "vyocmhwkrvspeitnllty.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "ipfs.io",
+      },
     ],
   },
   experimental: {

@@ -1,15 +1,20 @@
 import Link from "next/link";
 import Image from "next/image";
-import { GqlNftInstance } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Card } from "@/components/ui/card";
 
-interface UserNftListProps {
-  nftInstance: Omit<GqlNftInstance, "nftWallet">;
+export type NftCardData = {
+  id: string;
+  name?: string | null;
+  imageUrl?: string | null;
+};
+
+interface NftCardProps {
+  nftInstance: NftCardData;
   isCarousel?: boolean;
 }
 
-export const NftCard = ({ nftInstance, isCarousel = false }: UserNftListProps) => {
+export const NftCard = ({ nftInstance, isCarousel = false }: NftCardProps) => {
   return (
     <Link
       key={nftInstance.id}

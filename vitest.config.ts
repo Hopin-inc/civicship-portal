@@ -12,6 +12,23 @@ const dirname =
 export default defineConfig({
   test: {
     projects: [
+      // Unit tests project
+      {
+        test: {
+          name: "unit",
+          environment: "happy-dom",
+          globals: true,
+          setupFiles: ["./vitest.setup.ts"],
+          include: ["src/**/*.{test,spec}.{ts,tsx}"],
+          exclude: ["node_modules", ".storybook"],
+        },
+        resolve: {
+          alias: {
+            "@": path.resolve(dirname, "./src"),
+          },
+        },
+      },
+      // Storybook tests project
       {
         extends: true,
         plugins: [
