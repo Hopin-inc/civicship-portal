@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from "react";
 import { useMutation } from "@apollo/client";
-import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { IDENTITY_CHECK_PHONE_USER } from "@/graphql/account/identity/mutation";
 import {
@@ -24,7 +23,7 @@ interface CodeVerificationResult {
 }
 
 export function useCodeVerification(
-  phoneAuth: PhoneAuthService,
+  phoneAuth: { verifyPhoneCode: (verificationCode: string) => Promise<boolean> },
   nextParam: string,
   updateAuthState: () => void
 ) {
