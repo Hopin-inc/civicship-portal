@@ -1,13 +1,25 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { GqlWalletType } from "@/types/graphql";
 
-interface CurrentUserWalletData {
+interface CurrentUserData {
   currentUser: {
     id: string;
-    wallets: Array<{
-      id: string;
-      community: { id: string };
+  };
+}
+
+interface MemberWalletsData {
+  wallets: {
+    edges: Array<{
+      node: {
+        id: string;
+        type: string;
+        community: {
+          id: string;
+        } | null;
+      };
     }>;
   };
 }
@@ -21,28 +33,51 @@ export default async function WalletsRedirectPage({
   const session = cookieStore.get("session")?.value;
   
   if (!session) {
-    redirect("/error?message=wallet_not_found");
+    redirect("/login");
   }
   
   try {
-    const data = await executeServerGraphQLQuery<CurrentUserWalletData>(
-      `query GetCurrentUserWallet {
+    const userData = await executeServerGraphQLQuery<CurrentUserData>(
+      `query GetCurrentUser {
         currentUser {
           id
-          wallets {
-            id
-            community { id }
-          }
         }
       }`,
       {},
       { Authorization: `Bearer ${session}` }
     );
     
-    const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
-    const wallet = data.currentUser?.wallets?.find(
-      (w) => w.community?.id === communityId
+    const userId = userData.currentUser?.id;
+    
+    if (!userId) {
+      redirect("/login");
+    }
+    
+    const walletsData = await executeServerGraphQLQuery<MemberWalletsData>(
+      `query GetMemberWallets($filter: WalletFilterInput) {
+        wallets(filter: $filter) {
+          edges {
+            node {
+              id
+              type
+              community {
+                id
+              }
+            }
+          }
+        }
+      }`,
+      {
+        filter: {
+          type: GqlWalletType.Member,
+          userId: userId,
+          communityId: COMMUNITY_ID,
+        }
+      },
+      { Authorization: `Bearer ${session}` }
     );
+    
+    const wallet = walletsData.wallets?.edges?.[0]?.node;
     
     if (!wallet) {
       redirect("/error?message=wallet_not_found");

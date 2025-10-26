@@ -112,3 +112,24 @@ export const GET_MEMBER_WALLETS = gql`
     }
   }
 `;
+
+export const GET_WALLET_BY_ID = gql`
+  query GetWalletById($id: ID!) {
+    wallet(id: $id) {
+      id
+      type
+      currentPointView {
+        currentPoint
+      }
+      user {
+        id
+        name
+        image
+      }
+      community {
+        id
+        name
+      }
+    }
+  }
+`;

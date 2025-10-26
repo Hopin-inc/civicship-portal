@@ -12,16 +12,23 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import Link from "next/link";
 import { useWalletContext } from "@/app/wallets/features/shared/contexts/WalletContext";
+import { useWalletTransactions } from "@/app/wallets/[id]/features/transactions/hooks/useWalletTransactions";
 
 export default function WalletDetailPage() {
   const router = useRouter();
   const {
-    walletView,
-    transactions,
-    isLoadingWallet,
-    error,
+    walletId,
+    currentPoint,
+    isLoading: isLoadingWallet,
+    error: walletError,
     refresh,
   } = useWalletContext();
+
+  const {
+    transactions,
+    isLoading: isLoadingTransactions,
+    error: transactionsError,
+  } = useWalletTransactions(walletId);
 
   const headerConfig = useMemo(
     () => ({
@@ -33,13 +40,11 @@ export default function WalletDetailPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const currentPoint = walletView?.points ?? 0;
-
   const handleNavigateToGive = () =>
     router.push(`/wallets/donate?currentPoint=${currentPoint}&tab=history`);
 
-  if (isLoadingWallet && !walletView) return <LoadingIndicator />;
-  if (error) return <ErrorState title={"ウォレット"} />;
+  if (isLoadingWallet) return <LoadingIndicator />;
+  if (walletError || transactionsError) return <ErrorState title={"ウォレット"} />;
 
   return (
     <div className="space-y-6 max-w-xl mx-auto mt-8 px-4">
@@ -79,7 +84,9 @@ export default function WalletDetailPage() {
         </Link>
       </div>
       <div className="space-y-2 mt-2">
-        {transactions.length === 0 ? (
+        {isLoadingTransactions ? (
+          <LoadingIndicator />
+        ) : transactions.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center pt-6">
             まだ交換したことがありません
           </p>
@@ -87,17 +94,7 @@ export default function WalletDetailPage() {
           transactions.map((transaction) => (
             <TransactionItem
               key={transaction.id}
-              transaction={{
-                id: transaction.id,
-                reason: transaction.reason,
-                description: transaction.description,
-                comment: transaction.comment,
-                transferPoints: transaction.transferPoints,
-                transferredAt: transaction.transferredAt,
-                didValue: transaction.didValue,
-                isOutgoing: transaction.isOutgoing,
-              }}
-              image={transaction.avatarUrl}
+              transaction={transaction}
             />
           ))
         )}
