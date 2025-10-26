@@ -81,6 +81,13 @@ export function usePhoneSubmission(
         };
       }
 
+      useAuthStore.getState().setState({
+        phoneAuth: {
+          ...useAuthStore.getState().phoneAuth,
+          verificationId: null,
+        },
+      });
+
       setIsSubmitting(true);
 
       try {
@@ -88,7 +95,7 @@ export function usePhoneSubmission(
         
         const storedId = useAuthStore.getState().phoneAuth.verificationId;
         
-        if (!verificationId || !storedId) {
+        if (!verificationId || !storedId || storedId !== verificationId) {
           return {
             success: false,
             error: {
@@ -151,6 +158,13 @@ export function usePhoneSubmission(
       try {
         phoneAuth.clearRecaptcha?.();
 
+        useAuthStore.getState().setState({
+          phoneAuth: {
+            ...useAuthStore.getState().phoneAuth,
+            verificationId: null,
+          },
+        });
+
         const waitTime = isRunningInLiff()
           ? PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_LIFF
           : PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_BROWSER;
@@ -160,7 +174,7 @@ export function usePhoneSubmission(
         
         const storedId = useAuthStore.getState().phoneAuth.verificationId;
         
-        if (!verificationId || !storedId) {
+        if (!verificationId || !storedId || storedId !== verificationId) {
           return {
             success: false,
             error: {

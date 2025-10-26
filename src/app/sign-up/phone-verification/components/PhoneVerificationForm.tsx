@@ -13,6 +13,7 @@ import { usePhoneSubmission } from "../hooks/usePhoneSubmission";
 import { useCodeVerification } from "../hooks/useCodeVerification";
 import { PhoneInputStep } from "./PhoneInputStep";
 import { CodeVerificationStep } from "./CodeVerificationStep";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 const generateFlowId = () => `phone-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
@@ -145,6 +146,14 @@ export function PhoneVerificationForm() {
     setPhoneNumber("");
     setVerificationCode("");
     setStep("phone");
+    
+    const { setState, phoneAuth: currentPhoneAuth } = useAuthStore.getState();
+    setState({
+      phoneAuth: {
+        ...currentPhoneAuth,
+        verificationId: null,
+      },
+    });
   };
 
   if (loading) {
