@@ -51,22 +51,7 @@ export class AuthStateManager {
       const current = state.authenticationState;
       const allowed = this.ALLOWED_TRANSITIONS[current] ?? [];
 
-      logger.debug("[AuthStateManager] updateState called", {
-        component: "AuthStateManager",
-        from: current,
-        to: newState,
-        reason: reason || "no reason provided",
-        hasCurrentUser: !!state.currentUser,
-        isAuthenticating: state.isAuthenticating,
-        isAuthInProgress: state.isAuthInProgress,
-      });
-
       if (newState === current || this.pendingState === newState) {
-        logger.debug("[AuthStateManager] State unchanged, skipping", {
-          component: "AuthStateManager",
-          state: current,
-          reason: newState === current ? "same state" : "pending state",
-        });
         return;
       }
 
@@ -93,13 +78,6 @@ export class AuthStateManager {
 
       this.pendingState = newState;
       setState({ authenticationState: newState });
-
-      logger.info("[AuthStateManager] State updated", {
-        component: "AuthStateManager",
-        from: current,
-        to: newState,
-        reason: reason || "no reason provided",
-      });
 
       this.stateChangeListeners.forEach((listener) => listener(newState));
     } finally {

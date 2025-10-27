@@ -77,75 +77,41 @@ export class PhoneAuthService {
   }
 
   public async startPhoneVerification(phoneNumber: string): Promise<string | null> {
-    const flowId = `phone-${Date.now()}`;
-    logger.debug("[PhoneAuthService] startPhoneVerification:enter", {
-      flowId,
-      env: isRunningInLiff() ? "liff" : "browser",
-      hasThis: !!this,
-      isInstance: this instanceof PhoneAuthService,
-      hasVerifier: !!this.recaptchaVerifier,
-      phoneMasked: phoneNumber.replace(/\d(?=\d{4})/g, '*')
-    });
-
     try {
-      logger.debug("[PhoneAuthService] Clearing recaptcha", { flowId });
       this.clearRecaptcha();
-      
-      logger.debug("[PhoneAuthService] Generating container ID", { flowId });
       this.generateNewContainerId();
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const baseContainer = document.getElementById("recaptcha-container");
-      logger.debug("[PhoneAuthService] Base container check", { 
-        flowId,
-        exists: !!baseContainer 
-      });
       
       if (!baseContainer) {
-        logger.error("[PhoneAuthService] Base container not found", { flowId });
+        logger.error("[PhoneAuthService] Base container not found");
         throw new Error("Base reCAPTCHA container element not found");
       }
 
       const newContainer = document.createElement("div");
       newContainer.id = this.recaptchaContainerId;
       baseContainer.appendChild(newContainer);
-      logger.debug("[PhoneAuthService] Container appended", { 
-        flowId,
-        containerId: this.recaptchaContainerId 
-      });
 
       this.recaptchaContainerElement = newContainer;
 
       const recaptchaSize = isRunningInLiff() ? "normal" : "invisible";
-      logger.debug("[PhoneAuthService] Creating RecaptchaVerifier", { 
-        flowId,
-        size: recaptchaSize 
-      });
 
       this.recaptchaVerifier = new RecaptchaVerifier(getPhoneAuth(), this.recaptchaContainerId, {
         size: recaptchaSize,
         callback: () => {
-          logger.debug("[PhoneAuthService] reCAPTCHA completed", {
-            flowId,
-            authType: "phone",
-            component: "PhoneAuthService",
-            environment: isRunningInLiff() ? "liff" : "browser",
-          });
           if (isRunningInLiff()) {
             window.dispatchEvent(new CustomEvent("recaptcha-completed"));
           }
         },
         "expired-callback": () => {
-          logger.info("[PhoneAuthService] reCAPTCHA expired", { flowId });
+          logger.info("[PhoneAuthService] reCAPTCHA expired");
           this.clearRecaptcha();
         },
       });
 
-      logger.debug("[PhoneAuthService] Rendering recaptcha", { flowId });
       await this.recaptchaVerifier.render();
-      logger.debug("[PhoneAuthService] Recaptcha rendered", { flowId });
 
-      logger.debug("[PhoneAuthService] Calling signInWithPhoneNumber", { flowId });
       const confirmationResult = await signInWithPhoneNumber(
         getPhoneAuth(),
         phoneNumber,
@@ -153,23 +119,12 @@ export class PhoneAuthService {
       );
 
       const verificationId = confirmationResult.verificationId;
-      logger.info("[PhoneAuthService] signInWithPhoneNumber success", { 
-        flowId,
-        hasVerificationId: !!verificationId 
-      });
 
       useAuthStore.getState().setPhoneAuth({ verificationId });
-      const storedId = useAuthStore.getState().phoneAuth.verificationId;
-      logger.debug("[PhoneAuthService] VerificationId stored", { 
-        flowId,
-        stored: !!storedId,
-        match: storedId === verificationId
-      });
 
       return verificationId;
     } catch (error) {
       logger.error("[PhoneAuthService] Phone verification start failed", {
-        flowId,
         error: error instanceof Error ? error.message : String(error),
         errorCode: (error as any)?.code,
         phoneMasked: phoneNumber.replace(/\d(?=\d{4})/g, '*'),

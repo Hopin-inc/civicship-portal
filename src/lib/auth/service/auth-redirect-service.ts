@@ -3,7 +3,6 @@ import { GqlUser } from "@/types/graphql";
 import { encodeURIComponentWithType, matchPaths, RawURIComponent } from "@/utils/path";
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
 import { AuthenticationState } from "@/types/auth";
-import { logger } from "@/lib/logging";
 
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
@@ -25,24 +24,11 @@ export class AuthRedirectService {
     next?: RawURIComponent | null,
     currentUser?: GqlUser | null,
   ): RawURIComponent | null {
-    const flowId = `redirect-${Date.now()}`;
     const authState = this.authStateManager.getState();
     const basePath = pathname.split("?")[0];
     const nextParam = next ? this.generateNextParam(next) : this.generateNextParam(pathname);
 
-    logger.debug("[AuthRedirectService] getRedirectPath:start", {
-      flowId,
-      pathname,
-      basePath,
-      next,
-      authState,
-      hasCurrentUser: !!currentUser,
-      currentUserId: currentUser?.id,
-      membershipsCount: currentUser?.memberships?.length
-    });
-
     if (authState === "loading" || authState === "authenticating") {
-      logger.debug("[AuthRedirectService] Skipping redirect - loading/authenticating", { flowId, authState });
       return null;
     }
 
@@ -54,38 +40,19 @@ export class AuthRedirectService {
       nextParam,
     );
     if (redirectFromLogin) {
-      logger.info("[AuthRedirectService] Redirect from auth entry flow", { 
-        flowId,
-        from: pathname,
-        to: redirectFromLogin,
-        reason: "handleAuthEntryFlow"
-      });
       return redirectFromLogin;
     }
 
     const redirectFromUserPath = this.handleUserPath(basePath, authState, currentUser, nextParam);
     if (redirectFromUserPath) {
-      logger.info("[AuthRedirectService] Redirect from user path", { 
-        flowId,
-        from: pathname,
-        to: redirectFromUserPath,
-        reason: "handleUserPath"
-      });
       return redirectFromUserPath;
     }
 
     const redirectByRole = this.handleRoleRestriction(currentUser, basePath);
     if (redirectByRole) {
-      logger.info("[AuthRedirectService] Redirect by role restriction", { 
-        flowId,
-        from: pathname,
-        to: redirectByRole,
-        reason: "handleRoleRestriction"
-      });
       return redirectByRole;
     }
 
-    logger.debug("[AuthRedirectService] No redirect needed", { flowId, pathname });
     return null;
   }
 
