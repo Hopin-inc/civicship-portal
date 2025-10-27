@@ -34,6 +34,9 @@ export const GET_MEMBER_WALLETS_SERVER_QUERY = `
         node {
           id
           type
+          currentPointView {
+            currentPoint
+          }
           community {
             id
           }
