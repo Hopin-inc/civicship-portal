@@ -13,30 +13,39 @@ interface CurrentUserProfileQueryResult {
   } | null;
 }
 
-export function ClientLayout({ children }: { children: React.ReactNode }) {
+interface ClientLayoutProps {
+  children: React.ReactNode;
+  ssrUser: GqlUser | null;
+}
+
+export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   const { data, loading } = useQuery<CurrentUserProfileQueryResult>(GET_CURRENT_USER_PROFILE, {
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: ssrUser ? "cache-and-network" : "network-only",
     nextFetchPolicy: "cache-first",
   });
 
-  const gqlUser = data?.currentUser?.user ?? null;
+  const csrUser = data?.currentUser?.user ?? null;
 
-  if (loading && !gqlUser) {
+  if (ssrUser) {
+    return <>{children}</>;
+  }
+
+  if (loading && !csrUser) {
     return <LoadingIndicator />;
   }
 
-  if (!gqlUser) {
+  if (!csrUser) {
     return notFound();
   }
 
-  const portfolios = (gqlUser.portfolios ?? []).map(mapGqlPortfolio);
+  const portfolios = (csrUser.portfolios ?? []).map(mapGqlPortfolio);
 
   return (
     <UserProfileProvider
       value={{
-        userId: gqlUser.id,
+        userId: csrUser.id,
         isOwner: true,
-        gqlUser,
+        gqlUser: csrUser,
         portfolios,
       }}
     >
