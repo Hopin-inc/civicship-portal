@@ -3,6 +3,10 @@ import { cookies } from "next/headers";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlWalletType } from "@/types/graphql";
+import { 
+  GET_CURRENT_USER_ID_SERVER_QUERY, 
+  GET_MEMBER_WALLETS_SERVER_QUERY 
+} from "@/graphql/account/wallet/server";
 
 interface CurrentUserData {
   currentUser: {
@@ -38,11 +42,7 @@ export default async function WalletsRedirectPage({
   
   try {
     const userData = await executeServerGraphQLQuery<CurrentUserData>(
-      `query GetCurrentUser {
-        currentUser {
-          id
-        }
-      }`,
+      GET_CURRENT_USER_ID_SERVER_QUERY,
       {},
       { Authorization: `Bearer ${session}` }
     );
@@ -54,19 +54,7 @@ export default async function WalletsRedirectPage({
     }
     
     const walletsData = await executeServerGraphQLQuery<MemberWalletsData>(
-      `query GetMemberWallets($filter: WalletFilterInput) {
-        wallets(filter: $filter) {
-          edges {
-            node {
-              id
-              type
-              community {
-                id
-              }
-            }
-          }
-        }
-      }`,
+      GET_MEMBER_WALLETS_SERVER_QUERY,
       {
         filter: {
           type: GqlWalletType.Member,

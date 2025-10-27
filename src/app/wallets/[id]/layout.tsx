@@ -5,6 +5,10 @@ import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlWalletType } from "@/types/graphql";
 import { toPointNumber } from "@/utils/bigint";
+import { 
+  GET_CURRENT_USER_ID_SERVER_QUERY, 
+  GET_WALLET_BY_ID_SERVER_QUERY 
+} from "@/graphql/account/wallet/server";
 
 interface CurrentUserData {
   currentUser: {
@@ -51,11 +55,7 @@ export default async function WalletLayout({
 
   try {
     const userData = await executeServerGraphQLQuery<CurrentUserData>(
-      `query GetCurrentUser {
-        currentUser {
-          id
-        }
-      }`,
+      GET_CURRENT_USER_ID_SERVER_QUERY,
       {},
       { Authorization: `Bearer ${session}` }
     );
@@ -67,24 +67,7 @@ export default async function WalletLayout({
     }
 
     const walletData = await executeServerGraphQLQuery<WalletData>(
-      `query GetWalletById($id: ID!) {
-        wallet(id: $id) {
-          id
-          type
-          currentPointView {
-            currentPoint
-          }
-          user {
-            id
-            name
-            image
-          }
-          community {
-            id
-            name
-          }
-        }
-      }`,
+      GET_WALLET_BY_ID_SERVER_QUERY,
       { id: params.id },
       { Authorization: `Bearer ${session}` }
     );
