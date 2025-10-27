@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { WalletProvider } from "@/app/wallets/features/shared/contexts/WalletContext";
 import { getServerMyWalletWithTransactions } from "@/hooks/wallet/server";
 import { toPointNumber } from "@/utils/bigint";
