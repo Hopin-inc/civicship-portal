@@ -3,7 +3,7 @@
 import { createContext, ReactNode, useCallback, useContext, useState } from "react";
 import { toPointNumber } from "@/utils/bigint";
 import { logger } from "@/lib/logging";
-import { fetchMyWalletTransactionsAction } from "@/app/wallets/me/actions";
+import { fetchMyWalletTransactionsAction } from "@/app/wallets/features/shared/refetchActions";
 import { AppTransaction } from "@/app/wallets/features/shared/data/type";
 import { GqlTransaction, GqlTransactionsConnection } from "@/types/graphql";
 import { presenterTransaction } from "@/app/wallets/features/shared/data/presenter";
@@ -46,8 +46,12 @@ export function WalletProvider({
       .map((edge) => presenterTransaction(edge.node, walletId))
       .filter((tx): tx is AppTransaction => tx !== null);
   });
-  const [hasNextPage, setHasNextPage] = useState(initialTransactions.pageInfo?.hasNextPage ?? false);
-  const [endCursor, setEndCursor] = useState<string | null>(initialTransactions.pageInfo?.endCursor ?? null);
+  const [hasNextPage, setHasNextPage] = useState(
+    initialTransactions.pageInfo?.hasNextPage ?? false,
+  );
+  const [endCursor, setEndCursor] = useState<string | null>(
+    initialTransactions.pageInfo?.endCursor ?? null,
+  );
   const [error, setError] = useState<Error | null>(null);
   const [isLoadingWallet, setIsLoadingWallet] = useState(false);
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
@@ -56,17 +60,19 @@ export function WalletProvider({
     setIsLoadingWallet(true);
     setError(null);
     try {
-      const { refreshMyWalletWithTransactionsAction } = await import("@/app/wallets/me/actions");
+      const { refreshMyWalletWithTransactionsAction } = await import(
+        "@/app/wallets/features/shared/refetchActions"
+      );
       const result = await refreshMyWalletWithTransactionsAction();
-      
+
       setCurrentPoint(toPointNumber(result.currentPoint, 0));
-      
+
       const edges = result.transactions.edges ?? [];
       const newTransactions = edges
         .filter((edge): edge is { node: GqlTransaction } => !!edge?.node)
         .map((edge) => presenterTransaction(edge.node, walletId))
         .filter((tx): tx is AppTransaction => tx !== null);
-      
+
       setTransactions(newTransactions);
       setHasNextPage(result.transactions.pageInfo?.hasNextPage ?? false);
       setEndCursor(result.transactions.pageInfo?.endCursor ?? null);
@@ -87,13 +93,13 @@ export function WalletProvider({
     setIsLoadingTransactions(true);
     try {
       const result = await fetchMyWalletTransactionsAction(endCursor, 20);
-      
+
       const edges = result.edges ?? [];
       const newTransactions = edges
         .filter((edge): edge is { node: GqlTransaction } => !!edge?.node)
         .map((edge) => presenterTransaction(edge.node, walletId))
         .filter((tx): tx is AppTransaction => tx !== null);
-      
+
       setTransactions((prev) => [...prev, ...newTransactions]);
       setHasNextPage(result.pageInfo?.hasNextPage ?? false);
       setEndCursor(result.pageInfo?.endCursor ?? null);
