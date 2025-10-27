@@ -1716,6 +1716,7 @@ export type GqlQuery = {
   evaluations: GqlEvaluationsConnection;
   membership?: Maybe<GqlMembership>;
   memberships: GqlMembershipsConnection;
+  myWallet?: Maybe<GqlWallet>;
   nftInstance?: Maybe<GqlNftInstance>;
   nftInstances: GqlNftInstancesConnection;
   opportunities: GqlOpportunitiesConnection;
@@ -3959,17 +3960,7 @@ export type GqlGetWalletTransactionsQuery = {
           __typename?: "Wallet";
           id: string;
           type: GqlWalletType;
-          user?: {
-            __typename?: "User";
-            id: string;
-            name: string;
-            image?: string | null;
-            didIssuanceRequests?: Array<{
-              __typename?: "DidIssuanceRequest";
-              status: GqlDidIssuanceStatus;
-              didValue?: string | null;
-            }> | null;
-          } | null;
+          user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
         } | null;
       } | null;
     } | null> | null;
@@ -8423,10 +8414,6 @@ export const GetWalletTransactionsDocument = gql`
               id
               name
               image
-              didIssuanceRequests {
-                status
-                didValue
-              }
             }
           }
         }

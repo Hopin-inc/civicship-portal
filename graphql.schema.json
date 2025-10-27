@@ -15162,6 +15162,18 @@
             "deprecationReason": null
           },
           {
+            "name": "myWallet",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Wallet",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "nftInstance",
             "description": null,
             "args": [

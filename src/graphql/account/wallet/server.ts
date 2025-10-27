@@ -1,14 +1,6 @@
-export const GET_CURRENT_USER_ID_SERVER_QUERY = `
-  query GetCurrentUserId {
-    currentUser {
-      id
-    }
-  }
-`;
-
-export const GET_WALLET_BY_ID_SERVER_QUERY = `
-  query GetWalletById($id: ID!) {
-    wallet(id: $id) {
+export const GET_MY_WALLET_SERVER_QUERY = `
+  query GetMyWallet {
+    myWallet {
       id
       type
       currentPointView {
