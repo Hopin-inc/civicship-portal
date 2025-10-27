@@ -1,68 +1,52 @@
 import { notFound } from "next/navigation";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { GqlWalletType } from "@/types/graphql";
 import { toPointNumber } from "@/utils/bigint";
-import { GET_MEMBER_WALLETS_SERVER_QUERY } from "@/graphql/account/wallet/server";
+import { GET_MY_WALLET_SERVER_QUERY } from "@/graphql/account/wallet/server";
 
-interface MemberWalletsData {
-  wallets: {
-    edges: Array<{
-      node: {
-        id: string;
-        type: string;
-        currentPointView: { currentPoint: string } | null;
-        community: { id: string } | null;
-      };
-    }>;
-  };
+interface MyWalletData {
+  myWallet: {
+    id: string;
+    type: string;
+    currentPointView: { currentPoint: string } | null;
+    user: { id: string } | null;
+    community: { id: string } | null;
+  } | null;
 }
 
 export interface MyMemberWalletResult {
   walletId: string;
   userId: string;
   initialCurrentPoint: number;
-  initialWalletType: "MEMBER" | "COMMUNITY";
 }
 
 export async function fetchMyMemberWalletServer(session: string): Promise<MyMemberWalletResult> {
-  const userId = "cmh8cymuv00008zp26ed7n42i";
-
-  let walletsData: MemberWalletsData | null = null;
+  let walletData: MyWalletData | null = null;
   try {
-    walletsData = await executeServerGraphQLQuery<MemberWalletsData>(
-      GET_MEMBER_WALLETS_SERVER_QUERY,
-      {
-        filter: {
-          type: GqlWalletType.Member,
-          userId,
-          communityId: COMMUNITY_ID,
-        },
-      },
+    walletData = await executeServerGraphQLQuery<MyWalletData>(
+      GET_MY_WALLET_SERVER_QUERY,
+      {},
       { Authorization: `Bearer ${session}` },
     );
   } catch (error: any) {
-    console.error("[fetchMyMemberWalletServer] Failed to fetch wallets:", error);
-    throw new Error("ウォレット情報の取得に失敗しました。");
+    console.error("[fetchMyMemberWalletServer] Failed to fetch myWallet:", error);
   }
 
-  const wallet = walletsData?.wallets?.edges?.[0]?.node;
+  const wallet = walletData?.myWallet;
 
-  if (!wallet || wallet.community?.id !== COMMUNITY_ID || wallet.type !== GqlWalletType.Member) {
-    console.warn("[fetchMyMemberWalletServer] No valid member wallet found", {
+  if (!wallet || wallet.community?.id !== COMMUNITY_ID) {
+    console.warn("[fetchMyMemberWalletServer] No valid myWallet found", {
       wallet,
       communityId: COMMUNITY_ID,
     });
     notFound();
   }
 
-  // --- Step 3: 整形と返却 ---
   const initialCurrentPoint = toPointNumber(wallet.currentPointView?.currentPoint, 0);
 
   return {
     walletId: wallet.id,
-    userId,
+    userId: wallet.user?.id ?? "unknown",
     initialCurrentPoint,
-    initialWalletType: "MEMBER",
   };
 }

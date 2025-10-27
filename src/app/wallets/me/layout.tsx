@@ -2,12 +2,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { WalletProvider } from "@/app/wallets/features/shared/contexts/WalletContext";
 import { fetchMyMemberWalletServer } from "@/app/wallets/features/shared/server/fetchMyMemberWalletServer";
+import { logger } from "@/lib/logging";
 
-export default async function WalletMeLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function WalletMeLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const session = cookieStore.get("session")?.value;
 
@@ -15,20 +12,21 @@ export default async function WalletMeLayout({
     redirect("/login");
   }
 
-  let walletData;
+  let res;
   try {
-    walletData = await fetchMyMemberWalletServer(session);
+    res = await fetchMyMemberWalletServer(session);
   } catch (error) {
-    console.error("Failed to fetch wallet data (SSR):", error);
+    logger.error("Failed to fetch wallet data (SSR):", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     throw error;
   }
 
   return (
     <WalletProvider
-      walletId={walletData.walletId}
-      userId={walletData.userId}
-      initialCurrentPoint={walletData.initialCurrentPoint}
-      initialWalletType={walletData.initialWalletType}
+      walletId={res.walletId}
+      userId={res.userId}
+      initialCurrentPoint={res.initialCurrentPoint}
     >
       {children}
     </WalletProvider>
