@@ -1,6 +1,5 @@
 import { AuthenticationState } from "@/types/auth";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
-import { logger } from "@/lib/logging";
 
 export class AuthStateManager {
   private static instance: AuthStateManager;
@@ -57,24 +56,9 @@ export class AuthStateManager {
 
       const downgradeBlocked =
         !["unauthenticated", "loading"].includes(current) && newState === "unauthenticated";
-      if (downgradeBlocked) {
-        logger.warn("[AuthStateManager] Downgrade blocked", {
-          component: "AuthStateManager",
-          from: current,
-          to: newState,
-        });
-        return;
-      }
+      if (downgradeBlocked) return;
 
-      if (!allowed.includes(newState)) {
-        logger.warn("[AuthStateManager] Transition not allowed", {
-          component: "AuthStateManager",
-          from: current,
-          to: newState,
-          allowedTransitions: allowed,
-        });
-        return;
-      }
+      if (!allowed.includes(newState)) return;
 
       this.pendingState = newState;
       setState({ authenticationState: newState });
