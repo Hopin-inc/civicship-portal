@@ -4,36 +4,14 @@ import { cookies } from "next/headers";
 import { getServerMyWalletWithTransactions } from "@/hooks/wallet/server";
 
 /**
- * Server Action: マイウォレット情報とトランザクションを統合取得（refresh用）
- * WalletProviderのrefresh用
+ * Server Action: マイウォレット情報とトランザクションを統合取得
+ * refresh用とpagination用の両方で使用される統一アクション
+ * 
+ * @param cursor - ページネーション用のカーソル（オプション）
+ * @param first - 取得するトランザクション数（デフォルト: 20）
+ * @returns wallet情報とtransactionsを含むオブジェクト
  */
-export async function refreshMyWalletWithTransactionsAction() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value;
-
-  if (!session) {
-    throw new Error("No session found");
-  }
-
-  const result = await getServerMyWalletWithTransactions(session, { first: 20 });
-
-  if (!result.wallet) {
-    throw new Error("Failed to fetch wallet");
-  }
-
-  return {
-    id: result.wallet.id,
-    currentPoint: result.wallet.currentPoint.toString(),
-    accumulatedPoint: result.wallet.accumulatedPoint.toString(),
-    transactions: result.transactions,
-  };
-}
-
-/**
- * Server Action: マイウォレットのトランザクションをカーソルベースで取得（pagination用）
- * 統合クエリを使用し、transactionsのみを返す
- */
-export async function fetchMyWalletTransactionsAction(cursor?: string, first: number = 20) {
+export async function fetchMyWalletWithTransactionsAction(cursor?: string, first: number = 20) {
   const cookieStore = await cookies();
   const session = cookieStore.get("session")?.value;
 
@@ -43,5 +21,12 @@ export async function fetchMyWalletTransactionsAction(cursor?: string, first: nu
 
   const result = await getServerMyWalletWithTransactions(session, { first, after: cursor });
 
-  return result.transactions;
+  return {
+    wallet: result.wallet ? {
+      id: result.wallet.id,
+      currentPoint: result.wallet.currentPoint.toString(),
+      accumulatedPoint: result.wallet.accumulatedPoint.toString(),
+    } : null,
+    transactions: result.transactions,
+  };
 }

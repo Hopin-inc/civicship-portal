@@ -3,7 +3,6 @@
 import { createContext, ReactNode, useCallback, useContext, useState } from "react";
 import { toPointNumber } from "@/utils/bigint";
 import { logger } from "@/lib/logging";
-import { fetchMyWalletTransactionsAction } from "@/app/wallets/features/shared/refetchActions";
 import { AppTransaction } from "@/app/wallets/features/shared/data/type";
 import { GqlTransaction, GqlTransactionsConnection } from "@/types/graphql";
 import { presenterTransaction } from "@/app/wallets/features/shared/data/presenter";
@@ -60,12 +59,16 @@ export function WalletProvider({
     setIsLoadingWallet(true);
     setError(null);
     try {
-      const { refreshMyWalletWithTransactionsAction } = await import(
+      const { fetchMyWalletWithTransactionsAction } = await import(
         "@/app/wallets/features/shared/refetchActions"
       );
-      const result = await refreshMyWalletWithTransactionsAction();
+      const result = await fetchMyWalletWithTransactionsAction();
 
-      setCurrentPoint(toPointNumber(result.currentPoint, 0));
+      if (!result.wallet) {
+        throw new Error("Failed to fetch wallet");
+      }
+
+      setCurrentPoint(toPointNumber(result.wallet.currentPoint, 0));
 
       const edges = result.transactions.edges ?? [];
       const newTransactions = edges
@@ -92,17 +95,20 @@ export function WalletProvider({
 
     setIsLoadingTransactions(true);
     try {
-      const result = await fetchMyWalletTransactionsAction(endCursor, 20);
+      const { fetchMyWalletWithTransactionsAction } = await import(
+        "@/app/wallets/features/shared/refetchActions"
+      );
+      const result = await fetchMyWalletWithTransactionsAction(endCursor, 20);
 
-      const edges = result.edges ?? [];
+      const edges = result.transactions.edges ?? [];
       const newTransactions = edges
         .filter((edge): edge is { node: GqlTransaction } => !!edge?.node)
         .map((edge) => presenterTransaction(edge.node, walletId))
         .filter((tx): tx is AppTransaction => tx !== null);
 
       setTransactions((prev) => [...prev, ...newTransactions]);
-      setHasNextPage(result.pageInfo?.hasNextPage ?? false);
-      setEndCursor(result.pageInfo?.endCursor ?? null);
+      setHasNextPage(result.transactions.pageInfo?.hasNextPage ?? false);
+      setEndCursor(result.transactions.pageInfo?.endCursor ?? null);
     } catch (err) {
       logger.error("Failed to load more transactions", {
         error: err instanceof Error ? err.message : String(err),
