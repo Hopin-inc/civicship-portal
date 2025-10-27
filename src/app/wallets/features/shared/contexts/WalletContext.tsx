@@ -6,7 +6,6 @@ import { logger } from "@/lib/logging";
 import { AppTransaction } from "@/app/wallets/features/shared/data/type";
 import { GqlTransactionsConnection } from "@/types/graphql";
 import { presenterTransaction } from "@/app/wallets/features/shared/data/presenter";
-import { isTransactionEdgeWithNode } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
 
 export interface WalletContextValue {
   walletId: string;
@@ -42,8 +41,7 @@ export function WalletProvider({
   const [transactions, setTransactions] = useState<AppTransaction[]>(() => {
     const edges = initialTransactions.edges ?? [];
     return edges
-      .filter(isTransactionEdgeWithNode)
-      .map((edge) => presenterTransaction(edge.node, walletId))
+      .map((edge) => presenterTransaction(edge?.node, walletId))
       .filter((tx): tx is AppTransaction => tx !== null);
   });
   const [hasNextPage, setHasNextPage] = useState(
@@ -73,8 +71,7 @@ export function WalletProvider({
 
       const edges = result.transactions.edges ?? [];
       const newTransactions = edges
-        .filter(isTransactionEdgeWithNode)
-        .map((edge) => presenterTransaction(edge.node, walletId))
+        .map((edge) => presenterTransaction(edge?.node, walletId))
         .filter((tx): tx is AppTransaction => tx !== null);
 
       setTransactions(newTransactions);
@@ -103,8 +100,7 @@ export function WalletProvider({
 
       const edges = result.transactions.edges ?? [];
       const newTransactions = edges
-        .filter(isTransactionEdgeWithNode)
-        .map((edge) => presenterTransaction(edge.node, walletId))
+        .map((edge) => presenterTransaction(edge?.node, walletId))
         .filter((tx): tx is AppTransaction => tx !== null);
 
       setTransactions((prev) => [...prev, ...newTransactions]);

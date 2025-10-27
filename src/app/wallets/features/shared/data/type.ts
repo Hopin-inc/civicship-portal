@@ -1,24 +1,4 @@
-import { GqlTicketStatus, GqlTicketStatusReason, GqlTransactionReason } from "@/types/graphql";
-
-export type Wallet = {
-  currentPoint: number;
-};
-
-export type UserAsset = {
-  tickets: AvailableTicket[];
-  points: AvailablePoint;
-};
-
-export type AvailableTicket = {
-  id: string;
-  status: GqlTicketStatus;
-  reason: GqlTicketStatusReason;
-};
-
-export type AvailablePoint = {
-  walletId: string;
-  currentPoint: bigint;
-};
+import { GqlTransactionReason } from "@/types/graphql";
 
 export type AppTransaction = {
   id: string;

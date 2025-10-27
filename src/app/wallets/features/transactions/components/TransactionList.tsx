@@ -1,30 +1,20 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import TransactionItem from "@/components/shared/TransactionItem";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import Link from "next/link";
 import { useWalletContext } from "@/app/wallets/features/shared/contexts/WalletContext";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 export function TransactionList() {
   const { transactions, hasNextPage, isLoadingTransactions, loadMore } = useWalletContext();
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!sentinelRef.current || !hasNextPage || isLoadingTransactions) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(sentinelRef.current);
-    return () => observer.disconnect();
-  }, [hasNextPage, isLoadingTransactions, loadMore]);
+  const targetRef = useInfiniteScroll({
+    hasMore: hasNextPage,
+    isLoading: isLoadingTransactions,
+    onLoadMore: loadMore,
+    threshold: 0.1,
+  });
 
   return (
     <div className="pt-10">
@@ -48,7 +38,7 @@ export function TransactionList() {
               <TransactionItem key={transaction.id} transaction={transaction} />
             ))}
             {hasNextPage && (
-              <div ref={sentinelRef} className="h-10 flex items-center justify-center">
+              <div ref={targetRef} className="h-10 flex items-center justify-center">
                 {isLoadingTransactions && <LoadingIndicator />}
               </div>
             )}

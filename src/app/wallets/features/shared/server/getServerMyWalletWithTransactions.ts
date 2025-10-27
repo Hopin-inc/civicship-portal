@@ -1,5 +1,5 @@
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
-import { GqlTransactionsConnection, GqlTransactionEdge, GqlTransaction } from "@/types/graphql";
+import { GqlTransactionsConnection } from "@/types/graphql";
 import { GET_MY_WALLET_WITH_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/wallet/server";
 
 export interface MyWalletWithTransactionsResult {
@@ -31,16 +31,6 @@ const fallbackConnection: GqlTransactionsConnection = {
   },
   totalCount: 0,
 };
-
-/**
- * Type guard to check if an edge has a non-null node
- * This properly narrows the type while maintaining the cursor property
- */
-export function isTransactionEdgeWithNode(
-  edge: GqlTransactionEdge | null | undefined
-): edge is GqlTransactionEdge & { node: GqlTransaction } {
-  return !!edge?.node;
-}
 
 /**
  * サーバーサイドでマイウォレット情報とトランザクションを統合取得する関数
