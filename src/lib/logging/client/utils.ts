@@ -7,31 +7,6 @@ import { detectEnvironment } from "@/lib/auth/core/environment-detector";
  * クライアント環境とサーバー環境の両方で動作するよう設計
  */
 
-/**
- * フローIDを生成する（認証フロー追跡用）
- * @returns 一意のフローID
- */
-export const generateFlowId = (): string => {
-  return `flow_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-};
-
-/**
- * UIDの末尾6文字を取得（プライバシー保護）
- */
-export const getUidSuffix = (uid: string | null | undefined): string | null => {
-  if (!uid) return null;
-  return uid.slice(-6);
-};
-
-/**
- * 電話番号をマスク（末尾4桁のみ表示）
- */
-export const maskPhoneNumber = (phone: string | null | undefined): string | null => {
-  if (!phone) return null;
-  if (phone.length <= 4) return "****";
-  return `****${phone.slice(-4)}`;
-};
-
 let serverUtils: any = null;
 
 if (typeof window === "undefined") {
