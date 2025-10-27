@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -37,9 +37,9 @@ export function PhoneVerificationForm() {
           authLoggerRef.current = new AuthFlowLogger(undefined, "phone");
           flowIdRef.current = authLoggerRef.current.getFlowId();
         }
-        authLoggerRef.current.info("phone/form_start_verification", { 
+        authLoggerRef.current.info("phone/form_start_verification", {
           hasPhoneAuth: !!phoneAuth,
-          hasFn: typeof phoneAuth.startPhoneVerification === 'function'
+          hasFn: typeof phoneAuth.startPhoneVerification === "function",
         });
         return phoneAuth.startPhoneVerification(phoneNumber);
       },
@@ -50,19 +50,19 @@ export function PhoneVerificationForm() {
       isDisabled: isResendDisabled,
       start: startResendTimer,
     },
-    authLoggerRef.current || undefined
+    authLoggerRef.current || undefined,
   );
   const codeVerification = useCodeVerification(
-    { 
+    {
       verifyPhoneCode: (code: string) => {
         const flowId = flowIdRef.current;
         console.log("[PhoneForm] verifyPhoneCode wrapper called", { flowId });
         return phoneAuth.verifyPhoneCode(code);
-      }
+      },
     },
     nextParam,
     updateAuthState,
-    flowIdRef
+    flowIdRef,
   );
 
   const { isValid: isPhoneValid, formattedPhone } = validatePhoneNumber(phoneNumber);
@@ -80,21 +80,21 @@ export function PhoneVerificationForm() {
       flowIdRef.current = authLoggerRef.current.getFlowId();
     }
 
-    authLoggerRef.current.info("phone/form_submit_start", { 
-      phoneMasked: formattedPhone.replace(/\d(?=\d{4})/g, '*')
+    authLoggerRef.current.info("phone/form_submit_start", {
+      phoneMasked: formattedPhone.replace(/\d(?=\d{4})/g, "*"),
     });
 
     const result = await phoneSubmission.submit(formattedPhone);
 
     if (result.success) {
-      authLoggerRef.current.info("phone/form_submit_success", { 
-        nextStep: "code"
+      authLoggerRef.current.info("phone/form_submit_success", {
+        nextStep: "code",
       });
       setStep("code");
     } else if (result.error) {
-      authLoggerRef.current.error("phone/form_submit_failed", { 
+      authLoggerRef.current.error("phone/form_submit_failed", {
         errorType: result.error.type,
-        errorMessage: result.error.message
+        errorMessage: result.error.message,
       });
       toast.error(result.error.message);
     }
@@ -120,23 +120,23 @@ export function PhoneVerificationForm() {
     const result = await codeVerification.verify(verificationCode);
 
     if (result.success) {
-      authLoggerRef.current?.info("phone/form_code_verification_success", { 
+      authLoggerRef.current?.info("phone/form_code_verification_success", {
         hasRedirectPath: !!result.redirectPath,
-        redirectPath: result.redirectPath
+        redirectPath: result.redirectPath,
       });
       if (result.message) {
         toast.success(result.message);
       }
       if (result.redirectPath) {
-        authLoggerRef.current?.info("phone/form_navigation", { 
-          to: result.redirectPath 
+        authLoggerRef.current?.info("phone/form_navigation", {
+          to: result.redirectPath,
         });
         router.push(result.redirectPath);
       }
     } else if (result.error) {
-      authLoggerRef.current?.error("phone/form_code_verification_failed", { 
+      authLoggerRef.current?.error("phone/form_code_verification_failed", {
         errorType: result.error.type,
-        errorMessage: result.error.message
+        errorMessage: result.error.message,
       });
       toast.error(result.error.message);
     }
@@ -148,19 +148,14 @@ export function PhoneVerificationForm() {
 
   const handleBackToPhone = () => {
     authLoggerRef.current?.info("phone/form_back_to_phone", {});
-    
+
     setPhoneNumber("");
     setVerificationCode("");
     setStep("phone");
-    
-    const { setState, phoneAuth: currentPhoneAuth } = useAuthStore.getState();
-    setState({
-      phoneAuth: {
-        ...currentPhoneAuth,
-        verificationId: null,
-      },
-    });
-    
+
+    const { setPhoneAuth } = useAuthStore.getState();
+    setPhoneAuth({ verificationId: null });
+
     authLoggerRef.current = null;
     flowIdRef.current = null;
   };
