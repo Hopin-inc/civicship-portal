@@ -181,3 +181,156 @@ export const GET_WALLET_TRANSACTIONS_QUERY = gql`
     }
   }
 `;
+
+export const GET_MY_WALLET = gql`
+  query GetMyWallet {
+    myWallet {
+      id
+      type
+      currentPointView {
+        currentPoint
+      }
+      accumulatedPointView {
+        accumulatedPoint
+      }
+      user {
+        id
+        name
+        image
+      }
+      community {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const GET_WALLET_WITH_TRANSACTIONS_CONNECTION = gql`
+  query GetWalletWithTransactionsConnection(
+    $id: ID!
+    $first: Int
+    $cursor: String
+    $sort: TransactionSortInput
+  ) {
+    wallet(id: $id) {
+      id
+      type
+      currentPointView {
+        currentPoint
+      }
+      accumulatedPointView {
+        accumulatedPoint
+      }
+      user {
+        id
+        name
+        image
+      }
+      community {
+        id
+        name
+      }
+      transactionsConnection(first: $first, cursor: $cursor, sort: $sort) {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+        edges {
+          cursor
+          node {
+            id
+            reason
+            comment
+            fromPointChange
+            createdAt
+            fromWallet {
+              id
+              type
+              user {
+                id
+                name
+                image
+              }
+            }
+            toWallet {
+              id
+              type
+              user {
+                id
+                name
+                image
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_MY_WALLET_WITH_TRANSACTIONS_CONNECTION = gql`
+  query GetMyWalletWithTransactionsConnection(
+    $first: Int
+    $cursor: String
+    $sort: TransactionSortInput
+  ) {
+    myWallet {
+      id
+      type
+      currentPointView {
+        currentPoint
+      }
+      accumulatedPointView {
+        accumulatedPoint
+      }
+      user {
+        id
+        name
+        image
+      }
+      community {
+        id
+        name
+      }
+      transactionsConnection(first: $first, cursor: $cursor, sort: $sort) {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+        edges {
+          cursor
+          node {
+            id
+            reason
+            comment
+            fromPointChange
+            createdAt
+            fromWallet {
+              id
+              type
+              user {
+                id
+                name
+                image
+              }
+            }
+            toWallet {
+              id
+              type
+              user {
+                id
+                name
+                image
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
