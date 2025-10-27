@@ -83,9 +83,7 @@ export class PhoneAuthService {
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const baseContainer = document.getElementById("recaptcha-container");
-      
       if (!baseContainer) {
-        logger.error("[PhoneAuthService] Base container not found");
         throw new Error("Base reCAPTCHA container element not found");
       }
 
@@ -95,19 +93,19 @@ export class PhoneAuthService {
 
       this.recaptchaContainerElement = newContainer;
 
-      const recaptchaSize = isRunningInLiff() ? "normal" : "invisible";
-
       this.recaptchaVerifier = new RecaptchaVerifier(getPhoneAuth(), this.recaptchaContainerId, {
-        size: recaptchaSize,
+        size: isRunningInLiff() ? "normal" : "invisible",
         callback: () => {
+          logger.debug("reCAPTCHA completed", {
+            authType: "phone",
+            component: "PhoneAuthService",
+            environment: isRunningInLiff() ? "liff" : "browser",
+          });
           if (isRunningInLiff()) {
             window.dispatchEvent(new CustomEvent("recaptcha-completed"));
           }
         },
-        "expired-callback": () => {
-          logger.info("[PhoneAuthService] reCAPTCHA expired");
-          this.clearRecaptcha();
-        },
+        "expired-callback": () => this.clearRecaptcha(),
       });
 
       await this.recaptchaVerifier.render();
@@ -118,16 +116,11 @@ export class PhoneAuthService {
         this.recaptchaVerifier,
       );
 
-      const verificationId = confirmationResult.verificationId;
-
-      useAuthStore.getState().setPhoneAuth({ verificationId });
-
-      return verificationId;
+      return confirmationResult.verificationId;
     } catch (error) {
-      logger.error("[PhoneAuthService] Phone verification start failed", {
+      logger.error("Phone verification start failed", {
         error: error instanceof Error ? error.message : String(error),
-        errorCode: (error as any)?.code,
-        phoneMasked: phoneNumber.replace(/\d(?=\d{4})/g, '*'),
+        phoneNumber,
         component: "PhoneAuthService",
       });
       throw error;

@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
 import { categorizeFirebaseError } from "@/lib/auth/core/firebase-config";
 import { isRunningInLiff } from "@/lib/auth/core/environment-detector";
 import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
 import { useRecaptchaManager } from "./useRecaptchaManager";
 import { useResendTimer } from "./useResendTimer";
 import { logger } from "@/lib/logging";
-import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface PhoneSubmissionResult {
   success: boolean;
@@ -19,10 +19,7 @@ interface PhoneSubmissionResult {
 }
 
 export function usePhoneSubmission(
-  phoneAuth: {
-    startPhoneVerification: (phoneNumber: string) => Promise<string | null>;
-    clearRecaptcha?: () => void;
-  },
+  phoneAuth: PhoneAuthService,
   recaptchaManager: ReturnType<typeof useRecaptchaManager>,
   resendTimer: Pick<ReturnType<typeof useResendTimer>, "isDisabled" | "start">
 ) {
@@ -81,40 +78,13 @@ export function usePhoneSubmission(
         };
       }
 
-      useAuthStore.getState().setState({
-        phoneAuth: {
-          ...useAuthStore.getState().phoneAuth,
-          verificationId: null,
-        },
-      });
-
       setIsSubmitting(true);
 
       try {
-        const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
-        const storedId = useAuthStore.getState().phoneAuth.verificationId;
-        
-        if (!verificationId || !storedId || storedId !== verificationId) {
-          logger.error("Phone verification ID mismatch", {
-            verificationIdReturned: !!verificationId,
-            verificationIdStored: !!storedId,
-          });
-          return {
-            success: false,
-            error: {
-              message: "認証コードの送信に失敗しました。もう一度お試しください。",
-              type: "verification-id-missing"
-            }
-          };
-        }
-
+        await phoneAuth.startPhoneVerification(formattedPhone);
         resendTimer.start();
         return { success: true };
       } catch (error) {
-        logger.error("Phone verification submission failed", {
-          errorCode: (error as any)?.code,
-          errorMessage: (error as any)?.message,
-        });
         return handleSubmissionError(error);
       } finally {
         setIsSubmitting(false);
@@ -165,36 +135,12 @@ export function usePhoneSubmission(
       try {
         phoneAuth.clearRecaptcha?.();
 
-        useAuthStore.getState().setState({
-          phoneAuth: {
-            ...useAuthStore.getState().phoneAuth,
-            verificationId: null,
-          },
-        });
-
         const waitTime = isRunningInLiff()
           ? PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_LIFF
           : PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_BROWSER;
-
         await new Promise((resolve) => setTimeout(resolve, waitTime));
 
-        const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
-        const storedId = useAuthStore.getState().phoneAuth.verificationId;
-        
-        if (!verificationId || !storedId || storedId !== verificationId) {
-          logger.error("Phone verification ID mismatch on resend", {
-            verificationIdReturned: !!verificationId,
-            verificationIdStored: !!storedId,
-          });
-          return {
-            success: false,
-            error: {
-              message: "認証コードの再送信に失敗しました。もう一度お試しください。",
-              type: "verification-id-missing"
-            }
-          };
-        }
-
+        await phoneAuth.startPhoneVerification(formattedPhone);
         resendTimer.start();
 
         if (!isRunningInLiff()) {
@@ -203,10 +149,7 @@ export function usePhoneSubmission(
 
         return { success: true, message: "認証コードを再送信しました" };
       } catch (error) {
-        logger.error("Phone verification resend failed", {
-          errorCode: (error as any)?.code,
-          errorMessage: (error as any)?.message,
-        });
+        logger.error("再送信エラー:", { error });
         return handleSubmissionError(error);
       } finally {
         setIsSubmitting(false);
