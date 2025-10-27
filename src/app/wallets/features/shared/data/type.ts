@@ -32,5 +32,5 @@ export type AppTransaction = {
   transferPoints: number;
 
   transferredAt: string;
-  didValue: string;
+  didValue: string | null;
 };
