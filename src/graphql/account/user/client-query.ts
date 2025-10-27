@@ -4,52 +4,25 @@ export const GET_CURRENT_USER_PROFILE = gql`
   query GetCurrentUserProfile {
     currentUser {
       user {
-        id
-        name
-        image
-        bio
-        currentPrefecture
-        phoneNumber
-        urlFacebook
-        urlInstagram
-        urlX
-
+        ...UserFields
         portfolios {
-          id
-          title
-          thumbnailUrl
-          source
-          category
-          date
-          reservationStatus
-          evaluationStatus
-          place {
-            id
-            name
-          }
-          participants {
-            id
-            image
-          }
+          ...UserPortfolioFields
         }
-
         nftInstances {
           totalCount
           edges {
             node {
               id
+              instanceId
               name
               imageUrl
+              createdAt
             }
           }
         }
 
         wallets {
-          id
-          type
-          currentPointView {
-            currentPoint
-          }
+          ...WalletFields
           community {
             id
           }
@@ -59,11 +32,19 @@ export const GET_CURRENT_USER_PROFILE = gql`
           }
         }
 
+        nftWallet {
+          id
+          walletAddress
+        }
+
+        didIssuanceRequests {
+          ...DidIssuanceRequestFields
+        }
+
         opportunitiesCreatedByMe {
           id
           title
           images
-          category
         }
       }
     }

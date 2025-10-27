@@ -3290,8 +3290,38 @@ export type GqlGetCurrentUserProfileQuery = {
         date: Date;
         reservationStatus?: GqlReservationStatus | null;
         evaluationStatus?: GqlEvaluationStatus | null;
-        place?: { __typename?: "Place"; id: string; name: string } | null;
-        participants?: Array<{ __typename?: "User"; id: string; image?: string | null }> | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+          city?: {
+            __typename?: "City";
+            code: string;
+            name: string;
+            state?: {
+              __typename?: "State";
+              code: string;
+              countryCode: string;
+              name: string;
+            } | null;
+          } | null;
+        } | null;
+        participants?: Array<{
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
+          urlFacebook?: string | null;
+          urlInstagram?: string | null;
+          urlX?: string | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
+        }> | null;
       }> | null;
       nftInstances?: {
         __typename?: "NftInstancesConnection";
@@ -3312,9 +3342,9 @@ export type GqlGetCurrentUserProfileQuery = {
         __typename?: "Wallet";
         id: string;
         type: GqlWalletType;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         community?: { __typename?: "Community"; id: string } | null;
         tickets?: Array<{ __typename?: "Ticket"; id: string; status: GqlTicketStatus }> | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       }> | null;
       nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
       didIssuanceRequests?: Array<{
@@ -7427,32 +7457,9 @@ export const GetCurrentUserProfileDocument = gql`
   query GetCurrentUserProfile {
     currentUser {
       user {
-        id
-        name
-        image
-        bio
-        currentPrefecture
-        phoneNumber
-        urlFacebook
-        urlInstagram
-        urlX
+        ...UserFields
         portfolios {
-          id
-          title
-          thumbnailUrl
-          source
-          category
-          date
-          reservationStatus
-          evaluationStatus
-          place {
-            id
-            name
-          }
-          participants {
-            id
-            image
-          }
+          ...UserPortfolioFields
         }
         nftInstances {
           totalCount
@@ -7467,11 +7474,7 @@ export const GetCurrentUserProfileDocument = gql`
           }
         }
         wallets {
-          id
-          type
-          currentPointView {
-            currentPoint
-          }
+          ...WalletFields
           community {
             id
           }
@@ -7485,14 +7488,7 @@ export const GetCurrentUserProfileDocument = gql`
           walletAddress
         }
         didIssuanceRequests {
-          id
-          status
-          didValue
-          requestedAt
-          processedAt
-          completedAt
-          createdAt
-          updatedAt
+          ...DidIssuanceRequestFields
         }
         opportunitiesCreatedByMe {
           id
@@ -7502,6 +7498,10 @@ export const GetCurrentUserProfileDocument = gql`
       }
     }
   }
+  ${UserFieldsFragmentDoc}
+  ${UserPortfolioFieldsFragmentDoc}
+  ${WalletFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
 `;
 
 /**

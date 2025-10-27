@@ -1,11 +1,11 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
-import { GET_CURRENT_USER_PROFILE } from "@/graphql/account/user/client-query";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
 import { GqlUser } from "@/types/graphql";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { GET_CURRENT_USER_PROFILE } from "@/graphql/account/user/client-query";
 
 interface CurrentUserProfileQueryResult {
   currentUser?: {
