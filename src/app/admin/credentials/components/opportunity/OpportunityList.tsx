@@ -16,14 +16,9 @@ const STEP_NUMBERS = {
   TOTAL: 3,
 } as const;
 
-const STEP_COLORS = {
-  PRIMARY: "#71717A",
-  GRAY: "text-gray-400",
-} as const;
-
 export default function OpportunityList({ setStep }: { setStep: (step: number) => void }) {
   const { user } = useAuth();
-  const { selectedSlot,setSelectedSlot } = useSelection();
+  const { selectedSlot, setSelectedSlot } = useSelection();
   const [searchQuery, setSearchQuery] = useState("");
   const [input, setInput] = useState("");
   const router = useRouter();
@@ -61,24 +56,21 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
     <div className="space-y-6 flex flex-col min-h-screen mt-2">
       <div className="flex items-end gap-2">
         <h1 className="text-2xl font-bold">募集を選ぶ</h1>
-        <span className="ml-1 flex mb-1 items-baseline">
-          <span className={`${STEP_COLORS.GRAY} text-base`}>(</span>
-          <span className="text-xl font-bold ml-1" style={{ color: STEP_COLORS.PRIMARY }}>
-            {STEP_NUMBERS.CURRENT}
-          </span>
-          <span className={`${STEP_COLORS.GRAY} text-base`}>/</span>
-          <span className={`${STEP_COLORS.GRAY} text-base mr-1`}>{STEP_NUMBERS.TOTAL}</span>
-          <span className={`${STEP_COLORS.GRAY} text-base`}>)</span>
-        </span>
+        <p className="ml-1 flex mb-1 items-baseline text-caption text-base">
+          <span className="mr-1">(</span>
+          <span className="text-xl font-bold">{STEP_NUMBERS.CURRENT}</span>
+          /{STEP_NUMBERS.TOTAL}
+          <span className="ml-1">)</span>
+        </p>
       </div>
       <div>
-          <SearchForm
-            placeholder="募集を検索"
-            onSearch={setSearchQuery}
-            value={input}
-            onInputChange={setInput}
-          />
-        </div>
+        <SearchForm
+          placeholder="募集を検索"
+          onSearch={setSearchQuery}
+          value={input}
+          onInputChange={setInput}
+        />
+      </div>
       <div className="flex-1">
         <div className="grid gap-4">
           {opportunityList?.map((opportunity) => (

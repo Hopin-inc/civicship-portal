@@ -58,8 +58,7 @@ export default function OpportunitiesFeed() {
       {shouldShowQuests && (
       <div className="px-6">
         <button
-          className="w-full flex bg-blue-50 rounded-lg p-4 appearance-none border-none focus:outline-none"
-          style={{ boxSizing: 'border-box' }}
+          className="w-full flex bg-blue-50 rounded-lg p-4 appearance-none border-none focus:outline-none box-border"
           onClick={() => {
             router.push("/opportunities/search?type=quest");
           }}

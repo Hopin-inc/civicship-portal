@@ -12,11 +12,6 @@ const STEP_NUMBERS = {
   TOTAL: 3,
 } as const;
 
-const STEP_COLORS = {
-  PRIMARY: "#71717A",
-  GRAY: "text-gray-400",
-} as const;
-
 export default function TimeSlotSelector({ setStep }: { setStep: (step: number) => void }) {
   const { selectedSlot, setSelectedSlot } = useSelection();
   const router = useRouter();
@@ -60,15 +55,12 @@ export default function TimeSlotSelector({ setStep }: { setStep: (step: number) 
     <div>
       <div className="flex items-end gap-2 mb-6">
         <h1 className="text-2xl font-bold">開催日を選ぶ</h1>
-        <span className="ml-1 flex mb-1 items-baseline">
-          <span className={`${STEP_COLORS.GRAY} text-base`}>(</span>
-          <span className="text-xl font-bold ml-1" style={{ color: STEP_COLORS.PRIMARY }}>
-            {STEP_NUMBERS.CURRENT}
-          </span>
-          <span className={`${STEP_COLORS.GRAY} text-base`}>/</span>
-          <span className={`${STEP_COLORS.GRAY} text-base mr-1`}>{STEP_NUMBERS.TOTAL}</span>
-          <span className={`${STEP_COLORS.GRAY} text-base`}>)</span>
-        </span>
+        <p className="ml-1 flex mb-1 items-baseline text-caption text-base">
+          <span className="mr-1">(</span>
+          <span className="text-xl font-bold">{STEP_NUMBERS.CURRENT}</span>
+          /{STEP_NUMBERS.TOTAL}
+          <span className="ml-1">)</span>
+        </p>
       </div>
       <TimeSlotList
         dateSections={currentSections}

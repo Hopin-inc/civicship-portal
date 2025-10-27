@@ -76,7 +76,7 @@ export default function CredentialList() {
       {uniqueSlotEvaluations.length === 0 ? (
         <div className="text-[#71717A]">証明書はまだありません</div>
       ) : (
-        uniqueSlotEvaluations.map(({ slotId, evaluations, representative }) => {
+        uniqueSlotEvaluations.map(({ evaluations, representative }) => {
           const { denominator, numerator, hasPending, hasFailed } = getIssuanceStats(evaluations);
           const evaluationData = representative.node;
           const title = evaluationData?.participation?.opportunitySlot?.opportunity?.title ?? "";
@@ -101,7 +101,7 @@ export default function CredentialList() {
               onClick={() => router.push(`/admin/credentials/${evaluationData?.id}`)}
             >
               <div className="flex-1">
-                <div className="font-bold text-lg truncate" style={{ maxWidth: "100%" }}>
+                <div className="font-bold text-lg truncate max-w-full">
                   {title}
                 </div>
                 <div className="text-gray-500 text-sm mt-1">

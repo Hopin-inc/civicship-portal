@@ -5,6 +5,7 @@ import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { getCoordinatesFromAddress } from "@/app/places/utils/geocoding";
 import { logger } from "@/lib/logging";
+import { cn } from "@/lib/utils";
 
 interface AddressMapProps {
   address: string;
@@ -104,12 +105,12 @@ const useAddressGeocoding = (
           error: error instanceof Error ? error.message : String(error),
           address,
           placeId,
-          component: "AddressMap"
+          component: "AddressMap",
         });
 
         // エラー発生時もフォールバックの座標を使用
         return setFallbackLocation(map, zoom);
-      }finally {
+      } finally {
         setIsGeocoding(false);
       }
     },
@@ -190,8 +191,7 @@ export default function AddressMap({
 
   return (
     <div
-      className="relative w-full rounded-lg overflow-hidden"
-      style={{ height: containerStyle.height }}
+      className={cn("relative w-full rounded-lg overflow-hidden", `h-[${containerStyle.height}]`)}
     >
       <GoogleMap
         mapContainerStyle={containerStyle}

@@ -8,13 +8,7 @@ export function CardCarousel({
   children,
 }: CardCarouselProps) {
   return (
-    <div 
-      className="flex gap-4 overflow-x-auto scrollbar-hide"
-      style={{
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-      }}
-    >
+    <div className="flex gap-4 overflow-x-auto scrollbar-hide">
       {children}
     </div>
   );

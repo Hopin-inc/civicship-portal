@@ -28,7 +28,7 @@ export function PhoneVerificationForm() {
   const next = searchParams.get("next");
   const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
   // ==================================
-  const { phoneAuth, isAuthenticated, loading, authenticationState, updateAuthState } = useAuth();
+  const { phoneAuth, isAuthenticated, loading, updateAuthState } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -359,6 +359,11 @@ export function PhoneVerificationForm() {
               </div>
             </div>
             <div className="flex flex-col items-center gap-8 w-full mx-auto">
+              <div
+                id="recaptcha-container"
+                ref={recaptchaContainerRef}
+                className={showRecaptcha ? "block" : "hidden"}
+              />
               <Button
                 type="submit"
                 className="w-full h-12"
@@ -384,11 +389,6 @@ export function PhoneVerificationForm() {
                     ? "送信中..."
                     : "コードを再送信"}
               </Button>
-              <div
-                id="recaptcha-container"
-                ref={recaptchaContainerRef}
-                style={{ display: showRecaptcha ? "block" : "none" }}
-              ></div>
               <Button
                 type="button"
                 variant={"text"}
