@@ -133,3 +133,50 @@ export const GET_WALLET_BY_ID = gql`
     }
   }
 `;
+
+export const GET_WALLET_TRANSACTIONS_QUERY = gql`
+  query GetWalletTransactions(
+    $filter: TransactionFilterInput
+    $sort: TransactionSortInput
+    $first: Int
+    $cursor: String
+  ) {
+    transactions(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        node {
+          id
+          reason
+          comment
+          fromPointChange
+          createdAt
+          fromWallet {
+            id
+            type
+            user {
+              id
+              name
+              image
+            }
+          }
+          toWallet {
+            id
+            type
+            user {
+              id
+              name
+              image
+              didIssuanceRequests {
+                status
+                didValue
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;

@@ -92,7 +92,7 @@ export default async function WalletLayout({
 
     const pointString = wallet.currentPointView?.currentPoint;
     initialCurrentPoint = toPointNumber(pointString, 0);
-    initialWalletType = wallet.type === GqlWalletType.Community ? 'COMMUNITY' : 'MEMBER';
+    initialWalletType = 'MEMBER';
 
   } catch (error) {
     console.error("Failed to fetch wallet data (SSR):", error);

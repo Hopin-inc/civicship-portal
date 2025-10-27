@@ -1,57 +1,11 @@
 "use client";
 
 import { useMemo, useCallback } from "react";
-import { useQuery, gql } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { AppTransaction } from "@/app/wallets/features/shared/data/type";
 import { presenterTransaction } from "@/app/wallets/features/shared/data/presenter";
 import { GqlTransaction } from "@/types/graphql";
-
-const GET_WALLET_TRANSACTIONS = gql`
-  query GetWalletTransactions(
-    $filter: TransactionFilterInput
-    $sort: TransactionSortInput
-    $first: Int
-    $cursor: String
-  ) {
-    transactions(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      edges {
-        node {
-          id
-          reason
-          comment
-          fromPointChange
-          createdAt
-          fromWallet {
-            id
-            type
-            user {
-              id
-              name
-              image
-            }
-          }
-          toWallet {
-            id
-            type
-            user {
-              id
-              name
-              image
-              didIssuanceRequests {
-                status
-                didValue
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
+import { GET_WALLET_TRANSACTIONS_QUERY } from "@/graphql/account/wallet/query";
 
 export interface UseWalletTransactionsResult {
   transactions: AppTransaction[];
@@ -62,7 +16,7 @@ export interface UseWalletTransactionsResult {
 }
 
 export function useWalletTransactions(walletId: string): UseWalletTransactionsResult {
-  const { data, loading, error, fetchMore } = useQuery(GET_WALLET_TRANSACTIONS, {
+  const { data, loading, error, fetchMore } = useQuery(GET_WALLET_TRANSACTIONS_QUERY, {
     variables: {
       filter: {
         or: [
