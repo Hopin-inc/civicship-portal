@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useQuery } from "@apollo/client";
 import { AppTransaction } from "@/app/wallets/features/shared/data/type";
 import { presenterTransaction } from "@/app/wallets/features/shared/data/presenter";
@@ -9,7 +9,7 @@ import { GET_WALLET_TRANSACTIONS_QUERY } from "@/graphql/account/wallet/query";
 
 export interface UseWalletTransactionsResult {
   transactions: AppTransaction[];
-  isLoading: boolean;
+  loading: boolean;
   error: Error | null;
   loadMore: () => void;
   hasNextPage: boolean;
@@ -19,10 +19,7 @@ export function useWalletTransactions(walletId: string): UseWalletTransactionsRe
   const { data, loading, error, fetchMore } = useQuery(GET_WALLET_TRANSACTIONS_QUERY, {
     variables: {
       filter: {
-        or: [
-          { fromWalletId: walletId },
-          { toWalletId: walletId }
-        ]
+        or: [{ fromWalletId: walletId }, { toWalletId: walletId }],
       },
       sort: { createdAt: "DESC" },
       first: 20,
@@ -49,7 +46,7 @@ export function useWalletTransactions(walletId: string): UseWalletTransactionsRe
 
   return {
     transactions,
-    isLoading: loading,
+    loading,
     error: error ? new Error(error.message) : null,
     loadMore,
     hasNextPage: data?.transactions?.pageInfo?.hasNextPage ?? false,

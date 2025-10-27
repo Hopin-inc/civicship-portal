@@ -3,21 +3,13 @@
 import React from "react";
 import TransactionItem from "@/components/shared/TransactionItem";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared";
 import Link from "next/link";
 import { useWalletContext } from "@/app/wallets/features/shared/contexts/WalletContext";
 import { useWalletTransactions } from "@/app/wallets/features/transactions/hooks/useWalletTransactions";
 
 export function TransactionList() {
   const { walletId } = useWalletContext();
-
-  const {
-    transactions,
-    isLoading: isLoadingTransactions,
-    error: transactionsError,
-  } = useWalletTransactions(walletId);
-
-  if (transactionsError) return <ErrorState title={"トランザクション履歴"} />;
+  const { transactions, loading } = useWalletTransactions(walletId);
 
   return (
     <div className="pt-10">
@@ -31,7 +23,7 @@ export function TransactionList() {
         </Link>
       </div>
       <div className="space-y-2 mt-2">
-        {isLoadingTransactions ? (
+        {loading ? (
           <LoadingIndicator />
         ) : transactions.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center pt-6">
@@ -39,10 +31,7 @@ export function TransactionList() {
           </p>
         ) : (
           transactions.map((transaction) => (
-            <TransactionItem
-              key={transaction.id}
-              transaction={transaction}
-            />
+            <TransactionItem key={transaction.id} transaction={transaction} />
           ))
         )}
       </div>
