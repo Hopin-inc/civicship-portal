@@ -3,9 +3,9 @@
 import { useQuery } from "@apollo/client";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
 import { GqlUser } from "@/types/graphql";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { GET_CURRENT_USER_PROFILE } from "@/graphql/account/user/client-query";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { notFound } from "next/navigation";
 
 interface CurrentUserProfileQueryResult {
   currentUser?: {
@@ -14,7 +14,6 @@ interface CurrentUserProfileQueryResult {
 }
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
   const { data, loading } = useQuery<CurrentUserProfileQueryResult>(GET_CURRENT_USER_PROFILE, {
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
@@ -22,18 +21,12 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
   const gqlUser = data?.currentUser?.user ?? null;
 
-  useEffect(() => {
-    if (!loading && !gqlUser) {
-      router.replace("/login");
-    }
-  }, [loading, gqlUser, router]);
-
   if (loading && !gqlUser) {
-    return <div>Loading...</div>;
+    return <LoadingIndicator />;
   }
 
   if (!gqlUser) {
-    return null;
+    return notFound();
   }
 
   const portfolios = (gqlUser.portfolios ?? []).map(mapGqlPortfolio);
