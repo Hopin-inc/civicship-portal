@@ -1,11 +1,9 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { useQuery } from "@apollo/client";
 import { AppTransaction } from "@/app/wallets/features/shared/data/type";
 import { presenterTransaction } from "@/app/wallets/features/shared/data/presenter";
-import { GqlTransaction } from "@/types/graphql";
-import { GET_WALLET_TRANSACTIONS_QUERY } from "@/graphql/account/wallet/query";
+import { GqlTransaction, useGetWalletTransactionsQuery } from "@/types/graphql";
 
 export interface UseWalletTransactionsResult {
   transactions: AppTransaction[];
@@ -16,12 +14,12 @@ export interface UseWalletTransactionsResult {
 }
 
 export function useWalletTransactions(walletId: string): UseWalletTransactionsResult {
-  const { data, loading, error, fetchMore } = useQuery(GET_WALLET_TRANSACTIONS_QUERY, {
+  const { data, loading, error, fetchMore } = useGetWalletTransactionsQuery({
     variables: {
       filter: {
         or: [{ fromWalletId: walletId }, { toWalletId: walletId }],
       },
-      sort: { createdAt: "DESC" },
+      sort: { createdAt: "desc" },
       first: 20,
     },
     fetchPolicy: "cache-and-network",
@@ -30,8 +28,9 @@ export function useWalletTransactions(walletId: string): UseWalletTransactionsRe
   const transactions = useMemo(() => {
     const edges = data?.transactions?.edges ?? [];
     return edges
-      .map((edge: { node: GqlTransaction }) => presenterTransaction(edge.node, walletId))
-      .filter((tx: AppTransaction | null): tx is AppTransaction => tx !== null);
+      .filter((edge): edge is { node: GqlTransaction } => !!edge?.node)
+      .map((edge) => presenterTransaction(edge.node, walletId))
+      .filter((tx): tx is AppTransaction => tx !== null);
   }, [data, walletId]);
 
   const loadMore = useCallback(() => {
