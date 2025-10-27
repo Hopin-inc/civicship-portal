@@ -3,9 +3,8 @@
 import React from "react";
 import { formatCurrency } from "@/app/wallets/features/shared/data/presenter";
 import { AppTransaction } from "@/app/wallets/features/shared/data/type";
-import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GqlTransactionReason } from "@/types/graphql";
 import { truncateText } from "@/utils/stringUtils";
 
@@ -62,7 +61,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image })
     <Card className="px-4 py-4 bg-white">
       <div className="flex items-start gap-3">
         <Avatar className="h-10 w-10">
-          <AvatarImage src={image ?? PLACEHOLDER_IMAGE} alt="user" />
+          <AvatarImage src={image} alt="user" />
           <AvatarFallback>U</AvatarFallback>
         </Avatar>
         <div className="flex flex-col text-left min-w-0 flex-1">
@@ -79,7 +78,11 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image })
               {formatCurrency(transaction.transferPoints)} pt
             </div>
           </div>
-          {transaction.reason !== GqlTransactionReason.PointIssued &&<span className="text-label-xs text-caption py-2">{truncateText(transaction.didValue,20,"middle")}</span>}
+          {transaction.reason !== GqlTransactionReason.PointIssued && transaction.didValue && (
+            <span className="text-label-xs text-caption py-2">
+              {truncateText(transaction.didValue, 20, "middle")}
+            </span>
+          )}
           {transaction.comment && (
             <span className="text-label-xs text-caption bg-background-hover leading-relaxed block p-2 rounded-sm">
               {transaction.comment}
