@@ -5,7 +5,7 @@ import {
   GqlWallet,
   GqlWalletType,
 } from "@/types/graphql";
-import { AppTransaction, AvailableTicket, UserAsset } from "@/app/wallets/data/type";
+import { AppTransaction, AvailableTicket, UserAsset } from "@/app/wallets/features/shared/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 export const presenterUserAsset = (wallet: GqlWallet | undefined | null): UserAsset => {

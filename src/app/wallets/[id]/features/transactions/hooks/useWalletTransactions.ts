@@ -2,8 +2,8 @@
 
 import { useMemo, useCallback } from "react";
 import { useQuery, gql } from "@apollo/client";
-import { AppTransaction } from "@/app/wallets/data/type";
-import { presenterTransaction } from "@/app/wallets/data/presenter";
+import { AppTransaction } from "@/app/wallets/features/shared/data/type";
+import { presenterTransaction } from "@/app/wallets/features/shared/data/presenter";
 import { GqlTransaction } from "@/types/graphql";
 
 const GET_WALLET_TRANSACTIONS = gql`

@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { formatCurrency } from "@/app/wallets/data/presenter";
-import { AppTransaction } from "@/app/wallets/data/type";
+import { formatCurrency } from "@/app/wallets/features/shared/data/presenter";
+import { AppTransaction } from "@/app/wallets/features/shared/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";

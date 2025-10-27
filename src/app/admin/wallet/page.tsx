@@ -11,7 +11,7 @@ import { Coins, Gift } from "lucide-react";
 import TransactionItem from "@/components/shared/TransactionItem";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { presenterTransaction } from "@/app/wallets/data/presenter";
+import { presenterTransaction } from "@/app/wallets/features/shared/data/presenter";
 import { getToWalletImage } from "@/app/admin/wallet/data/presenter";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
 import { logger } from "@/lib/logging";
