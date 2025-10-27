@@ -20,7 +20,8 @@ interface ClientLayoutProps {
 
 export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   const { data, loading } = useQuery<CurrentUserProfileQueryResult>(GET_CURRENT_USER_PROFILE, {
-    fetchPolicy: ssrUser ? "cache-and-network" : "network-only",
+    skip: !!ssrUser,
+    fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   });
 
