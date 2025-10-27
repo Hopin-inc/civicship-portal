@@ -34,7 +34,7 @@ export function useWalletTransactions(walletId: string): UseWalletTransactionsRe
     const edges = data?.transactions?.edges ?? [];
     return edges
       .map((edge: { node: GqlTransaction }) => presenterTransaction(edge.node, walletId))
-      .filter((tx): tx is AppTransaction => tx !== null);
+      .filter((tx: AppTransaction | null): tx is AppTransaction => tx !== null);
   }, [data, walletId]);
 
   const loadMore = useCallback(() => {
