@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -24,7 +24,6 @@ export function PhoneVerificationForm() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<VerificationStep>("phone");
-  const flowIdRef = useRef<string | null>(null);
 
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
   const recaptchaManager = useRecaptchaManager();
@@ -37,7 +36,7 @@ export function PhoneVerificationForm() {
     {
       isDisabled: isResendDisabled,
       start: startResendTimer,
-    }
+    },
   );
   const codeVerification = useCodeVerification(
     {
@@ -45,7 +44,6 @@ export function PhoneVerificationForm() {
     },
     nextParam,
     updateAuthState,
-    flowIdRef
   );
 
   const { isValid: isPhoneValid, formattedPhone } = validatePhoneNumber(phoneNumber);
@@ -107,8 +105,6 @@ export function PhoneVerificationForm() {
 
     const { setPhoneAuth } = useAuthStore.getState();
     setPhoneAuth({ verificationId: null });
-
-    flowIdRef.current = null;
   };
 
   if (loading) {

@@ -24,7 +24,7 @@ export function usePhoneSubmission(
     clearRecaptcha?: () => void;
   },
   recaptchaManager: ReturnType<typeof useRecaptchaManager>,
-  resendTimer: Pick<ReturnType<typeof useResendTimer>, "isDisabled" | "start">
+  resendTimer: Pick<ReturnType<typeof useResendTimer>, "isDisabled" | "start">,
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
@@ -81,20 +81,14 @@ export function usePhoneSubmission(
         };
       }
 
-      useAuthStore.getState().setState({
-        phoneAuth: {
-          ...useAuthStore.getState().phoneAuth,
-          verificationId: null,
-        },
-      });
-
+      useAuthStore.getState().setPhoneAuth({ verificationId: null });
       setIsSubmitting(true);
 
       try {
         const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
         const storedId = useAuthStore.getState().phoneAuth.verificationId;
-        
-        if (!verificationId || !storedId || storedId !== verificationId) {
+
+        if (!verificationId) {
           logger.error("Phone verification ID mismatch", {
             verificationIdReturned: !!verificationId,
             verificationIdStored: !!storedId,
@@ -103,8 +97,8 @@ export function usePhoneSubmission(
             success: false,
             error: {
               message: "認証コードの送信に失敗しました。もう一度お試しください。",
-              type: "verification-id-missing"
-            }
+              type: "verification-id-missing",
+            },
           };
         }
 
@@ -120,7 +114,7 @@ export function usePhoneSubmission(
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited]
+    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited],
   );
 
   const resend = useCallback(
@@ -132,9 +126,13 @@ export function usePhoneSubmission(
             message: isRateLimited
               ? "送信回数が上限に達しました。しばらく待ってから再試行してください。"
               : resendTimer.isDisabled
-              ? "再送信は60秒後に可能です。"
-              : "送信処理中です。しばらくお待ちください。",
-            type: isRateLimited ? "rate-limit" : resendTimer.isDisabled ? "resend-disabled" : "already-submitting",
+                ? "再送信は60秒後に可能です。"
+                : "送信処理中です。しばらくお待ちください。",
+            type: isRateLimited
+              ? "rate-limit"
+              : resendTimer.isDisabled
+                ? "resend-disabled"
+                : "already-submitting",
           },
         };
       }
@@ -164,13 +162,7 @@ export function usePhoneSubmission(
 
       try {
         phoneAuth.clearRecaptcha?.();
-
-        useAuthStore.getState().setState({
-          phoneAuth: {
-            ...useAuthStore.getState().phoneAuth,
-            verificationId: null,
-          },
-        });
+        useAuthStore.getState().setPhoneAuth({ verificationId: null });
 
         const waitTime = isRunningInLiff()
           ? PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_LIFF
@@ -180,7 +172,7 @@ export function usePhoneSubmission(
 
         const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
         const storedId = useAuthStore.getState().phoneAuth.verificationId;
-        
+
         if (!verificationId || !storedId || storedId !== verificationId) {
           logger.error("Phone verification ID mismatch on resend", {
             verificationIdReturned: !!verificationId,
@@ -190,8 +182,8 @@ export function usePhoneSubmission(
             success: false,
             error: {
               message: "認証コードの再送信に失敗しました。もう一度お試しください。",
-              type: "verification-id-missing"
-            }
+              type: "verification-id-missing",
+            },
           };
         }
 
@@ -212,7 +204,7 @@ export function usePhoneSubmission(
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited]
+    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited],
   );
 
   return {
