@@ -15,6 +15,29 @@ import { PhoneInputStep } from "./PhoneInputStep";
 import { CodeVerificationStep } from "./CodeVerificationStep";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 
+async function performSessionLoginHandshake(returnTo: string): Promise<void> {
+  const firebaseUser = useAuthStore.getState().state.firebaseUser;
+  if (!firebaseUser) {
+    window.location.replace(returnTo);
+    return;
+  }
+
+  const idToken = await firebaseUser.getIdToken(true);
+
+  const res = await fetch("/api/sessionLogin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken }),
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    console.error("Session login failed:", res.status);
+  }
+
+  window.location.replace(returnTo);
+}
+
 export function PhoneVerificationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -89,7 +112,7 @@ export function PhoneVerificationForm() {
         toast.success(result.message);
       }
       if (result.redirectPath) {
-        router.push(result.redirectPath);
+        await performSessionLoginHandshake(result.redirectPath);
       }
     } else if (result.error) {
       toast.error(result.error.message);
