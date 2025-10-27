@@ -1,5 +1,11 @@
-import { WalletDetail } from "@/app/wallets/features/shared/components/WalletDetail";
+import { WalletOverview } from "@/app/wallets/features/overview/components/WalletOverview";
+import { TransactionList } from "@/app/wallets/features/transactions/components/TransactionList";
 
 export default function WalletDetailPage() {
-  return <WalletDetail />;
+  return (
+    <div className="max-w-xl mx-auto mt-8 px-4">
+      <WalletOverview />
+      <TransactionList />
+    </div>
+  );
 }
