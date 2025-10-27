@@ -11,6 +11,7 @@ import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { setContext } from "@apollo/client/link/context";
+import { getUidSuffix } from "@/lib/logging/client/utils";
 
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -23,17 +24,50 @@ const httpLink = createUploadLink({
 const requestLink = setContext(async (operation, prevContext) => {
   let token: string | null = null;
   let authMode: "session" | "id_token" = "session";
+  let tokenInfo: any = null;
+  let flowId: string | undefined;
 
   if (typeof window !== "undefined") {
     const { firebaseUser } = useAuthStore.getState().state;
+    
+    flowId = (window as any).__currentAuthFlowId;
     
     if (firebaseUser) {
       try {
         token = await firebaseUser.getIdToken();
         authMode = "id_token";
+        
+        const tokenResult = await firebaseUser.getIdTokenResult();
+        tokenInfo = {
+          uidSuffix: getUidSuffix(firebaseUser.uid),
+          signInProvider: tokenResult.signInProvider,
+          tenantPresent: !!(tokenResult.claims.firebase as any)?.tenant,
+        };
+
+        logger.debug("[Apollo] Request with id_token", {
+          component: "apollo",
+          operationName: operation.operationName,
+          flowId,
+          authMode,
+          hasAuthorization: !!token,
+          ...tokenInfo,
+        });
       } catch (error) {
-        logger.warn("Failed to get ID token, falling back to session", { error });
+        logger.warn("Failed to get ID token, falling back to session", { 
+          component: "apollo",
+          operationName: operation.operationName,
+          flowId,
+          error 
+        });
       }
+    } else {
+      logger.debug("[Apollo] Request with session", {
+        component: "apollo",
+        operationName: operation.operationName,
+        flowId,
+        authMode,
+        hasFirebaseUser: false,
+      });
     }
   }
 
@@ -43,6 +77,7 @@ const requestLink = setContext(async (operation, prevContext) => {
     "X-Auth-Mode": authMode,
     "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
     "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
+    ...(flowId ? { "X-Flow-Id": flowId } : {}),
   };
 
   return { headers };
@@ -51,12 +86,13 @@ const requestLink = setContext(async (operation, prevContext) => {
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
   if (graphQLErrors) {
     for (const error of graphQLErrors) {
-      logger.info("GraphQL error", {
+      logger.error("[Apollo] GraphQL error", {
         message: error.message,
         locations: error.locations,
         path: error.path,
         component: "ApolloErrorLink",
         operation: operation.operationName,
+        extensions: error.extensions,
       });
 
       if (
