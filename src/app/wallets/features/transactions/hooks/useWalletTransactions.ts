@@ -13,6 +13,19 @@ export interface UseWalletTransactionsResult {
   hasNextPage: boolean;
 }
 
+/**
+ * @deprecated Use useMyWalletDetail or useWalletDetail instead.
+ * This hook will be removed in a future version.
+ * 
+ * The new hooks provide:
+ * - Unified wallet + transactions query (better performance)
+ * - Proper infinite scroll support with relay-style pagination
+ * - Better Apollo Cache integration
+ * 
+ * Migration:
+ * - For /wallets/me: Use useMyWalletDetail() from @/app/wallets/features/detail/hooks
+ * - For /wallets/[id]: Use useWalletDetail(walletId) from @/app/wallets/features/detail/hooks
+ */
 export function useWalletTransactions(walletId: string): UseWalletTransactionsResult {
   const { data, loading, error, fetchMore } = useGetWalletTransactionsQuery({
     variables: {
