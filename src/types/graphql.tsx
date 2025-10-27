@@ -3263,6 +3263,81 @@ export type GqlGetNftInstanceWithDidQuery = {
   } | null;
 };
 
+export type GqlGetCurrentUserProfileQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetCurrentUserProfileQuery = {
+  __typename?: "Query";
+  currentUser?: {
+    __typename?: "CurrentUserPayload";
+    user?: {
+      __typename?: "User";
+      id: string;
+      name: string;
+      image?: string | null;
+      bio?: string | null;
+      currentPrefecture?: GqlCurrentPrefecture | null;
+      phoneNumber?: string | null;
+      urlFacebook?: string | null;
+      urlInstagram?: string | null;
+      urlX?: string | null;
+      portfolios?: Array<{
+        __typename?: "Portfolio";
+        id: string;
+        title: string;
+        thumbnailUrl?: string | null;
+        source: GqlPortfolioSource;
+        category: GqlPortfolioCategory;
+        date: Date;
+        reservationStatus?: GqlReservationStatus | null;
+        evaluationStatus?: GqlEvaluationStatus | null;
+        place?: { __typename?: "Place"; id: string; name: string } | null;
+        participants?: Array<{ __typename?: "User"; id: string; image?: string | null }> | null;
+      }> | null;
+      nftInstances?: {
+        __typename?: "NftInstancesConnection";
+        totalCount: number;
+        edges: Array<{
+          __typename?: "NftInstanceEdge";
+          node: {
+            __typename?: "NftInstance";
+            id: string;
+            instanceId: string;
+            name?: string | null;
+            imageUrl?: string | null;
+            createdAt: Date;
+          };
+        }>;
+      } | null;
+      wallets?: Array<{
+        __typename?: "Wallet";
+        id: string;
+        type: GqlWalletType;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
+        community?: { __typename?: "Community"; id: string } | null;
+        tickets?: Array<{ __typename?: "Ticket"; id: string; status: GqlTicketStatus }> | null;
+      }> | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
+      didIssuanceRequests?: Array<{
+        __typename?: "DidIssuanceRequest";
+        id: string;
+        status: GqlDidIssuanceStatus;
+        didValue?: string | null;
+        requestedAt?: Date | null;
+        processedAt?: Date | null;
+        completedAt?: Date | null;
+        createdAt?: Date | null;
+        updatedAt?: Date | null;
+      }> | null;
+      opportunitiesCreatedByMe?: Array<{
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        images?: Array<string> | null;
+      }> | null;
+    } | null;
+  } | null;
+};
+
 export type GqlUserFieldsFragment = {
   __typename?: "User";
   id: string;
@@ -7347,6 +7422,152 @@ export type GetNftInstanceWithDidSuspenseQueryHookResult = ReturnType<
 export type GetNftInstanceWithDidQueryResult = Apollo.QueryResult<
   GqlGetNftInstanceWithDidQuery,
   GqlGetNftInstanceWithDidQueryVariables
+>;
+export const GetCurrentUserProfileDocument = gql`
+  query GetCurrentUserProfile {
+    currentUser {
+      user {
+        id
+        name
+        image
+        bio
+        currentPrefecture
+        phoneNumber
+        urlFacebook
+        urlInstagram
+        urlX
+        portfolios {
+          id
+          title
+          thumbnailUrl
+          source
+          category
+          date
+          reservationStatus
+          evaluationStatus
+          place {
+            id
+            name
+          }
+          participants {
+            id
+            image
+          }
+        }
+        nftInstances {
+          totalCount
+          edges {
+            node {
+              id
+              instanceId
+              name
+              imageUrl
+              createdAt
+            }
+          }
+        }
+        wallets {
+          id
+          type
+          currentPointView {
+            currentPoint
+          }
+          community {
+            id
+          }
+          tickets {
+            id
+            status
+          }
+        }
+        nftWallet {
+          id
+          walletAddress
+        }
+        didIssuanceRequests {
+          id
+          status
+          didValue
+          requestedAt
+          processedAt
+          completedAt
+          createdAt
+          updatedAt
+        }
+        opportunitiesCreatedByMe {
+          id
+          title
+          images
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetCurrentUserProfileQuery__
+ *
+ * To run a query within a React component, call `useGetCurrentUserProfileQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCurrentUserProfileQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCurrentUserProfileQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCurrentUserProfileQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetCurrentUserProfileQuery,
+    GqlGetCurrentUserProfileQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetCurrentUserProfileQuery, GqlGetCurrentUserProfileQueryVariables>(
+    GetCurrentUserProfileDocument,
+    options,
+  );
+}
+export function useGetCurrentUserProfileLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetCurrentUserProfileQuery,
+    GqlGetCurrentUserProfileQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetCurrentUserProfileQuery, GqlGetCurrentUserProfileQueryVariables>(
+    GetCurrentUserProfileDocument,
+    options,
+  );
+}
+export function useGetCurrentUserProfileSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetCurrentUserProfileQuery,
+        GqlGetCurrentUserProfileQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetCurrentUserProfileQuery,
+    GqlGetCurrentUserProfileQueryVariables
+  >(GetCurrentUserProfileDocument, options);
+}
+export type GetCurrentUserProfileQueryHookResult = ReturnType<typeof useGetCurrentUserProfileQuery>;
+export type GetCurrentUserProfileLazyQueryHookResult = ReturnType<
+  typeof useGetCurrentUserProfileLazyQuery
+>;
+export type GetCurrentUserProfileSuspenseQueryHookResult = ReturnType<
+  typeof useGetCurrentUserProfileSuspenseQuery
+>;
+export type GetCurrentUserProfileQueryResult = Apollo.QueryResult<
+  GqlGetCurrentUserProfileQuery,
+  GqlGetCurrentUserProfileQueryVariables
 >;
 export const UpdateMyProfileDocument = gql`
   mutation UpdateMyProfile(
