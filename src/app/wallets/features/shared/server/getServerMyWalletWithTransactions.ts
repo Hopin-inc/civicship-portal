@@ -1,5 +1,6 @@
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
-import { GqlTransactionsConnection } from "@/types/graphql";
+import { GqlTransactionsConnection, GqlTransactionEdge, GqlTransaction } from "@/types/graphql";
+import { GET_MY_WALLET_WITH_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/wallet/server";
 
 export interface MyWalletWithTransactionsResult {
   wallet: {
@@ -31,85 +32,15 @@ const fallbackConnection: GqlTransactionsConnection = {
   totalCount: 0,
 };
 
-const GET_MY_WALLET_WITH_TRANSACTIONS_SERVER_QUERY = `
-  query GetMyWalletWithTransactions(
-    $first: Int
-    $cursor: String
-    $sort: TransactionSortInput
-  ) {
-    myWallet {
-      id
-      type
-      currentPointView {
-        currentPoint
-      }
-      accumulatedPointView {
-        accumulatedPoint
-      }
-      user {
-        id
-        name
-        image
-      }
-      community {
-        id
-        name
-      }
-      transactionsConnection(first: $first, cursor: $cursor, sort: $sort) {
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-          startCursor
-          endCursor
-        }
-        totalCount
-        edges {
-          cursor
-          node {
-            id
-            reason
-            comment
-            fromPointChange
-            toPointChange
-            createdAt
-            fromWallet {
-              id
-              type
-              currentPointView {
-                currentPoint
-              }
-              user {
-                id
-                name
-                image
-              }
-              community {
-                id
-                name
-              }
-            }
-            toWallet {
-              id
-              type
-              currentPointView {
-                currentPoint
-              }
-              user {
-                id
-                name
-                image
-              }
-              community {
-                id
-                name
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
+/**
+ * Type guard to check if an edge has a non-null node
+ * This properly narrows the type while maintaining the cursor property
+ */
+export function isTransactionEdgeWithNode(
+  edge: GqlTransactionEdge | null | undefined
+): edge is GqlTransactionEdge & { node: GqlTransaction } {
+  return !!edge?.node;
+}
 
 /**
  * サーバーサイドでマイウォレット情報とトランザクションを統合取得する関数

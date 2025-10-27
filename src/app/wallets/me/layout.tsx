@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { WalletProvider } from "@/app/wallets/features/shared/contexts/WalletContext";
-import { getServerMyWalletWithTransactions } from "@/hooks/wallet/server";
+import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
 import { toPointNumber } from "@/utils/bigint";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";

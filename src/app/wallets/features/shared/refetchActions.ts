@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { getServerMyWalletWithTransactions } from "@/hooks/wallet/server";
+import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
 
 /**
  * Server Action: マイウォレット情報とトランザクションを統合取得

@@ -4,8 +4,9 @@ import { createContext, ReactNode, useCallback, useContext, useState } from "rea
 import { toPointNumber } from "@/utils/bigint";
 import { logger } from "@/lib/logging";
 import { AppTransaction } from "@/app/wallets/features/shared/data/type";
-import { GqlTransaction, GqlTransactionsConnection } from "@/types/graphql";
+import { GqlTransactionsConnection } from "@/types/graphql";
 import { presenterTransaction } from "@/app/wallets/features/shared/data/presenter";
+import { isTransactionEdgeWithNode } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
 
 export interface WalletContextValue {
   walletId: string;
@@ -41,7 +42,7 @@ export function WalletProvider({
   const [transactions, setTransactions] = useState<AppTransaction[]>(() => {
     const edges = initialTransactions.edges ?? [];
     return edges
-      .filter((edge): edge is { node: GqlTransaction } => !!edge?.node)
+      .filter(isTransactionEdgeWithNode)
       .map((edge) => presenterTransaction(edge.node, walletId))
       .filter((tx): tx is AppTransaction => tx !== null);
   });
@@ -72,7 +73,7 @@ export function WalletProvider({
 
       const edges = result.transactions.edges ?? [];
       const newTransactions = edges
-        .filter((edge): edge is { node: GqlTransaction } => !!edge?.node)
+        .filter(isTransactionEdgeWithNode)
         .map((edge) => presenterTransaction(edge.node, walletId))
         .filter((tx): tx is AppTransaction => tx !== null);
 
@@ -102,7 +103,7 @@ export function WalletProvider({
 
       const edges = result.transactions.edges ?? [];
       const newTransactions = edges
-        .filter((edge): edge is { node: GqlTransaction } => !!edge?.node)
+        .filter(isTransactionEdgeWithNode)
         .map((edge) => presenterTransaction(edge.node, walletId))
         .filter((tx): tx is AppTransaction => tx !== null);
 
