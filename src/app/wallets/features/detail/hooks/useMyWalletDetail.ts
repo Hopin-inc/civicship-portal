@@ -5,6 +5,25 @@ import { AppTransaction } from "@/app/wallets/features/shared/data/type";
 import { presenterTransaction } from "@/app/wallets/features/shared/data/presenter";
 import { GqlTransaction, useGetMyWalletWithTransactionsConnectionQuery } from "@/types/graphql";
 
+/**
+ * @deprecated This hook is deprecated and will be removed in a future version.
+ * For TransactionList component, use the new SSR + refetch pattern:
+ * - Use `useTransactionsInitial()` to get initial SSR data
+ * - Use `useInfiniteTransactions()` with `fetchMyWalletTransactionsAction` for pagination
+ * 
+ * Migration example:
+ * ```tsx
+ * // Old pattern (deprecated)
+ * const { transactions, loading, loadMore, hasNextPage } = useMyWalletDetail();
+ * 
+ * // New pattern (recommended)
+ * const { initialTransactions } = useTransactionsInitial();
+ * const { transactions, hasNextPage, loading, loadMoreRef } = useInfiniteTransactions({
+ *   initialTransactions,
+ *   fetchMore: fetchMyWalletTransactionsAction,
+ * });
+ * ```
+ */
 export interface UseMyWalletDetailResult {
   wallet: {
     id: string;
@@ -28,6 +47,9 @@ export interface UseMyWalletDetailResult {
   hasNextPage: boolean;
 }
 
+/**
+ * @deprecated Use the new SSR + refetch pattern instead. See UseMyWalletDetailResult for migration guide.
+ */
 export function useMyWalletDetail(): UseMyWalletDetailResult {
   const { data, loading, error, fetchMore } = useGetMyWalletWithTransactionsConnectionQuery({
     variables: {
