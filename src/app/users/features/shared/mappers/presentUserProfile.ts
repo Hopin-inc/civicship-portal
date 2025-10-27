@@ -1,31 +1,31 @@
-import { GqlUser, GqlTicketStatus } from "@/types/graphql";
+import { GqlTicketStatus, GqlUser } from "@/types/graphql";
 import { UserProfileViewModel } from "@/app/users/features/profile/types";
 import { AppPortfolio } from "@/app/users/features/shared/types";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { prefectureLabels } from "@/shared/prefectures/constants";
 
 export function presentUserProfile(
-  gqlUser: GqlUser,
+  gqlUser: GqlUser | null,
   isOwner: boolean = false,
   portfolios?: AppPortfolio[],
 ): UserProfileViewModel {
-  const wallet = gqlUser.wallets?.find((w) => w.community?.id === COMMUNITY_ID);
+  const wallet = gqlUser?.wallets?.find((w) => w.community?.id === COMMUNITY_ID);
 
-  const selfOpportunities = (gqlUser.opportunitiesCreatedByMe ?? []).map((opp) => ({
+  const selfOpportunities = (gqlUser?.opportunitiesCreatedByMe ?? []).map((opp) => ({
     id: opp.id,
     title: opp.title,
     coverUrl: opp.images?.[0] ?? undefined,
     category: opp.category ?? "",
   }));
 
-  const currentlyHiringOpportunities = (gqlUser.opportunitiesCreatedByMe ?? []).map((opp) => ({
+  const currentlyHiringOpportunities = (gqlUser?.opportunitiesCreatedByMe ?? []).map((opp) => ({
     id: opp.id,
     title: opp.title,
     images: opp.images ?? undefined,
   }));
 
   const nftInstances = isOwner
-    ? (gqlUser.nftInstances?.edges ?? []).map((edge) => ({
+    ? (gqlUser?.nftInstances?.edges ?? []).map((edge) => ({
         id: edge.node.id,
         name: edge.node.name ?? "",
         imageUrl: edge.node.imageUrl ?? undefined,
@@ -33,19 +33,19 @@ export function presentUserProfile(
     : undefined;
 
   return {
-    id: gqlUser.id,
-    name: gqlUser.name,
-    bio: gqlUser.bio ?? undefined,
-    imageUrl: gqlUser.image ?? undefined,
-    currentPrefecture: gqlUser.currentPrefecture
-      ? prefectureLabels[gqlUser.currentPrefecture]
+    id: gqlUser?.id ?? "",
+    name: gqlUser?.name ?? "",
+    bio: gqlUser?.bio ?? undefined,
+    imageUrl: gqlUser?.image ?? undefined,
+    currentPrefecture: gqlUser?.currentPrefecture
+      ? prefectureLabels[gqlUser?.currentPrefecture]
       : undefined,
     socialUrl: {
-      x: gqlUser.urlX ?? null,
-      instagram: gqlUser.urlInstagram ?? null,
-      facebook: gqlUser.urlFacebook ?? null,
+      x: gqlUser?.urlX ?? null,
+      instagram: gqlUser?.urlInstagram ?? null,
+      facebook: gqlUser?.urlFacebook ?? null,
     },
-    ticketsAvailable: isOwner 
+    ticketsAvailable: isOwner
       ? (wallet?.tickets ?? []).filter((t) => t.status === GqlTicketStatus.Available).length
       : undefined,
     points: isOwner ? (wallet?.currentPointView?.currentPoint ?? 0) : undefined,

@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { metadata } from "./metadata";
 import { fetchPrivateUserServer } from "@/app/users/features/shared/server";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
@@ -24,15 +23,14 @@ export default async function MyPageLayout({ children }: { children: React.React
     logger.warn("[/users/me/layout] No user found, redirecting to /login", {
       component: "MyPageLayout",
     });
-    redirect("/login");
   }
 
-  const portfolios = (gqlUser.portfolios ?? []).map(mapGqlPortfolio);
+  const portfolios = (gqlUser?.portfolios ?? []).map(mapGqlPortfolio);
 
   return (
     <UserProfileProvider
       value={{
-        userId: gqlUser.id,
+        userId: gqlUser?.id,
         isOwner: true,
         gqlUser,
         portfolios,
