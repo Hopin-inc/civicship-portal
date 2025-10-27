@@ -1,19 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import TransactionItem from "@/components/shared/TransactionItem";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import Link from "next/link";
-import { useTransactionsInitial } from "@/app/wallets/features/shared/contexts/TransactionsInitialContext";
-import { useInfiniteTransactions } from "@/hooks/transactions/useInfiniteTransactions";
-import { fetchMyWalletTransactionsAction } from "@/app/wallets/me/actions";
+import { useWalletContext } from "@/app/wallets/features/shared/contexts/WalletContext";
 
 export function TransactionList() {
-  const { initialTransactions } = useTransactionsInitial();
-  const { transactions, hasNextPage, loading, loadMoreRef } = useInfiniteTransactions({
-    initialTransactions,
-    fetchMore: fetchMyWalletTransactionsAction,
-  });
+  const { transactions, hasNextPage, isLoadingTransactions, loadMore } = useWalletContext();
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!sentinelRef.current || !hasNextPage || isLoadingTransactions) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, isLoadingTransactions, loadMore]);
 
   return (
     <div className="pt-10">
@@ -37,8 +48,8 @@ export function TransactionList() {
               <TransactionItem key={transaction.id} transaction={transaction} />
             ))}
             {hasNextPage && (
-              <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
-                {loading && <LoadingIndicator />}
+              <div ref={sentinelRef} className="h-10 flex items-center justify-center">
+                {isLoadingTransactions && <LoadingIndicator />}
               </div>
             )}
           </>

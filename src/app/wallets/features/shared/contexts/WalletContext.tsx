@@ -3,15 +3,22 @@
 import { createContext, ReactNode, useCallback, useContext, useState } from "react";
 import { toPointNumber } from "@/utils/bigint";
 import { logger } from "@/lib/logging";
-import { useGetWalletByIdQuery } from "@/types/graphql";
+import { fetchMyWalletTransactionsAction } from "@/app/wallets/me/actions";
+import { AppTransaction } from "@/app/wallets/features/shared/data/type";
+import { GqlTransaction, GqlTransactionsConnection } from "@/types/graphql";
+import { presenterTransaction } from "@/app/wallets/features/shared/data/presenter";
 
 export interface WalletContextValue {
   walletId: string;
   userId?: string;
   currentPoint: number;
-  isLoading: boolean;
+  transactions: AppTransaction[];
+  hasNextPage: boolean;
+  isLoadingWallet: boolean;
+  isLoadingTransactions: boolean;
   error: Error | null;
   refresh: () => Promise<void>;
+  loadMore: () => Promise<void>;
 }
 
 const WalletContext = createContext<WalletContextValue | null>(null);
@@ -21,6 +28,7 @@ export interface WalletProviderProps {
   walletId: string;
   userId?: string;
   initialCurrentPoint: number;
+  initialTransactions: GqlTransactionsConnection;
 }
 
 export function WalletProvider({
@@ -28,25 +36,40 @@ export function WalletProvider({
   walletId,
   userId,
   initialCurrentPoint,
+  initialTransactions,
 }: WalletProviderProps) {
   const [currentPoint, setCurrentPoint] = useState(initialCurrentPoint);
-  const [error, setError] = useState<Error | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const { refetch } = useGetWalletByIdQuery({
-    variables: { id: walletId },
-    skip: true,
+  const [transactions, setTransactions] = useState<AppTransaction[]>(() => {
+    const edges = initialTransactions.edges ?? [];
+    return edges
+      .filter((edge): edge is { node: GqlTransaction } => !!edge?.node)
+      .map((edge) => presenterTransaction(edge.node, walletId))
+      .filter((tx): tx is AppTransaction => tx !== null);
   });
+  const [hasNextPage, setHasNextPage] = useState(initialTransactions.pageInfo?.hasNextPage ?? false);
+  const [endCursor, setEndCursor] = useState<string | null>(initialTransactions.pageInfo?.endCursor ?? null);
+  const [error, setError] = useState<Error | null>(null);
+  const [isLoadingWallet, setIsLoadingWallet] = useState(false);
+  const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
 
   const refresh = useCallback(async () => {
-    setIsLoading(true);
+    setIsLoadingWallet(true);
+    setError(null);
     try {
-      const { data } = await refetch();
-      const wallet = data?.wallet;
-      if (wallet) {
-        const pointString = wallet.currentPointView?.currentPoint;
-        setCurrentPoint(toPointNumber(pointString, 0));
-      }
+      const { refreshMyWalletWithTransactionsAction } = await import("@/app/wallets/me/actions");
+      const result = await refreshMyWalletWithTransactionsAction();
+      
+      setCurrentPoint(toPointNumber(result.currentPoint, 0));
+      
+      const edges = result.transactions.edges ?? [];
+      const newTransactions = edges
+        .filter((edge): edge is { node: GqlTransaction } => !!edge?.node)
+        .map((edge) => presenterTransaction(edge.node, walletId))
+        .filter((tx): tx is AppTransaction => tx !== null);
+      
+      setTransactions(newTransactions);
+      setHasNextPage(result.transactions.pageInfo?.hasNextPage ?? false);
+      setEndCursor(result.transactions.pageInfo?.endCursor ?? null);
     } catch (err) {
       logger.error("Failed to refresh wallet", {
         error: err instanceof Error ? err.message : String(err),
@@ -54,17 +77,47 @@ export function WalletProvider({
       });
       setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
-      setIsLoading(false);
+      setIsLoadingWallet(false);
     }
-  }, [refetch]);
+  }, [walletId]);
+
+  const loadMore = useCallback(async () => {
+    if (isLoadingTransactions || !hasNextPage || !endCursor) return;
+
+    setIsLoadingTransactions(true);
+    try {
+      const result = await fetchMyWalletTransactionsAction(endCursor, 20);
+      
+      const edges = result.edges ?? [];
+      const newTransactions = edges
+        .filter((edge): edge is { node: GqlTransaction } => !!edge?.node)
+        .map((edge) => presenterTransaction(edge.node, walletId))
+        .filter((tx): tx is AppTransaction => tx !== null);
+      
+      setTransactions((prev) => [...prev, ...newTransactions]);
+      setHasNextPage(result.pageInfo?.hasNextPage ?? false);
+      setEndCursor(result.pageInfo?.endCursor ?? null);
+    } catch (err) {
+      logger.error("Failed to load more transactions", {
+        error: err instanceof Error ? err.message : String(err),
+        component: "WalletProvider",
+      });
+    } finally {
+      setIsLoadingTransactions(false);
+    }
+  }, [isLoadingTransactions, hasNextPage, endCursor, walletId]);
 
   const value: WalletContextValue = {
     walletId,
     userId,
     currentPoint,
-    isLoading,
+    transactions,
+    hasNextPage,
+    isLoadingWallet,
+    isLoadingTransactions,
     error,
     refresh,
+    loadMore,
   };
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;

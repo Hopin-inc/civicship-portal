@@ -2,7 +2,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import { WalletProvider } from "@/app/wallets/features/shared/contexts/WalletContext";
-import { TransactionsInitialProvider } from "@/app/wallets/features/shared/contexts/TransactionsInitialContext";
 import { getServerMyWalletWithTransactions } from "@/hooks/wallet/server";
 import { toPointNumber } from "@/utils/bigint";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
@@ -43,10 +42,9 @@ export default async function WalletMeLayout({ children }: { children: React.Rea
       walletId={wallet.id}
       userId={wallet.user?.id ?? "unknown"}
       initialCurrentPoint={initialCurrentPoint}
+      initialTransactions={transactions}
     >
-      <TransactionsInitialProvider initialTransactions={transactions}>
-        {children}
-      </TransactionsInitialProvider>
+      {children}
     </WalletProvider>
   );
 }
