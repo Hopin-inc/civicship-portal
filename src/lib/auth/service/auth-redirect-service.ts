@@ -28,9 +28,10 @@ export class AuthRedirectService {
     const basePath = pathname.split("?")[0];
     const nextParam = next ? this.generateNextParam(next) : this.generateNextParam(pathname);
 
-    if (authState === "loading" || authState === "authenticating") return null;
+    if (authState === "loading" || authState === "authenticating") {
+      return null;
+    }
 
-    // 1️⃣ ログイン済みユーザーがlogin/sign-up画面に来た場合
     const redirectFromLogin = this.handleAuthEntryFlow(
       pathname,
       basePath,
@@ -38,15 +39,19 @@ export class AuthRedirectService {
       next,
       nextParam,
     );
-    if (redirectFromLogin) return redirectFromLogin;
+    if (redirectFromLogin) {
+      return redirectFromLogin;
+    }
 
-    // 2️⃣ 未認証ユーザーがユーザー専用パスに来た場合
     const redirectFromUserPath = this.handleUserPath(basePath, authState, currentUser, nextParam);
-    if (redirectFromUserPath) return redirectFromUserPath;
+    if (redirectFromUserPath) {
+      return redirectFromUserPath;
+    }
 
-    // 4️⃣ ロール不足
     const redirectByRole = this.handleRoleRestriction(currentUser, basePath);
-    if (redirectByRole) return redirectByRole;
+    if (redirectByRole) {
+      return redirectByRole;
+    }
 
     return null;
   }

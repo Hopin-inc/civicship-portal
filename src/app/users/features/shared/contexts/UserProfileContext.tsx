@@ -5,9 +5,9 @@ import { GqlUser } from "@/types/graphql";
 import { AppPortfolio } from "@/app/users/features/shared/types";
 
 export interface UserProfileContextValue {
-  userId: string;
+  userId?: string;
   isOwner: boolean;
-  gqlUser: GqlUser;
+  gqlUser: GqlUser | null;
   portfolios: AppPortfolio[];
 }
 

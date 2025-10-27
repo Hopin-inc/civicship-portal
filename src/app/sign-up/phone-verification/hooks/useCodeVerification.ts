@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from "react";
 import { useMutation } from "@apollo/client";
-import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { IDENTITY_CHECK_PHONE_USER } from "@/graphql/account/identity/mutation";
 import {
@@ -12,6 +11,7 @@ import {
 } from "@/types/graphql";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { RawURIComponent } from "@/utils/path";
+import { logger } from "@/lib/logging";
 
 interface CodeVerificationResult {
   success: boolean;
@@ -24,9 +24,9 @@ interface CodeVerificationResult {
 }
 
 export function useCodeVerification(
-  phoneAuth: PhoneAuthService,
+  phoneAuth: { verifyPhoneCode: (verificationCode: string) => Promise<boolean> },
   nextParam: string,
-  updateAuthState: () => void
+  updateAuthState: () => Promise<any>,
 ) {
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -39,7 +39,10 @@ export function useCodeVerification(
 
   const verify = useCallback(
     async (verificationCode: string): Promise<CodeVerificationResult> => {
+      const authStoreState = useAuthStore.getState();
+
       if (isVerifying) {
+        logger.warn("[useCodeVerification] Already verifying");
         return {
           success: false,
           error: {
@@ -51,11 +54,16 @@ export function useCodeVerification(
 
       setIsVerifying(true);
 
-      try {
-        const result = await phoneAuth.verifyPhoneCode(verificationCode);
-        const setAuthState = useAuthStore.getState().setState;
+      const setAuthState = authStoreState.setState;
+      setAuthState({ isAuthInProgress: true });
 
-        if (!result.success || !result.phoneUid) {
+      try {
+        const success = await phoneAuth.verifyPhoneCode(verificationCode);
+        const phoneUid = useAuthStore.getState().phoneAuth.phoneUid;
+
+        if (!success || !phoneUid) {
+          logger.error("[useCodeVerification] Invalid code or missing phoneUid");
+          setAuthState({ isAuthInProgress: false });
           return {
             success: false,
             error: {
@@ -68,14 +76,13 @@ export function useCodeVerification(
         const { data } = await identityCheckPhoneUser({
           variables: {
             input: {
-              phoneUid: result.phoneUid,
+              phoneUid: phoneUid,
             },
           },
         });
-
         const status = data?.identityCheckPhoneUser?.status;
-
         if (!status) {
+          setAuthState({ isAuthInProgress: false });
           return {
             success: false,
             error: {
@@ -87,6 +94,7 @@ export function useCodeVerification(
 
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
+            setAuthState({ isAuthInProgress: false });
             return {
               success: true,
               redirectPath: `/sign-up${nextParam}`,
@@ -94,7 +102,8 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
-            setAuthState({ authenticationState: "user_registered" });
+            await updateAuthState();
+            setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             const homeRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
@@ -106,8 +115,8 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
-            updateAuthState();
-            setAuthState({ authenticationState: "user_registered" });
+            await updateAuthState();
+            setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
@@ -119,6 +128,7 @@ export function useCodeVerification(
             };
 
           default:
+            setAuthState({ isAuthInProgress: false });
             return {
               success: false,
               error: {
@@ -128,6 +138,10 @@ export function useCodeVerification(
             };
         }
       } catch (error) {
+        logger.error("[useCodeVerification] Verification failed", {
+          error: error instanceof Error ? error.message : String(error),
+        });
+        setAuthState({ isAuthInProgress: false });
         return {
           success: false,
           error: {
@@ -136,11 +150,17 @@ export function useCodeVerification(
           },
         };
       } finally {
-        // エラー時も含めて、必ずisVerifyingをfalseに戻す
         setIsVerifying(false);
       }
     },
-    [phoneAuth, identityCheckPhoneUser, authRedirectService, nextParam, updateAuthState, isVerifying]
+    [
+      phoneAuth,
+      identityCheckPhoneUser,
+      authRedirectService,
+      nextParam,
+      updateAuthState,
+      isVerifying,
+    ],
   );
 
   return {
