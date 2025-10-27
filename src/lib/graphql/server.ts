@@ -31,13 +31,6 @@ export async function executeServerGraphQLQuery<
     ...headers,
   };
 
-  logger.info("[executeServerGraphQLQuery] SSR Request", {
-    authMode: requestHeaders["X-Auth-Mode"],
-    hasAuthorization: !!requestHeaders.Authorization,
-    authSuffix: requestHeaders.Authorization?.slice(-8),
-    component: "executeServerGraphQLQuery",
-  });
-
   const response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
     method: "POST",
     headers: requestHeaders,
