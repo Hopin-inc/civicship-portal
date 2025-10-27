@@ -92,7 +92,9 @@ export const GET_USER_WALLET = gql`
           fromWallet {
             ...WalletFields
             user {
-              ...UserFields
+              id
+              name
+              image
             }
             community {
               ...CommunityFields
@@ -101,7 +103,9 @@ export const GET_USER_WALLET = gql`
           toWallet {
             ...WalletFields
             user {
-              ...UserFields
+              id
+              name
+              image
             }
             community {
               ...CommunityFields

@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
 import { categorizeFirebaseError } from "@/lib/auth/core/firebase-config";
 import { isRunningInLiff } from "@/lib/auth/core/environment-detector";
 import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
 import { useRecaptchaManager } from "./useRecaptchaManager";
 import { useResendTimer } from "./useResendTimer";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface PhoneSubmissionResult {
   success: boolean;
@@ -19,9 +19,12 @@ interface PhoneSubmissionResult {
 }
 
 export function usePhoneSubmission(
-  phoneAuth: PhoneAuthService,
+  phoneAuth: {
+    startPhoneVerification: (phoneNumber: string) => Promise<string | null>;
+    clearRecaptcha?: () => void;
+  },
   recaptchaManager: ReturnType<typeof useRecaptchaManager>,
-  resendTimer: Pick<ReturnType<typeof useResendTimer>, "isDisabled" | "start">
+  resendTimer: Pick<ReturnType<typeof useResendTimer>, "isDisabled" | "start">,
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
@@ -78,19 +81,40 @@ export function usePhoneSubmission(
         };
       }
 
+      useAuthStore.getState().setPhoneAuth({ verificationId: null });
       setIsSubmitting(true);
 
       try {
-        await phoneAuth.startPhoneVerification(formattedPhone);
+        const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
+        const storedId = useAuthStore.getState().phoneAuth.verificationId;
+
+        if (!verificationId) {
+          logger.error("Phone verification ID mismatch", {
+            verificationIdReturned: !!verificationId,
+            verificationIdStored: !!storedId,
+          });
+          return {
+            success: false,
+            error: {
+              message: "認証コードの送信に失敗しました。もう一度お試しください。",
+              type: "verification-id-missing",
+            },
+          };
+        }
+
         resendTimer.start();
         return { success: true };
       } catch (error) {
+        logger.error("Phone verification submission failed", {
+          errorCode: (error as any)?.code,
+          errorMessage: (error as any)?.message,
+        });
         return handleSubmissionError(error);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited]
+    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited],
   );
 
   const resend = useCallback(
@@ -102,9 +126,13 @@ export function usePhoneSubmission(
             message: isRateLimited
               ? "送信回数が上限に達しました。しばらく待ってから再試行してください。"
               : resendTimer.isDisabled
-              ? "再送信は60秒後に可能です。"
-              : "送信処理中です。しばらくお待ちください。",
-            type: isRateLimited ? "rate-limit" : resendTimer.isDisabled ? "resend-disabled" : "already-submitting",
+                ? "再送信は60秒後に可能です。"
+                : "送信処理中です。しばらくお待ちください。",
+            type: isRateLimited
+              ? "rate-limit"
+              : resendTimer.isDisabled
+                ? "resend-disabled"
+                : "already-submitting",
           },
         };
       }
@@ -134,13 +162,31 @@ export function usePhoneSubmission(
 
       try {
         phoneAuth.clearRecaptcha?.();
+        useAuthStore.getState().setPhoneAuth({ verificationId: null });
 
         const waitTime = isRunningInLiff()
           ? PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_LIFF
           : PHONE_VERIFICATION_CONSTANTS.RECAPTCHA_WAIT_TIME_BROWSER;
+
         await new Promise((resolve) => setTimeout(resolve, waitTime));
 
-        await phoneAuth.startPhoneVerification(formattedPhone);
+        const verificationId = await phoneAuth.startPhoneVerification(formattedPhone);
+        const storedId = useAuthStore.getState().phoneAuth.verificationId;
+
+        if (!verificationId || !storedId || storedId !== verificationId) {
+          logger.error("Phone verification ID mismatch on resend", {
+            verificationIdReturned: !!verificationId,
+            verificationIdStored: !!storedId,
+          });
+          return {
+            success: false,
+            error: {
+              message: "認証コードの再送信に失敗しました。もう一度お試しください。",
+              type: "verification-id-missing",
+            },
+          };
+        }
+
         resendTimer.start();
 
         if (!isRunningInLiff()) {
@@ -149,13 +195,16 @@ export function usePhoneSubmission(
 
         return { success: true, message: "認証コードを再送信しました" };
       } catch (error) {
-        logger.error("再送信エラー:", { error });
+        logger.error("Phone verification resend failed", {
+          errorCode: (error as any)?.code,
+          errorMessage: (error as any)?.message,
+        });
         return handleSubmissionError(error);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited]
+    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited],
   );
 
   return {

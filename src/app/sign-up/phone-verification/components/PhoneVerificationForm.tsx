@@ -13,6 +13,7 @@ import { usePhoneSubmission } from "../hooks/usePhoneSubmission";
 import { useCodeVerification } from "../hooks/useCodeVerification";
 import { PhoneInputStep } from "./PhoneInputStep";
 import { CodeVerificationStep } from "./CodeVerificationStep";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 export function PhoneVerificationForm() {
   const router = useRouter();
@@ -26,11 +27,24 @@ export function PhoneVerificationForm() {
 
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
   const recaptchaManager = useRecaptchaManager();
-  const phoneSubmission = usePhoneSubmission(phoneAuth, recaptchaManager, {
-    isDisabled: isResendDisabled,
-    start: startResendTimer,
-  });
-  const codeVerification = useCodeVerification(phoneAuth, nextParam, updateAuthState);
+  const phoneSubmission = usePhoneSubmission(
+    {
+      startPhoneVerification: phoneAuth.startPhoneVerification,
+      clearRecaptcha: phoneAuth.clearRecaptcha,
+    },
+    recaptchaManager,
+    {
+      isDisabled: isResendDisabled,
+      start: startResendTimer,
+    },
+  );
+  const codeVerification = useCodeVerification(
+    {
+      verifyPhoneCode: phoneAuth.verifyPhoneCode,
+    },
+    nextParam,
+    updateAuthState,
+  );
 
   const { isValid: isPhoneValid, formattedPhone } = validatePhoneNumber(phoneNumber);
 
@@ -88,6 +102,9 @@ export function PhoneVerificationForm() {
     setPhoneNumber("");
     setVerificationCode("");
     setStep("phone");
+
+    const { setPhoneAuth } = useAuthStore.getState();
+    setPhoneAuth({ verificationId: null });
   };
 
   if (loading) {
@@ -129,7 +146,7 @@ export function PhoneVerificationForm() {
           isPhoneSubmitting={phoneSubmission.isSubmitting}
           showRecaptcha={recaptchaManager.showRecaptcha}
           recaptchaContainerRef={recaptchaManager.containerRef}
-          phoneAuth={phoneAuth}
+          phoneAuth={{ clearRecaptcha: phoneAuth.clearRecaptcha }}
         />
       )}
     </div>
