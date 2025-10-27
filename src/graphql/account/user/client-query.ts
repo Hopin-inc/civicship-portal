@@ -38,10 +38,8 @@ export const GET_CURRENT_USER_PROFILE = gql`
           edges {
             node {
               id
-              instanceId
               name
               imageUrl
-              createdAt
             }
           }
         }
@@ -61,26 +59,11 @@ export const GET_CURRENT_USER_PROFILE = gql`
           }
         }
 
-        nftWallet {
-          id
-          walletAddress
-        }
-
-        didIssuanceRequests {
-          id
-          status
-          didValue
-          requestedAt
-          processedAt
-          completedAt
-          createdAt
-          updatedAt
-        }
-
         opportunitiesCreatedByMe {
           id
           title
           images
+          category
         }
       }
     }
