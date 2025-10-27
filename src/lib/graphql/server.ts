@@ -34,7 +34,6 @@ export async function executeServerGraphQLQuery<
   logger.info("[executeServerGraphQLQuery] SSR Request", {
     authMode: requestHeaders["X-Auth-Mode"],
     hasAuthorization: !!requestHeaders.Authorization,
-    authSuffix: requestHeaders.Authorization?.slice(-8),
     component: "executeServerGraphQLQuery",
   });
 
