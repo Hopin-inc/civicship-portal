@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DEFAULT_COUNTRY,
@@ -8,6 +8,7 @@ import {
   SHOW_FLAGS,
 } from "../utils/phoneVerificationConstants";
 import { InternationalPhoneField } from "./InternationalPhoneField";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface PhoneInputStepProps {
   phoneNumber: string | undefined;
@@ -30,6 +31,16 @@ export function PhoneInputStep({
   isVerifying,
   recaptchaContainerRef,
 }: PhoneInputStepProps) {
+  const headerConfig = useMemo(
+    () => ({
+      title: "電話番号認証",
+      showBackButton: false,
+      showLogo: false,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
+
   const [isReloading, setIsReloading] = useState(false);
 
   return (
