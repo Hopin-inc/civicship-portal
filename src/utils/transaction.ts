@@ -7,6 +7,7 @@ import {
 } from "@/types/graphql";
 import { AppTransaction } from "@/app/wallets/features/shared/type";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("ja-JP").format(amount);
@@ -77,6 +78,13 @@ export const presenterTransaction = (
   const rawPoint = node.fromPointChange ?? 0;
   const isOutgoing = node.fromWallet?.id === walletId;
   const signedPoint = isOutgoing ? -Math.abs(rawPoint) : Math.abs(rawPoint);
+  
+  const counterparty = isOutgoing ? node.toWallet : node.fromWallet;
+  const image = 
+    counterparty?.type === GqlWalletType.Community
+      ? currentCommunityConfig.logoPath ?? PLACEHOLDER_IMAGE
+      : counterparty?.user?.image ?? PLACEHOLDER_IMAGE;
+  
   return {
     id: node.id,
     reason: node.reason,
@@ -91,5 +99,6 @@ export const presenterTransaction = (
       node.toWallet?.user?.didIssuanceRequests?.find(
         (req) => req?.status === GqlDidIssuanceStatus.Completed,
       )?.didValue ?? null,
+    image,
   };
 };

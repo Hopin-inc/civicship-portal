@@ -3,7 +3,6 @@ import { notFound, redirect } from "next/navigation";
 import { WalletProvider } from "@/app/wallets/features/shared/contexts/WalletProvider";
 import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
 import { toPointNumber } from "@/utils/bigint";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
 
 export default async function WalletMeLayout({ children }: { children: React.ReactNode }) {
@@ -26,11 +25,8 @@ export default async function WalletMeLayout({ children }: { children: React.Rea
 
   const { wallet, transactions } = result;
 
-  if (!wallet || wallet.community?.id !== COMMUNITY_ID) {
-    logger.warn("No valid myWallet found", {
-      wallet,
-      communityId: COMMUNITY_ID,
-    });
+  if (!wallet) {
+    logger.warn("No valid myWallet found");
     notFound();
   }
 
