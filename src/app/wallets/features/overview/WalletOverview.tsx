@@ -20,6 +20,7 @@ export function WalletOverview() {
       title: "保有ポイント",
       showBackButton: true,
       showLogo: false,
+      backTo: "/users/me",
     }),
     [],
   );
