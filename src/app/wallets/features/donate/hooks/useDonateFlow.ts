@@ -7,7 +7,7 @@ import { useDonatePoint } from "@/app/wallets/features/donate/hooks";
 import { toast } from "sonner";
 import { GqlUser } from "@/types/graphql";
 
-export function useDonateFlow(currentUser?: GqlUser, currentPoint?: bigint) {
+export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigint) {
   const router = useRouter();
   const track = useAnalytics();
   const { donate, isLoading } = useDonatePoint();
