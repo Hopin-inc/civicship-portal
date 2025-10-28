@@ -18,7 +18,7 @@ export function useDonatePoint() {
   const donate = async ({ toUserId, amount, comment, fromUserId }: DonatePointInput) => {
     setIsLoading(true);
     try {
-      const res = await donatePoint({
+      return await donatePoint({
         input: {
           communityId: COMMUNITY_ID,
           transferPoints: amount,
@@ -27,8 +27,6 @@ export function useDonatePoint() {
         },
         permission: { userId: fromUserId },
       });
-
-      return res;
     } finally {
       setIsLoading(false);
     }
