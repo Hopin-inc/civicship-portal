@@ -1,23 +1,6 @@
 import { getRequestConfig } from 'next-intl/server';
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { defaultLocale, locales, type Locale } from './config';
-
-/**
- * ルートごとに必要な namespace を判定
- */
-function getNamespacesForPath(pathname: string): string[] {
-  const namespaces = ['common']; // 常に common は含める
-
-  if (pathname.startsWith('/wallets')) {
-    namespaces.push('wallets', 'transactions');
-  } else if (pathname.startsWith('/users')) {
-    namespaces.push('users');
-  } else if (pathname.startsWith('/login') || pathname.startsWith('/sign-up')) {
-    namespaces.push('auth');
-  }
-
-  return namespaces;
-}
 
 /**
  * メッセージをマージ（メモ化付き）
@@ -46,7 +29,7 @@ async function loadMessages(locale: Locale, namespaces: string[]) {
   return messages;
 }
 
-export default getRequestConfig(async () => {
+export default getRequestConfig(async ({ requestLocale }) => {
   const cookieStore = await cookies();
   const savedLocale = cookieStore.get('language')?.value;
   
@@ -55,10 +38,7 @@ export default getRequestConfig(async () => {
       ? (savedLocale as Locale)
       : defaultLocale;
 
-  const headersList = await headers();
-  const pathname = headersList.get('x-pathname') || '/';
-
-  const namespaces = getNamespacesForPath(pathname);
+  const namespaces = ['common', 'wallets', 'transactions', 'users', 'auth'];
   const messages = await loadMessages(locale, namespaces);
 
   return {
