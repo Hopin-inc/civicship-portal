@@ -33,12 +33,12 @@ describe("isValidPhoneNumber", () => {
       expect(isValidPhoneNumber("+13105551234")).toBe(true);
     });
 
-    it("should reject landline numbers when identifiable", () => {
-      // Note: US numbers are often FIXED_LINE_OR_MOBILE, so this may pass
-      // This is expected behavior as mentioned in the commit message
+    it("should accept numbers that are FIXED_LINE_OR_MOBILE", () => {
+      // Note: US numbers are often FIXED_LINE_OR_MOBILE.
+      // We accept them to avoid false negatives for valid mobile numbers
+      // that can't be distinguished from landlines.
       const result = isValidPhoneNumber("+12125551234");
-      // Accept FIXED_LINE_OR_MOBILE to avoid false negatives
-      expect(typeof result).toBe("boolean");
+      expect(result).toBe(true);
     });
 
     it("should reject invalid US numbers", () => {
