@@ -3,34 +3,37 @@ import { isValidPhoneNumber } from "../validatePhoneNumber";
 
 describe("isValidPhoneNumber", () => {
   describe("Japanese phone numbers", () => {
-    it("should accept valid mobile numbers", () => {
-      expect(isValidPhoneNumber("+819012345678")).toBe(true);
-      expect(isValidPhoneNumber("+818012345678")).toBe(true);
-      expect(isValidPhoneNumber("+817012345678")).toBe(true);
+    it.each([
+      "+819012345678",
+      "+818012345678",
+      "+817012345678",
+    ])("should accept valid mobile number %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
-    it("should reject landline numbers", () => {
-      // Tokyo landline (03)
-      expect(isValidPhoneNumber("+81312345678")).toBe(false);
-      // Osaka landline (06)
-      expect(isValidPhoneNumber("+81612345678")).toBe(false);
+    it.each([
+      ["+81312345678", "Tokyo landline (03)"],
+      ["+81612345678", "Osaka landline (06)"],
+    ])("should reject %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
 
-    it("should reject invalid Japanese numbers", () => {
-      // Too short
-      expect(isValidPhoneNumber("+8190123456")).toBe(false);
-      // Too long
-      expect(isValidPhoneNumber("+8190123456789")).toBe(false);
-      // Invalid prefix
-      expect(isValidPhoneNumber("+819912345678")).toBe(false);
+    it.each([
+      ["+8190123456", "Too short"],
+      ["+8190123456789", "Too long"],
+      ["+819912345678", "Invalid prefix"],
+    ])("should reject %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
 
   describe("US phone numbers", () => {
-    it("should accept valid mobile numbers", () => {
-      expect(isValidPhoneNumber("+16505551234")).toBe(true);
-      expect(isValidPhoneNumber("+12025551234")).toBe(true);
-      expect(isValidPhoneNumber("+13105551234")).toBe(true);
+    it.each([
+      "+16505551234",
+      "+12025551234",
+      "+13105551234",
+    ])("should accept valid mobile number %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
     it("should accept numbers that are FIXED_LINE_OR_MOBILE", () => {
@@ -41,100 +44,109 @@ describe("isValidPhoneNumber", () => {
       expect(result).toBe(true);
     });
 
-    it("should reject invalid US numbers", () => {
-      // Too short
-      expect(isValidPhoneNumber("+1650555123")).toBe(false);
-      // Too long
-      expect(isValidPhoneNumber("+165055512345")).toBe(false);
-      // Invalid format
-      expect(isValidPhoneNumber("+11234567890")).toBe(false);
+    it.each([
+      ["+1650555123", "Too short"],
+      ["+165055512345", "Too long"],
+      ["+11234567890", "Invalid area code (NANP area codes cannot start with 1)"],
+    ])("should reject %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
 
   describe("UK phone numbers", () => {
-    it("should accept valid mobile numbers", () => {
-      expect(isValidPhoneNumber("+447700900123")).toBe(true);
-      expect(isValidPhoneNumber("+447911123456")).toBe(true);
-      expect(isValidPhoneNumber("+447400123456")).toBe(true);
+    it.each([
+      "+447700900123",
+      "+447911123456",
+      "+447400123456",
+    ])("should accept valid mobile number %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
-    it("should reject landline numbers", () => {
-      // London landline (020)
-      expect(isValidPhoneNumber("+442012345678")).toBe(false);
-      // Manchester landline (0161)
-      expect(isValidPhoneNumber("+441612345678")).toBe(false);
+    it.each([
+      ["+442012345678", "London landline (020)"],
+      ["+441612345678", "Manchester landline (0161)"],
+    ])("should reject %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
 
-    it("should reject invalid UK numbers", () => {
-      // Too short
-      expect(isValidPhoneNumber("+44770090012")).toBe(false);
-      // Invalid mobile prefix
-      expect(isValidPhoneNumber("+446700900123")).toBe(false);
+    it.each([
+      ["+44770090012", "Too short"],
+      ["+446700900123", "Invalid mobile prefix"],
+    ])("should reject %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
 
   describe("Korean phone numbers", () => {
-    it("should accept valid mobile numbers", () => {
-      expect(isValidPhoneNumber("+821012345678")).toBe(true);
-      expect(isValidPhoneNumber("+821112345678")).toBe(true);
-      expect(isValidPhoneNumber("+821612345678")).toBe(true);
+    it.each([
+      "+821012345678",
+      "+821112345678",
+      "+821612345678",
+    ])("should accept valid mobile number %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
-    it("should reject landline numbers", () => {
-      // Seoul landline (02)
-      expect(isValidPhoneNumber("+82212345678")).toBe(false);
-      // Busan landline (051)
-      expect(isValidPhoneNumber("+82512345678")).toBe(false);
+    it.each([
+      ["+82212345678", "Seoul landline (02)"],
+      ["+82512345678", "Busan landline (051)"],
+    ])("should reject %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
 
-    it("should reject invalid Korean numbers", () => {
-      // Too short
-      expect(isValidPhoneNumber("+82101234567")).toBe(false);
-      // Invalid prefix
-      expect(isValidPhoneNumber("+820012345678")).toBe(false);
+    it.each([
+      ["+82101234567", "Too short"],
+      ["+820012345678", "Invalid prefix"],
+    ])("should reject %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
 
   describe("Australian phone numbers", () => {
-    it("should accept valid mobile numbers", () => {
-      expect(isValidPhoneNumber("+61412345678")).toBe(true);
-      expect(isValidPhoneNumber("+61423456789")).toBe(true);
+    it.each([
+      "+61412345678",
+      "+61423456789",
+    ])("should accept valid mobile number %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
-    it("should reject landline numbers", () => {
-      // Sydney landline (02)
-      expect(isValidPhoneNumber("+61212345678")).toBe(false);
-      // Melbourne landline (03)
-      expect(isValidPhoneNumber("+61312345678")).toBe(false);
+    it.each([
+      ["+61212345678", "Sydney landline (02)"],
+      ["+61312345678", "Melbourne landline (03)"],
+    ])("should reject %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
 
   describe("German phone numbers", () => {
-    it("should accept valid mobile numbers", () => {
-      expect(isValidPhoneNumber("+4915112345678")).toBe(true);
-      expect(isValidPhoneNumber("+4916012345678")).toBe(true);
-      expect(isValidPhoneNumber("+4917012345678")).toBe(true);
+    it.each([
+      "+4915112345678",
+      "+4916012345678",
+      "+4917012345678",
+    ])("should accept valid mobile number %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
-    it("should reject landline numbers", () => {
-      // Berlin landline (030)
-      expect(isValidPhoneNumber("+493012345678")).toBe(false);
-      // Munich landline (089)
-      expect(isValidPhoneNumber("+498912345678")).toBe(false);
+    it.each([
+      ["+493012345678", "Berlin landline (030)"],
+      ["+498912345678", "Munich landline (089)"],
+    ])("should reject %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
 
   describe("French phone numbers", () => {
-    it("should accept valid mobile numbers", () => {
-      expect(isValidPhoneNumber("+33612345678")).toBe(true);
-      expect(isValidPhoneNumber("+33712345678")).toBe(true);
+    it.each([
+      "+33612345678",
+      "+33712345678",
+    ])("should accept valid mobile number %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
-    it("should reject landline numbers", () => {
-      // Paris landline (01)
-      expect(isValidPhoneNumber("+33112345678")).toBe(false);
-      // Lyon landline (04)
-      expect(isValidPhoneNumber("+33412345678")).toBe(false);
+    it.each([
+      ["+33112345678", "Paris landline (01)"],
+      ["+33412345678", "Lyon landline (04)"],
+    ])("should reject %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
 
@@ -148,40 +160,48 @@ describe("isValidPhoneNumber", () => {
     });
 
     it("should reject null-like values", () => {
+      // Test runtime behavior if null is passed, bypassing TypeScript types
       expect(isValidPhoneNumber(null as any)).toBe(false);
     });
 
-    it("should reject numbers without country code", () => {
-      expect(isValidPhoneNumber("09012345678")).toBe(false);
-      expect(isValidPhoneNumber("6505551234")).toBe(false);
+    it.each([
+      ["09012345678", "Japanese mobile without country code"],
+      ["6505551234", "US number without country code"],
+    ])("should reject %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
 
-    it("should reject invalid formats", () => {
-      expect(isValidPhoneNumber("abc")).toBe(false);
-      expect(isValidPhoneNumber("123")).toBe(false);
-      expect(isValidPhoneNumber("+")).toBe(false);
-      expect(isValidPhoneNumber("++819012345678")).toBe(false);
+    it.each([
+      "abc",
+      "123",
+      "+",
+      "++819012345678",
+    ])("should reject invalid format: %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
 
-    it("should reject numbers with invalid country codes", () => {
-      expect(isValidPhoneNumber("+9999012345678")).toBe(false);
-      expect(isValidPhoneNumber("+0009012345678")).toBe(false);
+    it.each([
+      "+9999012345678",
+      "+0009012345678",
+    ])("should reject invalid country code: %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
 
-    it("should handle spaces in phone numbers", () => {
-      // libphonenumber-js should handle spaces
-      expect(isValidPhoneNumber("+81 90 1234 5678")).toBe(true);
-      expect(isValidPhoneNumber("+1 650 555 1234")).toBe(true);
+    it.each([
+      "+81 90 1234 5678",
+      "+1 650 555 1234",
+    ])("should handle spaces in phone number: %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
-    it("should handle hyphens in phone numbers", () => {
-      // libphonenumber-js should handle hyphens
-      expect(isValidPhoneNumber("+81-90-1234-5678")).toBe(true);
-      expect(isValidPhoneNumber("+1-650-555-1234")).toBe(true);
+    it.each([
+      "+81-90-1234-5678",
+      "+1-650-555-1234",
+    ])("should handle hyphens in phone number: %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
     it("should handle parentheses in phone numbers", () => {
-      // libphonenumber-js should handle parentheses
       expect(isValidPhoneNumber("+1 (650) 555-1234")).toBe(true);
     });
   });
@@ -194,78 +214,75 @@ describe("isValidPhoneNumber", () => {
       expect(isValidPhoneNumber("+819012345678")).toBe(true);
     });
 
-    it("should validate complete international format", () => {
-      // Valid formats
-      expect(isValidPhoneNumber("+819012345678")).toBe(true);
-      expect(isValidPhoneNumber("+16505551234")).toBe(true);
+    it.each([
+      "+819012345678",
+      "+16505551234",
+    ])("should validate complete international format: %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
+    });
 
-      // Invalid: missing digits
-      expect(isValidPhoneNumber("+81")).toBe(false);
-      expect(isValidPhoneNumber("+1")).toBe(false);
+    it.each([
+      ["+81", "Japan country code only"],
+      ["+1", "US country code only"],
+    ])("should reject %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
 
   describe("Maximum length validation", () => {
-    it("should reject excessively long numbers", () => {
-      // Extremely long number
-      expect(isValidPhoneNumber("+819012345678901234567890")).toBe(false);
-      expect(isValidPhoneNumber("+165055512341234567890")).toBe(false);
+    it.each([
+      "+819012345678901234567890",
+      "+165055512341234567890",
+    ])("should reject excessively long number: %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
 
   describe("Special service numbers", () => {
-    it("should reject emergency numbers", () => {
-      expect(isValidPhoneNumber("+81110")).toBe(false); // Japan emergency
-      expect(isValidPhoneNumber("+1911")).toBe(false); // US emergency
-      expect(isValidPhoneNumber("+44999")).toBe(false); // UK emergency
+    it.each([
+      ["+81110", "Japan emergency"],
+      ["+1911", "US emergency"],
+      ["+44999", "UK emergency"],
+    ])("should reject emergency number %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
 
-    it("should reject short codes", () => {
-      expect(isValidPhoneNumber("+81171")).toBe(false); // Japan short code
-      expect(isValidPhoneNumber("+44150")).toBe(false); // UK short code
+    it.each([
+      ["+81171", "Japan short code"],
+      ["+44150", "UK short code"],
+    ])("should reject short code %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
 
-    it("should reject toll-free numbers", () => {
-      expect(isValidPhoneNumber("+810120123456")).toBe(false); // Japan toll-free
-      expect(isValidPhoneNumber("+18001234567")).toBe(false); // US toll-free
-    });
-  });
-
-  describe("Type validation", () => {
-    it("should only accept MOBILE type", () => {
-      // This is implicitly tested by landline rejection tests
-      // The function checks: type === "MOBILE" || type === "FIXED_LINE_OR_MOBILE"
-
-      // Valid mobile numbers
-      expect(isValidPhoneNumber("+819012345678")).toBe(true);
-
-      // Invalid: landlines should be rejected
-      expect(isValidPhoneNumber("+81312345678")).toBe(false);
-    });
-
-    it("should accept FIXED_LINE_OR_MOBILE type", () => {
-      // US numbers are often classified as FIXED_LINE_OR_MOBILE
-      // This is intentional to avoid false negatives
-      const result = isValidPhoneNumber("+16505551234");
-      expect(result).toBe(true);
+    it.each([
+      ["+810120123456", "Japan toll-free"],
+      ["+18001234567", "US toll-free"],
+    ])("should reject toll-free number %s (%s)", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
 
   describe("Real-world number formats", () => {
-    it("should handle numbers as entered by users in Japan", () => {
-      expect(isValidPhoneNumber("+81 90-1234-5678")).toBe(true);
-      expect(isValidPhoneNumber("+81(90)1234-5678")).toBe(true);
+    it.each([
+      "+81 90-1234-5678",
+      "+81(90)1234-5678",
+    ])("should handle Japanese format: %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
-    it("should handle numbers as entered by users in US", () => {
-      expect(isValidPhoneNumber("+1 (650) 555-1234")).toBe(true);
-      expect(isValidPhoneNumber("+1-650-555-1234")).toBe(true);
-      expect(isValidPhoneNumber("+1 650 555 1234")).toBe(true);
+    it.each([
+      "+1 (650) 555-1234",
+      "+1-650-555-1234",
+      "+1 650 555 1234",
+    ])("should handle US format: %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
-    it("should handle numbers as entered by users in UK", () => {
-      expect(isValidPhoneNumber("+44 7700 900123")).toBe(true);
-      expect(isValidPhoneNumber("+44-7700-900123")).toBe(true);
+    it.each([
+      "+44 7700 900123",
+      "+44-7700-900123",
+    ])("should handle UK format: %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
   });
 });
