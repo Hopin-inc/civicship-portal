@@ -75,7 +75,11 @@ export function useWalletActions({
         .map((edge) => presenterTransaction(edge?.node, walletId))
         .filter((tx): tx is any => tx !== null);
 
-      setTransactions((prev) => [...prev, ...newTransactions]);
+      setTransactions((prev) => {
+        const existingIds = new Set(prev.map((tx) => tx.id));
+        const uniqueNewTransactions = newTransactions.filter((tx) => !existingIds.has(tx.id));
+        return [...prev, ...uniqueNewTransactions];
+      });
       setHasNextPage(result.transactions.pageInfo?.hasNextPage ?? false);
       setEndCursor(result.transactions.pageInfo?.endCursor ?? null);
     } catch (err) {
