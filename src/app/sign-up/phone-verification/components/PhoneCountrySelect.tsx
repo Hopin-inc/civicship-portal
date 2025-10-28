@@ -8,20 +8,21 @@ import flags from "react-phone-number-input/flags";
 type CountrySelectProps = {
   disabled?: boolean;
   value: RPNInput.Country;
-  onChange: (value: RPNInput.Country) => void;
+  onChangeAction: (value: RPNInput.Country) => void;
   options: { label: string; value: RPNInput.Country | undefined }[];
 };
 
-const COUNTRY_SELECT_WRAPPER_CLASSES =
-  "relative inline-flex items-center self-stretch shrink-0 rounded-s-md border border-input bg-background py-2 ps-3 pe-2 text-muted-foreground transition-[color,box-shadow] outline-none focus-within:z-10 focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:bg-muted hover:text-foreground has-disabled:pointer-events-none has-disabled:opacity-50 has-aria-invalid:border-destructive/60 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40";
-
-export const CountrySelect = ({ disabled, value, onChange, options }: CountrySelectProps) => {
+export const CountrySelect = ({ disabled, value, onChangeAction, options }: CountrySelectProps) => {
   const handleSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onChange(event.target.value as RPNInput.Country);
+    onChangeAction(event.target.value as RPNInput.Country);
   };
 
   return (
-    <div className={COUNTRY_SELECT_WRAPPER_CLASSES}>
+    <div
+      className={
+        'relative inline-flex items-center self-stretch shrink-0 rounded-s-md border border-input bg-background py-2 ps-3 pe-2 text-muted-foreground transition-[color,box-shadow] outline-none focus-within:z-10 focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 hover:bg-muted hover:text-foreground has-disabled:pointer-events-none has-disabled:opacity-50 has-aria-invalid:border-destructive/60 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40"'
+      }
+    >
       <div className="inline-flex items-center gap-1" aria-hidden="true">
         <FlagComponent country={value} countryName={value} aria-hidden="true" />
         <span className="text-muted-foreground/80">
