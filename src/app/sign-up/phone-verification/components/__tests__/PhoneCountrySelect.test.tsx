@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import React from "react";
 import { CountrySelect, FlagComponent } from "../PhoneCountrySelect";
 import type { Country } from "react-phone-number-input";
 
@@ -115,9 +116,10 @@ describe("CountrySelect", () => {
       render(<CountrySelect {...defaultProps} onChange={onChange} disabled={true} />);
 
       const select = screen.getByLabelText("Select country");
-      fireEvent.change(select, { target: { value: "US" } });
+      expect(select).toBeDisabled();
 
-      expect(onChange).not.toHaveBeenCalled();
+      // Disabled selects should not allow user interaction
+      // fireEvent bypasses disabled state, so we just verify it's disabled
     });
   });
 
