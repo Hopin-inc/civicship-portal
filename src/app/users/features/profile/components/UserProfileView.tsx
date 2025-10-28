@@ -5,7 +5,6 @@ import { UserPortfolioSection } from "@/app/users/features/portfolios";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { NftCard } from "@/components/domains/nfts/components";
 import { CardCarousel } from "@/components/shared/CardCarousel";
-import { toast } from "sonner";
 
 interface UserProfileViewProps {
   viewModel: UserProfileViewModel;
@@ -17,8 +16,6 @@ export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
   const shouldShowOpportunities = targetFeatures.some((feature) =>
     currentCommunityConfig.enableFeatures.includes(feature),
   );
-
-  toast.info("teiteiteitei");
 
   return (
     <div className="container mx-auto py-6 max-w-3xl">
