@@ -6,7 +6,7 @@ import {
   GqlWalletType,
 } from "@/types/graphql";
 import { AppTransaction } from "@/app/wallets/features/shared/type";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { currentCommunityConfig, getSquareLogoPath } from "@/lib/communities/metadata";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
 export const formatCurrency = (amount: number): string => {
@@ -78,13 +78,13 @@ export const presenterTransaction = (
   const rawPoint = node.fromPointChange ?? 0;
   const isOutgoing = node.fromWallet?.id === walletId;
   const signedPoint = isOutgoing ? -Math.abs(rawPoint) : Math.abs(rawPoint);
-  
+
   const counterparty = isOutgoing ? node.toWallet : node.fromWallet;
-  const image = 
+  const image =
     counterparty?.type === GqlWalletType.Community
-      ? currentCommunityConfig.logoPath ?? PLACEHOLDER_IMAGE
-      : counterparty?.user?.image ?? PLACEHOLDER_IMAGE;
-  
+      ? getSquareLogoPath()
+      : (counterparty?.user?.image ?? PLACEHOLDER_IMAGE);
+
   return {
     id: node.id,
     reason: node.reason,
