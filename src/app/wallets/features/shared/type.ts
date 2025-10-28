@@ -13,4 +13,5 @@ export type AppTransaction = {
 
   transferredAt: string;
   didValue: string | null;
+  image?: string;
 };

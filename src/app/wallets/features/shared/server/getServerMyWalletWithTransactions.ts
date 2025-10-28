@@ -13,10 +13,6 @@ export interface MyWalletWithTransactionsResult {
       name: string;
       image?: string | null;
     } | null;
-    community?: {
-      id: string;
-      name: string;
-    } | null;
   } | null;
   transactions: GqlTransactionsConnection;
 }
@@ -59,10 +55,6 @@ export async function getServerMyWalletWithTransactions(
           name: string;
           image?: string | null;
         } | null;
-        community?: {
-          id: string;
-          name: string;
-        } | null;
         transactionsConnection: GqlTransactionsConnection;
       } | null;
     }>(
@@ -87,7 +79,6 @@ export async function getServerMyWalletWithTransactions(
         currentPoint: BigInt(myWallet.currentPointView?.currentPoint ?? '0'),
         accumulatedPoint: BigInt(myWallet.accumulatedPointView?.accumulatedPoint ?? '0'),
         user: myWallet.user,
-        community: myWallet.community,
       },
       transactions: myWallet.transactionsConnection ?? fallbackConnection,
     };

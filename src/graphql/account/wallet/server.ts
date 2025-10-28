@@ -23,10 +23,6 @@ export const GET_MY_WALLET_WITH_TRANSACTIONS_SERVER_QUERY = `
         name
         image
       }
-      community {
-        id
-        name
-      }
       transactionsConnection(first: $first, cursor: $cursor, sort: $sort) {
         pageInfo {
           hasNextPage
@@ -47,33 +43,23 @@ export const GET_MY_WALLET_WITH_TRANSACTIONS_SERVER_QUERY = `
             fromWallet {
               id
               type
-              currentPointView {
-                currentPoint
-              }
               user {
                 id
                 name
                 image
-              }
-              community {
-                id
-                name
               }
             }
             toWallet {
               id
               type
-              currentPointView {
-                currentPoint
-              }
               user {
                 id
                 name
                 image
-              }
-              community {
-                id
-                name
+                didIssuanceRequests {
+                  status
+                  didValue
+                }
               }
             }
           }

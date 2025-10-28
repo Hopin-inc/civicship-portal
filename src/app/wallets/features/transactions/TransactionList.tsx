@@ -35,7 +35,7 @@ export function TransactionList() {
         ) : (
           <>
             {transactions.map((transaction) => (
-              <TransactionItem key={transaction.id} transaction={transaction} />
+              <TransactionItem key={transaction.id} transaction={transaction} image={transaction.image} />
             ))}
             {hasNextPage && (
               <div ref={targetRef} className="h-10 flex items-center justify-center">
