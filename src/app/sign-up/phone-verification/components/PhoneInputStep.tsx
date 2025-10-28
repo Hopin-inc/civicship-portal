@@ -2,13 +2,12 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
-import { InternationalPhoneField } from "./InternationalPhoneField";
 import {
   DEFAULT_COUNTRY,
-  getAllowedCountries,
+  PHONE_VERIFICATION_CONSTANTS,
   SHOW_FLAGS,
-} from "@/app/sign-up/phone-verification/utils/phone-input-config";
+} from "../utils/phoneVerificationConstants";
+import { InternationalPhoneField } from "./InternationalPhoneField";
 
 interface PhoneInputStepProps {
   phoneNumber: string | undefined;
@@ -47,7 +46,6 @@ export function PhoneInputStep({
           value={phoneNumber}
           onChange={onPhoneNumberChange}
           defaultCountry={DEFAULT_COUNTRY}
-          countries={getAllowedCountries()}
           showFlags={SHOW_FLAGS}
           placeholder="例）09012345678"
           disabled={isSubmitting || isVerifying || isReloading}
