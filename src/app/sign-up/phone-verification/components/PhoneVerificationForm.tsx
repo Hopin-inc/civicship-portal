@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { VerificationStep } from "../types";
-import { isValidPhoneNumber } from "../utils/phone-number";
+import { isValidPhoneNumber } from "../utils/validatePhoneNumber";
 import { useResendTimer } from "../hooks/useResendTimer";
 import { useRecaptchaManager } from "../hooks/useRecaptchaManager";
 import { usePhoneSubmission } from "../hooks/usePhoneSubmission";
