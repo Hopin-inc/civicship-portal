@@ -21,7 +21,7 @@ export function PhoneVerificationForm() {
   const next = searchParams.get("next");
   const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
   const { phoneAuth, isAuthenticated, loading, updateAuthState } = useAuth();
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState<string | undefined>(undefined);
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<VerificationStep>("phone");
 
@@ -104,7 +104,7 @@ export function PhoneVerificationForm() {
   };
 
   const handleBackToPhone = () => {
-    setPhoneNumber("");
+    setPhoneNumber(undefined);
     setVerificationCode("");
     setStep("phone");
 

@@ -11,7 +11,7 @@ import {
 } from "@/config/phone-input-config";
 
 interface PhoneInputStepProps {
-  phoneNumber: string;
+  phoneNumber: string | undefined;
   onPhoneNumberChange: (value: string | undefined) => void;
   onSubmit: (e: React.FormEvent) => void;
   isSubmitting: boolean;
