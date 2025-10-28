@@ -1,12 +1,15 @@
-import { redirect } from "next/navigation";
+"use client";
 
-export default async function WalletsRedirectPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  const queryString = new URLSearchParams(searchParams as Record<string, string>).toString();
-  const redirectUrl = `/wallets/me${queryString ? `?${queryString}` : ""}`;
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
-  redirect(redirectUrl);
+export default function WalletsRedirectPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/wallets/me");
+  }, []);
+
+  return <LoadingIndicator />;
 }
