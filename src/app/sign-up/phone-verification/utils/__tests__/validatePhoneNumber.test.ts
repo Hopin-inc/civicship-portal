@@ -187,22 +187,12 @@ describe("isValidPhoneNumber", () => {
       ["+81 90 1234 5678", "Japanese with spaces"],
       ["+1 650 555 1234", "US with spaces"],
       ["+44 7700 900123", "UK with spaces"],
-    ])("should handle %s: %s", (phoneNumber) => {
-      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
-    });
-
-    it.each([
       ["+81-90-1234-5678", "Japanese with hyphens"],
       ["+1-650-555-1234", "US with hyphens"],
       ["+44-7700-900123", "UK with hyphens"],
-    ])("should handle %s: %s", (phoneNumber) => {
-      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
-    });
-
-    it.each([
       ["+1 (650) 555-1234", "US with parentheses and spaces"],
       ["+81(90)1234-5678", "Japanese with parentheses and hyphens"],
-    ])("should handle %s: %s", (phoneNumber) => {
+    ])("should accept number with formatting: %s (%s)", (phoneNumber) => {
       expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
   });
