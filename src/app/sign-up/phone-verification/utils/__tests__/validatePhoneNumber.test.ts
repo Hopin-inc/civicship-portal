@@ -151,17 +151,13 @@ describe("isValidPhoneNumber", () => {
   });
 
   describe("Edge cases", () => {
-    it("should reject undefined", () => {
-      expect(isValidPhoneNumber(undefined)).toBe(false);
-    });
-
-    it("should reject empty string", () => {
-      expect(isValidPhoneNumber("")).toBe(false);
-    });
-
-    it("should reject null-like values", () => {
-      // Test runtime behavior if null is passed, bypassing TypeScript types
-      expect(isValidPhoneNumber(null as any)).toBe(false);
+    it.each([
+      { value: undefined, name: "undefined" },
+      { value: "", name: "an empty string" },
+      { value: null, name: "null" },
+    ])("should reject $name", ({ value }) => {
+      // Test runtime behavior for edge cases, including null which bypasses TypeScript types
+      expect(isValidPhoneNumber(value as any)).toBe(false);
     });
 
     it.each([
@@ -188,21 +184,26 @@ describe("isValidPhoneNumber", () => {
     });
 
     it.each([
-      "+81 90 1234 5678",
-      "+1 650 555 1234",
-    ])("should handle spaces in phone number: %s", (phoneNumber) => {
+      ["+81 90 1234 5678", "Japanese with spaces"],
+      ["+1 650 555 1234", "US with spaces"],
+      ["+44 7700 900123", "UK with spaces"],
+    ])("should handle %s: %s", (phoneNumber) => {
       expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
     it.each([
-      "+81-90-1234-5678",
-      "+1-650-555-1234",
-    ])("should handle hyphens in phone number: %s", (phoneNumber) => {
+      ["+81-90-1234-5678", "Japanese with hyphens"],
+      ["+1-650-555-1234", "US with hyphens"],
+      ["+44-7700-900123", "UK with hyphens"],
+    ])("should handle %s: %s", (phoneNumber) => {
       expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
 
-    it("should handle parentheses in phone numbers", () => {
-      expect(isValidPhoneNumber("+1 (650) 555-1234")).toBe(true);
+    it.each([
+      ["+1 (650) 555-1234", "US with parentheses and spaces"],
+      ["+81(90)1234-5678", "Japanese with parentheses and hyphens"],
+    ])("should handle %s: %s", (phoneNumber) => {
+      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
     });
   });
 
@@ -262,27 +263,4 @@ describe("isValidPhoneNumber", () => {
     });
   });
 
-  describe("Real-world number formats", () => {
-    it.each([
-      "+81 90-1234-5678",
-      "+81(90)1234-5678",
-    ])("should handle Japanese format: %s", (phoneNumber) => {
-      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
-    });
-
-    it.each([
-      "+1 (650) 555-1234",
-      "+1-650-555-1234",
-      "+1 650 555 1234",
-    ])("should handle US format: %s", (phoneNumber) => {
-      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
-    });
-
-    it.each([
-      "+44 7700 900123",
-      "+44-7700-900123",
-    ])("should handle UK format: %s", (phoneNumber) => {
-      expect(isValidPhoneNumber(phoneNumber)).toBe(true);
-    });
-  });
 });
