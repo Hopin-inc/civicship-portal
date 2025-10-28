@@ -81,9 +81,11 @@ export const presenterTransaction = (
 
   const counterparty = isOutgoing ? node.toWallet : node.fromWallet;
   const image =
-    counterparty?.type === GqlWalletType.Community
+    node.reason === GqlTransactionReason.PointIssued
       ? getSquareLogoPath()
-      : (counterparty?.user?.image ?? PLACEHOLDER_IMAGE);
+      : counterparty?.type === GqlWalletType.Community
+        ? getSquareLogoPath()
+        : (counterparty?.user?.image ?? PLACEHOLDER_IMAGE);
 
   return {
     id: node.id,
