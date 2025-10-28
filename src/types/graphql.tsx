@@ -1716,6 +1716,7 @@ export type GqlQuery = {
   evaluations: GqlEvaluationsConnection;
   membership?: Maybe<GqlMembership>;
   memberships: GqlMembershipsConnection;
+  myWallet?: Maybe<GqlWallet>;
   nftInstance?: Maybe<GqlNftInstance>;
   nftInstances: GqlNftInstancesConnection;
   opportunities: GqlOpportunitiesConnection;
@@ -2797,10 +2798,18 @@ export type GqlWallet = {
   currentPointView?: Maybe<GqlCurrentPointView>;
   id: Scalars["ID"]["output"];
   tickets?: Maybe<Array<GqlTicket>>;
+  /** @deprecated Use transactionsConnection for pagination support */
   transactions?: Maybe<Array<GqlTransaction>>;
+  transactionsConnection?: Maybe<GqlTransactionsConnection>;
   type: GqlWalletType;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
   user?: Maybe<GqlUser>;
+};
+
+export type GqlWalletTransactionsConnectionArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlTransactionSortInput>;
 };
 
 export type GqlWalletEdge = GqlEdge & {

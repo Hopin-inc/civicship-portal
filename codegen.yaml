@@ -1,8 +1,6 @@
 overwrite: true
 schema:
-  - "https://localhost:3000/graphql":
-      headers:
-        "X-Community-Id": ${NEXT_PUBLIC_COMMUNITY_ID}
+  - ./graphql.schema.json
 documents:
   - src/**/*.ts?(x)
 generates:

@@ -5,17 +5,18 @@ import { Button } from "@/components/ui/button";
 import { COMMUNITY_ID, getCommunityIdFromEnv } from "@/lib/communities/metadata";
 import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import WalletCard from "@/app/wallets/components/WalletCard";
+import WalletCard from "@/components/shared/WalletCard";
 import { GqlMembership, GqlRole, GqlWallet, useGetCommunityWalletQuery } from "@/types/graphql";
 import { Coins, Gift } from "lucide-react";
-import TransactionItem from "@/app/wallets/[id]/components/TransactionItem";
+import TransactionItem from "@/components/shared/TransactionItem";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { presenterTransaction } from "@/app/wallets/data/presenter";
+import { presenterTransaction } from "@/utils/transaction";
 import { getToWalletImage } from "@/app/admin/wallet/data/presenter";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
 import { logger } from "@/lib/logging";
 import Link from "next/link";
+import { toPointNumber } from "@/utils/bigint";
 
 export default function WalletPage() {
   const communityId = COMMUNITY_ID;
@@ -57,7 +58,7 @@ export default function WalletPage() {
   )?.node;
   const walletId = wallet?.id ?? "";
   const currentPointView = wallet?.currentPointView;
-  const currentPoint = BigInt(currentPointView?.currentPoint ?? "0");
+  const currentPoint = toPointNumber(currentPointView?.currentPoint, 0);
 
   const { connection, loadMoreRef, refetch: refetchTransactions } = useCommunityTransactions();
 
