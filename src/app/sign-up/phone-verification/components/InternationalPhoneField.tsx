@@ -64,6 +64,7 @@ export function InternationalPhoneField({
       inputComponent={PhoneInputInner}
       countrySelectComponent={CountrySelect}
       flagComponent={showFlags ? FlagComponent : undefined}
+      limitMaxLength
     />
   );
 }
