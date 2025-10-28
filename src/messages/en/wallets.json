@@ -11,7 +11,8 @@
     "balanceLabel": "Balance",
     "pointUnit": "pt",
     "currentPoints": "Current Points",
-    "accumulatedPoints": "Total Accumulated"
+    "accumulatedPoints": "Total Accumulated",
+    "refreshButton": "Refresh"
   },
   "DonatePoints": {
     "title": "Give Points",

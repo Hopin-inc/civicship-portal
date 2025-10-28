@@ -11,7 +11,8 @@
     "balanceLabel": "残高",
     "pointUnit": "pt",
     "currentPoints": "現在のポイント",
-    "accumulatedPoints": "累計ポイント"
+    "accumulatedPoints": "累計ポイント",
+    "refreshButton": "再読み込み"
   },
   "DonatePoints": {
     "title": "ポイントを贈る",
