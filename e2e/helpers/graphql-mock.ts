@@ -292,25 +292,21 @@ export async function waitForGraphQLOperation(
   operationName: string,
   timeout: number = 10000,
 ): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const timeoutId = setTimeout(() => {
-      reject(new Error(`Timeout waiting for GraphQL operation: ${operationName}`));
-    }, timeout);
-
-    page.on('request', (request) => {
-      if (request.url().includes('graphql')) {
-        try {
-          const postData = request.postDataJSON();
-          if (postData?.operationName === operationName) {
-            clearTimeout(timeoutId);
-            resolve();
-          }
-        } catch (e) {
-          // Ignore JSON parse errors
-        }
+  await page.waitForResponse(
+    (response) => {
+      if (!response.url().includes('graphql')) {
+        return false;
       }
-    });
-  });
+      try {
+        const postData = response.request().postDataJSON();
+        return postData?.operationName === operationName;
+      } catch (e) {
+        // Ignore JSON parse errors
+        return false;
+      }
+    },
+    { timeout },
+  );
 }
 
 /**

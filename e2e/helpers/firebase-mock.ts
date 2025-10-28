@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
 /**
  * Firebase Authentication Mock Helpers for E2E Testing
@@ -114,11 +114,11 @@ export async function submitPhoneNumber(page: Page, phoneNumber: string) {
   const phoneInput = page.getByRole('textbox');
   await phoneInput.fill(phoneNumber);
 
-  // Wait for validation
-  await page.waitForTimeout(500);
+  // Wait for submit button to be enabled (validation complete)
+  const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+  await expect(submitButton).toBeEnabled();
 
   // Click submit
-  const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
   await submitButton.click();
 
   // Wait for code verification screen
@@ -140,14 +140,14 @@ export async function enterVerificationCode(page: Page, code: string) {
 
   // Find the first OTP input slot
   const codeInputSlots = page.locator('input[inputmode="numeric"]');
-  const firstInput = await codeInputSlots.first();
+  const firstInput = codeInputSlots.first();
 
   // Click and fill the code
   await firstInput.click();
   await firstInput.fill(code);
 
-  // Wait for value to be set
-  await page.waitForTimeout(300);
+  // Wait for the last digit of the OTP to be filled
+  await expect(codeInputSlots.nth(5)).not.toBeEmpty();
 }
 
 /**
@@ -165,6 +165,8 @@ export async function submitVerificationCode(page: Page) {
  *
  * This is a convenience function that combines all steps.
  * Note: Actual code verification requires Firebase emulator or test setup.
+ * After calling this function, you should wait for the expected outcome
+ * (e.g., redirect, success message) in your test.
  *
  * @param page - Playwright page instance
  * @param phoneNumber - Phone number to verify
@@ -182,8 +184,7 @@ export async function completePhoneVerification(
   await enterVerificationCode(page, code);
   await submitVerificationCode(page);
 
-  // Wait for potential loading state
-  await page.waitForTimeout(1000);
+  // Note: Caller should wait for expected outcome (redirect, success message, etc.)
 }
 
 /**

@@ -214,14 +214,14 @@ test.describe('Authentication Integration - International Numbers', () => {
 
     // Enter Japanese mobile number
     await phoneInput.fill('9012345678');
-    await page.waitForTimeout(500);
 
     // Verify formatting
     const value = await phoneInput.inputValue();
     expect(value).toContain('+81');
 
-    // Submit
+    // Wait for validation and submit button to be enabled
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Should proceed to code verification
@@ -245,14 +245,14 @@ test.describe('Authentication Integration - International Numbers', () => {
 
     // Enter US mobile number
     await phoneInput.fill('6505551234');
-    await page.waitForTimeout(500);
 
     // Verify formatting
     const value = await phoneInput.inputValue();
     expect(value).toContain('+1');
 
-    // Submit
+    // Wait for validation and submit button to be enabled
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Should proceed to code verification
@@ -276,14 +276,14 @@ test.describe('Authentication Integration - International Numbers', () => {
 
     // Enter UK mobile number
     await phoneInput.fill('7911123456');
-    await page.waitForTimeout(500);
 
     // Verify formatting
     const value = await phoneInput.inputValue();
     expect(value).toContain('+44');
 
-    // Submit
+    // Wait for validation and submit button to be enabled
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Should proceed to code verification

@@ -1,4 +1,12 @@
 import { test, expect } from '@playwright/test';
+import {
+  mockIdentityCheckPhoneUser,
+  mockIdentityCheckWithDelay,
+  mockGraphQLAuthError,
+  mockGraphQLNetworkError,
+  mockInvalidGraphQLResponse,
+  MOCK_RESPONSES,
+} from '../helpers/graphql-mock';
 
 /**
  * E2E tests for complete phone verification flow with GraphQL integration
@@ -18,40 +26,19 @@ test.describe('Phone Verification - Complete Flow with GraphQL', () => {
   });
 
   test('should complete full new user flow', async ({ page, context }) => {
-    // Mock GraphQL endpoint
-    await page.route('**/graphql', async (route) => {
-      const request = route.request();
-      const postData = request.postDataJSON();
-
-      if (postData.operationName === 'identityCheckPhoneUser') {
-        // Mock new user response
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            data: {
-              identityCheckPhoneUser: {
-                status: 'NEW_USER',
-                user: null,
-                membership: null,
-              },
-            },
-          }),
-        });
-      } else {
-        await route.continue();
-      }
-    });
+    // Mock GraphQL endpoint for new user
+    await mockIdentityCheckPhoneUser(page, MOCK_RESPONSES.NEW_USER);
 
     // Step 1: Enter phone number
     const phoneInput = page.getByRole('textbox');
     await phoneInput.fill('9012345678');
 
-    // Wait for validation
-    await page.waitForTimeout(500);
+    // Wait for submit button to be enabled (validation complete)
+    const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
+    await expect(submitButton).toBeEnabled();
 
     // Submit phone number
-    const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
     await submitButton.click();
 
     // Step 2: Wait for code input screen
@@ -77,41 +64,15 @@ test.describe('Phone Verification - Complete Flow with GraphQL', () => {
 
   test('should handle existing user in same community', async ({ page }) => {
     // Mock GraphQL endpoint for existing user
-    await page.route('**/graphql', async (route) => {
-      const request = route.request();
-      const postData = request.postDataJSON();
-
-      if (postData.operationName === 'identityCheckPhoneUser') {
-        // Mock existing user in same community
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            data: {
-              identityCheckPhoneUser: {
-                status: 'EXISTING_SAME_COMMUNITY',
-                user: {
-                  id: 'user-123',
-                  name: 'Test User',
-                },
-                membership: {
-                  role: 'MEMBER',
-                },
-              },
-            },
-          }),
-        });
-      } else {
-        await route.continue();
-      }
-    });
+    await mockIdentityCheckPhoneUser(page, MOCK_RESPONSES.EXISTING_SAME_COMMUNITY);
 
     // Enter phone number and submit
     const phoneInput = page.getByRole('textbox');
     await phoneInput.fill('9012345678');
-    await page.waitForTimeout(500);
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Wait for code verification screen
@@ -122,41 +83,15 @@ test.describe('Phone Verification - Complete Flow with GraphQL', () => {
 
   test('should handle existing user from different community', async ({ page }) => {
     // Mock GraphQL endpoint for cross-community user
-    await page.route('**/graphql', async (route) => {
-      const request = route.request();
-      const postData = request.postDataJSON();
-
-      if (postData.operationName === 'identityCheckPhoneUser') {
-        // Mock existing user from different community
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            data: {
-              identityCheckPhoneUser: {
-                status: 'EXISTING_DIFFERENT_COMMUNITY',
-                user: {
-                  id: 'user-456',
-                  name: 'Cross Community User',
-                },
-                membership: {
-                  role: 'MEMBER',
-                },
-              },
-            },
-          }),
-        });
-      } else {
-        await route.continue();
-      }
-    });
+    await mockIdentityCheckPhoneUser(page, MOCK_RESPONSES.EXISTING_DIFFERENT_COMMUNITY);
 
     // Enter phone number and submit
     const phoneInput = page.getByRole('textbox');
     await phoneInput.fill('8012345678');
-    await page.waitForTimeout(500);
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Wait for code verification screen
@@ -169,9 +104,10 @@ test.describe('Phone Verification - Complete Flow with GraphQL', () => {
     // Enter and submit phone number
     const phoneInput = page.getByRole('textbox');
     await phoneInput.fill('9012345678');
-    await page.waitForTimeout(500);
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Verify phone number is displayed in code verification screen
@@ -184,9 +120,10 @@ test.describe('Phone Verification - Complete Flow with GraphQL', () => {
     // Enter and submit phone number
     const phoneInput = page.getByRole('textbox');
     await phoneInput.fill('9012345678');
-    await page.waitForTimeout(500);
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Wait for code verification screen
@@ -209,9 +146,10 @@ test.describe('Phone Verification - Complete Flow with GraphQL', () => {
     // Enter and submit phone number
     const phoneInput = page.getByRole('textbox');
     await phoneInput.fill('9012345678');
-    await page.waitForTimeout(500);
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Wait for code verification screen
@@ -240,9 +178,10 @@ test.describe('Phone Verification - Code Input UI', () => {
     // Navigate to code verification step
     const phoneInput = page.getByRole('textbox');
     await phoneInput.fill('9012345678');
-    await page.waitForTimeout(500);
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Wait for code verification screen
@@ -274,24 +213,8 @@ test.describe('Phone Verification - Code Input UI', () => {
   });
 
   test('should show loading state when verifying code', async ({ page }) => {
-    // Mock GraphQL to add delay
-    await page.route('**/graphql', async (route) => {
-      // Delay response to show loading state
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          data: {
-            identityCheckPhoneUser: {
-              status: 'NEW_USER',
-              user: null,
-              membership: null,
-            },
-          },
-        }),
-      });
-    });
+    // Mock GraphQL with delay to show loading state
+    await mockIdentityCheckWithDelay(page, MOCK_RESPONSES.NEW_USER, 1000);
 
     // Enter full 6-digit code
     const codeInputSlots = page.locator('input[inputmode="numeric"]');
@@ -315,17 +238,15 @@ test.describe('Phone Verification - GraphQL Error Handling', () => {
   });
 
   test('should handle GraphQL network errors', async ({ page }) => {
-    // Mock GraphQL to return network error
-    await page.route('**/graphql', async (route) => {
-      await route.abort('failed');
-    });
+    // Mock GraphQL network error
+    await mockGraphQLNetworkError(page);
 
     // Enter phone number and submit
     const phoneInput = page.getByRole('textbox');
     await phoneInput.fill('9012345678');
-    await page.waitForTimeout(500);
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Wait for code verification screen
@@ -345,30 +266,15 @@ test.describe('Phone Verification - GraphQL Error Handling', () => {
   });
 
   test('should handle GraphQL authentication errors', async ({ page }) => {
-    // Mock GraphQL to return auth error
-    await page.route('**/graphql', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          errors: [
-            {
-              message: 'Authentication required',
-              extensions: {
-                code: 'UNAUTHENTICATED',
-              },
-            },
-          ],
-        }),
-      });
-    });
+    // Mock GraphQL authentication error
+    await mockGraphQLAuthError(page);
 
     // Enter phone number and submit
     const phoneInput = page.getByRole('textbox');
     await phoneInput.fill('9012345678');
-    await page.waitForTimeout(500);
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Wait for code verification screen
@@ -378,37 +284,15 @@ test.describe('Phone Verification - GraphQL Error Handling', () => {
   });
 
   test('should handle invalid GraphQL responses', async ({ page }) => {
-    // Mock GraphQL to return invalid response
-    await page.route('**/graphql', async (route) => {
-      const request = route.request();
-      const postData = request.postDataJSON();
-
-      if (postData.operationName === 'identityCheckPhoneUser') {
-        // Return response without status
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            data: {
-              identityCheckPhoneUser: {
-                // Missing required 'status' field
-                user: null,
-                membership: null,
-              },
-            },
-          }),
-        });
-      } else {
-        await route.continue();
-      }
-    });
+    // Mock invalid GraphQL response
+    await mockInvalidGraphQLResponse(page);
 
     // Complete flow to code verification
     const phoneInput = page.getByRole('textbox');
     await phoneInput.fill('9012345678');
-    await page.waitForTimeout(500);
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible({
@@ -422,32 +306,11 @@ test.describe('Phone Verification - GraphQL Error Handling', () => {
 
 test.describe('Phone Verification - International Numbers with GraphQL', () => {
   test.beforeEach(async ({ page }) => {
+    // Mock GraphQL for new user
+    await mockIdentityCheckPhoneUser(page, MOCK_RESPONSES.NEW_USER);
+
     await page.goto('/sign-up/phone-verification');
     await page.waitForLoadState('networkidle');
-
-    // Mock GraphQL responses
-    await page.route('**/graphql', async (route) => {
-      const request = route.request();
-      const postData = request.postDataJSON();
-
-      if (postData.operationName === 'identityCheckPhoneUser') {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            data: {
-              identityCheckPhoneUser: {
-                status: 'NEW_USER',
-                user: null,
-                membership: null,
-              },
-            },
-          }),
-        });
-      } else {
-        await route.continue();
-      }
-    });
   });
 
   test('should handle US phone number verification', async ({ page }) => {
@@ -459,7 +322,6 @@ test.describe('Phone Verification - International Numbers with GraphQL', () => {
 
     // Enter US phone number
     await phoneInput.fill('6505551234');
-    await page.waitForTimeout(500);
 
     // Verify formatting
     const value = await phoneInput.inputValue();
@@ -467,6 +329,7 @@ test.describe('Phone Verification - International Numbers with GraphQL', () => {
 
     // Submit
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Should proceed to code verification
@@ -487,7 +350,6 @@ test.describe('Phone Verification - International Numbers with GraphQL', () => {
 
     // Enter UK mobile number
     await phoneInput.fill('7911123456');
-    await page.waitForTimeout(500);
 
     // Verify formatting
     const value = await phoneInput.inputValue();
@@ -495,6 +357,7 @@ test.describe('Phone Verification - International Numbers with GraphQL', () => {
 
     // Submit
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Should proceed to code verification
@@ -506,40 +369,19 @@ test.describe('Phone Verification - International Numbers with GraphQL', () => {
 
 test.describe('Phone Verification - Redirect Flow', () => {
   test('should handle redirect with next parameter for new user', async ({ page }) => {
+    // Mock GraphQL for new user
+    await mockIdentityCheckPhoneUser(page, MOCK_RESPONSES.NEW_USER);
+
     // Navigate with next parameter
     await page.goto('/sign-up/phone-verification?next=/dashboard');
     await page.waitForLoadState('networkidle');
 
-    // Mock GraphQL for new user
-    await page.route('**/graphql', async (route) => {
-      const request = route.request();
-      const postData = request.postDataJSON();
-
-      if (postData.operationName === 'identityCheckPhoneUser') {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            data: {
-              identityCheckPhoneUser: {
-                status: 'NEW_USER',
-                user: null,
-                membership: null,
-              },
-            },
-          }),
-        });
-      } else {
-        await route.continue();
-      }
-    });
-
     // Complete phone input
     const phoneInput = page.getByRole('textbox');
     await phoneInput.fill('9012345678');
-    await page.waitForTimeout(500);
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Wait for code verification
@@ -552,45 +394,19 @@ test.describe('Phone Verification - Redirect Flow', () => {
   });
 
   test('should handle redirect for existing user', async ({ page }) => {
+    // Mock GraphQL for existing user
+    await mockIdentityCheckPhoneUser(page, MOCK_RESPONSES.EXISTING_SAME_COMMUNITY);
+
     // Navigate with next parameter
     await page.goto('/sign-up/phone-verification?next=/profile');
     await page.waitForLoadState('networkidle');
 
-    // Mock GraphQL for existing user
-    await page.route('**/graphql', async (route) => {
-      const request = route.request();
-      const postData = request.postDataJSON();
-
-      if (postData.operationName === 'identityCheckPhoneUser') {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            data: {
-              identityCheckPhoneUser: {
-                status: 'EXISTING_SAME_COMMUNITY',
-                user: {
-                  id: 'user-123',
-                  name: 'Test User',
-                },
-                membership: {
-                  role: 'MEMBER',
-                },
-              },
-            },
-          }),
-        });
-      } else {
-        await route.continue();
-      }
-    });
-
     // Complete phone input
     const phoneInput = page.getByRole('textbox');
     await phoneInput.fill('9012345678');
-    await page.waitForTimeout(500);
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
+    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible({
