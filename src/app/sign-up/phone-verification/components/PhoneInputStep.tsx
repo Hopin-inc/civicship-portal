@@ -8,7 +8,7 @@ import {
   DEFAULT_COUNTRY,
   getAllowedCountries,
   SHOW_FLAGS,
-} from "@/config/phone-input-config";
+} from "@/app/sign-up/phone-verification/utils/phone-input-config";
 
 interface PhoneInputStepProps {
   phoneNumber: string | undefined;
