@@ -32,7 +32,7 @@ export function UserTicketsAndPoints({ ticketCount, pointCount }: UserTicketsAnd
         </Link>
       )}
       {currentCommunityConfig.enableFeatures.includes("points") && (
-        <Link href="/wallets">
+        <Link href="/wallets/me">
           <div className={pointClass}>
             <Wallet className="w-5 h-5 mb-0.5" />
             <p className="text-label-md">保有ポイント</p>

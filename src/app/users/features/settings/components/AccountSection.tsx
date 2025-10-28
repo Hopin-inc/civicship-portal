@@ -20,10 +20,10 @@ export default function AccountSection() {
   const { isAuthenticated, isPhoneVerified, isAuthenticating } = useAuth();
   const { gqlUser } = useUserProfileContext();
 
-  const didValue = gqlUser.didIssuanceRequests?.find(
+  const didValue = gqlUser?.didIssuanceRequests?.find(
     (req) => req?.status === GqlDidIssuanceStatus.Completed,
   )?.didValue;
-  const isNftWalletLinked = !!gqlUser.nftWallet?.id;
+  const isNftWalletLinked = !!gqlUser?.nftWallet?.id;
 
   return (
     <Card className="w-full max-w-md mx-auto">

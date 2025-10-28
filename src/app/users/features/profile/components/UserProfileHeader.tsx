@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Facebook, Home, Instagram, Twitter } from "lucide-react";
 import { useReadMore } from "@/hooks/useReadMore";
-import { PLACEHOLDER_IMAGE } from "@/utils";
 import { cn } from "@/lib/utils";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -41,7 +40,7 @@ export function UserProfileHeader({
         <div className="flex items-center w-full mb-4">
           <div className="flex-grow">
             <Avatar className="w-24 h-24">
-              <AvatarImage src={imageUrl || PLACEHOLDER_IMAGE} alt={name} />
+              <AvatarImage src={imageUrl} alt={name} />
               <AvatarFallback>{name?.charAt(0) || "U"}</AvatarFallback>
             </Avatar>
           </div>
@@ -49,7 +48,10 @@ export function UserProfileHeader({
             <div className="flex gap-2">
               <Link
                 href="/users/me/setting"
-                className={cn(buttonVariants({ variant: "tertiary", size: "md" }), "ml-auto text-black")}
+                className={cn(
+                  buttonVariants({ variant: "tertiary", size: "md" }),
+                  "ml-auto text-black",
+                )}
               >
                 設定
               </Link>

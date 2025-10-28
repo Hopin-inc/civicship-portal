@@ -1,6 +1,6 @@
 "use client";
 
-import { formatCurrency, getNameFromWallet } from "@/app/wallets/data/presenter";
+import { formatCurrency, getNameFromWallet } from "@/utils/transaction";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { GqlTransaction, GqlTransactionReason } from "@/types/graphql";

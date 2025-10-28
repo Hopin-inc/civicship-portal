@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { PLACEHOLDER_IMAGE } from "@/utils";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -60,7 +59,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
           <div className="w-24 h-24 rounded-full overflow-hidden bg-muted">
             {profileImage ? (
               <Avatar className="w-24 h-24">
-                <AvatarImage src={profileImage || PLACEHOLDER_IMAGE} alt={displayName} />
+                <AvatarImage src={profileImage} alt={displayName} />
                 <AvatarFallback>{displayName.charAt(0) || "U"}</AvatarFallback>
               </Avatar>
             ) : (
