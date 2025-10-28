@@ -5,18 +5,6 @@ import { cn } from "@/lib/utils";
 export interface OriginInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {}
 
-/**
- * Origin UI-styled Input component
- * Based on Origin UI (https://coss.com/origin/input)
- * 
- * Key features:
- * - shadow-xs for subtle depth
- * - ring-[3px] for prominent focus state
- * - aria-invalid styling support
- * - Special handling for search and file input types
- * - forwardRef support for react-phone-number-input compatibility
- * - iOS 16px font-size workaround to prevent zoom
- */
 const OriginInput = React.forwardRef<HTMLInputElement, OriginInputProps>(
   ({ className, type, style, ...props }, ref) => {
     return (
@@ -34,7 +22,7 @@ const OriginInput = React.forwardRef<HTMLInputElement, OriginInputProps>(
           className,
         )}
         ref={ref}
-        style={{ fontSize: "16px", ...style }} // Prevents zoom on iOS devices
+        style={{ fontSize: "16px", ...style }}
         {...props}
       />
     );

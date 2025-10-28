@@ -18,10 +18,6 @@ interface InternationalPhoneFieldProps {
   id?: string;
 }
 
-/**
- * PhoneInputInner wrapper that applies Origin UI comp-46 styling adjustments
- * to integrate seamlessly with the CountrySelect component
- */
 const PhoneInputInner = React.forwardRef<
   HTMLInputElement,
   React.ComponentProps<"input">
@@ -41,15 +37,6 @@ const PhoneInputInner = React.forwardRef<
 
 PhoneInputInner.displayName = "PhoneInputInner";
 
-/**
- * Pure presentational component for international phone number input
- * - No validation logic (handled by parent)
- * - No labels (handled by parent)
- * - No business logic
- * - Fully controlled via props
- * - Uses Origin UI-styled components (CountrySelect, Input) for consistent styling
- * - Integrates Origin UI comp-46 component styling via shadcn CLI
- */
 export function InternationalPhoneField({
   value,
   onChange,
@@ -76,7 +63,7 @@ export function InternationalPhoneField({
       className={className}
       inputComponent={PhoneInputInner}
       countrySelectComponent={CountrySelect}
-      flagComponent={showFlags ? FlagComponent : () => null}
+      flagComponent={showFlags ? FlagComponent : undefined}
     />
   );
 }
