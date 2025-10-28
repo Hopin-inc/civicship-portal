@@ -3,7 +3,7 @@
 import { ReactNode, useState } from "react";
 import { WalletContext } from "./WalletContext";
 import { useWalletActions } from "./useWalletActions";
-import { AppTransaction } from "../data/type";
+import { AppTransaction } from "../type";
 import { GqlTransactionsConnection } from "@/types/graphql";
 import { presenterTransaction } from "../data/presenter";
 

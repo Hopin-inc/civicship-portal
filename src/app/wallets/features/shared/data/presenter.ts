@@ -5,7 +5,7 @@ import {
   GqlWallet,
   GqlWalletType,
 } from "@/types/graphql";
-import { AppTransaction } from "@/app/wallets/features/shared/data/type";
+import { AppTransaction } from "@/app/wallets/features/shared/type";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export const formatCurrency = (amount: number): string => {

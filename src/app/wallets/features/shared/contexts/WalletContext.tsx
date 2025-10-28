@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { AppTransaction } from "../data/type";
+import { AppTransaction } from "../type";
 
 export interface WalletContextValue {
   walletId: string;
