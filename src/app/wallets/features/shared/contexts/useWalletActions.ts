@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { toPointNumber } from "@/utils/bigint";
 import { logger } from "@/lib/logging";
-import { presenterTransaction } from "../data/presenter";
+import { presenterTransaction } from "@/utils/transaction";
 
 interface WalletActionDeps {
   walletId: string;

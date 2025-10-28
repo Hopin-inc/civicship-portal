@@ -5,7 +5,7 @@ import { WalletContext } from "./WalletContext";
 import { useWalletActions } from "./useWalletActions";
 import { AppTransaction } from "../type";
 import { GqlTransactionsConnection } from "@/types/graphql";
-import { presenterTransaction } from "../data/presenter";
+import { presenterTransaction } from "@/utils/transaction";
 
 export interface WalletProviderProps {
   children: ReactNode;

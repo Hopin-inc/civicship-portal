@@ -12,31 +12,17 @@ export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("ja-JP").format(amount);
 };
 
-export const presenterTransaction = (
-  node: GqlTransaction | null | undefined,
-  walletId: string,
-): AppTransaction | null => {
-  if (!node) return null;
-  const from = getNameFromWallet(node.fromWallet);
-  const to = getNameFromWallet(node.toWallet);
-  const rawPoint = node.fromPointChange ?? 0;
-  const isOutgoing = node.fromWallet?.id === walletId;
-  const signedPoint = isOutgoing ? -Math.abs(rawPoint) : Math.abs(rawPoint);
-  return {
-    id: node.id,
-    reason: node.reason,
-    from,
-    to,
-    source: "",
-    comment: node.comment ?? "",
-    transferPoints: signedPoint,
-    transferredAt: node.createdAt ? new Date(node.createdAt).toISOString() : "",
-    description: formatTransactionDescription(node.reason, from, to, signedPoint),
-    didValue:
-      node.toWallet?.user?.didIssuanceRequests?.find(
-        (req) => req?.status === GqlDidIssuanceStatus.Completed,
-      )?.didValue ?? null,
-  };
+export const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
+  if (!wallet) return "";
+  const communityName = currentCommunityConfig.title;
+  switch (wallet.type) {
+    case GqlWalletType.Member:
+      return wallet.user?.name ?? "";
+    case GqlWalletType.Community:
+      return communityName;
+    default:
+      return "";
+  }
 };
 
 const formatTransactionDescription = (
@@ -81,15 +67,29 @@ const formatTransactionDescription = (
   }
 };
 
-export const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
-  if (!wallet) return "";
-  const communityName = currentCommunityConfig.title;
-  switch (wallet.type) {
-    case GqlWalletType.Member:
-      return wallet.user?.name ?? "";
-    case GqlWalletType.Community:
-      return communityName;
-    default:
-      return "";
-  }
+export const presenterTransaction = (
+  node: GqlTransaction | null | undefined,
+  walletId: string,
+): AppTransaction | null => {
+  if (!node) return null;
+  const from = getNameFromWallet(node.fromWallet);
+  const to = getNameFromWallet(node.toWallet);
+  const rawPoint = node.fromPointChange ?? 0;
+  const isOutgoing = node.fromWallet?.id === walletId;
+  const signedPoint = isOutgoing ? -Math.abs(rawPoint) : Math.abs(rawPoint);
+  return {
+    id: node.id,
+    reason: node.reason,
+    from,
+    to,
+    source: "",
+    comment: node.comment ?? "",
+    transferPoints: signedPoint,
+    transferredAt: node.createdAt ? new Date(node.createdAt).toISOString() : "",
+    description: formatTransactionDescription(node.reason, from, to, signedPoint),
+    didValue:
+      node.toWallet?.user?.didIssuanceRequests?.find(
+        (req) => req?.status === GqlDidIssuanceStatus.Completed,
+      )?.didValue ?? null,
+  };
 };
