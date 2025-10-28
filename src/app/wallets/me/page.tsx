@@ -1,5 +1,5 @@
-import { WalletOverview } from "@/app/wallets/features/overview/components/WalletOverview";
-import { TransactionList } from "@/app/wallets/features/transactions/components/TransactionList";
+import { WalletOverview } from "@/app/wallets/features/overview/WalletOverview";
+import { TransactionList } from "@/app/wallets/features/transactions/TransactionList";
 
 export default function WalletMePage() {
   return (

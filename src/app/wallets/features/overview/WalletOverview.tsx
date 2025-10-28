@@ -13,12 +13,7 @@ import { useWalletContext } from "@/app/wallets/features/shared/contexts/WalletC
 
 export function WalletOverview() {
   const router = useRouter();
-  const {
-    currentPoint,
-    isLoading: isLoadingWallet,
-    error: walletError,
-    refresh,
-  } = useWalletContext();
+  const { currentPoint, isLoadingWallet, error, refresh } = useWalletContext();
 
   const headerConfig = useMemo(
     () => ({
@@ -26,7 +21,7 @@ export function WalletOverview() {
       showBackButton: true,
       showLogo: false,
     }),
-    []
+    [],
   );
   useHeaderConfig(headerConfig);
 
@@ -34,7 +29,7 @@ export function WalletOverview() {
     router.push(`/wallets/donate?currentPoint=${currentPoint}&tab=history`);
 
   if (isLoadingWallet) return <LoadingIndicator />;
-  if (walletError) return <ErrorState title={"ウォレット"} />;
+  if (error) return <ErrorState title={"ウォレット"} />;
 
   return (
     <div className="space-y-6">
