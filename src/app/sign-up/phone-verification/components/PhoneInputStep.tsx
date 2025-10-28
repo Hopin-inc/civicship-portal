@@ -78,7 +78,7 @@ export function PhoneInputStep({
             className="px-4"
             size="sm"
             variant="text"
-            disabled={isReloading}
+            disabled={isSubmitting || isVerifying || isReloading}
             onClick={() => {
               setIsReloading(true);
               setTimeout(() => {
