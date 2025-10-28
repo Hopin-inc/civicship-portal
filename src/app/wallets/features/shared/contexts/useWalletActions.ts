@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { toPointNumber } from "@/utils/bigint";
 import { logger } from "@/lib/logging";
 import { presenterTransaction } from "@/utils/transaction";
+import { AppTransaction } from "@/app/wallets/features/shared/type";
 
 interface WalletActionDeps {
   walletId: string;
@@ -42,7 +43,7 @@ export function useWalletActions({
 
       const newTransactions = (result.transactions.edges ?? [])
         .map((edge) => presenterTransaction(edge?.node, walletId))
-        .filter((tx): tx is any => tx !== null);
+        .filter((tx): tx is AppTransaction => tx !== null);
 
       setTransactions(newTransactions);
       setHasNextPage(result.transactions.pageInfo?.hasNextPage ?? false);
@@ -73,7 +74,7 @@ export function useWalletActions({
 
       const newTransactions = (result.transactions.edges ?? [])
         .map((edge) => presenterTransaction(edge?.node, walletId))
-        .filter((tx): tx is any => tx !== null);
+        .filter((tx): tx is AppTransaction => tx !== null);
 
       setTransactions((prev) => {
         const existingIds = new Set(prev.map((tx) => tx.id));
