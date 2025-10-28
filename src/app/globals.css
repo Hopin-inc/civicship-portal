@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import 'react-phone-number-input/style.css';
-
 @layer base {
   :root { /* Primitive Colors */
     --transparent: 0 0% 100% 0;
