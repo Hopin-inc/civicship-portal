@@ -2,6 +2,7 @@
 
 import React from "react";
 import PhoneInput, { Country } from "react-phone-number-input";
+import metadata from "libphonenumber-js/metadata.max.json";
 import { OriginInput } from "./OriginInput";
 import { CountrySelect, FlagComponent } from "./PhoneCountrySelect";
 import { cn } from "@/lib/utils";
@@ -64,6 +65,7 @@ export function InternationalPhoneField({
       inputComponent={PhoneInputInner}
       countrySelectComponent={CountrySelect}
       flagComponent={showFlags ? FlagComponent : undefined}
+      metadata={metadata}
       limitMaxLength
     />
   );
