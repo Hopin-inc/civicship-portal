@@ -24,10 +24,10 @@ describe("PhoneInputStep", () => {
   });
 
   it("should display phone number value", () => {
-    render(<PhoneInputStep {...defaultProps} phoneNumber="09012345678" />);
+    render(<PhoneInputStep {...defaultProps} phoneNumber="+819012345678" />);
 
     const input = screen.getByLabelText("電話番号") as HTMLInputElement;
-    expect(input.value).toBe("09012345678");
+    expect(input.value).toBe("+81 90 1234 5678");
   });
 
   it("should call onPhoneNumberChange when input changes", () => {
@@ -37,7 +37,7 @@ describe("PhoneInputStep", () => {
     const input = screen.getByLabelText("電話番号");
     fireEvent.change(input, { target: { value: "09012345678" } });
 
-    expect(onPhoneNumberChange).toHaveBeenCalledWith("09012345678");
+    expect(onPhoneNumberChange).toHaveBeenCalledWith("+819012345678");
   });
 
   it("should call onSubmit when form is submitted", () => {

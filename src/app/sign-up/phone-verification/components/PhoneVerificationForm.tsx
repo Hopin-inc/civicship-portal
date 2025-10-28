@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { VerificationStep } from "../types";
-import { validatePhoneNumber } from "../utils/validation";
+import { isValidPhoneNumber } from "../utils/phone-number";
 import { useResendTimer } from "../hooks/useResendTimer";
 import { useRecaptchaManager } from "../hooks/useRecaptchaManager";
 import { usePhoneSubmission } from "../hooks/usePhoneSubmission";
@@ -46,17 +46,17 @@ export function PhoneVerificationForm() {
     updateAuthState,
   );
 
-  const { isValid: isPhoneValid, formattedPhone } = validatePhoneNumber(phoneNumber);
+  const isPhoneValid = isValidPhoneNumber(phoneNumber);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isPhoneValid) {
+    if (!isPhoneValid || !phoneNumber) {
       toast.error("有効な電話番号を入力してください");
       return;
     }
 
-    const result = await phoneSubmission.submit(formattedPhone);
+    const result = await phoneSubmission.submit(phoneNumber);
 
     if (result.success) {
       setStep("code");
@@ -66,7 +66,12 @@ export function PhoneVerificationForm() {
   };
 
   const handleResendCode = async () => {
-    const result = await phoneSubmission.resend(formattedPhone);
+    if (!phoneNumber) {
+      toast.error("電話番号が設定されていません");
+      return;
+    }
+
+    const result = await phoneSubmission.resend(phoneNumber);
 
     if (result.success) {
       if (result.message) {

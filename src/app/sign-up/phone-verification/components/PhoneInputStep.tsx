@@ -3,10 +3,17 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
+import { InternationalPhoneField } from "./InternationalPhoneField";
+import {
+  DEFAULT_COUNTRY,
+  getAllowedCountries,
+  COUNTRY_LABELS,
+  SHOW_FLAGS,
+} from "@/config/phone-input-config";
 
 interface PhoneInputStepProps {
   phoneNumber: string;
-  onPhoneNumberChange: (value: string) => void;
+  onPhoneNumberChange: (value: string | undefined) => void;
   onSubmit: (e: React.FormEvent) => void;
   isSubmitting: boolean;
   isRateLimited: boolean;
@@ -41,14 +48,16 @@ export function PhoneInputStep({
           <label htmlFor="phone" className="text-sm font-medium">
             電話番号
           </label>
-          <input
+          <InternationalPhoneField
             id="phone"
-            type="tel"
             value={phoneNumber}
-            onChange={(e) => onPhoneNumberChange(e.target.value)}
+            onChange={onPhoneNumberChange}
+            defaultCountry={DEFAULT_COUNTRY}
+            countries={getAllowedCountries()}
+            labels={COUNTRY_LABELS}
+            showFlags={SHOW_FLAGS}
             placeholder="例）09012345678"
-            className="w-full h-12 px-3 border rounded-md"
-            required
+            disabled={isSubmitting || isVerifying || isReloading}
           />
         </div>
         <div className="flex flex-col items-center gap-8 w-full mx-auto">
