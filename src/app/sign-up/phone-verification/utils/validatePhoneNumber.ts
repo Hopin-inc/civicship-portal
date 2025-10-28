@@ -15,7 +15,13 @@ export const isValidPhoneNumber = (
     
     const type = parsed.getType();
     return type === "MOBILE" || type === "FIXED_LINE_OR_MOBILE";
-  } catch {
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.debug("Phone number parsing failed", {
+        phoneNumber,
+        error: String(error),
+      });
+    }
     return false;
   }
 };
