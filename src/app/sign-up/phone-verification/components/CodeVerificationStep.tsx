@@ -54,7 +54,7 @@ export function CodeVerificationStep({
 
   const handleBackToPhone = async () => {
     try {
-      await phoneAuth.clearRecaptcha?.();
+      phoneAuth.clearRecaptcha?.();
     } catch (error) {
       logger.error("reCAPTCHAクリアエラー:", { error });
     } finally {
@@ -76,7 +76,7 @@ export function CodeVerificationStep({
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-6">
         <div className="flex justify-center py-4">
           <InputOTP maxLength={6} value={verificationCode} onChange={onCodeChange}>
             <InputOTPGroup>
@@ -86,7 +86,7 @@ export function CodeVerificationStep({
             </InputOTPGroup>
           </InputOTP>
         </div>
-        <div className="flex flex-col items-center gap-8 w-full mx-auto">
+        <div className="flex flex-col items-center gap-4 w-full mx-auto">
           <Button
             type="submit"
             className="w-full h-12"
@@ -97,28 +97,35 @@ export function CodeVerificationStep({
               isReloading
             }
           >
-            {isVerifying ? "検証中..." : "コードを検証"}
+            {isVerifying ? "認証中..." : "認証する"}
           </Button>
           <Button
             type="button"
-            variant="tertiary"
-            className="w-full h-12"
+            variant="text"
+            className="w-full h-10"
             disabled={isResendDisabled || isPhoneSubmitting || isReloading}
             onClick={onResend}
           >
             {isResendDisabled
-              ? `${countdown}秒後に再送信できます`
+              ? `${countdown}秒後に再送できます`
               : isPhoneSubmitting
                 ? "送信中..."
-                : "コードを再送信"}
+                : "認証コードを再送"}
           </Button>
           <div
             id="recaptcha-container"
             ref={recaptchaContainerRef}
             style={{ display: showRecaptcha ? "block" : "none" }}
           ></div>
-          <Button type="button" variant={"text"} disabled={isReloading} onClick={handleBackToPhone}>
-            電話番号を再入力
+          <Button
+            type="button"
+            className="px-4"
+            size="sm"
+            variant={"text"}
+            disabled={isReloading}
+            onClick={handleBackToPhone}
+          >
+            電話番号を変更する
           </Button>
         </div>
       </form>
